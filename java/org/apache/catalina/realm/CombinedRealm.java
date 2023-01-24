@@ -38,10 +38,9 @@ import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSName;
 
 /**
- * Realm implementation that contains one or more realms. Authentication is
- * attempted for each realm in the order they were configured. If any realm
- * authenticates the user then the authentication succeeds. When combining
- * realms usernames should be unique across all combined realms.
+ * Realm implementation that contains one or more realms. Authentication is attempted for each realm in the order they
+ * were configured. If any realm authenticates the user then the authentication succeeds. When combining realms
+ * usernames should be unique across all combined realms.
  */
 public class CombinedRealm extends RealmBase {
 
@@ -53,17 +52,15 @@ public class CombinedRealm extends RealmBase {
     protected final List<Realm> realms = new ArrayList<>();
 
     /**
-     * Add a realm to the list of realms that will be used to authenticate
-     * users.
+     * Add a realm to the list of realms that will be used to authenticate users.
+     *
      * @param theRealm realm which should be wrapped by the combined realm
      */
     public void addRealm(Realm theRealm) {
         realms.add(theRealm);
 
         if (log.isDebugEnabled()) {
-            sm.getString("combinedRealm.addRealm",
-                    theRealm.getClass().getName(),
-                    Integer.toString(realms.size()));
+            sm.getString("combinedRealm.addRealm", theRealm.getClass().getName(), Integer.toString(realms.size()));
         }
     }
 
@@ -75,8 +72,7 @@ public class CombinedRealm extends RealmBase {
         ObjectName[] result = new ObjectName[realms.size()];
         for (Realm realm : realms) {
             if (realm instanceof RealmBase) {
-                result[realms.indexOf(realm)] =
-                    ((RealmBase) realm).getObjectName();
+                result[realms.indexOf(realm)] = ((RealmBase) realm).getObjectName();
             }
         }
         return result;
@@ -90,42 +86,34 @@ public class CombinedRealm extends RealmBase {
     }
 
     /**
-     * Return the Principal associated with the specified username, which
-     * matches the digest calculated using the given parameters using the
-     * method described in RFC 2069; otherwise return <code>null</code>.
+     * Return the Principal associated with the specified username, which matches the digest calculated using the given
+     * parameters using the method described in RFC 2069; otherwise return <code>null</code>.
      *
-     * @param username Username of the Principal to look up
+     * @param username     Username of the Principal to look up
      * @param clientDigest Digest which has been submitted by the client
-     * @param nonce Unique (or supposedly unique) token which has been used
-     * for this request
-     * @param realmName Realm name
-     * @param md5a2 Second MD5 digest used to calculate the digest :
-     * MD5(Method + ":" + uri)
+     * @param nonce        Unique (or supposedly unique) token which has been used for this request
+     * @param realmName    Realm name
+     * @param md5a2        Second MD5 digest used to calculate the digest : MD5(Method + ":" + uri)
      */
     @Override
-    public Principal authenticate(String username, String clientDigest,
-            String nonce, String nc, String cnonce, String qop,
-            String realmName, String md5a2) {
+    public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
+            String qop, String realmName, String md5a2) {
         Principal authenticatedUser = null;
 
         for (Realm realm : realms) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("combinedRealm.authStart", username,
-                        realm.getClass().getName()));
+                log.debug(sm.getString("combinedRealm.authStart", username, realm.getClass().getName()));
             }
 
-            authenticatedUser = realm.authenticate(username, clientDigest, nonce,
-                    nc, cnonce, qop, realmName, md5a2);
+            authenticatedUser = realm.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realmName, md5a2);
 
             if (authenticatedUser == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authFail", username,
-                            realm.getClass().getName()));
+                    log.debug(sm.getString("combinedRealm.authFail", username, realm.getClass().getName()));
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSuccess",
-                            username, realm.getClass().getName()));
+                    log.debug(sm.getString("combinedRealm.authSuccess", username, realm.getClass().getName()));
                 }
                 break;
             }
@@ -135,8 +123,7 @@ public class CombinedRealm extends RealmBase {
 
 
     /**
-     * Return the Principal associated with the specified user name otherwise
-     * return <code>null</code>.
+     * Return the Principal associated with the specified user name otherwise return <code>null</code>.
      *
      * @param username User name of the Principal to look up
      */
@@ -146,21 +133,18 @@ public class CombinedRealm extends RealmBase {
 
         for (Realm realm : realms) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("combinedRealm.authStart", username,
-                        realm.getClass().getName()));
+                log.debug(sm.getString("combinedRealm.authStart", username, realm.getClass().getName()));
             }
 
             authenticatedUser = realm.authenticate(username);
 
             if (authenticatedUser == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authFail", username,
-                            realm.getClass().getName()));
+                    log.debug(sm.getString("combinedRealm.authFail", username, realm.getClass().getName()));
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSuccess",
-                            username, realm.getClass().getName()));
+                    log.debug(sm.getString("combinedRealm.authSuccess", username, realm.getClass().getName()));
                 }
                 break;
             }
@@ -170,12 +154,11 @@ public class CombinedRealm extends RealmBase {
 
 
     /**
-     * Return the Principal associated with the specified username and
-     * credentials, if there is one; otherwise return <code>null</code>.
+     * Return the Principal associated with the specified username and credentials, if there is one; otherwise return
+     * <code>null</code>.
      *
-     * @param username Username of the Principal to look up
-     * @param credentials Password or other credentials to use in
-     *  authenticating this username
+     * @param username    Username of the Principal to look up
+     * @param credentials Password or other credentials to use in authenticating this username
      */
     @Override
     public Principal authenticate(String username, String credentials) {
@@ -183,21 +166,18 @@ public class CombinedRealm extends RealmBase {
 
         for (Realm realm : realms) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("combinedRealm.authStart", username,
-                        realm.getClass().getName()));
+                log.debug(sm.getString("combinedRealm.authStart", username, realm.getClass().getName()));
             }
 
             authenticatedUser = realm.authenticate(username, credentials);
 
             if (authenticatedUser == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authFail", username,
-                            realm.getClass().getName()));
+                    log.debug(sm.getString("combinedRealm.authFail", username, realm.getClass().getName()));
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSuccess",
-                            username, realm.getClass().getName()));
+                    log.debug(sm.getString("combinedRealm.authSuccess", username, realm.getClass().getName()));
                 }
                 break;
             }
@@ -213,11 +193,10 @@ public class CombinedRealm extends RealmBase {
      */
     @Override
     public void setContainer(Container container) {
-        for(Realm realm : realms) {
+        for (Realm realm : realms) {
             // Set the realmPath for JMX naming
             if (realm instanceof RealmBase) {
-                ((RealmBase) realm).setRealmPath(
-                        getRealmPath() + "/realm" + realms.indexOf(realm));
+                ((RealmBase) realm).setRealmPath(getRealmPath() + "/realm" + realms.indexOf(realm));
             }
 
             // Set the container for sub-realms. Mainly so logging works.
@@ -228,12 +207,11 @@ public class CombinedRealm extends RealmBase {
 
 
     /**
-     * Prepare for the beginning of active use of the public methods of this
-     * component and implement the requirements of
+     * Prepare for the beginning of active use of the public methods of this component and implement the requirements of
      * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
+     *                                   used
      */
     @Override
     protected void startInternal() throws LifecycleException {
@@ -248,8 +226,7 @@ public class CombinedRealm extends RealmBase {
                 } catch (LifecycleException e) {
                     // If realm doesn't start can't authenticate against it
                     iter.remove();
-                    log.error(sm.getString("combinedRealm.realmStartFail",
-                            realm.getClass().getName()), e);
+                    log.error(sm.getString("combinedRealm.realmStartFail", realm.getClass().getName()), e);
                 }
             }
         }
@@ -264,14 +241,12 @@ public class CombinedRealm extends RealmBase {
 
 
     /**
-     * Gracefully terminate the active use of the public methods of this
-     * component and implement the requirements of
+     * Gracefully terminate the active use of the public methods of this component and implement the requirements of
      * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
+     * @exception LifecycleException if this component detects a fatal error that needs to be reported
      */
-     @Override
+    @Override
     protected void stopInternal() throws LifecycleException {
         // Stop this realm, then the sub-realms (reverse order to start)
         super.stopInternal();
@@ -309,37 +284,34 @@ public class CombinedRealm extends RealmBase {
     }
 
     /**
-     * Return the Principal associated with the specified chain of X509
-     * client certificates.  If there is none, return <code>null</code>.
+     * Return the Principal associated with the specified chain of X509 client certificates. If there is none, return
+     * <code>null</code>.
      *
-     * @param certs Array of client certificates, with the first one in
-     *  the array being the certificate of the client itself.
+     * @param certs Array of client certificates, with the first one in the array being the certificate of the client
+     *                  itself.
      */
     @Override
     public Principal authenticate(X509Certificate[] certs) {
         Principal authenticatedUser = null;
         String username = null;
-        if (certs != null && certs.length >0) {
+        if (certs != null && certs.length > 0) {
             username = certs[0].getSubjectX500Principal().toString();
         }
 
         for (Realm realm : realms) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("combinedRealm.authStart", username,
-                        realm.getClass().getName()));
+                log.debug(sm.getString("combinedRealm.authStart", username, realm.getClass().getName()));
             }
 
             authenticatedUser = realm.authenticate(certs);
 
             if (authenticatedUser == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authFail", username,
-                            realm.getClass().getName()));
+                    log.debug(sm.getString("combinedRealm.authFail", username, realm.getClass().getName()));
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSuccess",
-                            username, realm.getClass().getName()));
+                    log.debug(sm.getString("combinedRealm.authSuccess", username, realm.getClass().getName()));
                 }
                 break;
             }
@@ -364,21 +336,18 @@ public class CombinedRealm extends RealmBase {
 
             for (Realm realm : realms) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authStart",
-                            gssName, realm.getClass().getName()));
+                    log.debug(sm.getString("combinedRealm.authStart", gssName, realm.getClass().getName()));
                 }
 
                 authenticatedUser = realm.authenticate(gssContext, storeCred);
 
                 if (authenticatedUser == null) {
                     if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("combinedRealm.authFail",
-                                gssName, realm.getClass().getName()));
+                        log.debug(sm.getString("combinedRealm.authFail", gssName, realm.getClass().getName()));
                     }
                 } else {
                     if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("combinedRealm.authSuccess",
-                                gssName, realm.getClass().getName()));
+                        log.debug(sm.getString("combinedRealm.authSuccess", gssName, realm.getClass().getName()));
                     }
                     break;
                 }
@@ -399,21 +368,18 @@ public class CombinedRealm extends RealmBase {
 
         for (Realm realm : realms) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("combinedRealm.authStart",
-                        gssName, realm.getClass().getName()));
+                log.debug(sm.getString("combinedRealm.authStart", gssName, realm.getClass().getName()));
             }
 
             authenticatedUser = realm.authenticate(gssName, gssCredential);
 
             if (authenticatedUser == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authFail",
-                            gssName, realm.getClass().getName()));
+                    log.debug(sm.getString("combinedRealm.authFail", gssName, realm.getClass().getName()));
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSuccess",
-                            gssName, realm.getClass().getName()));
+                    log.debug(sm.getString("combinedRealm.authSuccess", gssName, realm.getClass().getName()));
                 }
                 break;
             }
@@ -438,9 +404,8 @@ public class CombinedRealm extends RealmBase {
     protected String getPassword(String username) {
         // This method should never be called
         // Stack trace will show where this was called from
-        UnsupportedOperationException uoe =
-            new UnsupportedOperationException(
-                    sm.getString("combinedRealm.getPassword"));
+        UnsupportedOperationException uoe = new UnsupportedOperationException(
+                sm.getString("combinedRealm.getPassword"));
         log.error(sm.getString("combinedRealm.unexpectedMethod"), uoe);
         throw uoe;
     }
@@ -449,9 +414,8 @@ public class CombinedRealm extends RealmBase {
     protected Principal getPrincipal(String username) {
         // This method should never be called
         // Stack trace will show where this was called from
-        UnsupportedOperationException uoe =
-            new UnsupportedOperationException(
-                    sm.getString("combinedRealm.getPrincipal"));
+        UnsupportedOperationException uoe = new UnsupportedOperationException(
+                sm.getString("combinedRealm.getPrincipal"));
         log.error(sm.getString("combinedRealm.unexpectedMethod"), uoe);
         throw uoe;
     }
@@ -479,8 +443,7 @@ public class CombinedRealm extends RealmBase {
     private class CombinedRealmCredentialHandler implements CredentialHandler {
 
         @Override
-        public boolean matches(String inputCredentials,
-                String storedCredentials) {
+        public boolean matches(String inputCredentials, String storedCredentials) {
             for (Realm realm : realms) {
                 if (realm.getCredentialHandler().matches(inputCredentials, storedCredentials)) {
                     return true;
@@ -501,7 +464,7 @@ public class CombinedRealm extends RealmBase {
                 }
             }
             return null;
-       }
+        }
 
     }
 }
