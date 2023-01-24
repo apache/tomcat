@@ -32,9 +32,8 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.codec.binary.Base64;
 
 /**
- * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP BASIC
- * Authentication, as outlined in RFC 2617:  "HTTP Authentication: Basic
- * and Digest Access Authentication."
+ * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP BASIC Authentication, as outlined in RFC 2617: "HTTP
+ * Authentication: Basic and Digest Access Authentication."
  *
  * @author Craig R. McClanahan
  */
@@ -65,7 +64,6 @@ public class BasicAuthenticator extends AuthenticatorBase {
     }
 
 
-
     public boolean getTrimCredentials() {
         return trimCredentials;
     }
@@ -77,17 +75,14 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
 
     @Override
-    protected boolean doAuthenticate(Request request, HttpServletResponse response)
-            throws IOException {
+    protected boolean doAuthenticate(Request request, HttpServletResponse response) throws IOException {
 
         if (checkForCachedAuthentication(request, response, true)) {
             return true;
         }
 
         // Validate any credentials already included with this request
-        MessageBytes authorization =
-            request.getCoyoteRequest().getMimeHeaders()
-            .getValue("authorization");
+        MessageBytes authorization = request.getCoyoteRequest().getMimeHeaders().getValue("authorization");
 
         if (authorization != null) {
             authorization.toBytes();
@@ -100,12 +95,10 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
                 Principal principal = context.getRealm().authenticate(username, password);
                 if (principal != null) {
-                    register(request, response, principal,
-                        HttpServletRequest.BASIC_AUTH, username, password);
+                    register(request, response, principal, HttpServletRequest.BASIC_AUTH, username, password);
                     return true;
                 }
-            }
-            catch (IllegalArgumentException iae) {
+            } catch (IllegalArgumentException iae) {
                 if (log.isDebugEnabled()) {
                     log.debug("Invalid Authorization" + iae.getMessage());
                 }
@@ -142,9 +135,8 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Parser for an HTTP Authorization header for BASIC authentication
-     * as per RFC 2617 section 2, and the Base64 encoded credentials as
-     * per RFC 2045 section 6.8.
+     * Parser for an HTTP Authorization header for BASIC authentication as per RFC 2617 section 2, and the Base64
+     * encoded credentials as per RFC 2045 section 6.8.
      */
     public static class BasicCredentials {
 
@@ -163,16 +155,14 @@ public class BasicAuthenticator extends AuthenticatorBase {
         private String password = null;
 
         /**
-         * Parse the HTTP Authorization header for BASIC authentication
-         * as per RFC 2617 section 2, and the Base64 encoded credentials
-         * as per RFC 2045 section 6.8.
+         * Parse the HTTP Authorization header for BASIC authentication as per RFC 2617 section 2, and the Base64
+         * encoded credentials as per RFC 2045 section 6.8.
          *
          * @param input   The header value to parse in-place
-         * @param charset The character set to use to convert the bytes to a
-         *                string
+         * @param charset The character set to use to convert the bytes to a string
          *
-         * @throws IllegalArgumentException If the header does not conform
-         *                                  to RFC 2617
+         * @throws IllegalArgumentException If the header does not conform to RFC 2617
+         *
          * @deprecated Unused. Will be removed in Tomcat 10. Use 3-arg constructor
          */
         @Deprecated
@@ -181,18 +171,14 @@ public class BasicAuthenticator extends AuthenticatorBase {
         }
 
         /**
-         * Parse the HTTP Authorization header for BASIC authentication
-         * as per RFC 2617 section 2, and the Base64 encoded credentials
-         * as per RFC 2045 section 6.8.
+         * Parse the HTTP Authorization header for BASIC authentication as per RFC 2617 section 2, and the Base64
+         * encoded credentials as per RFC 2045 section 6.8.
          *
          * @param input           The header value to parse in-place
-         * @param charset         The character set to use to convert the bytes
-         *                        to a string
-         * @param trimCredentials Should leading and trailing whitespace be
-         *                        removed from the parsed credentials
+         * @param charset         The character set to use to convert the bytes to a string
+         * @param trimCredentials Should leading and trailing whitespace be removed from the parsed credentials
          *
-         * @throws IllegalArgumentException If the header does not conform
-         *                                  to RFC 2617
+         * @throws IllegalArgumentException If the header does not conform to RFC 2617
          */
         public BasicCredentials(ByteChunk input, Charset charset, boolean trimCredentials)
                 throws IllegalArgumentException {
@@ -209,8 +195,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
         /**
          * Trivial accessor.
          *
-         * @return  the decoded username token as a String, which is
-         *          never be <code>null</code>, but can be empty.
+         * @return the decoded username token as a String, which is never be <code>null</code>, but can be empty.
          */
         public String getUsername() {
             return username;
@@ -219,16 +204,15 @@ public class BasicAuthenticator extends AuthenticatorBase {
         /**
          * Trivial accessor.
          *
-         * @return  the decoded password token as a String, or <code>null</code>
-         *          if no password was found in the credentials.
+         * @return the decoded password token as a String, or <code>null</code> if no password was found in the
+         *             credentials.
          */
         public String getPassword() {
             return password;
         }
 
         /*
-         * The authorization method string is case-insensitive and must
-         * hae at least one space character as a delimiter.
+         * The authorization method string is case-insensitive and must hae at least one space character as a delimiter.
          */
         private void parseMethod() throws IllegalArgumentException {
             if (authorization.startsWithIgnoreCase(METHOD, 0)) {
@@ -237,35 +221,30 @@ public class BasicAuthenticator extends AuthenticatorBase {
                 base64blobLength = authorization.getLength() - METHOD.length();
             } else {
                 // is this possible, or permitted?
-                throw new IllegalArgumentException(
-                        "Authorization header method is not \"Basic\"");
+                throw new IllegalArgumentException("Authorization header method is not \"Basic\"");
             }
         }
+
         /*
-         * Decode the base64-user-pass token, which RFC 2617 states
-         * can be longer than the 76 characters per line limit defined
-         * in RFC 2045. The base64 decoder will ignore embedded line
-         * break characters as well as surplus surrounding white space.
+         * Decode the base64-user-pass token, which RFC 2617 states can be longer than the 76 characters per line limit
+         * defined in RFC 2045. The base64 decoder will ignore embedded line break characters as well as surplus
+         * surrounding white space.
          */
         private byte[] parseBase64() throws IllegalArgumentException {
-            byte[] decoded = Base64.decodeBase64(
-                        authorization.getBuffer(),
-                        base64blobOffset, base64blobLength);
-            //  restore original offset
+            byte[] decoded = Base64.decodeBase64(authorization.getBuffer(), base64blobOffset, base64blobLength);
+            // restore original offset
             authorization.setOffset(initialOffset);
             if (decoded == null) {
-                throw new IllegalArgumentException(
-                        "Basic Authorization credentials are not Base64");
+                throw new IllegalArgumentException("Basic Authorization credentials are not Base64");
             }
             return decoded;
         }
 
         /*
-         * Extract the mandatory username token and separate it from the
-         * optional password token. Tolerate surplus surrounding white space.
+         * Extract the mandatory username token and separate it from the optional password token. Tolerate surplus
+         * surrounding white space.
          */
-        private void parseCredentials(byte[] decoded)
-                throws IllegalArgumentException {
+        private void parseCredentials(byte[] decoded) throws IllegalArgumentException {
 
             int colon = -1;
             for (int i = 0; i < decoded.length; i++) {
