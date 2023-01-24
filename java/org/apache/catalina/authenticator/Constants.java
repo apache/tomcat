@@ -41,8 +41,7 @@ public class Constants {
     // --------------------------------------------------------- Request Notes
 
     /**
-     * The notes key to track the single-sign-on identity with which this
-     * request is associated.
+     * The notes key to track the single-sign-on identity with which this request is associated.
      */
     public static final String REQ_SSOID_NOTE = "org.apache.catalina.request.SSOID";
 
@@ -58,26 +57,23 @@ public class Constants {
 
 
     /**
-     * If the <code>cache</code> property of the authenticator is set, and the
-     * current request is part of a session, the password used to authenticate
-     * this user will be cached under this key to avoid the need for repeated
-     * calls to <code>Realm.authenticate()</code>.
+     * If the <code>cache</code> property of the authenticator is set, and the current request is part of a session, the
+     * password used to authenticate this user will be cached under this key to avoid the need for repeated calls to
+     * <code>Realm.authenticate()</code>.
      */
     public static final String SESS_PASSWORD_NOTE = "org.apache.catalina.session.PASSWORD";
 
     /**
-     * If the <code>cache</code> property of the authenticator is set, and the
-     * current request is part of a session, the user name used to authenticate
-     * this user will be cached under this key to avoid the need for repeated
-     * calls to <code>Realm.authenticate()</code>.
+     * If the <code>cache</code> property of the authenticator is set, and the current request is part of a session, the
+     * user name used to authenticate this user will be cached under this key to avoid the need for repeated calls to
+     * <code>Realm.authenticate()</code>.
      */
     public static final String SESS_USERNAME_NOTE = "org.apache.catalina.session.USERNAME";
 
 
     /**
-     * The original request information, to which the user will be redirected if
-     * authentication succeeds, is cached in the notes under this key during the
-     * authentication process.
+     * The original request information, to which the user will be redirected if authentication succeeds, is cached in
+     * the notes under this key during the authentication process.
      */
     public static final String FORM_REQUEST_NOTE = "org.apache.catalina.authenticator.REQUEST";
 }
