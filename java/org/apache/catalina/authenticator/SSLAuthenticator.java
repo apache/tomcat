@@ -39,8 +39,8 @@ import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLHostConfig;
 
 /**
- * An <b>Authenticator</b> and <b>Valve</b> implementation of authentication
- * that utilizes SSL certificates to identify client users.
+ * An <b>Authenticator</b> and <b>Valve</b> implementation of authentication that utilizes SSL certificates to identify
+ * client users.
  *
  * @author Craig R. McClanahan
  */
@@ -49,18 +49,16 @@ public class SSLAuthenticator extends AuthenticatorBase {
     private final Log log = LogFactory.getLog(SSLAuthenticator.class); // must not be static
 
     /**
-     * Authenticate the user by checking for the existence of a certificate
-     * chain, validating it against the trust manager for the connector and then
-     * validating the user's identity against the configured Realm.
+     * Authenticate the user by checking for the existence of a certificate chain, validating it against the trust
+     * manager for the connector and then validating the user's identity against the configured Realm.
      *
-     * @param request Request we are processing
+     * @param request  Request we are processing
      * @param response Response we are creating
      *
      * @exception IOException if an input/output error occurs
      */
     @Override
-    protected boolean doAuthenticate(Request request, HttpServletResponse response)
-            throws IOException {
+    protected boolean doAuthenticate(Request request, HttpServletResponse response) throws IOException {
 
         // NOTE: We don't try to reauthenticate using any existing SSO session,
         // because that will only work if the original authentication was
@@ -85,8 +83,7 @@ public class SSLAuthenticator extends AuthenticatorBase {
             if (containerLog.isDebugEnabled()) {
                 containerLog.debug("  No certificates included with this request");
             }
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                    sm.getString("authenticator.certificates"));
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, sm.getString("authenticator.certificates"));
             return false;
         }
 
@@ -96,14 +93,12 @@ public class SSLAuthenticator extends AuthenticatorBase {
             if (containerLog.isDebugEnabled()) {
                 containerLog.debug("  Realm.authenticate() returned false");
             }
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                               sm.getString("authenticator.unauthorized"));
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, sm.getString("authenticator.unauthorized"));
             return false;
         }
 
         // Cache the principal (if requested) and record this authentication
-        register(request, response, principal,
-                HttpServletRequest.CLIENT_CERT_AUTH, null, null);
+        register(request, response, principal, HttpServletRequest.CLIENT_CERT_AUTH, null, null);
         return true;
 
     }
@@ -124,19 +119,16 @@ public class SSLAuthenticator extends AuthenticatorBase {
 
     /**
      * Look for the X509 certificate chain in the Request under the key
-     * <code>jakarta.servlet.request.X509Certificate</code>. If not found, trigger
-     * extracting the certificate chain from the Coyote request.
+     * <code>jakarta.servlet.request.X509Certificate</code>. If not found, trigger extracting the certificate chain from
+     * the Coyote request.
      *
-     * @param request
-     *            Request to be processed
+     * @param request Request to be processed
      *
      * @return The X509 certificate chain if found, <code>null</code> otherwise.
      */
-    protected X509Certificate[] getRequestCertificates(final Request request)
-            throws IllegalStateException {
+    protected X509Certificate[] getRequestCertificates(final Request request) throws IllegalStateException {
 
-        X509Certificate certs[] =
-                (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
+        X509Certificate certs[] = (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
 
         if ((certs == null) || (certs.length < 1)) {
             try {
@@ -158,9 +150,8 @@ public class SSLAuthenticator extends AuthenticatorBase {
         super.startInternal();
 
         /*
-         * This Valve should only ever be added to a Context and if the Context
-         * is started there should always be a Host and an Engine but test at
-         * each stage to be safe.
+         * This Valve should only ever be added to a Context and if the Context is started there should always be a Host
+         * and an Engine but test at each stage to be safe.
          */
         Container container = getContainer();
         if (!(container instanceof Context)) {
@@ -204,7 +195,8 @@ public class SSLAuthenticator extends AuthenticatorBase {
                     }
                     for (String enbabledProtocol : enabledProtocols) {
                         if (Constants.SSL_PROTO_TLSv1_3.equals(enbabledProtocol)) {
-                            log.warn(sm.getString("sslAuthenticatorValve.tls13", context.getName(), host.getName(), connector));
+                            log.warn(sm.getString("sslAuthenticatorValve.tls13", context.getName(), host.getName(),
+                                    connector));
                         }
                     }
                 }

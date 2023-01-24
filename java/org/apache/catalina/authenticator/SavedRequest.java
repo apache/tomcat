@@ -30,13 +30,11 @@ import javax.servlet.http.Cookie;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
- * Object that saves the critical information from a request so that
- * form-based authentication can reproduce it once the user has been
- * authenticated.
+ * Object that saves the critical information from a request so that form-based authentication can reproduce it once the
+ * user has been authenticated.
  * <p>
- * <b>IMPLEMENTATION NOTE</b> - It is assumed that this object is accessed
- * only from the context of a single thread, so no synchronization around
- * internal collection classes is performed.
+ * <b>IMPLEMENTATION NOTE</b> - It is assumed that this object is accessed only from the context of a single thread, so
+ * no synchronization around internal collection classes is performed.
  *
  * @author Craig R. McClanahan
  */
@@ -59,10 +57,8 @@ public final class SavedRequest implements Serializable {
 
 
     /**
-     * The set of Headers associated with this Request.  Each key is a header
-     * name, while the value is a List containing one or more actual
-     * values for this header.  The values are returned as an Iterator when
-     * you ask for them.
+     * The set of Headers associated with this Request. Each key is a header name, while the value is a List containing
+     * one or more actual values for this header. The values are returned as an Iterator when you ask for them.
      */
     private final Map<String, List<String>> headers = new HashMap<>();
 
@@ -146,8 +142,7 @@ public final class SavedRequest implements Serializable {
 
 
     /**
-     * The decode request URI associated with this Request. Path parameters are
-     * also excluded
+     * The decode request URI associated with this Request. Path parameters are also excluded
      */
     private String decodedRequestURI = null;
 

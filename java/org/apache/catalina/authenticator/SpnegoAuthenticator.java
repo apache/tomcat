@@ -46,11 +46,9 @@ import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.Oid;
 
 /**
- * A SPNEGO authenticator that uses the SPNEGO/Kerberos support built in to Java
- * 6. Successful Kerberos authentication depends on the correct configuration of
- * multiple components. If the configuration is invalid, the error messages are
- * often cryptic although a Google search will usually point you in the right
- * direction.
+ * A SPNEGO authenticator that uses the SPNEGO/Kerberos support built in to Java 6. Successful Kerberos authentication
+ * depends on the correct configuration of multiple components. If the configuration is invalid, the error messages are
+ * often cryptic although a Google search will usually point you in the right direction.
  */
 public class SpnegoAuthenticator extends AuthenticatorBase {
 
@@ -58,23 +56,27 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     private static final String AUTH_HEADER_VALUE_NEGOTIATE = "Negotiate";
 
     private String loginConfigName = Constants.DEFAULT_LOGIN_MODULE_NAME;
+
     public String getLoginConfigName() {
         return loginConfigName;
     }
+
     public void setLoginConfigName(String loginConfigName) {
         this.loginConfigName = loginConfigName;
     }
 
     private boolean storeDelegatedCredential = true;
+
     public boolean isStoreDelegatedCredential() {
         return storeDelegatedCredential;
     }
-    public void setStoreDelegatedCredential(
-            boolean storeDelegatedCredential) {
+
+    public void setStoreDelegatedCredential(boolean storeDelegatedCredential) {
         this.storeDelegatedCredential = storeDelegatedCredential;
     }
 
     private Pattern noKeepAliveUserAgents = null;
+
     public String getNoKeepAliveUserAgents() {
         Pattern p = noKeepAliveUserAgents;
         if (p == null) {
@@ -83,9 +85,9 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             return p.pattern();
         }
     }
+
     public void setNoKeepAliveUserAgents(String noKeepAliveUserAgents) {
-        if (noKeepAliveUserAgents == null ||
-                noKeepAliveUserAgents.length() == 0) {
+        if (noKeepAliveUserAgents == null || noKeepAliveUserAgents.length() == 0) {
             this.noKeepAliveUserAgents = null;
         } else {
             this.noKeepAliveUserAgents = Pattern.compile(noKeepAliveUserAgents);
@@ -93,9 +95,11 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     }
 
     private boolean applyJava8u40Fix = true;
+
     public boolean getApplyJava8u40Fix() {
         return applyJava8u40Fix;
     }
+
     public void setApplyJava8u40Fix(boolean applyJava8u40Fix) {
         this.applyJava8u40Fix = applyJava8u40Fix;
     }
@@ -115,35 +119,28 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         String krb5Conf = System.getProperty(Constants.KRB5_CONF_PROPERTY);
         if (krb5Conf == null) {
             // System property not set, use the Tomcat default
-            File krb5ConfFile = new File(container.getCatalinaBase(),
-                    Constants.DEFAULT_KRB5_CONF);
-            System.setProperty(Constants.KRB5_CONF_PROPERTY,
-                    krb5ConfFile.getAbsolutePath());
+            File krb5ConfFile = new File(container.getCatalinaBase(), Constants.DEFAULT_KRB5_CONF);
+            System.setProperty(Constants.KRB5_CONF_PROPERTY, krb5ConfFile.getAbsolutePath());
         }
 
         // JAAS configuration file location
         String jaasConf = System.getProperty(Constants.JAAS_CONF_PROPERTY);
         if (jaasConf == null) {
             // System property not set, use the Tomcat default
-            File jaasConfFile = new File(container.getCatalinaBase(),
-                    Constants.DEFAULT_JAAS_CONF);
-            System.setProperty(Constants.JAAS_CONF_PROPERTY,
-                    jaasConfFile.getAbsolutePath());
+            File jaasConfFile = new File(container.getCatalinaBase(), Constants.DEFAULT_JAAS_CONF);
+            System.setProperty(Constants.JAAS_CONF_PROPERTY, jaasConfFile.getAbsolutePath());
         }
     }
 
 
     @Override
-    protected boolean doAuthenticate(Request request, HttpServletResponse response)
-            throws IOException {
+    protected boolean doAuthenticate(Request request, HttpServletResponse response) throws IOException {
 
         if (checkForCachedAuthentication(request, response, true)) {
             return true;
         }
 
-        MessageBytes authorization =
-            request.getCoyoteRequest().getMimeHeaders()
-            .getValue("authorization");
+        MessageBytes authorization = request.getCoyoteRequest().getMimeHeaders().getValue("authorization");
 
         if (authorization == null) {
             if (log.isDebugEnabled()) {
@@ -159,8 +156,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
         if (!authorizationBC.startsWithIgnoreCase("negotiate ", 0)) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString(
-                        "spnegoAuthenticator.authHeaderNotNego"));
+                log.debug(sm.getString("spnegoAuthenticator.authHeaderNotNego"));
             }
             response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -169,8 +165,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
         authorizationBC.setOffset(authorizationBC.getOffset() + 10);
 
-        byte[] decoded = Base64.decodeBase64(authorizationBC.getBuffer(),
-                authorizationBC.getOffset(),
+        byte[] decoded = Base64.decodeBase64(authorizationBC.getBuffer(), authorizationBC.getOffset(),
                 authorizationBC.getLength());
 
         if (getApplyJava8u40Fix()) {
@@ -179,8 +174,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
         if (decoded.length == 0) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString(
-                        "spnegoAuthenticator.authHeaderNoToken"));
+                log.debug(sm.getString("spnegoAuthenticator.authHeaderNoToken"));
             }
             response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
@@ -196,10 +190,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                 lc = new LoginContext(getLoginConfigName());
                 lc.login();
             } catch (LoginException e) {
-                log.error(sm.getString("spnegoAuthenticator.serviceLoginFail"),
-                        e);
-                response.sendError(
-                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                log.error(sm.getString("spnegoAuthenticator.serviceLoginFail"), e);
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return false;
             }
 
@@ -215,24 +207,20 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             } else {
                 credentialLifetime = GSSCredential.DEFAULT_LIFETIME;
             }
-            final PrivilegedExceptionAction<GSSCredential> action =
-                new PrivilegedExceptionAction<GSSCredential>() {
-                    @Override
-                    public GSSCredential run() throws GSSException {
-                        return manager.createCredential(null,
-                                credentialLifetime,
-                                new Oid("1.3.6.1.5.5.2"),
-                                GSSCredential.ACCEPT_ONLY);
-                    }
-                };
+            final PrivilegedExceptionAction<GSSCredential> action = new PrivilegedExceptionAction<GSSCredential>() {
+                @Override
+                public GSSCredential run() throws GSSException {
+                    return manager.createCredential(null, credentialLifetime, new Oid("1.3.6.1.5.5.2"),
+                            GSSCredential.ACCEPT_ONLY);
+                }
+            };
             gssContext = manager.createContext(Subject.doAs(subject, action));
 
             outToken = Subject.doAs(lc.getSubject(), new AcceptAction(gssContext, decoded));
 
             if (outToken == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString(
-                            "spnegoAuthenticator.ticketValidateFail"));
+                    log.debug(sm.getString("spnegoAuthenticator.ticketValidateFail"));
                 }
                 // Start again
                 response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE);
@@ -240,8 +228,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                 return false;
             }
 
-            principal = Subject.doAs(subject, new AuthenticateAction(
-                    context.getRealm(), gssContext, storeDelegatedCredential));
+            principal = Subject.doAs(subject,
+                    new AuthenticateAction(context.getRealm(), gssContext, storeDelegatedCredential));
 
         } catch (GSSException e) {
             if (log.isDebugEnabled()) {
@@ -280,18 +268,14 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         }
 
         // Send response token on success and failure
-        response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE + " "
-                + Base64.encodeBase64String(outToken));
+        response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE + " " + Base64.encodeBase64String(outToken));
 
         if (principal != null) {
-            register(request, response, principal, Constants.SPNEGO_METHOD,
-                    principal.getName(), null);
+            register(request, response, principal, Constants.SPNEGO_METHOD, principal.getName(), null);
 
             Pattern p = noKeepAliveUserAgents;
             if (p != null) {
-                MessageBytes ua =
-                        request.getCoyoteRequest().getMimeHeaders().getValue(
-                                "user-agent");
+                MessageBytes ua = request.getCoyoteRequest().getMimeHeaders().getValue("user-agent");
                 if (ua != null && p.matcher(ua.toString()).matches()) {
                     response.setHeader("Connection", "close");
                 }
@@ -327,8 +311,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
         @Override
         public byte[] run() throws GSSException {
-            return gssContext.acceptSecContext(decoded,
-                    0, decoded.length);
+            return gssContext.acceptSecContext(decoded, 0, decoded.length);
         }
     }
 
@@ -339,8 +322,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         private final GSSContext gssContext;
         private final boolean storeDelegatedCredential;
 
-        public AuthenticateAction(Realm realm, GSSContext gssContext,
-                boolean storeDelegatedCredential) {
+        public AuthenticateAction(Realm realm, GSSContext gssContext, boolean storeDelegatedCredential) {
             this.realm = realm;
             this.gssContext = gssContext;
             this.storeDelegatedCredential = storeDelegatedCredential;
@@ -354,17 +336,14 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * This class implements a hack around an incompatibility between the
-     * SPNEGO implementation in Windows and the SPNEGO implementation in Java 8
-     * update 40 onwards. It was introduced by the change to fix this bug:
-     * https://bugs.openjdk.java.net/browse/JDK-8048194
-     * (note: the change applied is not the one suggested in the bug report)
+     * This class implements a hack around an incompatibility between the SPNEGO implementation in Windows and the
+     * SPNEGO implementation in Java 8 update 40 onwards. It was introduced by the change to fix this bug:
+     * https://bugs.openjdk.java.net/browse/JDK-8048194 (note: the change applied is not the one suggested in the bug
+     * report)
      * <p>
-     * It is not clear to me if Windows, Java or Tomcat is at fault here. I
-     * think it is Java but I could be wrong.
+     * It is not clear to me if Windows, Java or Tomcat is at fault here. I think it is Java but I could be wrong.
      * <p>
-     * This hack works by re-ordering the list of mechTypes in the NegTokenInit
-     * token.
+     * This hack works by re-ordering the list of mechTypes in the NegTokenInit token.
      */
     public static class SpnegoTokenFixer {
 
@@ -386,9 +365,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         // Fixes the token in-place
         private void fix() {
             /*
-             * Useful references:
-             * http://tools.ietf.org/html/rfc4121#page-5
-             * http://tools.ietf.org/html/rfc2743#page-81
+             * Useful references: http://tools.ietf.org/html/rfc4121#page-5 http://tools.ietf.org/html/rfc2743#page-81
              * https://msdn.microsoft.com/en-us/library/ms995330.aspx
              */
 
