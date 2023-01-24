@@ -47,46 +47,35 @@ import java.util.logging.LogRecord;
 import java.util.regex.Pattern;
 
 /**
- * Implementation of <b>Handler</b> that appends log messages to a file
- * named {prefix}{date}{suffix} in a configured directory.
- *
- * <p>The following configuration properties are available:</p>
- *
+ * Implementation of <b>Handler</b> that appends log messages to a file named {prefix}{date}{suffix} in a configured
+ * directory.
+ * <p>
+ * The following configuration properties are available:
+ * </p>
  * <ul>
- *   <li><code>directory</code> - The directory where to create the log file.
- *    If the path is not absolute, it is relative to the current working
- *    directory of the application. The Apache Tomcat configuration files usually
- *    specify an absolute path for this property,
- *    <code>${catalina.base}/logs</code>
- *    Default value: <code>logs</code></li>
- *   <li><code>rotatable</code> - If <code>true</code>, the log file will be
- *    rotated on the first write past midnight and the filename will be
- *    <code>{prefix}{date}{suffix}</code>, where date is yyyy-MM-dd. If <code>false</code>,
- *    the file will not be rotated and the filename will be <code>{prefix}{suffix}</code>.
- *    Default value: <code>true</code></li>
- *   <li><code>prefix</code> - The leading part of the log file name.
- *    Default value: <code>juli.</code></li>
- *   <li><code>suffix</code> - The trailing part of the log file name. Default value: <code>.log</code></li>
- *   <li><code>bufferSize</code> - Configures buffering. The value of <code>0</code>
- *    uses system default buffering (typically an 8K buffer will be used). A
- *    value of <code>&lt;0</code> forces a writer flush upon each log write. A
- *    value <code>&gt;0</code> uses a BufferedOutputStream with the defined
- *    value but note that the system default buffering will also be
- *    applied. Default value: <code>-1</code></li>
- *   <li><code>encoding</code> - Character set used by the log file. Default value:
- *    empty string, which means to use the system default character set.</li>
- *   <li><code>level</code> - The level threshold for this Handler. See the
- *    <code>java.util.logging.Level</code> class for the possible levels.
- *    Default value: <code>ALL</code></li>
- *   <li><code>filter</code> - The <code>java.util.logging.Filter</code>
- *    implementation class name for this Handler. Default value: unset</li>
- *   <li><code>formatter</code> - The <code>java.util.logging.Formatter</code>
- *    implementation class name for this Handler. Default value:
- *    <code>org.apache.juli.OneLineFormatter</code></li>
- *   <li><code>maxDays</code> - The maximum number of days to keep the log
- *    files. If the specified value is <code>&lt;=0</code> then the log files
- *    will be kept on the file system forever, otherwise they will be kept the
- *    specified maximum days. Default value: <code>-1</code>.</li>
+ * <li><code>directory</code> - The directory where to create the log file. If the path is not absolute, it is relative
+ * to the current working directory of the application. The Apache Tomcat configuration files usually specify an
+ * absolute path for this property, <code>${catalina.base}/logs</code> Default value: <code>logs</code></li>
+ * <li><code>rotatable</code> - If <code>true</code>, the log file will be rotated on the first write past midnight and
+ * the filename will be <code>{prefix}{date}{suffix}</code>, where date is yyyy-MM-dd. If <code>false</code>, the file
+ * will not be rotated and the filename will be <code>{prefix}{suffix}</code>. Default value: <code>true</code></li>
+ * <li><code>prefix</code> - The leading part of the log file name. Default value: <code>juli.</code></li>
+ * <li><code>suffix</code> - The trailing part of the log file name. Default value: <code>.log</code></li>
+ * <li><code>bufferSize</code> - Configures buffering. The value of <code>0</code> uses system default buffering
+ * (typically an 8K buffer will be used). A value of <code>&lt;0</code> forces a writer flush upon each log write. A
+ * value <code>&gt;0</code> uses a BufferedOutputStream with the defined value but note that the system default
+ * buffering will also be applied. Default value: <code>-1</code></li>
+ * <li><code>encoding</code> - Character set used by the log file. Default value: empty string, which means to use the
+ * system default character set.</li>
+ * <li><code>level</code> - The level threshold for this Handler. See the <code>java.util.logging.Level</code> class for
+ * the possible levels. Default value: <code>ALL</code></li>
+ * <li><code>filter</code> - The <code>java.util.logging.Filter</code> implementation class name for this Handler.
+ * Default value: unset</li>
+ * <li><code>formatter</code> - The <code>java.util.logging.Formatter</code> implementation class name for this Handler.
+ * Default value: <code>org.apache.juli.OneLineFormatter</code></li>
+ * <li><code>maxDays</code> - The maximum number of days to keep the log files. If the specified value is
+ * <code>&lt;=0</code> then the log files will be kept on the file system forever, otherwise they will be kept the
+ * specified maximum days. Default value: <code>-1</code>.</li>
  * </ul>
  */
 public class FileHandler extends Handler {
@@ -96,8 +85,8 @@ public class FileHandler extends Handler {
     public static final int DEFAULT_BUFFER_SIZE = -1;
 
 
-    private static final ExecutorService DELETE_FILES_SERVICE =
-            Executors.newSingleThreadExecutor(new ThreadFactory("FileHandlerLogFilesCleaner-"));
+    private static final ExecutorService DELETE_FILES_SERVICE = Executors
+            .newSingleThreadExecutor(new ThreadFactory("FileHandlerLogFilesCleaner-"));
 
     // ------------------------------------------------------------ Constructor
 
@@ -117,8 +106,8 @@ public class FileHandler extends Handler {
     }
 
 
-    public FileHandler(String directory, String prefix, String suffix, Integer maxDays,
-            Boolean rotatable, Integer bufferSize) {
+    public FileHandler(String directory, String prefix, String suffix, Integer maxDays, Boolean rotatable,
+            Integer bufferSize) {
         this.directory = directory;
         this.prefix = prefix;
         this.suffix = suffix;
@@ -134,8 +123,7 @@ public class FileHandler extends Handler {
 
 
     /**
-     * The as-of date for the currently open log file, or null if there is no
-     * open log file.
+     * The as-of date for the currently open log file, or null if there is no open log file.
      */
     private volatile String date = null;
 
@@ -189,8 +177,7 @@ public class FileHandler extends Handler {
 
 
     /**
-     * Represents a file name pattern of type {prefix}{date}{suffix}.
-     * The date is YYYY-MM-DD
+     * Represents a file name pattern of type {prefix}{date}{suffix}. The date is YYYY-MM-DD
      */
     private Pattern pattern;
 
@@ -201,7 +188,7 @@ public class FileHandler extends Handler {
     /**
      * Format and publish a <code>LogRecord</code>.
      *
-     * @param  record  description of the log event
+     * @param record description of the log event
      */
     @Override
     public void publish(LogRecord record) {
@@ -257,8 +244,8 @@ public class FileHandler extends Handler {
                         writer.flush();
                     }
                 } else {
-                    reportError("FileHandler is closed or not yet initialized, unable to log ["
-                            + result + "]", null, ErrorManager.WRITE_FAILURE);
+                    reportError("FileHandler is closed or not yet initialized, unable to log [" + result + "]", null,
+                            ErrorManager.WRITE_FAILURE);
                 }
             } catch (Exception e) {
                 reportError(null, e, ErrorManager.WRITE_FAILURE);
@@ -326,7 +313,7 @@ public class FileHandler extends Handler {
      */
     private void configure() {
 
-        String className = this.getClass().getName(); //allow classes to override
+        String className = this.getClass().getName(); // allow classes to override
 
         ClassLoader cl = ClassLoaderLogManager.getClassLoader();
 
@@ -345,17 +332,15 @@ public class FileHandler extends Handler {
         }
 
         // https://bz.apache.org/bugzilla/show_bug.cgi?id=61232
-        boolean shouldCheckForRedundantSeparator =
-                !rotatable.booleanValue() && !prefix.isEmpty() && !suffix.isEmpty();
+        boolean shouldCheckForRedundantSeparator = !rotatable.booleanValue() && !prefix.isEmpty() && !suffix.isEmpty();
         // assuming separator is just one char, if there are use cases with
         // more, the notion of separator might be introduced
-        if (shouldCheckForRedundantSeparator &&
-                (prefix.charAt(prefix.length() - 1) == suffix.charAt(0))) {
+        if (shouldCheckForRedundantSeparator && (prefix.charAt(prefix.length() - 1) == suffix.charAt(0))) {
             suffix = suffix.substring(1);
         }
 
-        pattern = Pattern.compile("^(" + Pattern.quote(prefix) + ")\\d{4}-\\d{1,2}-\\d{1,2}("
-                + Pattern.quote(suffix) + ")$");
+        pattern = Pattern
+                .compile("^(" + Pattern.quote(prefix) + ")\\d{4}-\\d{1,2}-\\d{1,2}(" + Pattern.quote(suffix) + ")$");
 
         if (maxDays == null) {
             String sMaxDays = getProperty(className + ".maxDays", String.valueOf(DEFAULT_MAX_DAYS));
@@ -367,8 +352,7 @@ public class FileHandler extends Handler {
         }
 
         if (bufferSize == null) {
-            String sBufferSize = getProperty(className + ".bufferSize",
-                    String.valueOf(DEFAULT_BUFFER_SIZE));
+            String sBufferSize = getProperty(className + ".bufferSize", String.valueOf(DEFAULT_BUFFER_SIZE));
             try {
                 bufferSize = Integer.valueOf(sBufferSize);
             } catch (NumberFormatException ignore) {
@@ -403,8 +387,7 @@ public class FileHandler extends Handler {
         String formatterName = getProperty(className + ".formatter", null);
         if (formatterName != null) {
             try {
-                setFormatter((Formatter) cl.loadClass(
-                        formatterName).getConstructor().newInstance());
+                setFormatter((Formatter) cl.loadClass(formatterName).getConstructor().newInstance());
             } catch (Exception e) {
                 // Ignore and fallback to defaults
                 setFormatter(new OneLineFormatter());
@@ -451,8 +434,7 @@ public class FileHandler extends Handler {
         FileOutputStream fos = null;
         OutputStream os = null;
         try {
-            File pathname = new File(dir.getAbsoluteFile(), prefix
-                    + (rotatable.booleanValue() ? date : "") + suffix);
+            File pathname = new File(dir.getAbsoluteFile(), prefix + (rotatable.booleanValue() ? date : "") + suffix);
             File parent = pathname.getParentFile();
             if (!parent.mkdirs() && !parent.isDirectory()) {
                 reportError("Unable to create [" + parent + "]", null, ErrorManager.OPEN_FAILURE);
@@ -463,8 +445,7 @@ public class FileHandler extends Handler {
             fos = new FileOutputStream(pathname, true);
             os = bufferSize.intValue() > 0 ? new BufferedOutputStream(fos, bufferSize.intValue()) : fos;
             writer = new PrintWriter(
-                    (encoding != null) ? new OutputStreamWriter(os, encoding)
-                                       : new OutputStreamWriter(os), false);
+                    (encoding != null) ? new OutputStreamWriter(os, encoding) : new OutputStreamWriter(os), false);
             writer.write(getFormatter().getHead(this));
         } catch (Exception e) {
             reportError(null, e, ErrorManager.OPEN_FAILURE);
