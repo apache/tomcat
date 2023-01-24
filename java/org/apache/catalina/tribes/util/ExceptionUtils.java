@@ -22,8 +22,8 @@ package org.apache.catalina.tribes.util;
 public class ExceptionUtils {
 
     /**
-     * Checks whether the supplied Throwable is one that needs to be
-     * rethrown and swallows all others.
+     * Checks whether the supplied Throwable is one that needs to be rethrown and swallows all others.
+     *
      * @param t the Throwable to check
      */
     public static void handleThrowable(Throwable t) {
