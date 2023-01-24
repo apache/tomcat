@@ -52,8 +52,7 @@ public class Jre14Compat extends JreCompat {
     @Override
     public void setSocketoptionIpMulticastLoop(MulticastSocket socket, boolean enabled) throws IOException {
         /*
-         *  Java < 14, a value of true means loopback is disabled. Java 14+ a
-         *  value of true means loopback is enabled.
+         * Java < 14, a value of true means loopback is disabled. Java 14+ a value of true means loopback is enabled.
          */
         socket.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, Boolean.valueOf(enabled));
     }

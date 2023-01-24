@@ -21,9 +21,8 @@ import java.net.MulticastSocket;
 import java.net.StandardSocketOptions;
 
 /**
- * This is the base implementation class for JRE compatibility and provides an
- * implementation based on Java 11. Sub-classes may extend this class and provide
- * alternative implementations for later JRE versions
+ * This is the base implementation class for JRE compatibility and provides an implementation based on Java 11.
+ * Sub-classes may extend this class and provide alternative implementations for later JRE versions
  */
 public class JreCompat {
 
@@ -49,8 +48,7 @@ public class JreCompat {
 
     public void setSocketoptionIpMulticastLoop(MulticastSocket socket, boolean enabled) throws IOException {
         /*
-         *  Java < 14, a value of true means loopback is disabled. Java 14+ a
-         *  value of true means loopback is enabled.
+         * Java < 14, a value of true means loopback is disabled. Java 14+ a value of true means loopback is enabled.
          */
         socket.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, Boolean.valueOf(!enabled));
     }

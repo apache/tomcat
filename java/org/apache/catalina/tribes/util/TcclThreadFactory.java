@@ -20,11 +20,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * ThreadFactory implementation that creates threads with the thread context
- * class loader set to the class loader that loaded this factory. It is intended
- * to be used when tasks may be passed to executors when the web application
- * class loader is set as the thread context class loader, such as in async
- * session replication.
+ * ThreadFactory implementation that creates threads with the thread context class loader set to the class loader that
+ * loaded this factory. It is intended to be used when tasks may be passed to executors when the web application class
+ * loader is set as the thread context class loader, such as in async session replication.
  */
 public class TcclThreadFactory implements ThreadFactory {
 
