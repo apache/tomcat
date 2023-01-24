@@ -22,14 +22,12 @@ package org.apache.catalina.core;
 public enum ApplicationMappingMatch {
 
     /**
-     * The request was mapped to the servlet via the context root URL pattern of
-     * {@code ""}.
+     * The request was mapped to the servlet via the context root URL pattern of {@code ""}.
      */
     CONTEXT_ROOT,
 
     /**
-     * The request was mapped to the servlet via the default servlet URL pattern
-     * of {@code "/"} .
+     * The request was mapped to the servlet via the default servlet URL pattern of {@code "/"} .
      */
     DEFAULT,
 
@@ -39,8 +37,7 @@ public enum ApplicationMappingMatch {
     EXACT,
 
     /**
-     * The request was mapped to the servlet using an extension URL pattern
-     * match.
+     * The request was mapped to the servlet using an extension URL pattern match.
      */
     EXTENSION,
 

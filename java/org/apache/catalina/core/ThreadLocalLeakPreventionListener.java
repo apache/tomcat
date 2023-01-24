@@ -37,21 +37,17 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 /**
- * A {@link LifecycleListener} that triggers the renewal of threads in Executor
- * pools when a {@link Context} is being stopped to avoid thread-local related
- * memory leaks.
+ * A {@link LifecycleListener} that triggers the renewal of threads in Executor pools when a {@link Context} is being
+ * stopped to avoid thread-local related memory leaks.
  * <p>
- * Note : active threads will be renewed one by one when they come back to the
- * pool after executing their task, see
+ * Note : active threads will be renewed one by one when they come back to the pool after executing their task, see
  * {@link org.apache.tomcat.util.threads.ThreadPoolExecutor}.afterExecute().
  * <p>
  * This listener must only be nested within {@link Server} elements.
  */
-public class ThreadLocalLeakPreventionListener implements LifecycleListener,
-        ContainerListener {
+public class ThreadLocalLeakPreventionListener implements LifecycleListener, ContainerListener {
 
-    private static final Log log =
-        LogFactory.getLog(ThreadLocalLeakPreventionListener.class);
+    private static final Log log = LogFactory.getLog(ThreadLocalLeakPreventionListener.class);
 
     private volatile boolean serverStopping = false;
 
@@ -61,15 +57,14 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
     protected static final StringManager sm = StringManager.getManager(ThreadLocalLeakPreventionListener.class);
 
     /**
-     * Listens for {@link LifecycleEvent} for the start of the {@link Server} to
-     * initialize itself and then for after_stop events of each {@link Context}.
+     * Listens for {@link LifecycleEvent} for the start of the {@link Server} to initialize itself and then for
+     * after_stop events of each {@link Context}.
      */
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
         try {
             Lifecycle lifecycle = event.getLifecycle();
-            if (Lifecycle.AFTER_START_EVENT.equals(event.getType()) &&
-                    lifecycle instanceof Server) {
+            if (Lifecycle.AFTER_START_EVENT.equals(event.getType()) && lifecycle instanceof Server) {
                 // when the server starts, we register ourself as listener for
                 // all context
                 // as well as container event listener so that we know when new
@@ -78,22 +73,17 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
                 registerListenersForServer(server);
             }
 
-            if (Lifecycle.BEFORE_STOP_EVENT.equals(event.getType()) &&
-                    lifecycle instanceof Server) {
+            if (Lifecycle.BEFORE_STOP_EVENT.equals(event.getType()) && lifecycle instanceof Server) {
                 // Server is shutting down, so thread pools will be shut down so
                 // there is no need to clean the threads
                 serverStopping = true;
             }
 
-            if (Lifecycle.AFTER_STOP_EVENT.equals(event.getType()) &&
-                    lifecycle instanceof Context) {
+            if (Lifecycle.AFTER_STOP_EVENT.equals(event.getType()) && lifecycle instanceof Context) {
                 stopIdleThreads((Context) lifecycle);
             }
         } catch (Exception e) {
-            String msg =
-                sm.getString(
-                    "threadLocalLeakPreventionListener.lifecycleEvent.error",
-                    event);
+            String msg = sm.getString("threadLocalLeakPreventionListener.lifecycleEvent.error", event);
             log.error(msg, e);
         }
     }
@@ -103,17 +93,12 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
         try {
             String type = event.getType();
             if (Container.ADD_CHILD_EVENT.equals(type)) {
-                processContainerAddChild(event.getContainer(),
-                    (Container) event.getData());
+                processContainerAddChild(event.getContainer(), (Container) event.getData());
             } else if (Container.REMOVE_CHILD_EVENT.equals(type)) {
-                processContainerRemoveChild(event.getContainer(),
-                    (Container) event.getData());
+                processContainerRemoveChild(event.getContainer(), (Container) event.getData());
             }
         } catch (Exception e) {
-            String msg =
-                sm.getString(
-                    "threadLocalLeakPreventionListener.containerEvent.error",
-                    event);
+            String msg = sm.getString("threadLocalLeakPreventionListener.containerEvent.error", event);
             log.error(msg, e);
         }
 
@@ -151,8 +136,7 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
 
     protected void processContainerAddChild(Container parent, Container child) {
         if (log.isDebugEnabled()) {
-            log.debug("Process addChild[parent=" + parent + ",child=" + child +
-                "]");
+            log.debug("Process addChild[parent=" + parent + ",child=" + child + "]");
         }
 
         if (child instanceof Context) {
@@ -165,12 +149,10 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
 
     }
 
-    protected void processContainerRemoveChild(Container parent,
-        Container child) {
+    protected void processContainerRemoveChild(Container parent, Container child) {
 
         if (log.isDebugEnabled()) {
-            log.debug("Process removeChild[parent=" + parent + ",child=" +
-                child + "]");
+            log.debug("Process removeChild[parent=" + parent + ",child=" + child + "]");
         }
 
         if (child instanceof Context) {
@@ -182,12 +164,9 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
     }
 
     /**
-     * Updates each ThreadPoolExecutor with the current time, which is the time
-     * when a context is being stopped.
+     * Updates each ThreadPoolExecutor with the current time, which is the time when a context is being stopped.
      *
-     * @param context
-     *            the context being stopped, used to discover all the Connectors
-     *            of its parent Service.
+     * @param context the context being stopped, used to discover all the Connectors of its parent Service.
      */
     private void stopIdleThreads(Context context) {
         if (serverStopping) {
@@ -195,9 +174,8 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
         }
 
         if (!(context instanceof StandardContext) ||
-            !((StandardContext) context).getRenewThreadsWhenStoppingContext()) {
-            log.debug("Not renewing threads when the context is stopping. "
-                + "It is not configured to do it.");
+                !((StandardContext) context).getRenewThreadsWhenStoppingContext()) {
+            log.debug("Not renewing threads when the context is stopping. " + "It is not configured to do it.");
             return;
         }
 
@@ -213,12 +191,10 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
                 }
 
                 if (executor instanceof ThreadPoolExecutor) {
-                    ThreadPoolExecutor threadPoolExecutor =
-                        (ThreadPoolExecutor) executor;
+                    ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executor;
                     threadPoolExecutor.contextStopping();
                 } else if (executor instanceof StandardThreadExecutor) {
-                    StandardThreadExecutor stdThreadExecutor =
-                        (StandardThreadExecutor) executor;
+                    StandardThreadExecutor stdThreadExecutor = (StandardThreadExecutor) executor;
                     stdThreadExecutor.contextStopping();
                 }
 

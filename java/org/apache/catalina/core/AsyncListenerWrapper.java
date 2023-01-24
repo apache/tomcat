@@ -72,8 +72,7 @@ public class AsyncListenerWrapper {
 
     private AsyncEvent customizeEvent(AsyncEvent event) {
         if (servletRequest != null && servletResponse != null) {
-            return new AsyncEvent(event.getAsyncContext(), servletRequest, servletResponse,
-                    event.getThrowable());
+            return new AsyncEvent(event.getAsyncContext(), servletRequest, servletResponse, event.getThrowable());
         } else {
             return event;
         }

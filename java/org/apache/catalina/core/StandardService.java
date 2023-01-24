@@ -41,9 +41,8 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Standard implementation of the <code>Service</code> interface.  The
- * associated Container is generally an instance of Engine, but this is
- * not required.
+ * Standard implementation of the <code>Service</code> interface. The associated Container is generally an instance of
+ * Engine, but this is not required.
  *
  * @author Craig R. McClanahan
  */
@@ -213,8 +212,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Add a new Connector to the set of defined Connectors, and associate it
-     * with this Service's Container.
+     * Add a new Connector to the set of defined Connectors, and associate it with this Service's Container.
      *
      * @param connector The Connector to be added
      */
@@ -232,9 +230,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                 try {
                     connector.start();
                 } catch (LifecycleException e) {
-                    log.error(sm.getString(
-                            "standardService.connector.startFailed",
-                            connector), e);
+                    log.error(sm.getString("standardService.connector.startFailed", connector), e);
                 }
             }
 
@@ -247,7 +243,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     public ObjectName[] getConnectorNames() {
         ObjectName results[] = new ObjectName[connectors.length];
-        for (int i=0; i<results.length; i++) {
+        for (int i = 0; i < results.length; i++) {
             results[i] = connectors[i].getObjectName();
         }
         return results;
@@ -274,9 +270,8 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
 
     /**
-     * Remove the specified Connector from the set associated from this
-     * Service.  The removed Connector will also be disassociated from our
-     * Container.
+     * Remove the specified Connector from the set associated from this Service. The removed Connector will also be
+     * disassociated from our Container.
      *
      * @param connector The Connector to be removed
      */
@@ -298,9 +293,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                 try {
                     connectors[j].stop();
                 } catch (LifecycleException e) {
-                    log.error(sm.getString(
-                            "standardService.connector.stopFailed",
-                            connectors[j]), e);
+                    log.error(sm.getString("standardService.connector.stopFailed", connectors[j]), e);
                 }
             }
             connector.setService(null);
@@ -343,6 +336,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     /**
      * Adds a named executor to the service
+     *
      * @param ex Executor
      */
     @Override
@@ -364,6 +358,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     /**
      * Retrieves all executors
+     *
      * @return Executor[]
      */
     @Override
@@ -376,13 +371,15 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     /**
      * Retrieves executor by name, null if not found
+     *
      * @param executorName String
+     *
      * @return Executor
      */
     @Override
     public Executor getExecutor(String executorName) {
         synchronized (executors) {
-            for (Executor executor: executors) {
+            for (Executor executor : executors) {
                 if (executorName.equals(executor.getName())) {
                     return executor;
                 }
@@ -394,12 +391,13 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     /**
      * Removes an executor from the service
+     *
      * @param ex Executor
      */
     @Override
     public void removeExecutor(Executor ex) {
         synchronized (executors) {
-            if ( executors.remove(ex) && getState().isAvailable() ) {
+            if (executors.remove(ex) && getState().isAvailable()) {
                 try {
                     ex.stop();
                 } catch (LifecycleException e) {
@@ -411,17 +409,16 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
 
     /**
-     * Start nested components ({@link Executor}s, {@link Connector}s and
-     * {@link Container}s) and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
+     * Start nested components ({@link Executor}s, {@link Connector}s and {@link Container}s) and implement the
+     * requirements of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
+     *                                   used
      */
     @Override
     protected void startInternal() throws LifecycleException {
 
-        if(log.isInfoEnabled()) {
+        if (log.isInfoEnabled()) {
             log.info(sm.getString("standardService.start.name", this.name));
         }
         setState(LifecycleState.STARTING);
@@ -434,7 +431,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         }
 
         synchronized (executors) {
-            for (Executor executor: executors) {
+            for (Executor executor : executors) {
                 executor.start();
             }
         }
@@ -443,16 +440,14 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
         // Start our defined Connectors second
         synchronized (connectorsLock) {
-            for (Connector connector: connectors) {
+            for (Connector connector : connectors) {
                 try {
                     // If it has already failed, don't try and start it
                     if (connector.getState() != LifecycleState.FAILED) {
                         connector.start();
                     }
                 } catch (Exception e) {
-                    log.error(sm.getString(
-                            "standardService.connector.startFailed",
-                            connector), e);
+                    log.error(sm.getString("standardService.connector.startFailed", connector), e);
                 }
             }
         }
@@ -460,12 +455,10 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
 
     /**
-     * Stop nested components ({@link Executor}s, {@link Connector}s and
-     * {@link Container}s) and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
+     * Stop nested components ({@link Executor}s, {@link Connector}s and {@link Container}s) and implement the
+     * requirements of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
+     * @exception LifecycleException if this component detects a fatal error that needs to be reported
      */
     @Override
     protected void stopInternal() throws LifecycleException {
@@ -474,25 +467,25 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             // Initiate a graceful stop for each connector
             // This will only work if the bindOnInit==false which is not the
             // default.
-            for (Connector connector: connectors) {
+            for (Connector connector : connectors) {
                 connector.getProtocolHandler().closeServerSocketGraceful();
             }
 
             // Wait for the graceful shutdown to complete
             long waitMillis = gracefulStopAwaitMillis;
             if (waitMillis > 0) {
-                for (Connector connector: connectors) {
+                for (Connector connector : connectors) {
                     waitMillis = connector.getProtocolHandler().awaitConnectionsClose(waitMillis);
                 }
             }
 
             // Pause the connectors
-            for (Connector connector: connectors) {
+            for (Connector connector : connectors) {
                 connector.pause();
             }
         }
 
-        if(log.isInfoEnabled()) {
+        if (log.isInfoEnabled()) {
             log.info(sm.getString("standardService.stop.name", this.name));
         }
         setState(LifecycleState.STOPPING);
@@ -506,9 +499,8 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
         // Now stop the connectors
         synchronized (connectorsLock) {
-            for (Connector connector: connectors) {
-                if (!LifecycleState.STARTED.equals(
-                        connector.getState())) {
+            for (Connector connector : connectors) {
+                if (!LifecycleState.STARTED.equals(connector.getState())) {
                     // Connectors only need stopping if they are currently
                     // started. They may have failed to start or may have been
                     // stopped (e.g. via a JMX call)
@@ -517,9 +509,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                 try {
                     connector.stop();
                 } catch (Exception e) {
-                    log.error(sm.getString(
-                            "standardService.connector.stopFailed",
-                            connector), e);
+                    log.error(sm.getString("standardService.connector.stopFailed", connector), e);
                 }
             }
         }
@@ -531,7 +521,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         }
 
         synchronized (executors) {
-            for (Executor executor: executors) {
+            for (Executor executor : executors) {
                 executor.stop();
             }
         }
@@ -539,8 +529,8 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
 
     /**
-     * Invoke a pre-startup initialization. This is used to allow connectors
-     * to bind to restricted ports under Unix operating environments.
+     * Invoke a pre-startup initialization. This is used to allow connectors to bind to restricted ports under Unix
+     * operating environments.
      */
     @Override
     protected void initInternal() throws LifecycleException {
@@ -568,8 +558,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                 try {
                     connector.init();
                 } catch (Exception e) {
-                    String message = sm.getString(
-                            "standardService.connector.initFailed", connector);
+                    String message = sm.getString("standardService.connector.initFailed", connector);
                     log.error(message, e);
 
                     if (Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE")) {
@@ -591,8 +580,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                 try {
                     connector.destroy();
                 } catch (Exception e) {
-                    log.error(sm.getString(
-                            "standardService.connector.destroyFailed", connector), e);
+                    log.error(sm.getString("standardService.connector.destroyFailed", connector), e);
                 }
             }
         }
@@ -634,8 +622,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     public void setParentClassLoader(ClassLoader parent) {
         ClassLoader oldParentClassLoader = this.parentClassLoader;
         this.parentClassLoader = parent;
-        support.firePropertyChange("parentClassLoader", oldParentClassLoader,
-                                   this.parentClassLoader);
+        support.firePropertyChange("parentClassLoader", oldParentClassLoader, this.parentClassLoader);
     }
 
 

@@ -23,7 +23,8 @@ public class ApplicationMappingImpl {
     private final ApplicationMappingMatch mappingType;
     private final String servletName;
 
-    public ApplicationMappingImpl(String matchValue, String pattern, ApplicationMappingMatch mappingType, String servletName) {
+    public ApplicationMappingImpl(String matchValue, String pattern, ApplicationMappingMatch mappingType,
+            String servletName) {
         this.matchValue = matchValue;
         this.pattern = pattern;
         this.mappingType = mappingType;

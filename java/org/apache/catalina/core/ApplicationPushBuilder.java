@@ -67,7 +67,7 @@ public class ApplicationPushBuilder {
     private final boolean addSessionCookie;
     private final boolean addSessionPathParameter;
 
-    private final Map<String,List<String>> headers = new CaseInsensitiveKeyMap<>();
+    private final Map<String, List<String>> headers = new CaseInsensitiveKeyMap<>();
     private final List<Cookie> cookies = new ArrayList<>();
     private String method = "GET";
     private String path;
@@ -127,10 +127,9 @@ public class ApplicationPushBuilder {
         if (sessionId == null) {
             sessionId = request.getRequestedSessionId();
         }
-        if (!request.isRequestedSessionIdFromCookie() && !request.isRequestedSessionIdFromURL() &&
-                sessionId != null) {
-            Set<SessionTrackingMode> sessionTrackingModes =
-                    request.getServletContext().getEffectiveSessionTrackingModes();
+        if (!request.isRequestedSessionIdFromCookie() && !request.isRequestedSessionIdFromURL() && sessionId != null) {
+            Set<SessionTrackingMode> sessionTrackingModes = request.getServletContext()
+                    .getEffectiveSessionTrackingModes();
             addSessionCookie = sessionTrackingModes.contains(SessionTrackingMode.COOKIE);
             addSessionPathParameter = sessionTrackingModes.contains(SessionTrackingMode.URL);
         } else {
@@ -159,16 +158,15 @@ public class ApplicationPushBuilder {
         }
         if (cookies.size() > 0) {
             List<String> cookieValues = new ArrayList<>(1);
-            cookieValues.add(generateCookieHeader(cookies,
-                    catalinaRequest.getContext().getCookieProcessor()));
+            cookieValues.add(generateCookieHeader(cookies, catalinaRequest.getContext().getCookieProcessor()));
             headers.put("cookie", cookieValues);
         }
 
         // Authentication
         if (catalinaRequest.getPrincipal() != null) {
-            if ((session == null) || catalinaRequest.getSessionInternal(false).getPrincipal() == null
-                    || !(context.getAuthenticator() instanceof AuthenticatorBase)
-                    || !((AuthenticatorBase) context.getAuthenticator()).getCache()) {
+            if ((session == null) || catalinaRequest.getSessionInternal(false).getPrincipal() == null ||
+                    !(context.getAuthenticator() instanceof AuthenticatorBase) ||
+                    !((AuthenticatorBase) context.getAuthenticator()).getCache()) {
                 // Set a username only if there is no session cache for the principal
                 userName = catalinaRequest.getPrincipal().getName();
             }
@@ -201,8 +199,7 @@ public class ApplicationPushBuilder {
     public ApplicationPushBuilder method(String method) {
         String upperMethod = method.trim().toUpperCase(Locale.ENGLISH);
         if (DISALLOWED_METHODS.contains(upperMethod) || upperMethod.length() == 0) {
-            throw new IllegalArgumentException(
-                    sm.getString("applicationPushBuilder.methodInvalid", upperMethod));
+            throw new IllegalArgumentException(sm.getString("applicationPushBuilder.methodInvalid", upperMethod));
         }
         // Check a token was supplied
         if (!HttpParser.isToken(upperMethod)) {
@@ -302,7 +299,7 @@ public class ApplicationPushBuilder {
         pushTarget.scheme().setString(baseRequest.getScheme());
 
         // Copy headers
-        for (Map.Entry<String,List<String>> header : headers.entrySet()) {
+        for (Map.Entry<String, List<String>> header : headers.entrySet()) {
             for (String value : header.getValue()) {
                 pushTarget.getMimeHeaders().addValue(header.getKey()).setString(value);
             }
@@ -341,8 +338,7 @@ public class ApplicationPushBuilder {
 
         // Undecoded path - just %nn encoded
         pushTarget.requestURI().setString(pushPath);
-        pushTarget.decodedURI().setString(decode(pushPath,
-                catalinaRequest.getConnector().getURICharset()));
+        pushTarget.decodedURI().setString(decode(pushPath, catalinaRequest.getConnector().getURICharset()));
 
         // Query string
         if (pushQueryString == null && queryString != null) {
@@ -350,7 +346,7 @@ public class ApplicationPushBuilder {
         } else if (pushQueryString != null && queryString == null) {
             pushTarget.queryString().setString(pushQueryString);
         } else if (pushQueryString != null && queryString != null) {
-            pushTarget.queryString().setString(pushQueryString + "&" +queryString);
+            pushTarget.queryString().setString(pushQueryString + "&" + queryString);
         }
 
         // Authorization
@@ -385,7 +381,7 @@ public class ApplicationPushBuilder {
             result.append(input.substring(end, start));
             // Advance the end 3 characters: %nn
             end = start + 3;
-            while (end <input.length() && input.charAt(end) == '%') {
+            while (end < input.length() && input.charAt(end) == '%') {
                 end += 3;
             }
             result.append(decodePercentSequence(input.substring(start, end), charset));
@@ -399,7 +395,7 @@ public class ApplicationPushBuilder {
 
 
     private static String decodePercentSequence(String sequence, Charset charset) {
-        byte[] bytes = new byte[sequence.length()/3];
+        byte[] bytes = new byte[sequence.length() / 3];
         for (int i = 0; i < bytes.length; i += 3) {
             bytes[i] = (byte) ((HexUtils.getDec(sequence.charAt(1 + 3 * i)) << 4) +
                     HexUtils.getDec(sequence.charAt(2 + 3 * i)));

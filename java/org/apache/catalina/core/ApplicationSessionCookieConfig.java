@@ -82,9 +82,8 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     @Override
     public void setComment(String comment) {
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
-            throw new IllegalStateException(sm.getString(
-                    "applicationSessionCookieConfig.ise", "comment",
-                    context.getPath()));
+            throw new IllegalStateException(
+                    sm.getString("applicationSessionCookieConfig.ise", "comment", context.getPath()));
         }
         this.comment = comment;
     }
@@ -92,9 +91,8 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     @Override
     public void setDomain(String domain) {
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
-            throw new IllegalStateException(sm.getString(
-                    "applicationSessionCookieConfig.ise", "domain name",
-                    context.getPath()));
+            throw new IllegalStateException(
+                    sm.getString("applicationSessionCookieConfig.ise", "domain name", context.getPath()));
         }
         this.domain = domain;
     }
@@ -102,9 +100,8 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     @Override
     public void setHttpOnly(boolean httpOnly) {
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
-            throw new IllegalStateException(sm.getString(
-                    "applicationSessionCookieConfig.ise", "HttpOnly",
-                    context.getPath()));
+            throw new IllegalStateException(
+                    sm.getString("applicationSessionCookieConfig.ise", "HttpOnly", context.getPath()));
         }
         this.httpOnly = httpOnly;
     }
@@ -112,9 +109,8 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     @Override
     public void setMaxAge(int maxAge) {
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
-            throw new IllegalStateException(sm.getString(
-                    "applicationSessionCookieConfig.ise", "max age",
-                    context.getPath()));
+            throw new IllegalStateException(
+                    sm.getString("applicationSessionCookieConfig.ise", "max age", context.getPath()));
         }
         this.maxAge = maxAge;
     }
@@ -122,9 +118,8 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     @Override
     public void setName(String name) {
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
-            throw new IllegalStateException(sm.getString(
-                    "applicationSessionCookieConfig.ise", "name",
-                    context.getPath()));
+            throw new IllegalStateException(
+                    sm.getString("applicationSessionCookieConfig.ise", "name", context.getPath()));
         }
         this.name = name;
     }
@@ -132,9 +127,8 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     @Override
     public void setPath(String path) {
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
-            throw new IllegalStateException(sm.getString(
-                    "applicationSessionCookieConfig.ise", "path",
-                    context.getPath()));
+            throw new IllegalStateException(
+                    sm.getString("applicationSessionCookieConfig.ise", "path", context.getPath()));
         }
         this.path = path;
     }
@@ -142,9 +136,8 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     @Override
     public void setSecure(boolean secure) {
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
-            throw new IllegalStateException(sm.getString(
-                    "applicationSessionCookieConfig.ise", "secure",
-                    context.getPath()));
+            throw new IllegalStateException(
+                    sm.getString("applicationSessionCookieConfig.ise", "secure", context.getPath()));
         }
         this.secure = secure;
     }
@@ -152,25 +145,22 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     /**
      * Creates a new session cookie for the given session ID
      *
-     * @param context     The Context for the web application
-     * @param sessionId   The ID of the session for which the cookie will be
-     *                    created
-     * @param secure      Should session cookie be configured as secure
+     * @param context   The Context for the web application
+     * @param sessionId The ID of the session for which the cookie will be created
+     * @param secure    Should session cookie be configured as secure
+     *
      * @return the cookie for the session
      */
-    public static Cookie createSessionCookie(Context context,
-            String sessionId, boolean secure) {
+    public static Cookie createSessionCookie(Context context, String sessionId, boolean secure) {
 
-        SessionCookieConfig scc =
-            context.getServletContext().getSessionCookieConfig();
+        SessionCookieConfig scc = context.getServletContext().getSessionCookieConfig();
 
         // NOTE: The priority order for session cookie configuration is:
-        //       1. Context level configuration
-        //       2. Values from SessionCookieConfig
-        //       3. Defaults
+        // 1. Context level configuration
+        // 2. Values from SessionCookieConfig
+        // 3. Defaults
 
-        Cookie cookie = new Cookie(
-                SessionConfig.getSessionCookieName(context), sessionId);
+        Cookie cookie = new Cookie(SessionConfig.getSessionCookieName(context), sessionId);
 
         // Just apply the defaults.
         cookie.setMaxAge(scc.getMaxAge());
