@@ -35,13 +35,12 @@ import org.apache.naming.ContextBindings;
 import org.apache.tomcat.util.ExceptionUtils;
 
 /**
- * Implementation of {@link org.apache.catalina.Realm} that is based on an
- * implementation of {@link UserDatabase} made available through the JNDI
- * resources configured for this instance of Catalina. Set the
- * <code>resourceName</code> parameter to the JNDI resources name for the
- * configured instance of <code>UserDatabase</code> that we should consult.
+ * Implementation of {@link org.apache.catalina.Realm} that is based on an implementation of {@link UserDatabase} made
+ * available through the JNDI resources configured for this instance of Catalina. Set the <code>resourceName</code>
+ * parameter to the JNDI resources name for the configured instance of <code>UserDatabase</code> that we should consult.
  *
  * @author Craig R. McClanahan
+ *
  * @since 4.1
  */
 public class UserDatabaseRealm extends RealmBase {
@@ -49,14 +48,14 @@ public class UserDatabaseRealm extends RealmBase {
     // ----------------------------------------------------- Instance Variables
 
     /**
-     * The <code>UserDatabase</code> we will use to authenticate users and
-     * identify associated roles.
+     * The <code>UserDatabase</code> we will use to authenticate users and identify associated roles.
      */
     protected volatile UserDatabase database = null;
     private final Object databaseLock = new Object();
 
     /**
      * Descriptive information about this Realm implementation.
+     *
      * @deprecated This will be removed in Tomcat 9 onwards.
      */
     @Deprecated
@@ -64,8 +63,7 @@ public class UserDatabaseRealm extends RealmBase {
 
 
     /**
-     * The global JNDI name of the <code>UserDatabase</code> resource we will be
-     * utilizing.
+     * The global JNDI name of the <code>UserDatabase</code> resource we will be utilizing.
      */
     protected String resourceName = "UserDatabase";
 
@@ -78,8 +76,7 @@ public class UserDatabaseRealm extends RealmBase {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return the global JNDI name of the <code>UserDatabase</code> resource we
-     *         will be using.
+     * @return the global JNDI name of the <code>UserDatabase</code> resource we will be using.
      */
     public String getResourceName() {
         return resourceName;
@@ -87,8 +84,7 @@ public class UserDatabaseRealm extends RealmBase {
 
 
     /**
-     * Set the global JNDI name of the <code>UserDatabase</code> resource we
-     * will be using.
+     * Set the global JNDI name of the <code>UserDatabase</code> resource we will be using.
      *
      * @param resourceName The new global JNDI name
      */
@@ -98,12 +94,11 @@ public class UserDatabaseRealm extends RealmBase {
 
 
     /**
-     * Determines whether this Realm is configured to obtain the associated
-     * {@link UserDatabase} from the global JNDI context or a local (web
-     * application) JNDI context.
+     * Determines whether this Realm is configured to obtain the associated {@link UserDatabase} from the global JNDI
+     * context or a local (web application) JNDI context.
      *
-     * @return {@code true} if a local JNDI context will be used, {@code false}
-     *         if the the global JNDI context will be used
+     * @return {@code true} if a local JNDI context will be used, {@code false} if the the global JNDI context will be
+     *             used
      */
     public boolean getLocalJndiResource() {
         return localJndiResource;
@@ -111,11 +106,10 @@ public class UserDatabaseRealm extends RealmBase {
 
 
     /**
-     * Configure whether this Realm obtains the associated {@link UserDatabase}
-     * from the global JNDI context or a local (web application) JNDI context.
+     * Configure whether this Realm obtains the associated {@link UserDatabase} from the global JNDI context or a local
+     * (web application) JNDI context.
      *
-     * @param localJndiResource {@code true} to use a local JNDI context,
-     *                          {@code false} to use the global JNDI context
+     * @param localJndiResource {@code true} to use a local JNDI context, {@code false} to use the global JNDI context
      */
     public void setLocalJndiResource(boolean localJndiResource) {
         this.localJndiResource = localJndiResource;
@@ -179,8 +173,7 @@ public class UserDatabaseRealm extends RealmBase {
 
 
     /*
-     * Can't do this in startInternal() with local JNDI as the local JNDI
-     * context won't be initialised at this point.
+     * Can't do this in startInternal() with local JNDI as the local JNDI context won't be initialised at this point.
      */
     private UserDatabase getUserDatabase() {
         // DCL so database MUST be volatile
@@ -229,12 +222,10 @@ public class UserDatabaseRealm extends RealmBase {
 
 
     /**
-     * Gracefully terminate the active use of the public methods of this
-     * component and implement the requirements of
+     * Gracefully terminate the active use of the public methods of this component and implement the requirements of
      * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *                that needs to be reported
+     * @exception LifecycleException if this component detects a fatal error that needs to be reported
      */
     @Override
     protected void stopInternal() throws LifecycleException {
