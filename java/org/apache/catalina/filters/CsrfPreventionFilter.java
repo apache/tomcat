@@ -331,6 +331,12 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
 
+    /**
+     * Despite its name, this is a FIFO cache not an LRU cache. Using an older nonce should not delay its removal from
+     * the cache in favour of more recent values.
+     *
+     * @param <T> The type held by this cache.
+     */
     protected static class LruCache<T> implements NonceCache<T> {
 
         private static final long serialVersionUID = 1L;
