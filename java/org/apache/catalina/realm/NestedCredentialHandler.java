@@ -38,11 +38,8 @@ public class NestedCredentialHandler implements CredentialHandler {
 
 
     /**
-     * The input credentials will be passed to the first nested
-     * {@link CredentialHandler}. If no nested {@link CredentialHandler} are
-     * configured then <code>null</code> will be returned.
-     *
-     * {@inheritDoc}
+     * The input credentials will be passed to the first nested {@link CredentialHandler}. If no nested
+     * {@link CredentialHandler} are configured then <code>null</code> will be returned. {@inheritDoc}
      */
     @Override
     public String mutate(String inputCredentials) {
