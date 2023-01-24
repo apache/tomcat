@@ -35,8 +35,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * Represents a single resource (file or directory) that is located on a file
- * system.
+ * Represents a single resource (file or directory) that is located on a file system.
  */
 public class FileResource extends AbstractResource {
 
@@ -63,9 +62,8 @@ public class FileResource extends AbstractResource {
     private final Manifest manifest;
     private final boolean needConvert;
 
-    public FileResource(WebResourceRoot root, String webAppPath,
-            File resource, boolean readOnly, Manifest manifest) {
-        super(root,webAppPath);
+    public FileResource(WebResourceRoot root, String webAppPath, File resource, boolean readOnly, Manifest manifest) {
+        super(root, webAppPath);
         this.resource = resource;
 
         if (webAppPath.charAt(webAppPath.length() - 1) == '/') {
@@ -76,9 +74,7 @@ public class FileResource extends AbstractResource {
                 // This is the root directory of a mounted ResourceSet
                 // Need to return the mounted name, not the real name
                 int endOfName = webAppPath.length() - 1;
-                name = webAppPath.substring(
-                        webAppPath.lastIndexOf('/', endOfName - 1) + 1,
-                        endOfName);
+                name = webAppPath.substring(webAppPath.lastIndexOf('/', endOfName - 1) + 1, endOfName);
             }
         } else {
             // Must be a file
@@ -156,8 +152,7 @@ public class FileResource extends AbstractResource {
             return resource.getCanonicalPath();
         } catch (IOException ioe) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("fileResource.getCanonicalPathFail",
-                        resource.getPath()), ioe);
+                log.debug(sm.getString("fileResource.getCanonicalPathFail", resource.getPath()), ioe);
             }
             return null;
         }
@@ -193,9 +188,8 @@ public class FileResource extends AbstractResource {
 
         if (len > Integer.MAX_VALUE) {
             // Can't create an array that big
-            throw new ArrayIndexOutOfBoundsException(sm.getString(
-                    "abstractResource.getContentTooLarge", getWebappPath(),
-                    Long.valueOf(len)));
+            throw new ArrayIndexOutOfBoundsException(
+                    sm.getString("abstractResource.getContentTooLarge", getWebappPath(), Long.valueOf(len)));
         }
 
         if (len < 0) {
@@ -217,8 +211,7 @@ public class FileResource extends AbstractResource {
             }
         } catch (IOException ioe) {
             if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("abstractResource.getContentFail",
-                        getWebappPath()), ioe);
+                getLog().debug(sm.getString("abstractResource.getContentFail", getWebappPath()), ioe);
             }
             return null;
         }
@@ -242,13 +235,11 @@ public class FileResource extends AbstractResource {
     @Override
     public long getCreation() {
         try {
-            BasicFileAttributes attrs = Files.readAttributes(resource.toPath(),
-                    BasicFileAttributes.class);
+            BasicFileAttributes attrs = Files.readAttributes(resource.toPath(), BasicFileAttributes.class);
             return attrs.creationTime().toMillis();
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("fileResource.getCreationFail",
-                        resource.getPath()), e);
+                log.debug(sm.getString("fileResource.getCreationFail", resource.getPath()), e);
             }
             return 0;
         }
@@ -261,8 +252,7 @@ public class FileResource extends AbstractResource {
                 return resource.toURI().toURL();
             } catch (MalformedURLException e) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("fileResource.getUrlFail",
-                            resource.getPath()), e);
+                    log.debug(sm.getString("fileResource.getUrlFail", resource.getPath()), e);
                 }
                 return null;
             }

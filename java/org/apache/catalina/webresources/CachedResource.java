@@ -43,9 +43,8 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * This class is designed to wrap a 'raw' WebResource and providing caching for
- * expensive operations. Inexpensive operations may be passed through to the
- * underlying resource.
+ * This class is designed to wrap a 'raw' WebResource and providing caching for expensive operations. Inexpensive
+ * operations may be passed through to the underlying resource.
  */
 public class CachedResource implements WebResource {
 
@@ -77,8 +76,8 @@ public class CachedResource implements WebResource {
     private volatile Long cachedContentLength = null;
 
 
-    public CachedResource(Cache cache, StandardRoot root, String path, long ttl,
-            int objectMaxSizeBytes, boolean usesClassLoaderResources) {
+    public CachedResource(Cache cache, StandardRoot root, String path, long ttl, int objectMaxSizeBytes,
+            boolean usesClassLoaderResources) {
         this.cache = cache;
         this.root = root;
         this.webAppPath = path;
@@ -104,8 +103,7 @@ public class CachedResource implements WebResource {
         if (webResource == null) {
             synchronized (this) {
                 if (webResource == null) {
-                    webResource = root.getResourceInternal(
-                            webAppPath, useClassLoaderResources);
+                    webResource = root.getResourceInternal(webAppPath, useClassLoaderResources);
                     getLastModified();
                     getContentLength();
                     nextCheck = ttl + now;
@@ -127,8 +125,7 @@ public class CachedResource implements WebResource {
 
         // Assume resources inside WARs will not change
         if (!root.isPackedWarFile()) {
-            WebResource webResourceInternal = root.getResourceInternal(
-                    webAppPath, useClassLoaderResources);
+            WebResource webResourceInternal = root.getResourceInternal(webAppPath, useClassLoaderResources);
             if (!webResource.exists() && webResourceInternal.exists()) {
                 return false;
             }
@@ -157,8 +154,7 @@ public class CachedResource implements WebResource {
         if (webResources == null) {
             synchronized (this) {
                 if (webResources == null) {
-                    webResources = root.getResourcesInternal(
-                            webAppPath, useClassLoaderResources);
+                    webResources = root.getResourcesInternal(webAppPath, useClassLoaderResources);
                     nextCheck = ttl + now;
                     return true;
                 }
@@ -318,40 +314,30 @@ public class CachedResource implements WebResource {
     @Override
     public URL getURL() {
         /*
-         * We don't want applications using this URL to access the resource
-         * directly as that could lead to inconsistent results when the resource
-         * is updated on the file system but the cache entry has not yet
-         * expired. We saw this, for example, in JSP compilation.
-         * - last modified time was obtained via
-         *   ServletContext.getResource("path").openConnection().getLastModified()
-         * - JSP content was obtained via
-         *   ServletContext.getResourceAsStream("path")
-         * The result was that the JSP modification was detected but the JSP
-         * content was read from the cache so the non-updated JSP page was
-         * used to generate the .java and .class file
+         * We don't want applications using this URL to access the resource directly as that could lead to inconsistent
+         * results when the resource is updated on the file system but the cache entry has not yet expired. We saw this,
+         * for example, in JSP compilation. - last modified time was obtained via
+         * ServletContext.getResource("path").openConnection().getLastModified() - JSP content was obtained via
+         * ServletContext.getResourceAsStream("path") The result was that the JSP modification was detected but the JSP
+         * content was read from the cache so the non-updated JSP page was used to generate the .java and .class file
          *
-         * One option to resolve this issue is to use a custom URL scheme for
-         * resource URLs. This would allow us, via registration of a
-         * URLStreamHandlerFactory, to control how the resources are accessed
-         * and ensure that all access go via the cache We took this approach for
-         * war: URLs so we can use jar:war:file: URLs to reference resources in
-         * unpacked WAR files. However, because URL.setURLStreamHandlerFactory()
-         * may only be caused once, this can cause problems when using other
-         * libraries that also want to use a custom URL scheme.
+         * One option to resolve this issue is to use a custom URL scheme for resource URLs. This would allow us, via
+         * registration of a URLStreamHandlerFactory, to control how the resources are accessed and ensure that all
+         * access go via the cache We took this approach for war: URLs so we can use jar:war:file: URLs to reference
+         * resources in unpacked WAR files. However, because URL.setURLStreamHandlerFactory() may only be caused once,
+         * this can cause problems when using other libraries that also want to use a custom URL scheme.
          *
-         * The approach below allows us to insert a custom URLStreamHandler
-         * without registering a custom protocol. The only limitation (compared
-         * to registering a custom protocol) is that if the application
-         * constructs the same URL from a String, they will access the resource
-         * directly and not via the cache.
+         * The approach below allows us to insert a custom URLStreamHandler without registering a custom protocol. The
+         * only limitation (compared to registering a custom protocol) is that if the application constructs the same
+         * URL from a String, they will access the resource directly and not via the cache.
          */
         URL resourceURL = webResource.getURL();
         if (resourceURL == null) {
             return null;
         }
         try {
-            CachedResourceURLStreamHandler handler =
-                    new CachedResourceURLStreamHandler(resourceURL, root, webAppPath, usesClassLoaderResources);
+            CachedResourceURLStreamHandler handler = new CachedResourceURLStreamHandler(resourceURL, root, webAppPath,
+                    usesClassLoaderResources);
             URL result = new URL(null, resourceURL.toExternalForm(), handler);
             handler.setAssociatedURL(result);
             return result;
@@ -411,8 +397,7 @@ public class CachedResource implements WebResource {
 
 
     /*
-     * Mimics the behaviour of FileURLConnection.getInputStream for a directory.
-     * Deliberately uses default locale.
+     * Mimics the behaviour of FileURLConnection.getInputStream for a directory. Deliberately uses default locale.
      */
     private static InputStream buildInputStream(String[] files) {
         Arrays.sort(files, Collator.getInstance(Locale.getDefault()));
