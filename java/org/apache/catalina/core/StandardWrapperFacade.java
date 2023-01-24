@@ -28,8 +28,7 @@ import javax.servlet.ServletContext;
  *
  * @author Remy Maucherat
  */
-public final class StandardWrapperFacade
-    implements ServletConfig {
+public final class StandardWrapperFacade implements ServletConfig {
 
 
     // ----------------------------------------------------------- Constructors
@@ -37,6 +36,7 @@ public final class StandardWrapperFacade
 
     /**
      * Create a new facade around a StandardWrapper.
+     *
      * @param config the associated wrapper
      */
     public StandardWrapperFacade(StandardWrapper config) {
