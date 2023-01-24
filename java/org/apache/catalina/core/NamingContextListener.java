@@ -75,8 +75,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Helper class used to initialize and populate the JNDI context associated
- * with each context and server.
+ * Helper class used to initialize and populate the JNDI context associated with each context and server.
  *
  * @author Remy Maucherat
  */
@@ -141,8 +140,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
 
 
     /**
-     * Determines if an attempt to write to a read-only context results in an
-     * exception or if the request is ignored.
+     * Determines if an attempt to write to a read-only context results in an exception or if the request is ignored.
      */
     private boolean exceptionOnFailedWrite = true;
 
@@ -150,8 +148,8 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return whether or not an attempt to modify the JNDI context will trigger
-     * an exception or if the request will be ignored.
+     * @return whether or not an attempt to modify the JNDI context will trigger an exception or if the request will be
+     *             ignored.
      */
     public boolean getExceptionOnFailedWrite() {
         return exceptionOnFailedWrite;
@@ -159,10 +157,10 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
 
 
     /**
-     * Controls whether or not an attempt to modify the JNDI context will
-     * trigger an exception or if the request will be ignored.
+     * Controls whether or not an attempt to modify the JNDI context will trigger an exception or if the request will be
+     * ignored.
      *
-     * @param exceptionOnFailedWrite    The new value
+     * @param exceptionOnFailedWrite The new value
      */
     public void setExceptionOnFailedWrite(boolean exceptionOnFailedWrite) {
         this.exceptionOnFailedWrite = exceptionOnFailedWrite;
@@ -229,13 +227,12 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 ContextAccessController.setSecurityToken(getName(), token);
                 ContextAccessController.setSecurityToken(container, token);
                 ContextBindings.bindContext(container, namingContext, token);
-                if( log.isDebugEnabled() ) {
-                    log.debug("Bound " + container );
+                if (log.isDebugEnabled()) {
+                    log.debug("Bound " + container);
                 }
 
                 // Configure write when read-only behaviour
-                namingContext.setExceptionOnFailedWrite(
-                        getExceptionOnFailedWrite());
+                namingContext.setExceptionOnFailedWrite(getExceptionOnFailedWrite());
 
                 // Setting the context in read/write mode
                 ContextAccessController.setWritable(getName(), token);
@@ -243,8 +240,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 try {
                     createNamingContext();
                 } catch (NamingException e) {
-                    log.error
-                        (sm.getString("naming.namingContextCreationFailed", e));
+                    log.error(sm.getString("naming.namingContextCreationFailed", e));
                 }
 
                 namingResources.addPropertyChangeListener(this);
@@ -262,17 +258,14 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 }
 
                 if (container instanceof Server) {
-                    org.apache.naming.factory.ResourceLinkFactory.setGlobalContext
-                        (namingContext);
+                    org.apache.naming.factory.ResourceLinkFactory.setGlobalContext(namingContext);
                     try {
-                        ContextBindings.bindClassLoader(container, token,
-                                this.getClass().getClassLoader());
+                        ContextBindings.bindClassLoader(container, token, this.getClass().getClassLoader());
                     } catch (NamingException e) {
                         log.error(sm.getString("naming.bindFailed", e));
                     }
                     if (container instanceof StandardServer) {
-                        ((StandardServer) container).setGlobalNamingContext
-                            (namingContext);
+                        ((StandardServer) container).setGlobalNamingContext(namingContext);
                     }
                 }
 
@@ -298,8 +291,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 }
 
                 if (container instanceof Server) {
-                    ContextBindings.unbindClassLoader(container, token,
-                            this.getClass().getClassLoader());
+                    ContextBindings.unbindClassLoader(container, token, this.getClass().getClassLoader());
                 }
 
                 namingResources.removePropertyChangeListener(this);
@@ -355,9 +347,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
             // Setting the context in read/write mode
             ContextAccessController.setWritable(getName(), token);
 
-            processGlobalResourcesChange(event.getPropertyName(),
-                                         event.getOldValue(),
-                                         event.getNewValue());
+            processGlobalResourcesChange(event.getPropertyName(), event.getOldValue(), event.getNewValue());
 
             // Setting the context in read only mode
             ContextAccessController.setReadOnly(getName());
@@ -371,16 +361,14 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
 
 
     /**
-     * Process a property change on the naming resources, by making the
-     * corresponding addition or removal to the associated JNDI context.
+     * Process a property change on the naming resources, by making the corresponding addition or removal to the
+     * associated JNDI context.
      *
-     * @param name Property name of the change to be processed
+     * @param name     Property name of the change to be processed
      * @param oldValue The old value (or <code>null</code> if adding)
      * @param newValue The new value (or <code>null</code> if removing)
      */
-    private void processGlobalResourcesChange(String name,
-                                              Object oldValue,
-                                              Object newValue) {
+    private void processGlobalResourcesChange(String name, Object oldValue, Object newValue) {
 
         if (name.equals("ejb")) {
             if (oldValue != null) {
@@ -449,15 +437,13 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
             }
         } else if (name.equals("resourceEnvRef")) {
             if (oldValue != null) {
-                ContextResourceEnvRef resourceEnvRef =
-                    (ContextResourceEnvRef) oldValue;
+                ContextResourceEnvRef resourceEnvRef = (ContextResourceEnvRef) oldValue;
                 if (resourceEnvRef.getName() != null) {
                     removeResourceEnvRef(resourceEnvRef.getName());
                 }
             }
             if (newValue != null) {
-                ContextResourceEnvRef resourceEnvRef =
-                    (ContextResourceEnvRef) newValue;
+                ContextResourceEnvRef resourceEnvRef = (ContextResourceEnvRef) newValue;
                 if (resourceEnvRef.getName() != null) {
                     addResourceEnvRef(resourceEnvRef);
                 }
@@ -497,8 +483,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
     /**
      * Create and initialize the JNDI naming context.
      */
-    private void createNamingContext()
-        throws NamingException {
+    private void createNamingContext() throws NamingException {
 
         // Creating the comp subcontext
         if (container instanceof Server) {
@@ -521,8 +506,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
         }
 
         // Resource links
-        ContextResourceLink[] resourceLinks =
-            namingResources.findResourceLinks();
+        ContextResourceLink[] resourceLinks = namingResources.findResourceLinks();
         for (i = 0; i < resourceLinks.length; i++) {
             addResourceLink(resourceLinks[i]);
         }
@@ -540,8 +524,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
         }
 
         // Environment entries
-        ContextEnvironment[] contextEnvironments =
-            namingResources.findEnvironments();
+        ContextEnvironment[] contextEnvironments = namingResources.findEnvironments();
         for (i = 0; i < contextEnvironments.length; i++) {
             addEnvironment(contextEnvironments[i]);
         }
@@ -590,8 +573,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
         // Binding the resources directory context
         if (container instanceof Context) {
             try {
-                compCtx.bind("Resources",
-                             ((Context) container).getResources());
+                compCtx.bind("Resources", ((Context) container).getResources());
             } catch (NamingException e) {
                 log.error(sm.getString("naming.bindFailed", e));
             }
@@ -601,15 +583,15 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
 
 
     /**
-     * Create an <code>ObjectName</code> for this
-     * <code>ContextResource</code> object.
+     * Create an <code>ObjectName</code> for this <code>ContextResource</code> object.
      *
      * @param resource The resource
+     *
      * @return ObjectName The object name
+     *
      * @exception MalformedObjectNameException if a name cannot be created
      */
-    protected ObjectName createObjectName(ContextResource resource)
-        throws MalformedObjectNameException {
+    protected ObjectName createObjectName(ContextResource resource) throws MalformedObjectNameException {
 
         String domain = null;
         if (container instanceof StandardServer) {
@@ -624,20 +606,16 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
         ObjectName name = null;
         String quotedResourceName = ObjectName.quote(resource.getName());
         if (container instanceof Server) {
-            name = new ObjectName(domain + ":type=DataSource" +
-                        ",class=" + resource.getType() +
-                        ",name=" + quotedResourceName);
+            name = new ObjectName(
+                    domain + ":type=DataSource" + ",class=" + resource.getType() + ",name=" + quotedResourceName);
         } else if (container instanceof Context) {
-            String contextName = ((Context)container).getName();
+            String contextName = ((Context) container).getName();
             if (!contextName.startsWith("/")) {
                 contextName = "/" + contextName;
             }
-            Host host = (Host) ((Context)container).getParent();
-            name = new ObjectName(domain + ":type=DataSource" +
-                    ",host=" + host.getName() +
-                    ",context=" + contextName +
-                    ",class=" + resource.getType() +
-                    ",name=" + quotedResourceName);
+            Host host = (Host) ((Context) container).getParent();
+            name = new ObjectName(domain + ":type=DataSource" + ",host=" + host.getName() + ",context=" + contextName +
+                    ",class=" + resource.getType() + ",name=" + quotedResourceName);
         }
 
         return name;
@@ -743,8 +721,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 } else {
                     value = constructEnvEntry(env.getType(), env.getValue());
                     if (value == null) {
-                        log.error(sm.getString(
-                                "naming.invalidEnvEntryType", env.getName()));
+                        log.error(sm.getString("naming.invalidEnvEntryType", env.getName()));
                     }
                 }
             } catch (IllegalArgumentException e) {
@@ -772,8 +749,8 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
             Class<?> clazz = Class.forName(type);
             Constructor<?> c = null;
             try {
-                 c = clazz.getConstructor(String.class);
-                 return c.newInstance(value);
+                c = clazz.getConstructor(String.class);
+                return c.newInstance(value);
             } catch (NoSuchMethodException e) {
                 // Ignore
             }
@@ -840,18 +817,15 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 }
                 if (wsdlURL == null) {
                     try {
-                        wsdlURL = ((Context) container).getServletContext().getResource(
-                                service.getWsdlfile());
+                        wsdlURL = ((Context) container).getServletContext().getResource(service.getWsdlfile());
                     } catch (MalformedURLException e) {
                         // Ignore and carry on
                     }
                 }
                 if (wsdlURL == null) {
                     try {
-                        wsdlURL = ((Context) container).getServletContext().getResource(
-                                "/" + service.getWsdlfile());
-                        log.debug("  Changing service ref wsdl file for /"
-                                    + service.getWsdlfile());
+                        wsdlURL = ((Context) container).getServletContext().getResource("/" + service.getWsdlfile());
+                        log.debug("  Changing service ref wsdl file for /" + service.getWsdlfile());
                     } catch (MalformedURLException e) {
                         log.error(sm.getString("naming.wsdlFailed", e));
                     }
@@ -874,18 +848,17 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 }
                 if (jaxrpcURL == null) {
                     try {
-                        jaxrpcURL = ((Context) container).getServletContext().getResource(
-                                service.getJaxrpcmappingfile());
+                        jaxrpcURL = ((Context) container).getServletContext()
+                                .getResource(service.getJaxrpcmappingfile());
                     } catch (MalformedURLException e) {
                         // Ignore and carry on
                     }
                 }
                 if (jaxrpcURL == null) {
                     try {
-                        jaxrpcURL = ((Context) container).getServletContext().getResource(
-                                "/" + service.getJaxrpcmappingfile());
-                        log.debug("  Changing service ref jaxrpc file for /"
-                                    + service.getJaxrpcmappingfile());
+                        jaxrpcURL = ((Context) container).getServletContext()
+                                .getResource("/" + service.getJaxrpcmappingfile());
+                        log.debug("  Changing service ref jaxrpc file for /" + service.getJaxrpcmappingfile());
                     } catch (MalformedURLException e) {
                         log.error(sm.getString("naming.wsdlFailed", e));
                     }
@@ -898,9 +871,8 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
             }
 
             // Create a reference to the resource.
-            ref = new ServiceRef(service.getName(), service.getInterface(),
-                    service.getServiceqname(), service.getWsdlfile(),
-                    service.getJaxrpcmappingfile());
+            ref = new ServiceRef(service.getName(), service.getInterface(), service.getServiceqname(),
+                    service.getWsdlfile(), service.getJaxrpcmappingfile());
 
             // Adding the additional port-component-ref, if any
             Iterator<String> portcomponent = service.getServiceendpoints();
@@ -965,8 +937,8 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
 
         if (ref == null) {
             // Create a reference to the resource.
-            ref = new ResourceRef(resource.getType(), resource.getDescription(),
-                    resource.getScope(), resource.getAuth(), resource.getSingleton());
+            ref = new ResourceRef(resource.getType(), resource.getDescription(), resource.getScope(),
+                    resource.getAuth(), resource.getSingleton());
             // Adding the additional parameters, if any
             Iterator<String> params = resource.listProperties();
             while (params.hasNext()) {
@@ -987,9 +959,8 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
             log.error(sm.getString("naming.bindFailed", e));
         }
 
-        if (("javax.sql.DataSource".equals(ref.getClassName())  ||
-            "javax.sql.XADataSource".equals(ref.getClassName())) &&
-                resource.getSingleton()) {
+        if (("javax.sql.DataSource".equals(ref.getClassName()) ||
+                "javax.sql.XADataSource".equals(ref.getClassName())) && resource.getSingleton()) {
             Object actualResource = null;
             try {
                 ObjectName on = createObjectName(resource);
@@ -1050,20 +1021,18 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
     public void addResourceLink(ContextResourceLink resourceLink) {
 
         // Create a reference to the resource.
-        Reference ref = new ResourceLinkRef
-            (resourceLink.getType(), resourceLink.getGlobal(), resourceLink.getFactory(), null);
+        Reference ref = new ResourceLinkRef(resourceLink.getType(), resourceLink.getGlobal(), resourceLink.getFactory(),
+                null);
         Iterator<String> i = resourceLink.listProperties();
         while (i.hasNext()) {
             String key = i.next();
             Object val = resourceLink.getProperty(key);
-            if (val!=null) {
+            if (val != null) {
                 StringRefAddr refAddr = new StringRefAddr(key, val.toString());
                 ref.add(refAddr);
             }
         }
-        javax.naming.Context ctx =
-            "UserTransaction".equals(resourceLink.getName())
-            ? compCtx : envCtx;
+        javax.naming.Context ctx = "UserTransaction".equals(resourceLink.getName()) ? compCtx : envCtx;
         try {
             if (log.isDebugEnabled()) {
                 log.debug("  Adding resource link " + resourceLink.getName());
@@ -1074,8 +1043,8 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
             log.error(sm.getString("naming.bindFailed", e));
         }
 
-        ResourceLinkFactory.registerGlobalResourceAccess(
-                getGlobalNamingContext(), resourceLink.getName(), resourceLink.getGlobal());
+        ResourceLinkFactory.registerGlobalResourceAccess(getGlobalNamingContext(), resourceLink.getName(),
+                resourceLink.getGlobal());
     }
 
 
@@ -1143,8 +1112,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
     /**
      * Remove the specified message destination ref from the naming context.
      *
-     * @param name the name of the message destination ref which should be
-     *             removed
+     * @param name the name of the message destination ref which should be removed
      */
     public void removeMessageDestinationRef(String name) {
 
@@ -1195,11 +1163,9 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
 
 
     /**
-     * Remove the specified resource environment reference from the naming
-     * context.
+     * Remove the specified resource environment reference from the naming context.
      *
-     * @param name the name of the resource environment reference which should
-     *             be removed
+     * @param name the name of the resource environment reference which should be removed
      */
     public void removeResourceEnvRef(String name) {
 
@@ -1232,8 +1198,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
     /**
      * Create all intermediate subcontexts.
      */
-    private void createSubcontexts(javax.naming.Context ctx, String name)
-        throws NamingException {
+    private void createSubcontexts(javax.naming.Context ctx, String name) throws NamingException {
         javax.naming.Context currentContext = ctx;
         StringTokenizer tokenizer = new StringTokenizer(name, "/");
         while (tokenizer.hasMoreTokens()) {
@@ -1244,8 +1209,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 } catch (NamingException e) {
                     // Silent catch. Probably an object is already bound in
                     // the context.
-                    currentContext =
-                        (javax.naming.Context) currentContext.lookup(token);
+                    currentContext = (javax.naming.Context) currentContext.lookup(token);
                 }
             }
         }
@@ -1256,6 +1220,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
      * Gets look up reference from resource if exist.
      *
      * @param resourceBase resource base object
+     *
      * @return lookup ref
      */
     private LookupRef lookForLookupRef(ResourceBase resourceBase) {

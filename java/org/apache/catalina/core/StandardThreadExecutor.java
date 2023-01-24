@@ -28,8 +28,7 @@ import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
-public class StandardThreadExecutor extends LifecycleMBeanBase
-        implements Executor, ResizableExecutor {
+public class StandardThreadExecutor extends LifecycleMBeanBase implements Executor, ResizableExecutor {
 
     protected static final StringManager sm = StringManager.getManager(StandardThreadExecutor.class);
 
@@ -80,35 +79,35 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
     protected int maxQueueSize = Integer.MAX_VALUE;
 
     /**
-     * After a context is stopped, threads in the pool are renewed. To avoid
-     * renewing all threads at the same time, this delay is observed between 2
-     * threads being renewed.
+     * After a context is stopped, threads in the pool are renewed. To avoid renewing all threads at the same time, this
+     * delay is observed between 2 threads being renewed.
      */
-    protected long threadRenewalDelay =
-        org.apache.tomcat.util.threads.Constants.DEFAULT_THREAD_RENEWAL_DELAY;
+    protected long threadRenewalDelay = org.apache.tomcat.util.threads.Constants.DEFAULT_THREAD_RENEWAL_DELAY;
 
     private TaskQueue taskqueue = null;
+
     // ---------------------------------------------- Constructors
     public StandardThreadExecutor() {
-        //empty constructor for the digester
+        // empty constructor for the digester
     }
 
 
     // ---------------------------------------------- Public Methods
 
     /**
-     * Start the component and implement the requirements
-     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
+     * Start the component and implement the requirements of
+     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
+     *                                   used
      */
     @Override
     protected void startInternal() throws LifecycleException {
 
         taskqueue = new TaskQueue(maxQueueSize);
-        TaskThreadFactory tf = new TaskThreadFactory(namePrefix,daemon,getThreadPriority());
-        executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), maxIdleTime, TimeUnit.MILLISECONDS,taskqueue, tf);
+        TaskThreadFactory tf = new TaskThreadFactory(namePrefix, daemon, getThreadPriority());
+        executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), maxIdleTime, TimeUnit.MILLISECONDS,
+                taskqueue, tf);
         executor.setThreadRenewalDelay(threadRenewalDelay);
         taskqueue.setParent(executor);
 
@@ -117,11 +116,10 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
 
 
     /**
-     * Stop the component and implement the requirements
-     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
+     * Stop the component and implement the requirements of
+     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
+     * @exception LifecycleException if this component detects a fatal error that needs to be reported
      */
     @Override
     protected void stopInternal() throws LifecycleException {

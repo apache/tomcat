@@ -55,16 +55,14 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Wrapper around a <code>jakarta.servlet.http.HttpServletRequest</code>
- * that transforms an application request object (which might be the original
- * one passed to a servlet, or might be based on the 2.3
- * <code>jakarta.servlet.http.HttpServletRequestWrapper</code> class)
- * back into an internal <code>org.apache.catalina.HttpRequest</code>.
+ * Wrapper around a <code>jakarta.servlet.http.HttpServletRequest</code> that transforms an application request object
+ * (which might be the original one passed to a servlet, or might be based on the 2.3
+ * <code>jakarta.servlet.http.HttpServletRequestWrapper</code> class) back into an internal
+ * <code>org.apache.catalina.HttpRequest</code>.
  * <p>
- * <strong>WARNING</strong>:  Due to Java's lack of support for multiple
- * inheritance, all of the logic in <code>ApplicationRequest</code> is
- * duplicated in <code>ApplicationHttpRequest</code>.  Make sure that you
- * keep these two classes in synchronization when making changes!
+ * <strong>WARNING</strong>: Due to Java's lack of support for multiple inheritance, all of the logic in
+ * <code>ApplicationRequest</code> is duplicated in <code>ApplicationHttpRequest</code>. Make sure that you keep these
+ * two classes in synchronization when making changes!
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
@@ -76,19 +74,13 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * The set of attribute names that are special for request dispatchers.
      */
-    protected static final String specials[] =
-    { RequestDispatcher.INCLUDE_REQUEST_URI,
-      RequestDispatcher.INCLUDE_CONTEXT_PATH,
-      RequestDispatcher.INCLUDE_SERVLET_PATH,
-      RequestDispatcher.INCLUDE_PATH_INFO,
-      RequestDispatcher.INCLUDE_QUERY_STRING,
-      RequestDispatcher.INCLUDE_MAPPING,
-      RequestDispatcher.FORWARD_REQUEST_URI,
-      RequestDispatcher.FORWARD_CONTEXT_PATH,
-      RequestDispatcher.FORWARD_SERVLET_PATH,
-      RequestDispatcher.FORWARD_PATH_INFO,
-      RequestDispatcher.FORWARD_QUERY_STRING,
-      RequestDispatcher.FORWARD_MAPPING};
+    protected static final String specials[] = { RequestDispatcher.INCLUDE_REQUEST_URI,
+            RequestDispatcher.INCLUDE_CONTEXT_PATH, RequestDispatcher.INCLUDE_SERVLET_PATH,
+            RequestDispatcher.INCLUDE_PATH_INFO, RequestDispatcher.INCLUDE_QUERY_STRING,
+            RequestDispatcher.INCLUDE_MAPPING, RequestDispatcher.FORWARD_REQUEST_URI,
+            RequestDispatcher.FORWARD_CONTEXT_PATH, RequestDispatcher.FORWARD_SERVLET_PATH,
+            RequestDispatcher.FORWARD_PATH_INFO, RequestDispatcher.FORWARD_QUERY_STRING,
+            RequestDispatcher.FORWARD_MAPPING };
 
     private static final int SPECIALS_FIRST_FORWARD_INDEX = 6;
 
@@ -99,13 +91,11 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * Construct a new wrapped request around the specified servlet request.
      *
-     * @param request The servlet request being wrapped
-     * @param context The target context for the wrapped request
-     * @param crossContext {@code true} if the wrapped request will be a
-     *                     cross-context request, otherwise {@code false}
+     * @param request      The servlet request being wrapped
+     * @param context      The target context for the wrapped request
+     * @param crossContext {@code true} if the wrapped request will be a cross-context request, otherwise {@code false}
      */
-    public ApplicationHttpRequest(HttpServletRequest request, Context context,
-                                  boolean crossContext) {
+    public ApplicationHttpRequest(HttpServletRequest request, Context context, boolean crossContext) {
 
         super(request);
         this.context = context;
@@ -131,8 +121,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * If this request is cross context, since this changes session access
-     * behavior.
+     * If this request is cross context, since this changes session access behavior.
      */
     protected final boolean crossContext;
 
@@ -144,8 +133,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * The request parameters for this request.  This is initialized from the
-     * wrapped request.
+     * The request parameters for this request. This is initialized from the wrapped request.
      */
     protected Map<String, String[]> parameters = null;
 
@@ -232,7 +220,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (name.equals(Globals.DISPATCHER_TYPE_ATTR)) {
             return dispatcherType;
         } else if (name.equals(Globals.DISPATCHER_REQUEST_PATH_ATTR)) {
-            if ( requestDispatcherPath != null ){
+            if (requestDispatcherPath != null) {
                 return requestDispatcherPath.toString();
             } else {
                 return null;
@@ -243,8 +231,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (pos == -1) {
             return getRequest().getAttribute(name);
         } else {
-            if ((specialAttributes[pos] == null) &&
-                    (specialAttributes[SPECIALS_FIRST_FORWARD_INDEX] == null) &&
+            if ((specialAttributes[pos] == null) && (specialAttributes[SPECIALS_FIRST_FORWARD_INDEX] == null) &&
                     (pos >= SPECIALS_FIRST_FORWARD_INDEX)) {
                 // If it's a forward special attribute, and null, it means this
                 // is an include, so we check the wrapped request since
@@ -259,8 +246,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Override the <code>getAttributeNames()</code> method of the wrapped
-     * request.
+     * Override the <code>getAttributeNames()</code> method of the wrapped request.
      */
     @Override
     public Enumeration<String> getAttributeNames() {
@@ -269,8 +255,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Override the <code>removeAttribute()</code> method of the
-     * wrapped request.
+     * Override the <code>removeAttribute()</code> method of the wrapped request.
      *
      * @param name Name of the attribute to remove
      */
@@ -285,17 +270,16 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Override the <code>setAttribute()</code> method of the
-     * wrapped request.
+     * Override the <code>setAttribute()</code> method of the wrapped request.
      *
-     * @param name Name of the attribute to set
+     * @param name  Name of the attribute to set
      * @param value Value of the attribute to set
      */
     @Override
     public void setAttribute(String name, Object value) {
 
         if (name.equals(Globals.DISPATCHER_TYPE_ATTR)) {
-            dispatcherType = (DispatcherType)value;
+            dispatcherType = (DispatcherType) value;
             return;
         } else if (name.equals(Globals.DISPATCHER_REQUEST_PATH_ATTR)) {
             requestDispatcherPath = value;
@@ -310,8 +294,8 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Return a RequestDispatcher that wraps the resource at the specified
-     * path, which may be interpreted as relative to the current request path.
+     * Return a RequestDispatcher that wraps the resource at the specified path, which may be interpreted as relative to
+     * the current request path.
      *
      * @param path Path of the resource to be wrapped
      */
@@ -338,8 +322,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         }
 
         // Convert a request-relative path to a context-relative one
-        String servletPath =
-            (String) getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
+        String servletPath = (String) getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
         if (servletPath == null) {
             servletPath = getServletPath();
         }
@@ -358,8 +341,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         String relative = null;
         if (context.getDispatchersUseEncodedPaths()) {
             if (pos >= 0) {
-                relative = URLEncoder.DEFAULT.encode(
-                        requestPath.substring(0, pos + 1), StandardCharsets.UTF_8) + path;
+                relative = URLEncoder.DEFAULT.encode(requestPath.substring(0, pos + 1), StandardCharsets.UTF_8) + path;
             } else {
                 relative = URLEncoder.DEFAULT.encode(requestPath, StandardCharsets.UTF_8) + path;
             }
@@ -378,7 +360,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
     /**
      * Override the getDispatcherType() method of the wrapped request.
-     *
      */
     @Override
     public DispatcherType getDispatcherType() {
@@ -390,8 +371,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Override the <code>getContextPath()</code> method of the wrapped
-     * request.
+     * Override the <code>getContextPath()</code> method of the wrapped request.
      */
     @Override
     public String getContextPath() {
@@ -417,8 +397,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Override the <code>getParameterMap()</code> method of the
-     * wrapped request.
+     * Override the <code>getParameterMap()</code> method of the wrapped request.
      */
     @Override
     public Map<String, String[]> getParameterMap() {
@@ -428,8 +407,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Override the <code>getParameterNames()</code> method of the
-     * wrapped request.
+     * Override the <code>getParameterNames()</code> method of the wrapped request.
      */
     @Override
     public Enumeration<String> getParameterNames() {
@@ -439,8 +417,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Override the <code>getParameterValues()</code> method of the
-     * wrapped request.
+     * Override the <code>getParameterValues()</code> method of the wrapped request.
      *
      * @param name Name of the requested parameter
      */
@@ -461,8 +438,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Override the <code>getPathTranslated()</code> method of the wrapped
-     * request.
+     * Override the <code>getPathTranslated()</code> method of the wrapped request.
      */
     @Override
     public String getPathTranslated() {
@@ -475,8 +451,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Override the <code>getQueryString()</code> method of the wrapped
-     * request.
+     * Override the <code>getQueryString()</code> method of the wrapped request.
      */
     @Override
     public String getQueryString() {
@@ -485,8 +460,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Override the <code>getRequestURI()</code> method of the wrapped
-     * request.
+     * Override the <code>getRequestURI()</code> method of the wrapped request.
      */
     @Override
     public String getRequestURI() {
@@ -495,8 +469,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Override the <code>getRequestURL()</code> method of the wrapped
-     * request.
+     * Override the <code>getRequestURL()</code> method of the wrapped request.
      */
     @Override
     public StringBuffer getRequestURL() {
@@ -505,8 +478,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Override the <code>getServletPath()</code> method of the wrapped
-     * request.
+     * Override the <code>getServletPath()</code> method of the wrapped request.
      */
     @Override
     public String getServletPath() {
@@ -521,8 +493,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Return the session associated with this Request, creating one
-     * if necessary.
+     * Return the session associated with this Request, creating one if necessary.
      */
     @Override
     public HttpSession getSession() {
@@ -531,8 +502,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Return the session associated with this Request, creating one
-     * if necessary and requested.
+     * Return the session associated with this Request, creating one if necessary and requested.
      *
      * @param create Create a new session if one does not exist
      */
@@ -561,8 +531,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             if (other != null) {
                 Session localSession = null;
                 try {
-                    localSession =
-                        context.getManager().findSession(other.getId());
+                    localSession = context.getManager().findSession(other.getId());
                     if (localSession != null && !localSession.isValid()) {
                         localSession = null;
                     }
@@ -570,8 +539,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
                     // Ignore
                 }
                 if (localSession == null && create) {
-                    localSession =
-                        context.getManager().createSession(other.getId());
+                    localSession = context.getManager().createSession(other.getId());
                 }
                 if (localSession != null) {
                     localSession.access();
@@ -589,11 +557,11 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Returns true if the request specifies a JSESSIONID that is valid within
-     * the context of this ApplicationHttpRequest, false otherwise.
+     * Returns true if the request specifies a JSESSIONID that is valid within the context of this
+     * ApplicationHttpRequest, false otherwise.
      *
-     * @return true if the request specifies a JSESSIONID that is valid within
-     * the context of this ApplicationHttpRequest, false otherwise.
+     * @return true if the request specifies a JSESSIONID that is valid within the context of this
+     *             ApplicationHttpRequest, false otherwise.
      */
     @Override
     public boolean isRequestedSessionIdValid() {
@@ -701,9 +669,8 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         super.setRequest(request);
 
         // Initialize the attributes for this request
-        dispatcherType = (DispatcherType)request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);
-        requestDispatcherPath =
-            request.getAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR);
+        dispatcherType = (DispatcherType) request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);
+        requestDispatcherPath = request.getAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR);
 
         // Initialize the path elements for this request
         contextPath = request.getContextPath();
@@ -740,9 +707,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Parses the parameters of this request.
-     *
-     * If parameters are present in both the query string and the request
+     * Parses the parameters of this request. If parameters are present in both the query string and the request
      * content, they are merged.
      */
     void parseParameters() {
@@ -754,7 +719,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         parameters = new ParameterMap<>();
         parameters.putAll(getRequest().getParameterMap());
         mergeParameters();
-        ((ParameterMap<String,String[]>) parameters).setLocked(true);
+        ((ParameterMap<String, String[]>) parameters).setLocked(true);
         parsedParams = true;
     }
 
@@ -762,8 +727,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * Save query parameters for this request.
      *
-     * @param queryString The query string containing parameters for this
-     *                    request
+     * @param queryString The query string containing parameters for this request
      */
     void setQueryParams(String queryString) {
         this.queryParamString = queryString;
@@ -778,8 +742,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     // ------------------------------------------------------ Protected Methods
 
     /**
-     * Is this attribute name one of the special ones that is added only for
-     * included servlets?
+     * Is this attribute name one of the special ones that is added only for included servlets?
      *
      * @param name Attribute name to be tested
      */
@@ -798,8 +761,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * Get a special attribute.
      *
-     * @return the special attribute pos, or -1 if it is not a special
-     *         attribute
+     * @return the special attribute pos, or -1 if it is not a special attribute
      */
     protected int getSpecial(String name) {
         for (int i = 0; i < specials.length; i++) {
@@ -873,10 +835,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Merge the parameters from the saved query parameter string (if any), and
-     * the parameters already present on this request (if any), such that the
-     * parameter values from the query string show up first if there are
-     * duplicate parameter names.
+     * Merge the parameters from the saved query parameter string (if any), and the parameters already present on this
+     * request (if any), such that the parameter values from the query string show up first if there are duplicate
+     * parameter names.
      */
     private void mergeParameters() {
 
@@ -930,8 +891,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Utility class used to expose the special attributes as being available
-     * as request attributes.
+     * Utility class used to expose the special attributes as being available as request attributes.
      */
     protected class AttributeNamesEnumerator implements Enumeration<String> {
 
@@ -954,8 +914,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         @Override
         public boolean hasMoreElements() {
-            return ((pos != last) || (next != null)
-                    || ((next = findNext()) != null));
+            return ((pos != last) || (next != null) || ((next = findNext()) != null));
         }
 
         @Override

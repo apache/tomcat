@@ -40,8 +40,7 @@ import jakarta.servlet.descriptor.JspConfigDescriptor;
 
 
 /**
- * Facade object which masks the internal <code>ApplicationContext</code>
- * object from the web application.
+ * Facade object which masks the internal <code>ApplicationContext</code> object from the web application.
  *
  * @author Remy Maucherat
  */
@@ -51,14 +50,13 @@ public class ApplicationContextFacade implements ServletContext {
     /**
      * Cache Class object used for reflection.
      */
-    private final Map<String,Class<?>[]> classCache;
+    private final Map<String, Class<?>[]> classCache;
 
 
     // ----------------------------------------------------------- Constructors
 
     /**
-     * Construct a new instance of this class, associated with the specified
-     * Context instance.
+     * Construct a new instance of this class, associated with the specified Context instance.
      *
      * @param context The associated Context instance
      */
@@ -71,8 +69,8 @@ public class ApplicationContextFacade implements ServletContext {
     }
 
 
-    private void initClassCache(){
-        Class<?>[] clazz = new Class[]{String.class};
+    private void initClassCache() {
+        Class<?>[] clazz = new Class[] { String.class };
         classCache.put("getContext", clazz);
         classCache.put("getMimeType", clazz);
         classCache.put("getResourcePaths", clazz);
@@ -81,27 +79,27 @@ public class ApplicationContextFacade implements ServletContext {
         classCache.put("getRequestDispatcher", clazz);
         classCache.put("getNamedDispatcher", clazz);
         classCache.put("getServlet", clazz);
-        classCache.put("setInitParameter", new Class[]{String.class, String.class});
-        classCache.put("createServlet", new Class[]{Class.class});
-        classCache.put("addServlet", new Class[]{String.class, String.class});
-        classCache.put("createFilter", new Class[]{Class.class});
-        classCache.put("addFilter", new Class[]{String.class, String.class});
-        classCache.put("createListener", new Class[]{Class.class});
+        classCache.put("setInitParameter", new Class[] { String.class, String.class });
+        classCache.put("createServlet", new Class[] { Class.class });
+        classCache.put("addServlet", new Class[] { String.class, String.class });
+        classCache.put("createFilter", new Class[] { Class.class });
+        classCache.put("addFilter", new Class[] { String.class, String.class });
+        classCache.put("createListener", new Class[] { Class.class });
         classCache.put("addListener", clazz);
         classCache.put("getFilterRegistration", clazz);
         classCache.put("getServletRegistration", clazz);
         classCache.put("getInitParameter", clazz);
-        classCache.put("setAttribute", new Class[]{String.class, Object.class});
+        classCache.put("setAttribute", new Class[] { String.class, Object.class });
         classCache.put("removeAttribute", clazz);
         classCache.put("getRealPath", clazz);
         classCache.put("getAttribute", clazz);
         classCache.put("log", clazz);
-        classCache.put("setSessionTrackingModes", new Class[]{Set.class} );
-        classCache.put("addJspFile", new Class[]{String.class, String.class});
-        classCache.put("declareRoles", new Class[]{String[].class});
-        classCache.put("setSessionTimeout", new Class[]{int.class});
-        classCache.put("setRequestCharacterEncoding", new Class[]{String.class});
-        classCache.put("setResponseCharacterEncoding", new Class[]{String.class});
+        classCache.put("setSessionTrackingModes", new Class[] { Set.class });
+        classCache.put("addJspFile", new Class[] { String.class, String.class });
+        classCache.put("declareRoles", new Class[] { String[].class });
+        classCache.put("setSessionTimeout", new Class[] { int.class });
+        classCache.put("setRequestCharacterEncoding", new Class[] { String.class });
+        classCache.put("setResponseCharacterEncoding", new Class[] { String.class });
     }
 
 
@@ -120,9 +118,8 @@ public class ApplicationContextFacade implements ServletContext {
     @Override
     public ServletContext getContext(String uripath) {
         ServletContext theContext = context.getContext(uripath);
-        if ((theContext != null) &&
-            (theContext instanceof ApplicationContext)){
-            theContext = ((ApplicationContext)theContext).getFacade();
+        if ((theContext != null) && (theContext instanceof ApplicationContext)) {
+            theContext = ((ApplicationContext) theContext).getFacade();
         }
         return theContext;
     }
@@ -214,7 +211,7 @@ public class ApplicationContextFacade implements ServletContext {
     @Override
     public Object getAttribute(String name) {
         return context.getAttribute(name);
-     }
+    }
 
 
     @Override
@@ -260,8 +257,7 @@ public class ApplicationContextFacade implements ServletContext {
 
 
     @Override
-    public FilterRegistration.Dynamic addFilter(String filterName,
-            Class<? extends Filter> filterClass) {
+    public FilterRegistration.Dynamic addFilter(String filterName, Class<? extends Filter> filterClass) {
         return context.addFilter(filterName, filterClass);
     }
 
