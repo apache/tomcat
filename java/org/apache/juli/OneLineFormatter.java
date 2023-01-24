@@ -30,9 +30,8 @@ import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 
 /**
- * Provides same information as default log format but on a single line to make
- * it easier to grep the logs. The only exception is stacktraces which are
- * always preceded by whitespace to make it simple to skip them.
+ * Provides same information as default log format but on a single line to make it easier to grep the logs. The only
+ * exception is stacktraces which are always preceded by whitespace to make it simple to skip them.
  */
 /*
  * Date processing based on AccessLogValve.
@@ -43,8 +42,8 @@ public class OneLineFormatter extends Formatter {
     private static final Object threadMxBeanLock = new Object();
     private static volatile ThreadMXBean threadMxBean = null;
     private static final int THREAD_NAME_CACHE_SIZE = 10000;
-    private static final ThreadLocal<ThreadNameCache> threadNameCache =
-            ThreadLocal.withInitial(() -> new ThreadNameCache(THREAD_NAME_CACHE_SIZE));
+    private static final ThreadLocal<ThreadNameCache> threadNameCache = ThreadLocal
+            .withInitial(() -> new ThreadNameCache(THREAD_NAME_CACHE_SIZE));
 
     /* Timestamp format */
     private static final String DEFAULT_TIME_FORMAT = "dd-MMM-yyyy HH:mm:ss.SSS";
@@ -68,8 +67,7 @@ public class OneLineFormatter extends Formatter {
 
 
     public OneLineFormatter() {
-        String timeFormat = LogManager.getLogManager().getProperty(
-                OneLineFormatter.class.getName() + ".timeFormat");
+        String timeFormat = LogManager.getLogManager().getProperty(OneLineFormatter.class.getName() + ".timeFormat");
         if (timeFormat == null) {
             timeFormat = DEFAULT_TIME_FORMAT;
         }
@@ -80,14 +78,13 @@ public class OneLineFormatter extends Formatter {
     /**
      * Specify the time format to use for time stamps in log messages.
      *
-     * @param timeFormat The format to use using the
-     *                   {@link java.text.SimpleDateFormat} syntax
+     * @param timeFormat The format to use using the {@link java.text.SimpleDateFormat} syntax
      */
     public void setTimeFormat(final String timeFormat) {
         final String cachedTimeFormat;
 
         if (timeFormat.endsWith(".SSS")) {
-            cachedTimeFormat = timeFormat.substring(0,  timeFormat.length() - 4);
+            cachedTimeFormat = timeFormat.substring(0, timeFormat.length() - 4);
             millisHandling = MillisHandling.APPEND;
         } else if (timeFormat.contains("SSS")) {
             millisHandling = MillisHandling.REPLACE_SSS;
@@ -103,9 +100,9 @@ public class OneLineFormatter extends Formatter {
             cachedTimeFormat = timeFormat;
         }
 
-        final DateFormatCache globalDateCache =
-                new DateFormatCache(globalCacheSize, cachedTimeFormat, null);
-        localDateCache = ThreadLocal.withInitial(() -> new DateFormatCache(localCacheSize, cachedTimeFormat, globalDateCache));
+        final DateFormatCache globalDateCache = new DateFormatCache(globalCacheSize, cachedTimeFormat, null);
+        localDateCache = ThreadLocal
+                .withInitial(() -> new DateFormatCache(localCacheSize, cachedTimeFormat, globalDateCache));
     }
 
 
@@ -212,16 +209,14 @@ public class OneLineFormatter extends Formatter {
 
 
     /**
-     * LogRecord has threadID but no thread name.
-     * LogRecord uses an int for thread ID but thread IDs are longs.
-     * If the real thread ID > (Integer.MAXVALUE / 2) LogRecord uses it's own
-     * ID in an effort to avoid clashes due to overflow.
+     * LogRecord has threadID but no thread name. LogRecord uses an int for thread ID but thread IDs are longs. If the
+     * real thread ID > (Integer.MAXVALUE / 2) LogRecord uses it's own ID in an effort to avoid clashes due to overflow.
      * <p>
-     * Words fail me to describe what I think of the design decision to use an
-     * int in LogRecord for a long value and the resulting mess that follows.
+     * Words fail me to describe what I think of the design decision to use an int in LogRecord for a long value and the
+     * resulting mess that follows.
      */
     private static String getThreadName(int logRecordThreadId) {
-        Map<Integer,String> cache = threadNameCache.get();
+        Map<Integer, String> cache = threadNameCache.get();
         String result = cache.get(Integer.valueOf(logRecordThreadId));
 
         if (result != null) {
@@ -239,8 +234,7 @@ public class OneLineFormatter extends Formatter {
                     }
                 }
             }
-            ThreadInfo threadInfo =
-                    threadMxBean.getThreadInfo(logRecordThreadId);
+            ThreadInfo threadInfo = threadMxBean.getThreadInfo(logRecordThreadId);
             if (threadInfo == null) {
                 return Long.toString(logRecordThreadId);
             }
@@ -253,7 +247,7 @@ public class OneLineFormatter extends Formatter {
     }
 
 
-    private static class ThreadNameCache extends LinkedHashMap<Integer,String> {
+    private static class ThreadNameCache extends LinkedHashMap<Integer, String> {
 
         private static final long serialVersionUID = 1L;
 
@@ -271,8 +265,8 @@ public class OneLineFormatter extends Formatter {
 
 
     /*
-     * Minimal implementation to indent the printing of stack traces. This
-     * implementation depends on Throwable using WrappedPrintWriter.
+     * Minimal implementation to indent the printing of stack traces. This implementation depends on Throwable using
+     * WrappedPrintWriter.
      */
     private static class IndentingPrintWriter extends PrintWriter {
 
@@ -289,10 +283,6 @@ public class OneLineFormatter extends Formatter {
 
 
     private static enum MillisHandling {
-        NONE,
-        APPEND,
-        REPLACE_S,
-        REPLACE_SS,
-        REPLACE_SSS,
+        NONE, APPEND, REPLACE_S, REPLACE_SS, REPLACE_SSS,
     }
 }
