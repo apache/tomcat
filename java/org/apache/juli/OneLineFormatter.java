@@ -254,6 +254,9 @@ public class OneLineFormatter extends Formatter {
     }
 
 
+    /*
+     * This is an LRU cache.
+     */
     private static class ThreadNameCache extends LinkedHashMap<Integer, String> {
 
         private static final long serialVersionUID = 1L;
@@ -261,6 +264,7 @@ public class OneLineFormatter extends Formatter {
         private final int cacheSize;
 
         public ThreadNameCache(int cacheSize) {
+            super(cacheSize, 0.75f, true);
             this.cacheSize = cacheSize;
         }
 
