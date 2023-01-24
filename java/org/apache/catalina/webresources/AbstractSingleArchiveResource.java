@@ -40,8 +40,8 @@ public abstract class AbstractSingleArchiveResource extends AbstractArchiveResou
             return new JarInputStreamWrapper(jarEntry, is);
         } catch (IOException e) {
             if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("jarResource.getInputStreamFail",
-                        getResource().getName(), getBaseUrl()), e);
+                getLog().debug(sm.getString("jarResource.getInputStreamFail", getResource().getName(), getBaseUrl()),
+                        e);
             }
             if (jarFile != null) {
                 getArchiveResourceSet().closeJarFile();

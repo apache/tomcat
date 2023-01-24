@@ -27,8 +27,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.UriUtil;
 
 /**
- * Represents a single resource (file or directory) that is located within a
- * JAR that in turn is located in a WAR file.
+ * Represents a single resource (file or directory) that is located within a JAR that in turn is located in a WAR file.
  */
 public class JarWarResource extends AbstractArchiveResource {
 
@@ -36,11 +35,10 @@ public class JarWarResource extends AbstractArchiveResource {
 
     private final String archivePath;
 
-    public JarWarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
-            String baseUrl, JarEntry jarEntry, String archivePath) {
+    public JarWarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath, String baseUrl,
+            JarEntry jarEntry, String archivePath) {
 
-        super(archiveResourceSet, webAppPath,
-                "jar:war:" + baseUrl + UriUtil.getWarSeparator() + archivePath + "!/",
+        super(archiveResourceSet, webAppPath, "jar:war:" + baseUrl + UriUtil.getWarSeparator() + archivePath + "!/",
                 jarEntry, "war:" + baseUrl + UriUtil.getWarSeparator() + archivePath);
         this.archivePath = archivePath;
     }
@@ -57,8 +55,7 @@ public class JarWarResource extends AbstractArchiveResource {
 
             jarIs = new JarInputStream(isInWar);
             entry = jarIs.getNextJarEntry();
-            while (entry != null &&
-                    !entry.getName().equals(getResource().getName())) {
+            while (entry != null && !entry.getName().equals(getResource().getName())) {
                 entry = jarIs.getNextJarEntry();
             }
 
@@ -69,8 +66,7 @@ public class JarWarResource extends AbstractArchiveResource {
             return new JarInputStreamWrapper(entry, jarIs);
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("jarResource.getInputStreamFail",
-                        getResource().getName(), getBaseUrl()), e);
+                log.debug(sm.getString("jarResource.getInputStreamFail", getResource().getName(), getBaseUrl()), e);
             }
             // Ensure jarIs is closed if there is an exception
             entry = null;
