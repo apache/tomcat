@@ -31,38 +31,38 @@ public class Arrays {
     protected static final StringManager sm = StringManager.getManager(Arrays.class);
 
     public static boolean contains(byte[] source, int srcoffset, byte[] key, int keyoffset, int length) {
-        if ( srcoffset < 0 || srcoffset >= source.length) {
+        if (srcoffset < 0 || srcoffset >= source.length) {
             throw new ArrayIndexOutOfBoundsException(sm.getString("arrays.srcoffset.outOfBounds"));
         }
-        if ( keyoffset < 0 || keyoffset >= key.length) {
+        if (keyoffset < 0 || keyoffset >= key.length) {
             throw new ArrayIndexOutOfBoundsException(sm.getString("arrays.keyoffset.outOfBounds"));
         }
-        if ( length > (key.length-keyoffset) ) {
+        if (length > (key.length - keyoffset)) {
             throw new ArrayIndexOutOfBoundsException(sm.getString("arrays.length.outOfBounds"));
         }
-        //we don't have enough data to validate it
-        if ( length > (source.length-srcoffset) ) {
+        // we don't have enough data to validate it
+        if (length > (source.length - srcoffset)) {
             return false;
         }
         boolean match = true;
         int pos = keyoffset;
-        for ( int i=srcoffset; match && i<length; i++ ) {
+        for (int i = srcoffset; match && i < length; i++) {
             match = (source[i] == key[pos++]);
         }
         return match;
     }
 
     public static String toString(byte[] data) {
-        return toString(data,0,data!=null?data.length:0);
+        return toString(data, 0, data != null ? data.length : 0);
     }
 
     public static String toString(byte[] data, int offset, int length) {
-        return toString(data,offset,length,false);
+        return toString(data, offset, length, false);
     }
 
     public static String toString(byte[] data, int offset, int length, boolean unsigned) {
         StringBuilder buf = new StringBuilder("{");
-        if ( data != null && length > 0 ) {
+        if (data != null && length > 0) {
             int i = offset;
             if (unsigned) {
                 buf.append(data[i++] & 0xff);
@@ -81,12 +81,12 @@ public class Arrays {
     }
 
     public static String toString(Object[] data) {
-        return toString(data,0,data!=null?data.length:0);
+        return toString(data, 0, data != null ? data.length : 0);
     }
 
     public static String toString(Object[] data, int offset, int length) {
         StringBuilder buf = new StringBuilder("{");
-        if ( data != null && length > 0 ) {
+        if (data != null && length > 0) {
             buf.append(data[offset++]);
             for (int i = offset; i < length; i++) {
                 buf.append(", ").append(data[i]);
@@ -97,12 +97,12 @@ public class Arrays {
     }
 
     public static String toNameString(Member[] data) {
-        return toNameString(data,0,data!=null?data.length:0);
+        return toNameString(data, 0, data != null ? data.length : 0);
     }
 
     public static String toNameString(Member[] data, int offset, int length) {
         StringBuilder buf = new StringBuilder("{");
-        if ( data != null && length > 0 ) {
+        if (data != null && length > 0) {
             buf.append(data[offset++].getName());
             for (int i = offset; i < length; i++) {
                 buf.append(", ").append(data[i].getName());
@@ -129,13 +129,13 @@ public class Arrays {
     }
 
     public static boolean equals(byte[] o1, byte[] o2) {
-        return java.util.Arrays.equals(o1,o2);
+        return java.util.Arrays.equals(o1, o2);
     }
 
     public static boolean equals(Object[] o1, Object[] o2) {
         boolean result = o1.length == o2.length;
-        if ( result ) {
-            for (int i=0; i<o1.length && result; i++ ) {
+        if (result) {
+            for (int i = 0; i < o1.length && result; i++) {
                 result = o1[i].equals(o2[i]);
             }
         }
@@ -145,7 +145,7 @@ public class Arrays {
     public static boolean sameMembers(Member[] m1, Member[] m2) {
         AbsoluteOrder.absoluteOrder(m1);
         AbsoluteOrder.absoluteOrder(m2);
-        return equals(m1,m2);
+        return equals(m1, m2);
     }
 
     public static Member[] merge(Member[] m1, Member[] m2) {
@@ -183,7 +183,7 @@ public class Arrays {
     }
 
     public static Member[] remove(Member[] all, Member remove) {
-        return extract(all,new Member[] {remove});
+        return extract(all, new Member[] { remove });
     }
 
     public static Member[] extract(Member[] all, Member[] remove) {
@@ -197,8 +197,8 @@ public class Arrays {
 
     public static int indexOf(Member member, Member[] members) {
         int result = -1;
-        for (int i=0; (result==-1) && (i<members.length); i++ ) {
-            if ( member.equals(members[i]) ) {
+        for (int i = 0; (result == -1) && (i < members.length); i++) {
+            if (member.equals(members[i])) {
                 result = i;
             }
         }
@@ -206,9 +206,9 @@ public class Arrays {
     }
 
     public static int nextIndex(Member member, Member[] members) {
-        int idx = indexOf(member,members)+1;
-        if (idx >= members.length ) {
-            idx = ((members.length>0)?0:-1);
+        int idx = indexOf(member, members) + 1;
+        if (idx >= members.length) {
+            idx = ((members.length > 0) ? 0 : -1);
         }
 
         return idx;
@@ -227,15 +227,15 @@ public class Arrays {
     }
 
     public static byte[] fromString(String value) {
-        if ( value == null ) {
+        if (value == null) {
             return null;
         }
-        if ( !value.startsWith("{") ) {
+        if (!value.startsWith("{")) {
             throw new RuntimeException(sm.getString("arrays.malformed.arrays"));
         }
-        StringTokenizer t = new StringTokenizer(value,"{,}",false);
+        StringTokenizer t = new StringTokenizer(value, "{,}", false);
         byte[] result = new byte[t.countTokens()];
-        for (int i=0; i<result.length; i++ ) {
+        for (int i = 0; i < result.length; i++) {
             result[i] = Byte.parseByte(t.nextToken());
         }
         return result;
