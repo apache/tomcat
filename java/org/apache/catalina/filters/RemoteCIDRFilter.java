@@ -37,8 +37,8 @@ import org.apache.juli.logging.LogFactory;
 public final class RemoteCIDRFilter extends FilterBase {
 
     /**
-     * text/plain MIME type: this is the MIME type we return when a
-     * {@link ServletResponse} is not an {@link HttpServletResponse}
+     * text/plain MIME type: this is the MIME type we return when a {@link ServletResponse} is not an
+     * {@link HttpServletResponse}
      */
     private static final String PLAIN_TEXT_MIME_TYPE = "text/plain";
 
@@ -61,8 +61,7 @@ public final class RemoteCIDRFilter extends FilterBase {
     /**
      * Return a string representation of the {@link NetMask} list in #allow.
      *
-     * @return the #allow list as a string, without the leading '[' and trailing
-     *         ']'
+     * @return the #allow list as a string, without the leading '[' and trailing ']'
      */
     public String getAllow() {
         return allow.toString().replace("[", "").replace("]", "");
@@ -70,10 +69,10 @@ public final class RemoteCIDRFilter extends FilterBase {
 
 
     /**
-     * Fill the #allow list with the list of netmasks provided as an argument,
-     * if any. Calls #fillFromInput.
+     * Fill the #allow list with the list of netmasks provided as an argument, if any. Calls #fillFromInput.
      *
      * @param input The list of netmasks, as a comma separated string
+     *
      * @throws IllegalArgumentException One or more netmasks are invalid
      */
     public void setAllow(final String input) {
@@ -94,8 +93,7 @@ public final class RemoteCIDRFilter extends FilterBase {
     /**
      * Return a string representation of the {@link NetMask} list in #deny.
      *
-     * @return the #deny list as string, without the leading '[' and trailing
-     *         ']'
+     * @return the #deny list as string, without the leading '[' and trailing ']'
      */
     public String getDeny() {
         return deny.toString().replace("[", "").replace("]", "");
@@ -103,10 +101,10 @@ public final class RemoteCIDRFilter extends FilterBase {
 
 
     /**
-     * Fill the #deny list with the list of netmasks provided as an argument, if
-     * any. Calls #fillFromInput.
+     * Fill the #deny list with the list of netmasks provided as an argument, if any. Calls #fillFromInput.
      *
      * @param input The list of netmasks, as a comma separated string
+     *
      * @throws IllegalArgumentException One or more netmasks are invalid
      */
     public void setDeny(final String input) {
@@ -122,7 +120,6 @@ public final class RemoteCIDRFilter extends FilterBase {
 
         throw new IllegalArgumentException(sm.getString("remoteCidrFilter.invalid", "deny"));
     }
-
 
 
     @Override
@@ -161,6 +158,7 @@ public final class RemoteCIDRFilter extends FilterBase {
      * Test if a remote's IP address is allowed to proceed.
      *
      * @param property The remote's IP address, as a string
+     *
      * @return true if allowed
      */
     private boolean isAllowed(final String property) {
@@ -206,11 +204,12 @@ public final class RemoteCIDRFilter extends FilterBase {
 
 
     /**
-     * Fill a {@link NetMask} list from a string input containing a
-     * comma-separated list of (hopefully valid) {@link NetMask}s.
+     * Fill a {@link NetMask} list from a string input containing a comma-separated list of (hopefully valid)
+     * {@link NetMask}s.
      *
-     * @param input The input string
+     * @param input  The input string
      * @param target The list to fill
+     *
      * @return a string list of processing errors (empty when no errors)
      */
     private List<String> fillFromInput(final String input, final List<NetMask> target) {
