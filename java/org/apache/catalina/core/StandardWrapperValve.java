@@ -18,7 +18,7 @@ package org.apache.catalina.core;
 
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
@@ -66,8 +66,8 @@ final class StandardWrapperValve extends ValveBase {
     private volatile long processingTime;
     private volatile long maxTime;
     private volatile long minTime = Long.MAX_VALUE;
-    private final AtomicInteger requestCount = new AtomicInteger(0);
-    private final AtomicInteger errorCount = new AtomicInteger(0);
+    private final LongAdder requestCount = new LongAdder();
+    private final LongAdder errorCount = new LongAdder();
 
 
     // --------------------------------------------------------- Public Methods
@@ -89,7 +89,7 @@ final class StandardWrapperValve extends ValveBase {
         Throwable throwable = null;
         // This should be a Request attribute...
         long t1 = System.currentTimeMillis();
-        requestCount.incrementAndGet();
+        requestCount.increment();
         StandardWrapper wrapper = (StandardWrapper) getContainer();
         Servlet servlet = null;
         Context context = (Context) wrapper.getParent();
@@ -292,30 +292,22 @@ final class StandardWrapperValve extends ValveBase {
      * Returns the number of requests processed by the associated wrapper.
      *
      * @return the number of requests processed by the associated wrapper.
-     *
-     * @deprecated The return type will change to long in Tomcat 11 onwards. Callers of this method should switch to
-     *                 storing the result of calls to this method in a long value rather than an int.
      */
-    @Deprecated
-    public int getRequestCount() {
-        return requestCount.get();
+    public long getRequestCount() {
+        return requestCount.sum();
     }
 
     /**
      * Returns the number of requests processed by the associated wrapper that resulted in an error.
      *
      * @return the number of requests processed by the associated wrapper that resulted in an error.
-     *
-     * @deprecated The return type will change to long in Tomcat 11 onwards. Callers of this method should switch to
-     *                 storing the result of calls to this method in a long value rather than an int.
      */
-    @Deprecated
-    public int getErrorCount() {
-        return errorCount.get();
+    public long getErrorCount() {
+        return errorCount.sum();
     }
 
     public void incrementErrorCount() {
-        errorCount.incrementAndGet();
+        errorCount.increment();
     }
 
     @Override

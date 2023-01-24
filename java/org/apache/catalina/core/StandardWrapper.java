@@ -1178,12 +1178,8 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
      * Returns the number of requests processed by the wrapper.
      *
      * @return the number of requests processed by the wrapper.
-     *
-     * @deprecated The return type will change to long in Tomcat 11 onwards. Callers of this method should switch to
-     *                 storing the result of calls to this method in a long value rather than an int.
      */
-    @Deprecated
-    public int getRequestCount() {
+    public long getRequestCount() {
         return swValve.getRequestCount();
     }
 
@@ -1191,12 +1187,8 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
      * Returns the number of requests processed by the wrapper that resulted in an error.
      *
      * @return the number of requests processed by the wrapper that resulted in an error.
-     *
-     * @deprecated The return type will change to long in Tomcat 11 onwards. Callers of this method should switch to
-     *                 storing the result of calls to this method in a long value rather than an int.
      */
-    @Deprecated
-    public int getErrorCount() {
+    public long getErrorCount() {
         return swValve.getErrorCount();
     }
 

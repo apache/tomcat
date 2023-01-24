@@ -138,6 +138,11 @@
         Switch to using the ServiceLoader mechanism to load the custom URL
         protocol handlers that Tomcat uses. (markt)
       </update>
+      <fix>
+        Switch to using <code>LongAdder</code> rather than
+        <code>AtomicInteger</code> to track request count and error count for
+        servlets. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

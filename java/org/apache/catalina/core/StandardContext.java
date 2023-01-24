@@ -4094,14 +4094,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * Gets the cumulative request count of all servlets in this StandardContext.
      *
      * @return Cumulative request count of all servlets in this StandardContext
-     *
-     * @deprecated The return type will change to long in Tomcat 11 onwards. Callers of this method should switch to
-     *                 storing the result of calls to this method in a long value rather than an int.
      */
-    @Deprecated
-    public int getRequestCount() {
+    public long getRequestCount() {
 
-        int result = 0;
+        long result = 0;
 
         Container[] children = findChildren();
         if (children != null) {
@@ -4117,14 +4113,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * Gets the cumulative error count of all servlets in this StandardContext.
      *
      * @return Cumulative error count of all servlets in this StandardContext
-     *
-     * @deprecated The return type will change to long in Tomcat 11 onwards. Callers of this method should switch to
-     *                 storing the result of calls to this method in a long value rather than an int.
      */
-    @Deprecated
-    public int getErrorCount() {
+    public long getErrorCount() {
 
-        int result = 0;
+        long result = 0;
 
         Container[] children = findChildren();
         if (children != null) {
