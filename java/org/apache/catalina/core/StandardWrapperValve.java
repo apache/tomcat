@@ -18,7 +18,6 @@ package org.apache.catalina.core;
 
 
 import java.io.IOException;
-import java.util.concurrent.atomic.LongAdder;
 
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
@@ -34,6 +33,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.util.Counter;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.coyote.CloseNowException;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -66,8 +66,8 @@ final class StandardWrapperValve extends ValveBase {
     private volatile long processingTime;
     private volatile long maxTime;
     private volatile long minTime = Long.MAX_VALUE;
-    private final LongAdder requestCount = new LongAdder();
-    private final LongAdder errorCount = new LongAdder();
+    private Counter requestCount;
+    private Counter errorCount;
 
 
     // --------------------------------------------------------- Public Methods
@@ -294,7 +294,7 @@ final class StandardWrapperValve extends ValveBase {
      * @return the number of requests processed by the associated wrapper.
      */
     public long getRequestCount() {
-        return requestCount.sum();
+        return requestCount.get();
     }
 
     /**
@@ -303,15 +303,32 @@ final class StandardWrapperValve extends ValveBase {
      * @return the number of requests processed by the associated wrapper that resulted in an error.
      */
     public long getErrorCount() {
-        return errorCount.sum();
+        return errorCount.get();
     }
 
     public void incrementErrorCount() {
         errorCount.increment();
     }
 
+    /**
+     * Enable/disable the request count and error count.
+     *
+     * @param enabled {@code true} if request and error counts are tracked, {@code false} otherwise.
+     */
+    public void setEnableCounters(boolean enabled) {
+        requestCount = Counter.of(enabled);
+        errorCount = Counter.of(enabled);
+    }
+
     @Override
     protected void initInternal() throws LifecycleException {
-        // NOOP - Don't register this Valve in JMX
+        // Don't register this Valve in JMX
+
+        if (requestCount == null) {
+            requestCount = Counter.of(true);
+        }
+        if (errorCount == null) {
+            errorCount = Counter.of(true);
+        }
     }
 }
