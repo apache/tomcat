@@ -26,8 +26,7 @@ import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.util.ResourceSet;
 
 /**
- * Represents a {@link org.apache.catalina.WebResourceSet} based on a single
- * file.
+ * Represents a {@link org.apache.catalina.WebResourceSet} based on a single file.
  */
 public class FileResourceSet extends AbstractFileResourceSet {
 
@@ -39,25 +38,18 @@ public class FileResourceSet extends AbstractFileResourceSet {
     }
 
     /**
-     * Creates a new {@link org.apache.catalina.WebResourceSet} based on a
-     * file.
+     * Creates a new {@link org.apache.catalina.WebResourceSet} based on a file.
      *
-     * @param root          The {@link WebResourceRoot} this new
-     *                          {@link org.apache.catalina.WebResourceSet} will
-     *                          be added to.
-     * @param webAppMount   The path within the web application at which this
-     *                          {@link org.apache.catalina.WebResourceSet} will
-     *                          be mounted. For example, to add a directory of
-     *                          JARs to a web application, the directory would
-     *                          be mounted at "WEB-INF/lib/"
-     * @param base          The absolute path to the file on the file system
-     *                          from which the resource will be served.
-     * @param internalPath  The path within this new {@link
-     *                          org.apache.catalina.WebResourceSet} where
-     *                          resources will be served from.
+     * @param root         The {@link WebResourceRoot} this new {@link org.apache.catalina.WebResourceSet} will be added
+     *                         to.
+     * @param webAppMount  The path within the web application at which this {@link org.apache.catalina.WebResourceSet}
+     *                         will be mounted. For example, to add a directory of JARs to a web application, the
+     *                         directory would be mounted at "WEB-INF/lib/"
+     * @param base         The absolute path to the file on the file system from which the resource will be served.
+     * @param internalPath The path within this new {@link org.apache.catalina.WebResourceSet} where resources will be
+     *                         served from.
      */
-    public FileResourceSet(WebResourceRoot root, String webAppMount,
-            String base, String internalPath) {
+    public FileResourceSet(WebResourceRoot root, String webAppMount, String base, String internalPath) {
         super(internalPath);
         setRoot(root);
         setWebAppMount(webAppMount);
@@ -113,12 +105,12 @@ public class FileResourceSet extends AbstractFileResourceSet {
         if (webAppMount.startsWith(path)) {
             webAppMount = webAppMount.substring(path.length());
             if (webAppMount.equals(getFileBase().getName())) {
-                return new String[] {getFileBase().getName()};
+                return new String[] { getFileBase().getName() };
             } else {
                 // Virtual directory
                 int i = webAppMount.indexOf('/');
                 if (i > 0) {
-                    return new String[] {webAppMount.substring(0, i)};
+                    return new String[] { webAppMount.substring(0, i) };
                 }
             }
         }
@@ -169,8 +161,8 @@ public class FileResourceSet extends AbstractFileResourceSet {
     @Override
     protected void checkType(File file) {
         if (file.isFile() == false) {
-            throw new IllegalArgumentException(sm.getString("fileResourceSet.notFile",
-                    getBase(), File.separator, getInternalPath()));
+            throw new IllegalArgumentException(
+                    sm.getString("fileResourceSet.notFile", getBase(), File.separator, getInternalPath()));
         }
     }
 }

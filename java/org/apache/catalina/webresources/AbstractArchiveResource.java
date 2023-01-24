@@ -41,13 +41,13 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
 
     @Deprecated
-    protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
-            String baseUrl, JarEntry jarEntry, @SuppressWarnings("unused") String codeBaseUrl) {
+    protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath, String baseUrl,
+            JarEntry jarEntry, @SuppressWarnings("unused") String codeBaseUrl) {
         this(archiveResourceSet, webAppPath, baseUrl, jarEntry);
     }
 
-    protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
-            String baseUrl, JarEntry jarEntry) {
+    protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath, String baseUrl,
+            JarEntry jarEntry) {
         super(archiveResourceSet.getRoot(), webAppPath);
         this.archiveResourceSet = archiveResourceSet;
         this.baseUrl = baseUrl;
@@ -58,8 +58,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
             resourceName = resourceName.substring(0, resourceName.length() - 1);
         }
         String internalPath = archiveResourceSet.getInternalPath();
-        if (internalPath.length() > 0 && resourceName.equals(
-                internalPath.subSequence(1, internalPath.length()))) {
+        if (internalPath.length() > 0 && resourceName.equals(internalPath.subSequence(1, internalPath.length()))) {
             name = "";
         } else {
             int index = resourceName.lastIndexOf('/');
@@ -164,9 +163,8 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
         if (len > Integer.MAX_VALUE) {
             // Can't create an array that big
-            throw new ArrayIndexOutOfBoundsException(sm.getString(
-                    "abstractResource.getContentTooLarge", getWebappPath(),
-                    Long.valueOf(len)));
+            throw new ArrayIndexOutOfBoundsException(
+                    sm.getString("abstractResource.getContentTooLarge", getWebappPath(), Long.valueOf(len)));
         }
 
         if (len < 0) {
@@ -195,8 +193,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
             readCerts = true;
         } catch (IOException ioe) {
             if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("abstractResource.getContentFail",
-                        getWebappPath()), ioe);
+                getLog().debug(sm.getString("abstractResource.getContentFail", getWebappPath()), ioe);
             }
             // Don't return corrupted content
             return null;
@@ -231,10 +228,9 @@ public abstract class AbstractArchiveResource extends AbstractResource {
     protected abstract JarInputStreamWrapper getJarInputStreamWrapper();
 
     /**
-     * This wrapper assumes that the InputStream was created from a JarFile
-     * obtained from a call to getArchiveResourceSet().openJarFile(). If this is
-     * not the case then the usage counting in AbstractArchiveResourceSet will
-     * break and the JarFile may be unexpectedly closed.
+     * This wrapper assumes that the InputStream was created from a JarFile obtained from a call to
+     * getArchiveResourceSet().openJarFile(). If this is not the case then the usage counting in
+     * AbstractArchiveResourceSet will break and the JarFile may be unexpectedly closed.
      */
     protected class JarInputStreamWrapper extends InputStream {
 
