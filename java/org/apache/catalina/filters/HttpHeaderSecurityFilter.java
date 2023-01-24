@@ -31,8 +31,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * Provides a single configuration point for security measures that required the
- * addition of one or more HTTP headers to the response.
+ * Provides a single configuration point for security measures that required the addition of one or more HTTP headers to
+ * the response.
  */
 public class HttpHeaderSecurityFilter extends FilterBase {
 
@@ -91,8 +91,8 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-            FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
 
         if (response instanceof HttpServletResponse) {
             HttpServletResponse httpResponse = (HttpServletResponse) response;
@@ -222,8 +222,7 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     }
 
 
-    public void setBlockContentTypeSniffingEnabled(
-            boolean blockContentTypeSniffingEnabled) {
+    public void setBlockContentTypeSniffingEnabled(boolean blockContentTypeSniffingEnabled) {
         this.blockContentTypeSniffingEnabled = blockContentTypeSniffingEnabled;
     }
 
@@ -250,9 +249,7 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
 
     private enum XFrameOption {
-        DENY("DENY"),
-        SAME_ORIGIN("SAMEORIGIN"),
-        ALLOW_FROM("ALLOW-FROM");
+        DENY("DENY"), SAME_ORIGIN("SAMEORIGIN"), ALLOW_FROM("ALLOW-FROM");
 
 
         private final String headerValue;
