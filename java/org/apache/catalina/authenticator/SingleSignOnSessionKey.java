@@ -22,11 +22,9 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Session;
 
 /**
- * Key used by SSO to identify a session. This key is used rather than the
- * actual session to facilitate the replication of the SSO information
- * across a cluster where replicating the entire session would generate
- * significant, unnecessary overhead.
- *
+ * Key used by SSO to identify a session. This key is used rather than the actual session to facilitate the replication
+ * of the SSO information across a cluster where replicating the entire session would generate significant, unnecessary
+ * overhead.
  */
 public class SingleSignOnSessionKey implements Serializable {
 
@@ -59,12 +57,9 @@ public class SingleSignOnSessionKey implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result +
-                ((sessionId == null) ? 0 : sessionId.hashCode());
-        result = prime * result +
-                ((contextName == null) ? 0 : contextName.hashCode());
-        result = prime * result +
-                ((hostName == null) ? 0 : hostName.hashCode());
+        result = prime * result + ((sessionId == null) ? 0 : sessionId.hashCode());
+        result = prime * result + ((contextName == null) ? 0 : contextName.hashCode());
+        result = prime * result + ((hostName == null) ? 0 : hostName.hashCode());
         return result;
     }
 

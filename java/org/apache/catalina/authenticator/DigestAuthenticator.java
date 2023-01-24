@@ -38,8 +38,7 @@ import org.apache.tomcat.util.security.MD5Encoder;
 
 
 /**
- * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP DIGEST
- * Authentication (see RFC 2069).
+ * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP DIGEST Authentication (see RFC 2069).
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
@@ -70,27 +69,25 @@ public class DigestAuthenticator extends AuthenticatorBase {
     /**
      * List of server nonce values currently being tracked
      */
-    protected Map<String,NonceInfo> nonces;
+    protected Map<String, NonceInfo> nonces;
 
 
     /**
-     * The last timestamp used to generate a nonce. Each nonce should get a
-     * unique timestamp.
+     * The last timestamp used to generate a nonce. Each nonce should get a unique timestamp.
      */
     protected long lastTimestamp = 0;
     protected final Object lastTimestampLock = new Object();
 
 
     /**
-     * Maximum number of server nonces to keep in the cache. If not specified,
-     * the default value of 1000 is used.
+     * Maximum number of server nonces to keep in the cache. If not specified, the default value of 1000 is used.
      */
     protected int nonceCacheSize = 1000;
 
 
     /**
-     * The window size to use to track seen nonce count values for a given
-     * nonce. If not specified, the default of 100 is used.
+     * The window size to use to track seen nonce count values for a given nonce. If not specified, the default of 100
+     * is used.
      */
     protected int nonceCountWindowSize = 100;
 
@@ -101,8 +98,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * How long server nonces are valid for in milliseconds. Defaults to 5
-     * minutes.
+     * How long server nonces are valid for in milliseconds. Defaults to 5 minutes.
      */
     protected long nonceValidity = 5 * 60 * 1000;
 
@@ -114,8 +110,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Should the URI be validated as required by RFC2617? Can be disabled in
-     * reverse proxies where the proxy has modified the URI.
+     * Should the URI be validated as required by RFC2617? Can be disabled in reverse proxies where the proxy has
+     * modified the URI.
      */
     protected boolean validateUri = true;
 
@@ -184,19 +180,17 @@ public class DigestAuthenticator extends AuthenticatorBase {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Authenticate the user making this request, based on the specified
-     * login configuration.  Return <code>true</code> if any specified
-     * constraint has been satisfied, or <code>false</code> if we have
-     * created a response challenge already.
+     * Authenticate the user making this request, based on the specified login configuration. Return <code>true</code>
+     * if any specified constraint has been satisfied, or <code>false</code> if we have created a response challenge
+     * already.
      *
-     * @param request Request we are processing
+     * @param request  Request we are processing
      * @param response Response we are creating
      *
      * @exception IOException if an input/output error occurs
      */
     @Override
-    protected boolean doAuthenticate(Request request, HttpServletResponse response)
-            throws IOException {
+    protected boolean doAuthenticate(Request request, HttpServletResponse response) throws IOException {
 
         // NOTE: We don't try to reauthenticate using any existing SSO session,
         // because that will only work if the original authentication was
@@ -213,8 +207,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         // Validate any credentials already included with this request
         Principal principal = null;
         String authorization = request.getHeader("authorization");
-        DigestInfo digestInfo = new DigestInfo(getOpaque(), getNonceValidity(),
-                getKey(), nonces, isValidateUri());
+        DigestInfo digestInfo = new DigestInfo(getOpaque(), getNonceValidity(), getKey(), nonces, isValidateUri());
         if (authorization != null) {
             if (digestInfo.parse(request, authorization)) {
                 if (digestInfo.validate(request)) {
@@ -222,9 +215,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 }
 
                 if (principal != null && !digestInfo.isNonceStale()) {
-                    register(request, response, principal,
-                            HttpServletRequest.DIGEST_AUTH,
-                            digestInfo.getUsername(), null);
+                    register(request, response, principal, HttpServletRequest.DIGEST_AUTH, digestInfo.getUsername(),
+                            null);
                     return true;
                 }
             }
@@ -236,8 +228,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         // to be unique).
         String nonce = generateNonce(request);
 
-        setAuthenticateHeader(request, response, nonce,
-                principal != null && digestInfo.isNonceStale());
+        setAuthenticateHeader(request, response, nonce, principal != null && digestInfo.isNonceStale());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         return false;
     }
@@ -253,18 +244,16 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Removes the quotes on a string. RFC2617 states quotes are optional for
-     * all parameters except realm.
+     * Removes the quotes on a string. RFC2617 states quotes are optional for all parameters except realm.
      *
-     * @param quotedString The quoted string
+     * @param quotedString   The quoted string
      * @param quotesRequired <code>true</code> if quotes were required
+     *
      * @return The unquoted string
      */
-    protected static String removeQuotes(String quotedString,
-                                         boolean quotesRequired) {
-        //support both quoted and non-quoted
-        if (quotedString.length() > 0 && quotedString.charAt(0) != '"' &&
-                !quotesRequired) {
+    protected static String removeQuotes(String quotedString, boolean quotesRequired) {
+        // support both quoted and non-quoted
+        if (quotedString.length() > 0 && quotedString.charAt(0) != '"' && !quotesRequired) {
             return quotedString;
         } else if (quotedString.length() > 2) {
             return quotedString.substring(1, quotedString.length() - 1);
@@ -277,6 +266,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
      * Removes the quotes on a string.
      *
      * @param quotedString The quoted string
+     *
      * @return The unquoted string
      */
     protected static String removeQuotes(String quotedString) {
@@ -284,11 +274,11 @@ public class DigestAuthenticator extends AuthenticatorBase {
     }
 
     /**
-     * Generate a unique token. The token is generated according to the
-     * following pattern. NOnceToken = Base64 ( MD5 ( client-IP ":"
-     * time-stamp ":" private-key ) ).
+     * Generate a unique token. The token is generated according to the following pattern. NOnceToken = Base64 ( MD5 (
+     * client-IP ":" time-stamp ":" private-key ) ).
      *
      * @param request HTTP Servlet request
+     *
      * @return The generated nonce
      */
     protected String generateNonce(Request request) {
@@ -303,11 +293,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
             }
         }
 
-        String ipTimeKey =
-            request.getRemoteAddr() + ":" + currentTime + ":" + getKey();
+        String ipTimeKey = request.getRemoteAddr() + ":" + currentTime + ":" + getKey();
 
-        byte[] buffer = ConcurrentMessageDigest.digestMD5(
-                ipTimeKey.getBytes(StandardCharsets.ISO_8859_1));
+        byte[] buffer = ConcurrentMessageDigest.digestMD5(ipTimeKey.getBytes(StandardCharsets.ISO_8859_1));
         String nonce = currentTime + ":" + MD5Encoder.encode(buffer);
 
         NonceInfo info = new NonceInfo(currentTime, getNonceCountWindowSize());
@@ -323,6 +311,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
      * Generates the WWW-Authenticate header.
      * <p>
      * The header MUST follow this template :
+     *
      * <pre>
      *      WWW-Authenticate    = "WWW-Authenticate" ":" "Digest"
      *                            digest-challenge
@@ -340,27 +329,23 @@ public class DigestAuthenticator extends AuthenticatorBase {
      *      algorithm           = "algorithm" "=" ( "MD5" | token )
      * </pre>
      *
-     * @param request HTTP Servlet request
-     * @param response HTTP Servlet response
-     * @param nonce nonce token
+     * @param request      HTTP Servlet request
+     * @param response     HTTP Servlet response
+     * @param nonce        nonce token
      * @param isNonceStale <code>true</code> to add a stale parameter
      */
-    protected void setAuthenticateHeader(HttpServletRequest request,
-                                         HttpServletResponse response,
-                                         String nonce,
-                                         boolean isNonceStale) {
+    protected void setAuthenticateHeader(HttpServletRequest request, HttpServletResponse response, String nonce,
+            boolean isNonceStale) {
 
         String realmName = getRealmName(context);
 
         String authenticateHeader;
         if (isNonceStale) {
-            authenticateHeader = "Digest realm=\"" + realmName + "\", " +
-                    "qop=\"" + QOP + "\", nonce=\"" + nonce + "\", " + "opaque=\"" +
-            getOpaque() + "\", stale=true";
+            authenticateHeader = "Digest realm=\"" + realmName + "\", " + "qop=\"" + QOP + "\", nonce=\"" + nonce +
+                    "\", " + "opaque=\"" + getOpaque() + "\", stale=true";
         } else {
-            authenticateHeader = "Digest realm=\"" + realmName + "\", " +
-                    "qop=\"" + QOP + "\", nonce=\"" + nonce + "\", " + "opaque=\"" +
-            getOpaque() + "\"";
+            authenticateHeader = "Digest realm=\"" + realmName + "\", " + "qop=\"" + QOP + "\", nonce=\"" + nonce +
+                    "\", " + "opaque=\"" + getOpaque() + "\"";
         }
 
         response.setHeader(AUTH_HEADER_NAME, authenticateHeader);
@@ -399,17 +384,13 @@ public class DigestAuthenticator extends AuthenticatorBase {
             private long lastLog = 0;
 
             @Override
-            protected boolean removeEldestEntry(
-                    Map.Entry<String,NonceInfo> eldest) {
+            protected boolean removeEldestEntry(Map.Entry<String, NonceInfo> eldest) {
                 // This is called from a sync so keep it simple
                 long currentTime = System.currentTimeMillis();
                 if (size() > getNonceCacheSize()) {
-                    if (lastLog < currentTime &&
-                            currentTime - eldest.getValue().getTimestamp() <
-                            getNonceValidity()) {
+                    if (lastLog < currentTime && currentTime - eldest.getValue().getTimestamp() < getNonceValidity()) {
                         // Replay attack is possible
-                        log.warn(sm.getString(
-                                "digestAuthenticator.cacheRemove"));
+                        log.warn(sm.getString("digestAuthenticator.cacheRemove"));
                         lastLog = currentTime + LOG_SUPPRESS_TIME;
                     }
                     return true;
@@ -424,7 +405,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         private final String opaque;
         private final long nonceValidity;
         private final String key;
-        private final Map<String,NonceInfo> nonces;
+        private final Map<String, NonceInfo> nonces;
         private boolean validateUri = true;
 
         private String userName = null;
@@ -441,8 +422,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
         private boolean nonceStale = false;
 
 
-        public DigestInfo(String opaque, long nonceValidity, String key,
-                Map<String,NonceInfo> nonces, boolean validateUri) {
+        public DigestInfo(String opaque, long nonceValidity, String key, Map<String, NonceInfo> nonces,
+                boolean validateUri) {
             this.opaque = opaque;
             this.nonceValidity = nonceValidity;
             this.key = key;
@@ -462,10 +443,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 return false;
             }
 
-            Map<String,String> directives;
+            Map<String, String> directives;
             try {
-                directives = Authorization.parseAuthorizationDigest(
-                        new StringReader(authorization));
+                directives = Authorization.parseAuthorizationDigest(new StringReader(authorization));
             } catch (IOException e) {
                 return false;
             }
@@ -489,8 +469,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         }
 
         public boolean validate(Request request) {
-            if ( (userName == null) || (realmName == null) || (nonce == null)
-                 || (uri == null) || (response == null) ) {
+            if ((userName == null) || (realmName == null) || (nonce == null) || (uri == null) || (response == null)) {
                 return false;
             }
 
@@ -554,10 +533,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
                     nonces.remove(nonce);
                 }
             }
-            String serverIpTimeKey =
-                request.getRemoteAddr() + ":" + nonceTime + ":" + key;
-            byte[] buffer = ConcurrentMessageDigest.digestMD5(
-                    serverIpTimeKey.getBytes(StandardCharsets.ISO_8859_1));
+            String serverIpTimeKey = request.getRemoteAddr() + ":" + nonceTime + ":" + key;
+            byte[] buffer = ConcurrentMessageDigest.digestMD5(serverIpTimeKey.getBytes(StandardCharsets.ISO_8859_1));
             String md5ServerIpTimeKey = MD5Encoder.encode(buffer);
             if (!md5ServerIpTimeKey.equals(md5clientIpTimeKey)) {
                 return false;
@@ -615,12 +592,10 @@ public class DigestAuthenticator extends AuthenticatorBase {
             // MD5(Method + ":" + uri)
             String a2 = method + ":" + uri;
 
-            byte[] buffer = ConcurrentMessageDigest.digestMD5(
-                    a2.getBytes(StandardCharsets.ISO_8859_1));
+            byte[] buffer = ConcurrentMessageDigest.digestMD5(a2.getBytes(StandardCharsets.ISO_8859_1));
             String md5a2 = MD5Encoder.encode(buffer);
 
-            return realm.authenticate(userName, response, nonce, nc, cnonce,
-                    qop, realmName, md5a2);
+            return realm.authenticate(userName, response, nonce, nc, cnonce, qop, realmName, md5a2);
         }
 
     }
@@ -638,8 +613,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         }
 
         public synchronized boolean nonceCountValid(long nonceCount) {
-            if ((count - offset) >= nonceCount ||
-                    (nonceCount > count - offset + seen.length)) {
+            if ((count - offset) >= nonceCount || (nonceCount > count - offset + seen.length)) {
                 return false;
             }
             int checkIndex = (int) ((nonceCount + offset) % seen.length);
