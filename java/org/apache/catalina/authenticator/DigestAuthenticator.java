@@ -376,6 +376,10 @@ public class DigestAuthenticator extends AuthenticatorBase {
             setOpaque(sessionIdGenerator.generateSessionId());
         }
 
+        /*
+         * This is a FIFO cache as using an older nonce should not delay its removal from the cache in favour of more
+         * recent values.
+         */
         nonces = new LinkedHashMap<>() {
 
             private static final long serialVersionUID = 1L;
