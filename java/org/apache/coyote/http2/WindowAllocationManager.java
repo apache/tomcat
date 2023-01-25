@@ -28,22 +28,22 @@ import org.apache.tomcat.util.res.StringManager;
  * allocation and only issues allocation notifications when the stream is known
  * to be waiting for the notification.
  *
- * It is possible for a stream to be waiting for a connection allocation when
+ * <p>It is possible for a stream to be waiting for a connection allocation when
  * a stream allocation is made. Therefore this class tracks the type of
  * allocation that the stream is waiting for to ensure that notifications are
  * correctly triggered.
  *
- * With the implementation at the time of writing, it is not possible for a
+ * <p>With the implementation at the time of writing, it is not possible for a
  * stream to receive an unexpected connection notification as these are only
  * issues to streams in the backlog and a stream must be waiting for a
  * connection allocation in order to be placed on the backlog. However, as a
  * precaution, this class protects against unexpected connection notifications.
  *
- * It is important for asynchronous processing not to notify unless a
+ * <p>It is important for asynchronous processing not to notify unless a
  * notification is expected else a dispatch will be performed unnecessarily
  * which may lead to unexpected results.
  *
- * A previous implementation used separate locks for the stream and connection
+ * <p>A previous implementation used separate locks for the stream and connection
  * notifications. However, correct handling of allocation waiting requires
  * holding the stream lock when making the decision to wait. Therefore both
  * allocations need to wait on the Stream.
