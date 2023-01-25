@@ -182,6 +182,10 @@ class StreamProcessor extends AbstractProcessor {
                 headers.addValue("content-length").setLong(contentLength);
             }
         } else {
+            // Disable response body
+            if (stream != null) {
+                stream.configureVoidOutputFilter();
+            }
             if (statusCode == 205) {
                 // RFC 7231 requires the server to explicitly signal an empty
                 // response in this case

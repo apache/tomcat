@@ -119,6 +119,11 @@
         Log basic information for each configured TLS certificate when Tomcat
         starts. (markt)
       </add>
+      <fix>
+        <bug>66442</bug>: When an HTTP/2 response must not include a body,
+        ensure that the end of stream flag is set on the headers frame and that
+        no data frame is sent. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

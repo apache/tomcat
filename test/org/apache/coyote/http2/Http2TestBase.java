@@ -1269,6 +1269,18 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
+    public static class NoContentServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        }
+    }
+
+
     protected static class SimpleServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
