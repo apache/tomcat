@@ -141,10 +141,9 @@ public class Http2Protocol implements UpgradeProtocol {
 
 
     @Override
-    public InternalHttpUpgradeHandler getInternalUpgradeHandler(SocketWrapperBase<?> socketWrapper,
-            Adapter adapter, Request coyoteRequest) {
-        return socketWrapper.hasAsyncIO()
-                ? new Http2AsyncUpgradeHandler(this, adapter, coyoteRequest)
+    public InternalHttpUpgradeHandler getInternalUpgradeHandler(SocketWrapperBase<?> socketWrapper, Adapter adapter,
+            Request coyoteRequest) {
+        return socketWrapper.hasAsyncIO() ? new Http2AsyncUpgradeHandler(this, adapter, coyoteRequest)
                 : new Http2UpgradeHandler(this, adapter, coyoteRequest);
     }
 
@@ -388,9 +387,11 @@ public class Http2Protocol implements UpgradeProtocol {
     public void setCompression(String compression) {
         compressionConfig.setCompression(compression);
     }
+
     public String getCompression() {
         return compressionConfig.getCompression();
     }
+
     protected int getCompressionLevel() {
         return compressionConfig.getCompressionLevel();
     }
@@ -399,9 +400,11 @@ public class Http2Protocol implements UpgradeProtocol {
     public String getNoCompressionUserAgents() {
         return compressionConfig.getNoCompressionUserAgents();
     }
+
     protected Pattern getNoCompressionUserAgentsPattern() {
         return compressionConfig.getNoCompressionUserAgentsPattern();
     }
+
     public void setNoCompressionUserAgents(String noCompressionUserAgents) {
         compressionConfig.setNoCompressionUserAgents(noCompressionUserAgents);
     }
@@ -410,9 +413,11 @@ public class Http2Protocol implements UpgradeProtocol {
     public String getCompressibleMimeType() {
         return compressionConfig.getCompressibleMimeType();
     }
+
     public void setCompressibleMimeType(String valueS) {
         compressionConfig.setCompressibleMimeType(valueS);
     }
+
     public String[] getCompressibleMimeTypes() {
         return compressionConfig.getCompressibleMimeTypes();
     }
@@ -421,6 +426,7 @@ public class Http2Protocol implements UpgradeProtocol {
     public int getCompressionMinSize() {
         return compressionConfig.getCompressionMinSize();
     }
+
     public void setCompressionMinSize(int compressionMinSize) {
         compressionConfig.setCompressionMinSize(compressionMinSize);
     }
@@ -430,6 +436,7 @@ public class Http2Protocol implements UpgradeProtocol {
     public boolean getNoCompressionStrongETag() {
         return compressionConfig.getNoCompressionStrongETag();
     }
+
     @Deprecated
     public void setNoCompressionStrongETag(boolean noCompressionStrongETag) {
         compressionConfig.setNoCompressionStrongETag(noCompressionStrongETag);
