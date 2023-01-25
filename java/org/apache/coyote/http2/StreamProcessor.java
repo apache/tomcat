@@ -63,8 +63,7 @@ class StreamProcessor extends AbstractProcessor {
         H2_PSEUDO_HEADERS_REQUEST.add(":path");
     }
 
-    StreamProcessor(Http2UpgradeHandler handler, Stream stream, Adapter adapter,
-            SocketWrapperBase<?> socketWrapper) {
+    StreamProcessor(Http2UpgradeHandler handler, Stream stream, Adapter adapter, SocketWrapperBase<?> socketWrapper) {
         super(socketWrapper.getEndpoint(), stream.getCoyoteRequest(), stream.getCoyoteResponse());
         this.handler = handler;
         this.stream = stream;
@@ -92,22 +91,23 @@ class StreamProcessor extends AbstractProcessor {
                             // fully read. This typically occurs when Tomcat rejects an upload
                             // of some form (e.g. PUT or POST). Need to tell the client not to
                             // send any more data on this stream (reset).
-                            StreamException se = new StreamException(
-                                    sm.getString("streamProcessor.cancel", stream.getConnectionId(),
-                                            stream.getIdAsString()), Http2Error.NO_ERROR, stream.getIdAsInt());
+                            StreamException se = new StreamException(sm.getString("streamProcessor.cancel",
+                                    stream.getConnectionId(), stream.getIdAsString()), Http2Error.NO_ERROR,
+                                    stream.getIdAsInt());
                             stream.close(se);
                         } else if (!getErrorState().isConnectionIoAllowed()) {
-                            ConnectionException ce = new ConnectionException(sm.getString(
-                                    "streamProcessor.error.connection", stream.getConnectionId(),
-                                    stream.getIdAsString()), Http2Error.INTERNAL_ERROR);
+                            ConnectionException ce = new ConnectionException(
+                                    sm.getString("streamProcessor.error.connection", stream.getConnectionId(),
+                                            stream.getIdAsString()),
+                                    Http2Error.INTERNAL_ERROR);
                             stream.close(ce);
                         } else if (!getErrorState().isIoAllowed()) {
                             StreamException se = stream.getResetException();
                             if (se == null) {
-                                se = new StreamException(sm.getString(
-                                        "streamProcessor.error.stream", stream.getConnectionId(),
-                                        stream.getIdAsString()), Http2Error.INTERNAL_ERROR,
-                                        stream.getIdAsInt());
+                                se = new StreamException(
+                                        sm.getString("streamProcessor.error.stream", stream.getConnectionId(),
+                                                stream.getIdAsString()),
+                                        Http2Error.INTERNAL_ERROR, stream.getIdAsInt());
                             }
                             stream.close(se);
                         } else {
@@ -118,8 +118,8 @@ class StreamProcessor extends AbstractProcessor {
                         }
                     }
                 } catch (Exception e) {
-                    String msg = sm.getString("streamProcessor.error.connection",
-                            stream.getConnectionId(), stream.getIdAsString());
+                    String msg = sm.getString("streamProcessor.error.connection", stream.getConnectionId(),
+                            stream.getIdAsString());
                     if (log.isDebugEnabled()) {
                         log.debug(msg, e);
                     }
@@ -148,8 +148,7 @@ class StreamProcessor extends AbstractProcessor {
 
     // Static so it can be used by Stream to build the MimeHeaders required for
     // an ACK. For that use case coyoteRequest, protocol and stream will be null.
-    static void prepareHeaders(Request coyoteRequest, Response coyoteResponse,
-            Http2Protocol protocol, Stream stream) {
+    static void prepareHeaders(Request coyoteRequest, Response coyoteResponse, Http2Protocol protocol, Stream stream) {
         MimeHeaders headers = coyoteResponse.getMimeHeaders();
         int statusCode = coyoteResponse.getStatus();
 
@@ -300,22 +299,18 @@ class StreamProcessor extends AbstractProcessor {
     protected final void executeDispatches() {
         Iterator<DispatchType> dispatches = getIteratorAndClearDispatches();
         /*
-         * Compare with superclass that uses SocketWrapper
-         * A sync is not necessary here as the window sizes are updated with
-         * syncs before the dispatches are executed and it is the window size
-         * updates that need to be complete before the dispatch executes.
+         * Compare with superclass that uses SocketWrapper A sync is not necessary here as the window sizes are updated
+         * with syncs before the dispatches are executed and it is the window size updates that need to be complete
+         * before the dispatch executes.
          */
         while (dispatches != null && dispatches.hasNext()) {
             DispatchType dispatchType = dispatches.next();
             /*
-             * Dispatch on new thread.
-             * Firstly, this avoids a deadlock on the SocketWrapper as Streams
-             * being processed by container threads lock the SocketProcessor
-             * before they lock the SocketWrapper which is the opposite order to
-             * container threads processing via Http2UpgrageHandler.
-             * Secondly, this code executes after a Window update has released
-             * one or more Streams. By dispatching each Stream to a dedicated
-             * thread, those Streams may progress concurrently.
+             * Dispatch on new thread. Firstly, this avoids a deadlock on the SocketWrapper as Streams being processed
+             * by container threads lock the SocketProcessor before they lock the SocketWrapper which is the opposite
+             * order to container threads processing via Http2UpgrageHandler. Secondly, this code executes after a
+             * Window update has released one or more Streams. By dispatching each Stream to a dedicated thread, those
+             * Streams may progress concurrently.
              */
             processSocketEvent(dispatchType.getSocketStatus(), true);
         }
@@ -415,21 +410,17 @@ class StreamProcessor extends AbstractProcessor {
 
 
     /*
-     * In HTTP/1.1 some aspects of the request are validated as the request is
-     * parsed and the request rejected immediately with a 400 response. These
-     * checks are performed in Http11InputBuffer. Because, in Tomcat's HTTP/2
-     * implementation, incoming frames are processed on one thread while the
-     * corresponding request/response is processed on a separate thread,
-     * rejecting invalid requests is more involved.
+     * In HTTP/1.1 some aspects of the request are validated as the request is parsed and the request rejected
+     * immediately with a 400 response. These checks are performed in Http11InputBuffer. Because, in Tomcat's HTTP/2
+     * implementation, incoming frames are processed on one thread while the corresponding request/response is processed
+     * on a separate thread, rejecting invalid requests is more involved.
      *
-     * One approach would be to validate the request during parsing, note any
-     * validation errors and then generate a 400 response once processing moves
-     * to the separate request/response thread. This would require refactoring
-     * to track the validation errors.
+     * One approach would be to validate the request during parsing, note any validation errors and then generate a 400
+     * response once processing moves to the separate request/response thread. This would require refactoring to track
+     * the validation errors.
      *
-     * A second approach, and the one currently adopted, is to perform the
-     * validation shortly after processing of the received request passes to the
-     * separate thread and to generate a 400 response if validation fails.
+     * A second approach, and the one currently adopted, is to perform the validation shortly after processing of the
+     * received request passes to the separate thread and to generate a 400 response if validation fails.
      *
      * The checks performed below are based on the checks in Http11InputBuffer.
      */
@@ -487,8 +478,8 @@ class StreamProcessor extends AbstractProcessor {
     @Override
     protected final boolean flushBufferedWrite() throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("streamProcessor.flushBufferedWrite.entry",
-                    stream.getConnectionId(), stream.getIdAsString()));
+            log.debug(sm.getString("streamProcessor.flushBufferedWrite.entry", stream.getConnectionId(),
+                    stream.getIdAsString()));
         }
         if (stream.flush(false)) {
             // The buffer wasn't fully flushed so re-register the

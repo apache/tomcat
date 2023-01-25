@@ -23,30 +23,25 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Tracks whether the stream is waiting for an allocation to the stream flow
- * control window, to the connection flow control window or not waiting for an
- * allocation and only issues allocation notifications when the stream is known
- * to be waiting for the notification.
- *
- * <p>It is possible for a stream to be waiting for a connection allocation when
- * a stream allocation is made. Therefore this class tracks the type of
- * allocation that the stream is waiting for to ensure that notifications are
- * correctly triggered.
- *
- * <p>With the implementation at the time of writing, it is not possible for a
- * stream to receive an unexpected connection notification as these are only
- * issues to streams in the backlog and a stream must be waiting for a
- * connection allocation in order to be placed on the backlog. However, as a
- * precaution, this class protects against unexpected connection notifications.
- *
- * <p>It is important for asynchronous processing not to notify unless a
- * notification is expected else a dispatch will be performed unnecessarily
- * which may lead to unexpected results.
- *
- * <p>A previous implementation used separate locks for the stream and connection
- * notifications. However, correct handling of allocation waiting requires
- * holding the stream lock when making the decision to wait. Therefore both
- * allocations need to wait on the Stream.
+ * Tracks whether the stream is waiting for an allocation to the stream flow control window, to the connection flow
+ * control window or not waiting for an allocation and only issues allocation notifications when the stream is known to
+ * be waiting for the notification.
+ * <p>
+ * It is possible for a stream to be waiting for a connection allocation when a stream allocation is made. Therefore
+ * this class tracks the type of allocation that the stream is waiting for to ensure that notifications are correctly
+ * triggered.
+ * <p>
+ * With the implementation at the time of writing, it is not possible for a stream to receive an unexpected connection
+ * notification as these are only issues to streams in the backlog and a stream must be waiting for a connection
+ * allocation in order to be placed on the backlog. However, as a precaution, this class protects against unexpected
+ * connection notifications.
+ * <p>
+ * It is important for asynchronous processing not to notify unless a notification is expected else a dispatch will be
+ * performed unnecessarily which may lead to unexpected results.
+ * <p>
+ * A previous implementation used separate locks for the stream and connection notifications. However, correct handling
+ * of allocation waiting requires holding the stream lock when making the decision to wait. Therefore both allocations
+ * need to wait on the Stream.
  */
 class WindowAllocationManager {
 
@@ -67,8 +62,8 @@ class WindowAllocationManager {
 
     void waitForStream(long timeout) throws InterruptedException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("windowAllocationManager.waitFor.stream",
-                    stream.getConnectionId(), stream.getIdAsString(), Long.toString(timeout)));
+            log.debug(sm.getString("windowAllocationManager.waitFor.stream", stream.getConnectionId(),
+                    stream.getIdAsString(), Long.toString(timeout)));
         }
 
         waitFor(STREAM, timeout);
@@ -77,9 +72,9 @@ class WindowAllocationManager {
 
     void waitForConnection(long timeout) throws InterruptedException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("windowAllocationManager.waitFor.connection",
-                    stream.getConnectionId(), stream.getIdAsString(),
-                    Integer.toString(stream.getConnectionAllocationRequested()), Long.toString(timeout)));
+            log.debug(sm.getString("windowAllocationManager.waitFor.connection", stream.getConnectionId(),
+                    stream.getIdAsString(), Integer.toString(stream.getConnectionAllocationRequested()),
+                    Long.toString(timeout)));
         }
 
         waitFor(CONNECTION, timeout);
@@ -88,8 +83,8 @@ class WindowAllocationManager {
 
     void waitForStreamNonBlocking() {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("windowAllocationManager.waitForNonBlocking.stream",
-                    stream.getConnectionId(), stream.getIdAsString()));
+            log.debug(sm.getString("windowAllocationManager.waitForNonBlocking.stream", stream.getConnectionId(),
+                    stream.getIdAsString()));
         }
 
         waitForNonBlocking(STREAM);
@@ -98,8 +93,8 @@ class WindowAllocationManager {
 
     void waitForConnectionNonBlocking() {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("windowAllocationManager.waitForNonBlocking.connection",
-                    stream.getConnectionId(), stream.getIdAsString()));
+            log.debug(sm.getString("windowAllocationManager.waitForNonBlocking.connection", stream.getConnectionId(),
+                    stream.getIdAsString()));
         }
 
         waitForNonBlocking(CONNECTION);
@@ -192,15 +187,15 @@ class WindowAllocationManager {
                     if (response.getWriteListener() == null) {
                         // Blocking, so use notify to release StreamOutputBuffer
                         if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("windowAllocationManager.notified",
-                                    stream.getConnectionId(), stream.getIdAsString()));
+                            log.debug(sm.getString("windowAllocationManager.notified", stream.getConnectionId(),
+                                    stream.getIdAsString()));
                         }
                         stream.notify();
                     } else {
                         // Non-blocking so dispatch
                         if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("windowAllocationManager.dispatched",
-                                    stream.getConnectionId(), stream.getIdAsString()));
+                            log.debug(sm.getString("windowAllocationManager.dispatched", stream.getConnectionId(),
+                                    stream.getIdAsString()));
                         }
                         response.action(ActionCode.DISPATCH_WRITE, null);
                         // Need to explicitly execute dispatches on the StreamProcessor

@@ -92,8 +92,7 @@ public class Http2Protocol implements UpgradeProtocol {
     // change the default defined in ConnectionSettingsBase.
     private int initialWindowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
     // Limits
-    private Set<String> allowedTrailerHeaders =
-            Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+    private Set<String> allowedTrailerHeaders = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
     private int maxHeaderCount = Constants.DEFAULT_MAX_HEADER_COUNT;
     private int maxHeaderSize = Constants.DEFAULT_MAX_HEADER_SIZE;
     private int maxTrailerCount = Constants.DEFAULT_MAX_TRAILER_COUNT;
@@ -140,8 +139,7 @@ public class Http2Protocol implements UpgradeProtocol {
 
 
     @Override
-    public InternalHttpUpgradeHandler getInternalUpgradeHandler(Adapter adapter,
-            Request coyoteRequest) {
+    public InternalHttpUpgradeHandler getInternalUpgradeHandler(Adapter adapter, Request coyoteRequest) {
         Http2UpgradeHandler result = new Http2UpgradeHandler(this, adapter, coyoteRequest);
 
         result.setReadTimeout(getReadTimeout());
@@ -379,9 +377,11 @@ public class Http2Protocol implements UpgradeProtocol {
     public void setCompression(String compression) {
         compressionConfig.setCompression(compression);
     }
+
     public String getCompression() {
         return compressionConfig.getCompression();
     }
+
     protected int getCompressionLevel() {
         return compressionConfig.getCompressionLevel();
     }
@@ -390,9 +390,11 @@ public class Http2Protocol implements UpgradeProtocol {
     public String getNoCompressionUserAgents() {
         return compressionConfig.getNoCompressionUserAgents();
     }
+
     protected Pattern getNoCompressionUserAgentsPattern() {
         return compressionConfig.getNoCompressionUserAgentsPattern();
     }
+
     public void setNoCompressionUserAgents(String noCompressionUserAgents) {
         compressionConfig.setNoCompressionUserAgents(noCompressionUserAgents);
     }
@@ -401,9 +403,11 @@ public class Http2Protocol implements UpgradeProtocol {
     public String getCompressibleMimeType() {
         return compressionConfig.getCompressibleMimeType();
     }
+
     public void setCompressibleMimeType(String valueS) {
         compressionConfig.setCompressibleMimeType(valueS);
     }
+
     public String[] getCompressibleMimeTypes() {
         return compressionConfig.getCompressibleMimeTypes();
     }
@@ -412,6 +416,7 @@ public class Http2Protocol implements UpgradeProtocol {
     public int getCompressionMinSize() {
         return compressionConfig.getCompressionMinSize();
     }
+
     public void setCompressionMinSize(int compressionMinSize) {
         compressionConfig.setCompressionMinSize(compressionMinSize);
     }
@@ -421,6 +426,7 @@ public class Http2Protocol implements UpgradeProtocol {
     public boolean getNoCompressionStrongETag() {
         return compressionConfig.getNoCompressionStrongETag();
     }
+
     @Deprecated
     public void setNoCompressionStrongETag(boolean noCompressionStrongETag) {
         compressionConfig.setNoCompressionStrongETag(noCompressionStrongETag);
