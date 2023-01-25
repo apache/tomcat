@@ -21,7 +21,7 @@ import java.util.function.IntPredicate;
 import org.apache.tomcat.util.res.StringManager;
 
 enum FrameType {
-
+    // @formatter:off
     DATA            (  0, false,  true, null,              false),
     HEADERS         (  1, false,  true, null,               true),
     PRIORITY        (  2, false,  true, (x) -> x == 5,     false),
@@ -34,6 +34,7 @@ enum FrameType {
     CONTINUATION    (  9, false,  true, null,               true),
     PRIORITY_UPDATE ( 16,  true, false, (x) -> x >= 4,      true),
     UNKNOWN         (256,  true,  true, null,              false);
+    // @formatter:on
 
     private static final StringManager sm = StringManager.getManager(FrameType.class);
 
