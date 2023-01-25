@@ -19,7 +19,7 @@ package org.apache.coyote.http2;
 import org.apache.tomcat.util.res.StringManager;
 
 enum FrameType {
-
+    // @formatter:off
     DATA          (0,   false,  true, null,               false),
     HEADERS       (1,   false,  true, null,                true),
     PRIORITY      (2,   false,  true, equals(5),          false),
@@ -31,6 +31,7 @@ enum FrameType {
     WINDOW_UPDATE (8,    true,  true, equals(4),           true),
     CONTINUATION  (9,   false,  true, null,                true),
     UNKNOWN       (256,  true,  true, null,               false);
+    // @formatter:on
 
     private static final StringManager sm = StringManager.getManager(FrameType.class);
 
