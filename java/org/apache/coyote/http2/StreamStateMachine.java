@@ -169,6 +169,7 @@ class StreamStateMachine {
     }
 
     private enum State {
+        // @formatter:off
         IDLE               (false, false, false, true,
                             Http2Error.PROTOCOL_ERROR, FrameType.HEADERS,
                                                        FrameType.PRIORITY),
@@ -215,6 +216,7 @@ class StreamStateMachine {
                                                        FrameType.WINDOW_UPDATE),
         CLOSED_FINAL       (false, false, false, true,
                             Http2Error.PROTOCOL_ERROR, FrameType.PRIORITY);
+        // @formatter:on
 
         private final boolean canRead;
         private final boolean canWrite;
