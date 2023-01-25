@@ -18,9 +18,6 @@ package org.apache.coyote.http2;
 
 public class Constants {
 
-    // Prioritisation
-    public static final int DEFAULT_URGENCY = 3;
-    public static final boolean DEFAULT_INCREMENTAL = false;
     // Range 0 to 7 inclusive
     public static final int URGENCY_RANGE = 8;
 

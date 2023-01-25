@@ -97,8 +97,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     private Object pendingWindowUpdateForStreamLock = new Object();
     private int pendingWindowUpdateForStream = 0;
 
-    private volatile int urgency = Constants.DEFAULT_URGENCY;
-    private volatile boolean incremental = Constants.DEFAULT_INCREMENTAL;
+    private volatile int urgency = Priority.DEFAULT_URGENCY;
+    private volatile boolean incremental = Priority.DEFAULT_INCREMENTAL;
 
 
     Stream(Integer identifier, Http2UpgradeHandler handler) {
