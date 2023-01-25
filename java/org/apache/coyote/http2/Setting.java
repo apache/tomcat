@@ -28,7 +28,7 @@ enum Setting {
 
     private final int id;
 
-    private Setting (int id) {
+    private Setting(int id) {
         this.id = id;
     }
 
@@ -42,31 +42,31 @@ enum Setting {
     }
 
     static final Setting valueOf(int i) {
-        switch(i) {
-        case 1: {
-            return HEADER_TABLE_SIZE;
-        }
-        case 2: {
-            return ENABLE_PUSH;
-        }
-        case 3: {
-            return MAX_CONCURRENT_STREAMS;
-        }
-        case 4: {
-            return INITIAL_WINDOW_SIZE;
-        }
-        case 5: {
-            return MAX_FRAME_SIZE;
-        }
-        case 6: {
-            return MAX_HEADER_LIST_SIZE;
-        }
-        case 9: {
-            return NO_RFC7540_PRIORITIES;
-        }
-        default: {
-            return Setting.UNKNOWN;
-        }
+        switch (i) {
+            case 1: {
+                return HEADER_TABLE_SIZE;
+            }
+            case 2: {
+                return ENABLE_PUSH;
+            }
+            case 3: {
+                return MAX_CONCURRENT_STREAMS;
+            }
+            case 4: {
+                return INITIAL_WINDOW_SIZE;
+            }
+            case 5: {
+                return MAX_FRAME_SIZE;
+            }
+            case 6: {
+                return MAX_HEADER_LIST_SIZE;
+            }
+            case 9: {
+                return NO_RFC7540_PRIORITIES;
+            }
+            default: {
+                return Setting.UNKNOWN;
+            }
         }
     }
 }

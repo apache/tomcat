@@ -19,8 +19,8 @@ package org.apache.coyote.http2;
 import java.nio.ByteBuffer;
 
 /**
- * Base class for all streams other than stream 0, the connection. Primarily
- * provides functionality shared between full Stream and RecycledStream.
+ * Base class for all streams other than stream 0, the connection. Primarily provides functionality shared between full
+ * Stream and RecycledStream.
  */
 abstract class AbstractNonZeroStream extends AbstractStream {
 
@@ -52,12 +52,10 @@ abstract class AbstractNonZeroStream extends AbstractStream {
 
 
     /**
-     * Obtain the ByteBuffer to store DATA frame payload data for this stream
-     * that has been received from the client.
+     * Obtain the ByteBuffer to store DATA frame payload data for this stream that has been received from the client.
      *
-     * @return {@code null} if the DATA frame payload can be swallowed, or a
-     *         ByteBuffer with at least enough space remaining for the current
-     *         flow control window for stream data from the client.
+     * @return {@code null} if the DATA frame payload can be swallowed, or a ByteBuffer with at least enough space
+     *             remaining for the current flow control window for stream data from the client.
      */
     abstract ByteBuffer getInputByteBuffer();
 

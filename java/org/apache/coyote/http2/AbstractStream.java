@@ -21,8 +21,8 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Base class for all streams including the connection (referred to as Stream 0)
- * and is used primarily when managing prioritization.
+ * Base class for all streams including the connection (referred to as Stream 0) and is used primarily when managing
+ * prioritization.
  */
 abstract class AbstractStream {
 
@@ -71,9 +71,10 @@ abstract class AbstractStream {
 
     /**
      * Increment window size.
+     *
      * @param increment The amount by which the window size should be increased
-     * @throws Http2Exception If the window size is now higher than
-     *  the maximum allowed
+     *
+     * @throws Http2Exception If the window size is now higher than the maximum allowed
      */
     synchronized void incrementWindowSize(int increment) throws Http2Exception {
         // No need for overflow protection here.
@@ -82,8 +83,8 @@ abstract class AbstractStream {
         windowSize += increment;
 
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("abstractStream.windowSizeInc", getConnectionId(),
-                    getIdAsString(), Integer.toString(increment), Long.toString(windowSize)));
+            log.debug(sm.getString("abstractStream.windowSizeInc", getConnectionId(), getIdAsString(),
+                    Integer.toString(increment), Long.toString(windowSize)));
         }
 
         if (windowSize > ConnectionSettingsBase.MAX_WINDOW_SIZE) {
@@ -92,8 +93,7 @@ abstract class AbstractStream {
             if (identifier.intValue() == 0) {
                 throw new ConnectionException(msg, Http2Error.FLOW_CONTROL_ERROR);
             } else {
-                throw new StreamException(
-                        msg, Http2Error.FLOW_CONTROL_ERROR, identifier.intValue());
+                throw new StreamException(msg, Http2Error.FLOW_CONTROL_ERROR, identifier.intValue());
             }
         }
     }
@@ -105,8 +105,8 @@ abstract class AbstractStream {
         // decrements are permitted
         windowSize -= decrement;
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("abstractStream.windowSizeDec", getConnectionId(),
-                    getIdAsString(), Integer.toString(decrement), Long.toString(windowSize)));
+            log.debug(sm.getString("abstractStream.windowSizeDec", getConnectionId(), getIdAsString(),
+                    Integer.toString(decrement), Long.toString(windowSize)));
         }
     }
 

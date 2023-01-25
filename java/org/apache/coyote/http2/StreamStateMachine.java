@@ -25,14 +25,11 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * See <a href="https://tools.ietf.org/html/rfc7540#section-5.1">state
- * diagram</a> in RFC 7540.
- * <br>
+ * See <a href="https://tools.ietf.org/html/rfc7540#section-5.1">state diagram</a> in RFC 7540. <br>
  * The following additions are supported by this state machine:
  * <ul>
  * <li>differentiate between closed (normal) and closed caused by reset</li>
  * </ul>
- *
  */
 class StreamStateMachine {
 
@@ -82,20 +79,18 @@ class StreamStateMachine {
 
 
     /**
-     * Marks the stream as reset. This method will not change the stream state
-     * if:
+     * Marks the stream as reset. This method will not change the stream state if:
      * <ul>
      * <li>The stream is already reset</li>
      * <li>The stream is already closed</li>
      * </ul>
      *
-     * @throws IllegalStateException If the stream is in a state that does not
-     *         permit resets
+     * @throws IllegalStateException If the stream is in a state that does not permit resets
      */
     public synchronized void sendReset() {
         if (state == State.IDLE) {
-            throw new IllegalStateException(sm.getString("streamStateMachine.debug.change",
-                    connectionId, streamId, state));
+            throw new IllegalStateException(
+                    sm.getString("streamStateMachine.debug.change", connectionId, streamId, state));
         }
         if (state.canReset()) {
             stateChange(state, State.CLOSED_RST_TX);
@@ -112,8 +107,7 @@ class StreamStateMachine {
         if (state == oldState) {
             state = newState;
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("streamStateMachine.debug.change", connectionId,
-                        streamId, oldState, newState));
+                log.debug(sm.getString("streamStateMachine.debug.change", connectionId, streamId, oldState, newState));
             }
         }
     }
@@ -124,12 +118,12 @@ class StreamStateMachine {
         // the current state of this stream.
         if (!isFrameTypePermitted(frameType)) {
             if (state.connectionErrorForInvalidFrame) {
-                throw new ConnectionException(sm.getString("streamStateMachine.invalidFrame",
-                        connectionId, streamId, state, frameType),
+                throw new ConnectionException(
+                        sm.getString("streamStateMachine.invalidFrame", connectionId, streamId, state, frameType),
                         state.errorCodeForInvalidFrame);
             } else {
-                throw new StreamException(sm.getString("streamStateMachine.invalidFrame",
-                        connectionId, streamId, state, frameType),
+                throw new StreamException(
+                        sm.getString("streamStateMachine.invalidFrame", connectionId, streamId, state, frameType),
                         state.errorCodeForInvalidFrame, Integer.parseInt(streamId));
             }
         }
@@ -225,9 +219,8 @@ class StreamStateMachine {
         private final Http2Error errorCodeForInvalidFrame;
         private final Set<FrameType> frameTypesPermitted;
 
-        private State(boolean canRead, boolean canWrite, boolean canReset,
-                boolean connectionErrorForInvalidFrame, Http2Error errorCode,
-                FrameType... frameTypes) {
+        private State(boolean canRead, boolean canWrite, boolean canReset, boolean connectionErrorForInvalidFrame,
+                Http2Error errorCode, FrameType... frameTypes) {
             this.canRead = canRead;
             this.canWrite = canWrite;
             this.canReset = canReset;
