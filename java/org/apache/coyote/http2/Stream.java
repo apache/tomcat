@@ -37,6 +37,7 @@ import org.apache.coyote.Response;
 import org.apache.coyote.http11.HttpOutputBuffer;
 import org.apache.coyote.http11.OutputFilter;
 import org.apache.coyote.http11.filters.SavedRequestInputFilter;
+import org.apache.coyote.http11.filters.VoidOutputFilter;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -431,6 +432,12 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
     }
 
+
+    void configureVoidOutputFilter() {
+        addOutputFilter(new VoidOutputFilter());
+        // Prevent further writes by the application
+        streamOutputBuffer.closed = true;
+    }
 
     private void parseAuthority(String value, boolean host) throws HpackException {
         int i;
