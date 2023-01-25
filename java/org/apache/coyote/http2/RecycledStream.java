@@ -19,8 +19,8 @@ package org.apache.coyote.http2;
 import java.nio.ByteBuffer;
 
 /**
- * Represents a closed stream in the priority tree. Used in preference to the
- * full {@link Stream} as has much lower memory usage.
+ * Represents a closed stream in the priority tree. Used in preference to the full {@link Stream} as has much lower
+ * memory usage.
  */
 class RecycledStream extends AbstractNonZeroStream {
 
@@ -56,9 +56,8 @@ class RecycledStream extends AbstractNonZeroStream {
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation will return an zero length ByteBuffer to trigger a
-     * flow control error if more DATA frame payload than the remaining flow
-     * control window is received for this recycled stream.
+     * This implementation will return an zero length ByteBuffer to trigger a flow control error if more DATA frame
+     * payload than the remaining flow control window is received for this recycled stream.
      */
     @Override
     ByteBuffer getInputByteBuffer() {

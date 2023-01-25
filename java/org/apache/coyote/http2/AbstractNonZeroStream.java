@@ -24,8 +24,8 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Base class for all streams other than stream 0, the connection. Primarily
- * provides functionality shared between full Stream and RecycledStream.
+ * Base class for all streams other than stream 0, the connection. Primarily provides functionality shared between full
+ * Stream and RecycledStream.
  */
 abstract class AbstractNonZeroStream extends AbstractStream {
 
@@ -58,17 +58,15 @@ abstract class AbstractNonZeroStream extends AbstractStream {
 
 
     /*
-     * General method used when reprioritising a stream and care needs to be
-     * taken not to create circular references.
+     * General method used when reprioritising a stream and care needs to be taken not to create circular references.
      *
-     * Changes to the priority tree need to be synchronized at the connection
-     * level. This is the caller's responsibility.
+     * Changes to the priority tree need to be synchronized at the connection level. This is the caller's
+     * responsibility.
      */
     final void rePrioritise(AbstractStream parent, boolean exclusive, int weight) {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.reprioritisation.debug",
-                    getConnectionId(), getIdAsString(), Boolean.toString(exclusive),
-                    parent.getIdAsString(), Integer.toString(weight)));
+            log.debug(sm.getString("stream.reprioritisation.debug", getConnectionId(), getIdAsString(),
+                    Boolean.toString(exclusive), parent.getIdAsString(), Integer.toString(weight)));
         }
 
         // Check if new parent is a descendant of this stream
@@ -96,16 +94,14 @@ abstract class AbstractNonZeroStream extends AbstractStream {
 
 
     /*
-     * Used when removing closed streams from the tree and we know there is no
-     * need to check for circular references.
+     * Used when removing closed streams from the tree and we know there is no need to check for circular references.
      *
-     * Changes to the priority tree need to be synchronized at the connection
-     * level. This is the caller's responsibility.
+     * Changes to the priority tree need to be synchronized at the connection level. This is the caller's
+     * responsibility.
      */
     final void rePrioritise(AbstractStream parent, int weight) {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.reprioritisation.debug",
-                    getConnectionId(), getIdAsString(), Boolean.FALSE,
+            log.debug(sm.getString("stream.reprioritisation.debug", getConnectionId(), getIdAsString(), Boolean.FALSE,
                     parent.getIdAsString(), Integer.toString(weight)));
         }
 
@@ -115,14 +111,12 @@ abstract class AbstractNonZeroStream extends AbstractStream {
 
 
     /*
-     * Used when "recycling" a stream and replacing a Stream instance with a
-     * RecycledStream instance.
+     * Used when "recycling" a stream and replacing a Stream instance with a RecycledStream instance.
      *
-     * Replace this stream with the provided stream in the parent/child
-     * hierarchy.
+     * Replace this stream with the provided stream in the parent/child hierarchy.
      *
-     * Changes to the priority tree need to be synchronized at the connection
-     * level. This is the caller's responsibility.
+     * Changes to the priority tree need to be synchronized at the connection level. This is the caller's
+     * responsibility.
      */
     void replaceStream(AbstractNonZeroStream replacement) {
         getParentStream().addChild(replacement);
@@ -146,12 +140,10 @@ abstract class AbstractNonZeroStream extends AbstractStream {
 
 
     /**
-     * Obtain the ByteBuffer to store DATA frame payload data for this stream
-     * that has been received from the client.
+     * Obtain the ByteBuffer to store DATA frame payload data for this stream that has been received from the client.
      *
-     * @return {@code null} if the DATA frame payload can be swallowed, or a
-     *         ByteBuffer with at least enough space remaining for the current
-     *         flow control window for stream data from the client.
+     * @return {@code null} if the DATA frame payload can be swallowed, or a ByteBuffer with at least enough space
+     *             remaining for the current flow control window for stream data from the client.
      */
     abstract ByteBuffer getInputByteBuffer();
 

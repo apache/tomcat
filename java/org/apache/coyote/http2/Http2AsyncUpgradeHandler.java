@@ -50,8 +50,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     private final AtomicReference<Throwable> error = new AtomicReference<>();
     private final AtomicReference<IOException> applicationIOE = new AtomicReference<>();
 
-    public Http2AsyncUpgradeHandler(Http2Protocol protocol, Adapter adapter,
-            Request coyoteRequest, SocketWrapperBase<?> socketWrapper) {
+    public Http2AsyncUpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest,
+            SocketWrapperBase<?> socketWrapper) {
         super(protocol, adapter, coyoteRequest, socketWrapper);
     }
 
@@ -59,6 +59,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         @Override
         public void completed(Long result, Void attachment) {
         }
+
         @Override
         public void failed(Throwable t, Void attachment) {
             error.set(t);
@@ -68,6 +69,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         @Override
         public void completed(Long result, Void attachment) {
         }
+
         @Override
         public void failed(Throwable t, Void attachment) {
             if (t instanceof IOException) {
@@ -96,21 +98,19 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
 
     @Override
-    protected void processConnection(WebConnection webConnection,
-            Stream stream) {
+    protected void processConnection(WebConnection webConnection, Stream stream) {
         // The end of the processing will instead be an async callback
     }
 
-    void processConnectionCallback(WebConnection webConnection,
-            Stream stream) {
+    void processConnectionCallback(WebConnection webConnection, Stream stream) {
         super.processConnection(webConnection, stream);
     }
 
 
     @Override
     protected void writeSettings() {
-        socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
+        socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,
+                SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
                 ByteBuffer.wrap(localSettings.getSettingsFrameForPending()),
                 ByteBuffer.wrap(createWindowUpdateForSettings()));
         Throwable err = error.get();
@@ -127,8 +127,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     @Override
     void sendStreamReset(StreamStateMachine state, StreamException se) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.rst.debug", connectionId,
-                    Integer.toString(se.getStreamId()), se.getError(), se.getMessage()));
+            log.debug(sm.getString("upgradeHandler.rst.debug", connectionId, Integer.toString(se.getStreamId()),
+                    se.getError(), se.getMessage()));
         }
         // Write a RST frame
         byte[] rstFrame = new byte[13];
@@ -158,17 +158,15 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 }
             }
 
-            socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                    TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
-                    ByteBuffer.wrap(rstFrame));
+            socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,
+                    SocketWrapperBase.COMPLETE_WRITE, errorCompletion, ByteBuffer.wrap(rstFrame));
         }
         handleAsyncException();
     }
 
 
     @Override
-    protected void writeGoAwayFrame(int maxStreamId, long errorCode, byte[] debugMsg)
-            throws IOException {
+    protected void writeGoAwayFrame(int maxStreamId, long errorCode, byte[] debugMsg) throws IOException {
         byte[] fixedPayload = new byte[8];
         ByteUtil.set31Bits(fixedPayload, 0, maxStreamId);
         ByteUtil.setFourBytes(fixedPayload, 4, errorCode);
@@ -179,30 +177,28 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         byte[] payloadLength = new byte[3];
         ByteUtil.setThreeBytes(payloadLength, 0, len);
         if (debugMsg != null) {
-            socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                    TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
-                    ByteBuffer.wrap(payloadLength), ByteBuffer.wrap(GOAWAY),
-                    ByteBuffer.wrap(fixedPayload), ByteBuffer.wrap(debugMsg));
+            socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,
+                    SocketWrapperBase.COMPLETE_WRITE, errorCompletion, ByteBuffer.wrap(payloadLength),
+                    ByteBuffer.wrap(GOAWAY), ByteBuffer.wrap(fixedPayload), ByteBuffer.wrap(debugMsg));
         } else {
-            socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                    TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
-                    ByteBuffer.wrap(payloadLength), ByteBuffer.wrap(GOAWAY),
-                    ByteBuffer.wrap(fixedPayload));
+            socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,
+                    SocketWrapperBase.COMPLETE_WRITE, errorCompletion, ByteBuffer.wrap(payloadLength),
+                    ByteBuffer.wrap(GOAWAY), ByteBuffer.wrap(fixedPayload));
         }
         handleAsyncException();
     }
 
 
     @Override
-    void writeHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders,
-            boolean endOfStream, int payloadSize) throws IOException {
+    void writeHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders, boolean endOfStream, int payloadSize)
+            throws IOException {
         synchronized (headerWriteLock) {
-            AsyncHeaderFrameBuffers headerFrameBuffers = (AsyncHeaderFrameBuffers)
-                    doWriteHeaders(stream, pushedStreamId, mimeHeaders, endOfStream, payloadSize);
+            AsyncHeaderFrameBuffers headerFrameBuffers = (AsyncHeaderFrameBuffers) doWriteHeaders(stream,
+                    pushedStreamId, mimeHeaders, endOfStream, payloadSize);
             if (headerFrameBuffers != null) {
-                socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                        TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE,
-                        applicationErrorCompletion, headerFrameBuffers.bufs.toArray(BYTEBUFFER_ARRAY));
+                socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,
+                        SocketWrapperBase.COMPLETE_WRITE, applicationErrorCompletion,
+                        headerFrameBuffers.bufs.toArray(BYTEBUFFER_ARRAY));
                 handleAsyncException();
             }
         }
@@ -240,9 +236,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             ByteUtil.set31Bits(header, 5, stream.getIdAsInt());
             int orgLimit = data.limit();
             data.limit(data.position() + len);
-            socketWrapper.write(BlockingMode.BLOCK, protocol.getWriteTimeout(),
-                    TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE,
-                    applicationErrorCompletion, ByteBuffer.wrap(header), data);
+            socketWrapper.write(BlockingMode.BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,
+                    SocketWrapperBase.COMPLETE_WRITE, applicationErrorCompletion, ByteBuffer.wrap(header), data);
             data.limit(orgLimit);
             handleAsyncException();
         }
@@ -253,12 +248,12 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     void writeWindowUpdate(AbstractNonZeroStream stream, int increment, boolean applicationInitiated)
             throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.windowUpdateConnection",
-                    getConnectionId(), Integer.valueOf(increment)));
+            log.debug(sm.getString("upgradeHandler.windowUpdateConnection", getConnectionId(),
+                    Integer.valueOf(increment)));
         }
         // Build window update frame for stream 0
         byte[] frame = new byte[13];
-        ByteUtil.setThreeBytes(frame, 0,  4);
+        ByteUtil.setThreeBytes(frame, 0, 4);
         frame[3] = FrameType.WINDOW_UPDATE.getIdByte();
         ByteUtil.set31Bits(frame, 9, increment);
         boolean neetToWriteConnectionUpdate = true;
@@ -267,24 +262,23 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             int streamIncrement = ((Stream) stream).getWindowUpdateSizeToWrite(increment);
             if (streamIncrement > 0) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("upgradeHandler.windowUpdateStream",
-                            getConnectionId(), getIdAsString(), Integer.valueOf(streamIncrement)));
+                    log.debug(sm.getString("upgradeHandler.windowUpdateStream", getConnectionId(), getIdAsString(),
+                            Integer.valueOf(streamIncrement)));
                 }
                 byte[] frame2 = new byte[13];
-                ByteUtil.setThreeBytes(frame2, 0,  4);
+                ByteUtil.setThreeBytes(frame2, 0, 4);
                 frame2[3] = FrameType.WINDOW_UPDATE.getIdByte();
                 ByteUtil.set31Bits(frame2, 9, streamIncrement);
                 ByteUtil.set31Bits(frame2, 5, stream.getIdAsInt());
-                socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                        TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
-                        ByteBuffer.wrap(frame), ByteBuffer.wrap(frame2));
+                socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,
+                        SocketWrapperBase.COMPLETE_WRITE, errorCompletion, ByteBuffer.wrap(frame),
+                        ByteBuffer.wrap(frame2));
                 neetToWriteConnectionUpdate = false;
             }
         }
         if (neetToWriteConnectionUpdate) {
-            socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                    TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
-                    ByteBuffer.wrap(frame));
+            socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,
+                    SocketWrapperBase.COMPLETE_WRITE, errorCompletion, ByteBuffer.wrap(frame));
         }
         handleAsyncException();
     }
@@ -298,9 +292,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 log.warn(sm.getString("upgradeHandler.unexpectedAck", connectionId, getIdAsString()));
             }
         } else {
-            socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                    TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
-                    ByteBuffer.wrap(SETTINGS_ACK));
+            socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,
+                    SocketWrapperBase.COMPLETE_WRITE, errorCompletion, ByteBuffer.wrap(SETTINGS_ACK));
         }
         handleAsyncException();
     }
@@ -330,22 +323,25 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                     sendfile.mappedBuffer = channel.map(MapMode.READ_ONLY, sendfile.pos, sendfile.end - sendfile.pos);
                 }
                 // Reserve as much as possible right away
-                int reservation = (sendfile.end - sendfile.pos > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) (sendfile.end - sendfile.pos);
-                sendfile.streamReservation  = sendfile.stream.reserveWindowSize(reservation, true);
+                int reservation = (sendfile.end - sendfile.pos > Integer.MAX_VALUE) ? Integer.MAX_VALUE
+                        : (int) (sendfile.end - sendfile.pos);
+                sendfile.streamReservation = sendfile.stream.reserveWindowSize(reservation, true);
                 sendfile.connectionReservation = reserveWindowSize(sendfile.stream, sendfile.streamReservation, true);
             } catch (IOException e) {
                 return SendfileState.ERROR;
             }
 
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("upgradeHandler.sendfile.reservation", connectionId, sendfile.stream.getIdAsString(),
-                        Integer.valueOf(sendfile.connectionReservation), Integer.valueOf(sendfile.streamReservation)));
+                log.debug(sm.getString("upgradeHandler.sendfile.reservation", connectionId,
+                        sendfile.stream.getIdAsString(), Integer.valueOf(sendfile.connectionReservation),
+                        Integer.valueOf(sendfile.streamReservation)));
             }
 
             // connectionReservation will always be smaller than or the same as
             // streamReservation
             int frameSize = Integer.min(getMaxFrameSize(), sendfile.connectionReservation);
-            boolean finished = (frameSize == sendfile.left) && sendfile.stream.getCoyoteResponse().getTrailerFields() == null;
+            boolean finished = (frameSize == sendfile.left) &&
+                    sendfile.stream.getCoyoteResponse().getTrailerFields() == null;
 
             // Need to check this now since sending end of stream will change this.
             boolean writable = sendfile.stream.canWrite();
@@ -366,9 +362,9 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 }
                 ByteUtil.set31Bits(header, 5, sendfile.stream.getIdAsInt());
                 sendfile.mappedBuffer.limit(sendfile.mappedBuffer.position() + frameSize);
-                socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                        TimeUnit.MILLISECONDS, sendfile, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION,
-                        new SendfileCompletionHandler(), ByteBuffer.wrap(header), sendfile.mappedBuffer);
+                socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS,
+                        sendfile, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION, new SendfileCompletionHandler(),
+                        ByteBuffer.wrap(header), sendfile.mappedBuffer);
                 try {
                     handleAsyncException();
                 } catch (IOException e) {
@@ -388,8 +384,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             long bytesWritten = nBytes.longValue() - 9;
 
             /*
-             * Loop for in-line writes only. Avoids a possible stack-overflow of
-             * chained completion handlers with a long series of in-line writes.
+             * Loop for in-line writes only. Avoids a possible stack-overflow of chained completion handlers with a long
+             * series of in-line writes.
              */
             do {
                 sendfile.left -= bytesWritten;
@@ -407,25 +403,29 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 try {
                     if (sendfile.connectionReservation == 0) {
                         if (sendfile.streamReservation == 0) {
-                            int reservation = (sendfile.end - sendfile.pos > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) (sendfile.end - sendfile.pos);
+                            int reservation = (sendfile.end - sendfile.pos > Integer.MAX_VALUE) ? Integer.MAX_VALUE
+                                    : (int) (sendfile.end - sendfile.pos);
                             sendfile.streamReservation = sendfile.stream.reserveWindowSize(reservation, true);
                         }
-                        sendfile.connectionReservation = reserveWindowSize(sendfile.stream, sendfile.streamReservation, true);
+                        sendfile.connectionReservation = reserveWindowSize(sendfile.stream, sendfile.streamReservation,
+                                true);
                     }
                 } catch (IOException e) {
-                    failed (e, sendfile);
+                    failed(e, sendfile);
                     return;
                 }
 
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("upgradeHandler.sendfile.reservation", connectionId, sendfile.stream.getIdAsString(),
-                            Integer.valueOf(sendfile.connectionReservation), Integer.valueOf(sendfile.streamReservation)));
+                    log.debug(sm.getString("upgradeHandler.sendfile.reservation", connectionId,
+                            sendfile.stream.getIdAsString(), Integer.valueOf(sendfile.connectionReservation),
+                            Integer.valueOf(sendfile.streamReservation)));
                 }
 
                 // connectionReservation will always be smaller than or the same as
                 // streamReservation
                 int frameSize = Integer.min(getMaxFrameSize(), sendfile.connectionReservation);
-                boolean finished = (frameSize == sendfile.left) && sendfile.stream.getCoyoteResponse().getTrailerFields() == null;
+                boolean finished = (frameSize == sendfile.left) &&
+                        sendfile.stream.getCoyoteResponse().getTrailerFields() == null;
 
                 // Need to check this now since sending end of stream will change this.
                 boolean writable = sendfile.stream.canWrite();
@@ -441,17 +441,18 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 }
                 if (writable) {
                     if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("upgradeHandler.writeBody", connectionId, sendfile.stream.getIdAsString(),
-                                Integer.toString(frameSize), Boolean.valueOf(finished)));
+                        log.debug(
+                                sm.getString("upgradeHandler.writeBody", connectionId, sendfile.stream.getIdAsString(),
+                                        Integer.toString(frameSize), Boolean.valueOf(finished)));
                     }
                     ByteUtil.set31Bits(header, 5, sendfile.stream.getIdAsInt());
                     sendfile.mappedBuffer.limit(sendfile.mappedBuffer.position() + frameSize);
                     // Note: Completion handler not called in the write
-                    //       completes in-line. The wrote will continue via the
-                    //       surrounding loop.
+                    // completes in-line. The wrote will continue via the
+                    // surrounding loop.
                     completionState = socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                            TimeUnit.MILLISECONDS, sendfile, SocketWrapperBase.COMPLETE_WRITE,
-                            this, ByteBuffer.wrap(header), sendfile.mappedBuffer);
+                            TimeUnit.MILLISECONDS, sendfile, SocketWrapperBase.COMPLETE_WRITE, this,
+                            ByteBuffer.wrap(header), sendfile.mappedBuffer);
                     try {
                         handleAsyncException();
                     } catch (IOException e) {
@@ -484,9 +485,9 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 PingRecord pingRecord = new PingRecord(sentSequence, now);
                 inflightPings.add(pingRecord);
                 ByteUtil.set31Bits(payload, 4, sentSequence);
-                socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                        TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE,
-                        errorCompletion, ByteBuffer.wrap(PING), ByteBuffer.wrap(payload));
+                socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,
+                        SocketWrapperBase.COMPLETE_WRITE, errorCompletion, ByteBuffer.wrap(PING),
+                        ByteBuffer.wrap(payload));
                 handleAsyncException();
             }
         }
@@ -497,9 +498,9 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 super.receivePing(payload, ack);
             } else {
                 // Client originated ping. Echo it back.
-                socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                        TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE,
-                        errorCompletion, ByteBuffer.wrap(PING_ACK), ByteBuffer.wrap(payload));
+                socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,
+                        SocketWrapperBase.COMPLETE_WRITE, errorCompletion, ByteBuffer.wrap(PING_ACK),
+                        ByteBuffer.wrap(payload));
                 handleAsyncException();
             }
         }
