@@ -334,8 +334,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 if (coyoteRequest.method().isNull()) {
                     coyoteRequest.method().setString(value);
                     if ("HEAD".equals(value)) {
-                        addOutputFilter(new VoidOutputFilter());
-                        streamOutputBuffer.closed = true;
+                        configureVoidOutputFilter();
                     }
                 } else {
                     throw new HpackException(
@@ -436,6 +435,12 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
     }
 
+
+    void configureVoidOutputFilter() {
+        addOutputFilter(new VoidOutputFilter());
+        // Prevent further writes by the application
+        streamOutputBuffer.closed = true;
+    }
 
     private void parseAuthority(String value, boolean host) throws HpackException {
         int i;
