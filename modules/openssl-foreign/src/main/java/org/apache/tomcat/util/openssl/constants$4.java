@@ -24,8 +24,10 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-class constants$4 {
+final class constants$4 {
 
+    // Suppresses default constructor, ensuring non-instantiability.
+    private constants$4() {}
     static final FunctionDescriptor BN_get_rfc3526_prime_6144$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
         Constants$root.C_POINTER$LAYOUT
     );

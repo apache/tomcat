@@ -24,8 +24,10 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-class constants$6 {
+final class constants$6 {
 
+    // Suppresses default constructor, ensuring non-instantiability.
+    private constants$6() {}
     static final FunctionDescriptor EC_KEY_free$FUNC = FunctionDescriptor.ofVoid(
         Constants$root.C_POINTER$LAYOUT
     );
