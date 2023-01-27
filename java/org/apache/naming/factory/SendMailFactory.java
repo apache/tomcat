@@ -26,6 +26,8 @@ import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
+import org.apache.tomcat.util.ExceptionUtils;
+
 import jakarta.mail.Session;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -109,7 +111,10 @@ public class SendMailFactory implements ObjectFactory
                     message.setFrom(new InternetAddress(from));
                 }
                 message.setSubject("");
-            } catch (Exception e) {/*Ignore*/}
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                // Otherwise ignore
+            }
             MimePartDataSource mds = new MimePartDataSource(message);
             return mds;
         } else { // We can't create an instance of the DataSource
