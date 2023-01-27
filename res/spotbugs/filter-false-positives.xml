@@ -755,6 +755,12 @@
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
   </Match>
   <Match>
+    <!-- Not an issue. Initialisation is as intended. -->
+    <Class name="org.apache.catalina.tribes.util.JreCompat"/>
+    <Method name="&lt;clinit&gt;"/>
+    <Bug pattern="IC_SUPERCLASS_USES_SUBCLASS_DURING_INITIALIZATION" />
+  </Match>
+  <Match>
     <!-- Random is SecureRandom and will be used multiple times. -->
     <Class name="org.apache.catalina.tribes.util.UUIDGenerator"/>
     <Or>
