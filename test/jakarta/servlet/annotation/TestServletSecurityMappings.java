@@ -149,21 +149,21 @@ public class TestServletSecurityMappings extends TomcatBaseTest {
             if (secureRoot) {
                 sr = ctx.addServlet("Root", SecureRoot.class.getName());
             } else {
-                sr = ctx.addServlet("Root", Root.class.getName());
+                sr = ctx.addServlet("Root", Ok.class.getName());
             }
             sr.addMapping("");
 
             if (secureDefault) {
                 sr = ctx.addServlet("Default", SecureDefault.class.getName());
             } else {
-                sr = ctx.addServlet("Default", Default.class.getName());
+                sr = ctx.addServlet("Default", Ok.class.getName());
             }
             sr.addMapping("/");
 
             if (secureFoo) {
                 sr = ctx.addServlet("Foo", SecureFoo.class.getName());
             } else {
-                sr = ctx.addServlet("Foo", Foo.class.getName());
+                sr = ctx.addServlet("Foo", Ok.class.getName());
             }
             sr.addMapping("/foo");
         }
@@ -171,64 +171,27 @@ public class TestServletSecurityMappings extends TomcatBaseTest {
 
 
     @ServletSecurity(@HttpConstraint(ServletSecurity.EmptyRoleSemantic.DENY))
-    public static class SecureRoot extends HttpServlet {
+    public static class SecureRoot extends Ok {
 
         private static final long serialVersionUID = 1L;
-
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.getWriter().print("OK");
-        }
-    }
-
-
-    public static class Root extends HttpServlet {
-
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.getWriter().print("OK");
-        }
     }
 
 
     @ServletSecurity(@HttpConstraint(ServletSecurity.EmptyRoleSemantic.DENY))
-    public static class SecureDefault extends HttpServlet {
+    public static class SecureDefault extends Ok {
 
         private static final long serialVersionUID = 1L;
-
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.getWriter().print("OK");
-        }
-    }
-
-
-    public static class Default extends HttpServlet {
-
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.getWriter().print("OK");
-        }
     }
 
 
     @ServletSecurity(@HttpConstraint(ServletSecurity.EmptyRoleSemantic.DENY))
-    public static class SecureFoo extends HttpServlet {
+    public static class SecureFoo extends Ok {
 
         private static final long serialVersionUID = 1L;
-
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.getWriter().print("OK");
-        }
     }
 
 
-    public static class Foo extends HttpServlet {
+    public static class Ok extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 
