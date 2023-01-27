@@ -28,8 +28,7 @@ public class WrapperMappingInfo {
     private final boolean jspWildCard;
     private final boolean resourceOnly;
 
-    public WrapperMappingInfo(String mapping, Wrapper wrapper,
-            boolean jspWildCard, boolean resourceOnly) {
+    public WrapperMappingInfo(String mapping, Wrapper wrapper, boolean jspWildCard, boolean resourceOnly) {
         this.mapping = mapping;
         this.wrapper = wrapper;
         this.jspWildCard = jspWildCard;

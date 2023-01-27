@@ -45,25 +45,25 @@ import org.apache.tomcat.util.buf.ByteChunk;
 @RunWith(Parameterized.class)
 public class TestServletSecurityMappings extends TomcatBaseTest {
 
-    @Parameters(name="{0}, {1}, {2}, {3}")
+    @Parameters(name = "{0}, {1}, {2}, {3}")
     public static Collection<Object[]> inputs() {
         List<Object[]> result = new ArrayList<>();
         result.add(new Object[] { Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE });
         result.add(new Object[] { Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE });
-        result.add(new Object[] { Boolean.FALSE, Boolean.FALSE, Boolean.TRUE , Boolean.FALSE });
-        result.add(new Object[] { Boolean.FALSE, Boolean.FALSE, Boolean.TRUE,  Boolean.TRUE });
-        result.add(new Object[] { Boolean.FALSE, Boolean.TRUE,  Boolean.FALSE, Boolean.FALSE });
-        result.add(new Object[] { Boolean.FALSE, Boolean.TRUE,  Boolean.FALSE, Boolean.TRUE });
-        result.add(new Object[] { Boolean.FALSE, Boolean.TRUE,  Boolean.TRUE , Boolean.FALSE });
-        result.add(new Object[] { Boolean.FALSE, Boolean.TRUE,  Boolean.TRUE,  Boolean.TRUE });
-        result.add(new Object[] { Boolean.TRUE,  Boolean.FALSE, Boolean.FALSE, Boolean.FALSE });
-        result.add(new Object[] { Boolean.TRUE,  Boolean.FALSE, Boolean.FALSE, Boolean.TRUE });
-        result.add(new Object[] { Boolean.TRUE,  Boolean.FALSE, Boolean.TRUE , Boolean.FALSE });
-        result.add(new Object[] { Boolean.TRUE,  Boolean.FALSE, Boolean.TRUE,  Boolean.TRUE });
-        result.add(new Object[] { Boolean.TRUE,  Boolean.TRUE,  Boolean.FALSE, Boolean.FALSE });
-        result.add(new Object[] { Boolean.TRUE,  Boolean.TRUE,  Boolean.FALSE, Boolean.TRUE });
-        result.add(new Object[] { Boolean.TRUE,  Boolean.TRUE,  Boolean.TRUE , Boolean.FALSE });
-        result.add(new Object[] { Boolean.TRUE,  Boolean.TRUE,  Boolean.TRUE,  Boolean.TRUE });
+        result.add(new Object[] { Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE });
+        result.add(new Object[] { Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE });
+        result.add(new Object[] { Boolean.FALSE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE });
+        result.add(new Object[] { Boolean.FALSE, Boolean.TRUE, Boolean.FALSE, Boolean.TRUE });
+        result.add(new Object[] { Boolean.FALSE, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE });
+        result.add(new Object[] { Boolean.FALSE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE });
+        result.add(new Object[] { Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE });
+        result.add(new Object[] { Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE });
+        result.add(new Object[] { Boolean.TRUE, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE });
+        result.add(new Object[] { Boolean.TRUE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE });
+        result.add(new Object[] { Boolean.TRUE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE });
+        result.add(new Object[] { Boolean.TRUE, Boolean.TRUE, Boolean.FALSE, Boolean.TRUE });
+        result.add(new Object[] { Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE });
+        result.add(new Object[] { Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE });
         return result;
     }
 
@@ -119,7 +119,7 @@ public class TestServletSecurityMappings extends TomcatBaseTest {
         // Root
         rc = getUrl("http://localhost:" + getPort() + "/test", bc, false);
         if (redirectContextRoot) {
-           Assert.assertEquals(302, rc);
+            Assert.assertEquals(302, rc);
         } else {
             if (secureRoot || secureDefault) {
                 Assert.assertEquals(403, rc);
@@ -143,14 +143,13 @@ public class TestServletSecurityMappings extends TomcatBaseTest {
         }
 
         @Override
-        public void onStartup(Set<Class<?>> c, ServletContext ctx)
-                throws ServletException {
+        public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException {
 
             ServletRegistration.Dynamic sr;
             if (secureRoot) {
                 sr = ctx.addServlet("Root", SecureRoot.class.getName());
             } else {
-                sr =ctx.addServlet("Root", Root.class.getName());
+                sr = ctx.addServlet("Root", Root.class.getName());
             }
             sr.addMapping("");
 
@@ -177,8 +176,7 @@ public class TestServletSecurityMappings extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.getWriter().print("OK");
         }
     }
@@ -189,8 +187,7 @@ public class TestServletSecurityMappings extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.getWriter().print("OK");
         }
     }
@@ -202,8 +199,7 @@ public class TestServletSecurityMappings extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.getWriter().print("OK");
         }
     }
@@ -214,8 +210,7 @@ public class TestServletSecurityMappings extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.getWriter().print("OK");
         }
     }
@@ -227,8 +222,7 @@ public class TestServletSecurityMappings extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.getWriter().print("OK");
         }
     }
@@ -239,8 +233,7 @@ public class TestServletSecurityMappings extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.getWriter().print("OK");
         }
     }
