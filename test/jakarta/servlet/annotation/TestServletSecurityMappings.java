@@ -118,14 +118,10 @@ public class TestServletSecurityMappings extends TomcatBaseTest {
 
         // Root
         rc = getUrl("http://localhost:" + getPort() + "/test", bc, false);
-        if (redirectContextRoot) {
-            Assert.assertEquals(302, rc);
+        if (secureRoot || secureDefault) {
+            Assert.assertEquals(403, rc);
         } else {
-            if (secureRoot || secureDefault) {
-                Assert.assertEquals(403, rc);
-            } else {
-                Assert.assertEquals(200, rc);
-            }
+            Assert.assertEquals(200, rc);
         }
     }
 
