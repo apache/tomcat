@@ -237,6 +237,13 @@ public final class PersistentProviderRegistrations {
         public void addProperty(Property property) {
             properties.put(property.getName(), property.getValue());
         }
+
+        /**
+         * Used by IntrospectionUtils via reflection.
+         * @param name - the name of of the property to set on this object
+         * @param value - the value to set
+         * @see #addProperty(String, String)
+         */
         public void setProperty(String name, String value) {
             addProperty(name, value);
         }

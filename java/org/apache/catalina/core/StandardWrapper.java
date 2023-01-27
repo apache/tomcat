@@ -1334,7 +1334,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
 
         unloading = false;
         fireContainerEvent("unload", this);
-
     }
 
 

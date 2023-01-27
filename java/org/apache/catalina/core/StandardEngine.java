@@ -55,15 +55,13 @@ public class StandardEngine extends ContainerBase implements Engine {
 
     private static final Log log = LogFactory.getLog(StandardEngine.class);
 
-    // ----------------------------------------------------------- Constructors
 
+    // ----------------------------------------------------------- Constructors
 
     /**
      * Create a new StandardEngine component with the default basic Valve.
      */
     public StandardEngine() {
-
-        super();
         pipeline.setBasic(new StandardEngineValve());
         /* Set the jvmRoute using the system property jvmRoute */
         try {
@@ -73,12 +71,10 @@ public class StandardEngine extends ContainerBase implements Engine {
         }
         // By default, the engine will hold the reloading thread
         backgroundProcessorDelay = 10;
-
     }
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * Host name to use when no server host, or an unknown host, is specified in the request.
