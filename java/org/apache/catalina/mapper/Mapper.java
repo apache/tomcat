@@ -51,8 +51,20 @@ public final class Mapper {
 
     private static final StringManager sm = StringManager.getManager(Mapper.class);
 
-    // ----------------------------------------------------- Instance Variables
+    private static final CharChunk CONTEXT_ROOT_MAPPED_PATH_CHAR_CHUNK;
 
+    static {
+        CONTEXT_ROOT_MAPPED_PATH_CHAR_CHUNK = new CharChunk(1);
+        try {
+            CONTEXT_ROOT_MAPPED_PATH_CHAR_CHUNK.append('/');
+        } catch (IOException ioe) {
+            // Should never happen. Convert to a runtime exception if it does.
+            throw new IllegalStateException(ioe);
+        }
+    }
+
+
+    // ----------------------------------------------------- Instance Variables
 
     /**
      * Array containing the virtual hosts definitions.
@@ -995,6 +1007,12 @@ public final class Mapper {
      * Exact mapping.
      */
     private final void internalMapExactWrapper(MappedWrapper[] wrappers, CharChunk path, MappingData mappingData) {
+        if (path.length() == 0) {
+            /*
+             * Looking for a context root mapped servlet but that will be stored under the name "/"
+             */
+            path = CONTEXT_ROOT_MAPPED_PATH_CHAR_CHUNK;
+        }
         MappedWrapper wrapper = exactFind(wrappers, path);
         if (wrapper != null) {
             mappingData.requestPath.setString(wrapper.name);

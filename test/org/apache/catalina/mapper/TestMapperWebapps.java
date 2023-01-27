@@ -18,6 +18,8 @@ package org.apache.catalina.mapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -27,7 +29,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.catalina.Context;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -38,49 +39,119 @@ import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
 /**
- * Mapper tests that use real web applications on a running Tomcat.
+ * Mapper tests that use web applications on a running Tomcat instance.
  */
 public class TestMapperWebapps extends TomcatBaseTest {
 
     @Test
-    public void testContextRoot_Bug53339() throws Exception {
+    public void testContextRootMapping01() throws Exception {
+        doTestContextRootMapping("", false, false);
+    }
+
+
+    @Test
+    public void testContextRootMapping02() throws Exception {
+        doTestContextRootMapping("", true, false);
+    }
+
+
+    @Test
+    public void testContextRootMapping03() throws Exception {
+        doTestContextRootMapping("", false, true);
+    }
+
+
+    @Test
+    public void testContextRootMapping04() throws Exception {
+        doTestContextRootMapping("", true, true);
+    }
+
+
+    @Test
+    public void testContextRootMapping05() throws Exception {
+        doTestContextRootMapping("/somepath", false, false);
+    }
+
+
+    @Test
+    public void testContextRootMapping06() throws Exception {
+        doTestContextRootMapping("/somepath", true, false);
+    }
+
+
+    @Test
+    public void testContextRootMapping07() throws Exception {
+        doTestContextRootMapping("/somepath", false, true);
+    }
+
+
+    @Test
+    public void testContextRootMapping08() throws Exception {
+        doTestContextRootMapping("/somepath", true, true);
+    }
+
+
+    @Test
+    public void testContextRootMapping09() throws Exception {
+        doTestContextRootMapping("/some/other/path", false, false);
+    }
+
+
+    @Test
+    public void testContextRootMapping10() throws Exception {
+        doTestContextRootMapping("/some/other/path", true, false);
+    }
+
+
+    @Test
+    public void testContextRootMapping11() throws Exception {
+        doTestContextRootMapping("/some/other/path", false, true);
+    }
+
+
+    @Test
+    public void testContextRootMapping12() throws Exception {
+        doTestContextRootMapping("/some/other/path", true, true);
+    }
+
+
+    private void doTestContextRootMapping(String contextPath, boolean trailingSlash, boolean rootRedirect)
+            throws Exception {
         Tomcat tomcat = getTomcatInstance();
         tomcat.enableNaming();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        StandardContext ctx = (StandardContext) tomcat.addContext(contextPath, null);
+        ctx.setMapperContextRootRedirectEnabled(rootRedirect);
 
-        Tomcat.addServlet(ctx, "Bug53356", new Bug53356Servlet());
-        ctx.addServletMappingDecoded("", "Bug53356");
+        Tomcat.addServlet(ctx, "ReportMapping", new ReportMappingServlet());
+        ctx.addServletMappingDecoded("", "ReportMapping");
 
         tomcat.start();
 
-        ByteChunk body = getUrl("http://localhost:" + getPort());
+        ByteChunk bc = getUrl("http://localhost:" + getPort() + contextPath + (trailingSlash ? "/" : ""));
 
-        Assert.assertEquals("OK", body.toString());
+        String body = bc.toString();
+        System.out.println(body);
+        Assert.assertTrue(body, body.contains("ContextPath: [" + contextPath + "]"));
+        Assert.assertTrue(body, body.contains("ServletPath: []"));
+        Assert.assertTrue(body, body.contains("PathInfo: [/]"));
     }
 
-    private static class Bug53356Servlet extends HttpServlet {
+
+    private static class ReportMappingServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            // Confirm behaviour as per Servlet 12.2
-            boolean pass = "/".equals(req.getPathInfo());
-            if (pass) {
-                pass = "".equals(req.getServletPath());
-            }
-            if (pass) {
-                pass = "".equals(req.getContextPath());
-            }
-
+            resp.setCharacterEncoding(StandardCharsets.UTF_8);
             resp.setContentType("text/plain");
-            if (pass) {
-                resp.getWriter().write("OK");
-            } else {
-                resp.getWriter().write("FAIL");
-            }
+            PrintWriter pw = resp.getWriter();
+
+            pw.print("ContextPath: [" + req.getContextPath() + "]\n");
+            pw.print("ServletPath: [" + req.getServletPath() + "]\n");
+            pw.print("PathInfo: [" + req.getPathInfo() + "]\n");
         }
     }
 

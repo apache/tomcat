@@ -143,6 +143,11 @@
         <code>AtomicInteger</code> to track request count and error count for
         servlets. (markt)
       </fix>
+      <fix>
+        Implement clarification from Jakarta Servlet project that Servlets
+        mapped to the context root should be mapped for requests to the
+        context root with or without the trailing <code>/</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
