@@ -40,7 +40,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
 /**
  * Mapper tests that use real web applications on a running Tomcat.
  */
-public class TestMapperWebapps extends TomcatBaseTest{
+public class TestMapperWebapps extends TomcatBaseTest {
 
     @Test
     public void testContextRoot_Bug53339() throws Exception {
@@ -65,8 +65,7 @@ public class TestMapperWebapps extends TomcatBaseTest{
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             // Confirm behaviour as per Servlet 12.2
             boolean pass = "/".equals(req.getPathInfo());
             if (pass) {
@@ -91,8 +90,7 @@ public class TestMapperWebapps extends TomcatBaseTest{
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         // app dir is relative to server home
-        org.apache.catalina.Context ctxt  = tomcat.addWebapp(
-                null, "/examples", appDir.getAbsolutePath());
+        org.apache.catalina.Context ctxt = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         ctxt.addApplicationListener(WsContextListener.class.getName());
         tomcat.start();
 
@@ -101,13 +99,11 @@ public class TestMapperWebapps extends TomcatBaseTest{
         ByteChunk res;
         String text;
 
-        res = getUrl("http://localhost:" + getPort()
-                + "/examples/servlets/servlet/HelloWorldExample");
+        res = getUrl("http://localhost:" + getPort() + "/examples/servlets/servlet/HelloWorldExample");
         text = res.toString();
         Assert.assertTrue(text, text.contains("<a href=\"../helloworld.html\">"));
 
-        res = getUrl("http://localhost:" + getPort()
-                + "/examples/jsp/jsp2/el/basic-arithmetic.jsp");
+        res = getUrl("http://localhost:" + getPort() + "/examples/jsp/jsp2/el/basic-arithmetic.jsp");
         text = res.toString();
         Assert.assertTrue(text, text.contains("<td>${(1==2) ? 3 : 4}</td>"));
 
@@ -116,32 +112,26 @@ public class TestMapperWebapps extends TomcatBaseTest{
         Assert.assertTrue(text, text.contains("<title>Apache Tomcat Examples</title>"));
 
         long timeA = System.currentTimeMillis();
-        res = getUrl("http://localhost:" + getPort()
-                + "/examples/jsp/include/include.jsp");
+        res = getUrl("http://localhost:" + getPort() + "/examples/jsp/include/include.jsp");
         String timestamp = findCommonPrefix(timeA, System.currentTimeMillis());
         text = res.toString();
-        Assert.assertTrue(text, text.contains(
-                "In place evaluation of another JSP which gives you the current time: " + timestamp));
-        Assert.assertTrue(text, text.contains(
-                "To get the current time in ms"));
-        Assert.assertTrue(text, text.contains(
-                "by including the output of another JSP: " + timestamp));
+        Assert.assertTrue(text,
+                text.contains("In place evaluation of another JSP which gives you the current time: " + timestamp));
+        Assert.assertTrue(text, text.contains("To get the current time in ms"));
+        Assert.assertTrue(text, text.contains("by including the output of another JSP: " + timestamp));
         Assert.assertTrue(text, text.contains(":-)"));
 
-        res = getUrl("http://localhost:" + getPort()
-                + "/examples/jsp/forward/forward.jsp");
+        res = getUrl("http://localhost:" + getPort() + "/examples/jsp/forward/forward.jsp");
         text = res.toString();
         Assert.assertTrue(text, text.contains("VM Memory usage"));
 
         ctxt.reload();
 
-        res = getUrl("http://localhost:" + getPort()
-                + "/examples/servlets/servlet/HelloWorldExample");
+        res = getUrl("http://localhost:" + getPort() + "/examples/servlets/servlet/HelloWorldExample");
         text = res.toString();
         Assert.assertTrue(text, text.contains("<a href=\"../helloworld.html\">"));
 
-        res = getUrl("http://localhost:" + getPort()
-                + "/examples/jsp/jsp2/el/basic-arithmetic.jsp");
+        res = getUrl("http://localhost:" + getPort() + "/examples/jsp/jsp2/el/basic-arithmetic.jsp");
         text = res.toString();
         Assert.assertTrue(text, text.contains("<td>${(1==2) ? 3 : 4}</td>"));
 
@@ -150,20 +140,16 @@ public class TestMapperWebapps extends TomcatBaseTest{
         Assert.assertTrue(text, text.contains("<title>Apache Tomcat Examples</title>"));
 
         timeA = System.currentTimeMillis();
-        res = getUrl("http://localhost:" + getPort()
-                + "/examples/jsp/include/include.jsp");
+        res = getUrl("http://localhost:" + getPort() + "/examples/jsp/include/include.jsp");
         timestamp = findCommonPrefix(timeA, System.currentTimeMillis());
         text = res.toString();
-        Assert.assertTrue(text, text.contains(
-                "In place evaluation of another JSP which gives you the current time: " + timestamp));
-        Assert.assertTrue(text, text.contains(
-                "To get the current time in ms"));
-        Assert.assertTrue(text, text.contains(
-                "by including the output of another JSP: " + timestamp));
+        Assert.assertTrue(text,
+                text.contains("In place evaluation of another JSP which gives you the current time: " + timestamp));
+        Assert.assertTrue(text, text.contains("To get the current time in ms"));
+        Assert.assertTrue(text, text.contains("by including the output of another JSP: " + timestamp));
         Assert.assertTrue(text, text.contains(":-)"));
 
-        res = getUrl("http://localhost:" + getPort()
-                + "/examples/jsp/forward/forward.jsp");
+        res = getUrl("http://localhost:" + getPort() + "/examples/jsp/forward/forward.jsp");
         text = res.toString();
         Assert.assertTrue(text, text.contains("VM Memory usage"));
     }
@@ -175,8 +161,7 @@ public class TestMapperWebapps extends TomcatBaseTest{
 
         File appDir = new File("test/webapp");
 
-        StandardContext ctxt = (StandardContext) tomcat.addWebapp(null, "/test",
-                appDir.getAbsolutePath());
+        StandardContext ctxt = (StandardContext) tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         ctxt.setReplaceWelcomeFiles(true);
         ctxt.addWelcomeFile("index.jsp");
         // Mapping for *.do is defined in web.xml
@@ -200,8 +185,7 @@ public class TestMapperWebapps extends TomcatBaseTest{
 
         File appDir = new File("test/webapp");
 
-        StandardContext ctxt = (StandardContext) tomcat.addWebapp(null, "/test",
-                appDir.getAbsolutePath());
+        StandardContext ctxt = (StandardContext) tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         ctxt.setReplaceWelcomeFiles(true);
         ctxt.addWelcomeFile("index.jsp");
         // Mapping for *.do is defined in web.xml
@@ -226,8 +210,7 @@ public class TestMapperWebapps extends TomcatBaseTest{
 
         // Use standard test webapp as ROOT
         File rootDir = new File("test/webapp");
-        org.apache.catalina.Context root =
-                tomcat.addWebapp(null, "", rootDir.getAbsolutePath());
+        org.apache.catalina.Context root = tomcat.addWebapp(null, "", rootDir.getAbsolutePath());
 
         // Add a security constraint
         SecurityConstraint constraint = new SecurityConstraint();
@@ -240,8 +223,7 @@ public class TestMapperWebapps extends TomcatBaseTest{
 
         // Also make examples available
         File examplesDir = new File(getBuildDirectory(), "webapps/examples");
-        org.apache.catalina.Context examples  = tomcat.addWebapp(
-                null, "/examples", examplesDir.getAbsolutePath());
+        org.apache.catalina.Context examples = tomcat.addWebapp(null, "/examples", examplesDir.getAbsolutePath());
         examples.setMapperContextRootRedirectEnabled(false);
         // Then block access to the examples to test redirection
         RemoteAddrValve rav = new RemoteAddrValve();
@@ -275,9 +257,8 @@ public class TestMapperWebapps extends TomcatBaseTest{
 
 
     /**
-     * Prepare a string to search in messages that contain a timestamp, when it
-     * is known that the timestamp was printed between {@code timeA} and
-     * {@code timeB}.
+     * Prepare a string to search in messages that contain a timestamp, when it is known that the timestamp was printed
+     * between {@code timeA} and {@code timeB}.
      */
     private static String findCommonPrefix(long timeA, long timeB) {
         while ((timeA != timeB) && timeA > 0) {
