@@ -25,16 +25,8 @@ public class TestMapperPerformance extends TestMapper {
 
     @Test
     public void testPerformance() throws Exception {
-        String[] requestedHostNames = new String[] {
-                "xxxxxxxxxxx",
-                "iowejoiejfoiew",
-                "iowejoiejfoiex",
-                "owefojiwefoi",
-                "owefojiwefoix",
-                "qwerty.net",
-                "foo.net",
-                "zzz.com",
-                "abc.com"};
+        String[] requestedHostNames = new String[] { "xxxxxxxxxxx", "iowejoiejfoiew", "iowejoiejfoiex", "owefojiwefoi",
+                "owefojiwefoix", "qwerty.net", "foo.net", "zzz.com", "abc.com" };
 
         for (String requestedHostName : requestedHostNames) {
             testPerformance(requestedHostName);
