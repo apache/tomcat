@@ -148,7 +148,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
     // ----------------------------------------------------- Instance Variables
 
-
     /**
      * The child Containers belonging to this Container, keyed by name.
      */
