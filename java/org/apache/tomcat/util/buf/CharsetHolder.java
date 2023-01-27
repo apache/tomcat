@@ -33,7 +33,7 @@ import java.nio.charset.Charset;
  */
 public class CharsetHolder {
 
-    public static CharsetHolder EMPTY = new CharsetHolder(null, null);
+    public static final CharsetHolder EMPTY = new CharsetHolder(null, null);
 
     public static CharsetHolder getInstance(String name) {
         if (name == null) {
