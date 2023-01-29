@@ -29,7 +29,7 @@ import java.nio.charset.Charset;
  * and, if the name was valid, the Charset with validation and conversion logic
  * spread throughout those classes.
  *
- * <p>This class is an attempt to encapsulate that behvaiour.
+ * <p>This class is an attempt to encapsulate that behaviour.
  */
 public class CharsetHolder {
 
