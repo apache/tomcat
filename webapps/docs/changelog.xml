@@ -132,6 +132,12 @@
         ensure that the end of stream flag is set on the headers frame and that
         no data frame is sent. (markt)
       </fix>
+      <fix>
+        <bug>66455</bug>: Fix the cause of a potential
+        <code>ClassCastException</code> when processing a
+        <code>WINDOW_UPDATE</code> frame on an HTTP/2 connection where the flow
+        control window for the overall connection has been exhausted. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
