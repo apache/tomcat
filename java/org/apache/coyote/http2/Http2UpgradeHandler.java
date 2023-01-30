@@ -1037,13 +1037,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 if (stream.getConnectionAllocationRequested() > 0) {
                     stream.setConnectionAllocationMade(stream.getConnectionAllocationRequested());
                     stream.setConnectionAllocationRequested(0);
+                    result.add(stream);
                 }
             }
             remaining -= backLogSize;
             backLogSize = 0;
             super.incrementWindowSize(remaining);
 
-            result.addAll(backLogStreams);
             backLogStreams.clear();
         } else {
             allocate(this, remaining);
