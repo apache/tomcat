@@ -1052,6 +1052,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 if (stream.getConnectionAllocationRequested() > 0) {
                     stream.setConnectionAllocationMade(stream.getConnectionAllocationRequested());
                     stream.setConnectionAllocationRequested(0);
+                    result.add(stream);
                 }
             }
             // Cast is safe due to test above
@@ -1059,7 +1060,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             backLogSize = 0;
             super.incrementWindowSize(remaining);
 
-            result.addAll(backLogStreams);
             backLogStreams.clear();
         } else {
             // Can't clear the whole backlog.
