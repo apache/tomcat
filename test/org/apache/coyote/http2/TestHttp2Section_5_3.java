@@ -242,6 +242,56 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
     }
 
 
+    @Test
+    public void testReleaseFullBacklog() throws Exception {
+
+        http2Connect();
+
+        // This test uses small window updates that will trigger the excessive
+        // overhead protection so disable it.
+        http2Protocol.setOverheadWindowUpdateThreshold(0);
+        // May also see (rarely, depends on timing) sequential 1 byte data
+        // frames on the same Stream
+        http2Protocol.setOverheadDataThreshold(0);
+
+
+        // Default connection window size is 64k - 1. Initial request will have
+        // used 8k (56k -1). Increase it to 57k
+        sendWindowUpdate(0, 1 + 1024);
+
+        // Use up 56k of the connection window
+        for (int i = 3; i < 17; i += 2) {
+            sendSimpleGetRequest(i);
+            readSimpleGetResponse();
+        }
+
+        output.clearTrace();
+
+        // At this point the connection window should be 1k and any new stream
+        // should have a window of 64k
+
+        // Create priority tree. This test requires a blocked stream to depend on a closed stream
+        sendPriority(17,  15, 15);
+
+        // Process a request on stream 17.
+        // This should consume the connection window and put streams 15 and 17 in the backlog.
+        sendSimpleGetRequest(17);
+        // 17-headers, 17-1k-body
+        parser.readFrame();
+        parser.readFrame();
+        output.clearTrace();
+
+        // At this point 17 is blocked because the connection window is zero
+
+        // Send a large enough Window update to free the whole backlog
+        sendWindowUpdate(0, 8 * 1024);
+
+        parser.readFrame();
+
+        Assert.assertEquals("17-Body-7168\n17-EndOfStream\n", output.getTrace());
+    }
+
+
     private int[] parseBodyFrame(String output) {
         String[] parts = output.trim().split("-");
         if (parts.length != 3 || !"Body".equals(parts[1])) {
