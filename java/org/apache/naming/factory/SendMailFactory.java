@@ -26,12 +26,12 @@ import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
-import org.apache.tomcat.util.ExceptionUtils;
-
 import jakarta.mail.Session;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimePartDataSource;
+
+import org.apache.tomcat.util.ExceptionUtils;
 
 /**
  * Factory class that creates a JNDI named javamail MimePartDataSource
