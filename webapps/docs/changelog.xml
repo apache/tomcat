@@ -157,10 +157,6 @@
         starts. (markt)
       </add>
       <fix>
-        <bug>66441</bug>: Make imports of static fields in JSPs visible to any
-        EL expressions used on the page. (markt)
-      </fix>
-      <fix>
         <bug>66442</bug>: When an HTTP/2 response must not include a body,
         ensure that the end of stream flag is set on the headers frame and that
         no data frame is sent. (markt)
@@ -172,6 +168,10 @@
       <fix>
         <bug>66419</bug>: Fix calls from expression language to a method that
         accepts varargs when only one argument was passed. (markt)
+      </fix>
+      <fix>
+        <bug>66441</bug>: Make imports of static fields in JSPs visible to any
+        EL expressions used on the page. (markt)
       </fix>
     </changelog>
   </subsection>
