@@ -40,5 +40,5 @@ public interface ActionHook {
      * @param actionCode Type of the action
      * @param param Action parameter
      */
-    public void action(ActionCode actionCode, Object param);
+    void action(ActionCode actionCode, Object param);
 }

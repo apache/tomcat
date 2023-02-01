@@ -74,7 +74,7 @@ public interface HttpSession {
      * @exception IllegalStateException
      *                if this method is called on an invalidated session
      */
-    public long getCreationTime();
+    long getCreationTime();
 
     /**
      * Returns a string containing the unique identifier assigned to this
@@ -85,7 +85,7 @@ public interface HttpSession {
      * @exception IllegalStateException
      *                if this method is called on an invalidated session
      */
-    public String getId();
+    String getId();
 
     /**
      * Returns the last time the client sent a request associated with this
@@ -101,7 +101,7 @@ public interface HttpSession {
      * @exception IllegalStateException
      *                if this method is called on an invalidated session
      */
-    public long getLastAccessedTime();
+    long getLastAccessedTime();
 
     /**
      * Returns the ServletContext to which this session belongs.
@@ -109,7 +109,7 @@ public interface HttpSession {
      * @return The ServletContext object for the web application
      * @since Servlet 2.3
      */
-    public ServletContext getServletContext();
+    ServletContext getServletContext();
 
     /**
      * Specifies the time, in seconds, between client requests before the
@@ -119,7 +119,7 @@ public interface HttpSession {
      * @param interval
      *            An integer specifying the number of seconds
      */
-    public void setMaxInactiveInterval(int interval);
+    void setMaxInactiveInterval(int interval);
 
     /**
      * Returns the maximum time interval, in seconds, that the servlet container
@@ -132,7 +132,7 @@ public interface HttpSession {
      *         open between client requests
      * @see #setMaxInactiveInterval
      */
-    public int getMaxInactiveInterval();
+    int getMaxInactiveInterval();
 
     /**
      * Returns the object bound with the specified name in this session, or
@@ -144,7 +144,7 @@ public interface HttpSession {
      * @exception IllegalStateException
      *                if this method is called on an invalidated session
      */
-    public Object getAttribute(String name);
+    Object getAttribute(String name);
 
     /**
      * Returns an <code>Enumeration</code> of <code>String</code> objects
@@ -155,7 +155,7 @@ public interface HttpSession {
      * @exception IllegalStateException
      *                if this method is called on an invalidated session
      */
-    public Enumeration<String> getAttributeNames();
+    Enumeration<String> getAttributeNames();
 
     /**
      * Binds an object to this session, using the name specified. If an object
@@ -181,7 +181,7 @@ public interface HttpSession {
      * @exception IllegalStateException
      *                if this method is called on an invalidated session
      */
-    public void setAttribute(String name, Object value);
+    void setAttribute(String name, Object value);
 
     /**
      * Removes the object bound with the specified name from this session. If
@@ -199,7 +199,7 @@ public interface HttpSession {
      * @exception IllegalStateException
      *                if this method is called on an invalidated session
      */
-    public void removeAttribute(String name);
+    void removeAttribute(String name);
 
     /**
      * Invalidates this session then unbinds any objects bound to it.
@@ -207,7 +207,7 @@ public interface HttpSession {
      * @exception IllegalStateException
      *                if this method is called on an already invalidated session
      */
-    public void invalidate();
+    void invalidate();
 
     /**
      * Returns <code>true</code> if the client does not yet know about the
@@ -220,5 +220,5 @@ public interface HttpSession {
      * @exception IllegalStateException
      *                if this method is called on an already invalidated session
      */
-    public boolean isNew();
+    boolean isNew();
 }

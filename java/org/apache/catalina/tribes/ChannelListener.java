@@ -35,7 +35,7 @@ public interface ChannelListener {
      * @param msg Serializable
      * @param sender - the source of the message
      */
-    public void messageReceived(Serializable msg, Member sender);
+    void messageReceived(Serializable msg, Member sender);
 
     /**
      * Invoked by the channel to determine if the listener will process this message or not.
@@ -43,7 +43,7 @@ public interface ChannelListener {
      * @param sender Member
      * @return boolean
      */
-    public boolean accept(Serializable msg, Member sender);
+    boolean accept(Serializable msg, Member sender);
 
     /**
      * @param listener Object
@@ -51,13 +51,13 @@ public interface ChannelListener {
      * @see Object#equals(Object)
      */
     @Override
-    public boolean equals(Object listener);
+    boolean equals(Object listener);
 
     /**
      * @return int
      * @see Object#hashCode()
      */
     @Override
-    public int hashCode();
+    int hashCode();
 
 }

@@ -36,7 +36,7 @@ public interface CatalinaCluster extends Cluster {
      * Sends a message to all the members in the cluster
      * @param msg ClusterMessage
      */
-    public void send(ClusterMessage msg);
+    void send(ClusterMessage msg);
 
     /**
      * Sends a message to a specific member in the cluster.
@@ -44,7 +44,7 @@ public interface CatalinaCluster extends Cluster {
      * @param msg ClusterMessage
      * @param dest Member
      */
-    public void send(ClusterMessage msg, Member dest);
+    void send(ClusterMessage msg, Member dest);
 
     /**
      * Sends a message with the specified sendOptions to a specific member in the cluster.
@@ -53,44 +53,44 @@ public interface CatalinaCluster extends Cluster {
      * @param dest Member
      * @param sendOptions sendOptions
      */
-    public void send(ClusterMessage msg, Member dest, int sendOptions);
+    void send(ClusterMessage msg, Member dest, int sendOptions);
 
     /**
      * @return <code>true</code> if the cluster has members.
      */
-    public boolean hasMembers();
+    boolean hasMembers();
 
     /**
      * @return an array containing all the members currently participating in the cluster.
      */
-    public Member[] getMembers();
+    Member[] getMembers();
 
     /**
      * @return the member that represents this node.
      */
-    public Member getLocalMember();
+    Member getLocalMember();
 
-    public void addValve(Valve valve);
+    void addValve(Valve valve);
 
-    public void addClusterListener(ClusterListener listener);
+    void addClusterListener(ClusterListener listener);
 
-    public void removeClusterListener(ClusterListener listener);
+    void removeClusterListener(ClusterListener listener);
 
-    public void setClusterDeployer(ClusterDeployer deployer);
+    void setClusterDeployer(ClusterDeployer deployer);
 
-    public ClusterDeployer getClusterDeployer();
+    ClusterDeployer getClusterDeployer();
 
     /**
      * @return The map of managers
      */
-    public Map<String,ClusterManager> getManagers();
+    Map<String,ClusterManager> getManagers();
 
     /**
      * Get Manager
      * @param name The manager name
      * @return The manager
      */
-    public Manager getManager(String name);
+    Manager getManager(String name);
 
     /**
      * Get a new cluster name for a manager.
@@ -98,13 +98,13 @@ public interface CatalinaCluster extends Cluster {
      * @param manager The manager
      * @return the manager name in the cluster
      */
-    public String getManagerName(String name, Manager manager);
+    String getManagerName(String name, Manager manager);
 
-    public Valve[] getValves();
+    Valve[] getValves();
 
-    public void setChannel(Channel channel);
+    void setChannel(Channel channel);
 
-    public Channel getChannel();
+    Channel getChannel();
 
 
 }

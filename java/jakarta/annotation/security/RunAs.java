@@ -33,5 +33,5 @@ public @interface RunAs {
     /**
      * @return a String with the value for RunAs
      */
-    public String value();
+    String value();
 }

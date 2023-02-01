@@ -34,6 +34,6 @@ public interface ListenCallback
      * been received from one of the cluster nodes.
      * @param data - the message bytes received from the cluster/replication system
      */
-     public void messageDataReceived(ChannelMessage data);
+    void messageDataReceived(ChannelMessage data);
 
 }

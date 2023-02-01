@@ -54,7 +54,7 @@ public interface HttpJspPage extends JspPage {
      * @throws IOException Thrown if an error occurred while writing the
      *     response for this page.
      */
-    public void _jspService(HttpServletRequest request,
+    void _jspService(HttpServletRequest request,
                             HttpServletResponse response)
         throws ServletException, IOException;
 }

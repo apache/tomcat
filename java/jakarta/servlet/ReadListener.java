@@ -34,19 +34,19 @@ public interface ReadListener extends java.util.EventListener{
      *
      * @throws IOException id an I/O error occurs while processing the event
      */
-    public abstract void onDataAvailable() throws IOException;
+    void onDataAvailable() throws IOException;
 
     /**
      * Invoked when the request body has been fully read.
      *
      * @throws IOException id an I/O error occurs while processing the event
      */
-    public abstract void onAllDataRead() throws IOException;
+    void onAllDataRead() throws IOException;
 
     /**
      * Invoked if an error occurs while reading the request body.
      *
      * @param throwable The exception that occurred
      */
-    public abstract void onError(java.lang.Throwable throwable);
+    void onError(java.lang.Throwable throwable);
 }

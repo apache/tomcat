@@ -33,7 +33,7 @@ public interface HttpSessionAttributeListener extends EventListener {
      *
      * @param se Information about the added attribute
      */
-    public default void attributeAdded(HttpSessionBindingEvent se) {
+    default void attributeAdded(HttpSessionBindingEvent se) {
     }
 
     /**
@@ -43,7 +43,7 @@ public interface HttpSessionAttributeListener extends EventListener {
      *
      * @param se Information about the removed attribute
      */
-    public default void attributeRemoved(HttpSessionBindingEvent se) {
+    default void attributeRemoved(HttpSessionBindingEvent se) {
     }
 
     /**
@@ -53,6 +53,6 @@ public interface HttpSessionAttributeListener extends EventListener {
      *
      * @param se Information about the replaced attribute
      */
-    public default void attributeReplaced(HttpSessionBindingEvent se) {
+    default void attributeReplaced(HttpSessionBindingEvent se) {
     }
 }

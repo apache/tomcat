@@ -40,38 +40,38 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * @return int
      * @see ChannelMessage#getOptions()
      */
-    public int getOptionFlag();
+    int getOptionFlag();
 
     /**
      * Sets the option flag
      * @param flag int
      * @see #getOptionFlag()
      */
-    public void setOptionFlag(int flag);
+    void setOptionFlag(int flag);
 
     /**
      * Set the next interceptor in the list of interceptors
      * @param next ChannelInterceptor
      */
-    public void setNext(ChannelInterceptor next) ;
+    void setNext(ChannelInterceptor next) ;
 
     /**
      * Retrieve the next interceptor in the list
      * @return ChannelInterceptor - returns the next interceptor in the list or null if no more interceptors exist
      */
-    public ChannelInterceptor getNext();
+    ChannelInterceptor getNext();
 
     /**
      * Set the previous interceptor in the list
      * @param previous ChannelInterceptor
      */
-    public void setPrevious(ChannelInterceptor previous);
+    void setPrevious(ChannelInterceptor previous);
 
     /**
      * Retrieve the previous interceptor in the list
      * @return ChannelInterceptor - returns the previous interceptor in the list or null if no more interceptors exist
      */
-    public ChannelInterceptor getPrevious();
+    ChannelInterceptor getPrevious();
 
     /**
      * The <code>sendMessage</code> method is called when a message is being sent to one more destinations.
@@ -90,7 +90,7 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * @see ErrorHandler
      * @see InterceptorPayload
      */
-    public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException;
+    void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException;
 
     /**
      * the <code>messageReceived</code> is invoked when a message is received.
@@ -98,7 +98,7 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * if it has been overwritten.
      * @param data ChannelMessage
      */
-    public void messageReceived(ChannelMessage data);
+    void messageReceived(ChannelMessage data);
 
     /**
      * The <code>heartbeat()</code> method gets invoked periodically
@@ -106,21 +106,21 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * perform actions that are unrelated to sending/receiving data.
      */
     @Override
-    public void heartbeat();
+    void heartbeat();
 
     /**
      * Intercepts the <code>Channel.hasMembers()</code> method
      * @return boolean - if the channel has members in its membership group
      * @see Channel#hasMembers()
      */
-    public boolean hasMembers() ;
+    boolean hasMembers() ;
 
     /**
      * Intercepts the <code>Channel.getMembers()</code> method
      * @return Member[]
      * @see Channel#getMembers()
      */
-    public Member[] getMembers() ;
+    Member[] getMembers() ;
 
     /**
      * Intercepts the <code>Channel.getLocalMember(boolean)</code> method
@@ -128,7 +128,7 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * @return Member
      * @see Channel#getLocalMember(boolean)
      */
-    public Member getLocalMember(boolean incAliveTime) ;
+    Member getLocalMember(boolean incAliveTime) ;
 
     /**
      * Intercepts the <code>Channel.getMember(Member)</code> method
@@ -136,7 +136,7 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * @return Member - the actual member information, including stay alive
      * @see Channel#getMember(Member)
      */
-    public Member getMember(Member mbr);
+    Member getMember(Member mbr);
 
     /**
      * Starts up the channel. This can be called multiple times for individual services to start
@@ -150,7 +150,7 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * @throws ChannelException if a startup error occurs or the service is already started.
      * @see Channel
      */
-    public void start(int svc) throws ChannelException;
+    void start(int svc) throws ChannelException;
 
     /**
      * Shuts down the channel. This can be called multiple times for individual services to shutdown
@@ -164,21 +164,21 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * @throws ChannelException if a startup error occurs or the service is already started.
      * @see Channel
      */
-    public void stop(int svc) throws ChannelException;
+    void stop(int svc) throws ChannelException;
 
-    public void fireInterceptorEvent(InterceptorEvent event);
+    void fireInterceptorEvent(InterceptorEvent event);
 
     /**
      * Return the channel that is related to this interceptor
      * @return Channel
      */
-    public Channel getChannel();
+    Channel getChannel();
 
     /**
      * Set the channel that is related to this interceptor
      * @param channel The channel
      */
-    public void setChannel(Channel channel);
+    void setChannel(Channel channel);
 
     interface InterceptorEvent {
         int getEventType();
