@@ -138,6 +138,10 @@
         <bug>66419</bug>: Fix calls from expression language to a method that
         accepts varargs when only one argument was passed. (markt)
       </fix>
+      <fix>
+        <bug>66441</bug>: Make imports of static fields in JSPs visible to any
+        EL expressions used on the page. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
