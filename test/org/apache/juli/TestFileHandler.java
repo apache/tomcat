@@ -54,7 +54,7 @@ public class TestFileHandler {
         generateLogFiles(logsDir, PREFIX_3, SUFFIX_1, 3);
         generateLogFiles(logsDir, PREFIX_4, SUFFIX_1, 3);
 
-        String date = LocalDateTime.now().minusDays(3).toString().replaceAll(":", "-");
+        String date = LocalDateTime.now().minusDays(3).toString().replace(":", "-");
         File file = new File(logsDir, PREFIX_1 + date + SUFFIX_1);
         if (!file.createNewFile()) {
             Assert.fail("Unable to create " + file.getAbsolutePath());
