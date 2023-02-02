@@ -287,7 +287,7 @@ public final class ClassLoaderFactory {
         // JARs. If these URLs are used to construct URLs for resources in a JAR
         // the URL will be used as is. It is therefore necessary to ensure that
         // the sequence "!/" is not present in a class loader URL.
-        String result = urlString.replaceAll("!/", "%21/");
+        String result = urlString.replace("!/", "%21/");
         return new URI(result).toURL();
     }
 
@@ -295,7 +295,7 @@ public final class ClassLoaderFactory {
     private static URL buildClassLoaderUrl(File file) throws MalformedURLException, URISyntaxException {
         // Could be a directory or a file
         String fileUrlString = file.toURI().toString();
-        fileUrlString = fileUrlString.replaceAll("!/", "%21/");
+        fileUrlString = fileUrlString.replace("!/", "%21/");
         return new URI(fileUrlString).toURL();
     }
 
