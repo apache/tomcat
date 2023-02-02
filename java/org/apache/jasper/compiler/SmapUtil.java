@@ -776,12 +776,12 @@ public class SmapUtil {
 
         InputStream is = null;
         try {
-            is = cl.getResourceAsStream(className.replaceAll("\\.","/") + ".smap");
+            is = cl.getResourceAsStream(className.replace(".","/") + ".smap");
             if (is != null) {
                 encoding = SMAP_ENCODING;
                 found = true;
             } else {
-                is = cl.getResourceAsStream(className.replaceAll("\\.","/") + ".class");
+                is = cl.getResourceAsStream(className.replace(".","/") + ".class");
                 // Alternative approach would be to read the class file as per the
                 // JLS. That would require duplicating a lot of BCEL functionality.
                 int b = is.read();

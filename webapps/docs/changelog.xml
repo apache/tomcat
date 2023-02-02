@@ -124,6 +124,11 @@
         previous behavior following the removal of Java 9+ reflection code which
         caught the ISE. (remm)
       </fix>
+      <fix>
+        Refactor uses of <code>String.replaceAll()</code> to use
+        <code>String.replace()</code> where regular expressions where not being
+        used. Pull request <pr>581</pr> provided by Andrei Briukhov. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
