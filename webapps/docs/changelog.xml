@@ -111,6 +111,11 @@
         Allow a Valve to access cookies from a request that cannot be mapped to
         a Context. (markt)
       </fix>
+      <fix>
+        Refactor uses of <code>String.replaceAll()</code> to use
+        <code>String.replace()</code> where regular expressions where not being
+        used. Pull request <pr>581</pr> provided by Andrei Briukhov. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

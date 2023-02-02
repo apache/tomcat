@@ -105,7 +105,7 @@ public class Utils {
 
         result = ESCAPE_LEADING_SPACE.matcher(result).replaceAll("\\\\$1");
 
-        result = result.replaceAll("\t", "\\t");
+        result = result.replace("\t", "\\t");
 
         return result;
     }

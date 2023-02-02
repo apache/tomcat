@@ -133,7 +133,7 @@ public class TestImportHandlerStandardPackages {
                         // Skip directories
                         continue;
                     }
-                    Class<?> clazz = Class.forName(packageName + "." + name.replaceAll("\\.", "\\$"));
+                    Class<?> clazz = Class.forName(packageName + "." + name.replace(".", "$"));
                     if (!Modifier.isPublic(clazz.getModifiers())) {
                         // Skip non-public classes
                         continue;
