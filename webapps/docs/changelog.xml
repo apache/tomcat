@@ -155,6 +155,11 @@
         and any data remaining to be written is written in the background by the
         container. (markt)
       </fix>
+      <fix>
+        Avoid possible ISE when scanning from bad JAR URLs, to restore the
+        previous behavior following the removal of Java 9+ reflection code which
+        caught the ISE. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
