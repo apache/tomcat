@@ -158,7 +158,7 @@ public class TestMediaType {
         MediaType m = MediaType.parseMediaType(sr);
 
         Assert.assertEquals(CHARSET_WS, m.getCharset());
-        Assert.assertEquals(TYPES.replaceAll(" ", ""),
+        Assert.assertEquals(TYPES.replace(" ", ""),
                 m.toStringNoCharset());
     }
 
