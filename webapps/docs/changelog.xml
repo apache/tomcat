@@ -195,6 +195,9 @@
       <update>
         Remove support for starting Tomcat under a SecurityManager. (markt)
       </update>
+      <add>
+        Improvements to Chinese translations. (lihan)
+      </add>
     </changelog>
   </subsection>
 </section>
