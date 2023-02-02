@@ -938,6 +938,17 @@ public abstract class AbstractEndpoint<S,U> {
         this.maxKeepAliveRequests = maxKeepAliveRequests;
     }
 
+    /**
+     * activate drop connection when response http status code is abnormal.
+     */
+    private boolean activateDropConnection = true;
+    public boolean getActivateDropConnection() {
+        return activateDropConnection;
+    }
+    public void setActivateDropConnection(boolean activateDropConnection) {
+        this.activateDropConnection = activateDropConnection;
+    }
+
 
     /**
      * Name of the thread pool, which will be used for naming child threads.

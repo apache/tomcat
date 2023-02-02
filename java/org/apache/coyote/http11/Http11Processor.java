@@ -195,7 +195,11 @@ public class Http11Processor extends AbstractProcessor {
      * Determine if we must drop the connection because of the HTTP status
      * code.  Use the same list of codes as Apache/httpd.
      */
-    private static boolean statusDropsConnection(int status) {
+    private boolean statusDropsConnection(int status) {
+        if (!protocol.getActivateDropConnection()) {
+            return false;
+        }
+
         return status == 400 /* SC_BAD_REQUEST */ ||
                status == 408 /* SC_REQUEST_TIMEOUT */ ||
                status == 411 /* SC_LENGTH_REQUIRED */ ||

@@ -661,6 +661,20 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         getEndpoint().setMaxKeepAliveRequests(mkar);
     }
 
+    public boolean getActivateDropConnection() {
+        return getEndpoint().getActivateDropConnection();
+    }
+    /**
+     * If drop connection activate,
+     * then connection doesn't close even though response http status code is abnormal.
+     * The default is false
+     *
+     * @see Http11Processor#statusDropsConnection(int)
+     */
+    public void setActivateDropConnection(boolean activateDropConnection) {
+        getEndpoint().setActivateDropConnection(activateDropConnection);
+    }
+
 
     // ----------------------------------------------- HTTPS specific properties
     // ------------------------------------------ passed through to the EndPoint
