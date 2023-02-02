@@ -162,6 +162,9 @@
       <update>
         Update BND to 6.4.0. (markt)
       </update>
+      <add>
+        Improvements to Korean translations. (woonsan)
+      </add>
     </changelog>
   </subsection>
 </section>
