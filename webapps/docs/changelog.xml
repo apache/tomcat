@@ -144,6 +144,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to Korean translations. (woonsan)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.85 (schultz)" rtext="2023-01-19">
   <subsection name="Catalina">
