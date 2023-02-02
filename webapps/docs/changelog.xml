@@ -119,6 +119,11 @@
         Switch to using the ServiceLoader mechanism to load the custom URL
         protocol handlers that Tomcat uses. (markt)
       </update>
+      <fix>
+        Avoid possible ISE when scanning from bad JAR URLs, to restore the
+        previous behavior following the removal of Java 9+ reflection code which
+        caught the ISE. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
