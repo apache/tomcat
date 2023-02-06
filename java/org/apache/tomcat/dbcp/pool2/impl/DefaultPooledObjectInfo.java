@@ -18,7 +18,10 @@ package org.apache.tomcat.dbcp.pool2.impl;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.apache.tomcat.dbcp.pool2.PooledObject;
 
@@ -30,7 +33,7 @@ import org.apache.tomcat.dbcp.pool2.PooledObject;
  */
 public class DefaultPooledObjectInfo implements DefaultPooledObjectInfoMBean {
 
-    private static final String PATTERN = "yyyy-MM-dd HH:mm:ss Z";
+    private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z");
 
     private final PooledObject<?> pooledObject;
 
@@ -97,7 +100,8 @@ public class DefaultPooledObjectInfo implements DefaultPooledObjectInfoMBean {
     }
 
     private String getTimeMillisFormatted(final long millis) {
-        return new SimpleDateFormat(PATTERN).format(Long.valueOf(millis));
+        ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault());
+        return DTF.format(zdt);
     }
 
     /**

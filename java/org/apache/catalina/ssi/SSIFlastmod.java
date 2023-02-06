@@ -53,9 +53,8 @@ public final class SSIFlastmod implements SSICommand {
                     boolean virtual = paramName.equalsIgnoreCase("virtual");
                     lastModified = ssiMediator.getFileLastModified(
                             substitutedValue, virtual);
-                    Date date = new Date(lastModified);
                     String configTimeFmt = ssiMediator.getConfigTimeFmt();
-                    writer.write(formatDate(date, configTimeFmt));
+                    writer.write(formatDate(lastModified, configTimeFmt));
                 } else {
                     ssiMediator.log(sm.getString("ssiCommand.invalidAttribute", paramName));
                     writer.write(configErrMsg);
@@ -69,8 +68,8 @@ public final class SSIFlastmod implements SSICommand {
     }
 
 
-    protected String formatDate(Date date, String configTimeFmt) {
+    protected String formatDate(long milli, String configTimeFmt) {
         Strftime strftime = new Strftime(configTimeFmt, Locale.US);
-        return strftime.format(date);
+        return strftime.formatMilli(milli);
     }
 }

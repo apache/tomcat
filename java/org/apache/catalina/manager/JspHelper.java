@@ -16,10 +16,11 @@
  */
 package org.apache.catalina.manager;
 
-import java.text.DateFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 import org.apache.catalina.Session;
@@ -33,7 +34,8 @@ import org.apache.catalina.manager.util.SessionUtils;
  */
 public class JspHelper {
 
-    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final ZoneId ZONE_ID = ZoneId.systemDefault();
 
     /**
      * Public constructor, so that this class can be considered a JavaBean
@@ -72,14 +74,19 @@ public class JspHelper {
         return escapeXml(user);
     }
 
+    private static String getDateTimeStr(long value) {
+        Instant instant = Instant.ofEpochMilli(value);
+        LocalDateTime ldt = LocalDateTime.ofInstant(instant, ZONE_ID);
+        return DATE_TIME_FORMAT.format(ldt);
+    }
 
     public static String getDisplayCreationTimeForSession(Session in_session) {
         try {
             if (in_session.getCreationTime() == 0) {
                 return "";
             }
-            DateFormat formatter = new SimpleDateFormat(DATE_TIME_FORMAT);
-            return formatter.format(new Date(in_session.getCreationTime()));
+
+            return getDateTimeStr(in_session.getCreationTime());
         } catch (IllegalStateException ise) {
             //ignore: invalidated session
             return "";
@@ -91,8 +98,7 @@ public class JspHelper {
             if (in_session.getLastAccessedTime() == 0) {
                 return "";
             }
-            DateFormat formatter = new SimpleDateFormat(DATE_TIME_FORMAT);
-            return formatter.format(new Date(in_session.getLastAccessedTime()));
+            return getDateTimeStr(in_session.getLastAccessedTime());
         } catch (IllegalStateException ise) {
             //ignore: invalidated session
             return "";
@@ -135,6 +141,11 @@ public class JspHelper {
         return secondsToTimeString(SessionUtils.getInactiveTimeForSession(in_session)/1000);
     }
 
+    /**
+     * Converting seconds to format over 24h: 34:17:36
+     * @param in_seconds seconds
+     * @return formatted string with time
+     */
     public static String secondsToTimeString(long in_seconds) {
         StringBuilder buff = new StringBuilder(9);
         if (in_seconds < 0) {

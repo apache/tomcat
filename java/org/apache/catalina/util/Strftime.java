@@ -17,10 +17,10 @@
 package org.apache.catalina.util;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.TimeZone;
 
 /**
  * Converts dates to strings using the same format specifiers as strftime
@@ -42,7 +42,8 @@ import java.util.TimeZone;
  */
 public class Strftime {
     protected static final Properties translate;
-    protected final SimpleDateFormat simpleDateFormat;
+    protected final DateTimeFormatter dtf;
+    protected ZoneId zoneId;
 
     /*
      * Initialize our pattern translation
@@ -104,7 +105,6 @@ public class Strftime {
         translate.put("%","%");
     }
 
-
     /**
      * Create an instance of this date formatting class
      *
@@ -113,17 +113,33 @@ public class Strftime {
      */
     public Strftime( String origFormat, Locale locale ) {
         String convertedFormat = convertDateFormat( origFormat );
-        simpleDateFormat = new SimpleDateFormat( convertedFormat, locale );
+        dtf = DateTimeFormatter.ofPattern(convertedFormat).withLocale(locale);
     }
 
     /**
      * Format the date according to the strftime-style string given in the constructor.
      *
-     * @param date the date to format
+     * @param instant the date to format
      * @return the formatted date
      */
-    public String format( Date date ) {
-        return simpleDateFormat.format( date );
+    public String format(Instant instant) {
+        return dtf.format(ZonedDateTime.ofInstant(instant, zoneId));
+    }
+
+    public String format(LocalDate date) {
+        return dtf.format(date);
+    }
+
+    public String format(LocalDateTime date) {
+        return dtf.format(date.atZone(zoneId));
+    }
+
+    public String formatMilli(long milli) {
+        return dtf.format(ZonedDateTime.ofInstant(Instant.ofEpochMilli(milli), zoneId));
+    }
+
+    public String formatSeconds(long seconds) {
+        return dtf.format(ZonedDateTime.ofInstant(Instant.ofEpochSecond(seconds), zoneId));
     }
 
     /**
@@ -131,18 +147,18 @@ public class Strftime {
      *
      * @return the timezone
      */
-    public TimeZone getTimeZone() {
-        return simpleDateFormat.getTimeZone();
+    public ZoneId getZoneId() {
+        return zoneId;
     }
 
     /**
      * Change the timezone used to format dates
      *
-     * @param timeZone The new time zone
+     * @param zoneId The new time zone
      * @see SimpleDateFormat#setTimeZone
      */
-    public void setTimeZone( TimeZone timeZone ) {
-        simpleDateFormat.setTimeZone( timeZone );
+    public void setZoneId(ZoneId zoneId) {
+        this.zoneId = zoneId;
     }
 
     /**

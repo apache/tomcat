@@ -18,9 +18,12 @@ package org.apache.catalina.filters;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Enumeration;
+import java.util.concurrent.atomic.AtomicLong;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.GenericFilter;
@@ -56,12 +59,13 @@ public class RequestDumperFilter extends GenericFilter {
     private static final String NON_HTTP_REQ_MSG = "Not available. Non-http request.";
     private static final String NON_HTTP_RES_MSG = "Not available. Non-http response.";
 
-    private static final ThreadLocal<Timestamp> timestamp = ThreadLocal.withInitial(Timestamp::new);
-
     // Log must be non-static as loggers are created per class-loader and this
     // Filter may be used in multiple class loaders
     private transient Log log = LogFactory.getLog(RequestDumperFilter.class);
 
+    private static final ZoneId ZONE_ID = ZoneId.systemDefault();
+    private static final DateTimeFormatter DF_DATETIME = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+    private static final AtomicLong ATOMIC_LONG = new AtomicLong();
 
     /**
      * Log the interesting request parameters, invoke the next Filter in the sequence, and log the interesting response
@@ -239,16 +243,10 @@ public class RequestDumperFilter extends GenericFilter {
     }
 
     private String getTimestamp() {
-        Timestamp ts = timestamp.get();
         long currentTime = System.currentTimeMillis();
-
-        if ((ts.date.getTime() + 999) < currentTime) {
-            ts.date.setTime(currentTime - (currentTime % 1000));
-            ts.update();
-        }
-        return ts.dateString;
+        long res = ATOMIC_LONG.updateAndGet(it -> it + 999 < currentTime ? currentTime - (currentTime % 1000) : it);
+        return DF_DATETIME.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(res), ZONE_ID));
     }
-
 
     /*
      * Log objects are not Serializable but this Filter is because it extends GenericFilter. Tomcat won't serialize a
@@ -259,14 +257,4 @@ public class RequestDumperFilter extends GenericFilter {
         log = LogFactory.getLog(RequestDumperFilter.class);
     }
 
-
-    private static final class Timestamp {
-        private final Date date = new Date(0);
-        private final SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
-        private String dateString = format.format(date);
-
-        private void update() {
-            dateString = format.format(date);
-        }
-    }
 }

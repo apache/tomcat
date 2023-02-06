@@ -17,8 +17,10 @@
 package async;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.ServletException;
@@ -35,14 +37,15 @@ public class Async0 extends HttpServlet {
 
     private static final Log log = LogFactory.getLog(Async0.class);
 
+    private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z");
+
     @Override
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
         if (Boolean.TRUE.equals(req.getAttribute("dispatch"))) {
             log.info("Received dispatch, completing on the worker thread.");
             log.info("After complete called started:"+req.isAsyncStarted());
-            Date date = new Date(System.currentTimeMillis());
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-            resp.getWriter().write("Async dispatch worked: " + sdf.format(date) + "\n");
+            ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(System.currentTimeMillis()), ZoneId.systemDefault());
+            resp.getWriter().write("Async dispatch worked: " + DTF.format(zdt) + "\n");
         } else {
             resp.setContentType("text/plain");
             final AsyncContext actx = req.startAsync();

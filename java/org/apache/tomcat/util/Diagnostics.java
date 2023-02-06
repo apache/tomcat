@@ -49,11 +49,11 @@ import java.lang.management.PlatformLoggingMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
@@ -76,8 +76,7 @@ public class Diagnostics {
 
     private static final Log log = LogFactory.getLog(Diagnostics.class);
 
-    private static final SimpleDateFormat timeformat =
-        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     /* Some platform MBeans */
     private static final ClassLoadingMXBean classLoadingMXBean =
@@ -416,9 +415,7 @@ public class Diagnostics {
     public static String getThreadDump(StringManager requestedSm) {
         StringBuilder sb = new StringBuilder();
 
-        synchronized(timeformat) {
-            sb.append(timeformat.format(new Date()));
-        }
+        sb.append(DTF.format(LocalDateTime.now()));
         sb.append(CRLF);
 
         sb.append(requestedSm.getString("diagnostics.threadDumpTitle"));
@@ -490,9 +487,7 @@ public class Diagnostics {
     public static String getVMInfo(StringManager requestedSm) {
         StringBuilder sb = new StringBuilder();
 
-        synchronized(timeformat) {
-            sb.append(timeformat.format(new Date()));
-        }
+        sb.append(DTF.format(LocalDateTime.now()));
         sb.append(CRLF);
 
         sb.append(requestedSm.getString("diagnostics.vmInfoRuntime"));

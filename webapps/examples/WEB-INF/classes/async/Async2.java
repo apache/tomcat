@@ -17,8 +17,10 @@
 package async;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.ServletException;
@@ -35,6 +37,8 @@ public class Async2 extends HttpServlet {
 
     private static final Log log = LogFactory.getLog(Async2.class);
 
+    private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z");
+
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -48,10 +52,9 @@ public class Async2 extends HttpServlet {
                     log.info("Putting AsyncThread to sleep");
                     Thread.sleep(2*1000);
                     log.info("Writing data.");
-                    Date date = new Date(System.currentTimeMillis());
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+                    ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(System.currentTimeMillis()), ZoneId.systemDefault());
                     actx.getResponse().getWriter().write(
-                            "Output from background thread. Time: " + sdf.format(date) + "\n");
+                            "Output from background thread. Time: " + DTF.format(zdt) + "\n");
                     actx.complete();
                 }catch (InterruptedException x) {
                     log.error("Async2",x);

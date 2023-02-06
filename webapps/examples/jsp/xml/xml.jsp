@@ -18,13 +18,12 @@
 <jsp:root xmlns:jsp="http://java.sun.com/JSP/Page"
   version="1.2">
 <jsp:directive.page contentType="text/html"/>
-<jsp:directive.page import="java.util.Date, java.util.Locale"/>
-<jsp:directive.page import="java.text.*"/>
+<jsp:directive.page import="java.time.format.DateTimeFormatter, java.time.LocalDateTime, java.time.format.FormatStyle, java.util.Locale"/>
 
 <jsp:declaration>
   String getDateTimeStr(Locale l) {
-    DateFormat df = SimpleDateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, l);
-    return df.format(new Date());
+    DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withLocale(l);
+    return dtf.format(LocalDateTime.now());
   }
 </jsp:declaration>
 

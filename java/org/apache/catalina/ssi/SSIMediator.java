@@ -18,12 +18,12 @@ package org.apache.catalina.ssi;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 
 import org.apache.catalina.util.Strftime;
@@ -273,18 +273,18 @@ public class SSIMediator {
     }
 
 
-    protected String formatDate(Date date, TimeZone timeZone) {
+    protected String formatDate(Instant instant, ZoneId zoneId) {
         String retVal;
-        if (timeZone != null) {
+        if (zoneId != null) {
             //we temporarily change strftime. Since SSIMediator is inherently
             // single-threaded, this
             //isn't a problem
-            TimeZone oldTimeZone = strftime.getTimeZone();
-            strftime.setTimeZone(timeZone);
-            retVal = strftime.format(date);
-            strftime.setTimeZone(oldTimeZone);
+            ZoneId oldZoneIdStrf = strftime.getZoneId();
+            strftime.setZoneId(zoneId);
+            retVal = strftime.format(instant);
+            strftime.setZoneId(oldZoneIdStrf);
         } else {
-            retVal = strftime.format(date);
+            retVal = strftime.format(instant);
         }
         return retVal;
     }
@@ -325,9 +325,8 @@ public class SSIMediator {
         if (!(fromConstructor && alreadySet)) {
             ssiExternalResolver.setVariableValue(className + ".alreadyset",
                     "true");
-            Date date = new Date();
-            TimeZone timeZone = TimeZone.getTimeZone("GMT");
-            String retVal = formatDate(date, timeZone);
+            Instant now = Instant.now();
+            String retVal = formatDate(now, ZoneId.of("Etc/GMT"));
             //If we are setting on of the date variables, we want to remove
             // them from the
             // user
@@ -335,11 +334,11 @@ public class SSIMediator {
             setVariableValue("DATE_GMT", null);
             ssiExternalResolver.setVariableValue(className + ".DATE_GMT",
                     retVal);
-            retVal = formatDate(date, null);
+            retVal = formatDate(now, null);
             setVariableValue("DATE_LOCAL", null);
             ssiExternalResolver.setVariableValue(className + ".DATE_LOCAL",
                     retVal);
-            retVal = formatDate(new Date(lastModifiedDate), null);
+            retVal = formatDate(Instant.ofEpochMilli(lastModifiedDate), null);
             setVariableValue("LAST_MODIFIED", null);
             ssiExternalResolver.setVariableValue(className + ".LAST_MODIFIED",
                     retVal);

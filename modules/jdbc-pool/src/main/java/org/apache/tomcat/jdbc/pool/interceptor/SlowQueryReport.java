@@ -16,13 +16,15 @@
  */
 package org.apache.tomcat.jdbc.pool.interceptor;
 
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.openmbean.CompositeDataSupport;
@@ -72,6 +74,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
      * Sort QueryStats by last invocation time
      */
     protected final Comparator<QueryStats> queryStatsComparator = new QueryStatsComparator();
+
+    protected static final DateTimeFormatter DF =
+            DateTimeFormatter.ofPattern("d MMM yyyy HH:mm:ss z").withLocale(Locale.US);
 
     /**
      * Returns the query stats for a given pool
@@ -361,11 +366,13 @@ public class SlowQueryReport extends AbstractQueryReport  {
             return FIELD_TYPES;
         }
 
+        private static String getDateString(long milliseconds) {
+            ZonedDateTime zdt1 = ZonedDateTime.ofInstant(Instant.ofEpochMilli(milliseconds), ZoneId.systemDefault());
+            return DF.format(zdt1.withZoneSameInstant(ZoneId.of("Etc/GMT")));
+        }
+
         @Override
         public String toString() {
-            SimpleDateFormat sdf =
-                    new SimpleDateFormat("d MMM yyyy HH:mm:ss z", Locale.US);
-            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
             StringBuilder buf = new StringBuilder("QueryStats[query:");
             buf.append(query);
             buf.append(", nrOfInvocations:");
@@ -373,11 +380,11 @@ public class SlowQueryReport extends AbstractQueryReport  {
             buf.append(", maxInvocationTime:");
             buf.append(maxInvocationTime);
             buf.append(", maxInvocationDate:");
-            buf.append(sdf.format(new java.util.Date(maxInvocationDate)));
+            buf.append(getDateString(maxInvocationDate));
             buf.append(", minInvocationTime:");
             buf.append(minInvocationTime);
             buf.append(", minInvocationDate:");
-            buf.append(sdf.format(new java.util.Date(minInvocationDate)));
+            buf.append(getDateString(minInvocationDate));
             buf.append(", totalInvocationTime:");
             buf.append(totalInvocationTime);
             buf.append(", averageInvocationTime:");

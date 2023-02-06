@@ -16,8 +16,8 @@ limitations under the License.
 --%>
 <%@ page session="false" pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
 <%
-java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy");
-request.setAttribute("year", sdf.format(new java.util.Date()));
+java.time.format.DateTimeFormatter DF_YYYY = java.time.format.DateTimeFormatter.ofPattern("yyyy");
+request.setAttribute("year", DF_YYYY.format(java.time.LocalDate.now()));
 request.setAttribute("tomcatUrl", "https://tomcat.apache.org/");
 request.setAttribute("tomcatDocUrl", "/docs/");
 request.setAttribute("tomcatExamplesUrl", "/examples/");

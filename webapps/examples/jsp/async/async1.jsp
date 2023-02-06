@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<%@page session="false" import="java.util.Date,java.text.SimpleDateFormat"%>
+<%@page session="false" import="java.time.ZonedDateTime,java.time.ZoneId,java.time.format.DateTimeFormatter"%>
 Output from async1.jsp
 Type is <%=request.getDispatcherType()%>
 <%
@@ -22,7 +22,8 @@ Type is <%=request.getDispatcherType()%>
   if (request.isAsyncStarted()) {
     request.getAsyncContext().complete();
   }
-  Date date = new Date(System.currentTimeMillis());
-  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+
+  DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z");
+  ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(System.currentTimeMillis()), ZoneId.systemDefault());
 %>
-Completed async request at <%=sdf.format(date)%>
+Completed async request at <%=dtf.format(zdt)%>
