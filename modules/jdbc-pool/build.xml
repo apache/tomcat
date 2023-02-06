@@ -481,6 +481,7 @@
           <include name="**/CreateTestTable*"/>
         </fileset>
       </batchtest>
+      <sysproperty key="java.awt.headless" value="${headless}"/>
     </junit>
 
     <echo/>
@@ -498,6 +499,7 @@
           <exclude name="**/DefaultTestCase*"/>
         </fileset>
       </batchtest>
+      <sysproperty key="java.awt.headless" value="${headless}"/>
     </junit>
 
     <echo/>
@@ -517,6 +519,7 @@
           <exclude name="**/Fairness*"/>
         </fileset>
       </batchtest>
+      <sysproperty key="java.awt.headless" value="${headless}"/>
     </junit>
 
   </target>
@@ -539,6 +542,7 @@
           <exclude name="**/DefaultTestCase*"/>
         </fileset>
       </batchtest>
+      <sysproperty key="java.awt.headless" value="${headless}"/>
     </junit>
 
   </target>

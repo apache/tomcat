@@ -1761,6 +1761,7 @@
     <java classname="org.apache.tomcat.util.xreflection.ObjectReflectionPropertyInspector"
           classpath="${xreflect.directory}/classes">
       <arg value="${xreflect.directory}/sources"/>
+      <sysproperty key="java.awt.headless" value="${headless}"/>
     </java>
 
     <!-- Compile the generated XReflectionIntrospectionUtils.java class -->
@@ -2001,6 +2002,7 @@
           <jvmarg value="${runtests.librarypath}"/>
           <jvmarg value="${test.formatter}"/>
           <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
+          <sysproperty key="java.awt.headless" value="${headless}"/>
           <jvmarg value="${opens.javalang}"/>
           <jvmarg value="${opens.javaio}"/>
           <jvmarg value="${opens.sunrmi}"/>
