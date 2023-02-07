@@ -19,16 +19,16 @@
     <classpathentry kind="src" path="java"/>
     <classpathentry excluding="deployment/|tld/|webapp*/|webresources/" kind="src" path="test"/>
     <classpathentry kind="src" path="webapps/examples/WEB-INF/classes"/>
-    <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11"/>
+    <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-@BUILD_JAVA_VERSION@"/>
     <classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-    <classpathentry kind="var" path="ANT_HOME/lib/ant.jar"/>
-    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/ecj-4.26/ecj-4.26.jar"/>
-    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/easymock-4.3/easymock-4.3.jar"/>
-    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/hamcrest-2.2/hamcrest-2.2.jar"/>
-    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/cglib-3.3.0/cglib-nodep-3.3.0.jar"/>
-    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/objenesis-3.3/objenesis-3.3.jar"/>
-    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/bnd-6.4.0/biz.aQute.bnd-6.4.0.jar"/>
-    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/migration-1.0.6/jakartaee-migration-1.0.6-shaded.jar"/>
-    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/unboundid-6.0.7/unboundid-ldapsdk-6.0.7.jar"/>
+    <classpathentry kind="lib" path="@ANT_JAR@"/>
+    <classpathentry kind="lib" path="@JDT_JAR@"/>
+    <classpathentry kind="lib" path="@EASYMOCK_JAR@"/>
+    <classpathentry kind="lib" path="@HAMCREST_JAR@"/>
+    <classpathentry kind="lib" path="@CGLIB_JAR@"/>
+    <classpathentry kind="lib" path="@OBJENESIS_JAR@"/>
+    <classpathentry kind="lib" path="@BND_JAR@"/>
+    <classpathentry kind="lib" path="@MIGRATION_JAR@"/>
+    <classpathentry kind="lib" path="@UNBOUNDID_JAR@"/>
     <classpathentry kind="output" path=".settings/output"/>
 </classpath>
