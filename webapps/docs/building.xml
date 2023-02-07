@@ -219,19 +219,6 @@ Start Eclipse and create a new Workspace.
 </p>
 
 <p>
-Open the <em>Preferences</em> dialog and then select <em>Java-&gt;Build Path-&gt;Classpath
-Variables</em> to add two new <em>Classpath Variables</em>:
-</p>
-
-
-<table class="defaultTable">
- <tr><td>TOMCAT_LIBS_BASE</td><td>The same location as the <code>base.path</code>
-  setting in <code>build.properties</code>, where the binary dependencies have been downloaded</td></tr>
- <tr><td>ANT_HOME</td><td>the base path of Ant <ant-version-required/> or later</td></tr>
-</table>
-
-
-<p>
 Use <em>File-&gt;Import</em> and choose <em>Existing Projects into Workspace</em>.
 From there choose the root directory of the Tomcat source tree (<code>${tomcat.source}</code>)
 and import the Tomcat project located there.
