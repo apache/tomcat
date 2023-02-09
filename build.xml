@@ -251,6 +251,21 @@
     </fileset>
   </path>
 
+  <!-- Classpath filter set -->
+  <filterset id="classpath.filters">
+    <filter token="JAXRPC_JAR" value="${jaxrpc-lib.jar}"/>
+    <filter token="WSDL4J_JAR" value="${wsdl4j-lib.jar}"/>
+    <filter token="ANT_JAR" value="${ant.home}/lib/ant.jar"/>
+    <filter token="JDT_JAR" value="${jdt.jar}"/>
+    <filter token="EASYMOCK_JAR" value="${easymock.jar}"/>
+    <filter token="HAMCREST_JAR" value="${hamcrest.jar}"/>
+    <filter token="CGLIB_JAR" value="${cglib.jar}"/>
+    <filter token="OBJENESIS_JAR" value="${objenesis.jar}"/>
+    <filter token="BND_JAR" value="${bnd.jar}"/>
+    <filter token="UNBOUNDID_JAR" value="${unboundid.jar}"/>
+    <filter token="JUNIT_JAR" value="${junit.jar}"/>
+  </filterset>
+
   <!-- Version info filter set -->
   <tstamp>
     <format property="year" pattern="yyyy" locale="en" timezone="UTC"/>
@@ -3372,12 +3387,16 @@ asf.ldap.username=${release.asfusername}
 
     <!-- Copy the sample project files into the root directory -->
     <copy file="${tomcat.home}/res/ide-support/eclipse/eclipse.project" tofile="${tomcat.home}/.project"/>
-    <copy file="${tomcat.home}/res/ide-support/eclipse/eclipse.classpath" tofile="${tomcat.home}/.classpath"/>
+    <copy file="${tomcat.home}/res/ide-support/eclipse/eclipse.classpath" tofile="${tomcat.home}/.classpath">
+      <filterset refid="classpath.filters"/>
+      <filterset refid="version.filters"/>
+    </copy>
 
     <!-- Copy compiler settings file -->
     <mkdir dir="${tomcat.home}/.settings" />
-    <copy file="${tomcat.home}/res/ide-support/eclipse/org.eclipse.jdt.core.prefs.properties" tofile="${tomcat.home}/.settings/org.eclipse.jdt.core.prefs"/>
-
+    <copy file="${tomcat.home}/res/ide-support/eclipse/org.eclipse.jdt.core.prefs.properties" tofile="${tomcat.home}/.settings/org.eclipse.jdt.core.prefs">
+      <filterset refid="version.filters"/>
+    </copy>
     <echo>Eclipse project files created.
 Read the Building page on the Apache Tomcat documentation site for details on how to configure your Eclipse workspace.</echo>
   </target>
@@ -3390,13 +3409,11 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
 
     <copy todir="${tomcat.home}/.idea">
       <fileset dir="${tomcat.home}/res/ide-support/idea"/>
+      <filterset refid="classpath.filters"/>
+      <filterset refid="version.filters"/>
     </copy>
 
-    <echo>IntelliJ IDEA project directory created. Please create PATH VARIABLES for
-
-      ANT_HOME          = ${ant.home}
-      TOMCAT_BUILD_LIBS = ${base.path}
-    </echo>
+    <echo>IntelliJ IDEA project directory created.</echo>
   </target>
 
   <!-- ============================ NetBeans =============================== -->
@@ -3432,6 +3449,8 @@ Use the "ide-netbeans-replace" target if you wish to overwrite them.</echo>
     <mkdir dir="${tomcat-nb.home}/"/>
     <copy todir="${tomcat-nb.home}" overwrite="true">
       <fileset dir="${tomcat-nb.dist}"/>
+      <filterset refid="version.filters" />
+      <filterset refid="classpath.filters"/>
     </copy>
     <echo>NetBeans project files created.
 Read the Building page on the Apache Tomcat documentation site for details on how to customise your NetBeans project.</echo>
