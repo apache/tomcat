@@ -2181,7 +2181,7 @@
       for HTTP status codes that will return Json error messages.</p>
 
     <p>By specifying this class in <code>errorReportValveClass</code> attribute
-      in <code>HOST</code>, it will be used instead of
+      in <code>Host</code>, it will be used instead of
       <code>ErrorReportValve</code> and will return JSON response instead of HTML.
     </p>
 
@@ -2205,6 +2205,65 @@
 
 </section>
 
+<section name="Proxy Error Report Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Proxy Error Report Valve</strong> is a simple error handler
+    for HTTP status codes that will redirect or proxy to another location
+    responsible for the generation of the error report.</p>
+
+    <p>By specifying this class in <code>errorReportValveClass</code> attribute
+    in <code>Host</code>, it will be used instead of
+    <code>ErrorReportValve</code> with the default attribute values. To
+    configure the attributes, the valve can be defined nested in the
+    <code>Host</code> element.</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Proxy Error Report Valve</strong> supports the following
+    configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.ProxyErrorReportValve</strong>.</p>
+      </attribute>
+
+      <attribute name="usePropertiesFile" required="false">
+        <p>If <code>true</code>, the valve will use the properties file
+        described below to associate the URLs with the status code.
+        If <code>false</code>, the configuration mechanism of the default
+        <code>ErrorReportValve</code> will be used instead. The default
+        value is <code>false</code>.</p>
+      </attribute>
+
+      <attribute name="useRedirect" required="false">
+        <p>If <code>true</code>, the valve will send a redirect to the URL.
+        If <code>false</code>, the valve will instead proxy the content from
+        the specified URL. The default value is <code>true</code>.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+  <subsection name="Configuration">
+
+    <p>The <strong>Proxy Error Report Valve</strong> can use a resource file
+    <strong>ProxyErrorReportValve.properties</strong>
+    from the class path, where each entry is a statusCode=baseUrl. baseUrl
+    should not include any url parameters, statusCode, statusDescription,
+    requestUri, and throwable which will be automatically appended. A special
+    key named <code>0</code> should be used to match any other unmapped
+    code to a redirect or proxy URL.</p>
+
+  </subsection>
+
+</section>
 
 <section name="Crawler Session Manager Valve">
 

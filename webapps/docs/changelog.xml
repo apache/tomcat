@@ -116,6 +116,11 @@
         <code>String.replace()</code> where regular expressions where not being
         used. Pull request <pr>581</pr> provided by Andrei Briukhov. (markt)
       </fix>
+      <add>
+        Add error report valve that allows redirecting to of proxying from an
+        external web server. Based on code and ideas from pull request
+        <pr>506</pr> provided by Max Fortun. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

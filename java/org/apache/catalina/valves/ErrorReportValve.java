@@ -152,6 +152,29 @@ public class ErrorReportValve extends ValveBase {
 
 
     /**
+     * Return the error page associated with the specified status and exception.
+     *
+     * @param statusCode the status code
+     * @param throwable the exception
+     * @return the associated error page
+     */
+    protected ErrorPage findErrorPage(int statusCode, Throwable throwable) {
+        ErrorPage errorPage = null;
+        if (throwable != null) {
+            errorPage = errorPageSupport.find(throwable);
+        }
+        if (errorPage == null) {
+            errorPage = errorPageSupport.find(statusCode);
+        }
+        if (errorPage == null) {
+            // Default error page
+            errorPage = errorPageSupport.find(0);
+        }
+        return errorPage;
+    }
+
+
+    /**
      * Prints out an error report.
      *
      * @param request The request being processed
@@ -179,18 +202,7 @@ public class ErrorReportValve extends ValveBase {
             return;
         }
 
-        ErrorPage errorPage = null;
-        if (throwable != null) {
-            errorPage = errorPageSupport.find(throwable);
-        }
-        if (errorPage == null) {
-            errorPage = errorPageSupport.find(statusCode);
-        }
-        if (errorPage == null) {
-            // Default error page
-            errorPage = errorPageSupport.find(0);
-        }
-
+        ErrorPage errorPage = findErrorPage(statusCode, throwable);
 
         if (errorPage != null) {
             if (sendErrorPage(errorPage.getLocation(), response)) {
