@@ -19,12 +19,12 @@ package org.apache.catalina.valves;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -153,10 +153,14 @@ public class ProxyErrorReportValve extends ErrorReportValve {
         } else {
             stringBuilder.append("?");
         }
-        stringBuilder.append("requestUri=");
-        stringBuilder.append(URLEncoder.encode(request.getDecodedRequestURI(), request.getConnector().getURICharset()));
-        stringBuilder.append("&statusCode=");
-        stringBuilder.append(URLEncoder.encode(String.valueOf(statusCode), StandardCharsets.UTF_8));
+        try {
+            stringBuilder.append("requestUri=");
+            stringBuilder.append(URLEncoder.encode(request.getDecodedRequestURI(), request.getConnector().getURIEncoding()));
+            stringBuilder.append("&statusCode=");
+            stringBuilder.append(URLEncoder.encode(String.valueOf(statusCode), "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            // Ignore
+        }
 
         String reason = null;
         String description = null;
@@ -172,19 +176,23 @@ public class ProxyErrorReportValve extends ErrorReportValve {
             reason = smClient.getString("errorReportValve.unknownReason");
             description = smClient.getString("errorReportValve.noDescription");
         }
-        stringBuilder.append("&statusDescription=");
-        stringBuilder.append(URLEncoder.encode(description, StandardCharsets.UTF_8));
-        stringBuilder.append("&statusReason=");
-        stringBuilder.append(URLEncoder.encode(reason, StandardCharsets.UTF_8));
+        try {
+            stringBuilder.append("&statusDescription=");
+            stringBuilder.append(URLEncoder.encode(description, "UTF-8"));
+            stringBuilder.append("&statusReason=");
+            stringBuilder.append(URLEncoder.encode(reason, "UTF-8"));
 
-        String message = response.getMessage();
-        if (message != null) {
-            stringBuilder.append("&message=");
-            stringBuilder.append(URLEncoder.encode(message, StandardCharsets.UTF_8));
-        }
-        if (throwable != null) {
-            stringBuilder.append("&throwable=");
-            stringBuilder.append(URLEncoder.encode(throwable.toString(), StandardCharsets.UTF_8));
+            String message = response.getMessage();
+            if (message != null) {
+                stringBuilder.append("&message=");
+                stringBuilder.append(URLEncoder.encode(message, "UTF-8"));
+            }
+            if (throwable != null) {
+                stringBuilder.append("&throwable=");
+                stringBuilder.append(URLEncoder.encode(throwable.toString(), "UTF-8"));
+            }
+        } catch (UnsupportedEncodingException e) {
+            // Ignore
         }
 
         urlString = stringBuilder.toString();
