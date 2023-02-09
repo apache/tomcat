@@ -253,7 +253,6 @@
     <filter token="CGLIB_JAR" value="${cglib.jar}"/>
     <filter token="OBJENESIS_JAR" value="${objenesis.jar}"/>
     <filter token="BND_JAR" value="${bnd.jar}"/>
-    <filter token="MIGRATION_JAR" value="${migration-lib.jar}"/>
     <filter token="UNBOUNDID_JAR" value="${unboundid.jar}"/>
     <filter token="JUNIT_JAR" value="${junit.jar}"/>
   </filterset>
