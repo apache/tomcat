@@ -153,6 +153,11 @@
         <code>WINDOW_UPDATE</code> frame on an HTTP/2 connection where the flow
         control window for the overall connection has been exhausted. (markt)
       </fix>
+      <fix>
+        Fix a regression introduced in 10.1.0-M17 that prevented HTTP/2
+        connections from timing out when using a Connector configured with
+        <code>useAsyncIO=true</code> (the default). (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
