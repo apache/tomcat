@@ -824,6 +824,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertTrue(bug66471Servlet.isSecure.booleanValue());
     }
     public static class Bug66471Servlet extends HttpServlet {
+        private static final long serialVersionUID = 1L;
         public Boolean isSecure;
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
