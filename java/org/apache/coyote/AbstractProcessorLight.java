@@ -28,9 +28,8 @@ import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
- * This is a light-weight abstract processor implementation that is intended as
- * a basis for all Processor implementations from the light-weight upgrade
- * processors to the HTTP/AJP processors.
+ * This is a light-weight abstract processor implementation that is intended as a basis for all Processor
+ * implementations from the light-weight upgrade processors to the HTTP/AJP processors.
  */
 public abstract class AbstractProcessorLight implements Processor {
 
@@ -38,8 +37,7 @@ public abstract class AbstractProcessorLight implements Processor {
 
 
     @Override
-    public SocketState process(SocketWrapperBase<?> socketWrapper, SocketEvent status)
-            throws IOException {
+    public SocketState process(SocketWrapperBase<?> socketWrapper, SocketEvent status) throws IOException {
 
         SocketState state = SocketState.CLOSED;
         Iterator<DispatchType> dispatches = null;
@@ -72,16 +70,15 @@ public abstract class AbstractProcessorLight implements Processor {
             }
 
             if (getLog().isDebugEnabled()) {
-                getLog().debug("Socket: [" + socketWrapper +
-                        "], Status in: [" + status +
-                        "], State out: [" + state + "]");
+                getLog().debug(
+                        "Socket: [" + socketWrapper + "], Status in: [" + status + "], State out: [" + state + "]");
             }
 
             if (isAsync()) {
                 state = asyncPostProcess();
                 if (getLog().isDebugEnabled()) {
-                    getLog().debug("Socket: [" + socketWrapper +
-                            "], State after async post processing: [" + state + "]");
+                    getLog().debug(
+                            "Socket: [" + socketWrapper + "], State after async post processing: [" + state + "]");
                 }
             }
 
@@ -90,8 +87,7 @@ public abstract class AbstractProcessorLight implements Processor {
                 // dispatches to process.
                 dispatches = getIteratorAndClearDispatches();
             }
-        } while (state == SocketState.ASYNC_END ||
-                dispatches != null && state != SocketState.CLOSED);
+        } while (state == SocketState.ASYNC_END || dispatches != null && state != SocketState.CLOSED);
 
         return state;
     }
@@ -150,8 +146,7 @@ public abstract class AbstractProcessorLight implements Processor {
      *
      * @param socketWrapper The connection to process
      *
-     * @throws IOException If an I/O error occurs during the processing of the
-     *         request
+     * @throws IOException If an I/O error occurs during the processing of the request
      */
     protected void logAccess(SocketWrapperBase<?> socketWrapper) throws IOException {
         // NO-OP by default
@@ -159,36 +154,29 @@ public abstract class AbstractProcessorLight implements Processor {
 
 
     /**
-     * Service a 'standard' HTTP request. This method is called for both new
-     * requests and for requests that have partially read the HTTP request line
-     * or HTTP headers. Once the headers have been fully read this method is not
-     * called again until there is a new HTTP request to process. Note that the
-     * request type may change during processing which may result in one or more
-     * calls to {@link #dispatch(SocketEvent)}. Requests may be pipe-lined.
+     * Service a 'standard' HTTP request. This method is called for both new requests and for requests that have
+     * partially read the HTTP request line or HTTP headers. Once the headers have been fully read this method is not
+     * called again until there is a new HTTP request to process. Note that the request type may change during
+     * processing which may result in one or more calls to {@link #dispatch(SocketEvent)}. Requests may be pipe-lined.
      *
      * @param socketWrapper The connection to process
      *
-     * @return The state the caller should put the socket in when this method
-     *         returns
+     * @return The state the caller should put the socket in when this method returns
      *
-     * @throws IOException If an I/O error occurs during the processing of the
-     *         request
+     * @throws IOException If an I/O error occurs during the processing of the request
      */
     protected abstract SocketState service(SocketWrapperBase<?> socketWrapper) throws IOException;
 
     /**
-     * Process an in-progress request that is not longer in standard HTTP mode.
-     * Uses currently include Servlet 3.0 Async and HTTP upgrade connections.
-     * Further uses may be added in the future. These will typically start as
-     * HTTP requests.
+     * Process an in-progress request that is not longer in standard HTTP mode. Uses currently include Servlet 3.0 Async
+     * and HTTP upgrade connections. Further uses may be added in the future. These will typically start as HTTP
+     * requests.
      *
      * @param status The event to process
      *
-     * @return The state the caller should put the socket in when this method
-     *         returns
+     * @return The state the caller should put the socket in when this method returns
      *
-     * @throws IOException If an I/O error occurs during the processing of the
-     *         request
+     * @throws IOException If an I/O error occurs during the processing of the request
      */
     protected abstract SocketState dispatch(SocketEvent status) throws IOException;
 
