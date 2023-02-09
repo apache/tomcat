@@ -52,9 +52,8 @@ public class CompressionConfig {
     /**
      * Set compression level.
      *
-     * @param compression One of <code>on</code>, <code>force</code>,
-     *                    <code>off</code> or the minimum compression size in
-     *                    bytes which implies <code>on</code>
+     * @param compression One of <code>on</code>, <code>force</code>, <code>off</code> or the minimum compression size
+     *                        in bytes which implies <code>on</code>
      */
     public void setCompression(String compression) {
         if (compression.equals("on")) {
@@ -83,12 +82,12 @@ public class CompressionConfig {
      */
     public String getCompression() {
         switch (compressionLevel) {
-        case 0:
-            return "off";
-        case 1:
-            return "on";
-        case 2:
-            return "force";
+            case 0:
+                return "off";
+            case 1:
+                return "on";
+            case 2:
+                return "force";
         }
         return "off";
     }
@@ -100,8 +99,7 @@ public class CompressionConfig {
 
 
     /**
-     * Obtain the String form of the regular expression that defines the user
-     * agents to not use gzip with.
+     * Obtain the String form of the regular expression that defines the user agents to not use gzip with.
      *
      * @return The regular expression as a String
      */
@@ -120,19 +118,17 @@ public class CompressionConfig {
 
 
     /**
-     * Set no compression user agent pattern. Regular expression as supported
-     * by {@link Pattern}. e.g.: <code>gorilla|desesplorer|tigrus</code>.
+     * Set no compression user agent pattern. Regular expression as supported by {@link Pattern}. e.g.:
+     * <code>gorilla|desesplorer|tigrus</code>.
      *
-     * @param noCompressionUserAgents The regular expression for user agent
-     *                                strings for which compression should not
-     *                                be applied
+     * @param noCompressionUserAgents The regular expression for user agent strings for which compression should not be
+     *                                    applied
      */
     public void setNoCompressionUserAgents(String noCompressionUserAgents) {
         if (noCompressionUserAgents == null || noCompressionUserAgents.length() == 0) {
             this.noCompressionUserAgents = null;
         } else {
-            this.noCompressionUserAgents =
-                Pattern.compile(noCompressionUserAgents);
+            this.noCompressionUserAgents = Pattern.compile(noCompressionUserAgents);
         }
     }
 
@@ -175,8 +171,7 @@ public class CompressionConfig {
     /**
      * Set Minimum size to trigger compression.
      *
-     * @param compressionMinSize The minimum content length required for
-     *                           compression in bytes
+     * @param compressionMinSize The minimum content length required for compression in bytes
      */
     public void setCompressionMinSize(int compressionMinSize) {
         this.compressionMinSize = compressionMinSize;
@@ -188,8 +183,7 @@ public class CompressionConfig {
      *
      * @return {@code true} if compression is disabled, otherwise {@code false}
      *
-     * @deprecated Will be removed in Tomcat 10 where it will be hard-coded to
-     *             {@code true}
+     * @deprecated Will be removed in Tomcat 10 where it will be hard-coded to {@code true}
      */
     @Deprecated
     public boolean getNoCompressionStrongETag() {
@@ -200,11 +194,9 @@ public class CompressionConfig {
     /**
      * Set whether compression is disabled for resources with a strong ETag.
      *
-     * @param noCompressionStrongETag {@code true} if compression is disabled,
-     *                                otherwise {@code false}
+     * @param noCompressionStrongETag {@code true} if compression is disabled, otherwise {@code false}
      *
-     * @deprecated Will be removed in Tomcat 10 where it will be hard-coded to
-     *             {@code true}
+     * @deprecated Will be removed in Tomcat 10 where it will be hard-coded to {@code true}
      */
     @Deprecated
     public void setNoCompressionStrongETag(boolean noCompressionStrongETag) {
@@ -213,14 +205,13 @@ public class CompressionConfig {
 
 
     /**
-     * Determines if compression should be enabled for the given response and if
-     * it is, sets any necessary headers to mark it as such.
+     * Determines if compression should be enabled for the given response and if it is, sets any necessary headers to
+     * mark it as such.
      *
      * @param request  The request that triggered the response
      * @param response The response to consider compressing
      *
-     * @return {@code true} if compression was enabled for the given response,
-     *         otherwise {@code false}
+     * @return {@code true} if compression was enabled for the given response, otherwise {@code false}
      */
     public boolean useCompression(Request request, Response response) {
         // Check if compression is enabled
@@ -311,7 +302,7 @@ public class CompressionConfig {
             Pattern noCompressionUserAgents = this.noCompressionUserAgents;
             if (noCompressionUserAgents != null) {
                 MessageBytes userAgentValueMB = request.getMimeHeaders().getValue("user-agent");
-                if(userAgentValueMB != null) {
+                if (userAgentValueMB != null) {
                     String userAgentValue = userAgentValueMB.toString();
                     if (noCompressionUserAgents.matcher(userAgentValue).matches()) {
                         return false;
@@ -335,7 +326,7 @@ public class CompressionConfig {
      * Checks if any entry in the string array starts with the specified value
      *
      * @param sArray the StringArray
-     * @param value string
+     * @param value  string
      */
     private static boolean startsWithStringArray(String sArray[], String value) {
         if (value == null) {
