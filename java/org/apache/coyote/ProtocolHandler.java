@@ -21,20 +21,19 @@ import java.util.concurrent.Executor;
 import org.apache.tomcat.util.net.SSLHostConfig;
 
 /**
- * Abstract the protocol implementation, including threading, etc.
- *
- * This is the main interface to be implemented by a coyote protocol.
- * Adapter is the main interface to be implemented by a coyote servlet
- * container.
+ * Abstract the protocol implementation, including threading, etc. This is the main interface to be implemented by a
+ * coyote protocol. Adapter is the main interface to be implemented by a coyote servlet container.
  *
  * @author Remy Maucherat
  * @author Costin Manolache
+ *
  * @see Adapter
  */
 public interface ProtocolHandler {
 
     /**
      * Return the adapter associated with the protocol handler.
+     *
      * @return the adapter
      */
     public Adapter getAdapter();
@@ -105,20 +104,17 @@ public interface ProtocolHandler {
 
 
     /**
-     * Close the server socket (to prevent further connections) if the server
-     * socket was bound on {@link #start()} (rather than on {@link #init()}
-     * but do not perform any further shutdown.
+     * Close the server socket (to prevent further connections) if the server socket was bound on {@link #start()}
+     * (rather than on {@link #init()} but do not perform any further shutdown.
      */
     public void closeServerSocketGraceful();
 
 
     /**
-     * Wait for the client connections to the server to close gracefully. The
-     * method will return when all of the client connections have closed or the
-     * method has been waiting for {@code waitTimeMillis}.
+     * Wait for the client connections to the server to close gracefully. The method will return when all of the client
+     * connections have closed or the method has been waiting for {@code waitTimeMillis}.
      *
-     * @param waitMillis    The maximum time to wait in milliseconds for the
-     *                      client connections to close.
+     * @param waitMillis The maximum time to wait in milliseconds for the client connections to close.
      *
      * @return The wait time, if any remaining when the method returned
      */
@@ -128,8 +124,7 @@ public interface ProtocolHandler {
     /**
      * Requires APR/native library
      *
-     * @return <code>true</code> if this Protocol Handler requires the
-     *         APR/native library, otherwise <code>false</code>
+     * @return <code>true</code> if this Protocol Handler requires the APR/native library, otherwise <code>false</code>
      *
      * @deprecated This method will be removed in Tomcat 10.1.x onwards
      */
@@ -140,22 +135,22 @@ public interface ProtocolHandler {
     /**
      * Does this ProtocolHandler support sendfile?
      *
-     * @return <code>true</code> if this Protocol Handler supports sendfile,
-     *         otherwise <code>false</code>
+     * @return <code>true</code> if this Protocol Handler supports sendfile, otherwise <code>false</code>
      */
     public boolean isSendfileSupported();
 
 
     /**
      * Add a new SSL configuration for a virtual host.
+     *
      * @param sslHostConfig the configuration
      */
     public void addSslHostConfig(SSLHostConfig sslHostConfig);
 
 
     /**
-     * Find all configured SSL virtual host configurations which will be used
-     * by SNI.
+     * Find all configured SSL virtual host configurations which will be used by SNI.
+     *
      * @return the configurations
      */
     public SSLHostConfig[] findSslHostConfigs();
@@ -163,6 +158,7 @@ public interface ProtocolHandler {
 
     /**
      * Add a new protocol for used by HTTP/1.1 upgrade or ALPN.
+     *
      * @param upgradeProtocol the protocol
      */
     public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol);
@@ -170,6 +166,7 @@ public interface ProtocolHandler {
 
     /**
      * Return all configured upgrade protocols.
+     *
      * @return the protocols
      */
     public UpgradeProtocol[] findUpgradeProtocols();

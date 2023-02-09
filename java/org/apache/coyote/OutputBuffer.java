@@ -22,10 +22,8 @@ import java.nio.ByteBuffer;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
- * Output buffer.
- *
- * This class is used internally by the protocol implementation. All writes from
- * higher level code should happen via Response.doWrite().
+ * Output buffer. This class is used internally by the protocol implementation. All writes from higher level code should
+ * happen via Response.doWrite().
  *
  * @author Remy Maucherat
  */
@@ -36,13 +34,11 @@ public interface OutputBuffer {
      *
      * @param chunk data to write
      *
-     * @return The number of bytes written which may be less than available in
-     *         the input chunk
+     * @return The number of bytes written which may be less than available in the input chunk
      *
      * @throws IOException an underlying I/O error occurred
      *
-     * @deprecated Unused. Will be removed in Tomcat 9. Use
-     *             {@link #doWrite(ByteBuffer)}
+     * @deprecated Unused. Will be removed in Tomcat 9. Use {@link #doWrite(ByteBuffer)}
      */
     @Deprecated
     public int doWrite(ByteChunk chunk) throws IOException;
@@ -53,8 +49,7 @@ public interface OutputBuffer {
      *
      * @param chunk data to write
      *
-     * @return The number of bytes written which may be less than available in
-     *         the input chunk
+     * @return The number of bytes written which may be less than available in the input chunk
      *
      * @throws IOException an underlying I/O error occurred
      */
@@ -62,10 +57,9 @@ public interface OutputBuffer {
 
 
     /**
-     * Bytes written to the underlying socket. This includes the effects of
-     * chunking, compression, etc.
+     * Bytes written to the underlying socket. This includes the effects of chunking, compression, etc.
      *
-     * @return  Bytes written for the current request
+     * @return Bytes written for the current request
      */
     public long getBytesWritten();
 }

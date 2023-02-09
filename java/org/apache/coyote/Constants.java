@@ -30,7 +30,7 @@ public final class Constants {
      * @deprecated This will be removed in Tomcat 9.0.x onwards.
      */
     @Deprecated
-    public static final String DEFAULT_CHARACTER_ENCODING="ISO-8859-1";
+    public static final String DEFAULT_CHARACTER_ENCODING = "ISO-8859-1";
 
     public static final Charset DEFAULT_URI_CHARSET = StandardCharsets.ISO_8859_1;
     public static final Charset DEFAULT_BODY_CHARSET = StandardCharsets.ISO_8859_1;
@@ -60,62 +60,54 @@ public final class Constants {
 
     /**
      * If true, custom HTTP status messages will be used in headers.
-     * @deprecated This option will be removed in Tomcat 9. Reason phrase will
-     *             not be sent.
+     *
+     * @deprecated This option will be removed in Tomcat 9. Reason phrase will not be sent.
      */
     @Deprecated
-    public static final boolean USE_CUSTOM_STATUS_MSG_IN_HEADER =
-            Boolean.getBoolean("org.apache.coyote.USE_CUSTOM_STATUS_MSG_IN_HEADER");
+    public static final boolean USE_CUSTOM_STATUS_MSG_IN_HEADER = Boolean
+            .getBoolean("org.apache.coyote.USE_CUSTOM_STATUS_MSG_IN_HEADER");
 
     /**
-     * The request attribute that is set to the value of {@code Boolean.TRUE}
-     * if connector processing this request supports use of sendfile.
+     * The request attribute that is set to the value of {@code Boolean.TRUE} if connector processing this request
+     * supports use of sendfile.
      */
     public static final String SENDFILE_SUPPORTED_ATTR = "org.apache.tomcat.sendfile.support";
 
 
     /**
-     * The request attribute that can be used by a servlet to pass
-     * to the connector the name of the file that is to be served
-     * by sendfile. The value should be {@code java.lang.String}
-     * that is {@code File.getCanonicalPath()} of the file to be served.
+     * The request attribute that can be used by a servlet to pass to the connector the name of the file that is to be
+     * served by sendfile. The value should be {@code java.lang.String} that is {@code File.getCanonicalPath()} of the
+     * file to be served.
      */
     public static final String SENDFILE_FILENAME_ATTR = "org.apache.tomcat.sendfile.filename";
 
 
     /**
-     * The request attribute that can be used by a servlet to pass
-     * to the connector the start offset of the part of a file
-     * that is to be served by sendfile. The value should be
-     * {@code java.lang.Long}. To serve complete file
-     * the value should be {@code Long.valueOf(0)}.
+     * The request attribute that can be used by a servlet to pass to the connector the start offset of the part of a
+     * file that is to be served by sendfile. The value should be {@code java.lang.Long}. To serve complete file the
+     * value should be {@code Long.valueOf(0)}.
      */
     public static final String SENDFILE_FILE_START_ATTR = "org.apache.tomcat.sendfile.start";
 
 
     /**
-     * The request attribute that can be used by a servlet to pass
-     * to the connector the end offset (not including) of the part
-     * of a file that is to be served by sendfile. The value should be
-     * {@code java.lang.Long}. To serve complete file
-     * the value should be equal to the length of the file.
+     * The request attribute that can be used by a servlet to pass to the connector the end offset (not including) of
+     * the part of a file that is to be served by sendfile. The value should be {@code java.lang.Long}. To serve
+     * complete file the value should be equal to the length of the file.
      */
     public static final String SENDFILE_FILE_END_ATTR = "org.apache.tomcat.sendfile.end";
 
 
     /**
-     * The request attribute set by the RemoteIpFilter, RemoteIpValve (and may
-     * be set by other similar components) that identifies for the connector the
-     * remote IP address claimed to be associated with this request when a
-     * request is received via one or more proxies. It is typically provided via
-     * the X-Forwarded-For HTTP header.
+     * The request attribute set by the RemoteIpFilter, RemoteIpValve (and may be set by other similar components) that
+     * identifies for the connector the remote IP address claimed to be associated with this request when a request is
+     * received via one or more proxies. It is typically provided via the X-Forwarded-For HTTP header.
      */
     public static final String REMOTE_ADDR_ATTRIBUTE = "org.apache.tomcat.remoteAddr";
 
     /**
-     * The request attribute set by the RemoteIpFilter, RemoteIpValve (and may
-     * be set by other similar components) that identifies for the connector the
-     * connection peer IP address.
+     * The request attribute set by the RemoteIpFilter, RemoteIpValve (and may be set by other similar components) that
+     * identifies for the connector the connection peer IP address.
      */
     public static final String PEER_ADDR_ATTRIBUTE = "org.apache.tomcat.peerAddr";
 }

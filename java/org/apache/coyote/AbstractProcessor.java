@@ -40,8 +40,8 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Provides functionality and attributes common to all supported protocols
- * (currently HTTP and AJP) for processing a single request/response.
+ * Provides functionality and attributes common to all supported protocols (currently HTTP and AJP) for processing a
+ * single request/response.
  */
 public abstract class AbstractProcessor extends AbstractProcessorLight implements ActionHook {
 
@@ -54,16 +54,14 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected final AsyncStateMachine asyncStateMachine;
     private volatile long asyncTimeout = -1;
     /*
-     * Tracks the current async generation when a timeout is dispatched. In the
-     * time it takes for a container thread to be allocated and the timeout
-     * processing to start, it is possible that the application completes this
-     * generation of async processing and starts a new one. If the timeout is
-     * then processed against the new generation, response mix-up can occur.
-     * This field is used to ensure that any timeout event processed is for the
-     * current async generation. This prevents the response mix-up.
+     * Tracks the current async generation when a timeout is dispatched. In the time it takes for a container thread to
+     * be allocated and the timeout processing to start, it is possible that the application completes this generation
+     * of async processing and starts a new one. If the timeout is then processed against the new generation, response
+     * mix-up can occur. This field is used to ensure that any timeout event processed is for the current async
+     * generation. This prevents the response mix-up.
      */
     private volatile long asyncTimeoutGeneration = 0;
-    protected final AbstractEndpoint<?,?> endpoint;
+    protected final AbstractEndpoint<?, ?> endpoint;
     protected final Request request;
     protected final Response response;
     protected volatile SocketWrapperBase<?> socketWrapper = null;
@@ -77,13 +75,12 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
     protected final UserDataHelper userDataHelper;
 
-    public AbstractProcessor(AbstractEndpoint<?,?> endpoint) {
+    public AbstractProcessor(AbstractEndpoint<?, ?> endpoint) {
         this(endpoint, new Request(), new Response());
     }
 
 
-    protected AbstractProcessor(AbstractEndpoint<?,?> endpoint, Request coyoteRequest,
-            Response coyoteResponse) {
+    protected AbstractProcessor(AbstractEndpoint<?, ?> endpoint, Request coyoteRequest, Response coyoteResponse) {
         this.endpoint = endpoint;
         asyncStateMachine = new AsyncStateMachine(this);
         request = coyoteRequest;
@@ -96,10 +93,11 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Update the current error state to the new error state if the new error
-     * state is more severe than the current error state.
+     * Update the current error state to the new error state if the new error state is more severe than the current
+     * error state.
+     *
      * @param errorState The error status details
-     * @param t The error which occurred
+     * @param t          The error which occurred
      */
     protected void setErrorState(ErrorState errorState, Throwable t) {
         if (getLog().isDebugEnabled()) {
@@ -160,6 +158,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
     /**
      * Set the socket wrapper being used.
+     *
      * @param socketWrapper The socket wrapper
      */
     protected void setSocketWrapper(SocketWrapperBase<?> socketWrapper) {
@@ -269,9 +268,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         }
 
         if (getLog().isDebugEnabled()) {
-            getLog().debug("Socket: [" + socketWrapper +
-                    "], Status in: [" + status +
-                    "], State out: [" + state + "]");
+            getLog().debug("Socket: [" + socketWrapper + "], Status in: [" + status + "], State out: [" + state + "]");
         }
 
         return state;
@@ -350,9 +347,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Called when a host header is not present in the request (e.g. HTTP/1.0).
-     * It populates the server name with appropriate information. The source is
-     * expected to vary by protocol.
+     * Called when a host header is not present in the request (e.g. HTTP/1.0). It populates the server name with
+     * appropriate information. The source is expected to vary by protocol.
      * <p>
      * The default implementation is a NO-OP.
      */
@@ -362,9 +358,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Called when a host header is not present or is empty in the request (e.g.
-     * HTTP/1.0). It populates the server port with appropriate information. The
-     * source is expected to vary by protocol.
+     * Called when a host header is not present or is empty in the request (e.g. HTTP/1.0). It populates the server port
+     * with appropriate information. The source is expected to vary by protocol.
      * <p>
      * The default implementation is a NO-OP.
      */
@@ -376,271 +371,271 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     @Override
     public final void action(ActionCode actionCode, Object param) {
         switch (actionCode) {
-        // 'Normal' servlet support
-        case COMMIT: {
-            if (!response.isCommitted()) {
+            // 'Normal' servlet support
+            case COMMIT: {
+                if (!response.isCommitted()) {
+                    try {
+                        // Validate and write response headers
+                        prepareResponse();
+                    } catch (IOException e) {
+                        handleIOException(e);
+                    }
+                }
+                break;
+            }
+            case CLOSE: {
+                action(ActionCode.COMMIT, null);
                 try {
-                    // Validate and write response headers
-                    prepareResponse();
+                    finishResponse();
                 } catch (IOException e) {
                     handleIOException(e);
                 }
+                break;
             }
-            break;
-        }
-        case CLOSE: {
-            action(ActionCode.COMMIT, null);
-            try {
-                finishResponse();
-            } catch (IOException e) {
-                handleIOException(e);
+            case ACK: {
+                ack((ContinueResponseTiming) param);
+                break;
             }
-            break;
-        }
-        case ACK: {
-            ack((ContinueResponseTiming) param);
-            break;
-        }
-        case CLIENT_FLUSH: {
-            action(ActionCode.COMMIT, null);
-            try {
-                flush();
-            } catch (IOException e) {
-                handleIOException(e);
-                response.setErrorException(e);
+            case CLIENT_FLUSH: {
+                action(ActionCode.COMMIT, null);
+                try {
+                    flush();
+                } catch (IOException e) {
+                    handleIOException(e);
+                    response.setErrorException(e);
+                }
+                break;
             }
-            break;
-        }
-        case AVAILABLE: {
-            request.setAvailable(available(Boolean.TRUE.equals(param)));
-            break;
-        }
-        case REQ_SET_BODY_REPLAY: {
-            ByteChunk body = (ByteChunk) param;
-            setRequestBody(body);
-            break;
-        }
+            case AVAILABLE: {
+                request.setAvailable(available(Boolean.TRUE.equals(param)));
+                break;
+            }
+            case REQ_SET_BODY_REPLAY: {
+                ByteChunk body = (ByteChunk) param;
+                setRequestBody(body);
+                break;
+            }
 
-        // Error handling
-        case IS_ERROR: {
-            ((AtomicBoolean) param).set(getErrorState().isError());
-            break;
-        }
-        case IS_IO_ALLOWED: {
-            ((AtomicBoolean) param).set(getErrorState().isIoAllowed());
-            break;
-        }
-        case CLOSE_NOW: {
-            // Prevent further writes to the response
-            setSwallowResponse();
-            if (param instanceof Throwable) {
-                setErrorState(ErrorState.CLOSE_NOW, (Throwable) param);
-            } else {
-                setErrorState(ErrorState.CLOSE_NOW, null);
+            // Error handling
+            case IS_ERROR: {
+                ((AtomicBoolean) param).set(getErrorState().isError());
+                break;
             }
-            break;
-        }
-        case DISABLE_SWALLOW_INPUT: {
-            // Cancelled upload or similar.
-            // No point reading the remainder of the request.
-            disableSwallowRequest();
-            // This is an error state. Make sure it is marked as such.
-            setErrorState(ErrorState.CLOSE_CLEAN, null);
-            break;
-        }
+            case IS_IO_ALLOWED: {
+                ((AtomicBoolean) param).set(getErrorState().isIoAllowed());
+                break;
+            }
+            case CLOSE_NOW: {
+                // Prevent further writes to the response
+                setSwallowResponse();
+                if (param instanceof Throwable) {
+                    setErrorState(ErrorState.CLOSE_NOW, (Throwable) param);
+                } else {
+                    setErrorState(ErrorState.CLOSE_NOW, null);
+                }
+                break;
+            }
+            case DISABLE_SWALLOW_INPUT: {
+                // Cancelled upload or similar.
+                // No point reading the remainder of the request.
+                disableSwallowRequest();
+                // This is an error state. Make sure it is marked as such.
+                setErrorState(ErrorState.CLOSE_CLEAN, null);
+                break;
+            }
 
-        // Request attribute support
-        case REQ_HOST_ADDR_ATTRIBUTE: {
-            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
-                request.remoteAddr().setString(socketWrapper.getRemoteAddr());
+            // Request attribute support
+            case REQ_HOST_ADDR_ATTRIBUTE: {
+                if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                    request.remoteAddr().setString(socketWrapper.getRemoteAddr());
+                }
+                break;
             }
-            break;
-        }
-        case REQ_PEER_ADDR_ATTRIBUTE: {
-            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
-                request.peerAddr().setString(socketWrapper.getRemoteAddr());
+            case REQ_PEER_ADDR_ATTRIBUTE: {
+                if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                    request.peerAddr().setString(socketWrapper.getRemoteAddr());
+                }
+                break;
             }
-            break;
-        }
-        case REQ_HOST_ATTRIBUTE: {
-            populateRequestAttributeRemoteHost();
-            break;
-        }
-        case REQ_LOCALPORT_ATTRIBUTE: {
-            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
-                request.setLocalPort(socketWrapper.getLocalPort());
+            case REQ_HOST_ATTRIBUTE: {
+                populateRequestAttributeRemoteHost();
+                break;
             }
-            break;
-        }
-        case REQ_LOCAL_ADDR_ATTRIBUTE: {
-            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
-                request.localAddr().setString(socketWrapper.getLocalAddr());
+            case REQ_LOCALPORT_ATTRIBUTE: {
+                if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                    request.setLocalPort(socketWrapper.getLocalPort());
+                }
+                break;
             }
-            break;
-        }
-        case REQ_LOCAL_NAME_ATTRIBUTE: {
-            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
-                request.localName().setString(socketWrapper.getLocalName());
+            case REQ_LOCAL_ADDR_ATTRIBUTE: {
+                if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                    request.localAddr().setString(socketWrapper.getLocalAddr());
+                }
+                break;
             }
-            break;
-        }
-        case REQ_REMOTEPORT_ATTRIBUTE: {
-            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
-                request.setRemotePort(socketWrapper.getRemotePort());
+            case REQ_LOCAL_NAME_ATTRIBUTE: {
+                if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                    request.localName().setString(socketWrapper.getLocalName());
+                }
+                break;
             }
-            break;
-        }
+            case REQ_REMOTEPORT_ATTRIBUTE: {
+                if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                    request.setRemotePort(socketWrapper.getRemotePort());
+                }
+                break;
+            }
 
-        // SSL request attribute support
-        case REQ_SSL_ATTRIBUTE: {
-            populateSslRequestAttributes();
-            break;
-        }
-        case REQ_SSL_CERTIFICATE: {
-            try {
-                sslReHandShake();
-            } catch (IOException ioe) {
-                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
+            // SSL request attribute support
+            case REQ_SSL_ATTRIBUTE: {
+                populateSslRequestAttributes();
+                break;
             }
-            break;
-        }
-
-        // Servlet 3.0 asynchronous support
-        case ASYNC_START: {
-            asyncStateMachine.asyncStart((AsyncContextCallback) param);
-            break;
-        }
-        case ASYNC_COMPLETE: {
-            clearDispatches();
-            if (asyncStateMachine.asyncComplete()) {
-                processSocketEvent(SocketEvent.OPEN_READ, true);
+            case REQ_SSL_CERTIFICATE: {
+                try {
+                    sslReHandShake();
+                } catch (IOException ioe) {
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
+                }
+                break;
             }
-            break;
-        }
-        case ASYNC_DISPATCH: {
-            if (asyncStateMachine.asyncDispatch()) {
-                processSocketEvent(SocketEvent.OPEN_READ, true);
+
+            // Servlet 3.0 asynchronous support
+            case ASYNC_START: {
+                asyncStateMachine.asyncStart((AsyncContextCallback) param);
+                break;
             }
-            break;
-        }
-        case ASYNC_DISPATCHED: {
-            asyncStateMachine.asyncDispatched();
-            break;
-        }
-        case ASYNC_ERROR: {
-            asyncStateMachine.asyncError();
-            break;
-        }
-        case ASYNC_IS_ASYNC: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isAsync());
-            break;
-        }
-        case ASYNC_IS_COMPLETING: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isCompleting());
-            break;
-        }
-        case ASYNC_IS_DISPATCHING: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncDispatching());
-            break;
-        }
-        case ASYNC_IS_ERROR: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
-            break;
-        }
-        case ASYNC_IS_STARTED: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncStarted());
-            break;
-        }
-        case ASYNC_IS_TIMINGOUT: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
-            break;
-        }
-        case ASYNC_RUN: {
-            asyncStateMachine.asyncRun((Runnable) param);
-            break;
-        }
-        case ASYNC_SETTIMEOUT: {
-            if (param == null) {
-                return;
+            case ASYNC_COMPLETE: {
+                clearDispatches();
+                if (asyncStateMachine.asyncComplete()) {
+                    processSocketEvent(SocketEvent.OPEN_READ, true);
+                }
+                break;
             }
-            long timeout = ((Long) param).longValue();
-            setAsyncTimeout(timeout);
-            break;
-        }
-        case ASYNC_TIMEOUT: {
-            AtomicBoolean result = (AtomicBoolean) param;
-            result.set(asyncStateMachine.asyncTimeout());
-            break;
-        }
-        case ASYNC_POST_PROCESS: {
-            asyncStateMachine.asyncPostProcess();
-            break;
-        }
+            case ASYNC_DISPATCH: {
+                if (asyncStateMachine.asyncDispatch()) {
+                    processSocketEvent(SocketEvent.OPEN_READ, true);
+                }
+                break;
+            }
+            case ASYNC_DISPATCHED: {
+                asyncStateMachine.asyncDispatched();
+                break;
+            }
+            case ASYNC_ERROR: {
+                asyncStateMachine.asyncError();
+                break;
+            }
+            case ASYNC_IS_ASYNC: {
+                ((AtomicBoolean) param).set(asyncStateMachine.isAsync());
+                break;
+            }
+            case ASYNC_IS_COMPLETING: {
+                ((AtomicBoolean) param).set(asyncStateMachine.isCompleting());
+                break;
+            }
+            case ASYNC_IS_DISPATCHING: {
+                ((AtomicBoolean) param).set(asyncStateMachine.isAsyncDispatching());
+                break;
+            }
+            case ASYNC_IS_ERROR: {
+                ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
+                break;
+            }
+            case ASYNC_IS_STARTED: {
+                ((AtomicBoolean) param).set(asyncStateMachine.isAsyncStarted());
+                break;
+            }
+            case ASYNC_IS_TIMINGOUT: {
+                ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
+                break;
+            }
+            case ASYNC_RUN: {
+                asyncStateMachine.asyncRun((Runnable) param);
+                break;
+            }
+            case ASYNC_SETTIMEOUT: {
+                if (param == null) {
+                    return;
+                }
+                long timeout = ((Long) param).longValue();
+                setAsyncTimeout(timeout);
+                break;
+            }
+            case ASYNC_TIMEOUT: {
+                AtomicBoolean result = (AtomicBoolean) param;
+                result.set(asyncStateMachine.asyncTimeout());
+                break;
+            }
+            case ASYNC_POST_PROCESS: {
+                asyncStateMachine.asyncPostProcess();
+                break;
+            }
 
-        // Servlet 3.1 non-blocking I/O
-        case REQUEST_BODY_FULLY_READ: {
-            AtomicBoolean result = (AtomicBoolean) param;
-            result.set(isRequestBodyFullyRead());
-            break;
-        }
-        case NB_READ_INTEREST: {
-            AtomicBoolean isReady = (AtomicBoolean)param;
-            isReady.set(isReadyForRead());
-            break;
-        }
-        case NB_WRITE_INTEREST: {
-            AtomicBoolean isReady = (AtomicBoolean)param;
-            isReady.set(isReadyForWrite());
-            break;
-        }
-        case DISPATCH_READ: {
-            addDispatch(DispatchType.NON_BLOCKING_READ);
-            break;
-        }
-        case DISPATCH_WRITE: {
-            addDispatch(DispatchType.NON_BLOCKING_WRITE);
-            break;
-        }
-        case DISPATCH_EXECUTE: {
-            executeDispatches();
-            break;
-        }
+            // Servlet 3.1 non-blocking I/O
+            case REQUEST_BODY_FULLY_READ: {
+                AtomicBoolean result = (AtomicBoolean) param;
+                result.set(isRequestBodyFullyRead());
+                break;
+            }
+            case NB_READ_INTEREST: {
+                AtomicBoolean isReady = (AtomicBoolean) param;
+                isReady.set(isReadyForRead());
+                break;
+            }
+            case NB_WRITE_INTEREST: {
+                AtomicBoolean isReady = (AtomicBoolean) param;
+                isReady.set(isReadyForWrite());
+                break;
+            }
+            case DISPATCH_READ: {
+                addDispatch(DispatchType.NON_BLOCKING_READ);
+                break;
+            }
+            case DISPATCH_WRITE: {
+                addDispatch(DispatchType.NON_BLOCKING_WRITE);
+                break;
+            }
+            case DISPATCH_EXECUTE: {
+                executeDispatches();
+                break;
+            }
 
-        // Servlet 3.1 HTTP Upgrade
-        case UPGRADE: {
-            doHttpUpgrade((UpgradeToken) param);
-            break;
-        }
+            // Servlet 3.1 HTTP Upgrade
+            case UPGRADE: {
+                doHttpUpgrade((UpgradeToken) param);
+                break;
+            }
 
-        // Servlet 4.0 Push requests
-        case IS_PUSH_SUPPORTED: {
-            AtomicBoolean result = (AtomicBoolean) param;
-            result.set(isPushSupported());
-            break;
-        }
-        case PUSH_REQUEST: {
-            doPush((Request) param);
-            break;
-        }
+            // Servlet 4.0 Push requests
+            case IS_PUSH_SUPPORTED: {
+                AtomicBoolean result = (AtomicBoolean) param;
+                result.set(isPushSupported());
+                break;
+            }
+            case PUSH_REQUEST: {
+                doPush((Request) param);
+                break;
+            }
 
-        // Identifiers associated with multiplexing protocols like HTTP/2
-        case CONNECTION_ID: {
-            @SuppressWarnings("unchecked")
-            AtomicReference<Object> result = (AtomicReference<Object>) param;
-            result.set(getConnectionID());
-            break;
-        }
-        case STREAM_ID: {
-            @SuppressWarnings("unchecked")
-            AtomicReference<Object> result = (AtomicReference<Object>) param;
-            result.set(getStreamID());
-            break;
-        }
+            // Identifiers associated with multiplexing protocols like HTTP/2
+            case CONNECTION_ID: {
+                @SuppressWarnings("unchecked")
+                AtomicReference<Object> result = (AtomicReference<Object>) param;
+                result.set(getConnectionID());
+                break;
+            }
+            case STREAM_ID: {
+                @SuppressWarnings("unchecked")
+                AtomicReference<Object> result = (AtomicReference<Object>) param;
+                result.set(getStreamID());
+                break;
+            }
         }
     }
 
 
-    private void handleIOException (IOException ioe) {
+    private void handleIOException(IOException ioe) {
         if (ioe instanceof CloseNowException) {
             // Close the channel but keep the connection open
             setErrorState(ErrorState.CLOSE_NOW, ioe);
@@ -652,8 +647,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Perform any necessary processing for a non-blocking read before
-     * dispatching to the adapter.
+     * Perform any necessary processing for a non-blocking read before dispatching to the adapter.
      */
     protected void dispatchNonBlockingRead() {
         asyncStateMachine.asyncOperation();
@@ -663,9 +657,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     /**
      * {@inheritDoc}
      * <p>
-     * Sub-classes of this base class represent a single request/response pair.
-     * The timeout to be processed is, therefore, the Servlet asynchronous
-     * processing timeout.
+     * Sub-classes of this base class represent a single request/response pair. The timeout to be processed is,
+     * therefore, the Servlet asynchronous processing timeout.
      */
     @Override
     public void timeoutAsync(long now) {
@@ -725,8 +718,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * @deprecated Unused. This will be removed in Tomcat 10 onwards. Use
-     *             {@link #ack(ContinueResponseTiming)}.
+     * @deprecated Unused. This will be removed in Tomcat 10 onwards. Use {@link #ack(ContinueResponseTiming)}.
      */
     @Deprecated
     protected void ack() {
@@ -753,11 +745,11 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Processors that populate request attributes directly (e.g. AJP) should
-     * over-ride this method and return {@code false}.
+     * Processors that populate request attributes directly (e.g. AJP) should over-ride this method and return
+     * {@code false}.
      *
-     * @return {@code true} if the SocketWrapper should be used to populate the
-     *         request attributes, otherwise {@code false}.
+     * @return {@code true} if the SocketWrapper should be used to populate the request attributes, otherwise
+     *             {@code false}.
      */
     protected boolean getPopulateRequestAttributesFromSocket() {
         return true;
@@ -765,8 +757,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Populate the remote host request attribute. Processors (e.g. AJP) that
-     * populate this from an alternative source should override this method.
+     * Populate the remote host request attribute. Processors (e.g. AJP) that populate this from an alternative source
+     * should override this method.
      */
     protected void populateRequestAttributeRemoteHost() {
         if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
@@ -776,10 +768,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Populate the TLS related request attributes from the {@link SSLSupport}
-     * instance associated with this processor. Protocols that populate TLS
-     * attributes from a different source (e.g. AJP) should override this
-     * method.
+     * Populate the TLS related request attributes from the {@link SSLSupport} instance associated with this processor.
+     * Protocols that populate TLS attributes from a different source (e.g. AJP) should override this method.
      */
     protected void populateSslRequestAttributes() {
         try {
@@ -794,7 +784,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 }
                 sslO = sslSupport.getKeySize();
                 if (sslO != null) {
-                    request.setAttribute (SSLSupport.KEY_SIZE_KEY, sslO);
+                    request.setAttribute(SSLSupport.KEY_SIZE_KEY, sslO);
                 }
                 sslO = sslSupport.getSessionId();
                 if (sslO != null) {
@@ -821,12 +811,11 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Processors that can perform a TLS re-handshake (e.g. HTTP/1.1) should
-     * override this method and implement the re-handshake.
+     * Processors that can perform a TLS re-handshake (e.g. HTTP/1.1) should override this method and implement the
+     * re-handshake.
      *
-     * @throws IOException If authentication is required then there will be I/O
-     *                     with the client and this exception will be thrown if
-     *                     that goes wrong
+     * @throws IOException If authentication is required then there will be I/O with the client and this exception will
+     *                         be thrown if that goes wrong
      */
     protected void sslReHandShake() throws IOException {
         // NO-OP
@@ -869,22 +858,17 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         if (socketWrapper != null) {
             synchronized (socketWrapper) {
                 /*
-                 * This method is called when non-blocking IO is initiated by defining
-                 * a read and/or write listener in a non-container thread. It is called
-                 * once the non-container thread completes so that the first calls to
-                 * onWritePossible() and/or onDataAvailable() as appropriate are made by
-                 * the container.
+                 * This method is called when non-blocking IO is initiated by defining a read and/or write listener in a
+                 * non-container thread. It is called once the non-container thread completes so that the first calls to
+                 * onWritePossible() and/or onDataAvailable() as appropriate are made by the container.
                  *
-                 * Processing the dispatches requires (for APR/native at least)
-                 * that the socket has been added to the waitingRequests queue. This may
-                 * not have occurred by the time that the non-container thread completes
-                 * triggering the call to this method. Therefore, the coded syncs on the
-                 * SocketWrapper as the container thread that initiated this
-                 * non-container thread holds a lock on the SocketWrapper. The container
-                 * thread will add the socket to the waitingRequests queue before
-                 * releasing the lock on the socketWrapper. Therefore, by obtaining the
-                 * lock on socketWrapper before processing the dispatches, we can be
-                 * sure that the socket has been added to the waitingRequests queue.
+                 * Processing the dispatches requires (for APR/native at least) that the socket has been added to the
+                 * waitingRequests queue. This may not have occurred by the time that the non-container thread completes
+                 * triggering the call to this method. Therefore, the coded syncs on the SocketWrapper as the container
+                 * thread that initiated this non-container thread holds a lock on the SocketWrapper. The container
+                 * thread will add the socket to the waitingRequests queue before releasing the lock on the
+                 * socketWrapper. Therefore, by obtaining the lock on socketWrapper before processing the dispatches, we
+                 * can be sure that the socket has been added to the waitingRequests queue.
                  */
                 while (dispatches != null && dispatches.hasNext()) {
                     DispatchType dispatchType = dispatches.next();
@@ -896,38 +880,31 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * {@inheritDoc}
-     * Processors that implement HTTP upgrade must override this method and
-     * provide the necessary token.
+     * {@inheritDoc} Processors that implement HTTP upgrade must override this method and provide the necessary token.
      */
     @Override
     public UpgradeToken getUpgradeToken() {
         // Should never reach this code but in case we do...
-        throw new IllegalStateException(
-                sm.getString("abstractProcessor.httpupgrade.notsupported"));
+        throw new IllegalStateException(sm.getString("abstractProcessor.httpupgrade.notsupported"));
     }
 
 
     /**
-     * Process an HTTP upgrade. Processors that support HTTP upgrade should
-     * override this method and process the provided token.
+     * Process an HTTP upgrade. Processors that support HTTP upgrade should override this method and process the
+     * provided token.
      *
-     * @param upgradeToken Contains all the information necessary for the
-     *                     Processor to process the upgrade
+     * @param upgradeToken Contains all the information necessary for the Processor to process the upgrade
      *
-     * @throws UnsupportedOperationException if the protocol does not support
-     *         HTTP upgrade
+     * @throws UnsupportedOperationException if the protocol does not support HTTP upgrade
      */
     protected void doHttpUpgrade(UpgradeToken upgradeToken) {
         // Should never happen
-        throw new UnsupportedOperationException(
-                sm.getString("abstractProcessor.httpupgrade.notsupported"));
+        throw new UnsupportedOperationException(sm.getString("abstractProcessor.httpupgrade.notsupported"));
     }
 
 
     /**
-     * {@inheritDoc}
-     * Processors that implement HTTP upgrade must override this method.
+     * {@inheritDoc} Processors that implement HTTP upgrade must override this method.
      */
     @Override
     public ByteBuffer getLeftoverInput() {
@@ -937,8 +914,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * {@inheritDoc}
-     * Processors that implement HTTP upgrade must override this method.
+     * {@inheritDoc} Processors that implement HTTP upgrade must override this method.
      */
     @Override
     public boolean isUpgrade() {
@@ -950,8 +926,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
      * Protocols that support push should override this method and return {@code
      * true}.
      *
-     * @return {@code true} if push is supported by this processor, otherwise
-     *         {@code false}.
+     * @return {@code true} if push is supported by this processor, otherwise {@code false}.
      */
     protected boolean isPushSupported() {
         return false;
@@ -959,39 +934,31 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Process a push. Processors that support push should override this method
-     * and process the provided token.
+     * Process a push. Processors that support push should override this method and process the provided token.
      *
-     * @param pushTarget Contains all the information necessary for the Processor
-     *                   to process the push request
+     * @param pushTarget Contains all the information necessary for the Processor to process the push request
      *
-     * @throws UnsupportedOperationException if the protocol does not support
-     *         push
+     * @throws UnsupportedOperationException if the protocol does not support push
      */
     protected void doPush(Request pushTarget) {
-        throw new UnsupportedOperationException(
-                sm.getString("abstractProcessor.pushrequest.notsupported"));
+        throw new UnsupportedOperationException(sm.getString("abstractProcessor.pushrequest.notsupported"));
     }
 
 
     /**
-     * Protocols that support multiplexing (e.g. HTTP/2) should override this
-     * method and return the appropriate ID.
+     * Protocols that support multiplexing (e.g. HTTP/2) should override this method and return the appropriate ID.
      *
-     * @return The stream ID associated with this request or {@code null} if a
-     *         multiplexing protocol is not being used
-      */
+     * @return The stream ID associated with this request or {@code null} if a multiplexing protocol is not being used
+     */
     protected Object getConnectionID() {
         return null;
     }
 
 
     /**
-     * Protocols that support multiplexing (e.g. HTTP/2) should override this
-     * method and return the appropriate ID.
+     * Protocols that support multiplexing (e.g. HTTP/2) should override this method and return the appropriate ID.
      *
-     * @return The stream ID associated with this request or {@code null} if a
-     *         multiplexing protocol is not being used
+     * @return The stream ID associated with this request or {@code null} if a multiplexing protocol is not being used
      */
     protected Object getStreamID() {
         return null;
@@ -999,27 +966,23 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Flush any pending writes. Used during non-blocking writes to flush any
-     * remaining data from a previous incomplete write.
+     * Flush any pending writes. Used during non-blocking writes to flush any remaining data from a previous incomplete
+     * write.
      *
-     * @return <code>true</code> if data remains to be flushed at the end of
-     *         method
+     * @return <code>true</code> if data remains to be flushed at the end of method
      *
-     * @throws IOException If an I/O error occurs while attempting to flush the
-     *         data
+     * @throws IOException If an I/O error occurs while attempting to flush the data
      */
-    protected abstract boolean flushBufferedWrite() throws IOException ;
+    protected abstract boolean flushBufferedWrite() throws IOException;
 
 
     /**
-     * Perform any necessary clean-up processing if the dispatch resulted in the
-     * completion of processing for the current request.
+     * Perform any necessary clean-up processing if the dispatch resulted in the completion of processing for the
+     * current request.
      *
-     * @return The state to return for the socket once the clean-up for the
-     *         current request has completed
+     * @return The state to return for the socket once the clean-up for the current request has completed
      *
-     * @throws IOException If an I/O error occurs while attempting to end the
-     *         request
+     * @throws IOException If an I/O error occurs while attempting to end the request
      */
     protected abstract SocketState dispatchEndRequest() throws IOException;
 

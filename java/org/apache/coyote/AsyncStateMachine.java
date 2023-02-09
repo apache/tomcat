@@ -132,27 +132,26 @@ public class AsyncStateMachine {
     private static final StringManager sm = StringManager.getManager(AsyncStateMachine.class);
 
     private enum AsyncState {
-        DISPATCHED      (false, false, false, false),
-        STARTING        (true,  true,  false, false),
-        STARTED         (true,  true,  false, false),
-        MUST_COMPLETE   (true,  true,  true,  false),
-        COMPLETE_PENDING(true,  true,  false, false),
-        COMPLETING      (true,  false, true,  false),
-        TIMING_OUT      (true,  true,  false, false),
-        MUST_DISPATCH   (true,  true,  false, true),
-        DISPATCH_PENDING(true,  true,  false, false),
-        DISPATCHING     (true,  false, false, true),
-        READ_WRITE_OP   (true,  true,  false, false),
-        MUST_ERROR      (true,  true,  false, false),
-        ERROR           (true,  true,  false, false);
+        DISPATCHED(false, false, false, false),
+        STARTING(true, true, false, false),
+        STARTED(true, true, false, false),
+        MUST_COMPLETE(true, true, true, false),
+        COMPLETE_PENDING(true, true, false, false),
+        COMPLETING(true, false, true, false),
+        TIMING_OUT(true, true, false, false),
+        MUST_DISPATCH(true, true, false, true),
+        DISPATCH_PENDING(true, true, false, false),
+        DISPATCHING(true, false, false, true),
+        READ_WRITE_OP(true, true, false, false),
+        MUST_ERROR(true, true, false, false),
+        ERROR(true, true, false, false);
 
         private final boolean isAsync;
         private final boolean isStarted;
         private final boolean isCompleting;
         private final boolean isDispatching;
 
-        private AsyncState(boolean isAsync, boolean isStarted, boolean isCompleting,
-                boolean isDispatching) {
+        private AsyncState(boolean isAsync, boolean isStarted, boolean isCompleting, boolean isDispatching) {
             this.isAsync = isAsync;
             this.isStarted = isStarted;
             this.isCompleting = isCompleting;
@@ -180,12 +179,10 @@ public class AsyncStateMachine {
     private volatile AsyncState state = AsyncState.DISPATCHED;
     private volatile long lastAsyncStart = 0;
     /*
-     * Tracks the current generation of async processing for this state machine.
-     * The generation is incremented every time async processing is started. The
-     * primary purpose of this is to enable Tomcat to detect and prevent
-     * attempts to process an event for a previous generation with the current
-     * generation as processing such an event usually ends badly:
-     * e.g. CVE-2018-8037.
+     * Tracks the current generation of async processing for this state machine. The generation is incremented every
+     * time async processing is started. The primary purpose of this is to enable Tomcat to detect and prevent attempts
+     * to process an event for a previous generation with the current generation as processing such an event usually
+     * ends badly: e.g. CVE-2018-8037.
      */
     private final AtomicLong generation = new AtomicLong(0);
     // Need this to fire listener on complete
@@ -223,11 +220,10 @@ public class AsyncStateMachine {
     }
 
     /**
-     * Obtain the time that this connection last transitioned to async
-     * processing.
+     * Obtain the time that this connection last transitioned to async processing.
      *
-     * @return The time (as returned by {@link System#currentTimeMillis()}) that
-     *         this connection last transitioned to async
+     * @return The time (as returned by {@link System#currentTimeMillis()}) that this connection last transitioned to
+     *             async
      */
     public long getLastAsyncStart() {
         return lastAsyncStart;
@@ -247,26 +243,22 @@ public class AsyncStateMachine {
             this.asyncCtxt = asyncCtxt;
             lastAsyncStart = System.currentTimeMillis();
         } else {
-            throw new IllegalStateException(
-                    sm.getString("asyncStateMachine.invalidAsyncState",
-                            "asyncStart()", state));
+            throw new IllegalStateException(sm.getString("asyncStateMachine.invalidAsyncState", "asyncStart()", state));
         }
     }
 
     public synchronized void asyncOperation() {
-        if (state==AsyncState.STARTED) {
+        if (state == AsyncState.STARTED) {
             updateState(AsyncState.READ_WRITE_OP);
         } else {
             throw new IllegalStateException(
-                    sm.getString("asyncStateMachine.invalidAsyncState",
-                            "asyncOperation()", state));
+                    sm.getString("asyncStateMachine.invalidAsyncState", "asyncOperation()", state));
         }
     }
 
     /*
-     * Async has been processed. Whether or not to enter a long poll depends on
-     * current state. For example, as per SRV.2.3.3.3 can now process calls to
-     * complete() or dispatch().
+     * Async has been processed. Whether or not to enter a long poll depends on current state. For example, as per
+     * SRV.2.3.3.3 can now process calls to complete() or dispatch().
      */
     public synchronized SocketState asyncPostProcess() {
         if (state == AsyncState.COMPLETE_PENDING) {
@@ -277,7 +269,7 @@ public class AsyncStateMachine {
             clearNonBlockingListeners();
             updateState(AsyncState.DISPATCHING);
             return SocketState.ASYNC_END;
-        } else  if (state == AsyncState.STARTING || state == AsyncState.READ_WRITE_OP) {
+        } else if (state == AsyncState.STARTING || state == AsyncState.READ_WRITE_OP) {
             updateState(AsyncState.STARTED);
             return SocketState.LONG;
         } else if (state == AsyncState.MUST_COMPLETE || state == AsyncState.COMPLETING) {
@@ -298,8 +290,7 @@ public class AsyncStateMachine {
             return SocketState.LONG;
         } else {
             throw new IllegalStateException(
-                    sm.getString("asyncStateMachine.invalidAsyncState",
-                            "asyncPostProcess()", state));
+                    sm.getString("asyncStateMachine.invalidAsyncState", "asyncPostProcess()", state));
         }
     }
 
@@ -327,8 +318,7 @@ public class AsyncStateMachine {
             // request/response associated with the AsyncContext so need a new
             // container thread to process the different request/response.
             triggerDispatch = true;
-        } else if (state == AsyncState.READ_WRITE_OP || state == AsyncState.TIMING_OUT ||
-                state == AsyncState.ERROR) {
+        } else if (state == AsyncState.READ_WRITE_OP || state == AsyncState.TIMING_OUT || state == AsyncState.ERROR) {
             // Read/write operations can happen on or off a container thread but
             // while in this state the call to listener that triggers the
             // read/write will be in progress on a container thread.
@@ -342,8 +332,7 @@ public class AsyncStateMachine {
             updateState(AsyncState.COMPLETING);
         } else {
             throw new IllegalStateException(
-                    sm.getString("asyncStateMachine.invalidAsyncState",
-                            "asyncComplete()", state));
+                    sm.getString("asyncStateMachine.invalidAsyncState", "asyncComplete()", state));
         }
         return triggerDispatch;
     }
@@ -353,16 +342,14 @@ public class AsyncStateMachine {
         if (state == AsyncState.STARTED) {
             updateState(AsyncState.TIMING_OUT);
             return true;
-        } else if (state == AsyncState.COMPLETING ||
-                state == AsyncState.DISPATCHING ||
+        } else if (state == AsyncState.COMPLETING || state == AsyncState.DISPATCHING ||
                 state == AsyncState.DISPATCHED) {
             // NOOP - App called complete() or dispatch() between the the
             // timeout firing and execution reaching this point
             return false;
         } else {
             throw new IllegalStateException(
-                    sm.getString("asyncStateMachine.invalidAsyncState",
-                            "asyncTimeout()", state));
+                    sm.getString("asyncStateMachine.invalidAsyncState", "asyncTimeout()", state));
         }
     }
 
@@ -390,8 +377,7 @@ public class AsyncStateMachine {
             // request/response associated with the AsyncContext so need a new
             // container thread to process the different request/response.
             triggerDispatch = true;
-        } else if (state == AsyncState.READ_WRITE_OP || state == AsyncState.TIMING_OUT ||
-                state == AsyncState.ERROR) {
+        } else if (state == AsyncState.READ_WRITE_OP || state == AsyncState.TIMING_OUT || state == AsyncState.ERROR) {
             // Read/write operations can happen on or off a container thread but
             // while in this state the call to listener that triggers the
             // read/write will be in progress on a container thread.
@@ -405,22 +391,19 @@ public class AsyncStateMachine {
             updateState(AsyncState.DISPATCHING);
         } else {
             throw new IllegalStateException(
-                    sm.getString("asyncStateMachine.invalidAsyncState",
-                            "asyncDispatch()", state));
+                    sm.getString("asyncStateMachine.invalidAsyncState", "asyncDispatch()", state));
         }
         return triggerDispatch;
     }
 
 
     public synchronized void asyncDispatched() {
-        if (state == AsyncState.DISPATCHING ||
-                state == AsyncState.MUST_DISPATCH) {
+        if (state == AsyncState.DISPATCHING || state == AsyncState.MUST_DISPATCH) {
             updateState(AsyncState.DISPATCHED);
             asyncCtxt.decrementInProgressAsyncCount();
         } else {
             throw new IllegalStateException(
-                    sm.getString("asyncStateMachine.invalidAsyncState",
-                            "asyncDispatched()", state));
+                    sm.getString("asyncStateMachine.invalidAsyncState", "asyncDispatched()", state));
         }
     }
 
@@ -445,8 +428,7 @@ public class AsyncStateMachine {
 
 
     public synchronized void asyncRun(Runnable runnable) {
-        if (state == AsyncState.STARTING || state ==  AsyncState.STARTED ||
-                state == AsyncState.READ_WRITE_OP) {
+        if (state == AsyncState.STARTING || state == AsyncState.STARTED || state == AsyncState.READ_WRITE_OP) {
             // Execute the runnable using a container thread from the
             // Connector's thread pool. Use a wrapper to prevent a memory leak
             ClassLoader oldCL;
@@ -458,28 +440,23 @@ public class AsyncStateMachine {
             }
             try {
                 if (Constants.IS_SECURITY_ENABLED) {
-                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                            this.getClass().getClassLoader());
+                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(this.getClass().getClassLoader());
                     AccessController.doPrivileged(pa);
                 } else {
-                    Thread.currentThread().setContextClassLoader(
-                            this.getClass().getClassLoader());
+                    Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
                 }
 
                 processor.getExecutor().execute(runnable);
             } finally {
                 if (Constants.IS_SECURITY_ENABLED) {
-                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                            oldCL);
+                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(oldCL);
                     AccessController.doPrivileged(pa);
                 } else {
                     Thread.currentThread().setContextClassLoader(oldCL);
                 }
             }
         } else {
-            throw new IllegalStateException(
-                    sm.getString("asyncStateMachine.invalidAsyncState",
-                            "asyncRun()", state));
+            throw new IllegalStateException(sm.getString("asyncStateMachine.invalidAsyncState", "asyncRun()", state));
         }
 
     }

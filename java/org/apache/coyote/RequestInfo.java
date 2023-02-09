@@ -20,24 +20,20 @@ import javax.management.ObjectName;
 
 
 /**
- * Structure holding the Request and Response objects. It also holds statistical
- * information about request processing and provide management information
- * about the requests being processed.
- *
- * Each thread uses a Request/Response pair that is recycled on each request.
- * This object provides a place to collect global low-level statistics - without
- * having to deal with synchronization ( since each thread will have it's own
- * RequestProcessorMX ).
+ * Structure holding the Request and Response objects. It also holds statistical information about request processing
+ * and provide management information about the requests being processed. Each thread uses a Request/Response pair that
+ * is recycled on each request. This object provides a place to collect global low-level statistics - without having to
+ * deal with synchronization ( since each thread will have it's own RequestProcessorMX ).
  *
  * @author Costin Manolache
  */
-public class RequestInfo  {
-    private RequestGroupInfo global=null;
+public class RequestInfo {
+    private RequestGroupInfo global = null;
 
     // ----------------------------------------------------------- Constructors
 
-    public RequestInfo( Request req) {
-        this.req=req;
+    public RequestInfo(Request req) {
+        this.req = req;
     }
 
     public RequestGroupInfo getGlobalProcessor() {
@@ -45,12 +41,12 @@ public class RequestInfo  {
     }
 
     public void setGlobalProcessor(RequestGroupInfo global) {
-        if( global != null) {
-            this.global=global;
-            global.addRequestProcessor( this );
+        if (global != null) {
+            this.global = global;
+            global.addRequestProcessor(this);
         } else {
             if (this.global != null) {
-                this.global.removeRequestProcessor( this );
+                this.global.removeRequestProcessor(this);
                 this.global = null;
             }
         }
@@ -63,7 +59,7 @@ public class RequestInfo  {
     private String workerThreadName;
     private ObjectName rpName;
 
-    // -------------------- Information about the current request  -----------
+    // -------------------- Information about the current request -----------
     // This is useful for long-running requests only
 
     public String getMethod() {
@@ -101,8 +97,7 @@ public class RequestInfo  {
     }
 
     /**
-     * Obtain the remote address for this connection as reported by an
-     * intermediate proxy (if any).
+     * Obtain the remote address for this connection as reported by an intermediate proxy (if any).
      *
      * @return The remote address for the this connection
      */
@@ -137,7 +132,7 @@ public class RequestInfo  {
         }
     }
 
-    // -------------------- Statistical data  --------------------
+    // -------------------- Statistical data --------------------
     // Collected at the end of each request.
     private long bytesSent;
     private long bytesReceived;
@@ -153,30 +148,29 @@ public class RequestInfo  {
     // number of response codes >= 400
     private int errorCount;
 
-    //the time of the last request
+    // the time of the last request
     private long lastRequestProcessingTime = 0;
 
 
     /**
-     * Called by the processor before recycling the request. It'll collect
-     * statistic information.
+     * Called by the processor before recycling the request. It'll collect statistic information.
      */
     void updateCounters() {
-        bytesReceived+=req.getBytesRead();
-        bytesSent+=req.getResponse().getContentWritten();
+        bytesReceived += req.getBytesRead();
+        bytesSent += req.getResponse().getContentWritten();
 
         requestCount++;
-        if( req.getResponse().getStatus() >=400 ) {
+        if (req.getResponse().getStatus() >= 400) {
             errorCount++;
         }
-        long t0=req.getStartTime();
-        long t1=System.currentTimeMillis();
-        long time=t1-t0;
+        long t0 = req.getStartTime();
+        long t1 = System.currentTimeMillis();
+        long time = t1 - t0;
         this.lastRequestProcessingTime = time;
-        processingTime+=time;
-        if( maxTime < time ) {
-            maxTime=time;
-            maxRequestUri=req.requestURI().toString();
+        processingTime += time;
+        if (maxTime < time) {
+            maxTime = time;
+            maxRequestUri = req.requestURI().toString();
         }
     }
 
