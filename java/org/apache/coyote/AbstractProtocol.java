@@ -1016,6 +1016,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                 } else if (state == SocketState.ASYNC_IO) {
                     // Don't add sockets back to the poller.
                     // The handler will initiate all further I/O
+                    if (status != SocketEvent.OPEN_WRITE) {
+                        getProtocol().addWaitingProcessor(processor);
+                    }
                 } else if (state == SocketState.SUSPENDED) {
                     // Don't add sockets back to the poller.
                     // The resumeProcessing() method will add this socket
