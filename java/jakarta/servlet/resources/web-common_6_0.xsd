@@ -1371,7 +1371,7 @@
       </xsd:documentation>
     </xsd:annotation>
     <xsd:restriction base="xsd:string">
-      <xsd:pattern value="[^\s]+"/>
+      <xsd:pattern value="\S+"/>
     </xsd:restriction>
   </xsd:simpleType>
 

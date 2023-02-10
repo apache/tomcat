@@ -689,7 +689,7 @@
       </xsd:documentation>
     </xsd:annotation>
     <xsd:restriction base="xsd:token">
-      <xsd:pattern value="\.?[0-9]+(\.[0-9]+)*"/>
+      <xsd:pattern value="\.?\d+(\.\d+)*"/>
     </xsd:restriction>
   </xsd:simpleType>
 

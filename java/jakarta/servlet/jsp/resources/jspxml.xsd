@@ -24,11 +24,11 @@
 <!ENTITY ImportList   "&Import;(&WS;,&WS;&Import;)*">
 <!ENTITY SetProp    "(&Identifier;|\*)">
 <!ENTITY RelativeURL  "[^:#/\?]*(:{0,0}|[#/\?].*)">
-<!ENTITY Length     "[0-9]*&#x25;?">
-<!ENTITY AsciiName    "[A-Za-z0-9_-]*">
+<!ENTITY Length     "\d*&#x25;?">
+<!ENTITY AsciiName    "[\w-]*">
 <!ENTITY ValidContentType  "&AsciiName;/&AsciiName;(;&WS;(charset=)?&AsciiName;)?">
 <!ENTITY ValidPageEncoding  "&AsciiName;/&AsciiName;">
-<!ENTITY Buffer     "[0-9]+kb">
+<!ENTITY Buffer     "\d+kb">
 <!ENTITY RTexpr     "&#x25;=.*&#x25;">
 ]>
 
