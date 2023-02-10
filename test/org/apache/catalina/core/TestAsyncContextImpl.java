@@ -1521,15 +1521,10 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             // Just for debugging
             async.setTimeout(100000);
 
-            ExecutorService executor = Executors.newSingleThreadExecutor();
-            executor.submit(new Runnable() {
-
-                @Override
-                public void run() {
-                    async.dispatch("/ServletC");
-                }
-            });
-            executor.shutdown();
+            try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
+                executor.submit(() -> async.dispatch("/ServletC"));
+                executor.shutdown();
+            }
         }
     }
 
