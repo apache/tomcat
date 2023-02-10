@@ -579,11 +579,6 @@ public class RemoteIpFilter implements Filter {
             return serverPort;
         }
 
-        @Override
-        public boolean isSecure() {
-            return secure;
-        }
-
         public void removeHeader(String name) {
             Map.Entry<String, List<String>> header = getHeaderEntry(name);
             if (header != null) {
@@ -623,7 +618,7 @@ public class RemoteIpFilter implements Filter {
         }
 
         public void setSecure(boolean secure) {
-            this.secure = secure;
+            super.getRequest().setAttribute(Globals.REMOTE_IP_FILTER_SECURE, Boolean.valueOf(secure));
         }
 
         public void setServerName(String serverName) {
