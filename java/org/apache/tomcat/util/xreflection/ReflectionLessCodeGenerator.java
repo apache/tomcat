@@ -185,10 +185,10 @@ final class ReflectionLessCodeGenerator {
             .append(System.lineSeparator());
         //end - class
         File destination = new File(directory, className+".java");
-        BufferedWriter writer = new BufferedWriter(new FileWriter(destination, false));
-        writer.write(code.toString());
-        writer.flush();
-        writer.close();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(destination, false))) {
+            writer.write(code.toString());
+            writer.flush();
+        }
 
     }
 

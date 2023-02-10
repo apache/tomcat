@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
+<%--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
   this work for additional information regarding copyright ownership.
@@ -14,9 +13,11 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
-<project version="4">
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_@BUILD_JAVA_VERSION@" default="false" project-jdk-name="@BUILD_JAVA_VERSION@" project-jdk-type="JavaSDK">
-    <output url="file://$PROJECT_DIR$/.idea/output" />
-  </component>
-</project>
+--%>
+<%@ page import="static java.lang.Long.MIN_VALUE"%>
+<html>
+  <body>
+    <p>EL  - Long min value is ${MIN_VALUE}</p>
+    <p>JSP - Long min value is <%= MIN_VALUE  %></p>
+  </body>
+</html>

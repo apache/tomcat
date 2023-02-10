@@ -144,9 +144,36 @@
         servlets. (markt)
       </fix>
       <fix>
-        Implement clarification from Jakarta Servlet project that Servlets
-        mapped to the context root should be mapped for requests to the
+        Implement the clarification from the Jakarta Servlet project that
+        Servlets mapped to the context root should be mapped for requests to the
         context root with or without the trailing <code>/</code>. (markt)
+      </fix>
+      <fix>
+        Implement the clarification from the Jakarta Servlet project that
+        calling <code>ServletOutputStream.close()</code> on a stream in
+        non-blocking mode returns immediately with the stream effectively closed
+        and any data remaining to be written is written in the background by the
+        container. (markt)
+      </fix>
+      <fix>
+        Avoid possible ISE when scanning from bad JAR URLs, to restore the
+        previous behavior following the removal of Java 9+ reflection code which
+        caught the ISE. (remm)
+      </fix>
+      <fix>
+        Refactor uses of <code>String.replaceAll()</code> to use
+        <code>String.replace()</code> where regular expressions where not being
+        used. Pull request <pr>581</pr> provided by Andrei Briukhov. (markt)
+      </fix>
+      <add>
+        Add error report valve that allows redirecting to of proxying from an
+        external web server. Based on code and ideas from pull request
+        <pr>506</pr> provided by Max Fortun. (remm)
+      </add>
+      <fix>
+        <bug>66471</bug>: Fix JSessionId secure attribute missing When
+        <code>RemoteIpFilter</code> determines that this request was submitted
+        via a secure channel. (lihan)
       </fix>
     </changelog>
   </subsection>
@@ -161,6 +188,11 @@
         ensure that the end of stream flag is set on the headers frame and that
         no data frame is sent. (markt)
       </fix>
+      <fix>
+        Fix a bug that prevented HTTP/2 connections from timing out when using
+        a Connector configured with <code>useAsyncIO=true</code> (the default).
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -168,6 +200,10 @@
       <fix>
         <bug>66419</bug>: Fix calls from expression language to a method that
         accepts varargs when only one argument was passed. (markt)
+      </fix>
+      <fix>
+        <bug>66441</bug>: Make imports of static fields in JSPs visible to any
+        EL expressions used on the page. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -179,6 +215,18 @@
       <update>
         Remove support for starting Tomcat under a SecurityManager. (markt)
       </update>
+      <add>
+        Improvements to Chinese translations. (lihan)
+      </add>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations. Contributed by tak7iji. (markt)
+      </add>
+      <add>
+        Improvements to Korean translations. (woonsan)
+      </add>
     </changelog>
   </subsection>
 </section>

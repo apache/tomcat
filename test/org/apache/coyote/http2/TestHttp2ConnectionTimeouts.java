@@ -14,24 +14,27 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.coyote;
+package org.apache.coyote.http2;
 
+import org.junit.Assert;
+import org.junit.Test;
 
-/**
- * Action hook. Actions represent the callback mechanism used by coyote servlet containers to request operations on the
- * coyote connectors. Some standard actions are defined in ActionCode, however custom actions are permitted. The param
- * object can be used to pass and return information related with the action. This interface is typically implemented by
- * ProtocolHandlers, and the param is usually a Request or Response object.
- *
- * @author Remy Maucherat
- */
-public interface ActionHook {
+public class TestHttp2ConnectionTimeouts extends Http2TestBase {
 
-    /**
-     * Send an action to the connector.
-     *
-     * @param actionCode Type of the action
-     * @param param      Action parameter
-     */
-    void action(ActionCode actionCode, Object param);
+    @Test
+    public void testConnectionTimeout() throws Exception {
+
+        // Reduce default timeouts so test completes sooner
+        enableHttp2(200, false, 5000, 5000, 10000, 5000, 5000);
+        configureAndStartWebApplication();
+        openClientConnection(false);
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        // Wait for timeout - should receive GoAway frame
+        parser.readFrame();
+
+        Assert.assertEquals("0-Goaway-[1]-[0]-[null]", output.getTrace());
+    }
 }
