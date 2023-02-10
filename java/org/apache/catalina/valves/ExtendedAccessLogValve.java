@@ -432,22 +432,22 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 switch (c) {
                 case ' ':
                     result = buf.toString();
-                    buf = new StringBuilder();
+                    buf.setLength(0);
                     buf.append((char) c);
                     return result;
                 case '-':
                     result = buf.toString();
-                    buf = new StringBuilder();
+                    buf.setLength(0);
                     subToken = true;
                     return result;
                 case '(':
                     result = buf.toString();
-                    buf = new StringBuilder();
+                    buf.setLength(0);
                     parameter = true;
                     return result;
                 case ')':
                     result = buf.toString();
-                    buf = new StringBuilder();
+                    buf.setLength(0);
                     break;
                 default:
                     buf.append((char) c);
