@@ -97,7 +97,7 @@ public final class Globals {
 
     /**
      * The request attribute that is set to the value of {@code Boolean.TRUE}
-     * if {@code org.apache.catalina.filters.RemoteIpFilter } determines
+     * if {@link org.apache.catalina.filters.RemoteIpFilter} determines
      * that this request was submitted via a secure channel.
      */
     public static final String REMOTE_IP_FILTER_SECURE = "org.apache.catalina.filters.RemoteIpFilter.secure";

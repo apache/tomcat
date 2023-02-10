@@ -170,6 +170,11 @@
         external web server. Based on code and ideas from pull request
         <pr>506</pr> provided by Max Fortun. (remm)
       </add>
+      <fix>
+        <bug>66471</bug>: Fix JSessionId secure attribute missing When
+        <code>RemoteIpFilter</code> determines that this request was submitted
+        via a secure channel. (lihan)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
