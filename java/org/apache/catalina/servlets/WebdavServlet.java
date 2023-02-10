@@ -890,7 +890,7 @@ public class WebdavServlet extends DefaultServlet {
 
         // Parsing timeout header
 
-        int lockDuration = DEFAULT_TIMEOUT;
+        int lockDuration;
         String lockDurationStr = req.getHeader("Timeout");
         if (lockDurationStr == null) {
             lockDuration = DEFAULT_TIMEOUT;

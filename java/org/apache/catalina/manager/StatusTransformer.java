@@ -631,8 +631,8 @@ public class StatusTransformer {
                 return;
             }
 
-            String hostName = null;
-            String contextName = null;
+            String hostName;
+            String contextName;
             if (name.startsWith("//")) {
                 name = name.substring(2);
             }
@@ -659,11 +659,6 @@ public class StatusTransformer {
                  webModuleName + ",*");
             Set<ObjectName> jspMonitorONs =
                 mBeanServer.queryNames(queryJspMonitor, null);
-
-            // Special case for the root context
-            if (contextName.equals("/")) {
-                contextName = "";
-            }
 
             writer.print("<h1>");
             writer.print(Escape.htmlElementContent(name));

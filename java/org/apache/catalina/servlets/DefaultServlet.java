@@ -2462,17 +2462,15 @@ public class DefaultServlet extends HttpServlet {
         // Copy the input stream to the output stream
         IOException exception = null;
         byte buffer[] = new byte[input];
-        int len = buffer.length;
         while (true) {
             try {
-                len = istream.read(buffer);
+                int len = istream.read(buffer);
                 if (len == -1) {
                     break;
                 }
                 ostream.write(buffer, 0, len);
             } catch (IOException e) {
                 exception = e;
-                len = -1;
                 break;
             }
         }
@@ -2495,17 +2493,15 @@ public class DefaultServlet extends HttpServlet {
         // Copy the input stream to the output stream
         IOException exception = null;
         char buffer[] = new char[input];
-        int len = buffer.length;
         while (true) {
             try {
-                len = reader.read(buffer);
+                int len = reader.read(buffer);
                 if (len == -1) {
                     break;
                 }
                 writer.write(buffer, 0, len);
             } catch (IOException e) {
                 exception = e;
-                len = -1;
                 break;
             }
         }

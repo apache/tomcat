@@ -480,8 +480,6 @@ public final class ByteChunk extends AbstractChunk {
      * @param count The size
      */
     public void makeSpace(int count) {
-        byte[] tmp = null;
-
         int limit = getLimitInternal();
 
         long newSize;
@@ -514,7 +512,7 @@ public final class ByteChunk extends AbstractChunk {
         if (newSize > limit) {
             newSize = limit;
         }
-        tmp = new byte[(int) newSize];
+        byte[] tmp = new byte[(int) newSize];
 
         // Compacts buffer
         System.arraycopy(buff, start, tmp, 0, end - start);

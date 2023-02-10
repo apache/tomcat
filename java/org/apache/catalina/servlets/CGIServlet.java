@@ -1111,10 +1111,8 @@ public final class CGIServlet extends HttpServlet {
 
 
             Enumeration<String> headers = req.getHeaderNames();
-            String header = null;
             while (headers.hasMoreElements()) {
-                header = null;
-                header = headers.nextElement().toUpperCase(Locale.ENGLISH);
+                String header = headers.nextElement().toUpperCase(Locale.ENGLISH);
                 //REMIND: rewrite multiple headers as if received as single
                 //REMIND: change character set
                 //REMIND: I forgot what the previous REMIND means

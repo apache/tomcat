@@ -277,7 +277,6 @@ public class ChannelData implements ChannelMessage {
         offset += 4; //message length
         System.arraycopy(b,offset,data.message.getBytesDirect(),0,xsize);
         data.message.append(b,offset,xsize);
-        offset += xsize; //message data
         return data;
     }
 

@@ -260,7 +260,7 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_DEFAULTTRANSACTIONISOLATION);
         if (value != null) {
-            int level = UNKNOWN_TRANSACTIONISOLATION;
+            int level;
             if ("NONE".equalsIgnoreCase(value)) {
                 level = Connection.TRANSACTION_NONE;
             } else if ("READ_COMMITTED".equalsIgnoreCase(value)) {

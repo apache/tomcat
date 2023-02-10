@@ -769,8 +769,6 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             offset += 16;
             type = new byte[16];
             System.arraycopy(buf.getBytesDirect(), offset, type, 0, type.length);
-            offset += 16;
-
         }
 
         public void write() {

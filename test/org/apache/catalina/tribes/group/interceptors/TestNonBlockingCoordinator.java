@@ -146,7 +146,6 @@ public class TestNonBlockingCoordinator {
 
         // Allow up to 30s for election to complete
         int count = 0;
-        member = null;
         boolean electionComplete = false;
         while (!electionComplete && count < 300) {
             electionComplete = true;

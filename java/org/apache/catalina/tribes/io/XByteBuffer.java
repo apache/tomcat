@@ -361,7 +361,6 @@ public class XByteBuffer implements Serializable {
         cdata.getDataPackage(data,offset);
         offset += dlength;
         System.arraycopy(END_DATA, 0, data, offset, END_DATA.length);
-        offset += END_DATA.length;
         return data;
     }
 

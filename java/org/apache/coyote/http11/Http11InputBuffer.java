@@ -598,7 +598,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             throw new IllegalStateException(sm.getString("iib.parseheaders.ise.error"));
         }
 
-        HeaderParseStatus status = HeaderParseStatus.HAVE_MORE_HEADERS;
+        HeaderParseStatus status;
 
         do {
             status = parseHeader();

@@ -116,7 +116,7 @@ public class EchoRpcTest implements RpcCallback, Runnable {
         public static void main(String[] args) throws Exception {
             long pause = 3000;
             int count = 1000000;
-            int stats = 10000;
+            int stats;
             String name = "EchoRpcId";
             int options = RpcChannel.ALL_REPLY;
             long timeout = 15000;

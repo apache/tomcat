@@ -140,7 +140,7 @@ public class ExpressionTokenizer {
                 // Otherwise it's a string
                 break;
         }
-        int end = index;
+        int end;
         if (currentChar == '"' || currentChar == '\'') {
             // It's a quoted string and the end is the next unescaped quote
             char endChar = currentChar;

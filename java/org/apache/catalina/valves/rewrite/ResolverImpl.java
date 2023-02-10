@@ -197,15 +197,15 @@ public class ResolverImpl extends Resolver {
                     String result = resolveSslCertificates(key, certificates);
                     if (result != null) {
                         return result;
-                    } else if (key.startsWith("SAN_OTHER_msUPN_")) {
+                    } //else if (key.startsWith("SAN_OTHER_msUPN_")) {
                         // Type otherName, which is 0
-                        key = key.substring("SAN_OTHER_msUPN_".length());
+                        //key = key.substring("SAN_OTHER_msUPN_".length());
                         // FIXME OID from resolveAlternateName
-                    } else if (key.equals("CERT_RFC4523_CEA")) {
+                    //} else if (key.equals("CERT_RFC4523_CEA")) {
                         // FIXME return certificate[0] format CertificateExactAssertion in RFC4523
-                    } else if (key.equals("VERIFY")) {
+                    //} else if (key.equals("VERIFY")) {
                         // FIXME return verification state, not available anywhere
-                    }
+                    //}
                 }
             } else if (key.startsWith("SSL_SERVER_")) {
                 X509Certificate[] certificates = sslSupport.getLocalCertificateChain();
@@ -214,11 +214,11 @@ public class ResolverImpl extends Resolver {
                     String result = resolveSslCertificates(key, certificates);
                     if (result != null) {
                         return result;
-                    } else if (key.startsWith("SAN_OTHER_dnsSRV_")) {
+                    } //else if (key.startsWith("SAN_OTHER_dnsSRV_")) {
                         // Type otherName, which is 0
-                        key = key.substring("SAN_OTHER_dnsSRV_".length());
+                        //key = key.substring("SAN_OTHER_dnsSRV_".length());
                         // FIXME OID from resolveAlternateName
-                    }
+                    //}
                 }
             }
         } catch (IOException e) {

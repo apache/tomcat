@@ -320,9 +320,8 @@ class JspDocumentParser
          * Notice that due to a bug in the underlying SAX parser, the
          * attributes must be enumerated in descending order.
          */
-        boolean isTaglib = false;
         for (int i = attrs.getLength() - 1; i >= 0; i--) {
-            isTaglib = false;
+            boolean isTaglib;
             String attrQName = attrs.getQName(i);
             if (!attrQName.startsWith("xmlns")) {
                 if (nonTaglibAttrs == null) {
@@ -367,7 +366,7 @@ class JspDocumentParser
             }
         }
 
-        Node node = null;
+        Node node;
 
         if (tagDependentPending && JSP_URI.equals(uri) &&
                      localName.equals(BODY_ACTION)) {

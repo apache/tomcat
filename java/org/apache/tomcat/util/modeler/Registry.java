@@ -587,7 +587,6 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             type = param;
             inputsource = source;
         } else if (source instanceof Class<?>) {
-            location = ((Class<?>) source).getName();
             type = param;
             inputsource = source;
             if (sourceType == null) {

@@ -423,7 +423,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 return null ;
             }
 
-            String result = null;
+            String result;
             subToken = false;
             parameter = false;
 
@@ -446,7 +446,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                     parameter = true;
                     return result;
                 case ')':
-                    result = buf.toString();
+                    //result = buf.toString();
                     buf = new StringBuilder();
                     break;
                 default:

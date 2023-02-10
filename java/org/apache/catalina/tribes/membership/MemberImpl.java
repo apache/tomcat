@@ -286,7 +286,6 @@ public class MemberImpl implements Member, java.io.Externalizable {
 
         //TRIBES_MBR_END
         System.arraycopy(TRIBES_MBR_END,0,data,pos,TRIBES_MBR_END.length);
-        pos += TRIBES_MBR_END.length;
 
         //create local data
         dataPkg = data;
@@ -392,7 +391,6 @@ public class MemberImpl implements Member, java.io.Externalizable {
 
         byte[] payload = new byte[pl];
         System.arraycopy(data, pos, payload, 0, payload.length);
-        pos += payload.length;
 
         member.setHost(addr);
         member.setPort(XByteBuffer.toInt(portd, 0));

@@ -157,7 +157,6 @@ final class RuntimeHelper {
             Object[] unnamedArgs = (Object[]) args[args.length - 1];
 
             int argsCount = nNamedArgs + unnamedArgs.length;
-            Class<?>[] argTypes = new Class<?>[argsCount];
             MemoryLayout[] argLayouts = new MemoryLayout[nNamedArgs + unnamedArgs.length];
 
             int pos = 0;
