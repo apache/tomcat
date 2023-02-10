@@ -3533,5 +3533,19 @@ public class Request implements HttpServletRequest {
                         // NO-OP
                     }
                 });
+        specialAttributes.put(Globals.REMOTE_IP_FILTER_SECURE,
+            new SpecialAttributeAdapter() {
+                @Override
+                public Object get(Request request, String name) {
+                    return Boolean.valueOf(request.isSecure());
+                }
+
+                @Override
+                public void set(Request request, String name, Object value) {
+                    if (value instanceof Boolean) {
+                        request.setSecure(((Boolean) value).booleanValue());
+                    }
+                }
+            });
     }
 }
