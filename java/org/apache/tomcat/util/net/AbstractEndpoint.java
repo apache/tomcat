@@ -814,6 +814,14 @@ public abstract class AbstractEndpoint<S,U> {
     public boolean getUseAsyncIO() { return useAsyncIO; }
 
 
+    /**
+     * Always returns {@code false}.
+     *
+     * @return Always {@code false}
+     *
+     * @deprecated This code will be removed in Tomcat 11 onwards
+     */
+    @Deprecated
     protected boolean getDeferAccept() {
         return false;
     }
