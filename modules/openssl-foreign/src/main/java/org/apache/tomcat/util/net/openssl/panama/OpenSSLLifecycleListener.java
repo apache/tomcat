@@ -229,7 +229,7 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                 return;
             }
 
-            try (var memorySession = Arena.openConfined()) {
+            try (var memorySession = Arena.ofConfined()) {
 
                 // Main library init
                 initLibrary();

@@ -2,14 +2,20 @@
 
 ## This module is experimental
 
-It uses the JEP 434 API. More details on this API are available
-at `https://openjdk.java.net/jeps/434`.
+It uses the JEP XXX API. More details on this API are available
+at `https://openjdk.java.net/jeps/XXX`.
 
-## Building
+## Building Java 21 with the JEP XXX API
 
-The module can be built using Java 20. This will be the only Java version that
-is supported as the JEP 434 API is incubating and will continue to evolve.
-It can be built and run with Apache Tomcat 9.0 or newer.
+Clone `https://github.com/openjdk/panama-foreign/` in some location and
+checkout the main branch. This is a Java 21 development JVM
+with the JEP XXX API. It may fail to build. When this happens, step back
+one commit at a time until it does.
+
+```
+bash configure
+make images
+```
 
 ## Running
 
@@ -54,8 +60,9 @@ export JAVA_OPTS="--enable-preview --enable-native-access=ALL-UNNAMED"
 
 jextract is now available in its own standalone repository. Clone
 `https://github.com/openjdk/jextract` in some location and
-checkout the branch that supports Java 20. Please refer to the
-instructions from the repository for building.
+checkout the branch that supports Java 21. Please refer to the
+instructions from the repository for building. It should be the
+`panama` branch.
 
 This step is only useful to be able to use additional native APIs from OpenSSL
 or stdlib.
