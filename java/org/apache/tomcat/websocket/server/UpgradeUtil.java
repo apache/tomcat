@@ -100,7 +100,7 @@ public class UpgradeUtil {
         }
         if (!headerContainsToken(req, Constants.WS_VERSION_HEADER_NAME,
                 Constants.WS_VERSION_HEADER_VALUE)) {
-            resp.setStatus(426);
+            resp.setStatus(HttpServletResponse.SC_UPGRADE_REQUIRED);
             resp.setHeader(Constants.WS_VERSION_HEADER_NAME,
                     Constants.WS_VERSION_HEADER_VALUE);
             return;

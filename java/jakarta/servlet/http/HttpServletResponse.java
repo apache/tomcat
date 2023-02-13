@@ -389,6 +389,12 @@ public interface HttpServletResponse extends ServletResponse {
     public static final int SC_TEMPORARY_REDIRECT = 307;
 
     /**
+     * Status code (308) indicating that the requested resource resides permanently under a different URI. The new URI
+     * <em>SHOULD</em> be given by the <code><em>Location</em></code> field in the response.
+     */
+    public static final int SC_PERMANENT_REDIRECT = 308;
+
+    /**
      * Status code (400) indicating the request sent by the client was syntactically incorrect.
      */
     public static final int SC_BAD_REQUEST = 400;
@@ -487,6 +493,25 @@ public interface HttpServletResponse extends ServletResponse {
      * Status code (417) indicating that the server could not meet the expectation given in the Expect request header.
      */
     public static final int SC_EXPECTATION_FAILED = 417;
+
+    /**
+     * Status code (421) indicating that the server is unwilling or unable to produce an authoritative response for the
+     * target URI.
+     */
+    public static final int SC_MISDIRECTED_REQUEST = 421;
+
+    /**
+     * Status code (422) indicating that the server understands the content type of the request but is unable to process
+     * the contained instructions.
+     */
+    public static final int SC_UNPROCESSABLE_CONTENT = 422;
+
+    /**
+     * Status code (426) indicating that the server refuses to perform the request using the current protocol but may be
+     * willing to do so after the client upgrades to a different protocol. The server must include an appropriate
+     * {@code Upgrade} header in the response.
+     */
+    public static final int SC_UPGRADE_REQUIRED = 426;
 
     /**
      * Status code (500) indicating an error inside the HTTP server which prevented it from fulfilling the request.

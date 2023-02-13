@@ -175,6 +175,11 @@
         <code>RemoteIpFilter</code> determines that this request was submitted
         via a secure channel. (lihan)
       </fix>
+      <add>
+        Add the additional HTTP status code constants to
+        <code>HttpServletResponse</code> defined by the Jakarta Servlet project
+        for the Servlet 6.1 API. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
