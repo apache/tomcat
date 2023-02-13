@@ -17,7 +17,6 @@
 package org.apache.tomcat.util.net;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
@@ -974,19 +973,6 @@ public abstract class AbstractEndpoint<S,U> {
 
 
     /**
-     * Always returns {@code false}.
-     *
-     * @return Always {@code false}
-     *
-     * @deprecated This code will be removed in Tomcat 11 onwards
-     */
-    @Deprecated
-    protected boolean getDeferAccept() {
-        return false;
-    }
-
-
-    /**
      * The default behavior is to identify connectors uniquely with address
      * and port. However, certain connectors are not using that and need
      * some other identifier, which then can be used as a replacement.
@@ -1206,19 +1192,6 @@ public abstract class AbstractEndpoint<S,U> {
                     getLog().debug("About to unlock socket for:" + unlockAddress);
                 }
                 s.connect(unlockAddress,utmo);
-                if (getDeferAccept()) {
-                    /*
-                     * In the case of a deferred accept / accept filters we need to
-                     * send data to wake up the accept. Send OPTIONS * to bypass
-                     * even BSD accept filters. The Acceptor will discard it.
-                     */
-                    OutputStreamWriter sw;
-
-                    sw = new OutputStreamWriter(s.getOutputStream(), "ISO-8859-1");
-                    sw.write("OPTIONS * HTTP/1.0\r\n" +
-                            "User-Agent: Tomcat wakeup connection\r\n\r\n");
-                    sw.flush();
-                }
                 if (getLog().isDebugEnabled()) {
                     getLog().debug("Socket unlock completed for:" + unlockAddress);
                 }
