@@ -19,17 +19,16 @@ package jakarta.servlet.http;
 import java.util.EventListener;
 
 /**
- * This listener interface can be implemented in order to get notifications of
- * changes to the attribute lists of sessions within this web application.
+ * This listener interface can be implemented in order to get notifications of changes to the attribute lists of
+ * sessions within this web application.
  *
  * @since Servlet 2.3
  */
 public interface HttpSessionAttributeListener extends EventListener {
 
     /**
-     * Notification that an attribute has been added to a session. Called after
-     * the attribute is added.
-     * The default implementation is a NO-OP.
+     * Notification that an attribute has been added to a session. Called after the attribute is added. The default
+     * implementation is a NO-OP.
      *
      * @param se Information about the added attribute
      */
@@ -37,9 +36,8 @@ public interface HttpSessionAttributeListener extends EventListener {
     }
 
     /**
-     * Notification that an attribute has been removed from a session. Called
-     * after the attribute is removed.
-     * The default implementation is a NO-OP.
+     * Notification that an attribute has been removed from a session. Called after the attribute is removed. The
+     * default implementation is a NO-OP.
      *
      * @param se Information about the removed attribute
      */
@@ -47,9 +45,8 @@ public interface HttpSessionAttributeListener extends EventListener {
     }
 
     /**
-     * Notification that an attribute has been replaced in a session. Called
-     * after the attribute is replaced.
-     * The default implementation is a NO-OP.
+     * Notification that an attribute has been replaced in a session. Called after the attribute is replaced. The
+     * default implementation is a NO-OP.
      *
      * @param se Information about the replaced attribute
      */
