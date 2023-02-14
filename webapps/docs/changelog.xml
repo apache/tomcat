@@ -180,6 +180,12 @@
         <code>HttpServletResponse</code> defined by the Jakarta Servlet project
         for the Servlet 6.1 API. (markt)
       </add>
+      <fix>
+        Implement the clarification from the Jakarta Servlet project that
+        calling one of the <code>HttpServletResponse</code> methods for setting
+        HTTP header values with <code>null</code> as the new header value
+        removes any existing header of that name. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

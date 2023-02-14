@@ -366,7 +366,11 @@ public final class Response {
                 return;
             }
         }
-        headers.setValue(name).setString(value);
+        if (value == null) {
+            headers.removeHeader(name);
+        } else {
+            headers.setValue(name).setString(value);
+        }
     }
 
 
@@ -419,6 +423,10 @@ public final class Response {
         }
         if (name.equalsIgnoreCase("Content-Length")) {
             try {
+                if (value == null) {
+                    setContentLength(-1);
+                    return true;
+                }
                 long cL = Long.parseLong(value);
                 setContentLength(cL);
                 return true;

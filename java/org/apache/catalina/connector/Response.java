@@ -1363,7 +1363,7 @@ public class Response implements HttpServletResponse {
     @Override
     public void setHeader(String name, String value) {
 
-        if (name == null || name.length() == 0 || value == null) {
+        if (name == null || name.length() == 0) {
             return;
         }
 
