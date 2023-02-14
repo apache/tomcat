@@ -22,9 +22,9 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-public class TestCallbackHandlerImpl implements CallbackHandler {
+public class TesterCallbackHandlerImpl implements CallbackHandler {
 
-    public TestCallbackHandlerImpl() {
+    public TesterCallbackHandlerImpl() {
         // Default constructor required by reflection
     }
 
