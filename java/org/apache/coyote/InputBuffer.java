@@ -36,7 +36,7 @@ public interface InputBuffer {
      *
      * @throws IOException If an I/O error occurs reading from the input stream
      */
-    public int doRead(ApplicationBufferHandler handler) throws IOException;
+    int doRead(ApplicationBufferHandler handler) throws IOException;
 
 
     /**
@@ -45,6 +45,6 @@ public interface InputBuffer {
      *
      * @return The number of bytes that can be read without blocking
      */
-    public int available();
+    int available();
 
 }

@@ -34,7 +34,7 @@ public interface HttpSessionListener extends EventListener {
      *
      * @param se the notification event
      */
-    public default void sessionCreated(HttpSessionEvent se) {
+    default void sessionCreated(HttpSessionEvent se) {
     }
 
     /**
@@ -42,6 +42,6 @@ public interface HttpSessionListener extends EventListener {
      *
      * @param se the notification event
      */
-    public default void sessionDestroyed(HttpSessionEvent se) {
+    default void sessionDestroyed(HttpSessionEvent se) {
     }
 }

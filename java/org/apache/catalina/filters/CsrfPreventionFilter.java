@@ -324,7 +324,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
 
-    protected static interface NonceCache<T> extends Serializable {
+    protected interface NonceCache<T> extends Serializable {
         void add(T nonce);
 
         boolean contains(T nonce);

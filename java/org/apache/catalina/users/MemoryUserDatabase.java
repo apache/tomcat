@@ -775,7 +775,7 @@ public class MemoryUserDatabase implements UserDatabase {
  */
 class MemoryGroupCreationFactory extends AbstractObjectCreationFactory {
 
-    public MemoryGroupCreationFactory(MemoryUserDatabase database) {
+    MemoryGroupCreationFactory(MemoryUserDatabase database) {
         this.database = database;
     }
 
@@ -828,7 +828,7 @@ class MemoryGroupCreationFactory extends AbstractObjectCreationFactory {
  */
 class MemoryRoleCreationFactory extends AbstractObjectCreationFactory {
 
-    public MemoryRoleCreationFactory(MemoryUserDatabase database) {
+    MemoryRoleCreationFactory(MemoryUserDatabase database) {
         this.database = database;
     }
 
@@ -859,7 +859,7 @@ class MemoryRoleCreationFactory extends AbstractObjectCreationFactory {
  */
 class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
 
-    public MemoryUserCreationFactory(MemoryUserDatabase database) {
+    MemoryUserCreationFactory(MemoryUserDatabase database) {
         this.database = database;
     }
 

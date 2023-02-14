@@ -43,7 +43,7 @@ public interface Adapter {
      *                          Tomcat should be able to handle and log any other exception ( including runtime
      *                          exceptions )
      */
-    public void service(Request req, Response res) throws Exception;
+    void service(Request req, Response res) throws Exception;
 
     /**
      * Prepare the given request/response for processing. This method requires that the request object has been
@@ -57,11 +57,11 @@ public interface Adapter {
      *
      * @throws Exception If the processing fails unexpectedly
      */
-    public boolean prepare(Request req, Response res) throws Exception;
+    boolean prepare(Request req, Response res) throws Exception;
 
-    public boolean asyncDispatch(Request req, Response res, SocketEvent status) throws Exception;
+    boolean asyncDispatch(Request req, Response res, SocketEvent status) throws Exception;
 
-    public void log(Request req, Response res, long time);
+    void log(Request req, Response res, long time);
 
     /**
      * Assert that request and response have been recycled. If they have not then log a warning and force a recycle.
@@ -71,12 +71,12 @@ public interface Adapter {
      * @param req Request
      * @param res Response
      */
-    public void checkRecycled(Request req, Response res);
+    void checkRecycled(Request req, Response res);
 
     /**
      * Provide the name of the domain to use to register MBeans for components associated with the connector.
      *
      * @return The MBean domain name
      */
-    public String getDomain();
+    String getDomain();
 }

@@ -216,7 +216,7 @@ public class ELProcessor {
         private final String name;
         private final String[] parameterTypeNames;
 
-        public MethodSignature(ELContext context, String methodName,
+        MethodSignature(ELContext context, String methodName,
                 String className) throws NoSuchMethodException {
 
             int paramIndex = methodName.indexOf('(');

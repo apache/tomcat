@@ -394,7 +394,7 @@ public class OpenSSLCipherConfigurationParser {
 
     private static final Map<String,String> jsseToOpenSSL = new HashMap<>();
 
-    private static final void init() {
+    private static void init() {
 
         for (Cipher cipher : Cipher.values()) {
             String alias = cipher.getOpenSSLAlias();

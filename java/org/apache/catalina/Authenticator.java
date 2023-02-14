@@ -47,11 +47,11 @@ public interface Authenticator {
      *
      * @exception IOException if an input/output error occurs
      */
-    public boolean authenticate(Request request, HttpServletResponse response)
+    boolean authenticate(Request request, HttpServletResponse response)
             throws IOException;
 
-    public void login(String userName, String password, Request request)
+    void login(String userName, String password, Request request)
             throws ServletException;
 
-    public void logout(Request request);
+    void logout(Request request);
 }

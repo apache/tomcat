@@ -79,7 +79,7 @@ public class TestTomcatClassLoader extends TomcatBaseTest {
 
         private transient ClassLoader custom;
 
-        public ClassLoaderReport(ClassLoader custom) {
+        ClassLoaderReport(ClassLoader custom) {
             this.custom = custom;
         }
 

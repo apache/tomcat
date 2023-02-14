@@ -39,7 +39,7 @@ class InterruptibleReentrantLock extends ReentrantLock {
      * @param fairness true means threads should acquire contended locks as if
      * waiting in a FIFO queue
      */
-    public InterruptibleReentrantLock(final boolean fairness) {
+    InterruptibleReentrantLock(final boolean fairness) {
         super(fairness);
     }
 

@@ -308,7 +308,7 @@ public class TestAbstractStream {
 
     private static class TesterSocketWrapper extends SocketWrapperBase<NioChannel> {
 
-        public TesterSocketWrapper() {
+        TesterSocketWrapper() {
             super(null, new NioEndpoint());
         }
 

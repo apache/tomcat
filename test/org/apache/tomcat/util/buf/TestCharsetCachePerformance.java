@@ -71,7 +71,7 @@ public class TestCharsetCachePerformance {
     }
 
 
-    private static interface CsCache {
+    private interface CsCache {
         Charset getCharset(String charsetName);
     }
 
@@ -124,7 +124,7 @@ public class TestCharsetCachePerformance {
         private final String[] lookupNames;
         private final int lookupNamesCount;
 
-        public TestCsCacheThread(int iterations, CsCache cache, String[] lookupNames) {
+        TestCsCacheThread(int iterations, CsCache cache, String[] lookupNames) {
             this.iterations = iterations;
             this.cache = cache;
             this.lookupNames = lookupNames;

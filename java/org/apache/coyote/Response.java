@@ -190,12 +190,12 @@ public final class Response {
 
     // -------------------- Per-Response "notes" --------------------
 
-    public final void setNote(int pos, Object value) {
+    public void setNote(int pos, Object value) {
         notes[pos] = value;
     }
 
 
-    public final Object getNote(int pos) {
+    public Object getNote(int pos) {
         return notes[pos];
     }
 

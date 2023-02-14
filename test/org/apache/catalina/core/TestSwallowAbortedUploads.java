@@ -328,7 +328,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
 
         private final int status;
 
-        public AbortedPOSTServlet(int status) {
+        AbortedPOSTServlet(int status) {
             this.status = status;
         }
 

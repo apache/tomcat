@@ -35,7 +35,7 @@ public class FooTag extends ExampleTagBase {
     private final String atts[] = new String[3];
     int i = 0;
 
-    private final void setAtt(int index, String value) {
+    private void setAtt(int index, String value) {
         atts[index] = value;
     }
 

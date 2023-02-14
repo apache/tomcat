@@ -36,7 +36,7 @@ public enum AuthenticationType {
     private final String userPasswordProperty;
     private final String userRealmProperty;
 
-    private AuthenticationType(String authorizationHeaderName, String authenticateHeaderName, String userNameProperty,
+    AuthenticationType(String authorizationHeaderName, String authenticateHeaderName, String userNameProperty,
             String userPasswordProperty, String userRealmProperty) {
         this.authorizationHeaderName = authorizationHeaderName;
         this.authenticateHeaderName = authenticateHeaderName;

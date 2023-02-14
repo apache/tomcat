@@ -219,7 +219,7 @@ class StreamStateMachine {
         private final Http2Error errorCodeForInvalidFrame;
         private final Set<FrameType> frameTypesPermitted;
 
-        private State(boolean canRead, boolean canWrite, boolean canReset, boolean connectionErrorForInvalidFrame,
+        State(boolean canRead, boolean canWrite, boolean canReset, boolean connectionErrorForInvalidFrame,
                 Http2Error errorCode, FrameType... frameTypes) {
             this.canRead = canRead;
             this.canWrite = canWrite;

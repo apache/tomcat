@@ -115,9 +115,7 @@
 
     <!-- Modifiers -->
     <module name="ModifierOrder"/>
-    <!-- ~1750 errors
     <module name="RedundantModifier"/>
-    -->
 
     <!-- Whitespace -->
     <module name="GenericWhitespace"/>

@@ -29,13 +29,13 @@ public interface ErrorHandler {
      * @param id - the unique id for the message
      * @see Channel#send(Member[], java.io.Serializable, int, ErrorHandler)
      */
-    public void handleError(ChannelException x, UniqueId id);
+    void handleError(ChannelException x, UniqueId id);
 
     /**
      * Invoked when the message has been sent successfully.
      * @param id - the unique id for the message
      * @see Channel#send(Member[], java.io.Serializable, int, ErrorHandler)
      */
-    public void handleCompletion(UniqueId id);
+    void handleCompletion(UniqueId id);
 
 }

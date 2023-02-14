@@ -49,7 +49,7 @@ public final class SecurityClassLoad {
     }
 
 
-    private static final void loadCorePackage(ClassLoader loader) throws Exception {
+    private static void loadCorePackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.core.";
         loader.loadClass(basePackage + "AccessLogAdapter");
         loader.loadClass(basePackage + "ApplicationContextFacade$PrivilegedExecuteMethod");
@@ -70,20 +70,20 @@ public final class SecurityClassLoad {
     }
 
 
-    private static final void loadLoaderPackage(ClassLoader loader) throws Exception {
+    private static void loadLoaderPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.loader.";
         loader.loadClass(basePackage + "WebappClassLoaderBase$PrivilegedFindClassByName");
         loader.loadClass(basePackage + "WebappClassLoaderBase$PrivilegedHasLoggingConfig");
     }
 
 
-    private static final void loadRealmPackage(ClassLoader loader) throws Exception {
+    private static void loadRealmPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.realm.";
         loader.loadClass(basePackage + "LockOutRealm$LockRecord");
     }
 
 
-    private static final void loadServletsPackage(ClassLoader loader) throws Exception {
+    private static void loadServletsPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.servlets.";
         // Avoid a possible memory leak in the DefaultServlet when running with
         // a security manager. The DefaultServlet needs to load an XML parser
@@ -94,7 +94,7 @@ public final class SecurityClassLoad {
     }
 
 
-    private static final void loadSessionPackage(ClassLoader loader) throws Exception {
+    private static void loadSessionPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.session.";
         loader.loadClass(basePackage + "StandardSession");
         loader.loadClass(basePackage + "StandardSession$PrivilegedNewSessionFacade");
@@ -102,7 +102,7 @@ public final class SecurityClassLoad {
     }
 
 
-    private static final void loadUtilPackage(ClassLoader loader) throws Exception {
+    private static void loadUtilPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.util.";
         loader.loadClass(basePackage + "ParameterMap");
         loader.loadClass(basePackage + "RequestUtil");
@@ -110,7 +110,7 @@ public final class SecurityClassLoad {
     }
 
 
-    private static final void loadCoyotePackage(ClassLoader loader) throws Exception {
+    private static void loadCoyotePackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.coyote.";
         loader.loadClass(basePackage + "http11.Constants");
         // Make sure system property is read at this point
@@ -120,12 +120,12 @@ public final class SecurityClassLoad {
     }
 
 
-    private static final void loadJakartaPackage(ClassLoader loader) throws Exception {
+    private static void loadJakartaPackage(ClassLoader loader) throws Exception {
         loader.loadClass("jakarta.servlet.http.Cookie");
     }
 
 
-    private static final void loadConnectorPackage(ClassLoader loader) throws Exception {
+    private static void loadConnectorPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.connector.";
         loader.loadClass(basePackage + "RequestFacade$GetAttributePrivilegedAction");
         loader.loadClass(basePackage + "RequestFacade$GetParameterMapPrivilegedAction");
@@ -157,7 +157,7 @@ public final class SecurityClassLoad {
     }
 
 
-    private static final void loadTomcatPackage(ClassLoader loader) throws Exception {
+    private static void loadTomcatPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.tomcat.";
         // buf
         loader.loadClass(basePackage + "util.buf.B2CConverter");

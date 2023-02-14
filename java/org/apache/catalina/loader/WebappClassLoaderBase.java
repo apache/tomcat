@@ -1743,7 +1743,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      *
      * If only apps cleaned up after themselves...
      */
-    private final void clearReferencesJdbc() {
+    private void clearReferencesJdbc() {
         // We know roughly how big the class will be (~ 1K) so allow 2k as a
         // starting point
         byte[] classBytes = new byte[2048];
@@ -2764,7 +2764,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         private final Enumeration<URL>[] sources;
         private int index = 0;
 
-        public CombinedEnumeration(Enumeration<URL> enum1, Enumeration<URL> enum2) {
+        CombinedEnumeration(Enumeration<URL> enum1, Enumeration<URL> enum2) {
             @SuppressWarnings("unchecked")
             Enumeration<URL>[] sources = new Enumeration[] { enum1, enum2 };
             this.sources = sources;

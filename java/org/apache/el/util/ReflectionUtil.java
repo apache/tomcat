@@ -463,7 +463,7 @@ public class ReflectionUtil {
     }
 
 
-    private static final String paramString(Class<?>[] types) {
+    private static String paramString(Class<?>[] types) {
         if (types != null) {
             StringBuilder sb = new StringBuilder();
             for (Class<?> type : types) {
@@ -516,7 +516,7 @@ public class ReflectionUtil {
         private final int varArgsCount;
         private final boolean bridge;
 
-        public MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount, int varArgsCount,
+        MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount, int varArgsCount,
                 boolean bridge) {
             this.varArgs = varArgs;
             this.exactCount = exactCount;

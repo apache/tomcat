@@ -174,7 +174,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
      * @param mapping     The mapping for this resource (if any)
      * @param name        Servlet name (if a named dispatcher was created) else <code>null</code>
      */
-    public ApplicationDispatcher(Wrapper wrapper, String requestURI, String servletPath, String pathInfo,
+    ApplicationDispatcher(Wrapper wrapper, String requestURI, String servletPath, String pathInfo,
             String queryString, HttpServletMapping mapping, String name) {
 
         super();

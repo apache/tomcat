@@ -82,7 +82,7 @@ public class RequestFacade implements HttpServletRequest {
 
         private final String path;
 
-        public GetRequestDispatcherPrivilegedAction(String path){
+        GetRequestDispatcherPrivilegedAction(String path){
             this.path = path;
         }
 
@@ -98,7 +98,7 @@ public class RequestFacade implements HttpServletRequest {
 
         public String name;
 
-        public GetParameterPrivilegedAction(String name){
+        GetParameterPrivilegedAction(String name){
             this.name = name;
         }
 
@@ -124,7 +124,7 @@ public class RequestFacade implements HttpServletRequest {
 
         public String name;
 
-        public GetParameterValuePrivilegedAction(String name){
+        GetParameterValuePrivilegedAction(String name){
             this.name = name;
         }
 
@@ -160,7 +160,7 @@ public class RequestFacade implements HttpServletRequest {
 
         private final String name;
 
-        public GetHeadersPrivilegedAction(String name){
+        GetHeadersPrivilegedAction(String name){
             this.name = name;
         }
 
@@ -205,7 +205,7 @@ public class RequestFacade implements HttpServletRequest {
 
         private final boolean create;
 
-        public GetSessionPrivilegedAction(boolean create){
+        GetSessionPrivilegedAction(boolean create){
             this.create = create;
         }
 

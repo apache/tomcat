@@ -34,14 +34,14 @@ public interface SessionCookieConfig {
      * @throws IllegalStateException if the associated ServletContext has
      *         already been initialised
      */
-    public void setName(String name);
+    void setName(String name);
 
     /**
      * Obtain the name to use for the session cookies.
      *
      * @return the name to use for session cookies.
      */
-    public String getName();
+    String getName();
 
     /**
      * Sets the domain for the session cookie
@@ -51,14 +51,14 @@ public interface SessionCookieConfig {
      * @throws IllegalStateException if the associated ServletContext has
      *         already been initialised
      */
-    public void setDomain(String domain);
+    void setDomain(String domain);
 
     /**
      * Obtain the domain to use for session cookies.
      *
      * @return the domain to use for session cookies.
      */
-    public String getDomain();
+    String getDomain();
 
     /**
      * Sets the path of the session cookie.
@@ -68,7 +68,7 @@ public interface SessionCookieConfig {
      * @throws IllegalStateException if the associated ServletContext has
      *         already been initialised
      */
-    public void setPath(String path);
+    void setPath(String path);
 
     /**
      * Obtain the path to use for session cookies. This is normally the context
@@ -76,7 +76,7 @@ public interface SessionCookieConfig {
      *
      * @return The path to use for session cookies.
      */
-    public String getPath();
+    String getPath();
 
     /**
      * If called, this method has no effect.
@@ -89,7 +89,7 @@ public interface SessionCookieConfig {
      * @deprecated This is no longer required with RFC 6265
      */
     @Deprecated(since = "Servlet 6.0", forRemoval = true)
-    public void setComment(String comment);
+    void setComment(String comment);
 
     /**
      * With the adoption of support for RFC 6265, this method should no longer be used.
@@ -99,7 +99,7 @@ public interface SessionCookieConfig {
      * @deprecated This is no longer required with RFC 6265
      */
     @Deprecated(since = "Servlet 6.0", forRemoval = true)
-    public String getComment();
+    String getComment();
 
     /**
      * Sets the httpOnly flag for the session cookie.
@@ -109,14 +109,14 @@ public interface SessionCookieConfig {
      * @throws IllegalStateException if the associated ServletContext has
      *         already been initialised
      */
-    public void setHttpOnly(boolean httpOnly);
+    void setHttpOnly(boolean httpOnly);
 
     /**
      * Will session cookies be created with the httpOnly flag set?
      *
      * @return {@code true} if the flag should be set, otherwise {@code false}
      */
-    public boolean isHttpOnly();
+    boolean isHttpOnly();
 
     /**
      * Sets the secure flag for the session cookie.
@@ -126,14 +126,14 @@ public interface SessionCookieConfig {
      * @throws IllegalStateException if the associated ServletContext has
      *         already been initialised
      */
-    public void setSecure(boolean secure);
+    void setSecure(boolean secure);
 
     /**
      * Will session cookies be created with the secure flag set?
      *
      * @return {@code true} if the flag should be set, otherwise {@code false}
      */
-    public boolean isSecure();
+    boolean isSecure();
 
     /**
      * Sets the maximum age.
@@ -142,14 +142,14 @@ public interface SessionCookieConfig {
      * @throws IllegalStateException if the associated ServletContext has
      *         already been initialised
      */
-    public void setMaxAge(int MaxAge);
+    void setMaxAge(int MaxAge);
 
     /**
      * Obtain the maximum age to set for a session cookie.
      *
      * @return the maximum age in seconds
      */
-    public int getMaxAge();
+    int getMaxAge();
 
     /**
      * Sets the value for the given session cookie attribute. When a value is
@@ -170,7 +170,7 @@ public interface SessionCookieConfig {
      *
      * @since Servlet 6.0
      */
-    public void setAttribute(String name, String value);
+    void setAttribute(String name, String value);
 
     /**
      * Obtain the value for a sesison cookie given attribute. Values returned
@@ -183,7 +183,7 @@ public interface SessionCookieConfig {
      *
      * @since Servlet 6.0
      */
-    public String getAttribute(String name);
+    String getAttribute(String name);
 
     /**
      * Obtain the Map of attributes and values (excluding version) for this
@@ -193,5 +193,5 @@ public interface SessionCookieConfig {
      *
      * @since Servlet 6.0
      */
-    public Map<String,String> getAttributes();
+    Map<String,String> getAttributes();
 }

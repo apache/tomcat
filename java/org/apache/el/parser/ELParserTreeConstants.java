@@ -3,52 +3,52 @@ package org.apache.el.parser;
 
 public interface ELParserTreeConstants
 {
-  public int JJTCOMPOSITEEXPRESSION = 0;
-  public int JJTLITERALEXPRESSION = 1;
-  public int JJTDEFERREDEXPRESSION = 2;
-  public int JJTDYNAMICEXPRESSION = 3;
-  public int JJTVOID = 4;
-  public int JJTSEMICOLON = 5;
-  public int JJTASSIGN = 6;
-  public int JJTLAMBDAEXPRESSION = 7;
-  public int JJTLAMBDAPARAMETERS = 8;
-  public int JJTCHOICE = 9;
-  public int JJTOR = 10;
-  public int JJTAND = 11;
-  public int JJTEQUAL = 12;
-  public int JJTNOTEQUAL = 13;
-  public int JJTLESSTHAN = 14;
-  public int JJTGREATERTHAN = 15;
-  public int JJTLESSTHANEQUAL = 16;
-  public int JJTGREATERTHANEQUAL = 17;
-  public int JJTCONCATENATION = 18;
-  public int JJTPLUS = 19;
-  public int JJTMINUS = 20;
-  public int JJTMULT = 21;
-  public int JJTDIV = 22;
-  public int JJTMOD = 23;
-  public int JJTNEGATIVE = 24;
-  public int JJTNOT = 25;
-  public int JJTEMPTY = 26;
-  public int JJTVALUE = 27;
-  public int JJTDOTSUFFIX = 28;
-  public int JJTBRACKETSUFFIX = 29;
-  public int JJTMETHODPARAMETERS = 30;
-  public int JJTSETDATA = 31;
-  public int JJTLISTDATA = 32;
-  public int JJTMAPDATA = 33;
-  public int JJTMAPENTRY = 34;
-  public int JJTIDENTIFIER = 35;
-  public int JJTFUNCTION = 36;
-  public int JJTTRUE = 37;
-  public int JJTFALSE = 38;
-  public int JJTFLOATINGPOINT = 39;
-  public int JJTINTEGER = 40;
-  public int JJTSTRING = 41;
-  public int JJTNULL = 42;
+  int JJTCOMPOSITEEXPRESSION = 0;
+  int JJTLITERALEXPRESSION = 1;
+  int JJTDEFERREDEXPRESSION = 2;
+  int JJTDYNAMICEXPRESSION = 3;
+  int JJTVOID = 4;
+  int JJTSEMICOLON = 5;
+  int JJTASSIGN = 6;
+  int JJTLAMBDAEXPRESSION = 7;
+  int JJTLAMBDAPARAMETERS = 8;
+  int JJTCHOICE = 9;
+  int JJTOR = 10;
+  int JJTAND = 11;
+  int JJTEQUAL = 12;
+  int JJTNOTEQUAL = 13;
+  int JJTLESSTHAN = 14;
+  int JJTGREATERTHAN = 15;
+  int JJTLESSTHANEQUAL = 16;
+  int JJTGREATERTHANEQUAL = 17;
+  int JJTCONCATENATION = 18;
+  int JJTPLUS = 19;
+  int JJTMINUS = 20;
+  int JJTMULT = 21;
+  int JJTDIV = 22;
+  int JJTMOD = 23;
+  int JJTNEGATIVE = 24;
+  int JJTNOT = 25;
+  int JJTEMPTY = 26;
+  int JJTVALUE = 27;
+  int JJTDOTSUFFIX = 28;
+  int JJTBRACKETSUFFIX = 29;
+  int JJTMETHODPARAMETERS = 30;
+  int JJTSETDATA = 31;
+  int JJTLISTDATA = 32;
+  int JJTMAPDATA = 33;
+  int JJTMAPENTRY = 34;
+  int JJTIDENTIFIER = 35;
+  int JJTFUNCTION = 36;
+  int JJTTRUE = 37;
+  int JJTFALSE = 38;
+  int JJTFLOATINGPOINT = 39;
+  int JJTINTEGER = 40;
+  int JJTSTRING = 41;
+  int JJTNULL = 42;
 
 
-  public String[] jjtNodeName = {
+  String[] jjtNodeName = {
     "CompositeExpression",
     "LiteralExpression",
     "DeferredExpression",

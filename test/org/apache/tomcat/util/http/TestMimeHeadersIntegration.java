@@ -169,7 +169,7 @@ public class TestMimeHeadersIntegration extends TomcatBaseTest {
     }
 
     private static final class Client extends SimpleHttpClient {
-        public Client(Tomcat tomcat) {
+        Client(Tomcat tomcat) {
             setPort(tomcat.getConnector().getLocalPort());
         }
 

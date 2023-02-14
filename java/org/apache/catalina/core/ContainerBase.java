@@ -1323,7 +1323,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
         private Container child;
 
-        public StartChild(Container child) {
+        StartChild(Container child) {
             this.child = child;
         }
 
@@ -1338,7 +1338,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
         private Container child;
 
-        public StopChild(Container child) {
+        StopChild(Container child) {
             this.child = child;
         }
 

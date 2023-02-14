@@ -61,7 +61,7 @@ public interface ServletRequest {
      * @return an <code>Object</code> containing the value of the attribute, or
      *         <code>null</code> if the attribute does not exist
      */
-    public Object getAttribute(String name);
+    Object getAttribute(String name);
 
     /**
      * Returns an <code>Enumeration</code> containing the names of the
@@ -72,7 +72,7 @@ public interface ServletRequest {
      * @return an <code>Enumeration</code> of strings containing the names of the
      *         request's attributes
      */
-    public Enumeration<String> getAttributeNames();
+    Enumeration<String> getAttributeNames();
 
     /**
      * Returns the name of the character encoding used in the body of this
@@ -90,7 +90,7 @@ public interface ServletRequest {
      *         encoding, or <code>null</code> if the request does not specify a
      *         character encoding
      */
-    public String getCharacterEncoding();
+    String getCharacterEncoding();
 
     /**
      * Overrides the name of the character encoding used in the body of this
@@ -103,7 +103,7 @@ public interface ServletRequest {
      * @throws java.io.UnsupportedEncodingException
      *             if this is not a valid encoding
      */
-    public void setCharacterEncoding(String env)
+    void setCharacterEncoding(String env)
             throws java.io.UnsupportedEncodingException;
 
     /**
@@ -114,7 +114,7 @@ public interface ServletRequest {
      * @return an integer containing the length of the request body or -1 if the
      *         length is not known or is greater than {@link Integer#MAX_VALUE}
      */
-    public int getContentLength();
+    int getContentLength();
 
     /**
      * Returns the length, in bytes, of the request body and made available by
@@ -125,7 +125,7 @@ public interface ServletRequest {
      *         the length is not known
      * @since Servlet 3.1
      */
-    public long getContentLengthLong();
+    long getContentLengthLong();
 
     /**
      * Returns the MIME type of the body of the request, or <code>null</code> if
@@ -135,7 +135,7 @@ public interface ServletRequest {
      * @return a <code>String</code> containing the name of the MIME type of the
      *         request, or null if the type is not known
      */
-    public String getContentType();
+    String getContentType();
 
     /**
      * Retrieves the body of the request as binary data using a
@@ -150,7 +150,7 @@ public interface ServletRequest {
      * @exception IOException
      *                if an input or output exception occurred
      */
-    public ServletInputStream getInputStream() throws IOException;
+    ServletInputStream getInputStream() throws IOException;
 
     /**
      * Returns the value of a request parameter as a <code>String</code>, or
@@ -177,7 +177,7 @@ public interface ServletRequest {
      *         parameter
      * @see #getParameterValues
      */
-    public String getParameter(String name);
+    String getParameter(String name);
 
     /**
      * Returns an <code>Enumeration</code> of <code>String</code> objects
@@ -190,7 +190,7 @@ public interface ServletRequest {
      *         or an empty <code>Enumeration</code> if the request has no
      *         parameters
      */
-    public Enumeration<String> getParameterNames();
+    Enumeration<String> getParameterNames();
 
     /**
      * Returns an array of <code>String</code> objects containing all of the
@@ -206,7 +206,7 @@ public interface ServletRequest {
      *         values
      * @see #getParameter
      */
-    public String[] getParameterValues(String name);
+    String[] getParameterValues(String name);
 
     /**
      * Returns a java.util.Map of the parameters of this request. Request
@@ -219,7 +219,7 @@ public interface ServletRequest {
      *         of type String. The values in the parameter map are of type
      *         String array.
      */
-    public Map<String, String[]> getParameterMap();
+    Map<String, String[]> getParameterMap();
 
     /**
      * Returns the name and version of the protocol the request uses in the form
@@ -230,7 +230,7 @@ public interface ServletRequest {
      * @return a <code>String</code> containing the protocol name and version
      *         number
      */
-    public String getProtocol();
+    String getProtocol();
 
     /**
      * Returns the name of the scheme used to make this request, for example,
@@ -240,7 +240,7 @@ public interface ServletRequest {
      * @return a <code>String</code> containing the name of the scheme used to
      *         make this request
      */
-    public String getScheme();
+    String getScheme();
 
     /**
      * Returns the host name of the server to which the request was sent. It is
@@ -249,7 +249,7 @@ public interface ServletRequest {
      *
      * @return a <code>String</code> containing the name of the server
      */
-    public String getServerName();
+    String getServerName();
 
     /**
      * Returns the port number to which the request was sent. It is the value of
@@ -258,7 +258,7 @@ public interface ServletRequest {
      *
      * @return an integer specifying the port number
      */
-    public int getServerPort();
+    int getServerPort();
 
     /**
      * Retrieves the body of the request as character data using a
@@ -277,7 +277,7 @@ public interface ServletRequest {
      *                if an input or output exception occurred
      * @see #getInputStream
      */
-    public BufferedReader getReader() throws IOException;
+    BufferedReader getReader() throws IOException;
 
     /**
      * Returns the Internet Protocol (IP) address of the client or last proxy
@@ -287,7 +287,7 @@ public interface ServletRequest {
      * @return a <code>String</code> containing the IP address of the client
      *         that sent the request
      */
-    public String getRemoteAddr();
+    String getRemoteAddr();
 
     /**
      * Returns the fully qualified name of the client or the last proxy that
@@ -299,7 +299,7 @@ public interface ServletRequest {
      * @return a <code>String</code> containing the fully qualified name of the
      *         client
      */
-    public String getRemoteHost();
+    String getRemoteHost();
 
     /**
      * Stores an attribute in this request. Attributes are reset between
@@ -324,7 +324,7 @@ public interface ServletRequest {
      * @param o
      *            the <code>Object</code> to be stored
      */
-    public void setAttribute(String name, Object o);
+    void setAttribute(String name, Object o);
 
     /**
      * Removes an attribute from this request. This method is not generally
@@ -341,7 +341,7 @@ public interface ServletRequest {
      *            a <code>String</code> specifying the name of the attribute to
      *            remove
      */
-    public void removeAttribute(String name);
+    void removeAttribute(String name);
 
     /**
      * Returns the preferred <code>Locale</code> that the client will accept
@@ -351,7 +351,7 @@ public interface ServletRequest {
      *
      * @return the preferred <code>Locale</code> for the client
      */
-    public Locale getLocale();
+    Locale getLocale();
 
     /**
      * Returns an <code>Enumeration</code> of <code>Locale</code> objects
@@ -364,7 +364,7 @@ public interface ServletRequest {
      * @return an <code>Enumeration</code> of preferred <code>Locale</code>
      *         objects for the client
      */
-    public Enumeration<Locale> getLocales();
+    Enumeration<Locale> getLocales();
 
     /**
      * Returns a boolean indicating whether this request was made using a secure
@@ -373,7 +373,7 @@ public interface ServletRequest {
      * @return a boolean indicating if the request was made using a secure
      *         channel
      */
-    public boolean isSecure();
+    boolean isSecure();
 
     /**
      * Returns a {@link RequestDispatcher} object that acts as a wrapper for the
@@ -401,7 +401,7 @@ public interface ServletRequest {
      * @see RequestDispatcher
      * @see ServletContext#getRequestDispatcher
      */
-    public RequestDispatcher getRequestDispatcher(String path);
+    RequestDispatcher getRequestDispatcher(String path);
 
     /**
      * Returns the Internet Protocol (IP) source port of the client or last
@@ -411,7 +411,7 @@ public interface ServletRequest {
      *
      * @since Servlet 2.4
      */
-    public int getRemotePort();
+    int getRemotePort();
 
     /**
      * Returns the host name of the Internet Protocol (IP) interface on which
@@ -421,7 +421,7 @@ public interface ServletRequest {
      *         the request was received.
      * @since Servlet 2.4
      */
-    public String getLocalName();
+    String getLocalName();
 
     /**
      * Returns the Internet Protocol (IP) address of the interface on which the
@@ -431,7 +431,7 @@ public interface ServletRequest {
      *         request was received.
      * @since Servlet 2.4
      */
-    public String getLocalAddr();
+    String getLocalAddr();
 
     /**
      * Returns the Internet Protocol (IP) port number of the interface on which
@@ -441,20 +441,20 @@ public interface ServletRequest {
      *
      * @since Servlet 2.4
      */
-    public int getLocalPort();
+    int getLocalPort();
 
     /**
      * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
-    public ServletContext getServletContext();
+    ServletContext getServletContext();
 
     /**
      * @return TODO
      * @throws IllegalStateException If async is not supported for this request
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
-    public AsyncContext startAsync() throws IllegalStateException;
+    AsyncContext startAsync() throws IllegalStateException;
 
     /**
      * @param servletRequest    The ServletRequest with which to initialise the
@@ -465,20 +465,20 @@ public interface ServletRequest {
      * @throws IllegalStateException If async is not supported for this request
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
-    public AsyncContext startAsync(ServletRequest servletRequest,
+    AsyncContext startAsync(ServletRequest servletRequest,
             ServletResponse servletResponse) throws IllegalStateException;
 
     /**
      * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
-    public boolean isAsyncStarted();
+    boolean isAsyncStarted();
 
     /**
      * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
-    public boolean isAsyncSupported();
+    boolean isAsyncSupported();
 
     /**
      * Get the current AsyncContext.
@@ -490,13 +490,13 @@ public interface ServletRequest {
      *
      * @since Servlet 3.0
      */
-    public AsyncContext getAsyncContext();
+    AsyncContext getAsyncContext();
 
     /**
      * @return TODO
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
-    public DispatcherType getDispatcherType();
+    DispatcherType getDispatcherType();
 
     /**
      * Obtain a unique (within the lifetime of the Servlet container) identifier

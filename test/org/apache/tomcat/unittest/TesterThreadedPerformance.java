@@ -62,7 +62,7 @@ public class TesterThreadedPerformance {
         private final IntConsumer testTarget;
         private final int iterationCount;
 
-        public TesterThreadedPerformanceRunnable(IntConsumer testTarget, int iterationCount) {
+        TesterThreadedPerformanceRunnable(IntConsumer testTarget, int iterationCount) {
             this.testTarget = testTarget;
             this.iterationCount = iterationCount;
         }

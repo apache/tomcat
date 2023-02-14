@@ -74,7 +74,7 @@ public final class ByteChunk extends AbstractChunk {
      *
      * Same as java.nio.channels.ReadableByteChannel
      */
-    public static interface ByteInputChannel {
+    public interface ByteInputChannel {
 
         /**
          * Read new bytes.
@@ -83,7 +83,7 @@ public final class ByteChunk extends AbstractChunk {
          *
          * @throws IOException If an I/O error occurs during reading
          */
-        public int realReadBytes() throws IOException;
+        int realReadBytes() throws IOException;
     }
 
     /**
@@ -92,7 +92,7 @@ public final class ByteChunk extends AbstractChunk {
      *
      * Same as java.nio.channel.WritableByteChannel.
      */
-    public static interface ByteOutputChannel {
+    public interface ByteOutputChannel {
 
         /**
          * Send the bytes ( usually the internal conversion buffer ). Expect 8k
@@ -103,7 +103,7 @@ public final class ByteChunk extends AbstractChunk {
          * @param len length that will be written
          * @throws IOException If an I/O occurs while writing the bytes
          */
-        public void realWriteBytes(byte buf[], int off, int len) throws IOException;
+        void realWriteBytes(byte buf[], int off, int len) throws IOException;
 
 
         /**
@@ -113,7 +113,7 @@ public final class ByteChunk extends AbstractChunk {
          * @param from bytes that will be written
          * @throws IOException If an I/O occurs while writing the bytes
          */
-        public void realWriteBytes(ByteBuffer from) throws IOException;
+        void realWriteBytes(ByteBuffer from) throws IOException;
     }
 
     // --------------------
@@ -823,7 +823,7 @@ public final class ByteChunk extends AbstractChunk {
      * @param value to convert to byte array
      * @return the byte array value
      */
-    public static final byte[] convertToBytes(String value) {
+    public static byte[] convertToBytes(String value) {
         byte[] result = new byte[value.length()];
         for (int i = 0; i < value.length(); i++) {
             result[i] = (byte) value.charAt(i);

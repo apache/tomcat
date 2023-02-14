@@ -44,7 +44,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 3.0
      */
-    static final String FORWARD_REQUEST_URI = "jakarta.servlet.forward.request_uri";
+    String FORWARD_REQUEST_URI = "jakarta.servlet.forward.request_uri";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -55,7 +55,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 3.0
      */
-    static final String FORWARD_CONTEXT_PATH = "jakarta.servlet.forward.context_path";
+    String FORWARD_CONTEXT_PATH = "jakarta.servlet.forward.context_path";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -66,7 +66,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 4.0
      */
-    static final String FORWARD_MAPPING = "jakarta.servlet.forward.mapping";
+    String FORWARD_MAPPING = "jakarta.servlet.forward.mapping";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -77,7 +77,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 3.0
      */
-    static final String FORWARD_PATH_INFO = "jakarta.servlet.forward.path_info";
+    String FORWARD_PATH_INFO = "jakarta.servlet.forward.path_info";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -88,7 +88,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 3.0
      */
-    static final String FORWARD_SERVLET_PATH = "jakarta.servlet.forward.servlet_path";
+    String FORWARD_SERVLET_PATH = "jakarta.servlet.forward.servlet_path";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -99,7 +99,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 3.0
      */
-    static final String FORWARD_QUERY_STRING = "jakarta.servlet.forward.query_string";
+    String FORWARD_QUERY_STRING = "jakarta.servlet.forward.query_string";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -111,7 +111,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 3.0
      */
-    static final String INCLUDE_REQUEST_URI = "jakarta.servlet.include.request_uri";
+    String INCLUDE_REQUEST_URI = "jakarta.servlet.include.request_uri";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -123,7 +123,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 3.0
      */
-    static final String INCLUDE_CONTEXT_PATH = "jakarta.servlet.include.context_path";
+    String INCLUDE_CONTEXT_PATH = "jakarta.servlet.include.context_path";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -135,7 +135,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 3.0
      */
-    static final String INCLUDE_PATH_INFO = "jakarta.servlet.include.path_info";
+    String INCLUDE_PATH_INFO = "jakarta.servlet.include.path_info";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -147,7 +147,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 4.0
      */
-    static final String INCLUDE_MAPPING = "jakarta.servlet.include.mapping";
+    String INCLUDE_MAPPING = "jakarta.servlet.include.mapping";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -159,7 +159,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 3.0
      */
-    static final String INCLUDE_SERVLET_PATH = "jakarta.servlet.include.servlet_path";
+    String INCLUDE_SERVLET_PATH = "jakarta.servlet.include.servlet_path";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -171,7 +171,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 3.0
      */
-    static final String INCLUDE_QUERY_STRING = "jakarta.servlet.include.query_string";
+    String INCLUDE_QUERY_STRING = "jakarta.servlet.include.query_string";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -181,7 +181,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 3.0
      */
-    public static final String ERROR_EXCEPTION = "jakarta.servlet.error.exception";
+    String ERROR_EXCEPTION = "jakarta.servlet.error.exception";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -191,7 +191,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 3.0
      */
-    public static final String ERROR_EXCEPTION_TYPE = "jakarta.servlet.error.exception_type";
+    String ERROR_EXCEPTION_TYPE = "jakarta.servlet.error.exception_type";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -201,7 +201,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 3.0
      */
-    public static final String ERROR_MESSAGE = "jakarta.servlet.error.message";
+    String ERROR_MESSAGE = "jakarta.servlet.error.message";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -211,7 +211,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 3.0
      */
-    public static final String ERROR_REQUEST_URI = "jakarta.servlet.error.request_uri";
+    String ERROR_REQUEST_URI = "jakarta.servlet.error.request_uri";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -221,7 +221,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 3.0
      */
-    public static final String ERROR_SERVLET_NAME = "jakarta.servlet.error.servlet_name";
+    String ERROR_SERVLET_NAME = "jakarta.servlet.error.servlet_name";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -231,7 +231,7 @@ public interface RequestDispatcher {
      *
      * @since Servlet 3.0
      */
-    public static final String ERROR_STATUS_CODE = "jakarta.servlet.error.status_code";
+    String ERROR_STATUS_CODE = "jakarta.servlet.error.status_code";
 
     /**
      * Forwards a request from a servlet to another resource (servlet, JSP file,
@@ -276,7 +276,7 @@ public interface RequestDispatcher {
      * @exception IllegalStateException
      *                if the response was already committed
      */
-    public void forward(ServletRequest request, ServletResponse response)
+    void forward(ServletRequest request, ServletResponse response)
             throws ServletException, IOException;
 
     /**
@@ -310,6 +310,6 @@ public interface RequestDispatcher {
      * @exception IOException
      *                if the included resource throws this exception
      */
-    public void include(ServletRequest request, ServletResponse response)
+    void include(ServletRequest request, ServletResponse response)
             throws ServletException, IOException;
 }

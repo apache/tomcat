@@ -430,7 +430,7 @@ class NamesEnumerator implements Enumeration<String> {
     private String next;
     private final MimeHeaders headers;
 
-    public NamesEnumerator(MimeHeaders headers) {
+    NamesEnumerator(MimeHeaders headers) {
         this.headers=headers;
         pos=0;
         size = headers.size();
@@ -522,7 +522,7 @@ class MimeHeaderField {
     /**
      * Creates a new, uninitialized header field.
      */
-    public MimeHeaderField() {
+    MimeHeaderField() {
         // NO-OP
     }
 

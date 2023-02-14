@@ -162,7 +162,7 @@ public class TestStreamQueryString extends Http2TestBase {
 
         private final String expectedValue;
 
-        public Query(String expectedValue) {
+        Query(String expectedValue) {
             String decoded;
             try {
                 decoded = URLDecoder.decode(expectedValue, "UTF-8");

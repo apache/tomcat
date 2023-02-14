@@ -40,7 +40,7 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
     private final WsSession wsSession;
     private volatile AtomicReference<SendResult> result = new AtomicReference<>(null);
 
-    public FutureToSendHandler(WsSession wsSession) {
+    FutureToSendHandler(WsSession wsSession) {
         this.wsSession = wsSession;
     }
 

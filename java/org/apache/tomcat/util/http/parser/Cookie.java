@@ -259,7 +259,7 @@ public class Cookie {
         private int limit;
         private int position = 0;
 
-        public ByteBuffer(byte[] bytes, int offset, int len) {
+        ByteBuffer(byte[] bytes, int offset, int len) {
             this.bytes = bytes;
             this.position = offset;
             this.limit = offset + len;

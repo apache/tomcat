@@ -87,7 +87,7 @@ public class ApplicationMapping {
         private final MappingMatch mappingType;
         private final String servletName;
 
-        public MappingImpl(String matchValue, String pattern, MappingMatch mappingType, String servletName) {
+        MappingImpl(String matchValue, String pattern, MappingMatch mappingType, String servletName) {
             this.matchValue = matchValue;
             this.pattern = pattern;
             this.mappingType = mappingType;

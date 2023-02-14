@@ -41,7 +41,7 @@ public final class UEncoder {
             return this.safeChars;
         }
 
-        private SafeCharsSet(String additionalSafeChars) {
+        SafeCharsSet(String additionalSafeChars) {
             safeChars = initialSafeChars();
             for (char c : additionalSafeChars.toCharArray()) {
                 safeChars.set(c);

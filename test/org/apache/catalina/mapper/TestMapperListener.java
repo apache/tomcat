@@ -89,7 +89,7 @@ public class TestMapperListener extends TomcatBaseTest {
         public final ContainerListener[] containerListeners;
         public final LifecycleListener[] lifecycleListeners;
 
-        public ListenersInfo(Container container, ContainerListener[] containerListeners,
+        ListenersInfo(Container container, ContainerListener[] containerListeners,
                 LifecycleListener[] lifecycleListeners) {
             this.container = container;
             this.containerListeners = containerListeners;

@@ -275,11 +275,11 @@ public class FastRemovalDequeue<T> {
             content = object;
         }
 
-        private final boolean getValid() {
+        private boolean getValid() {
             return valid;
         }
 
-        private final void invalidate() {
+        private void invalidate() {
             this.valid = false;
             this.previous = null;
             this.next = null;
@@ -293,7 +293,7 @@ public class FastRemovalDequeue<T> {
             return replaced;
         }
 
-        private final void setReplaced(final T replaced) {
+        private void setReplaced(final T replaced) {
             this.replaced = replaced;
         }
 
@@ -301,19 +301,19 @@ public class FastRemovalDequeue<T> {
             this.replaced = null;
         }
 
-        private final Entry getNext() {
+        private Entry getNext() {
             return next;
         }
 
-        private final void setNext(final Entry next) {
+        private void setNext(final Entry next) {
             this.next = next;
         }
 
-        private final Entry getPrevious() {
+        private Entry getPrevious() {
             return previous;
         }
 
-        private final void setPrevious(final Entry previous) {
+        private void setPrevious(final Entry previous) {
             this.previous = previous;
         }
 

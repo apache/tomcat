@@ -61,7 +61,7 @@ public final class PoolUtils {
          * @param factor
          *            erosion factor
          */
-        public ErodingFactor(final float factor) {
+        ErodingFactor(final float factor) {
             this.factor = factor;
             nextShrinkMillis = System.currentTimeMillis() + (long) (900000 * factor); // now + 15 min * factor
             idleHighWaterMark = 1;
@@ -151,7 +151,7 @@ public final class PoolUtils {
          *            events
          * @see #erodingFactor
          */
-        public ErodingKeyedObjectPool(final KeyedObjectPool<K, V> keyedPool,
+        ErodingKeyedObjectPool(final KeyedObjectPool<K, V> keyedPool,
                 final float factor) {
             this(keyedPool, new ErodingFactor(factor));
         }
@@ -341,7 +341,7 @@ public final class PoolUtils {
          *            events
          * @see #factor
          */
-        public ErodingObjectPool(final ObjectPool<T> pool, final float factor) {
+        ErodingObjectPool(final ObjectPool<T> pool, final float factor) {
             this.pool = pool;
             this.factor = new ErodingFactor(factor);
         }
@@ -484,7 +484,7 @@ public final class PoolUtils {
          * @param factor
          *            erosion factor
          */
-        public ErodingPerKeyKeyedObjectPool(
+        ErodingPerKeyKeyedObjectPool(
                 final KeyedObjectPool<K, V> keyedPool, final float factor) {
             super(keyedPool, null);
             this.factor = factor;

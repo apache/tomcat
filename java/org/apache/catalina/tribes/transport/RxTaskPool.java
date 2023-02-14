@@ -147,7 +147,7 @@ public class RxTaskPool {
         return this.creator;
     }
 
-    public static interface TaskCreator  {
-        public AbstractRxTask createRxTask();
+    public interface TaskCreator  {
+        AbstractRxTask createRxTask();
     }
 }

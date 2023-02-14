@@ -511,7 +511,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         private final Context context;
         private final org.apache.coyote.Request coyoteRequest;
 
-        public RunnableWrapper(Runnable wrapped, Context ctxt, org.apache.coyote.Request coyoteRequest) {
+        RunnableWrapper(Runnable wrapped, Context ctxt, org.apache.coyote.Request coyoteRequest) {
             this.wrapped = wrapped;
             this.context = ctxt;
             this.coyoteRequest = coyoteRequest;
@@ -548,7 +548,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         private final ServletRequest servletRequest;
         private final ServletResponse servletResponse;
 
-        public AsyncRunnable(Request request, AsyncDispatcher applicationDispatcher, ServletRequest servletRequest,
+        AsyncRunnable(Request request, AsyncDispatcher applicationDispatcher, ServletRequest servletRequest,
                 ServletResponse servletResponse) {
             this.request = request;
             this.applicationDispatcher = applicationDispatcher;

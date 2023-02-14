@@ -6061,7 +6061,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         private final ServletContext sc;
 
-        public NoPluggabilityServletContext(ServletContext sc) {
+        NoPluggabilityServletContext(ServletContext sc) {
             this.sc = sc;
         }
 

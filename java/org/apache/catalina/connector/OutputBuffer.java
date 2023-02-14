@@ -865,7 +865,7 @@ public class OutputBuffer extends Writer {
 
         private final Charset charset;
 
-        public PrivilegedCreateConverter(Charset charset) {
+        PrivilegedCreateConverter(Charset charset) {
             this.charset = charset;
         }
 

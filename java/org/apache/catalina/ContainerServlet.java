@@ -32,7 +32,7 @@ public interface ContainerServlet {
      *
      * @return The Wrapper with which this Servlet is associated.
      */
-    public Wrapper getWrapper();
+    Wrapper getWrapper();
 
 
     /**
@@ -40,5 +40,5 @@ public interface ContainerServlet {
      *
      * @param wrapper The new associated Wrapper
      */
-    public void setWrapper(Wrapper wrapper);
+    void setWrapper(Wrapper wrapper);
 }

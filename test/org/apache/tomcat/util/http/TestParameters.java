@@ -274,7 +274,7 @@ public class TestParameters {
         private final String name;
         private final String[] values;
 
-        public Parameter(String name, String... values) {
+        Parameter(String name, String... values) {
             this.name = name;
             this.values = values;
         }

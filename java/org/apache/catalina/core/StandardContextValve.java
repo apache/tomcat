@@ -41,7 +41,7 @@ final class StandardContextValve extends ValveBase {
 
     private static final StringManager sm = StringManager.getManager(StandardContextValve.class);
 
-    public StandardContextValve() {
+    StandardContextValve() {
         super(true);
     }
 
@@ -57,7 +57,7 @@ final class StandardContextValve extends ValveBase {
      * @exception ServletException if a servlet error occurred
      */
     @Override
-    public final void invoke(Request request, Response response) throws IOException, ServletException {
+    public void invoke(Request request, Response response) throws IOException, ServletException {
 
         // Disallow any direct access to resources under WEB-INF or META-INF
         MessageBytes requestPathMB = request.getRequestPathMB();

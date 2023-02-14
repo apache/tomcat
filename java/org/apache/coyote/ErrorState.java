@@ -50,7 +50,7 @@ public enum ErrorState {
     private final boolean ioAllowed;
     private final boolean connectionIoAllowed;
 
-    private ErrorState(boolean error, int severity, boolean ioAllowed, boolean connectionIoAllowed) {
+    ErrorState(boolean error, int severity, boolean ioAllowed, boolean connectionIoAllowed) {
         this.error = error;
         this.severity = severity;
         this.ioAllowed = ioAllowed;

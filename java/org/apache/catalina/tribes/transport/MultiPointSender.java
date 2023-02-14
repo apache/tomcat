@@ -24,9 +24,9 @@ import org.apache.catalina.tribes.Member;
  */
 public interface MultiPointSender extends DataSender
 {
-    public void sendMessage(Member[] destination, ChannelMessage data) throws ChannelException;
-    public void setMaxRetryAttempts(int attempts);
-    public void setDirectBuffer(boolean directBuf);
-    public void add(Member member);
-    public void remove(Member member);
+    void sendMessage(Member[] destination, ChannelMessage data) throws ChannelException;
+    void setMaxRetryAttempts(int attempts);
+    void setDirectBuffer(boolean directBuf);
+    void add(Member member);
+    void remove(Member member);
 }

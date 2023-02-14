@@ -37,45 +37,45 @@ public interface ChannelMessage extends Serializable, Cloneable {
      * that originally sent it.
      * @return the source or reply-to address of this message
      */
-    public Member getAddress();
+    Member getAddress();
 
     /**
      * Sets the source or reply-to address of this message
      * @param member Member
      */
-    public void setAddress(Member member);
+    void setAddress(Member member);
 
     /**
      * Timestamp of when the message was created.
      * @return long timestamp in milliseconds
      */
-    public long getTimestamp();
+    long getTimestamp();
 
     /**
      * Sets the timestamp of this message.
      *
      * @param timestamp The timestamp
      */
-    public void setTimestamp(long timestamp);
+    void setTimestamp(long timestamp);
 
     /**
      * Each message must have a globally unique Id.
      * interceptors heavily depend on this id for message processing
      * @return byte
      */
-    public byte[] getUniqueId();
+    byte[] getUniqueId();
 
     /**
      * The byte buffer that contains the actual message payload
      * @param buf XByteBuffer
      */
-    public void setMessage(XByteBuffer buf);
+    void setMessage(XByteBuffer buf);
 
     /**
      * returns the byte buffer that contains the actual message payload
      * @return XByteBuffer
      */
-    public XByteBuffer getMessage();
+    XByteBuffer getMessage();
 
     /**
      * The message options is a 32 bit flag set
@@ -84,24 +84,24 @@ public interface ChannelMessage extends Serializable, Cloneable {
      * @see ChannelInterceptor#getOptionFlag
      * @return int - the option bits set for this message
      */
-    public int getOptions();
+    int getOptions();
 
     /**
      * sets the option bits for this message
      * @param options int
      * @see #getOptions()
      */
-    public void setOptions(int options);
+    void setOptions(int options);
 
     /**
      * Shallow clone, what gets cloned depends on the implementation
      * @return ChannelMessage
      */
-    public Object clone();
+    Object clone();
 
     /**
      * Deep clone, all fields MUST get cloned
      * @return ChannelMessage
      */
-    public Object deepclone();
+    Object deepclone();
 }
