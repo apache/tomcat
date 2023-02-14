@@ -46,9 +46,6 @@ Export-Package: \
     org.apache.catalina.manager.util,\
     org.apache.catalina
 
--includepackage: \
-    org.apache.naming.factory.webservices
-
 -jpms-module-info: \
     ${module.name};\
         access=32;\

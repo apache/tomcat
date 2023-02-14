@@ -1179,13 +1179,6 @@
     <Bug pattern="DE_MIGHT_IGNORE" />
   </Match>
   <Match>
-    <!-- Simpler to catch Exception than to create dummy implementations of the
-         necessary exception hierarchy -->
-    <Class name="org.apache.naming.factory.webservices.ServiceProxy" />
-    <Method name="&lt;init&gt;"/>
-    <Bug code="ST" />
-  </Match>
-  <Match>
     <!-- Class name needs to start with a lower case letter in this case -->
     <Class name="org.apache.naming.java.javaURLContextFactory" />
     <Bug code="Nm" />

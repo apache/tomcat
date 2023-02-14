@@ -89,7 +89,6 @@ Export-Package: \
     org.apache.tomcat.util.threads
 
 -includepackage: \
-    org.apache.naming.factory.webservices,\
     org.apache.tomcat.util.bcel,\
     org.apache.tomcat.util.http.fileupload.util.mime,\
     org.apache.tomcat.util.json,\
