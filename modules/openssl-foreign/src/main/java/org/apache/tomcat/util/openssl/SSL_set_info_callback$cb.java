@@ -24,11 +24,27 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-final class constants$29 {
+/**
+ * {@snippet :
+ * void (*SSL_set_info_callback$cb)(const SSL*,int,int);
+ * }
+ */
+public interface SSL_set_info_callback$cb {
 
-    // Suppresses default constructor, ensuring non-instantiability.
-    private constants$29() {}
-    static final MemorySegment OPENSSL_FILE$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("/tmp/jextract$13590800042373814498.h");
+    void apply(java.lang.foreign.MemorySegment _x0, int _x1, int _x2);
+    static MemorySegment allocate(SSL_set_info_callback$cb fi, Arena scope) {
+        return RuntimeHelper.upcallStub(SSL_set_info_callback$cb.class, fi, constants$21.SSL_set_info_callback$cb$FUNC, scope);
+    }
+    static SSL_set_info_callback$cb ofAddress(MemorySegment addr, Arena scope) {
+        MemorySegment symbol = MemorySegment.ofAddress(addr.address(), 0, scope);
+        return (java.lang.foreign.MemorySegment __x0, int __x1, int __x2) -> {
+            try {
+                constants$21.SSL_set_info_callback$cb$MH.invokeExact(symbol, __x0, __x1, __x2);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        };
+    }
 }
 
 

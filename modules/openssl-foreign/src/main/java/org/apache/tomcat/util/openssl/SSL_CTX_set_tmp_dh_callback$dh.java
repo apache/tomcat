@@ -24,11 +24,27 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-final class constants$29 {
+/**
+ * {@snippet :
+ * DH* (*SSL_CTX_set_tmp_dh_callback$dh)(SSL*,int,int);
+ * }
+ */
+public interface SSL_CTX_set_tmp_dh_callback$dh {
 
-    // Suppresses default constructor, ensuring non-instantiability.
-    private constants$29() {}
-    static final MemorySegment OPENSSL_FILE$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("/tmp/jextract$13590800042373814498.h");
+    java.lang.foreign.MemorySegment apply(java.lang.foreign.MemorySegment _x0, int _x1, int _x2);
+    static MemorySegment allocate(SSL_CTX_set_tmp_dh_callback$dh fi, Arena scope) {
+        return RuntimeHelper.upcallStub(SSL_CTX_set_tmp_dh_callback$dh.class, fi, constants$21.SSL_CTX_set_tmp_dh_callback$dh$FUNC, scope);
+    }
+    static SSL_CTX_set_tmp_dh_callback$dh ofAddress(MemorySegment addr, Arena scope) {
+        MemorySegment symbol = MemorySegment.ofAddress(addr.address(), 0, scope);
+        return (java.lang.foreign.MemorySegment __x0, int __x1, int __x2) -> {
+            try {
+                return (java.lang.foreign.MemorySegment)constants$22.SSL_CTX_set_tmp_dh_callback$dh$MH.invokeExact(symbol, __x0, __x1, __x2);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        };
+    }
 }
 
 
