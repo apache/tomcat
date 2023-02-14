@@ -859,7 +859,10 @@
         <exclude name="nbproject/**"/>
         <exclude name="output/**"/>
         <exclude name="modules/**"/>
-        <exclude name="test/**"/>
+        <exclude name="test/webapp-fragments/WEB-INF/classes/*.txt"/>
+        <exclude name="test/webapp/bug49nnn/*.txt"/>
+        <exclude name="test/webapp/bug53257/**/*.txt"/>
+        <exclude name="test/webresources/**/*.txt"/>
         <exclude name="**/*.mdl"/>
         <exclude name="**/*.pem"/>
         <exclude name="**/*.svg"/>
