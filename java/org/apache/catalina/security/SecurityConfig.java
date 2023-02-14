@@ -126,7 +126,7 @@ public final class SecurityConfig{
      * Set the proper security property
      * @param properties the package.* property.
      */
-    private final void setSecurityProperty(String properties, String packageList){
+    private void setSecurityProperty(String properties, String packageList){
         if (System.getSecurityManager() != null){
             String definition = Security.getProperty(properties);
             if( definition != null && definition.length() > 0 ){

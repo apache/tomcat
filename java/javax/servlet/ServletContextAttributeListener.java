@@ -35,19 +35,19 @@ public interface ServletContextAttributeListener extends EventListener {
      * Called after the attribute is added.
      * @param scae Information about the new attribute
      */
-    public void attributeAdded(ServletContextAttributeEvent scae);
+    void attributeAdded(ServletContextAttributeEvent scae);
 
     /**
      * Notification that an existing attribute has been removed from the servlet
      * context. Called after the attribute is removed.
      * @param scae Information about the removed attribute
      */
-    public void attributeRemoved(ServletContextAttributeEvent scae);
+    void attributeRemoved(ServletContextAttributeEvent scae);
 
     /**
      * Notification that an attribute on the servlet context has been replaced.
      * Called after the attribute is replaced.
      * @param scae Information about the replaced attribute
      */
-    public void attributeReplaced(ServletContextAttributeEvent scae);
+    void attributeReplaced(ServletContextAttributeEvent scae);
 }

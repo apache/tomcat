@@ -148,13 +148,13 @@ public class TesterAjpMessage extends AjpMessage {
         private final String name;
         private final String value;
 
-        public Header(int code, String value) {
+        Header(int code, String value) {
             this.code = code;
             this.name = null;
             this.value = value;
         }
 
-        public Header(String name, String value) {
+        Header(String name, String value) {
             this.code = 0;
             this.name = name;
             this.value = value;
@@ -176,13 +176,13 @@ public class TesterAjpMessage extends AjpMessage {
         private final String name;
         private final String value;
 
-        public Attribute(int code, String value) {
+        Attribute(int code, String value) {
             this.code = code;
             this.name = null;
             this.value = value;
         }
 
-        public Attribute(String name, String value) {
+        Attribute(String name, String value) {
             this.code = 0;
             this.name = name;
             this.value = value;

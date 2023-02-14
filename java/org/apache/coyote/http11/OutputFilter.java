@@ -32,13 +32,13 @@ public interface OutputFilter extends HttpOutputBuffer {
      *
      * @param response The response to associate with this OutputFilter
      */
-    public void setResponse(Response response);
+    void setResponse(Response response);
 
 
     /**
      * Make the filter ready to process the next request.
      */
-    public void recycle();
+    void recycle();
 
 
     /**
@@ -46,5 +46,5 @@ public interface OutputFilter extends HttpOutputBuffer {
      *
      * @param buffer The next buffer instance
      */
-    public void setBuffer(HttpOutputBuffer buffer);
+    void setBuffer(HttpOutputBuffer buffer);
 }

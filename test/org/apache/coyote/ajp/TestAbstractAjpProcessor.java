@@ -958,7 +958,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         final List<Integer> availableList;
         final List<Integer> readList;
 
-        public ReadBodyServlet(boolean callAvailable) {
+        ReadBodyServlet(boolean callAvailable) {
             this.callAvailable = callAvailable;
             this.availableList = callAvailable ? new ArrayList<Integer>() : null;
             this.readList = callAvailable ? new ArrayList<Integer>() : null;
@@ -1017,7 +1017,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         private final int responseSize;
         private final int bufferSize;
 
-        public FixedResponseSizeServlet(int responseSize, int bufferSize) {
+        FixedResponseSizeServlet(int responseSize, int bufferSize) {
             this.responseSize = responseSize;
             this.bufferSize = bufferSize;
         }

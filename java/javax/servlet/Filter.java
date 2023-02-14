@@ -64,7 +64,7 @@ public interface Filter {
      *
      * @throws ServletException if the initialisation fails
      */
-    public void init(FilterConfig filterConfig) throws ServletException;
+    void init(FilterConfig filterConfig) throws ServletException;
 
     /**
      * The <code>doFilter</code> method of the Filter is called by the container
@@ -97,7 +97,7 @@ public interface Filter {
      *                     processing of the request
      * @throws ServletException if the processing fails for any other reason
      */
-    public void doFilter(ServletRequest request, ServletResponse response,
+    void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException;
 
     /**
@@ -113,5 +113,5 @@ public interface Filter {
      * sure that any persistent state is synchronized with the filter's current
      * state in memory.
      */
-    public void destroy();
+    void destroy();
 }

@@ -268,7 +268,7 @@ public class TesterBean {
 
     @SuppressWarnings("unused")
     private static class Inner2 {
-        public Inner2() {
+        Inner2() {
         }
     }
 

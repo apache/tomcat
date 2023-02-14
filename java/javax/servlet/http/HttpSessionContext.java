@@ -43,7 +43,7 @@ public interface HttpSessionContext {
      *                 future version of this API.
      */
     // Spec API does not use @Deprecated
-    public HttpSession getSession(String sessionId);
+    HttpSession getSession(String sessionId);
 
     /**
      * Do not use.
@@ -54,5 +54,5 @@ public interface HttpSessionContext {
      *                 <code>Enumeration</code> and will be removed in a future version of this API.
      */
     // Spec API does not use @Deprecated
-    public Enumeration<String> getIds();
+    Enumeration<String> getIds();
 }

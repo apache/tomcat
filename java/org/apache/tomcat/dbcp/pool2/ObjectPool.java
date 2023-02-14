@@ -85,7 +85,7 @@ public interface ObjectPool<T> extends Closeable {
      *             when {@link ObjectPool#addObject()} fails.
      * @since 2.8.0
      */
-    void addObjects(final int count) throws Exception;
+    void addObjects(int count) throws Exception;
 
     /**
      * Obtains an instance from this pool.
@@ -199,7 +199,7 @@ public interface ObjectPool<T> extends Closeable {
      * @throws Exception if the instance cannot be invalidated
      * @since 2.9.0
      */
-    void invalidateObject(final T obj, final DestroyMode mode) throws Exception;
+    void invalidateObject(T obj, DestroyMode mode) throws Exception;
 
     /**
      * Returns an instance to the pool. By contract, {@code obj}

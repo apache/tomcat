@@ -49,7 +49,7 @@ public class ResponseFacade implements HttpServletResponse {
 
         private final String contentType;
 
-        public SetContentTypePrivilegedAction(String contentType){
+        SetContentTypePrivilegedAction(String contentType){
             this.contentType = contentType;
         }
 
@@ -88,7 +88,7 @@ public class ResponseFacade implements HttpServletResponse {
 
         private final Response response;
 
-        public FlushBufferPrivilegedAction(Response response) {
+        FlushBufferPrivilegedAction(Response response) {
             this.response = response;
         }
 

@@ -63,7 +63,7 @@ class ApplicationRequest extends ServletRequestWrapper {
      *
      * @param request The servlet request being wrapped
      */
-    public ApplicationRequest(ServletRequest request) {
+    ApplicationRequest(ServletRequest request) {
 
         super(request);
         setRequest(request);

@@ -80,7 +80,7 @@ class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserPassKey
      * @param rollbackAfterValidation
      *            whether a rollback should be issued after {@link #validateObject validating} {@link Connection}s.
      */
-    public KeyedCPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery,
+    KeyedCPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery,
             final int validationQueryTimeoutSeconds, final boolean rollbackAfterValidation) {
         this.cpds = cpds;
         this.validationQuery = validationQuery;

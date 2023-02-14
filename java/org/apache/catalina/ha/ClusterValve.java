@@ -28,11 +28,11 @@ public interface ClusterValve extends Valve{
      * Returns the cluster the cluster deployer is associated with
      * @return CatalinaCluster
      */
-    public CatalinaCluster getCluster();
+    CatalinaCluster getCluster();
 
     /**
      * Associates the cluster deployer with a cluster
      * @param cluster CatalinaCluster
      */
-    public void setCluster(CatalinaCluster cluster);
+    void setCluster(CatalinaCluster cluster);
 }

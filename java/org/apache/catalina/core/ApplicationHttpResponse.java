@@ -47,7 +47,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      * @param included <code>true</code> if this response is being processed by a
      *                     <code>RequestDispatcher.include()</code> call
      */
-    public ApplicationHttpResponse(HttpServletResponse response, boolean included) {
+    ApplicationHttpResponse(HttpServletResponse response, boolean included) {
 
         super(response);
         setIncluded(included);

@@ -40,6 +40,6 @@ public interface GSSRealm extends Realm {
      *                      {@code null}
      * @return the associated principal, or {@code null} if there is none
      */
-    public Principal authenticate(GSSName gssName, GSSCredential gssCredential);
+    Principal authenticate(GSSName gssName, GSSCredential gssCredential);
 
 }

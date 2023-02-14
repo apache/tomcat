@@ -30,14 +30,14 @@ public interface DocumentProperties {
      * @deprecated This method will be removed in Tomcat 9
      */
     @Deprecated
-    public interface Encoding {
-        public void setEncoding(String encoding);
+    interface Encoding {
+        void setEncoding(String encoding);
     }
 
     /**
      * The character encoding used by the source XML document.
      */
-    public interface Charset {
-        public void setCharset(java.nio.charset.Charset charset);
+    interface Charset {
+        void setCharset(java.nio.charset.Charset charset);
     }
 }

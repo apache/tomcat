@@ -809,7 +809,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         private final Request request;
         private final Stream stream;
 
-        public PrivilegedPush(Http2UpgradeHandler handler, Request request, Stream stream) {
+        PrivilegedPush(Http2UpgradeHandler handler, Request request, Stream stream) {
             this.handler = handler;
             this.request = request;
             this.stream = stream;
@@ -938,7 +938,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             return dataLeft;
         }
 
-        private final synchronized boolean flush(boolean writeInProgress, boolean block) throws IOException {
+        private synchronized boolean flush(boolean writeInProgress, boolean block) throws IOException {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("stream.outputBuffer.flush.debug", getConnectionId(), getIdAsString(),
                         Integer.toString(buffer.position()), Boolean.toString(writeInProgress),
@@ -1325,7 +1325,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
 
 
-        private final void ensureBuffersExist() {
+        private void ensureBuffersExist() {
             if (inBuffer == null && !closed) {
                 // The client must obey Tomcat's window size when sending so
                 // this is the initial window size set by Tomcat that the client

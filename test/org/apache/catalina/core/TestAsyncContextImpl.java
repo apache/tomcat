@@ -594,7 +594,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         public static final long ASYNC_TIMEOUT = 100;
 
-        public TimeoutServlet(Boolean completeOnTimeout, String dispatchUrl) {
+        TimeoutServlet(Boolean completeOnTimeout, String dispatchUrl) {
             this.completeOnTimeout = completeOnTimeout;
             if (completeOnTimeout == null) {
                 this.trackingListener = null;
@@ -722,7 +722,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         private static final String DISPATCH_CHECK = "check";
         private final transient TrackingListener trackingListener;
 
-        public DispatchingServlet(boolean addTrackingListener,
+        DispatchingServlet(boolean addTrackingListener,
                 boolean completeOnError) {
             if (addTrackingListener) {
                 trackingListener = new TrackingListener(completeOnError, true, null);
@@ -934,7 +934,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
     private static class StickyTrackingListener extends TrackingListener {
 
-        public StickyTrackingListener(boolean completeOnError,
+        StickyTrackingListener(boolean completeOnError,
                 boolean completeOnTimeout, String dispatchUrl) {
             super(completeOnError, completeOnTimeout, dispatchUrl);
         }
@@ -1315,7 +1315,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private int status;
 
-        public AsyncStatusServlet(int status) {
+        AsyncStatusServlet(int status) {
             this.status = status;
         }
 
@@ -1435,7 +1435,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         private int status;
         private boolean threaded;
 
-        public AsyncErrorServlet(int status, boolean threaded) {
+        AsyncErrorServlet(int status, boolean threaded) {
             this.status = status;
             this.threaded = threaded;
         }
@@ -1757,7 +1757,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private final ErrorPageAsyncMode mode;
 
-        public AsyncErrorPage(ErrorPageAsyncMode mode) {
+        AsyncErrorPage(ErrorPageAsyncMode mode) {
             this.mode = mode;
         }
 
@@ -2274,7 +2274,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         private final String target;
         private final boolean addTrackingListener;
 
-        public DispatchingServletTracking(String target, boolean addTrackingListener) {
+        DispatchingServletTracking(String target, boolean addTrackingListener) {
             this.target = target;
             this.addTrackingListener = addTrackingListener;
         }
@@ -2781,7 +2781,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         private final boolean useComplete;
         private transient AsyncIoEndWriteListener asyncIoEndWriteListener;
 
-        public AsyncIoEndServlet(boolean useThread, boolean useComplete) {
+        AsyncIoEndServlet(boolean useThread, boolean useComplete) {
             this.useThread = useThread;
             this.useComplete = useComplete;
         }
@@ -2818,7 +2818,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         private final boolean useComplete;
         private boolean invalidStateDetected = false;
 
-        public AsyncIoEndWriteListener(AsyncContext ac, boolean useThread,
+        AsyncIoEndWriteListener(AsyncContext ac, boolean useThread,
                 boolean useComplete) {
             this.ac = ac;
             this.useThread = useThread;
@@ -2958,7 +2958,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         private final transient CountDownLatch threadCompleteLatch;
         private final AtomicBoolean ise;
 
-        public Bug63816Servlet(CountDownLatch doGetLatch, CountDownLatch clientCloseLatch,
+        Bug63816Servlet(CountDownLatch doGetLatch, CountDownLatch clientCloseLatch,
                 CountDownLatch threadCompleteLatch, AtomicBoolean ise) {
             this.doGetLatch = doGetLatch;
             this.clientCloseLatch = clientCloseLatch;
@@ -2992,7 +2992,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         private final CountDownLatch threadCompleteLatch;
         private final AtomicBoolean ise;
 
-        public Bug63816Thread(AsyncContext ac, CountDownLatch clientCloseLatch, CountDownLatch threadCompleteLatch,
+        Bug63816Thread(AsyncContext ac, CountDownLatch clientCloseLatch, CountDownLatch threadCompleteLatch,
                 AtomicBoolean ise) {
             this.ac = ac;
             this.clientCloseLatch = clientCloseLatch;
@@ -3125,7 +3125,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         private final transient CountDownLatch threadCompleteLatch;
         private final AtomicBoolean testFailed;
 
-        public PostServlet(CountDownLatch doPostLatch, CountDownLatch clientCloseLatch,
+        PostServlet(CountDownLatch doPostLatch, CountDownLatch clientCloseLatch,
                 CountDownLatch threadCompleteLatch, AtomicBoolean testFailed) {
             this.partialReadLatch = doPostLatch;
             this.clientCloseLatch = clientCloseLatch;
@@ -3158,7 +3158,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         private final CountDownLatch threadCompleteLatch;
         private final AtomicBoolean testFailed;
 
-        public PostServletThread(AsyncContext ac, CountDownLatch partialReadLatch, CountDownLatch clientCloseLatch,
+        PostServletThread(AsyncContext ac, CountDownLatch partialReadLatch, CountDownLatch clientCloseLatch,
                 CountDownLatch threadCompleteLatch, AtomicBoolean testFailed) {
             this.ac = ac;
             this.partialReadLatch = partialReadLatch;

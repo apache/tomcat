@@ -86,7 +86,7 @@ public class Host {
         private int pos;
         private int mark;
 
-        public MessageBytesReader(MessageBytes mb) {
+        MessageBytesReader(MessageBytes mb) {
             ByteChunk bc = mb.getByteChunk();
             bytes = bc.getBytes();
             pos = bc.getOffset();

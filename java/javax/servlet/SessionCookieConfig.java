@@ -32,14 +32,14 @@ public interface SessionCookieConfig {
      * @throws IllegalStateException if the associated ServletContext has
      *         already been initialised
      */
-    public void setName(String name);
+    void setName(String name);
 
     /**
      * Obtain the name to use for the session cookies.
      *
      * @return the name to use for session cookies.
      */
-    public String getName();
+    String getName();
 
     /**
      * Sets the domain for the session cookie
@@ -49,14 +49,14 @@ public interface SessionCookieConfig {
      * @throws IllegalStateException if the associated ServletContext has
      *         already been initialised
      */
-    public void setDomain(String domain);
+    void setDomain(String domain);
 
     /**
      * Obtain the domain to use for session cookies.
      *
      * @return the domain to use for session cookies.
      */
-    public String getDomain();
+    String getDomain();
 
     /**
      * Sets the path of the session cookie.
@@ -66,7 +66,7 @@ public interface SessionCookieConfig {
      * @throws IllegalStateException if the associated ServletContext has
      *         already been initialised
      */
-    public void setPath(String path);
+    void setPath(String path);
 
     /**
      * Obtain the path to use for session cookies. This is normally the context
@@ -74,7 +74,7 @@ public interface SessionCookieConfig {
      *
      * @return The path to use for session cookies.
      */
-    public String getPath();
+    String getPath();
 
     /**
      * Sets the comment for the session cookie
@@ -84,14 +84,14 @@ public interface SessionCookieConfig {
      * @throws IllegalStateException if the associated ServletContext has
      *         already been initialised
      */
-    public void setComment(String comment);
+    void setComment(String comment);
 
     /**
      * Obtain the comment to use for session cookies.
      *
      * @return the comment to use for session cookies.
      */
-    public String getComment();
+    String getComment();
 
     /**
      * Sets the httpOnly flag for the session cookie.
@@ -101,14 +101,14 @@ public interface SessionCookieConfig {
      * @throws IllegalStateException if the associated ServletContext has
      *         already been initialised
      */
-    public void setHttpOnly(boolean httpOnly);
+    void setHttpOnly(boolean httpOnly);
 
     /**
      * Will session cookies be created with the httpOnly flag set?
      *
      * @return {@code true} if the flag should be set, otherwise {@code false}
      */
-    public boolean isHttpOnly();
+    boolean isHttpOnly();
 
     /**
      * Sets the secure flag for the session cookie.
@@ -118,14 +118,14 @@ public interface SessionCookieConfig {
      * @throws IllegalStateException if the associated ServletContext has
      *         already been initialised
      */
-    public void setSecure(boolean secure);
+    void setSecure(boolean secure);
 
     /**
      * Will session cookies be created with the secure flag set?
      *
      * @return {@code true} if the flag should be set, otherwise {@code false}
      */
-    public boolean isSecure();
+    boolean isSecure();
 
     /**
      * Sets the maximum age.
@@ -134,12 +134,12 @@ public interface SessionCookieConfig {
      * @throws IllegalStateException if the associated ServletContext has
      *         already been initialised
      */
-    public void setMaxAge(int MaxAge);
+    void setMaxAge(int MaxAge);
 
     /**
      * Obtain the maximum age to set for a session cookie.
      *
      * @return the maximum age in seconds
      */
-    public int getMaxAge();
+    int getMaxAge();
 }

@@ -24,31 +24,31 @@ public interface AsyncContext {
     /**
      * The attribute name for the URI of the async request
      */
-    public static final String ASYNC_REQUEST_URI =
+    String ASYNC_REQUEST_URI =
             "javax.servlet.async.request_uri";
 
     /**
      * The attribute name for the Context Path of the async request
      */
-    public static final String ASYNC_CONTEXT_PATH  =
+    String ASYNC_CONTEXT_PATH  =
             "javax.servlet.async.context_path";
 
     /**
      * The attribute name for the Path Info of the async request
      */
-    public static final String ASYNC_PATH_INFO =
+    String ASYNC_PATH_INFO =
             "javax.servlet.async.path_info";
 
     /**
      * The attribute name for the Servlet Path of the async request
      */
-    public static final String ASYNC_SERVLET_PATH =
+    String ASYNC_SERVLET_PATH =
             "javax.servlet.async.servlet_path";
 
     /**
      * The attribute name for the Query String of the async request
      */
-    public static final String ASYNC_QUERY_STRING =
+    String ASYNC_QUERY_STRING =
             "javax.servlet.async.query_string";
 
     /**

@@ -551,12 +551,12 @@ public final class IntrospectionUtils {
     // -------------------- Get property --------------------
     // This provides a layer of abstraction
 
-    public static interface PropertySource {
-        public String getProperty(String key);
+    public interface PropertySource {
+        String getProperty(String key);
     }
 
 
-    public static interface SecurePropertySource extends PropertySource {
+    public interface SecurePropertySource extends PropertySource {
 
         /**
          * Obtain a property value, checking that code associated with the
@@ -573,6 +573,6 @@ public final class IntrospectionUtils {
          *         or if {@link PermissionCheck#check(java.security.Permission)}
          *         fails
          */
-        public String getProperty(String key, ClassLoader classLoader);
+        String getProperty(String key, ClassLoader classLoader);
     }
 }

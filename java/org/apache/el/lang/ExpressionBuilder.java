@@ -96,12 +96,12 @@ public final class ExpressionBuilder implements NodeVisitor {
         }
     }
 
-    public static final Node createNode(String expr) throws ELException {
+    public static Node createNode(String expr) throws ELException {
         Node n = createNodeInternal(expr);
         return n;
     }
 
-    private static final Node createNodeInternal(String expr)
+    private static Node createNodeInternal(String expr)
             throws ELException {
         if (expr == null) {
             throw new ELException(MessageFactory.get("error.null"));
@@ -286,11 +286,11 @@ public final class ExpressionBuilder implements NodeVisitor {
         private Object[] stack;
 
 
-        public SynchronizedStack() {
+        SynchronizedStack() {
             this(DEFAULT_SIZE, DEFAULT_LIMIT);
         }
 
-        public SynchronizedStack(int size, int limit) {
+        SynchronizedStack(int size, int limit) {
             this.size = size;
             this.limit = limit;
             stack = new Object[size];

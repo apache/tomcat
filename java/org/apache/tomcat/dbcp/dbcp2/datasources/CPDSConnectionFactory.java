@@ -85,7 +85,7 @@ class CPDSConnectionFactory
      *            The password to use to create connections
      * @since 2.4.0
      */
-    public CPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery,
+    CPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery,
             final int validationQueryTimeoutSeconds, final boolean rollbackAfterValidation, final String userName,
             final char[] userPassword) {
         this.cpds = cpds;
@@ -114,7 +114,7 @@ class CPDSConnectionFactory
      * @param userPassword
      *            The password to use to create connections
      */
-    public CPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery,
+    CPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery,
             final int validationQueryTimeoutSeconds, final boolean rollbackAfterValidation, final String userName,
             final String userPassword) {
         this(cpds, validationQuery, validationQueryTimeoutSeconds, rollbackAfterValidation, userName,

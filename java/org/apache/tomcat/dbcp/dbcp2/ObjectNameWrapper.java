@@ -61,7 +61,7 @@ class ObjectNameWrapper {
 
     private final ObjectName objectName;
 
-    public ObjectNameWrapper(final ObjectName objectName) {
+    ObjectNameWrapper(final ObjectName objectName) {
         this.objectName = objectName;
     }
 

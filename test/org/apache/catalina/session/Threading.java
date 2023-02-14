@@ -113,7 +113,7 @@ public class Threading {
         private long byteCount = 0;
         private boolean fail = false;
 
-        public FisReaderThread(FileInputStream fis) {
+        FisReaderThread(FileInputStream fis) {
             this.fis = fis;
         }
 

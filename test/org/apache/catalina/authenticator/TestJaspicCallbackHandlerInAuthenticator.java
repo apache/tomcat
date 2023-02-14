@@ -27,7 +27,6 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.message.callback.CallerPrincipalCallback;
 import javax.security.auth.message.callback.GroupPrincipalCallback;
 import javax.security.auth.message.callback.PasswordValidationCallback;
@@ -188,19 +187,5 @@ public class TestJaspicCallbackHandlerInAuthenticator {
         protected String getName() {
             return "Test Realm";
         }
-    }
-}
-
-
-class TestCallbackHandlerImpl implements CallbackHandler {
-
-    public TestCallbackHandlerImpl() {
-        // Default constructor required by reflection
-    }
-
-
-    @Override
-    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-        // don't have to do anything; needed only for instantiation
     }
 }

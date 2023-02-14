@@ -250,7 +250,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         private final String[] roles;
         private final Principal principal;
 
-        public SerializablePrincipal(String name, String password, String[] roles, Principal principal) {
+        SerializablePrincipal(String name, String password, String[] roles, Principal principal) {
             this.name = name;
             this.password = password;
             this.roles = roles;

@@ -33,7 +33,7 @@ public interface ExtendedRpcCallback extends RpcCallback {
      * @param sender - the sender requested that reply
      * @param reason - the reason the reply failed
      */
-    public void replyFailed(Serializable request, Serializable response, Member sender, Exception reason);
+    void replyFailed(Serializable request, Serializable response, Member sender, Exception reason);
 
     /**
      * The reply succeeded
@@ -41,5 +41,5 @@ public interface ExtendedRpcCallback extends RpcCallback {
      * @param response - the reply message to the original message
      * @param sender - the sender requested that reply
      */
-    public void replySucceeded(Serializable request, Serializable response, Member sender);
+    void replySucceeded(Serializable request, Serializable response, Member sender);
 }

@@ -154,8 +154,8 @@ public abstract class AbstractReplicatedMap<K,V>
 //              map owner interface
 //------------------------------------------------------------------------------
 
-    public static interface MapOwner {
-        public void objectMadePrimary(Object key, Object value);
+    public interface MapOwner {
+        void objectMadePrimary(Object key, Object value);
     }
 
 //------------------------------------------------------------------------------
@@ -1728,7 +1728,7 @@ public abstract class AbstractReplicatedMap<K,V>
 
         private final boolean available;
 
-        private State(boolean available) {
+        State(boolean available) {
             this.available = available;
         }
 

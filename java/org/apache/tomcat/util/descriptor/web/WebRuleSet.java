@@ -714,7 +714,7 @@ public class WebRuleSet extends RuleSetBase {
  */
 final class SetLoginConfig extends Rule {
     boolean isLoginConfigSet = false;
-    public SetLoginConfig() {
+    SetLoginConfig() {
         // NO-OP
     }
 
@@ -737,7 +737,7 @@ final class SetLoginConfig extends Rule {
  */
 final class SetJspConfig extends Rule {
     boolean isJspConfigSet = false;
-    public SetJspConfig() {
+    SetJspConfig() {
         // NO-OP
     }
 
@@ -760,7 +760,7 @@ final class SetJspConfig extends Rule {
  */
 final class SetSessionConfig extends Rule {
     boolean isSessionConfigSet = false;
-    public SetSessionConfig() {
+    SetSessionConfig() {
         // NO-OP
     }
 
@@ -784,7 +784,7 @@ final class SetSessionConfig extends Rule {
 
 final class SetAuthConstraintRule extends Rule {
 
-    public SetAuthConstraintRule() {
+    SetAuthConstraintRule() {
         // NO-OP
     }
 
@@ -809,7 +809,7 @@ final class SetAuthConstraintRule extends Rule {
  */
 final class SetDistributableRule extends Rule {
 
-    public SetDistributableRule() {
+    SetDistributableRule() {
         // NO-OP
     }
 
@@ -832,7 +832,7 @@ final class SetDistributableRule extends Rule {
  */
 final class SetDenyUncoveredHttpMethodsRule extends Rule {
 
-    public SetDenyUncoveredHttpMethodsRule() {
+    SetDenyUncoveredHttpMethodsRule() {
         // NO-OP
     }
 
@@ -856,7 +856,7 @@ final class SetDenyUncoveredHttpMethodsRule extends Rule {
 
 final class SetPublicIdRule extends Rule {
 
-    public SetPublicIdRule(String method) {
+    SetPublicIdRule(String method) {
         this.method = method;
     }
 
@@ -899,7 +899,7 @@ final class SetPublicIdRule extends Rule {
 
 final class ServletDefCreateRule extends Rule {
 
-    public ServletDefCreateRule() {
+    ServletDefCreateRule() {
         // NO-OP
     }
 
@@ -931,7 +931,7 @@ final class ServletDefCreateRule extends Rule {
  */
 final class CallParamMultiRule extends CallParamRule {
 
-    public CallParamMultiRule(int paramIndex) {
+    CallParamMultiRule(int paramIndex) {
         super(paramIndex);
     }
 
@@ -961,7 +961,7 @@ final class CallMethodMultiRule extends CallMethodRule {
 
     final int multiParamIndex;
 
-    public CallMethodMultiRule(String methodName, int paramCount, int multiParamIndex) {
+    CallMethodMultiRule(String methodName, int paramCount, int multiParamIndex) {
         super(methodName, paramCount);
         this.multiParamIndex = multiParamIndex;
     }
@@ -1060,7 +1060,7 @@ final class CallMethodMultiRule extends CallMethodRule {
 
 final class IgnoreAnnotationsRule extends Rule {
 
-    public IgnoreAnnotationsRule() {
+    IgnoreAnnotationsRule() {
         // NO-OP
     }
 
@@ -1090,7 +1090,7 @@ final class IgnoreAnnotationsRule extends Rule {
 
 final class VersionRule extends Rule {
 
-    public VersionRule() {
+    VersionRule() {
         // NO-OP
     }
 
@@ -1117,7 +1117,7 @@ final class NameRule extends Rule {
 
     boolean isNameSet = false;
 
-    public NameRule() {
+    NameRule() {
         // NO-OP
     }
 
@@ -1149,7 +1149,7 @@ final class AbsoluteOrderingRule extends Rule {
     boolean isAbsoluteOrderingSet = false;
     private final boolean fragment;
 
-    public AbsoluteOrderingRule(boolean fragment) {
+    AbsoluteOrderingRule(boolean fragment) {
         this.fragment = fragment;
     }
 
@@ -1183,7 +1183,7 @@ final class RelativeOrderingRule extends Rule {
     boolean isRelativeOrderingSet = false;
     private final boolean fragment;
 
-    public RelativeOrderingRule(boolean fragment) {
+    RelativeOrderingRule(boolean fragment) {
         this.fragment = fragment;
     }
 
@@ -1209,7 +1209,7 @@ final class RelativeOrderingRule extends Rule {
  */
 final class SoapHeaderRule extends Rule {
 
-    public SoapHeaderRule() {
+    SoapHeaderRule() {
         // NO-OP
     }
 
@@ -1245,7 +1245,7 @@ final class SoapHeaderRule extends Rule {
  */
 final class ServiceQnameRule extends Rule {
 
-    public ServiceQnameRule() {
+    ServiceQnameRule() {
         // NO-OP
     }
 
@@ -1284,7 +1284,7 @@ final class TaglibLocationRule extends Rule {
 
     final boolean isServlet24OrLater;
 
-    public TaglibLocationRule(boolean isServlet24OrLater) {
+    TaglibLocationRule(boolean isServlet24OrLater) {
         this.isServlet24OrLater = isServlet24OrLater;
     }
 
@@ -1307,7 +1307,7 @@ final class TaglibLocationRule extends Rule {
  */
 final class MappedNameRule extends Rule {
 
-    public MappedNameRule() {
+    MappedNameRule() {
         // NO-OP
     }
 
@@ -1337,7 +1337,7 @@ final class LifecycleCallbackRule extends CallMethodRule {
 
     private final boolean postConstruct;
 
-    public LifecycleCallbackRule(String methodName, int paramCount,
+    LifecycleCallbackRule(String methodName, int paramCount,
             boolean postConstruct) {
         super(methodName, paramCount);
         this.postConstruct = postConstruct;
@@ -1366,7 +1366,7 @@ final class LifecycleCallbackRule extends CallMethodRule {
 
 final class SetOverrideRule extends Rule {
 
-    public SetOverrideRule() {
+    SetOverrideRule() {
         // no-op
     }
 

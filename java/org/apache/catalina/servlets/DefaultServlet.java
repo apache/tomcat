@@ -2974,7 +2974,7 @@ public class DefaultServlet extends HttpServlet {
          */
         protected Comparator<WebResource> resourceLastModifiedComparatorAsc;
 
-        public SortManager(boolean directoriesFirst) {
+        SortManager(boolean directoriesFirst) {
             resourceNameComparator = new ResourceNameComparator();
             resourceNameComparatorAsc = Collections.reverseOrder(resourceNameComparator);
             resourceSizeComparator = new ResourceSizeComparator(resourceNameComparator);
@@ -3115,7 +3115,7 @@ public class DefaultServlet extends HttpServlet {
             final char column;
             final boolean ascending;
 
-            public Order(char column, boolean ascending) {
+            Order(char column, boolean ascending) {
                 this.column = column;
                 this.ascending = ascending;
             }
@@ -3135,7 +3135,7 @@ public class DefaultServlet extends HttpServlet {
     private static class DirsFirstComparator implements Comparator<WebResource> {
         private final Comparator<WebResource> base;
 
-        public DirsFirstComparator(Comparator<WebResource> core) {
+        DirsFirstComparator(Comparator<WebResource> core) {
             this.base = core;
         }
 
@@ -3166,7 +3166,7 @@ public class DefaultServlet extends HttpServlet {
     private static class ResourceSizeComparator implements Comparator<WebResource> {
         private Comparator<WebResource> base;
 
-        public ResourceSizeComparator(Comparator<WebResource> base) {
+        ResourceSizeComparator(Comparator<WebResource> base) {
             this.base = base;
         }
 
@@ -3185,7 +3185,7 @@ public class DefaultServlet extends HttpServlet {
     private static class ResourceLastModifiedDateComparator implements Comparator<WebResource> {
         private Comparator<WebResource> base;
 
-        public ResourceLastModifiedDateComparator(Comparator<WebResource> base) {
+        ResourceLastModifiedDateComparator(Comparator<WebResource> base) {
             this.base = base;
         }
 
@@ -3201,7 +3201,7 @@ public class DefaultServlet extends HttpServlet {
         }
     }
 
-    static enum BomConfig {
+    enum BomConfig {
         /**
          * BoM is stripped if present and any BoM found used to determine the
          * encoding used to read the resource.
@@ -3222,7 +3222,7 @@ public class DefaultServlet extends HttpServlet {
         final boolean stripBom;
         final boolean useBomEncoding;
 
-        private BomConfig(String configurationValue, boolean stripBom, boolean useBomEncoding) {
+        BomConfig(String configurationValue, boolean stripBom, boolean useBomEncoding) {
             this.configurationValue = configurationValue;
             this.stripBom = stripBom;
             this.useBomEncoding = useBomEncoding;

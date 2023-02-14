@@ -194,7 +194,7 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
 
     private class Client extends SimpleHttpClient {
 
-        public Client(String[] request, boolean isHttp09) {
+        Client(String[] request, boolean isHttp09) {
             setRequest(request);
             setUseHttp09(isHttp09);
         }

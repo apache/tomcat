@@ -261,7 +261,7 @@ public class TestLoadBalancerDrainingValve {
     private static class MyCookie extends Cookie {
         private static final long serialVersionUID = 1L;
 
-        public MyCookie(String name, String value) { super(name, value); }
+        MyCookie(String name, String value) { super(name, value); }
 
         @Override
         public boolean equals(Object o) {

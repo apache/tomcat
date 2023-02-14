@@ -40,7 +40,7 @@ public interface ELInterpreter {
      * @param fnmapvar Variable pointing to a function map.
      * @return a String representing a call to the EL interpreter.
      */
-    public String interpreterCall(JspCompilationContext context,
+    String interpreterCall(JspCompilationContext context,
             boolean isTagFile, String expression,
             Class<?> expectedType, String fnmapvar);
 }

@@ -639,7 +639,7 @@ class Http2Parser {
     /**
      * Interface that must be implemented by the source of data for the parser.
      */
-    static interface Input {
+    interface Input {
 
         /**
          * Fill the given array with data unless non-blocking is requested and no data is available. If any data is
@@ -667,7 +667,7 @@ class Http2Parser {
     /**
      * Interface that must be implemented to receive notifications from the parser as it processes incoming frames.
      */
-    static interface Output {
+    interface Output {
 
         HpackDecoder getHpackDecoder();
 

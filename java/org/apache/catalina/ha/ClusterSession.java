@@ -26,13 +26,13 @@ public interface ClusterSession extends Session, HttpSession {
     * case, the manager can expire it upon timeout.
     * @return True if this session is primary
     */
-   public boolean isPrimarySession();
+   boolean isPrimarySession();
 
    /**
     * Sets whether this is the primary session or not.
     * @param primarySession Flag value
     */
-   public void setPrimarySession(boolean primarySession);
+   void setPrimarySession(boolean primarySession);
 
 
 }

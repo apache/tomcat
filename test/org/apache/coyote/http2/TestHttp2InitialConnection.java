@@ -158,7 +158,7 @@ public class TestHttp2InitialConnection extends Http2TestBase {
         private final List<String> hostHeaders;
         private final int expectedStatus;
 
-        public TestData(List<String> hostHeaders, int expectedStatus) {
+        TestData(List<String> hostHeaders, int expectedStatus) {
             this.hostHeaders = hostHeaders;
             this.expectedStatus = expectedStatus;
         }

@@ -179,7 +179,7 @@ public class CompositeELResolver extends ELResolver {
 
         private FeatureDescriptor next;
 
-        public FeatureIterator(ELContext context, Object base, ELResolver[] resolvers, int size) {
+        FeatureIterator(ELContext context, Object base, ELResolver[] resolvers, int size) {
             this.context = context;
             this.base = base;
             this.resolvers = resolvers;

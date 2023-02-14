@@ -2243,7 +2243,7 @@ public class ContextConfig implements LifecycleListener {
         return EMPTY_SCI_SET;
     }
 
-    private static final String getClassName(String internalForm) {
+    private static String getClassName(String internalForm) {
         if (!internalForm.startsWith("L")) {
             return internalForm;
         }
@@ -2552,7 +2552,7 @@ public class ContextConfig implements LifecycleListener {
         private final long globalTimeStamp;
         private final long hostTimeStamp;
 
-        public DefaultWebXmlCacheEntry(WebXml webXml, long globalTimeStamp,
+        DefaultWebXmlCacheEntry(WebXml webXml, long globalTimeStamp,
                 long hostTimeStamp) {
             this.webXml = webXml;
             this.globalTimeStamp = globalTimeStamp;
@@ -2591,7 +2591,7 @@ public class ContextConfig implements LifecycleListener {
 
         private Set<ServletContainerInitializer> sciSet = null;
 
-        public JavaClassCacheEntry(JavaClass javaClass) {
+        JavaClassCacheEntry(JavaClass javaClass) {
             superclassName = javaClass.getSuperclassName();
             interfaceNames = javaClass.getInterfaceNames();
         }

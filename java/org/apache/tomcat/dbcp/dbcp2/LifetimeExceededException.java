@@ -28,7 +28,7 @@ class LifetimeExceededException extends Exception {
     /**
      * Create a LifetimeExceededException.
      */
-    public LifetimeExceededException() {
+    LifetimeExceededException() {
     }
 
     /**
@@ -37,7 +37,7 @@ class LifetimeExceededException extends Exception {
      * @param message
      *            The message with which to create the exception
      */
-    public LifetimeExceededException(final String message) {
+    LifetimeExceededException(final String message) {
         super(message);
     }
 }

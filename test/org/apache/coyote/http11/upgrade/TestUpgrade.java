@@ -209,7 +209,7 @@ public class TestUpgrade extends TomcatBaseTest {
 
         private final Class<? extends HttpUpgradeHandler> upgradeHandlerClass;
 
-        public UpgradeServlet(Class<? extends HttpUpgradeHandler> upgradeHandlerClass) {
+        UpgradeServlet(Class<? extends HttpUpgradeHandler> upgradeHandlerClass) {
             this.upgradeHandlerClass = upgradeHandlerClass;
         }
 
@@ -229,7 +229,7 @@ public class TestUpgrade extends TomcatBaseTest {
         private final Writer writer;
         private final BufferedReader reader;
 
-        public UpgradeConnection(Socket socket) {
+        UpgradeConnection(Socket socket) {
             this.socket = socket;
             InputStream is;
             OutputStream os;
@@ -322,7 +322,7 @@ public class TestUpgrade extends TomcatBaseTest {
             private final ServletOutputStream sos;
             private final byte[] buffer = new byte[8192];
 
-            public EchoListener(ServletInputStream sis, ServletOutputStream sos) {
+            EchoListener(ServletInputStream sis, ServletOutputStream sos) {
                 this.sis = sis;
                 this.sos = sos;
             }

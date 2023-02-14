@@ -39,25 +39,25 @@ public interface Session {
     /**
      * The SessionEvent event type when a session is created.
      */
-    public static final String SESSION_CREATED_EVENT = "createSession";
+    String SESSION_CREATED_EVENT = "createSession";
 
 
     /**
      * The SessionEvent event type when a session is destroyed.
      */
-    public static final String SESSION_DESTROYED_EVENT = "destroySession";
+    String SESSION_DESTROYED_EVENT = "destroySession";
 
 
     /**
      * The SessionEvent event type when a session is activated.
      */
-    public static final String SESSION_ACTIVATED_EVENT = "activateSession";
+    String SESSION_ACTIVATED_EVENT = "activateSession";
 
 
     /**
      * The SessionEvent event type when a session is passivated.
      */
-    public static final String SESSION_PASSIVATED_EVENT = "passivateSession";
+    String SESSION_PASSIVATED_EVENT = "passivateSession";
 
 
     // ------------------------------------------------------------- Properties
@@ -67,7 +67,7 @@ public interface Session {
      * @return the authentication type used to authenticate our cached
      * Principal, if any.
      */
-    public String getAuthType();
+    String getAuthType();
 
 
     /**
@@ -76,20 +76,20 @@ public interface Session {
      *
      * @param authType The new cached authentication type
      */
-    public void setAuthType(String authType);
+    void setAuthType(String authType);
 
 
     /**
      * @return the creation time for this session.
      */
-    public long getCreationTime();
+    long getCreationTime();
 
 
     /**
      * @return the creation time for this session, bypassing the session validity
      * checks.
      */
-    public long getCreationTimeInternal();
+    long getCreationTimeInternal();
 
 
     /**
@@ -98,19 +98,19 @@ public interface Session {
      *
      * @param time The new creation time
      */
-    public void setCreationTime(long time);
+    void setCreationTime(long time);
 
 
     /**
      * @return the session identifier for this session.
      */
-    public String getId();
+    String getId();
 
 
     /**
      * @return the session identifier for this session.
      */
-    public String getIdInternal();
+    String getIdInternal();
 
 
     /**
@@ -119,7 +119,7 @@ public interface Session {
      *
      * @param id The new session identifier
      */
-    public void setId(String id);
+    void setId(String id);
 
 
     /**
@@ -130,7 +130,7 @@ public interface Session {
      * @param notify    Should any associated listeners be notified that a new
      *                      session has been created?
      */
-    public void setId(String id, boolean notify);
+    void setId(String id, boolean notify);
 
 
     /**
@@ -140,13 +140,13 @@ public interface Session {
      * a value associated with the session, do not affect the access time.
      * This one gets updated whenever a request starts.
      */
-    public long getThisAccessedTime();
+    long getThisAccessedTime();
 
     /**
      * @return the last client access time without invalidation check
      * @see #getThisAccessedTime()
      */
-    public long getThisAccessedTimeInternal();
+    long getThisAccessedTimeInternal();
 
     /**
      * @return the last time the client sent a request associated with this
@@ -155,29 +155,29 @@ public interface Session {
      * a value associated with the session, do not affect the access time.
      * This one gets updated whenever a request finishes.
      */
-    public long getLastAccessedTime();
+    long getLastAccessedTime();
 
     /**
      * @return the last client access time without invalidation check
      * @see #getLastAccessedTime()
      */
-    public long getLastAccessedTimeInternal();
+    long getLastAccessedTimeInternal();
 
     /**
      * @return the idle time (in milliseconds) from last client access time.
      */
-    public long getIdleTime();
+    long getIdleTime();
 
     /**
      * @return the idle time from last client access time without invalidation check
      * @see #getIdleTime()
      */
-    public long getIdleTimeInternal();
+    long getIdleTimeInternal();
 
     /**
      * @return the Manager within which this Session is valid.
      */
-    public Manager getManager();
+    Manager getManager();
 
 
     /**
@@ -185,7 +185,7 @@ public interface Session {
      *
      * @param manager The new Manager
      */
-    public void setManager(Manager manager);
+    void setManager(Manager manager);
 
 
     /**
@@ -193,7 +193,7 @@ public interface Session {
      * before the servlet container will invalidate the session.  A negative
      * time indicates that the session should never time out.
      */
-    public int getMaxInactiveInterval();
+    int getMaxInactiveInterval();
 
 
     /**
@@ -203,7 +203,7 @@ public interface Session {
      *
      * @param interval The new maximum interval
      */
-    public void setMaxInactiveInterval(int interval);
+    void setMaxInactiveInterval(int interval);
 
 
     /**
@@ -211,7 +211,7 @@ public interface Session {
      *
      * @param isNew The new value for the <code>isNew</code> flag
      */
-    public void setNew(boolean isNew);
+    void setNew(boolean isNew);
 
 
     /**
@@ -221,7 +221,7 @@ public interface Session {
      * <code>Realm.authenticate()</code> calls on every request.  If there
      * is no current associated Principal, return <code>null</code>.
      */
-    public Principal getPrincipal();
+    Principal getPrincipal();
 
 
     /**
@@ -232,14 +232,14 @@ public interface Session {
      *
      * @param principal The new Principal, or <code>null</code> if none
      */
-    public void setPrincipal(Principal principal);
+    void setPrincipal(Principal principal);
 
 
     /**
      * @return the <code>HttpSession</code> for which this object
      * is the facade.
      */
-    public HttpSession getSession();
+    HttpSession getSession();
 
 
     /**
@@ -247,13 +247,13 @@ public interface Session {
      *
      * @param isValid The new value for the <code>isValid</code> flag
      */
-    public void setValid(boolean isValid);
+    void setValid(boolean isValid);
 
 
     /**
      * @return <code>true</code> if the session is still valid
      */
-    public boolean isValid();
+    boolean isValid();
 
 
     // --------------------------------------------------------- Public Methods
@@ -264,7 +264,7 @@ public interface Session {
      * should be called by the context when a request comes in for a particular
      * session, even if the application does not reference it.
      */
-    public void access();
+    void access();
 
 
     /**
@@ -273,20 +273,20 @@ public interface Session {
      * @param listener the SessionListener instance that should be notified
      *   for session events
      */
-    public void addSessionListener(SessionListener listener);
+    void addSessionListener(SessionListener listener);
 
 
     /**
      * End access to the session.
      */
-    public void endAccess();
+    void endAccess();
 
 
     /**
      * Perform the internal processing required to invalidate this session,
      * without triggering an exception if the session has already expired.
      */
-    public void expire();
+    void expire();
 
 
     /**
@@ -295,21 +295,21 @@ public interface Session {
      *
      * @param name Name of the note to be returned
      */
-    public Object getNote(String name);
+    Object getNote(String name);
 
 
     /**
      * @return an Iterator containing the String names of all notes bindings
      * that exist for this session.
      */
-    public Iterator<String> getNoteNames();
+    Iterator<String> getNoteNames();
 
 
     /**
      * Release all object references, and initialize instance variables, in
      * preparation for reuse of this object.
      */
-    public void recycle();
+    void recycle();
 
 
     /**
@@ -318,7 +318,7 @@ public interface Session {
      *
      * @param name Name of the note to be removed
      */
-    public void removeNote(String name);
+    void removeNote(String name);
 
 
     /**
@@ -327,7 +327,7 @@ public interface Session {
      * @param listener remove the session listener, which will no longer be
      *     notified
      */
-    public void removeSessionListener(SessionListener listener);
+    void removeSessionListener(SessionListener listener);
 
 
     /**
@@ -337,7 +337,7 @@ public interface Session {
      * @param name Name to which the object should be bound
      * @param value Object to be bound to the specified name
      */
-    public void setNote(String name, Object value);
+    void setNote(String name, Object value);
 
 
     /**
@@ -350,7 +350,7 @@ public interface Session {
      * @param notifyContainerListeners  Should any associated ContainerListeners
      *        be notified that session ID has been changed?
      */
-    public void tellChangedSessionId(String newId, String oldId,
+    void tellChangedSessionId(String newId, String oldId,
             boolean notifySessionListeners, boolean notifyContainerListeners);
 
 
@@ -372,5 +372,5 @@ public interface Session {
      * @return {@code true} if distribution is supported, otherwise {@code
      *         false}
      */
-    public boolean isAttributeDistributable(String name, Object value);
+    boolean isAttributeDistributable(String name, Object value);
 }

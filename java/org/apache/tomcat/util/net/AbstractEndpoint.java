@@ -67,12 +67,12 @@ public abstract class AbstractEndpoint<S,U> {
 
     protected static final StringManager sm = StringManager.getManager(AbstractEndpoint.class);
 
-    public static interface Handler<S> {
+    public interface Handler<S> {
 
         /**
          * Different types of socket states to react upon.
          */
-        public enum SocketState {
+        enum SocketState {
             // TODO Add a new state to the AsyncStateMachine and remove
             //      ASYNC_END (if possible)
             OPEN, CLOSED, LONG, ASYNC_END, SENDFILE, UPGRADING, UPGRADED, SUSPENDED
@@ -87,7 +87,7 @@ public abstract class AbstractEndpoint<S,U> {
          *
          * @return The state of the socket after processing
          */
-        public SocketState process(SocketWrapperBase<S> socket,
+        SocketState process(SocketWrapperBase<S> socket,
                 SocketEvent status);
 
 
@@ -96,7 +96,7 @@ public abstract class AbstractEndpoint<S,U> {
          *
          * @return the GlobalRequestProcessor
          */
-        public Object getGlobal();
+        Object getGlobal();
 
 
         /**
@@ -107,15 +107,14 @@ public abstract class AbstractEndpoint<S,U> {
          * @deprecated Unused, will be removed in Tomcat 10, replaced
          *         by AbstractEndpoint.getConnections
          */
-        @Deprecated
-        public Set<S> getOpenSockets();
+        @Deprecated Set<S> getOpenSockets();
 
         /**
          * Release any resources associated with the given SocketWrapper.
          *
          * @param socketWrapper The socketWrapper to release resources for
          */
-        public void release(SocketWrapperBase<S> socketWrapper);
+        void release(SocketWrapperBase<S> socketWrapper);
 
 
         /**
@@ -124,13 +123,13 @@ public abstract class AbstractEndpoint<S,U> {
          * afterwards but it is possible that the endpoint will be resumed so
          * the handler should not assume that a stop will follow.
          */
-        public void pause();
+        void pause();
 
 
         /**
          * Recycle resources associated with the handler.
          */
-        public void recycle();
+        void recycle();
     }
 
     protected enum BindState {
@@ -142,7 +141,7 @@ public abstract class AbstractEndpoint<S,U> {
         private final boolean bound;
         private final boolean wasBound;
 
-        private BindState(boolean bound, boolean wasBound) {
+        BindState(boolean bound, boolean wasBound) {
             this.bound = bound;
             this.wasBound = wasBound;
         }

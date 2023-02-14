@@ -89,7 +89,7 @@ public class MBeanFactory {
      * @param t path string
      * @return empty string if t==null || t.equals("/")
      */
-    private final String getPathStr(String t) {
+    private String getPathStr(String t) {
         if (t == null || t.equals("/")) {
             return "";
         }

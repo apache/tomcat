@@ -129,7 +129,7 @@ public class HttpServletDoHeadBaseTest extends TomcatBaseTest {
         private final int validWriteCount;
         private final boolean explicitFlush;
 
-        public HeadTestServlet(int bufferSize, boolean useWriter, int invalidWriteCount, ResetType resetType,
+        HeadTestServlet(int bufferSize, boolean useWriter, int invalidWriteCount, ResetType resetType,
                 int validWriteCount, boolean explicitFlush) {
             this.bufferSize = bufferSize;
             this.useWriter = useWriter;
@@ -286,7 +286,7 @@ public class HttpServletDoHeadBaseTest extends TomcatBaseTest {
     }
 
 
-    static enum ResetType {
+    enum ResetType {
         NONE,
         BUFFER,
         FULL

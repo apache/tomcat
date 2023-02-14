@@ -1925,7 +1925,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
         private final HttpSession session;
 
-        public PrivilegedNewSessionFacade(HttpSession session) {
+        PrivilegedNewSessionFacade(HttpSession session) {
             this.session = session;
         }
 

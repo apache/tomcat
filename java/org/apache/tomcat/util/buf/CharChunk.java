@@ -35,7 +35,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     /**
      * Input interface, used when the buffer is empty.
      */
-    public static interface CharInputChannel {
+    public interface CharInputChannel {
 
         /**
          * Read new characters.
@@ -44,14 +44,14 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
          *
          * @throws IOException If an I/O error occurs during reading
          */
-        public int realReadChars() throws IOException;
+        int realReadChars() throws IOException;
     }
 
     /**
      * When we need more space we'll either grow the buffer ( up to the limit )
      * or send it to a channel.
      */
-    public static interface CharOutputChannel {
+    public interface CharOutputChannel {
 
         /**
          * Send the bytes ( usually the internal conversion buffer ). Expect 8k
@@ -62,7 +62,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
          * @param len length that will be written
          * @throws IOException If an I/O occurs while writing the characters
          */
-        public void realWriteChars(char buf[], int off, int len) throws IOException;
+        void realWriteChars(char buf[], int off, int len) throws IOException;
     }
 
     // --------------------

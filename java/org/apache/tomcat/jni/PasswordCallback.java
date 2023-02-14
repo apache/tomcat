@@ -31,5 +31,5 @@ public interface PasswordCallback {
      * @param prompt Password prompt
      * @return Valid password or null
      */
-    public String callback(String prompt);
+    String callback(String prompt);
 }

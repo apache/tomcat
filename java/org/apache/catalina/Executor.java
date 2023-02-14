@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 public interface Executor extends java.util.concurrent.Executor, Lifecycle {
 
-    public String getName();
+    String getName();
 
     /**
      * Executes the given command at some time in the future.  The command

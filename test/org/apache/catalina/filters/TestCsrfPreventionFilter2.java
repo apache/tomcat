@@ -60,7 +60,7 @@ public class TestCsrfPreventionFilter2 {
         private long iterationCount = 0;
         private volatile boolean result = false;
 
-        public LruTestThread(LruCache<String> cache, long iterationCount) {
+        LruTestThread(LruCache<String> cache, long iterationCount) {
             this.cache = cache;
             this.iterationCount = iterationCount;
         }

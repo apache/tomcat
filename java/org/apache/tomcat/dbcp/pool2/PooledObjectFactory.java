@@ -122,7 +122,7 @@ public interface PooledObjectFactory<T> {
    * @see DestroyMode
    * @since 2.9.0
    */
-  void destroyObject(final PooledObject<T> p, final DestroyMode mode) throws Exception;
+  void destroyObject(PooledObject<T> p, DestroyMode mode) throws Exception;
 
   /**
    * Ensures that the instance is safe to be returned by the pool.

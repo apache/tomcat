@@ -44,7 +44,7 @@ public interface ServletRegistration extends Registration {
      * @throws IllegalStateException if the associated ServletContext has
      *                                  already been initialised
      */
-    public Set<String> addMapping(String... urlPatterns);
+    Set<String> addMapping(String... urlPatterns);
 
     /**
      * Gets the currently available mappings of the Servlet represented by this
@@ -56,7 +56,7 @@ public interface ServletRegistration extends Registration {
      * @return a (possibly empty) Collection of the currently available mappings
      * of the Servlet represented by this ServletRegistration
      */
-    public Collection<String> getMappings();
+    Collection<String> getMappings();
 
     /**
      * Obtain the name of the user / group under which the Servlet has been
@@ -65,13 +65,13 @@ public interface ServletRegistration extends Registration {
      * @return the name of the user / group or {@code null} if none has been
      *         specified
      */
-    public String getRunAsRole();
+    String getRunAsRole();
 
     /**
      * Interface through which a Servlet registered via one of the addServlet
      * methods on ServletContext may be further configured.
      */
-    public static interface Dynamic extends ServletRegistration, Registration.Dynamic {
+    interface Dynamic extends ServletRegistration, Registration.Dynamic {
 
         /**
          * Set the loadOnStartup order for the Servlet
@@ -80,7 +80,7 @@ public interface ServletRegistration extends Registration {
          *                      started (higher numbers are started after lower
          *                      numbers)
          */
-        public void setLoadOnStartup(int loadOnStartup);
+        void setLoadOnStartup(int loadOnStartup);
 
         /**
          * Add security constraints to this Servlet.
@@ -90,7 +90,7 @@ public interface ServletRegistration extends Registration {
          * @return urls currently mapped to this registration that are already
          *         present in web.xml
          */
-        public Set<String> setServletSecurity(ServletSecurityElement constraint);
+        Set<String> setServletSecurity(ServletSecurityElement constraint);
 
         /**
          * Set the multi-part configuration for the associated Servlet. To clear
@@ -100,7 +100,7 @@ public interface ServletRegistration extends Registration {
          * @param multipartConfig The configuration to associate with the
          *                        Servlet
          */
-        public void setMultipartConfig(MultipartConfigElement multipartConfig);
+        void setMultipartConfig(MultipartConfigElement multipartConfig);
 
         /**
          * Set the name of the user / group under which the Servlet should be
@@ -108,6 +108,6 @@ public interface ServletRegistration extends Registration {
          *
          * @param roleName name of the user / group or {@code null} if none
          */
-        public void setRunAsRole(String roleName);
+        void setRunAsRole(String roleName);
     }
 }

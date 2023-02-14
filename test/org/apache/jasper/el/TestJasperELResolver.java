@@ -65,7 +65,7 @@ public class TestJasperELResolver {
                 Integer.valueOf(((AtomicInteger) getField("resolversSize", resolver)).get()));
     }
 
-    private static final Object getField(String name, Object target)
+    private static Object getField(String name, Object target)
             throws NoSuchFieldException, SecurityException,
             IllegalArgumentException, IllegalAccessException {
         Field field = target.getClass().getDeclaredField(name);

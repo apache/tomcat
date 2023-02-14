@@ -32,13 +32,13 @@ public interface HttpSessionActivationListener extends EventListener {
      *
      * @param se Information about the session this is about to be passivated
      */
-    public void sessionWillPassivate(HttpSessionEvent se);
+    void sessionWillPassivate(HttpSessionEvent se);
 
     /**
      * Notification that the session has just been activated.
      *
      * @param se Information about the session this has just been activated
      */
-    public void sessionDidActivate(HttpSessionEvent se);
+    void sessionDidActivate(HttpSessionEvent se);
 }
 

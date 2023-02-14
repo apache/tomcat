@@ -130,7 +130,7 @@ public class TestMessageBytesConversion {
     }
 
 
-    public static enum MessageBytesType {
+    public enum MessageBytesType {
         BYTE(setBytes(PREVIOUS_BYTES),
                 setBytes(EXPECTED_BYTES),
                 assertBytes(EXPECTED_BYTES),
@@ -156,7 +156,7 @@ public class TestMessageBytesConversion {
         private final MessageBytesConsumer checkExpected;
         private final MessageBytesConsumer checkNull;
 
-        private MessageBytesType(MessageBytesConsumer setPrevious, MessageBytesConsumer setExpected,
+        MessageBytesType(MessageBytesConsumer setPrevious, MessageBytesConsumer setExpected,
                 MessageBytesConsumer checkExpected, MessageBytesConsumer checkNull) {
             this.setPrevious = setPrevious;
             this.setExpected = setExpected;

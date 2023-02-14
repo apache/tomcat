@@ -36,7 +36,7 @@ enum Http2Error {
 
     private final long code;
 
-    private Http2Error(long code) {
+    Http2Error(long code) {
         this.code = code;
     }
 

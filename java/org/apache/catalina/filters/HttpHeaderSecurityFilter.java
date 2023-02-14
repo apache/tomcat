@@ -254,7 +254,7 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
         private final String headerValue;
 
-        private XFrameOption(String headerValue) {
+        XFrameOption(String headerValue) {
             this.headerValue = headerValue;
         }
 

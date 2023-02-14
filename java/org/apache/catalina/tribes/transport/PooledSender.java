@@ -120,7 +120,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
 
         private boolean isOpen = true;
 
-        public SenderQueue(PooledSender parent, int limit) {
+        SenderQueue(PooledSender parent, int limit) {
             this.limit = limit;
             this.parent = parent;
             notinuse = new ArrayList<>();

@@ -36,7 +36,7 @@ public interface CallStack {
      * @param writer a PrintWriter to write the current stack trace to if available
      * @return true if a stack trace was available to print or false if nothing was printed
      */
-    boolean printStackTrace(final PrintWriter writer);
+    boolean printStackTrace(PrintWriter writer);
 
     /**
      * Takes a snapshot of the current call stack. Subsequent calls to {@link #printStackTrace(PrintWriter)} will print

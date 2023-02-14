@@ -815,7 +815,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * AccessLogElement writes the partial message into the buffer.
      */
     protected interface AccessLogElement {
-        public void addElement(CharArrayWriter buf, Date date, Request request,
+        void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time);
     }
 
@@ -830,7 +830,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * state-less.
      */
     protected interface CachedElement {
-        public void cache(Request request);
+        void cache(Request request);
     }
 
     /**

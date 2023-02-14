@@ -40,8 +40,7 @@ public interface OutputBuffer {
      *
      * @deprecated Unused. Will be removed in Tomcat 9. Use {@link #doWrite(ByteBuffer)}
      */
-    @Deprecated
-    public int doWrite(ByteChunk chunk) throws IOException;
+    @Deprecated int doWrite(ByteChunk chunk) throws IOException;
 
 
     /**
@@ -53,7 +52,7 @@ public interface OutputBuffer {
      *
      * @throws IOException an underlying I/O error occurred
      */
-    public int doWrite(ByteBuffer chunk) throws IOException;
+    int doWrite(ByteBuffer chunk) throws IOException;
 
 
     /**
@@ -61,5 +60,5 @@ public interface OutputBuffer {
      *
      * @return Bytes written for the current request
      */
-    public long getBytesWritten();
+    long getBytesWritten();
 }

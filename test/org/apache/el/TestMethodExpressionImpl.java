@@ -899,8 +899,8 @@ public class TestMethodExpressionImpl {
     }
 
 
-    private static interface Function<T, R> {
-        public R apply(T t);
+    private interface Function<T, R> {
+        R apply(T t);
     }
 
 

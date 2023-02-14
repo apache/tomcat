@@ -152,7 +152,7 @@ public class TestUtil {
     }
 
 
-    private static interface Foo<T> {
+    private interface Foo<T> {
         void doSomething(T thing);
     }
 

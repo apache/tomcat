@@ -44,7 +44,7 @@ public class SecretKeyCallback implements Callback {
         return key;
     }
 
-    public static interface Request {
+    public interface Request {
     }
 
     public static class AliasRequest implements Request {

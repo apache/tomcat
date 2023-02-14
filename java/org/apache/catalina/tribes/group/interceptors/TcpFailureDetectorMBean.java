@@ -18,29 +18,29 @@ package org.apache.catalina.tribes.group.interceptors;
 
 public interface TcpFailureDetectorMBean {
 
-    public int getOptionFlag();
+    int getOptionFlag();
 
     // Attributes
-    public long getConnectTimeout();
+    long getConnectTimeout();
 
-    public boolean getPerformSendTest();
+    boolean getPerformSendTest();
 
-    public boolean getPerformReadTest();
+    boolean getPerformReadTest();
 
-    public long getReadTestTimeout();
+    long getReadTestTimeout();
 
-    public int getRemoveSuspectsTimeout();
+    int getRemoveSuspectsTimeout();
 
-    public void setPerformReadTest(boolean performReadTest);
+    void setPerformReadTest(boolean performReadTest);
 
-    public void setPerformSendTest(boolean performSendTest);
+    void setPerformSendTest(boolean performSendTest);
 
-    public void setReadTestTimeout(long readTestTimeout);
+    void setReadTestTimeout(long readTestTimeout);
 
-    public void setConnectTimeout(long connectTimeout);
+    void setConnectTimeout(long connectTimeout);
 
-    public void setRemoveSuspectsTimeout(int removeSuspectsTimeout);
+    void setRemoveSuspectsTimeout(int removeSuspectsTimeout);
 
     // Operations
-    public void checkMembers(boolean checkAll);
+    void checkMembers(boolean checkAll);
 }

@@ -149,7 +149,7 @@ public class AsyncFileHandler extends FileHandler {
          */
         private final AtomicInteger handlerCount = new AtomicInteger();
 
-        public LoggerExecutorService(final int overflowDropType, final int maxRecords) {
+        LoggerExecutorService(final int overflowDropType, final int maxRecords) {
             super(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<Runnable>(maxRecords), THREAD_FACTORY);
             switch (overflowDropType) {
                 case OVERFLOW_DROP_LAST:

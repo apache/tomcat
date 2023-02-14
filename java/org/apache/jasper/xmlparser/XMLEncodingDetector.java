@@ -1038,7 +1038,7 @@ public class XMLEncodingDetector {
         private int fLength;
         private int fMark;
 
-        public RewindableInputStream(InputStream is) {
+        RewindableInputStream(InputStream is) {
             fData = new byte[DEFAULT_XMLDECL_BUFFER_SIZE];
             fInputStream = is;
             fEndOffset = -1;

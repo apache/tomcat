@@ -70,7 +70,7 @@ public class TestCookieProcessorGenerationHttp extends TomcatBaseTest {
 
         private final String cookieValue;
 
-        public CookieServlet(String cookieValue) {
+        CookieServlet(String cookieValue) {
             this.cookieValue = cookieValue;
         }
 

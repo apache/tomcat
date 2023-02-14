@@ -927,7 +927,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
 
     @Override
-    protected final String getObjectNameKeyProperties() {
+    protected String getObjectNameKeyProperties() {
         return "type=Server";
     }
 }

@@ -40,8 +40,7 @@ public interface InputBuffer {
      *
      * @deprecated Unused. Will be removed in Tomcat 9. Use {@link #doRead(ApplicationBufferHandler)}
      */
-    @Deprecated
-    public int doRead(ByteChunk chunk) throws IOException;
+    @Deprecated int doRead(ByteChunk chunk) throws IOException;
 
     /**
      * Read from the input stream into the ByteBuffer provided by the ApplicationBufferHandler. IMPORTANT: the current
@@ -53,7 +52,7 @@ public interface InputBuffer {
      *
      * @throws IOException If an I/O error occurs reading from the input stream
      */
-    public int doRead(ApplicationBufferHandler handler) throws IOException;
+    int doRead(ApplicationBufferHandler handler) throws IOException;
 
 
     /**
@@ -62,6 +61,6 @@ public interface InputBuffer {
      *
      * @return The number of bytes that can be read without blocking
      */
-    public int available();
+    int available();
 
 }

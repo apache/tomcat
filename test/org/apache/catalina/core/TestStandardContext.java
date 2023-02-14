@@ -150,7 +150,7 @@ public class TestStandardContext extends TomcatBaseTest {
 
     private static final class Bug46243Client extends SimpleHttpClient {
 
-        public Bug46243Client(int port) {
+        Bug46243Client(int port) {
             setPort(port);
         }
 

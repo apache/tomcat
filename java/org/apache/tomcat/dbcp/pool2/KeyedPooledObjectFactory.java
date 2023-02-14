@@ -129,7 +129,7 @@ public interface KeyedPooledObjectFactory<K, V> {
      * @see DestroyMode
      * @since 2.9.0
      */
-    void destroyObject(final K key, final PooledObject<V> p, final DestroyMode mode) throws Exception;
+    void destroyObject(K key, PooledObject<V> p, DestroyMode mode) throws Exception;
 
     /**
      * Ensures that the instance is safe to be returned by the pool.

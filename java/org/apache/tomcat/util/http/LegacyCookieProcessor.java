@@ -421,7 +421,7 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
      * RFC 2965 / RFC 2109
      * JVK
      */
-    private final void processCookieHeader(byte bytes[], int off, int len,
+    private void processCookieHeader(byte bytes[], int off, int len,
             ServerCookies serverCookies) {
 
         if (len <= 0 || bytes == null) {
@@ -676,7 +676,7 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
      * token, with no separator characters in between.
      * JVK
      */
-    private final int getTokenEndPosition(byte bytes[], int off, int end,
+    private int getTokenEndPosition(byte bytes[], int off, int end,
             int version, boolean isName){
         int pos = off;
         while (pos < end &&
@@ -727,7 +727,7 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
      * the position of the end quote. This escapes anything after a '\' char
      * JVK RFC 2616
      */
-    private static final int getQuotedValueEndPosition(byte bytes[], int off, int end){
+    private static int getQuotedValueEndPosition(byte bytes[], int off, int end){
         int pos = off;
         while (pos < end) {
             if (bytes[pos] == '"') {
@@ -743,7 +743,7 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
     }
 
 
-    private static final boolean equals(String s, byte b[], int start, int end) {
+    private static boolean equals(String s, byte b[], int start, int end) {
         int blen = end-start;
         if (b == null || blen != s.length()) {
             return false;
@@ -763,7 +763,7 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
      * defined in RFC2619
      * JVK
      */
-    private static final boolean isWhiteSpace(final byte c) {
+    private static boolean isWhiteSpace(final byte c) {
         // This switch statement is slightly slower
         // for my vm than the if statement.
         // Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_07-164)
@@ -792,7 +792,7 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
      *
      * @param bc The cookie value to modify
      */
-    private static final void unescapeDoubleQuotes(ByteChunk bc) {
+    private static void unescapeDoubleQuotes(ByteChunk bc) {
 
         if (bc == null || bc.getLength() == 0 || bc.indexOf('"', 0) == -1) {
             return;

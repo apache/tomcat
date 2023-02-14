@@ -100,6 +100,6 @@ public final class StringUtils {
 
 
     public interface Function<T> {
-        public String apply(T t);
+        String apply(T t);
     }
 }

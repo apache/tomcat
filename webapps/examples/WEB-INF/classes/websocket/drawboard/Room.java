@@ -79,7 +79,7 @@ public final class Room {
 
         private final char flag;
 
-        private MessageType(char flag) {
+        MessageType(char flag) {
             this.flag = flag;
         }
 

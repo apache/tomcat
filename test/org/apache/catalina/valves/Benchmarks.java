@@ -492,7 +492,7 @@ public class Benchmarks {
         private int count;
         private Runnable test;
 
-        public TestThread(int count, Runnable test) {
+        TestThread(int count, Runnable test) {
             this.count = count;
             this.test = test;
         }

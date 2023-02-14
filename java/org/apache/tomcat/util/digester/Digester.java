@@ -2034,7 +2034,7 @@ public class Digester extends DefaultHandler2 {
         private final PropertySource[] source;
         private final ClassLoader classLoader;
 
-        public EntityResolverWrapper(EntityResolver entityResolver, PropertySource[] source, ClassLoader classLoader) {
+        EntityResolverWrapper(EntityResolver entityResolver, PropertySource[] source, ClassLoader classLoader) {
             this.entityResolver = entityResolver;
             this.source = source;
             this.classLoader = classLoader;
@@ -2062,7 +2062,7 @@ public class Digester extends DefaultHandler2 {
 
         private final EntityResolver2 entityResolver2;
 
-        public EntityResolver2Wrapper(EntityResolver2 entityResolver, PropertySource[] source,
+        EntityResolver2Wrapper(EntityResolver2 entityResolver, PropertySource[] source,
                 ClassLoader classLoader) {
             super(entityResolver, source, classLoader);
             this.entityResolver2 = entityResolver;

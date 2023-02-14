@@ -156,7 +156,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     protected final UserDataHelper userDataHelper = new UserDataHelper(log);
 
 
-    public Http2UpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest) {
+    Http2UpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest) {
         super(STREAM_ID_ZERO);
         this.protocol = protocol;
         this.adapter = adapter;
@@ -2083,7 +2083,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         private final int sequence;
         private final long sentNanoTime;
 
-        public PingRecord(int sequence, long sentNanoTime) {
+        PingRecord(int sequence, long sentNanoTime) {
             this.sequence = sequence;
             this.sentNanoTime = sentNanoTime;
         }
@@ -2108,7 +2108,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
         private final boolean newStreamsAllowed;
 
-        private ConnectionState(boolean newStreamsAllowed) {
+        ConnectionState(boolean newStreamsAllowed) {
             this.newStreamsAllowed = newStreamsAllowed;
         }
 

@@ -34,7 +34,7 @@ public interface Group extends Principal {
     /**
      * @return the description of this group.
      */
-    public String getDescription();
+    String getDescription();
 
 
     /**
@@ -42,14 +42,14 @@ public interface Group extends Principal {
      *
      * @param description The new description
      */
-    public void setDescription(String description);
+    void setDescription(String description);
 
 
     /**
      * @return the group name of this group, which must be unique
      * within the scope of a {@link UserDatabase}.
      */
-    public String getGroupname();
+    String getGroupname();
 
 
     /**
@@ -58,25 +58,25 @@ public interface Group extends Principal {
      *
      * @param groupname The new group name
      */
-    public void setGroupname(String groupname);
+    void setGroupname(String groupname);
 
 
     /**
      * @return the set of {@link Role}s assigned specifically to this group.
      */
-    public Iterator<Role> getRoles();
+    Iterator<Role> getRoles();
 
 
     /**
      * @return the {@link UserDatabase} within which this Group is defined.
      */
-    public UserDatabase getUserDatabase();
+    UserDatabase getUserDatabase();
 
 
     /**
      * @return the set of {@link User}s that are members of this group.
      */
-    public Iterator<User> getUsers();
+    Iterator<User> getUsers();
 
 
     // --------------------------------------------------------- Public Methods
@@ -86,7 +86,7 @@ public interface Group extends Principal {
      *
      * @param role The new role
      */
-    public void addRole(Role role);
+    void addRole(Role role);
 
 
     /**
@@ -97,7 +97,7 @@ public interface Group extends Principal {
      * @return <code>true</code> if the group is assigned to the specified role
      *         otherwise <code>false</code>
      */
-    public boolean isInRole(Role role);
+    boolean isInRole(Role role);
 
 
     /**
@@ -105,13 +105,13 @@ public interface Group extends Principal {
      *
      * @param role The old role
      */
-    public void removeRole(Role role);
+    void removeRole(Role role);
 
 
     /**
      * Remove all {@link Role}s from those assigned to this group.
      */
-    public void removeRoles();
+    void removeRoles();
 
 
 }

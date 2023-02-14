@@ -36,7 +36,7 @@ public interface ServletContextListener extends EventListener {
      * any filter or servlet in the web application is initialized.
      * @param sce Information about the ServletContext that was initialized
      */
-    public void contextInitialized(ServletContextEvent sce);
+    void contextInitialized(ServletContextEvent sce);
 
     /**
      ** Notification that the servlet context is about to be shut down. All
@@ -44,5 +44,5 @@ public interface ServletContextListener extends EventListener {
      * ServletContextListeners are notified of context destruction.
      * @param sce Information about the ServletContext that was destroyed
      */
-    public void contextDestroyed(ServletContextEvent sce);
+    void contextDestroyed(ServletContextEvent sce);
 }

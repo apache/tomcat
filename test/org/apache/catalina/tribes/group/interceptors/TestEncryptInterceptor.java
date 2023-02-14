@@ -485,7 +485,7 @@ public class TestEncryptInterceptor {
     {
         private ChannelInterceptor dest;
 
-        public PipedInterceptor(ChannelInterceptor dest) {
+        PipedInterceptor(ChannelInterceptor dest) {
             if(null == dest) {
               throw new IllegalArgumentException("Destination must not be null");
             }

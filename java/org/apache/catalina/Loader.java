@@ -55,19 +55,19 @@ public interface Loader {
      * invoked inside the classloading context of this container. Unexpected
      * throwables will be caught and logged.
      */
-    public void backgroundProcess();
+    void backgroundProcess();
 
 
     /**
      * @return the Java class loader to be used by this Container.
      */
-    public ClassLoader getClassLoader();
+    ClassLoader getClassLoader();
 
 
     /**
      * @return the Context with which this Loader has been associated.
      */
-    public Context getContext();
+    Context getContext();
 
 
     /**
@@ -75,14 +75,14 @@ public interface Loader {
      *
      * @param context The associated Context
      */
-    public void setContext(Context context);
+    void setContext(Context context);
 
 
     /**
      * @return the "follow standard delegation model" flag used to configure
      * our ClassLoader.
      */
-    public boolean getDelegate();
+    boolean getDelegate();
 
 
     /**
@@ -91,7 +91,7 @@ public interface Loader {
      *
      * @param delegate The new flag
      */
-    public void setDelegate(boolean delegate);
+    void setDelegate(boolean delegate);
 
 
     /**
@@ -100,8 +100,7 @@ public interface Loader {
      * @deprecated Use {@link Context#getReloadable()}. This method will be
      *             removed in Tomcat 10.
      */
-    @Deprecated
-    public boolean getReloadable();
+    @Deprecated boolean getReloadable();
 
 
     /**
@@ -112,8 +111,7 @@ public interface Loader {
      * @deprecated Use {@link Context#setReloadable(boolean)}. This method will
      *             be removed in Tomcat 10.
      */
-    @Deprecated
-    public void setReloadable(boolean reloadable);
+    @Deprecated void setReloadable(boolean reloadable);
 
 
     /**
@@ -121,7 +119,7 @@ public interface Loader {
      *
      * @param listener The listener to add
      */
-    public void addPropertyChangeListener(PropertyChangeListener listener);
+    void addPropertyChangeListener(PropertyChangeListener listener);
 
 
     /**
@@ -131,7 +129,7 @@ public interface Loader {
      * @return <code>true</code> when the repository has been modified,
      *         <code>false</code> otherwise
      */
-    public boolean modified();
+    boolean modified();
 
 
     /**
@@ -139,5 +137,5 @@ public interface Loader {
      *
      * @param listener The listener to remove
      */
-    public void removePropertyChangeListener(PropertyChangeListener listener);
+    void removePropertyChangeListener(PropertyChangeListener listener);
 }

@@ -119,7 +119,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         private final boolean useChunks;
 
-        public ResponseWithErrorServlet(boolean useChunks) {
+        ResponseWithErrorServlet(boolean useChunks) {
             this.useChunks = useChunks;
         }
 
@@ -533,7 +533,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
                 "Accept-Language: en-US,en;q=0.8,fr;q=0.6,es;q=0.4\r\n" +
                 "\r\n";
 
-        try (final Socket connection = new Socket("localhost", getPort())) {
+        try (Socket connection = new Socket("localhost", getPort())) {
             connection.setSoLinger(true, 0);
             Writer writer = new OutputStreamWriter(connection.getOutputStream(),
                     StandardCharsets.US_ASCII);
@@ -547,7 +547,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         bug55772Latch2.await();
         bug55772IsSecondRequest = true;
 
-        try (final Socket connection = new Socket("localhost", getPort())) {
+        try (Socket connection = new Socket("localhost", getPort())) {
             connection.setSoLinger(true, 0);
             Writer writer = new OutputStreamWriter(connection.getOutputStream(),
                     B2CConverter.getCharset("US-ASCII"));
@@ -673,7 +673,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         boolean flush = false;
 
-        public LargeHeaderServlet(boolean flush) {
+        LargeHeaderServlet(boolean flush) {
             this.flush = flush;
         }
 
@@ -730,7 +730,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
     private static final class Client extends SimpleHttpClient {
 
-        public Client(int port) {
+        Client(int port) {
             setPort(port);
         }
 
@@ -794,7 +794,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         private final boolean delayAsyncThread;
 
 
-        public Bug57621Servlet(boolean delayAsyncThread) {
+        Bug57621Servlet(boolean delayAsyncThread) {
             this.delayAsyncThread = delayAsyncThread;
         }
 
@@ -1788,7 +1788,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        public SwallowBodyTesterServlet() {
+        SwallowBodyTesterServlet() {
             super(true);
         }
 

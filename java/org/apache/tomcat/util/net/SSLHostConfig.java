@@ -929,7 +929,7 @@ public class SSLHostConfig implements Serializable {
 
         private final boolean optional;
 
-        private CertificateVerification(boolean optional) {
+        CertificateVerification(boolean optional) {
             this.optional = optional;
         }
 

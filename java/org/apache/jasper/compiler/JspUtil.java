@@ -814,7 +814,7 @@ public class JspUtil {
      *
      * @return Legal Java identifier corresponding to the given identifier
      */
-    private static final String makeJavaIdentifier(String identifier,
+    private static String makeJavaIdentifier(String identifier,
             boolean periodToUnderscore) {
         StringBuilder modifiedIdentifier = new StringBuilder(identifier.length());
         if (!Character.isJavaIdentifierStart(identifier.charAt(0))) {

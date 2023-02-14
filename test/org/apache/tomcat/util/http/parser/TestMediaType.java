@@ -263,7 +263,7 @@ public class TestMediaType {
         private final String name;
         private final String value;
 
-        public Parameter(String name,String value) {
+        Parameter(String name,String value) {
             this.name = name;
             this.value = value;
         }

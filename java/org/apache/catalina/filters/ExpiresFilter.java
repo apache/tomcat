@@ -454,7 +454,7 @@ public class ExpiresFilter extends FilterBase {
 
         private final int calendarField;
 
-        private DurationUnit(int calendarField) {
+        DurationUnit(int calendarField) {
             this.calendarField = calendarField;
         }
 

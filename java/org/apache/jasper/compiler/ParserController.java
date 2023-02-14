@@ -71,7 +71,7 @@ class ParserController implements TagConstants {
     /*
      * Constructor
      */
-    public ParserController(JspCompilationContext ctxt, Compiler compiler) {
+    ParserController(JspCompilationContext ctxt, Compiler compiler) {
         this.ctxt = ctxt;
         this.compiler = compiler;
         this.err = compiler.getErrorDispatcher();

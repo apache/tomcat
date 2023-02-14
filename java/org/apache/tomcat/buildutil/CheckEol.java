@@ -142,7 +142,7 @@ public class CheckEol extends Task {
         private final int line;
         private final String value;
 
-        public CheckFailure(File file, int line, String value) {
+        CheckFailure(File file, int line, String value) {
             this.file = file;
             this.line = line;
             this.value = value;

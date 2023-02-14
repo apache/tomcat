@@ -77,7 +77,7 @@ public interface Channel {
      * @see #start(int)
      * @see #stop(int)
      */
-    public static final int DEFAULT = 15;
+    int DEFAULT = 15;
 
     /**
      * Start and stop sequences can be controlled by these constants
@@ -87,7 +87,7 @@ public interface Channel {
      * @see #start(int)
      * @see #stop(int)
      */
-    public static final int SND_RX_SEQ = 1;
+    int SND_RX_SEQ = 1;
 
     /**
      * Start and stop sequences can be controlled by these constants
@@ -97,7 +97,7 @@ public interface Channel {
      * @see #start(int)
      * @see #stop(int)
      */
-    public static final int SND_TX_SEQ = 2;
+    int SND_TX_SEQ = 2;
 
     /**
      * Start and stop sequences can be controlled by these constants
@@ -108,7 +108,7 @@ public interface Channel {
      * @see #start(int)
      * @see #stop(int)
      */
-    public static final int MBR_RX_SEQ = 4;
+    int MBR_RX_SEQ = 4;
 
     /**
      * Start and stop sequences can be controlled by these constants
@@ -118,7 +118,7 @@ public interface Channel {
      * @see #start(int)
      * @see #stop(int)
      */
-    public static final int MBR_TX_SEQ = 8;
+    int MBR_TX_SEQ = 8;
 
     /**
      * Send options, when a message is sent, it can have an option flag
@@ -131,7 +131,7 @@ public interface Channel {
      * @see #send(Member[], Serializable , int)
      * @see #send(Member[], Serializable, int, ErrorHandler)
      */
-    public static final int SEND_OPTIONS_BYTE_MESSAGE = 0x0001;
+    int SEND_OPTIONS_BYTE_MESSAGE = 0x0001;
 
     /**
      * Send options, when a message is sent, it can have an option flag
@@ -143,7 +143,7 @@ public interface Channel {
      * @see #send(Member[], Serializable , int)
      * @see #send(Member[], Serializable, int, ErrorHandler)
      */
-    public static final int SEND_OPTIONS_USE_ACK = 0x0002;
+    int SEND_OPTIONS_USE_ACK = 0x0002;
 
     /**
      * Send options, when a message is sent, it can have an option flag
@@ -156,7 +156,7 @@ public interface Channel {
      * @see #send(Member[], Serializable , int)
      * @see #send(Member[], Serializable, int, ErrorHandler)
      */
-    public static final int SEND_OPTIONS_SYNCHRONIZED_ACK = 0x0004;
+    int SEND_OPTIONS_SYNCHRONIZED_ACK = 0x0004;
 
     /**
      * Send options, when a message is sent, it can have an option flag
@@ -168,7 +168,7 @@ public interface Channel {
      * @see #send(Member[], Serializable , int)
      * @see #send(Member[], Serializable, int, ErrorHandler)
      */
-    public static final int SEND_OPTIONS_ASYNCHRONOUS = 0x0008;
+    int SEND_OPTIONS_ASYNCHRONOUS = 0x0008;
 
     /**
      * Send options, when a message is sent, it can have an option flag
@@ -179,7 +179,7 @@ public interface Channel {
      * @see #send(Member[], Serializable , int)
      * @see #send(Member[], Serializable, int, ErrorHandler)
      */
-    public static final int SEND_OPTIONS_SECURE = 0x0010;
+    int SEND_OPTIONS_SECURE = 0x0010;
 
     /**
      * Send options. When a message is sent with this flag on
@@ -187,7 +187,7 @@ public interface Channel {
      * @see #send(Member[], Serializable , int)
      * @see #send(Member[], Serializable, int, ErrorHandler)
      */
-    public static final int SEND_OPTIONS_UDP =  0x0020;
+    int SEND_OPTIONS_UDP =  0x0020;
 
     /**
      * Send options. When a message is sent with this flag on
@@ -195,7 +195,7 @@ public interface Channel {
      * @see #send(Member[], Serializable , int)
      * @see #send(Member[], Serializable, int, ErrorHandler)
      */
-    public static final int SEND_OPTIONS_MULTICAST =  0x0040;
+    int SEND_OPTIONS_MULTICAST =  0x0040;
 
     /**
      * Send options, when a message is sent, it can have an option flag
@@ -208,14 +208,14 @@ public interface Channel {
      * @see #send(Member[], Serializable , int)
      * @see #send(Member[], Serializable, int, ErrorHandler)
      */
-    public static final int SEND_OPTIONS_DEFAULT = SEND_OPTIONS_USE_ACK;
+    int SEND_OPTIONS_DEFAULT = SEND_OPTIONS_USE_ACK;
 
 
     /**
      * Adds an interceptor to the channel message chain.
      * @param interceptor ChannelInterceptor
      */
-    public void addInterceptor(ChannelInterceptor interceptor);
+    void addInterceptor(ChannelInterceptor interceptor);
 
     /**
      * Starts up the channel. This can be called multiple times for individual services to start
@@ -230,7 +230,7 @@ public interface Channel {
      * transmit the correct information, it has to be started after the replication receiver.
      * @throws ChannelException if a startup error occurs or the service is already started or an error occurs.
      */
-    public void start(int svc) throws ChannelException;
+    void start(int svc) throws ChannelException;
 
     /**
      * Shuts down the channel. This can be called multiple times for individual services to shutdown
@@ -243,7 +243,7 @@ public interface Channel {
      * SND_RX_SEQ - stops the replication receiver<BR>
      * @throws ChannelException if a startup error occurs or the service is already stopped or an error occurs.
      */
-    public void stop(int svc) throws ChannelException;
+    void stop(int svc) throws ChannelException;
 
     /**
      * Send a message to one or more members in the cluster
@@ -260,7 +260,7 @@ public interface Channel {
      * @see #SEND_OPTIONS_ASYNCHRONOUS
      * @see #SEND_OPTIONS_SYNCHRONIZED_ACK
      */
-    public UniqueId send(Member[] destination, Serializable msg, int options) throws ChannelException;
+    UniqueId send(Member[] destination, Serializable msg, int options) throws ChannelException;
 
     /**
      * Send a message to one or more members in the cluster
@@ -271,7 +271,7 @@ public interface Channel {
      * @return a unique Id that identifies the message that is sent
      * @exception ChannelException - if a serialization error happens.
      */
-    public UniqueId send(Member[] destination, Serializable msg, int options, ErrorHandler handler) throws ChannelException;
+    UniqueId send(Member[] destination, Serializable msg, int options, ErrorHandler handler) throws ChannelException;
 
     /**
      * Sends a heart beat through the interceptor stacks
@@ -282,14 +282,14 @@ public interface Channel {
      * and invoking this method.
      * @see #setHeartbeat(boolean)
      */
-    public void heartbeat();
+    void heartbeat();
 
     /**
      * Enables or disables internal heartbeat.
      * @param enable boolean - default value is implementation specific
      * @see #heartbeat()
      */
-    public void setHeartbeat(boolean enable);
+    void setHeartbeat(boolean enable);
 
     /**
      * Add a membership listener, will get notified when a new member joins, leaves or crashes
@@ -298,7 +298,7 @@ public interface Channel {
      * @param listener MembershipListener
      * @see MembershipListener
      */
-    public void addMembershipListener(MembershipListener listener);
+    void addMembershipListener(MembershipListener listener);
 
     /**
      * Add a channel listener, this is a callback object when messages are received
@@ -308,33 +308,33 @@ public interface Channel {
      * @see ChannelListener
      * @see Heartbeat
      */
-    public void addChannelListener(ChannelListener listener);
+    void addChannelListener(ChannelListener listener);
 
     /**
      * remove a membership listener, listeners are removed based on Object.hashCode and Object.equals
      * @param listener MembershipListener
      * @see MembershipListener
      */
-    public void removeMembershipListener(MembershipListener listener);
+    void removeMembershipListener(MembershipListener listener);
     /**
      * remove a channel listener, listeners are removed based on Object.hashCode and Object.equals
      * @param listener ChannelListener
      * @see ChannelListener
      */
-    public void removeChannelListener(ChannelListener listener);
+    void removeChannelListener(ChannelListener listener);
 
     /**
      * Returns true if there are any members in the group,
      * this call is the same as <code>getMembers().length &gt; 0</code>
      * @return boolean - true if there are any members automatically discovered
      */
-    public boolean hasMembers() ;
+    boolean hasMembers() ;
 
     /**
      * Get all current group members
      * @return all members or empty array, never null
      */
-    public Member[] getMembers() ;
+    Member[] getMembers() ;
 
     /**
      * Return the member that represents this node. This is also the data
@@ -343,7 +343,7 @@ public interface Channel {
      * since the membership service started.
      * @return Member
      */
-    public Member getLocalMember(boolean incAlive);
+    Member getLocalMember(boolean incAlive);
 
     /**
      * Returns the member from the membership service with complete and
@@ -356,18 +356,18 @@ public interface Channel {
      * @param mbr Member
      * @return Member
      */
-    public Member getMember(Member mbr);
+    Member getMember(Member mbr);
 
     /**
      * Return the name of this channel.
      * @return channel name
      */
-    public String getName();
+    String getName();
 
     /**
      * Set the name of this channel
      * @param name The new channel name
      */
-    public void setName(String name);
+    void setName(String name);
 
 }

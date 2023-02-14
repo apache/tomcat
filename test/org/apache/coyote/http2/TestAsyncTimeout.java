@@ -132,7 +132,7 @@ public class TestAsyncTimeout extends Http2TestBase {
         private final AtomicBoolean completeCalled;
         private volatile boolean running = true;
 
-        public Ticker(AsyncContext asyncContext, AtomicBoolean completeCalled) {
+        Ticker(AsyncContext asyncContext, AtomicBoolean completeCalled) {
             this.asyncContext = asyncContext;
             this.completeCalled = completeCalled;
         }
@@ -174,7 +174,7 @@ public class TestAsyncTimeout extends Http2TestBase {
         private final Ticker ticker;
         private final AtomicBoolean completeCalled;
 
-        public TimeoutListener(CountDownLatch latch, Ticker ticker, AtomicBoolean completeCalled) {
+        TimeoutListener(CountDownLatch latch, Ticker ticker, AtomicBoolean completeCalled) {
             this.latch = latch;
             this.ticker = ticker;
             this.completeCalled = completeCalled;

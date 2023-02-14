@@ -72,7 +72,7 @@ public class TestHpack {
 
     private static class HeadersListener implements HpackDecoder.HeaderEmitter {
         private final MimeHeaders headers;
-        public HeadersListener(MimeHeaders headers) {
+        HeadersListener(MimeHeaders headers) {
             this.headers = headers;
         }
         @Override

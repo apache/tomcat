@@ -152,7 +152,7 @@ public class TesterDigestAuthenticatorPerformance {
 
 
         // All init code should be in here. run() needs to be quick
-        public TesterRunnable(DigestAuthenticator authenticator,
+        TesterRunnable(DigestAuthenticator authenticator,
                 String nonce, int requestCount) throws Exception {
             this.authenticator = authenticator;
             this.nonce = nonce;

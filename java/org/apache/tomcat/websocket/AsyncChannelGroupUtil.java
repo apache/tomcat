@@ -130,7 +130,7 @@ public class AsyncChannelGroupUtil {
 
             private final Runnable r;
 
-            public NewThreadPrivilegedAction(Runnable r) {
+            NewThreadPrivilegedAction(Runnable r) {
                 this.r = r;
             }
 

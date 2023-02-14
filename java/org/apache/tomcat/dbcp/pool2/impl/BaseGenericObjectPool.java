@@ -1212,7 +1212,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
          *
          * @param size number of values to maintain in the cache.
          */
-        public StatsStore(final int size) {
+        StatsStore(final int size) {
             this.size = size;
             values = new AtomicLong[size];
             for (int i = 0; i < size; i++) {
@@ -1335,7 +1335,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
          *
          * @param instance object to wrap
          */
-        public IdentityWrapper(final T instance) {
+        IdentityWrapper(final T instance) {
             this.instance = instance;
         }
 

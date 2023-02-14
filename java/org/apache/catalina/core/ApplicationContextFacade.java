@@ -900,7 +900,7 @@ public class ApplicationContextFacade implements ServletContext {
         private final ApplicationContext context;
         private final Object[] params;
 
-        public PrivilegedExecuteMethod(Method method, ApplicationContext context, Object[] params) {
+        PrivilegedExecuteMethod(Method method, ApplicationContext context, Object[] params) {
             this.method = method;
             this.context = context;
             this.params = params;

@@ -176,7 +176,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
 
 class BaseNotificationBroadcasterEntry {
 
-    public BaseNotificationBroadcasterEntry(NotificationListener listener,
+    BaseNotificationBroadcasterEntry(NotificationListener listener,
                                             NotificationFilter filter,
                                             Object handback) {
         this.listener = listener;

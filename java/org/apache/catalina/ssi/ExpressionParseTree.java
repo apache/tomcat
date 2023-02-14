@@ -241,7 +241,7 @@ public class ExpressionParseTree {
         String resolved = null;
 
 
-        public StringNode(String value) {
+        StringNode(String value) {
             this.value = new StringBuilder(value);
         }
 

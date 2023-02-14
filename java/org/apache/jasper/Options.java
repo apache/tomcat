@@ -40,34 +40,34 @@ public interface Options {
      * is invalid.
      * @return <code>true</code> to get an error
      */
-    public boolean getErrorOnUseBeanInvalidClassAttribute();
+    boolean getErrorOnUseBeanInvalidClassAttribute();
 
     /**
      * @return <code>true</code> to keep the generated source
      */
-    public boolean getKeepGenerated();
+    boolean getKeepGenerated();
 
     /**
      * @return <code>true</code> if tag handler pooling is enabled,
      *  <code>false</code> otherwise.
      */
-    public boolean isPoolingEnabled();
+    boolean isPoolingEnabled();
 
     /**
      * @return <code>true</code> if HTML mapped Servlets are supported.
      */
-    public boolean getMappedFile();
+    boolean getMappedFile();
 
     /**
      * @return <code>true</code> if debug information in included
      *  in compiled classes.
      */
-    public boolean getClassDebugInfo();
+    boolean getClassDebugInfo();
 
     /**
      * @return background compile thread check interval in seconds
      */
-    public int getCheckInterval();
+    int getCheckInterval();
 
     /**
      * Main development flag, which enables detailed error reports with
@@ -76,49 +76,49 @@ public interface Options {
      *  in production.
      * @return <code>true</code> if Jasper is in development mode
      */
-    public boolean getDevelopment();
+    boolean getDevelopment();
 
     /**
      * @return <code>true</code> to include a source fragment in exception
      *  messages.
      */
-    public boolean getDisplaySourceFragment();
+    boolean getDisplaySourceFragment();
 
     /**
      * @return <code>true</code> to suppress generation of SMAP info for
      *  JSR45 debugging.
      */
-    public boolean isSmapSuppressed();
+    boolean isSmapSuppressed();
 
     /**
      * This setting is ignored if suppressSmap() is <code>true</code>.
      * @return <code>true</code> to write SMAP info for JSR45 debugging to a
      * file.
      */
-    public boolean isSmapDumped();
+    boolean isSmapDumped();
 
     /**
      * @return <code>true</code> to remove template text that consists entirely
      *         of whitespace
      */
-    public boolean getTrimSpaces();
+    boolean getTrimSpaces();
 
     /**
      * Gets the class-id value that is sent to Internet Explorer when using
      * &lt;jsp:plugin&gt; tags.
      * @return Class-id value
      */
-    public String getIeClassId();
+    String getIeClassId();
 
     /**
      * @return the work folder
      */
-    public File getScratchDir();
+    File getScratchDir();
 
     /**
      * @return the classpath used to compile generated Servlets
      */
-    public String getClassPath();
+    String getClassPath();
 
     /**
      * Compiler to use.
@@ -131,22 +131,22 @@ public interface Options {
      * Apache Ant documentation for the possible values.
      * @return the compiler name
      */
-    public String getCompiler();
+    String getCompiler();
 
     /**
      * @return the compiler target VM, e.g. 1.8.
      */
-    public String getCompilerTargetVM();
+    String getCompilerTargetVM();
 
     /**
      * @return the compiler source VM, e.g. 1.8.
      */
-    public String getCompilerSourceVM();
+    String getCompilerSourceVM();
 
     /**
      * @return Jasper Java compiler class to use.
      */
-    public String getCompilerClassName();
+    String getCompilerClassName();
 
     /**
      * The cache that maps URIs, resource paths and parsed TLD files for the
@@ -158,12 +158,12 @@ public interface Options {
      * @return the instance of the TldLocationsCache
      *  for the web-application.
      */
-    public TldCache getTldCache();
+    TldCache getTldCache();
 
     /**
      * @return Java platform encoding to generate the JSP page servlet.
      */
-    public String getJavaEncoding();
+    String getJavaEncoding();
 
     /**
      * The boolean flag to tell Ant whether to fork JSP page compilations.
@@ -173,22 +173,22 @@ public interface Options {
      * a <code>javac</code> Apache Ant task).
      * @return <code>true</code> to fork a process during compilation
      */
-    public boolean getFork();
+    boolean getFork();
 
     /**
      * @return JSP configuration information specified in web.xml.
      */
-    public JspConfig getJspConfig();
+    JspConfig getJspConfig();
 
     /**
      * @return <code>true</code> to generate a X-Powered-By response header.
      */
-    public boolean isXpoweredBy();
+    boolean isXpoweredBy();
 
     /**
      * @return a Tag Plugin Manager
      */
-    public TagPluginManager getTagPluginManager();
+    TagPluginManager getTagPluginManager();
 
     /**
      * Indicates whether text strings are to be generated as char arrays.
@@ -196,24 +196,24 @@ public interface Options {
      * @return <code>true</code> if text strings are to be generated as char
      *         arrays, <code>false</code> otherwise
      */
-    public boolean genStringAsCharArray();
+    boolean genStringAsCharArray();
 
     /**
      * @return modification test interval.
      */
-    public int getModificationTestInterval();
+    int getModificationTestInterval();
 
 
     /**
      * @return <code>true</code> if re-compile will occur on a failure.
      */
-    public boolean getRecompileOnFail();
+    boolean getRecompileOnFail();
 
     /**
      * @return <code>true</code> is caching is enabled
      *  (used for precompilation).
      */
-    public boolean isCaching();
+    boolean isCaching();
 
     /**
      * The web-application wide cache for the TagLibraryInfo tag library
@@ -226,7 +226,7 @@ public interface Options {
      *
      * @return the Map(String uri, TagLibraryInfo tld) instance.
      */
-    public Map<String, TagLibraryInfo> getCache();
+    Map<String, TagLibraryInfo> getCache();
 
     /**
      * The maximum number of loaded jsps per web-application. If there are more
@@ -234,23 +234,23 @@ public interface Options {
      * are unloaded.
      * @return The JSP count
      */
-    public int getMaxLoadedJsps();
+    int getMaxLoadedJsps();
 
     /**
      * @return the idle time in seconds after which a JSP is unloaded.
      * If unset or less or equal than 0, no jsps are unloaded.
      */
-    public int getJspIdleTimeout();
+    int getJspIdleTimeout();
 
     /**
      * @return {@code true} if the quote escaping required by section JSP.1.6 of
      *         the JSP specification should be applied to scriplet expression.
      */
-    public boolean getStrictQuoteEscaping();
+    boolean getStrictQuoteEscaping();
 
     /**
      * @return {@code true} if EL expressions used within attributes should have
      *         the quoting rules in JSP.1.6 applied to the expression.
      */
-    public boolean getQuoteAttributeEL();
+    boolean getQuoteAttributeEL();
 }

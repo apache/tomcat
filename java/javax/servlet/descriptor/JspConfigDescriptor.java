@@ -34,7 +34,7 @@ public interface JspConfigDescriptor {
      *
      * @return the tag library descriptors
      */
-    public Collection<TaglibDescriptor> getTaglibs();
+    Collection<TaglibDescriptor> getTaglibs();
 
     /**
      * Provide the set of JSP property groups obtained from the
@@ -43,5 +43,5 @@ public interface JspConfigDescriptor {
      *
      * @return the JSP property groups
      */
-    public Collection<JspPropertyGroupDescriptor> getJspPropertyGroups();
+    Collection<JspPropertyGroupDescriptor> getJspPropertyGroups();
 }

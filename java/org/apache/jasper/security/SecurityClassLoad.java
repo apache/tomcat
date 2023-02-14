@@ -62,7 +62,7 @@ public final class SecurityClassLoad {
         }
     }
 
-    private static final void loadAnonymousInnerClasses(ClassLoader loader, String enclosingClass) {
+    private static void loadAnonymousInnerClasses(ClassLoader loader, String enclosingClass) {
         try {
             for (int i = 1;; i++) {
                 loader.loadClass(enclosingClass + '$' + i);

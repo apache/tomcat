@@ -171,7 +171,7 @@ class Util {
         private final int hash;
         private final WeakReference<ClassLoader> ref;
 
-        public CacheKey(ClassLoader key) {
+        CacheKey(ClassLoader key) {
             hash = key.hashCode();
             ref = new WeakReference<>(key);
         }
@@ -201,7 +201,7 @@ class Util {
         private final ReadWriteLock lock = new ReentrantReadWriteLock();
         private WeakReference<ExpressionFactory> ref;
 
-        public CacheValue() {
+        CacheValue() {
         }
 
         public ReadWriteLock getLock() {
@@ -406,7 +406,7 @@ class Util {
     }
 
 
-    private static final String paramString(Class<?>[] types) {
+    private static String paramString(Class<?>[] types) {
         if (types != null) {
             StringBuilder sb = new StringBuilder();
             for (Class<?> type : types) {
@@ -713,7 +713,7 @@ class Util {
     private static class MethodWrapper extends Wrapper<Method> {
         private final Method m;
 
-        public MethodWrapper(Method m) {
+        MethodWrapper(Method m) {
             this.m = m;
         }
 
@@ -741,7 +741,7 @@ class Util {
     private static class ConstructorWrapper extends Wrapper<Constructor<?>> {
         private final Constructor<?> c;
 
-        public ConstructorWrapper(Constructor<?> c) {
+        ConstructorWrapper(Constructor<?> c) {
             this.c = c;
         }
 
@@ -779,7 +779,7 @@ class Util {
         private final int varArgsCount;
         private final boolean bridge;
 
-        public MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount, int varArgsCount,
+        MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount, int varArgsCount,
                 boolean bridge) {
             this.varArgs = varArgs;
             this.exactCount = exactCount;

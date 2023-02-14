@@ -66,7 +66,7 @@ class ScriptingVariabler {
         private final ErrorDispatcher err;
         private final Map<String, Integer> scriptVars;
 
-        public ScriptingVariableVisitor(ErrorDispatcher err) {
+        ScriptingVariableVisitor(ErrorDispatcher err) {
             this.err = err;
             scriptVars = new HashMap<>();
         }

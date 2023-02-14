@@ -151,7 +151,7 @@ public class AsyncStateMachine {
         private final boolean isCompleting;
         private final boolean isDispatching;
 
-        private AsyncState(boolean isAsync, boolean isStarted, boolean isCompleting, boolean isDispatching) {
+        AsyncState(boolean isAsync, boolean isStarted, boolean isCompleting, boolean isDispatching) {
             this.isAsync = isAsync;
             this.isStarted = isStarted;
             this.isCompleting = isCompleting;

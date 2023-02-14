@@ -103,7 +103,7 @@ public interface KeyedObjectPool<K, V> extends Closeable {
      *             in {@code keys} is {@code null}.
      * @see #addObjects(Object, int)
      */
-    void addObjects(final Collection<K> keys, final int count) throws Exception, IllegalArgumentException;
+    void addObjects(Collection<K> keys, int count) throws Exception, IllegalArgumentException;
 
     /**
      * Calls {@link KeyedObjectPool#addObject(Object)}
@@ -119,7 +119,7 @@ public interface KeyedObjectPool<K, V> extends Closeable {
      *             when {@code key} is {@code null}.
      * @since 2.8.0
      */
-    void addObjects(final K key, final int count) throws Exception, IllegalArgumentException;
+    void addObjects(K key, int count) throws Exception, IllegalArgumentException;
 
     /**
      * Obtains an instance from this pool for the specified {@code key}.
@@ -278,7 +278,7 @@ public interface KeyedObjectPool<K, V> extends Closeable {
      * @throws Exception if the instance cannot be invalidated
      * @since 2.9.0
      */
-    void invalidateObject(final K key, final V obj, final DestroyMode mode) throws Exception;
+    void invalidateObject(K key, V obj, DestroyMode mode) throws Exception;
 
     /**
      * Return an instance to the pool. By contract, {@code obj}

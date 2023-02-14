@@ -34,6 +34,6 @@ public interface AsyncDispatcher {
      * @throws IOException      if an I/O error occurs while processing the
      *                          dispatch
      */
-    public void dispatch(ServletRequest request, ServletResponse response)
+    void dispatch(ServletRequest request, ServletResponse response)
             throws ServletException, IOException;
 }

@@ -898,7 +898,7 @@ public class Catalina {
 
 final class SetParentClassLoaderRule extends Rule {
 
-    public SetParentClassLoaderRule(ClassLoader parentClassLoader) {
+    SetParentClassLoaderRule(ClassLoader parentClassLoader) {
 
         this.parentClassLoader = parentClassLoader;
 

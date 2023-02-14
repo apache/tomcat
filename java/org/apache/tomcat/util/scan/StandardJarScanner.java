@@ -477,7 +477,7 @@ public class StandardJarScanner implements JarScanner {
         private final boolean jar;
         private final String name;
 
-        public ClassPathEntry(URL url) {
+        ClassPathEntry(URL url) {
             String path = url.getPath();
             int end = path.lastIndexOf(Constants.JAR_EXT);
             if (end != -1) {
