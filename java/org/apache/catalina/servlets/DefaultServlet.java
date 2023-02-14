@@ -2657,7 +2657,7 @@ public class DefaultServlet extends HttpServlet {
          */
         protected Comparator<WebResource> resourceLastModifiedComparatorAsc;
 
-        public SortManager(boolean directoriesFirst) {
+        SortManager(boolean directoriesFirst) {
             resourceNameComparator = Comparator.comparing(WebResource::getName);
             resourceNameComparatorAsc = resourceNameComparator.reversed();
             resourceSizeComparator =
@@ -2801,7 +2801,7 @@ public class DefaultServlet extends HttpServlet {
             final char column;
             final boolean ascending;
 
-            public Order(char column, boolean ascending) {
+            Order(char column, boolean ascending) {
                 this.column = column;
                 this.ascending = ascending;
             }
@@ -2837,7 +2837,7 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-    static enum BomConfig {
+    enum BomConfig {
         /**
          * BoM is stripped if present and any BoM found used to determine the
          * encoding used to read the resource.
@@ -2858,7 +2858,7 @@ public class DefaultServlet extends HttpServlet {
         final boolean stripBom;
         final boolean useBomEncoding;
 
-        private BomConfig(String configurationValue, boolean stripBom, boolean useBomEncoding) {
+        BomConfig(String configurationValue, boolean stripBom, boolean useBomEncoding) {
             this.configurationValue = configurationValue;
             this.stripBom = stripBom;
             this.useBomEncoding = useBomEncoding;

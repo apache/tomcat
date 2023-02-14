@@ -394,7 +394,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
          */
         private final ConcurrentLinkedQueue<SecureRandom> randomPool;
 
-        public BaseEncryptionManager(String algorithm, SecretKeySpec secretKey, String providerName)
+        BaseEncryptionManager(String algorithm, SecretKeySpec secretKey, String providerName)
             throws NoSuchAlgorithmException, NoSuchPaddingException, NoSuchProviderException {
             this.algorithm = algorithm;
             this.providerName = providerName;
@@ -591,7 +591,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      */
     private static class GCMEncryptionManager extends BaseEncryptionManager
     {
-        public GCMEncryptionManager(String algorithm, SecretKeySpec secretKey, String providerName)
+        GCMEncryptionManager(String algorithm, SecretKeySpec secretKey, String providerName)
                 throws NoSuchAlgorithmException, NoSuchPaddingException, NoSuchProviderException {
             super(algorithm, secretKey, providerName);
         }
@@ -613,7 +613,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
     {
         private static final long serialVersionUID = 1L;
 
-        public ChannelConfigException(String message) {
+        ChannelConfigException(String message) {
             super(message);
         }
     }

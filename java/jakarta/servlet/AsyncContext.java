@@ -26,37 +26,37 @@ public interface AsyncContext {
     /**
      * The attribute name for the URI of the async request
      */
-    public static final String ASYNC_REQUEST_URI =
+    String ASYNC_REQUEST_URI =
             "jakarta.servlet.async.request_uri";
 
     /**
      * The attribute name for the Context Path of the async request
      */
-    public static final String ASYNC_CONTEXT_PATH  =
+    String ASYNC_CONTEXT_PATH  =
             "jakarta.servlet.async.context_path";
 
     /**
      * The attribute name for the Mapping of the async request
      */
-    public static final String ASYNC_MAPPING =
+    String ASYNC_MAPPING =
             "jakarta.servlet.async.mapping";
 
     /**
      * The attribute name for the Path Info of the async request
      */
-    public static final String ASYNC_PATH_INFO =
+    String ASYNC_PATH_INFO =
             "jakarta.servlet.async.path_info";
 
     /**
      * The attribute name for the Servlet Path of the async request
      */
-    public static final String ASYNC_SERVLET_PATH =
+    String ASYNC_SERVLET_PATH =
             "jakarta.servlet.async.servlet_path";
 
     /**
      * The attribute name for the Query String of the async request
      */
-    public static final String ASYNC_QUERY_STRING =
+    String ASYNC_QUERY_STRING =
             "jakarta.servlet.async.query_string";
 
     /**

@@ -591,7 +591,7 @@ public final class IntrospectionUtils {
     // -------------------- Get property --------------------
     // This provides a layer of abstraction
 
-    public static interface PropertySource {
-        public String getProperty(String key);
+    public interface PropertySource {
+        String getProperty(String key);
     }
 }

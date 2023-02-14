@@ -66,7 +66,7 @@ public enum ContinueResponseTiming {
     private final String configValue;
 
 
-    private ContinueResponseTiming(String configValue) {
+    ContinueResponseTiming(String configValue) {
         this.configValue = configValue;
     }
 

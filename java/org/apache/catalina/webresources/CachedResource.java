@@ -415,7 +415,7 @@ public class CachedResource implements WebResource {
 
         private URL associatedURL = null;
 
-        public CachedResourceURLStreamHandler(URL resourceURL, StandardRoot root, String webAppPath,
+        CachedResourceURLStreamHandler(URL resourceURL, StandardRoot root, String webAppPath,
                 boolean usesClassLoaderResources) {
             this.resourceURL = resourceURL;
             this.root = root;

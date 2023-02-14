@@ -50,7 +50,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
     Configurator getConfigurator();
 
 
-    public final class Builder {
+    final class Builder {
 
         public static Builder create(
                 Class<?> endpointClass, String path) {
@@ -149,7 +149,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
     }
 
 
-    public class Configurator {
+    class Configurator {
 
         private static volatile Configurator defaultImpl = null;
         private static final Object defaultImplLock = new Object();

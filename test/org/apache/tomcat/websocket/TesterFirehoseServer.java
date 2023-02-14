@@ -142,7 +142,7 @@ public class TesterFirehoseServer {
 
         private final Session session;
 
-        public Writer(Session session) {
+        Writer(Session session) {
             this.session = session;
         }
 

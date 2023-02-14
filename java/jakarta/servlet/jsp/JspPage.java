@@ -74,7 +74,7 @@ public interface JspPage extends Servlet {
      *
      * A JSP page should redefine the init() method from Servlet.
      */
-    public void jspInit();
+    void jspInit();
 
     /**
      * The jspDestroy() method is invoked when the JSP page is about to be
@@ -85,6 +85,6 @@ public interface JspPage extends Servlet {
      *
      * A JSP page should redefine the destroy() method from Servlet.
      */
-    public void jspDestroy();
+    void jspDestroy();
 
 }

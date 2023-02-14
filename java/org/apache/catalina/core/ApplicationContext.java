@@ -1261,7 +1261,7 @@ public class ApplicationContext implements ServletContext {
         public MessageBytes uriMB;
         public MappingData mappingData;
 
-        public DispatchData() {
+        DispatchData() {
             uriMB = MessageBytes.newInstance();
             CharChunk uriCC = uriMB.getCharChunk();
             uriCC.setLimit(-1);

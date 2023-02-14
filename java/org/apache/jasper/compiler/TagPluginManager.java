@@ -133,7 +133,7 @@ public class TagPluginManager {
         private final TagPluginManager manager;
         private final PageInfo pageInfo;
 
-        public NodeVisitor(TagPluginManager manager, PageInfo pageInfo) {
+        NodeVisitor(TagPluginManager manager, PageInfo pageInfo) {
             this.manager = manager;
             this.pageInfo = pageInfo;
         }

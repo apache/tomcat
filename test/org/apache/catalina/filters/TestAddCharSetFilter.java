@@ -130,7 +130,7 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
         private final int mode;
         private final boolean useSetContentType;
 
-        public CharsetServlet(int mode, boolean useSetContentType) {
+        CharsetServlet(int mode, boolean useSetContentType) {
             this.mode = mode;
             this.useSetContentType = useSetContentType;
         }

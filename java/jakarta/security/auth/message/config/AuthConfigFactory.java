@@ -147,7 +147,7 @@ public abstract class AuthConfigFactory {
         return DEFAULT_JASPI_AUTHCONFIGFACTORYIMPL;
     }
 
-    public static interface RegistrationContext {
+    public interface RegistrationContext {
 
         String getMessageLayer();
 

@@ -188,7 +188,7 @@ public class BeanELResolver extends ELResolver {
 
         private final Class<?> type;
 
-        public BeanProperties(Class<?> type) throws ELException {
+        BeanProperties(Class<?> type) throws ELException {
             this.type = type;
             this.properties = new HashMap<>();
             try {
@@ -252,7 +252,7 @@ public class BeanELResolver extends ELResolver {
 
         private Method write;
 
-        public BeanProperty(Class<?> owner, PropertyDescriptor descriptor) {
+        BeanProperty(Class<?> owner, PropertyDescriptor descriptor) {
             this.owner = owner;
             this.descriptor = descriptor;
             this.type = descriptor.getPropertyType();
@@ -292,7 +292,7 @@ public class BeanELResolver extends ELResolver {
         }
     }
 
-    private final BeanProperty property(ELContext ctx, Object base,
+    private BeanProperty property(ELContext ctx, Object base,
             Object property) {
         Class<?> type = base.getClass();
         String prop = property.toString();
@@ -312,7 +312,7 @@ public class BeanELResolver extends ELResolver {
         private final Map<K,V> eden;
         private final Map<K,V> longterm;
 
-        public ConcurrentCache(int size) {
+        ConcurrentCache(int size) {
             this.size = size;
             this.eden = new ConcurrentHashMap<>(size);
             this.longterm = new WeakHashMap<>(size);

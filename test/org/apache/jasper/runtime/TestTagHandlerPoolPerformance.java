@@ -55,7 +55,7 @@ public class TestTagHandlerPoolPerformance extends TomcatBaseTest {
 
         private final TagHandlerPool tagHandlerPool;
 
-        public TestInstanceSupplier(TagHandlerPool tagHandlerPool) {
+        TestInstanceSupplier(TagHandlerPool tagHandlerPool) {
             this.tagHandlerPool = tagHandlerPool;
         }
 
@@ -71,7 +71,7 @@ public class TestTagHandlerPoolPerformance extends TomcatBaseTest {
 
         private final TagHandlerPool tagHandlerPool;
 
-        public TestInstance(TagHandlerPool tagHandlerPool) {
+        TestInstance(TagHandlerPool tagHandlerPool) {
             this.tagHandlerPool = tagHandlerPool;
         }
 

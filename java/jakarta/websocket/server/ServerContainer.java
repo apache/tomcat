@@ -26,9 +26,9 @@ import jakarta.websocket.WebSocketContainer;
  * Provides the ability to deploy endpoints programmatically.
  */
 public interface ServerContainer extends WebSocketContainer {
-    public abstract void addEndpoint(Class<?> clazz) throws DeploymentException;
+    void addEndpoint(Class<?> clazz) throws DeploymentException;
 
-    public abstract void addEndpoint(ServerEndpointConfig sec) throws DeploymentException;
+    void addEndpoint(ServerEndpointConfig sec) throws DeploymentException;
 
     /**
      * Upgrade the HTTP connection represented by the {@code HttpServletRequest} and {@code HttpServletResponse} to the
@@ -57,6 +57,6 @@ public interface ServerContainer extends WebSocketContainer {
      *
      * @since WebSocket 2.0
      */
-    public void upgradeHttpToWebSocket(Object httpServletRequest, Object httpServletResponse, ServerEndpointConfig sec,
+    void upgradeHttpToWebSocket(Object httpServletRequest, Object httpServletResponse, ServerEndpointConfig sec,
             Map<String,String> pathParameters) throws IOException, DeploymentException;
 }

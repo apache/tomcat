@@ -30,7 +30,7 @@ final class LifetimeExceededException extends SQLException {
     /**
      * Constructs a new instance.
      */
-    public LifetimeExceededException() {
+    LifetimeExceededException() {
     }
 
     /**
@@ -38,7 +38,7 @@ final class LifetimeExceededException extends SQLException {
      *
      * @param reason a description of the exception
      */
-    public LifetimeExceededException(final String reason) {
+    LifetimeExceededException(final String reason) {
         super(reason);
     }
 }

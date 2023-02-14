@@ -932,7 +932,7 @@ class Generator {
 
         private final boolean useInstanceManagerForTags;
 
-        public GenerateVisitor(boolean isTagFile, ServletWriter out,
+        GenerateVisitor(boolean isTagFile, ServletWriter out,
                 ArrayList<GenBuffer> methodsBuffered,
                 FragmentHelperClass fragmentHelperClass,
                 boolean useInstanceManagerForTags) {
@@ -3952,7 +3952,7 @@ class Generator {
 
             private int id;
 
-            public Fragment(int id, Node node) {
+            Fragment(int id, Node node) {
                 this.id = id;
                 genBuffer = new GenBuffer(null, node.getBody());
             }
@@ -3976,7 +3976,7 @@ class Generator {
         // Buffer for entire helper class
         private GenBuffer classBuffer = new GenBuffer();
 
-        public FragmentHelperClass(String className) {
+        FragmentHelperClass(String className) {
             this.className = className;
         }
 

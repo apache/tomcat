@@ -56,7 +56,7 @@ public final class ConstantUtf8 extends Constant {
     /**
      * @return Data converted to string.
      */
-    public final String getBytes() {
+    public String getBytes() {
         return value;
     }
 }

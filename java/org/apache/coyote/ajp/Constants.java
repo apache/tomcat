@@ -139,7 +139,7 @@ public final class Constants {
      * @param code the coded value
      * @return the string value of the method
      */
-    public static final String getMethodForCode(final int code) {
+    public static String getMethodForCode(final int code) {
         return methodTransArray[code];
     }
 
@@ -184,7 +184,7 @@ public final class Constants {
      * @param code the coded value
      * @return the string value of the header name
      */
-    public static final String getHeaderForCode(final int code) {
+    public static String getHeaderForCode(final int code) {
         return headerTransArray[code];
     }
 
@@ -208,7 +208,7 @@ public final class Constants {
      * @param code the coded value
      * @return the string value of the header
      */
-    public static final String getResponseHeaderForCode(final int code) {
+    public static String getResponseHeaderForCode(final int code) {
         return responseTransArray[code];
     }
 
@@ -226,7 +226,7 @@ public final class Constants {
         }
     }
 
-    public static final int getResponseAjpIndex(String header) {
+    public static int getResponseAjpIndex(String header) {
         Integer i = responseTransMap.get(header);
         if (i == null) {
             return 0;

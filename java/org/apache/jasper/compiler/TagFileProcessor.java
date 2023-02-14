@@ -133,7 +133,7 @@ class TagFileProcessor {
 
         private Map<String,NameEntry> nameFromTable = new HashMap<>();
 
-        public TagFileDirectiveVisitor(Compiler compiler,
+        TagFileDirectiveVisitor(Compiler compiler,
                 TagLibraryInfo tagLibInfo, String name, String path) {
             err = compiler.getErrorDispatcher();
             this.tagLibInfo = tagLibInfo;

@@ -62,7 +62,7 @@ public class TestOneLineFormatterPerformance {
 
         private final DateFormatCache cache;
 
-        public DateFormatCacheImpl() {
+        DateFormatCacheImpl() {
             cache = new DateFormatCache(5, "dd-MMM-yyyy HH:mm:ss",  null);
         }
 

@@ -160,7 +160,7 @@ public class UriTemplate {
         private final int parameterIndex;
         private final String value;
 
-        public Segment(int parameterIndex, String value) {
+        Segment(int parameterIndex, String value) {
             this.parameterIndex = parameterIndex;
             this.value = value;
         }

@@ -207,7 +207,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
          *
          * @param instance object to wrap
          */
-        public IdentityWrapper(final T instance) {
+        IdentityWrapper(final T instance) {
             this.instance = instance;
         }
 

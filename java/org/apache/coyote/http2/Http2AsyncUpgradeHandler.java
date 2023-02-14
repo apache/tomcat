@@ -517,7 +517,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
         private final List<ByteBuffer> bufs = new ArrayList<>();
 
-        public AsyncHeaderFrameBuffers(int initialPayloadSize) {
+        AsyncHeaderFrameBuffers(int initialPayloadSize) {
             this.payloadSize = initialPayloadSize;
         }
 

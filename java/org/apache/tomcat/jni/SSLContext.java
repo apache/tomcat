@@ -360,7 +360,7 @@ public final class SSLContext {
      * select an OpenSSL SSLContext based on the host name requested by the
      * client.
      */
-    public static interface SNICallBack {
+    public interface SNICallBack {
 
         /**
          * This callback is made during the TLS handshake when the client uses
@@ -373,7 +373,7 @@ public final class SSLContext {
          *         SSLContext to use for the given host or zero if no SSLContext
          *         could be identified
          */
-        public long getSslContext(String sniHostName);
+        long getSslContext(String sniHostName);
     }
 
     /**

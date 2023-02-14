@@ -225,11 +225,11 @@ public class TestResourceBundleELResolver {
 
     private static class TesterResourceBundle extends ListResourceBundle {
 
-        public TesterResourceBundle() {
+        TesterResourceBundle() {
             this(new Object[][] { { "key1", "value1" }, { "key2", "value2" } });
         }
 
-        public TesterResourceBundle(Object[][] contents) {
+        TesterResourceBundle(Object[][] contents) {
             this.contents = contents;
         }
 

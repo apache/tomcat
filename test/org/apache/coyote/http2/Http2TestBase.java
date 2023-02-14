@@ -1055,7 +1055,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         private final InputStream is;
 
 
-        public TestInput(InputStream is) {
+        TestInput(InputStream is) {
             this.is = is;
         }
 
@@ -1532,7 +1532,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         private final int setting;
         private final long value;
 
-        public SettingValue(int setting, long value) {
+        SettingValue(int setting, long value) {
             this.setting = setting;
             this.value = value;
         }
@@ -1551,7 +1551,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         private final String name;
         private final String value;
 
-        public Header(String name, String value) {
+        Header(String name, String value) {
             this.name = name;
             this.value = value;
         }

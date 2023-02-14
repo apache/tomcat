@@ -653,7 +653,7 @@ public class DefaultInstanceManager implements InstanceManager {
         private final String name;
         private final AnnotationCacheEntryType type;
 
-        public AnnotationCacheEntry(String accessibleObjectName, Class<?>[] paramTypes, String name,
+        AnnotationCacheEntry(String accessibleObjectName, Class<?>[] paramTypes, String name,
                 AnnotationCacheEntryType type) {
             this.accessibleObjectName = accessibleObjectName;
             this.paramTypes = paramTypes;

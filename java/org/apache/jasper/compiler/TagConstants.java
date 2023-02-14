@@ -18,89 +18,89 @@ package org.apache.jasper.compiler;
 
 public interface TagConstants {
 
-    public static final String JSP_URI = "http://java.sun.com/JSP/Page";
+    String JSP_URI = "http://java.sun.com/JSP/Page";
 
-    public static final String DIRECTIVE_ACTION = "directive.";
+    String DIRECTIVE_ACTION = "directive.";
 
-    public static final String ROOT_ACTION = "root";
-    public static final String JSP_ROOT_ACTION = "jsp:root";
+    String ROOT_ACTION = "root";
+    String JSP_ROOT_ACTION = "jsp:root";
 
-    public static final String PAGE_DIRECTIVE_ACTION = "directive.page";
-    public static final String JSP_PAGE_DIRECTIVE_ACTION = "jsp:directive.page";
+    String PAGE_DIRECTIVE_ACTION = "directive.page";
+    String JSP_PAGE_DIRECTIVE_ACTION = "jsp:directive.page";
 
-    public static final String INCLUDE_DIRECTIVE_ACTION = "directive.include";
-    public static final String JSP_INCLUDE_DIRECTIVE_ACTION = "jsp:directive.include";
+    String INCLUDE_DIRECTIVE_ACTION = "directive.include";
+    String JSP_INCLUDE_DIRECTIVE_ACTION = "jsp:directive.include";
 
-    public static final String DECLARATION_ACTION = "declaration";
-    public static final String JSP_DECLARATION_ACTION = "jsp:declaration";
+    String DECLARATION_ACTION = "declaration";
+    String JSP_DECLARATION_ACTION = "jsp:declaration";
 
-    public static final String SCRIPTLET_ACTION = "scriptlet";
-    public static final String JSP_SCRIPTLET_ACTION = "jsp:scriptlet";
+    String SCRIPTLET_ACTION = "scriptlet";
+    String JSP_SCRIPTLET_ACTION = "jsp:scriptlet";
 
-    public static final String EXPRESSION_ACTION = "expression";
-    public static final String JSP_EXPRESSION_ACTION = "jsp:expression";
+    String EXPRESSION_ACTION = "expression";
+    String JSP_EXPRESSION_ACTION = "jsp:expression";
 
-    public static final String USE_BEAN_ACTION = "useBean";
-    public static final String JSP_USE_BEAN_ACTION = "jsp:useBean";
+    String USE_BEAN_ACTION = "useBean";
+    String JSP_USE_BEAN_ACTION = "jsp:useBean";
 
-    public static final String SET_PROPERTY_ACTION = "setProperty";
-    public static final String JSP_SET_PROPERTY_ACTION = "jsp:setProperty";
+    String SET_PROPERTY_ACTION = "setProperty";
+    String JSP_SET_PROPERTY_ACTION = "jsp:setProperty";
 
-    public static final String GET_PROPERTY_ACTION = "getProperty";
-    public static final String JSP_GET_PROPERTY_ACTION = "jsp:getProperty";
+    String GET_PROPERTY_ACTION = "getProperty";
+    String JSP_GET_PROPERTY_ACTION = "jsp:getProperty";
 
-    public static final String INCLUDE_ACTION = "include";
-    public static final String JSP_INCLUDE_ACTION = "jsp:include";
+    String INCLUDE_ACTION = "include";
+    String JSP_INCLUDE_ACTION = "jsp:include";
 
-    public static final String FORWARD_ACTION = "forward";
-    public static final String JSP_FORWARD_ACTION = "jsp:forward";
+    String FORWARD_ACTION = "forward";
+    String JSP_FORWARD_ACTION = "jsp:forward";
 
-    public static final String PARAM_ACTION = "param";
-    public static final String JSP_PARAM_ACTION = "jsp:param";
+    String PARAM_ACTION = "param";
+    String JSP_PARAM_ACTION = "jsp:param";
 
-    public static final String TEXT_ACTION = "text";
-    public static final String JSP_TEXT_ACTION = "jsp:text";
-    public static final String JSP_TEXT_ACTION_END = "</jsp:text>";
+    String TEXT_ACTION = "text";
+    String JSP_TEXT_ACTION = "jsp:text";
+    String JSP_TEXT_ACTION_END = "</jsp:text>";
 
-    public static final String ATTRIBUTE_ACTION = "attribute";
-    public static final String JSP_ATTRIBUTE_ACTION = "jsp:attribute";
+    String ATTRIBUTE_ACTION = "attribute";
+    String JSP_ATTRIBUTE_ACTION = "jsp:attribute";
 
-    public static final String BODY_ACTION = "body";
-    public static final String JSP_BODY_ACTION = "jsp:body";
+    String BODY_ACTION = "body";
+    String JSP_BODY_ACTION = "jsp:body";
 
-    public static final String ELEMENT_ACTION = "element";
-    public static final String JSP_ELEMENT_ACTION = "jsp:element";
+    String ELEMENT_ACTION = "element";
+    String JSP_ELEMENT_ACTION = "jsp:element";
 
-    public static final String OUTPUT_ACTION = "output";
-    public static final String JSP_OUTPUT_ACTION = "jsp:output";
+    String OUTPUT_ACTION = "output";
+    String JSP_OUTPUT_ACTION = "jsp:output";
 
-    public static final String TAGLIB_DIRECTIVE_ACTION = "taglib";
-    public static final String JSP_TAGLIB_DIRECTIVE_ACTION = "jsp:taglib";
+    String TAGLIB_DIRECTIVE_ACTION = "taglib";
+    String JSP_TAGLIB_DIRECTIVE_ACTION = "jsp:taglib";
 
     /*
      * Tag Files
      */
-    public static final String INVOKE_ACTION = "invoke";
-    public static final String JSP_INVOKE_ACTION = "jsp:invoke";
+    String INVOKE_ACTION = "invoke";
+    String JSP_INVOKE_ACTION = "jsp:invoke";
 
-    public static final String DOBODY_ACTION = "doBody";
-    public static final String JSP_DOBODY_ACTION = "jsp:doBody";
+    String DOBODY_ACTION = "doBody";
+    String JSP_DOBODY_ACTION = "jsp:doBody";
 
     /*
      * Tag File Directives
      */
-    public static final String TAG_DIRECTIVE_ACTION = "directive.tag";
-    public static final String JSP_TAG_DIRECTIVE_ACTION = "jsp:directive.tag";
+    String TAG_DIRECTIVE_ACTION = "directive.tag";
+    String JSP_TAG_DIRECTIVE_ACTION = "jsp:directive.tag";
 
-    public static final String ATTRIBUTE_DIRECTIVE_ACTION = "directive.attribute";
-    public static final String JSP_ATTRIBUTE_DIRECTIVE_ACTION = "jsp:directive.attribute";
+    String ATTRIBUTE_DIRECTIVE_ACTION = "directive.attribute";
+    String JSP_ATTRIBUTE_DIRECTIVE_ACTION = "jsp:directive.attribute";
 
-    public static final String VARIABLE_DIRECTIVE_ACTION = "directive.variable";
-    public static final String JSP_VARIABLE_DIRECTIVE_ACTION = "jsp:directive.variable";
+    String VARIABLE_DIRECTIVE_ACTION = "directive.variable";
+    String JSP_VARIABLE_DIRECTIVE_ACTION = "jsp:directive.variable";
 
     /*
      * Directive attributes
      */
-    public static final String URN_JSPTAGDIR = "urn:jsptagdir:";
-    public static final String URN_JSPTLD = "urn:jsptld:";
+    String URN_JSPTAGDIR = "urn:jsptagdir:";
+    String URN_JSPTLD = "urn:jsptld:";
 }

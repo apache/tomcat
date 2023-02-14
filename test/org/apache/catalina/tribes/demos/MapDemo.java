@@ -522,7 +522,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
 
         private static final long serialVersionUID = 1L;
 
-        public ColorRenderer() {
+        ColorRenderer() {
             super();
         }
 

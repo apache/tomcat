@@ -29,7 +29,7 @@ class MessagePart {
     private volatile SendHandler endHandler;
     private final long blockingWriteTimeoutExpiry;
 
-    public MessagePart( boolean fin, int rsv, byte opCode, ByteBuffer payload,
+    MessagePart( boolean fin, int rsv, byte opCode, ByteBuffer payload,
             SendHandler intermediateHandler, SendHandler endHandler,
             long blockingWriteTimeoutExpiry) {
         this.fin = fin;

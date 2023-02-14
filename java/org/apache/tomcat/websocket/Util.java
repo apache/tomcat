@@ -660,7 +660,7 @@ public class Util {
         private final int index;
         private int dimension;
 
-        public TypeResult(Class<?> clazz, int index, int dimension) {
+        TypeResult(Class<?> clazz, int index, int dimension) {
             this.clazz= clazz;
             this.index = index;
             this.dimension = dimension;

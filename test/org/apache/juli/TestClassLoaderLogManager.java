@@ -115,7 +115,7 @@ public class TestClassLoaderLogManager {
         private final LogManager logManager;
         private volatile boolean running = true;
 
-        public LoggerCreateThread(LogManager logManager) {
+        LoggerCreateThread(LogManager logManager) {
             this.logManager = logManager;
         }
 
@@ -138,7 +138,7 @@ public class TestClassLoaderLogManager {
         private final LogManager logManager;
         private volatile boolean running = true;
 
-        public LoggerListThread(LogManager logManager) {
+        LoggerListThread(LogManager logManager) {
             this.logManager = logManager;
         }
 
@@ -165,7 +165,7 @@ public class TestClassLoaderLogManager {
 
     private static class TestClassLoader extends URLClassLoader implements WebappProperties {
 
-        public TestClassLoader() {
+        TestClassLoader() {
             super(new URL[0]);
         }
 

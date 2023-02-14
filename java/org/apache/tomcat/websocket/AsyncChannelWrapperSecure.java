@@ -180,7 +180,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
         private final int length;
         private final WrapperFuture<Long,?> future;
 
-        public WriteTask(ByteBuffer[] srcs, int offset, int length,
+        WriteTask(ByteBuffer[] srcs, int offset, int length,
                 WrapperFuture<Long,?> future) {
             this.srcs = srcs;
             this.future = future;
@@ -255,7 +255,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
         private final ByteBuffer dest;
         private final WrapperFuture<Integer,?> future;
 
-        public ReadTask(ByteBuffer dest, WrapperFuture<Integer,?> future) {
+        ReadTask(ByteBuffer dest, WrapperFuture<Integer,?> future) {
             this.dest = dest;
             this.future = future;
         }
@@ -356,7 +356,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
         private HandshakeStatus handshakeStatus;
         private Status resultStatus;
 
-        public WebSocketSslHandshakeThread(WrapperFuture<Void,Void> hFuture) {
+        WebSocketSslHandshakeThread(WrapperFuture<Void,Void> hFuture) {
             this.hFuture = hFuture;
         }
 
@@ -458,11 +458,11 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
         private volatile Throwable throwable = null;
         private CountDownLatch completionLatch = new CountDownLatch(1);
 
-        public WrapperFuture() {
+        WrapperFuture() {
             this(null, null);
         }
 
-        public WrapperFuture(CompletionHandler<T,A> handler, A attachment) {
+        WrapperFuture(CompletionHandler<T,A> handler, A attachment) {
             this.handler = handler;
             this.attachment = attachment;
         }
@@ -528,7 +528,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
 
         private final Future<Long> wrapped;
 
-        public LongToIntegerFuture(Future<Long> wrapped) {
+        LongToIntegerFuture(Future<Long> wrapped) {
             this.wrapped = wrapped;
         }
 

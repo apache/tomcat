@@ -65,7 +65,7 @@ public final class AstValue extends SimpleNode {
         return result;
     }
 
-    private final Target getTarget(EvaluationContext ctx) throws ELException {
+    private Target getTarget(EvaluationContext ctx) throws ELException {
         // evaluate expr-a to value-a
         Object base = this.children[0].getValue(ctx);
 

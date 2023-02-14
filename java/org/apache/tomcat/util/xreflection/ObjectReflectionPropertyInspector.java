@@ -62,7 +62,7 @@ public final class ObjectReflectionPropertyInspector {
         );
     }
 
-    private static final Set<Class<?>> getKnownClasses() throws ClassNotFoundException {
+    private static Set<Class<?>> getKnownClasses() throws ClassNotFoundException {
         return
             Collections.unmodifiableSet(new LinkedHashSet<>(
                     Arrays.asList(

@@ -57,7 +57,7 @@ public class TestHttpServletPerformance {
 
         private final boolean allowTrace;
 
-        public TesterRequest(boolean allowTrace) {
+        TesterRequest(boolean allowTrace) {
             super(null);
             this.allowTrace = allowTrace;
         }

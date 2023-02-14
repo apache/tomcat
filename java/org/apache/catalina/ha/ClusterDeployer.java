@@ -32,13 +32,13 @@ public interface ClusterDeployer extends ChannelListener {
      * Start the cluster deployer, the owning container will invoke this
      * @throws Exception - if failure to start cluster
      */
-    public void start() throws Exception;
+    void start() throws Exception;
 
     /**
      * Stops the cluster deployer, the owning container will invoke this
      * @throws LifecycleException Error stopping cluster deployer
      */
-    public void stop() throws LifecycleException;
+    void stop() throws LifecycleException;
 
     /**
      * Install a new web application, whose web application archive is at the
@@ -62,7 +62,7 @@ public interface ClusterDeployer extends ChannelListener {
      * @exception IOException if an input/output error was encountered
      *  during installation
      */
-    public void install(String contextName, File webapp) throws IOException;
+    void install(String contextName, File webapp) throws IOException;
 
     /**
      * Remove an existing web application, attached to the specified context
@@ -82,23 +82,23 @@ public interface ClusterDeployer extends ChannelListener {
      * @exception IOException if an input/output error occurs during
      *  removal
      */
-    public void remove(String contextName, boolean undeploy) throws IOException;
+    void remove(String contextName, boolean undeploy) throws IOException;
 
     /**
      * call from container Background Process
      */
-    public void backgroundProcess();
+    void backgroundProcess();
 
     /**
      * Returns the cluster the cluster deployer is associated with
      * @return CatalinaCluster
      */
-    public CatalinaCluster getCluster();
+    CatalinaCluster getCluster();
 
     /**
      * Associates the cluster deployer with a cluster
      * @param cluster CatalinaCluster
      */
-    public void setCluster(CatalinaCluster cluster);
+    void setCluster(CatalinaCluster cluster);
 
 }

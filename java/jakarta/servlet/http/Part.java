@@ -35,21 +35,21 @@ public interface Part {
      *
      * @throws IOException if an I/O occurs while obtaining the stream
      */
-    public InputStream getInputStream() throws IOException;
+    InputStream getInputStream() throws IOException;
 
     /**
      * Obtain the content type passed by the browser.
      *
      * @return The content type passed by the browser or <code>null</code> if not defined.
      */
-    public String getContentType();
+    String getContentType();
 
     /**
      * Obtain the name of the field in the multipart form corresponding to this part.
      *
      * @return The name of the field in the multipart form corresponding to this part.
      */
-    public String getName();
+    String getName();
 
     /**
      * If this part represents an uploaded file, gets the file name submitted in the upload. Returns {@code null} if no
@@ -59,14 +59,14 @@ public interface Part {
      *
      * @since Servlet 3.1
      */
-    public String getSubmittedFileName();
+    String getSubmittedFileName();
 
     /**
      * Obtain the size of this part.
      *
      * @return The size of the part if bytes
      */
-    public long getSize();
+    long getSize();
 
     /**
      * A convenience method to write an uploaded part to disk. The client code is not concerned with whether or not the
@@ -80,7 +80,7 @@ public interface Part {
      *
      * @throws IOException if an I/O occurs while attempting to write the part
      */
-    public void write(String fileName) throws IOException;
+    void write(String fileName) throws IOException;
 
     /**
      * Deletes the underlying storage for a part, including deleting any associated temporary disk file. Although the
@@ -93,7 +93,7 @@ public interface Part {
      *
      * @throws IOException if an I/O occurs while attempting to delete the part
      */
-    public void delete() throws IOException;
+    void delete() throws IOException;
 
     /**
      * Obtains the value of the specified part header as a String. If there are multiple headers with the same name,
@@ -103,7 +103,7 @@ public interface Part {
      *
      * @return The header value or <code>null</code> if the header is not present
      */
-    public String getHeader(String name);
+    String getHeader(String name);
 
     /**
      * Obtain all the values of the specified part header.
@@ -113,12 +113,12 @@ public interface Part {
      * @return All the values of the specified part header. If the part did not include any headers of the specified
      *             name, this method returns an empty Collection.
      */
-    public Collection<String> getHeaders(String name);
+    Collection<String> getHeaders(String name);
 
     /**
      * Get the header names provided for this part.
      *
      * @return a Collection of all the header names provided for this part.
      */
-    public Collection<String> getHeaderNames();
+    Collection<String> getHeaderNames();
 }

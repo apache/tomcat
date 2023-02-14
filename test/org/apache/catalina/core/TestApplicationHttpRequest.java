@@ -243,7 +243,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
 
         private final String target;
 
-        public ForwardServlet(String target) {
+        ForwardServlet(String target) {
             this.target = target;
         }
 
@@ -262,7 +262,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
 
         private Map<String,String[]> expected;
 
-        public DisplayParameterServlet(Map<String,String[]> expected) {
+        DisplayParameterServlet(Map<String,String[]> expected) {
             this.expected = expected;
         }
 

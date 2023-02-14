@@ -587,7 +587,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
     private static class TestCustomErrorClient extends SimpleHttpClient {
 
-        public TestCustomErrorClient(int port) {
+        TestCustomErrorClient(int port) {
             setPort(port);
         }
 
@@ -599,7 +599,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
     private static class TestCompressedClient extends SimpleHttpClient {
 
-        public TestCompressedClient(int port) {
+        TestCompressedClient(int port) {
             setPort(port);
         }
 

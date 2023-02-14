@@ -105,7 +105,7 @@ public class TestOutputBuffer extends TomcatBaseTest{
         private final String writeString;
         private final int writeCount;
 
-        public WritingServlet(int writeLength) {
+        WritingServlet(int writeLength) {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < writeLength; i++) {
                 sb.append('x');
@@ -193,7 +193,7 @@ public class TestOutputBuffer extends TomcatBaseTest{
 
         private final char[] chars;
 
-        public Utf8WriteChars(String data) {
+        Utf8WriteChars(String data) {
             chars = data.toCharArray();
         }
 

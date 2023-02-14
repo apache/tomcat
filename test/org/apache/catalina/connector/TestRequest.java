@@ -162,7 +162,7 @@ public class TestRequest extends TomcatBaseTest {
 
         private boolean init;
 
-        public Bug37794Client(boolean createFilter) {
+        Bug37794Client(boolean createFilter) {
             this.createFilter = createFilter;
         }
 

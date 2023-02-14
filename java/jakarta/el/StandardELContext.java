@@ -147,7 +147,7 @@ public class StandardELContext extends ELContext {
 
         private final Map<String,Object> beans;
 
-        public StandardBeanNameResolver(Map<String,Object> beans) {
+        StandardBeanNameResolver(Map<String,Object> beans) {
             this.beans = beans;
         }
 
@@ -183,7 +183,7 @@ public class StandardELContext extends ELContext {
 
         private final Map<String,Method> methods = new HashMap<>();
 
-        public StandardFunctionMapper(Map<String,Method> initFunctionMap) {
+        StandardFunctionMapper(Map<String,Method> initFunctionMap) {
             if (initFunctionMap != null) {
                 methods.putAll(initFunctionMap);
             }

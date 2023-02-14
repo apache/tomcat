@@ -36,7 +36,7 @@ public interface Cluster extends Contained {
      *
      * @return The name of the cluster associated with this server
      */
-    public String getClusterName();
+    String getClusterName();
 
 
     /**
@@ -45,7 +45,7 @@ public interface Cluster extends Contained {
      *
      * @param clusterName The clustername to join
      */
-    public void setClusterName(String clusterName);
+    void setClusterName(String clusterName);
 
 
     /**
@@ -57,7 +57,7 @@ public interface Cluster extends Contained {
      *
      * @return The newly created Manager instance
      */
-    public Manager createManager(String name);
+    Manager createManager(String name);
 
 
     /**
@@ -66,14 +66,14 @@ public interface Cluster extends Contained {
      * cluster that this manager is participating in the cluster.
      * @param manager Manager
      */
-    public void registerManager(Manager manager);
+    void registerManager(Manager manager);
 
 
     /**
      * Removes a manager from the cluster
      * @param manager Manager
      */
-    public void removeManager(Manager manager);
+    void removeManager(Manager manager);
 
 
     /**
@@ -81,5 +81,5 @@ public interface Cluster extends Contained {
      * invoked inside the classloading context of this container. Unexpected
      * throwables will be caught and logged.
      */
-    public void backgroundProcess();
+    void backgroundProcess();
 }

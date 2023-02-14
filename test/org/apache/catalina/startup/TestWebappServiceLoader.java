@@ -195,7 +195,7 @@ public class TestWebappServiceLoader {
         private final ClassLoader parent;
         private final WebResourceRoot resources;
 
-        public ExtendedTesterContext(ServletContext servletContext, ClassLoader parent) {
+        ExtendedTesterContext(ServletContext servletContext, ClassLoader parent) {
             this.servletContext = servletContext;
             this.parent = parent;
             // Empty resources - any non-null returns will be mocked on the

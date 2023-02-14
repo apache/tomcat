@@ -166,7 +166,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
         private final AtomicInteger asyncWriteCount = new AtomicInteger(0);
         private final boolean useContainerThreadToSetListener;
 
-        public NonBlockingWriteServlet(int asyncWriteTarget,
+        NonBlockingWriteServlet(int asyncWriteTarget,
                 boolean useContainerThreadToSetListener) {
             this.asyncWriteTarget = asyncWriteTarget;
             this.useContainerThreadToSetListener = useContainerThreadToSetListener;
@@ -213,7 +213,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
             private final AsyncContext asyncCtxt;
             private final ServletOutputStream sos;
 
-            public AsyncTask(AsyncContext asyncCtxt, ServletOutputStream sos) {
+            AsyncTask(AsyncContext asyncCtxt, ServletOutputStream sos) {
                 this.asyncCtxt = asyncCtxt;
                 this.sos = sos;
             }
@@ -229,7 +229,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
             private final AsyncContext asyncCtxt;
             private final ServletOutputStream sos;
 
-            public MyWriteListener(AsyncContext asyncCtxt,
+            MyWriteListener(AsyncContext asyncCtxt,
                     ServletOutputStream sos) {
                 this.asyncCtxt = asyncCtxt;
                 this.sos = sos;
@@ -255,7 +255,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
         private final int start;
         private final int len;
 
-        public BlockingWriteServlet(int start, int len) {
+        BlockingWriteServlet(int start, int len) {
             this.start = start;
             this.len = len;
         }

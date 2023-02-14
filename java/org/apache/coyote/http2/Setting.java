@@ -28,7 +28,7 @@ enum Setting {
 
     private final int id;
 
-    private Setting(int id) {
+    Setting(int id) {
         this.id = id;
     }
 
@@ -41,7 +41,7 @@ enum Setting {
         return Integer.toString(id);
     }
 
-    static final Setting valueOf(int i) {
+    static Setting valueOf(int i) {
         switch (i) {
             case 1: {
                 return HEADER_TABLE_SIZE;

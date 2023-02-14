@@ -979,7 +979,7 @@ public class HttpParser {
         private final boolean allowsEnd;
         private final String errorMsg;
 
-        private DomainParseState(boolean mayContinue, boolean allowsHyphen, boolean allowsPeriod,
+        DomainParseState(boolean mayContinue, boolean allowsHyphen, boolean allowsPeriod,
                 boolean allowsEnd, String errorMsg) {
             this.mayContinue = mayContinue;
             this.allowsHyphen = allowsHyphen;

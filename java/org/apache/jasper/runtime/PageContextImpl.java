@@ -467,7 +467,7 @@ public class PageContextImpl extends PageContext {
         return servlet;
     }
 
-    private final String getAbsolutePathRelativeToContext(String relativeUrlPath) {
+    private String getAbsolutePathRelativeToContext(String relativeUrlPath) {
         String path = relativeUrlPath;
 
         if (!path.startsWith("/")) {

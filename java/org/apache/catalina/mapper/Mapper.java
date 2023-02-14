@@ -705,7 +705,7 @@ public final class Mapper {
      *
      * @throws IOException If an error occurs while manipulating the URI during the mapping
      */
-    private final void internalMap(CharChunk host, CharChunk uri, String version, MappingData mappingData)
+    private void internalMap(CharChunk host, CharChunk uri, String version, MappingData mappingData)
             throws IOException {
 
         if (mappingData.host != null) {
@@ -829,7 +829,7 @@ public final class Mapper {
      *
      * @throws IOException if the buffers are too small to hold the results of the mapping.
      */
-    private final void internalMapWrapper(ContextVersion contextVersion, CharChunk path, MappingData mappingData)
+    private void internalMapWrapper(ContextVersion contextVersion, CharChunk path, MappingData mappingData)
             throws IOException {
 
         int pathOffset = path.getOffset();
@@ -1006,7 +1006,7 @@ public final class Mapper {
     /**
      * Exact mapping.
      */
-    private final void internalMapExactWrapper(MappedWrapper[] wrappers, CharChunk path, MappingData mappingData) {
+    private void internalMapExactWrapper(MappedWrapper[] wrappers, CharChunk path, MappingData mappingData) {
         if (path.length() == 0) {
             /*
              * Looking for a context root mapped servlet but that will be stored under the name "/"
@@ -1033,7 +1033,7 @@ public final class Mapper {
     /**
      * Wildcard mapping.
      */
-    private final void internalMapWildcardWrapper(MappedWrapper[] wrappers, int nesting, CharChunk path,
+    private void internalMapWildcardWrapper(MappedWrapper[] wrappers, int nesting, CharChunk path,
             MappingData mappingData) {
 
         int pathEnd = path.getEnd();
@@ -1086,7 +1086,7 @@ public final class Mapper {
      * @param mappingData      Mapping data for result
      * @param resourceExpected Is this mapping expecting to find a resource
      */
-    private final void internalMapExtensionWrapper(MappedWrapper[] wrappers, CharChunk path, MappingData mappingData,
+    private void internalMapExtensionWrapper(MappedWrapper[] wrappers, CharChunk path, MappingData mappingData,
             boolean resourceExpected) {
         char[] buf = path.getBuffer();
         int pathEnd = path.getEnd();
@@ -1127,7 +1127,7 @@ public final class Mapper {
      * Find a map element given its name in a sorted array of map elements. This will return the index for the closest
      * inferior or equal item in the given array.
      */
-    private static final <T> int find(MapElement<T>[] map, CharChunk name) {
+    private static <T> int find(MapElement<T>[] map, CharChunk name) {
         return find(map, name, name.getStart(), name.getEnd());
     }
 
@@ -1136,7 +1136,7 @@ public final class Mapper {
      * Find a map element given its name in a sorted array of map elements. This will return the index for the closest
      * inferior or equal item in the given array.
      */
-    private static final <T> int find(MapElement<T>[] map, CharChunk name, int start, int end) {
+    private static <T> int find(MapElement<T>[] map, CharChunk name, int start, int end) {
 
         int a = 0;
         int b = map.length - 1;
@@ -1180,7 +1180,7 @@ public final class Mapper {
      * Find a map element given its name in a sorted array of map elements. This will return the index for the closest
      * inferior or equal item in the given array.
      */
-    private static final <T> int findIgnoreCase(MapElement<T>[] map, CharChunk name) {
+    private static <T> int findIgnoreCase(MapElement<T>[] map, CharChunk name) {
         return findIgnoreCase(map, name, name.getStart(), name.getEnd());
     }
 
@@ -1189,7 +1189,7 @@ public final class Mapper {
      * Find a map element given its name in a sorted array of map elements. This will return the index for the closest
      * inferior or equal item in the given array.
      */
-    private static final <T> int findIgnoreCase(MapElement<T>[] map, CharChunk name, int start, int end) {
+    private static <T> int findIgnoreCase(MapElement<T>[] map, CharChunk name, int start, int end) {
 
         int a = 0;
         int b = map.length - 1;
@@ -1235,7 +1235,7 @@ public final class Mapper {
      *
      * @see #exactFind(MapElement[], String)
      */
-    private static final <T> int find(MapElement<T>[] map, String name) {
+    private static <T> int find(MapElement<T>[] map, String name) {
 
         int a = 0;
         int b = map.length - 1;
@@ -1282,7 +1282,7 @@ public final class Mapper {
      *
      * @see #find(MapElement[], String)
      */
-    private static final <T, E extends MapElement<T>> E exactFind(E[] map, String name) {
+    private static <T, E extends MapElement<T>> E exactFind(E[] map, String name) {
         int pos = find(map, name);
         if (pos >= 0) {
             E result = map[pos];
@@ -1297,7 +1297,7 @@ public final class Mapper {
      * Find a map element given its name in a sorted array of map elements. This will return the element that you were
      * searching for. Otherwise it will return <code>null</code>.
      */
-    private static final <T, E extends MapElement<T>> E exactFind(E[] map, CharChunk name) {
+    private static <T, E extends MapElement<T>> E exactFind(E[] map, CharChunk name) {
         int pos = find(map, name);
         if (pos >= 0) {
             E result = map[pos];
@@ -1314,7 +1314,7 @@ public final class Mapper {
      *
      * @see #findIgnoreCase(MapElement[], CharChunk)
      */
-    private static final <T, E extends MapElement<T>> E exactFindIgnoreCase(E[] map, CharChunk name) {
+    private static <T, E extends MapElement<T>> E exactFindIgnoreCase(E[] map, CharChunk name) {
         int pos = findIgnoreCase(map, name);
         if (pos >= 0) {
             E result = map[pos];
@@ -1329,7 +1329,7 @@ public final class Mapper {
     /**
      * Compare given char chunk with String. Return -1, 0 or +1 if inferior, equal, or superior to the String.
      */
-    private static final int compare(CharChunk name, int start, int end, String compareTo) {
+    private static int compare(CharChunk name, int start, int end, String compareTo) {
         int result = 0;
         char[] c = name.getBuffer();
         int len = compareTo.length();
@@ -1358,7 +1358,7 @@ public final class Mapper {
      * Compare given char chunk with String ignoring case. Return -1, 0 or +1 if inferior, equal, or superior to the
      * String.
      */
-    private static final int compareIgnoreCase(CharChunk name, int start, int end, String compareTo) {
+    private static int compareIgnoreCase(CharChunk name, int start, int end, String compareTo) {
         int result = 0;
         char[] c = name.getBuffer();
         int len = compareTo.length();
@@ -1386,7 +1386,7 @@ public final class Mapper {
     /**
      * Find the position of the last slash in the given char chunk.
      */
-    private static final int lastSlash(CharChunk name) {
+    private static int lastSlash(CharChunk name) {
         char[] c = name.getBuffer();
         int end = name.getEnd();
         int start = name.getStart();
@@ -1405,7 +1405,7 @@ public final class Mapper {
     /**
      * Find the position of the nth slash, in the given char chunk.
      */
-    private static final int nthSlash(CharChunk name, int n) {
+    private static int nthSlash(CharChunk name, int n) {
         char[] c = name.getBuffer();
         int end = name.getEnd();
         int start = name.getStart();
@@ -1426,7 +1426,7 @@ public final class Mapper {
     /**
      * Return the slash count in a given string.
      */
-    private static final int slashCount(String name) {
+    private static int slashCount(String name) {
         int pos = -1;
         int count = 0;
         while ((pos = name.indexOf('/', pos + 1)) != -1) {
@@ -1439,7 +1439,7 @@ public final class Mapper {
     /**
      * Insert into the right place in a sorted MapElement array, and prevent duplicates.
      */
-    private static final <T> boolean insertMap(MapElement<T>[] oldMap, MapElement<T>[] newMap,
+    private static <T> boolean insertMap(MapElement<T>[] oldMap, MapElement<T>[] newMap,
             MapElement<T> newElement) {
         int pos = find(oldMap, newElement.name);
         if ((pos != -1) && (newElement.name.equals(oldMap[pos].name))) {
@@ -1455,7 +1455,7 @@ public final class Mapper {
     /**
      * Insert into the right place in a sorted MapElement array.
      */
-    private static final <T> boolean removeMap(MapElement<T>[] oldMap, MapElement<T>[] newMap, String name) {
+    private static <T> boolean removeMap(MapElement<T>[] oldMap, MapElement<T>[] newMap, String name) {
         int pos = find(oldMap, name);
         if ((pos != -1) && (name.equals(oldMap[pos].name))) {
             System.arraycopy(oldMap, 0, newMap, 0, pos);

@@ -30,5 +30,5 @@ public interface StreamProvider {
      * @return the stream
      * @throws IOException when an error occurs
      */
-    public InputStream openStream(String url, Map<String, String> headers, int connectTimeout, int readTimeout) throws IOException;
+    InputStream openStream(String url, Map<String, String> headers, int connectTimeout, int readTimeout) throws IOException;
 }

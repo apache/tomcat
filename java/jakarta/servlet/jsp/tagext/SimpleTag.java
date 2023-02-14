@@ -94,7 +94,7 @@ public interface SimpleTag extends JspTag {
      * @throws java.io.IOException If there was an error writing to the
      *     output stream.
      */
-    public void doTag()
+    void doTag()
         throws jakarta.servlet.jsp.JspException, java.io.IOException;
 
     /**
@@ -105,14 +105,14 @@ public interface SimpleTag extends JspTag {
      *
      * @param parent the tag that encloses this tag
      */
-    public void setParent( JspTag parent );
+    void setParent( JspTag parent );
 
     /**
      * Returns the parent of this tag, for collaboration purposes.
      *
      * @return the parent of this tag
      */
-    public JspTag getParent();
+    JspTag getParent();
 
     /**
      * Called by the container to provide this tag handler with
@@ -122,7 +122,7 @@ public interface SimpleTag extends JspTag {
      * @param pc the page context for this invocation
      * @see Tag#setPageContext
      */
-    public void setJspContext( JspContext pc );
+    void setJspContext( JspContext pc );
 
     /**
      * Provides the body of this tag as a JspFragment object, able to be
@@ -134,7 +134,7 @@ public interface SimpleTag extends JspTag {
      *
      * @param jspBody The fragment encapsulating the body of this tag.
      */
-    public void setJspBody( JspFragment jspBody );
+    void setJspBody( JspFragment jspBody );
 
 
 }

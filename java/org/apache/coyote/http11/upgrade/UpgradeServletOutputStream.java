@@ -262,7 +262,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     }
 
 
-    private final void onError(Throwable t) {
+    private void onError(Throwable t) {
         if (listener == null) {
             return;
         }

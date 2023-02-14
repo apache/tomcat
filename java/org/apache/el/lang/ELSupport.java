@@ -256,7 +256,7 @@ public class ELSupport {
                 obj, obj.getClass(), Boolean.class));
     }
 
-    private static final Character coerceToCharacter(final ELContext ctx, final Object obj)
+    private static Character coerceToCharacter(final ELContext ctx, final Object obj)
             throws ELException {
 
         if (ctx != null) {

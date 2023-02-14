@@ -57,7 +57,7 @@ class DirectJDKLog implements Log {
         }
     }
 
-    public DirectJDKLog(String name ) {
+    DirectJDKLog(String name ) {
         logger=Logger.getLogger(name);
     }
 

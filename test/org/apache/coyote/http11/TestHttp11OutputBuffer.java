@@ -122,7 +122,7 @@ public class TestHttp11OutputBuffer extends TomcatBaseTest {
 
         private final String customHeaderValue;
 
-        public HeaderServlet(String customHeaderValue) {
+        HeaderServlet(String customHeaderValue) {
             this.customHeaderValue = customHeaderValue;
         }
 

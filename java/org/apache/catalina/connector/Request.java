@@ -3379,7 +3379,7 @@ public class Request implements HttpServletRequest {
 
     // ----------------------------------------------------- Special attributes handling
 
-    private static interface SpecialAttributeAdapter {
+    private interface SpecialAttributeAdapter {
         Object get(Request request, String name);
 
         void set(Request request, String name, Object value);

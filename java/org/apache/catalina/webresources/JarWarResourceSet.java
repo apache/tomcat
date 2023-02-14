@@ -244,7 +244,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
         private final int version;
         private final JarEntry jarEntry;
 
-        public VersionedJarEntry(int version, JarEntry jarEntry) {
+        VersionedJarEntry(int version, JarEntry jarEntry) {
             this.version = version;
             this.jarEntry = jarEntry;
         }

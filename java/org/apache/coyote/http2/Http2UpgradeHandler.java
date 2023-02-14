@@ -1922,7 +1922,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
         private final boolean newStreamsAllowed;
 
-        private ConnectionState(boolean newStreamsAllowed) {
+        ConnectionState(boolean newStreamsAllowed) {
             this.newStreamsAllowed = newStreamsAllowed;
         }
 
@@ -1932,18 +1932,18 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    protected static interface HeaderFrameBuffers {
-        public void startFrame();
+    protected interface HeaderFrameBuffers {
+        void startFrame();
 
-        public void endFrame() throws IOException;
+        void endFrame() throws IOException;
 
-        public void endHeaders() throws IOException;
+        void endHeaders() throws IOException;
 
-        public byte[] getHeader();
+        byte[] getHeader();
 
-        public ByteBuffer getPayload();
+        ByteBuffer getPayload();
 
-        public void expandPayload();
+        void expandPayload();
     }
 
 
@@ -1952,7 +1952,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         private final byte[] header;
         private ByteBuffer payload;
 
-        public DefaultHeaderFrameBuffers(int initialPayloadSize) {
+        DefaultHeaderFrameBuffers(int initialPayloadSize) {
             header = new byte[9];
             payload = ByteBuffer.allocate(initialPayloadSize);
         }

@@ -50,7 +50,7 @@ public class TestFastHttpDateFormatPerformance {
 
         private final int callCount;
 
-        public GetCurrentDateThread(int callCount) {
+        GetCurrentDateThread(int callCount) {
             this.callCount = callCount;
         }
 

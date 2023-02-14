@@ -33,5 +33,5 @@ public @interface RolesAllowed {
     /**
      * @return a String[] of the allowed roles
      */
-    public String[] value();
+    String[] value();
 }

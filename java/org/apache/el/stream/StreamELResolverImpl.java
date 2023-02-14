@@ -79,7 +79,7 @@ public class StreamELResolverImpl extends ELResolver {
         private final int size;
         private int index = 0;
 
-        public ArrayIterator(Object base) {
+        ArrayIterator(Object base) {
             this.base = base;
             size = Array.getLength(base);
         }

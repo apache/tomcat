@@ -26,7 +26,7 @@ public interface MessageListener {
      * Receive a message from the IO components in the Channel stack
      * @param msg ChannelMessage
      */
-    public void messageReceived(ChannelMessage msg);
+    void messageReceived(ChannelMessage msg);
 
-    public boolean accept(ChannelMessage msg);
+    boolean accept(ChannelMessage msg);
 }
