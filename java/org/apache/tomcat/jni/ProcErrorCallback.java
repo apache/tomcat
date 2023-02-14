@@ -38,5 +38,5 @@ public interface ProcErrorCallback {
      * @param err APR error code describing the error
      * @param description Text description of type of processing which failed
      */
-    public void callback(long pool, int err, String description);
+    void callback(long pool, int err, String description);
 }

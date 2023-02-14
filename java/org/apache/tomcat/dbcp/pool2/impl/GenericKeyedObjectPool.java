@@ -128,7 +128,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
          * @param fairness true means client threads waiting to borrow / return instances
          * will be served as if waiting in a FIFO queue.
          */
-        public ObjectDeque(final boolean fairness) {
+        ObjectDeque(final boolean fairness) {
             idleObjects = new LinkedBlockingDeque<>(fairness);
         }
 

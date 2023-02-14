@@ -64,7 +64,7 @@ public interface HttpSession {
      *
      * @exception IllegalStateException if this method is called on an invalidated session
      */
-    public long getCreationTime();
+    long getCreationTime();
 
     /**
      * Returns a string containing the unique identifier assigned to this session. The identifier is assigned by the
@@ -74,7 +74,7 @@ public interface HttpSession {
      *
      * @exception IllegalStateException if this method is called on an invalidated session
      */
-    public String getId();
+    String getId();
 
     /**
      * Returns the last time the client sent a request associated with this session, as the number of milliseconds since
@@ -88,7 +88,7 @@ public interface HttpSession {
      *
      * @exception IllegalStateException if this method is called on an invalidated session
      */
-    public long getLastAccessedTime();
+    long getLastAccessedTime();
 
     /**
      * Returns the ServletContext to which this session belongs.
@@ -97,7 +97,7 @@ public interface HttpSession {
      *
      * @since Servlet 2.3
      */
-    public ServletContext getServletContext();
+    ServletContext getServletContext();
 
     /**
      * Specifies the time, in seconds, between client requests before the servlet container will invalidate this
@@ -105,7 +105,7 @@ public interface HttpSession {
      *
      * @param interval An integer specifying the number of seconds
      */
-    public void setMaxInactiveInterval(int interval);
+    void setMaxInactiveInterval(int interval);
 
     /**
      * Returns the maximum time interval, in seconds, that the servlet container will keep this session open between
@@ -117,7 +117,7 @@ public interface HttpSession {
      *
      * @see #setMaxInactiveInterval
      */
-    public int getMaxInactiveInterval();
+    int getMaxInactiveInterval();
 
     /**
      * Do not use.
@@ -127,8 +127,7 @@ public interface HttpSession {
      * @deprecated As of Version 2.1, this method is deprecated and has no replacement. It will be removed in a future
      *                 version of the Java Servlet API.
      */
-    @Deprecated
-    public HttpSessionContext getSessionContext();
+    @Deprecated HttpSessionContext getSessionContext();
 
     /**
      * Returns the object bound with the specified name in this session, or <code>null</code> if no object is bound
@@ -140,7 +139,7 @@ public interface HttpSession {
      *
      * @exception IllegalStateException if this method is called on an invalidated session
      */
-    public Object getAttribute(String name);
+    Object getAttribute(String name);
 
     /**
      * @param name a string specifying the name of the object
@@ -151,8 +150,7 @@ public interface HttpSession {
      *
      * @deprecated As of Version 2.2, this method is replaced by {@link #getAttribute}.
      */
-    @Deprecated
-    public Object getValue(String name);
+    @Deprecated Object getValue(String name);
 
     /**
      * Returns an <code>Enumeration</code> of <code>String</code> objects containing the names of all the objects bound
@@ -163,7 +161,7 @@ public interface HttpSession {
      *
      * @exception IllegalStateException if this method is called on an invalidated session
      */
-    public Enumeration<String> getAttributeNames();
+    Enumeration<String> getAttributeNames();
 
     /**
      * @return an array of <code>String</code> objects specifying the names of all the objects bound to this session
@@ -172,8 +170,7 @@ public interface HttpSession {
      *
      * @deprecated As of Version 2.2, this method is replaced by {@link #getAttributeNames}
      */
-    @Deprecated
-    public String[] getValueNames();
+    @Deprecated String[] getValueNames();
 
     /**
      * Binds an object to this session, using the name specified. If an object of the same name is already bound to the
@@ -194,7 +191,7 @@ public interface HttpSession {
      *
      * @exception IllegalStateException if this method is called on an invalidated session
      */
-    public void setAttribute(String name, Object value);
+    void setAttribute(String name, Object value);
 
     /**
      * @param name  the name to which the object is bound; cannot be null
@@ -204,8 +201,7 @@ public interface HttpSession {
      *
      * @deprecated As of Version 2.2, this method is replaced by {@link #setAttribute}
      */
-    @Deprecated
-    public void putValue(String name, Object value);
+    @Deprecated void putValue(String name, Object value);
 
     /**
      * Removes the object bound with the specified name from this session. If the session does not have an object bound
@@ -219,7 +215,7 @@ public interface HttpSession {
      *
      * @exception IllegalStateException if this method is called on an invalidated session
      */
-    public void removeAttribute(String name);
+    void removeAttribute(String name);
 
     /**
      * @param name the name of the object to remove from this session
@@ -228,15 +224,14 @@ public interface HttpSession {
      *
      * @deprecated As of Version 2.2, this method is replaced by {@link #removeAttribute}
      */
-    @Deprecated
-    public void removeValue(String name);
+    @Deprecated void removeValue(String name);
 
     /**
      * Invalidates this session then unbinds any objects bound to it.
      *
      * @exception IllegalStateException if this method is called on an already invalidated session
      */
-    public void invalidate();
+    void invalidate();
 
     /**
      * Returns <code>true</code> if the client does not yet know about the session or if the client chooses not to join
@@ -247,5 +242,5 @@ public interface HttpSession {
      *
      * @exception IllegalStateException if this method is called on an already invalidated session
      */
-    public boolean isNew();
+    boolean isNew();
 }

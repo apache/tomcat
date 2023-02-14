@@ -591,7 +591,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         private int port;
         private String result;
 
-        public Bug51445Thread(int port) {
+        Bug51445Thread(int port) {
             this.port = port;
         }
 

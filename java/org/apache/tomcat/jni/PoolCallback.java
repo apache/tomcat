@@ -33,5 +33,5 @@ public interface PoolCallback {
      * Called when the pool is destroyed or cleared
      * @return Function must return APR_SUCCESS
      */
-    public int callback();
+    int callback();
 }

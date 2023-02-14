@@ -489,7 +489,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         private final RegistrationListener listener;
 
 
-        public RegistrationListenerWrapper(String messageLayer, String appContext,
+        RegistrationListenerWrapper(String messageLayer, String appContext,
                 RegistrationListener listener) {
             this.messageLayer = messageLayer;
             this.appContext = appContext;

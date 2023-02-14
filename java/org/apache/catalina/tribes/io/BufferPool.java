@@ -72,13 +72,13 @@ public class BufferPool {
     }
 
 
-    public static interface BufferPoolAPI {
-        public void setMaxSize(int bytes);
+    public interface BufferPoolAPI {
+        void setMaxSize(int bytes);
 
-        public XByteBuffer getBuffer(int minSize, boolean discard);
+        XByteBuffer getBuffer(int minSize, boolean discard);
 
-        public void returnBuffer(XByteBuffer buffer);
+        void returnBuffer(XByteBuffer buffer);
 
-        public void clear();
+        void clear();
     }
 }

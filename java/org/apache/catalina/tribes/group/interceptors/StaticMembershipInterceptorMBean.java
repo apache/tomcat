@@ -20,7 +20,7 @@ import org.apache.catalina.tribes.Member;
 
 public interface StaticMembershipInterceptorMBean  {
 
-    public int getOptionFlag();
+    int getOptionFlag();
 
-    public Member getLocalMember(boolean incAlive);
+    Member getLocalMember(boolean incAlive);
 }

@@ -369,7 +369,7 @@ public class WebdavServlet extends DefaultServlet {
      * @param path the full path of the resource being accessed
      * @return <code>true</code> if the resource specified is under a special path
      */
-    private final boolean isSpecialPath(final String path) {
+    private boolean isSpecialPath(final String path) {
         return !allowSpecialPaths && (
                 path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF") ||
                 path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF"));
@@ -2224,7 +2224,7 @@ public class WebdavServlet extends DefaultServlet {
 
         private static final long serialVersionUID = 1L;
 
-        public LockInfo(int maxDepth) {
+        LockInfo(int maxDepth) {
             this.maxDepth = maxDepth;
         }
 
@@ -2344,7 +2344,7 @@ public class WebdavServlet extends DefaultServlet {
     private static class WebdavResolver implements EntityResolver {
         private ServletContext context;
 
-        public WebdavResolver(ServletContext theContext) {
+        WebdavResolver(ServletContext theContext) {
             context = theContext;
         }
 

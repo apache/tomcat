@@ -26,9 +26,9 @@ public interface ClientEndpointConfig extends EndpointConfig {
 
     List<Extension> getExtensions();
 
-    public Configurator getConfigurator();
+    Configurator getConfigurator();
 
-    public final class Builder {
+    final class Builder {
 
         private static final Configurator DEFAULT_CONFIGURATOR =
                 new Configurator() {};
@@ -113,7 +113,7 @@ public interface ClientEndpointConfig extends EndpointConfig {
     }
 
 
-    public class Configurator {
+    class Configurator {
 
         /**
          * Provides the client with a mechanism to inspect and/or modify the headers

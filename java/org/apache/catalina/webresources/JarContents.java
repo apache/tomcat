@@ -121,7 +121,7 @@ public final class JarContents {
      *
      * @return Whether the prefix of the path is known to be in this jar.
      */
-    public final boolean mightContainResource(String path, String webappRoot) {
+    public boolean mightContainResource(String path, String webappRoot) {
         int startPos = 0;
         if (path.startsWith(webappRoot)) {
             startPos = webappRoot.length();

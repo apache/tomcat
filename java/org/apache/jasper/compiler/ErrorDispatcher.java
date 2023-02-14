@@ -481,7 +481,7 @@ public class ErrorDispatcher {
          *
          * @param lineNum Source line number in the generated servlet code
          */
-        public ErrorVisitor(int lineNum) {
+        ErrorVisitor(int lineNum) {
             this.lineNum = lineNum;
         }
 

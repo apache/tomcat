@@ -665,7 +665,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         protected final StringBuilder body = new StringBuilder();
 
 
-        public TestReadListener(AsyncContext ctx,
+        TestReadListener(AsyncContext ctx,
                 boolean usingNonBlockingWrite,
                 boolean ignoreIsReady) {
             this.ctx = ctx;
@@ -725,7 +725,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         AtomicInteger containerThreadCount = new AtomicInteger(0);
         AtomicInteger nonContainerThreadCount = new AtomicInteger(0);
 
-        public TestAsyncReadListener(AsyncContext ctx,
+        TestAsyncReadListener(AsyncContext ctx,
                 boolean usingNonBlockingWrite, boolean ignoreIsReady) {
             super(ctx, usingNonBlockingWrite, ignoreIsReady);
         }
@@ -794,7 +794,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         int written = 0;
         public volatile boolean onErrorInvoked = false;
 
-        public TestWriteListener(AsyncContext ctx, boolean unlimited) {
+        TestWriteListener(AsyncContext ctx, boolean unlimited) {
             this.ctx = ctx;
             this.unlimited = unlimited;
         }
@@ -838,7 +838,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         AsyncContext ctx;
         private final StringBuilder body = new StringBuilder();
 
-        public TestReadWriteListener(AsyncContext ctx) {
+        TestReadWriteListener(AsyncContext ctx) {
             this.ctx = ctx;
         }
 
@@ -1012,7 +1012,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private final CountDownLatch latch;
         private final List<Throwable> exceptions;
 
-        public RequestExecutor(String url, CountDownLatch latch, List<Throwable> exceptions) {
+        RequestExecutor(String url, CountDownLatch latch, List<Throwable> exceptions) {
             this.url = url;
             this.latch = latch;
             this.exceptions = exceptions;
@@ -1040,7 +1040,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private final CountDownLatch latch;
         private final List<Throwable> exceptions;
 
-        public RequestPostExecutor(String url, CountDownLatch latch, List<Throwable> exceptions) {
+        RequestPostExecutor(String url, CountDownLatch latch, List<Throwable> exceptions) {
             this.url = url;
             this.latch = latch;
             this.exceptions = exceptions;
@@ -1069,7 +1069,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private final Set<Emitter> emitters = new HashSet<>();
         private final transient CountDownLatch latch;
 
-        public DelayedNBWriteServlet(CountDownLatch latch) {
+        DelayedNBWriteServlet(CountDownLatch latch) {
             this.latch = latch;
         }
 
@@ -1099,7 +1099,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
         private final transient CountDownLatch latch;
 
-        public DelayedNBReadWriteServlet(CountDownLatch latch) {
+        DelayedNBReadWriteServlet(CountDownLatch latch) {
             this.latch = latch;
         }
 
@@ -1118,7 +1118,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private final transient CountDownLatch latch;
         private final transient AsyncContext ctx;
 
-        public ReadWriteListener(CountDownLatch latch, AsyncContext ctx){
+        ReadWriteListener(CountDownLatch latch, AsyncContext ctx){
             this.latch = latch;
             this.ctx = ctx;
         }
@@ -1412,7 +1412,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private final transient CountDownLatch completeLatch;
         private final AtomicBoolean testFailed;
 
-        public PostServlet(CountDownLatch doPostLatch, CountDownLatch completeLatch, AtomicBoolean testFailed) {
+        PostServlet(CountDownLatch doPostLatch, CountDownLatch completeLatch, AtomicBoolean testFailed) {
             this.partialReadLatch = doPostLatch;
             this.completeLatch = completeLatch;
             this.testFailed = testFailed;
@@ -1437,7 +1437,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         private final transient CountDownLatch completeLatch;
 
-        public CanceledPostAsyncListener(CountDownLatch completeLatch) {
+        CanceledPostAsyncListener(CountDownLatch completeLatch) {
             this.completeLatch = completeLatch;
         }
 
@@ -1470,7 +1470,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private final AtomicBoolean testFailed;
         private int totalRead = 0;
 
-        public CanceledPostReadListener(AsyncContext ac, CountDownLatch partialReadLatch, AtomicBoolean testFailed) {
+        CanceledPostReadListener(AsyncContext ac, CountDownLatch partialReadLatch, AtomicBoolean testFailed) {
             this.ac = ac;
             this.partialReadLatch = partialReadLatch;
             this.testFailed = testFailed;
@@ -1585,7 +1585,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private final transient CountDownLatch asyncCompleteLatch;
         private final boolean swallowIoException;
 
-        public NBWriteServlet02(CountDownLatch responseCommitLatch, CountDownLatch clientCloseLatch,
+        NBWriteServlet02(CountDownLatch responseCommitLatch, CountDownLatch clientCloseLatch,
                 CountDownLatch asyncCompleteLatch, boolean swallowIoException) {
             this.responseCommitLatch = responseCommitLatch;
             this.clientCloseLatch = clientCloseLatch;
@@ -1613,7 +1613,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         private final CountDownLatch asyncCompleteLatch;
 
-        public TestAsyncListener02(CountDownLatch asyncCompleteLatch) {
+        TestAsyncListener02(CountDownLatch asyncCompleteLatch) {
             this.asyncCompleteLatch = asyncCompleteLatch;
         }
 
@@ -1647,7 +1647,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private final boolean swallowIoException;
         private volatile AtomicInteger stage = new AtomicInteger(0);
 
-        public TestWriteListener02(AsyncContext ac, CountDownLatch responseCommitLatch,
+        TestWriteListener02(AsyncContext ac, CountDownLatch responseCommitLatch,
                 CountDownLatch clientCloseLatch, boolean swallowIoException) {
             this.ac = ac;
             this.responseCommitLatch = responseCommitLatch;

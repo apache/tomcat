@@ -255,7 +255,7 @@ public class OneLineFormatter extends Formatter {
 
         private final int cacheSize;
 
-        public ThreadNameCache(int cacheSize) {
+        ThreadNameCache(int cacheSize) {
             super(cacheSize, 0.75f, true);
             this.cacheSize = cacheSize;
         }
@@ -273,7 +273,7 @@ public class OneLineFormatter extends Formatter {
      */
     private static class IndentingPrintWriter extends PrintWriter {
 
-        public IndentingPrintWriter(Writer out) {
+        IndentingPrintWriter(Writer out) {
             super(out);
         }
 
@@ -285,7 +285,7 @@ public class OneLineFormatter extends Formatter {
     }
 
 
-    private static enum MillisHandling {
+    private enum MillisHandling {
         NONE, APPEND, REPLACE_S, REPLACE_SS, REPLACE_SSS,
     }
 }

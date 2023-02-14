@@ -253,7 +253,7 @@ public abstract class ExpressionFactory {
         private final int hash;
         private final WeakReference<ClassLoader> ref;
 
-        public CacheKey(ClassLoader cl) {
+        CacheKey(ClassLoader cl) {
             hash = cl.hashCode();
             ref = new WeakReference<>(cl);
         }
@@ -284,7 +284,7 @@ public abstract class ExpressionFactory {
         private String className;
         private WeakReference<Class<?>> ref;
 
-        public CacheValue() {
+        CacheValue() {
         }
 
         public ReadWriteLock getLock() {
@@ -379,7 +379,7 @@ public abstract class ExpressionFactory {
         return null;
     }
 
-    private static final String getClassNameSysProp() {
+    private static String getClassNameSysProp() {
         String value = System.getProperty(PROPERTY_NAME);
         if (value != null && value.trim().length() > 0) {
             return value.trim();

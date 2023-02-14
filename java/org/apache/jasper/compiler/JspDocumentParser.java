@@ -113,7 +113,7 @@ class JspDocumentParser
     /*
      * Constructor
      */
-    public JspDocumentParser(
+    JspDocumentParser(
         ParserController pc,
         String path,
         boolean isTagFile,

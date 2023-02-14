@@ -28,12 +28,12 @@ public interface Encoder {
      *
      * @param endpointConfig The end-point configuration
      */
-    abstract void init(EndpointConfig endpointConfig);
+    void init(EndpointConfig endpointConfig);
 
     /**
      * Destroy the decoder.
      */
-    abstract void destroy();
+    void destroy();
 
     interface Text<T> extends Encoder {
 

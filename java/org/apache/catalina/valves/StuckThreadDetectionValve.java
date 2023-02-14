@@ -300,7 +300,7 @@ public class StuckThreadDetectionValve extends ValveBase {
          */
         private boolean interrupted;
 
-        public MonitoredThread(Thread thread, String requestUri,
+        MonitoredThread(Thread thread, String requestUri,
                 boolean interruptible) {
             this.thread = thread;
             this.requestUri = requestUri;
@@ -400,7 +400,7 @@ public class StuckThreadDetectionValve extends ValveBase {
         private final long threadId;
         private final long totalActiveTime;
 
-        public CompletedStuckThread(Thread thread, long totalActiveTime) {
+        CompletedStuckThread(Thread thread, long totalActiveTime) {
             this.threadName = thread.getName();
             this.threadId = thread.getId();
             this.totalActiveTime = totalActiveTime;

@@ -1875,7 +1875,7 @@ public class Response implements HttpServletResponse {
         private final Cookie cookie;
         private final HttpServletRequest request;
 
-        public PrivilegedGenerateCookieString(Context context, Cookie cookie, HttpServletRequest request) {
+        PrivilegedGenerateCookieString(Context context, Cookie cookie, HttpServletRequest request) {
             this.context = context;
             this.cookie = cookie;
             this.request = request;
@@ -1895,7 +1895,7 @@ public class Response implements HttpServletResponse {
         private final Session session;
         private final String location;
 
-        public PrivilegedDoIsEncodable(Context context, Request hreq, Session session,
+        PrivilegedDoIsEncodable(Context context, Request hreq, Session session,
                 String location) {
             this.context = context;
             this.hreq = hreq;
@@ -1916,7 +1916,7 @@ public class Response implements HttpServletResponse {
         private final String relativePath;
         private final int end;
 
-        public PrivilegedEncodeUrl(UEncoder urlEncoder, String relativePath, int end) {
+        PrivilegedEncodeUrl(UEncoder urlEncoder, String relativePath, int end) {
             this.urlEncoder = urlEncoder;
             this.relativePath = relativePath;
             this.end = end;

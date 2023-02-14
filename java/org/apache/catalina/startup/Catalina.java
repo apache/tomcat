@@ -977,7 +977,7 @@ public class Catalina {
 
 
     public interface ServerXml {
-        public void load(Catalina catalina);
+        void load(Catalina catalina);
     }
 
 
@@ -1020,7 +1020,7 @@ public class Catalina {
 
     final class SetParentClassLoaderRule extends Rule {
 
-        public SetParentClassLoaderRule(ClassLoader parentClassLoader) {
+        SetParentClassLoaderRule(ClassLoader parentClassLoader) {
 
             this.parentClassLoader = parentClassLoader;
 

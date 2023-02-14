@@ -549,7 +549,7 @@ public class WsServerContainer extends WsWebSocketContainer
         private final UriTemplate uriTemplate;
         private final boolean fromAnnotatedPojo;
 
-        public TemplatePathMatch(ServerEndpointConfig config, UriTemplate uriTemplate,
+        TemplatePathMatch(ServerEndpointConfig config, UriTemplate uriTemplate,
                 boolean fromAnnotatedPojo) {
             this.config = config;
             this.uriTemplate = uriTemplate;
@@ -577,7 +577,7 @@ public class WsServerContainer extends WsWebSocketContainer
         private final ServerEndpointConfig config;
         private final boolean fromAnnotatedPojo;
 
-        public ExactPathMatch(ServerEndpointConfig config, boolean fromAnnotatedPojo) {
+        ExactPathMatch(ServerEndpointConfig config, boolean fromAnnotatedPojo) {
             this.config = config;
             this.fromAnnotatedPojo = fromAnnotatedPojo;
         }

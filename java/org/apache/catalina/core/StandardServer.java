@@ -477,7 +477,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     /**
      * @return The period between two lifecycle events, in seconds
      */
-    public final int getPeriodicEventDelay() {
+    public int getPeriodicEventDelay() {
         return periodicEventDelay;
     }
 
@@ -487,7 +487,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      *
      * @param periodicEventDelay The period in seconds, negative or zero will disable events
      */
-    public final void setPeriodicEventDelay(int periodicEventDelay) {
+    public void setPeriodicEventDelay(int periodicEventDelay) {
         this.periodicEventDelay = periodicEventDelay;
     }
 
@@ -1108,7 +1108,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
 
     @Override
-    protected final String getObjectNameKeyProperties() {
+    protected String getObjectNameKeyProperties() {
         return "type=Server";
     }
 

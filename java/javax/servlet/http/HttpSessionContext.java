@@ -41,8 +41,7 @@ public interface HttpSessionContext {
      * @deprecated As of Java Servlet API 2.1 with no replacement. This method must return null and will be removed in a
      *                 future version of this API.
      */
-    @Deprecated
-    public HttpSession getSession(String sessionId);
+    @Deprecated HttpSession getSession(String sessionId);
 
     /**
      * Do not use.
@@ -52,6 +51,5 @@ public interface HttpSessionContext {
      * @deprecated As of Java Servlet API 2.1 with no replacement. This method must return an empty
      *                 <code>Enumeration</code> and will be removed in a future version of this API.
      */
-    @Deprecated
-    public Enumeration<String> getIds();
+    @Deprecated Enumeration<String> getIds();
 }

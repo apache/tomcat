@@ -300,17 +300,17 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         private final String headerLine;
         private final boolean rejectIllegalHeader;
 
-        public Bug51557Client(String headerName) {
+        Bug51557Client(String headerName) {
             this.headerName = headerName;
             this.headerLine = headerName;
             this.rejectIllegalHeader = false;
         }
 
-        public Bug51557Client(String headerName, String headerValue) {
+        Bug51557Client(String headerName, String headerValue) {
             this(headerName, headerValue, false);
         }
 
-        public Bug51557Client(String headerName, String headerValue,
+        Bug51557Client(String headerName, String headerValue,
                 boolean rejectIllegalHeader) {
             this.headerName = headerName;
             this.headerLine = headerName + ": " + headerValue;
@@ -380,7 +380,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
          * @param invalidHeaderName The header name should be invalid and
          *                          therefore ignored by the header parsing code
          */
-        public Bug51557Servlet(String invalidHeaderName) {
+        Bug51557Servlet(String invalidHeaderName) {
             this.invalidHeaderName = invalidHeaderName;
         }
 
@@ -747,7 +747,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
         private final String[] request;
 
-        public InvalidClient(String[] request) {
+        InvalidClient(String[] request) {
             this.request = request;
         }
 

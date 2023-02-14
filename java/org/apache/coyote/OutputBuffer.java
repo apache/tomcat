@@ -36,7 +36,7 @@ public interface OutputBuffer {
      *
      * @throws IOException an underlying I/O error occurred
      */
-    public int doWrite(ByteBuffer chunk) throws IOException;
+    int doWrite(ByteBuffer chunk) throws IOException;
 
 
     /**
@@ -44,5 +44,5 @@ public interface OutputBuffer {
      *
      * @return Bytes written for the current request
      */
-    public long getBytesWritten();
+    long getBytesWritten();
 }

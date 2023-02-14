@@ -53,7 +53,7 @@ final class StandardWrapperValve extends ValveBase {
 
     // ------------------------------------------------------ Constructor
 
-    public StandardWrapperValve() {
+    StandardWrapperValve() {
         super(true);
     }
 
@@ -83,7 +83,7 @@ final class StandardWrapperValve extends ValveBase {
      * @exception ServletException if a servlet error occurred
      */
     @Override
-    public final void invoke(Request request, Response response) throws IOException, ServletException {
+    public void invoke(Request request, Response response) throws IOException, ServletException {
 
         // Initialize local variables we may need
         boolean unavailable = false;

@@ -32,7 +32,7 @@ class JasperTagInfo extends TagInfo {
 
     private final String dynamicAttrsMapName;
 
-    public JasperTagInfo(String tagName,
+    JasperTagInfo(String tagName,
             String tagClassName,
             String bodyContent,
             String infoString,

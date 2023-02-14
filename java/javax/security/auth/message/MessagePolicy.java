@@ -40,16 +40,16 @@ public class MessagePolicy {
         return targetPolicies;
     }
 
-    public static interface ProtectionPolicy {
+    public interface ProtectionPolicy {
 
-        static String AUTHENTICATE_SENDER = "#authenticateSender";
-        static String AUTHENTICATE_CONTENT = "#authenticateContent";
-        static String AUTHENTICATE_RECIPIENT = "#authenticateRecipient";
+        String AUTHENTICATE_SENDER = "#authenticateSender";
+        String AUTHENTICATE_CONTENT = "#authenticateContent";
+        String AUTHENTICATE_RECIPIENT = "#authenticateRecipient";
 
         String getID();
     }
 
-    public static interface Target {
+    public interface Target {
 
         Object get(MessageInfo messageInfo);
 

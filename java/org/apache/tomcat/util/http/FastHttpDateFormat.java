@@ -101,7 +101,7 @@ public final class FastHttpDateFormat {
      * Get the current date in HTTP format.
      * @return the HTTP date
      */
-    public static final String getCurrentDate() {
+    public static String getCurrentDate() {
         long now = System.currentTimeMillis();
         // Handle case where time moves backwards (e.g. system time corrected)
         if (Math.abs(now - currentDateGenerated) > 1000) {
@@ -122,7 +122,7 @@ public final class FastHttpDateFormat {
      * @deprecated Unused. This will be removed in Tomcat 10
      */
     @Deprecated
-    public static final String formatDate(long value, DateFormat threadLocalformat) {
+    public static String formatDate(long value, DateFormat threadLocalformat) {
         return formatDate(value);
     }
 
@@ -132,7 +132,7 @@ public final class FastHttpDateFormat {
      * @param value The date
      * @return the HTTP date
      */
-    public static final String formatDate(long value) {
+    public static String formatDate(long value) {
         Long longValue = Long.valueOf(value);
         String cachedDate = formatCache.get(longValue);
         if (cachedDate != null) {
@@ -156,7 +156,7 @@ public final class FastHttpDateFormat {
      *             Use {@link #parseDate(String)}
      */
     @Deprecated
-    public static final long parseDate(String value, DateFormat[] threadLocalformats) {
+    public static long parseDate(String value, DateFormat[] threadLocalformats) {
         return parseDate(value);
     }
 
@@ -167,7 +167,7 @@ public final class FastHttpDateFormat {
      * @return the date as a long or <code>-1</code> if the value cannot be
      *         parsed
      */
-    public static final long parseDate(String value) {
+    public static long parseDate(String value) {
 
         Long cachedDate = parseCache.get(value);
         if (cachedDate != null) {

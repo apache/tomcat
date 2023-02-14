@@ -28,7 +28,7 @@ public enum DispatchType {
 
     private final SocketEvent status;
 
-    private DispatchType(SocketEvent status) {
+    DispatchType(SocketEvent status) {
         this.status = status;
     }
 

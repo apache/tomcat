@@ -86,28 +86,28 @@ public interface Container extends Lifecycle {
      * The ContainerEvent event type sent when a child container is added
      * by <code>addChild()</code>.
      */
-    public static final String ADD_CHILD_EVENT = "addChild";
+    String ADD_CHILD_EVENT = "addChild";
 
 
     /**
      * The ContainerEvent event type sent when a valve is added
      * by <code>addValve()</code>, if this Container supports pipelines.
      */
-    public static final String ADD_VALVE_EVENT = "addValve";
+    String ADD_VALVE_EVENT = "addValve";
 
 
     /**
      * The ContainerEvent event type sent when a child container is removed
      * by <code>removeChild()</code>.
      */
-    public static final String REMOVE_CHILD_EVENT = "removeChild";
+    String REMOVE_CHILD_EVENT = "removeChild";
 
 
     /**
      * The ContainerEvent event type sent when a valve is removed
      * by <code>removeValve()</code>, if this Container supports pipelines.
      */
-    public static final String REMOVE_VALVE_EVENT = "removeValve";
+    String REMOVE_VALVE_EVENT = "removeValve";
 
 
     // ------------------------------------------------------------- Properties
@@ -119,14 +119,14 @@ public interface Container extends Lifecycle {
      *         no associated Logger, return the Logger associated with the
      *         parent Container (if any); otherwise return <code>null</code>.
      */
-    public Log getLogger();
+    Log getLogger();
 
 
     /**
      * Return the logger name that the container will use.
      * @return the abbreviated name of this container for logging messages
      */
-    public String getLogName();
+    String getLogName();
 
 
     /**
@@ -134,7 +134,7 @@ public interface Container extends Lifecycle {
      *
      * @return the JMX name associated with this container.
      */
-    public ObjectName getObjectName();
+    ObjectName getObjectName();
 
 
     /**
@@ -143,7 +143,7 @@ public interface Container extends Lifecycle {
      *
      * @return The JMX domain name
      */
-    public String getDomain();
+    String getDomain();
 
 
     /**
@@ -153,7 +153,7 @@ public interface Container extends Lifecycle {
      * @return          A string suitable for appending to the ObjectName
      *
      */
-    public String getMBeanKeyProperties();
+    String getMBeanKeyProperties();
 
 
     /**
@@ -162,7 +162,7 @@ public interface Container extends Lifecycle {
      *
      * @return The Pipeline
      */
-    public Pipeline getPipeline();
+    Pipeline getPipeline();
 
 
     /**
@@ -172,7 +172,7 @@ public interface Container extends Lifecycle {
      *         no associated Cluster, return the Cluster associated with our
      *         parent Container (if any); otherwise return <code>null</code>.
      */
-    public Cluster getCluster();
+    Cluster getCluster();
 
 
     /**
@@ -180,7 +180,7 @@ public interface Container extends Lifecycle {
      *
      * @param cluster the Cluster with which this Container is associated.
      */
-    public void setCluster(Cluster cluster);
+    void setCluster(Cluster cluster);
 
 
     /**
@@ -197,7 +197,7 @@ public interface Container extends Lifecycle {
      *         indicates that background processing will be managed by the
      *         parent.
      */
-    public int getBackgroundProcessorDelay();
+    int getBackgroundProcessorDelay();
 
 
     /**
@@ -207,7 +207,7 @@ public interface Container extends Lifecycle {
      * @param delay The delay in seconds between the invocation of
      *              backgroundProcess methods
      */
-    public void setBackgroundProcessorDelay(int delay);
+    void setBackgroundProcessorDelay(int delay);
 
 
     /**
@@ -217,7 +217,7 @@ public interface Container extends Lifecycle {
      *
      * @return The human readable name of this container.
      */
-    public String getName();
+    String getName();
 
 
     /**
@@ -231,7 +231,7 @@ public interface Container extends Lifecycle {
      *  added to the children of a parent Container (after which the name
      *  may not be changed)
      */
-    public void setName(String name);
+    void setName(String name);
 
 
     /**
@@ -241,7 +241,7 @@ public interface Container extends Lifecycle {
      *         there is one. If there is no defined parent, return
      *         <code>null</code>.
      */
-    public Container getParent();
+    Container getParent();
 
 
     /**
@@ -255,7 +255,7 @@ public interface Container extends Lifecycle {
      * @exception IllegalArgumentException if this Container refuses to become
      *  attached to the specified Container
      */
-    public void setParent(Container container);
+    void setParent(Container container);
 
 
     /**
@@ -265,7 +265,7 @@ public interface Container extends Lifecycle {
      *         {@link #getParent()}.{@link #getParentClassLoader()}. If no
      *         parent has been set, return the system class loader.
      */
-    public ClassLoader getParentClassLoader();
+    ClassLoader getParentClassLoader();
 
 
     /**
@@ -276,7 +276,7 @@ public interface Container extends Lifecycle {
      *
      * @param parent The new parent class loader
      */
-    public void setParentClassLoader(ClassLoader parent);
+    void setParentClassLoader(ClassLoader parent);
 
 
     /**
@@ -286,7 +286,7 @@ public interface Container extends Lifecycle {
      *         Realm associated with the parent Container (if any); otherwise
      *         return <code>null</code>.
      */
-    public Realm getRealm();
+    Realm getRealm();
 
 
     /**
@@ -294,7 +294,7 @@ public interface Container extends Lifecycle {
      *
      * @param realm The newly associated Realm
      */
-    public void setRealm(Realm realm);
+    void setRealm(Realm realm);
 
 
     /**
@@ -304,7 +304,7 @@ public interface Container extends Lifecycle {
      * @param resourceName The resource file name
      * @return the configuration path
      */
-    public static String getConfigPath(Container container, String resourceName) {
+    static String getConfigPath(Container container, String resourceName) {
         StringBuilder result = new StringBuilder();
         Container host = null;
         Container engine = null;
@@ -337,7 +337,7 @@ public interface Container extends Lifecycle {
      * @param container The container to start from
      * @return the Service, or null if not found
      */
-    public static Service getService(Container container) {
+    static Service getService(Container container) {
         while (container != null && !(container instanceof Engine)) {
             container = container.getParent();
         }
@@ -356,7 +356,7 @@ public interface Container extends Lifecycle {
      * invoked inside the classloading context of this container. Unexpected
      * throwables will be caught and logged.
      */
-    public void backgroundProcess();
+    void backgroundProcess();
 
 
     /**
@@ -376,7 +376,7 @@ public interface Container extends Lifecycle {
      * @exception IllegalStateException if this Container does not support
      *  child Containers
      */
-    public void addChild(Container child);
+    void addChild(Container child);
 
 
     /**
@@ -384,7 +384,7 @@ public interface Container extends Lifecycle {
      *
      * @param listener The listener to add
      */
-    public void addContainerListener(ContainerListener listener);
+    void addContainerListener(ContainerListener listener);
 
 
     /**
@@ -392,7 +392,7 @@ public interface Container extends Lifecycle {
      *
      * @param listener The listener to add
      */
-    public void addPropertyChangeListener(PropertyChangeListener listener);
+    void addPropertyChangeListener(PropertyChangeListener listener);
 
 
     /**
@@ -403,7 +403,7 @@ public interface Container extends Lifecycle {
      * @return The child Container with the given name or <code>null</code> if
      *         no such child exists.
      */
-    public Container findChild(String name);
+    Container findChild(String name);
 
 
     /**
@@ -412,7 +412,7 @@ public interface Container extends Lifecycle {
      * @return An array containing all children of this container. If this
      *         Container has no children, a zero-length array is returned.
      */
-    public Container[] findChildren();
+    Container[] findChildren();
 
 
     /**
@@ -422,7 +422,7 @@ public interface Container extends Lifecycle {
      *         Container. If this Container has no registered container
      *         listeners, a zero-length array is returned.
      */
-    public ContainerListener[] findContainerListeners();
+    ContainerListener[] findContainerListeners();
 
 
     /**
@@ -431,7 +431,7 @@ public interface Container extends Lifecycle {
      *
      * @param child Existing child Container to be removed
      */
-    public void removeChild(Container child);
+    void removeChild(Container child);
 
 
     /**
@@ -439,7 +439,7 @@ public interface Container extends Lifecycle {
      *
      * @param listener The listener to remove
      */
-    public void removeContainerListener(ContainerListener listener);
+    void removeContainerListener(ContainerListener listener);
 
 
     /**
@@ -447,7 +447,7 @@ public interface Container extends Lifecycle {
      *
      * @param listener The listener to remove
      */
-    public void removePropertyChangeListener(PropertyChangeListener listener);
+    void removePropertyChangeListener(PropertyChangeListener listener);
 
 
     /**
@@ -458,7 +458,7 @@ public interface Container extends Lifecycle {
      * @param type Event type
      * @param data Event data
      */
-    public void fireContainerEvent(String type, Object data);
+    void fireContainerEvent(String type, Object data);
 
 
     /**
@@ -472,7 +472,7 @@ public interface Container extends Lifecycle {
      * @param   useDefault  Flag that indicates that the request/response should
      *                      be logged in the engine's default access log
      */
-    public void logAccess(Request request, Response response, long time,
+    void logAccess(Request request, Response response, long time,
             boolean useDefault);
 
 
@@ -485,7 +485,7 @@ public interface Container extends Lifecycle {
      * @return The AccessLog to use for a request/response destined for this
      *         container
      */
-    public AccessLog getAccessLog();
+    AccessLog getAccessLog();
 
 
     /**
@@ -496,7 +496,7 @@ public interface Container extends Lifecycle {
      * @return The currently configured number of threads used to start/stop
      *         children associated with this container
      */
-    public int getStartStopThreads();
+    int getStartStopThreads();
 
 
     /**
@@ -505,7 +505,7 @@ public interface Container extends Lifecycle {
      * children to be processed in parallel.
      * @param   startStopThreads    The new number of threads to be used
      */
-    public void setStartStopThreads(int startStopThreads);
+    void setStartStopThreads(int startStopThreads);
 
 
     /**
@@ -513,7 +513,7 @@ public interface Container extends Lifecycle {
      *
      * @return  The location of CATALINA_BASE.
      */
-    public File getCatalinaBase();
+    File getCatalinaBase();
 
 
     /**
@@ -521,5 +521,5 @@ public interface Container extends Lifecycle {
      *
      * @return The location of CATALINA_HOME.
      */
-    public File getCatalinaHome();
+    File getCatalinaHome();
 }

@@ -115,7 +115,7 @@ public class TestSendFile extends TomcatBaseTest {
 
         private final File f;
 
-        public WritingServlet(File f) {
+        WritingServlet(File f) {
             this.f = f;
         }
 

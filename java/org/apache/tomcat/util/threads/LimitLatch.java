@@ -35,7 +35,7 @@ public class LimitLatch {
     private class Sync extends AbstractQueuedSynchronizer {
         private static final long serialVersionUID = 1L;
 
-        public Sync() {
+        Sync() {
         }
 
         @Override

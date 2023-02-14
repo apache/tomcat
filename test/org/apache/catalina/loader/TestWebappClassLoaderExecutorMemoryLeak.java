@@ -108,7 +108,7 @@ public class TestWebappClassLoaderExecutorMemoryLeak extends TomcatBaseTest {
 
             String _id;
 
-            public Task(String id) {
+            Task(String id) {
                 this._id = id;
             }
 

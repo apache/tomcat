@@ -125,7 +125,7 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
 
         private final long serverSocket;
 
-        public Client(long serverSocket) throws Exception {
+        Client(long serverSocket) throws Exception {
             this.serverSocket = serverSocket;
         }
 

@@ -695,12 +695,12 @@ public final class Request {
      * @param pos   Index to use to store the note
      * @param value The value to store at that index
      */
-    public final void setNote(int pos, Object value) {
+    public void setNote(int pos, Object value) {
         notes[pos] = value;
     }
 
 
-    public final Object getNote(int pos) {
+    public Object getNote(int pos) {
         return notes[pos];
     }
 

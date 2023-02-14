@@ -44,7 +44,7 @@ enum FrameType {
     private final boolean payloadErrorFatal;
 
 
-    private FrameType(int id, boolean streamZero, boolean streamNonZero, IntPredicate payloadSizeValidator,
+    FrameType(int id, boolean streamZero, boolean streamNonZero, IntPredicate payloadSizeValidator,
             boolean payloadErrorFatal) {
         this.id = id;
         this.streamZero = streamZero;

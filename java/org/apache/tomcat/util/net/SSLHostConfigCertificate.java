@@ -278,7 +278,7 @@ public class SSLHostConfigCertificate implements Serializable {
 
         private final Set<Authentication> compatibleAuthentications;
 
-        private Type(Authentication... authentications) {
+        Type(Authentication... authentications) {
             compatibleAuthentications = new HashSet<>();
             if (authentications != null) {
                 compatibleAuthentications.addAll(Arrays.asList(authentications));

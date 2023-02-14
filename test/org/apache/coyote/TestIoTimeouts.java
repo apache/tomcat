@@ -81,7 +81,7 @@ public class TestIoTimeouts extends TomcatBaseTest {
         private final boolean sendEndChunk;
 
 
-        public ChunkedClient(boolean sendEndChunk) {
+        ChunkedClient(boolean sendEndChunk) {
             this.sendEndChunk = sendEndChunk;
         }
 
@@ -193,7 +193,7 @@ public class TestIoTimeouts extends TomcatBaseTest {
         private final ServletOutputStream sos;
         private final byte[] buffer = new byte[8192];
 
-        public EchoListener(AsyncContext ac, ServletInputStream sis, ServletOutputStream sos) {
+        EchoListener(AsyncContext ac, ServletInputStream sis, ServletOutputStream sos) {
             t = null;
             this.ac = ac;
             this.sis = sis;

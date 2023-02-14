@@ -134,7 +134,7 @@ public class ListELResolver extends ELResolver {
         return null;
     }
 
-    private static final int coerce(Object property) {
+    private static int coerce(Object property) {
         if (property instanceof Number) {
             return ((Number) property).intValue();
         }

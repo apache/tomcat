@@ -32,7 +32,7 @@ public interface ServletConfig {
      *
      * @return the name of the servlet instance
      */
-    public String getServletName();
+    String getServletName();
 
     /**
      * Returns a reference to the {@link ServletContext} in which the caller is
@@ -42,7 +42,7 @@ public interface ServletConfig {
      *         with its servlet container
      * @see ServletContext
      */
-    public ServletContext getServletContext();
+    ServletContext getServletContext();
 
     /**
      * Returns a <code>String</code> containing the value of the named
@@ -55,7 +55,7 @@ public interface ServletConfig {
      * @return a <code>String</code> containing the value of the initialization
      *         parameter
      */
-    public String getInitParameter(String name);
+    String getInitParameter(String name);
 
     /**
      * Returns the names of the servlet's initialization parameters as an
@@ -65,5 +65,5 @@ public interface ServletConfig {
      * @return an <code>Enumeration</code> of <code>String</code> objects
      *         containing the names of the servlet's initialization parameters
      */
-    public Enumeration<String> getInitParameterNames();
+    Enumeration<String> getInitParameterNames();
 }

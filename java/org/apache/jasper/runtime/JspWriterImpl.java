@@ -147,7 +147,7 @@ public class JspWriterImpl extends JspWriter {
         nextChar = 0;
     }
 
-    private final void bufferOverflow() throws IOException {
+    private void bufferOverflow() throws IOException {
         throw new IOException(Localizer.getMessage("jsp.error.overflow"));
     }
 

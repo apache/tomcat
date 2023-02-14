@@ -571,7 +571,7 @@ public class TestHttp2Limits extends Http2TestBase {
         private final String pattern;
 
 
-        public RegexMatcher(String pattern) {
+        RegexMatcher(String pattern) {
             this.pattern = pattern;
         }
 

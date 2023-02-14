@@ -347,7 +347,7 @@ public class ResolverImpl extends Resolver {
         }
     }
 
-    private static final String emptyStringIfNull(String value) {
+    private static String emptyStringIfNull(String value) {
         if (value == null) {
             return "";
         } else {

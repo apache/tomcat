@@ -26,7 +26,7 @@ public interface Sender {
    * @param config The heartbeat listener configuration
    * @throws Exception An error occurred
    */
-  public void init(HeartbeatListener config) throws Exception;
+  void init(HeartbeatListener config) throws Exception;
 
   /**
    * Send the message to the proxies
@@ -34,5 +34,5 @@ public interface Sender {
    * @return <code>0</code> if no error occurred, <code>-1</code> otherwise
    * @throws Exception An error occurred
    */
-  public int send(String mess) throws Exception;
+  int send(String mess) throws Exception;
 }

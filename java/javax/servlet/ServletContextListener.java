@@ -37,7 +37,7 @@ public interface ServletContextListener extends EventListener {
      * The default implementation is a NO-OP.
      * @param sce Information about the ServletContext that was initialized
      */
-    public default void contextInitialized(ServletContextEvent sce) {
+    default void contextInitialized(ServletContextEvent sce) {
     }
 
     /**
@@ -47,6 +47,6 @@ public interface ServletContextListener extends EventListener {
      * The default implementation is a NO-OP.
      * @param sce Information about the ServletContext that was destroyed
      */
-    public default void contextDestroyed(ServletContextEvent sce) {
+    default void contextDestroyed(ServletContextEvent sce) {
     }
 }

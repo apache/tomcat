@@ -437,7 +437,7 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
 
         private final String dispatchPath;
 
-        public DispatcherServlet(String dispatchPath) {
+        DispatcherServlet(String dispatchPath) {
             this.dispatchPath = dispatchPath;
         }
 
@@ -489,7 +489,7 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
         private final String dispatchPath;
         private final boolean encodePath;
 
-        public AsyncDispatcherServlet(String dispatchPath, boolean encodePath) {
+        AsyncDispatcherServlet(String dispatchPath, boolean encodePath) {
             this.dispatchPath = dispatchPath;
             this.encodePath = encodePath;
         }

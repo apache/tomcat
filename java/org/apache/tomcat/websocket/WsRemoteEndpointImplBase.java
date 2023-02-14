@@ -552,7 +552,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         private final WsRemoteEndpointImplBase endpoint;
         private final SendHandler handler;
 
-        public EndMessageHandler(WsRemoteEndpointImplBase endpoint,
+        EndMessageHandler(WsRemoteEndpointImplBase endpoint,
                 SendHandler handler) {
             this.endpoint = endpoint;
             this.handler = handler;
@@ -579,7 +579,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         private final WsRemoteEndpointImplBase endpoint;
 
-        public IntermediateMessageHandler(WsRemoteEndpointImplBase endpoint) {
+        IntermediateMessageHandler(WsRemoteEndpointImplBase endpoint) {
             this.endpoint = endpoint;
         }
 
@@ -826,7 +826,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         private final WsRemoteEndpointImplBase endpoint;
         private volatile boolean isDone = false;
 
-        public TextMessageSendHandler(SendHandler handler, CharBuffer message,
+        TextMessageSendHandler(SendHandler handler, CharBuffer message,
                 boolean isLast, CharsetEncoder encoder,
                 ByteBuffer encoderBuffer, WsRemoteEndpointImplBase endpoint) {
             this.handler = handler;
@@ -883,7 +883,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         private final WsRemoteEndpointImplBase endpoint;
         private volatile int maskIndex = 0;
 
-        public OutputBufferSendHandler(SendHandler completion,
+        OutputBufferSendHandler(SendHandler completion,
                 long blockingWriteTimeoutExpiry,
                 ByteBuffer headerBuffer, ByteBuffer payload, byte[] mask,
                 ByteBuffer outputBuffer, boolean flushRequired,
@@ -981,7 +981,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         private final ByteBuffer outputBuffer;
         private final SendHandler handler;
 
-        public OutputBufferFlushSendHandler(ByteBuffer outputBuffer, SendHandler handler) {
+        OutputBufferFlushSendHandler(ByteBuffer outputBuffer, SendHandler handler) {
             this.outputBuffer = outputBuffer;
             this.handler = handler;
         }
@@ -1004,7 +1004,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         private volatile boolean closed = false;
         private volatile boolean used = false;
 
-        public WsOutputStream(WsRemoteEndpointImplBase endpoint) {
+        WsOutputStream(WsRemoteEndpointImplBase endpoint) {
             this.endpoint = endpoint;
         }
 
@@ -1099,7 +1099,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         private volatile boolean closed = false;
         private volatile boolean used = false;
 
-        public WsWriter(WsRemoteEndpointImplBase endpoint) {
+        WsWriter(WsRemoteEndpointImplBase endpoint) {
             this.endpoint = endpoint;
         }
 
@@ -1176,7 +1176,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         private final Class<?> clazz;
         private final Encoder encoder;
 
-        public EncoderEntry(Class<?> clazz, Encoder encoder) {
+        EncoderEntry(Class<?> clazz, Encoder encoder) {
             this.clazz = clazz;
             this.encoder = encoder;
         }
@@ -1281,7 +1281,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         private final SendHandler handler;
         private final StateMachine stateMachine;
 
-        public StateUpdateSendHandler(SendHandler handler, StateMachine stateMachine) {
+        StateUpdateSendHandler(SendHandler handler, StateMachine stateMachine) {
             this.handler = handler;
             this.stateMachine = stateMachine;
         }

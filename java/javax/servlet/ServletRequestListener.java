@@ -35,7 +35,7 @@ public interface ServletRequestListener extends EventListener {
      * The default implementation is a NO-OP.
      * @param sre Information about the request
      */
-    public default void requestDestroyed (ServletRequestEvent sre) {
+    default void requestDestroyed (ServletRequestEvent sre) {
     }
 
     /**
@@ -43,6 +43,6 @@ public interface ServletRequestListener extends EventListener {
      * The default implementation is a NO-OP.
      * @param sre Information about the request
      */
-    public default void requestInitialized (ServletRequestEvent sre) {
+    default void requestInitialized (ServletRequestEvent sre) {
     }
 }

@@ -369,15 +369,15 @@ public abstract class ELArithmetic {
         super();
     }
 
-    protected abstract Number add(final Number num0, final Number num1);
+    protected abstract Number add(Number num0, Number num1);
 
-    protected abstract Number multiply(final Number num0, final Number num1);
+    protected abstract Number multiply(Number num0, Number num1);
 
-    protected abstract Number subtract(final Number num0, final Number num1);
+    protected abstract Number subtract(Number num0, Number num1);
 
-    protected abstract Number mod(final Number num0, final Number num1);
+    protected abstract Number mod(Number num0, Number num1);
 
-    protected abstract Number coerce(final Number num);
+    protected abstract Number coerce(Number num);
 
     protected final Number coerce(final Object obj) {
 
@@ -397,9 +397,9 @@ public abstract class ELArithmetic {
         throw new ELException(MessageFactory.get("error.convert", obj, obj.getClass(), "Number"));
     }
 
-    protected abstract Number coerce(final String str);
+    protected abstract Number coerce(String str);
 
-    protected abstract Number divide(final Number num0, final Number num1);
+    protected abstract Number divide(Number num0, Number num1);
 
-    protected abstract boolean matches(final Object obj0, final Object obj1);
+    protected abstract boolean matches(Object obj0, Object obj1);
 }

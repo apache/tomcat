@@ -79,17 +79,17 @@ final class DefaultServerEndpointConfig implements ServerEndpointConfig {
     }
 
     @Override
-    public final Map<String, Object> getUserProperties() {
+    public Map<String, Object> getUserProperties() {
         return userProperties;
     }
 
     @Override
-    public final List<String> getSubprotocols() {
+    public List<String> getSubprotocols() {
         return subprotocols;
     }
 
     @Override
-    public final List<Extension> getExtensions() {
+    public List<Extension> getExtensions() {
         return extensions;
     }
 }

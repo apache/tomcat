@@ -347,11 +347,11 @@ public class DeltaRequest implements Externalizable {
         private int action;
         private int type;
 
-        public AttributeInfo() {
+        AttributeInfo() {
             this(-1, -1, null, null);
         }
 
-        public AttributeInfo(int type,
+        AttributeInfo(int type,
                              int action,
                              String name,
                              Object value) {

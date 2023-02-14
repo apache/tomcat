@@ -124,7 +124,7 @@ public class BackgroundProcessManager {
         private final BackgroundProcessManager manager;
         private volatile boolean running = true;
 
-        public WsBackgroundThread(BackgroundProcessManager manager) {
+        WsBackgroundThread(BackgroundProcessManager manager) {
             setName("WebSocket background processing");
             this.manager = manager;
         }

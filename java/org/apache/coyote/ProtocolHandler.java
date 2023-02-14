@@ -38,7 +38,7 @@ public interface ProtocolHandler {
      *
      * @return the adapter
      */
-    public Adapter getAdapter();
+    Adapter getAdapter();
 
 
     /**
@@ -46,7 +46,7 @@ public interface ProtocolHandler {
      *
      * @param adapter The adapter to associate
      */
-    public void setAdapter(Adapter adapter);
+    void setAdapter(Adapter adapter);
 
 
     /**
@@ -54,7 +54,7 @@ public interface ProtocolHandler {
      *
      * @return The executor used to process requests
      */
-    public Executor getExecutor();
+    Executor getExecutor();
 
 
     /**
@@ -62,7 +62,7 @@ public interface ProtocolHandler {
      *
      * @param executor the executor
      */
-    public void setExecutor(Executor executor);
+    void setExecutor(Executor executor);
 
 
     /**
@@ -70,7 +70,7 @@ public interface ProtocolHandler {
      *
      * @return the executor
      */
-    public ScheduledExecutorService getUtilityExecutor();
+    ScheduledExecutorService getUtilityExecutor();
 
 
     /**
@@ -78,7 +78,7 @@ public interface ProtocolHandler {
      *
      * @param utilityExecutor the executor
      */
-    public void setUtilityExecutor(ScheduledExecutorService utilityExecutor);
+    void setUtilityExecutor(ScheduledExecutorService utilityExecutor);
 
 
     /**
@@ -86,7 +86,7 @@ public interface ProtocolHandler {
      *
      * @throws Exception If the protocol handler fails to initialise
      */
-    public void init() throws Exception;
+    void init() throws Exception;
 
 
     /**
@@ -94,7 +94,7 @@ public interface ProtocolHandler {
      *
      * @throws Exception If the protocol handler fails to start
      */
-    public void start() throws Exception;
+    void start() throws Exception;
 
 
     /**
@@ -102,7 +102,7 @@ public interface ProtocolHandler {
      *
      * @throws Exception If the protocol handler fails to pause
      */
-    public void pause() throws Exception;
+    void pause() throws Exception;
 
 
     /**
@@ -110,7 +110,7 @@ public interface ProtocolHandler {
      *
      * @throws Exception If the protocol handler fails to resume
      */
-    public void resume() throws Exception;
+    void resume() throws Exception;
 
 
     /**
@@ -118,7 +118,7 @@ public interface ProtocolHandler {
      *
      * @throws Exception If the protocol handler fails to stop
      */
-    public void stop() throws Exception;
+    void stop() throws Exception;
 
 
     /**
@@ -126,14 +126,14 @@ public interface ProtocolHandler {
      *
      * @throws Exception If the protocol handler fails to destroy
      */
-    public void destroy() throws Exception;
+    void destroy() throws Exception;
 
 
     /**
      * Close the server socket (to prevent further connections) if the server socket was bound on {@link #start()}
      * (rather than on {@link #init()} but do not perform any further shutdown.
      */
-    public void closeServerSocketGraceful();
+    void closeServerSocketGraceful();
 
 
     /**
@@ -144,7 +144,7 @@ public interface ProtocolHandler {
      *
      * @return The wait time, if any remaining when the method returned
      */
-    public long awaitConnectionsClose(long waitMillis);
+    long awaitConnectionsClose(long waitMillis);
 
 
     /**
@@ -154,8 +154,7 @@ public interface ProtocolHandler {
      *
      * @deprecated This method will be removed in Tomcat 10.1.x onwards
      */
-    @Deprecated
-    public boolean isAprRequired();
+    @Deprecated boolean isAprRequired();
 
 
     /**
@@ -163,7 +162,7 @@ public interface ProtocolHandler {
      *
      * @return <code>true</code> if this Protocol Handler supports sendfile, otherwise <code>false</code>
      */
-    public boolean isSendfileSupported();
+    boolean isSendfileSupported();
 
 
     /**
@@ -171,7 +170,7 @@ public interface ProtocolHandler {
      *
      * @param sslHostConfig the configuration
      */
-    public void addSslHostConfig(SSLHostConfig sslHostConfig);
+    void addSslHostConfig(SSLHostConfig sslHostConfig);
 
 
     /**
@@ -179,7 +178,7 @@ public interface ProtocolHandler {
      *
      * @return the configurations
      */
-    public SSLHostConfig[] findSslHostConfigs();
+    SSLHostConfig[] findSslHostConfigs();
 
 
     /**
@@ -187,7 +186,7 @@ public interface ProtocolHandler {
      *
      * @param upgradeProtocol the protocol
      */
-    public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol);
+    void addUpgradeProtocol(UpgradeProtocol upgradeProtocol);
 
 
     /**
@@ -195,7 +194,7 @@ public interface ProtocolHandler {
      *
      * @return the protocols
      */
-    public UpgradeProtocol[] findUpgradeProtocols();
+    UpgradeProtocol[] findUpgradeProtocols();
 
 
     /**
@@ -204,7 +203,7 @@ public interface ProtocolHandler {
      *
      * @return the desired buffer size, or -1 if not relevant
      */
-    public default int getDesiredBufferSize() {
+    default int getDesiredBufferSize() {
         return -1;
     }
 
@@ -215,7 +214,7 @@ public interface ProtocolHandler {
      *
      * @return the id
      */
-    public default String getId() {
+    default String getId() {
         return null;
     }
 
@@ -237,7 +236,7 @@ public interface ProtocolHandler {
      * @throws SecurityException         Exception occurred
      */
     @SuppressWarnings("deprecation")
-    public static ProtocolHandler create(String protocol, boolean apr)
+    static ProtocolHandler create(String protocol, boolean apr)
             throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException,
             InvocationTargetException, NoSuchMethodException, SecurityException {
         if (protocol == null || "HTTP/1.1".equals(protocol) ||

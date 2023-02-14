@@ -271,7 +271,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         private final Principal principal;
         private final Map<String, Object> attributes;
 
-        public SerializablePrincipal(String name, String password, String[] roles, Principal principal,
+        SerializablePrincipal(String name, String password, String[] roles, Principal principal,
                 Map<String, Object> attributes) {
             this.name = name;
             this.password = password;

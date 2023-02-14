@@ -780,7 +780,7 @@ public abstract class HttpServlet extends GenericServlet {
         private final String encoding;
         private PrintWriter pw;
 
-        public NoBodyPrintWriter(NoBodyOutputStream out, String encoding) throws UnsupportedEncodingException {
+        NoBodyPrintWriter(NoBodyOutputStream out, String encoding) throws UnsupportedEncodingException {
             super(out);
             this.out = out;
             this.encoding = encoding;
@@ -948,7 +948,7 @@ public abstract class HttpServlet extends GenericServlet {
 
         private final NoBodyResponse noBodyResponse;
 
-        public NoBodyAsyncContextListener(NoBodyResponse noBodyResponse) {
+        NoBodyAsyncContextListener(NoBodyResponse noBodyResponse) {
             this.noBodyResponse = noBodyResponse;
         }
 

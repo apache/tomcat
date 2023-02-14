@@ -222,7 +222,7 @@ public class CoyoteInputStream extends ServletInputStream {
 
         private final InputBuffer inputBuffer;
 
-        public PrivilegedAvailable(InputBuffer inputBuffer) {
+        PrivilegedAvailable(InputBuffer inputBuffer) {
             this.inputBuffer = inputBuffer;
         }
 
@@ -237,7 +237,7 @@ public class CoyoteInputStream extends ServletInputStream {
 
         private final InputBuffer inputBuffer;
 
-        public PrivilegedClose(InputBuffer inputBuffer) {
+        PrivilegedClose(InputBuffer inputBuffer) {
             this.inputBuffer = inputBuffer;
         }
 
@@ -253,7 +253,7 @@ public class CoyoteInputStream extends ServletInputStream {
 
         private final InputBuffer inputBuffer;
 
-        public PrivilegedRead(InputBuffer inputBuffer) {
+        PrivilegedRead(InputBuffer inputBuffer) {
             this.inputBuffer = inputBuffer;
         }
 
@@ -272,7 +272,7 @@ public class CoyoteInputStream extends ServletInputStream {
         private final int off;
         private final int len;
 
-        public PrivilegedReadArray(InputBuffer inputBuffer, byte[] buf, int off, int len) {
+        PrivilegedReadArray(InputBuffer inputBuffer, byte[] buf, int off, int len) {
             this.inputBuffer = inputBuffer;
             this.buf = buf;
             this.off = off;
@@ -292,7 +292,7 @@ public class CoyoteInputStream extends ServletInputStream {
         private final InputBuffer inputBuffer;
         private final ByteBuffer bb;
 
-        public PrivilegedReadBuffer(InputBuffer inputBuffer, ByteBuffer bb) {
+        PrivilegedReadBuffer(InputBuffer inputBuffer, ByteBuffer bb) {
             this.inputBuffer = inputBuffer;
             this.bb = bb;
         }

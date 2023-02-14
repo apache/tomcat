@@ -46,7 +46,7 @@ public class ToStringUtil {
     }
 
 
-    private static final String containedToString(Object contained, Object container,
+    private static String containedToString(Object contained, Object container,
             String containerTypeName) {
         StringBuilder sb = new StringBuilder(contained.getClass().getSimpleName());
         sb.append('[');

@@ -490,7 +490,7 @@ public class TestValidation extends DefaultTestCase {
 
     /* ------- Helper mock classes ----- */
 
-    public static enum ValidationOutcome {
+    public enum ValidationOutcome {
         SUCCESS,  // Validation returns true
         FAILURE,  // Validation returns false
         EXCEPTION // Validation throws an unexpected exception

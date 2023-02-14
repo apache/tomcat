@@ -667,7 +667,7 @@ public class DefaultInstanceManager implements InstanceManager {
         private final String name;
         private final AnnotationCacheEntryType type;
 
-        public AnnotationCacheEntry(String accessibleObjectName, Class<?>[] paramTypes, String name,
+        AnnotationCacheEntry(String accessibleObjectName, Class<?>[] paramTypes, String name,
                 AnnotationCacheEntryType type) {
             this.accessibleObjectName = accessibleObjectName;
             this.paramTypes = paramTypes;
@@ -703,7 +703,7 @@ public class DefaultInstanceManager implements InstanceManager {
         private final Class<?> clazz;
         private final AnnotationCacheEntry entry;
 
-        public PrivilegedGetField(Class<?> clazz, AnnotationCacheEntry entry) {
+        PrivilegedGetField(Class<?> clazz, AnnotationCacheEntry entry) {
             this.clazz = clazz;
             this.entry = entry;
         }
@@ -726,7 +726,7 @@ public class DefaultInstanceManager implements InstanceManager {
         private final Class<?> clazz;
         private final AnnotationCacheEntry entry;
 
-        public PrivilegedGetMethod(Class<?> clazz, AnnotationCacheEntry entry) {
+        PrivilegedGetMethod(Class<?> clazz, AnnotationCacheEntry entry) {
             this.clazz = clazz;
             this.entry = entry;
         }
@@ -749,7 +749,7 @@ public class DefaultInstanceManager implements InstanceManager {
         private final String className;
         private final ClassLoader classLoader;
 
-        public PrivilegedLoadClass(String className, ClassLoader classLoader) {
+        PrivilegedLoadClass(String className, ClassLoader classLoader) {
             this.className = className;
             this.classLoader = classLoader;
         }

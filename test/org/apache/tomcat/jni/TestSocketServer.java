@@ -211,7 +211,7 @@ public class TestSocketServer extends AbstractJniTest {
         private final int port;
         private final CountDownLatch complete = new CountDownLatch(1);
 
-        public Client(int port) throws Exception {
+        Client(int port) throws Exception {
             this.port = port;
         }
 

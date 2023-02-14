@@ -39,19 +39,19 @@ public final class UpgradeToken {
         this.protocol = protocol;
     }
 
-    public final ContextBind getContextBind() {
+    public ContextBind getContextBind() {
         return contextBind;
     }
 
-    public final HttpUpgradeHandler getHttpUpgradeHandler() {
+    public HttpUpgradeHandler getHttpUpgradeHandler() {
         return httpUpgradeHandler;
     }
 
-    public final InstanceManager getInstanceManager() {
+    public InstanceManager getInstanceManager() {
         return instanceManager;
     }
 
-    public final String getProtocol() {
+    public String getProtocol() {
         return protocol;
     }
 }

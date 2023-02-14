@@ -149,7 +149,7 @@ public class TestMultipartConfig {
     }
 
     private static class MyContextConfig extends ContextConfig {
-        public MyContextConfig() {
+        MyContextConfig() {
             CustomContext context = new CustomContext();
             super.context = context;
             context.setConfigured(false);

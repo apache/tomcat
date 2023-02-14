@@ -1132,7 +1132,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         private final int status;
         private final HandshakeResponse handshakeResponse;
 
-        public HttpResponse(int status, HandshakeResponse handshakeResponse) {
+        HttpResponse(int status, HandshakeResponse handshakeResponse) {
             this.status = status;
             this.handshakeResponse = handshakeResponse;
         }

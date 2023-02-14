@@ -29,13 +29,13 @@ public interface UpgradeProtocol {
      * @return The name that clients will use to request an upgrade to this protocol via an HTTP/1.1 upgrade request or
      *             <code>null</code> if upgrade via an HTTP/1.1 upgrade request is not supported.
      */
-    public String getHttpUpgradeName(boolean isSSLEnabled);
+    String getHttpUpgradeName(boolean isSSLEnabled);
 
     /**
      * @return The byte sequence as listed in the IANA registry for this protocol or <code>null</code> if upgrade via
      *             ALPN is not supported.
      */
-    public byte[] getAlpnIdentifier();
+    byte[] getAlpnIdentifier();
 
     /**
      * @return The name of the protocol as listed in the IANA registry if and only if {@link #getAlpnIdentifier()}
@@ -50,7 +50,7 @@ public interface UpgradeProtocol {
      * Implementation note: Tomcat assumes that the UTF-8 encoding of this name will not exceed 255 bytes. Tomcat's
      * behaviour if longer names are used is undefined.
      */
-    public String getAlpnName();
+    String getAlpnName();
 
     /**
      * @param socketWrapper The socketWrapper for the connection that requires a processor
@@ -59,7 +59,7 @@ public interface UpgradeProtocol {
      *
      * @return A processor instance for processing a connection using this protocol.
      */
-    public Processor getProcessor(SocketWrapperBase<?> socketWrapper, Adapter adapter);
+    Processor getProcessor(SocketWrapperBase<?> socketWrapper, Adapter adapter);
 
 
     /**
@@ -69,7 +69,7 @@ public interface UpgradeProtocol {
      *
      * @return An instance of the HTTP upgrade handler for this protocol
      */
-    public InternalHttpUpgradeHandler getInternalUpgradeHandler(SocketWrapperBase<?> socketWrapper, Adapter adapter,
+    InternalHttpUpgradeHandler getInternalUpgradeHandler(SocketWrapperBase<?> socketWrapper, Adapter adapter,
             Request request);
 
 
@@ -80,7 +80,7 @@ public interface UpgradeProtocol {
      *
      * @return <code>true</code> if the request is accepted, otherwise <code>false</code>
      */
-    public boolean accept(Request request);
+    boolean accept(Request request);
 
 
     /**
@@ -92,7 +92,7 @@ public interface UpgradeProtocol {
      * @param protocol The HTTP/1.1 protocol implementation that will initially handle any connections passed to this
      *                     UpgradeProtocol via the HTTP upgrade mechanism
      */
-    public default void setHttp11Protocol(AbstractHttp11Protocol<?> protocol) {
+    default void setHttp11Protocol(AbstractHttp11Protocol<?> protocol) {
         // NO-OP
     }
 
@@ -110,7 +110,7 @@ public interface UpgradeProtocol {
      * @deprecated This will be removed in Tomcat 10. Use {@link #setHttp11Protocol(AbstractHttp11Protocol)} instead
      */
     @Deprecated
-    public default void setHttp11Protocol(AbstractProtocol<?> protocol) {
+    default void setHttp11Protocol(AbstractProtocol<?> protocol) {
         if (protocol instanceof AbstractHttp11Protocol) {
             setHttp11Protocol((AbstractHttp11Protocol<?>) protocol);
         }

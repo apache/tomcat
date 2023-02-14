@@ -180,7 +180,7 @@ public class JspFactoryImpl extends JspFactory {
 
         private int current = -1;
 
-        public PageContextPool() {
+        PageContextPool() {
             this.pool = new PageContext[POOL_SIZE];
         }
 

@@ -355,7 +355,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
     private class Client extends SimpleHttpClient {
 
-        public Client(String request, boolean isHttp09) {
+        Client(String request, boolean isHttp09) {
             setRequest(new String[] {request});
             setUseHttp09(isHttp09);
         }
@@ -449,7 +449,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         private final boolean useWriter;
 
-        public ResetBufferServlet(boolean useWriter) {
+        ResetBufferServlet(boolean useWriter) {
             this.useWriter = useWriter;
         }
 
@@ -480,7 +480,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         private final boolean useWriter;
 
-        public ResetServlet(boolean useWriter) {
+        ResetServlet(boolean useWriter) {
             this.useWriter = useWriter;
         }
 
@@ -515,7 +515,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         private final int bytesToWrite;
 
-        public NonBlockingWriteServlet(int bytesToWrite) {
+        NonBlockingWriteServlet(int bytesToWrite) {
             this.bytesToWrite = bytesToWrite;
         }
 
@@ -534,7 +534,7 @@ public class TestHttpServlet extends TomcatBaseTest {
             private final ServletOutputStream sos;
             private int bytesToWrite;
 
-            public NonBlockingWriteListener(AsyncContext ac, int bytesToWrite) throws IOException {
+            NonBlockingWriteListener(AsyncContext ac, int bytesToWrite) throws IOException {
                 this.ac = ac;
                 this.sos = ac.getResponse().getOutputStream();
                 this.bytesToWrite = bytesToWrite;

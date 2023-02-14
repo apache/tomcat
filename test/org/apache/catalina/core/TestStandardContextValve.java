@@ -155,7 +155,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
 
         private StringBuilder sb;
 
-        public Bug51653ErrorPage(StringBuilder sb) {
+        Bug51653ErrorPage(StringBuilder sb) {
             this.sb = sb;
         }
 
@@ -175,7 +175,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
 
         private StringBuilder sb;
 
-        public Bug51653RequestListener(StringBuilder sb) {
+        Bug51653RequestListener(StringBuilder sb) {
             this.sb = sb;
         }
 

@@ -27,5 +27,5 @@ public interface JspIdConsumer {
      *
      * @param jspId The unique Id
      */
-    public void setJspId(String jspId);
+    void setJspId(String jspId);
 }

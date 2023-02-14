@@ -42,7 +42,7 @@ public interface Realm extends Contained {
     /**
      * @return the CredentialHandler configured for this Realm.
      */
-    public CredentialHandler getCredentialHandler();
+    CredentialHandler getCredentialHandler();
 
 
     /**
@@ -50,7 +50,7 @@ public interface Realm extends Contained {
      *
      * @param credentialHandler the {@link CredentialHandler} to use
      */
-    public void setCredentialHandler(CredentialHandler credentialHandler);
+    void setCredentialHandler(CredentialHandler credentialHandler);
 
 
     /**
@@ -58,7 +58,7 @@ public interface Realm extends Contained {
      *
      * @param listener The listener to add
      */
-    public void addPropertyChangeListener(PropertyChangeListener listener);
+    void addPropertyChangeListener(PropertyChangeListener listener);
 
 
     /**
@@ -68,7 +68,7 @@ public interface Realm extends Contained {
      * @return the associated principal, or <code>null</code> if none is
      *         associated.
      */
-    public Principal authenticate(String username);
+    Principal authenticate(String username);
 
 
     /**
@@ -80,7 +80,7 @@ public interface Realm extends Contained {
      * authenticating this username
      * @return the associated principal, or <code>null</code> if there is none
      */
-    public Principal authenticate(String username, String credentials);
+    Principal authenticate(String username, String credentials);
 
 
     /**
@@ -101,7 +101,7 @@ public interface Realm extends Contained {
      * MD5(Method + ":" + uri)
      * @return the associated principal, or <code>null</code> if there is none.
      */
-    public Principal authenticate(String username, String digest,
+    Principal authenticate(String username, String digest,
                                   String nonce, String nc, String cnonce,
                                   String qop, String realm,
                                   String md5a2);
@@ -115,7 +115,7 @@ public interface Realm extends Contained {
      *                   credentials in the returned Principal?
      * @return the associated principal, or <code>null</code> if there is none
      */
-    public Principal authenticate(GSSContext gssContext, boolean storeCreds);
+    Principal authenticate(GSSContext gssContext, boolean storeCreds);
 
 
     /**
@@ -129,7 +129,7 @@ public interface Realm extends Contained {
      *                      {@code null}
      * @return the associated principal, or {@code null} if there is none
      */
-    public default Principal authenticate(GSSName gssName, GSSCredential gssCredential) {
+    default Principal authenticate(GSSName gssName, GSSCredential gssCredential) {
         return null;
     }
 
@@ -141,7 +141,7 @@ public interface Realm extends Contained {
      *  the array being the certificate of the client itself.
      * @return the associated principal, or <code>null</code> if there is none
      */
-    public Principal authenticate(X509Certificate certs[]);
+    Principal authenticate(X509Certificate certs[]);
 
 
     /**
@@ -149,7 +149,7 @@ public interface Realm extends Contained {
      * invoked inside the classloading context of this container. Unexpected
      * throwables will be caught and logged.
      */
-    public void backgroundProcess();
+    void backgroundProcess();
 
 
     /**
@@ -161,7 +161,7 @@ public interface Realm extends Contained {
      * @return the configured {@link SecurityConstraint}, of <code>null</code>
      *         if there is none
      */
-    public SecurityConstraint [] findSecurityConstraints(Request request,
+    SecurityConstraint [] findSecurityConstraints(Request request,
                                                      Context context);
 
 
@@ -177,7 +177,7 @@ public interface Realm extends Contained {
      *
      * @exception IOException if an input/output error occurs
      */
-    public boolean hasResourcePermission(Request request,
+    boolean hasResourcePermission(Request request,
                                          Response response,
                                          SecurityConstraint [] constraint,
                                          Context context)
@@ -195,7 +195,7 @@ public interface Realm extends Contained {
      *         security role, within the context of this Realm; otherwise return
      *         <code>false</code>.
      */
-    public boolean hasRole(Wrapper wrapper, Principal principal, String role);
+    boolean hasRole(Wrapper wrapper, Principal principal, String role);
 
 
     /**
@@ -211,7 +211,7 @@ public interface Realm extends Contained {
      *
      * @exception IOException if an input/output error occurs
      */
-    public boolean hasUserDataPermission(Request request,
+    boolean hasUserDataPermission(Request request,
                                          Response response,
                                          SecurityConstraint []constraint)
         throws IOException;
@@ -222,7 +222,7 @@ public interface Realm extends Contained {
      *
      * @param listener The listener to remove
      */
-    public void removePropertyChangeListener(PropertyChangeListener listener);
+    void removePropertyChangeListener(PropertyChangeListener listener);
 
 
     /**
@@ -231,15 +231,14 @@ public interface Realm extends Contained {
      * @return principal roles
      * @deprecated This will be removed in Tomcat 10.
      */
-    @Deprecated
-    public String[] getRoles(Principal principal);
+    @Deprecated String[] getRoles(Principal principal);
 
 
     /**
      * Return the availability of the realm for authentication.
      * @return <code>true</code> if the realm is able to perform authentication
      */
-    public default boolean isAvailable() {
+    default boolean isAvailable() {
         return true;
     }
 }

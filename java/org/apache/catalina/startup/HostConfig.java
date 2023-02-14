@@ -1875,7 +1875,7 @@ public class HostConfig implements LifecycleListener {
         private ContextName cn;
         private File descriptor;
 
-        public DeployDescriptor(HostConfig config, ContextName cn,
+        DeployDescriptor(HostConfig config, ContextName cn,
                 File descriptor) {
             this.config = config;
             this.cn = cn;
@@ -1898,7 +1898,7 @@ public class HostConfig implements LifecycleListener {
         private ContextName cn;
         private File war;
 
-        public DeployWar(HostConfig config, ContextName cn, File war) {
+        DeployWar(HostConfig config, ContextName cn, File war) {
             this.config = config;
             this.cn = cn;
             this.war = war;
@@ -1920,7 +1920,7 @@ public class HostConfig implements LifecycleListener {
         private ContextName cn;
         private File dir;
 
-        public DeployDirectory(HostConfig config, ContextName cn, File dir) {
+        DeployDirectory(HostConfig config, ContextName cn, File dir) {
             this.config = config;
             this.cn = cn;
             this.dir = dir;
@@ -1962,7 +1962,7 @@ public class HostConfig implements LifecycleListener {
          *                 to be deleted
          * @param newDocBase The new docBase for the Context
          */
-        public ExpandedDirectoryRemovalListener(File toDelete, String newDocBase) {
+        ExpandedDirectoryRemovalListener(File toDelete, String newDocBase) {
             this.toDelete = toDelete;
             this.newDocBase = newDocBase;
         }

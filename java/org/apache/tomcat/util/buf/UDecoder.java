@@ -43,7 +43,7 @@ public final class UDecoder {
 
     private static class DecodeException extends CharConversionException {
         private static final long serialVersionUID = 1L;
-        public DecodeException(String s) {
+        DecodeException(String s) {
             super(s);
         }
 
@@ -283,7 +283,7 @@ public final class UDecoder {
      * @deprecated Unused. Will be removed in Tomcat 10
      */
     @Deprecated
-    public final String convert(String str, boolean query)
+    public String convert(String str, boolean query)
     {
         if (str == null) {
             return  null;

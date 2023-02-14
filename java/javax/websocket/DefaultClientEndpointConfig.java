@@ -68,7 +68,7 @@ final class DefaultClientEndpointConfig implements ClientEndpointConfig {
 
 
     @Override
-    public final Map<String, Object> getUserProperties() {
+    public Map<String, Object> getUserProperties() {
         return userProperties;
     }
 
