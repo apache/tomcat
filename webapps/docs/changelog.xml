@@ -172,6 +172,11 @@
       <add>
         Improvements to Korean translations. (woonsan)
       </add>
+      <update>
+        Update the packaged version of the Apache Tomcat Native Library to
+        1.2.36 to pick up the Windows binaries built with with OpenSSL 1.1.1t.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
