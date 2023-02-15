@@ -37,7 +37,7 @@ public class BeanELResolver extends ELResolver {
     private static final String CACHE_SIZE_PROP = "org.apache.el.BeanELResolver.CACHE_SIZE";
 
     static {
-        CACHE_SIZE = Integer.parseInt(System.getProperty(CACHE_SIZE_PROP, "1000"));
+        CACHE_SIZE = Integer.getInteger(CACHE_SIZE_PROP, 1000).intValue();
     }
 
     private final boolean readOnly;

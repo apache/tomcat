@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -45,7 +46,7 @@ public class FileResource extends AbstractResource {
     static {
         boolean isEBCDIC = false;
         try {
-            String encoding = System.getProperty("file.encoding");
+            String encoding = Charset.defaultCharset().displayName();
             if (encoding.contains("EBCDIC")) {
                 isEBCDIC = true;
             }
