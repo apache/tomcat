@@ -110,12 +110,9 @@ public class UriTemplate {
             return null;
         }
 
-        Iterator<Segment> candidateSegments =
-                candidate.getSegments().iterator();
         Iterator<Segment> targetSegments = segments.iterator();
 
-        while (candidateSegments.hasNext()) {
-            Segment candidateSegment = candidateSegments.next();
+        for (Segment candidateSegment : candidate.getSegments()) {
             Segment targetSegment = targetSegments.next();
 
             if (targetSegment.getParameterIndex() == -1) {
