@@ -121,6 +121,12 @@
         external web server. Based on code and ideas from pull request
         <pr>506</pr> provided by Max Fortun. (remm)
       </add>
+      <add>
+        <bug>66470</bug>: Add the Shared Address Space defined by RFC 6598
+        (100.64.0.0/10) to the regular expression used to identify internal
+        proxies for the <code>RemoteIpFilter</code> and
+        <code>RemoteIpValve</code>. (markt)
+      </add>
       <fix>
         <bug>66471</bug>: Fix JSessionId secure attribute missing When
         <code>RemoteIpFilter</code> determines that this request was submitted
