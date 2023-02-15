@@ -48,7 +48,7 @@ public class TestJaspicCallbackHandlerInAuthenticator {
 
     @Test
     public void testCustomCallbackHandlerCreation() throws Exception {
-        testCallbackHandlerCreation("org.apache.catalina.authenticator.TestCallbackHandlerImpl",
+        testCallbackHandlerCreation("org.apache.catalina.authenticator.TesterCallbackHandlerImpl",
                 TesterCallbackHandlerImpl.class);
     }
 
