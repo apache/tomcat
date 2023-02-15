@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 
@@ -1184,5 +1185,32 @@ public class TestRemoteIpValve {
             Assert.assertTrue(a.remove(entry));
         }
         Assert.assertTrue(a.isEmpty());
+    }
+
+    @Test
+    public void testInternalProxies() throws Exception {
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        Pattern internalProxiesPattern = Pattern.compile(remoteIpValve.getInternalProxies());
+
+        doTestPattern(internalProxiesPattern, "8.8.8.8", false);
+        doTestPattern(internalProxiesPattern, "100.62.0.0", false);
+        doTestPattern(internalProxiesPattern, "100.63.255.255", false);
+        doTestPattern(internalProxiesPattern, "100.64.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.65.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.68.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.72.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.88.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.95.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.102.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.110.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.126.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.127.255.255", true);
+        doTestPattern(internalProxiesPattern, "100.128.0.0", false);
+        doTestPattern(internalProxiesPattern, "100.130.0.0", false);
+    }
+
+    private void doTestPattern(Pattern pattern, String input, boolean expectedMatch) {
+        boolean match = pattern.matcher(input).matches();
+        Assert.assertEquals(input, Boolean.valueOf(expectedMatch), Boolean.valueOf(match));
     }
 }

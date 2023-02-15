@@ -27,6 +27,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -823,6 +824,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertTrue(setCookie.contains("Secure"));
         Assert.assertTrue(bug66471Servlet.isSecure.booleanValue());
     }
+
     public static class Bug66471Servlet extends HttpServlet {
         private static final long serialVersionUID = 1L;
         public Boolean isSecure;
@@ -831,5 +833,32 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
             req.getSession();
             isSecure = (Boolean) req.getAttribute(Globals.REMOTE_IP_FILTER_SECURE);
         }
+    }
+
+    @Test
+    public void testInternalProxies() throws Exception {
+        RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
+        Pattern internalProxiesPattern = remoteIpFilter.getInternalProxies();
+
+        doTestPattern(internalProxiesPattern, "8.8.8.8", false);
+        doTestPattern(internalProxiesPattern, "100.62.0.0", false);
+        doTestPattern(internalProxiesPattern, "100.63.255.255", false);
+        doTestPattern(internalProxiesPattern, "100.64.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.65.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.68.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.72.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.88.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.95.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.102.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.110.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.126.0.0", true);
+        doTestPattern(internalProxiesPattern, "100.127.255.255", true);
+        doTestPattern(internalProxiesPattern, "100.128.0.0", false);
+        doTestPattern(internalProxiesPattern, "100.130.0.0", false);
+    }
+
+    private void doTestPattern(Pattern pattern, String input, boolean expectedMatch) {
+        boolean match = pattern.matcher(input).matches();
+        Assert.assertEquals(input, Boolean.valueOf(expectedMatch), Boolean.valueOf(match));
     }
 }
