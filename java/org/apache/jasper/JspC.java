@@ -292,13 +292,8 @@ public class JspC extends Task implements Options {
                 } else {
                     jspc.execute();
                 }
-            } catch (JasperException je) {
-                System.err.println(je);
-                if (jspc.dieLevel != NO_DIE_LEVEL) {
-                    System.exit(jspc.dieLevel);
-                }
-            } catch (BuildException je) {
-                System.err.println(je);
+            } catch (JasperException | BuildException e) {
+                System.err.println(e);
                 if (jspc.dieLevel != NO_DIE_LEVEL) {
                     System.exit(jspc.dieLevel);
                 }

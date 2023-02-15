@@ -47,9 +47,7 @@ public class Async1 extends HttpServlet {
                     Thread.sleep(2*1000);
                     log.info("Dispatching to "+path);
                     actx.dispatch(path);
-                }catch (InterruptedException x) {
-                    log.error("Async1",x);
-                }catch (IllegalStateException x) {
+                }catch (InterruptedException | IllegalStateException x) {
                     log.error("Async1",x);
                 }
             }
