@@ -17,7 +17,6 @@
 package org.apache.catalina.ant.jmx;
 
 
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.management.MBeanAttributeInfo;
@@ -117,11 +116,9 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
         }
 
         if (resultproperty != null) {
-            Iterator<ObjectName> it = names.iterator();
             int oindex = 0;
             String pname = null;
-            while (it.hasNext()) {
-                ObjectName oname = it.next();
+            for (ObjectName oname : names) {
                 pname = resultproperty + "." + Integer.toString(oindex) + ".";
                 oindex++;
                 setProperty(pname + "Name", oname.toString());
