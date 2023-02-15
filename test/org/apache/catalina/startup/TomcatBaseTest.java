@@ -192,8 +192,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         tomcat.setBaseDir(catalinaBase.getAbsolutePath());
         tomcat.getHost().setAppBase(appBase.getAbsolutePath());
 
-        accessLogEnabled = Boolean.parseBoolean(
-            System.getProperty("tomcat.test.accesslog", "false"));
+        accessLogEnabled = Boolean.getBoolean("tomcat.test.accesslog");
         if (accessLogEnabled) {
             String accessLogDirectory = System
                     .getProperty("tomcat.test.reports");

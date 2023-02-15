@@ -42,25 +42,22 @@ public class StringCache {
     /**
      * Enabled ?
      */
-    protected static boolean byteEnabled = ("true".equals(System.getProperty(
-            "tomcat.util.buf.StringCache.byte.enabled", "false")));
+    protected static boolean byteEnabled = Boolean.getBoolean("tomcat.util.buf.StringCache.byte.enabled");
 
 
-    protected static boolean charEnabled = ("true".equals(System.getProperty(
-            "tomcat.util.buf.StringCache.char.enabled", "false")));
+    protected static boolean charEnabled = Boolean.getBoolean("tomcat.util.buf.StringCache.char.enabled");
 
 
-    protected static int trainThreshold = Integer.parseInt(System.getProperty(
-            "tomcat.util.buf.StringCache.trainThreshold", "20000"));
+    protected static int trainThreshold =
+            Integer.getInteger("tomcat.util.buf.StringCache.trainThreshold", 20000).intValue();
 
 
-    protected static int cacheSize = Integer.parseInt(System.getProperty(
-            "tomcat.util.buf.StringCache.cacheSize", "200"));
+    protected static int cacheSize =
+            Integer.getInteger("tomcat.util.buf.StringCache.cacheSize", 200).intValue();
 
 
     protected static final int maxStringSize =
-            Integer.parseInt(System.getProperty(
-                    "tomcat.util.buf.StringCache.maxStringSize", "128"));
+            Integer.getInteger("tomcat.util.buf.StringCache.maxStringSize", 128).intValue();
 
 
    /**
