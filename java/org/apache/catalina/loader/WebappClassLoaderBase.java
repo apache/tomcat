@@ -2137,10 +2137,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
 
         if (o instanceof Collection<?>) {
-            Iterator<?> iter = ((Collection<?>) o).iterator();
             try {
-                while (iter.hasNext()) {
-                    Object entry = iter.next();
+                for (Object entry : ((Collection<?>) o)) {
                     if (loadedByThisOrChild(entry)) {
                         return true;
                     }

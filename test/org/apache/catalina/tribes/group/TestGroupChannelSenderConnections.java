@@ -97,7 +97,7 @@ public class TestGroupChannelSenderConnections extends LoggingBaseTest {
     @Test
     public void testKeepAliveCount() throws Exception {
         log.info("Setting keep alive count to 0");
-        for (int i = 0; i < channels.length; i++) {
+        for (ManagedChannel channel : channels) {
             ReplicationTransmitter t = (ReplicationTransmitter)channels[0].getChannelSender();
             t.getTransport().setKeepAliveCount(0);
         }
@@ -107,7 +107,7 @@ public class TestGroupChannelSenderConnections extends LoggingBaseTest {
     @Test
     public void testKeepAliveTime() throws Exception {
         log.info("Setting keep alive count to 1 second");
-        for (int i = 0; i < channels.length; i++) {
+        for (ManagedChannel channel : channels) {
             ReplicationTransmitter t = (ReplicationTransmitter)channels[0].getChannelSender();
             t.getTransport().setKeepAliveTime(1000);
         }
