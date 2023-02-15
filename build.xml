@@ -1334,6 +1334,7 @@
     <copy todir="${tomcat.build}/webapps">
       <fileset dir="webapps">
         <include name="docs/images/**"/>
+        <include name="docs/META-INF/**"/>
         <include name="docs/WEB-INF/**"/>
         <include name="docs/appdev/*.txt"/>
         <include name="docs/appdev/sample/**"/>
