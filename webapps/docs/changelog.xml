@@ -165,6 +165,18 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>66429</bug>: Documentation. Limit access to the documentation web
+        application to localhost by default. (markt)
+      </fix>
+      <fix>
+        <bug>66429</bug>: Examples. Limit access to the exmaples web application
+        to localhost by default. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
