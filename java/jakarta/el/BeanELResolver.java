@@ -42,14 +42,12 @@ public class BeanELResolver extends ELResolver {
     private static final String CACHE_SIZE_PROP = "org.apache.el.BeanELResolver.CACHE_SIZE";
 
     static {
-        String cacheSizeStr;
         if (System.getSecurityManager() == null) {
-            cacheSizeStr = System.getProperty(CACHE_SIZE_PROP, "1000");
+            CACHE_SIZE = Integer.getInteger(CACHE_SIZE_PROP, 1000).intValue();
         } else {
-            cacheSizeStr = AccessController.doPrivileged(
-                    (PrivilegedAction<String>) () -> System.getProperty(CACHE_SIZE_PROP, "1000"));
+            CACHE_SIZE = AccessController.doPrivileged(
+                    (PrivilegedAction<Integer>) () -> Integer.getInteger(CACHE_SIZE_PROP, 1000)).intValue();
         }
-        CACHE_SIZE = Integer.parseInt(cacheSizeStr);
     }
 
     private final boolean readOnly;
