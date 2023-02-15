@@ -53,11 +53,7 @@ public class Async2 extends HttpServlet {
                     actx.getResponse().getWriter().write(
                             "Output from background thread. Time: " + sdf.format(date) + "\n");
                     actx.complete();
-                }catch (InterruptedException x) {
-                    log.error("Async2",x);
-                }catch (IllegalStateException x) {
-                    log.error("Async2",x);
-                }catch (IOException x) {
+                }catch (InterruptedException | IllegalStateException | IOException x) {
                     log.error("Async2",x);
                 }
             }

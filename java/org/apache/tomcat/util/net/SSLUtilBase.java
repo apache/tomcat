@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.net;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -218,8 +217,6 @@ public abstract class SSLUtilBase implements SSLUtil {
                 }
                 KeyStoreUtil.load(ks, istream, storePass);
             }
-        } catch (FileNotFoundException fnfe) {
-            throw fnfe;
         } catch (IOException ioe) {
             // May be expected when working with a trust store
             // Re-throw. Caller will catch and log as required
@@ -534,12 +531,8 @@ public abstract class SSLUtilBase implements SSLUtil {
             try (InputStream is = ConfigFileLoader.getSource().getResource(crlf).getInputStream()) {
                 crls = cf.generateCRLs(is);
             }
-        } catch(IOException iex) {
-            throw iex;
-        } catch(CRLException crle) {
-            throw crle;
-        } catch(CertificateException ce) {
-            throw ce;
+        } catch(IOException | CRLException | CertificateException e) {
+            throw e;
         }
         return crls;
     }
