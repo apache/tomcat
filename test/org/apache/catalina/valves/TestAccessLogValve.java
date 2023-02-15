@@ -33,13 +33,10 @@ public class TestAccessLogValve {
 
         final int cacheSize = 10;
 
-        SimpleDateFormat sdf =
-                new SimpleDateFormat("[dd/MMM/yyyy:HH:mm:ss Z]", Locale.US);
+        SimpleDateFormat sdf = new SimpleDateFormat("[dd/MMM/yyyy:HH:mm:ss Z]", Locale.US);
         sdf.setTimeZone(TimeZone.getDefault());
 
-        AccessLogValve.DateFormatCache dfc =
-                new AccessLogValve.DateFormatCache(
-                        cacheSize, Locale.US, null);
+        AccessLogValve.DateFormatCache dfc = new AccessLogValve.DateFormatCache(cacheSize, Locale.US, null);
 
         // Create an array to hold the expected values
         String[] expected = new String[cacheSize];
@@ -58,13 +55,13 @@ public class TestAccessLogValve {
         Assert.assertArrayEquals(expected, dfc.cLFCache.cache);
 
         // Jump 2 ahead and then confirm (skipped value should be null)
-        dfc.getFormat((cacheSize + 2)* 1000);
+        dfc.getFormat((cacheSize + 2) * 1000);
         expected[1] = null;
         expected[2] = generateExpected(sdf, cacheSize + 2);
         Assert.assertArrayEquals(expected, dfc.cLFCache.cache);
 
         // Back 1 to fill in the gap
-        dfc.getFormat((cacheSize + 1)* 1000);
+        dfc.getFormat((cacheSize + 1) * 1000);
         expected[1] = generateExpected(sdf, cacheSize + 1);
         Assert.assertArrayEquals(expected, dfc.cLFCache.cache);
 
