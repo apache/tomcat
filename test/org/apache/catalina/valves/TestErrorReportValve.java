@@ -58,8 +58,8 @@ public class TestErrorReportValve extends TomcatBaseTest {
         ByteChunk res = new ByteChunk();
         res.setCharset(StandardCharsets.UTF_8);
         getUrl("http://localhost:" + getPort(), res, null);
-        Assert.assertTrue(res.toString().contains("<p><b>" + sm.getString("errorReportValve.message") + "</b> " +
-            ErrorServlet.ERROR_TEXT + "</p>"));
+        Assert.assertTrue(res.toString().contains(
+                "<p><b>" + sm.getString("errorReportValve.message") + "</b> " + ErrorServlet.ERROR_TEXT + "</p>"));
     }
 
 
@@ -67,11 +67,10 @@ public class TestErrorReportValve extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
         private static final String ERROR_TEXT = "The wheels fell off.";
+
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
-            req.setAttribute(RequestDispatcher.ERROR_EXCEPTION,
-                    new Throwable(ERROR_TEXT));
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            req.setAttribute(RequestDispatcher.ERROR_EXCEPTION, new Throwable(ERROR_TEXT));
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -128,8 +127,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             if (setNotFound) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -170,8 +168,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         private static final String ERROR_MESSAGE = "The sky is falling";
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.sendError(ERROR_STATUS, ERROR_MESSAGE);
         }
     }
@@ -185,8 +182,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Bug56042Servlet bug56042Servlet = new Bug56042Servlet();
-        Wrapper wrapper =
-            Tomcat.addServlet(ctx, "bug56042Servlet", bug56042Servlet);
+        Wrapper wrapper = Tomcat.addServlet(ctx, "bug56042Servlet", bug56042Servlet);
         wrapper.setAsyncSupported(true);
         ctx.addServletMappingDecoded("/bug56042Servlet", "bug56042Servlet");
 
@@ -208,8 +204,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             // Only set the status on the first call (the dispatch will trigger
             // another call to this Servlet)
             if (resp.getStatus() != HttpServletResponse.SC_BAD_REQUEST) {
@@ -223,9 +218,9 @@ public class TestErrorReportValve extends TomcatBaseTest {
     private static final class ExceptionServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
+
         @Override
-        public void service(ServletRequest request, ServletResponse response)
-                throws IOException {
+        public void service(ServletRequest request, ServletResponse response) throws IOException {
             throw new RuntimeException();
         }
     }
@@ -234,9 +229,9 @@ public class TestErrorReportValve extends TomcatBaseTest {
     private static final class ErrorPageServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
+
         @Override
-        public void service(ServletRequest request, ServletResponse response)
-                throws IOException {
+        public void service(ServletRequest request, ServletResponse response) throws IOException {
             response.getWriter().print("OK");
         }
     }
