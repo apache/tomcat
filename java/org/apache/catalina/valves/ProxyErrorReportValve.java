@@ -89,8 +89,7 @@ public class ProxyErrorReportValve extends ErrorReportValve {
     }
 
     private String getRedirectUrl(Response response) {
-        ResourceBundle resourceBundle = ResourceBundle.getBundle(this.getClass().getSimpleName(),
-                response.getLocale());
+        ResourceBundle resourceBundle = ResourceBundle.getBundle(this.getClass().getSimpleName(), response.getLocale());
         String redirectUrl = null;
         try {
             redirectUrl = resourceBundle.getString(Integer.toString(response.getStatus()));
@@ -115,7 +114,7 @@ public class ProxyErrorReportValve extends ErrorReportValve {
         // Do nothing on a 1xx, 2xx and 3xx status
         // Do nothing if anything has been written already
         // Do nothing if the response hasn't been explicitly marked as in error
-        //    and that error has not been reported.
+        // and that error has not been reported.
         if (statusCode < 400 || response.getContentWritten() > 0) {
             return;
         }
@@ -155,7 +154,8 @@ public class ProxyErrorReportValve extends ErrorReportValve {
         }
         try {
             stringBuilder.append("requestUri=");
-            stringBuilder.append(URLEncoder.encode(request.getDecodedRequestURI(), request.getConnector().getURIEncoding()));
+            stringBuilder
+                    .append(URLEncoder.encode(request.getDecodedRequestURI(), request.getConnector().getURIEncoding()));
             stringBuilder.append("&statusCode=");
             stringBuilder.append(URLEncoder.encode(String.valueOf(statusCode), "UTF-8"));
         } catch (UnsupportedEncodingException e) {
