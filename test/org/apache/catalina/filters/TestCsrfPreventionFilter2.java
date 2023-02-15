@@ -24,8 +24,8 @@ import org.apache.catalina.filters.CsrfPreventionFilter.LruCache;
 public class TestCsrfPreventionFilter2 {
 
     /*
-     * When this test fails, it tends to enter a long running loop but it will
-     * eventually finish (after ~70s on a 8-core Windows box).
+     * When this test fails, it tends to enter a long running loop but it will eventually finish (after ~70s on a 8-core
+     * Windows box).
      */
     @Test
     public void testLruCacheConcurrency() throws Exception {
