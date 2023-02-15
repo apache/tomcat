@@ -441,7 +441,7 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * Determine if the matadata of the application is complete. This typically
+     * Determine if the metadata of the application is complete. This typically
      * means annotations which add to the application metadata will be
      * ignored.
      *
