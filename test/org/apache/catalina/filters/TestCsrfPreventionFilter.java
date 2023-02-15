@@ -31,35 +31,29 @@ import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestCsrfPreventionFilter extends TomcatBaseTest {
 
-    private static final String RESULT_NONCE =
-        Constants.CSRF_NONCE_SESSION_ATTR_NAME + "=TESTNONCE";
+    private static final String RESULT_NONCE = Constants.CSRF_NONCE_SESSION_ATTR_NAME + "=TESTNONCE";
 
-    private final HttpServletResponse wrapper =
-        new CsrfPreventionFilter.CsrfResponseWrapper(
-                new NonEncodingResponse(), Constants.CSRF_NONCE_SESSION_ATTR_NAME, "TESTNONCE");
+    private final HttpServletResponse wrapper = new CsrfPreventionFilter.CsrfResponseWrapper(new NonEncodingResponse(),
+            Constants.CSRF_NONCE_SESSION_ATTR_NAME, "TESTNONCE");
 
     @Test
     public void testAddNonceNoQueryNoAnchor() throws Exception {
-        Assert.assertEquals("/test?" + RESULT_NONCE ,
-                wrapper.encodeRedirectURL("/test"));
+        Assert.assertEquals("/test?" + RESULT_NONCE, wrapper.encodeRedirectURL("/test"));
     }
 
     @Test
     public void testAddNonceQueryNoAnchor() throws Exception {
-        Assert.assertEquals("/test?a=b&" + RESULT_NONCE ,
-                wrapper.encodeRedirectURL("/test?a=b"));
+        Assert.assertEquals("/test?a=b&" + RESULT_NONCE, wrapper.encodeRedirectURL("/test?a=b"));
     }
 
     @Test
     public void testAddNonceNoQueryAnchor() throws Exception {
-        Assert.assertEquals("/test?" + RESULT_NONCE + "#c",
-                wrapper.encodeRedirectURL("/test#c"));
+        Assert.assertEquals("/test?" + RESULT_NONCE + "#c", wrapper.encodeRedirectURL("/test#c"));
     }
 
     @Test
     public void testAddNonceQueryAnchor() throws Exception {
-        Assert.assertEquals("/test?a=b&" + RESULT_NONCE + "#c",
-                wrapper.encodeRedirectURL("/test?a=b#c"));
+        Assert.assertEquals("/test?a=b&" + RESULT_NONCE + "#c", wrapper.encodeRedirectURL("/test?a=b#c"));
     }
 
     @Test
@@ -76,8 +70,7 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         ObjectOutputStream oos = new ObjectOutputStream(baos);
         oos.writeObject(cache);
 
-        ByteArrayInputStream bais =
-            new ByteArrayInputStream(baos.toByteArray());
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         ObjectInputStream ois = new ObjectInputStream(bais);
         @SuppressWarnings("unchecked")
         LruCache<String> cache2 = (LruCache<String>) ois.readObject();

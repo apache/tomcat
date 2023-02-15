@@ -111,7 +111,7 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public Map<String,String[]> getParameterMap() {
+    public Map<String, String[]> getParameterMap() {
         throw new RuntimeException("Not implemented");
     }
 
@@ -379,8 +379,8 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public AsyncContext startAsync(ServletRequest servletRequest,
-            ServletResponse servletResponse) throws IllegalStateException {
+    public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse)
+            throws IllegalStateException {
         throw new RuntimeException("Not implemented");
     }
 
@@ -410,14 +410,12 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public boolean authenticate(HttpServletResponse response)
-            throws IOException, ServletException {
+    public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public void login(String username, String password)
-            throws ServletException {
+    public void login(String username, String password) throws ServletException {
         throw new RuntimeException("Not implemented");
     }
 
@@ -437,8 +435,8 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public <T extends HttpUpgradeHandler> T upgrade(
-            Class<T> httpUpgradeHandlerClass) throws IOException, ServletException {
+    public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass)
+            throws IOException, ServletException {
         throw new RuntimeException("Not implemented");
     }
 
