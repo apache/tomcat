@@ -36,7 +36,7 @@ public final class FastHttpDateFormat {
 
 
     private static final int CACHE_SIZE =
-        Integer.parseInt(System.getProperty("org.apache.tomcat.util.http.FastHttpDateFormat.CACHE_SIZE", "1000"));
+            Integer.getInteger("org.apache.tomcat.util.http.FastHttpDateFormat.CACHE_SIZE", 1000).intValue();
 
 
     /**
