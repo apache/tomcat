@@ -72,6 +72,7 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
+import org.apache.tomcat.util.net.SSLUtilBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 
@@ -1773,7 +1774,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                             SSLContext sslContext = sslHostConfigCert.getSslContext();
                             String alias = sslHostConfigCert.getCertificateKeyAlias();
                             if (alias == null) {
-                                alias = "tomcat";
+                                alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
                             }
                             X509Certificate[] certs = sslContext.getCertificateChain(alias);
                             if (certs == null) {
