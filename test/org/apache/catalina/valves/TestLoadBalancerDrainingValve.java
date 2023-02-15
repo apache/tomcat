@@ -49,22 +49,22 @@ public class TestLoadBalancerDrainingValve {
         String[] queryStrings = new String[] { null, "foo=bar" };
 
         List<Object[]> parameterSets = new ArrayList<>();
-            for (String jkActivation : jkActivations) {
-                for (Boolean validSessionId : booleans) {
-                    for (Boolean enableIgnore : booleans) {
-                        Boolean expectInvokeNext = Boolean.valueOf("ACT".equals(jkActivation) || enableIgnore.booleanValue() ||
-                                validSessionId.booleanValue());
-                        for (String queryString : queryStrings) {
-                            for (Boolean secureRequest : booleans) {
-                                for (Boolean secureSessionConfig : booleans) {
-                                    parameterSets.add(new Object[] { jkActivation, validSessionId, expectInvokeNext,
-                                            enableIgnore, queryString, secureRequest, secureSessionConfig});
-                                }
+        for (String jkActivation : jkActivations) {
+            for (Boolean validSessionId : booleans) {
+                for (Boolean enableIgnore : booleans) {
+                    Boolean expectInvokeNext = Boolean.valueOf(
+                            "ACT".equals(jkActivation) || enableIgnore.booleanValue() || validSessionId.booleanValue());
+                    for (String queryString : queryStrings) {
+                        for (Boolean secureRequest : booleans) {
+                            for (Boolean secureSessionConfig : booleans) {
+                                parameterSets.add(new Object[] { jkActivation, validSessionId, expectInvokeNext,
+                                        enableIgnore, queryString, secureRequest, secureSessionConfig });
                             }
                         }
                     }
                 }
             }
+        }
         return parameterSets;
     }
 
@@ -113,19 +113,22 @@ public class TestLoadBalancerDrainingValve {
         EasyMock.expect(ctx.getName()).andStubReturn("");
         EasyMock.expect(ctx.getPipeline()).andStubReturn(new StandardPipeline());
         EasyMock.expect(ctx.getDomain()).andStubReturn("foo");
-        EasyMock.expect(ctx.getLogger()).andStubReturn(org.apache.juli.logging.LogFactory.getLog(LoadBalancerDrainingValve.class));
+        EasyMock.expect(ctx.getLogger())
+                .andStubReturn(org.apache.juli.logging.LogFactory.getLog(LoadBalancerDrainingValve.class));
         EasyMock.expect(ctx.getServletContext()).andStubReturn(servletContext);
 
         // Set up the actual test
-        EasyMock.expect(request.getAttribute(LoadBalancerDrainingValve.ATTRIBUTE_KEY_JK_LB_ACTIVATION)).andStubReturn(jkActivation);
-        EasyMock.expect(Boolean.valueOf(request.isRequestedSessionIdValid())).andStubReturn(Boolean.valueOf(validSessionId));
+        EasyMock.expect(request.getAttribute(LoadBalancerDrainingValve.ATTRIBUTE_KEY_JK_LB_ACTIVATION))
+                .andStubReturn(jkActivation);
+        EasyMock.expect(Boolean.valueOf(request.isRequestedSessionIdValid()))
+                .andStubReturn(Boolean.valueOf(validSessionId));
 
         ArrayList<Cookie> cookies = new ArrayList<>();
-        if(enableIgnore) {
+        if (enableIgnore) {
             cookies.add(new Cookie("ignore", "true"));
         }
 
-        if(!validSessionId && jkActivation.equals("DIS")) {
+        if (!validSessionId && jkActivation.equals("DIS")) {
             MyCookie cookie = new MyCookie(cookieConfig.getName(), sessionId);
             cookie.setPath(cookieConfig.getPath());
             cookie.setValue(sessionId);
@@ -142,7 +145,8 @@ public class TestLoadBalancerDrainingValve {
             EasyMock.expect(ctx.getSessionCookiePath()).andStubReturn("/");
 
             if (!enableIgnore) {
-                EasyMock.expect(Boolean.valueOf(ctx.getSessionCookiePathUsesTrailingSlash())).andStubReturn(Boolean.TRUE);
+                EasyMock.expect(Boolean.valueOf(ctx.getSessionCookiePathUsesTrailingSlash()))
+                        .andStubReturn(Boolean.TRUE);
                 EasyMock.expect(request.getQueryString()).andStubReturn(queryString);
                 // Response will have cookie deleted
                 MyCookie expectedCookie = new MyCookie(cookieConfig.getName(), "");
@@ -155,8 +159,8 @@ public class TestLoadBalancerDrainingValve {
                 response.addCookie(expectedCookie);
                 EasyMock.expect(ctx.getSessionCookieName()).andReturn(sessionCookieName); // Indirect call
                 String expectedRequestURI = requestURI;
-                if(null != queryString) {
-                  expectedRequestURI = expectedRequestURI + '?' + queryString;
+                if (null != queryString) {
+                    expectedRequestURI = expectedRequestURI + '?' + queryString;
                 }
                 response.setHeader("Location", expectedRequestURI);
                 response.setStatus(307);
@@ -165,7 +169,7 @@ public class TestLoadBalancerDrainingValve {
 
         Valve next = control.createMock(Valve.class);
 
-        if(expectInvokeNext) {
+        if (expectInvokeNext) {
             // Expect the "next" Valve to fire
             // Next 2 lines are basically EasyMock.expect(next.invoke(req,res)) but for a void method
             next.invoke(request, response);
@@ -202,54 +206,67 @@ public class TestLoadBalancerDrainingValve {
         public String getName() {
             return name;
         }
+
         @Override
         public void setName(String name) {
             this.name = name;
         }
+
         @Override
         public String getDomain() {
             return domain;
         }
+
         @Override
         public void setDomain(String domain) {
             this.domain = domain;
         }
+
         @Override
         public String getPath() {
             return path;
         }
+
         @Override
         public void setPath(String path) {
             this.path = path;
         }
+
         @Override
         public String getComment() {
             return comment;
         }
+
         @Override
         public void setComment(String comment) {
             this.comment = comment;
         }
+
         @Override
         public boolean isHttpOnly() {
             return httpOnly;
         }
+
         @Override
         public void setHttpOnly(boolean httpOnly) {
             this.httpOnly = httpOnly;
         }
+
         @Override
         public boolean isSecure() {
             return secure;
         }
+
         @Override
         public void setSecure(boolean secure) {
             this.secure = secure;
         }
+
         @Override
         public int getMaxAge() {
             return maxAge;
         }
+
         @Override
         public void setMaxAge(int maxAge) {
             this.maxAge = maxAge;
@@ -261,19 +278,19 @@ public class TestLoadBalancerDrainingValve {
     private static class MyCookie extends Cookie {
         private static final long serialVersionUID = 1L;
 
-        MyCookie(String name, String value) { super(name, value); }
+        MyCookie(String name, String value) {
+            super(name, value);
+        }
 
         @Override
         public boolean equals(Object o) {
-            if(!(o instanceof MyCookie)) {
+            if (!(o instanceof MyCookie)) {
                 return false;
             }
 
-            MyCookie mc = (MyCookie)o;
-            return mc.getName().equals(this.getName())
-                && mc.getPath().equals(this.getPath())
-                && mc.getValue().equals(this.getValue())
-                && mc.getMaxAge() == this.getMaxAge();
+            MyCookie mc = (MyCookie) o;
+            return mc.getName().equals(this.getName()) && mc.getPath().equals(this.getPath()) &&
+                    mc.getValue().equals(this.getValue()) && mc.getMaxAge() == this.getMaxAge();
         }
 
         @Override
@@ -290,7 +307,8 @@ public class TestLoadBalancerDrainingValve {
 
         @Override
         public String toString() {
-            return "Cookie { name=" + getName() + ", value=" + getValue() + ", path=" + getPath() + ", maxAge=" + getMaxAge() + " }";
+            return "Cookie { name=" + getName() + ", value=" + getValue() + ", path=" + getPath() + ", maxAge=" +
+                    getMaxAge() + " }";
         }
     }
 }
