@@ -27,11 +27,9 @@ import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Convenience base class for implementations of the <b>Valve</b> interface.
- * A subclass <strong>MUST</strong> implement an <code>invoke()</code>
- * method to provide the required functionality, and <strong>MAY</strong>
- * implement the <code>Lifecycle</code> interface to provide configuration
- * management and lifecycle support.
+ * Convenience base class for implementations of the <b>Valve</b> interface. A subclass <strong>MUST</strong> implement
+ * an <code>invoke()</code> method to provide the required functionality, and <strong>MAY</strong> implement the
+ * <code>Lifecycle</code> interface to provide configuration management and lifecycle support.
  *
  * @author Craig R. McClanahan
  */
@@ -40,7 +38,7 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
     protected static final StringManager sm = StringManager.getManager(ValveBase.class);
 
 
-    //------------------------------------------------------ Constructor
+    // ------------------------------------------------------ Constructor
 
     public ValveBase() {
         this(false);
@@ -52,7 +50,7 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
     }
 
 
-    //------------------------------------------------------ Instance Variables
+    // ------------------------------------------------------ Instance Variables
 
     /**
      * Does this valve support Servlet 3+ async requests?
@@ -78,7 +76,7 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
     protected Valve next = null;
 
 
-    //-------------------------------------------------------------- Properties
+    // -------------------------------------------------------------- Properties
 
     /**
      * Return the Container with which this Valve is associated, if any.
@@ -112,8 +110,7 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
 
 
     /**
-     * Return the next Valve in this pipeline, or <code>null</code> if this
-     * is the last Valve in the pipeline.
+     * Return the next Valve in this pipeline, or <code>null</code> if this is the last Valve in the pipeline.
      */
     @Override
     public Valve getNext() {
@@ -132,12 +129,11 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
     }
 
 
-    //---------------------------------------------------------- Public Methods
+    // ---------------------------------------------------------- Public Methods
 
     /**
-     * Execute a periodic task, such as reloading, etc. This method will be
-     * invoked inside the classloading context of this container. Unexpected
-     * throwables will be caught and logged.
+     * Execute a periodic task, such as reloading, etc. This method will be invoked inside the classloading context of
+     * this container. Unexpected throwables will be caught and logged.
      */
     @Override
     public void backgroundProcess() {
@@ -153,11 +149,11 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
 
 
     /**
-     * Start this component and implement the requirements
-     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
+     * Start this component and implement the requirements of
+     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
+     *                                   used
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
@@ -166,11 +162,11 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
 
 
     /**
-     * Stop this component and implement the requirements
-     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
+     * Stop this component and implement the requirements of
+     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
+     *                                   used
      */
     @Override
     protected synchronized void stopInternal() throws LifecycleException {
@@ -195,7 +191,7 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
     }
 
 
-    // -------------------- JMX and Registration  --------------------
+    // -------------------- JMX and Registration --------------------
 
     @Override
     public String getObjectNameKeyProperties() {
@@ -222,7 +218,7 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
                 if (valve.getClass() == this.getClass()) {
                     // Duplicate valve earlier in pipeline
                     // increment sequence number
-                    seq ++;
+                    seq++;
                 }
             }
         }

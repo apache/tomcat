@@ -37,11 +37,9 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * Web crawlers can trigger the creation of many thousands of sessions as they
- * crawl a site which may result in significant memory consumption. This Valve
- * ensures that crawlers are associated with a single session - just like normal
- * users - regardless of whether or not they provide a session token with their
- * requests.
+ * Web crawlers can trigger the creation of many thousands of sessions as they crawl a site which may result in
+ * significant memory consumption. This Valve ensures that crawlers are associated with a single session - just like
+ * normal users - regardless of whether or not they provide a session token with their requests.
  */
 public class CrawlerSessionManagerValve extends ValveBase {
 
@@ -72,9 +70,8 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
 
     /**
-     * Specify the regular expression (using {@link Pattern}) that will be used
-     * to identify crawlers based in the User-Agent header provided. The default
-     * is ".*GoogleBot.*|.*bingbot.*|.*Yahoo! Slurp.*"
+     * Specify the regular expression (using {@link Pattern}) that will be used to identify crawlers based in the
+     * User-Agent header provided. The default is ".*GoogleBot.*|.*bingbot.*|.*Yahoo! Slurp.*"
      *
      * @param crawlerUserAgents The regular expression using {@link Pattern}
      */
@@ -89,7 +86,8 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
     /**
      * @see #setCrawlerUserAgents(String)
-     * @return  The current regular expression being used to match user agents.
+     *
+     * @return The current regular expression being used to match user agents.
      */
     public String getCrawlerUserAgents() {
         return crawlerUserAgents;
@@ -97,9 +95,8 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
 
     /**
-     * Specify the regular expression (using {@link Pattern}) that will be used
-     * to identify crawlers based on their IP address. The default is no crawler
-     * IPs.
+     * Specify the regular expression (using {@link Pattern}) that will be used to identify crawlers based on their IP
+     * address. The default is no crawler IPs.
      *
      * @param crawlerIps The regular expression using {@link Pattern}
      */
@@ -114,6 +111,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
     /**
      * @see #setCrawlerIps(String)
+     *
      * @return The current regular expression being used to match IP addresses.
      */
     public String getCrawlerIps() {
@@ -122,10 +120,10 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
 
     /**
-     * Specify the session timeout (in seconds) for a crawler's session. This is
-     * typically lower than that for a user session. The default is 60 seconds.
+     * Specify the session timeout (in seconds) for a crawler's session. This is typically lower than that for a user
+     * session. The default is 60 seconds.
      *
-     * @param sessionInactiveInterval   The new timeout for crawler sessions
+     * @param sessionInactiveInterval The new timeout for crawler sessions
      */
     public void setSessionInactiveInterval(int sessionInactiveInterval) {
         this.sessionInactiveInterval = sessionInactiveInterval;
@@ -133,7 +131,8 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
     /**
      * @see #setSessionInactiveInterval(int)
-     * @return  The current timeout in seconds
+     *
+     * @return The current timeout in seconds
      */
     public int getSessionInactiveInterval() {
         return sessionInactiveInterval;
@@ -182,8 +181,8 @@ public class CrawlerSessionManagerValve extends ValveBase {
         String clientIdentifier = getClientIdentifier(request.getHost(), request.getContext(), clientIp);
 
         if (log.isDebugEnabled()) {
-            log.debug(request.hashCode() + ": ClientIdentifier=" + clientIdentifier + ", RequestedSessionId="
-                    + request.getRequestedSessionId());
+            log.debug(request.hashCode() + ": ClientIdentifier=" + clientIdentifier + ", RequestedSessionId=" +
+                    request.getRequestedSessionId());
         }
 
         // If the incoming request has a valid session ID, no action is required
@@ -252,8 +251,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug(
-                            request.hashCode() + ": Bot session accessed. SessionID=" + sessionId);
+                    log.debug(request.hashCode() + ": Bot session accessed. SessionID=" + sessionId);
                 }
             }
         }
