@@ -90,7 +90,7 @@
         <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1500 errors -->
         <property name="checkFirstSentence" value="false"/>
         <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1400 errors -->
-        <property name="checkEmptyJavadoc" value="true"/>
+        <property name="checkEmptyJavadoc" value="false"/>
         <!-- Does not handle HTML tags in {@code ...} correctly -->
         <property name="checkHtml" value="false"/>
     </module>
