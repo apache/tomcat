@@ -37,7 +37,12 @@ public class Http11NioProtocol extends AbstractHttp11Protocol<NioChannel> {
 
 
     public Http11NioProtocol() {
-        super(new NioEndpoint());
+        this(new NioEndpoint());
+    }
+
+
+    public Http11NioProtocol(NioEndpoint endpoint) {
+        super(endpoint);
     }
 
 

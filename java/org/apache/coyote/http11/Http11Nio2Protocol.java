@@ -32,7 +32,12 @@ public class Http11Nio2Protocol extends AbstractHttp11Protocol<Nio2Channel> {
 
 
     public Http11Nio2Protocol() {
-        super(new Nio2Endpoint());
+        this(new Nio2Endpoint());
+    }
+
+
+    public Http11Nio2Protocol(Nio2Endpoint endpoint) {
+        super(endpoint);
     }
 
 
