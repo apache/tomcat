@@ -20,9 +20,8 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
+import java.net.StandardSocketOptions;
 import java.net.UnknownHostException;
-
-import org.apache.catalina.tribes.util.JreCompat;
 
 /**
  * A simple multicast test that replicates the core elements of Tomcat's
@@ -83,7 +82,7 @@ public class TesterMulticast {
         @Override
         public void run() {
             try (MulticastSocket s = new MulticastSocket(PORT)) {
-                JreCompat.getInstance().setSocketoptionIpMulticastLoop(s, true);
+                s.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, Boolean.valueOf(true));
                 s.joinGroup(new InetSocketAddress(INET_ADDRESS, 0), null);
                 DatagramPacket p = new DatagramPacket(new byte[4], 4);
                 p.setAddress(INET_ADDRESS);
@@ -110,7 +109,7 @@ public class TesterMulticast {
         @Override
         public void run() {
             try (MulticastSocket s = new MulticastSocket(PORT)) {
-                JreCompat.getInstance().setSocketoptionIpMulticastLoop(s, true);
+                s.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, Boolean.valueOf(true));
                 s.joinGroup(new InetSocketAddress(INET_ADDRESS, 0), null);
                 DatagramPacket p = new DatagramPacket(new byte[4], 4);
                 p.setAddress(INET_ADDRESS);

@@ -25,6 +25,7 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketTimeoutException;
+import java.net.StandardSocketOptions;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -34,7 +35,6 @@ import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.MessageListener;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
-import org.apache.catalina.tribes.util.JreCompat;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -220,7 +220,7 @@ public class McastServiceImpl extends MembershipProviderBase {
             socket = new MulticastSocket(port);
         }
         // Hint if we want disable loop back(local machine) messages
-        JreCompat.getInstance().setSocketoptionIpMulticastLoop(socket, !localLoopbackDisabled);
+        socket.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, Boolean.valueOf(!localLoopbackDisabled));
         if (mcastBindAddress != null) {
             if(log.isInfoEnabled()) {
                 log.info(sm.getString("mcastServiceImpl.setInterface", mcastBindAddress));
