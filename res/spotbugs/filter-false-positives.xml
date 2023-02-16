@@ -306,6 +306,11 @@
     <Bug code="DE" />
   </Match>
   <Match>
+    <!-- Unit test confirms public no-arg constructor is not required -->
+    <Class name="org.apache.catalina.ha.session.DeltaRequest$AttributeInfo" />
+    <Pattern code="SE_NO_SUITABLE_CONSTRUCTOR_FOR_EXTERNALIZATION" />
+  </Match>
+  <Match>
     <!-- False positive caused by additional method syncs -->
     <Class name="org.apache.catalina.ha.session.DeltaManager" />
     <Field name="receiverQueue" />
@@ -2006,6 +2011,15 @@
     <Bug pattern="RR_NOT_CHECKED"/>
   </Match>
   <Match>
+    <!-- Test class not intended to be serialized -->
+    <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI$NBWriteWithCloseServlet"/>
+    <Or>
+      <Field name="afterCloseLatch"/>
+      <Field name="beforeCloseLatch"/>
+    </Or>
+    <Bug pattern="SE_BAD_FIELD"/>
+  </Match>
+  <Match>
     <!-- Not single use -->
     <Class name="org.apache.catalina.startup.FastNonSecureRandom"/>
     <Or>
@@ -2251,11 +2265,14 @@
   </Match>
   <Match>
     <!-- Deliberate hack for the purposes of the test -->
-    <Class name="org.apache.coyote.http11.filters.TestChunkedInputFilter$BodyReadServlet"/>
-    <Or>
-      <Field name="countRead"/>
-      <Field name="exceptionDuringRead"/>
-    </Or>
+    <Class name="org.apache.coyote.TestIoTimeouts$EchoListener"/>
+    <Field name="t"/>
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.coyote.http11.filters.TestChunkedInputFilter$EchoHeaderServlet"/>
+    <Field name="exceptionDuringRead"/>
     <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
   </Match>
   <Match>
