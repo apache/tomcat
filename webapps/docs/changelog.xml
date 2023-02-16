@@ -169,6 +169,12 @@
         connections from timing out when using a Connector configured with
         <code>useAsyncIO=true</code> (the default). (markt)
       </fix>
+      <add>
+        Provided dedicated loggers
+        (<code>org.apache.tomcat.util.net.NioEndpoint.certificate</code> /
+        <code>org.apache.tomcat.util.net.Nio2Endpoint.certificate</code>) for
+        logging of configured TLS certificates. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
