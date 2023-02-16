@@ -22,12 +22,7 @@ import org.apache.tomcat.util.net.AprEndpoint;
 
 
 /**
- * Abstract the protocol implementation, including threading, etc.
- * Processor is single threaded and specific to stream-based protocols,
- * will not fit Jk protocols like JNI.
- *
- * @author Remy Maucherat
- * @author Costin Manolache
+ * HTTP/1.1 protocol implementation using APR/native.
  *
  * @deprecated  The APR/Native Connector will be removed in Tomcat 10.1.x
  *              onwards.
