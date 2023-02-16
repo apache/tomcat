@@ -157,9 +157,9 @@
         <code>useAsyncIO=true</code> (the default for NIO and NIO2). (markt)
       </fix>
       <add>
-        Provided dedicated loggers
         (<code>org.apache.tomcat.util.net.NioEndpoint.certificate</code> /
-        <code>org.apache.tomcat.util.net.Nio2Endpoint.certificate</code>) for
+        <code>org.apache.tomcat.util.net.Nio2Endpoint.certificate</code> /
+        <code>org.apache.tomcat.util.net.AprEndpoint.certificate</code>) for
         logging of configured TLS certificates. (markt)
       </add>
     </changelog>
