@@ -35,8 +35,8 @@ public interface SSL_set_info_callback$cb {
     static MemorySegment allocate(SSL_set_info_callback$cb fi, Arena scope) {
         return RuntimeHelper.upcallStub(SSL_set_info_callback$cb.class, fi, constants$21.SSL_set_info_callback$cb$FUNC, scope);
     }
-    static SSL_set_info_callback$cb ofAddress(MemorySegment addr, Arena scope) {
-        MemorySegment symbol = MemorySegment.ofAddress(addr.address(), 0, scope);
+    static SSL_set_info_callback$cb ofAddress(MemorySegment addr, Arena arena) {
+        MemorySegment symbol = addr.reinterpret(arena.scope(), null);
         return (java.lang.foreign.MemorySegment __x0, int __x1, int __x2) -> {
             try {
                 constants$21.SSL_set_info_callback$cb$MH.invokeExact(symbol, __x0, __x1, __x2);

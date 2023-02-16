@@ -35,8 +35,8 @@ public interface SSL_CTX_set_cert_verify_callback$cb {
     static MemorySegment allocate(SSL_CTX_set_cert_verify_callback$cb fi, Arena scope) {
         return RuntimeHelper.upcallStub(SSL_CTX_set_cert_verify_callback$cb.class, fi, constants$15.SSL_CTX_set_cert_verify_callback$cb$FUNC, scope);
     }
-    static SSL_CTX_set_cert_verify_callback$cb ofAddress(MemorySegment addr, Arena scope) {
-        MemorySegment symbol = MemorySegment.ofAddress(addr.address(), 0, scope);
+    static SSL_CTX_set_cert_verify_callback$cb ofAddress(MemorySegment addr, Arena arena) {
+        MemorySegment symbol = addr.reinterpret(arena.scope(), null);
         return (java.lang.foreign.MemorySegment __x0, java.lang.foreign.MemorySegment __x1) -> {
             try {
                 return (int)constants$15.SSL_CTX_set_cert_verify_callback$cb$MH.invokeExact(symbol, __x0, __x1);

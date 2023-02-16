@@ -35,8 +35,8 @@ public interface SSL_CTX_set_tmp_dh_callback$dh {
     static MemorySegment allocate(SSL_CTX_set_tmp_dh_callback$dh fi, Arena scope) {
         return RuntimeHelper.upcallStub(SSL_CTX_set_tmp_dh_callback$dh.class, fi, constants$21.SSL_CTX_set_tmp_dh_callback$dh$FUNC, scope);
     }
-    static SSL_CTX_set_tmp_dh_callback$dh ofAddress(MemorySegment addr, Arena scope) {
-        MemorySegment symbol = MemorySegment.ofAddress(addr.address(), 0, scope);
+    static SSL_CTX_set_tmp_dh_callback$dh ofAddress(MemorySegment addr, Arena arena) {
+        MemorySegment symbol = addr.reinterpret(arena.scope(), null);
         return (java.lang.foreign.MemorySegment __x0, int __x1, int __x2) -> {
             try {
                 return (java.lang.foreign.MemorySegment)constants$22.SSL_CTX_set_tmp_dh_callback$dh$MH.invokeExact(symbol, __x0, __x1, __x2);

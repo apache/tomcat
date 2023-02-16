@@ -794,7 +794,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             return SSL_TLSEXT_ERR_NOACK();
         }
         try (var localArena = Arena.ofConfined()) {
-            MemorySegment inSeg = MemorySegment.ofAddress(in.address(), inlen, localArena);
+            MemorySegment inSeg = in.reinterpret(inlen, localArena.scope(), null);
             byte[] advertisedBytes = inSeg.toArray(ValueLayout.JAVA_BYTE);
             for (byte[] negotiableProtocolBytes : state.negotiableProtocols) {
                 for (int i = 0; i <= advertisedBytes.length - negotiableProtocolBytes.length; i++) {
@@ -803,9 +803,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                             if (advertisedBytes[i + j] == negotiableProtocolBytes[j]) {
                                 if (j == negotiableProtocolBytes.length - 1) {
                                     // Match
-                                    MemorySegment outSeg = MemorySegment.ofAddress(out.address(), ValueLayout.ADDRESS.byteSize(), localArena);
+                                    MemorySegment outSeg = out.reinterpret(ValueLayout.ADDRESS.byteSize(), localArena.scope(), null);
                                     outSeg.set(ValueLayout.ADDRESS, 0, inSeg.asSlice(i));
-                                    MemorySegment outlenSeg = MemorySegment.ofAddress(outlen.address(), ValueLayout.JAVA_BYTE.byteSize(), localArena);
+                                    MemorySegment outlenSeg = outlen.reinterpret(ValueLayout.JAVA_BYTE.byteSize(), localArena.scope(), null);
                                     outlenSeg.set(ValueLayout.JAVA_BYTE, 0, (byte) negotiableProtocolBytes.length);
                                     return SSL_TLSEXT_ERR_OK();
                                 }
@@ -851,7 +851,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     continue;
                 }
                 MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
-                certificateChain[i] = MemorySegment.ofAddress(buf.address(), length, localArena).toArray(ValueLayout.JAVA_BYTE);
+                certificateChain[i] = buf.reinterpret(length, localArena.scope(), null).toArray(ValueLayout.JAVA_BYTE);
                 CRYPTO_free(buf, MemorySegment.NULL, 0); // OPENSSL_free macro
             }
             MemorySegment cipher = SSL_get_current_cipher(ssl);
@@ -965,7 +965,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     // The password is too long
                     log.error(sm.getString("openssl.passwordTooLong"));
                 } else {
-                    MemorySegment bufSegment = MemorySegment.ofAddress(buf.address(), bufsiz, localArena);
+                    MemorySegment bufSegment = buf.reinterpret(bufsiz, localArena.scope(), null);
                     bufSegment.copyFrom(callbackPasswordNative);
                     return (int) callbackPasswordNative.byteSize();
                 }
@@ -1383,9 +1383,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             this.negotiableProtocols = negotiableProtocols;
             // Use another arena to avoid keeping a reference through segments
             // This also allows making further accesses to the main pointers safer
-            this.sslCtx = MemorySegment.ofAddress(sslCtx.address(), ValueLayout.ADDRESS.byteSize(), stateArena);
+            this.sslCtx = sslCtx.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena.scope(), null);
             if (!MemorySegment.NULL.equals(confCtx)) {
-                this.confCtx = MemorySegment.ofAddress(confCtx.address(), ValueLayout.ADDRESS.byteSize(), stateArena);
+                this.confCtx = confCtx.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena.scope(), null);
             } else {
                 this.confCtx = null;
             }
