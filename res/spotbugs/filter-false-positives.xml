@@ -306,6 +306,11 @@
     <Bug code="DE" />
   </Match>
   <Match>
+    <!-- Unit test confirms public no-arg constructor is not required -->
+    <Class name="org.apache.catalina.ha.session.DeltaRequest$AttributeInfo" />
+    <Pattern code="SE_NO_SUITABLE_CONSTRUCTOR_FOR_EXTERNALIZATION" />
+  </Match>
+  <Match>
     <!-- False positive caused by additional method syncs -->
     <Class name="org.apache.catalina.ha.session.DeltaManager" />
     <Field name="receiverQueue" />
@@ -753,6 +758,12 @@
     <Class name="org.apache.catalina.tribes.transport.nio.NioSender"/>
     <Field name="current"/>
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
+  </Match>
+  <Match>
+    <!-- Not an issue. Initialisation is as intended. -->
+    <Class name="org.apache.catalina.tribes.util.JreCompat"/>
+    <Method name="&lt;clinit&gt;"/>
+    <Bug pattern="IC_SUPERCLASS_USES_SUBCLASS_DURING_INITIALIZATION" />
   </Match>
   <Match>
     <!-- Random is SecureRandom and will be used multiple times. -->
@@ -2249,6 +2260,12 @@
     <Class name="org.apache.catalina.webresources.TestStandardRoot" />
     <Method name="&lt;clinit&gt;" />
     <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.coyote.TestIoTimeouts$EchoListener"/>
+    <Field name="t"/>
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
   </Match>
   <Match>
     <!-- Deliberate hack for the purposes of the test -->
