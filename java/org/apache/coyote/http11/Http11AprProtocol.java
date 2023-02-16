@@ -38,7 +38,12 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
     private static final Log log = LogFactory.getLog(Http11AprProtocol.class);
 
     public Http11AprProtocol() {
-        super(new AprEndpoint());
+        this(new AprEndpoint());
+    }
+
+
+    public Http11AprProtocol(AprEndpoint endpoint) {
+        super(endpoint);
     }
 
 
