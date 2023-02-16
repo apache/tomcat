@@ -151,6 +151,13 @@
         <code>WINDOW_UPDATE</code> frame on an HTTP/2 connection where the flow
         control window for the overall connection has been exhausted. (markt)
       </fix>
+      <add>
+        Provided dedicated loggers
+        (<code>org.apache.tomcat.util.net.NioEndpoint.certificate</code> /
+        <code>org.apache.tomcat.util.net.Nio2Endpoint.certificate</code> /
+        <code>org.apache.tomcat.util.net.AprEndpoint.certificate</code>) for
+        logging of configured TLS certificates. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

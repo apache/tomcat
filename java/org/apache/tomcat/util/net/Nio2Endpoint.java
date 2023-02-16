@@ -59,6 +59,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
 
     private static final Log log = LogFactory.getLog(Nio2Endpoint.class);
+    private static final Log logCertificate = LogFactory.getLog(Nio2Endpoint.class.getName() + ".certificate");
     private static final Log logHandshake = LogFactory.getLog(Nio2Endpoint.class.getName() + ".handshake");
 
 
@@ -398,6 +399,12 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
     @Override
     protected Log getLog() {
         return log;
+    }
+
+
+    @Override
+    protected Log getLogCertificate() {
+        return logCertificate;
     }
 
 
