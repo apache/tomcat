@@ -30,6 +30,8 @@ import java.util.Random;
 public class RandomizedTextRewriteMap implements RewriteMap{
 
     protected static final StringManager sm = StringManager.getManager(RandomizedTextRewriteMap.class);
+
+    private static final Random random = new Random();
     private final Map<String,String> map = new HashMap<>();
 
     public RandomizedTextRewriteMap(String txtFilePath) {
@@ -46,7 +48,7 @@ public class RandomizedTextRewriteMap implements RewriteMap{
                     String value = keyValuePair[1];
                     if (value.contains("|")) {
                         String[] possibleValues = value.split("\\|");
-                        value = possibleValues[new Random().nextInt(possibleValues.length)];
+                        value = possibleValues[random.nextInt(possibleValues.length)];
                     }
                     map.put(key, value);
                 } else {
