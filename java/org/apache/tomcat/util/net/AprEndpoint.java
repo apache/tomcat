@@ -402,6 +402,12 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 } catch (Exception e) {
                     throw new IllegalArgumentException(e.getMessage(), e);
                 }
+                try {
+                    KeyManager[] kms = sslUtil.getKeyManagers();
+                    certificate.setCertificateKeyManager(OpenSSLUtil.chooseKeyManager(kms));
+                } catch (Exception e) {
+                    log.debug(sm.getString("endpoint.apr.keyManagerError"), e);
+                }
             } else {
                 SSLUtil sslUtil = new OpenSSLUtil(certificate);
                 KeyManager[] kms = sslUtil.getKeyManagers();
