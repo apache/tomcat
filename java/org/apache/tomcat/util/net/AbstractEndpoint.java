@@ -21,6 +21,10 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -46,6 +50,7 @@ import javax.net.ssl.SSLParameters;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.Acceptor.AcceptorState;
@@ -406,8 +411,8 @@ public abstract class AbstractEndpoint<S,U> {
                 throw new IllegalArgumentException(e.getMessage(), e);
             }
 
-            logCertificate(certificate);
             certificate.setSslContext(sslContext);
+            logCertificate(certificate);
         }
     }
 
@@ -433,8 +438,50 @@ public abstract class AbstractEndpoint<S,U> {
             trustStoreSource = sslHostConfig.getCaCertificatePath();
         }
 
-        getLog().info(sm.getString("endpoint.tls.info", getName(), sslHostConfig.getHostName(), certificate.getType(),
-                certificateSource, keyAlias, trustStoreSource));
+        getLogCertificate().info(sm.getString("endpoint.tls.info", getName(), sslHostConfig.getHostName(),
+                certificate.getType(), certificateSource, keyAlias, trustStoreSource));
+
+        if (getLogCertificate().isDebugEnabled()) {
+            String alias = certificate.getCertificateKeyAlias();
+            if (alias == null) {
+                alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
+            }
+            X509Certificate[] x509Certificates = certificate.getSslContext().getCertificateChain(alias);
+            if (x509Certificates != null && x509Certificates.length > 0) {
+                getLogCertificate().debug(generateCertificateDebug(x509Certificates[0]));
+            } else {
+                getLogCertificate().debug(sm.getString("endpoint.tls.cert.noCerts"));
+            }
+        }
+    }
+
+
+    protected String generateCertificateDebug(X509Certificate certificate) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n[");
+        try {
+            byte[] certBytes = certificate.getEncoded();
+            // SHA-256 fingerprint
+            sb.append("\nSHA-256 fingerprint: ");
+            MessageDigest sha512Digest = MessageDigest.getInstance("SHA-256");
+            sha512Digest.update(certBytes);
+            sb.append(HexUtils.toHexString(sha512Digest.digest()));
+            // SHA-256 fingerprint
+            sb.append("\nSHA-1 fingerprint: ");
+            MessageDigest sha1Digest = MessageDigest.getInstance("SHA-1");
+            sha1Digest.update(certBytes);
+            sb.append(HexUtils.toHexString(sha1Digest.digest()));
+        } catch (CertificateEncodingException e) {
+            getLogCertificate().warn(sm.getString("endpoint.tls.cert.encodingError"), e);
+        } catch (NoSuchAlgorithmException e) {
+            // Unreachable code
+            // All JREs are required to support SHA-1 and SHA-256
+            throw new RuntimeException(e);
+        }
+        sb.append("\n");
+        sb.append(certificate);
+        sb.append("\n]");
+        return sb.toString();
     }
 
     protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers,
@@ -1497,6 +1544,10 @@ public abstract class AbstractEndpoint<S,U> {
 
 
     protected abstract Log getLog();
+
+    protected Log getLogCertificate() {
+        return getLog();
+    }
 
     protected LimitLatch initializeConnectionLatch() {
         if (maxConnections==-1) {
