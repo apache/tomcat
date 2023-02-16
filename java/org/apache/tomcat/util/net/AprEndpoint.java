@@ -90,6 +90,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
     // -------------------------------------------------------------- Constants
 
     private static final Log log = LogFactory.getLog(AprEndpoint.class);
+    private static final Log logCertificate = LogFactory.getLog(AprEndpoint.class.getName() + ".certificate");
 
     // ----------------------------------------------------------------- Fields
 
@@ -474,8 +475,8 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 sslContext.addCertificate(certificate);
             }
 
-            logCertificate(certificate);
             certificate.setSslContext(sslContext);
+            logCertificate(certificate);
         }
 
         if (certificates.size() > 2) {
@@ -931,6 +932,12 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
     protected Log getLog() {
         return log;
     }
+
+    @Override
+    protected Log getLogCertificate() {
+        return logCertificate;
+    }
+
 
     // -------------------------------------------------- SocketInfo Inner Class
 
