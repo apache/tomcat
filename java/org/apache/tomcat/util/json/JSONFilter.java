@@ -34,12 +34,12 @@ public class JSONFilter {
          * MUST be escaped.
          */
         char[] chars = input.toCharArray();
-        StringBuffer escaped = null;
+        StringBuilder escaped = null;
         int lastUnescapedStart = 0;
         for (int i = 0; i < chars.length; i++) {
             if (chars[i] < 0x20 || chars[i] == 0x22 || chars[i] == 0x5c) {
                 if (escaped == null) {
-                    escaped = new StringBuffer(chars.length + 20);
+                    escaped = new StringBuilder(chars.length + 20);
                 }
                 if (lastUnescapedStart < i) {
                     escaped.append(input.subSequence(lastUnescapedStart, i));

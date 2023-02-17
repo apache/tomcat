@@ -296,7 +296,7 @@ public abstract class SSLUtilBase implements SSLUtil {
         char[] keyPassArray = keyPass.toCharArray();
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
-        if (kmf.getProvider().getInfo().indexOf("FIPS") != -1) {
+        if (kmf.getProvider().getInfo().contains("FIPS")) {
             // FIPS doesn't like ANY wrapping nor key manipulation.
             if (keyAlias != null) {
                 log.warn(sm.getString("sslUtilBase.aliasIgnored", keyAlias));
