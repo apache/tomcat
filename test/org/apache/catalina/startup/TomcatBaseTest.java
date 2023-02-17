@@ -525,7 +525,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                      h.hasMoreElements();) {
                     value.append(h.nextElement());
                     if (h.hasMoreElements()) {
-                        value.append(";");
+                        value.append(';');
                     }
                 }
                 out.println("HEADER:" + name + ": " + value);
@@ -548,7 +548,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                 for (int j = 0; j < m; j++) {
                     value.append(values[j]);
                     if (j < m - 1) {
-                        value.append(";");
+                        value.append(';');
                     }
                 }
                 out.println("PARAM/" + name + ": " + value);

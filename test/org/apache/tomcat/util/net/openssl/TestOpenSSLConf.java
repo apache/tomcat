@@ -111,17 +111,17 @@ public class TestOpenSSLConf extends TomcatBaseTest {
         Set<String> disabledProtocols = new HashSet<>(Arrays.asList(DISABLED_PROTOCOLS));
         StringBuilder sb = new StringBuilder();
         for (String protocol : DISABLED_PROTOCOLS) {
-            sb.append(",").append("-").append(protocol);
+            sb.append(',').append('-').append(protocol);
         }
         if (hasTLS13()) {
             // Also disable TLSv1.3
             for (String protocol : DISABLED_PROTOCOLS_TLS13) {
-                sb.append(",").append("-").append(protocol);
+                sb.append(',').append('-').append(protocol);
                 disabledProtocols.add(protocol);
             }
         }
         for (String protocol : ENABLED_PROTOCOLS) {
-            sb.append(",").append(protocol);
+            sb.append(',').append(protocol);
         }
         SSLHostConfig sslHostConfig = initOpenSSLConfCmd("Protocol", sb.substring(1));
         String[] protocols = sslHostConfig.getEnabledProtocols();

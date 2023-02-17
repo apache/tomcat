@@ -316,7 +316,7 @@ public final class Room {
                     String s = String.valueOf(p.getLastReceivedMessageId())
                             + "," + msg.toString();
                     if (i > 0) {
-                        sb.append("|");
+                        sb.append('|');
                     }
 
                     sb.append(s);

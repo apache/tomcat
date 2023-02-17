@@ -149,7 +149,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             buf.append(query);
             buf.append("; Delegate=");
             buf.append(delegate);
-            buf.append("]");
+            buf.append(']');
             return buf.toString();
         }
     }

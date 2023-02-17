@@ -118,7 +118,7 @@ public class TestResponse extends TomcatBaseTest {
         String contentType = getSingleHeader("Content-Type", responseHeaders);
         StringBuilder expected = new StringBuilder("text/plain;");
         if (withSpace) {
-            expected.append(" ");
+            expected.append(' ');
         }
         expected.append("v=1;charset=UTF-8");
         Assert.assertEquals(expected.toString() , contentType);

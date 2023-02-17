@@ -284,11 +284,11 @@ public class TestMediaType {
         public String toString(String lws) {
             StringBuilder sb = new StringBuilder();
             sb.append(lws);
-            sb.append(";");
+            sb.append(';');
             sb.append(lws);
             sb.append(name);
             sb.append(lws);
-            sb.append("=");
+            sb.append('=');
             sb.append(lws);
             sb.append(value);
             sb.append(lws);

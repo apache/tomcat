@@ -148,9 +148,9 @@ public class ProxyErrorReportValve extends ErrorReportValve {
 
         StringBuilder stringBuilder = new StringBuilder(urlString);
         if (urlString.indexOf("?") > -1) {
-            stringBuilder.append("&");
+            stringBuilder.append('&');
         } else {
-            stringBuilder.append("?");
+            stringBuilder.append('?');
         }
         try {
             stringBuilder.append("requestUri=");

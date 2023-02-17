@@ -139,8 +139,8 @@ public class BioSender extends AbstractSender {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder("DataSender[(");
-        buf.append(super.toString()).append(")");
-        buf.append(getAddress()).append(":").append(getPort()).append("]");
+        buf.append(super.toString()).append(')');
+        buf.append(getAddress()).append(':').append(getPort()).append(']');
         return buf.toString();
     }
 

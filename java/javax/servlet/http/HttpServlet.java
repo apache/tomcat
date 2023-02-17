@@ -437,7 +437,7 @@ public abstract class HttpServlet extends GenericServlet {
         int responseLength;
 
         String CRLF = "\r\n";
-        StringBuilder buffer = new StringBuilder("TRACE ").append(req.getRequestURI()).append(" ")
+        StringBuilder buffer = new StringBuilder("TRACE ").append(req.getRequestURI()).append(' ')
                 .append(req.getProtocol());
 
         Enumeration<String> reqHeaderNames = req.getHeaderNames();
