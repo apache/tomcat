@@ -16,10 +16,10 @@
  */
 package org.apache.tomcat.util.digester;
 
+import java.util.Arrays;
+
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.xml.sax.Attributes;
-
-import java.util.Arrays;
 
 /**
  * <p>Rule implementation that calls a method on an object on the stack
