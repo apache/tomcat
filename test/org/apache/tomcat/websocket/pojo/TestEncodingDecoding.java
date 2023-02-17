@@ -660,11 +660,11 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         @Override
         public String encode(List<String> str) throws EncodeException {
             StringBuffer sbuf = new StringBuffer();
-            sbuf.append("[");
+            sbuf.append('[');
             for (String s: str){
-                sbuf.append(s).append(",");
+                sbuf.append(s).append(',');
             }
-            sbuf.deleteCharAt(sbuf.lastIndexOf(",")).append("]");
+            sbuf.deleteCharAt(sbuf.lastIndexOf(",")).append(']');
             return sbuf.toString();
         }
     }

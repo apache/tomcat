@@ -1243,11 +1243,11 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         @Override
         public void onSwallowedUnknownFrame(int streamId, int frameTypeId, int flags, int size) {
             trace.append(streamId);
-            trace.append(",");
+            trace.append(',');
             trace.append(frameTypeId);
-            trace.append(",");
+            trace.append(',');
             trace.append(flags);
-            trace.append(",");
+            trace.append(',');
             trace.append(size);
             trace.append("\n");
         }

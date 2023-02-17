@@ -398,7 +398,7 @@ public class AjpMessage {
         StringBuilder sb = new StringBuilder();
         for (int i = start; i < start + 16 ; i++) {
             if (i < len + 4) {
-                sb.append(hex(buf[i])).append(" ");
+                sb.append(hex(buf[i])).append(' ');
             } else {
                 sb.append("   ");
             }

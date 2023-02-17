@@ -5546,7 +5546,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     parent = parent.getParent();
                 }
                 while (!stk.isEmpty()) {
-                    buff.append("/").append(stk.remove());
+                    buff.append('/').append(stk.remove());
                 }
                 buff.append(getName());
                 namingContextName = buff.toString();

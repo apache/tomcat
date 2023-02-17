@@ -949,7 +949,7 @@ public class Catalina {
     protected void generateLoader() {
         String loaderClassName = "DigesterGeneratedCodeLoader";
         StringBuilder code = new StringBuilder();
-        code.append("package ").append(generatedCodePackage).append(";").append(System.lineSeparator());
+        code.append("package ").append(generatedCodePackage).append(';').append(System.lineSeparator());
         code.append("public class ").append(loaderClassName);
         code.append(" implements org.apache.tomcat.util.digester.Digester.GeneratedCodeLoader {").append(System.lineSeparator());
         code.append("public Object loadGeneratedCode(String className) {").append(System.lineSeparator());
@@ -972,7 +972,7 @@ public class Catalina {
 
     protected void generateClassHeader(Digester digester, boolean start) {
         StringBuilder code = digester.getGeneratedCode();
-        code.append("package ").append(generatedCodePackage).append(";").append(System.lineSeparator());
+        code.append("package ").append(generatedCodePackage).append(';').append(System.lineSeparator());
         code.append("public class ServerXml");
         if (!start) {
             code.append("Stop");

@@ -388,7 +388,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
             buf.append(prepareCount);
             buf.append(", prepareTime:");
             buf.append(prepareTime);
-            buf.append("]");
+            buf.append(']');
             return buf.toString();
         }
 
