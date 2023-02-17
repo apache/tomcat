@@ -377,7 +377,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                                     // really checking here is that it does not
                                     // return true.
                                     result.append(req.isAsyncStarted());
-                                } catch (NullPointerException npe) {
+                                } catch (IllegalStateException ise) {
                                     result.append("false");
                                 }
                                 done = true;
