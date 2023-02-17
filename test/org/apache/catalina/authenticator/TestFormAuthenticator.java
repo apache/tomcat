@@ -465,7 +465,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
 
             // build the HTTP request while assembling the uri
             StringBuilder requestHead = new StringBuilder(128);
-            requestHead.append(method).append(" ");
+            requestHead.append(method).append(' ');
             if (isFullQualUri) {
                 requestHead.append(resourceUri);
             } else {
@@ -499,7 +499,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
                 if (sessionId != null) {
                     requestHead.append("Cookie: ")
                             .append(SESSION_COOKIE_NAME)
-                            .append("=").append(sessionId).append(CRLF);
+                            .append('=').append(sessionId).append(CRLF);
                 }
             }
 

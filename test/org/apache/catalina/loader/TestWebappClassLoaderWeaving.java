@@ -394,7 +394,7 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
             for (int i = 0, b = input.read(); b >= 0; i++, b = input.read()) {
                 String value = "" + ((byte)b);
                 if (builder.length() + value.length() > 97) {
-                    builder.append(",");
+                    builder.append(',');
                     System.out.println(builder.toString());
                     builder = new StringBuilder();
                     builder.append("            ").append(value);

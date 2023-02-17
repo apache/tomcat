@@ -236,7 +236,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         String extName = ";foo=";
         StringBuilder extValue = new StringBuilder(len);
         for (int i = 0; i < (len - extName.length()); i++) {
-            extValue.append("x");
+            extValue.append('x');
         }
 
         String[] request = new String[]{
