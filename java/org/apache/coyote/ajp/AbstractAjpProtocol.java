@@ -182,11 +182,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     private int packetSize = Constants.MAX_PACKET_SIZE;
     public int getPacketSize() { return packetSize; }
     public void setPacketSize(int packetSize) {
-        if (packetSize < Constants.MAX_PACKET_SIZE) {
-            this.packetSize = Constants.MAX_PACKET_SIZE;
-        } else {
-            this.packetSize = packetSize;
-        }
+        this.packetSize = Math.max(packetSize, Constants.MAX_PACKET_SIZE);
     }
 
 

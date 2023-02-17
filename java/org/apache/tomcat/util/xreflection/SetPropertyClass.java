@@ -118,10 +118,8 @@ final class SetPropertyClass implements Comparable<SetPropertyClass> {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("SetPropertyClass{");
-        sb.append("clazz=").append(clazz.getName());
-        sb.append('}');
-        return sb.toString();
+        return "SetPropertyClass{" + "clazz=" + clazz.getName() +
+            '}';
     }
 
     public void addProperty(ReflectionProperty property) {
