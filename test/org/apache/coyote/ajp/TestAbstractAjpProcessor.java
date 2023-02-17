@@ -235,12 +235,12 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             boolean sep = false;
             for (String name: params.keySet()) {
                 if (sep) {
-                    query.append("&");
+                    query.append('&');
                 } else {
                     sep = true;
                 }
                 query.append(name);
-                query.append("=");
+                query.append('=');
                 query.append(params.get(name));
             }
             forwardMessage.addAttribute(0x05, query.toString());

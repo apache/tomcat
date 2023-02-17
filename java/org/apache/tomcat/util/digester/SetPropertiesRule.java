@@ -104,7 +104,7 @@ public class SetPropertiesRule extends Rule {
                     }
                 } else {
                     if (code != null) {
-                        code.append(variableName).append(".").append(actualMethod).append(';');
+                        code.append(variableName).append('.').append(actualMethod).append(';');
                         code.append(System.lineSeparator());
                     }
                 }

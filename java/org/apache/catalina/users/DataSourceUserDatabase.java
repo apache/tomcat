@@ -948,7 +948,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             StringBuilder temp = new StringBuilder("SELECT ");
             temp.append(userCredCol);
             if (userFullNameCol != null) {
-                temp.append(",").append(userFullNameCol);
+                temp.append(',').append(userFullNameCol);
             }
             temp.append(" FROM ");
             temp.append(userTable);
@@ -994,7 +994,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 temp = new StringBuilder("SELECT ");
                 temp.append(groupNameCol);
                 if (roleAndGroupDescriptionCol != null) {
-                    temp.append(",").append(roleAndGroupDescriptionCol);
+                    temp.append(',').append(roleAndGroupDescriptionCol);
                 }
                 temp.append(" FROM ");
                 temp.append(groupTable);
@@ -1015,7 +1015,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 temp = new StringBuilder("SELECT ");
                 temp.append(roleNameCol);
                 if (roleAndGroupDescriptionCol != null) {
-                    temp.append(",").append(roleAndGroupDescriptionCol);
+                    temp.append(',').append(roleAndGroupDescriptionCol);
                 }
                 temp.append(" FROM ");
                 temp.append(roleTable);

@@ -182,7 +182,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
             StringBuilder buf = new StringBuilder();
             buf.append(host[i++] & 0xff);
             for (; i < host.length; i++) {
-                buf.append(".").append(host[i] & 0xff);
+                buf.append('.').append(host[i] & 0xff);
             }
 
             byte[] id = md5.digest(buf.toString().getBytes());

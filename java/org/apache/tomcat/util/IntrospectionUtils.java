@@ -491,15 +491,14 @@ public final class IntrospectionUtils {
             if (log.isDebugEnabled()) {
                 // debug
                 StringBuilder sb = new StringBuilder();
-                sb.append(target.getClass().getName()).append('.')
-                        .append(methodN).append("( ");
+                sb.append(target.getClass().getName()).append('.').append(methodN).append('(');
                 for (int i = 0; i < params.length; i++) {
                     if (i > 0) {
                         sb.append(", ");
                     }
                     sb.append(params[i]);
                 }
-                sb.append(")");
+                sb.append(')');
                 log.debug("IntrospectionUtils:" + sb.toString());
             }
             return o;

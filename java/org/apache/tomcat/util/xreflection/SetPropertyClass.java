@@ -198,7 +198,7 @@ final class SetPropertyClass implements Comparable<SetPropertyClass> {
 
         //end switch statement
         code.append(ReflectionLessCodeGenerator.getIndent(2))
-            .append("}")
+            .append('}')
             .append(System.lineSeparator());
 
         //we have a generic setProperty(String, String) method, invoke it
@@ -222,7 +222,7 @@ final class SetPropertyClass implements Comparable<SetPropertyClass> {
                .append("return true;")
                .append(System.lineSeparator())
                .append(ReflectionLessCodeGenerator.getIndent(2))
-               .append("}")
+               .append('}')
                .append(System.lineSeparator());
         }
 
@@ -232,7 +232,7 @@ final class SetPropertyClass implements Comparable<SetPropertyClass> {
             .append(getSetPropertyForExitStatement())
             .append(System.lineSeparator())
             .append(ReflectionLessCodeGenerator.getIndent(1))
-            .append("}");
+            .append('}');
 
         return code.toString();
     }
@@ -265,7 +265,7 @@ final class SetPropertyClass implements Comparable<SetPropertyClass> {
         for (String s : classParts) {
             methodInvocation.append(IntrospectionUtils.capitalize(s));
         }
-        methodInvocation.append("(")
+        methodInvocation.append('(')
         .append(OBJECT_VAR_NAME)
             .append(", ")
             .append(NAME_VAR_NAME)
@@ -318,7 +318,7 @@ final class SetPropertyClass implements Comparable<SetPropertyClass> {
         for (String s : classParts) {
             methodInvocation.append(IntrospectionUtils.capitalize(s));
         }
-        methodInvocation.append("(")
+        methodInvocation.append('(')
             .append(OBJECT_VAR_NAME)
             .append(", ")
             .append(NAME_VAR_NAME)
@@ -389,7 +389,7 @@ final class SetPropertyClass implements Comparable<SetPropertyClass> {
 
         //end switch statement
         code.append(ReflectionLessCodeGenerator.getIndent(2))
-            .append("}")
+            .append('}')
             .append(System.lineSeparator());
 
         //invoke parent or return null
@@ -401,7 +401,7 @@ final class SetPropertyClass implements Comparable<SetPropertyClass> {
             .append(getGetPropertyForExitStatement())
             .append(System.lineSeparator())
             .append(ReflectionLessCodeGenerator.getIndent(2))
-            .append("}")
+            .append('}')
             .append(System.lineSeparator())
             ;
 
@@ -421,14 +421,14 @@ final class SetPropertyClass implements Comparable<SetPropertyClass> {
                 .append(generateGetPropertyMethod(p))
                 .append(System.lineSeparator())
                 .append(ReflectionLessCodeGenerator.getIndent(2))
-                .append("}")
+                .append('}')
                 .append(System.lineSeparator());
         }
         code.append(ReflectionLessCodeGenerator.getIndent(2))
             .append("return result;")
             .append(System.lineSeparator())
             .append(ReflectionLessCodeGenerator.getIndent(1))
-            .append("}")
+            .append('}')
             .append(System.lineSeparator());
 
 

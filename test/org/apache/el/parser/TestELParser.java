@@ -186,13 +186,13 @@ public class TestELParser {
         StringBuilder expr = new StringBuilder();
         expr.append("${");
         for (int i = 0; i < parenthesesCount; i++) {
-            expr.append("(");
+            expr.append('(');
         }
         expr.append(innerExpr);
         for (int i = 0; i < parenthesesCount; i++) {
-            expr.append(")");
+            expr.append(')');
         }
-        expr.append("}");
+        expr.append('}');
         ValueExpression ve = factory.createValueExpression(
                 context, expr.toString(), String.class);
 

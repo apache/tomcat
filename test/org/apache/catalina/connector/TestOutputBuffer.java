@@ -164,7 +164,7 @@ public class TestOutputBuffer extends TomcatBaseTest{
         // Create test data. This is carefully constructed to trigger the edge
         // case. Small variations may cause the test to miss the edge case.
         StringBuffer sb = new StringBuffer();
-        sb.append("a");
+        sb.append('a');
 
         for (int i = 0x10000; i < 0x11000; i++) {
             char[] chars = Character.toChars(i);

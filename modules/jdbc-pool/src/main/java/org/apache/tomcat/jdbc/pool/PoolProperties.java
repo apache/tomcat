@@ -838,7 +838,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                         continue;
                     }
                     buf.append(field);
-                    buf.append("=");
+                    buf.append('=');
                     if (DataSourceFactory.PROP_PASSWORD.equals(field)) {
                         buf.append("********");
                     } else {
