@@ -46,8 +46,7 @@ public class ListELResolver extends ELResolver {
             List<?> list = (List<?>) base;
             int idx = coerce(property);
             if (idx < 0 || idx >= list.size()) {
-                throw new PropertyNotFoundException(
-                        new ArrayIndexOutOfBoundsException(idx).getMessage());
+                throw new PropertyNotFoundException(new ArrayIndexOutOfBoundsException(idx).getMessage());
             }
             return Object.class;
         }
@@ -73,8 +72,7 @@ public class ListELResolver extends ELResolver {
     }
 
     @Override
-    public void setValue(ELContext context, Object base, Object property,
-            Object value) {
+    public void setValue(ELContext context, Object base, Object property, Object value) {
         Objects.requireNonNull(context);
 
         if (base instanceof List<?>) {
@@ -83,8 +81,8 @@ public class ListELResolver extends ELResolver {
             List<Object> list = (List<Object>) base;
 
             if (this.readOnly) {
-                throw new PropertyNotWritableException(Util.message(context,
-                        "resolverNotWritable", base.getClass().getName()));
+                throw new PropertyNotWritableException(
+                        Util.message(context, "resolverNotWritable", base.getClass().getName()));
             }
 
             int idx = coerce(property);
@@ -108,9 +106,7 @@ public class ListELResolver extends ELResolver {
             try {
                 int idx = coerce(property);
                 if (idx < 0 || idx >= list.size()) {
-                    throw new PropertyNotFoundException(
-                            new ArrayIndexOutOfBoundsException(idx)
-                                    .getMessage());
+                    throw new PropertyNotFoundException(new ArrayIndexOutOfBoundsException(idx).getMessage());
                 }
             } catch (IllegalArgumentException e) {
                 // ignore
@@ -147,7 +143,6 @@ public class ListELResolver extends ELResolver {
         if (property instanceof String) {
             return Integer.parseInt((String) property);
         }
-        throw new IllegalArgumentException(property != null ?
-                property.toString() : "null");
+        throw new IllegalArgumentException(property != null ? property.toString() : "null");
     }
 }
