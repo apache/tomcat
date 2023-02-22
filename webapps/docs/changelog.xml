@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0-M4 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Add support for <code>txt:</code> and <code>rnd:</code> rewrite map
+        types from mod_rewrite. Based on a pull request <pr>591</pr>
+        provided by Dimitrios Soumis. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M3 (markt)" rtext="release in progress">
   <subsection name="General">
