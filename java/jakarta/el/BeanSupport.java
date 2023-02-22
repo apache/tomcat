@@ -27,6 +27,17 @@ abstract class BeanSupport {
     private static final BeanSupport beanSupport;
 
     static {
+        // Only intended for unit tests. Not intended to be part of public API.
+        boolean doNotCacheInstance = Boolean.getBoolean("jakarta.el.BeanSupport.doNotCacheInstance");
+        if (doNotCacheInstance) {
+            beanSupport = null;
+        } else {
+            beanSupport = createInstance();
+        }
+    }
+
+    private static BeanSupport createInstance() {
+        // Only intended for unit tests. Not intended to be part of public API.
         boolean useFull = !Boolean.getBoolean("jakarta.el.BeanSupport.useStandalone");
 
         if (useFull) {
@@ -40,14 +51,17 @@ abstract class BeanSupport {
         }
         if (useFull) {
             // The full implementation provided by the java.beans package
-            beanSupport = new BeanSupportFull();
+            return new BeanSupportFull();
         } else {
             // The cut-down local implementation that does not depend on the java.beans package
-            beanSupport = new BeanSupportStandalone();
+            return new BeanSupportStandalone();
         }
     }
 
     static BeanSupport getInstance() {
+        if (beanSupport == null) {
+            return createInstance();
+        }
         return beanSupport;
     }
 

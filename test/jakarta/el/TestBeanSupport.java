@@ -22,7 +22,7 @@ import jakarta.el.BeanELResolver.BeanProperty;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class BeanSupportBaseTest {
+public class TestBeanSupport extends ELBaseTest {
 
     @Test
     public void testSimpleBean() {
