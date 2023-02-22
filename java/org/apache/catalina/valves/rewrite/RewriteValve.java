@@ -607,7 +607,6 @@ public class RewriteValve extends ValveBase {
                 return rule;
             } else if (token.equals("RewriteMap")) {
                 // RewriteMap name rewriteMapClassName whateverOptionalParameterInWhateverFormat
-                // FIXME: Possibly implement more special maps from https://httpd.apache.org/docs/2.4/rewrite/rewritemap.html
                 if (tokenizer.countTokens() < 2) {
                     throw new IllegalArgumentException(sm.getString("rewriteValve.invalidLine", line));
                 }
@@ -616,6 +615,10 @@ public class RewriteValve extends ValveBase {
                 RewriteMap map = null;
                 if (rewriteMapClassName.startsWith("int:")) {
                     map = InternalRewriteMap.toMap(rewriteMapClassName.substring("int:".length()));
+                } else if (rewriteMapClassName.startsWith("txt:")) {
+                    map = new RandomizedTextRewriteMap(rewriteMapClassName.substring("txt:".length()), false);
+                } else if (rewriteMapClassName.startsWith("rnd:")) {
+                    map = new RandomizedTextRewriteMap(rewriteMapClassName.substring("rnd:".length()), true);
                 } else if (rewriteMapClassName.startsWith("prg:")) {
                     rewriteMapClassName = rewriteMapClassName.substring("prg:".length());
                 }
