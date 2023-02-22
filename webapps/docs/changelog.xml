@@ -114,6 +114,17 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        Provide an implementation of the sub-set of JavaBeans support that does
+        not depend on the <code>java.beans</code> package. This for use by
+        Expression Language when the <code>java.desktop</code> module (which is
+        where the <code>java.beans</code> package resides) is not available.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M3 (markt)" rtext="release in progress">
   <subsection name="General">
