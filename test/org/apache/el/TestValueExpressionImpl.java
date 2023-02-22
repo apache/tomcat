@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.el.ELBaseTest;
 import jakarta.el.ELContext;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.ValueExpression;
@@ -32,7 +33,7 @@ import org.junit.Test;
 
 import org.apache.jasper.el.ELContextImpl;
 
-public class TestValueExpressionImpl {
+public class TestValueExpressionImpl extends ELBaseTest {
 
     @Test
     public void testGetValueReference() {

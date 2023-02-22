@@ -18,6 +18,7 @@ package org.apache.el.parser;
 
 import java.io.StringReader;
 
+import jakarta.el.ELBaseTest;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.ExpressionFactory;
@@ -30,7 +31,7 @@ import org.junit.Test;
 import org.apache.jasper.el.ELContextImpl;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 
-public class TestELParser {
+public class TestELParser extends ELBaseTest {
 
     @Test
     public void testBug49081() {

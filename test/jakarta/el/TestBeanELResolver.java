@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import org.apache.jasper.el.ELContextImpl;
 
-public class TestBeanELResolver {
+public class TestBeanELResolver extends ELBaseTest {
 
     private static final String METHOD01_NAME = "toString";
     private static final String METHOD02_NAME = "<init>";

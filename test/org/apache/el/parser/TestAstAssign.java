@@ -16,6 +16,7 @@
  */
 package org.apache.el.parser;
 
+import jakarta.el.ELBaseTest;
 import jakarta.el.ELContext;
 import jakarta.el.ELManager;
 import jakarta.el.ELProcessor;
@@ -25,7 +26,7 @@ import jakarta.el.ValueExpression;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestAstAssign {
+public class TestAstAssign extends ELBaseTest {
 
     @Test
     public void testGetValue01() {

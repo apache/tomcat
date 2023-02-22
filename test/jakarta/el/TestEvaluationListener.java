@@ -23,7 +23,7 @@ import jakarta.el.TesterEvaluationListener.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestEvaluationListener {
+public class TestEvaluationListener extends ELBaseTest {
 
 
     @Test

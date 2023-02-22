@@ -18,6 +18,7 @@ package org.apache.el;
 
 import java.util.function.Function;
 
+import jakarta.el.ELBaseTest;
 import jakarta.el.ELContext;
 import jakarta.el.ELProcessor;
 import jakarta.el.ExpressionFactory;
@@ -32,7 +33,7 @@ import org.junit.Test;
 
 import org.apache.jasper.el.ELContextImpl;
 
-public class TestMethodExpressionImpl {
+public class TestMethodExpressionImpl extends ELBaseTest {
 
     private static final String BUG53792 = "TEST_PASS";
 

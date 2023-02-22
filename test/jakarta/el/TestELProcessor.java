@@ -19,7 +19,7 @@ package jakarta.el;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestELProcessor {
+public class TestELProcessor extends ELBaseTest {
 
     @Test
     public void testDefineBean01() {
