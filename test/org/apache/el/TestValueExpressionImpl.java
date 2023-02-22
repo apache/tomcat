@@ -42,12 +42,10 @@ public class TestValueExpressionImpl extends ELBaseTest {
 
         TesterBeanB beanB = new TesterBeanB();
         beanB.setName("Tomcat");
-        ValueExpression var =
-            factory.createValueExpression(beanB, TesterBeanB.class);
+        ValueExpression var = factory.createValueExpression(beanB, TesterBeanB.class);
         context.getVariableMapper().setVariable("beanB", var);
 
-        ValueExpression ve = factory.createValueExpression(
-                context, "${beanB.name}", String.class);
+        ValueExpression ve = factory.createValueExpression(context, "${beanB.name}", String.class);
 
         // First check the basics work
         String result = (String) ve.getValue(context);
@@ -68,17 +66,14 @@ public class TestValueExpressionImpl extends ELBaseTest {
 
         TesterBeanB beanB = new TesterBeanB();
         beanB.setName("Tomcat");
-        ValueExpression var =
-            factory.createValueExpression(beanB, TesterBeanB.class);
+        ValueExpression var = factory.createValueExpression(beanB, TesterBeanB.class);
         context.getVariableMapper().setVariable("beanB", var);
 
-        ValueExpression var2 = factory.createValueExpression(
-                context, "${beanB.name}", String.class);
+        ValueExpression var2 = factory.createValueExpression(context, "${beanB.name}", String.class);
 
         context.getVariableMapper().setVariable("foo", var2);
 
-        ValueExpression ve = factory.createValueExpression(
-                context, "${foo}", ValueExpression.class);
+        ValueExpression ve = factory.createValueExpression(context, "${foo}", ValueExpression.class);
 
 
         // Now check the value reference
@@ -99,12 +94,10 @@ public class TestValueExpressionImpl extends ELBaseTest {
         beanB.setName("Tomcat");
         beanA.setBean(beanB);
 
-        ValueExpression var =
-            factory.createValueExpression(beanA, TesterBeanA.class);
+        ValueExpression var = factory.createValueExpression(beanA, TesterBeanA.class);
         context.getVariableMapper().setVariable("beanA", var);
 
-        ValueExpression ve = factory.createValueExpression(
-                context, "${beanA.bean.name}", String.class);
+        ValueExpression ve = factory.createValueExpression(context, "${beanA.bean.name}", String.class);
 
         // First check the basics work
         String result = (String) ve.getValue(context);
@@ -125,18 +118,15 @@ public class TestValueExpressionImpl extends ELBaseTest {
 
         TesterEnum testEnum = TesterEnum.APPLE;
 
-        ValueExpression var =
-            factory.createValueExpression(testEnum, TesterEnum.class);
+        ValueExpression var = factory.createValueExpression(testEnum, TesterEnum.class);
         context.getVariableMapper().setVariable("testEnum", var);
 
         // When coercing an Enum to a String, name() should always be used.
-        ValueExpression ve1 = factory.createValueExpression(
-                context, "${testEnum}", String.class);
+        ValueExpression ve1 = factory.createValueExpression(context, "${testEnum}", String.class);
         String result1 = (String) ve1.getValue(context);
         Assert.assertEquals("APPLE", result1);
 
-        ValueExpression ve2 = factory.createValueExpression(
-                context, "foo${testEnum}bar", String.class);
+        ValueExpression ve2 = factory.createValueExpression(context, "foo${testEnum}bar", String.class);
         String result2 = (String) ve2.getValue(context);
         Assert.assertEquals("fooAPPLEbar", result2);
     }
@@ -149,21 +139,18 @@ public class TestValueExpressionImpl extends ELBaseTest {
         Object o1 = "String value";
         Object o2 = Integer.valueOf(32);
 
-        Map<Object,Object> map = new HashMap<>();
+        Map<Object, Object> map = new HashMap<>();
         map.put("key1", o1);
         map.put("key2", o2);
 
-        ValueExpression var =
-            factory.createValueExpression(map, Map.class);
+        ValueExpression var = factory.createValueExpression(map, Map.class);
         context.getVariableMapper().setVariable("map", var);
 
-        ValueExpression ve1 = factory.createValueExpression(
-                context, "${map.key1}", Object.class);
+        ValueExpression ve1 = factory.createValueExpression(context, "${map.key1}", Object.class);
         ve1.setValue(context, o2);
         Assert.assertEquals(o2, ve1.getValue(context));
 
-        ValueExpression ve2 = factory.createValueExpression(
-                context, "${map.key2}", Object.class);
+        ValueExpression ve2 = factory.createValueExpression(context, "${map.key2}", Object.class);
         ve2.setValue(context, o1);
         Assert.assertEquals(o1, ve2.getValue(context));
     }
@@ -180,17 +167,14 @@ public class TestValueExpressionImpl extends ELBaseTest {
         list.add(0, o1);
         list.add(1, o2);
 
-        ValueExpression var =
-            factory.createValueExpression(list, List.class);
+        ValueExpression var = factory.createValueExpression(list, List.class);
         context.getVariableMapper().setVariable("list", var);
 
-        ValueExpression ve1 = factory.createValueExpression(
-                context, "${list[0]}", Object.class);
+        ValueExpression ve1 = factory.createValueExpression(context, "${list[0]}", Object.class);
         ve1.setValue(context, o2);
         Assert.assertEquals(o2, ve1.getValue(context));
 
-        ValueExpression ve2 = factory.createValueExpression(
-                context, "${list[1]}", Object.class);
+        ValueExpression ve2 = factory.createValueExpression(context, "${list[1]}", Object.class);
         ve2.setValue(context, o1);
         Assert.assertEquals(o1, ve2.getValue(context));
     }
@@ -207,12 +191,10 @@ public class TestValueExpressionImpl extends ELBaseTest {
         TesterBeanA beanA = new TesterBeanA();
         beanA.setValList(Collections.emptyList());
 
-        ValueExpression var =
-            factory.createValueExpression(beanA, TesterBeanA.class);
+        ValueExpression var = factory.createValueExpression(beanA, TesterBeanA.class);
         context.getVariableMapper().setVariable("beanA", var);
 
-        ValueExpression ve = factory.createValueExpression(
-                context, "${beanA.valList.size()}", Integer.class);
+        ValueExpression ve = factory.createValueExpression(context, "${beanA.valList.size()}", Integer.class);
 
         Integer result = (Integer) ve.getValue(context);
         Assert.assertEquals(Integer.valueOf(0), result);
@@ -229,12 +211,10 @@ public class TestValueExpressionImpl extends ELBaseTest {
 
         List<?> list = Collections.emptyList();
 
-        ValueExpression var =
-            factory.createValueExpression(list, List.class);
+        ValueExpression var = factory.createValueExpression(list, List.class);
         context.getVariableMapper().setVariable("list", var);
 
-        ValueExpression ve = factory.createValueExpression(
-                context, "${list.size()}", Integer.class);
+        ValueExpression ve = factory.createValueExpression(context, "${list.size()}", Integer.class);
 
         Integer result = (Integer) ve.getValue(context);
         Assert.assertEquals(Integer.valueOf(0), result);
@@ -248,12 +228,10 @@ public class TestValueExpressionImpl extends ELBaseTest {
 
         TesterBeanB beanB = new TesterBeanB();
         beanB.setName("Tomcat");
-        ValueExpression var =
-            factory.createValueExpression(beanB, TesterBeanB.class);
+        ValueExpression var = factory.createValueExpression(beanB, TesterBeanB.class);
         context.getVariableMapper().setVariable("beanB", var);
 
-        ValueExpression ve = factory.createValueExpression(
-                context, "${beanB.name}", String.class);
+        ValueExpression ve = factory.createValueExpression(context, "${beanB.name}", String.class);
 
         // First check the basics work
         String result = (String) ve.getValue(context);

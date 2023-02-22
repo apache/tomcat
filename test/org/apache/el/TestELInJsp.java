@@ -33,9 +33,8 @@ import org.apache.jasper.servlet.JasperInitializer;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
- * Tests EL with an without JSP attributes using a test web application. Similar
- * tests may be found in {@link TestELEvaluation} and
- * {@link org.apache.jasper.compiler.TestAttributeParser}.
+ * Tests EL with an without JSP attributes using a test web application. Similar tests may be found in
+ * {@link TestELEvaluation} and {@link org.apache.jasper.compiler.TestAttributeParser}.
  */
 public class TestELInJsp extends TomcatBaseTest {
 
@@ -90,8 +89,7 @@ public class TestELInJsp extends TomcatBaseTest {
     public void testBug45427() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug45nnn/bug45427.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45427.jsp");
 
         String result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
@@ -117,8 +115,7 @@ public class TestELInJsp extends TomcatBaseTest {
     public void testBug45451() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug45nnn/bug45451a.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45451a.jsp");
 
         String result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
@@ -131,7 +128,7 @@ public class TestELInJsp extends TomcatBaseTest {
         result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
         // Warning: Attributes are always unescaped before passing to the EL
-        //          processor
+        // processor
         assertEcho(result, "00-2");
         assertEcho(result, "01-${1+1}");
         assertEcho(result, "02-\\${1+1}");
@@ -160,7 +157,7 @@ public class TestELInJsp extends TomcatBaseTest {
         result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
         // TODO - Currently we allow a single unescaped \ in attribute values
-        //        Review if this should cause a warning/error
+        // Review if this should cause a warning/error
         assertEcho(result, "00-${1+1}");
         assertEcho(result, "01-\\${1+1}");
         assertEcho(result, "02-\\\\${1+1}");
@@ -203,7 +200,7 @@ public class TestELInJsp extends TomcatBaseTest {
         result = res.toString();
         // Warning: JSP attribute escaping != Java String escaping
         // Warning: Attributes are always unescaped before passing to the EL
-        //          processor
+        // processor
         assertEcho(result, "00-2");
         assertEcho(result, "01-${1+1}");
         assertEcho(result, "02-\\${1+1}");
@@ -226,8 +223,7 @@ public class TestELInJsp extends TomcatBaseTest {
     public void testBug45511() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug45nnn/bug45511.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45511.jsp");
 
         String result = res.toString();
         assertEcho(result, "00-true");
@@ -268,8 +264,7 @@ public class TestELInJsp extends TomcatBaseTest {
     public void testBug48112() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug48nnn/bug48112.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug48nnn/bug48112.jsp");
         String result = res.toString();
         assertEcho(result, "{OK}");
     }
@@ -288,8 +283,7 @@ public class TestELInJsp extends TomcatBaseTest {
     public void testBug51544() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug51544.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug51544.jsp");
 
         String result = res.toString();
         assertEcho(result, "Empty list: true");
@@ -311,8 +305,7 @@ public class TestELInJsp extends TomcatBaseTest {
         // Create the context (don't use addWebapp as we want to modify the
         // JSP Servlet settings).
         File appDir = new File("test/webapp");
-        StandardContext ctxt = (StandardContext) tomcat.addContext(
-                null, "/test", appDir.getAbsolutePath());
+        StandardContext ctxt = (StandardContext) tomcat.addContext(null, "/test", appDir.getAbsolutePath());
 
         ctxt.addServletContainerInitializer(new JasperInitializer(), null);
 
@@ -399,8 +392,7 @@ public class TestELInJsp extends TomcatBaseTest {
     public void testBug56029() throws Exception {
         getTomcatInstanceTestWebapp(true, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug56029.jspx");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug56029.jspx");
 
         String result = res.toString();
 
@@ -412,8 +404,7 @@ public class TestELInJsp extends TomcatBaseTest {
     public void testBug56147() throws Exception {
         getTomcatInstanceTestWebapp(true, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug56147.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug56147.jsp");
 
         String result = res.toString();
         assertEcho(result, "00-OK");
@@ -424,8 +415,7 @@ public class TestELInJsp extends TomcatBaseTest {
     public void testBug56612() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug56612.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug56612.jsp");
 
         String result = res.toString();
         Assert.assertTrue(result.contains("00-''"));
@@ -439,8 +429,7 @@ public class TestELInJsp extends TomcatBaseTest {
     public void testBug57141() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug57141.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug57141.jsp");
 
         String result = res.toString();
         assertEcho(result, "00-true");
@@ -450,16 +439,14 @@ public class TestELInJsp extends TomcatBaseTest {
 
 
     /*
-     * BZ https://bz.apache.org/bugzilla/show_bug.cgi?id=57142
-     * jakarta.servlet, jakarta.servlet.http and jakarta.servlet.jsp should be
-     * imported by default.
+     * BZ https://bz.apache.org/bugzilla/show_bug.cgi?id=57142 jakarta.servlet, jakarta.servlet.http and
+     * jakarta.servlet.jsp should be imported by default.
      */
     @Test
     public void testBug57142() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug57142.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug57142.jsp");
 
         String result = res.toString();
         // jakarta.servlet
@@ -475,15 +462,14 @@ public class TestELInJsp extends TomcatBaseTest {
 
 
     /*
-     * BZ https://bz.apache.org/bugzilla/show_bug.cgi?id=57441
-     * Can't validate function names defined in lambdas (or via imports)
+     * BZ https://bz.apache.org/bugzilla/show_bug.cgi?id=57441 Can't validate function names defined in lambdas (or via
+     * imports)
      */
     @Test
     public void testBug57441() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug57441.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug57441.jsp");
 
         String result = res.toString();
         assertEcho(result, "00-11");
@@ -514,7 +500,7 @@ public class TestELInJsp extends TomcatBaseTest {
 
     @Test
     public void testBug61854a() throws Exception {
-        getTomcatInstanceTestWebapp(true,  true);
+        getTomcatInstanceTestWebapp(true, true);
 
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug6nnnn/bug61854.jsp");
         String result = res.toString();
