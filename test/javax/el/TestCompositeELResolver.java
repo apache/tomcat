@@ -30,8 +30,7 @@ public class TestCompositeELResolver extends TomcatBaseTest {
     public void testBug50408() throws Exception {
         getTomcatInstanceTestWebapp(true, true);
 
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug50408.jsp", new ByteChunk(), null);
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug50408.jsp", new ByteChunk(), null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
     }

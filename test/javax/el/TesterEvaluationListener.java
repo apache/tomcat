@@ -27,8 +27,7 @@ public class TesterEvaluationListener extends EvaluationListener {
 
 
     @Override
-    public void propertyResolved(ELContext context, Object base,
-            Object property) {
+    public void propertyResolved(ELContext context, Object base, Object property) {
         resolvedProperties.add(new Pair(base, property));
     }
 

@@ -41,9 +41,9 @@ public class TestImportHandlerStandardPackages {
         Object obj = f.get(null);
 
         @SuppressWarnings("unchecked")
-        Map<String,Set<String>> standardPackageName = (Map<String, Set<String>>) obj;
+        Map<String, Set<String>> standardPackageName = (Map<String, Set<String>>) obj;
 
-        for (Map.Entry<String,Set<String>> entry : standardPackageName.entrySet()) {
+        for (Map.Entry<String, Set<String>> entry : standardPackageName.entrySet()) {
             checkPackageClassList(entry.getKey(), entry.getValue());
         }
     }
@@ -63,9 +63,9 @@ public class TestImportHandlerStandardPackages {
                 return;
             }
             for (String fileName : getJavaBaseClasses()) {
-                if (!fileName.startsWith("java/lang/") ||          // Class not in java.lang
-                        fileName.lastIndexOf('/') != 9 ||          // Class no in sub-package
-                        !fileName.endsWith(".class")) {             // Exclude non-class resources
+                if (!fileName.startsWith("java/lang/") || // Class not in java.lang
+                        fileName.lastIndexOf('/') != 9 || // Class no in sub-package
+                        !fileName.endsWith(".class")) { // Exclude non-class resources
                     continue;
                 }
                 // Extract class name
@@ -82,8 +82,7 @@ public class TestImportHandlerStandardPackages {
                     continue;
                 }
                 // Skip public inner classes of non-public classes
-                if (className.startsWith("FdLibm.") ||
-                        className.startsWith("LiveStackFrame.") ||
+                if (className.startsWith("FdLibm.") || className.startsWith("LiveStackFrame.") ||
                         className.startsWith("WeakPairMap.")) {
                     continue;
                 }
@@ -128,7 +127,7 @@ public class TestImportHandlerStandardPackages {
                         // Skip classes already known
                         continue;
                     }
-                    File f = new File (dir, file);
+                    File f = new File(dir, file);
                     if (!f.isFile()) {
                         // Skip directories
                         continue;
@@ -161,7 +160,7 @@ public class TestImportHandlerStandardPackages {
         // Returns Optional containing a ModuleReference
         Object optMRef = clazzModuleFinder.getMethod("find", String.class).invoke(mf, "java.base");
         // Extract the ModuleReference
-        Object mRef =  clazzOptional.getMethod("get").invoke(optMRef);
+        Object mRef = clazzOptional.getMethod("get").invoke(optMRef);
         // Returns ModuleReader
         Object mr = clazzModuleReference.getMethod("open").invoke(mRef);
         // Returns a Stream of class names
@@ -169,7 +168,7 @@ public class TestImportHandlerStandardPackages {
         // Convert to an array
         Object[] names = (Object[]) clazzStream.getMethod("toArray").invoke(stream);
         // Cast
-        String [] result = new String[names.length];
+        String[] result = new String[names.length];
         for (int i = 0; i < names.length; i++) {
             result[i] = (String) names[i];
         }
