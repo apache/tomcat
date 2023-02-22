@@ -17,7 +17,8 @@
 package org.apache.el;
 
 public enum TesterEnum {
-    APPLE, ORANGE;
+    APPLE,
+    ORANGE;
 
     @Override
     public String toString() {
