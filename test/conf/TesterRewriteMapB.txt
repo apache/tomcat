@@ -1,3 +1,4 @@
+# -----------------------------------------------------------------------------
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -12,15 +13,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# -----------------------------------------------------------------------------
+##
+## map.txt -- rewriting map
+##
 
-quotedStringTokenizer.tokenizeError=Error tokenizing text [{0}] after position [{1}] from mode [{2}]
+a aa
 
-rewriteMap.tooManyParameters=Too many parameters for this map
-rewriteMap.txtInvalidLine=Invalid line [{0}] in text file [{1}]
-rewriteMap.txtReadError=Error reading text file [{0}]
-
-rewriteValve.closeError=Error closing configuration
-rewriteValve.invalidFlags=Invalid flag in [{0}] flags [{1}]
-rewriteValve.invalidLine=Invalid line [{0}]
-rewriteValve.invalidMapClassName=Invalid map class name [{0}]
-rewriteValve.readError=Error reading configuration
+aa aaaa
+b bb
