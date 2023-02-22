@@ -58,8 +58,7 @@ public class TestBeanELResolverVarargsInvocation {
                 private Map<String, ValueExpression> vars = new HashMap<>();
 
                 @Override
-                public ValueExpression setVariable(String arg0,
-                        ValueExpression arg1) {
+                public ValueExpression setVariable(String arg0, ValueExpression arg1) {
                     if (arg1 == null) {
                         return vars.remove(arg0);
                     } else {
@@ -102,21 +101,18 @@ public class TestBeanELResolverVarargsInvocation {
      */
     @Test
     public void testJoinDelimited() {
-        Assert.assertEquals(foo.joinDelimited("-", "foo", "bar", "baz"),
-            beanELResolver.invoke(elContext, foo, "joinDelimited", null,
-                    new Object[] { "-", "foo", "bar", "baz" }));
+        Assert.assertEquals(foo.joinDelimited("-", "foo", "bar", "baz"), beanELResolver.invoke(elContext, foo,
+                "joinDelimited", null, new Object[] { "-", "foo", "bar", "baz" }));
     }
 
     /**
-     * Tests varargs that constitute a method's only parameters, as well as
-     * bogus results due to improper matching of ANY vararg method, and
-     * depending on the order in which reflected methods are encountered.
+     * Tests varargs that constitute a method's only parameters, as well as bogus results due to improper matching of
+     * ANY vararg method, and depending on the order in which reflected methods are encountered.
      */
     @Test
     public void testJoin() {
         Assert.assertEquals(foo.join("foo", "bar", "baz"),
-            beanELResolver.invoke(elContext, foo, "join", null,
-                    new Object[] { "foo", "bar", "baz" }));
+                beanELResolver.invoke(elContext, foo, "join", null, new Object[] { "foo", "bar", "baz" }));
     }
 
 }
