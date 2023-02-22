@@ -30,22 +30,20 @@ public class StandardELContext extends ELContext {
     private final FunctionMapper functionMapper;
     private final CompositeELResolver standardResolver;
     private final CompositeELResolver customResolvers;
-    private final Map<String,Object> localBeans = new HashMap<>();
+    private final Map<String, Object> localBeans = new HashMap<>();
 
 
     public StandardELContext(ExpressionFactory factory) {
         wrappedContext = null;
         variableMapper = new StandardVariableMapper();
-        functionMapper =
-                new StandardFunctionMapper(factory.getInitFunctionMap());
+        functionMapper = new StandardFunctionMapper(factory.getInitFunctionMap());
         standardResolver = new CompositeELResolver();
         customResolvers = new CompositeELResolver();
 
         ELResolver streamResolver = factory.getStreamELResolver();
 
         // Add resolvers in order
-        standardResolver.add(new BeanNameELResolver(
-                new StandardBeanNameResolver(localBeans)));
+        standardResolver.add(new BeanNameELResolver(new StandardBeanNameResolver(localBeans)));
         standardResolver.add(customResolvers);
         if (streamResolver != null) {
             standardResolver.add(streamResolver);
@@ -66,8 +64,7 @@ public class StandardELContext extends ELContext {
         customResolvers = new CompositeELResolver();
 
         // Add resolvers in order
-        standardResolver.add(new BeanNameELResolver(
-                new StandardBeanNameResolver(localBeans)));
+        standardResolver.add(new BeanNameELResolver(new StandardBeanNameResolver(localBeans)));
         standardResolver.add(customResolvers);
         // Use resolvers from context from this point on
         standardResolver.add(context.getELResolver());
@@ -75,8 +72,7 @@ public class StandardELContext extends ELContext {
 
     // Can't use Class<?> because API needs to match specification
     @Override
-    public void putContext(@SuppressWarnings("rawtypes") Class key,
-            Object contextObject) {
+    public void putContext(@SuppressWarnings("rawtypes") Class key, Object contextObject) {
         if (wrappedContext == null) {
             super.putContext(key, contextObject);
         } else {
@@ -113,7 +109,7 @@ public class StandardELContext extends ELContext {
     }
 
 
-    Map<String,Object> getLocalBeans() {
+    Map<String, Object> getLocalBeans() {
         return localBeans;
     }
 
@@ -131,8 +127,7 @@ public class StandardELContext extends ELContext {
         }
 
         @Override
-        public ValueExpression setVariable(String variable,
-                ValueExpression expression) {
+        public ValueExpression setVariable(String variable, ValueExpression expression) {
             if (vars == null) {
                 vars = new HashMap<>();
             }
@@ -147,9 +142,9 @@ public class StandardELContext extends ELContext {
 
     private static class StandardBeanNameResolver extends BeanNameResolver {
 
-        private final Map<String,Object> beans;
+        private final Map<String, Object> beans;
 
-        StandardBeanNameResolver(Map<String,Object> beans) {
+        StandardBeanNameResolver(Map<String, Object> beans) {
             this.beans = beans;
         }
 
@@ -164,8 +159,7 @@ public class StandardELContext extends ELContext {
         }
 
         @Override
-        public void setBeanValue(String beanName, Object value)
-                throws PropertyNotWritableException {
+        public void setBeanValue(String beanName, Object value) throws PropertyNotWritableException {
             beans.put(beanName, value);
         }
 
@@ -183,9 +177,9 @@ public class StandardELContext extends ELContext {
 
     private static class StandardFunctionMapper extends FunctionMapper {
 
-        private final Map<String,Method> methods = new HashMap<>();
+        private final Map<String, Method> methods = new HashMap<>();
 
-        StandardFunctionMapper(Map<String,Method> initFunctionMap) {
+        StandardFunctionMapper(Map<String, Method> initFunctionMap) {
             if (initFunctionMap != null) {
                 methods.putAll(initFunctionMap);
             }
@@ -198,8 +192,7 @@ public class StandardELContext extends ELContext {
         }
 
         @Override
-        public void mapFunction(String prefix, String localName,
-                Method method) {
+        public void mapFunction(String prefix, String localName, Method method) {
             String key = prefix + ':' + localName;
             if (method == null) {
                 methods.remove(key);

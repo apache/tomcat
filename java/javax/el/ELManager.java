@@ -53,16 +53,14 @@ public class ELManager {
     }
 
     public void mapFunction(String prefix, String function, Method method) {
-        getELContext().getFunctionMapper().mapFunction(
-                prefix, function, method);
+        getELContext().getFunctionMapper().mapFunction(prefix, function, method);
     }
 
     public void setVariable(String variable, ValueExpression expression) {
         getELContext().getVariableMapper().setVariable(variable, expression);
     }
 
-    public void importStatic(String staticMemberName)
-            throws javax.el.ELException {
+    public void importStatic(String staticMemberName) throws javax.el.ELException {
         getELContext().getImportHandler().importStatic(staticMemberName);
     }
 
@@ -75,7 +73,7 @@ public class ELManager {
     }
 
     public Object defineBean(String name, Object bean) {
-        Map<String,Object> localBeans = getELContext().getLocalBeans();
+        Map<String, Object> localBeans = getELContext().getLocalBeans();
 
         if (bean == null) {
             return localBeans.remove(name);

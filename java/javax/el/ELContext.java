@@ -38,7 +38,7 @@ public abstract class ELContext {
 
     private List<EvaluationListener> listeners;
 
-    private Deque<Map<String,Object>> lambdaArguments = new ArrayDeque<>();
+    private Deque<Map<String, Object>> lambdaArguments = new ArrayDeque<>();
 
     public ELContext() {
         this.resolved = false;
@@ -72,11 +72,9 @@ public abstract class ELContext {
      * @param key           The key under which to store the object
      * @param contextObject The object to add
      *
-     * @throws NullPointerException
-     *              If the supplied key or context is <code>null</code>
+     * @throws NullPointerException If the supplied key or context is <code>null</code>
      */
-    public void putContext(@SuppressWarnings("rawtypes") Class key,
-            Object contextObject) {
+    public void putContext(@SuppressWarnings("rawtypes") Class key, Object contextObject) {
         Objects.requireNonNull(key);
         Objects.requireNonNull(contextObject);
 
@@ -95,8 +93,7 @@ public abstract class ELContext {
      *
      * @return The value of the context object associated with the given key
      *
-     * @throws NullPointerException
-     *              If the supplied key is <code>null</code>
+     * @throws NullPointerException If the supplied key is <code>null</code>
      */
     public Object getContext(@SuppressWarnings("rawtypes") Class key) {
         Objects.requireNonNull(key);
@@ -109,8 +106,7 @@ public abstract class ELContext {
     public abstract ELResolver getELResolver();
 
     /**
-     * Obtain the ImportHandler for this ELContext, creating one if necessary.
-     * This method is not thread-safe.
+     * Obtain the ImportHandler for this ELContext, creating one if necessary. This method is not thread-safe.
      *
      * @return the ImportHandler for this ELContext.
      *
@@ -229,18 +225,17 @@ public abstract class ELContext {
     }
 
     /**
-     * Determine if the specified name is recognised as the name of a lambda
-     * argument.
+     * Determine if the specified name is recognised as the name of a lambda argument.
      *
      * @param name The name of the lambda argument
      *
-     * @return <code>true</code> if the name is recognised as the name of a
-     *         lambda argument, otherwise <code>false</code>
+     * @return <code>true</code> if the name is recognised as the name of a lambda argument, otherwise
+     *             <code>false</code>
      *
      * @since EL 3.0
      */
     public boolean isLambdaArgument(String name) {
-        for (Map<String,Object> arguments : lambdaArguments) {
+        for (Map<String, Object> arguments : lambdaArguments) {
             if (arguments.containsKey(name)) {
                 return true;
             }
@@ -258,7 +253,7 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public Object getLambdaArgument(String name) {
-        for (Map<String,Object> arguments : lambdaArguments) {
+        for (Map<String, Object> arguments : lambdaArguments) {
             Object result = arguments.get(name);
             if (result != null) {
                 return result;
@@ -268,20 +263,19 @@ public abstract class ELContext {
     }
 
     /**
-     * Called when starting to evaluate a lambda expression so that the
-     * arguments are available to the EL context during evaluation.
+     * Called when starting to evaluate a lambda expression so that the arguments are available to the EL context during
+     * evaluation.
      *
-     * @param arguments The arguments in scope for the current lambda
-     *                  expression.
+     * @param arguments The arguments in scope for the current lambda expression.
+     *
      * @since EL 3.0
      */
-    public void enterLambdaScope(Map<String,Object> arguments) {
+    public void enterLambdaScope(Map<String, Object> arguments) {
         lambdaArguments.push(arguments);
     }
 
     /**
-     * Called after evaluating a lambda expression to signal that the arguments
-     * are no longer required.
+     * Called after evaluating a lambda expression to signal that the arguments are no longer required.
      *
      * @since EL 3.0
      */
@@ -297,8 +291,7 @@ public abstract class ELContext {
      *
      * @return An instance of the requested type.
      *
-     * @throws ELException
-     *              If the conversion fails
+     * @throws ELException If the conversion fails
      *
      * @since EL 3.0
      */

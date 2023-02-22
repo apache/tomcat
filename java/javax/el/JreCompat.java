@@ -44,14 +44,12 @@ class JreCompat {
 
 
     /**
-     * Is the accessibleObject accessible (as a result of appropriate module
-     * exports) on the provided instance?
+     * Is the accessibleObject accessible (as a result of appropriate module exports) on the provided instance?
      *
-     * @param base  The specific instance to be tested.
-     * @param accessibleObject  The method/field/constructor to be tested.
+     * @param base             The specific instance to be tested.
+     * @param accessibleObject The method/field/constructor to be tested.
      *
-     * @return {code true} if the AccessibleObject can be accessed otherwise
-     *         {code false}
+     * @return {code true} if the AccessibleObject can be accessed otherwise {code false}
      */
     public boolean canAccess(Object base, AccessibleObject accessibleObject) {
         // Java 8 doesn't support modules so default to true
@@ -62,10 +60,9 @@ class JreCompat {
     /**
      * Is the given class in an exported package?
      *
-     * @param type  The class to test
+     * @param type The class to test
      *
-     * @return Always {@code true} for Java 8. {@code true} if the enclosing
-     *         package is exported for Java 9+
+     * @return Always {@code true} for Java 8. {@code true} if the enclosing package is exported for Java 9+
      */
     public boolean isExported(Class<?> type) {
         return true;
