@@ -17,8 +17,8 @@
 package jakarta.el;
 
 /**
- * Base implementation that provides a minimal default implementation that is
- * intended to be extended by application developers.
+ * Base implementation that provides a minimal default implementation that is intended to be extended by application
+ * developers.
  *
  * @since EL 3.0
  */
@@ -49,17 +49,15 @@ public abstract class BeanNameResolver {
 
 
     /**
-     * Sets a value of a bean of the given name. If the named bean does not
-     * exist and {@link #canCreateBean} returns <code>true</code> then a bean
-     * is created with the given value.
+     * Sets a value of a bean of the given name. If the named bean does not exist and {@link #canCreateBean} returns
+     * <code>true</code> then a bean is created with the given value.
      *
      * @param beanName The name of the bean to be set/create
      * @param value    The value of the bean to set/create
      *
      * @throws PropertyNotWritableException if the bean is read only
      */
-    public void setBeanValue(String beanName, Object value)
-            throws PropertyNotWritableException {
+    public void setBeanValue(String beanName, Object value) throws PropertyNotWritableException {
         throw new PropertyNotWritableException();
     }
 
@@ -69,8 +67,7 @@ public abstract class BeanNameResolver {
      *
      * @param beanName The name of the bean of interest
      *
-     * @return <code>true</code> if the bean is read only, otherwise
-     *         <code>false</code>
+     * @return <code>true</code> if the bean is read only, otherwise <code>false</code>
      */
     public boolean isReadOnly(String beanName) {
         return true;
@@ -82,8 +79,7 @@ public abstract class BeanNameResolver {
      *
      * @param beanName The name of the bean of interest
      *
-     * @return <code>true</code> if the bean may be created, otherwise
-     *         <code>false</code>
+     * @return <code>true</code> if the bean may be created, otherwise <code>false</code>
      */
     public boolean canCreateBean(String beanName) {
         return false;

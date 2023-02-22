@@ -43,8 +43,7 @@ public class MethodReference {
     /**
      * Obtain the base object on which the method will be invoked.
      *
-     * @return The base object on which the method will be invoked or
-     *         {@code null} for literal method expressions.
+     * @return The base object on which the method will be invoked or {@code null} for literal method expressions.
      */
     public Object getBase() {
         return base;
@@ -52,11 +51,11 @@ public class MethodReference {
 
 
     /**
-     * Obtain the {@link MethodInfo} for the {@link MethodExpression} for which
-     * this {@link MethodReference} has been generated.
+     * Obtain the {@link MethodInfo} for the {@link MethodExpression} for which this {@link MethodReference} has been
+     * generated.
      *
-     * @return The {@link MethodInfo} for the {@link MethodExpression} for which
-     *         this {@link MethodReference} has been generated.
+     * @return The {@link MethodInfo} for the {@link MethodExpression} for which this {@link MethodReference} has been
+     *             generated.
      */
     public MethodInfo getMethodInfo() {
         return this.methodInfo;
@@ -64,12 +63,10 @@ public class MethodReference {
 
 
     /**
-     * Obtain the annotations on the method to which the associated expression
-     * resolves.
+     * Obtain the annotations on the method to which the associated expression resolves.
      *
-     * @return The annotations on the method to which the associated expression
-     *         resolves. If the are no annotations, then an empty array is
-     *         returned.
+     * @return The annotations on the method to which the associated expression resolves. If the are no annotations,
+     *             then an empty array is returned.
      */
     public Annotation[] getAnnotations() {
         return annotations;
@@ -77,10 +74,10 @@ public class MethodReference {
 
 
     /**
-     * Obtain the evaluated parameter values that will be passed to the method
-     * to which the associated expression resolves.
+     * Obtain the evaluated parameter values that will be passed to the method to which the associated expression
+     * resolves.
      *
-     *  @return The evaluated parameters.
+     * @return The evaluated parameters.
      */
     public Object[] getEvaluatedParameters() {
         return evaluatedParameters;

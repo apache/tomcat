@@ -27,8 +27,7 @@ import java.util.Objects;
 
 public class MapELResolver extends ELResolver {
 
-    private static final Class<?> UNMODIFIABLE =
-            Collections.unmodifiableMap(new HashMap<>()).getClass();
+    private static final Class<?> UNMODIFIABLE = Collections.unmodifiableMap(new HashMap<>()).getClass();
 
     private final boolean readOnly;
 
@@ -44,7 +43,7 @@ public class MapELResolver extends ELResolver {
     public Class<?> getType(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);
 
-        if (base instanceof Map<?,?>) {
+        if (base instanceof Map<?, ?>) {
             context.setPropertyResolved(base, property);
 
             Map<?, ?> map = (Map<?, ?>) base;
@@ -62,25 +61,24 @@ public class MapELResolver extends ELResolver {
     public Object getValue(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);
 
-        if (base instanceof Map<?,?>) {
+        if (base instanceof Map<?, ?>) {
             context.setPropertyResolved(base, property);
-            return ((Map<?,?>) base).get(property);
+            return ((Map<?, ?>) base).get(property);
         }
 
         return null;
     }
 
     @Override
-    public void setValue(ELContext context, Object base, Object property,
-            Object value) {
+    public void setValue(ELContext context, Object base, Object property, Object value) {
         Objects.requireNonNull(context);
 
         if (base instanceof Map<?, ?>) {
             context.setPropertyResolved(base, property);
 
             if (this.readOnly) {
-                throw new PropertyNotWritableException(Util.message(context,
-                        "resolverNotWritable", base.getClass().getName()));
+                throw new PropertyNotWritableException(
+                        Util.message(context, "resolverNotWritable", base.getClass().getName()));
             }
 
             try {

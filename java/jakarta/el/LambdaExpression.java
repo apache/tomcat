@@ -25,11 +25,10 @@ public class LambdaExpression {
 
     private final List<String> formalParameters;
     private final ValueExpression expression;
-    private final Map<String,Object> nestedArguments = new HashMap<>();
+    private final Map<String, Object> nestedArguments = new HashMap<>();
     private ELContext context = null;
 
-    public LambdaExpression(List<String> formalParameters,
-            ValueExpression expression) {
+    public LambdaExpression(List<String> formalParameters, ValueExpression expression) {
         this.formalParameters = formalParameters;
         this.expression = expression;
 
@@ -40,8 +39,7 @@ public class LambdaExpression {
     }
 
     @SuppressWarnings("null") // args[i] can't be null due to earlier checks
-    public Object invoke(ELContext context, Object... args)
-            throws ELException {
+    public Object invoke(ELContext context, Object... args) throws ELException {
 
         Objects.requireNonNull(context);
 
@@ -56,9 +54,7 @@ public class LambdaExpression {
         }
 
         if (formalParamCount > argCount) {
-            throw new ELException(Util.message(context,
-                    "lambdaExpression.tooFewArgs",
-                    Integer.valueOf(argCount),
+            throw new ELException(Util.message(context, "lambdaExpression.tooFewArgs", Integer.valueOf(argCount),
                     Integer.valueOf(formalParamCount)));
         }
 
@@ -77,8 +73,7 @@ public class LambdaExpression {
             // Make arguments from this expression available to any nested
             // expression
             if (result instanceof LambdaExpression) {
-                ((LambdaExpression) result).nestedArguments.putAll(
-                        lambdaArguments);
+                ((LambdaExpression) result).nestedArguments.putAll(lambdaArguments);
             }
             return result;
         } finally {
@@ -87,6 +82,6 @@ public class LambdaExpression {
     }
 
     public java.lang.Object invoke(Object... args) {
-        return invoke (context, args);
+        return invoke(context, args);
     }
 }
