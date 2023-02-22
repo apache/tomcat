@@ -17,13 +17,12 @@
 package org.apache.el;
 
 /**
- * Test cases based on https://bz.apache.org/bugzilla/show_bug.cgi?id=65358
- * BeanH is BeanG with just the varargs method.
+ * Test cases based on https://bz.apache.org/bugzilla/show_bug.cgi?id=65358 BeanH is BeanG with just the varargs method.
  */
 public class TesterBeanH {
 
     @SuppressWarnings("unused")
-    public String doTest(String param1, String... param2 ) {
+    public String doTest(String param1, String... param2) {
         return "String-VString";
     }
 }
