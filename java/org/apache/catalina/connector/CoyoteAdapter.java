@@ -629,7 +629,7 @@ public class CoyoteAdapter implements Adapter {
                 connector.getService().getContainer().logAccess(request, response, 0, true);
                 return false;
             } else {
-                response.sendError(400, "Invalid URI");
+                response.sendError(400, sm.getString("coyoteAdapter.invalidURI"));
             }
         }
 
@@ -643,7 +643,7 @@ public class CoyoteAdapter implements Adapter {
             if (undecodedURI.getType() == MessageBytes.T_BYTES) {
                 if (connector.getRejectSuspiciousURIs()) {
                     if (checkSuspiciousURIs(undecodedURI.getByteChunk())) {
-                        response.sendError(400, "Invalid URI");
+                        response.sendError(400, sm.getString("coyoteAdapter.invalidURI"));
                     }
                 }
 
@@ -658,7 +658,7 @@ public class CoyoteAdapter implements Adapter {
                 try {
                     req.getURLDecoder().convert(decodedURI.getByteChunk(), connector.getEncodedSolidusHandlingInternal());
                 } catch (IOException ioe) {
-                    response.sendError(400, "Invalid URI: " + ioe.getMessage());
+                    response.sendError(400, sm.getString("coyoteAdapter.invalidURIWithMessage", ioe.getMessage()));
                 }
                 // Normalization
                 if (normalize(req.decodedURI(), connector.getAllowBackslash())) {
@@ -668,7 +668,7 @@ public class CoyoteAdapter implements Adapter {
                     // Therefore it is not necessary to check that the URI remains
                     // normalized after character decoding
                 } else {
-                    response.sendError(400, "Invalid URI");
+                    response.sendError(400, sm.getString("coyoteAdapter.invalidURI"));
                 }
             } else {
                 /* The URI is chars or String, and has been sent using an in-memory
@@ -866,7 +866,7 @@ public class CoyoteAdapter implements Adapter {
             if (header != null) {
                 res.addHeader("Allow", header);
             }
-            response.sendError(405, "TRACE method is not allowed");
+            response.sendError(405, sm.getString("coyoteAdapter.trace"));
             // Safe to skip the remainder of this method.
             return true;
         }
