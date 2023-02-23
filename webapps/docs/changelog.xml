@@ -114,6 +114,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        Add a check for the validity of the scheme pseudo-header in HTTP/2.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.72 (remm)" rtext="2023-02-23">
   <subsection name="Catalina">
