@@ -19,8 +19,7 @@ package org.apache.catalina.connector;
 import java.io.IOException;
 
 /**
- * Extend IOException to identify it as being caused by an abort of a request by
- * a remote client.
+ * Extend IOException to identify it as being caused by an abort of a request by a remote client.
  *
  * @author Glenn L. Nielsen
  */
@@ -29,7 +28,7 @@ public final class ClientAbortException extends IOException {
     private static final long serialVersionUID = 1L;
 
 
-    //------------------------------------------------------------ Constructors
+    // ------------------------------------------------------------ Constructors
 
     /**
      * Construct a new ClientAbortException with no other information.
@@ -60,10 +59,9 @@ public final class ClientAbortException extends IOException {
 
 
     /**
-     * Construct a new ClientAbortException for the specified message
-     * and throwable.
+     * Construct a new ClientAbortException for the specified message and throwable.
      *
-     * @param message Message describing this exception
+     * @param message   Message describing this exception
      * @param throwable Throwable that caused this exception
      */
     public ClientAbortException(String message, Throwable throwable) {

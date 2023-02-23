@@ -36,8 +36,7 @@ import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Facade class that wraps a Coyote response object.
- * All methods are delegated to the wrapped response.
+ * Facade class that wraps a Coyote response object. All methods are delegated to the wrapped response.
  *
  * @author Remy Maucherat
  */
@@ -46,12 +45,11 @@ public class ResponseFacade implements HttpServletResponse {
 
     // ----------------------------------------------------------- DoPrivileged
 
-    private final class SetContentTypePrivilegedAction
-            implements PrivilegedAction<Void> {
+    private final class SetContentTypePrivilegedAction implements PrivilegedAction<Void> {
 
         private final String contentType;
 
-        SetContentTypePrivilegedAction(String contentType){
+        SetContentTypePrivilegedAction(String contentType) {
             this.contentType = contentType;
         }
 
@@ -62,8 +60,7 @@ public class ResponseFacade implements HttpServletResponse {
         }
     }
 
-    private final class DateHeaderPrivilegedAction
-            implements PrivilegedAction<Void> {
+    private final class DateHeaderPrivilegedAction implements PrivilegedAction<Void> {
 
         private final String name;
         private final long value;
@@ -77,7 +74,7 @@ public class ResponseFacade implements HttpServletResponse {
 
         @Override
         public Void run() {
-            if(add) {
+            if (add) {
                 response.addDateHeader(name, value);
             } else {
                 response.setDateHeader(name, value);
@@ -111,7 +108,7 @@ public class ResponseFacade implements HttpServletResponse {
      * @param response The response to be wrapped
      */
     public ResponseFacade(Response response) {
-         this.response = response;
+        this.response = response;
     }
 
 
@@ -225,7 +222,7 @@ public class ResponseFacade implements HttpServletResponse {
             return;
         }
 
-        if (SecurityUtil.isPackageProtectionEnabled()){
+        if (SecurityUtil.isPackageProtectionEnabled()) {
             AccessController.doPrivileged(new SetContentTypePrivilegedAction(type));
         } else {
             response.setContentType(type);
@@ -255,12 +252,12 @@ public class ResponseFacade implements HttpServletResponse {
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            try{
+            try {
                 AccessController.doPrivileged(new FlushBufferPrivilegedAction(response));
-            } catch(PrivilegedActionException e) {
+            } catch (PrivilegedActionException e) {
                 Exception ex = e.getException();
                 if (ex instanceof IOException) {
-                    throw (IOException)ex;
+                    throw (IOException) ex;
                 }
             }
         } else {
