@@ -149,6 +149,13 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     private void prepareRequest() {
+        if (coyoteRequest.scheme().isNull()) {
+            if (handler.getProtocol().getHttp11Protocol().isSSLEnabled()) {
+                coyoteRequest.scheme().setString("https");
+            } else {
+                coyoteRequest.scheme().setString("http");
+            }
+        }
         MessageBytes hostValueMB = coyoteRequest.getMimeHeaders().getUniqueValue("host");
         if (hostValueMB == null) {
             throw new IllegalArgumentException();

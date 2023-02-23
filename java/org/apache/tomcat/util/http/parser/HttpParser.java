@@ -47,6 +47,7 @@ public class HttpParser {
     private static final boolean[] IS_HTTP_PROTOCOL = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_ALPHA = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_NUMERIC = new boolean[ARRAY_SIZE];
+    private static final boolean[] IS_SCHEME = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_UNRESERVED = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_SUBDELIM = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_USERINFO = new boolean[ARRAY_SIZE];
@@ -92,6 +93,10 @@ public class HttpParser {
 
             if (i >= 'a' && i <= 'z' || i >= 'A' && i <= 'Z') {
                 IS_ALPHA[i] = true;
+            }
+
+            if (IS_ALPHA[i] || IS_NUMERIC[i] || i == '+' || i == '-' || i == '.') {
+                IS_SCHEME[i] = true;
             }
 
             if (IS_ALPHA[i] || IS_NUMERIC[i] || i == '-' || i == '.' || i == '_' || i == '~') {
@@ -316,6 +321,52 @@ public class HttpParser {
         } catch (ArrayIndexOutOfBoundsException ex) {
             return false;
         }
+    }
+
+
+    public static boolean isScheme(int c) {
+        // Fast for valid scheme characters, slower for some incorrect
+        // ones
+        try {
+            return IS_SCHEME[c];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return false;
+        }
+    }
+
+
+    /**
+     * Is the provided String a scheme as per RFC 3986?
+     * <br>
+     * Note: scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+     * <br>
+     * Since a scheme requires at least 1 ALPHA, {@code null} and the empty
+     * string ({@code ""}) are not considered to be valid tokens.
+     *
+     * @param s The string to test
+     *
+     * @return {@code true} if the string is a valid scheme, otherwise
+     *         {@code false}
+     */
+    public static boolean isScheme(String s) {
+        if (s == null) {
+            return false;
+        }
+        if (s.isEmpty()) {
+            return false;
+        }
+        char[] chars = s.toCharArray();
+        if (!isAlpha(chars[0])) {
+            return false;
+        }
+        if (chars.length > 1) {
+            for (int i = 1; i < chars.length; i++) {
+                if (!isScheme(chars[i])) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 
