@@ -635,53 +635,59 @@ public class CoyoteAdapter implements Adapter {
 
         MessageBytes decodedURI = req.decodedURI();
 
-        if (undecodedURI.getType() == MessageBytes.T_BYTES) {
-            if (connector.getRejectSuspiciousURIs()) {
-                if (checkSuspiciousURIs(undecodedURI.getByteChunk())) {
+        // Filter CONNECT method
+        if (req.method().equalsIgnoreCase("CONNECT")) {
+            response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, sm.getString("coyoteAdapter.connect"));
+        } else {
+            // No URI for CONNECT requests
+            if (undecodedURI.getType() == MessageBytes.T_BYTES) {
+                if (connector.getRejectSuspiciousURIs()) {
+                    if (checkSuspiciousURIs(undecodedURI.getByteChunk())) {
+                        response.sendError(400, "Invalid URI");
+                    }
+                }
+
+                // Copy the raw URI to the decodedURI
+                decodedURI.duplicate(undecodedURI);
+
+                // Parse (and strip out) the path parameters
+                parsePathParameters(req, request);
+
+                // URI decoding
+                // %xx decoding of the URL
+                try {
+                    req.getURLDecoder().convert(decodedURI.getByteChunk(), connector.getEncodedSolidusHandlingInternal());
+                } catch (IOException ioe) {
+                    response.sendError(400, "Invalid URI: " + ioe.getMessage());
+                }
+                // Normalization
+                if (normalize(req.decodedURI(), connector.getAllowBackslash())) {
+                    // Character decoding
+                    convertURI(decodedURI, request);
+                    // URIEncoding values are limited to US-ASCII supersets.
+                    // Therefore it is not necessary to check that the URI remains
+                    // normalized after character decoding
+                } else {
                     response.sendError(400, "Invalid URI");
                 }
-            }
-
-            // Copy the raw URI to the decodedURI
-            decodedURI.duplicate(undecodedURI);
-
-            // Parse (and strip out) the path parameters
-            parsePathParameters(req, request);
-
-            // URI decoding
-            // %xx decoding of the URL
-            try {
-                req.getURLDecoder().convert(decodedURI.getByteChunk(), connector.getEncodedSolidusHandlingInternal());
-            } catch (IOException ioe) {
-                response.sendError(400, "Invalid URI: " + ioe.getMessage());
-            }
-            // Normalization
-            if (normalize(req.decodedURI(), connector.getAllowBackslash())) {
-                // Character decoding
-                convertURI(decodedURI, request);
-                // URIEncoding values are limited to US-ASCII supersets.
-                // Therefore it is not necessary to check that the URI remains
-                // normalized after character decoding
             } else {
-                response.sendError(400, "Invalid URI");
-            }
-        } else {
-            /* The URI is chars or String, and has been sent using an in-memory
-             * protocol handler. The following assumptions are made:
-             * - req.requestURI() has been set to the 'original' non-decoded,
-             *   non-normalized URI
-             * - req.decodedURI() has been set to the decoded, normalized form
-             *   of req.requestURI()
-             * - 'suspicious' URI filtering - if required - has already been
-             *   performed
-             */
-            decodedURI.toChars();
-            // Remove all path parameters; any needed path parameter should be set
-            // using the request object rather than passing it in the URL
-            CharChunk uriCC = decodedURI.getCharChunk();
-            int semicolon = uriCC.indexOf(';');
-            if (semicolon > 0) {
-                decodedURI.setChars(uriCC.getBuffer(), uriCC.getStart(), semicolon);
+                /* The URI is chars or String, and has been sent using an in-memory
+                 * protocol handler. The following assumptions are made:
+                 * - req.requestURI() has been set to the 'original' non-decoded,
+                 *   non-normalized URI
+                 * - req.decodedURI() has been set to the decoded, normalized form
+                 *   of req.requestURI()
+                 * - 'suspicious' URI filtering - if required - has already been
+                 *   performed
+                 */
+                decodedURI.toChars();
+                // Remove all path parameters; any needed path parameter should be set
+                // using the request object rather than passing it in the URL
+                CharChunk uriCC = decodedURI.getCharChunk();
+                int semicolon = uriCC.indexOf(';');
+                if (semicolon > 0) {
+                    decodedURI.setChars(uriCC.getBuffer(), uriCC.getStart(), semicolon);
+                }
             }
         }
 
@@ -837,7 +843,7 @@ public class CoyoteAdapter implements Adapter {
             return false;
         }
 
-        // Filter trace method
+        // Filter TRACE method
         if (!connector.getAllowTrace()
                 && req.method().equalsIgnoreCase("TRACE")) {
             Wrapper wrapper = request.getWrapper();
