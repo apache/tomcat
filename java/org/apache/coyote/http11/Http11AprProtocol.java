@@ -24,8 +24,7 @@ import org.apache.tomcat.util.net.AprEndpoint;
 /**
  * HTTP/1.1 protocol implementation using APR/native.
  *
- * @deprecated  The APR/Native Connector will be removed in Tomcat 10.1.x
- *              onwards.
+ * @deprecated The APR/Native Connector will be removed in Tomcat 10.1.x onwards.
  */
 @Deprecated
 public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
@@ -43,7 +42,9 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
 
     @Override
-    protected Log getLog() { return log; }
+    protected Log getLog() {
+        return log;
+    }
 
     @Override
     public boolean isAprRequired() {
@@ -52,14 +53,29 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         return true;
     }
 
-    public int getPollTime() { return ((AprEndpoint)getEndpoint()).getPollTime(); }
-    public void setPollTime(int pollTime) { ((AprEndpoint)getEndpoint()).setPollTime(pollTime); }
+    public int getPollTime() {
+        return ((AprEndpoint) getEndpoint()).getPollTime();
+    }
 
-    public int getSendfileSize() { return ((AprEndpoint)getEndpoint()).getSendfileSize(); }
-    public void setSendfileSize(int sendfileSize) { ((AprEndpoint)getEndpoint()).setSendfileSize(sendfileSize); }
+    public void setPollTime(int pollTime) {
+        ((AprEndpoint) getEndpoint()).setPollTime(pollTime);
+    }
 
-    public boolean getDeferAccept() { return ((AprEndpoint)getEndpoint()).getDeferAccept(); }
-    public void setDeferAccept(boolean deferAccept) { ((AprEndpoint)getEndpoint()).setDeferAccept(deferAccept); }
+    public int getSendfileSize() {
+        return ((AprEndpoint) getEndpoint()).getSendfileSize();
+    }
+
+    public void setSendfileSize(int sendfileSize) {
+        ((AprEndpoint) getEndpoint()).setSendfileSize(sendfileSize);
+    }
+
+    public boolean getDeferAccept() {
+        return ((AprEndpoint) getEndpoint()).getDeferAccept();
+    }
+
+    public void setDeferAccept(boolean deferAccept) {
+        ((AprEndpoint) getEndpoint()).setDeferAccept(deferAccept);
+    }
 
 
     // ----------------------------------------------------- JMX related methods
