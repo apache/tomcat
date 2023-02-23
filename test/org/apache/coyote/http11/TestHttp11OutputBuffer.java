@@ -97,7 +97,7 @@ public class TestHttp11OutputBuffer extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String,List<String>> resHeaders = new HashMap<>();
+        Map<String, List<String>> resHeaders = new HashMap<>();
         int rc = getUrl("http://localhost:" + getPort() + "/header", new ByteChunk(), resHeaders);
 
         if (valid) {
