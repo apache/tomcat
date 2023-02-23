@@ -20,11 +20,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Unit tests for Section 6.5 of
- * <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>.
- * <br>
- * The order of tests in this class is aligned with the order of the
- * requirements in the RFC.
+ * Unit tests for Section 6.5 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
+ * The order of tests in this class is aligned with the order of the requirements in the RFC.
  */
 public class TestHttp2Section_6_5 extends Http2TestBase {
 
@@ -34,7 +31,7 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
         // HTTP2 upgrade
         http2Connect();
 
-        sendSettings(0, true, new SettingValue(1,1));
+        sendSettings(0, true, new SettingValue(1, 1));
 
         handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
     }
@@ -46,7 +43,7 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
         http2Connect();
 
         sendPriority(3, 0, 15);
-        sendSettings(3, true, new SettingValue(1,1));
+        sendSettings(3, true, new SettingValue(1, 1));
 
         handleGoAwayResponse(1);
     }
@@ -81,7 +78,7 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
         // HTTP2 upgrade
         http2Connect();
 
-        sendSettings(0, false, new SettingValue(0x2,0x2));
+        sendSettings(0, false, new SettingValue(0x2, 0x2));
 
         handleGoAwayResponse(1);
     }
@@ -92,7 +89,7 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
         // HTTP2 upgrade
         http2Connect();
 
-        sendSettings(0, false, new SettingValue(0x4,1 << 31));
+        sendSettings(0, false, new SettingValue(0x4, 1 << 31));
 
         handleGoAwayResponse(1, Http2Error.FLOW_CONTROL_ERROR);
     }
@@ -103,7 +100,7 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
         // HTTP2 upgrade
         http2Connect();
 
-        sendSettings(0, false, new SettingValue(0x5,1 << 31));
+        sendSettings(0, false, new SettingValue(0x5, 1 << 31));
 
         handleGoAwayResponse(1);
     }
@@ -114,13 +111,12 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
         // HTTP2 upgrade
         http2Connect();
 
-        sendSettings(0, false, new SettingValue(0xFF,0xFF));
+        sendSettings(0, false, new SettingValue(0xFF, 0xFF));
 
         // Ack
         parser.readFrame();
 
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Settings-Ack"));
+        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith("0-Settings-Ack"));
     }
 
     // delayed ACKs. Requires an API (TBD) for applications to send settings.

@@ -102,8 +102,7 @@ public class TestAsyncTimeout extends Http2TestBase {
         }
 
         @Override
-        protected void doGet(HttpServletRequest request, HttpServletResponse response)
-                throws IOException {
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
             // The idea of this test is that the timeout kicks in after 2
             // seconds and stops the async thread early rather than letting it

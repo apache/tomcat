@@ -20,14 +20,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Unit tests for Section 5.3 of
- * <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>.
- * <br>
- * The order of tests in this class is aligned with the order of the
- * requirements in the RFC.
- *
- * Note: Unit tests for the examples described by each of the figures may be
- * found in {@link TestAbstractStream}.
+ * Unit tests for Section 5.3 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
+ * The order of tests in this class is aligned with the order of the requirements in the RFC. Note: Unit tests for the
+ * examples described by each of the figures may be found in {@link TestAbstractStream}.
  */
 public class TestHttp2Section_5_3 extends Http2TestBase {
 
@@ -37,11 +32,11 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
     public void testStreamDependsOnSelf() throws Exception {
         http2Connect();
 
-        sendPriority(3,  3,  15);
+        sendPriority(3, 3, 15);
 
         parser.readFrame();
 
-        Assert.assertEquals("3-RST-[1]\n",  output.getTrace());
+        Assert.assertEquals("3-RST-[1]\n", output.getTrace());
     }
 
 
@@ -82,8 +77,8 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         // should have a window of 1k as well
 
         // Set up streams A=17, B=19, C=21
-        sendPriority(17,  0, 15);
-        sendPriority(19, 17,  3);
+        sendPriority(17, 0, 15);
+        sendPriority(19, 17, 3);
         sendPriority(21, 17, 11);
 
         // First, process a request on stream 17. This should consume both
@@ -105,8 +100,8 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
 
         // Open up the flow control windows for stream 19 & 21 to more than the
         // size of a simple request (8k)
-        sendWindowUpdate(19, 16*1024);
-        sendWindowUpdate(21, 16*1024);
+        sendWindowUpdate(19, 16 * 1024);
+        sendWindowUpdate(21, 16 * 1024);
 
         // Read some frames
         // 19-headers, 21-headers
@@ -135,22 +130,22 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         //
         // The loop below handles 0, 1 or 2 stream being blocked
         // - If 0 streams are blocked the connection window will be set to one
-        //   and that will be consumed by the first stream to attempt to write.
-        //   That body frame will be read by the client. The stream will then be
-        //   blocked and the loop will start again.
+        // and that will be consumed by the first stream to attempt to write.
+        // That body frame will be read by the client. The stream will then be
+        // blocked and the loop will start again.
         // - If 1 stream is blocked, the connection window will be set to one
-        //   which will then be consumed by the blocked stream. After writing
-        //   the single byte the stream will again be blocked and the loop will
-        //   start again.
+        // which will then be consumed by the blocked stream. After writing
+        // the single byte the stream will again be blocked and the loop will
+        // start again.
         // - If 2 streams are blocked the connection window will be set to one
-        //   but one byte will be permitted for both streams (due to rounding in
-        //   the allocation). The window size should be -1 (see below). Two
-        //   frames (one for each stream will be written) one of which will be
-        //   consumed by the client. The loop will start again and the Window
-        //   size incremented to zero. No data will be written by the streams
-        //   but the second data frame written in the last iteration of the loop
-        //   will be read. The loop will then exit since frames from both
-        //   streams will have been observed.
+        // but one byte will be permitted for both streams (due to rounding in
+        // the allocation). The window size should be -1 (see below). Two
+        // frames (one for each stream will be written) one of which will be
+        // consumed by the client. The loop will start again and the Window
+        // size incremented to zero. No data will be written by the streams
+        // but the second data frame written in the last iteration of the loop
+        // will be read. The loop will then exit since frames from both
+        // streams will have been observed.
         boolean seen19 = false;
         boolean seen21 = false;
         while (!seen19 || !seen21) {
@@ -271,7 +266,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         // should have a window of 64k
 
         // Create priority tree. This test requires a blocked stream to depend on a closed stream
-        sendPriority(17,  15, 15);
+        sendPriority(17, 15, 15);
 
         // Process a request on stream 17.
         // This should consume the connection window and put streams 15 and 17 in the backlog.

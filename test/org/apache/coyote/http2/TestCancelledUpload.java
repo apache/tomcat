@@ -42,7 +42,8 @@ public class TestCancelledUpload extends Http2TestBase {
 
         LogManager.getLogManager().getLogger("org.apache.coyote.http2").setLevel(Level.ALL);
         try {
-            ((AbstractHttp11Protocol<?>) http2Protocol.getHttp11Protocol()).setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
+            ((AbstractHttp11Protocol<?>) http2Protocol.getHttp11Protocol())
+                    .setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
 
             int bodySize = 8192;
             int bodyCount = 20;
@@ -54,8 +55,8 @@ public class TestCancelledUpload extends Http2TestBase {
             byte[] trailerFrameHeader = new byte[9];
             ByteBuffer trailerPayload = ByteBuffer.allocate(256);
 
-            buildPostRequest(headersFrameHeader, headersPayload, false, dataFrameHeader, dataPayload,
-                    null, trailerFrameHeader, trailerPayload, 3);
+            buildPostRequest(headersFrameHeader, headersPayload, false, dataFrameHeader, dataPayload, null,
+                    trailerFrameHeader, trailerPayload, 3);
 
             // Write the headers
             writeFrame(headersFrameHeader, headersPayload);
@@ -71,7 +72,7 @@ public class TestCancelledUpload extends Http2TestBase {
             // incoming frames.
             // The request processing thread will:
             // - read up to 128 bytes of request body
-            //   (and issue a window update for bytes read)
+            // (and issue a window update for bytes read)
             // - write a 403 response with no response body
             // The connection processing thread will:
             // - read the request body until the flow control window is exhausted
@@ -84,12 +85,8 @@ public class TestCancelledUpload extends Http2TestBase {
             }
 
             // Not window update, not reset, must be the headers
-            Assert.assertEquals("3-HeadersStart\n" +
-                    "3-Header-[:status]-[403]\n" +
-                    "3-Header-[content-length]-[0]\n" +
-                    "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                    "3-HeadersEnd\n",
-                    output.getTrace());
+            Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[403]\n" + "3-Header-[content-length]-[0]\n" +
+                    "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n", output.getTrace());
             output.clearTrace();
             parser.readFrame();
 
@@ -99,9 +96,7 @@ public class TestCancelledUpload extends Http2TestBase {
             }
 
             // Not window update, not reset, must be the response body
-            Assert.assertEquals("3-Body-0\n" +
-                    "3-EndOfStream\n",
-                    output.getTrace());
+            Assert.assertEquals("3-Body-0\n" + "3-EndOfStream\n", output.getTrace());
             output.clearTrace();
             parser.readFrame();
 
@@ -117,11 +112,9 @@ public class TestCancelledUpload extends Http2TestBase {
     /*
      * Looking for a RST frame with error type 3 (flow control error).
      *
-     * If there is a flow control window update for stream 0 it may be followed
-     * by one for stream 3.
+     * If there is a flow control window update for stream 0 it may be followed by one for stream 3.
      *
-     * If there is a flow control window update for stream 3 it will always be
-     * preceded by one for stream 0.
+     * If there is a flow control window update for stream 3 it will always be preceded by one for stream 0.
      */
     private boolean checkReset() throws IOException, Http2Exception {
         int lastConnectionFlowControlWindowUpdate = -1;
