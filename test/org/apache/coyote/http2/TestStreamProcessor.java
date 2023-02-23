@@ -74,14 +74,9 @@ public class TestStreamProcessor extends Http2TestBase {
         // additional frame needs to be read
         parser.readFrame();
 
-        Assert.assertEquals(
-                "3-HeadersStart\n" +
-                "3-Header-[:status]-[200]\n" +
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[200]\n" +
                 "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
-                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "3-HeadersEnd\n" +
-                "3-Body-17\n" +
-                "3-Body-8\n" +
+                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n" + "3-Body-17\n" + "3-Body-8\n" +
                 "3-EndOfStream\n", output.getTrace());
     }
 
@@ -539,15 +534,9 @@ public class TestStreamProcessor extends Http2TestBase {
 
         readSimpleGetResponse();
 
-        Assert.assertEquals(
-                "3-HeadersStart\n" +
-                "3-Header-[:status]-[200]\n" +
-                "3-Header-[vary]-[accept-encoding]\n" +
-                "3-Header-[content-encoding]-[gzip]\n" +
-                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
-                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "3-HeadersEnd\n" +
-                "3-Body-97\n" +
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[200]\n" + "3-Header-[vary]-[accept-encoding]\n" +
+                "3-Header-[content-encoding]-[gzip]\n" + "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
+                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n" + "3-Body-97\n" +
                 "3-EndOfStream\n", output.getTrace());
     }
 
@@ -557,8 +546,7 @@ public class TestStreamProcessor extends Http2TestBase {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             // Generate content type that is compressible
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
@@ -589,7 +577,7 @@ public class TestStreamProcessor extends Http2TestBase {
         byte[] headersFrameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
 
-        buildGetRequest(headersFrameHeader, headersPayload, null, headers , 3);
+        buildGetRequest(headersFrameHeader, headersPayload, null, headers, 3);
 
         writeFrame(headersFrameHeader, headersPayload);
 

@@ -68,11 +68,9 @@ public class TestAsync extends Http2TestBase {
                     for (Boolean streamUnlimited : booleans) {
                         for (Boolean useNonContainerThreadForWrite : booleans) {
                             for (Boolean largeInitialWindow : booleans) {
-                                parameterSets.add(new Object[] {
-                                        base[0], base[1],
-                                        expandConnectionFirst, connectionUnlimited, streamUnlimited,
-                                        useNonContainerThreadForWrite, largeInitialWindow
-                                });
+                                parameterSets.add(
+                                        new Object[] { base[0], base[1], expandConnectionFirst, connectionUnlimited,
+                                                streamUnlimited, useNonContainerThreadForWrite, largeInitialWindow });
                             }
                         }
                     }
@@ -110,8 +108,7 @@ public class TestAsync extends Http2TestBase {
         Context ctxt = tomcat.addContext("", null);
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
-        Wrapper w = Tomcat.addServlet(ctxt, "async",
-                new AsyncServlet(blockCount, useNonContainerThreadForWrite));
+        Wrapper w = Tomcat.addServlet(ctxt, "async", new AsyncServlet(blockCount, useNonContainerThreadForWrite));
         w.setAsyncSupported(true);
         ctxt.addServletMappingDecoded("/async", "async");
         tomcat.start();
@@ -128,8 +125,7 @@ public class TestAsync extends Http2TestBase {
 
         if (largeInitialWindow) {
             startingWindowSize = ((1 << 17) - 1);
-            SettingValue sv =
-                    new SettingValue(Setting.INITIAL_WINDOW_SIZE.getId(), startingWindowSize);
+            SettingValue sv = new SettingValue(Setting.INITIAL_WINDOW_SIZE.getId(), startingWindowSize);
             sendSettings(0, false, sv);
             // Test code assumes connection window and stream window size are the same at the start
             sendWindowUpdate(0, startingWindowSize - ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE);
@@ -217,8 +213,7 @@ public class TestAsync extends Http2TestBase {
          * Not thread-safe. OK for this test. NOt OK for use in the real world.
          */
         @Override
-        protected void doGet(HttpServletRequest request, HttpServletResponse response)
-                throws IOException {
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
             final AsyncContext asyncContext = request.startAsync();
 
@@ -259,7 +254,7 @@ public class TestAsync extends Http2TestBase {
                     while (output.isReady()) {
                         blockCount.incrementAndGet();
                         output.write(bytes);
-                        if (blockCount.get()  == blockLimit) {
+                        if (blockCount.get() == blockLimit) {
                             asyncContext.complete();
                             scheduler.shutdown();
                             return;

@@ -99,17 +99,11 @@ public class TestFlowControl extends Http2TestBase {
             // Language will depend on locale
             String language = sm.getLocale().toLanguageTag();
 
-            Assert.assertEquals(
-                    "3-HeadersStart\n" +
-                    "3-Header-[:status]-[404]\n" +
-                    "3-Header-[content-type]-[text/html;charset=utf-8]\n" +
-                    "3-Header-[content-language]-[" + language + "]\n" +
-                    "3-Header-[content-length]-[" + contentLength + "]\n" +
-                    "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                    "3-HeadersEnd\n" +
-                    "3-Body-" + contentLength + "\n" +
-                    "3-EndOfStream\n" +
-                    "3-RST-[0]\n", output.getTrace());
+            Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[404]\n" +
+                    "3-Header-[content-type]-[text/html;charset=utf-8]\n" + "3-Header-[content-language]-[" + language +
+                    "]\n" + "3-Header-[content-length]-[" + contentLength + "]\n" +
+                    "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n" + "3-Body-" + contentLength +
+                    "\n" + "3-EndOfStream\n" + "3-RST-[0]\n", output.getTrace());
             output.clearTrace();
 
             // Write 3*16k=48k of request body
@@ -132,8 +126,8 @@ public class TestFlowControl extends Http2TestBase {
 
 
     /*
-     * This might be unnecessary but given the potential for timing differences
-     * across different systems a more robust approach seems prudent.
+     * This might be unnecessary but given the potential for timing differences across different systems a more robust
+     * approach seems prudent.
      */
     private void waitForWindowSize(int streamId) throws Http2Exception, IOException {
         String prefix = streamId + "-WindowSize-";

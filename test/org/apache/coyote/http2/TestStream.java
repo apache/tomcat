@@ -60,20 +60,14 @@ public class TestStream extends Http2TestBase {
 
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
-        buildGetRequest(frameHeader, headersPayload, null, 3,
-                "/pathparam;jsessionid=" + PathParam.EXPECTED_SESSION_ID);
+        buildGetRequest(frameHeader, headersPayload, null, 3, "/pathparam;jsessionid=" + PathParam.EXPECTED_SESSION_ID);
         writeFrame(frameHeader, headersPayload);
 
         readSimpleGetResponse();
 
-        Assert.assertEquals(
-                "3-HeadersStart\n" +
-                "3-Header-[:status]-[200]\n" +
-                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
-                "3-Header-[content-length]-[2]\n" +
-                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "3-HeadersEnd\n" +
-                "3-Body-2\n" +
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[200]\n" +
+                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" + "3-Header-[content-length]-[2]\n" +
+                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n" + "3-Body-2\n" +
                 "3-EndOfStream\n", output.getTrace());
     }
 
@@ -111,18 +105,12 @@ public class TestStream extends Http2TestBase {
         parser.readFrame();
 
         Assert.assertEquals(
-                "3-HeadersStart\n" +
-                "3-Header-[:status]-[200]\n" +
-                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
-                "3-Header-[content-length]-[44]\n" +
-                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "3-HeadersEnd\n" +
-                "3-Body-44\n" +
-                "3-HeadersStart\n" +
-                "3-Header-[x-trailer-2]-[Trailer value two]\n" +
-                "3-Header-[x-trailer-1]-[Trailer value one]\n" +
-                "3-HeadersEnd\n" +
-                "3-EndOfStream\n", output.getTrace());
+                "3-HeadersStart\n" + "3-Header-[:status]-[200]\n" +
+                        "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" + "3-Header-[content-length]-[44]\n" +
+                        "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n" + "3-Body-44\n" +
+                        "3-HeadersStart\n" + "3-Header-[x-trailer-2]-[Trailer value two]\n" +
+                        "3-Header-[x-trailer-1]-[Trailer value one]\n" + "3-HeadersEnd\n" + "3-EndOfStream\n",
+                output.getTrace());
     }
 
 

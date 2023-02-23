@@ -54,15 +54,12 @@ public class TestLargeUpload extends Http2TestBase {
 
         List<Object[]> parameterSets = new ArrayList<>();
         for (Object[] base : baseData) {
-            parameterSets.add(new Object[] {
-                    base[0], base[1],
-                    "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
-            parameterSets.add(new Object[] {
-                    base[0], base[1],
-                    "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
-            parameterSets.add(new Object[] {
-                    base[0], base[1],
-                    "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+            parameterSets.add(new Object[] { base[0], base[1], "JSSE", Boolean.FALSE,
+                    "org.apache.tomcat.util.net.jsse.JSSEImplementation" });
+            parameterSets.add(new Object[] { base[0], base[1], "OpenSSL", Boolean.TRUE,
+                    "org.apache.tomcat.util.net.openssl.OpenSSLImplementation" });
+            parameterSets.add(new Object[] { base[0], base[1], "OpenSSL-Panama", Boolean.FALSE,
+                    "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" });
         }
 
         return parameterSets;
@@ -98,8 +95,8 @@ public class TestLargeUpload extends Http2TestBase {
         byte[] trailerFrameHeader = new byte[9];
         ByteBuffer trailerPayload = ByteBuffer.allocate(256);
 
-        buildPostRequest(headersFrameHeader, headersPayload, false, dataFrameHeader, dataPayload,
-                null, trailerFrameHeader, trailerPayload, 3);
+        buildPostRequest(headersFrameHeader, headersPayload, false, dataFrameHeader, dataPayload, null,
+                trailerFrameHeader, trailerPayload, 3);
 
         // Write the headers
         writeFrame(headersFrameHeader, headersPayload);
