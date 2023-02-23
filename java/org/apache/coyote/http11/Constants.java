@@ -121,12 +121,10 @@ public final class Constants {
     public static final byte[] KEEPALIVE_BYTES = ByteChunk.convertToBytes(KEEPALIVE);
     public static final String CHUNKED = "chunked";
     /**
-     * @deprecated This option will be removed in Tomcat 9. Reason phrase will
-     *             not be sent.
+     * @deprecated This option will be removed in Tomcat 9. Reason phrase will not be sent.
      */
     @Deprecated
-    public static final byte[] ACK_BYTES_REASON =
-            ByteChunk.convertToBytes("HTTP/1.1 100 Continue" + CRLF + CRLF);
+    public static final byte[] ACK_BYTES_REASON = ByteChunk.convertToBytes("HTTP/1.1 100 Continue" + CRLF + CRLF);
     public static final byte[] ACK_BYTES = ByteChunk.convertToBytes("HTTP/1.1 100 " + CRLF + CRLF);
     public static final String TRANSFERENCODING = "Transfer-Encoding";
     public static final String KEEP_ALIVE_HEADER_NAME = "Keep-Alive";

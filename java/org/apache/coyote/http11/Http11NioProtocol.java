@@ -41,7 +41,9 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
 
 
     @Override
-    protected Log getLog() { return log; }
+    protected Log getLog() {
+        return log;
+    }
 
 
     // -------------------- Pool setup --------------------
@@ -70,19 +72,19 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
     }
 
     public void setSelectorTimeout(long timeout) {
-        ((NioEndpoint)getEndpoint()).setSelectorTimeout(timeout);
+        ((NioEndpoint) getEndpoint()).setSelectorTimeout(timeout);
     }
 
     public long getSelectorTimeout() {
-        return ((NioEndpoint)getEndpoint()).getSelectorTimeout();
+        return ((NioEndpoint) getEndpoint()).getSelectorTimeout();
     }
 
     public void setPollerThreadPriority(int threadPriority) {
-        ((NioEndpoint)getEndpoint()).setPollerThreadPriority(threadPriority);
+        ((NioEndpoint) getEndpoint()).setPollerThreadPriority(threadPriority);
     }
 
     public int getPollerThreadPriority() {
-      return ((NioEndpoint)getEndpoint()).getPollerThreadPriority();
+        return ((NioEndpoint) getEndpoint()).getPollerThreadPriority();
     }
 
 
@@ -91,7 +93,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
     @Override
     protected String getNamePrefix() {
         if (isSSLEnabled()) {
-            return ("https-" + getSslImplementationShortName()+ "-nio");
+            return ("https-" + getSslImplementationShortName() + "-nio");
         } else {
             return ("http-nio");
         }
