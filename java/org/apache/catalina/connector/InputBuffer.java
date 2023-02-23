@@ -42,15 +42,13 @@ import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * The buffer used by Tomcat request. This is a derivative of the Tomcat 3.3
- * OutputBuffer, adapted to handle input instead of output. This allows
- * complete recycling of the facade objects (the ServletInputStream and the
+ * The buffer used by Tomcat request. This is a derivative of the Tomcat 3.3 OutputBuffer, adapted to handle input
+ * instead of output. This allows complete recycling of the facade objects (the ServletInputStream and the
  * BufferedReader).
  *
  * @author Remy Maucherat
  */
-public class InputBuffer extends Reader
-    implements ByteChunk.ByteInputChannel, ApplicationBufferHandler {
+public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, ApplicationBufferHandler {
 
     /**
      * The string manager for this package.
@@ -223,8 +221,7 @@ public class InputBuffer extends Reader
     public int available() {
         int available = availableInThisBuffer();
         if (available == 0) {
-            coyoteRequest.action(ActionCode.AVAILABLE,
-                    Boolean.valueOf(coyoteRequest.getReadListener() != null));
+            coyoteRequest.action(ActionCode.AVAILABLE, Boolean.valueOf(coyoteRequest.getReadListener() != null));
             available = (coyoteRequest.getAvailable() > 0) ? 1 : 0;
         }
         return available;
@@ -354,14 +351,14 @@ public class InputBuffer extends Reader
 
 
     /**
-     * Transfers bytes from the buffer to the specified ByteBuffer. After the
-     * operation the position of the ByteBuffer will be returned to the one
-     * before the operation, the limit will be the position incremented by
-     * the number of the transferred bytes.
+     * Transfers bytes from the buffer to the specified ByteBuffer. After the operation the position of the ByteBuffer
+     * will be returned to the one before the operation, the limit will be the position incremented by the number of the
+     * transferred bytes.
      *
      * @param to the ByteBuffer into which bytes are to be written.
-     * @return an integer specifying the actual number of bytes read, or -1 if
-     *         the end of the stream is reached
+     *
+     * @return an integer specifying the actual number of bytes read, or -1 if the end of the stream is reached
+     *
      * @throws IOException if an input or output exception has occurred
      */
     public int read(ByteBuffer to) throws IOException {
@@ -384,7 +381,7 @@ public class InputBuffer extends Reader
 
 
     /**
-     * @param s     New encoding value
+     * @param s New encoding value
      *
      * @deprecated This method will be removed in Tomcat 9.0.x
      */
@@ -650,17 +647,17 @@ public class InputBuffer extends Reader
 
     private void makeSpace(int count) {
         int desiredSize = cb.limit() + count;
-        if(desiredSize > readLimit) {
+        if (desiredSize > readLimit) {
             desiredSize = readLimit;
         }
 
-        if(desiredSize <= cb.capacity()) {
+        if (desiredSize <= cb.capacity()) {
             return;
         }
 
         int newSize = 2 * cb.capacity();
-        if(desiredSize >= newSize) {
-            newSize= 2 * cb.capacity() + count;
+        if (desiredSize >= newSize) {
+            newSize = 2 * cb.capacity() + count;
         }
 
         if (newSize > readLimit) {
