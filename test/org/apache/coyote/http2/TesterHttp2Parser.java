@@ -36,8 +36,7 @@ public class TesterHttp2Parser extends Http2Parser {
     /**
      * {@inheritDoc}
      * <p>
-     * <b>Note:</b> The test implementation always uses blocking IO for both the
-     * initial read and the remainder.
+     * <b>Note:</b> The test implementation always uses blocking IO for both the initial read and the remainder.
      */
     @Override
     public boolean readFrame() throws Http2Exception, IOException {

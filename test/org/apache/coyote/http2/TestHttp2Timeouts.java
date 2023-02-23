@@ -30,8 +30,7 @@ public class TestHttp2Timeouts extends Http2TestBase {
 
 
     /*
-     * Simple request won't fill buffer so timeout will occur in Tomcat internal
-     * code during response completion.
+     * Simple request won't fill buffer so timeout will occur in Tomcat internal code during response completion.
      */
     @Test
     public void testClientWithEmptyWindow() throws Exception {
@@ -51,9 +50,8 @@ public class TestHttp2Timeouts extends Http2TestBase {
 
 
     /*
-     * Large request will fill buffer so timeout will occur in application code
-     * during response write (when Tomcat commits the response and flushes the
-     * buffer as a result of the buffer filling).
+     * Large request will fill buffer so timeout will occur in application code during response write (when Tomcat
+     * commits the response and flushes the buffer as a result of the buffer filling).
      */
     @Test
     public void testClientWithEmptyWindowLargeResponse() throws Exception {
@@ -77,7 +75,7 @@ public class TestHttp2Timeouts extends Http2TestBase {
      */
     @Test
     public void testClientPostsNoBody() throws Exception {
-        sendSimplePostRequest(3,  null,  false);
+        sendSimplePostRequest(3, null, false);
 
         // Headers
         parser.readFrame();

@@ -37,10 +37,9 @@ import org.apache.catalina.core.ApplicationPushBuilder;
 import org.apache.catalina.startup.Tomcat;
 
 /**
- * Unit tests for Section 6.5 of
- * <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>.
+ * Unit tests for Section 6.5 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>.
  */
-public class TestHttp2Section_6_6  extends Http2TestBase {
+public class TestHttp2Section_6_6 extends Http2TestBase {
 
 
     @Test

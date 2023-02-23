@@ -22,11 +22,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Unit tests for Section 5.5 of
- * <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>.
- * <br>
- * The order of tests in this class is aligned with the order of the
- * requirements in the RFC.
+ * Unit tests for Section 5.5 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
+ * The order of tests in this class is aligned with the order of the requirements in the RFC.
  */
 public class TestHttp2Section_5_5 extends Http2TestBase {
 
@@ -57,7 +54,7 @@ public class TestHttp2Section_5_5 extends Http2TestBase {
 
         parser.readFrame();
 
-        Assert.assertEquals("0-Settings-Ack\n",  output.getTrace());
+        Assert.assertEquals("0-Settings-Ack\n", output.getTrace());
     }
 
 
