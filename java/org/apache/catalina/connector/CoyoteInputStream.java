@@ -93,9 +93,7 @@ public class CoyoteInputStream extends ServletInputStream {
 
 
     /**
-     * Close the stream
-     * Since we re-cycle, we can't allow the call to super.close()
-     * which would permanently disable us.
+     * Close the stream Since we re-cycle, we can't allow the call to super.close() which would permanently disable us.
      */
     @Override
     public void close() throws IOException {

@@ -55,8 +55,7 @@ public class CoyoteWriter extends PrintWriter {
      * Prevent cloning the facade.
      */
     @Override
-    protected Object clone()
-        throws CloneNotSupportedException {
+    protected Object clone() throws CloneNotSupportedException {
         throw new CloneNotSupportedException();
     }
 
@@ -106,7 +105,7 @@ public class CoyoteWriter extends PrintWriter {
         // so the stream can be reused. We close ob.
         try {
             ob.close();
-        } catch (IOException ex ) {
+        } catch (IOException ex) {
             // Ignore
         }
         error = false;

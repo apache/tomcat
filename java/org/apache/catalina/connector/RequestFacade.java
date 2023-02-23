@@ -45,8 +45,7 @@ import jakarta.servlet.http.PushBuilder;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Facade class that wraps a Coyote request object.
- * All methods are delegated to the wrapped request.
+ * Facade class that wraps a Coyote request object. All methods are delegated to the wrapped request.
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
@@ -85,8 +84,7 @@ public class RequestFacade implements HttpServletRequest {
      * Prevent cloning the facade.
      */
     @Override
-    protected Object clone()
-        throws CloneNotSupportedException {
+    protected Object clone() throws CloneNotSupportedException {
         throw new CloneNotSupportedException();
     }
 
@@ -171,7 +169,7 @@ public class RequestFacade implements HttpServletRequest {
 
 
     @Override
-    public Map<String,String[]> getParameterMap() {
+    public Map<String, String[]> getParameterMap() {
         checkFacade();
         return request.getParameterMap();
     }
@@ -569,8 +567,8 @@ public class RequestFacade implements HttpServletRequest {
 
 
     @Override
-    public <T extends HttpUpgradeHandler> T upgrade(
-            Class<T> httpUpgradeHandlerClass) throws java.io.IOException, ServletException {
+    public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass)
+            throws java.io.IOException, ServletException {
         checkFacade();
         return request.upgrade(httpUpgradeHandlerClass);
     }
