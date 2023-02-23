@@ -477,6 +477,12 @@ class StreamProcessor extends AbstractProcessor {
             return false;
         }
 
+        // Scheme must adhere to RFC 3986
+        String scheme = request.scheme().toString();
+        if (!HttpParser.isScheme(scheme)) {
+            return false;
+        }
+
         // Invalid character in request target
         // (other checks such as valid %nn happen later)
         ByteChunk bc = request.requestURI().getByteChunk();
