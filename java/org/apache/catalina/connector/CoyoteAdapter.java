@@ -645,46 +645,52 @@ public class CoyoteAdapter implements Adapter {
 
         MessageBytes decodedURI = req.decodedURI();
 
-        if (undecodedURI.getType() == MessageBytes.T_BYTES) {
-            // Copy the raw URI to the decodedURI
-            decodedURI.duplicate(undecodedURI);
+        // Filter CONNECT method
+        if (req.method().equalsIgnoreCase("CONNECT")) {
+            response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, sm.getString("coyoteAdapter.connect"));
+        } else {
+            // No URI for CONNECT requests
+            if (undecodedURI.getType() == MessageBytes.T_BYTES) {
+                // Copy the raw URI to the decodedURI
+                decodedURI.duplicate(undecodedURI);
 
-            // Parse (and strip out) the path parameters
-            parsePathParameters(req, request);
+                // Parse (and strip out) the path parameters
+                parsePathParameters(req, request);
 
-            // URI decoding
-            // %xx decoding of the URL
-            try {
-                req.getURLDecoder().convert(decodedURI.getByteChunk(), connector.getEncodedSolidusHandlingInternal());
-            } catch (IOException ioe) {
-                response.sendError(400, "Invalid URI: " + ioe.getMessage());
-            }
-            // Normalization
-            if (normalize(req.decodedURI())) {
-                // Character decoding
-                convertURI(decodedURI, request);
-                // Check that the URI is still normalized
-                if (!checkNormalize(req.decodedURI())) {
+                // URI decoding
+                // %xx decoding of the URL
+                try {
+                    req.getURLDecoder().convert(decodedURI.getByteChunk(), connector.getEncodedSolidusHandlingInternal());
+                } catch (IOException ioe) {
+                    response.sendError(400, "Invalid URI: " + ioe.getMessage());
+                }
+                // Normalization
+                if (normalize(req.decodedURI())) {
+                    // Character decoding
+                    convertURI(decodedURI, request);
+                    // Check that the URI is still normalized
+                    if (!checkNormalize(req.decodedURI())) {
+                        response.sendError(400, "Invalid URI");
+                    }
+                } else {
                     response.sendError(400, "Invalid URI");
                 }
             } else {
-                response.sendError(400, "Invalid URI");
-            }
-        } else {
-            /* The URI is chars or String, and has been sent using an in-memory
-             * protocol handler. The following assumptions are made:
-             * - req.requestURI() has been set to the 'original' non-decoded,
-             *   non-normalized URI
-             * - req.decodedURI() has been set to the decoded, normalized form
-             *   of req.requestURI()
-             */
-            decodedURI.toChars();
-            // Remove all path parameters; any needed path parameter should be set
-            // using the request object rather than passing it in the URL
-            CharChunk uriCC = decodedURI.getCharChunk();
-            int semicolon = uriCC.indexOf(';');
-            if (semicolon > 0) {
-                decodedURI.setChars(uriCC.getBuffer(), uriCC.getStart(), semicolon);
+                /* The URI is chars or String, and has been sent using an in-memory
+                 * protocol handler. The following assumptions are made:
+                 * - req.requestURI() has been set to the 'original' non-decoded,
+                 *   non-normalized URI
+                 * - req.decodedURI() has been set to the decoded, normalized form
+                 *   of req.requestURI()
+                 */
+                decodedURI.toChars();
+                // Remove all path parameters; any needed path parameter should be set
+                // using the request object rather than passing it in the URL
+                CharChunk uriCC = decodedURI.getCharChunk();
+                int semicolon = uriCC.indexOf(';');
+                if (semicolon > 0) {
+                    decodedURI.setChars(uriCC.getBuffer(), uriCC.getStart(), semicolon);
+                }
             }
         }
 
@@ -840,7 +846,7 @@ public class CoyoteAdapter implements Adapter {
             return false;
         }
 
-        // Filter trace method
+        // Filter TRACE method
         if (!connector.getAllowTrace()
                 && req.method().equalsIgnoreCase("TRACE")) {
             Wrapper wrapper = request.getWrapper();

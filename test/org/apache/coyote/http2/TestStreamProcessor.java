@@ -580,4 +580,27 @@ public class TestStreamProcessor extends Http2TestBase {
             }
         }
     }
+
+
+    @Test
+    public void testConnect() throws Exception {
+        http2Connect();
+
+        List<Header> headers = new ArrayList<>(4);
+        headers.add(new Header(":method", "CONNECT"));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":authority", "example.local"));
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, headers , 3);
+
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("3-Header-[:status]-[501]"));
+    }
 }

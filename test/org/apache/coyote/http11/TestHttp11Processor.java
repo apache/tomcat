@@ -2003,6 +2003,24 @@ public class TestHttp11Processor extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testConnect() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        String request =
+            "CONNECT example.local HTTP/1.1" + SimpleHttpClient.CRLF +
+            "Host: example.local" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF;
+
+        Client client = new Client(getPort());
+        client.setRequest(new String[] {request});
+
+        client.connect();
+        client.processRequest();
+        Assert.assertTrue(client.isResponse501());
+    }
+
+
     private static class TestPostNoReadServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;

@@ -31,6 +31,7 @@ import org.apache.coyote.CloseNowException;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http11.HttpOutputBuffer;
 import org.apache.coyote.http11.OutputFilter;
 import org.apache.coyote.http11.filters.SavedRequestInputFilter;
@@ -147,7 +148,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     private void prepareRequest() {
         if (coyoteRequest.scheme().isNull()) {
-            if (handler.getProtocol().getHttp11Protocol().isSSLEnabled()) {
+            if (((AbstractHttp11Protocol<?>) handler.getProtocol().getHttp11Protocol()).isSSLEnabled()) {
                 coyoteRequest.scheme().setString("https");
             } else {
                 coyoteRequest.scheme().setString("http");
@@ -496,7 +497,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     final boolean receivedEndOfHeaders() throws ConnectionException {
-        if (coyoteRequest.method().isNull() || coyoteRequest.scheme().isNull() || coyoteRequest.requestURI().isNull()) {
+        if (coyoteRequest.method().isNull() || coyoteRequest.scheme().isNull() ||
+                !coyoteRequest.method().equalsIgnoreCase("CONNECT") && coyoteRequest.requestURI().isNull()) {
             throw new ConnectionException(sm.getString("stream.header.required", getConnectionId(), getIdAsString()),
                     Http2Error.PROTOCOL_ERROR);
         }
