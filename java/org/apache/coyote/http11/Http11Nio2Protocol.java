@@ -42,7 +42,9 @@ public class Http11Nio2Protocol extends AbstractHttp11Protocol<Nio2Channel> {
 
 
     @Override
-    protected Log getLog() { return log; }
+    protected Log getLog() {
+        return log;
+    }
 
 
     @Override
@@ -54,7 +56,7 @@ public class Http11Nio2Protocol extends AbstractHttp11Protocol<Nio2Channel> {
     @Override
     protected String getNamePrefix() {
         if (isSSLEnabled()) {
-            return "https-" + getSslImplementationShortName()+ "-nio2";
+            return "https-" + getSslImplementationShortName() + "-nio2";
         } else {
             return "http-nio2";
         }
