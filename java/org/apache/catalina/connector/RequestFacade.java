@@ -48,8 +48,7 @@ import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Facade class that wraps a Coyote request object.
- * All methods are delegated to the wrapped request.
+ * Facade class that wraps a Coyote request object. All methods are delegated to the wrapped request.
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
@@ -57,8 +56,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class RequestFacade implements HttpServletRequest {
 
 
-    private final class GetAttributePrivilegedAction
-            implements PrivilegedAction<Enumeration<String>> {
+    private final class GetAttributePrivilegedAction implements PrivilegedAction<Enumeration<String>> {
 
         @Override
         public Enumeration<String> run() {
@@ -67,22 +65,20 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetParameterMapPrivilegedAction
-            implements PrivilegedAction<Map<String,String[]>> {
+    private final class GetParameterMapPrivilegedAction implements PrivilegedAction<Map<String, String[]>> {
 
         @Override
-        public Map<String,String[]> run() {
+        public Map<String, String[]> run() {
             return request.getParameterMap();
         }
     }
 
 
-    private final class GetRequestDispatcherPrivilegedAction
-            implements PrivilegedAction<RequestDispatcher> {
+    private final class GetRequestDispatcherPrivilegedAction implements PrivilegedAction<RequestDispatcher> {
 
         private final String path;
 
-        GetRequestDispatcherPrivilegedAction(String path){
+        GetRequestDispatcherPrivilegedAction(String path) {
             this.path = path;
         }
 
@@ -93,12 +89,11 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetParameterPrivilegedAction
-            implements PrivilegedAction<String> {
+    private final class GetParameterPrivilegedAction implements PrivilegedAction<String> {
 
         public String name;
 
-        GetParameterPrivilegedAction(String name){
+        GetParameterPrivilegedAction(String name) {
             this.name = name;
         }
 
@@ -109,8 +104,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetParameterNamesPrivilegedAction
-            implements PrivilegedAction<Enumeration<String>> {
+    private final class GetParameterNamesPrivilegedAction implements PrivilegedAction<Enumeration<String>> {
 
         @Override
         public Enumeration<String> run() {
@@ -119,12 +113,11 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetParameterValuePrivilegedAction
-            implements PrivilegedAction<String[]> {
+    private final class GetParameterValuePrivilegedAction implements PrivilegedAction<String[]> {
 
         public String name;
 
-        GetParameterValuePrivilegedAction(String name){
+        GetParameterValuePrivilegedAction(String name) {
             this.name = name;
         }
 
@@ -135,8 +128,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetCookiesPrivilegedAction
-            implements PrivilegedAction<Cookie[]> {
+    private final class GetCookiesPrivilegedAction implements PrivilegedAction<Cookie[]> {
 
         @Override
         public Cookie[] run() {
@@ -145,8 +137,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetCharacterEncodingPrivilegedAction
-            implements PrivilegedAction<String> {
+    private final class GetCharacterEncodingPrivilegedAction implements PrivilegedAction<String> {
 
         @Override
         public String run() {
@@ -155,12 +146,11 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetHeadersPrivilegedAction
-            implements PrivilegedAction<Enumeration<String>> {
+    private final class GetHeadersPrivilegedAction implements PrivilegedAction<Enumeration<String>> {
 
         private final String name;
 
-        GetHeadersPrivilegedAction(String name){
+        GetHeadersPrivilegedAction(String name) {
             this.name = name;
         }
 
@@ -171,8 +161,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetHeaderNamesPrivilegedAction
-            implements PrivilegedAction<Enumeration<String>> {
+    private final class GetHeaderNamesPrivilegedAction implements PrivilegedAction<Enumeration<String>> {
 
         @Override
         public Enumeration<String> run() {
@@ -181,8 +170,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetLocalePrivilegedAction
-            implements PrivilegedAction<Locale> {
+    private final class GetLocalePrivilegedAction implements PrivilegedAction<Locale> {
 
         @Override
         public Locale run() {
@@ -191,8 +179,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetLocalesPrivilegedAction
-            implements PrivilegedAction<Enumeration<Locale>> {
+    private final class GetLocalesPrivilegedAction implements PrivilegedAction<Enumeration<Locale>> {
 
         @Override
         public Enumeration<Locale> run() {
@@ -200,12 +187,11 @@ public class RequestFacade implements HttpServletRequest {
         }
     }
 
-    private final class GetSessionPrivilegedAction
-            implements PrivilegedAction<HttpSession> {
+    private final class GetSessionPrivilegedAction implements PrivilegedAction<HttpSession> {
 
         private final boolean create;
 
-        GetSessionPrivilegedAction(boolean create){
+        GetSessionPrivilegedAction(boolean create) {
             this.create = create;
         }
 
@@ -217,7 +203,6 @@ public class RequestFacade implements HttpServletRequest {
 
 
     private static final StringManager sm = StringManager.getManager(RequestFacade.class);
-
 
 
     /**
@@ -248,8 +233,7 @@ public class RequestFacade implements HttpServletRequest {
      * Prevent cloning the facade.
      */
     @Override
-    protected Object clone()
-        throws CloneNotSupportedException {
+    protected Object clone() throws CloneNotSupportedException {
         throw new CloneNotSupportedException();
     }
 
@@ -267,9 +251,8 @@ public class RequestFacade implements HttpServletRequest {
     public Enumeration<String> getAttributeNames() {
         checkFacade();
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetAttributePrivilegedAction());
+        if (Globals.IS_SECURITY_ENABLED) {
+            return AccessController.doPrivileged(new GetAttributePrivilegedAction());
         } else {
             return request.getAttributeNames();
         }
@@ -280,9 +263,8 @@ public class RequestFacade implements HttpServletRequest {
     public String getCharacterEncoding() {
         checkFacade();
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetCharacterEncodingPrivilegedAction());
+        if (Globals.IS_SECURITY_ENABLED) {
+            return AccessController.doPrivileged(new GetCharacterEncodingPrivilegedAction());
         } else {
             return request.getCharacterEncoding();
         }
@@ -321,9 +303,8 @@ public class RequestFacade implements HttpServletRequest {
     public String getParameter(String name) {
         checkFacade();
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetParameterPrivilegedAction(name));
+        if (Globals.IS_SECURITY_ENABLED) {
+            return AccessController.doPrivileged(new GetParameterPrivilegedAction(name));
         } else {
             return request.getParameter(name);
         }
@@ -334,9 +315,8 @@ public class RequestFacade implements HttpServletRequest {
     public Enumeration<String> getParameterNames() {
         checkFacade();
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetParameterNamesPrivilegedAction());
+        if (Globals.IS_SECURITY_ENABLED) {
+            return AccessController.doPrivileged(new GetParameterNamesPrivilegedAction());
         } else {
             return request.getParameterNames();
         }
@@ -350,12 +330,11 @@ public class RequestFacade implements HttpServletRequest {
         String[] ret = null;
 
         /*
-         * Clone the returned array only if there is a security manager
-         * in place, so that performance won't suffer in the non-secure case
+         * Clone the returned array only if there is a security manager in place, so that performance won't suffer in
+         * the non-secure case
          */
-        if (SecurityUtil.isPackageProtectionEnabled()){
-            ret = AccessController.doPrivileged(
-                new GetParameterValuePrivilegedAction(name));
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            ret = AccessController.doPrivileged(new GetParameterValuePrivilegedAction(name));
             if (ret != null) {
                 ret = ret.clone();
             }
@@ -368,12 +347,11 @@ public class RequestFacade implements HttpServletRequest {
 
 
     @Override
-    public Map<String,String[]> getParameterMap() {
+    public Map<String, String[]> getParameterMap() {
         checkFacade();
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetParameterMapPrivilegedAction());
+        if (Globals.IS_SECURITY_ENABLED) {
+            return AccessController.doPrivileged(new GetParameterMapPrivilegedAction());
         } else {
             return request.getParameterMap();
         }
@@ -447,9 +425,8 @@ public class RequestFacade implements HttpServletRequest {
     public Locale getLocale() {
         checkFacade();
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetLocalePrivilegedAction());
+        if (Globals.IS_SECURITY_ENABLED) {
+            return AccessController.doPrivileged(new GetLocalePrivilegedAction());
         } else {
             return request.getLocale();
         }
@@ -460,9 +437,8 @@ public class RequestFacade implements HttpServletRequest {
     public Enumeration<Locale> getLocales() {
         checkFacade();
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetLocalesPrivilegedAction());
+        if (Globals.IS_SECURITY_ENABLED) {
+            return AccessController.doPrivileged(new GetLocalesPrivilegedAction());
         } else {
             return request.getLocales();
         }
@@ -480,9 +456,8 @@ public class RequestFacade implements HttpServletRequest {
     public RequestDispatcher getRequestDispatcher(String path) {
         checkFacade();
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetRequestDispatcherPrivilegedAction(path));
+        if (Globals.IS_SECURITY_ENABLED) {
+            return AccessController.doPrivileged(new GetRequestDispatcherPrivilegedAction(path));
         } else {
             return request.getRequestDispatcher(path);
         }
@@ -502,12 +477,11 @@ public class RequestFacade implements HttpServletRequest {
         Cookie[] ret = null;
 
         /*
-         * Clone the returned array only if there is a security manager
-         * in place, so that performance won't suffer in the non-secure case
+         * Clone the returned array only if there is a security manager in place, so that performance won't suffer in
+         * the non-secure case
          */
-        if (SecurityUtil.isPackageProtectionEnabled()){
-            ret = AccessController.doPrivileged(
-                new GetCookiesPrivilegedAction());
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            ret = AccessController.doPrivileged(new GetCookiesPrivilegedAction());
             if (ret != null) {
                 ret = ret.clone();
             }
@@ -537,9 +511,8 @@ public class RequestFacade implements HttpServletRequest {
     public Enumeration<String> getHeaders(String name) {
         checkFacade();
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetHeadersPrivilegedAction(name));
+        if (Globals.IS_SECURITY_ENABLED) {
+            return AccessController.doPrivileged(new GetHeadersPrivilegedAction(name));
         } else {
             return request.getHeaders(name);
         }
@@ -550,9 +523,8 @@ public class RequestFacade implements HttpServletRequest {
     public Enumeration<String> getHeaderNames() {
         checkFacade();
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetHeaderNamesPrivilegedAction());
+        if (Globals.IS_SECURITY_ENABLED) {
+            return AccessController.doPrivileged(new GetHeaderNamesPrivilegedAction());
         } else {
             return request.getHeaderNames();
         }
@@ -661,9 +633,8 @@ public class RequestFacade implements HttpServletRequest {
     public HttpSession getSession(boolean create) {
         checkFacade();
 
-        if (SecurityUtil.isPackageProtectionEnabled()){
-            return AccessController.
-                doPrivileged(new GetSessionPrivilegedAction(create));
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return AccessController.doPrivileged(new GetSessionPrivilegedAction(create));
         } else {
             return request.getSession(create);
         }
@@ -825,8 +796,8 @@ public class RequestFacade implements HttpServletRequest {
 
 
     @Override
-    public <T extends HttpUpgradeHandler> T upgrade(
-            Class<T> httpUpgradeHandlerClass) throws java.io.IOException, ServletException {
+    public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass)
+            throws java.io.IOException, ServletException {
         checkFacade();
         return request.upgrade(httpUpgradeHandlerClass);
     }
