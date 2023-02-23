@@ -58,15 +58,9 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
         // Body
         parser.readFrame();
 
-        Assert.assertEquals(
-                "3-HeadersStart\n" +
-                "3-Header-[:status]-[200]\n" +
-                "3-Header-[x-ignore]-[...]\n" +
-                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
-                "3-Header-[content-length]-[2]\n" +
-                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "3-HeadersEnd\n" +
-                "3-Body-2\n" +
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[200]\n" + "3-Header-[x-ignore]-[...]\n" +
+                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" + "3-Header-[content-length]-[2]\n" +
+                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n" + "3-Body-2\n" +
                 "3-EndOfStream\n", output.getTrace());
     }
 
@@ -136,14 +130,9 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
 
         openClientConnection();
 
-        byte[] upgradeRequest = ((usePost ? "POST" : "GET") +
-                " /" + (useReader ? "?useReader=true " : " ") + "HTTP/1.1\r\n" +
-                "Host: localhost:" + getPort() + "\r\n" +
-                "Content-Length: 18\r\n" +
-                "Connection: Upgrade,HTTP2-Settings\r\n" +
-                "Upgrade: h2c\r\n" +
-                EMPTY_HTTP2_SETTINGS_HEADER +
-                "\r\n" +
+        byte[] upgradeRequest = ((usePost ? "POST" : "GET") + " /" + (useReader ? "?useReader=true " : " ") +
+                "HTTP/1.1\r\n" + "Host: localhost:" + getPort() + "\r\n" + "Content-Length: 18\r\n" +
+                "Connection: Upgrade,HTTP2-Settings\r\n" + "Upgrade: h2c\r\n" + EMPTY_HTTP2_SETTINGS_HEADER + "\r\n" +
                 "Small request body").getBytes(StandardCharsets.ISO_8859_1);
         os.write(upgradeRequest);
         os.flush();
@@ -171,19 +160,11 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
             parser.readFrame();
             parser.readFrame();
 
-            Assert.assertEquals("0-Settings-[3]-[200]\n" +
-                    "0-Settings-End\n" +
-                    "0-Settings-Ack\n" +
-                    "0-Ping-[0,0,0,0,0,0,0,1]\n" +
-                    "1-HeadersStart\n" +
-                    "1-Header-[:status]-[200]\n" +
-                    "1-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
-                    "1-Header-[content-length]-[39]\n" +
-                    "1-Header-[date]-[" + DEFAULT_DATE + "]\n" +
-                    "1-HeadersEnd\n" +
-                    "1-Body-39\n" +
-                    "1-EndOfStream\n"
-                    , output.getTrace());
+            Assert.assertEquals("0-Settings-[3]-[200]\n" + "0-Settings-End\n" + "0-Settings-Ack\n" +
+                    "0-Ping-[0,0,0,0,0,0,0,1]\n" + "1-HeadersStart\n" + "1-Header-[:status]-[200]\n" +
+                    "1-Header-[content-type]-[text/plain;charset=UTF-8]\n" + "1-Header-[content-length]-[39]\n" +
+                    "1-Header-[date]-[" + DEFAULT_DATE + "]\n" + "1-HeadersEnd\n" + "1-Body-39\n" + "1-EndOfStream\n",
+                    output.getTrace());
         }
     }
 
@@ -222,9 +203,8 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
 
             // 500 response (triggered by IOException trying to read body that never arrived)
             parser.readFrame();
-            Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                    stream + "-HeadersStart\n" +
-                    stream + "-Header-[:status]-[500]\n"));
+            Assert.assertTrue(output.getTrace(),
+                    output.getTrace().startsWith(stream + "-HeadersStart\n" + stream + "-Header-[:status]-[500]\n"));
             output.clearTrace();
 
             // reset frame

@@ -55,9 +55,7 @@ public class TestStreamQueryString extends Http2TestBase {
         for (Object[] base : baseData) {
             // Test ASCII characters from 32 to 126 inclusive
             for (int i = 32; i < 128; i++) {
-                result.add(new Object[] {
-                        base[0], base[1],
-                       "%" + HexUtils.toHexString(new byte[] { (byte) i})});
+                result.add(new Object[] { base[0], base[1], "%" + HexUtils.toHexString(new byte[] { (byte) i }) });
             }
         }
 
@@ -89,36 +87,28 @@ public class TestStreamQueryString extends Http2TestBase {
 
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
-        buildGetRequest(frameHeader, headersPayload, null, 3,
-                "/query?" + Query.PARAM_NAME + "=" + queryValue);
+        buildGetRequest(frameHeader, headersPayload, null, 3, "/query?" + Query.PARAM_NAME + "=" + queryValue);
         writeFrame(frameHeader, headersPayload);
 
         readSimpleGetResponse();
 
         Assert.assertEquals(queryValue,
-                "3-HeadersStart\n" +
-                "3-Header-[:status]-[200]\n" +
-                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
-                "3-Header-[content-length]-[2]\n" +
-                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "3-HeadersEnd\n" +
-                "3-Body-2\n" +
-                "3-EndOfStream\n", output.getTrace());
+                "3-HeadersStart\n" + "3-Header-[:status]-[200]\n" +
+                        "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" + "3-Header-[content-length]-[2]\n" +
+                        "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n" + "3-Body-2\n" +
+                        "3-EndOfStream\n",
+                output.getTrace());
     }
 
 
     protected void doHttpUpgrade(String queryValue) throws IOException {
         byte[] upgradeRequest = ("GET /query?" + Query.PARAM_NAME + "=" + queryValue + " HTTP/1.1\r\n" +
-                "Host: localhost:" + getPort() + "\r\n" +
-                "Connection: "+ DEFAULT_CONNECTION_HEADER_VALUE + "\r\n" +
-                "Upgrade: h2c\r\n" +
-                EMPTY_HTTP2_SETTINGS_HEADER +
-                "\r\n").getBytes(StandardCharsets.ISO_8859_1);
+                "Host: localhost:" + getPort() + "\r\n" + "Connection: " + DEFAULT_CONNECTION_HEADER_VALUE + "\r\n" +
+                "Upgrade: h2c\r\n" + EMPTY_HTTP2_SETTINGS_HEADER + "\r\n").getBytes(StandardCharsets.ISO_8859_1);
         os.write(upgradeRequest);
         os.flush();
 
-        Assert.assertTrue("Failed to read HTTP Upgrade response",
-                readHttpUpgradeResponse());
+        Assert.assertTrue("Failed to read HTTP Upgrade response", readHttpUpgradeResponse());
     }
 
 
@@ -137,17 +127,10 @@ public class TestStreamQueryString extends Http2TestBase {
         parser.readFrame();
         parser.readFrame();
 
-        Assert.assertEquals("0-Settings-[3]-[200]\n" +
-                "0-Settings-End\n" +
-                "0-Settings-Ack\n" +
-                "0-Ping-[0,0,0,0,0,0,0,1]\n" +
-                "1-HeadersStart\n" +
-                "1-Header-[:status]-[200]\n" +
-                "1-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
-                "1-Header-[content-length]-[2]\n" +
-                "1-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "1-HeadersEnd\n" +
-                "1-Body-2\n" +
+        Assert.assertEquals("0-Settings-[3]-[200]\n" + "0-Settings-End\n" + "0-Settings-Ack\n" +
+                "0-Ping-[0,0,0,0,0,0,0,1]\n" + "1-HeadersStart\n" + "1-Header-[:status]-[200]\n" +
+                "1-Header-[content-type]-[text/plain;charset=UTF-8]\n" + "1-Header-[content-length]-[2]\n" +
+                "1-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "1-HeadersEnd\n" + "1-Body-2\n" +
                 "1-EndOfStream\n", output.getTrace());
 
         output.clearTrace();

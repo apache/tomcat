@@ -22,11 +22,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Unit tests for Section 6.2 of
- * <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>.
- * <br>
- * The order of tests in this class is aligned with the order of the
- * requirements in the RFC.
+ * Unit tests for Section 6.2 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
+ * The order of tests in this class is aligned with the order of the requirements in the RFC.
  */
 public class TestHttp2Section_6_2 extends Http2TestBase {
 
@@ -49,7 +46,7 @@ public class TestHttp2Section_6_2 extends Http2TestBase {
     public void testHeaderFrameWithPadding() throws Exception {
         http2Connect();
 
-        byte[] padding= new byte[8];
+        byte[] padding = new byte[8];
 
         sendSimpleGetRequest(3, padding);
         readSimpleGetResponse();
@@ -61,7 +58,7 @@ public class TestHttp2Section_6_2 extends Http2TestBase {
     public void testHeaderFrameWithNonZeroPadding() throws Exception {
         http2Connect();
 
-        byte[] padding= new byte[8];
+        byte[] padding = new byte[8];
         padding[4] = 1;
 
         sendSimpleGetRequest(3, padding);
@@ -98,7 +95,7 @@ public class TestHttp2Section_6_2 extends Http2TestBase {
     public void testHeaderFrameWithZeroLengthPadding() throws Exception {
         http2Connect();
 
-        byte[] padding= new byte[0];
+        byte[] padding = new byte[0];
 
         sendSimpleGetRequest(3, padding);
         readSimpleGetResponse();

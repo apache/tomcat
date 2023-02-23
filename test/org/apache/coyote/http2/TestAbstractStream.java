@@ -46,13 +46,13 @@ public class TestAbstractStream {
         Assert.assertEquals(a, d.getParentStream());
 
         // Check children
-        Assert.assertEquals(3,  a.getChildStreams().size());
+        Assert.assertEquals(3, a.getChildStreams().size());
         Assert.assertTrue(a.getChildStreams().contains(b));
         Assert.assertTrue(a.getChildStreams().contains(c));
         Assert.assertTrue(a.getChildStreams().contains(d));
-        Assert.assertEquals(0,  b.getChildStreams().size());
-        Assert.assertEquals(0,  c.getChildStreams().size());
-        Assert.assertEquals(0,  d.getChildStreams().size());
+        Assert.assertEquals(0, b.getChildStreams().size());
+        Assert.assertEquals(0, c.getChildStreams().size());
+        Assert.assertEquals(0, d.getChildStreams().size());
     }
 
 
@@ -77,13 +77,13 @@ public class TestAbstractStream {
         Assert.assertEquals(a, d.getParentStream());
 
         // Check children
-        Assert.assertEquals(1,  a.getChildStreams().size());
+        Assert.assertEquals(1, a.getChildStreams().size());
         Assert.assertTrue(a.getChildStreams().contains(d));
-        Assert.assertEquals(2,  d.getChildStreams().size());
+        Assert.assertEquals(2, d.getChildStreams().size());
         Assert.assertTrue(d.getChildStreams().contains(b));
         Assert.assertTrue(d.getChildStreams().contains(c));
-        Assert.assertEquals(0,  b.getChildStreams().size());
-        Assert.assertEquals(0,  c.getChildStreams().size());
+        Assert.assertEquals(0, b.getChildStreams().size());
+        Assert.assertEquals(0, c.getChildStreams().size());
     }
 
 
@@ -115,17 +115,17 @@ public class TestAbstractStream {
         Assert.assertEquals(c, e.getParentStream());
 
         // Check children
-        Assert.assertEquals(2,  d.getChildStreams().size());
+        Assert.assertEquals(2, d.getChildStreams().size());
         Assert.assertTrue(d.getChildStreams().contains(a));
         Assert.assertTrue(d.getChildStreams().contains(f));
-        Assert.assertEquals(0,  f.getChildStreams().size());
-        Assert.assertEquals(2,  a.getChildStreams().size());
+        Assert.assertEquals(0, f.getChildStreams().size());
+        Assert.assertEquals(2, a.getChildStreams().size());
         Assert.assertTrue(a.getChildStreams().contains(b));
         Assert.assertTrue(a.getChildStreams().contains(c));
-        Assert.assertEquals(0,  b.getChildStreams().size());
-        Assert.assertEquals(1,  c.getChildStreams().size());
+        Assert.assertEquals(0, b.getChildStreams().size());
+        Assert.assertEquals(1, c.getChildStreams().size());
         Assert.assertTrue(c.getChildStreams().contains(e));
-        Assert.assertEquals(0,  e.getChildStreams().size());
+        Assert.assertEquals(0, e.getChildStreams().size());
     }
 
 
@@ -157,17 +157,17 @@ public class TestAbstractStream {
         Assert.assertEquals(c, e.getParentStream());
 
         // Check children
-        Assert.assertEquals(1,  d.getChildStreams().size());
+        Assert.assertEquals(1, d.getChildStreams().size());
         Assert.assertTrue(d.getChildStreams().contains(a));
-        Assert.assertEquals(3,  a.getChildStreams().size());
+        Assert.assertEquals(3, a.getChildStreams().size());
         Assert.assertTrue(a.getChildStreams().contains(b));
         Assert.assertTrue(a.getChildStreams().contains(c));
         Assert.assertTrue(a.getChildStreams().contains(f));
-        Assert.assertEquals(0,  b.getChildStreams().size());
-        Assert.assertEquals(0,  f.getChildStreams().size());
-        Assert.assertEquals(1,  c.getChildStreams().size());
+        Assert.assertEquals(0, b.getChildStreams().size());
+        Assert.assertEquals(0, f.getChildStreams().size());
+        Assert.assertEquals(1, c.getChildStreams().size());
         Assert.assertTrue(c.getChildStreams().contains(e));
-        Assert.assertEquals(0,  e.getChildStreams().size());
+        Assert.assertEquals(0, e.getChildStreams().size());
     }
 
 
@@ -191,12 +191,12 @@ public class TestAbstractStream {
         Assert.assertEquals(handler, c.getParentStream());
 
         // Check children
-        Assert.assertEquals(1,  handler.getChildStreams().size());
+        Assert.assertEquals(1, handler.getChildStreams().size());
         Assert.assertTrue(handler.getChildStreams().contains(c));
-        Assert.assertEquals(1,  a.getChildStreams().size());
+        Assert.assertEquals(1, a.getChildStreams().size());
         Assert.assertTrue(a.getChildStreams().contains(b));
-        Assert.assertEquals(0,  b.getChildStreams().size());
-        Assert.assertEquals(1,  c.getChildStreams().size());
+        Assert.assertEquals(0, b.getChildStreams().size());
+        Assert.assertEquals(1, c.getChildStreams().size());
         Assert.assertTrue(c.getChildStreams().contains(a));
     }
 
@@ -230,18 +230,18 @@ public class TestAbstractStream {
         Assert.assertEquals(e, f.getParentStream());
 
         // Check children
-        Assert.assertEquals(1,  handler.getChildStreams().size());
+        Assert.assertEquals(1, handler.getChildStreams().size());
         Assert.assertTrue(handler.getChildStreams().contains(c));
-        Assert.assertEquals(1,  a.getChildStreams().size());
+        Assert.assertEquals(1, a.getChildStreams().size());
         Assert.assertTrue(a.getChildStreams().contains(b));
-        Assert.assertEquals(0,  b.getChildStreams().size());
-        Assert.assertEquals(1,  c.getChildStreams().size());
+        Assert.assertEquals(0, b.getChildStreams().size());
+        Assert.assertEquals(1, c.getChildStreams().size());
         Assert.assertTrue(c.getChildStreams().contains(d));
-        Assert.assertEquals(1,  d.getChildStreams().size());
+        Assert.assertEquals(1, d.getChildStreams().size());
         Assert.assertTrue(d.getChildStreams().contains(e));
-        Assert.assertEquals(1,  e.getChildStreams().size());
+        Assert.assertEquals(1, e.getChildStreams().size());
         Assert.assertTrue(e.getChildStreams().contains(f));
-        Assert.assertEquals(1,  f.getChildStreams().size());
+        Assert.assertEquals(1, f.getChildStreams().size());
         Assert.assertTrue(f.getChildStreams().contains(a));
     }
 
@@ -273,14 +273,14 @@ public class TestAbstractStream {
         Assert.assertTrue(c.isDescendant(d));
 
         // Check children
-        Assert.assertEquals(1,  handler.getChildStreams().size());
+        Assert.assertEquals(1, handler.getChildStreams().size());
         Assert.assertTrue(handler.getChildStreams().contains(c));
-        Assert.assertEquals(1,  c.getChildStreams().size());
+        Assert.assertEquals(1, c.getChildStreams().size());
         Assert.assertTrue(c.getChildStreams().contains(a));
-        Assert.assertEquals(1,  a.getChildStreams().size());
+        Assert.assertEquals(1, a.getChildStreams().size());
         Assert.assertTrue(a.getChildStreams().contains(b));
-        Assert.assertEquals(1,  b.getChildStreams().size());
+        Assert.assertEquals(1, b.getChildStreams().size());
         Assert.assertTrue(b.getChildStreams().contains(d));
-        Assert.assertEquals(0,  d.getChildStreams().size());
+        Assert.assertEquals(0, d.getChildStreams().size());
     }
 }
