@@ -173,13 +173,14 @@ public class StuckThreadDetectionValve extends ValveBase {
         // Keeping a reference to the thread object here does not prevent
         // GC'ing, as the reference is removed from the Map in the finally clause
 
-        Long key = Long.valueOf(Thread.currentThread().getId());
+        Thread currentThread = Thread.currentThread();
+        Long key = Long.valueOf(currentThread.getId());
         StringBuffer requestUrl = request.getRequestURL();
         if (request.getQueryString() != null) {
             requestUrl.append('?');
             requestUrl.append(request.getQueryString());
         }
-        MonitoredThread monitoredThread = new MonitoredThread(Thread.currentThread(), requestUrl.toString(),
+        MonitoredThread monitoredThread = new MonitoredThread(currentThread, requestUrl.toString(),
                 interruptThreadThreshold > 0);
         activeThreads.put(key, monitoredThread);
 

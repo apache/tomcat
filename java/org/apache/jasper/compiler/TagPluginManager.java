@@ -77,20 +77,19 @@ public class TagPluginManager {
 
         TagPluginParser parser;
         ClassLoader original;
+        Thread currentThread = Thread.currentThread();
         if (Constants.IS_SECURITY_ENABLED) {
-            PrivilegedGetTccl pa = new PrivilegedGetTccl();
+            PrivilegedGetTccl pa = new PrivilegedGetTccl(currentThread);
             original = AccessController.doPrivileged(pa);
         } else {
-            original = Thread.currentThread().getContextClassLoader();
+            original = currentThread.getContextClassLoader();
         }
         try {
             if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa =
-                        new PrivilegedSetTccl(TagPluginManager.class.getClassLoader());
+                PrivilegedSetTccl pa = new PrivilegedSetTccl(currentThread, TagPluginManager.class.getClassLoader());
                 AccessController.doPrivileged(pa);
             } else {
-                Thread.currentThread().setContextClassLoader(
-                        TagPluginManager.class.getClassLoader());
+                currentThread.setContextClassLoader(TagPluginManager.class.getClassLoader());
             }
 
             parser = new TagPluginParser(ctxt, blockExternal);
@@ -110,10 +109,10 @@ public class TagPluginManager {
             throw new JasperException(e);
         } finally {
             if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa = new PrivilegedSetTccl(original);
+                PrivilegedSetTccl pa = new PrivilegedSetTccl(currentThread, original);
                 AccessController.doPrivileged(pa);
             } else {
-                Thread.currentThread().setContextClassLoader(original);
+                currentThread.setContextClassLoader(original);
             }
         }
 

@@ -398,6 +398,7 @@ public class McastServiceImpl {
             log.trace("Mcast receive ping from member " + m);
         }
         Runnable t = null;
+        final Thread currentThread = Thread.currentThread();
         if (Arrays.equals(m.getCommand(), Member.SHUTDOWN_PAYLOAD)) {
             if (log.isDebugEnabled()) {
                 log.debug("Member has shutdown:" + m);
@@ -406,12 +407,12 @@ public class McastServiceImpl {
             t = new Runnable() {
                 @Override
                 public void run() {
-                    String name = Thread.currentThread().getName();
+                    String name = currentThread.getName();
                     try {
-                        Thread.currentThread().setName("Membership-MemberDisappeared.");
+                        currentThread.setName("Membership-MemberDisappeared.");
                         service.memberDisappeared(m);
-                    }finally {
-                        Thread.currentThread().setName(name);
+                    } finally {
+                        currentThread.setName(name);
                     }
                 }
             };
@@ -422,17 +423,17 @@ public class McastServiceImpl {
             t = new Runnable() {
                 @Override
                 public void run() {
-                    String name = Thread.currentThread().getName();
+                    String name = currentThread.getName();
                     try {
-                        Thread.currentThread().setName("Membership-MemberAdded.");
+                        currentThread.setName("Membership-MemberAdded.");
                         service.memberAdded(m);
-                    }finally {
-                        Thread.currentThread().setName(name);
+                    } finally {
+                        currentThread.setName(name);
                     }
                 }
             };
-        } //end if
-        if ( t != null ) {
+        }
+        if (t != null) {
             executor.execute(t);
         }
     }
@@ -455,9 +456,10 @@ public class McastServiceImpl {
             Runnable t = new Runnable() {
                 @Override
                 public void run() {
-                    String name = Thread.currentThread().getName();
+                    Thread currentThread = Thread.currentThread();
+                    String name = currentThread.getName();
                     try {
-                        Thread.currentThread().setName("Membership-MemberAdded.");
+                        currentThread.setName("Membership-MemberAdded.");
                         for (ChannelData datum : data) {
                             try {
                                 if (datum != null && !member.equals(datum.getAddress())) {
@@ -473,8 +475,8 @@ public class McastServiceImpl {
                                 log.error(sm.getString("mcastServiceImpl.unableReceive.broadcastMessage"), t);
                             }
                         }
-                    }finally {
-                        Thread.currentThread().setName(name);
+                    } finally {
+                        currentThread.setName(name);
                     }
                 }
             };
@@ -494,14 +496,14 @@ public class McastServiceImpl {
                     Runnable t = new Runnable() {
                         @Override
                         public void run() {
-                            String name = Thread.currentThread().getName();
+                            Thread currentThread = Thread.currentThread();
+                            String name = currentThread.getName();
                             try {
-                                Thread.currentThread().setName("Membership-MemberExpired.");
+                                currentThread.setName("Membership-MemberExpired.");
                                 service.memberDisappeared(member);
                             } finally {
-                                Thread.currentThread().setName(name);
+                                currentThread.setName(name);
                             }
-
                         }
                     };
                     executor.execute(t);

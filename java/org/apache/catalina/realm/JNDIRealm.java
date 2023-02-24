@@ -1143,6 +1143,7 @@ public class JNDIRealm extends RealmBase {
     public Principal authenticate(String username, String credentials) {
 
         ClassLoader ocl = null;
+        Thread currentThread = null;
         JNDIConnection connection = null;
         Principal principal = null;
 
@@ -1152,8 +1153,9 @@ public class JNDIRealm extends RealmBase {
             // running on a JVM that includes a fix for
             // https://bugs.openjdk.java.net/browse/JDK-8273874
             if (!isUseContextClassLoader()) {
-                ocl = Thread.currentThread().getContextClassLoader();
-                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+                currentThread = Thread.currentThread();
+                ocl = currentThread.getContextClassLoader();
+                currentThread.setContextClassLoader(this.getClass().getClassLoader());
             }
 
             // Ensure that we have a directory context available
@@ -1215,8 +1217,8 @@ public class JNDIRealm extends RealmBase {
             }
             return null;
         } finally {
-            if (!isUseContextClassLoader()) {
-                Thread.currentThread().setContextClassLoader(ocl);
+            if (currentThread != null) {
+                currentThread.setContextClassLoader(ocl);
             }
         }
     }
@@ -1245,14 +1247,16 @@ public class JNDIRealm extends RealmBase {
         }
 
         ClassLoader ocl = null;
+        Thread currentThread= null;
         try {
             // https://bz.apache.org/bugzilla/show_bug.cgi?id=65553
             // This can move back to open() once it is known that Tomcat must be
             // running on a JVM that includes a fix for
             // https://bugs.openjdk.java.net/browse/JDK-8273874
             if (!isUseContextClassLoader()) {
-                ocl = Thread.currentThread().getContextClassLoader();
-                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+                currentThread = Thread.currentThread();
+                ocl = currentThread.getContextClassLoader();
+                currentThread.setContextClassLoader(this.getClass().getClassLoader());
             }
 
             if (userPatternArray != null) {
@@ -1303,8 +1307,8 @@ public class JNDIRealm extends RealmBase {
                 return new GenericPrincipal(username, credentials, roles);
             }
         } finally {
-            if (!isUseContextClassLoader()) {
-                Thread.currentThread().setContextClassLoader(ocl);
+            if (currentThread != null) {
+                currentThread.setContextClassLoader(ocl);
             }
         }
     }
@@ -1318,15 +1322,17 @@ public class JNDIRealm extends RealmBase {
     @Override
     public Principal authenticate(String username) {
         ClassLoader ocl = null;
+        Thread currentThread = null;
         try {
             if (!isUseContextClassLoader()) {
-                ocl = Thread.currentThread().getContextClassLoader();
-                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+                currentThread = Thread.currentThread();
+                ocl = currentThread.getContextClassLoader();
+                currentThread.setContextClassLoader(this.getClass().getClassLoader());
             }
             return super.authenticate(username);
         } finally {
-            if (!isUseContextClassLoader()) {
-                Thread.currentThread().setContextClassLoader(ocl);
+            if (currentThread != null) {
+                currentThread.setContextClassLoader(ocl);
             }
         }
     }
@@ -1341,15 +1347,17 @@ public class JNDIRealm extends RealmBase {
     public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
             String qop, String realm, String md5a2) {
         ClassLoader ocl = null;
+        Thread currentThread = null;
         try {
             if (!isUseContextClassLoader()) {
-                ocl = Thread.currentThread().getContextClassLoader();
-                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+                currentThread = Thread.currentThread();
+                ocl = currentThread.getContextClassLoader();
+                currentThread.setContextClassLoader(this.getClass().getClassLoader());
             }
             return super.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realm, md5a2);
         } finally {
-            if (!isUseContextClassLoader()) {
-                Thread.currentThread().setContextClassLoader(ocl);
+            if (currentThread != null) {
+                currentThread.setContextClassLoader(ocl);
             }
         }
     }
@@ -1363,15 +1371,17 @@ public class JNDIRealm extends RealmBase {
     @Override
     public Principal authenticate(X509Certificate[] certs) {
         ClassLoader ocl = null;
+        Thread currentThread = null;
         try {
             if (!isUseContextClassLoader()) {
-                ocl = Thread.currentThread().getContextClassLoader();
-                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+                currentThread = Thread.currentThread();
+                ocl = currentThread.getContextClassLoader();
+                currentThread.setContextClassLoader(this.getClass().getClassLoader());
             }
             return super.authenticate(certs);
         } finally {
-            if (!isUseContextClassLoader()) {
-                Thread.currentThread().setContextClassLoader(ocl);
+            if (currentThread != null) {
+                currentThread.setContextClassLoader(ocl);
             }
         }
     }
@@ -1385,15 +1395,17 @@ public class JNDIRealm extends RealmBase {
     @Override
     public Principal authenticate(GSSContext gssContext, boolean storeCred) {
         ClassLoader ocl = null;
+        Thread currentThread = null;
         try {
             if (!isUseContextClassLoader()) {
-                ocl = Thread.currentThread().getContextClassLoader();
-                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+                currentThread = Thread.currentThread();
+                ocl = currentThread.getContextClassLoader();
+                currentThread.setContextClassLoader(this.getClass().getClassLoader());
             }
             return super.authenticate(gssContext, storeCred);
         } finally {
-            if (!isUseContextClassLoader()) {
-                Thread.currentThread().setContextClassLoader(ocl);
+            if (currentThread != null) {
+                currentThread.setContextClassLoader(ocl);
             }
         }
     }
@@ -1407,15 +1419,17 @@ public class JNDIRealm extends RealmBase {
     @Override
     public Principal authenticate(GSSName gssName, GSSCredential gssCredential) {
         ClassLoader ocl = null;
+        Thread currentThread = null;
         try {
             if (!isUseContextClassLoader()) {
-                ocl = Thread.currentThread().getContextClassLoader();
-                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+                currentThread = Thread.currentThread();
+                ocl = currentThread.getContextClassLoader();
+                currentThread.setContextClassLoader(this.getClass().getClassLoader());
             }
             return super.authenticate(gssName, gssCredential);
         } finally {
-            if (!isUseContextClassLoader()) {
-                Thread.currentThread().setContextClassLoader(ocl);
+            if (currentThread != null) {
+                currentThread.setContextClassLoader(ocl);
             }
         }
     }
@@ -2737,6 +2751,7 @@ public class JNDIRealm extends RealmBase {
 
         // Check to see if the connection to the directory can be opened
         ClassLoader ocl = null;
+        Thread currentThread = null;
         JNDIConnection connection = null;
         try {
             // https://bz.apache.org/bugzilla/show_bug.cgi?id=65553
@@ -2744,8 +2759,9 @@ public class JNDIRealm extends RealmBase {
             // running on a JVM that includes a fix for
             // https://bugs.openjdk.java.net/browse/JDK-8273874
             if (!isUseContextClassLoader()) {
-                ocl = Thread.currentThread().getContextClassLoader();
-                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+                currentThread = Thread.currentThread();
+                ocl = currentThread.getContextClassLoader();
+                currentThread.setContextClassLoader(this.getClass().getClassLoader());
             }
             connection = get();
         } catch (NamingException e) {
@@ -2756,8 +2772,8 @@ public class JNDIRealm extends RealmBase {
             containerLog.error(sm.getString("jndiRealm.open"), e);
         } finally {
             release(connection);
-            if (!isUseContextClassLoader()) {
-                Thread.currentThread().setContextClassLoader(ocl);
+            if (currentThread != null) {
+                currentThread.setContextClassLoader(ocl);
             }
         }
 
