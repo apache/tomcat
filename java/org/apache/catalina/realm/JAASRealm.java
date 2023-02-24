@@ -394,7 +394,7 @@ public class JAASRealm extends RealmBase {
                 invocationSuccess = false;
                 return null;
             } finally {
-                if (!isUseContextClassLoader()) {
+                if (currentThread != null) {
                     currentThread.setContextClassLoader(ocl);
                 }
             }
