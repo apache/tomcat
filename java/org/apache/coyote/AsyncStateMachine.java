@@ -432,27 +432,28 @@ class AsyncStateMachine {
             // Execute the runnable using a container thread from the
             // Connector's thread pool. Use a wrapper to prevent a memory leak
             ClassLoader oldCL;
+            Thread currentThread = Thread.currentThread();
             if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
+                PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl(currentThread);
                 oldCL = AccessController.doPrivileged(pa);
             } else {
-                oldCL = Thread.currentThread().getContextClassLoader();
+                oldCL = currentThread.getContextClassLoader();
             }
             try {
                 if (Constants.IS_SECURITY_ENABLED) {
-                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(this.getClass().getClassLoader());
+                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(currentThread, this.getClass().getClassLoader());
                     AccessController.doPrivileged(pa);
                 } else {
-                    Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+                    currentThread.setContextClassLoader(this.getClass().getClassLoader());
                 }
 
                 processor.execute(runnable);
             } finally {
                 if (Constants.IS_SECURITY_ENABLED) {
-                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(oldCL);
+                    PrivilegedAction<Void> pa = new PrivilegedSetTccl(currentThread, oldCL);
                     AccessController.doPrivileged(pa);
                 } else {
-                    Thread.currentThread().setContextClassLoader(oldCL);
+                    currentThread.setContextClassLoader(oldCL);
                 }
             }
         } else {

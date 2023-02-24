@@ -2193,9 +2193,9 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
 
     protected boolean currentThreadShouldBeStopped() {
-        if (threadRenewalDelay >= 0
-            && Thread.currentThread() instanceof TaskThread) {
-            TaskThread currentTaskThread = (TaskThread) Thread.currentThread();
+        Thread currentThread = Thread.currentThread();
+        if (threadRenewalDelay >= 0 && currentThread instanceof TaskThread) {
+            TaskThread currentTaskThread = (TaskThread) currentThread;
             if (currentTaskThread.getCreationTime() <
                     this.lastContextStoppedTime.longValue()) {
                 return true;

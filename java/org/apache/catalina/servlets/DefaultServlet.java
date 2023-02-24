@@ -1714,16 +1714,16 @@ public class DefaultServlet extends HttpServlet {
         // Prevent possible memory leak. Ensure Transformer and
         // TransformerFactory are not loaded from the web application.
         ClassLoader original;
+        Thread currentThread = Thread.currentThread();
         if (Globals.IS_SECURITY_ENABLED) {
-            PrivilegedGetTccl pa = new PrivilegedGetTccl();
+            PrivilegedGetTccl pa = new PrivilegedGetTccl(currentThread);
             original = AccessController.doPrivileged(pa);
         } else {
             original = Thread.currentThread().getContextClassLoader();
         }
         try {
             if (Globals.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa =
-                        new PrivilegedSetTccl(DefaultServlet.class.getClassLoader());
+                PrivilegedSetTccl pa = new PrivilegedSetTccl(currentThread, DefaultServlet.class.getClassLoader());
                 AccessController.doPrivileged(pa);
             } else {
                 Thread.currentThread().setContextClassLoader(
@@ -1744,10 +1744,10 @@ public class DefaultServlet extends HttpServlet {
             throw new ServletException(sm.getString("defaultServlet.xslError"), e);
         } finally {
             if (Globals.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa = new PrivilegedSetTccl(original);
+                PrivilegedSetTccl pa = new PrivilegedSetTccl(currentThread, original);
                 AccessController.doPrivileged(pa);
             } else {
-                Thread.currentThread().setContextClassLoader(original);
+                currentThread.setContextClassLoader(original);
             }
         }
     }
