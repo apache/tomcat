@@ -73,22 +73,11 @@ public class CoyoteAdapter implements Adapter {
 
     public static final int ADAPTER_NOTES = 1;
 
-
     protected static final boolean ALLOW_BACKSLASH = Boolean
             .parseBoolean(System.getProperty("org.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH", "false"));
 
 
-    private static final ThreadLocal<String> THREAD_NAME = new ThreadLocal<String>() {
-
-        @Override
-        protected String initialValue() {
-            return Thread.currentThread().getName();
-        }
-
-    };
-
     // ----------------------------------------------------------- Constructors
-
 
     /**
      * Construct a new CoyoteProcessor associated with the specified connector.
@@ -134,7 +123,6 @@ public class CoyoteAdapter implements Adapter {
         boolean success = true;
         AsyncContextImpl asyncConImpl = request.getAsyncContextInternal();
 
-        req.getRequestProcessor().setWorkerThreadName(THREAD_NAME.get());
         req.setRequestThread();
 
         try {
@@ -342,7 +330,6 @@ public class CoyoteAdapter implements Adapter {
         boolean async = false;
         boolean postParseSuccess = false;
 
-        req.getRequestProcessor().setWorkerThreadName(THREAD_NAME.get());
         req.setRequestThread();
 
         try {
