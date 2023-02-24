@@ -33,13 +33,13 @@ public interface SSL_CTX_set_cert_verify_callback$cb {
 
     int apply(java.lang.foreign.MemorySegment _x0, java.lang.foreign.MemorySegment _x1);
     static MemorySegment allocate(SSL_CTX_set_cert_verify_callback$cb fi, Arena scope) {
-        return RuntimeHelper.upcallStub(SSL_CTX_set_cert_verify_callback$cb.class, fi, constants$15.SSL_CTX_set_cert_verify_callback$cb$FUNC, scope);
+        return RuntimeHelper.upcallStub(constants$15.SSL_CTX_set_cert_verify_callback$cb_UP$MH, fi, constants$15.SSL_CTX_set_cert_verify_callback$cb$FUNC, scope);
     }
     static SSL_CTX_set_cert_verify_callback$cb ofAddress(MemorySegment addr, Arena arena) {
         MemorySegment symbol = addr.reinterpret(arena.scope(), null);
         return (java.lang.foreign.MemorySegment __x0, java.lang.foreign.MemorySegment __x1) -> {
             try {
-                return (int)constants$15.SSL_CTX_set_cert_verify_callback$cb$MH.invokeExact(symbol, __x0, __x1);
+                return (int)constants$15.SSL_CTX_set_cert_verify_callback$cb_DOWN$MH.invokeExact(symbol, __x0, __x1);
             } catch (Throwable ex$) {
                 throw new AssertionError("should not reach here", ex$);
             }

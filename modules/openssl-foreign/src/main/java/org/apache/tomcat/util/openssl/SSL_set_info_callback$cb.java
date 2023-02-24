@@ -33,13 +33,13 @@ public interface SSL_set_info_callback$cb {
 
     void apply(java.lang.foreign.MemorySegment _x0, int _x1, int _x2);
     static MemorySegment allocate(SSL_set_info_callback$cb fi, Arena scope) {
-        return RuntimeHelper.upcallStub(SSL_set_info_callback$cb.class, fi, constants$21.SSL_set_info_callback$cb$FUNC, scope);
+        return RuntimeHelper.upcallStub(constants$21.SSL_set_info_callback$cb_UP$MH, fi, constants$21.SSL_set_info_callback$cb$FUNC, scope);
     }
     static SSL_set_info_callback$cb ofAddress(MemorySegment addr, Arena arena) {
         MemorySegment symbol = addr.reinterpret(arena.scope(), null);
         return (java.lang.foreign.MemorySegment __x0, int __x1, int __x2) -> {
             try {
-                constants$21.SSL_set_info_callback$cb$MH.invokeExact(symbol, __x0, __x1, __x2);
+                constants$21.SSL_set_info_callback$cb_DOWN$MH.invokeExact(symbol, __x0, __x1, __x2);
             } catch (Throwable ex$) {
                 throw new AssertionError("should not reach here", ex$);
             }

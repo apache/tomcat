@@ -89,18 +89,25 @@ final class RuntimeHelper {
                 orElse(null);
     }
 
-    static <Z> MemorySegment upcallStub(Class<Z> fi, Z z, FunctionDescriptor fdesc, Arena scope) {
+    static MethodHandle upcallHandle(Class<?> fi, String name, FunctionDescriptor fdesc) {
         try {
-            MethodHandle handle = MH_LOOKUP.findVirtual(fi, "apply", fdesc.toMethodType());
-            handle = handle.bindTo(z);
-            return LINKER.upcallStub(handle, fdesc, scope);
+            return MH_LOOKUP.findVirtual(fi, name, fdesc.toMethodType());
+        } catch (Throwable ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    static <Z> MemorySegment upcallStub(MethodHandle fiHandle, Z z, FunctionDescriptor fdesc, Arena scope) {
+        try {
+            fiHandle = fiHandle.bindTo(z);
+            return LINKER.upcallStub(fiHandle, fdesc, scope);
         } catch (Throwable ex) {
             throw new AssertionError(ex);
         }
     }
 
     static MemorySegment asArray(MemorySegment addr, MemoryLayout layout, int numElements, Arena arena) {
-        return addr.reinterpret(numElements * layout.byteSize(), arena.scope(), null);
+         return addr.reinterpret(numElements * layout.byteSize(), arena.scope(), null);
     }
 
     // Internals only below this point
