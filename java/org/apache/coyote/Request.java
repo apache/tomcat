@@ -723,7 +723,9 @@ public final class Request {
     }
 
     public void setRequestThread() {
-        threadId = Thread.currentThread().getId();
+        Thread t = Thread.currentThread();
+        threadId = t.getId();
+        getRequestProcessor().setWorkerThreadName(t.getName());
     }
 
     public boolean isRequestThread() {
