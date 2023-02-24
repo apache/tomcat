@@ -123,24 +123,26 @@ public class WsFrameServer extends WsFrameBase {
 
     @Override
     protected void sendMessageText(boolean last) throws WsIOException {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        Thread currentThread = Thread.currentThread();
+        ClassLoader cl = currentThread.getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(applicationClassLoader);
+            currentThread.setContextClassLoader(applicationClassLoader);
             super.sendMessageText(last);
         } finally {
-            Thread.currentThread().setContextClassLoader(cl);
+            currentThread.setContextClassLoader(cl);
         }
     }
 
 
     @Override
     protected void sendMessageBinary(ByteBuffer msg, boolean last) throws WsIOException {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        Thread currentThread = Thread.currentThread();
+        ClassLoader cl = currentThread.getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(applicationClassLoader);
+            currentThread.setContextClassLoader(applicationClassLoader);
             super.sendMessageBinary(msg, last);
         } finally {
-            Thread.currentThread().setContextClassLoader(cl);
+            currentThread.setContextClassLoader(cl);
         }
     }
 

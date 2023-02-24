@@ -142,8 +142,9 @@ public class ContextBindings {
                 throw new NamingException(
                         sm.getString("contextBindings.unknownContext", obj));
             }
-            threadBindings.put(Thread.currentThread(), context);
-            threadObjectBindings.put(Thread.currentThread(), obj);
+            Thread currentThread = Thread.currentThread();
+            threadBindings.put(currentThread, context);
+            threadObjectBindings.put(currentThread, obj);
         }
     }
 
@@ -156,8 +157,9 @@ public class ContextBindings {
      */
     public static void unbindThread(Object obj, Object token) {
         if (ContextAccessController.checkSecurityToken(obj, token)) {
-            threadBindings.remove(Thread.currentThread());
-            threadObjectBindings.remove(Thread.currentThread());
+            Thread currentThread = Thread.currentThread();
+            threadBindings.remove(currentThread);
+            threadObjectBindings.remove(currentThread);
         }
     }
 

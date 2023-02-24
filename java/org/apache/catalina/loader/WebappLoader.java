@@ -302,16 +302,15 @@ public class WebappLoader extends LifecycleMBeanBase
     @Override
     public void backgroundProcess() {
         if (reloadable && modified()) {
+            Thread currentThread = Thread.currentThread();
             try {
-                Thread.currentThread().setContextClassLoader
-                    (WebappLoader.class.getClassLoader());
+                currentThread.setContextClassLoader(WebappLoader.class.getClassLoader());
                 if (context != null) {
                     context.reload();
                 }
             } finally {
                 if (context != null && context.getLoader() != null) {
-                    Thread.currentThread().setContextClassLoader
-                        (context.getLoader().getClassLoader());
+                    currentThread.setContextClassLoader(context.getLoader().getClassLoader());
                 }
             }
         }

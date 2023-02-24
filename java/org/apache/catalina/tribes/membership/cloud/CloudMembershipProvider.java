@@ -156,17 +156,18 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
             log.debug(message);
         }
         Runnable r = () -> {
-            String name = Thread.currentThread().getName();
+            Thread currentThread = Thread.currentThread();
+            String name = currentThread.getName();
             try {
                 String threadName = add ? "CloudMembership-memberAdded" : "CloudMembership-memberDisappeared";
-                Thread.currentThread().setName(threadName);
+                currentThread.setName(threadName);
                 if (add) {
                     membershipListener.memberAdded(member);
                 } else {
                     membershipListener.memberDisappeared(member);
                 }
             } finally {
-                Thread.currentThread().setName(name);
+                currentThread.setName(name);
             }
         };
         executor.execute(r);

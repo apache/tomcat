@@ -237,12 +237,13 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 DriverManager.getDrivers();
             }
 
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            Thread currentThread = Thread.currentThread();
+            ClassLoader loader = currentThread.getContextClassLoader();
 
             try {
                 // Use the system classloader as the victim for all this
                 // ClassLoader pinning we're about to do.
-                Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
+                currentThread.setContextClassLoader(ClassLoader.getSystemClassLoader());
 
                 /*
                  * Several components end up calling: sun.awt.AppContext.getAppContext()
@@ -403,7 +404,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 }
 
             } finally {
-                Thread.currentThread().setContextClassLoader(loader);
+                currentThread.setContextClassLoader(loader);
             }
         }
     }

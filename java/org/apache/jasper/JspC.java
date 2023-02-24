@@ -1331,6 +1331,7 @@ public class JspC extends Task implements Options {
         }
 
         ClassLoader originalClassLoader = null;
+        Thread currentThread = Thread.currentThread();
 
         try {
             // set up a scratch/output dir if none is provided
@@ -1355,8 +1356,8 @@ public class JspC extends Task implements Options {
                 clctxt.setBasePackageName(targetPackage);
             }
 
-            originalClassLoader = Thread.currentThread().getContextClassLoader();
-            Thread.currentThread().setContextClassLoader(loader);
+            originalClassLoader = currentThread.getContextClassLoader();
+            currentThread.setContextClassLoader(loader);
 
             clctxt.setClassLoader(loader);
             clctxt.setClassPath(classPath);
@@ -1400,8 +1401,8 @@ public class JspC extends Task implements Options {
             }
             throw new JasperException(e);
         } finally {
-            if(originalClassLoader != null) {
-                Thread.currentThread().setContextClassLoader(originalClassLoader);
+            if (originalClassLoader != null) {
+                currentThread.setContextClassLoader(originalClassLoader);
             }
         }
     }

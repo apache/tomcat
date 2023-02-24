@@ -74,11 +74,11 @@ public class AsyncChannelGroupUtil {
     private static AsynchronousChannelGroup createAsynchronousChannelGroup() {
         // Need to do this with the right thread context class loader else the
         // first web app to call this will trigger a leak
-        ClassLoader original = Thread.currentThread().getContextClassLoader();
+        Thread currentThread = Thread.currentThread();
+        ClassLoader original = currentThread.getContextClassLoader();
 
         try {
-            Thread.currentThread().setContextClassLoader(
-                    AsyncIOThreadFactory.class.getClassLoader());
+            currentThread.setContextClassLoader(AsyncIOThreadFactory.class.getClassLoader());
 
             // These are the same settings as the default
             // AsynchronousChannelGroup
@@ -98,7 +98,7 @@ public class AsyncChannelGroupUtil {
                 throw new IllegalStateException(sm.getString("asyncChannelGroup.createFail"));
             }
         } finally {
-            Thread.currentThread().setContextClassLoader(original);
+            currentThread.setContextClassLoader(original);
         }
     }
 

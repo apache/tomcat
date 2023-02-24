@@ -1217,11 +1217,12 @@ public class DeltaManager extends ClusterManagerBase{
      *            requesting node
      */
     protected void messageReceived(SessionMessage msg, Member sender) {
-        ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
+        Thread currentThread = Thread.currentThread();
+        ClassLoader contextLoader = currentThread.getContextClassLoader();
         try {
 
             ClassLoader[] loaders = getClassLoaders();
-            Thread.currentThread().setContextClassLoader(loaders[0]);
+            currentThread.setContextClassLoader(loaders[0]);
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("deltaManager.receiveMessage.eventType",
                         getName(), msg.getEventTypeString(), sender));
@@ -1262,7 +1263,7 @@ public class DeltaManager extends ClusterManagerBase{
         } catch (Exception x) {
             log.error(sm.getString("deltaManager.receiveMessage.error",getName()), x);
         } finally {
-            Thread.currentThread().setContextClassLoader(contextLoader);
+            currentThread.setContextClassLoader(contextLoader);
         }
     }
 

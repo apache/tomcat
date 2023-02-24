@@ -23,6 +23,7 @@ public class PrivilegedSetTccl implements PrivilegedAction<Void> {
     private final ClassLoader cl;
     private final Thread t;
 
+    @Deprecated
     public PrivilegedSetTccl(ClassLoader cl) {
         this(Thread.currentThread(), cl);
     }

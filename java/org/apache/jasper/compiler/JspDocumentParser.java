@@ -1455,20 +1455,19 @@ class JspDocumentParser
         throws Exception {
 
         ClassLoader original;
+        Thread currentThread = Thread.currentThread();
         if (Constants.IS_SECURITY_ENABLED) {
-            PrivilegedGetTccl pa = new PrivilegedGetTccl();
+            PrivilegedGetTccl pa = new PrivilegedGetTccl(currentThread);
             original = AccessController.doPrivileged(pa);
         } else {
-            original = Thread.currentThread().getContextClassLoader();
+            original = currentThread.getContextClassLoader();
         }
         try {
             if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa =
-                        new PrivilegedSetTccl(JspDocumentParser.class.getClassLoader());
+                PrivilegedSetTccl pa = new PrivilegedSetTccl(currentThread, JspDocumentParser.class.getClassLoader());
                 AccessController.doPrivileged(pa);
             } else {
-                Thread.currentThread().setContextClassLoader(
-                        JspDocumentParser.class.getClassLoader());
+                currentThread.setContextClassLoader(JspDocumentParser.class.getClassLoader());
             }
 
             SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -1500,10 +1499,10 @@ class JspDocumentParser
             return saxParser;
         } finally {
             if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa = new PrivilegedSetTccl(original);
+                PrivilegedSetTccl pa = new PrivilegedSetTccl(currentThread, original);
                 AccessController.doPrivileged(pa);
             } else {
-                Thread.currentThread().setContextClassLoader(original);
+                currentThread.setContextClassLoader(original);
             }
         }
     }

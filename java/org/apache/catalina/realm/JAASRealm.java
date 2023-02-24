@@ -374,10 +374,12 @@ public class JAASRealm extends RealmBase {
 
             // What if the LoginModule is in the container class loader ?
             ClassLoader ocl = null;
+            Thread currentThread = null;
 
             if (!isUseContextClassLoader()) {
-                ocl = Thread.currentThread().getContextClassLoader();
-                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+                currentThread = Thread.currentThread();
+                ocl = currentThread.getContextClassLoader();
+                currentThread.setContextClassLoader(this.getClass().getClassLoader());
             }
 
             try {
@@ -391,8 +393,8 @@ public class JAASRealm extends RealmBase {
                 invocationSuccess = false;
                 return null;
             } finally {
-                if (!isUseContextClassLoader()) {
-                    Thread.currentThread().setContextClassLoader(ocl);
+                if (currentThread != null) {
+                    currentThread.setContextClassLoader(ocl);
                 }
             }
 

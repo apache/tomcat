@@ -5522,12 +5522,13 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             webApplicationClassLoader = loader.getClassLoader();
         }
 
+        Thread currentThread = Thread.currentThread();
         if (originalClassLoader == null) {
             if (usePrivilegedAction) {
-                PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
+                PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl(currentThread);
                 originalClassLoader = AccessController.doPrivileged(pa);
             } else {
-                originalClassLoader = Thread.currentThread().getContextClassLoader();
+                originalClassLoader = currentThread.getContextClassLoader();
             }
         }
 
@@ -5540,10 +5541,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         ThreadBindingListener threadBindingListener = getThreadBindingListener();
 
         if (usePrivilegedAction) {
-            PrivilegedAction<Void> pa = new PrivilegedSetTccl(webApplicationClassLoader);
+            PrivilegedAction<Void> pa = new PrivilegedSetTccl(currentThread, webApplicationClassLoader);
             AccessController.doPrivileged(pa);
         } else {
-            Thread.currentThread().setContextClassLoader(webApplicationClassLoader);
+            currentThread.setContextClassLoader(webApplicationClassLoader);
         }
         if (threadBindingListener != null) {
             try {
@@ -5573,11 +5574,12 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             }
         }
 
+        Thread currentThread = Thread.currentThread();
         if (usePrivilegedAction) {
-            PrivilegedAction<Void> pa = new PrivilegedSetTccl(originalClassLoader);
+            PrivilegedAction<Void> pa = new PrivilegedSetTccl(currentThread, originalClassLoader);
             AccessController.doPrivileged(pa);
         } else {
-            Thread.currentThread().setContextClassLoader(originalClassLoader);
+            currentThread.setContextClassLoader(originalClassLoader);
         }
     }
 

@@ -558,9 +558,10 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             // undocumented yet - for embedding apps that are around, alive.
             return;
         }
+        Thread currentThread = Thread.currentThread();
         if (getPortWithOffset() == -1) {
             try {
-                awaitThread = Thread.currentThread();
+                awaitThread = currentThread;
                 while (!stopAwait) {
                     try {
                         Thread.sleep(10000);
@@ -584,7 +585,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         }
 
         try {
-            awaitThread = Thread.currentThread();
+            awaitThread = currentThread;
 
             // Loop waiting for a connection and a valid command
             while (!stopAwait) {
