@@ -1462,15 +1462,14 @@ class JspDocumentParser
             PrivilegedGetTccl pa = new PrivilegedGetTccl(currentThread);
             original = AccessController.doPrivileged(pa);
         } else {
-            original = Thread.currentThread().getContextClassLoader();
+            original = currentThread.getContextClassLoader();
         }
         try {
             if (Constants.IS_SECURITY_ENABLED) {
                 PrivilegedSetTccl pa = new PrivilegedSetTccl(currentThread, JspDocumentParser.class.getClassLoader());
                 AccessController.doPrivileged(pa);
             } else {
-                Thread.currentThread().setContextClassLoader(
-                        JspDocumentParser.class.getClassLoader());
+                currentThread.setContextClassLoader(JspDocumentParser.class.getClassLoader());
             }
 
             SAXParserFactory factory = SAXParserFactory.newInstance();

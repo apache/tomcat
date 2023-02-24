@@ -1719,14 +1719,14 @@ public class DefaultServlet extends HttpServlet {
             PrivilegedGetTccl pa = new PrivilegedGetTccl(currentThread);
             original = AccessController.doPrivileged(pa);
         } else {
-            original = Thread.currentThread().getContextClassLoader();
+            original = currentThread.getContextClassLoader();
         }
         try {
             if (Globals.IS_SECURITY_ENABLED) {
                 PrivilegedSetTccl pa = new PrivilegedSetTccl(currentThread, DefaultServlet.class.getClassLoader());
                 AccessController.doPrivileged(pa);
             } else {
-                Thread.currentThread().setContextClassLoader(
+                currentThread.setContextClassLoader(
                         DefaultServlet.class.getClassLoader());
             }
 

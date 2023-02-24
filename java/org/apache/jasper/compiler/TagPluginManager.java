@@ -82,7 +82,7 @@ public class TagPluginManager {
             PrivilegedGetTccl pa = new PrivilegedGetTccl(currentThread);
             original = AccessController.doPrivileged(pa);
         } else {
-            original = Thread.currentThread().getContextClassLoader();
+            original = currentThread.getContextClassLoader();
         }
         try {
             if (Constants.IS_SECURITY_ENABLED) {

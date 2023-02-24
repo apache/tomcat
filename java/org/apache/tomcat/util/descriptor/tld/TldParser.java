@@ -57,7 +57,7 @@ public class TldParser {
             PrivilegedGetTccl pa = new PrivilegedGetTccl(currentThread);
             original = AccessController.doPrivileged(pa);
         } else {
-            original = Thread.currentThread().getContextClassLoader();
+            original = currentThread.getContextClassLoader();
         }
         try (InputStream is = path.openStream()) {
             if (Constants.IS_SECURITY_ENABLED) {
