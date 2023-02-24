@@ -96,9 +96,10 @@ public class TestClassLoaderLogManager {
     @Test
     public void testBug66184() throws IOException {
         final ClassLoader cl = new TestClassLoader();
-        final ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
+        final Thread currentThread = Thread.currentThread();
+        final ClassLoader oldCL = currentThread.getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(cl);
+            currentThread.setContextClassLoader(cl);
             final ClassLoaderLogManager logManager = new ClassLoaderLogManager();
             logManager.readConfiguration();
             final Logger rootLogger = logManager.getLogger("");
@@ -106,7 +107,7 @@ public class TestClassLoaderLogManager {
             Assert.assertNull("root logger has a parent", rootLogger.getParent());
             Assert.assertEquals(Level.INFO, rootLogger.getLevel());
         } finally {
-            Thread.currentThread().setContextClassLoader(oldCL);
+            currentThread.setContextClassLoader(oldCL);
         }
     }
 

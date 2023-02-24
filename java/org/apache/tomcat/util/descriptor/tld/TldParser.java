@@ -47,9 +47,10 @@ public class TldParser {
     }
 
     public TaglibXml parse(TldResourcePath path) throws IOException, SAXException {
-        ClassLoader original = Thread.currentThread().getContextClassLoader();
+        Thread currentThread = Thread.currentThread();
+        ClassLoader original = currentThread.getContextClassLoader();
         try (InputStream is = path.openStream()) {
-            Thread.currentThread().setContextClassLoader(TldParser.class.getClassLoader());
+            currentThread.setContextClassLoader(TldParser.class.getClassLoader());
             XmlErrorHandler handler = new XmlErrorHandler();
             digester.setErrorHandler(handler);
 
@@ -69,7 +70,7 @@ public class TldParser {
             return taglibXml;
         } finally {
             digester.reset();
-            Thread.currentThread().setContextClassLoader(original);
+            currentThread.setContextClassLoader(original);
         }
     }
 

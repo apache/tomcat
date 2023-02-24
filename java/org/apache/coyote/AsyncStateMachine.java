@@ -434,12 +434,13 @@ class AsyncStateMachine {
         if (state == AsyncState.STARTING || state == AsyncState.STARTED || state == AsyncState.READ_WRITE_OP) {
             // Execute the runnable using a container thread from the
             // Connector's thread pool. Use a wrapper to prevent a memory leak
-            ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
+            Thread currentThread = Thread.currentThread();
+            ClassLoader oldCL = currentThread.getContextClassLoader();
             try {
-                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+                currentThread.setContextClassLoader(this.getClass().getClassLoader());
                 processor.execute(runnable);
             } finally {
-                Thread.currentThread().setContextClassLoader(oldCL);
+                currentThread.setContextClassLoader(oldCL);
             }
         } else {
             throw new IllegalStateException(sm.getString("asyncStateMachine.invalidAsyncState", "asyncRun()", state));

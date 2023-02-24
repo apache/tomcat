@@ -80,8 +80,9 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
         }
 
         // Commons-logging likes having the context classloader set
-        ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(ValidatorTask.class.getClassLoader());
+        Thread currentThread = Thread.currentThread();
+        ClassLoader oldCL = currentThread.getContextClassLoader();
+        currentThread.setContextClassLoader(ValidatorTask.class.getClassLoader());
 
         // Called through trusted manager interface.
         Digester digester = DigesterFactory.newDigester(true, true, null, false);
@@ -97,7 +98,7 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
                 handleErrorOutput("Validation failure: " + e);
             }
         } finally {
-            Thread.currentThread().setContextClassLoader(oldCL);
+            currentThread.setContextClassLoader(oldCL);
             closeRedirector();
         }
 

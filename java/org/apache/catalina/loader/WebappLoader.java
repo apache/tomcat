@@ -261,12 +261,13 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
         Context context = getContext();
         if (context != null) {
             if (context.getReloadable() && modified()) {
-                ClassLoader originalTccl = Thread.currentThread().getContextClassLoader();
+                Thread currentThread = Thread.currentThread();
+                ClassLoader originalTccl = currentThread.getContextClassLoader();
                 try {
-                    Thread.currentThread().setContextClassLoader(WebappLoader.class.getClassLoader());
+                    currentThread.setContextClassLoader(WebappLoader.class.getClassLoader());
                     context.reload();
                 } finally {
-                    Thread.currentThread().setContextClassLoader(originalTccl);
+                    currentThread.setContextClassLoader(originalTccl);
                 }
             }
         }

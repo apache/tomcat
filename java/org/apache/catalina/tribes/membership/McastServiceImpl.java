@@ -400,18 +400,19 @@ public class McastServiceImpl extends MembershipProviderBase {
             log.trace("Mcast receive ping from member " + m);
         }
         Runnable t = null;
+        Thread currentThread = Thread.currentThread();
         if (Arrays.equals(m.getCommand(), Member.SHUTDOWN_PAYLOAD)) {
             if (log.isDebugEnabled()) {
                 log.debug("Member has shutdown:" + m);
             }
             membership.removeMember(m);
             t = () -> {
-                String name = Thread.currentThread().getName();
+                String name = currentThread.getName();
                 try {
-                    Thread.currentThread().setName("Membership-MemberDisappeared");
+                    currentThread.setName("Membership-MemberDisappeared");
                     service.memberDisappeared(m);
-                }finally {
-                    Thread.currentThread().setName(name);
+                } finally {
+                    currentThread.setName(name);
                 }
             };
         } else if (membership.memberAlive(m)) {
@@ -419,16 +420,16 @@ public class McastServiceImpl extends MembershipProviderBase {
                 log.debug("Mcast add member " + m);
             }
             t = () -> {
-                String name = Thread.currentThread().getName();
+                String name = currentThread.getName();
                 try {
-                    Thread.currentThread().setName("Membership-MemberAdded");
+                    currentThread.setName("Membership-MemberAdded");
                     service.memberAdded(m);
-                }finally {
-                    Thread.currentThread().setName(name);
+                } finally {
+                    currentThread.setName(name);
                 }
             };
-        } //end if
-        if ( t != null ) {
+        }
+        if (t != null) {
             executor.execute(t);
         }
     }
@@ -449,9 +450,10 @@ public class McastServiceImpl extends MembershipProviderBase {
                 }
             }
             Runnable t = () -> {
-                String name = Thread.currentThread().getName();
+                Thread currentThread = Thread.currentThread();
+                String name = currentThread.getName();
                 try {
-                    Thread.currentThread().setName("Membership-MemberAdded");
+                    currentThread.setName("Membership-MemberAdded");
                     for (ChannelData datum : data) {
                         try {
                             if (datum != null && !member.equals(datum.getAddress())) {
@@ -467,8 +469,8 @@ public class McastServiceImpl extends MembershipProviderBase {
                             log.error(sm.getString("mcastServiceImpl.unableReceive.broadcastMessage"), t1);
                         }
                     }
-                }finally {
-                    Thread.currentThread().setName(name);
+                } finally {
+                    currentThread.setName(name);
                 }
             };
             executor.execute(t);
@@ -485,12 +487,13 @@ public class McastServiceImpl extends MembershipProviderBase {
                 }
                 try {
                     Runnable t = () -> {
-                        String name = Thread.currentThread().getName();
+                        Thread currentThread = Thread.currentThread();
+                        String name = currentThread.getName();
                         try {
-                            Thread.currentThread().setName("Membership-MemberExpired");
+                            currentThread.setName("Membership-MemberExpired");
                             service.memberDisappeared(member);
                         } finally {
-                            Thread.currentThread().setName(name);
+                            currentThread.setName(name);
                         }
                     };
                     executor.execute(t);

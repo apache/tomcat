@@ -1428,9 +1428,10 @@ class JspDocumentParser
         JspDocumentParser jspDocParser)
         throws Exception {
 
-        ClassLoader original = Thread.currentThread().getContextClassLoader();
+        Thread currentThread = Thread.currentThread();
+        ClassLoader original = currentThread.getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(JspDocumentParser.class.getClassLoader());
+            currentThread.setContextClassLoader(JspDocumentParser.class.getClassLoader());
 
             SAXParserFactory factory = SAXParserFactory.newInstance();
 
@@ -1460,7 +1461,7 @@ class JspDocumentParser
 
             return saxParser;
         } finally {
-            Thread.currentThread().setContextClassLoader(original);
+            currentThread.setContextClassLoader(original);
         }
     }
 

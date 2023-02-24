@@ -159,12 +159,13 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         Member mbr = setupMember(member);
         if(membership.memberAlive(mbr)) {
             Runnable r = () -> {
-                String name = Thread.currentThread().getName();
+                Thread currentThread = Thread.currentThread();
+                String name = currentThread.getName();
                 try {
-                    Thread.currentThread().setName("StaticMembership-memberAdded");
+                    currentThread.setName("StaticMembership-memberAdded");
                     membershipListener.memberAdded(mbr);
                 } finally {
-                    Thread.currentThread().setName(name);
+                    currentThread.setName(name);
                 }
             };
             executor.execute(r);
@@ -174,12 +175,13 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
     protected void memberDisappeared(Member member) {
         membership.removeMember(member);
         Runnable r = () -> {
-            String name = Thread.currentThread().getName();
+            Thread currentThread = Thread.currentThread();
+            String name = currentThread.getName();
             try {
-                Thread.currentThread().setName("StaticMembership-memberDisappeared");
+                currentThread.setName("StaticMembership-memberDisappeared");
                 membershipListener.memberDisappeared(member);
             } finally {
-                Thread.currentThread().setName(name);
+                currentThread.setName(name);
             }
         };
         executor.execute(r);

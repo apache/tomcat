@@ -1683,9 +1683,10 @@ public class DefaultServlet extends HttpServlet {
 
         // Prevent possible memory leak. Ensure Transformer and
         // TransformerFactory are not loaded from the web application.
-        ClassLoader original = Thread.currentThread().getContextClassLoader();
+        Thread currentThread = Thread.currentThread();
+        ClassLoader original = currentThread.getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(DefaultServlet.class.getClassLoader());
+            currentThread.setContextClassLoader(DefaultServlet.class.getClassLoader());
 
             TransformerFactory tFactory = TransformerFactory.newInstance();
             Source xmlSource = new StreamSource(new StringReader(sb.toString()));
@@ -1700,7 +1701,7 @@ public class DefaultServlet extends HttpServlet {
         } catch (TransformerException e) {
             throw new ServletException(sm.getString("defaultServlet.xslError"), e);
         } finally {
-            Thread.currentThread().setContextClassLoader(original);
+            currentThread.setContextClassLoader(original);
         }
     }
 

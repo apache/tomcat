@@ -73,9 +73,10 @@ public class TagPluginManager {
         }
 
         TagPluginParser parser;
-        ClassLoader original = Thread.currentThread().getContextClassLoader();
+        Thread currentThread = Thread.currentThread();
+        ClassLoader original = currentThread.getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(TagPluginManager.class.getClassLoader());
+            currentThread.setContextClassLoader(TagPluginManager.class.getClassLoader());
 
             parser = new TagPluginParser(ctxt, blockExternal);
 
@@ -93,7 +94,7 @@ public class TagPluginManager {
         } catch (IOException | SAXException e) {
             throw new JasperException(e);
         } finally {
-            Thread.currentThread().setContextClassLoader(original);
+            currentThread.setContextClassLoader(original);
         }
 
         Map<String, String> plugins = parser.getPlugins();

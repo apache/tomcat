@@ -5464,8 +5464,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             webApplicationClassLoader = loader.getClassLoader();
         }
 
+        Thread currentThread = Thread.currentThread();
         if (originalClassLoader == null) {
-            originalClassLoader = Thread.currentThread().getContextClassLoader();
+            originalClassLoader = currentThread.getContextClassLoader();
         }
 
         if (webApplicationClassLoader == null || webApplicationClassLoader == originalClassLoader) {
@@ -5476,7 +5477,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         ThreadBindingListener threadBindingListener = getThreadBindingListener();
 
-        Thread.currentThread().setContextClassLoader(webApplicationClassLoader);
+        currentThread.setContextClassLoader(webApplicationClassLoader);
         if (threadBindingListener != null) {
             try {
                 threadBindingListener.bind();
