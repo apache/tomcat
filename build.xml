@@ -3798,7 +3798,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
           depends="download-compile, download-test-compile"
           description="Creates project directory .idea for IntelliJ IDEA">
 
-    <copy todir="${tomcat.home}/.idea">
+    <copy todir="${tomcat.home}/.idea" overwrite="true">
       <fileset dir="${tomcat.home}/res/ide-support/idea"/>
       <filterset refid="classpath.filters"/>
       <filterset refid="version.filters"/>
