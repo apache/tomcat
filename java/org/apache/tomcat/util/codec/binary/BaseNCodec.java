@@ -161,23 +161,6 @@ public abstract class BaseNCodec {
     static final byte[] CHUNK_SEPARATOR = {'\r', '\n'};
 
     /**
-     * Compares two {@code int} values numerically treating the values
-     * as unsigned. Taken from JDK 1.8.
-     *
-     * <p>TODO: Replace with JDK 1.8 Integer::compareUnsigned(int, int).</p>
-     *
-     * @param  x the first {@code int} to compare
-     * @param  y the second {@code int} to compare
-     * @return the value {@code 0} if {@code x == y}; a value less
-     *         than {@code 0} if {@code x < y} as unsigned values; and
-     *         a value greater than {@code 0} if {@code x > y} as
-     *         unsigned values
-     */
-    private static int compareUnsigned(final int x, final int y) {
-        return Integer.compare(x + Integer.MIN_VALUE, y + Integer.MIN_VALUE);
-    }
-
-    /**
      * Create a positive capacity at least as large the minimum required capacity.
      * If the minimum capacity is negative then this throws an OutOfMemoryError as no array
      * can be allocated.
@@ -243,10 +226,10 @@ public abstract class BaseNCodec {
         // Overflow-conscious code treats the min and new capacity as unsigned.
         final int oldCapacity = context.buffer.length;
         int newCapacity = oldCapacity * DEFAULT_BUFFER_RESIZE_FACTOR;
-        if (compareUnsigned(newCapacity, minCapacity) < 0) {
+        if (Integer.compareUnsigned(newCapacity, minCapacity) < 0) {
             newCapacity = minCapacity;
         }
-        if (compareUnsigned(newCapacity, MAX_BUFFER_SIZE) > 0) {
+        if (Integer.compareUnsigned(newCapacity, MAX_BUFFER_SIZE) > 0) {
             newCapacity = createPositiveCapacity(minCapacity);
         }
 
