@@ -49,6 +49,8 @@ Export-Package: \
 -includepackage: \
     org.apache.naming.factory.webservices
 
+-includeresource.meta-inf: /META-INF/=${tomcat.output}/manifests/catalina.jar/
+
 -jpms-module-info: \
     ${module.name};\
         access=32;\
