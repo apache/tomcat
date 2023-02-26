@@ -297,6 +297,7 @@
     <include name="**/jakarta.servlet.ServletContainerInitializer"/>
     <include name="**/jakarta.websocket.ContainerProvider"/>
     <include name="**/jakarta.websocket.server.ServerEndpointConfig$Configurator"/>
+    <include name="**/java.net.spi.URLStreamHandlerProvider"/>
     <include name="**/.gitignore"/>
     <include name="**/*.bnd"/>
     <include name="**/*.classpath"/>
@@ -1040,16 +1041,14 @@
     <filter token="annotation.revision" value="${annotation.revision}"/>
 
     <mkdir dir="${tomcat.manifests}" />
-    <copy todir="${tomcat.manifests}" overwrite="yes" filtering="yes"
-      encoding="ISO-8859-1">
+    <copy todir="${tomcat.manifests}" overwrite="yes" filtering="yes" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
       <fileset dir="${tomcat.home}/res/META-INF" />
     </copy>
 
     <!-- Ensure text files in JARs have consistent line endings. Required for
     reproducible builds. -->
-    <fixcrlf srcdir="${tomcat.manifests}" eol="lf"
-        encoding="ISO-8859-1" fixlast="false" >
+    <fixcrlf srcdir="${tomcat.manifests}" eol="lf" encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files" />
     </fixcrlf>
   </target>

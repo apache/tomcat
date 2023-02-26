@@ -46,6 +46,8 @@ Export-Package: \
     org.apache.catalina.manager.util,\
     org.apache.catalina
 
+-includeresource.meta-inf: /META-INF/=${tomcat.output}/manifests/catalina.jar/
+
 -jpms-module-info: \
     ${module.name};\
         access=32;\

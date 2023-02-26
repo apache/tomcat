@@ -123,6 +123,8 @@ Provide-Capability: \
         Implementation-Version=${servlet.spec.version}${servlet.revision};\
         Implementation-Vendor=Apache Software Foundation
 
+-includeresource.meta-inf: /META-INF/=${tomcat.output}/manifests/tomcat-embed-core.jar/
+
 -jpms-module-info: \
     ${module.name};\
         access=32;\
