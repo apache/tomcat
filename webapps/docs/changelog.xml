@@ -125,6 +125,12 @@
         an HTTP request using the CONNECT method. (markt)
       </update>
       <fix>
+        <bug>66488</bug>: Correct a regression introduced in the fix for bug
+        <bug>66196</bug> that meant that the HTTP headers and/or request line
+        could get corrupted (one part overwriting another part) within a single
+        request. (markt)
+      </fix>
+      <fix>
         <bug>66491</bug>: Correct the BND configuration used by the build script
         so that the provider configuration file required by Tomcat's custom URL
         protocol for WAR files is retained when adding OSGi meta-data. (markt)

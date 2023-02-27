@@ -123,7 +123,7 @@ public class TestMessageBytes {
             optimized = doTestOptimisedConversionPerformance();
             nonOptimized = doTestConversionPerformance();
 
-            System.out.println(optimized + " " + nonOptimized);
+            System.out.println("    Optimized: " + optimized + "\nNon-optimized: " + nonOptimized);
             if (optimized * 2 < nonOptimized) {
                 break;
             }
