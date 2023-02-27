@@ -1042,8 +1042,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     writeNotify = true;
                 }
                 Nio2Endpoint.startInline();
-                run();
-                Nio2Endpoint.endInline();
+                try {
+                    run();
+                } finally {
+                    Nio2Endpoint.endInline();
+                }
             }
 
             @Override
