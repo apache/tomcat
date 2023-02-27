@@ -23,12 +23,15 @@ import java.net.URL;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
+
 public abstract class TesterUriUtilBase {
 
     private final String separator;
 
     protected TesterUriUtilBase(String separator) {
         this.separator = separator;
+        TomcatURLStreamHandlerFactory.register();
         System.setProperty("org.apache.tomcat.util.buf.UriUtil.WAR_SEPARATOR", separator);
     }
 

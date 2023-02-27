@@ -203,6 +203,9 @@ set "JSSE_OPTS=-Djdk.tls.ephemeralDHKeySize=2048"
 :gotJsseOpts
 set "JAVA_OPTS=%JAVA_OPTS% %JSSE_OPTS%"
 
+rem Register custom URL handlers
+set "JAVA_OPTS=%JAVA_OPTS% -Djava.protocol.handler.pkgs=org.apache.catalina.webresources"
+
 if not "%CATALINA_LOGGING_CONFIG%" == "" goto noJuliConfig
 set CATALINA_LOGGING_CONFIG=-Dnop
 if not exist "%CATALINA_BASE%\conf\logging.properties" goto noJuliConfig

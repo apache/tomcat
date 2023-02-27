@@ -17,24 +17,27 @@
 package org.apache.catalina.webresources;
 
 import java.net.URLStreamHandler;
-import java.net.spi.URLStreamHandlerProvider;
+import java.net.URLStreamHandlerFactory;
 
-import org.apache.catalina.webresources.war.Handler;
+import org.junit.Before;
+import org.junit.Test;
 
-public class TomcatURLStreamHandlerProvider extends URLStreamHandlerProvider {
+public class TestTomcatURLStreamHandlerFactory {
 
-    private static final String WAR_PROTOCOL = "war";
-    private static final String CLASSPATH_PROTOCOL = "classpath";
+    @Before
+    public void register() {
+        TomcatURLStreamHandlerFactory.register();
+    }
 
-    @Override
-    public URLStreamHandler createURLStreamHandler(String protocol) {
-        if (WAR_PROTOCOL.equals(protocol)) {
-            return new Handler();
-        } else if (CLASSPATH_PROTOCOL.equals(protocol)) {
-            return new ClasspathURLStreamHandler();
-        }
-
-
-        return null;
+    @Test
+    public void testUserFactory() throws Exception {
+        URLStreamHandlerFactory factory = new URLStreamHandlerFactory() {
+            @Override
+            public URLStreamHandler createURLStreamHandler(String protocol) {
+                return null;
+            }
+        };
+        TomcatURLStreamHandlerFactory.getInstance().addUserFactory(factory);
+        TomcatURLStreamHandlerFactory.release(factory.getClass().getClassLoader());
     }
 }

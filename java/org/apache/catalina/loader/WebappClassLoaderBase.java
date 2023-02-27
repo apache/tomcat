@@ -61,6 +61,7 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
+import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 import org.apache.juli.WebappProperties;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -1542,6 +1543,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         // Clear the classloader reference in the VM's bean introspector
         java.beans.Introspector.flushCaches();
+
+        // Clear any custom URLStreamHandlers
+        TomcatURLStreamHandlerFactory.release(this);
     }
 
 

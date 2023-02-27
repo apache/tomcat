@@ -1169,7 +1169,6 @@
     <jarIt jarfile="${catalina.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.catalina"
-      meta-inf="${tomcat.manifests}/catalina.jar"
       addOSGi="true" />
 
     <!-- Catalina Cluster/HA JAR File -->
@@ -1699,7 +1698,6 @@
            filesId="files.tomcat-embed-core"
            notice="${tomcat.manifests}/servlet-api.jar.notice"
            license="${tomcat.manifests}/servlet-api.jar.license"
-           meta-inf="${tomcat.manifests}/tomcat-embed-core.jar"
            addOSGi="true"
            addGraal="true"
            graalPrefix="org.apache.tomcat.embed/tomcat-embed-core"
