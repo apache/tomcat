@@ -102,5 +102,10 @@ public class TestMessageBytesIntegration extends TomcatBaseTest {
         public void contextInitialized(ServletContextEvent sce) {
             sce.getServletContext().setSessionTrackingModes(new HashSet<>(Arrays.asList(SessionTrackingMode.URL)));
         }
+
+        @Override
+        public void contextDestroyed(ServletContextEvent sce) {
+            // NO-OP
+        }
     }
 }
