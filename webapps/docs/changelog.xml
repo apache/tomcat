@@ -284,7 +284,7 @@
         application to localhost by default. (markt)
       </fix>
       <fix>
-        <bug>66429</bug>: Examples. Limit access to the exmaples web application
+        <bug>66429</bug>: Examples. Limit access to the examples web application
         to localhost by default. (markt)
       </fix>
     </changelog>
