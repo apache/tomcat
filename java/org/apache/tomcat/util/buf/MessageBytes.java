@@ -283,9 +283,7 @@ public final class MessageBytes implements Cloneable, Serializable {
      *                                  above code point 0xFF.
      */
     private void toBytesSimple(char[] chars, int start, int len) {
-        byteC.recycle();
-        byteC.allocate(len, byteC.getLimit());
-        byte[] bytes = byteC.getBuffer();
+        byte[] bytes = new byte[len];
 
         for (int i = 0; i < len; i++) {
             if (chars[i + start] > 255) {
@@ -296,7 +294,7 @@ public final class MessageBytes implements Cloneable, Serializable {
             }
         }
 
-        byteC.setEnd(len);
+        byteC.setBytes(bytes, 0, len);
         type = T_BYTES;
     }
 

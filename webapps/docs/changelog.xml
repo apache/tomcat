@@ -124,6 +124,12 @@
         Provide a more appropriate response (501 rather than 400) when rejecting
         an HTTP request using the CONNECT method. (markt)
       </update>
+      <fix>
+        <bug>66488</bug>: Correct a regression introduced in the fix for bug
+        <bug>66196</bug> that meant that the HTTP headers and/or request line
+        could get corrupted (one part overwriting another part) within a single
+        request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
