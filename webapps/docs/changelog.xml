@@ -125,6 +125,12 @@
         an HTTP request using the CONNECT method. (markt)
       </update>
       <fix>
+        <bug>66488</bug>: Correct a regression introduced in the fix for bug
+        <bug>66196</bug> that meant that the HTTP headers and/or request line
+        could get corrupted (one part overwriting another part) within a single
+        request. (markt)
+      </fix>
+      <fix>
         <bug>66491</bug>: Revert the switch to using the ServiceLoader mechanism
         to load the custom URL protocol handlers that Tomcat uses. The original
         system property based approach has been restored. (markt)
