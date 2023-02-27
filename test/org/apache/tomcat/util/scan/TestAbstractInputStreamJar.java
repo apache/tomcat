@@ -22,12 +22,20 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.util.IOTools;
+import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 import org.apache.tomcat.Jar;
 
 public class TestAbstractInputStreamJar {
+
+    @Before
+    public void register() {
+        TomcatURLStreamHandlerFactory.register();
+    }
+
 
     @Test
     public void testNestedJarGetInputStream() throws Exception {

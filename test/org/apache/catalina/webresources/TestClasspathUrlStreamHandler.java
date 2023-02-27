@@ -22,9 +22,15 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestClasspathUrlStreamHandler {
+
+    @BeforeClass
+    public static void setup() {
+        TomcatURLStreamHandlerFactory.getInstance();
+    }
 
     @Test
     public void testClasspathURL01() throws IOException {

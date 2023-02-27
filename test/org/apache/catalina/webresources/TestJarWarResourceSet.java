@@ -19,6 +19,7 @@ package org.apache.catalina.webresources;
 import java.io.File;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -28,6 +29,12 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestJarWarResourceSet extends TomcatBaseTest {
+
+    @Before
+    public void register() {
+        TomcatURLStreamHandlerFactory.register();
+    }
+
 
     @Test
     public void testJarWarMetaInf() throws LifecycleException  {

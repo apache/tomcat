@@ -19,13 +19,15 @@ package org.apache.catalina.webresources;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 
+import org.junit.Before;
 import org.junit.Test;
 
-/**
- * @deprecated Code under test is deprecated and will be removed in Tomcat 11
- */
-@Deprecated
 public class TestTomcatURLStreamHandlerFactory {
+
+    @Before
+    public void register() {
+        TomcatURLStreamHandlerFactory.register();
+    }
 
     @Test
     public void testUserFactory() throws Exception {
