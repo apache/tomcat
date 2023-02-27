@@ -117,11 +117,11 @@
   </subsection>
   <subsection name="Catalina">
     <changelog>
-      <update>
+      <add>
         Add support for <code>txt:</code> and <code>rnd:</code> rewrite map
         types from mod_rewrite. Based on a pull request <pr>591</pr>
-        provided by Dimitrios Soumis. (markt)
-      </update>
+        provided by Dimitrios Soumis. (remm)
+      </add>
       <update>
         Provide a more appropriate response (501 rather than 400) when rejecting
         an HTTP request using the CONNECT method. (markt)
