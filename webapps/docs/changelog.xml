@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.87 (schultz)" rtext="in development">
+  <subsection name="General">
+    <changelog>
+      <fix>
+        Fix a bug that memory allocation is larger than limit in
+        <code>SynchronizedStack</code> to reduce memory footprint. (lihan)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Catalina">
     <changelog>
       <update>
