@@ -52,7 +52,7 @@ public class SynchronizedStack<T> {
             this.size = size;
         }
         this.limit = limit;
-        stack = new Object[size];
+        stack = new Object[this.size];
     }
 
 
