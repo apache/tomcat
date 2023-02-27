@@ -143,6 +143,11 @@
         Add a check for the validity of the scheme pseudo-header in HTTP/2.
         (markt)
       </add>
+      <fix>
+        <bug>66482</bug>: Restore inline state after async operation in NIO2,
+        to account the fact that unexpected exceptions are sometimes thrown
+        by the implementation. Patch submitted by zhougang. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
