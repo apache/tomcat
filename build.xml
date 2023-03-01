@@ -2403,7 +2403,7 @@ asf.ldap.username=${release.asfusername}
     <replace file="webapps/docs/changelog.xml"
         encoding="UTF-8"
         token="rtext=&quot;in development&quot;"
-        value="rtext=&quot;Release in progress&quot;" />
+        value="rtext=&quot;&quot;" />
   </target>
 
   <target name="release"
