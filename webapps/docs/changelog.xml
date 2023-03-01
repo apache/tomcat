@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0-M5 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add a <code>doPatch</code> method to <code>HttpServlet</code> to provide
+        support for the HTTP <code>PATCH</code> method as defined in RFC 5789.
+        This is one of the changes in the Servlet 6.1 API. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M4 (markt)" rtext="release in progress">
   <subsection name="General">
