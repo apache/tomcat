@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
-    private static final Pattern ESCAPE_LEADING_SPACE = Pattern.compile("^(\\s)", Pattern.MULTILINE);
+    private static final Pattern ESCAPE_LEADING_SPACE = Pattern.compile("^( )", Pattern.MULTILINE);
 
     private static final Set<String> KEYS_WITH_UNNECESSARY_ESCAPING = new HashSet<>();
 
