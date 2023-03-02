@@ -856,6 +856,12 @@
     <Bug code="RCN"/>
   </Match>
   <Match>
+    <!-- Deliberately ignored -->
+    <Class name="org.apache.catalina.valves.rewrite.RewriteValve"/>
+    <Method name="parse"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
+  </Match>
+  <Match>
     <!-- request.getQueryString() can be null because
     o.a.t.util.buf.MessageBytes.toString() can return NULL -->
     <Class name="org.apache.catalina.valves.StuckThreadDetectionValve"/>
