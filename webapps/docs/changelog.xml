@@ -119,6 +119,10 @@
       <add>
         Improvements to French translations. (remm)
       </add>
+      <add>
+        Improvements to Japanese translations. Contributed by Shirayuking.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
