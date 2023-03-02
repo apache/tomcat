@@ -859,6 +859,12 @@
     <Bug code="RCN"/>
   </Match>
   <Match>
+    <!-- Deliberately ignored -->
+    <Class name="org.apache.catalina.valves.rewrite.RewriteValve"/>
+    <Method name="parse"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
+  </Match>
+  <Match>
     <!-- request.getQueryString() can be null because
     o.a.t.util.buf.MessageBytes.toString() can return NULL -->
     <Class name="org.apache.catalina.valves.StuckThreadDetectionValve"/>
@@ -1836,6 +1842,12 @@
 
   <!-- Test code -->
   <Match>
+    <!-- null is used deliberately -->
+    <Class name="jakarta.el.TestBeanSupport$InvalidIs03Bean" />
+    <Method name="isValue"/>
+    <Bug pattern="NP_BOOLEAN_RETURN_NULL"/>
+  </Match>
+  <Match>
     <!-- Code is deliberately unused -->
     <Class name="jakarta.el.TestImportHandler" />
     <Method name="testImportPackage01_57574"/>
@@ -2271,14 +2283,14 @@
   </Match>
   <Match>
     <!-- Deliberate hack for the purposes of the test -->
-    <Class name="org.apache.coyote.http11.filters.TestChunkedInputFilter$EchoHeaderServlet"/>
-    <Field name="exceptionDuringRead"/>
-    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
-  </Match>
-  <Match>
-    <!-- Deliberate hack for the purposes of the test -->
-    <Class name="org.apache.coyote.http11.filters.TestChunkedInputFilter$EchoHeaderServlet"/>
-    <Field name="exceptionDuringRead"/>
+    <Or>
+      <Class name="org.apache.coyote.http11.filters.TestChunkedInputFilter$BodyReadServlet"/>
+      <Class name="org.apache.coyote.http11.filters.TestChunkedInputFilter$EchoHeaderServlet"/>
+    </Or>
+    <Or>
+      <Field name="countRead"/>
+      <Field name="exceptionDuringRead"/>
+    </Or>
     <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
   </Match>
   <Match>

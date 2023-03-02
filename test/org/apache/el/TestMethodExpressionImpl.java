@@ -41,8 +41,10 @@ public class TestMethodExpressionImpl extends ELBaseTest {
     private ELContext context;
     private TesterBeanB beanB;
 
+    @Override
     @Before
-    public void setUp() {
+    public void setup() {
+        super.setup();
         factory = ExpressionFactory.newInstance();
         context = new ELContextImpl();
 
