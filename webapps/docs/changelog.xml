@@ -112,6 +112,11 @@
         support for the HTTP <code>PATCH</code> method as defined in RFC 5789.
         This is one of the changes in the Servlet 6.1 API. (markt)
       </add>
+      <fix>
+        <bug>65995</bug>: Implement RFC 9239 and use
+        <code>text/javascript</code> as the media type for JavaScript rather
+        than <code>application/javascript</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

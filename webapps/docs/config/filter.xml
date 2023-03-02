@@ -529,7 +529,7 @@ HTTP/1.1 200 OK
     <param-value>access plus 10 minutes</param-value>
  </init-param>
  <init-param>
-    <param-name>ExpiresByType application/javascript</param-name>
+    <param-name>ExpiresByType text/javascript</param-name>
     <param-value>access plus 10 minutes</param-value>
  </init-param>
 </filter>
