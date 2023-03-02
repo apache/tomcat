@@ -117,6 +117,11 @@
         <code>text/javascript</code> as the media type for JavaScript rather
         than <code>application/javascript</code>. (markt)
       </fix>
+      <scode>
+        Tomcat no longer sets the <code>java.protocol.handler.pkgs</code> system
+        property when starting. Users are now free to configure this property if
+        they wish. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
