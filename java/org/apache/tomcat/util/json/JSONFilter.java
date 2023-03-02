@@ -52,7 +52,7 @@ public class JSONFilter {
      * @return the escaped string
      */
     public static String escape(String input) {
-        return escape((CharSequence) input, 0, input.length()).toString();
+        return escape(input, 0, input.length()).toString();
     }
 
     /**
@@ -77,7 +77,6 @@ public class JSONFilter {
          * characters), U+0022 (quotation mark) and U+005C (reverse solidus)
          * MUST be escaped.
          */
-        //char[] chars = input.toCharArray();
         StringBuilder escaped = null;
         int lastUnescapedStart = off;
         for (int i = off; i < length; i++) {
