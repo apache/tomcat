@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.88 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>65995</bug>: Implement RFC 9239 and use
+        <code>text/javascript</code> as the media type for JavaScript rather
+        than <code>application/javascript</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.87 (schultz)" rtext="Release in progress">
   <subsection name="General">
