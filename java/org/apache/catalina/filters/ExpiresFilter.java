@@ -92,7 +92,7 @@ import org.apache.juli.logging.LogFactory;
  *          <param-value>access plus 10 minutes</param-value>
  *       </init-param>
  *       <init-param>
- *          <param-name>ExpiresByType application/javascript</param-name>
+ *          <param-name>ExpiresByType text/javascript</param-name>
  *          <param-value>access plus 10 minutes</param-value>
  *       </init-param>
  *    </filter>
@@ -394,7 +394,7 @@ import org.apache.juli.logging.LogFactory;
  *    byType={
  *       image=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]],
  *       text/css=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]],
- *       application/javascript=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]]}]
+ *       text/javascript=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]]}]
  * </code>
  * <p>
  * Sample of per-request log message where {@code ExpiresFilter} adds an expiration date
