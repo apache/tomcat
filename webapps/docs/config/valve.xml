@@ -504,6 +504,71 @@
 
 </subsection>
 
+<subsection name="JSON Access Log Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>JSON Access Log Valve</strong> extends the
+    <a href="#Access_Log_Valve">Access Log Valve</a> class, and so
+    uses the same self-contained logging logic.  This means it
+    implements many of the same file handling attributes.  The main
+    difference to the standard <code>AccessLogValve</code> is that
+    <code>JsonAccessLogValve</code> creates log files which
+    follow the JSON syntax as defined by
+    <a href="https://www.rfc-editor.org/rfc/rfc8259.html">RFC 8259</a>.</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>JSON Access Log Valve</strong> supports all
+    configuration attributes of the standard
+    <a href="#Access_Log_Valve">Access Log Valve.</a> Only the
+    values used for <code>className</code> differ.</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.JsonAccessLogValve</strong> to
+        use the extended access log valve.</p>
+      </attribute>
+
+    </attributes>
+
+    <p>While the pattern supported are the same as for the regular access log,
+    those are mapped to specific JSON attribute names. The attributes are the
+    following:
+    <ul>
+    <li>a: remoteAddr</li>
+    <li>A: localAddr</li>
+    <li>b: size (byteSent: size)</li>
+    <li>B: byteSentNC</li>
+    <li>D: elapsedTime</li>
+    <li>F: firstByteTime</li>
+    <li>h: host</li>
+    <li>H: protocol</li>
+    <li>l: logicalUserName</li>
+    <li>m: method</li>
+    <li>p: port</li>
+    <li>q: query</li>
+    <li>r: request</li>
+    <li>s: statusCode</li>
+    <li>S: sessionId</li>
+    <li>t: time (dateTime: time)</li>
+    <li>T: elapsedTimeS</li>
+    <li>u: user</li>
+    <li>U: path (requestURI: path)</li>
+    <li>v: localServerName</li>
+    <li>I: threadName</li>
+    <li>X: connectionStatus</li>
+    </ul>
+    </p>
+
+  </subsection>
+
+</subsection>
+
 </section>
 
 

@@ -112,6 +112,10 @@
         <code>text/javascript</code> as the media type for JavaScript rather
         than <code>application/javascript</code>. (markt)
       </fix>
+      <add>
+        Add an access log valve that uses a json format. Based on pull request
+        <pr>539</pr> provided by Thomas Meyer. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
