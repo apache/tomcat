@@ -32,8 +32,8 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.codec.binary.Base64;
 
 /**
- * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP BASIC Authentication, as outlined in RFC 2617: "HTTP
- * Authentication: Basic and Digest Access Authentication."
+ * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP BASIC Authentication, as outlined in RFC 7617: "The
+ * 'Basic' HTTP Authentication Scheme"
  *
  * @author Craig R. McClanahan
  */
