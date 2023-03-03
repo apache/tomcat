@@ -139,6 +139,10 @@
       <add>
         Improvements to Chinese translations. Contributed by totoo. (markt)
       </add>
+      <scode>
+        Refactor code using <code>MD5Encoder</code> to use
+        <code>HexUtils.toHexString()</code>. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
