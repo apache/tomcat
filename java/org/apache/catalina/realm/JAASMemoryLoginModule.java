@@ -247,7 +247,8 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         callbacks[5] = new TextInputCallback("qop");
         callbacks[6] = new TextInputCallback("realmName");
         callbacks[7] = new TextInputCallback("digestA2");
-        callbacks[8] = new TextInputCallback("authMethod");
+        callbacks[8] = new TextInputCallback("algorithm");
+        callbacks[9] = new TextInputCallback("authMethod");
 
         // Interact with the user to retrieve the username and password
         String username = null;
@@ -258,6 +259,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         String qop = null;
         String realmName = null;
         String digestA2 = null;
+        String algorithm = null;
         String authMethod = null;
 
         try {
@@ -270,7 +272,8 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             qop = ((TextInputCallback) callbacks[5]).getText();
             realmName = ((TextInputCallback) callbacks[6]).getText();
             digestA2 = ((TextInputCallback) callbacks[7]).getText();
-            authMethod = ((TextInputCallback) callbacks[8]).getText();
+            algorithm = ((TextInputCallback) callbacks[8]).getText();
+            authMethod = ((TextInputCallback) callbacks[9]).getText();
         } catch (IOException | UnsupportedCallbackException e) {
             throw new LoginException(sm.getString("jaasMemoryLoginModule.callbackHandlerError", e.toString()));
         }
@@ -280,7 +283,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             // BASIC or FORM
             principal = super.authenticate(username, password);
         } else if (authMethod.equals(HttpServletRequest.DIGEST_AUTH)) {
-            principal = super.authenticate(username, password, nonce, nc, cnonce, qop, realmName, digestA2);
+            principal = super.authenticate(username, password, nonce, nc, cnonce, qop, realmName, digestA2, algorithm);
         } else if (authMethod.equals(HttpServletRequest.CLIENT_CERT_AUTH)) {
             principal = super.getPrincipal(username);
         } else {

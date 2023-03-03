@@ -74,7 +74,7 @@ public class TestJNDIRealm {
         String expectedResponse =
                 HexUtils.toHexString(md5Helper.digest((digestA1() + ":" + NONCE + ":" + DIGEST_A2).getBytes()));
         Principal principal =
-                realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, DIGEST_A2);
+                realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, DIGEST_A2, ALGORITHM);
 
         // THEN
         Assert.assertNull(principal);
@@ -90,7 +90,7 @@ public class TestJNDIRealm {
         String expectedResponse =
                 HexUtils.toHexString(md5Helper.digest((digestA1() + ":" + NONCE + ":" + DIGEST_A2).getBytes()));
         Principal principal =
-                realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, DIGEST_A2);
+                realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, DIGEST_A2, ALGORITHM);
 
         // THEN
         assertThat(principal, instanceOf(GenericPrincipal.class));
@@ -108,7 +108,7 @@ public class TestJNDIRealm {
         String expectedResponse =
                 HexUtils.toHexString(md5Helper.digest((digestA1() + ":" + NONCE + ":" + DIGEST_A2).getBytes()));
         Principal principal =
-                realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, DIGEST_A2);
+                realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, DIGEST_A2, ALGORITHM);
 
         // THEN
         assertThat(principal, instanceOf(GenericPrincipal.class));
