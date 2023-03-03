@@ -122,6 +122,10 @@
         property when starting. Users are now free to configure this property if
         they wish. (markt)
       </scode>
+      <add>
+        Add an access log valve that uses a json format. Based on pull request
+        <pr>539</pr> provided by Thomas Meyer. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
