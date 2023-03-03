@@ -97,7 +97,11 @@ public class JsonAccessLogValve extends AccessLogValve {
     protected AccessLogElement[] createLogElements() {
         List<AccessLogElement> logElements = new ArrayList<>(Arrays.asList(super.createLogElements()));
         ListIterator<AccessLogElement> lit = logElements.listIterator();
-        lit.add((buf, date, req, resp, time) -> buf.write('{'));
+        lit.add(new AccessLogElement() {
+            @Override
+            public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+                buf.write('{');
+            }});
         while (lit.hasNext()) {
             AccessLogElement logElement = lit.next();
             // remove all other elements, like StringElements
@@ -105,12 +109,20 @@ public class JsonAccessLogValve extends AccessLogValve {
                 lit.remove();
                 continue;
             }
-            lit.add((buf, date, req, resp, time) -> buf.write(','));
+            lit.add(new AccessLogElement() {
+                @Override
+                public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+                    buf.write(',');
+                }});
         }
         // remove last comma again
         lit.previous();
         lit.remove();
-        lit.add((buf, date, req, resp, time) -> buf.write('}'));
+        lit.add(new AccessLogElement() {
+            @Override
+            public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+                buf.write('}');
+            }});
         return logElements.toArray(new AccessLogElement[logElements.size()]);
     }
 
