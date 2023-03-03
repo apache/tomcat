@@ -316,9 +316,9 @@ public class JAASRealm extends RealmBase {
 
     @Override
     public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
-            String qop, String realmName, String digestA2) {
+            String qop, String realmName, String digestA2, String algorithm) {
         return authenticate(username, new JAASCallbackHandler(this, username, clientDigest, nonce, nc, cnonce, qop,
-                realmName, digestA2, HttpServletRequest.DIGEST_AUTH));
+                realmName, digestA2, algorithm, HttpServletRequest.DIGEST_AUTH));
     }
 
 
@@ -471,7 +471,7 @@ public class JAASRealm extends RealmBase {
     protected Principal getPrincipal(String username) {
 
         return authenticate(username, new JAASCallbackHandler(this, username, null, null, null, null, null, null, null,
-                HttpServletRequest.CLIENT_CERT_AUTH));
+                null, HttpServletRequest.CLIENT_CERT_AUTH));
 
     }
 
