@@ -22,7 +22,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Map;
 
-import org.apache.tomcat.util.security.MD5Encoder;
+import org.apache.tomcat.util.buf.HexUtils;
 
 /**
  * Authenticator supporting the DIGEST authentication method.
@@ -141,7 +141,7 @@ public class DigestAuthenticator extends Authenticator {
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] thedigest = md.digest(bytesOfMessage);
 
-        return MD5Encoder.encode(thedigest);
+        return HexUtils.toHexString(thedigest);
     }
 
     @Override

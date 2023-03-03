@@ -42,7 +42,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.naming.NameParserImpl;
 import org.apache.tomcat.unittest.TesterContext;
-import org.apache.tomcat.util.security.MD5Encoder;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.easymock.EasyMock;
 
 public class TestJNDIRealm {
@@ -71,7 +71,7 @@ public class TestJNDIRealm {
 
         // WHEN
         String expectedResponse =
-                MD5Encoder.encode(md5Helper.digest((ha1() + ":" + NONCE + ":" + HA2).getBytes()));
+                HexUtils.toHexString(md5Helper.digest((ha1() + ":" + NONCE + ":" + HA2).getBytes()));
         Principal principal =
                 realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, HA2);
 
@@ -87,7 +87,7 @@ public class TestJNDIRealm {
 
         // WHEN
         String expectedResponse =
-                MD5Encoder.encode(md5Helper.digest((ha1() + ":" + NONCE + ":" + HA2).getBytes()));
+                HexUtils.toHexString(md5Helper.digest((ha1() + ":" + NONCE + ":" + HA2).getBytes()));
         Principal principal =
                 realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, HA2);
 
@@ -105,7 +105,7 @@ public class TestJNDIRealm {
 
         // WHEN
         String expectedResponse =
-                MD5Encoder.encode(md5Helper.digest((ha1() + ":" + NONCE + ":" + HA2).getBytes()));
+                HexUtils.toHexString(md5Helper.digest((ha1() + ":" + NONCE + ":" + HA2).getBytes()));
         Principal principal =
                 realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, HA2);
 
@@ -194,6 +194,6 @@ public class TestJNDIRealm {
 
     private String ha1() {
         String a1 = USER + ":" + REALM + ":" + PASSWORD;
-        return MD5Encoder.encode(md5Helper.digest(a1.getBytes()));
+        return HexUtils.toHexString(md5Helper.digest(a1.getBytes()));
     }
 }

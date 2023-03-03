@@ -53,11 +53,11 @@ import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.DOMWriter;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.util.XMLWriter;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.http.ConcurrentDateFormat;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
-import org.apache.tomcat.util.security.MD5Encoder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -1069,7 +1069,7 @@ public class WebdavServlet extends DefaultServlet {
                     lock.depth + "-" + lock.owner + "-" + lock.tokens + "-" +
                     lock.expiresAt + "-" + System.currentTimeMillis() + "-" +
                     secret;
-            String lockToken = MD5Encoder.encode(ConcurrentMessageDigest.digestMD5(
+            String lockToken = HexUtils.toHexString(ConcurrentMessageDigest.digestMD5(
                     lockTokenStr.getBytes(StandardCharsets.ISO_8859_1)));
 
             if (resource.isDirectory() && lock.depth == maxDepth) {

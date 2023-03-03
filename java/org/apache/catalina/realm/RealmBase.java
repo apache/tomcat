@@ -52,11 +52,11 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
-import org.apache.tomcat.util.security.MD5Encoder;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
@@ -399,7 +399,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     uee);
         }
 
-        String serverDigest = MD5Encoder.encode(ConcurrentMessageDigest.digestMD5(valueBytes));
+        String serverDigest = HexUtils.toHexString(ConcurrentMessageDigest.digestMD5(valueBytes));
 
         if (log.isDebugEnabled()) {
             log.debug("Digest : " + clientDigest + " Username:" + username + " ClientDigest:" + clientDigest +
@@ -1131,7 +1131,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     uee);
         }
 
-        return MD5Encoder.encode(ConcurrentMessageDigest.digestMD5(valueBytes));
+        return HexUtils.toHexString(ConcurrentMessageDigest.digestMD5(valueBytes));
     }
 
 
