@@ -68,28 +68,28 @@ public class JsonAccessLogValve extends AccessLogValve {
     static {
         // FIXME: finalize attribute names
         Map<Character, String> pattern2AttributeName = new HashMap<>();
-        pattern2AttributeName.put('a', "remoteAddr");
-        pattern2AttributeName.put('A', "localAddr");
-        pattern2AttributeName.put('b', "size"); /* byteSent -> size */
-        pattern2AttributeName.put('B', "byteSentNC");
-        pattern2AttributeName.put('D', "elapsedTime");
-        pattern2AttributeName.put('F', "firstByteTime");
-        pattern2AttributeName.put('h', "host");
-        pattern2AttributeName.put('H', "protocol");
-        pattern2AttributeName.put('l', "logicalUserName");
-        pattern2AttributeName.put('m', "method");
-        pattern2AttributeName.put('p', "port");
-        pattern2AttributeName.put('q', "query");
-        pattern2AttributeName.put('r', "request");
-        pattern2AttributeName.put('s', "statusCode");
-        pattern2AttributeName.put('S', "sessionId");
-        pattern2AttributeName.put('t', "time"); /* dateTime -> time */
-        pattern2AttributeName.put('T', "elapsedTimeS");
-        pattern2AttributeName.put('u', "user");
-        pattern2AttributeName.put('U', "path"); /* requestURI -> path */
-        pattern2AttributeName.put('v', "localServerName");
-        pattern2AttributeName.put('I', "threadName");
-        pattern2AttributeName.put('X', "connectionStatus");
+        pattern2AttributeName.put(Character.valueOf('a'), "remoteAddr");
+        pattern2AttributeName.put(Character.valueOf('A'), "localAddr");
+        pattern2AttributeName.put(Character.valueOf('b'), "size"); /* byteSent -> size */
+        pattern2AttributeName.put(Character.valueOf('B'), "byteSentNC");
+        pattern2AttributeName.put(Character.valueOf('D'), "elapsedTime");
+        pattern2AttributeName.put(Character.valueOf('F'), "firstByteTime");
+        pattern2AttributeName.put(Character.valueOf('h'), "host");
+        pattern2AttributeName.put(Character.valueOf('H'), "protocol");
+        pattern2AttributeName.put(Character.valueOf('l'), "logicalUserName");
+        pattern2AttributeName.put(Character.valueOf('m'), "method");
+        pattern2AttributeName.put(Character.valueOf('p'), "port");
+        pattern2AttributeName.put(Character.valueOf('q'), "query");
+        pattern2AttributeName.put(Character.valueOf('r'), "request");
+        pattern2AttributeName.put(Character.valueOf('s'), "statusCode");
+        pattern2AttributeName.put(Character.valueOf('S'), "sessionId");
+        pattern2AttributeName.put(Character.valueOf('t'), "time"); /* dateTime -> time */
+        pattern2AttributeName.put(Character.valueOf('T'), "elapsedTimeS");
+        pattern2AttributeName.put(Character.valueOf('u'), "user");
+        pattern2AttributeName.put(Character.valueOf('U'), "path"); /* requestURI -> path */
+        pattern2AttributeName.put(Character.valueOf('v'), "localServerName");
+        pattern2AttributeName.put(Character.valueOf('I'), "threadName");
+        pattern2AttributeName.put(Character.valueOf('X'), "connectionStatus");
         PATTERNS = Collections.unmodifiableMap(pattern2AttributeName);
     }
 
@@ -129,7 +129,7 @@ public class JsonAccessLogValve extends AccessLogValve {
     @Override
     protected AccessLogElement createAccessLogElement(char pattern) {
         AccessLogElement ale = super.createAccessLogElement(pattern);
-        String attributeName = PATTERNS.get(pattern);
+        String attributeName = PATTERNS.get(Character.valueOf(pattern));
         if (attributeName == null) {
             attributeName = "other-" + new String(JSONFilter.escape(pattern));
         }
