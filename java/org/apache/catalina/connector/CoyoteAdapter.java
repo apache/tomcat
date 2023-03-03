@@ -1021,6 +1021,7 @@ public class CoyoteAdapter implements Adapter {
                     if (log.isDebugEnabled()) {
                         log.debug(" Requested cookie session id is " + request.getRequestedSessionId());
                     }
+                    break;
                 } else {
                     if (!request.isRequestedSessionIdValid()) {
                         // Replace the session id until one is valid
