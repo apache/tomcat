@@ -1308,6 +1308,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
 
     protected enum AllowCorsPreflight {
-        NEVER, FILTER, ALWAYS
+        NEVER,
+        FILTER,
+        ALWAYS
     }
 }
