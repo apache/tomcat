@@ -1555,6 +1555,13 @@
 
     <attributes>
 
+      <attribute name="algoirthms" required="false">
+        <p>A comma-separated list of digest algorithms to be used for the
+        authentication process. Algorithms may be specified using the Java
+        Standard names or the names used by RFC 7616. If not specified, the
+        default value of <code>SHA-256,MD5</code> will be used.</p>
+      </attribute>
+
       <attribute name="allowCorsPreflight" required="false">
         <p>Are requests that appear to be CORS preflight requests allowed to
         bypass the authenticator as required by the CORS specification. The

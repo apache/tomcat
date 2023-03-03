@@ -61,7 +61,7 @@ public class JAASCallbackHandler implements CallbackHandler {
      */
     public JAASCallbackHandler(JAASRealm realm, String username, String password) {
 
-        this(realm, username, password, null, null, null, null, null, null, null);
+        this(realm, username, password, null, null, null, null, null, null, null, null);
     }
 
 
@@ -77,14 +77,15 @@ public class JAASCallbackHandler implements CallbackHandler {
      * @param qop        Quality of protection applied to the message
      * @param realmName  Realm name
      * @param digestA2   Second digest calculated as digest(Method + ":" + uri)
+     * @param algorithm  The digest algorithm to use
      * @param authMethod The authentication method in use
      */
     public JAASCallbackHandler(JAASRealm realm, String username, String password, String nonce, String nc,
-            String cnonce, String qop, String realmName, String digestA2, String authMethod) {
+            String cnonce, String qop, String realmName, String digestA2, String algorithm, String authMethod) {
         this.realm = realm;
         this.username = username;
 
-        if (password != null && realm.hasMessageDigest()) {
+        if (password != null && realm.hasMessageDigest(algorithm)) {
             this.password = realm.getCredentialHandler().mutate(password);
         } else {
             this.password = password;

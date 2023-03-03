@@ -89,7 +89,7 @@ public class CombinedRealm extends RealmBase {
 
     @Override
     public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
-            String qop, String realmName, String digestA2) {
+            String qop, String realmName, String digestA2, String algorithm) {
         Principal authenticatedUser = null;
 
         for (Realm realm : realms) {
@@ -97,7 +97,7 @@ public class CombinedRealm extends RealmBase {
                 log.debug(sm.getString("combinedRealm.authStart", username, realm.getClass().getName()));
             }
 
-            authenticatedUser = realm.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realmName, digestA2);
+            authenticatedUser = realm.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realmName, digestA2, algorithm);
 
             if (authenticatedUser == null) {
                 if (log.isDebugEnabled()) {

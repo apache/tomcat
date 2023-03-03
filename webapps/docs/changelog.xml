@@ -137,6 +137,12 @@
         Implement the new Servlet API methods that provide additional control
         when sending a redirect to the client. (markt)
       </add>
+      <add>
+        Update Digest authentication support to align with RFC 7616. This adds a
+        new configuration attribute, <code>algorithms</code>, to the
+        <code>DigestAuthenticator</code> with a default of
+        <code>SHA-256,MD5</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
