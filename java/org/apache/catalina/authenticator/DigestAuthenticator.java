@@ -31,10 +31,10 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.connector.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.parser.Authorization;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
-import org.apache.tomcat.util.security.MD5Encoder;
 
 
 /**
@@ -296,7 +296,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         String ipTimeKey = request.getRemoteAddr() + ":" + currentTime + ":" + getKey();
 
         byte[] buffer = ConcurrentMessageDigest.digestMD5(ipTimeKey.getBytes(StandardCharsets.ISO_8859_1));
-        String nonce = currentTime + ":" + MD5Encoder.encode(buffer);
+        String nonce = currentTime + ":" + HexUtils.toHexString(buffer);
 
         NonceInfo info = new NonceInfo(currentTime, getNonceCountWindowSize());
         synchronized (nonces) {
@@ -539,7 +539,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             }
             String serverIpTimeKey = request.getRemoteAddr() + ":" + nonceTime + ":" + key;
             byte[] buffer = ConcurrentMessageDigest.digestMD5(serverIpTimeKey.getBytes(StandardCharsets.ISO_8859_1));
-            String md5ServerIpTimeKey = MD5Encoder.encode(buffer);
+            String md5ServerIpTimeKey = HexUtils.toHexString(buffer);
             if (!md5ServerIpTimeKey.equals(md5clientIpTimeKey)) {
                 return false;
             }
@@ -597,7 +597,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             String a2 = method + ":" + uri;
 
             byte[] buffer = ConcurrentMessageDigest.digestMD5(a2.getBytes(StandardCharsets.ISO_8859_1));
-            String md5a2 = MD5Encoder.encode(buffer);
+            String md5a2 = HexUtils.toHexString(buffer);
 
             return realm.authenticate(userName, response, nonce, nc, cnonce, qop, realmName, md5a2);
         }

@@ -37,11 +37,11 @@ import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.unittest.TesterServletContext;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
-import org.apache.tomcat.util.security.MD5Encoder;
 
 public class TestDigestAuthenticator extends TomcatBaseTest {
 
@@ -383,6 +383,6 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
     }
 
     private static String digest(String input) {
-        return MD5Encoder.encode(ConcurrentMessageDigest.digestMD5(input.getBytes()));
+        return HexUtils.toHexString(ConcurrentMessageDigest.digestMD5(input.getBytes()));
     }
 }
