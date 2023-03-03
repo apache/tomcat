@@ -99,13 +99,19 @@ public class DigestAuthenticator extends Authenticator {
     private String calculateRequestDigest(String requestUri, String userName, String password, String realm,
             String nonce, String qop, String algorithm) throws NoSuchAlgorithmException {
 
+        boolean session = false;
+        if (algorithm.endsWith("-sess")) {
+            algorithm = algorithm.substring(0, algorithm.length() - 5);
+            session = true;
+        }
+
         StringBuilder preDigest = new StringBuilder();
         String A1;
 
-        if (algorithm.equalsIgnoreCase("MD5")) {
-            A1 = userName + ":" + realm + ":" + password;
+        if (session) {
+            A1 = encode(algorithm, userName + ":" + realm + ":" + password) + ":" + nonce + ":" + cNonce;
         } else {
-            A1 = encodeMD5(userName + ":" + realm + ":" + password) + ":" + nonce + ":" + cNonce;
+            A1 = userName + ":" + realm + ":" + password;
         }
 
         /*
@@ -114,7 +120,7 @@ public class DigestAuthenticator extends Authenticator {
          */
         String A2 = "GET:" + requestUri;
 
-        preDigest.append(encodeMD5(A1));
+        preDigest.append(encode(algorithm, A1));
         preDigest.append(':');
         preDigest.append(nonce);
 
@@ -128,15 +134,14 @@ public class DigestAuthenticator extends Authenticator {
         }
 
         preDigest.append(':');
-        preDigest.append(encodeMD5(A2));
+        preDigest.append(encode(algorithm, A2));
 
-        return encodeMD5(preDigest.toString());
-
+        return encode(algorithm, preDigest.toString());
     }
 
-    private String encodeMD5(String value) throws NoSuchAlgorithmException {
+    private String encode(String algorithm, String value) throws NoSuchAlgorithmException {
         byte[] bytesOfMessage = value.getBytes(StandardCharsets.ISO_8859_1);
-        MessageDigest md = MessageDigest.getInstance("MD5");
+        MessageDigest md = MessageDigest.getInstance(algorithm);
         byte[] thedigest = md.digest(bytesOfMessage);
 
         return HexUtils.toHexString(thedigest);

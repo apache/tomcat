@@ -99,11 +99,41 @@ public interface Realm extends Contained {
      * @param digestA2 Second digest calculated as digest(Method + ":" + uri)
      *
      * @return the associated principal, or {@code null} if there is none.
+     *
+     * @deprecated Unused. Use {@link #authenticate(String, String, String,
+     * String, String, String, String, String, String)}. Will be removed in
+     * Tomcat 11.
      */
+    @Deprecated
     Principal authenticate(String username, String digest,
                                   String nonce, String nc, String cnonce,
                                   String qop, String realm,
                                   String digestA2);
+
+
+    /**
+     * Try to authenticate with the specified username, which
+     * matches the digest calculated using the given parameters using the
+     * method described in RFC 7616.
+     *
+     * @param username Username of the Principal to look up
+     * @param digest Digest which has been submitted by the client
+     * @param nonce Unique (or supposedly unique) token which has been used
+     * for this request
+     * @param nc the nonce counter
+     * @param cnonce the client chosen nonce
+     * @param qop the "quality of protection" ({@code nc} and {@code cnonce}
+     *        will only be used, if {@code qop} is not {@code null}).
+     * @param realm Realm name
+     * @param digestA2 Second digest calculated as digest(Method + ":" + uri)
+     * @param algorithm The message digest algorithm to use
+     *
+     * @return the associated principal, or {@code null} if there is none.
+     */
+    Principal authenticate(String username, String digest,
+                                  String nonce, String nc, String cnonce,
+                                  String qop, String realm,
+                                  String digestA2, String algorithm);
 
 
     /**

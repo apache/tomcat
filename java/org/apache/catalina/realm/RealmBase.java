@@ -328,12 +328,20 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
     }
 
 
+    @Deprecated
     @Override
     public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
             String qop, String realm, String digestA2) {
+        return authenticate(username, clientDigest, nonce, nc, cnonce, qop, realm, digestA2, "MD5");
+    }
+
+
+    @Override
+    public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
+            String qop, String realm, String digestA2, String algorithm) {
 
         // In digest auth, digests are always lower case
-        String digestA1 = getDigest(username, realm);
+        String digestA1 = getDigest(username, realm, algorithm);
         if (digestA1 == null) {
             return null;
         }
@@ -353,7 +361,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
             throw new IllegalArgumentException(uee.getMessage());
         }
 
-        String serverDigest = HexUtils.toHexString(ConcurrentMessageDigest.digestMD5(valueBytes));
+        String serverDigest = HexUtils.toHexString(ConcurrentMessageDigest.digest(algorithm, valueBytes));
 
         if (log.isDebugEnabled()) {
             log.debug("Digest : " + clientDigest + " Username:" + username + " ClientDigest:" + clientDigest +
@@ -1012,10 +1020,17 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
     // ------------------------------------------------------ Protected Methods
 
-    protected boolean hasMessageDigest() {
+    protected boolean hasMessageDigest(String algorithm) {
         CredentialHandler ch = credentialHandler;
         if (ch instanceof MessageDigestCredentialHandler) {
-            return ((MessageDigestCredentialHandler) ch).getAlgorithm() != null;
+            String realmAlgorithm = ((MessageDigestCredentialHandler) ch).getAlgorithm();
+            if (realmAlgorithm != null) {
+                if (realmAlgorithm.equals(algorithm)) {
+                    return true;
+                } else {
+                    log.debug(sm.getString("relamBase.digestMismatch", algorithm, realmAlgorithm));
+                }
+            }
         }
         return false;
     }
@@ -1024,13 +1039,30 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
     /**
      * Return the digest associated with given principal's user name.
      *
-     * @param username  the user name
-     * @param realmName the realm name
+     * @param username  The user name
+     * @param realmName The realm name
+     *
+     * @return the digest for the specified user
+     *
+     * @deprecated Unused. Use {@link #getDigest(String, String, String)}. Will be removed in Tomcat 11.
+     */
+    @Deprecated
+    protected String getDigest(String username, String realmName) {
+        return getDigest(username, realmName, "MD5");
+    }
+
+
+    /**
+     * Return the digest associated with given principal's user name.
+     *
+     * @param username  The user name
+     * @param realmName The realm name
+     * @param algorithm The name of the message digest algorithm to use
      *
      * @return the digest for the specified user
      */
-    protected String getDigest(String username, String realmName) {
-        if (hasMessageDigest()) {
+    protected String getDigest(String username, String realmName, String algorithm) {
+        if (hasMessageDigest(algorithm)) {
             // Use pre-generated digest
             return getPassword(username);
         }
@@ -1045,7 +1077,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
             throw new IllegalArgumentException(uee.getMessage());
         }
 
-        return HexUtils.toHexString(ConcurrentMessageDigest.digestMD5(valueBytes));
+        return HexUtils.toHexString(ConcurrentMessageDigest.digest(algorithm, valueBytes));
     }
 
 
