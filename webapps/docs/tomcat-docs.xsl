@@ -196,7 +196,7 @@
     <h3 id="{$name}">
       <xsl:if test="@rtext">
         <!-- Additional right-aligned text cell in section heading. It is used by changelog.xml -->
-        <span style="float: right;">
+        <span id="{$name}_rtext" style="float: right;">
           <xsl:value-of select="@rtext"/>
         </span><xsl:text>&#x20;</xsl:text> <!-- Ensure a space follows after </span> -->
       </xsl:if>
