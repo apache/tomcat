@@ -1050,19 +1050,10 @@ public class AjpProcessor extends AbstractProcessor {
         responseMessage.reset();
         responseMessage.appendByte(Constants.JK_AJP13_SEND_HEADERS);
 
-        // Responses with certain status codes are not permitted to include a
-        // response body.
+        // Responses with certain status codes and/or methods are not permitted to include a response body.
         int statusCode = response.getStatus();
-        if (statusCode < 200 || statusCode == 204 || statusCode == 205 ||
-                statusCode == 304) {
-            // No entity body
-            swallowResponse = true;
-        }
-
-        // Responses to HEAD requests are not permitted to include a response
-        // body.
-        MessageBytes methodMB = request.method();
-        if (methodMB.equals("HEAD")) {
+        if (statusCode < 200 || statusCode == 204 || statusCode == 205 || statusCode == 304 ||
+                request.method().equals("HEAD")) {
             // No entity body
             swallowResponse = true;
         }
