@@ -140,6 +140,10 @@
         HTTP responses) when used with direct buffers. Patch suggested by Arjen
         Poutsma. (markt)
       </fix>
+      <fix>
+        <bug>66512</bug>: Align AJP handling of invalid HTTP response headers
+        (they are now removed from the response) with HTTP. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

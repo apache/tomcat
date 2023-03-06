@@ -826,11 +826,74 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     }
 
 
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=66512
+     */
+    @Test
+    public void testInvalidHeader() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        Tomcat.addServlet(ctx, "bug66512", new InvalidHeaderServlet());
+        ctx.addServletMappingDecoded("/", "bug66512");
+
+        tomcat.start();
+
+        SimpleAjpClient ajpClient = new SimpleAjpClient();
+        ajpClient.setPort(getPort());
+        ajpClient.connect();
+
+        validateCpong(ajpClient.cping());
+
+        TesterAjpMessage forwardMessage = ajpClient.createForwardMessage();
+        forwardMessage.end();
+
+        TesterAjpMessage responseHeaderMessage = ajpClient.sendMessage(forwardMessage, null);
+
+        // Expect 2 messages: headers, end
+        Map<String,List<String>> responseHeaders = validateResponseHeaders(responseHeaderMessage, 200, "200");
+        Assert.assertTrue(responseHeaders.containsKey(InvalidHeaderServlet.VALID_HEADER_A_NAME));
+        Assert.assertFalse(responseHeaders.containsKey(InvalidHeaderServlet.INVALID_HEADER_B_NAME));
+        Assert.assertTrue(responseHeaders.containsKey(InvalidHeaderServlet.VALID_HEADER_C_NAME));
+
+        validateResponseEnd(ajpClient.readMessage(), true);
+
+        // Double check the connection is still open
+        validateCpong(ajpClient.cping());
+
+        ajpClient.disconnect();
+    }
+
+
+    private static class InvalidHeaderServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private static final String VALID_HEADER_A_NAME = "X-Bug66512-A";
+        private static final String VALID_HEADER_A_VALUE = "AaAaA";
+        private static final String VALID_HEADER_C_NAME = "X-Bug66512-C";
+        private static final String VALID_HEADER_C_VALUE = "CcCcC";
+
+        private static final String INVALID_HEADER_B_NAME = "X-Bug66512-B";
+        private static final String INVALID_HEADER_B_VALUE = "Bb\u039abB";
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setHeader(VALID_HEADER_A_NAME, VALID_HEADER_A_VALUE);
+            resp.setHeader(INVALID_HEADER_B_NAME, INVALID_HEADER_B_VALUE);
+            resp.setHeader(VALID_HEADER_C_NAME, VALID_HEADER_C_VALUE);
+        }
+    }
+
+
     /**
      * Process response header packet and checks the status. Any other data is
      * ignored.
      */
-    private void validateResponseHeaders(TesterAjpMessage message,
+    private Map<String,List<String>> validateResponseHeaders(TesterAjpMessage message,
             int expectedStatus, String expectedMessage) throws Exception {
         // First two bytes should always be AB
         Assert.assertEquals((byte) 'A', message.buf[0]);
@@ -854,12 +917,14 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         // Get the number of headers
         int headerCount = message.readInt();
 
+        Map<String,List<String>> headerMap = new HashMap<>();
         for (int i = 0; i < headerCount; i++) {
-            // Read the header name
-            message.readHeaderName();
-            // Read the header value
-            message.readString();
+            String headerName = message.readHeaderName();
+            String heaverValue = message.readString();
+            headerMap.computeIfAbsent(headerName, k -> new ArrayList<>()).add(heaverValue);
         }
+
+        return headerMap;
     }
 
     private void validateGetBody(TesterAjpMessage message) {
