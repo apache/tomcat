@@ -922,8 +922,8 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Map<String,List<String>> headerMap = new HashMap<>();
         for (int i = 0; i < headerCount; i++) {
             String headerName = message.readHeaderName();
-            String heaverValue = message.readString();
-            headerMap.computeIfAbsent(headerName, k -> new ArrayList<>()).add(heaverValue);
+            String headerValue = message.readString();
+            headerMap.computeIfAbsent(headerName, k -> new ArrayList<>()).add(headerValue);
         }
 
         return headerMap;
