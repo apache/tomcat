@@ -961,11 +961,6 @@ public class AjpProcessor extends AbstractProcessor {
 
         response.setCommitted(true);
 
-        tmpMB.recycle();
-        responseMsgPos = -1;
-        responseMessage.reset();
-        responseMessage.appendByte(Constants.JK_AJP13_SEND_HEADERS);
-
         // Responses with certain status codes and/or methods are not permitted to include a response body.
         int statusCode = response.getStatus();
         if (statusCode < 200 || statusCode == 204 || statusCode == 205 || statusCode == 304 ||
@@ -974,14 +969,7 @@ public class AjpProcessor extends AbstractProcessor {
             swallowResponse = true;
         }
 
-        // HTTP header contents
-        responseMessage.appendInt(statusCode);
-        // Reason phrase is optional but mod_jk + httpd 2.x fails with a null
-        // reason phrase - bug 45026
-        tmpMB.setString(Integer.toString(response.getStatus()));
-        responseMessage.appendBytes(tmpMB);
-
-        // Special headers
+        // Prepare special headers
         MimeHeaders headers = response.getMimeHeaders();
         String contentType = response.getContentType();
         if (contentType != null) {
@@ -996,7 +984,20 @@ public class AjpProcessor extends AbstractProcessor {
             headers.setValue("Content-Length").setLong(contentLength);
         }
 
-        // Other headers
+        // Write AJP message header
+        tmpMB.recycle();
+        responseMsgPos = -1;
+        responseMessage.reset();
+        responseMessage.appendByte(Constants.JK_AJP13_SEND_HEADERS);
+
+        // Write HTTP response line
+        responseMessage.appendInt(statusCode);
+        // Reason phrase is optional but mod_jk + httpd 2.x fails with a null
+        // reason phrase - bug 45026
+        tmpMB.setString(Integer.toString(response.getStatus()));
+        responseMessage.appendBytes(tmpMB);
+
+        // Write headers
         int numHeaders = headers.size();
         responseMessage.appendInt(numHeaders);
         for (int i = 0; i < numHeaders; i++) {
