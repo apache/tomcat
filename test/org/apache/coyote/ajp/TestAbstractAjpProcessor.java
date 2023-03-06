@@ -58,8 +58,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     @Override
     protected String getProtocol() {
         /*
-         * The tests are all setup for HTTP so need to convert the protocol
-         * values to AJP.
+         * The tests are all setup for HTTP so need to convert the protocol values to AJP.
          */
         // Has a protocol been specified
         String protocol = System.getProperty("tomcat.test.protocol");
@@ -100,17 +99,15 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         SimpleAjpClient ajpClient = new SimpleAjpClient(ajpPacketSize);
 
-        if (requestInfo.get("REQUEST-QUERY-STRING") != null &&
-            params.size() > 0) {
-            throw(new IllegalArgumentException("Request setting " +
-                "'REQUEST-QUERY-STRING' and explicit params not allowed " +
-                "together"));
+        if (requestInfo.get("REQUEST-QUERY-STRING") != null && params.size() > 0) {
+            throw (new IllegalArgumentException(
+                    "Request setting " + "'REQUEST-QUERY-STRING' and explicit params not allowed " + "together"));
         }
 
         String value;
         int bodySize = 0;
         Map<String, String> savedRequestInfo = new HashMap<>();
-        for (String name: requestInfo.keySet()) {
+        for (String name : requestInfo.keySet()) {
             value = requestInfo.get(name);
             switch (name) {
                 case "REQUEST-METHOD":
@@ -123,8 +120,9 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
                     ajpClient.setUri(value);
                     break;
                 case "REQUEST-REMOTE-HOST":
-                    /* request.getRemoteHost() will default to
-                     * request.getRemoteAddr() unless enableLookups is set. */
+                    /*
+                     * request.getRemoteHost() will default to request.getRemoteAddr() unless enableLookups is set.
+                     */
                     tomcat.getConnector().setEnableLookups(true);
                     ajpClient.setRemoteHost(value);
                     break;
@@ -164,38 +162,38 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
                     headers.put("CONTENT-TYPE", value);
                     break;
                 /* Not yet implemented or not (easily) possible to implement */
-                case "REQUEST-LOCAL-NAME":          //request.getLocalName()
-                case "REQUEST-LOCAL-PORT":          //request.getLocalPort()
-                case "REQUEST-SCHEME":              //request.getScheme()
-                case "REQUEST-URL":                 //request.getRequestURL()
-                case "REQUEST-CONTEXT-PATH":        //request.getContextPath()
-                case "REQUEST-SERVLET-PATH":        //request.getServletPath()
-                case "REQUEST-PATH-INFO":           //request.getPathInfo()
-                case "REQUEST-PATH-TRANSLATED":     //request.getPathTranslated()
-                case "REQUEST-USER-PRINCIPAL":      //request.getUserPrincipal()
-                case "REQUEST-CHARACTER-ENCODING":  //request.getCharacterEncoding()
-                case "REQUEST-LOCALE":              //request.getLocale()
-                case "SESSION-REQUESTED-ID":        //request.getRequestedSessionId()
-                case "SESSION-REQUESTED-ID-COOKIE": //request.isRequestedSessionIdFromCookie()
-                case "SESSION-REQUESTED-ID-URL":    //request.isRequestedSessionIdFromUrl()
-                case "SESSION-REQUESTED-ID-VALID":  //request.isRequestedSessionIdValid()
+                case "REQUEST-LOCAL-NAME": // request.getLocalName()
+                case "REQUEST-LOCAL-PORT": // request.getLocalPort()
+                case "REQUEST-SCHEME": // request.getScheme()
+                case "REQUEST-URL": // request.getRequestURL()
+                case "REQUEST-CONTEXT-PATH": // request.getContextPath()
+                case "REQUEST-SERVLET-PATH": // request.getServletPath()
+                case "REQUEST-PATH-INFO": // request.getPathInfo()
+                case "REQUEST-PATH-TRANSLATED": // request.getPathTranslated()
+                case "REQUEST-USER-PRINCIPAL": // request.getUserPrincipal()
+                case "REQUEST-CHARACTER-ENCODING": // request.getCharacterEncoding()
+                case "REQUEST-LOCALE": // request.getLocale()
+                case "SESSION-REQUESTED-ID": // request.getRequestedSessionId()
+                case "SESSION-REQUESTED-ID-COOKIE": // request.isRequestedSessionIdFromCookie()
+                case "SESSION-REQUESTED-ID-URL": // request.isRequestedSessionIdFromUrl()
+                case "SESSION-REQUESTED-ID-VALID": // request.isRequestedSessionIdValid()
                 default:
-                    throw(new IllegalArgumentException("Request setting '" + name + "' not supported"));
+                    throw (new IllegalArgumentException("Request setting '" + name + "' not supported"));
             }
         }
 
         ServletContext sc = ctx.getServletContext();
-        for (String name: contextInitParameters.keySet()) {
+        for (String name : contextInitParameters.keySet()) {
             sc.setInitParameter(name, contextInitParameters.get(name));
         }
-        for (String name: contextAttributes.keySet()) {
+        for (String name : contextAttributes.keySet()) {
             sc.setAttribute(name, contextAttributes.get(name));
         }
 
         /* Basic request properties must be set before this call */
         TesterAjpMessage forwardMessage = ajpClient.createForwardMessage();
 
-        for (String name: savedRequestInfo.keySet()) {
+        for (String name : savedRequestInfo.keySet()) {
             value = savedRequestInfo.get(name);
             switch (name) {
                 case "REQUEST-LOCAL-ADDR":
@@ -205,14 +203,16 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
                     forwardMessage.addAttribute("AJP_REMOTE_PORT", value);
                     break;
                 case "REQUEST-REMOTE-USER":
-                    /* request.getRemoteUser() will not trust the AJP
-                     * info if tomcatAuthentication is set. */
+                    /*
+                     * request.getRemoteUser() will not trust the AJP info if tomcatAuthentication is set.
+                     */
                     Assert.assertTrue(tomcat.getConnector().setProperty("tomcatAuthentication", "false"));
                     forwardMessage.addAttribute(0x03, value);
                     break;
                 case "REQUEST-AUTH-TYPE":
-                    /* request.getAuthType() will not trust the AJP
-                     * info if tomcatAuthentication is set. */
+                    /*
+                     * request.getAuthType() will not trust the AJP info if tomcatAuthentication is set.
+                     */
                     Assert.assertTrue(tomcat.getConnector().setProperty("tomcatAuthentication", "false"));
                     forwardMessage.addAttribute(0x04, value);
                     break;
@@ -228,14 +228,14 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
                 case "REQUEST-BODY-SIZE":
                     break;
                 default:
-                    throw(new IllegalArgumentException("Request setting '" + name + "' not supported"));
+                    throw (new IllegalArgumentException("Request setting '" + name + "' not supported"));
             }
         }
 
         if (params.size() > 0) {
             StringBuilder query = new StringBuilder();
             boolean sep = false;
-            for (String name: params.keySet()) {
+            for (String name : params.keySet()) {
                 if (sep) {
                     query.append('&');
                 } else {
@@ -248,7 +248,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             forwardMessage.addAttribute(0x05, query.toString());
         }
 
-        for (String name: headers.keySet()) {
+        for (String name : headers.keySet()) {
             value = headers.get(name);
             name = name.toUpperCase(Locale.ENGLISH);
             switch (name) {
@@ -299,7 +299,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
                     break;
             }
         }
-        for (String name: attributes.keySet()) {
+        for (String name : attributes.keySet()) {
             value = attributes.get(name);
             forwardMessage.addAttribute(name, value);
         }
@@ -329,9 +329,10 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         String body = extractResponseBody(ajpClient.readMessage());
         RequestDescriptor result = SnoopResult.parse(body);
 
-        /* AJP attributes result in Coyote Request attributes, which are
-         * not listed by request.getAttributeNames(), so SnoopServlet
-         * does not see them. Delete attributes before result comparison. */
+        /*
+         * AJP attributes result in Coyote Request attributes, which are not listed by request.getAttributeNames(), so
+         * SnoopServlet does not see them. Delete attributes before result comparison.
+         */
         desc.getAttributes().clear();
 
         result.compare(desc);
@@ -515,7 +516,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         StringManager smClient = StringManager.getManager("org.apache.catalina.valves");
         String expectedBody = "<p><b>" + smClient.getString("errorReportValve.type") + "</b> " +
-            smClient.getString("errorReportValve.statusReport") + "</p>";
+                smClient.getString("errorReportValve.statusReport") + "</p>";
 
         SimpleAjpClient ajpClient = new SimpleAjpClient();
 
@@ -622,8 +623,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     }
 
 
-    public void doTestPost(boolean multipleCL, int expectedStatus,
-                           String expectedMessage) throws Exception {
+    public void doTestPost(boolean multipleCL, int expectedStatus, String expectedMessage) throws Exception {
 
         getTomcatInstanceTestWebapp(false, true);
 
@@ -643,11 +643,9 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         forwardMessage.addHeader(0xA007, "application/x-www-form-urlencoded");
         forwardMessage.end();
 
-        TesterAjpMessage bodyMessage =
-                ajpClient.createBodyMessage("test=data".getBytes());
+        TesterAjpMessage bodyMessage = ajpClient.createBodyMessage("test=data".getBytes());
 
-        TesterAjpMessage responseHeaders =
-                ajpClient.sendMessage(forwardMessage, bodyMessage);
+        TesterAjpMessage responseHeaders = ajpClient.sendMessage(forwardMessage, bodyMessage);
 
         validateResponseHeaders(responseHeaders, expectedStatus, expectedMessage);
         if (expectedStatus == HttpServletResponse.SC_OK) {
@@ -662,7 +660,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             // Expect 3 messages: headers, error report body, end for an invalid request
             StringManager smClient = StringManager.getManager("org.apache.catalina.valves");
             String expectedBody = "<p><b>" + smClient.getString("errorReportValve.type") + "</b> " +
-                smClient.getString("errorReportValve.statusReport") + "</p>";
+                    smClient.getString("errorReportValve.statusReport") + "</p>";
             TesterAjpMessage responseBody = ajpClient.readMessage();
             validateResponseBody(responseBody, expectedBody);
             validateResponseEnd(ajpClient.readMessage(), false);
@@ -698,8 +696,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         TesterAjpMessage forwardMessage = ajpClient.createForwardMessage();
         forwardMessage.end();
 
-        TesterAjpMessage responseHeaders =
-                ajpClient.sendMessage(forwardMessage, null);
+        TesterAjpMessage responseHeaders = ajpClient.sendMessage(forwardMessage, null);
 
         // Expect 2 messages: headers, end
         validateResponseHeaders(responseHeaders, 304, "304");
@@ -732,8 +729,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         doTestZeroLengthRequestBody("POST", false);
     }
 
-    private void doTestZeroLengthRequestBody(String method, boolean callAvailable)
-            throws Exception {
+    private void doTestZeroLengthRequestBody(String method, boolean callAvailable) throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
 
@@ -757,13 +753,11 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         forwardMessage.addHeader(0xA008, "0");
         forwardMessage.end();
 
-        TesterAjpMessage responseHeaders =
-                ajpClient.sendMessage(forwardMessage, null);
+        TesterAjpMessage responseHeaders = ajpClient.sendMessage(forwardMessage, null);
 
         // Expect 3 messages: headers, body, end
         validateResponseHeaders(responseHeaders, 200, "200");
-        validateResponseBody(ajpClient.readMessage(),
-                "Request Body length in bytes: 0");
+        validateResponseBody(ajpClient.readMessage(), "Request Body length in bytes: 0");
         validateResponseEnd(ajpClient.readMessage(), true);
 
         // Double check the connection is still open
@@ -779,8 +773,8 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
                 success = ((itRead.next().intValue() > 0) == (itAvailable.next().intValue() > 0));
             }
             if (!success) {
-                Assert.fail("available() and read() results do not match.\nAvailable: "
-                        + servlet.availableList + "\nRead: " + servlet.readList);
+                Assert.fail("available() and read() results do not match.\nAvailable: " + servlet.availableList +
+                        "\nRead: " + servlet.readList);
             }
         }
     }
@@ -856,7 +850,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         TesterAjpMessage responseHeaderMessage = ajpClient.sendMessage(forwardMessage, null);
 
         // Expect 2 messages: headers, end
-        Map<String,List<String>> responseHeaders = validateResponseHeaders(responseHeaderMessage, 200, "200");
+        Map<String, List<String>> responseHeaders = validateResponseHeaders(responseHeaderMessage, 200, "200");
         Assert.assertTrue(responseHeaders.containsKey(InvalidHeaderServlet.VALID_HEADER_A_NAME));
         Assert.assertFalse(responseHeaders.containsKey(InvalidHeaderServlet.INVALID_HEADER_B_NAME));
         Assert.assertTrue(responseHeaders.containsKey(InvalidHeaderServlet.VALID_HEADER_C_NAME));
@@ -892,11 +886,10 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
 
     /**
-     * Process response header packet and checks the status. Any other data is
-     * ignored.
+     * Process response header packet and checks the status. Any other data is ignored.
      */
-    private Map<String,List<String>> validateResponseHeaders(TesterAjpMessage message,
-            int expectedStatus, String expectedMessage) throws Exception {
+    private Map<String, List<String>> validateResponseHeaders(TesterAjpMessage message, int expectedStatus,
+            String expectedMessage) throws Exception {
         // First two bytes should always be AB
         Assert.assertEquals((byte) 'A', message.buf[0]);
         Assert.assertEquals((byte) 'B', message.buf[1]);
@@ -919,7 +912,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         // Get the number of headers
         int headerCount = message.readInt();
 
-        Map<String,List<String>> headerMap = new HashMap<>();
+        Map<String, List<String>> headerMap = new HashMap<>();
         for (int i = 0; i < headerCount; i++) {
             String headerName = message.readHeaderName();
             String headerValue = message.readString();
@@ -940,8 +933,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     /**
      * Extract the content from a response message.
      */
-    private String extractResponseBody(TesterAjpMessage message)
-            throws Exception {
+    private String extractResponseBody(TesterAjpMessage message) throws Exception {
 
         Assert.assertEquals((byte) 'A', message.buf[0]);
         Assert.assertEquals((byte) 'B', message.buf[1]);
@@ -958,18 +950,15 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     }
 
     /**
-     * Validates that the response message is valid and contains the expected
-     * content.
+     * Validates that the response message is valid and contains the expected content.
      */
-    private void validateResponseBody(TesterAjpMessage message,
-            String expectedBody) throws Exception {
+    private void validateResponseBody(TesterAjpMessage message, String expectedBody) throws Exception {
 
         String body = extractResponseBody(message);
         Assert.assertTrue(body.contains(expectedBody));
     }
 
-    private void validateResponseEnd(TesterAjpMessage message,
-            boolean expectedReuse) {
+    private void validateResponseEnd(TesterAjpMessage message, boolean expectedReuse) {
         Assert.assertEquals((byte) 'A', message.buf[0]);
         Assert.assertEquals((byte) 'B', message.buf[1]);
 
@@ -1006,8 +995,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             resp.setStatus(304);
             resp.getWriter().print("Body not permitted for 304 response");
@@ -1030,19 +1018,17 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             doRequest(req, resp, false);
         }
 
         @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             doRequest(req, resp, true);
         }
 
-        private void doRequest(HttpServletRequest request, HttpServletResponse response,
-                boolean isPost) throws IOException {
+        private void doRequest(HttpServletRequest request, HttpServletResponse response, boolean isPost)
+                throws IOException {
 
             long readCount = 0;
 
@@ -1088,8 +1074,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setBufferSize(bufferSize);
 
             resp.setContentType("text/plain");
