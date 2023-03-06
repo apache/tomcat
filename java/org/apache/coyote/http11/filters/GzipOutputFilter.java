@@ -87,7 +87,7 @@ public class GzipOutputFilter implements OutputFilter {
             chunk.position(chunk.position() + len);
         } else {
             byte[] bytes = new byte[len];
-            chunk.put(bytes);
+            chunk.get(bytes);
             compressionStream.write(bytes, 0, len);
         }
         return len;
