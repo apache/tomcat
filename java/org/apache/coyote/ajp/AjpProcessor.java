@@ -1068,49 +1068,65 @@ public class AjpProcessor extends AbstractProcessor {
             headers.setValue("Content-Length").setLong(contentLength);
         }
 
-        // Write AJP message header
         tmpMB.recycle();
         responseMsgPos = -1;
-        responseMessage.reset();
-        responseMessage.appendByte(Constants.JK_AJP13_SEND_HEADERS);
 
-        // Write HTTP response line
-        responseMessage.appendInt(statusCode);
-        if (sendReasonPhrase) {
-            String message = null;
-            if (org.apache.coyote.Constants.USE_CUSTOM_STATUS_MSG_IN_HEADER &&
-                    HttpMessages.isSafeInHttpHeader(response.getMessage())) {
-                message = response.getMessage();
-            }
-            if (message == null) {
-                message = HttpMessages.getInstance(
-                        response.getLocale()).getMessage(response.getStatus());
-            }
-            if (message == null) {
-                // mod_jk + httpd 2.x fails with a null status message - bug 45026
-                message = Integer.toString(response.getStatus());
-            }
-            tmpMB.setString(message);
-        } else {
-            // Reason phrase is optional but mod_jk + httpd 2.x fails with a null
-            // reason phrase - bug 45026
-            tmpMB.setString(Integer.toString(response.getStatus()));
-        }
-        responseMessage.appendBytes(tmpMB);
-
-        // Write headers
         int numHeaders = headers.size();
-        responseMessage.appendInt(numHeaders);
         for (int i = 0; i < numHeaders; i++) {
-            MessageBytes hN = headers.getName(i);
-            int hC = Constants.getResponseAjpIndex(hN.toString());
-            if (hC > 0) {
-                responseMessage.appendInt(hC);
-            } else {
-                responseMessage.appendBytes(hN);
+            if (i == 0) {
+                // Write AJP message header
+                responseMessage.reset();
+                responseMessage.appendByte(Constants.JK_AJP13_SEND_HEADERS);
+
+                // Write HTTP response line
+                responseMessage.appendInt(statusCode);
+                if (sendReasonPhrase) {
+                    String message = null;
+                    if (org.apache.coyote.Constants.USE_CUSTOM_STATUS_MSG_IN_HEADER &&
+                            HttpMessages.isSafeInHttpHeader(response.getMessage())) {
+                        message = response.getMessage();
+                    }
+                    if (message == null) {
+                        message = HttpMessages.getInstance(
+                                response.getLocale()).getMessage(response.getStatus());
+                    }
+                    if (message == null) {
+                        // mod_jk + httpd 2.x fails with a null status message - bug 45026
+                        message = Integer.toString(response.getStatus());
+                    }
+                    tmpMB.setString(message);
+                } else {
+                    // Reason phrase is optional but mod_jk + httpd 2.x fails with a null
+                    // reason phrase - bug 45026
+                    tmpMB.setString(Integer.toString(response.getStatus()));
+                }
+                responseMessage.appendBytes(tmpMB);
+
+                // Start headers
+                responseMessage.appendInt(numHeaders);
             }
-            MessageBytes hV=headers.getValue(i);
-            responseMessage.appendBytes(hV);
+
+            try {
+                // Write headers
+                MessageBytes hN = headers.getName(i);
+                int hC = Constants.getResponseAjpIndex(hN.toString());
+                if (hC > 0) {
+                    responseMessage.appendInt(hC);
+                } else {
+                    responseMessage.appendBytes(hN);
+                }
+                MessageBytes hV=headers.getValue(i);
+                responseMessage.appendBytes(hV);
+            } catch (IllegalArgumentException iae) {
+                // Log the problematic header
+                log.warn(sm.getString("ajpprocessor.response.invalidHeader", headers.getName(i),
+                        headers.getValue(i)), iae);
+                // Remove the problematic header
+                headers.removeHeader(i);
+                numHeaders--;
+                // Reset loop and start again
+                i = -1;
+            }
         }
 
         // Write to buffer
