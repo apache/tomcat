@@ -126,24 +126,24 @@ public class AjpProcessor extends AbstractProcessor {
         System.arraycopy(pongMessage.getBuffer(), 0, pongMessageArray, 0, pongMessage.getLen());
 
         // Build the Set of javax attributes
-        Set<String> s = new HashSet<>();
-        s.add("javax.servlet.request.cipher_suite");
-        s.add("javax.servlet.request.key_size");
-        s.add("javax.servlet.request.ssl_session");
-        s.add("javax.servlet.request.X509Certificate");
-        javaxAttributes = Collections.unmodifiableSet(s);
+        Set<String> s2 = new HashSet<>();
+        s2.add("javax.servlet.request.cipher_suite");
+        s2.add("javax.servlet.request.key_size");
+        s2.add("javax.servlet.request.ssl_session");
+        s2.add("javax.servlet.request.X509Certificate");
+        javaxAttributes = Collections.unmodifiableSet(s2);
 
-        Set<String> iis = new HashSet<>();
-        iis.add("CERT_ISSUER");
-        iis.add("CERT_SUBJECT");
-        iis.add("CERT_COOKIE");
-        iis.add("HTTPS_SERVER_SUBJECT");
-        iis.add("CERT_FLAGS");
-        iis.add("HTTPS_SECRETKEYSIZE");
-        iis.add("CERT_SERIALNUMBER");
-        iis.add("HTTPS_SERVER_ISSUER");
-        iis.add("HTTPS_KEYSIZE");
-        iisTlsAttributes = Collections.unmodifiableSet(iis);
+        Set<String> s = new HashSet<>();
+        s.add("CERT_ISSUER");
+        s.add("CERT_SUBJECT");
+        s.add("CERT_COOKIE");
+        s.add("HTTPS_SERVER_SUBJECT");
+        s.add("CERT_FLAGS");
+        s.add("HTTPS_SECRETKEYSIZE");
+        s.add("CERT_SERIALNUMBER");
+        s.add("HTTPS_SERVER_ISSUER");
+        s.add("HTTPS_KEYSIZE");
+        iisTlsAttributes = Collections.unmodifiableSet(s);
     }
 
 
