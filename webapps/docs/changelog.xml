@@ -125,6 +125,11 @@
         characters as defined in RFC 8259. Based on code submitted by
         Thomas Meyer. (remm)
       </fix>
+      <fix>
+        <bug>66511</bug>: Fix <code>GzipOutputFilter</code> (used for compressed
+        HTTP responses) when used with direct buffers. Patch suggested by Arjen
+        Poutsma. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
