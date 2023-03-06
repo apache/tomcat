@@ -503,7 +503,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     @Test
     public void testSecret() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        Assert.assertTrue(tomcat.getConnector().setProperty("requiredSecret", "RIGHTSECRET"));
+        Assert.assertTrue(tomcat.getConnector().setProperty("secret", "RIGHTSECRET"));
         tomcat.start();
 
         // No file system docBase required
