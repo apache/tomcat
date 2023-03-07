@@ -29,7 +29,7 @@ import javax.servlet.ServletResponse;
  * <p>
  * Provides an abstract class to be subclassed to create an HTTP filter suitable for a Web site. A subclass of
  * <code>HttpFilter</code> should override
- * {@link #doFilter(jakarta.servlet.http.HttpServletRequest, jakarta.servlet.http.HttpServletResponse, jakarta.servlet.FilterChain) }.
+ * {@link #doFilter(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, javax.servlet.FilterChain) }.
  * </p>
  *
  * <p>
@@ -70,7 +70,7 @@ public abstract class HttpFilter extends GenericFilter {
      * The default implementation inspects the incoming {@code req} and {@code res} objects to determine if they are
      * instances of {@link HttpServletRequest} and {@link HttpServletResponse}, respectively. If not, a
      * {@link ServletException} is thrown. Otherwise, the protected
-     * {@link #doFilter(jakarta.servlet.http.HttpServletRequest, jakarta.servlet.http.HttpServletResponse, jakarta.servlet.FilterChain)}
+     * {@link #doFilter(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, javax.servlet.FilterChain)}
      * method is called.
      * </p>
      *
