@@ -36,7 +36,7 @@ public interface SSL_set_info_callback$cb {
         return RuntimeHelper.upcallStub(constants$21.SSL_set_info_callback$cb_UP$MH, fi, constants$21.SSL_set_info_callback$cb$FUNC, scope);
     }
     static SSL_set_info_callback$cb ofAddress(MemorySegment addr, Arena arena) {
-        MemorySegment symbol = addr.reinterpret(arena.scope(), null);
+        MemorySegment symbol = addr.reinterpret(arena, null);
         return (java.lang.foreign.MemorySegment __x0, int __x1, int __x2) -> {
             try {
                 constants$21.SSL_set_info_callback$cb_DOWN$MH.invokeExact(symbol, __x0, __x1, __x2);

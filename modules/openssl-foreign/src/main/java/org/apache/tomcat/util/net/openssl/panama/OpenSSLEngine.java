@@ -914,7 +914,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return null;
             }
             MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
-            byte[] certificate = buf.reinterpret(length, localArena.scope(), null).toArray(ValueLayout.JAVA_BYTE);
+            byte[] certificate = buf.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
             X509_free(x509);
             CRYPTO_free(buf, MemorySegment.NULL, 0); // OPENSSL_free macro
             return certificate;
@@ -938,7 +938,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     continue;
                 }
                 MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
-                byte[] certificate = buf.reinterpret(length, localArena.scope(), null).toArray(ValueLayout.JAVA_BYTE);
+                byte[] certificate = buf.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
                 certificateChain[i] = certificate;
                 CRYPTO_free(buf, MemorySegment.NULL, 0); // OPENSSL_free macro
             }
@@ -959,7 +959,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return null;
             }
             MemorySegment protocolAddress = protocolPointer.get(ValueLayout.ADDRESS, 0);
-            byte[] name = protocolAddress.reinterpret(length, localArena.scope(), null).toArray(ValueLayout.JAVA_BYTE);
+            byte[] name = protocolAddress.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
             if (log.isDebugEnabled()) {
                 log.debug("Protocol negotiated [" + new String(name) + "]");
             }
@@ -1329,7 +1329,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                             int length = ASN1_STRING_length(os);
                             MemorySegment data = ASN1_STRING_get0_data(os);
                             // ocsp_urls = decode_OCSP_url(os);
-                            byte[] asn1String = data.reinterpret(length, localArenal.scope(), null).toArray(ValueLayout.JAVA_BYTE);
+                            byte[] asn1String = data.reinterpret(length, localArenal, null).toArray(ValueLayout.JAVA_BYTE);
                             Asn1Parser parser = new Asn1Parser(asn1String);
                             // Parse the byte sequence
                             ArrayList<String> urls = new ArrayList<>();
@@ -1425,7 +1425,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // Host: urlHost:urlPort
             // Content-Type: application/ocsp-request
             // Content-Length: ocspRequestData.length
-            byte[] ocspRequestData = buf.reinterpret(requestLength, localArena.scope(), null).toArray(ValueLayout.JAVA_BYTE);
+            byte[] ocspRequestData = buf.reinterpret(requestLength, localArena, null).toArray(ValueLayout.JAVA_BYTE);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setDoInput(true);
@@ -1515,7 +1515,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                         MemorySegment sessionId = SSL_SESSION_get_id(session, lenPointer);
                         int len = lenPointer.get(ValueLayout.JAVA_INT, 0);
                         id = (len == 0) ? new byte[0]
-                                : sessionId.reinterpret(len, localArena.scope(), null).toArray(ValueLayout.JAVA_BYTE);
+                                : sessionId.reinterpret(len, localArena, null).toArray(ValueLayout.JAVA_BYTE);
                     }
                 }
             }
@@ -1814,8 +1814,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             this.noOcspCheck = noOcspCheck;
             // Use another arena to avoid keeping a reference through segments
             // This also allows making further accesses to the main pointers safer
-            this.ssl = ssl.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena.scope(), null);
-            this.networkBIO = networkBIO.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena.scope(), null);
+            this.ssl = ssl.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena, null);
+            this.networkBIO = networkBIO.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena, null);
         }
 
         @Override
