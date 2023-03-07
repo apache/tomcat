@@ -25,63 +25,105 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 /**
- * Provides a base class that implements the Filter interface and ensures that the Request and Response are of type
- * HttpServletRequest and HttpServletResponse respectively.
+ *
+ * <p>
+ * Provides an abstract class to be subclassed to create an HTTP filter suitable for a Web site. A subclass of
+ * <code>HttpFilter</code> should override
+ * {@link #doFilter(jakarta.servlet.http.HttpServletRequest, jakarta.servlet.http.HttpServletResponse, jakarta.servlet.FilterChain) }.
+ * </p>
+ *
+ * <p>
+ * Filters typically run on multithreaded servers, so be aware that a filter must handle concurrent requests and be
+ * careful to synchronize access to shared resources. Shared resources include in-memory data such as instance or class
+ * variables and external objects such as files, database connections, and network connections. See the
+ * <a href="https://docs.oracle.com/javase/tutorial/essential/concurrency/"> Java Tutorial on Multithreaded
+ * Programming</a> for more information on handling multiple threads in a Java program.
+ *
+ * @author Various
+ *
+ * @since Servlet 4.0
  */
 public abstract class HttpFilter extends GenericFilter {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 7478463438252262094L;
 
     /**
-     * {@inheritDoc} This implementation tests the request and response to see if they are instances of
-     * {@link HttpServletRequest} and {@link HttpServletResponse} respectively. If they are then they are passed to
-     * {@link #doFilter(HttpServletRequest, HttpServletResponse, FilterChain)}. If not, a {@link ServletException} is
-     * thrown.
+     * <p>
+     * Does nothing, because this is an abstract class.
+     * </p>
      *
-     * @throws ServletException If either the request or response are not of the expected types or any other error
-     *                              occurs
+     * @since Servlet 4.0
+     */
+    public HttpFilter() {
+    }
+
+    /**
+     *
+     * <p>
+     * The <code>doFilter</code> method of the Filter is called by the container each time a request/response pair is passed
+     * through the chain due to a client request for a resource at the end of the chain. The FilterChain passed in to this
+     * method allows the Filter to pass on the request and response to the next entity in the chain. There's no need to
+     * override this method.
+     * </p>
+     *
+     * <p>
+     * The default implementation inspects the incoming {@code req} and {@code res} objects to determine if they are
+     * instances of {@link HttpServletRequest} and {@link HttpServletResponse}, respectively. If not, a
+     * {@link ServletException} is thrown. Otherwise, the protected
+     * {@link #doFilter(jakarta.servlet.http.HttpServletRequest, jakarta.servlet.http.HttpServletResponse, jakarta.servlet.FilterChain)}
+     * method is called.
+     * </p>
+     *
+     * @param req a {@link ServletRequest} object that contains the request the client has made of the filter
+     *
+     * @param res a {@link ServletResponse} object that contains the response the filter sends to the client
+     *
+     * @param chain the <code>FilterChain</code> for invoking the next filter or the resource
+     *
+     * @throws IOException if an input or output error is detected when the filter handles the request
+     *
+     * @throws ServletException if the request for the could not be handled or either parameter is not an instance of the
+     * respective {@link HttpServletRequest} or {@link HttpServletResponse}.
+     *
+     * @since Servlet 4.0
      */
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
-        if (!(request instanceof HttpServletRequest)) {
-            throw new ServletException(request + " not HttpServletRequest");
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+        throws IOException, ServletException {
+        if (!(req instanceof HttpServletRequest && res instanceof HttpServletResponse)) {
+            throw new ServletException("non-HTTP request or response");
         }
-        if (!(response instanceof HttpServletResponse)) {
-            throw new ServletException(request + " not HttpServletResponse");
-        }
-        doFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
-    }
 
+        this.doFilter((HttpServletRequest) req, (HttpServletResponse) res, chain);
+    }
 
     /**
-     * The <code>doFilter</code> method of the Filter is called by the container each time a request/response pair is
-     * passed through the chain due to a client request for a resource at the end of the chain. The FilterChain passed
-     * in to this method allows the Filter to pass on the request and response to the next entity in the chain.
+     *
      * <p>
-     * A typical implementation of this method would follow the following pattern:- <br>
-     * 1. Examine the request<br>
-     * 2. Optionally wrap the request object with a custom implementation to filter content or headers for input
-     * filtering <br>
-     * 3. Optionally wrap the response object with a custom implementation to filter content or headers for output
-     * filtering <br>
-     * 4. a) <strong>Either</strong> invoke the next entity in the chain using the FilterChain object
-     * (<code>chain.doFilter()</code>), <br>
-     * 4. b) <strong>or</strong> not pass on the request/response pair to the next entity in the filter chain to block
-     * the request processing<br>
-     * 5. Directly set headers on the response after invocation of the next entity in the filter chain. This default
-     * implementation simply calls the next filter in the filter chain.
+     * The <code>doFilter</code> method of the Filter is called by the container each time a request/response pair is passed
+     * through the chain due to a client request for a resource at the end of the chain. The FilterChain passed in to this
+     * method allows the Filter to pass on the request and response to the next entity in the chain.
+     * </p>
      *
-     * @param request  The request to process
-     * @param response The response associated with the request
-     * @param chain    Provides access to the next filter in the chain for this filter to pass the request and response
-     *                     to for further processing
+     * <p>
+     * The default implementation simply calls {@link FilterChain#doFilter}
+     * </p>
      *
-     * @throws IOException      if an I/O error occurs during this filter's processing of the request
-     * @throws ServletException if the processing fails for any other reason
+     * @param req a {@link HttpServletRequest} object that contains the request the client has made of the filter
+     *
+     * @param res a {@link HttpServletResponse} object that contains the response the filter sends to the client
+     *
+     * @param chain the <code>FilterChain</code> for invoking the next filter or the resource
+     *
+     * @throws IOException if an input or output error is detected when the filter handles the request
+     *
+     * @throws ServletException if the request for the could not be handled
+     *
+     * @since Servlet 4.0
      */
-    protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
-        chain.doFilter(request, response);
+    protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
+        throws IOException, ServletException {
+        chain.doFilter(req, res);
     }
+
 }
