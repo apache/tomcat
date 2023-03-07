@@ -324,7 +324,7 @@ set CATALINA_OPTS=
 goto execCmd
 
 :doVersion
-%_EXECJAVA% -classpath "%CATALINA_HOME%\lib\catalina.jar" org.apache.catalina.util.ServerInfo
+%_EXECJAVA% %JAVA_OPTS% -classpath "%CATALINA_HOME%\lib\catalina.jar" org.apache.catalina.util.ServerInfo
 goto end
 
 
