@@ -162,6 +162,11 @@
         Refactor code using <code>MD5Encoder</code> to use
         <code>HexUtils.toHexString()</code>. (markt)
       </scode>
+      <fix>
+        <bug>66507</bug>: Fix a bug that <code>$JAVA_OPTS</code> is not passed
+        to the jvm in <code>catalina.sh</code> when calling <code>version</code>.
+        Patch suggested by Eric Hamilton. (lihan)
+      </fix>
     </changelog>
   </subsection>
 </section>
