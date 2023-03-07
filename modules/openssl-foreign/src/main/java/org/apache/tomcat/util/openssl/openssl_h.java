@@ -33,7 +33,7 @@ public class openssl_h  {
     public static final OfLong C_LONG_LONG = Constants$root.C_LONG_LONG$LAYOUT;
     public static final OfFloat C_FLOAT = Constants$root.C_FLOAT$LAYOUT;
     public static final OfDouble C_DOUBLE = Constants$root.C_DOUBLE$LAYOUT;
-    public static final OfAddress C_POINTER = Constants$root.C_POINTER$LAYOUT;
+    public static final AddressLayout C_POINTER = Constants$root.C_POINTER$LAYOUT;
     /**
      * {@snippet :
      * #define BIO_CLOSE 1
