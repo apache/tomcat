@@ -89,7 +89,7 @@ public class TestCloseBug58624 extends WebSocketBaseTest {
     }
 
     @ClientEndpoint
-    public class Bug58624ClientEndpoint {
+    public static class Bug58624ClientEndpoint {
 
         private volatile Throwable t;
 
