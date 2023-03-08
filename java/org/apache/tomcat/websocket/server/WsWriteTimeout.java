@@ -25,18 +25,17 @@ import org.apache.tomcat.websocket.BackgroundProcess;
 import org.apache.tomcat.websocket.BackgroundProcessManager;
 
 /**
- * Provides timeouts for asynchronous web socket writes. On the server side we
- * only have access to {@link jakarta.servlet.ServletOutputStream} and
- * {@link jakarta.servlet.ServletInputStream} so there is no way to set a timeout
- * for writes to the client.
+ * Provides timeouts for asynchronous web socket writes. On the server side we only have access to
+ * {@link jakarta.servlet.ServletOutputStream} and {@link jakarta.servlet.ServletInputStream} so there is no way to set
+ * a timeout for writes to the client.
  */
 public class WsWriteTimeout implements BackgroundProcess {
 
     /**
      * Note: The comparator imposes orderings that are inconsistent with equals
      */
-    private final Set<WsRemoteEndpointImplServer> endpoints =
-            new ConcurrentSkipListSet<>(Comparator.comparingLong(WsRemoteEndpointImplServer::getTimeoutExpiry));
+    private final Set<WsRemoteEndpointImplServer> endpoints = new ConcurrentSkipListSet<>(
+            Comparator.comparingLong(WsRemoteEndpointImplServer::getTimeoutExpiry));
     private final AtomicInteger count = new AtomicInteger(0);
     private int backgroundProcessCount = 0;
     private volatile int processPeriod = 1;
@@ -44,7 +43,7 @@ public class WsWriteTimeout implements BackgroundProcess {
     @Override
     public void backgroundProcess() {
         // This method gets called once a second.
-        backgroundProcessCount ++;
+        backgroundProcessCount++;
 
         if (backgroundProcessCount >= processPeriod) {
             backgroundProcessCount = 0;
@@ -73,10 +72,7 @@ public class WsWriteTimeout implements BackgroundProcess {
 
 
     /**
-     * {@inheritDoc}
-     *
-     * The default value is 1 which means asynchronous write timeouts are
-     * processed every 1 second.
+     * {@inheritDoc} The default value is 1 which means asynchronous write timeouts are processed every 1 second.
      */
     @Override
     public int getProcessPeriod() {
