@@ -44,9 +44,8 @@ public abstract class Authenticator {
      *
      * @throws AuthenticationException When an error occurs
      *
-     * @deprecated Use {@link
-     *             #getAuthorization(String, String, String, String, String)}.
-     *             Will be removed in Tomcat 10.1.x
+     * @deprecated Use {@link #getAuthorization(String, String, String, String, String)}. Will be removed in Tomcat
+     *                 10.1.x
      */
     @Deprecated
     public String getAuthorization(String requestUri, String authenticateHeader, Map<String, Object> userProperties)
@@ -60,13 +59,12 @@ public abstract class Authenticator {
     /**
      * Generate the authorization header value that will be sent to the server.
      *
-     * @param requestUri            The request URI
-     * @param authenticateHeader    The server authentication header received
-     * @param userName              The user name
-     * @param userPassword          The user password
-     * @param userRealm             The realm for which the provided user name
-     *                                  and password are valid. {@code null} to
-     *                                  indicate all realms.
+     * @param requestUri         The request URI
+     * @param authenticateHeader The server authentication header received
+     * @param userName           The user name
+     * @param userPassword       The user password
+     * @param userRealm          The realm for which the provided user name and password are valid. {@code null} to
+     *                               indicate all realms.
      *
      * @return The generated authorization header value
      *
@@ -91,8 +89,7 @@ public abstract class Authenticator {
      *
      * @return a map of authentication parameter names and values
      *
-     * @deprecated Use {@link Authenticator#parseAuthenticateHeader(String)}.
-     *             Will be removed in Tomcat 10.1.x onwards
+     * @deprecated Use {@link Authenticator#parseAuthenticateHeader(String)}. Will be removed in Tomcat 10.1.x onwards
      */
     @Deprecated
     public Map<String, String> parseWWWAuthenticateHeader(String authenticateHeader) {
@@ -150,9 +147,8 @@ public abstract class Authenticator {
         }
 
         /*
-         * User has configured a realm. Only allow authentication to proceed if
-         * the realm in the authentication challenge matches (both BASIC and
-         * DIGEST are required to include a realm).
+         * User has configured a realm. Only allow authentication to proceed if the realm in the authentication
+         * challenge matches (both BASIC and DIGEST are required to include a realm).
          */
         if (serverRealm != null) {
             serverRealm = serverRealm.trim();

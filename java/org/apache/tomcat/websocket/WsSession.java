@@ -77,8 +77,8 @@ public class WsSession implements Session {
         // be sufficient to pass the validation tests.
         ServerEndpointConfig.Builder builder = ServerEndpointConfig.Builder.create(Object.class, "/");
         ServerEndpointConfig sec = builder.build();
-        SEC_CONFIGURATOR_USES_IMPL_DEFAULT =
-                sec.getConfigurator().getClass().equals(DefaultServerEndpointConfigurator.class);
+        SEC_CONFIGURATOR_USES_IMPL_DEFAULT = sec.getConfigurator().getClass()
+                .equals(DefaultServerEndpointConfigurator.class);
     }
 
     private final Endpoint localEndpoint;
@@ -117,32 +117,26 @@ public class WsSession implements Session {
 
 
     /**
-     * Creates a new WebSocket session for communication between the provided
-     * client and remote end points. The result of
-     * {@link Thread#getContextClassLoader()} at the time this constructor is
-     * called will be used when calling
+     * Creates a new WebSocket session for communication between the provided client and remote end points. The result
+     * of {@link Thread#getContextClassLoader()} at the time this constructor is called will be used when calling
      * {@link Endpoint#onClose(Session, CloseReason)}.
      *
      * @param clientEndpointHolder The end point managed by this code
      * @param wsRemoteEndpoint     The other / remote end point
      * @param wsWebSocketContainer The container that created this session
      * @param negotiatedExtensions The agreed extensions to use for this session
-     * @param subProtocol          The agreed sub-protocol to use for this
-     *                             session
-     * @param pathParameters       The path parameters associated with the
-     *                             request that initiated this session or
-     *                             <code>null</code> if this is a client session
-     * @param secure               Was this session initiated over a secure
-     *                             connection?
-     * @param clientEndpointConfig The configuration information for the client
-     *                             end point
+     * @param subProtocol          The agreed sub-protocol to use for this session
+     * @param pathParameters       The path parameters associated with the request that initiated this session or
+     *                                 <code>null</code> if this is a client session
+     * @param secure               Was this session initiated over a secure connection?
+     * @param clientEndpointConfig The configuration information for the client end point
+     *
      * @throws DeploymentException if an invalid encode is specified
      */
-    public WsSession(ClientEndpointHolder clientEndpointHolder,
-            WsRemoteEndpointImplBase wsRemoteEndpoint,
-            WsWebSocketContainer wsWebSocketContainer,
-            List<Extension> negotiatedExtensions, String subProtocol, Map<String, String> pathParameters,
-            boolean secure, ClientEndpointConfig clientEndpointConfig) throws DeploymentException {
+    public WsSession(ClientEndpointHolder clientEndpointHolder, WsRemoteEndpointImplBase wsRemoteEndpoint,
+            WsWebSocketContainer wsWebSocketContainer, List<Extension> negotiatedExtensions, String subProtocol,
+            Map<String, String> pathParameters, boolean secure, ClientEndpointConfig clientEndpointConfig)
+            throws DeploymentException {
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.wsRemoteEndpoint.setSession(this);
         this.remoteEndpointAsync = new WsRemoteEndpointAsync(wsRemoteEndpoint);
@@ -181,46 +175,36 @@ public class WsSession implements Session {
 
 
     /**
-     * Creates a new WebSocket session for communication between the provided
-     * server and remote end points. The result of
-     * {@link Thread#getContextClassLoader()} at the time this constructor is
-     * called will be used when calling
+     * Creates a new WebSocket session for communication between the provided server and remote end points. The result
+     * of {@link Thread#getContextClassLoader()} at the time this constructor is called will be used when calling
      * {@link Endpoint#onClose(Session, CloseReason)}.
      *
      * @param wsRemoteEndpoint     The other / remote end point
      * @param wsWebSocketContainer The container that created this session
-     * @param requestUri           The URI used to connect to this end point or
-     *                             <code>null</code> if this is a client session
-     * @param requestParameterMap  The parameters associated with the request
-     *                             that initiated this session or
-     *                             <code>null</code> if this is a client session
-     * @param queryString          The query string associated with the request
-     *                             that initiated this session or
-     *                             <code>null</code> if this is a client session
-     * @param userPrincipal        The principal associated with the request
-     *                             that initiated this session or
-     *                             <code>null</code> if this is a client session
-     * @param httpSessionId        The HTTP session ID associated with the
-     *                             request that initiated this session or
-     *                             <code>null</code> if this is a client session
+     * @param requestUri           The URI used to connect to this end point or <code>null</code> if this is a client
+     *                                 session
+     * @param requestParameterMap  The parameters associated with the request that initiated this session or
+     *                                 <code>null</code> if this is a client session
+     * @param queryString          The query string associated with the request that initiated this session or
+     *                                 <code>null</code> if this is a client session
+     * @param userPrincipal        The principal associated with the request that initiated this session or
+     *                                 <code>null</code> if this is a client session
+     * @param httpSessionId        The HTTP session ID associated with the request that initiated this session or
+     *                                 <code>null</code> if this is a client session
      * @param negotiatedExtensions The agreed extensions to use for this session
-     * @param subProtocol          The agreed sub-protocol to use for this
-     *                             session
-     * @param pathParameters       The path parameters associated with the
-     *                             request that initiated this session or
-     *                             <code>null</code> if this is a client session
-     * @param secure               Was this session initiated over a secure
-     *                             connection?
-     * @param serverEndpointConfig The configuration information for the server
-     *                             end point
+     * @param subProtocol          The agreed sub-protocol to use for this session
+     * @param pathParameters       The path parameters associated with the request that initiated this session or
+     *                                 <code>null</code> if this is a client session
+     * @param secure               Was this session initiated over a secure connection?
+     * @param serverEndpointConfig The configuration information for the server end point
+     *
      * @throws DeploymentException if an invalid encode is specified
      */
-    public WsSession(WsRemoteEndpointImplBase wsRemoteEndpoint,
-            WsWebSocketContainer wsWebSocketContainer,
-            URI requestUri, Map<String, List<String>> requestParameterMap,
-            String queryString, Principal userPrincipal, String httpSessionId,
-            List<Extension> negotiatedExtensions, String subProtocol, Map<String, String> pathParameters,
-            boolean secure, ServerEndpointConfig serverEndpointConfig) throws DeploymentException {
+    public WsSession(WsRemoteEndpointImplBase wsRemoteEndpoint, WsWebSocketContainer wsWebSocketContainer,
+            URI requestUri, Map<String, List<String>> requestParameterMap, String queryString, Principal userPrincipal,
+            String httpSessionId, List<Extension> negotiatedExtensions, String subProtocol,
+            Map<String, String> pathParameters, boolean secure, ServerEndpointConfig serverEndpointConfig)
+            throws DeploymentException {
 
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.wsRemoteEndpoint.setSession(this);
@@ -302,50 +286,40 @@ public class WsSession implements Session {
 
 
     /**
-     * Creates a new WebSocket session for communication between the two
-     * provided end points. The result of {@link Thread#getContextClassLoader()}
-     * at the time this constructor is called will be used when calling
+     * Creates a new WebSocket session for communication between the two provided end points. The result of
+     * {@link Thread#getContextClassLoader()} at the time this constructor is called will be used when calling
      * {@link Endpoint#onClose(Session, CloseReason)}.
      *
      * @param localEndpoint        The end point managed by this code
      * @param wsRemoteEndpoint     The other / remote endpoint
      * @param wsWebSocketContainer The container that created this session
-     * @param requestUri           The URI used to connect to this endpoint or
-     *                             <code>null</code> is this is a client session
-     * @param requestParameterMap  The parameters associated with the request
-     *                             that initiated this session or
-     *                             <code>null</code> if this is a client session
-     * @param queryString          The query string associated with the request
-     *                             that initiated this session or
-     *                             <code>null</code> if this is a client session
-     * @param userPrincipal        The principal associated with the request
-     *                             that initiated this session or
-     *                             <code>null</code> if this is a client session
-     * @param httpSessionId        The HTTP session ID associated with the
-     *                             request that initiated this session or
-     *                             <code>null</code> if this is a client session
+     * @param requestUri           The URI used to connect to this endpoint or <code>null</code> is this is a client
+     *                                 session
+     * @param requestParameterMap  The parameters associated with the request that initiated this session or
+     *                                 <code>null</code> if this is a client session
+     * @param queryString          The query string associated with the request that initiated this session or
+     *                                 <code>null</code> if this is a client session
+     * @param userPrincipal        The principal associated with the request that initiated this session or
+     *                                 <code>null</code> if this is a client session
+     * @param httpSessionId        The HTTP session ID associated with the request that initiated this session or
+     *                                 <code>null</code> if this is a client session
      * @param negotiatedExtensions The agreed extensions to use for this session
-     * @param subProtocol          The agreed subprotocol to use for this
-     *                             session
-     * @param pathParameters       The path parameters associated with the
-     *                             request that initiated this session or
-     *                             <code>null</code> if this is a client session
-     * @param secure               Was this session initiated over a secure
-     *                             connection?
-     * @param endpointConfig       The configuration information for the
-     *                             endpoint
+     * @param subProtocol          The agreed subprotocol to use for this session
+     * @param pathParameters       The path parameters associated with the request that initiated this session or
+     *                                 <code>null</code> if this is a client session
+     * @param secure               Was this session initiated over a secure connection?
+     * @param endpointConfig       The configuration information for the endpoint
+     *
      * @throws DeploymentException if an invalid encode is specified
      *
-     * @deprecated  Unused. This will be removed in Tomcat 10.1
+     * @deprecated Unused. This will be removed in Tomcat 10.1
      */
     @Deprecated
-    public WsSession(Endpoint localEndpoint,
-            WsRemoteEndpointImplBase wsRemoteEndpoint,
-            WsWebSocketContainer wsWebSocketContainer,
-            URI requestUri, Map<String, List<String>> requestParameterMap,
-            String queryString, Principal userPrincipal, String httpSessionId,
-            List<Extension> negotiatedExtensions, String subProtocol, Map<String, String> pathParameters,
-            boolean secure, EndpointConfig endpointConfig) throws DeploymentException {
+    public WsSession(Endpoint localEndpoint, WsRemoteEndpointImplBase wsRemoteEndpoint,
+            WsWebSocketContainer wsWebSocketContainer, URI requestUri, Map<String, List<String>> requestParameterMap,
+            String queryString, Principal userPrincipal, String httpSessionId, List<Extension> negotiatedExtensions,
+            String subProtocol, Map<String, String> pathParameters, boolean secure, EndpointConfig endpointConfig)
+            throws DeploymentException {
         this.localEndpoint = localEndpoint;
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.wsRemoteEndpoint.setSession(this);
@@ -415,15 +389,13 @@ public class WsSession implements Session {
 
 
     @Override
-    public <T> void addMessageHandler(Class<T> clazz, Partial<T> handler)
-            throws IllegalStateException {
+    public <T> void addMessageHandler(Class<T> clazz, Partial<T> handler) throws IllegalStateException {
         doAddMessageHandler(clazz, handler);
     }
 
 
     @Override
-    public <T> void addMessageHandler(Class<T> clazz, Whole<T> handler)
-            throws IllegalStateException {
+    public <T> void addMessageHandler(Class<T> clazz, Whole<T> handler) throws IllegalStateException {
         doAddMessageHandler(clazz, handler);
     }
 
@@ -442,44 +414,41 @@ public class WsSession implements Session {
         // arbitrary objects with MessageHandlers and can wrap MessageHandlers
         // just as easily.
 
-        Set<MessageHandlerResult> mhResults = Util.getMessageHandlers(target, listener,
-                endpointConfig, this);
+        Set<MessageHandlerResult> mhResults = Util.getMessageHandlers(target, listener, endpointConfig, this);
 
         for (MessageHandlerResult mhResult : mhResults) {
             switch (mhResult.getType()) {
-            case TEXT: {
-                if (textMessageHandler != null) {
-                    throw new IllegalStateException(sm.getString("wsSession.duplicateHandlerText"));
+                case TEXT: {
+                    if (textMessageHandler != null) {
+                        throw new IllegalStateException(sm.getString("wsSession.duplicateHandlerText"));
+                    }
+                    textMessageHandler = mhResult.getHandler();
+                    break;
                 }
-                textMessageHandler = mhResult.getHandler();
-                break;
-            }
-            case BINARY: {
-                if (binaryMessageHandler != null) {
-                    throw new IllegalStateException(
-                            sm.getString("wsSession.duplicateHandlerBinary"));
+                case BINARY: {
+                    if (binaryMessageHandler != null) {
+                        throw new IllegalStateException(sm.getString("wsSession.duplicateHandlerBinary"));
+                    }
+                    binaryMessageHandler = mhResult.getHandler();
+                    break;
                 }
-                binaryMessageHandler = mhResult.getHandler();
-                break;
-            }
-            case PONG: {
-                if (pongMessageHandler != null) {
-                    throw new IllegalStateException(sm.getString("wsSession.duplicateHandlerPong"));
-                }
-                MessageHandler handler = mhResult.getHandler();
-                if (handler instanceof MessageHandler.Whole<?>) {
-                    pongMessageHandler = (MessageHandler.Whole<PongMessage>) handler;
-                } else {
-                    throw new IllegalStateException(
-                            sm.getString("wsSession.invalidHandlerTypePong"));
-                }
+                case PONG: {
+                    if (pongMessageHandler != null) {
+                        throw new IllegalStateException(sm.getString("wsSession.duplicateHandlerPong"));
+                    }
+                    MessageHandler handler = mhResult.getHandler();
+                    if (handler instanceof MessageHandler.Whole<?>) {
+                        pongMessageHandler = (MessageHandler.Whole<PongMessage>) handler;
+                    } else {
+                        throw new IllegalStateException(sm.getString("wsSession.invalidHandlerTypePong"));
+                    }
 
-                break;
-            }
-            default: {
-                throw new IllegalArgumentException(
-                        sm.getString("wsSession.unknownHandlerType", listener, mhResult.getType()));
-            }
+                    break;
+                }
+                default: {
+                    throw new IllegalArgumentException(
+                            sm.getString("wsSession.unknownHandlerType", listener, mhResult.getType()));
+                }
             }
         }
     }
@@ -538,8 +507,7 @@ public class WsSession implements Session {
         if (!removed) {
             // ISE for now. Could swallow this silently / log this if the ISE
             // becomes a problem
-            throw new IllegalStateException(
-                    sm.getString("wsSession.removeHandlerFailed", listener));
+            throw new IllegalStateException(sm.getString("wsSession.removeHandlerFailed", listener));
         }
     }
 
@@ -654,9 +622,8 @@ public class WsSession implements Session {
 
 
     /**
-     * WebSocket 1.0. Section 2.1.5.
-     * Need internal close method as spec requires that the local endpoint
-     * receives a 1006 on timeout.
+     * WebSocket 1.0. Section 2.1.5. Need internal close method as spec requires that the local endpoint receives a 1006
+     * on timeout.
      *
      * @param closeReasonMessage The close reason to pass to the remote endpoint
      * @param closeReasonLocal   The close reason to pass to the local endpoint
@@ -667,17 +634,14 @@ public class WsSession implements Session {
 
 
     /**
-     * WebSocket 1.0. Section 2.1.5.
-     * Need internal close method as spec requires that the local endpoint
-     * receives a 1006 on timeout.
+     * WebSocket 1.0. Section 2.1.5. Need internal close method as spec requires that the local endpoint receives a 1006
+     * on timeout.
      *
      * @param closeReasonMessage The close reason to pass to the remote endpoint
      * @param closeReasonLocal   The close reason to pass to the local endpoint
-     * @param closeSocket        Should the socket be closed immediately rather than waiting
-     *                           for the server to respond
+     * @param closeSocket        Should the socket be closed immediately rather than waiting for the server to respond
      */
-    public void doClose(CloseReason closeReasonMessage, CloseReason closeReasonLocal,
-            boolean closeSocket) {
+    public void doClose(CloseReason closeReasonMessage, CloseReason closeReasonLocal, boolean closeSocket) {
         // Double-checked locking. OK because state is volatile
         if (state != State.OPEN) {
             return;
@@ -701,9 +665,8 @@ public class WsSession implements Session {
             }
 
             /*
-             * If the flush above fails the error handling could call this
-             * method recursively. Without this check, the close message and
-             * notifications could be sent multiple times.
+             * If the flush above fails the error handling could call this method recursively. Without this check, the
+             * close message and notifications could be sent multiple times.
              */
             if (state != State.OUTPUT_CLOSED) {
                 state = State.OUTPUT_CLOSED;
@@ -725,12 +688,10 @@ public class WsSession implements Session {
 
 
     /**
-     * Called when a close message is received. Should only ever happen once.
-     * Also called after a protocol error when the ProtocolHandler needs to
-     * force the closing of the connection.
+     * Called when a close message is received. Should only ever happen once. Also called after a protocol error when
+     * the ProtocolHandler needs to force the closing of the connection.
      *
-     * @param closeReason The reason contained within the received close
-     *                    message.
+     * @param closeReason The reason contained within the received close message.
      */
     public void onClose(CloseReason closeReason) {
 
@@ -786,7 +747,6 @@ public class WsSession implements Session {
             fireEndpointOnError(throwable);
         }
     }
-
 
 
     private void fireEndpointOnError(Throwable throwable) {
@@ -854,7 +814,8 @@ public class WsSession implements Session {
 
     /**
      * Use protected so unit tests can access this method directly.
-     * @param msg The message
+     *
+     * @param msg    The message
      * @param reason The reason
      */
     protected static void appendCloseReasonWithTruncation(ByteBuffer msg, String reason) {
@@ -884,9 +845,9 @@ public class WsSession implements Session {
 
 
     /**
-     * Make the session aware of a {@link FutureToSendHandler} that will need to
-     * be forcibly closed if the session closes before the
-     * {@link FutureToSendHandler} completes.
+     * Make the session aware of a {@link FutureToSendHandler} that will need to be forcibly closed if the session
+     * closes before the {@link FutureToSendHandler} completes.
+     *
      * @param f2sh The handler
      */
     protected void registerFuture(FutureToSendHandler f2sh) {
@@ -927,7 +888,7 @@ public class WsSession implements Session {
         // complete the Future but knowing if this is the case requires the sync
         // on stateLock (see above).
         // Note: If multiple attempts are made to complete the Future, the
-        //       second and subsequent attempts are ignored.
+        // second and subsequent attempts are ignored.
 
         IOException ioe = new IOException(sm.getString("wsSession.messageFailed"));
         SendResult sr = new SendResult(ioe);
@@ -937,6 +898,7 @@ public class WsSession implements Session {
 
     /**
      * Remove a {@link FutureToSendHandler} from the set of tracked instances.
+     *
      * @param f2sh The handler
      */
     protected void unregisterFuture(FutureToSendHandler f2sh) {
@@ -1076,8 +1038,8 @@ public class WsSession implements Session {
     private void checkState() {
         if (state == State.CLOSED) {
             /*
-             * As per RFC 6455, a WebSocket connection is considered to be
-             * closed once a peer has sent and received a WebSocket close frame.
+             * As per RFC 6455, a WebSocket connection is considered to be closed once a peer has sent and received a
+             * WebSocket close frame.
              */
             throw new IllegalStateException(sm.getString("wsSession.closed", id));
         }
@@ -1091,6 +1053,7 @@ public class WsSession implements Session {
 
 
     private WsFrameBase wsFrame;
+
     void setWsFrame(WsFrameBase wsFrame) {
         this.wsFrame = wsFrame;
     }
