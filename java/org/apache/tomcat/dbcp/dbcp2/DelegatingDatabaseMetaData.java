@@ -1894,7 +1894,6 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
         }
     }
 
-    /* JDBC_4_ANT_KEY_END */
 
     @Override
     public <T> T unwrap(final Class<T> iface) throws SQLException {

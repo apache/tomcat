@@ -157,6 +157,11 @@
         to the jvm in <code>catalina.sh</code> when calling <code>version</code>.
         Patch suggested by Eric Hamilton. (lihan)
       </fix>
+      <update>
+        Update the internal fork of Commons DBCP to f131286 (2023-03-08,
+        2.10.0-SNAPSHOT). This corrects a regression introduced in 9.0.71.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

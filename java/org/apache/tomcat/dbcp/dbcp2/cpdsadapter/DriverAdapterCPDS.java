@@ -288,7 +288,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
                 if (isNotEmpty(ra)) {
                     setDriver(getStringContent(ra));
                 }
-                ra = ref.get("connectionString");
+                ra = ref.get("url");
                 if (isNotEmpty(ra)) {
                     setUrl(getStringContent(ra));
                 }
@@ -449,7 +449,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
         ref.add(new StringRefAddr("loginTimeout", String.valueOf(getLoginTimeout())));
         ref.add(new StringRefAddr(Constants.KEY_PASSWORD, getPassword()));
         ref.add(new StringRefAddr(Constants.KEY_USER, getUser()));
-        ref.add(new StringRefAddr("connectionString", getUrl()));
+        ref.add(new StringRefAddr("url", getUrl()));
 
         ref.add(new StringRefAddr("poolPreparedStatements", String.valueOf(isPoolPreparedStatements())));
         ref.add(new StringRefAddr("maxIdle", String.valueOf(getMaxIdle())));
