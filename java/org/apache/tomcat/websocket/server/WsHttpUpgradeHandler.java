@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket.server;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -241,11 +242,22 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
     private void close(CloseReason cr) {
         /*
          * Any call to this method is a result of a problem reading from the
-         * client. At this point that state of the connection is unknown.
-         * Attempt to send a close frame to the client and then close the socket
-         * immediately. There is no point in waiting for a close frame from the
-         * client because there is no guarantee that we can recover from
-         * whatever messed up state the client put the connection into.
+         * client. At this point that state of the connection is unknown. First
+         * attempt to clear the handler for any in-flight message write (that
+         * probably failed). If using NIO2 is is possible that the original
+         * error occurred on a write but this method was called during a read.
+         * The in-progress write will block the sending of the close frame
+         * unless the handler is cleared (effectively signalling the write
+         * failed).
+         */
+        wsRemoteEndpointServer.clearHandler(new EOFException(), true);
+
+        /* Then:
+         *  - send a close frame to the client
+         * - close the socket immediately.
+         * There is no point in waiting for a close frame from the client
+         * because there is no guarantee that we can recover from whatever
+         * messed up state the client put the connection into.
          */
         wsSession.onClose(cr);
     }

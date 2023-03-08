@@ -268,7 +268,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
      *                      requirements of
      *                      {@link javax.websocket.RemoteEndpoint.Async}
      */
-    private void clearHandler(Throwable t, boolean useDispatch) {
+    void clearHandler(Throwable t, boolean useDispatch) {
         // Setting the result marks this (partial) message as
         // complete which means the next one may be sent which
         // could update the value of the handler. Therefore, keep a
