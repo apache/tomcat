@@ -25,13 +25,11 @@ import java.nio.charset.StandardCharsets;
 import javax.websocket.CloseReason.CloseCode;
 
 /**
- * A client for testing Websocket behavior that differs from standard client
- * behavior.
+ * A client for testing Websocket behavior that differs from standard client behavior.
  */
 public class TesterWsClient {
 
-    private static final byte[] maskingKey = new byte[] { 0x12, 0x34, 0x56,
-            0x78 };
+    private static final byte[] maskingKey = new byte[] { 0x12, 0x34, 0x56, 0x78 };
 
     private final Socket socket;
 
@@ -68,8 +66,7 @@ public class TesterWsClient {
     }
 
     private void readUpgradeResponse() throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(
-                socket.getInputStream()));
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         String line = in.readLine();
         while (line != null && !line.isEmpty()) {
             line = in.readLine();
@@ -98,11 +95,9 @@ public class TesterWsClient {
     }
 
     private static String createUpgradeRequest(String path) {
-        String[] upgradeRequestLines = { "GET " + path + " HTTP/1.1",
-                "Connection: Upgrade", "Host: localhost:8080",
-                "Origin: localhost:8080",
-                "Sec-WebSocket-Key: OEvAoAKn5jsuqv2/YJ1Wfg==",
-                "Sec-WebSocket-Version: 13", "Upgrade: websocket" };
+        String[] upgradeRequestLines = { "GET " + path + " HTTP/1.1", "Connection: Upgrade", "Host: localhost:8080",
+                "Origin: localhost:8080", "Sec-WebSocket-Key: OEvAoAKn5jsuqv2/YJ1Wfg==", "Sec-WebSocket-Version: 13",
+                "Upgrade: websocket" };
         StringBuffer sb = new StringBuffer();
         for (String line : upgradeRequestLines) {
             sb.append(line);

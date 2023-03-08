@@ -59,9 +59,7 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
         ClientEndpointConfig clientEndpointConfig = ClientEndpointConfig.Builder.create().build();
-        Session wsSession = wsContainer.connectToServer(
-                TesterProgrammaticEndpoint.class,
-                clientEndpointConfig,
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class, clientEndpointConfig,
                 new URI("ws://localhost:" + getPort() + Config.PATH));
 
         final CountDownLatch latch = new CountDownLatch(2);
@@ -102,7 +100,7 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
     public static final class SuspendResumeEndpoint extends Endpoint {
 
         @Override
-        public void onOpen(Session session, EndpointConfig  epc) {
+        public void onOpen(Session session, EndpointConfig epc) {
             final MessageProcessor processor = new MessageProcessor(session, 3);
             session.addMessageHandler(new MessageHandler.Whole<String>() {
 

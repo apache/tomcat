@@ -35,7 +35,7 @@ import org.apache.tomcat.websocket.TestWsWebSocketContainer.EndpointA;
  * significantly extends the length of a test run when using multiple test
  * threads.
  */
-public class TestWsWebSocketContainerSessionExpiryContainer  extends WsWebSocketContainerBaseTest {
+public class TestWsWebSocketContainerSessionExpiryContainer extends WsWebSocketContainerBaseTest {
 
     @Test
     public void testSessionExpiryContainer() throws Exception {
@@ -50,20 +50,16 @@ public class TestWsWebSocketContainerSessionExpiryContainer  extends WsWebSocket
         tomcat.start();
 
         // Need access to implementation methods for configuring unit tests
-        WsWebSocketContainer wsContainer = (WsWebSocketContainer)
-                ContainerProvider.getWebSocketContainer();
+        WsWebSocketContainer wsContainer = (WsWebSocketContainer) ContainerProvider.getWebSocketContainer();
 
         // 5 second timeout
         wsContainer.setDefaultMaxSessionIdleTimeout(5000);
         wsContainer.setProcessPeriod(1);
 
         EndpointA endpointA = new EndpointA();
-        connectToEchoServer(wsContainer, endpointA,
-                TesterEchoServer.Config.PATH_BASIC);
-        connectToEchoServer(wsContainer, endpointA,
-                TesterEchoServer.Config.PATH_BASIC);
-        Session s3a = connectToEchoServer(wsContainer, endpointA,
-                TesterEchoServer.Config.PATH_BASIC);
+        connectToEchoServer(wsContainer, endpointA, TesterEchoServer.Config.PATH_BASIC);
+        connectToEchoServer(wsContainer, endpointA, TesterEchoServer.Config.PATH_BASIC);
+        Session s3a = connectToEchoServer(wsContainer, endpointA, TesterEchoServer.Config.PATH_BASIC);
 
         // Check all three sessions are open
         Set<Session> setA = s3a.getOpenSessions();
@@ -72,7 +68,7 @@ public class TestWsWebSocketContainerSessionExpiryContainer  extends WsWebSocket
         int count = 0;
         boolean isOpen = true;
         while (isOpen && count < 8) {
-            count ++;
+            count++;
             Thread.sleep(1000);
             isOpen = false;
             for (Session session : setA) {
@@ -86,8 +82,7 @@ public class TestWsWebSocketContainerSessionExpiryContainer  extends WsWebSocket
         if (isOpen) {
             for (Session session : setA) {
                 if (session.isOpen()) {
-                    System.err.println("Session with ID [" + session.getId() +
-                            "] is open");
+                    System.err.println("Session with ID [" + session.getId() + "] is open");
                 }
             }
             Assert.fail("There were open sessions");
