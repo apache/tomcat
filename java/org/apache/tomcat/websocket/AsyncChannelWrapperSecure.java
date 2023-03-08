@@ -388,6 +388,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             break;
                         }
                         case NOT_HANDSHAKING: {
+                            // Don't expect to see this during a handshake
                             throw new SSLException(sm.getString("asyncChannelWrapperSecure.notHandshaking"));
                         }
                     }
