@@ -21,24 +21,18 @@ package org.apache.tomcat.websocket.server;
  */
 public class Constants {
 
-    public static final String BINARY_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM =
-            "org.apache.tomcat.websocket.binaryBufferSize";
-    public static final String TEXT_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM =
-            "org.apache.tomcat.websocket.textBufferSize";
+    public static final String BINARY_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM = "org.apache.tomcat.websocket.binaryBufferSize";
+    public static final String TEXT_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM = "org.apache.tomcat.websocket.textBufferSize";
 
     /**
-     * Allows the deployment restriction defined in section 6.4 of the Jakarta
-     * WebSocket specification to be ignored.
+     * Allows the deployment restriction defined in section 6.4 of the Jakarta WebSocket specification to be ignored.
      *
-     * @deprecated  This is no longer required in Jakarta EE 10 onwards and will
-     *              be removed in Tomcat 10.1.
+     * @deprecated This is no longer required in Jakarta EE 10 onwards and will be removed in Tomcat 10.1.
      */
     @Deprecated
-    public static final String ENFORCE_NO_ADD_AFTER_HANDSHAKE_CONTEXT_INIT_PARAM =
-            "org.apache.tomcat.websocket.noAddAfterHandshake";
+    public static final String ENFORCE_NO_ADD_AFTER_HANDSHAKE_CONTEXT_INIT_PARAM = "org.apache.tomcat.websocket.noAddAfterHandshake";
 
-    public static final String SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE =
-            "javax.websocket.server.ServerContainer";
+    public static final String SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE = "javax.websocket.server.ServerContainer";
 
 
     private Constants() {

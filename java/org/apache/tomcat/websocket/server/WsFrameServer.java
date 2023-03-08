@@ -54,8 +54,7 @@ public class WsFrameServer extends WsFrameBase {
     /**
      * Called when there is data in the ServletInputStream to process.
      *
-     * @throws IOException if an I/O error occurs while processing the available
-     *                     data
+     * @throws IOException if an I/O error occurs while processing the available data
      */
     private void onDataAvailable() throws IOException {
         if (log.isDebugEnabled()) {
@@ -156,24 +155,23 @@ public class WsFrameServer extends WsFrameBase {
     SocketState notifyDataAvailable() throws IOException {
         while (isOpen()) {
             switch (getReadState()) {
-            case WAITING:
-                if (!changeReadState(ReadState.WAITING, ReadState.PROCESSING)) {
-                    continue;
-                }
-                try {
-                    return doOnDataAvailable();
-                } catch (IOException e) {
-                    changeReadState(ReadState.CLOSING);
-                    throw e;
-                }
-            case SUSPENDING_WAIT:
-                if (!changeReadState(ReadState.SUSPENDING_WAIT, ReadState.SUSPENDED)) {
-                    continue;
-                }
-                return SocketState.SUSPENDED;
-            default:
-                throw new IllegalStateException(
-                        sm.getString("wsFrameServer.illegalReadState", getReadState()));
+                case WAITING:
+                    if (!changeReadState(ReadState.WAITING, ReadState.PROCESSING)) {
+                        continue;
+                    }
+                    try {
+                        return doOnDataAvailable();
+                    } catch (IOException e) {
+                        changeReadState(ReadState.CLOSING);
+                        throw e;
+                    }
+                case SUSPENDING_WAIT:
+                    if (!changeReadState(ReadState.SUSPENDING_WAIT, ReadState.SUSPENDED)) {
+                        continue;
+                    }
+                    return SocketState.SUSPENDED;
+                default:
+                    throw new IllegalStateException(sm.getString("wsFrameServer.illegalReadState", getReadState()));
             }
         }
 
@@ -185,19 +183,18 @@ public class WsFrameServer extends WsFrameBase {
         onDataAvailable();
         while (isOpen()) {
             switch (getReadState()) {
-            case PROCESSING:
-                if (!changeReadState(ReadState.PROCESSING, ReadState.WAITING)) {
-                    continue;
-                }
-                return SocketState.UPGRADED;
-            case SUSPENDING_PROCESS:
-                if (!changeReadState(ReadState.SUSPENDING_PROCESS, ReadState.SUSPENDED)) {
-                    continue;
-                }
-                return SocketState.SUSPENDED;
-            default:
-                throw new IllegalStateException(
-                        sm.getString("wsFrameServer.illegalReadState", getReadState()));
+                case PROCESSING:
+                    if (!changeReadState(ReadState.PROCESSING, ReadState.WAITING)) {
+                        continue;
+                    }
+                    return SocketState.UPGRADED;
+                case SUSPENDING_PROCESS:
+                    if (!changeReadState(ReadState.SUSPENDING_PROCESS, ReadState.SUSPENDED)) {
+                        continue;
+                    }
+                    return SocketState.SUSPENDED;
+                default:
+                    throw new IllegalStateException(sm.getString("wsFrameServer.illegalReadState", getReadState()));
             }
         }
 
