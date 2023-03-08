@@ -56,7 +56,7 @@ public class DigestAuthenticator extends Authenticator {
 
         if (!messageQop.isEmpty()) {
             if (cnonceGenerator == null) {
-                synchronized(cnonceGeneratorLock) {
+                synchronized (cnonceGeneratorLock) {
                     if (cnonceGenerator == null) {
                         cnonceGenerator = new SecureRandom();
                     }
@@ -74,13 +74,13 @@ public class DigestAuthenticator extends Authenticator {
         challenge.append("uri=\"" + requestUri + "\",");
 
         try {
-            challenge.append("response=\"" + calculateRequestDigest(requestUri, userName, userPassword,
-                    realm, nonce, messageQop, algorithm) + "\",");
+            challenge.append("response=\"" +
+                    calculateRequestDigest(requestUri, userName, userPassword, realm, nonce, messageQop, algorithm) +
+                    "\",");
         }
 
         catch (NoSuchAlgorithmException e) {
-            throw new AuthenticationException(
-                    "Unable to generate request digest " + e.getMessage());
+            throw new AuthenticationException("Unable to generate request digest " + e.getMessage());
         }
 
         challenge.append("algorithm=" + algorithm + ",");
@@ -96,9 +96,8 @@ public class DigestAuthenticator extends Authenticator {
 
     }
 
-    private String calculateRequestDigest(String requestUri, String userName, String password,
-            String realm, String nonce, String qop, String algorithm)
-            throws NoSuchAlgorithmException {
+    private String calculateRequestDigest(String requestUri, String userName, String password, String realm,
+            String nonce, String qop, String algorithm) throws NoSuchAlgorithmException {
 
         StringBuilder preDigest = new StringBuilder();
         String A1;
@@ -110,9 +109,8 @@ public class DigestAuthenticator extends Authenticator {
         }
 
         /*
-         * If the "qop" value is "auth-int", then A2 is: A2 = Method ":"
-         * digest-uri-value ":" H(entity-body) since we do not have an entity-body, A2 =
-         * Method ":" digest-uri-value for auth and auth_int
+         * If the "qop" value is "auth-int", then A2 is: A2 = Method ":" digest-uri-value ":" H(entity-body) since we do
+         * not have an entity-body, A2 = Method ":" digest-uri-value for auth and auth_int
          */
         String A2 = "GET:" + requestUri;
 
