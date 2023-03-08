@@ -28,9 +28,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
 
 public abstract class WebSocketBaseTest extends TomcatBaseTest {
 
-    protected Tomcat startServer(
-            final Class<? extends WsContextListener> configClass)
-            throws LifecycleException {
+    protected Tomcat startServer(final Class<? extends WsContextListener> configClass) throws LifecycleException {
 
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required

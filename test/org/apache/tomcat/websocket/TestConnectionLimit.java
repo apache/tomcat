@@ -38,8 +38,7 @@ import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEn
 public class TestConnectionLimit extends TomcatBaseTest {
 
     /*
-     * Simple test to see how many outgoing connections can be created on a
-     * single machine.
+     * Simple test to see how many outgoing connections can be created on a single machine.
      */
     @Test
     public void testSingleMachine() throws Exception {
@@ -54,8 +53,7 @@ public class TestConnectionLimit extends TomcatBaseTest {
 
         tomcat.start();
 
-        URI uri = new URI("ws://localhost:" + getPort() +
-                TesterEchoServer.Config.PATH_ASYNC);
+        URI uri = new URI("ws://localhost:" + getPort() + TesterEchoServer.Config.PATH_ASYNC);
         AtomicInteger counter = new AtomicInteger(0);
 
         int threadCount = 50;
@@ -87,8 +85,7 @@ public class TestConnectionLimit extends TomcatBaseTest {
 
         @Override
         public void run() {
-            WebSocketContainer wsContainer =
-                    ContainerProvider.getWebSocketContainer();
+            WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
             int count = 0;
 
