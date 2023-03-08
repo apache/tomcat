@@ -45,8 +45,8 @@ public class TesterAsyncTiming {
     @ServerEndpoint(Config.PATH)
     public static class Endpoint {
 
-        private static final ByteBuffer LARGE_DATA= ByteBuffer.allocate(16 * 1024);
-        private static final ByteBuffer SMALL_DATA= ByteBuffer.allocate(4 * 1024);
+        private static final ByteBuffer LARGE_DATA = ByteBuffer.allocate(16 * 1024);
+        private static final ByteBuffer SMALL_DATA = ByteBuffer.allocate(4 * 1024);
 
         @OnMessage
         public void onMessage(Session session, @SuppressWarnings("unused") String text) {

@@ -171,11 +171,8 @@ public class TesterWebSocketClientProxy extends WebSocketBaseTest {
             clientEndpointConfig.getUserProperties().put(Constants.WS_AUTHENTICATION_PROXY_PASSWORD, PROXY_PASSWORD);
         }
 
-        Session wsSession = wsContainer.connectToServer(
-                TesterProgrammaticEndpoint.class,
-                clientEndpointConfig,
-                new URI("ws://" + TOMCAT_ADDRESS + ":" + getPort() +
-                        TesterEchoServer.Config.PATH_ASYNC));
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class, clientEndpointConfig,
+                new URI("ws://" + TOMCAT_ADDRESS + ":" + getPort() + TesterEchoServer.Config.PATH_ASYNC));
         CountDownLatch latch = new CountDownLatch(1);
         BasicText handler = new BasicText(latch);
         wsSession.addMessageHandler(handler);

@@ -54,9 +54,7 @@ public class TestAsyncMessages extends TomcatBaseTest {
 
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
         ClientEndpointConfig clientEndpointConfig = ClientEndpointConfig.Builder.create().build();
-        Session wsSession = wsContainer.connectToServer(
-                TesterProgrammaticEndpoint.class,
-                clientEndpointConfig,
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class, clientEndpointConfig,
                 new URI("ws://localhost:" + getPort() + TesterAsyncTiming.Config.PATH));
 
         AsyncTimingClientHandler handler = new AsyncTimingClientHandler();
@@ -80,7 +78,7 @@ public class TestAsyncMessages extends TomcatBaseTest {
         public void onMessage(ByteBuffer message, boolean last) {
             if (lastMessage == 0) {
                 // First message. Don't check
-                sequence ++;
+                sequence++;
                 lastMessage = System.nanoTime();
             } else {
                 long newTime = System.nanoTime();
@@ -88,9 +86,10 @@ public class TestAsyncMessages extends TomcatBaseTest {
                 lastMessage = newTime;
 
                 if (sequence == 0) {
-                    sequence ++;
+                    sequence++;
                     if (message.capacity() != 8192) {
-                        System.out.println("Expected size 8192 but was [" + message.capacity() + "], count [" + count + "]");
+                        System.out.println(
+                                "Expected size 8192 but was [" + message.capacity() + "], count [" + count + "]");
                         fail = true;
                     }
                     if (diff < 40000000) {
@@ -98,9 +97,10 @@ public class TestAsyncMessages extends TomcatBaseTest {
                         fail = true;
                     }
                 } else if (sequence == 1) {
-                    sequence ++;
+                    sequence++;
                     if (message.capacity() != 8192) {
-                        System.out.println("Expected size 8192 but was [" + message.capacity() + "], count [" + count + "]");
+                        System.out.println(
+                                "Expected size 8192 but was [" + message.capacity() + "], count [" + count + "]");
                         fail = true;
                     }
                     if (diff > 500000) {
@@ -110,7 +110,8 @@ public class TestAsyncMessages extends TomcatBaseTest {
                 } else if (sequence == 2) {
                     sequence = 0;
                     if (message.capacity() != 4096) {
-                        System.out.println("Expected size 4096 but was [" + message.capacity() + "], count [" + count + "]");
+                        System.out.println(
+                                "Expected size 4096 but was [" + message.capacity() + "], count [" + count + "]");
                         fail = true;
                     }
                     if (diff > 500000) {
@@ -120,7 +121,7 @@ public class TestAsyncMessages extends TomcatBaseTest {
                 }
             }
 
-            count ++;
+            count++;
             if (count >= TesterAsyncTiming.Config.ITERATIONS * 3) {
                 latch.countDown();
             }

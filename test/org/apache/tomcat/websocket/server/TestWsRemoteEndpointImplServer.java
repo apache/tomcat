@@ -51,20 +51,15 @@ public class TestWsRemoteEndpointImplServer extends WebSocketBaseTest {
     /*
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=58624
      *
-     * This test requires three breakpoints to be set. Two in this file (marked
-     * A & B with comments) and one (C) at the start of
-     * WsRemoteEndpointImplServer.doWrite().
+     * This test requires three breakpoints to be set. Two in this file (marked A & B with comments) and one (C) at the
+     * start of WsRemoteEndpointImplServer.doWrite().
      *
-     * With the breakpoints in place, run this test.
-     * Once breakpoints A & B are reached, progress the thread at breakpoint A
-     * one line to close the connection.
-     * Once breakpoint C is reached, allow the thread at breakpoint B to
-     * continue.
-     * Then allow the thread at breakpoint C to continue.
+     * With the breakpoints in place, run this test. Once breakpoints A & B are reached, progress the thread at
+     * breakpoint A one line to close the connection. Once breakpoint C is reached, allow the thread at breakpoint B to
+     * continue. Then allow the thread at breakpoint C to continue.
      *
-     * In the failure mode, the thread at breakpoint B will not progress past
-     * the call to sendObject(). If the issue is fixed, the thread at breakpoint
-     * B will continue past sendObject() and terminate with a TimeoutException.
+     * In the failure mode, the thread at breakpoint B will not progress past the call to sendObject(). If the issue is
+     * fixed, the thread at breakpoint B will continue past sendObject() and terminate with a TimeoutException.
      */
     @Test
     public void testClientDropsConnection() throws Exception {
@@ -75,8 +70,7 @@ public class TestWsRemoteEndpointImplServer extends WebSocketBaseTest {
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
-        WebSocketContainer wsContainer =
-                ContainerProvider.getWebSocketContainer();
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
         tomcat.start();
 
@@ -97,8 +91,7 @@ public class TestWsRemoteEndpointImplServer extends WebSocketBaseTest {
         protected ServerEndpointConfig getServerEndpointConfig() {
             List<Class<? extends Encoder>> encoders = new ArrayList<>();
             encoders.add(Bug58624Encoder.class);
-            return ServerEndpointConfig.Builder.create(
-                    Bug58624Endpoint.class, PATH).encoders(encoders).build();
+            return ServerEndpointConfig.Builder.create(Bug58624Endpoint.class, PATH).encoders(encoders).build();
         }
     }
 
@@ -109,8 +102,7 @@ public class TestWsRemoteEndpointImplServer extends WebSocketBaseTest {
         @OnOpen
         public void onOpen(Session session) {
             // Disabling blocking timeouts for this test
-            session.getUserProperties().put(
-                    org.apache.tomcat.websocket.Constants.BLOCKING_SEND_TIMEOUT_PROPERTY,
+            session.getUserProperties().put(org.apache.tomcat.websocket.Constants.BLOCKING_SEND_TIMEOUT_PROPERTY,
                     Long.valueOf(-1));
             ex.submit(new Bug58624SendMessage(session));
         }

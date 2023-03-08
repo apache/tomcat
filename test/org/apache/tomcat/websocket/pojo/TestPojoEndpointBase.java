@@ -58,8 +58,7 @@ public class TestPojoEndpointBase extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
-        WebSocketContainer wsContainer =
-                ContainerProvider.getWebSocketContainer();
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
 
         tomcat.start();
@@ -89,8 +88,7 @@ public class TestPojoEndpointBase extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
-        WebSocketContainer wsContainer =
-                ContainerProvider.getWebSocketContainer();
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
 
         tomcat.start();
@@ -109,15 +107,14 @@ public class TestPojoEndpointBase extends TomcatBaseTest {
     public static class OnOpenServerEndpoint {
 
         @OnOpen
-        public void onOpen(@SuppressWarnings("unused") Session session,
-                EndpointConfig config) {
+        public void onOpen(@SuppressWarnings("unused") Session session, EndpointConfig config) {
             if (config == null) {
                 throw new RuntimeException();
             }
         }
 
         @OnError
-        public void onError(@SuppressWarnings("unused") Throwable t){
+        public void onError(@SuppressWarnings("unused") Throwable t) {
             throw new RuntimeException();
         }
     }

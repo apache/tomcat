@@ -93,17 +93,16 @@ public class TestPerMessageDeflate {
 
         ByteBuffer received = ByteBuffer.allocate(8192);
 
-        TransformationResult tr = perMessageDeflateRx.getMoreData(
-                compressedPart.getOpCode(), compressedPart.isFin(), compressedPart.getRsv(), received);
+        TransformationResult tr = perMessageDeflateRx.getMoreData(compressedPart.getOpCode(), compressedPart.isFin(),
+                compressedPart.getRsv(), received);
 
         Assert.assertEquals(8192, received.position());
-        Assert.assertEquals(TransformationResult.END_OF_FRAME , tr);
+        Assert.assertEquals(TransformationResult.END_OF_FRAME, tr);
     }
 
 
     /*
-     * Minimal implementation to enable other transformations to be tested. It
-     * is NOT robust.
+     * Minimal implementation to enable other transformations to be tested. It is NOT robust.
      */
     private static class TesterTransformation implements Transformation {
 
@@ -121,30 +120,35 @@ public class TestPerMessageDeflate {
         public boolean validateRsvBits(int i) {
             return false;
         }
+
         @Override
         public boolean validateRsv(int rsv, byte opCode) {
             return false;
         }
+
         @Override
         public void setNext(Transformation t) {
         }
+
         @Override
         public List<MessagePart> sendMessagePart(List<MessagePart> messageParts) {
             return messageParts;
         }
+
         @Override
-        public TransformationResult getMoreData(byte opCode, boolean fin, int rsv, ByteBuffer dest)
-                throws IOException {
+        public TransformationResult getMoreData(byte opCode, boolean fin, int rsv, ByteBuffer dest) throws IOException {
             if (data == null) {
                 return TransformationResult.UNDERFLOW;
             }
             dest.put(data);
             return TransformationResult.END_OF_FRAME;
         }
+
         @Override
         public Extension getExtensionResponse() {
             return null;
         }
+
         @Override
         public void close() {
         }
