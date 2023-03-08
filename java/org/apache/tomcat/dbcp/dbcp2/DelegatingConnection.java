@@ -41,6 +41,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
+import org.apache.tomcat.dbcp.dbcp2.managed.ManagedConnection;
+
 /**
  * A base delegating implementation of {@link Connection}.
  * <p>
@@ -78,7 +80,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     /**
      * Creates a wrapper for the Connection which traces this Connection in the AbandonedObjectPool.
      *
-     * @param connection the {@link Connection} to delegate all calls to.
+     * @param connection the {@link Connection} to delegate all calls to, may be null (see {@link ManagedConnection}).
      */
     public DelegatingConnection(final C connection) {
         this.connection = connection;
@@ -104,11 +106,12 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     protected void checkOpen() throws SQLException {
         if (closed) {
             if (null != connection) {
-                String label = "";
+                String label;
                 try {
                     label = connection.toString();
-                } catch (final Exception ignored) {
-                    // ignore, leave label empty
+                } catch (final Exception e) {
+                    // leave label empty
+                    label = "";
                 }
                 throw new SQLException("Connection " + label + " is closed.");
             }
@@ -889,7 +892,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
      * Sets my delegate.
      *
      * @param connection
-     *            my delegate.
+     *            my delegate, may be null.
      */
     public void setDelegate(final C connection) {
         this.connection = connection;

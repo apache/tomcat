@@ -182,7 +182,7 @@ public class PStmtKey {
      *        {@code ResultSet.TYPE_SCROLL_INSENSITIVE}, or {@code ResultSet.TYPE_SCROLL_SENSITIVE}.
      * @param resultSetConcurrency A concurrency type; one of {@code ResultSet.CONCUR_READ_ONLY} or
      *        {@code ResultSet.CONCUR_UPDATABLE}.
-     * @deprecated Use @link {@link #PStmtKey(String, String, String, int, int)}.
+     * @deprecated Use {@link #PStmtKey(String, String, String, int, int)}.
      */
     @Deprecated
     public PStmtKey(final String sql, final String catalog, final int resultSetType, final int resultSetConcurrency) {

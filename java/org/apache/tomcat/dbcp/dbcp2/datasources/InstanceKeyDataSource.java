@@ -1324,5 +1324,4 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
         }
         throw new SQLException(this + " is not a wrapper for " + iface);
     }
-    /* JDBC_4_ANT_KEY_END */
 }
