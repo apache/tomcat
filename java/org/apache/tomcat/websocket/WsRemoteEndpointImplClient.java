@@ -41,8 +41,7 @@ public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
 
 
     @Override
-    protected void doWrite(SendHandler handler, long blockingWriteTimeoutExpiry,
-            ByteBuffer... data) {
+    protected void doWrite(SendHandler handler, long blockingWriteTimeoutExpiry, ByteBuffer... data) {
         long timeout;
         for (ByteBuffer byteBuffer : data) {
             if (blockingWriteTimeoutExpiry == -1) {
