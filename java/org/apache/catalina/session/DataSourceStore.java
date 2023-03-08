@@ -597,12 +597,17 @@ public class DataSourceStore extends StoreBase {
     @Override
     public void save(Session session) throws IOException {
         ByteArrayOutputStream bos = null;
-        String saveSql = "INSERT INTO " + sessionTable + " ("
-                + sessionIdCol + ", " + sessionAppCol + ", "
-                + sessionDataCol + ", " + sessionValidCol
-                + ", " + sessionMaxInactiveCol + ", "
-                + sessionLastAccessedCol
-                + ") VALUES (?, ?, ?, ?, ?, ?)";
+        String saveSql = "SELECT " + sessionIdCol
+                + ", " + sessionAppCol
+                + ", " + sessionIdCol
+                + ", " + sessionDataCol
+                + ", " + sessionValidCol
+                + ", " + sessionMaxInactiveCol
+                + ", " + sessionLastAccessedCol
+                + " FROM " + sessionTable
+                + " WHERE " + sessionAppCol + "=?"
+                + " AND " + sessionIdCol + "=? FOR UPDATE"
+                ;
 
         synchronized (session) {
             int numberOfTries = 2;
@@ -613,11 +618,6 @@ public class DataSourceStore extends StoreBase {
                 }
 
                 try {
-                    // If sessions already exist in DB, remove and insert again.
-                    // TODO:
-                    // * Check if ID exists in database and if so use UPDATE.
-                    remove(session.getIdInternal(), _conn);
-
                     bos = new ByteArrayOutputStream();
                     try (ObjectOutputStream oos =
                             new ObjectOutputStream(new BufferedOutputStream(bos))) {
@@ -626,15 +626,77 @@ public class DataSourceStore extends StoreBase {
                     byte[] obs = bos.toByteArray();
                     int size = obs.length;
                     try (ByteArrayInputStream bis = new ByteArrayInputStream(obs, 0, size);
-                            InputStream in = new BufferedInputStream(bis, size);
-                            PreparedStatement preparedSaveSql = _conn.prepareStatement(saveSql)) {
-                        preparedSaveSql.setString(1, session.getIdInternal());
-                        preparedSaveSql.setString(2, getName());
-                        preparedSaveSql.setBinaryStream(3, in, size);
-                        preparedSaveSql.setString(4, session.isValid() ? "1" : "0");
-                        preparedSaveSql.setInt(5, session.getMaxInactiveInterval());
-                        preparedSaveSql.setLong(6, session.getLastAccessedTime());
-                        preparedSaveSql.execute();
+                         InputStream in = new BufferedInputStream(bis, size);
+                         PreparedStatement preparedSaveSql = _conn.prepareStatement(saveSql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE)) {
+
+                        // Store auto-commit state
+                        boolean autoCommit = _conn.getAutoCommit();
+
+                        try {
+                            if(autoCommit) {
+                                _conn.setAutoCommit(false); // BEGIN TRANSACTION
+                            }
+
+                            preparedSaveSql.setString(1, getName());
+                            preparedSaveSql.setString(2, session.getIdInternal());
+
+                            ResultSet rs = preparedSaveSql.executeQuery();
+
+                            if(rs.next()) {
+                                // Session already exists in the db; update the various fields
+                                rs.updateBinaryStream(sessionDataCol, in, size);
+                                rs.updateString(sessionValidCol, session.isValid() ? "1" : "0");
+                                rs.updateInt(sessionMaxInactiveCol, session.getMaxInactiveInterval());
+                                rs.updateLong(sessionLastAccessedCol, session.getLastAccessedTime());
+
+                                rs.updateRow();
+                            } else {
+                                // Session does not exist. Insert.
+                                rs.moveToInsertRow();
+
+                                rs.updateString(sessionAppCol, getName());
+                                rs.updateString(sessionIdCol, session.getIdInternal());
+                                rs.updateBinaryStream(sessionIdCol, in, size);
+                                rs.updateString(sessionValidCol, session.isValid() ? "1" : "0");
+                                rs.updateInt(sessionMaxInactiveCol, session.getMaxInactiveInterval());
+                                rs.updateLong(sessionLastAccessedCol, session.getLastAccessedTime());
+
+                                rs.updateRow();
+                            }
+
+                            _conn.commit();
+                        } catch (SQLException sqle) {
+                            manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", sqle));
+                            try {
+                                _conn.rollback();
+                            } catch (SQLException sqle1) {
+                                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", sqle1));
+                            }
+                        } catch (RuntimeException rte) {
+                            manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", rte));
+                            try {
+                                _conn.rollback();
+                            } catch (SQLException sqle1) {
+                                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", sqle1));
+                            }
+
+                            throw rte;
+                        } catch (Error e) {
+                            manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
+                            try {
+                                _conn.rollback();
+                            } catch (SQLException sqle1) {
+                                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", sqle1));
+                            }
+
+                            throw e;
+                        } finally {
+                            if(autoCommit) {
+                                // Restore connection auto-commit state
+                                _conn.setAutoCommit(autoCommit);
+                            }
+                        }
+
                         // Break out after the finally block
                         numberOfTries = 0;
                     }
