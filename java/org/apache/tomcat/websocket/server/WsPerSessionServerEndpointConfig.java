@@ -26,16 +26,14 @@ import jakarta.websocket.Extension;
 import jakarta.websocket.server.ServerEndpointConfig;
 
 /**
- * Wraps the provided {@link ServerEndpointConfig} and provides a per session
- * view - the difference being that the map returned by {@link
- * #getUserProperties()} is unique to this instance rather than shared with the
- * wrapped {@link ServerEndpointConfig}.
+ * Wraps the provided {@link ServerEndpointConfig} and provides a per session view - the difference being that the map
+ * returned by {@link #getUserProperties()} is unique to this instance rather than shared with the wrapped
+ * {@link ServerEndpointConfig}.
  */
 class WsPerSessionServerEndpointConfig implements ServerEndpointConfig {
 
     private final ServerEndpointConfig perEndpointConfig;
-    private final Map<String,Object> perSessionUserProperties =
-            new ConcurrentHashMap<>();
+    private final Map<String, Object> perSessionUserProperties = new ConcurrentHashMap<>();
 
     WsPerSessionServerEndpointConfig(ServerEndpointConfig perEndpointConfig) {
         this.perEndpointConfig = perEndpointConfig;
@@ -53,7 +51,7 @@ class WsPerSessionServerEndpointConfig implements ServerEndpointConfig {
     }
 
     @Override
-    public Map<String,Object> getUserProperties() {
+    public Map<String, Object> getUserProperties() {
         return perSessionUserProperties;
     }
 
