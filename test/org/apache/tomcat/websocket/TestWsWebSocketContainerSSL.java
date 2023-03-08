@@ -59,12 +59,11 @@ public class TestWsWebSocketContainerSSL extends WebSocketBaseTest {
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
-        parameterSets.add(new Object[] {
-                "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
-        parameterSets.add(new Object[] {
-                "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
-        parameterSets.add(new Object[] {
-                "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+        parameterSets.add(new Object[] { "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation" });
+        parameterSets.add(
+                new Object[] { "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation" });
+        parameterSets.add(new Object[] { "OpenSSL-Panama", Boolean.FALSE,
+                "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" });
 
         return parameterSets;
     }
@@ -94,18 +93,12 @@ public class TestWsWebSocketContainerSSL extends WebSocketBaseTest {
 
         tomcat.start();
 
-        WebSocketContainer wsContainer =
-                ContainerProvider.getWebSocketContainer();
-        ClientEndpointConfig clientEndpointConfig =
-                ClientEndpointConfig.Builder.create().build();
-        clientEndpointConfig.getUserProperties().put(
-                org.apache.tomcat.websocket.Constants.SSL_TRUSTSTORE_PROPERTY,
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
+        ClientEndpointConfig clientEndpointConfig = ClientEndpointConfig.Builder.create().build();
+        clientEndpointConfig.getUserProperties().put(org.apache.tomcat.websocket.Constants.SSL_TRUSTSTORE_PROPERTY,
                 TesterSupport.CA_JKS);
-        Session wsSession = wsContainer.connectToServer(
-                TesterProgrammaticEndpoint.class,
-                clientEndpointConfig,
-                new URI("wss://localhost:" + getPort() +
-                        TesterEchoServer.Config.PATH_ASYNC));
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class, clientEndpointConfig,
+                new URI("wss://localhost:" + getPort() + TesterEchoServer.Config.PATH_ASYNC));
         CountDownLatch latch = new CountDownLatch(1);
         BasicText handler = new BasicText(latch);
         wsSession.addMessageHandler(handler);
@@ -144,16 +137,13 @@ public class TestWsWebSocketContainerSSL extends WebSocketBaseTest {
         }
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(ks);
-        sslContext.init(null,  tmf.getTrustManagers(), null);
+        sslContext.init(null, tmf.getTrustManagers(), null);
 
-        ClientEndpointConfig clientEndpointConfig =
-                ClientEndpointConfig.Builder.create().sslContext(sslContext).build();
+        ClientEndpointConfig clientEndpointConfig = ClientEndpointConfig.Builder.create().sslContext(sslContext)
+                .build();
 
-        Session wsSession = wsContainer.connectToServer(
-                TesterProgrammaticEndpoint.class,
-                clientEndpointConfig,
-                new URI("wss://localhost:" + getPort() +
-                        TesterEchoServer.Config.PATH_ASYNC));
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class, clientEndpointConfig,
+                new URI("wss://localhost:" + getPort() + TesterEchoServer.Config.PATH_ASYNC));
         CountDownLatch latch = new CountDownLatch(1);
         BasicText handler = new BasicText(latch);
         wsSession.addMessageHandler(handler);

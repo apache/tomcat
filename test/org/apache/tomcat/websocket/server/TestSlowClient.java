@@ -52,7 +52,8 @@ public class TestSlowClient extends WebSocketBaseTest {
         // WebSocket client
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
         Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
-                ClientEndpointConfig.Builder.create().build(), new URI("ws://localhost:" + getPort() + TesterFirehoseServer.PATH));
+                ClientEndpointConfig.Builder.create().build(),
+                new URI("ws://localhost:" + getPort() + TesterFirehoseServer.PATH));
         // Configure a handler designed to create a backlog causing the server
         // side write to time out.
         wsSession.addMessageHandler(new VerySlowHandler());
