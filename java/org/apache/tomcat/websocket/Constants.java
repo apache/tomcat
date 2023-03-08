@@ -42,54 +42,42 @@ public class Constants {
     static final byte INTERNAL_OPCODE_FLUSH = 0x18;
 
     // Buffers
-    static final int DEFAULT_BUFFER_SIZE = Integer.getInteger(
-            "org.apache.tomcat.websocket.DEFAULT_BUFFER_SIZE", 8 * 1024)
-            .intValue();
+    static final int DEFAULT_BUFFER_SIZE = Integer
+            .getInteger("org.apache.tomcat.websocket.DEFAULT_BUFFER_SIZE", 8 * 1024).intValue();
 
     // Client connection
     /**
      * Property name to set to configure the value that is passed to
-     * {@link javax.net.ssl.SSLEngine#setEnabledProtocols(String[])}. The value
-     * should be a comma separated string.
+     * {@link javax.net.ssl.SSLEngine#setEnabledProtocols(String[])}. The value should be a comma separated string.
      *
-     * @deprecated This will be removed in Tomcat 11.
-     *             Use {@link ClientEndpointConfig#getSSLContext()}
+     * @deprecated This will be removed in Tomcat 11. Use {@link ClientEndpointConfig#getSSLContext()}
      */
     @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
-    public static final String SSL_PROTOCOLS_PROPERTY =
-            "org.apache.tomcat.websocket.SSL_PROTOCOLS";
+    public static final String SSL_PROTOCOLS_PROPERTY = "org.apache.tomcat.websocket.SSL_PROTOCOLS";
     @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
-    public static final String SSL_TRUSTSTORE_PROPERTY =
-            "org.apache.tomcat.websocket.SSL_TRUSTSTORE";
+    public static final String SSL_TRUSTSTORE_PROPERTY = "org.apache.tomcat.websocket.SSL_TRUSTSTORE";
     @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
-    public static final String SSL_TRUSTSTORE_PWD_PROPERTY =
-            "org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD";
+    public static final String SSL_TRUSTSTORE_PWD_PROPERTY = "org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD";
     @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
     public static final String SSL_TRUSTSTORE_PWD_DEFAULT = "changeit";
     /**
-     * Property name to set to configure used SSLContext. The value should be an
-     * instance of SSLContext. If this property is present, the SSL_TRUSTSTORE*
-     * properties are ignored.
+     * Property name to set to configure used SSLContext. The value should be an instance of SSLContext. If this
+     * property is present, the SSL_TRUSTSTORE* properties are ignored.
      *
-     * @deprecated This will be removed in Tomcat 11.
-     *             Use {@link ClientEndpointConfig#getSSLContext()}
+     * @deprecated This will be removed in Tomcat 11. Use {@link ClientEndpointConfig#getSSLContext()}
      */
     @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
-    public static final String SSL_CONTEXT_PROPERTY =
-            "org.apache.tomcat.websocket.SSL_CONTEXT";
+    public static final String SSL_CONTEXT_PROPERTY = "org.apache.tomcat.websocket.SSL_CONTEXT";
     /**
-     * Property name to set to configure the timeout (in milliseconds) when
-     * establishing a WebSocket connection to server. The default is
-     * {@link #IO_TIMEOUT_MS_DEFAULT}.
+     * Property name to set to configure the timeout (in milliseconds) when establishing a WebSocket connection to
+     * server. The default is {@link #IO_TIMEOUT_MS_DEFAULT}.
      */
-    public static final String IO_TIMEOUT_MS_PROPERTY =
-            "org.apache.tomcat.websocket.IO_TIMEOUT_MS";
+    public static final String IO_TIMEOUT_MS_PROPERTY = "org.apache.tomcat.websocket.IO_TIMEOUT_MS";
     public static final long IO_TIMEOUT_MS_DEFAULT = 5000;
 
     // RFC 2068 recommended a limit of 5
     // Most browsers have a default limit of 20
-    public static final String MAX_REDIRECTIONS_PROPERTY =
-            "org.apache.tomcat.websocket.MAX_REDIRECTIONS";
+    public static final String MAX_REDIRECTIONS_PROPERTY = "org.apache.tomcat.websocket.MAX_REDIRECTIONS";
     public static final int MAX_REDIRECTIONS_DEFAULT = 20;
 
     // HTTP upgrade header names and values
@@ -121,12 +109,11 @@ public class Constants {
     public static final int PROXY_AUTHENTICATION_REQUIRED = 407;
 
     // Configuration for Origin header in client
-    static final String DEFAULT_ORIGIN_HEADER_VALUE =
-            System.getProperty("org.apache.tomcat.websocket.DEFAULT_ORIGIN_HEADER_VALUE");
+    static final String DEFAULT_ORIGIN_HEADER_VALUE = System
+            .getProperty("org.apache.tomcat.websocket.DEFAULT_ORIGIN_HEADER_VALUE");
 
     // Configuration for blocking sends
-    public static final String BLOCKING_SEND_TIMEOUT_PROPERTY =
-            "org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT";
+    public static final String BLOCKING_SEND_TIMEOUT_PROPERTY = "org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT";
     // Milliseconds so this is 20 seconds
     public static final long DEFAULT_BLOCKING_SEND_TIMEOUT = 20 * 1000;
 
@@ -137,20 +124,16 @@ public class Constants {
     public static final String WRITE_IDLE_TIMEOUT_MS = "org.apache.tomcat.websocket.WRITE_IDLE_TIMEOUT_MS";
 
     // Configuration for background processing checks intervals
-    static final int DEFAULT_PROCESS_PERIOD = Integer.getInteger(
-            "org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10)
-            .intValue();
+    static final int DEFAULT_PROCESS_PERIOD = Integer
+            .getInteger("org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10).intValue();
 
     public static final String WS_AUTHENTICATION_USER_NAME = "org.apache.tomcat.websocket.WS_AUTHENTICATION_USER_NAME";
     public static final String WS_AUTHENTICATION_PASSWORD = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PASSWORD";
     public static final String WS_AUTHENTICATION_REALM = "org.apache.tomcat.websocket.WS_AUTHENTICATION_REALM";
 
-    public static final String WS_AUTHENTICATION_PROXY_USER_NAME =
-            "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_USER_NAME";
-    public static final String WS_AUTHENTICATION_PROXY_PASSWORD =
-            "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_PASSWORD";
-    public static final String WS_AUTHENTICATION_PROXY_REALM =
-            "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_REALM";
+    public static final String WS_AUTHENTICATION_PROXY_USER_NAME = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_USER_NAME";
+    public static final String WS_AUTHENTICATION_PROXY_PASSWORD = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_PASSWORD";
+    public static final String WS_AUTHENTICATION_PROXY_REALM = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_REALM";
 
     public static final List<Extension> INSTALLED_EXTENSIONS;
 

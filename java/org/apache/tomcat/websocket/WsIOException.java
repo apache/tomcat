@@ -21,9 +21,8 @@ import java.io.IOException;
 import jakarta.websocket.CloseReason;
 
 /**
- * Allows the WebSocket implementation to throw an {@link IOException} that
- * includes a {@link CloseReason} specific to the error that can be passed back
- * to the client.
+ * Allows the WebSocket implementation to throw an {@link IOException} that includes a {@link CloseReason} specific to
+ * the error that can be passed back to the client.
  */
 public class WsIOException extends IOException {
 

@@ -44,8 +44,7 @@ public class BasicAuthenticator extends Authenticator {
         String userPass = userName + ":" + userPassword;
         Charset charset;
 
-        if (parameterMap.get(charsetparam) != null
-                && parameterMap.get(charsetparam).equalsIgnoreCase("UTF-8")) {
+        if (parameterMap.get(charsetparam) != null && parameterMap.get(charsetparam).equalsIgnoreCase("UTF-8")) {
             charset = StandardCharsets.UTF_8;
         } else {
             charset = StandardCharsets.ISO_8859_1;
