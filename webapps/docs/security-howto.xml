@@ -561,11 +561,11 @@
     text. Web applications using these authentication mechanisms with clients
     connecting over untrusted networks should use SSL.</p>
 
-    <p>The session cookie for a session with an authenticated user are nearly
-    as useful as the user's password to an attacker and in nearly all
-    circumstances should be afforded the same level of protection as the
-    password itself. This usually means authenticating over SSL and continuing
-    to use SSL until the session ends.</p>
+    <p>The session cookie for a session with an authenticated user is nearly as
+    useful as the user's password to an attacker and should be afforded the same
+    level of protection as the password itself. This usually means
+    authenticating over SSL and continuing to use SSL until the session
+    ends.</p>
   </section>
 
 </body>
