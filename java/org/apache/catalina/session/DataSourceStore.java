@@ -641,10 +641,21 @@ public class DataSourceStore extends StoreBase {
      */
     @Override
     public void save(Session session) throws IOException {
+
+        byte[] sessionBytes;
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ObjectOutputStream oos =
+                        new ObjectOutputStream(new BufferedOutputStream(bos))) {
+
+            ((StandardSession) session).writeObjectData(oos);
+
+            sessionBytes = bos.toByteArray();
+        }
+
         if(SAVE_STRATEGY_SELECT_FOR_UPDATE.equals(getSaveStrategy())) {
-            saveSelectForUpdate(session);
+            saveSelectForUpdate(session, sessionBytes);
         } else {
-            saveDeleteAndInsert(session);
+            saveDeleteAndInsert(session, sessionBytes);
         }
     }
 
@@ -654,8 +665,7 @@ public class DataSourceStore extends StoreBase {
      * @param session The session to be stored.
      * @throws IOException If an input/output error occurs.
      */
-    private void saveDeleteAndInsert(Session session) throws IOException {
-        ByteArrayOutputStream bos = null;
+    private void saveDeleteAndInsert(Session session, byte[] sessionBytes) throws IOException {
         String saveSql = "INSERT INTO " + sessionTable + " ("
                 + sessionIdCol + ", " + sessionAppCol + ", "
                 + sessionDataCol + ", " + sessionValidCol
@@ -663,6 +673,7 @@ public class DataSourceStore extends StoreBase {
                 + sessionLastAccessedCol
                 + ") VALUES (?, ?, ?, ?, ?, ?)";
 
+        int sessionBytesLength = sessionBytes.length;
         synchronized (session) {
             int numberOfTries = 2;
             while (numberOfTries > 0) {
@@ -677,19 +688,12 @@ public class DataSourceStore extends StoreBase {
                     // * Check if ID exists in database and if so use UPDATE.
                     remove(session.getIdInternal(), _conn);
 
-                    bos = new ByteArrayOutputStream();
-                    try (ObjectOutputStream oos =
-                            new ObjectOutputStream(new BufferedOutputStream(bos))) {
-                        ((StandardSession) session).writeObjectData(oos);
-                    }
-                    byte[] obs = bos.toByteArray();
-                    int size = obs.length;
-                    try (ByteArrayInputStream bis = new ByteArrayInputStream(obs, 0, size);
-                            InputStream in = new BufferedInputStream(bis, size);
-                            PreparedStatement preparedSaveSql = _conn.prepareStatement(saveSql)) {
+                    try (ByteArrayInputStream bis = new ByteArrayInputStream(sessionBytes, 0, sessionBytesLength);
+                         InputStream in = new BufferedInputStream(bis, sessionBytesLength);
+                         PreparedStatement preparedSaveSql = _conn.prepareStatement(saveSql)) {
                         preparedSaveSql.setString(1, session.getIdInternal());
                         preparedSaveSql.setString(2, getName());
-                        preparedSaveSql.setBinaryStream(3, in, size);
+                        preparedSaveSql.setBinaryStream(3, in, sessionBytesLength);
                         preparedSaveSql.setString(4, session.isValid() ? "1" : "0");
                         preparedSaveSql.setInt(5, session.getMaxInactiveInterval());
                         preparedSaveSql.setLong(6, session.getLastAccessedTime());
@@ -724,8 +728,7 @@ public class DataSourceStore extends StoreBase {
      * @param session The session to be stored.
      * @throws IOException If an input/output error occurs.
      */
-    private void saveSelectForUpdate(Session session) throws IOException {
-        ByteArrayOutputStream bos = null;
+    private void saveSelectForUpdate(Session session, byte[] sessionBytes) throws IOException {
         String saveSql = "SELECT " + sessionIdCol
                 + ", " + sessionAppCol
                 + ", " + sessionIdCol
@@ -738,6 +741,7 @@ public class DataSourceStore extends StoreBase {
                 + " AND " + sessionIdCol + "=? FOR UPDATE"
                 ;
 
+        int sessionBytesLength = sessionBytes.length;
         synchronized (session) {
             int numberOfTries = 2;
             while (numberOfTries > 0) {
@@ -747,15 +751,8 @@ public class DataSourceStore extends StoreBase {
                 }
 
                 try {
-                    bos = new ByteArrayOutputStream();
-                    try (ObjectOutputStream oos =
-                            new ObjectOutputStream(new BufferedOutputStream(bos))) {
-                        ((StandardSession) session).writeObjectData(oos);
-                    }
-                    byte[] obs = bos.toByteArray();
-                    int size = obs.length;
-                    try (ByteArrayInputStream bis = new ByteArrayInputStream(obs, 0, size);
-                         InputStream in = new BufferedInputStream(bis, size);
+                    try (ByteArrayInputStream bis = new ByteArrayInputStream(sessionBytes, 0, sessionBytesLength);
+                         InputStream in = new BufferedInputStream(bis, sessionBytesLength);
                          PreparedStatement preparedSaveSql = _conn.prepareStatement(saveSql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE)) {
 
                         // Store auto-commit state
@@ -774,7 +771,7 @@ public class DataSourceStore extends StoreBase {
 
                             if(rs.next()) {
                                 // Session already exists in the db; update the various fields
-                                rs.updateBinaryStream(sessionDataCol, in, size);
+                                rs.updateBinaryStream(sessionDataCol, in, sessionBytesLength);
                                 rs.updateString(sessionValidCol, session.isValid() ? "1" : "0");
                                 rs.updateInt(sessionMaxInactiveCol, session.getMaxInactiveInterval());
                                 rs.updateLong(sessionLastAccessedCol, session.getLastAccessedTime());
@@ -786,7 +783,7 @@ public class DataSourceStore extends StoreBase {
 
                                 rs.updateString(sessionAppCol, getName());
                                 rs.updateString(sessionIdCol, session.getIdInternal());
-                                rs.updateBinaryStream(sessionIdCol, in, size);
+                                rs.updateBinaryStream(sessionIdCol, in, sessionBytesLength);
                                 rs.updateString(sessionValidCol, session.isValid() ? "1" : "0");
                                 rs.updateInt(sessionMaxInactiveCol, session.getMaxInactiveInterval());
                                 rs.updateLong(sessionLastAccessedCol, session.getLastAccessedTime());
