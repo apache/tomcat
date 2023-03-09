@@ -299,10 +299,12 @@
       duration of the authentication (which may be many minutes) so this is
       limited to 4KB by default to reduce exposure to a DOS attack.</p>
 
-      <p>The <strong>maxParameterCount</strong> attribute controls the
-      maximum number of parameter and value pairs (GET plus POST) that can
-      be parsed and stored in the request. Excessive parameters are ignored.
-      If you want to reject such requests, configure a
+      <p>The <strong>maxParameterCount</strong> attribute controls the maximum
+      total number of request parameters (including uploaded files) obtained
+      from the query string and, for POST requests, the request body if the
+      content type is <code>application/x-www-form-urlencoded</code> or
+      <code>multipart/form-data</code>. Excessive parameters are ignored. If you
+      want to reject such requests, configure a
       <a href="config/filter.html">FailedRequestFilter</a>.</p>
 
       <p>The <strong>xpoweredBy</strong> attribute controls whether or not the
