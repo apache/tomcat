@@ -27,6 +27,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
@@ -67,6 +68,13 @@ public class FormAuthenticator extends AuthenticatorBase {
      * If not set, error responses will be sent instead.
      */
     protected String landingPage = null;
+
+    /**
+     * If the authentication process creates a session, this is the maximum session timeout (in seconds) during the
+     * authentication process. Once authentication is complete, the default session timeout will apply. Sessions that
+     * exist before the authentication process starts will retain their original session timeout throughout.
+     */
+    protected int authenticationSessionTimeout = 120;
 
 
     // ------------------------------------------------------------- Properties
@@ -111,8 +119,31 @@ public class FormAuthenticator extends AuthenticatorBase {
     }
 
 
-    // ------------------------------------------------------ Protected Methods
+    /**
+     * Returns the maximum session timeout to be used during authentication if the authentication process creates a
+     * session.
+     *
+     * @return the maximum session timeout to be used during authentication if the authentication process creates a
+     *             session
+     */
+    public int getAuthenticationSessionTimeout() {
+        return authenticationSessionTimeout;
+    }
 
+
+    /**
+     * Configures the maximum session timeout to be used during authentication if the authentication process creates a
+     * session.
+     *
+     * @param authenticationSessionTimeout The maximum session timeout to use duriing authentication if the
+     *                                         authentication process creates a session
+     */
+    public void setAuthenticationSessionTimeout(int authenticationSessionTimeout) {
+        this.authenticationSessionTimeout = authenticationSessionTimeout;
+    }
+
+
+    // ------------------------------------------------------ Protected Methods
 
     /**
      * Authenticate the user making this request, based on the specified login configuration. Return <code>true</code>
@@ -616,6 +647,10 @@ public class FormAuthenticator extends AuthenticatorBase {
         request.getQueryString();
         request.getProtocol();
 
+        if (saved.getOriginalMaxInactiveInterval() > 0) {
+            session.setMaxInactiveInterval(saved.getOriginalMaxInactiveInterval());
+        }
+
         return true;
     }
 
@@ -680,6 +715,14 @@ public class FormAuthenticator extends AuthenticatorBase {
         saved.setQueryString(request.getQueryString());
         saved.setRequestURI(request.getRequestURI());
         saved.setDecodedRequestURI(request.getDecodedRequestURI());
+
+        if (session instanceof HttpSession && ((HttpSession) session).isNew()) {
+            int originalMaxInactiveInterval = session.getMaxInactiveInterval();
+            if (originalMaxInactiveInterval > getAuthenticationSessionTimeout()) {
+                saved.setOriginalMaxInactiveInterval(originalMaxInactiveInterval);
+                session.setMaxInactiveInterval(getAuthenticationSessionTimeout());
+            }
+        }
 
         // Stash the SavedRequest in our session for later use
         session.setNote(Constants.FORM_REQUEST_NOTE, saved);
