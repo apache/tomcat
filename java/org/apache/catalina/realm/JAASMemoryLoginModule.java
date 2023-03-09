@@ -246,7 +246,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         callbacks[4] = new TextInputCallback("cnonce");
         callbacks[5] = new TextInputCallback("qop");
         callbacks[6] = new TextInputCallback("realmName");
-        callbacks[7] = new TextInputCallback("md5a2");
+        callbacks[7] = new TextInputCallback("digestA2");
         callbacks[8] = new TextInputCallback("authMethod");
 
         // Interact with the user to retrieve the username and password
@@ -257,7 +257,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         String cnonce = null;
         String qop = null;
         String realmName = null;
-        String md5a2 = null;
+        String digestA2 = null;
         String authMethod = null;
 
         try {
@@ -269,7 +269,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             cnonce = ((TextInputCallback) callbacks[4]).getText();
             qop = ((TextInputCallback) callbacks[5]).getText();
             realmName = ((TextInputCallback) callbacks[6]).getText();
-            md5a2 = ((TextInputCallback) callbacks[7]).getText();
+            digestA2 = ((TextInputCallback) callbacks[7]).getText();
             authMethod = ((TextInputCallback) callbacks[8]).getText();
         } catch (IOException | UnsupportedCallbackException e) {
             throw new LoginException(e.toString());
@@ -280,7 +280,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             // BASIC or FORM
             principal = super.authenticate(username, password);
         } else if (authMethod.equals(HttpServletRequest.DIGEST_AUTH)) {
-            principal = super.authenticate(username, password, nonce, nc, cnonce, qop, realmName, md5a2);
+            principal = super.authenticate(username, password, nonce, nc, cnonce, qop, realmName, digestA2);
         } else if (authMethod.equals(HttpServletRequest.CLIENT_CERT_AUTH)) {
             principal = super.getPrincipal(username);
         } else {

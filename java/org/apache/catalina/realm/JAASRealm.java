@@ -326,9 +326,9 @@ public class JAASRealm extends RealmBase {
 
     @Override
     public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
-            String qop, String realmName, String md5a2) {
+            String qop, String realmName, String digestA2) {
         return authenticate(username, new JAASCallbackHandler(this, username, clientDigest, nonce, nc, cnonce, qop,
-                realmName, md5a2, HttpServletRequest.DIGEST_AUTH));
+                realmName, digestA2, HttpServletRequest.DIGEST_AUTH));
     }
 
 

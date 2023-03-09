@@ -96,15 +96,14 @@ public interface Realm extends Contained {
      * @param qop the "quality of protection" ({@code nc} and {@code cnonce}
      *        will only be used, if {@code qop} is not {@code null}).
      * @param realm Realm name
-     * @param md5a2 Second MD5 digest used to calculate the digest :
-     * MD5(Method + ":" + uri)
+     * @param digestA2 Second digest calculated as digest(Method + ":" + uri)
      *
      * @return the associated principal, or {@code null} if there is none.
      */
     Principal authenticate(String username, String digest,
                                   String nonce, String nc, String cnonce,
                                   String qop, String realm,
-                                  String md5a2);
+                                  String digestA2);
 
 
     /**

@@ -330,19 +330,19 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
     @Override
     public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
-            String qop, String realm, String md5a2) {
+            String qop, String realm, String digestA2) {
 
         // In digest auth, digests are always lower case
-        String md5a1 = getDigest(username, realm);
-        if (md5a1 == null) {
+        String digestA1 = getDigest(username, realm);
+        if (digestA1 == null) {
             return null;
         }
-        md5a1 = md5a1.toLowerCase(Locale.ENGLISH);
+        digestA1 = digestA1.toLowerCase(Locale.ENGLISH);
         String serverDigestValue;
         if (qop == null) {
-            serverDigestValue = md5a1 + ":" + nonce + ":" + md5a2;
+            serverDigestValue = digestA1 + ":" + nonce + ":" + digestA2;
         } else {
-            serverDigestValue = md5a1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + md5a2;
+            serverDigestValue = digestA1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + digestA2;
         }
 
         byte[] valueBytes = null;
@@ -358,7 +358,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
         if (log.isDebugEnabled()) {
             log.debug("Digest : " + clientDigest + " Username:" + username + " ClientDigest:" + clientDigest +
                     " nonce:" + nonce + " nc:" + nc + " cnonce:" + cnonce + " qop:" + qop + " realm:" + realm +
-                    "md5a2:" + md5a2 + " Server digest:" + serverDigest);
+                    "digestA2:" + digestA2 + " Server digest:" + serverDigest);
         }
 
         if (serverDigest.equals(clientDigest)) {

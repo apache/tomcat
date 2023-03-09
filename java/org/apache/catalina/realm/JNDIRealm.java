@@ -1341,7 +1341,7 @@ public class JNDIRealm extends RealmBase {
      */
     @Override
     public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
-            String qop, String realm, String md5a2) {
+            String qop, String realm, String digestA2) {
         ClassLoader ocl = null;
         Thread currentThread = null;
         try {
@@ -1350,7 +1350,7 @@ public class JNDIRealm extends RealmBase {
                 ocl = currentThread.getContextClassLoader();
                 currentThread.setContextClassLoader(this.getClass().getClassLoader());
             }
-            return super.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realm, md5a2);
+            return super.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realm, digestA2);
         } finally {
             if (currentThread != null) {
                 currentThread.setContextClassLoader(ocl);
