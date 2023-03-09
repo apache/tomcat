@@ -185,7 +185,7 @@ public class StaticFieldELResolver extends ELResolver {
     }
 
     /**
-     * Always returns <code>String.class</code>.
+     * @return This resolver always returns <code>String.class</code>
      */
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
