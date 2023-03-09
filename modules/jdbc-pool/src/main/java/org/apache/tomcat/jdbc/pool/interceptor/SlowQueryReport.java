@@ -255,8 +255,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
         // Make a defensive deep-copy of the query stats list to prevent
         // concurrent changes to the lastModified member during list-sort
         ArrayList<MiniQueryStats> list = new ArrayList<>(queries.size());
-        for(QueryStats stats : queries.values())
+        for(QueryStats stats : queries.values()) {
             list.add(new MiniQueryStats(stats));
+        }
 
         Collections.sort(list, miniQueryStatsComparator);
         int removeIndex = 0;
