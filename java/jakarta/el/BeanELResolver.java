@@ -121,9 +121,6 @@ public class BeanELResolver extends ELResolver {
         }
     }
 
-    /**
-     * @since EL 2.2
-     */
     @Override
     public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
         Objects.requireNonNull(context);
