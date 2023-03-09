@@ -1753,6 +1753,13 @@
         value is <code>never</code>.</p>
       </attribute>
 
+      <attribute name="authenticationSessionTimeout" required="false">
+        <p>If the authentication process creates a session, this is the maximum session timeout (in seconds) during the
+        authentication process. Once authentication is complete, the default session timeout will apply. Sessions that
+        exist before the authentication process starts will retain their original session timeout throughout. If not
+        set, the default value of <code>120</code> seconds will be used.</p>
+      </attribute>
+
       <attribute name="changeSessionIdOnAuthentication" required="false">
         <p>Controls if the session ID is changed if a session exists at the
         point where users are authenticated. This is to prevent session fixation
