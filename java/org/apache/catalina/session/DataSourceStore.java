@@ -51,6 +51,22 @@ import org.apache.juli.logging.Log;
 public class DataSourceStore extends StoreBase {
 
     /**
+     * The DELETE + INSERT saving strategy.
+     *
+     * @see #setSaveStrategy
+     * @see #getSaveStrategy
+     */
+    public static final String SAVE_STRATEGY_DELETE_INSERT = "deleteInsert";
+
+    /**
+     * The SELECT...FOR UPDATE saving strategy.
+     *
+     * @see #setSaveStrategy
+     * @see #getSaveStrategy
+     */
+    public static final String SAVE_STRATEGY_SELECT_FOR_UPDATE = "selectForUpdate";
+
+    /**
      * Context name associated with this Store
      */
     private String name = null;
@@ -75,6 +91,10 @@ public class DataSourceStore extends StoreBase {
      */
     protected DataSource dataSource = null;
 
+    /**
+     * Which saving strategy to use: deleteInsert, selectForUpdate, etc.
+     */
+    private String saveStrategy = SAVE_STRATEGY_DELETE_INSERT;
 
     // ------------------------------------------------------------ Table & cols
 
@@ -326,6 +346,31 @@ public class DataSourceStore extends StoreBase {
       this.localDataSource = localDataSource;
     }
 
+    /**
+     * Sets the session-saving strategy to use.
+     *
+     * E.g. {@link #SAVE_STRATEGY_DELETE_INSERT} or {@link #SAVE_STRATEGY_SELECT_FOR_UPDATE}.
+     *
+     * The default is {@link #SAVE_STRATEGY_DELETE_INSERT} for compatibility with all RDMBSs.
+     *
+     * @param saveStrategy The saving strategy to use.
+     */
+    public void setSaveStrategy(String saveStrategy) {
+        this.saveStrategy = saveStrategy;
+    }
+
+    /**
+     * Gets the session-saving strategy to use.
+     *
+     * E.g. {@link #SAVE_STRATEGY_DELETE_INSERT} or {@link #SAVE_STRATEGY_SELECT_FOR_UPDATE}.
+     *
+     * The default is {@link #SAVE_STRATEGY_DELETE_INSERT} for compatibility with all RDMBSs.
+     *
+     * @return The saving strategy to use.
+     */
+    public String getSaveStrategy() {
+        return saveStrategy;
+    }
 
     // --------------------------------------------------------- Public Methods
 
@@ -596,6 +641,90 @@ public class DataSourceStore extends StoreBase {
      */
     @Override
     public void save(Session session) throws IOException {
+        if(SAVE_STRATEGY_SELECT_FOR_UPDATE.equals(getSaveStrategy())) {
+            saveSelectForUpdate(session);
+        } else {
+            saveDeleteAndInsert(session);
+        }
+    }
+
+    /**
+     * Saves a session by DELETEing any existing session and INSERTing a new one.
+     *
+     * @param session The session to be stored.
+     * @throws IOException If an input/output error occurs.
+     */
+    private void saveDeleteAndInsert(Session session) throws IOException {
+        ByteArrayOutputStream bos = null;
+        String saveSql = "INSERT INTO " + sessionTable + " ("
+                + sessionIdCol + ", " + sessionAppCol + ", "
+                + sessionDataCol + ", " + sessionValidCol
+                + ", " + sessionMaxInactiveCol + ", "
+                + sessionLastAccessedCol
+                + ") VALUES (?, ?, ?, ?, ?, ?)";
+
+        synchronized (session) {
+            int numberOfTries = 2;
+            while (numberOfTries > 0) {
+                Connection _conn = getConnection();
+                if (_conn == null) {
+                    return;
+                }
+
+                try {
+                    // If sessions already exist in DB, remove and insert again.
+                    // TODO:
+                    // * Check if ID exists in database and if so use UPDATE.
+                    remove(session.getIdInternal(), _conn);
+
+                    bos = new ByteArrayOutputStream();
+                    try (ObjectOutputStream oos =
+                            new ObjectOutputStream(new BufferedOutputStream(bos))) {
+                        ((StandardSession) session).writeObjectData(oos);
+                    }
+                    byte[] obs = bos.toByteArray();
+                    int size = obs.length;
+                    try (ByteArrayInputStream bis = new ByteArrayInputStream(obs, 0, size);
+                            InputStream in = new BufferedInputStream(bis, size);
+                            PreparedStatement preparedSaveSql = _conn.prepareStatement(saveSql)) {
+                        preparedSaveSql.setString(1, session.getIdInternal());
+                        preparedSaveSql.setString(2, getName());
+                        preparedSaveSql.setBinaryStream(3, in, size);
+                        preparedSaveSql.setString(4, session.isValid() ? "1" : "0");
+                        preparedSaveSql.setInt(5, session.getMaxInactiveInterval());
+                        preparedSaveSql.setLong(6, session.getLastAccessedTime());
+                        preparedSaveSql.execute();
+                        // Break out after the finally block
+                        numberOfTries = 0;
+                    }
+                } catch (SQLException e) {
+                    manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
+                } catch (IOException e) {
+                    // Ignore
+                } finally {
+                    release(_conn);
+                }
+                numberOfTries--;
+            }
+        }
+
+        if (manager.getContext().getLogger().isDebugEnabled()) {
+            manager.getContext().getLogger().debug(sm.getString(getStoreName() + ".saving",
+                    session.getIdInternal(), sessionTable));
+        }
+    }
+
+    /**
+     * Saves a session using SELECT ... FOR UPDATE to update any existing session
+     * record or insert a new one.
+     *
+     * This should be more efficient with database resources if it is supported
+     * by the underlying database.
+     *
+     * @param session The session to be stored.
+     * @throws IOException If an input/output error occurs.
+     */
+    private void saveSelectForUpdate(Session session) throws IOException {
         ByteArrayOutputStream bos = null;
         String saveSql = "SELECT " + sessionIdCol
                 + ", " + sessionAppCol

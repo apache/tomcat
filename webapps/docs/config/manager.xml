@@ -468,6 +468,13 @@
       <code>false</code>: use a global DataSource.</p>
     </attribute>
 
+    <attribute name="saveStrategy" required="false">
+      <p>The session-saving strategy to use, either <code>deleteInsert</code>
+      or <code>selectForUpdate</code>. The default is <code>deleteInsert</code>
+      which is compatible with all known RDBMS systems. The <code>selectForUpdate</code>
+      strategy uses <code>SELECT...FOR UPDATE</code> which may be more efficient
+      if supported by your RDBMS system.</p>
+    </attribute>
     <attribute name="sessionAppCol" required="false">
       <p>Name of the database column, contained in the specified session table,
       that contains the Engine, Host, and Web Application Context name in the
