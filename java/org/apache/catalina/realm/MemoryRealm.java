@@ -103,16 +103,6 @@ public class MemoryRealm extends RealmBase {
 
     // --------------------------------------------------------- Public Methods
 
-
-    /**
-     * Return the Principal associated with the specified username and credentials, if there is one; otherwise return
-     * <code>null</code>.
-     *
-     * @param username    Username of the Principal to look up
-     * @param credentials Password or other credentials to use in authenticating this username
-     *
-     * @return the associated principal, or <code>null</code> if there is none.
-     */
     @Override
     public Principal authenticate(String username, String credentials) {
 
@@ -217,9 +207,6 @@ public class MemoryRealm extends RealmBase {
     }
 
 
-    /**
-     * @return the password associated with the given principal's user name.
-     */
     @Override
     protected String getPassword(String username) {
 
@@ -233,26 +220,14 @@ public class MemoryRealm extends RealmBase {
     }
 
 
-    /**
-     * @return the Principal associated with the given user name.
-     */
     @Override
     protected Principal getPrincipal(String username) {
-
         return principals.get(username);
-
     }
 
 
     // ------------------------------------------------------ Lifecycle Methods
 
-    /**
-     * Prepare for the beginning of active use of the public methods of this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
     @Override
     protected void startInternal() throws LifecycleException {
         String pathName = getPathname();

@@ -125,6 +125,9 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
+    /**
+     * Calls {@link UserDatabase#backgroundProcess()}.
+     */
     @Override
     public void backgroundProcess() {
         UserDatabase database = getUserDatabase();
@@ -134,9 +137,6 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
-    /**
-     * Return the password associated with the given principal's user name.
-     */
     @Override
     protected String getPassword(String username) {
         UserDatabase database = getUserDatabase();
@@ -154,9 +154,6 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
-    /**
-     * Return the Principal associated with the given user name.
-     */
     @Override
     protected Principal getPrincipal(String username) {
         UserDatabase database = getUserDatabase();
@@ -221,12 +218,6 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
-    /**
-     * Gracefully terminate the active use of the public methods of this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that needs to be reported
-     */
     @Override
     protected void stopInternal() throws LifecycleException {
 

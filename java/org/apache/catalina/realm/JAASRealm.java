@@ -318,36 +318,12 @@ public class JAASRealm extends RealmBase {
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Return the <code>Principal</code> associated with the specified username and credentials, if there is one;
-     * otherwise return <code>null</code>.
-     *
-     * @param username    Username of the <code>Principal</code> to look up
-     * @param credentials Password or other credentials to use in authenticating this username
-     *
-     * @return the associated principal, or <code>null</code> if there is none.
-     */
     @Override
     public Principal authenticate(String username, String credentials) {
         return authenticate(username, new JAASCallbackHandler(this, username, credentials));
     }
 
 
-    /**
-     * Return the <code>Principal</code> associated with the specified username and digest, if there is one; otherwise
-     * return <code>null</code>.
-     *
-     * @param username     Username of the <code>Principal</code> to look up
-     * @param clientDigest Digest to use in authenticating this username
-     * @param nonce        Server generated nonce
-     * @param nc           Nonce count
-     * @param cnonce       Client generated nonce
-     * @param qop          Quality of protection applied to the message
-     * @param realmName    Realm name
-     * @param md5a2        Second MD5 digest used to calculate the digest MD5(Method + ":" + uri)
-     *
-     * @return the associated principal, or <code>null</code> if there is none.
-     */
     @Override
     public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
             String qop, String realmName, String md5a2) {
@@ -356,11 +332,7 @@ public class JAASRealm extends RealmBase {
     }
 
 
-    // -------------------------------------------------------- Package Methods
-
-
     // ------------------------------------------------------ Protected Methods
-
 
     /**
      * Perform the actual JAAS authentication.
@@ -611,14 +583,6 @@ public class JAASRealm extends RealmBase {
 
     // ------------------------------------------------------ Lifecycle Methods
 
-
-    /**
-     * Prepare for the beginning of active use of the public methods of this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
     @Override
     protected void startInternal() throws LifecycleException {
 

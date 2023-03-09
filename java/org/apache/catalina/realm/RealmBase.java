@@ -177,20 +177,12 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
     }
 
 
-    /**
-     * Return the Container with which this Realm has been associated.
-     */
     @Override
     public Container getContainer() {
         return container;
     }
 
 
-    /**
-     * Set the Container with which this Realm has been associated.
-     *
-     * @param container The associated Container
-     */
     @Override
     public void setContainer(Container container) {
 
@@ -274,25 +266,12 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
     // --------------------------------------------------------- Public Methods
 
-
-    /**
-     * Add a property change listener to this component.
-     *
-     * @param listener The listener to add
-     */
     @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-
         support.addPropertyChangeListener(listener);
-
     }
 
 
-    /**
-     * Return the Principal associated with the specified username, if there is one; otherwise return <code>null</code>.
-     *
-     * @param username Username of the Principal to look up
-     */
     @Override
     public Principal authenticate(String username) {
 
@@ -308,15 +287,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
     }
 
 
-    /**
-     * Return the Principal associated with the specified username and credentials, if there is one; otherwise return
-     * <code>null</code>.
-     *
-     * @param username    Username of the Principal to look up
-     * @param credentials Password or other credentials to use in authenticating this username
-     *
-     * @return the associated principal, or <code>null</code> if there is none.
-     */
     @Override
     public Principal authenticate(String username, String credentials) {
         // No user or no credentials
@@ -358,22 +328,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
     }
 
 
-    /**
-     * Try to authenticate with the specified username, which matches the digest calculated using the given parameters
-     * using the method described in RFC 2617 (which is a superset of RFC 2069).
-     *
-     * @param username     Username of the Principal to look up
-     * @param clientDigest Digest which has been submitted by the client
-     * @param nonce        Unique (or supposedly unique) token which has been used for this request
-     * @param nc           the nonce counter
-     * @param cnonce       the client chosen nonce
-     * @param qop          the "quality of protection" (<code>nc</code> and <code>cnonce</code> will only be used, if
-     *                         <code>qop</code> is not <code>null</code>).
-     * @param realm        Realm name
-     * @param md5a2        Second MD5 digest used to calculate the digest : MD5(Method + ":" + uri)
-     *
-     * @return the associated principal, or <code>null</code> if there is none.
-     */
     @Override
     public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
             String qop, String realm, String md5a2) {
@@ -415,13 +369,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
     }
 
 
-    /**
-     * Return the Principal associated with the specified chain of X509 client certificates. If there is none, return
-     * <code>null</code>.
-     *
-     * @param certs Array of client certificates, with the first one in the array being the certificate of the client
-     *                  itself.
-     */
     @Override
     public Principal authenticate(X509Certificate certs[]) {
 
@@ -454,9 +401,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Principal authenticate(GSSContext gssContext, boolean storeCred) {
         if (gssContext.isEstablished()) {
@@ -494,9 +438,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Principal authenticate(GSSName gssName, GSSCredential gssCredential) {
         if (gssName == null) {
@@ -508,8 +449,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
 
     /**
-     * Execute a periodic task, such as reloading, etc. This method will be invoked inside the classloading context of
-     * this container. Unexpected throwables will be caught and logged.
+     * {@inheritDoc}
+     * <p>
+     * The default implementation is NO-OP.
      */
     @Override
     public void backgroundProcess() {
@@ -517,13 +459,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
     }
 
 
-    /**
-     * Return the SecurityConstraints configured to guard the request URI for this request, or <code>null</code> if
-     * there is no such constraint.
-     *
-     * @param request Request we are processing
-     * @param context Context the Request is mapped to
-     */
     @Override
     public SecurityConstraint[] findSecurityConstraints(Request request, Context context) {
 
@@ -768,17 +703,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
     }
 
 
-    /**
-     * Perform access control based on the specified authorization constraint. Return <code>true</code> if this
-     * constraint is satisfied and processing should continue, or <code>false</code> otherwise.
-     *
-     * @param request     Request we are processing
-     * @param response    Response we are creating
-     * @param constraints Security constraint we are enforcing
-     * @param context     The Context to which client of this class is attached.
-     *
-     * @exception IOException if an input/output error occurs
-     */
     @Override
     public boolean hasResourcePermission(Request request, Response response, SecurityConstraint[] constraints,
             Context context) throws IOException {
@@ -885,9 +809,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
 
     /**
-     * {@inheritDoc} This method or {@link #hasRoleInternal(Principal, String)} can be overridden by Realm
-     * implementations, but the default is adequate when an instance of <code>GenericPrincipal</code> is used to
-     * represent authenticated Principals from this Realm.
+     * {@inheritDoc}
+     * <p>
+     * This method or {@link #hasRoleInternal(Principal, String)} can be overridden by Realm implementations, but the
+     * default is adequate when an instance of <code>GenericPrincipal</code> is used to represent authenticated
+     * Principals from this Realm.
      */
     @Override
     public boolean hasRole(Wrapper wrapper, Principal principal, String role) {
@@ -942,17 +868,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
     }
 
 
-    /**
-     * Enforce any user data constraint required by the security constraint guarding this request URI. Return
-     * <code>true</code> if this constraint was not violated and processing should continue, or <code>false</code> if we
-     * have created a response already.
-     *
-     * @param request     Request we are processing
-     * @param response    Response we are creating
-     * @param constraints Security constraint being checked
-     *
-     * @exception IOException if an input/output error occurs
-     */
     @Override
     public boolean hasUserDataPermission(Request request, Response response, SecurityConstraint[] constraints)
             throws IOException {
@@ -1032,16 +947,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
     }
 
 
-    /**
-     * Remove a property change listener from this component.
-     *
-     * @param listener The listener to remove
-     */
     @Override
     public void removePropertyChangeListener(PropertyChangeListener listener) {
-
         support.removePropertyChangeListener(listener);
-
     }
 
 
@@ -1062,6 +970,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
         x509UsernameRetriever = createUsernameRetriever(x509UsernameRetrieverClassName);
     }
+
 
     /**
      * Prepare for the beginning of active use of the public methods of this component and implement the requirements of
@@ -1092,9 +1001,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
     }
 
 
-    /**
-     * Return a String representation of this component.
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Realm[");
