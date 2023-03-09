@@ -126,6 +126,13 @@
         Add an access log valve that uses a json format. Based on pull request
         <pr>539</pr> provided by Thomas Meyer. (remm)
       </add>
+      <add>
+        Harden the FORM authentication process against DoS attacks by using a
+        reduced session timeout if the FORM authentication process creates a
+        session. The duration of this timeout is configured by the
+        <code>authenticationSessionTimeout</code> attribute of the FORM
+        authenticator. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

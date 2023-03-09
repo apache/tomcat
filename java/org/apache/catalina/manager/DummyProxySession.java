@@ -99,6 +99,11 @@ public class DummyProxySession implements Session {
     }
 
     @Override
+    public boolean isNew() {
+        return false;
+    }
+
+    @Override
     public Manager getManager() {
         return null;
     }
