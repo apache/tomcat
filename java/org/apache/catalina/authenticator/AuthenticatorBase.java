@@ -264,29 +264,18 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         this.cache = cache;
     }
 
-    /**
-     * Return the Container to which this Valve is attached.
-     */
     @Override
     public Container getContainer() {
         return this.context;
     }
 
-    /**
-     * Set the Container to which this Valve is attached.
-     *
-     * @param container The container to which we are attached
-     */
     @Override
     public void setContainer(Container container) {
-
         if (container != null && !(container instanceof Context)) {
             throw new IllegalArgumentException(sm.getString("authenticator.notContext"));
         }
-
         super.setContainer(container);
         this.context = (Context) container;
-
     }
 
     /**
@@ -1148,6 +1137,11 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         register(request, request.getResponse(), principal, getAuthMethod(), username, password);
     }
 
+    /**
+     * Return the authentication method, which is vendor-specific and not defined by HttpServletRequest.
+     *
+     * @return the authentication method, which is vendor-specific and not defined by HttpServletRequest.
+     */
     protected abstract String getAuthMethod();
 
     /**
@@ -1203,13 +1197,6 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     }
 
 
-    /**
-     * Start this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
         ServletContext servletContext = context.getServletContext();
@@ -1247,18 +1234,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     }
 
 
-    /**
-     * Stop this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
     @Override
     protected synchronized void stopInternal() throws LifecycleException {
-
         super.stopInternal();
-
         sso = null;
     }
 

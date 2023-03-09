@@ -97,9 +97,6 @@ public final class NonLoginAuthenticator extends AuthenticatorBase {
     }
 
 
-    /**
-     * Return the authentication method, which is vendor-specific and not defined by HttpServletRequest.
-     */
     @Override
     protected String getAuthMethod() {
         return "NONE";

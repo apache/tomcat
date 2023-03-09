@@ -78,20 +78,12 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
 
     // -------------------------------------------------------------- Properties
 
-    /**
-     * Return the Container with which this Valve is associated, if any.
-     */
     @Override
     public Container getContainer() {
         return container;
     }
 
 
-    /**
-     * Set the Container with which this Valve is associated, if any.
-     *
-     * @param container The new associated container
-     */
     @Override
     public void setContainer(Container container) {
         this.container = container;
@@ -109,20 +101,12 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
     }
 
 
-    /**
-     * Return the next Valve in this pipeline, or <code>null</code> if this is the last Valve in the pipeline.
-     */
     @Override
     public Valve getNext() {
         return next;
     }
 
 
-    /**
-     * Set the Valve that follows this one in the pipeline it is part of.
-     *
-     * @param valve The new next valve
-     */
     @Override
     public void setNext(Valve valve) {
         this.next = valve;
@@ -132,8 +116,9 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
     // ---------------------------------------------------------- Public Methods
 
     /**
-     * Execute a periodic task, such as reloading, etc. This method will be invoked inside the classloading context of
-     * this container. Unexpected throwables will be caught and logged.
+     * {@inheritDoc}
+     * <p>
+     * The default implementation is NO-OP.
      */
     @Override
     public void backgroundProcess() {
@@ -174,9 +159,6 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
     }
 
 
-    /**
-     * Return a String rendering of this object.
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(this.getClass().getName());
