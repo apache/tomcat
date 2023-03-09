@@ -627,7 +627,8 @@ public class DataSourceStore extends StoreBase {
                     int size = obs.length;
                     try (ByteArrayInputStream bis = new ByteArrayInputStream(obs, 0, size);
                          InputStream in = new BufferedInputStream(bis, size);
-                         PreparedStatement preparedSaveSql = _conn.prepareStatement(saveSql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE)) {
+                         PreparedStatement preparedSaveSql = _conn.prepareStatement(saveSql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
+                         ResultSet rs = null) {
 
                         // Store auto-commit state
                         boolean autoCommit = _conn.getAutoCommit();
@@ -640,7 +641,7 @@ public class DataSourceStore extends StoreBase {
                             preparedSaveSql.setString(1, getName());
                             preparedSaveSql.setString(2, session.getIdInternal());
 
-                            ResultSet rs = preparedSaveSql.executeQuery();
+                            rs = preparedSaveSql.executeQuery();
 
                             if(rs.next()) {
                                 // Session already exists in the db; update the various fields
@@ -661,7 +662,7 @@ public class DataSourceStore extends StoreBase {
                                 rs.updateInt(sessionMaxInactiveCol, session.getMaxInactiveInterval());
                                 rs.updateLong(sessionLastAccessedCol, session.getLastAccessedTime());
 
-                                rs.updateRow();
+                                rs.insertRow();
                             }
 
                             _conn.commit();
