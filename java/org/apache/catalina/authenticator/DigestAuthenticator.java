@@ -597,9 +597,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
             String a2 = method + ":" + uri;
 
             byte[] buffer = ConcurrentMessageDigest.digestMD5(a2.getBytes(StandardCharsets.ISO_8859_1));
-            String md5a2 = HexUtils.toHexString(buffer);
+            String digestA2 = HexUtils.toHexString(buffer);
 
-            return realm.authenticate(userName, response, nonce, nc, cnonce, qop, realmName, md5a2);
+            return realm.authenticate(userName, response, nonce, nc, cnonce, qop, realmName, digestA2);
         }
 
     }
