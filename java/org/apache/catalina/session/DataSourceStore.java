@@ -627,12 +627,12 @@ public class DataSourceStore extends StoreBase {
                     int size = obs.length;
                     try (ByteArrayInputStream bis = new ByteArrayInputStream(obs, 0, size);
                          InputStream in = new BufferedInputStream(bis, size);
-                         PreparedStatement preparedSaveSql = _conn.prepareStatement(saveSql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
-                         ResultSet rs = null) {
+                         PreparedStatement preparedSaveSql = _conn.prepareStatement(saveSql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE)) {
 
                         // Store auto-commit state
                         boolean autoCommit = _conn.getAutoCommit();
 
+                        ResultSet rs = null;
                         try {
                             if(autoCommit) {
                                 _conn.setAutoCommit(false); // BEGIN TRANSACTION
@@ -692,6 +692,13 @@ public class DataSourceStore extends StoreBase {
 
                             throw e;
                         } finally {
+                            if(null != rs) {
+                                try {
+                                    rs.close();
+                                } catch (SQLException sqle) {
+                                    manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", sqle));
+                                }
+                            }
                             if(autoCommit) {
                                 // Restore connection auto-commit state
                                 _conn.setAutoCommit(autoCommit);
