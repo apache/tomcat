@@ -1120,15 +1120,11 @@ public class JNDIRealm extends RealmBase {
     // ---------------------------------------------------------- Realm Methods
 
     /**
-     * Return the Principal associated with the specified username and credentials, if there is one; otherwise return
-     * <code>null</code>. If there are any errors with the JDBC connection, executing the query or anything we return
+     * {@inheritDoc}
+     * <p>
+     * If there are any errors with the JNDI connection, executing the query or anything we return
      * null (don't authenticate). This event is also logged, and the connection will be closed so that a subsequent
      * request will automatically re-open it.
-     *
-     * @param username    Username of the Principal to look up
-     * @param credentials Password or other credentials to use in authenticating this username
-     *
-     * @return the associated principal, or <code>null</code> if there is none.
      */
     @Override
     public Principal authenticate(String username, String credentials) {
