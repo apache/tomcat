@@ -295,9 +295,15 @@
 
       <p>The <strong>maxSavePostSize</strong> attribute controls the saving of
       the request body during FORM and CLIENT-CERT authentication and HTTP/1.1
-      upgrade. For FORM authentication, the request body is cached for the
-      duration of the authentication (which may be many minutes) so this is
-      limited to 4KB by default to reduce exposure to a DOS attack.</p>
+      upgrade. For FORM authentication, the request body is cached in the HTTP
+      session for the duration of the authentication so the cached request body
+      is limited to 4KB by default to reduce exposure to a DOS attack. To
+      further reduce exposure to a DoS attack by limiting the permitted duration
+      of the FORM authentication, a reduced session timeout is used if the
+      session is created by the FORM authentication. This reduced timeout is
+      controlled by the <code>authenticationSessionTimeout</code> attribute of
+      the <a href="config/valve.html#Form_Authenticator_Valve">FORM
+      authenticator</a>.</p>
 
       <p>The <strong>maxParameterCount</strong> attribute controls the maximum
       total number of request parameters (including uploaded files) obtained
