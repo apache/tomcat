@@ -112,7 +112,7 @@ public class TestJNDIRealm {
 
         // THEN
         assertThat(principal, instanceOf(GenericPrincipal.class));
-        Assert.assertEquals(ha1(), ((GenericPrincipal)principal).getPassword());
+        Assert.assertEquals(digestA1(), ((GenericPrincipal)principal).getPassword());
     }
 
     @Test
