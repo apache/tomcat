@@ -43,7 +43,11 @@ public interface Valve {
     //-------------------------------------------------------------- Properties
 
     /**
-     * @return the next Valve in the pipeline containing this Valve, if any.
+     * Returns the next Valve in this pipeline, or <code>null</code> if this is
+     * the last Valve in the pipeline.
+     *
+     * @return the next Valve in the pipeline containing this Valve, or
+     *         <code>null</code> if this is the last Valve in the pipeline.
      */
     Valve getNext();
 
