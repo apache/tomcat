@@ -76,11 +76,11 @@ public class JAASCallbackHandler implements CallbackHandler {
      * @param cnonce     Client generated nonce
      * @param qop        Quality of protection applied to the message
      * @param realmName  Realm name
-     * @param md5a2      Second MD5 digest used to calculate the digest MD5(Method + ":" + uri)
+     * @param digestA2   Second digest calculated as digest(Method + ":" + uri)
      * @param authMethod The authentication method in use
      */
     public JAASCallbackHandler(JAASRealm realm, String username, String password, String nonce, String nc,
-            String cnonce, String qop, String realmName, String md5a2, String authMethod) {
+            String cnonce, String qop, String realmName, String digestA2, String authMethod) {
         this.realm = realm;
         this.username = username;
 
@@ -94,7 +94,7 @@ public class JAASCallbackHandler implements CallbackHandler {
         this.cnonce = cnonce;
         this.qop = qop;
         this.realmName = realmName;
-        this.md5a2 = md5a2;
+        this.digestA2 = digestA2;
         this.authMethod = authMethod;
     }
 
@@ -147,9 +147,9 @@ public class JAASCallbackHandler implements CallbackHandler {
     protected final String realmName;
 
     /**
-     * Second MD5 digest.
+     * Second digest.
      */
-    protected final String md5a2;
+    protected final String digestA2;
 
     /**
      * The authentication method to be used. If null, assume BASIC/FORM.
@@ -199,8 +199,8 @@ public class JAASCallbackHandler implements CallbackHandler {
                     cb.setText(qop);
                 } else if (cb.getPrompt().equals("realmName")) {
                     cb.setText(realmName);
-                } else if (cb.getPrompt().equals("md5a2")) {
-                    cb.setText(md5a2);
+                } else if (cb.getPrompt().equals("digestA2")) {
+                    cb.setText(digestA2);
                 } else if (cb.getPrompt().equals("authMethod")) {
                     cb.setText(authMethod);
                 } else if (cb.getPrompt().equals("catalinaBase")) {

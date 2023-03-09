@@ -104,10 +104,10 @@ public class LockOutRealm extends CombinedRealm {
 
     @Override
     public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
-            String qop, String realmName, String md5a2) {
+            String qop, String realmName, String digestA2) {
 
         Principal authenticatedUser = super.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realmName,
-                md5a2);
+                digestA2);
         return filterLockedAccounts(username, authenticatedUser);
     }
 
