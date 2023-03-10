@@ -41,7 +41,7 @@ public class TestCGIServletCmdLineArguments {
          * here. This was chosen as it is simple and the tests are run on
          * Windows as part of every release cycle.
          */
-        defaultDecodedPatternWindows = Pattern.compile("[a-zA-Z0-9\\Q-_.\\/:\\E]+");
+        defaultDecodedPatternWindows = Pattern.compile("[\\w\\Q-.\\/:\\E]+");
 
         if (JrePlatform.IS_WINDOWS) {
             Pattern p = null;
