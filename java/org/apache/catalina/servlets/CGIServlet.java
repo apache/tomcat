@@ -254,7 +254,7 @@ public final class CGIServlet extends HttpServlet {
         DEFAULT_SUPER_METHODS.add("TRACE");
 
         if (JrePlatform.IS_WINDOWS) {
-            DEFAULT_CMD_LINE_ARGUMENTS_DECODED_PATTERN = Pattern.compile("[a-zA-Z0-9\\Q-_.\\/:\\E]+");
+            DEFAULT_CMD_LINE_ARGUMENTS_DECODED_PATTERN = Pattern.compile("[\\w\\Q-.\\/:\\E]+");
         } else {
             // No restrictions
             DEFAULT_CMD_LINE_ARGUMENTS_DECODED_PATTERN = null;
@@ -323,7 +323,7 @@ public final class CGIServlet extends HttpServlet {
      * Uses \Q...\E to avoid individual quoting.
      */
     private Pattern cmdLineArgumentsEncodedPattern =
-            Pattern.compile("[a-zA-Z0-9\\Q%;/?:@&,$-_.!~*'()\\E]+");
+            Pattern.compile("[\\w\\Q%;/?:@&,$-.!~*'()\\E]+");
 
     /**
      * Limits the decoded form of individual command line arguments. Default
