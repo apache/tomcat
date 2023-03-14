@@ -272,10 +272,10 @@ public class ResponseFacade implements HttpServletResponse {
 
 
     @Override
-    public void sendRedirect(String location) throws IOException {
+    public void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException {
         checkCommitted("coyoteResponse.sendRedirect.ise");
         response.setAppCommitted(true);
-        response.sendRedirect(location);
+        response.sendRedirect(location, sc, clearBuffer);
     }
 
 

@@ -1222,30 +1222,8 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Send a temporary redirect to the specified redirect location URL.
-     *
-     * @param location Location URL to redirect to
-     *
-     * @exception IllegalStateException if this response has already been committed
-     * @exception IOException           if an input/output error occurs
-     */
     @Override
-    public void sendRedirect(String location) throws IOException {
-        sendRedirect(location, SC_FOUND);
-    }
-
-
-    /**
-     * Internal method that allows a redirect to be sent with a status other than {@link HttpServletResponse#SC_FOUND}
-     * (302). No attempt is made to validate the status code.
-     *
-     * @param location Location URL to redirect to
-     * @param status   HTTP status code that will be sent
-     *
-     * @throws IOException an IO exception occurred
-     */
-    public void sendRedirect(String location, int status) throws IOException {
+    public void sendRedirect(String location, int status, boolean clearBuffer) throws IOException {
         if (isCommitted()) {
             throw new IllegalStateException(sm.getString("coyoteResponse.sendRedirect.ise"));
         }
@@ -1256,7 +1234,9 @@ public class Response implements HttpServletResponse {
         }
 
         // Clear any data content that has been buffered
-        resetBuffer(true);
+        if (clearBuffer) {
+            resetBuffer(true);
+        }
 
         // Generate a temporary redirect to the specified location
         try {
@@ -1274,7 +1254,7 @@ public class Response implements HttpServletResponse {
             }
             setStatus(status);
             setHeader("Location", locationUri);
-            if (context != null && context.getSendRedirectBody()) {
+            if (clearBuffer && context != null && context.getSendRedirectBody()) {
                 PrintWriter writer = getWriter();
                 writer.print(sm.getString("coyoteResponse.sendRedirect.note", Escape.htmlElementContent(locationUri)));
                 flushBuffer();

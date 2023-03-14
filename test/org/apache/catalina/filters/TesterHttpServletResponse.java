@@ -349,7 +349,7 @@ public class TesterHttpServletResponse implements HttpServletResponse {
     }
 
     @Override
-    public void sendRedirect(String location) throws IOException {
+    public void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException {
         /* NOOP */}
 
     @Override

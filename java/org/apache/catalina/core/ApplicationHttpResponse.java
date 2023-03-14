@@ -257,19 +257,15 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
 
 
     /**
+     * {@inheritDoc}
+     * <p>
      * Disallow <code>sendRedirect()</code> calls on an included response.
-     *
-     * @param location The new location
-     *
-     * @exception IOException if an input/output error occurs
      */
     @Override
-    public void sendRedirect(String location) throws IOException {
-
+    public void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException {
         if (!included) {
-            ((HttpServletResponse) getResponse()).sendRedirect(location);
+            ((HttpServletResponse) getResponse()).sendRedirect(location, sc, clearBuffer);
         }
-
     }
 
 

@@ -133,6 +133,10 @@
         <code>authenticationSessionTimeout</code> attribute of the FORM
         authenticator. (markt)
       </add>
+      <add>
+        Implement the new Servlet API methods that provide additional control
+        when sending a redirect to the client. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

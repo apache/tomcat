@@ -98,12 +98,40 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
     }
 
     /**
-     * The default behavior of this method is to return sendRedirect(String location) on the wrapped response object.
+     * The default behavior of this method is to call sendRedirect(String location) on the wrapped response object.
      */
     @Override
     public void sendRedirect(String location) throws IOException {
         this._getHttpServletResponse().sendRedirect(location);
     }
+
+    /**
+     * The default behavior of this method is to call sendRedirect(String location, int sc) on the wrapped response
+     * object.
+     */
+    @Override
+    public void sendRedirect(String location, int sc) throws IOException {
+        this._getHttpServletResponse().sendRedirect(location, sc);
+    }
+
+    /**
+     * The default behavior of this method is to call sendRedirect(String location, boolean clearBuffer) on the wrapped
+     * response object.
+     */
+    @Override
+    public void sendRedirect(String location, boolean clearBuffer) throws IOException {
+        this._getHttpServletResponse().sendRedirect(location, clearBuffer);
+    }
+
+    /**
+     * The default behavior of this method is to call sendRedirect(String location, int sc, boolean clearBuffer) on the
+     * wrapped response object.
+     */
+    @Override
+    public void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException {
+        this._getHttpServletResponse().sendRedirect(location, sc, clearBuffer);
+    }
+
 
     /**
      * The default behavior of this method is to call setDateHeader(String name, long date) on the wrapped response
