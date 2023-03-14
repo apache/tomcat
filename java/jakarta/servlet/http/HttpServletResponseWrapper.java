@@ -108,6 +108,8 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
     /**
      * The default behavior of this method is to call sendRedirect(String location, int sc) on the wrapped response
      * object.
+     *
+     * @since Servlet 6.1
      */
     @Override
     public void sendRedirect(String location, int sc) throws IOException {
@@ -117,6 +119,8 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
     /**
      * The default behavior of this method is to call sendRedirect(String location, boolean clearBuffer) on the wrapped
      * response object.
+     *
+     * @since Servlet 6.1
      */
     @Override
     public void sendRedirect(String location, boolean clearBuffer) throws IOException {
@@ -126,6 +130,8 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
     /**
      * The default behavior of this method is to call sendRedirect(String location, int sc, boolean clearBuffer) on the
      * wrapped response object.
+     *
+     * @since Servlet 6.1
      */
     @Override
     public void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException {

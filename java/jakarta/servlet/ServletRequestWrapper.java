@@ -116,6 +116,8 @@ public class ServletRequestWrapper implements ServletRequest {
     /**
      * The default behavior of this method is to set the character encoding on
      * the wrapped request object.
+     *
+     * @since Servlet 6.1
      */
     @Override
     public void setCharacterEncoding(Charset encoding) {

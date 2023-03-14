@@ -67,6 +67,8 @@ public final class ErrorData {
      *            The name of the servlet invoked
      * @param queryString
      *            The request query string
+     *
+     * @since JSP 4.0
      */
     public ErrorData(Throwable throwable, int statusCode, String uri,
             String servletName, String queryString) {
@@ -118,6 +120,8 @@ public final class ErrorData {
      * query string.
      *
      * @return The request query string
+     *
+     * @since JSP 4.0
      */
     public String getQueryString() {
         return this.queryString;

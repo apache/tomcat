@@ -146,6 +146,8 @@ public interface HttpServletResponse extends ServletResponse {
      * @exception IllegalStateException    If the response was already committed when this method was called
      *
      * @see #sendRedirect(String, int, boolean)
+     *
+     * @since Servlet 6.1
      */
     default void sendRedirect(String location, boolean clearBuffer) throws IOException {
         sendRedirect(location, SC_FOUND, clearBuffer);
@@ -166,6 +168,8 @@ public interface HttpServletResponse extends ServletResponse {
      * @exception IllegalStateException    If the response was already committed when this method was called
      *
      * @see #sendRedirect(String, int, boolean)
+     *
+     * @since Servlet 6.1
      */
     default void sendRedirect(String location, int sc) throws IOException {
         sendRedirect(location, sc, true);
@@ -203,6 +207,8 @@ public interface HttpServletResponse extends ServletResponse {
      * @exception IOException              If an input or output exception occurs
      * @exception IllegalArgumentException If a relative URL is given and cannot be converted into an absolute URL
      * @exception IllegalStateException    If the response was already committed when this method was called
+     *
+     * @since Servlet 6.1
      */
     void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException;
 
@@ -468,6 +474,8 @@ public interface HttpServletResponse extends ServletResponse {
     /**
      * Status code (308) indicating that the requested resource resides permanently under a different URI. The new URI
      * <em>SHOULD</em> be given by the <code><em>Location</em></code> field in the response.
+     *
+     * @since Servlet 6.1
      */
     int SC_PERMANENT_REDIRECT = 308;
 
@@ -574,12 +582,16 @@ public interface HttpServletResponse extends ServletResponse {
     /**
      * Status code (421) indicating that the server is unwilling or unable to produce an authoritative response for the
      * target URI.
+     *
+     * @since Servlet 6.1
      */
     int SC_MISDIRECTED_REQUEST = 421;
 
     /**
      * Status code (422) indicating that the server understands the content type of the request but is unable to process
      * the contained instructions.
+     *
+     * @since Servlet 6.1
      */
     int SC_UNPROCESSABLE_CONTENT = 422;
 
@@ -587,6 +599,8 @@ public interface HttpServletResponse extends ServletResponse {
      * Status code (426) indicating that the server refuses to perform the request using the current protocol but may be
      * willing to do so after the client upgrades to a different protocol. The server must include an appropriate
      * {@code Upgrade} header in the response.
+     *
+     * @since Servlet 6.1
      */
     int SC_UPGRADE_REQUIRED = 426;
 
