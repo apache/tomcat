@@ -1258,7 +1258,7 @@ public class Tomcat {
     }
 
     protected URL getWebappConfigFile(String path, String contextName) {
-        File docBase = new File(server.getCatalinaBase(), path);
+        File docBase = new File(path);
         if (docBase.isDirectory()) {
             return getWebappConfigFileFromDirectory(docBase, contextName);
         } else {
