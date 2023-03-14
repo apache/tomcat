@@ -326,15 +326,9 @@ public class Cache {
             long nc1 = cr1.getNextCheck();
             long nc2 = cr2.getNextCheck();
 
-            // Oldest resource should be first (so iterator goes from oldest to
-            // youngest.
-            if (nc1 == nc2) {
-                return 0;
-            } else if (nc1 > nc2) {
-                return -1;
-            } else {
-                return 1;
-            }
+            // Oldest resource (lowest next-check value) should be first (so
+            // iterator goes from oldest to youngest.
+            return Long.compare(nc1, nc2);
         }
     }
 }

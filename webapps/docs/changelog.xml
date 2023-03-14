@@ -128,6 +128,9 @@
         <code>Tomcat.addWebapp()</code> methods that incorrectly stated that the
         <code>docBase</code> parameter could be a relative path. (markt)
       </fix>
+      <fix>
+        <bug>66524</bug> Correct eviction ordering in WebResource cache to
+        by LRU as intended. (schultz)
     </changelog>
   </subsection>
   <subsection name="Coyote">
