@@ -138,7 +138,7 @@
       <code>application/x-www-form-urlencoded</code> or
       <code>multipart/form-data</code>. Request parameters beyond this limit
       will be ignored. A value of less than 0 means no limit. If not specified,
-      a default of 10000 is used. Note that <code>FailedRequestFilter</code>
+      a default of 1000 is used. Note that <code>FailedRequestFilter</code>
       <a href="filter.html">filter</a> can be used to reject requests that
       exceed the limit.</p>
     </attribute>
