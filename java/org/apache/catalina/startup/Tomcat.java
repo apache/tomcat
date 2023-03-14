@@ -239,7 +239,7 @@ public class Tomcat {
      *
      * @param contextPath The context mapping to use, "" for root context.
      * @param docBase     Base directory for the context, for static files. Must
-     *                        exist, relative to the server home
+     *                        exist and be an absolute path.
      *
      * @return the deployed context
      */
@@ -711,7 +711,7 @@ public class Tomcat {
      * @param host        The host in which the context will be deployed
      * @param contextPath The context mapping to use, "" for root context.
      * @param docBase     Base directory for the context, for static files. Must
-     *                        exist, relative to the server home
+     *                        exist and be an absolute path.
      *
      * @return the deployed context
      */
@@ -744,7 +744,7 @@ public class Tomcat {
      * @param host        The host in which the context will be deployed
      * @param contextPath The context mapping to use, "" for root context.
      * @param docBase     Base directory for the context, for static files. Must
-     *                        exist, relative to the server home
+     *                        exist and be an absolute path.
      * @param config      Custom context configuration helper. Any configuration
      *                        will be in addition to equivalent of the default
      *                        web.xml configuration described above.
@@ -1234,7 +1234,7 @@ public class Tomcat {
     }
 
     protected URL getWebappConfigFile(String path, String contextName) {
-        File docBase = new File(path);
+        File docBase = new File(server.getCatalinaBase(), path);
         if (docBase.isDirectory()) {
             return getWebappConfigFileFromDirectory(docBase, contextName);
         } else {

@@ -147,6 +147,11 @@
         Reduce the default value of <code>maxParameterCount</code> from 10,000
         to 1,000. (markt)
       </update>
+      <fix>
+        <bug>66527</bug>: Correct the Javadoc for the
+        <code>Tomcat.addWebapp()</code> methods that incorrectly stated that the
+        <code>docBase</code> parameter could be a relative path. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
