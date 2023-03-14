@@ -208,7 +208,7 @@ public class Cache {
         // used first. This is a background process so we can afford to take the
         // time to order the elements first
         TreeSet<CachedResource> orderedResources = new TreeSet<>(
-                Comparator.comparingLong(CachedResource::getNextCheck).reversed());
+                Comparator.comparingLong(CachedResource::getNextCheck));
         orderedResources.addAll(resourceCache.values());
 
         Iterator<CachedResource> iter = orderedResources.iterator();
