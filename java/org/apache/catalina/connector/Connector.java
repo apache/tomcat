@@ -198,7 +198,7 @@ public class Connector extends LifecycleMBeanBase {
      * The maximum number of parameters (GET plus POST) which will be automatically parsed by the container. 10000 by
      * default. A value of less than 0 means no limit.
      */
-    protected int maxParameterCount = 10000;
+    protected int maxParameterCount = 1000;
 
     /**
      * Maximum size of a POST which will be automatically parsed by the container. 2MB by default.
