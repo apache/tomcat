@@ -123,6 +123,11 @@
         <code>authenticationSessionTimeout</code> attribute of the FORM
         authenticator. (markt)
       </add>
+      <fix>
+        <bug>66527</bug>: Correct the Javadoc for the
+        <code>Tomcat.addWebapp()</code> methods that incorrectly stated that the
+        <code>docBase</code> parameter could be a relative path. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
