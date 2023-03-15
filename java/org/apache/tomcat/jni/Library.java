@@ -18,6 +18,8 @@ package org.apache.tomcat.jni;
 
 import java.io.File;
 
+import org.apache.catalina.Globals;
+
 public final class Library {
 
     /* Default library names */
@@ -30,7 +32,7 @@ public final class Library {
     private Library() throws Exception {
         boolean loaded = false;
         StringBuilder err = new StringBuilder();
-        File binLib = new File(System.getProperty("catalina.home"), "bin");
+        File binLib = new File(System.getProperty(Globals.CATALINA_HOME_PROP), "bin");
         for (int i = 0; i < NAMES.length; i++) {
             File library = new File(binLib, System.mapLibraryName(NAMES[i]));
             try {
