@@ -173,6 +173,7 @@ public class ChannelCreator {
             String key = (String) o;
             IntrospectionUtils.setProperty(sender, key, transportProperties.getProperty(key));
         }
+        IntrospectionUtils.clear();
         ps.setTransport(sender);
 
         McastService service = new McastService();
