@@ -155,6 +155,7 @@
       <fix>
         <bug>66524</bug> Correct eviction ordering in WebResource cache to
         by LRU as intended. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
