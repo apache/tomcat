@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.valves.rewrite;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
@@ -148,88 +149,95 @@ public class TestRewriteValve extends TomcatBaseTest {
             "RewriteRule ^(.*) ${lc:$1}", "/c/a%2520aa", "/c/a%20aa");
     }
 
+
+    private static String getTestConfDirectory() {
+        File f = new File("test/conf");
+        return f.getAbsolutePath() + File.separator;
+    }
+
+
     @Test
     public void testRewriteMap12() throws Exception {
-        doTestRewrite("RewriteMap mapb txt:../../../test/conf/TesterRewriteMapB.txt\n" +
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt\n" +
             "RewriteRule /b/(.*).html$ /c/${mapb:$1}", "/b/a.html", "/c/aa");
     }
 
     @Test
     public void testRewriteMap13() throws Exception {
-        doTestRewrite("RewriteMap mapb txt:../../../test/conf/TesterRewriteMapB.txt\n" +
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt\n" +
             "RewriteRule /b/(.*).html$ /c/${mapb:$1|dd}", "/b/x.html", "/c/dd");
     }
 
     // BZ 62667
     @Test
     public void testRewriteMap14() throws Exception {
-        doTestRewrite("RewriteMap mapb txt:../../../test/conf/TesterRewriteMapB.txt\n" +
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt\n" +
             "RewriteRule /b/(.*).html$ /c/${mapb:$1|d$1d}", "/b/x.html", "/c/dxd");
     }
 
     @Test
     public void testRewriteMap15() throws Exception {
-        doTestRewrite("RewriteMap mapb txt:../../../test/conf/TesterRewriteMapB.txt\n" +
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt\n" +
             "RewriteRule /b/(.*).html$ /c/${mapb:a$1|dd}", "/b/a.html", "/c/aaaa");
     }
 
     @Test
     public void testRewriteMap16() throws Exception {
-        doTestRewrite("RewriteMap mapb txt:../../../test/conf/TesterRewriteMapB.txt\n" +
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt\n" +
             "RewriteRule /b/.* /c/${mapb:a}", "/b/a.html", "/c/aa");
     }
 
     @Test
     public void testRewriteMap17() throws Exception {
-        doTestRewrite("RewriteMap mapb txt:../../../test/conf/TesterRewriteMapB.txt\n" +
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt\n" +
             "RewriteRule /b/.* /c/${mapb:${mapb:a}}", "/b/a.html", "/c/aaaa");
     }
 
     @Test
     public void testRewriteMap18() throws Exception {
-        doTestRewrite("RewriteMap mapb txt:../../../test/conf/TesterRewriteMapB.txt\n" +
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt\n" +
             "RewriteRule /b/.* /c/${mapb:${mapb:a}}", "/b/a.html", "/c/aaaa");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testRewriteMap19() throws Exception {
-        doTestRewrite("RewriteMap mapb txt:../../../test/conf/TesterRewriteMapB.txt first\n" +
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt first\n" +
             "RewriteRule /b/(.*).html$ /c/${mapb:$1}", "/b/aa.html", "/c/aaaa");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testRewriteMap20() throws Exception {
-        doTestRewrite("RewriteMap mapb txt:../../../test/conf/TesterRewriteMapB.txt first second\n" +
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt first second\n" +
             "RewriteRule /b/(.*).html$ /c/${mapb:$1}", "/b/aa.html", "/c/aaaa");
     }
 
     @Test
     public void testRewriteMap21() throws Exception {
-        doTestRewrite("RewriteMap mapb rnd:../../../test/conf/TesterRewriteMapC.txt\n" +
+        doTestRewrite("RewriteMap mapb rnd:" + getTestConfDirectory() + "TesterRewriteMapC.txt\n" +
             "RewriteRule /b/(.*).html$ /c/${mapb:$1}", "/b/a.html", "/c/aa");
     }
 
     //This test should succeed 50% of the runs as it depends on a random choice
     public void testRewriteMap22() throws Exception {
-        doTestRewrite("RewriteMap mapb rnd:../../../test/conf/TesterRewriteMapC.txt\n" +
+        doTestRewrite("RewriteMap mapb rnd:" + getTestConfDirectory() + "TesterRewriteMapC.txt\n" +
             "RewriteRule /b/(.*).html$ /c/${mapb:$1}", "/b/b.html", "/c/bb");
     }
 
     @Test
     public void testRewriteMap23() throws Exception {
-        doTestRewrite("RewriteMap mapb rnd:../../../test/conf/TesterRewriteMapC.txt\n" +
+        doTestRewrite("RewriteMap mapb rnd:" + getTestConfDirectory() + "TesterRewriteMapC.txt\n" +
             "RewriteRule /b/(.*).html$ /c/${mapb:$1}", "/b/aa.html", "/c/aaaa");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testRewriteMap24() throws Exception {
-        doTestRewrite("RewriteMap mapb rnd:../../../test/conf/TesterRewriteMapC.txt first\n" +
+        doTestRewrite("RewriteMap mapb rnd:" + getTestConfDirectory() + "TesterRewriteMapC.txt first\n" +
             "RewriteRule /b/(.*).html$ /c/${mapb:$1}", "/b/aa.html", "/c/aaaa");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testRewriteMap25() throws Exception {
-        doTestRewrite("RewriteMap mapb rnd:../../../test/conf/TesterRewriteMapC.txt first second\n" +
+        doTestRewrite("RewriteMap mapb rnd:" + getTestConfDirectory() + "TesterRewriteMapC.txt first second\n" +
             "RewriteRule /b/(.*).html$ /c/${mapb:$1}", "/b/aa.html", "/c/aaaa");
     }
 
