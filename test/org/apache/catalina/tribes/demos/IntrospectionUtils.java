@@ -191,10 +191,7 @@ public final class IntrospectionUtils {
     }
 
     // -------------------- other utils --------------------
-    /**
-     * @deprecated Not used, but code must be updated to call it
-     */
-    @Deprecated
+
     public static void clear() {
         objectMethods.clear();
     }
