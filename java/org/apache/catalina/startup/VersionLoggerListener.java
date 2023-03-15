@@ -113,9 +113,9 @@ public class VersionLoggerListener implements LifecycleListener {
         log.info(sm.getString("versionLoggerListener.vm.vendor",
                 System.getProperty("java.vm.vendor")));
         log.info(sm.getString("versionLoggerListener.catalina.base",
-                System.getProperty("catalina.base")));
+                System.getProperty(Constants.CATALINA_BASE_PROP)));
         log.info(sm.getString("versionLoggerListener.catalina.home",
-                System.getProperty("catalina.home")));
+                System.getProperty(Constants.CATALINA_HOME_PROP)));
 
         if (logArgs) {
             List<String> args = ManagementFactory.getRuntimeMXBean().getInputArguments();
