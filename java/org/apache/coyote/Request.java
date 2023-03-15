@@ -388,7 +388,7 @@ public final class Request {
      * @return The value set via {@link #setCharset(Charset)} or if no call has been made to that method try to obtain
      *             if from the content type.
      *
-     * @deprecated Unused. This method will be removed in Tomcat 11.
+     * @deprecated Unused. This method will be removed in Tomcat 12.
      */
     @Deprecated
     public String getCharacterEncoding() {
@@ -408,7 +408,7 @@ public final class Request {
      *
      * @throws UnsupportedEncodingException If the user agent has specified an invalid character encoding
      *
-     * @deprecated Unused. This method will be removed in Tomcat 11.
+     * @deprecated Unused. This method will be removed in Tomcat 12.
      */
     @Deprecated
     public Charset getCharset() throws UnsupportedEncodingException {
@@ -426,7 +426,7 @@ public final class Request {
      *
      * @param charset The Charset to use for the request
      *
-     * @deprecated Unused. This method will be removed in Tomcat 11.
+     * @deprecated Unused. This method will be removed in Tomcat 12.
      */
     @Deprecated
     public void setCharset(Charset charset) {
