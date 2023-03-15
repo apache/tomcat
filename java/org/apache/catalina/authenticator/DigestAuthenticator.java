@@ -558,12 +558,6 @@ public class DigestAuthenticator extends AuthenticatorBase {
             return true;
         }
 
-        @Deprecated
-        public boolean validate(Request request) {
-            List<AuthDigest> fallbackList = Arrays.asList(FALLBACK_DIGEST);
-            return validate(request, fallbackList);
-        }
-
         public boolean validate(Request request, List<AuthDigest> algorithms) {
             if ((userName == null) || (realmName == null) || (nonce == null) || (uri == null) || (response == null)) {
                 return false;

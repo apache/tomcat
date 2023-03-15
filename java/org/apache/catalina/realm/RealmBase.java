@@ -328,14 +328,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     }
 
 
-    @Deprecated
-    @Override
-    public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
-            String qop, String realm, String digestA2) {
-        return authenticate(username, clientDigest, nonce, nc, cnonce, qop, realm, digestA2, "MD5");
-    }
-
-
     @Override
     public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
             String qop, String realm, String digestA2, String algorithm) {
@@ -1025,22 +1017,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             }
         }
         return false;
-    }
-
-
-    /**
-     * Return the digest associated with given principal's user name.
-     *
-     * @param username  The user name
-     * @param realmName The realm name
-     *
-     * @return the digest for the specified user
-     *
-     * @deprecated Unused. Use {@link #getDigest(String, String, String)}. Will be removed in Tomcat 11.
-     */
-    @Deprecated
-    protected String getDigest(String username, String realmName) {
-        return getDigest(username, realmName, "MD5");
     }
 
 
