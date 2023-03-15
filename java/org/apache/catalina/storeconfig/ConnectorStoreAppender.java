@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.tomcat.util.IntrospectionUtils;
@@ -281,7 +282,7 @@ public class ConnectorStoreAppender extends StoreAppender {
 
     protected File getCatalinaBase() {
 
-        File file = new File(System.getProperty("catalina.base"));
+        File file = new File(System.getProperty(Globals.CATALINA_BASE_PROP));
         try {
             file = file.getCanonicalFile();
         } catch (IOException e) {
