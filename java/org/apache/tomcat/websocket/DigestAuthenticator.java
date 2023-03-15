@@ -102,6 +102,7 @@ public class DigestAuthenticator extends Authenticator {
         boolean session = false;
         if (algorithm.endsWith("-sess")) {
             algorithm = algorithm.substring(0, algorithm.length() - 5);
+            session = true;
         }
 
         StringBuilder preDigest = new StringBuilder();
