@@ -173,6 +173,8 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                 }
                 break;
             case ERROR:
+                // Need to clear any in-progress writes before trying to send a close frame
+                wsRemoteEndpointServer.clearHandler(socketWrapper.getError(), false);
                 String msg = sm.getString("wsHttpUpgradeHandler.closeOnError");
                 wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
                         new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
