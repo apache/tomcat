@@ -118,7 +118,7 @@ if not "%JRE_HOME%" == "" goto okJavaHome
 set "JRE_HOME=%JAVA_HOME%"
 goto okJavaHome
 :noJavaHome
-echo The JAVA_HOME environment variable is not defined correctly
+echo The JAVA_HOME environment variable "%JAVA_HOME%" is not defined correctly
 echo This environment variable is needed to run this program
 echo NB: JAVA_HOME should point to a JDK not a JRE
 exit /b 1
