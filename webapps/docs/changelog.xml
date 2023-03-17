@@ -160,6 +160,13 @@
         <bug>66512</bug>: Align AJP handling of invalid HTTP response headers
         (they are now removed from the response) with HTTP. (markt)
       </fix>
+      <fix>
+        <bug>66530</bug>: Correct a regression in the fix for bug
+        <bug>66442</bug> that meant that streams without a response body did not
+        decrement the active stream count when completing leading to
+        <code>ERR_HTTP2_SERVER_REFUSED_STREAM</code> for some connections.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

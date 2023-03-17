@@ -708,7 +708,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
         stream.sentHeaders();
         if (endOfStream) {
-            stream.sentEndOfStream();
+            sentEndOfStream(stream);
         }
     }
 
@@ -813,10 +813,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         header[3] = FrameType.DATA.getIdByte();
         if (finished) {
             header[4] = FLAG_END_OF_STREAM;
-            stream.sentEndOfStream();
-            if (!stream.isActive()) {
-                setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
-            }
+            sentEndOfStream(stream);
         }
         if (writable) {
             ByteUtil.set31Bits(header, 5, stream.getIdAsInt());
@@ -833,6 +830,14 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             } finally {
                 socketWrapper.getLock().unlock();
             }
+        }
+    }
+
+
+    protected void sentEndOfStream(Stream stream) {
+        stream.sentEndOfStream();
+        if (!stream.isActive()) {
+            setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
         }
     }
 
