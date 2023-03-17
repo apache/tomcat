@@ -27,6 +27,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -71,6 +72,21 @@ import org.ietf.jgss.GSSName;
 public abstract class RealmBase extends LifecycleMBeanBase implements org.apache.catalina.GSSRealm {
 
     private static final Log log = LogFactory.getLog(RealmBase.class);
+
+    /**
+     * The character used for delimiting user attribute names.
+     * <p>
+     * Applies to some of the Realm implementations only.
+     */
+    protected static final String USER_ATTRIBUTES_DELIMITER = ",";
+
+    /**
+     * The character used as wildcard in user attribute lists. Using it means
+     * <i>query all available user attributes</i>.
+     * <p>
+     * Applies to some of the Realm implementations only.
+     */
+    protected static final String USER_ATTRIBUTES_WILDCARD = "*";
 
     private static final List<Class<? extends DigestCredentialHandlerBase>> credentialHandlerClasses = new ArrayList<>();
 
@@ -141,6 +157,22 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
 
     private int transportGuaranteeRedirectStatus = HttpServletResponse.SC_FOUND;
+
+
+    /**
+     * The comma separated names of user attributes to additionally query from the
+     * realm. These will be provided to the user through the created
+     * Principal's <i>attributes</i> map. Support for this feature is optional.
+     */
+    protected String userAttributes = null;
+
+
+    /**
+     * The list of user attributes to additionally query from the
+     * realm. These will be provided to the user through the created
+     * Principal's <i>attributes</i> map. Support for this feature is optional.
+     */
+    protected List<String> userAttributesList = null;
 
 
     // ------------------------------------------------------------- Properties
@@ -263,6 +295,33 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
         this.stripRealmForGss = stripRealmForGss;
     }
 
+
+    /**
+     * @return the comma separated names of user attributes to additionally query from realm
+     */
+    public String getUserAttributes() {
+        return userAttributes;
+    }
+
+    /**
+     * Set the comma separated names of user attributes to additionally query from
+     * the realm. These will be provided to the user through the created
+     * Principal's <i>attributes</i> map. In this map, each field value is bound to
+     * the field's name, that is, the name of the field serves as the key of the
+     * mapping.
+     * <p>
+     * If set to the wildcard character, or, if the wildcard character is part of
+     * the comma separated list, all available attributes - except the
+     * <i>password</i> attribute (as specified by <code>userCredCol</code>) - are
+     * queried. The wildcard character is defined by constant
+     * {@link RealmBase#USER_ATTRIBUTES_WILDCARD}. It defaults to the asterisk (*)
+     * character.
+     *
+     * @param userAttributes the comma separated names of user attributes
+     */
+    public void setUserAttributes(String userAttributes) {
+        this.userAttributes = userAttributes;
+    }
 
     // --------------------------------------------------------- Public Methods
 
@@ -854,6 +913,40 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
 
     /**
+     * Parse the specified delimiter separated attribute names and return a list of
+     * that names or <code>null</code>, if no attributes have been specified.
+     * <p>
+     * If a wildcard character is found, return a list consisting of a single
+     * wildcard character only.
+     *
+     * @param userAttributes comma separated names of attributes to parse
+     * @return a list containing the parsed attribute names or <code>null</code>, if
+     *         no attributes have been specified
+     */
+    protected List<String> parseUserAttributes(String userAttributes) {
+        if (userAttributes == null) {
+            return null;
+        }
+        List<String> attrs = new ArrayList<>();
+        for (String name : userAttributes.split(USER_ATTRIBUTES_DELIMITER)) {
+            name = name.trim();
+            if (name.length() == 0) {
+                continue;
+            }
+            if (name.equals(USER_ATTRIBUTES_WILDCARD)) {
+                return Collections.singletonList(USER_ATTRIBUTES_WILDCARD);
+            }
+            if (attrs.contains(name)) {
+                // skip duplicates
+                continue;
+            }
+            attrs.add(name);
+        }
+        return attrs.size() > 0 ? attrs : null;
+    }
+
+
+    /**
      * Check if the specified Principal has the specified security role, within the context of this Realm. This method
      * or {@link #hasRoleInternal(Principal, String)} can be overridden by Realm implementations, but the default is
      * adequate when an instance of <code>GenericPrincipal</code> is used to represent authenticated Principals from
@@ -992,7 +1085,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
         if (credentialHandler == null) {
             credentialHandler = new MessageDigestCredentialHandler();
         }
-
+        if (userAttributes != null) {
+            userAttributesList = parseUserAttributes(userAttributes);
+        }
         setState(LifecycleState.STARTING);
     }
 
