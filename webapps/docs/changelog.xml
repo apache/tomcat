@@ -156,6 +156,10 @@
         <bug>66524</bug> Correct eviction ordering in WebResource cache to
         by LRU as intended. (schultz)
       </fix>
+      <update>
+        Add support code for custom user attributes in <code>RealmBase</code>.
+        Based on code from <pr>473</pr> by Carsten Klein. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
