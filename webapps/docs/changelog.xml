@@ -142,6 +142,10 @@
         <code>DigestAuthenticator</code> with a default of
         <code>SHA-256,MD5</code>. (markt)
       </add>
+      <update>
+        Add support code for custom user attributes in <code>RealmBase</code>.
+        Based on code from <pr>473</pr> by Carsten Klein. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
