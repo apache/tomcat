@@ -202,7 +202,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             }
         }
         if (endOfStream) {
-            stream.sentEndOfStream();
+            sentEndOfStream(stream);
         }
     }
 
@@ -226,10 +226,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         header[3] = FrameType.DATA.getIdByte();
         if (finished) {
             header[4] = FLAG_END_OF_STREAM;
-            stream.sentEndOfStream();
-            if (!stream.isActive()) {
-                setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
-            }
+            sentEndOfStream(stream);
         }
         if (writable) {
             ByteUtil.set31Bits(header, 5, stream.getIdAsInt());
@@ -349,10 +346,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             header[3] = FrameType.DATA.getIdByte();
             if (finished) {
                 header[4] = FLAG_END_OF_STREAM;
-                sendfile.stream.sentEndOfStream();
-                if (!sendfile.stream.isActive()) {
-                    setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
-                }
+                sentEndOfStream(sendfile.stream);
             }
             if (writable) {
                 if (log.isDebugEnabled()) {
@@ -433,10 +427,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 header[3] = FrameType.DATA.getIdByte();
                 if (finished) {
                     header[4] = FLAG_END_OF_STREAM;
-                    sendfile.stream.sentEndOfStream();
-                    if (!sendfile.stream.isActive()) {
-                        setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
-                    }
+                    sentEndOfStream(sendfile.stream);
                 }
                 if (writable) {
                     if (log.isDebugEnabled()) {
