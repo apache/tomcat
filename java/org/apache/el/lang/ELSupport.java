@@ -635,7 +635,11 @@ public class ELSupport {
                     if (!Modifier.isAbstract(method.getModifiers())) {
                         throw new ELException(MessageFactory.get("elSupport.coerce.nonAbstract", type, method));
                     }
-                    return lambdaExpression.invoke(ctx, args);
+                    if (ctx == null) {
+                        return lambdaExpression.invoke(args);
+                    } else {
+                        return lambdaExpression.invoke(ctx, args);
+                    }
                 });
             return result;
         };
@@ -695,6 +699,9 @@ public class ELSupport {
     }
 
 
+    /*
+     * Copied to jakarta.el.ELContext - keep in sync
+     */
     static boolean isFunctionalInterface(Class<?> type) {
 
         if (!type.isInterface()) {
@@ -722,6 +729,9 @@ public class ELSupport {
     }
 
 
+    /*
+     * Copied to jakarta.el.ELContext - keep in sync
+     */
     private static boolean overridesObjectMethod(Method method) {
         // There are three methods that can be overridden
         if ("equals".equals(method.getName())) {
