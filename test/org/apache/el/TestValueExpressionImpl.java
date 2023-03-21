@@ -247,7 +247,7 @@ public class TestValueExpressionImpl {
     @Test
     public void testOptional01() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl();
+        ELContext context = new ELContextImpl(factory);
 
         final String data = "some data";
 
@@ -271,7 +271,7 @@ public class TestValueExpressionImpl {
     @Test
     public void testOptional02() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl();
+        ELContext context = new ELContextImpl(factory);
 
         TesterBeanJ beanJ = new TesterBeanJ();
 
@@ -290,7 +290,7 @@ public class TestValueExpressionImpl {
     @Test
     public void testOptional03() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl();
+        ELContext context = new ELContextImpl(factory);
 
         final String data = "some data";
 
@@ -312,7 +312,7 @@ public class TestValueExpressionImpl {
     @Test
     public void testOptional04() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl();
+        ELContext context = new ELContextImpl(factory);
 
         TesterBeanJ beanJ = new TesterBeanJ();
 
