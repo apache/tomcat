@@ -16,6 +16,8 @@
  */
 package jakarta.el;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -310,6 +312,71 @@ public abstract class ELContext {
             setPropertyResolved(originalResolved);
         }
 
+        if (obj instanceof LambdaExpression && isFunctionalInterface(type)) {
+            ((LambdaExpression) obj).setELContext(this);
+        }
+
         return ELManager.getExpressionFactory().coerceToType(obj, type);
+    }
+
+
+    /*
+     * Copied from org.apache.el.lang.ELSupport - keep in sync
+     */
+    static boolean isFunctionalInterface(Class<?> type) {
+
+        if (!type.isInterface()) {
+            return false;
+        }
+
+        boolean foundAbstractMethod = false;
+        Method[] methods = type.getMethods();
+        for (Method method : methods) {
+            if (Modifier.isAbstract(method.getModifiers())) {
+                // Abstract methods that override one of the public methods
+                // of Object don't count
+                if (overridesObjectMethod(method)) {
+                    continue;
+                }
+                if (foundAbstractMethod) {
+                    // Found more than one
+                    return false;
+                } else {
+                    foundAbstractMethod = true;
+                }
+            }
+        }
+        return foundAbstractMethod;
+    }
+
+
+    /*
+     * Copied from org.apache.el.lang.ELSupport - keep in sync
+     */
+    private static boolean overridesObjectMethod(Method method) {
+        // There are three methods that can be overridden
+        if ("equals".equals(method.getName())) {
+            if (method.getReturnType().equals(boolean.class)) {
+                if (method.getParameterCount() == 1) {
+                    if (method.getParameterTypes()[0].equals(Object.class)) {
+                        return true;
+                    }
+                }
+            }
+        } else if ("hashCode".equals(method.getName())) {
+            if (method.getReturnType().equals(int.class)) {
+                if (method.getParameterCount() == 0) {
+                    return true;
+                }
+            }
+        } else if ("toString".equals(method.getName())) {
+            if (method.getReturnType().equals(String.class)) {
+                if (method.getParameterCount() == 0) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

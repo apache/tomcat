@@ -187,6 +187,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Fix bug that meant some instances of coercing a
+        <code>LambdaExpression</code> to a functional interface invocation
+        failed. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
