@@ -453,8 +453,8 @@ class ParserController implements TagConstants {
                 continue;
             }
 
-            // compare for "tag ", so we don't match "taglib"
-            if (jspReader.matches("tag ") || jspReader.matches("page")) {
+            // Want to match tag and page but not taglib
+            if (jspReader.matches("tag") && !jspReader.matches("lib") || jspReader.matches("page")) {
 
                 jspReader.skipSpaces();
                 Attributes attrs = Parser.parseAttributes(this, jspReader);
