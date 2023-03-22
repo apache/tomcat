@@ -512,7 +512,7 @@ public abstract class HttpServlet extends GenericServlet {
      * Is the provided HTTP request header considered sensitive and therefore should be excluded from the response to a
      * {@code TRACE} request?
      * <p>
-     * By default, the headers thats start with any of the following are considered sensitive:
+     * By default, the headers that start with any of the following are considered sensitive:
      * <ul>
      * <li>authorization</li>
      * <li>cookie</li>
@@ -527,10 +527,8 @@ public abstract class HttpServlet extends GenericServlet {
      *
      * @return (@code true} if the HTTP request header is considered sensitive and should be excluded from the response
      *             to a {@code TRACE} request, otherwise {@code false}
-     *
-     * @since Servlet 6.1
      */
-    protected boolean isSensitiveHeader(String headerName) {
+    private boolean isSensitiveHeader(String headerName) {
         String lcHeaderName = headerName.toLowerCase(Locale.ENGLISH);
         for (String sensitiveHeaderName : SENSITIVE_HTTP_HEADERS) {
             if (lcHeaderName.startsWith(sensitiveHeaderName)) {
