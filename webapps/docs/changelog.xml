@@ -149,7 +149,7 @@
       <fix>
         Expand the set of HTTP request headers considered sensitive that should
         be skipped when generating a response to a <code>TRACE</code> request.
-        This aligns with 11.0.x. (markt)  
+        This aligns with 11.0.x. (markt)
       </fix>
     </changelog>
   </subsection>
