@@ -146,6 +146,11 @@
         Add support code for custom user attributes in <code>RealmBase</code>.
         Based on code from <pr>473</pr> by Carsten Klein. (remm)
       </update>
+      <fix>
+        Expand the set of HTTP request headers considered sensitive that should
+        be skipped when generating a response to a <code>TRACE</code> request.
+        This aligns with 11.0.x. (markt)  
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

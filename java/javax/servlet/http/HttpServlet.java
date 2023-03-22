@@ -24,11 +24,11 @@ import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
@@ -82,13 +82,9 @@ public abstract class HttpServlet extends GenericServlet {
     private static final String LSTRING_FILE = "javax.servlet.http.LocalStrings";
     private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
-    private static final Set<String> SENSITIVE_HTTP_HEADERS = new HashSet<>();
+    private static final List<String> SENSITIVE_HTTP_HEADERS = Arrays.asList("authorization", "cookie", "x-forwarded",
+            "forwarded", "proxy-authorization");
 
-
-    static {
-        SENSITIVE_HTTP_HEADERS.add("cookie");
-        SENSITIVE_HTTP_HEADERS.add("authorization");
-    }
 
 
     /**
@@ -456,7 +452,7 @@ public abstract class HttpServlet extends GenericServlet {
         while (reqHeaderNames.hasMoreElements()) {
             String headerName = reqHeaderNames.nextElement();
             // RFC 7231, 4.3.8 - skip 'sensitive' headers
-            if (!SENSITIVE_HTTP_HEADERS.contains(headerName.toLowerCase(Locale.ENGLISH))) {
+            if (!isSensitiveHeader(headerName)) {
                 Enumeration<String> headerValues = req.getHeaders(headerName);
                 while (headerValues.hasMoreElements()) {
                     String headerValue = headerValues.nextElement();
@@ -474,6 +470,37 @@ public abstract class HttpServlet extends GenericServlet {
         ServletOutputStream out = resp.getOutputStream();
         out.print(buffer.toString());
         out.close();
+    }
+
+
+    /**
+     * Is the provided HTTP request header considered sensitive and therefore should be excluded from the response to a
+     * {@code TRACE} request?
+     * <p>
+     * By default, the headers that start with any of the following are considered sensitive:
+     * <ul>
+     * <li>authorization</li>
+     * <li>cookie</li>
+     * <li>x-forwarded</li>
+     * <li>forwarded</li>
+     * <li>proxy-authorization</li>
+     * </ul>
+     * <p>
+     * Note that HTTP header names are case insensitive.
+     *
+     * @param headerName the name of the HTTP request header to test
+     *
+     * @return (@code true} if the HTTP request header is considered sensitive and should be excluded from the response
+     *             to a {@code TRACE} request, otherwise {@code false}
+     */
+    private boolean isSensitiveHeader(String headerName) {
+        String lcHeaderName = headerName.toLowerCase(Locale.ENGLISH);
+        for (String sensitiveHeaderName : SENSITIVE_HTTP_HEADERS) {
+            if (lcHeaderName.startsWith(sensitiveHeaderName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
