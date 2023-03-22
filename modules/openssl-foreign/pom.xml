@@ -31,7 +31,7 @@
     <version>0.1-SNAPSHOT</version>
 
     <properties>
-        <tomcat.version>9.0.68</tomcat.version>
+        <tomcat.version>9.0.72</tomcat.version>
         <project.build.outputTimestamp>2021-12-02T12:00:00Z</project.build.outputTimestamp>
     </properties>
 
