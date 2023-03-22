@@ -200,6 +200,10 @@
         <code>LambdaExpression</code> to a functional interface invocation
         failed. (markt)
       </fix>
+      <fix>
+        <bug>66536</bug>: Fix parsing of tag files that meant that tag
+        directives could be ignored for some tag files. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
