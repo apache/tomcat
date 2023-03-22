@@ -164,7 +164,7 @@
         Expand the set of HTTP request headers considered sensitive that should
         be skipped when generating a response to a <code>TRACE</code> request.
         This aligns with the current draft of the Servlet 6.1 specification.
-        (markt)  
+        (markt)
       </fix>
     </changelog>
   </subsection>
