@@ -160,6 +160,12 @@
         Add support code for custom user attributes in <code>RealmBase</code>.
         Based on code from <pr>473</pr> by Carsten Klein. (remm)
       </update>
+      <fix>
+        Expand the set of HTTP request headers considered sensitive that should
+        be skipped when generating a response to a <code>TRACE</code> request.
+        This aligns with the current draft of the Servlet 6.1 specification.
+        (markt)  
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
