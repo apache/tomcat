@@ -84,7 +84,7 @@
         attribute will have no effect.
       </attribute>
       <attribute name="maxValidTime" required="false">
-        FileMessageFactory instances used by the FarmWarDeployer are  only
+        FileMessageFactory instances used by the FarmWarDeployer are only
         retained while they are required. When receiving a WAR file, the
         associated FileMessageFactory instance is deleted once the WAR file has
         been fully received. To avoid memory leaks under various error
@@ -94,7 +94,7 @@
         maximum time is exceeded, the FileMessageFactory will be deleted and the
         WAR file transfer will fail for that node. If a negative value is
         specified, the FileMessageFactory will only be removed once the WAR file
-        is fully recieved. If not specified, the default value of 300 (5
+        is fully received. If not specified, the default value of 300 (5
         minutes) will be used.
       </attribute>
     </attributes>
