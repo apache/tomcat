@@ -915,6 +915,15 @@
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
   </Match>
   <Match>
+    <!-- Delegation to URL methods is deliberate -->
+    <Class name="org.apache.catalina.webresources.CachedResource"/>
+    <Or>
+      <Method name="equals"/>
+      <Method name="hashCode"/>
+    </Or>
+    <Bug pattern="DMI_BLOCKING_METHODS_ON_URL"/>
+  </Match>
+  <Match>
     <!-- Class lock is not an instance lock -->
     <Class name="org.apache.catalina.webresources.TomcatURLStreamHandlerFactory"/>
     <Field name="instance"/>
