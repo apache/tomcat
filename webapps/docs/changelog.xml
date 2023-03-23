@@ -166,6 +166,14 @@
         This aligns with the current draft of the Servlet 6.1 specification.
         (markt)
       </fix>
+      <fix>
+        <bug>66541</bug>: Improve handling for cached resources for resources
+        that use custom URL schemes. The scheme specific <code>equals()</code>
+        and <code>hashcode()</code> algorithms, if present, will now be used for
+        URLs for these resources. This addresses a potential performance issue
+        with some OSGi custom URL schemes that can trigger potentially slow DNS
+        lookups in some configurations. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

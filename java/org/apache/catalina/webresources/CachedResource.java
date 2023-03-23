@@ -456,6 +456,40 @@ public class CachedResource implements WebResource {
                 return constructedURL.openConnection();
             }
         }
+
+        /**
+         * {@inheritDoc}
+         * <p>
+         * We don't know what the requirements are for equals for the wrapped resourceURL so if u1 is the wrapped
+         * resourceURL, delegate to the resourceURL and it's handler. Otherwise, use the default implementation from
+         * URLStreamHandler.
+         */
+        @Override
+        protected boolean equals(URL u1, URL u2) {
+            // Deliberate use of ==
+            if (resourceURL == u1) {
+                return resourceURL.equals(u2);
+            }
+            // Not the original resourceURL. Use the default implementation from URLStreamHandler.
+            return super.equals(u1, u2);
+        }
+
+        /**
+         * {@inheritDoc}
+         * <p>
+         * We don't know what the requirements are for hashcode for the wrapped resourceURL so if u1 is the wrapped
+         * resourceURL, delegate to the resourceURL and it's handler. Otherwise, use the default implementation from
+         * URLStreamHandler.
+         */
+        @Override
+        protected int hashCode(URL u) {
+            // Deliberate use of ==
+            if (resourceURL == u) {
+                return resourceURL.hashCode();
+            }
+            // Not the original resourceURL. Use the default implementation from URLStreamHandler.
+            return super.hashCode(u);
+        }
     }
 
 
