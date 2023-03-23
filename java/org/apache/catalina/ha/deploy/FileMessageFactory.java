@@ -110,15 +110,6 @@ public class FileMessageFactory {
     protected boolean isWriting = false;
 
     /**
-     * The time this instance was created. (in milliseconds)
-     *
-     * @deprecated Unused. This will be removed in Tomcat 11.
-     */
-    @Deprecated
-    protected long creationTime = 0;
-
-
-    /**
      * The time this instance was last modified.
      */
     protected long lastModified = 0;
@@ -158,7 +149,6 @@ public class FileMessageFactory {
             totalNrOfMessages = (size / READ_SIZE) + 1;
             in = new FileInputStream(f);
         } // end if
-        creationTime = System.currentTimeMillis();
         lastModified = System.currentTimeMillis();
     }
 
