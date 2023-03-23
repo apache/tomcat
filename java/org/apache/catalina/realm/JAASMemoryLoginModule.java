@@ -238,7 +238,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         if (callbackHandler == null) {
             throw new LoginException("No CallbackHandler specified");
         }
-        Callback callbacks[] = new Callback[9];
+        Callback callbacks[] = new Callback[10];
         callbacks[0] = new NameCallback("Username: ");
         callbacks[1] = new PasswordCallback("Password: ", false);
         callbacks[2] = new TextInputCallback("nonce");
