@@ -111,11 +111,20 @@ public class FileMessageFactory {
 
     /**
      * The time this instance was created. (in milliseconds)
+     *
+     * @deprecated Unused. This will be removed in Tomcat 11.
      */
+    @Deprecated
     protected long creationTime = 0;
 
+
     /**
-     * The maximum valid time(in seconds) from creationTime.
+     * The time this instance was last modified.
+     */
+    protected long lastModified = 0;
+
+    /**
+     * The maximum time (in seconds) this instance will be allowed to exist from lastModifiedTime.
      */
     protected int maxValidTime = -1;
 
@@ -150,6 +159,7 @@ public class FileMessageFactory {
             in = new FileInputStream(f);
         } // end if
         creationTime = System.currentTimeMillis();
+        lastModified = System.currentTimeMillis();
     }
 
     /**
@@ -230,6 +240,9 @@ public class FileMessageFactory {
                     HexUtils.toHexString(msg.getData()), Integer.valueOf(msg.getDataLength())));
             return false;
         }
+
+        // Have received a new message. Update the last modified time (even if the message is being buffered for now).
+        lastModified = System.currentTimeMillis();
 
         FileMessage next = null;
         synchronized (this) {
@@ -350,11 +363,15 @@ public class FileMessageFactory {
     public boolean isValid() {
         if (maxValidTime > 0) {
             long timeNow = System.currentTimeMillis();
-            int timeIdle = (int) ((timeNow - creationTime) / 1000L);
+            long timeIdle = (timeNow - lastModified) / 1000L;
             if (timeIdle > maxValidTime) {
                 cleanup();
-                if (file.exists() && !file.delete()) {
-                    log.warn(sm.getString("fileMessageFactory.deleteFail", file));
+                if (file.exists()) {
+                    if (file.delete()) {
+                        log.warn(sm.getString("fileMessageFactory.delete", file, Long.toString(maxValidTime)));
+                    } else {
+                        log.warn(sm.getString("fileMessageFactory.deleteFail", file));
+                    }
                 }
                 return false;
             }

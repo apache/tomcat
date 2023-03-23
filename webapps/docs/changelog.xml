@@ -181,6 +181,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        <bug>66535</bug>: Redefine the <code>maxValidTime</code> attribute of
+        <code>FarmWarDeployer</code> to be the maximum time allowed between
+        receiving parts of a transferred file before the transfer is cancelled
+        and the associated resources cleaned-up. A new warning message will be
+        logged if the file transfer is cancelled. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
