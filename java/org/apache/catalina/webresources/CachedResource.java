@@ -316,10 +316,14 @@ public class CachedResource implements WebResource {
         /*
          * We don't want applications using this URL to access the resource directly as that could lead to inconsistent
          * results when the resource is updated on the file system but the cache entry has not yet expired. We saw this,
-         * for example, in JSP compilation. - last modified time was obtained via
-         * ServletContext.getResource("path").openConnection().getLastModified() - JSP content was obtained via
-         * ServletContext.getResourceAsStream("path") The result was that the JSP modification was detected but the JSP
-         * content was read from the cache so the non-updated JSP page was used to generate the .java and .class file
+         * for example, in JSP compilation.
+         *
+         * - last modified time was obtained via ServletContext.getResource("path").openConnection().getLastModified()
+         *
+         * - JSP content was obtained via ServletContext.getResourceAsStream("path")
+         *
+         * The result was that the JSP modification was detected but the JSP content was read from the cache so the
+         * non-updated JSP page was used to generate the .java and .class file
          *
          * One option to resolve this issue is to use a custom URL scheme for resource URLs. This would allow us, via
          * registration of a URLStreamHandlerFactory, to control how the resources are accessed and ensure that all
