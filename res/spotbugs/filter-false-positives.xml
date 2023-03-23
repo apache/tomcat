@@ -916,7 +916,7 @@
   </Match>
   <Match>
     <!-- Delegation to URL methods is deliberate -->
-    <Class name="org.apache.catalina.webresources.CachedResource"/>
+    <Class name="org.apache.catalina.webresources.CachedResource$CachedResourceURLStreamHandler"/>
     <Or>
       <Method name="equals"/>
       <Method name="hashCode"/>
