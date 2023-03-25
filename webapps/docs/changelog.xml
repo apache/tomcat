@@ -160,6 +160,10 @@
         application, avoid <code>ClassNotFoundException</code>s when validating
         session IDs extracted from requests. (markt)
       </fix>
+      <fix>
+        <bug>66543</bug>: Give <code>StandardContext#fireRequestDestroyEvent</code>
+         its own log message. (fschumacher)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
