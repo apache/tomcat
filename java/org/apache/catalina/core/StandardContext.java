@@ -5643,7 +5643,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     listener.requestDestroyed(event);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    getLogger().error(sm.getString("standardContext.requestListener.requestInit",
+                    getLogger().error(sm.getString("standardContext.requestListener.requestDestroyed",
                             instances[j].getClass().getName()), t);
                     request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
                     return false;
