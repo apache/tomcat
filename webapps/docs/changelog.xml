@@ -154,6 +154,11 @@
         with some OSGi custom URL schemes that can trigger potentially slow DNS
         lookups in some configurations. (markt)
       </fix>
+      <fix>
+        When using a custom session manager deployed as part of the web
+        application, avoid <code>ClassNotFoundException</code>s when validating
+        session IDs extracted from requests. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
