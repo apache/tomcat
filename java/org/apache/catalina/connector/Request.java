@@ -2433,38 +2433,47 @@ public class Request implements HttpServletRequest {
             return false;
         }
 
-        Manager manager = context.getManager();
-        if (manager == null) {
-            return false;
-        }
-
-        Session session = null;
+        /*
+         * As per PR #594, the manager could be provided by the web application and calls to findSession() could trigger
+         * class loading so set the thread context class loader appropriately to void ClassNotFoundException.
+         */
+        ClassLoader originalClassLoader = context.bind(null);
         try {
-            session = manager.findSession(requestedSessionId);
-        } catch (IOException e) {
-            // Can't find the session
-        }
-
-        if ((session == null) || !session.isValid()) {
-            // Check for parallel deployment contexts
-            if (getMappingData().contexts == null) {
-                return false;
-            } else {
-                for (int i = (getMappingData().contexts.length); i > 0; i--) {
-                    Context ctxt = getMappingData().contexts[i - 1];
-                    try {
-                        if (ctxt.getManager().findSession(requestedSessionId) != null) {
-                            return true;
-                        }
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
+            Manager manager = context.getManager();
+            if (manager == null) {
                 return false;
             }
-        }
 
-        return true;
+            Session session = null;
+            try {
+                session = manager.findSession(requestedSessionId);
+            } catch (IOException e) {
+                // Can't find the session
+            }
+
+            if ((session == null) || !session.isValid()) {
+                // Check for parallel deployment contexts
+                if (getMappingData().contexts == null) {
+                    return false;
+                } else {
+                    for (int i = (getMappingData().contexts.length); i > 0; i--) {
+                        Context ctxt = getMappingData().contexts[i - 1];
+                        try {
+                            if (ctxt.getManager().findSession(requestedSessionId) != null) {
+                                return true;
+                            }
+                        } catch (IOException e) {
+                            // Ignore
+                        }
+                    }
+                    return false;
+                }
+            }
+
+            return true;
+        } finally {
+            context.unbind(originalClassLoader);
+        }
     }
 
 
