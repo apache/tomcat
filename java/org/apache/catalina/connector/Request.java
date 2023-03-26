@@ -2499,7 +2499,7 @@ public class Request implements HttpServletRequest {
 
         /*
          * As per PR #594, the manager could be provided by the web application and calls to findSession() could trigger
-         * class loading so set the thread context class loader appropriately to void ClassNotFoundException.
+         * class loading so set the thread context class loader appropriately to avoid ClassNotFoundException.
          */
         ClassLoader originalClassLoader = context.bind(null);
         try {
