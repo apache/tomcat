@@ -472,7 +472,7 @@ public class CachedResource implements WebResource {
         @Override
         protected boolean equals(URL u1, URL u2) {
             // Deliberate use of ==
-            if (resourceURL == u1) {
+            if (associatedURL == u1) {
                 return resourceURL.equals(u2);
             }
             // Not the original resourceURL. Use the default implementation from URLStreamHandler.
@@ -489,7 +489,7 @@ public class CachedResource implements WebResource {
         @Override
         protected int hashCode(URL u) {
             // Deliberate use of ==
-            if (resourceURL == u) {
+            if (associatedURL == u) {
                 return resourceURL.hashCode();
             }
             // Not the original resourceURL. Use the default implementation from URLStreamHandler.
