@@ -343,7 +343,7 @@ public class CachedResource implements WebResource {
             CachedResourceURLStreamHandler handler = new CachedResourceURLStreamHandler(resourceURL, root, webAppPath,
                     usesClassLoaderResources);
             URL result = new URL(null, resourceURL.toExternalForm(), handler);
-            handler.setAssociatedURL(result);
+            handler.setCacheURL(result);
             return result;
         } catch (MalformedURLException e) {
             log.error(sm.getString("cachedResource.invalidURL", resourceURL.toExternalForm()), e);
@@ -415,6 +415,15 @@ public class CachedResource implements WebResource {
     }
 
 
+    /**
+     * URLStreamHandler to handle a URL for a cached resource, delegating reads to the Cache.
+     * <ul>
+     * <li>delegates reads to the Cache, to ensure consistent invalidation behavior</li>
+     * <li>delegates hashCode()/ equals() behavior to the underlying Resource URL. (Equinox/ OSGi compatibility)</li>
+     * <li>detects the case where a new relative URL is created from the wrapped URL, inheriting its handler; in this
+     * case reverts to default behavior</li>
+     * </ul>
+     */
     private static class CachedResourceURLStreamHandler extends URLStreamHandler {
 
         private final URL resourceURL;
@@ -422,7 +431,7 @@ public class CachedResource implements WebResource {
         private final String webAppPath;
         private final boolean usesClassLoaderResources;
 
-        private URL associatedURL = null;
+        private URL cacheURL = null;
 
         CachedResourceURLStreamHandler(URL resourceURL, StandardRoot root, String webAppPath,
                 boolean usesClassLoaderResources) {
@@ -432,8 +441,8 @@ public class CachedResource implements WebResource {
             this.usesClassLoaderResources = usesClassLoaderResources;
         }
 
-        protected void setAssociatedURL(URL associatedURL) {
-            this.associatedURL = associatedURL;
+        protected void setCacheURL(URL cacheURL) {
+            this.cacheURL = cacheURL;
         }
 
         @Override
@@ -441,15 +450,15 @@ public class CachedResource implements WebResource {
             // This deliberately uses ==. If u isn't the URL object this
             // URLStreamHandler was constructed for we do not want to use this
             // URLStreamHandler to create a connection.
-            if (associatedURL != null && u == associatedURL) {
-                if ("jar".equals(associatedURL.getProtocol())) {
+            if (cacheURL != null && u == cacheURL) {
+                if ("jar".equals(cacheURL.getProtocol())) {
                     return new CachedResourceJarURLConnection(resourceURL, root, webAppPath, usesClassLoaderResources);
                 } else {
                     return new CachedResourceURLConnection(resourceURL, root, webAppPath, usesClassLoaderResources);
                 }
             } else {
-                // The stream handler has been inherited by a URL that was
-                // constructed from a cache URL. We need to break that link.
+                // This stream handler has been inherited by a URL that was constructed from a cache URL.
+                // We need to break that link.
                 URI constructedURI;
                 try {
                     constructedURI = new URI(u.toExternalForm());
@@ -465,34 +474,36 @@ public class CachedResource implements WebResource {
         /**
          * {@inheritDoc}
          * <p>
-         * We don't know what the requirements are for equals for the wrapped resourceURL so if u1 is the wrapped
-         * resourceURL, delegate to the resourceURL and it's handler. Otherwise, use the default implementation from
+         * We don't know what the requirements are for equals for the wrapped resourceURL so if u1 is the cacheURL,
+         * delegate to the resourceURL and it's handler. Otherwise, use the default implementation from
          * URLStreamHandler.
          */
         @Override
         protected boolean equals(URL u1, URL u2) {
             // Deliberate use of ==
-            if (associatedURL == u1) {
+            if (cacheURL == u1) {
                 return resourceURL.equals(u2);
             }
-            // Not the original resourceURL. Use the default implementation from URLStreamHandler.
+            // Not the cacheURL. This stream handler has been inherited by a URL that was constructed from a cache URL.
+            // Use the default implementation from URLStreamHandler.
             return super.equals(u1, u2);
         }
 
         /**
          * {@inheritDoc}
          * <p>
-         * We don't know what the requirements are for hashcode for the wrapped resourceURL so if u1 is the wrapped
-         * resourceURL, delegate to the resourceURL and it's handler. Otherwise, use the default implementation from
+         * We don't know what the requirements are for hashcode for the wrapped resourceURL so if u1 is the cacheURL,
+         * delegate to the resourceURL and it's handler. Otherwise, use the default implementation from
          * URLStreamHandler.
          */
         @Override
         protected int hashCode(URL u) {
             // Deliberate use of ==
-            if (associatedURL == u) {
+            if (cacheURL == u) {
                 return resourceURL.hashCode();
             }
-            // Not the original resourceURL. Use the default implementation from URLStreamHandler.
+            // Not the cacheURL. This stream handler has been inherited by a URL that was constructed from a cache URL.
+            // Use the default implementation from URLStreamHandler.
             return super.hashCode(u);
         }
     }
