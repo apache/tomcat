@@ -229,6 +229,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>66542</bug>: Documentation. Update the JNDI documentation to
+        replace references to JavaMail with references to Jakarta Mail. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
