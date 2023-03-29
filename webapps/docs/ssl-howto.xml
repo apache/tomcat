@@ -337,6 +337,7 @@ this:</p>
 <Connector
            protocol="org.apache.coyote.http11.Http11NioProtocol"
            port="8443" maxThreads="200"
+           maxParameterCount="1000"
            scheme="https" secure="true" SSLEnabled="true"
            keystoreFile="${user.home}/.keystore" keystorePass="changeit"
            clientAuth="false" sslProtocol="TLS"/>]]></source>
@@ -351,6 +352,7 @@ this:</p>
 <Connector
            protocol="org.apache.coyote.http11.Http11AprProtocol"
            port="8443" maxThreads="200"
+           maxParameterCount="1000"
            scheme="https" secure="true" SSLEnabled="true"
            SSLCertificateFile="/usr/local/ssl/server.crt"
            SSLCertificateKeyFile="/usr/local/ssl/server.pem"
@@ -529,6 +531,7 @@ for more information about installation of APR. A basic OCSP-enabled connector
 <![CDATA[<Connector
     port="8443"
     protocol="org.apache.coyote.http11.Http11AprProtocol"
+    maxParameterCount="1000"
     secure="true"
     scheme="https"
     SSLEnabled="true"

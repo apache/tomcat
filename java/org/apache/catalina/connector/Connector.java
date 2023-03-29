@@ -197,10 +197,10 @@ public class Connector extends LifecycleMBeanBase {
     private int maxCookieCount = 200;
 
     /**
-     * The maximum number of parameters (GET plus POST) which will be automatically parsed by the container. 1000 by
-     * default. A value of less than 0 means no limit.
+     * The maximum number of parameters (GET plus POST) which will be automatically parsed by the container. 10000 by
+     * default. The default Tomcat server.xml configures a lower default of 1000. A value of less than 0 means no limit.
      */
-    protected int maxParameterCount = 1000;
+    protected int maxParameterCount = 10000;
 
     /**
      * Maximum size of a POST which will be automatically parsed by the container. 2MB by default.
