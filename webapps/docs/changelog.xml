@@ -133,8 +133,9 @@
         by LRU as intended. (schultz)
       </fix>
       <update>
-        Reduce the default value of <code>maxParameterCount</code> from 10,000
-        to 1,000. (markt)
+        Use server.xml to reduce the default value of
+        <code>maxParameterCount</code> from 10,000 to 1,000. If not configured
+        in server.xml, the default remains 10,000. (markt)
       </update>
       <add>
         Update Digest authentication support to align with RFC 7616. This adds a
