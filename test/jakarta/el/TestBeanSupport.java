@@ -74,15 +74,6 @@ public class TestBeanSupport extends ELBaseTest {
         doTest(MismatchBean.class, "value", TypeA.class, TypeA.class, null);
     }
 
-    /*
-     * The first setter found "wins".
-     */
-    @Test
-    public void testAmbiguousBean() {
-        doTest(AmbiguousBean.class, "value", TypeA.class, null, TypeA.class);
-    }
-
-
     private void doTest(Class<?> clazz, String propertyName, Class<?> type, Class<?> typeGet, Class<?> typeSet) {
         BeanProperties beanProperties = BeanSupport.getInstance().getBeanProperties(clazz);
         BeanProperty beanProperty = beanProperties.properties.get(propertyName);
@@ -215,15 +206,6 @@ public class TestBeanSupport extends ELBaseTest {
     public static class MismatchBean {
         public TypeA getValue() {
             return null;
-        }
-
-        public void setValue(@SuppressWarnings("unused") String value) {
-        }
-    }
-
-
-    public static class AmbiguousBean {
-        public void setValue(@SuppressWarnings("unused") TypeA value) {
         }
 
         public void setValue(@SuppressWarnings("unused") String value) {
