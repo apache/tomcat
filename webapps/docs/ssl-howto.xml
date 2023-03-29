@@ -326,7 +326,9 @@ so it looks something like this:</p>
     protocol="org.apache.coyote.http11.Http11NioProtocol"
     port="8443"
     maxThreads="150"
-    SSLEnabled="true">
+    SSLEnabled="true"
+    maxParameterCount="1000"
+    >
   <SSLHostConfig>
     <Certificate
       certificateKeystoreFile="${user.home}/.keystore"
@@ -347,7 +349,9 @@ so it looks something like this:</p>
     protocol="org.apache.coyote.http11.Http11NioProtocol"
     port="8443"
     maxThreads="150"
-    SSLEnabled="true" >
+    SSLEnabled="true"
+    maxParameterCount="1000"
+    >
   <SSLHostConfig>
     <Certificate
         certificateKeyFile="conf/localhost-rsa-key.pem"
