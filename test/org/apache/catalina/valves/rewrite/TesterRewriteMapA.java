@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class TesterRewriteMapA implements RewriteMap {
 
-    private static final Map<String,String> map = new HashMap<>();
+    private static final Map<String, String> map = new HashMap<>();
 
     static {
         map.put("a", "aa");
