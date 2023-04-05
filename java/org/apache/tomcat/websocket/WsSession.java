@@ -106,7 +106,6 @@ public class WsSession implements Session {
     private volatile MessageHandler binaryMessageHandler = null;
     private volatile MessageHandler.Whole<PongMessage> pongMessageHandler = null;
     private volatile State state = State.OPEN;
-    private final Object stateLock = new Object();
     private final Map<String, Object> userProperties = new ConcurrentHashMap<>();
     private volatile int maxBinaryMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile int maxTextMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
@@ -647,7 +646,8 @@ public class WsSession implements Session {
             return;
         }
 
-        synchronized (stateLock) {
+        wsRemoteEndpoint.getLock().lock();
+        try {
             if (state != State.OPEN) {
                 return;
             }
@@ -677,6 +677,8 @@ public class WsSession implements Session {
                 }
                 fireEndpointOnClose(closeReasonLocal);
             }
+        } finally {
+            wsRemoteEndpoint.getLock().unlock();
         }
 
         IOException ioe = new IOException(sm.getString("wsSession.messageFailed"));
@@ -695,7 +697,8 @@ public class WsSession implements Session {
      */
     public void onClose(CloseReason closeReason) {
 
-        synchronized (stateLock) {
+        wsRemoteEndpoint.getLock().lock();
+        try {
             if (state != State.CLOSED) {
                 try {
                     wsRemoteEndpoint.setBatchingAllowed(false);
@@ -713,8 +716,11 @@ public class WsSession implements Session {
                 // Close the socket
                 wsRemoteEndpoint.close();
             }
+        } finally {
+            wsRemoteEndpoint.getLock().unlock();
         }
     }
+
 
     private void fireEndpointOnClose(CloseReason closeReason) {
 
