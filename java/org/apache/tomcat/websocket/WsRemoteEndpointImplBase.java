@@ -33,6 +33,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
 
 import javax.naming.NamingException;
 
@@ -66,7 +67,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     private final IntermediateMessageHandler intermediateMessageHandler = new IntermediateMessageHandler(this);
 
     private Transformation transformation = null;
-    private final Semaphore messagePartInProgress = new Semaphore(1);
+    protected final Semaphore messagePartInProgress = new Semaphore(1);
     private final Queue<MessagePart> messagePartQueue = new ArrayDeque<>();
     private final Object messagePartLock = new Object();
 
@@ -288,9 +289,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             return;
         }
 
-        long timeout = timeoutExpiry - System.currentTimeMillis();
         try {
-            if (!messagePartInProgress.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
+            if (!acquireMessagePartInProgressSemaphore(opCode, timeoutExpiry)) {
                 String msg = sm.getString("wsRemoteEndpoint.acquireTimeout");
                 wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
                         new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg), true);
@@ -331,6 +331,23 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         }
 
         endMessage(null, null);
+    }
+
+
+    /**
+     * Acquire the semaphore that allows a message part to be written.
+     *
+     * @param opCode        The OPCODE for the message to be written
+     * @param timeoutExpiry The time when the attempt to acquire the semaphore should expire
+     *
+     * @return {@code true} if the semaphore is obtained, otherwise {@code false}.
+     *
+     * @throws InterruptedException If the wait for the semaphore is interrupted
+     */
+    protected boolean acquireMessagePartInProgressSemaphore(byte opCode, long timeoutExpiry)
+            throws InterruptedException {
+        long timeout = timeoutExpiry - System.currentTimeMillis();
+        return messagePartInProgress.tryAcquire(timeout, TimeUnit.MILLISECONDS);
     }
 
 
@@ -392,7 +409,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    void endMessage(SendHandler handler, SendResult result) {
+    protected void endMessage(SendHandler handler, SendResult result) {
         boolean doWrite = false;
         MessagePart mpNext = null;
         synchronized (messagePartLock) {
@@ -734,6 +751,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     protected abstract boolean isMasked();
 
     protected abstract void doClose();
+
+    protected abstract Lock getLock();
+
 
     private static void writeHeader(ByteBuffer headerBuffer, boolean fin, int rsv, byte opCode, boolean masked,
             ByteBuffer payload, byte[] mask, boolean first) {
