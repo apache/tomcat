@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
@@ -28,6 +29,7 @@ import javax.websocket.SendResult;
 public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
 
     private final AsyncChannelWrapper channel;
+    private final ReentrantLock lock = new ReentrantLock();
 
     public WsRemoteEndpointImplClient(AsyncChannelWrapper channel) {
         this.channel = channel;
@@ -67,8 +69,15 @@ public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
         handler.onResult(SENDRESULT_OK);
     }
 
+
     @Override
     protected void doClose() {
         channel.close();
+    }
+
+
+    @Override
+    protected ReentrantLock getLock() {
+        return lock;
     }
 }
