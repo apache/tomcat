@@ -980,11 +980,6 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
         register(utilityExecutor, "type=UtilityExecutor");
 
-        // Initialize random generation of the JVM, as some platforms use
-        // a thread which could end up being associated with a webapp rather
-        // than the container.
-        (new Random()).nextInt();
-
         // Register global String cache
         // Note although the cache is global, if there are multiple Servers
         // present in the JVM (may happen when embedding) then the same cache
