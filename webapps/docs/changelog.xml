@@ -165,6 +165,11 @@
         <bug>66543</bug>: Give <code>StandardContext#fireRequestDestroyEvent</code>
          its own log message. (fschumacher)
       </fix>
+      <fix>
+        <bug>66554</bug>: Initialize Random during server initialization to
+        avoid possible JVM thread creation in the webapp context on some
+        platforms. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
