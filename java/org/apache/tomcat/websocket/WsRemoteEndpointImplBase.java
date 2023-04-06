@@ -409,7 +409,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    protected void endMessage(SendHandler handler, SendResult result) {
+    void endMessage(SendHandler handler, SendResult result) {
         boolean doWrite = false;
         MessagePart mpNext = null;
         synchronized (messagePartLock) {
