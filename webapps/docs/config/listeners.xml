@@ -229,6 +229,16 @@
         side-effects. The default is <code>true</code>.</p>
       </attribute>
 
+      <attribute name="initSeedGenerator" required="false">
+        <p>The first use of <code>SeedGenerator</code>, an internal class of
+        the default security spi implementation, might create a thread on some
+        platforms. Depending on the timing of the first use of a secure random
+        this thread might become associated with a webapp classloader, causing
+        a memory leak. Setting this to <code>true</code> will initialize the
+        seed. The default is <code>false</code> to avoid consuming random if
+        not needed.</p>
+      </attribute>
+
       <attribute name="urlCacheProtection" required="false">
         <p>Enables protection so that reading resources from JAR files using
         <code>java.net.URLConnection</code>s does not result in the JAR file
