@@ -306,7 +306,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 // Regardless of whether a non-secure wrapper was created for a
                 // proxy CONNECT, need to use TLS from this point on so wrap the
                 // original AsynchronousSocketChannel
-                SSLEngine sslEngine = createSSLEngine(userProperties, host, port);
+                SSLEngine sslEngine = createSSLEngine(clientEndpointConfiguration, host, port);
                 channel = new AsyncChannelWrapperSecure(socketChannel, sslEngine);
             } else if (channel == null) {
                 // Only need to wrap as this point if it wasn't wrapped to process a
@@ -885,9 +885,10 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
-    private SSLEngine createSSLEngine(Map<String, Object> userProperties, String host, int port)
+    private SSLEngine createSSLEngine(ClientEndpointConfig clientEndpointConfig, String host, int port)
             throws DeploymentException {
 
+        Map<String, Object> userProperties = clientEndpointConfig.getUserProperties();
         try {
             // See if a custom SSLContext has been provided
             SSLContext sslContext = (SSLContext) userProperties.get(Constants.SSL_CONTEXT_PROPERTY);
