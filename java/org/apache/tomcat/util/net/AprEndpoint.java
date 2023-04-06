@@ -2103,7 +2103,9 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         @Override
         public void run() {
 
-            synchronized (socket) {
+            Lock lock = socket.getLock();
+            lock.lock();
+            try {
                 if (!deferAccept) {
                     if (setSocketOptions(socket)) {
                         getPoller().add(socket.getSocket().longValue(),
@@ -2131,6 +2133,8 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                         socket = null;
                     }
                 }
+            } finally {
+                lock.unlock();
             }
         }
     }
