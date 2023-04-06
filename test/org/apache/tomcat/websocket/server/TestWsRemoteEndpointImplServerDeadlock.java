@@ -180,21 +180,24 @@ public class TestWsRemoteEndpointImplServerDeadlock extends WebSocketBaseTest {
         private boolean sendOnContainerThread = initialSendOnContainerThread;
 
         @OnOpen
-        public void onOpen(Session session) {
+        public void onOpen(final Session session) {
             serverSession = session;
             // Send messages to the client until they appear to hang
             // Need to do this on a non-container thread
-            Runnable r = () -> {
-                Future<Void> sendMessageFuture;
-                while (true) {
-                    sendMessageFuture = session.getAsyncRemote().sendText(MSG);
-                    try {
-                        sendMessageFuture.get(2, TimeUnit.SECONDS);
-                    } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                        break;
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    Future<Void> sendMessageFuture;
+                    while (true) {
+                        sendMessageFuture = session.getAsyncRemote().sendText(MSG);
+                        try {
+                            sendMessageFuture.get(2, TimeUnit.SECONDS);
+                        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                            break;
+                        }
                     }
+                    serverSendLatch.countDown();
                 }
-                serverSendLatch.countDown();
             };
             if (sendOnContainerThread) {
                 r.run();
