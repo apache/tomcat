@@ -269,6 +269,16 @@
         been fixed for Java 9 onwards.</p>
       </attribute>
 
+      <attribute name="initSeedGenerator" required="false">
+        <p>The first use of <code>SeedGenerator</code>, an internal class of
+        the default security spi implementation, might create a thread on some
+        platforms. Depending on the timing of the first use of a secure random
+        this thread might become associated with a webapp classloader, causing
+        a memory leak. Setting this to <code>true</code> will initialize the
+        seed. The default is <code>false</code> to avoid consuming random if
+        not needed.</p>
+      </attribute>
+
       <attribute name="ldapPoolProtection" required="false">
         <p>Enables protection so that the PoolCleaner thread started by
         <code>com.sun.jndi.ldap.LdapPoolManager</code> does not result in a
