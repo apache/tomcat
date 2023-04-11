@@ -43,13 +43,23 @@ goto okJava
 
 :noJavaHome
 echo The JAVA_HOME environment variable is not defined correctly.
+echo JAVA_HOME=%JAVA_HOME%
 echo It is needed to run this program in debug mode.
 echo NB: JAVA_HOME should point to a JDK not a JRE.
 goto exit
 
 :gotJavaHome
-rem No JRE given, use JAVA_HOME as JRE_HOME
+rem No JRE given, check if JAVA_HOME is usable as JRE_HOME
+if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHomeAsJre
+rem Use JAVA_HOME as JRE_HOME
 set "JRE_HOME=%JAVA_HOME%"
+goto okJava
+
+:noJavaHomeAsJre
+echo The JAVA_HOME environment variable is not defined correctly.
+echo JAVA_HOME=%JAVA_HOME%
+echo NB: JAVA_HOME should point to a JDK not a JRE.
+goto exit
 
 :gotJreHome
 rem Check if we have a usable JRE
@@ -59,6 +69,7 @@ goto okJava
 :noJreHome
 rem Needed at least a JRE
 echo The JRE_HOME environment variable is not defined correctly
+echo JRE_HOME=%JRE_HOME%
 echo This environment variable is needed to run this program
 goto exit
 
