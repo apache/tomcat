@@ -108,11 +108,12 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
         // Can't use StringBuilder due to DateFormat
         StringBuffer header = new StringBuffer();
 
-        // TODO: Name validation takes place in Cookie and cannot be configured
-        //       per Context. Moving it to here would allow per Context config
-        //       but delay validation until the header is generated. However,
-        //       the spec requires an IllegalArgumentException on Cookie
-        //       generation.
+        /* TODO: Name validation takes place in Cookie and cannot be configured
+         *       per Context. Moving it to here would allow per Context config
+         *       but delay validation until the header is generated. However,
+         *       the spec requires an IllegalArgumentException on Cookie
+         *       generation.
+         */
         header.append(cookie.getName());
         header.append('=');
         String value = cookie.getValue();
