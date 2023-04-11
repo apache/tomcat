@@ -95,7 +95,7 @@ public class UpgradeUtil {
             return;
         }
         key = req.getHeader(Constants.WS_KEY_HEADER_NAME);
-        if (key == null) {
+        if (!validateKey(key)) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
@@ -221,6 +221,43 @@ public class UpgradeUtil {
         wsHandler.preInit(perSessionServerEndpointConfig, sc, wsRequest, negotiatedExtensionsPhase2, subProtocol,
                 transformation, pathParams, req.isSecure());
 
+    }
+
+
+    /*
+     * Validate the key. It should be the base64 encoding of a random 16-byte value. 16-bytes are encoded in 24 base64
+     * characters, the last two of which must be ==.
+     *
+     * The validation isn't perfect:
+     *
+     * - it doesn't check the final non-'=' character is valid in the context of the number of bits it is meant to be
+     * encoding.
+     *
+     * - it doesn't check that the value is random and changes for each connection.
+     *
+     * Given that this header is for the benefit of the client, not the server, this should be good enough.
+     */
+    private static boolean validateKey(String key) {
+        if (key == null) {
+            return false;
+        }
+
+        if (key.length() != 24) {
+            return false;
+        }
+
+        char[] keyChars = key.toCharArray();
+        if (keyChars[22] != '=' || keyChars[23] != '=') {
+            return false;
+        }
+
+        for (int i = 0; i < 22; i++) {
+            if (!Base64.isInAlphabet(keyChars[i])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 

@@ -247,6 +247,13 @@
         a timeout before sending the close frame if an I/O error occurs during a
         write. (markt)
       </fix>
+      <fix>
+        <bug>66548</bug>: Expand the validation of the value of the
+        <code>Sec-Websocket-Key</code> header in the HTTP upgrade request that
+        initiates a WebSocket connection. The value is not decoded but it is
+        checked for the correct length and that only valid characters from the
+        base64 alphabet are used. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

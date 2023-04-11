@@ -279,6 +279,15 @@ public class Base64 extends BaseNCodec {
     }
 
 
+    public static boolean isInAlphabet(char c) {
+        // Fast for valid data. May be slow for invalid data.
+        try {
+            return STANDARD_DECODE_TABLE[c] != -1;
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return false;
+        }
+    }
+
     /**
      * Encode table to use: either STANDARD or URL_SAFE. Note: the DECODE_TABLE above remains static because it is able
      * to decode both STANDARD and URL_SAFE streams, but the encodeTable must be a member variable so we can switch
