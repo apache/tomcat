@@ -16,6 +16,8 @@
  */
 package org.apache.coyote.http2;
 
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -144,9 +146,16 @@ public class TestRfc9218 extends Http2TestBase {
          * with the remainder split equally between 17 and 21.
          */
         sendWindowUpdate(0, 1024 * 8);
-        parser.readFrame();
-        parser.readFrame();
-        parser.readFrame();
+        // Use try/catch as third read has been failing on some tests runs
+        try {
+            parser.readFrame();
+            parser.readFrame();
+            parser.readFrame();
+        } catch (IOException ioe) {
+            // Dump for debugging purposes
+            ioe.printStackTrace();
+            // Continue - we'll get trace dumped to stdout below
+        }
 
         trace = output.getTrace();
         System.out.println(trace);
