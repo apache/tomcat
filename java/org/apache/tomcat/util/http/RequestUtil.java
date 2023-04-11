@@ -30,15 +30,13 @@ public class RequestUtil {
 
 
     /**
-     * Normalize a relative URI path that may have relative values ("/./",
-     * "/../", and so on ) it it.  <strong>WARNING</strong> - This method is
-     * useful only for normalizing application-generated paths.  It does not
+     * Normalize a relative URI path that may have relative values ("/./", "/../", and so on ) it it.
+     * <strong>WARNING</strong> - This method is useful only for normalizing application-generated paths. It does not
      * try to perform security checks for malicious input.
      *
      * @param path Relative path to be normalized
      *
-     * @return The normalized path or <code>null</code> if the path cannot be
-     *         normalized
+     * @return The normalized path or <code>null</code> if the path cannot be normalized
      */
     public static String normalize(String path) {
         return normalize(path, true);
@@ -46,16 +44,14 @@ public class RequestUtil {
 
 
     /**
-     * Normalize a relative URI path that may have relative values ("/./",
-     * "/../", and so on ) it it.  <strong>WARNING</strong> - This method is
-     * useful only for normalizing application-generated paths.  It does not
+     * Normalize a relative URI path that may have relative values ("/./", "/../", and so on ) it it.
+     * <strong>WARNING</strong> - This method is useful only for normalizing application-generated paths. It does not
      * try to perform security checks for malicious input.
      *
-     * @param path Relative path to be normalized
+     * @param path             Relative path to be normalized
      * @param replaceBackSlash Should '\\' be replaced with '/'
      *
-     * @return The normalized path or <code>null</code> if the path cannot be
-     *         normalized
+     * @return The normalized path or <code>null</code> if the path cannot be normalized
      */
     public static String normalize(String path, boolean replaceBackSlash) {
 
@@ -106,7 +102,7 @@ public class RequestUtil {
                 break;
             }
             if (index == 0) {
-                return null;  // Trying to go outside our context
+                return null; // Trying to go outside our context
             }
             int index2 = normalized.lastIndexOf('/', index - 1);
             normalized = normalized.substring(0, index2) + normalized.substring(index + 3);
@@ -178,7 +174,9 @@ public class RequestUtil {
      * </ul>
      *
      * @param origin The origin URI
+     *
      * @return <code>true</code> if the origin was valid
+     *
      * @see <a href="http://tools.ietf.org/html/rfc952">RFC952</a>
      */
     public static boolean isValidOrigin(String origin) {

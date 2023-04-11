@@ -94,7 +94,8 @@ import org.apache.tomcat.util.res.StringManager;
 public class MimeHeaders {
     /**
      * Initial size - should be == average number of headers per request
-     * XXX  make it configurable ( fine-tuning of web-apps )
+     * <p>
+     * TODO make it configurable (fine-tuning of web-apps)
      */
     public static final int DEFAULT_HEADER_SIZE=8;
 
