@@ -219,6 +219,10 @@
         <code>ERR_HTTP2_SERVER_REFUSED_STREAM</code> for some connections.
         (markt)
       </fix>
+      <fix>
+        Remove use of deprecated classes in the <code>javax.security.cert</code>
+        package. Pull request <pr>608</pr> provided by Eirik Bjorsnos. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
