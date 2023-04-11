@@ -134,7 +134,9 @@ public class TestWsRemoteEndpointImplServerDeadlock extends WebSocketBaseTest {
         Object state = f.get(Bug66508Endpoint.serverSession);
         int count = 0;
         long start = System.nanoTime();
-        while (!"CLOSED".equals(state.toString()) && count < 100) {
+        // Send times out after 20s so test should complete in less than that. Allow large margin as VMs can sometimes
+        // be slow when running tests.
+        while (!"CLOSED".equals(state.toString()) && count < 190) {
             count++;
             Thread.sleep(100);
             state = f.get(Bug66508Endpoint.serverSession);
