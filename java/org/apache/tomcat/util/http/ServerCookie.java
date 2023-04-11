@@ -26,7 +26,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
  *  Allows recycling and uses MessageBytes as low-level
  *  representation ( and thus the byte -&gt; char conversion can be delayed
  *  until we know the charset ).
- *
+ * <p>
  *  Tomcat.core uses this recyclable object to represent cookies,
  *  and the facade will convert it to the external representation.
  */

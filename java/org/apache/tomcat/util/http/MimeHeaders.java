@@ -67,20 +67,23 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  *  Memory-efficient repository for Mime Headers. When the object is recycled, it
  *  will keep the allocated headers[] and all the MimeHeaderField - no GC is generated.
- *
+ *  <p>
  *  For input headers it is possible to use the MessageByte for Fields - so no GC
  *  will be generated.
- *
+ * <p>
  *  The only garbage is generated when using the String for header names/values -
  *  this can't be avoided when the servlet calls header methods, but is easy
  *  to avoid inside tomcat. The goal is to use _only_ MessageByte-based Fields,
  *  and reduce to 0 the memory overhead of tomcat.
+ *  <p>
  *
  *  TODO:
- *  XXX one-buffer parsing - for http ( other protocols don't need that )
- *  XXX remove unused methods
- *  XXX External enumerations, with 0 GC.
- *  XXX use HeaderName ID
+ *  <ul>
+ *  <li>one-buffer parsing - for http (other protocols don't need that)</li>
+ *  <li>remove unused methods</li>
+ *  <li>External enumerations, with 0 GC.</li>
+ *  <li>use HeaderName ID</li>
+ *  </ul>
  *
  *
  * @author dac@eng.sun.com
