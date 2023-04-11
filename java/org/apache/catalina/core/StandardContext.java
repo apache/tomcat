@@ -135,6 +135,7 @@ import org.apache.tomcat.util.http.Rfc6265CookieProcessor;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.apache.tomcat.util.security.PrivilegedGetTccl;
 import org.apache.tomcat.util.security.PrivilegedSetTccl;
+import org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor;
 
 /**
  * Standard implementation of the <b>Context</b> interface. Each child container must be a Wrapper implementation to
@@ -4918,6 +4919,12 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
                 // Make the version info available
                 getServletContext().setAttribute(Globals.WEBAPP_VERSION, getWebappVersion());
+
+                // Make the utility executor available
+                if (!Globals.IS_SECURITY_ENABLED) {
+                    getServletContext().setAttribute(ScheduledThreadPoolExecutor.class.getName(),
+                            Container.getService(this).getServer().getUtilityExecutor());
+                }
             }
 
             // Set up the context init params
