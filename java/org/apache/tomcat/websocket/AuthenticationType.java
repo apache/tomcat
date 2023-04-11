@@ -18,16 +18,12 @@ package org.apache.tomcat.websocket;
 
 public enum AuthenticationType {
 
-    WWW(Constants.AUTHORIZATION_HEADER_NAME,
-            Constants.WWW_AUTHENTICATE_HEADER_NAME,
-            Constants.WS_AUTHENTICATION_USER_NAME,
-            Constants.WS_AUTHENTICATION_PASSWORD,
+    WWW(Constants.AUTHORIZATION_HEADER_NAME, Constants.WWW_AUTHENTICATE_HEADER_NAME,
+            Constants.WS_AUTHENTICATION_USER_NAME, Constants.WS_AUTHENTICATION_PASSWORD,
             Constants.WS_AUTHENTICATION_REALM),
 
-    PROXY(Constants.PROXY_AUTHORIZATION_HEADER_NAME,
-            Constants.PROXY_AUTHENTICATE_HEADER_NAME,
-            Constants.WS_AUTHENTICATION_PROXY_USER_NAME,
-            Constants.WS_AUTHENTICATION_PROXY_PASSWORD,
+    PROXY(Constants.PROXY_AUTHORIZATION_HEADER_NAME, Constants.PROXY_AUTHENTICATE_HEADER_NAME,
+            Constants.WS_AUTHENTICATION_PROXY_USER_NAME, Constants.WS_AUTHENTICATION_PROXY_PASSWORD,
             Constants.WS_AUTHENTICATION_PROXY_REALM);
 
     private final String authorizationHeaderName;
@@ -36,7 +32,7 @@ public enum AuthenticationType {
     private final String userPasswordProperty;
     private final String userRealmProperty;
 
-    private AuthenticationType(String authorizationHeaderName, String authenticateHeaderName, String userNameProperty,
+    AuthenticationType(String authorizationHeaderName, String authenticateHeaderName, String userNameProperty,
             String userPasswordProperty, String userRealmProperty) {
         this.authorizationHeaderName = authorizationHeaderName;
         this.authenticateHeaderName = authenticateHeaderName;

@@ -25,9 +25,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +35,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.CustomObjectInputStream;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -59,38 +55,6 @@ import org.apache.tomcat.util.ExceptionUtils;
 public class StandardManager extends ManagerBase {
 
     private final Log log = LogFactory.getLog(StandardManager.class); // must not be static
-
-    // ---------------------------------------------------- Security Classes
-
-    private class PrivilegedDoLoad
-        implements PrivilegedExceptionAction<Void> {
-
-        PrivilegedDoLoad() {
-            // NOOP
-        }
-
-        @Override
-        public Void run() throws Exception{
-           doLoad();
-           return null;
-        }
-    }
-
-    private class PrivilegedDoUnload
-        implements PrivilegedExceptionAction<Void> {
-
-        PrivilegedDoUnload() {
-            // NOOP
-        }
-
-        @Override
-        public Void run() throws Exception{
-            doUnload();
-            return null;
-        }
-
-    }
-
 
     // ----------------------------------------------------- Instance Variables
 
@@ -144,36 +108,6 @@ public class StandardManager extends ManagerBase {
 
     @Override
     public void load() throws ClassNotFoundException, IOException {
-        if (SecurityUtil.isPackageProtectionEnabled()){
-            try{
-                AccessController.doPrivileged( new PrivilegedDoLoad() );
-            } catch (PrivilegedActionException ex){
-                Exception exception = ex.getException();
-                if (exception instanceof ClassNotFoundException) {
-                    throw (ClassNotFoundException)exception;
-                } else if (exception instanceof IOException) {
-                    throw (IOException)exception;
-                }
-                if (log.isDebugEnabled()) {
-                    log.debug("Unreported exception in load() ", exception);
-                }
-            }
-        } else {
-            doLoad();
-        }
-    }
-
-
-    /**
-     * Load any currently active sessions that were previously unloaded
-     * to the appropriate persistence mechanism, if any.  If persistence is not
-     * supported, this method returns without doing anything.
-     *
-     * @exception ClassNotFoundException if a serialized class cannot be
-     *  found during the reload
-     * @exception IOException if an input/output error occurs
-     */
-    protected void doLoad() throws ClassNotFoundException, IOException {
         if (log.isDebugEnabled()) {
             log.debug("Start: Loading persisted sessions");
         }
@@ -252,33 +186,6 @@ public class StandardManager extends ManagerBase {
 
     @Override
     public void unload() throws IOException {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            try {
-                AccessController.doPrivileged(new PrivilegedDoUnload());
-            } catch (PrivilegedActionException ex){
-                Exception exception = ex.getException();
-                if (exception instanceof IOException) {
-                    throw (IOException)exception;
-                }
-                if (log.isDebugEnabled()) {
-                    log.debug("Unreported exception in unLoad()", exception);
-                }
-            }
-        } else {
-            doUnload();
-        }
-    }
-
-
-    /**
-     * Save any currently active sessions in the appropriate persistence
-     * mechanism, if any.  If persistence is not supported, this method
-     * returns without doing anything.
-     *
-     * @exception IOException if an input/output error occurs
-     */
-    protected void doUnload() throws IOException {
-
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("standardManager.unloading.debug"));
         }

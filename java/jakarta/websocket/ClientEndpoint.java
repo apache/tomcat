@@ -29,6 +29,6 @@ public @interface ClientEndpoint {
     String[] subprotocols() default {};
     Class<? extends Decoder>[] decoders() default {};
     Class<? extends Encoder>[] encoders() default {};
-    public Class<? extends Configurator> configurator()
+    Class<? extends Configurator> configurator()
             default Configurator.class;
 }

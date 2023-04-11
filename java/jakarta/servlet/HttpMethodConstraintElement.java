@@ -28,8 +28,7 @@ public class HttpMethodConstraintElement extends HttpConstraintElement {
 
     // Can't inherit from HttpConstraintElement as API does not allow it
     private static final String LSTRING_FILE = "jakarta.servlet.LocalStrings";
-    private static final ResourceBundle lStrings =
-        ResourceBundle.getBundle(LSTRING_FILE);
+    private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
     private final String methodName;
 

@@ -104,7 +104,406 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 11.0.0-M2 (markt)" rtext="in development">
+<section name="Tomcat 11.0.0-M5 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add a <code>doPatch</code> method to <code>HttpServlet</code> to provide
+        support for the HTTP <code>PATCH</code> method as defined in RFC 5789.
+        This is one of the changes in the Servlet 6.1 API. (markt)
+      </add>
+      <fix>
+        <bug>65995</bug>: Implement RFC 9239 and use
+        <code>text/javascript</code> as the media type for JavaScript rather
+        than <code>application/javascript</code>. (markt)
+      </fix>
+      <scode>
+        Tomcat no longer sets the <code>java.protocol.handler.pkgs</code> system
+        property when starting. Users are now free to configure this property if
+        they wish. (markt)
+      </scode>
+      <add>
+        Add an access log valve that uses a json format. Based on pull request
+        <pr>539</pr> provided by Thomas Meyer. (remm)
+      </add>
+      <add>
+        Harden the FORM authentication process against DoS attacks by using a
+        reduced session timeout if the FORM authentication process creates a
+        session. The duration of this timeout is configured by the
+        <code>authenticationSessionTimeout</code> attribute of the FORM
+        authenticator. (markt)
+      </add>
+      <add>
+        Implement the new Servlet API methods that provide additional control
+        when sending a redirect to the client. (markt)
+      </add>
+      <add>
+        Update Digest authentication support to align with RFC 7616. This adds a
+        new configuration attribute, <code>algorithms</code>, to the
+        <code>DigestAuthenticator</code> with a default of
+        <code>SHA-256,MD5</code>. (markt)
+      </add>
+      <update>
+        Reduce the default value of <code>maxParameterCount</code> from 10,000
+        to 1,000. (markt)
+      </update>
+      <fix>
+        <bug>66527</bug>: Correct the Javadoc for the
+        <code>Tomcat.addWebapp()</code> methods that incorrectly stated that the
+        <code>docBase</code> parameter could be a relative path. (markt)
+      </fix>
+      <fix>
+        <bug>66524</bug> Correct eviction ordering in WebResource cache to
+        by LRU as intended. (schultz)
+      </fix>
+      <update>
+        Add support code for custom user attributes in <code>RealmBase</code>.
+        Based on code from <pr>473</pr> by Carsten Klein. (remm)
+      </update>
+      <fix>
+        Expand the set of HTTP request headers considered sensitive that should
+        be skipped when generating a response to a <code>TRACE</code> request.
+        This aligns with the current draft of the Servlet 6.1 specification.
+        (markt)
+      </fix>
+      <fix>
+        <bug>66541</bug>: Improve handling for cached resources for resources
+        that use custom URL schemes. The scheme specific <code>equals()</code>
+        and <code>hashcode()</code> algorithms, if present, will now be used for
+        URLs for these resources. This addresses a potential performance issue
+        with some OSGi custom URL schemes that can trigger potentially slow DNS
+        lookups in some configurations. Based on a patch provided by Tom
+        Whitmore. (markt)
+      </fix>
+      <fix>
+        When using a custom session manager deployed as part of the web
+        application, avoid <code>ClassNotFoundException</code>s when validating
+        session IDs extracted from requests. (markt)
+      </fix>
+      <fix>
+        <bug>66543</bug>: Give <code>StandardContext#fireRequestDestroyEvent</code>
+         its own log message. (fschumacher)
+      </fix>
+      <fix>
+        <bug>66554</bug>: Initialize Random during server initialization to
+        avoid possible JVM thread creation in the webapp context on some
+        platforms. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        JSON filter should support specific escaping for common special
+        characters as defined in RFC 8259. Based on code submitted by
+        Thomas Meyer. (remm)
+      </fix>
+      <fix>
+        <bug>66511</bug>: Fix <code>GzipOutputFilter</code> (used for compressed
+        HTTP responses) when used with direct buffers. Patch suggested by Arjen
+        Poutsma. (markt)
+      </fix>
+      <fix>
+        <bug>66512</bug>: Align AJP handling of invalid HTTP response headers
+        (they are now removed from the response) with HTTP. (markt)
+      </fix>
+      <fix>
+        <bug>66530</bug>: Correct a regression in the fix for bug
+        <bug>66442</bug> that meant that streams without a response body did not
+        decrement the active stream count when completing leading to
+        <code>ERR_HTTP2_SERVER_REFUSED_STREAM</code> for some connections.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Fix bug that meant some instances of coercing a
+        <code>LambdaExpression</code> to a functional interface invocation
+        failed. (markt)
+      </fix>
+      <fix>
+        <bug>66536</bug>: Fix parsing of tag files that meant that tag
+        directives could be ignored for some tag files. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        <bug>66535</bug>: Redefine the <code>maxValidTime</code> attribute of
+        <code>FarmWarDeployer</code> to be the maximum time allowed between
+        receiving parts of a transferred file before the transfer is cancelled
+        and the associated resources cleaned-up. A new warning message will be
+        logged if the file transfer is cancelled. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>66508</bug>: When using WebSocket with NIO2, avoid waiting for
+        a timeout before sending the close frame if an I/O error occurs during a
+        write. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>66542</bug>: Documentation. Update the JNDI documentation to
+        replace references to JavaMail with references to Jakarta Mail. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations. Contributed by Shirayuking and
+        tak7iji. (markt)
+      </add>
+      <add>
+        Improvements to Chinese translations. Contributed by totoo. (markt)
+      </add>
+      <scode>
+        Refactor code using <code>MD5Encoder</code> to use
+        <code>HexUtils.toHexString()</code>. (markt)
+      </scode>
+      <fix>
+        <bug>66507</bug>: Fix a bug that <code>$JAVA_OPTS</code> is not passed
+        to the jvm in <code>catalina.sh</code> when calling <code>version</code>.
+        Patch suggested by Eric Hamilton. (lihan)
+      </fix>
+      <update>
+        Update the internal fork of Commons DBCP to f131286 (2023-03-08,
+        2.10.0-SNAPSHOT). This corrects a regression introduced in 11.0.0-M2.
+        (markt)
+      </update>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 11.0.0-M4 (markt)" rtext="2023-03-06">
+  <subsection name="General">
+    <changelog>
+      <fix>
+        Fix a bug that memory allocation is larger than limit in
+        <code>SynchronizedStack</code> to reduce memory footprint. (lihan)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add support for <code>txt:</code> and <code>rnd:</code> rewrite map
+        types from mod_rewrite. Based on a pull request <pr>591</pr>
+        provided by Dimitrios Soumis. (remm)
+      </add>
+      <update>
+        Provide a more appropriate response (501 rather than 400) when rejecting
+        an HTTP request using the CONNECT method. (markt)
+      </update>
+      <fix>
+        <bug>66491</bug>: Revert the switch to using the ServiceLoader mechanism
+        to load the custom URL protocol handlers that Tomcat uses. The original
+        system property based approach has been restored. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        Add a check for the validity of the scheme pseudo-header in HTTP/2.
+        (markt)
+      </add>
+      <fix>
+        <bug>66482</bug>: Restore inline state after async operation in NIO2,
+        to account the fact that unexpected exceptions are sometimes thrown
+        by the implementation. Patch submitted by zhougang. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        Provide an implementation of the sub-set of JavaBeans support that does
+        not depend on the <code>java.beans</code> package. This for use by
+        Expression Language when the <code>java.desktop</code> module (which is
+        where the <code>java.beans</code> package resides) is not available.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 11.0.0-M3 (markt)" rtext="2023-02-23">
+  <subsection name="General">
+    <changelog>
+      <update>
+        Increase the minimum supported Java version to Java 17. Note that
+        Jakarta EE 11 permits a minimum Java version of 21. The minimum Java
+        version for Tomcat 11 may be increased to Java 21 before the first
+        stable release. (markt)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Allow a Valve to access cookies from a request that cannot be mapped to
+        a Context. (markt)
+      </fix>
+      <add>
+        Implement the new Servlet API methods for setting character encodings
+        that accept <code>Charset</code> objects. (markt)
+      </add>
+      <update>
+        The default HEAD response no longer includes some HTTP header fields
+        where the value is determined only while generating the content as per
+        section 9.3.2 of RFC 9110. (markt)
+      </update>
+      <fix>
+        <bug>66438</bug>: Correct names of Jakarta modules in JPMS metadata.
+        (markt)
+      </fix>
+      <update>
+        Switch to using the ServiceLoader mechanism to load the custom URL
+        protocol handlers that Tomcat uses. (markt)
+      </update>
+      <fix>
+        Switch to using <code>LongAdder</code> rather than
+        <code>AtomicInteger</code> to track request count and error count for
+        servlets. (markt)
+      </fix>
+      <fix>
+        Implement the clarification from the Jakarta Servlet project that
+        Servlets mapped to the context root should be mapped for requests to the
+        context root with or without the trailing <code>/</code>. (markt)
+      </fix>
+      <fix>
+        Implement the clarification from the Jakarta Servlet project that
+        calling <code>ServletOutputStream.close()</code> on a stream in
+        non-blocking mode returns immediately with the stream effectively closed
+        and any data remaining to be written is written in the background by the
+        container. (markt)
+      </fix>
+      <fix>
+        Avoid possible ISE when scanning from bad JAR URLs, to restore the
+        previous behavior following the removal of Java 9+ reflection code which
+        caught the ISE. (remm)
+      </fix>
+      <fix>
+        Refactor uses of <code>String.replaceAll()</code> to use
+        <code>String.replace()</code> where regular expressions where not being
+        used. Pull request <pr>581</pr> provided by Andrei Briukhov. (markt)
+      </fix>
+      <add>
+        Add error report valve that allows redirecting to of proxying from an
+        external web server. Based on code and ideas from pull request
+        <pr>506</pr> provided by Max Fortun. (remm)
+      </add>
+      <add>
+        <bug>66470</bug>: Add the Shared Address Space defined by RFC 6598
+        (100.64.0.0/10) to the regular expression used to identify internal
+        proxies for the <code>RemoteIpFilter</code> and
+        <code>RemoteIpValve</code>. (markt)
+      </add>
+      <fix>
+        <bug>66471</bug>: Fix JSessionId secure attribute missing When
+        <code>RemoteIpFilter</code> determines that this request was submitted
+        via a secure channel. (lihan)
+      </fix>
+      <add>
+        Add the additional HTTP status code constants to
+        <code>HttpServletResponse</code> defined by the Jakarta Servlet project
+        for the Servlet 6.1 API. (markt)
+      </add>
+      <fix>
+        Implement the clarification from the Jakarta Servlet project that
+        calling one of the <code>HttpServletResponse</code> methods for setting
+        HTTP header values with <code>null</code> as the new header value
+        removes any existing header of that name. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        Log basic information for each configured TLS certificate when Tomcat
+        starts. (markt)
+      </add>
+      <fix>
+        <bug>66442</bug>: When an HTTP/2 response must not include a body,
+        ensure that the end of stream flag is set on the headers frame and that
+        no data frame is sent. (markt)
+      </fix>
+      <fix>
+        Fix a bug that prevented HTTP/2 connections from timing out when using
+        a Connector configured with <code>useAsyncIO=true</code> (the default).
+        (markt)
+      </fix>
+      <add>
+        Provided dedicated loggers
+        (<code>org.apache.tomcat.util.net.NioEndpoint.certificate</code> /
+        <code>org.apache.tomcat.util.net.Nio2Endpoint.certificate</code>) for
+        logging of configured TLS certificates. (markt)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>66419</bug>: Fix calls from expression language to a method that
+        accepts varargs when only one argument was passed. (markt)
+      </fix>
+      <fix>
+        <bug>66441</bug>: Make imports of static fields in JSPs visible to any
+        EL expressions used on the page. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>66429</bug>: Documentation. Limit access to the documentation web
+        application to localhost by default. (markt)
+      </fix>
+      <fix>
+        <bug>66429</bug>: Examples. Limit access to the examples web application
+        to localhost by default. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update BND to 6.4.0. (markt)
+      </update>
+      <update>
+        Remove support for starting Tomcat under a SecurityManager. (markt)
+      </update>
+      <add>
+        Improvements to Chinese translations. (lihan)
+      </add>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations. Contributed by tak7iji. (markt)
+      </add>
+      <add>
+        Improvements to Korean translations. (woonsan)
+      </add>
+      <update>
+        Update the packaged version of the Apache Tomcat Native Library to 2.0.3
+        to pick up the Windows binaries built with with OpenSSL 3.0.8. (markt)
+      </update>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 11.0.0-M2 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <add>
@@ -119,6 +518,18 @@
         the use of the <code>URL</code> constructors. The regression broke
         lookups for resources that contained one or more characters in their
         name that required escaping when used in a URI path. (markt)
+      </fix>
+      <fix>
+        <bug>66392</bug>: Change the default value of <code>AccessLogValve</code>'s
+        file encoding to UTF-8 and update documentation. (lihan)
+      </fix>
+      <fix>
+        <bug>66393</bug>: Align <code>ExtendedAccessLogValve</code>'s x-P(XXX) with the
+        documentation. (lihan)
+      </fix>
+      <fix>
+        Remove JAX-RPC support which was removed from the Jakarta EE platform
+        for Jakarta EE 9. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -149,11 +560,66 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>66370</bug>: Change the default of the
+        <code>org.apache.el.GET_CLASSLOADER_USE_PRIVILEGED</code> system
+        property to <code>true</code> unless the EL library is running on Tomcat
+        in which case the default remains <code>false</code> as the EL library
+        is already called from within a privileged block and skipping the
+        unnecessary privileged block improves performance. (markt)
+      </fix>
+      <add>
+        Add support for specifying Java 21 (with the value <code>21</code>) as
+        the compiler source and/or compiler target for JSP compilation. If used
+        with an Eclipse JDT compiler version that does not support these values,
+        a warning will be logged and the default will used.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
         Update the packaged version of the Apache Tomcat Migration Tool for
         Jakarta EE to 1.0.6. (markt)
+      </update>
+      <update>
+        Update the internal fork of Apache Commons BCEL to 2ee2bff (2023-01-03,
+        6.7.1-SNAPSHOT). (markt)
+      </update>
+      <update>
+        Update the internal fork of Apache Commons Codec to 3eafd6c (2023-01-03,
+        1.16-SNAPSHOT). (markt)
+      </update>
+      <update>
+        Update the internal fork of Apache Commons FileUpload to 34eb241
+        (2023-01-03, 2.0-SNAPSHOT). (markt)
+      </update>
+      <update>
+        Update the internal fork of Apache Commons DBCP to f131286 (2023-01-03,
+        2.10.0-SNAPSHOT). (markt)
+      </update>
+      <add>
+        Improvements to Japanese translations. Contributed by Shirayuking.
+        (markt)
+      </add>
+      <add>
+        Improvements to Portuguese translations. Contributed by Guilherme
+        Custódio. (markt)
+      </add>
+      <update>
+        Update to the Eclipse JDT compiler 4.26. (markt)
+      </update>
+      <update>
+        Update Checkstyle to 10.6.0. (markt)
+      </update>
+      <update>
+        Update Unboundid to 6.0.7. (markt)
+      </update>
+      <update>
+        Update SpotBugs to 4.7.3. (markt)
       </update>
     </changelog>
   </subsection>

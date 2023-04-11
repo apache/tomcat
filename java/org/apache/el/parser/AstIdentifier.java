@@ -204,7 +204,7 @@ public final class AstIdentifier extends SimpleNode {
     }
 
 
-    private final MethodExpression getMethodExpression(EvaluationContext ctx)
+    private MethodExpression getMethodExpression(EvaluationContext ctx)
             throws ELException {
         Object obj = null;
 

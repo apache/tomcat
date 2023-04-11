@@ -65,7 +65,7 @@ public interface Filter {
      *
      * @throws ServletException if the initialisation fails
      */
-    public default void init(FilterConfig filterConfig) throws ServletException {}
+    default void init(FilterConfig filterConfig) throws ServletException {}
 
     /**
      * The <code>doFilter</code> method of the Filter is called by the container
@@ -98,7 +98,7 @@ public interface Filter {
      *                     processing of the request
      * @throws ServletException if the processing fails for any other reason
      */
-    public void doFilter(ServletRequest request, ServletResponse response,
+    void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException;
 
     /**
@@ -116,5 +116,5 @@ public interface Filter {
      *
      * The default implementation is a NO-OP.
      */
-    public default void destroy() {}
+    default void destroy() {}
 }

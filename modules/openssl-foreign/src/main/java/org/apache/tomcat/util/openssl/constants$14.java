@@ -24,8 +24,10 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-class constants$14 {
+final class constants$14 {
 
+    // Suppresses default constructor, ensuring non-instantiability.
+    private constants$14() {}
     static final FunctionDescriptor SSL_CTX_set_ciphersuites$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
         Constants$root.C_POINTER$LAYOUT,
         Constants$root.C_POINTER$LAYOUT

@@ -44,6 +44,7 @@ public class ConstantPool {
         constantPool = new Constant[constantPoolCount];
         /*
          * constantPool[0] is unused by the compiler and may be used freely by the implementation.
+         * constantPool[0] is currently unused by the implementation.
          */
         for (int i = 1; i < constantPoolCount; i++) {
             constantPool[i] = Constant.readConstant(input);
@@ -105,21 +106,24 @@ public class ConstantPool {
      * @throws ClassFormatException if index is invalid
      */
     public <T extends Constant> T getConstant(final int index, final Class<T> castTo) throws ClassFormatException {
-        if (index >= constantPool.length || index < 0) {
+        if (index >= constantPool.length || index < 1) {
             throw new ClassFormatException("Invalid constant pool reference using index: " + index + ". Constant pool size is: " + constantPool.length);
         }
         if (constantPool[index] != null && !castTo.isAssignableFrom(constantPool[index].getClass())) {
             throw new ClassFormatException("Invalid constant pool reference at index: " + index +
                     ". Expected " + castTo + " but was " + constantPool[index].getClass());
         }
+        if (index > 1) {
+            final Constant prev = constantPool[index - 1];
+            if (prev != null && (prev.getTag() == Const.CONSTANT_Double || prev.getTag() == Const.CONSTANT_Long)) {
+                throw new ClassFormatException("Constant pool at index " + index + " is invalid. The index is unused due to the preceeding "
+                        + Const.getConstantName(prev.getTag()) + ".");
+            }
+        }
         // Previous check ensures this won't throw a ClassCastException
         final T c = castTo.cast(constantPool[index]);
-        // the 0th element is always null
-        if (c == null && index != 0) {
-            final Constant prev = constantPool[index - 1];
-            if (prev == null || prev.getTag() != Const.CONSTANT_Double && prev.getTag() != Const.CONSTANT_Long) {
-                throw new ClassFormatException("Constant pool at index " + index + " is null.");
-            }
+        if (c == null) {
+            throw new ClassFormatException("Constant pool at index " + index + " is null.");
         }
         return c;
     }

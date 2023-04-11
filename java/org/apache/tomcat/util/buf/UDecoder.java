@@ -39,7 +39,7 @@ public final class UDecoder {
 
     private static class DecodeException extends CharConversionException {
         private static final long serialVersionUID = 1L;
-        public DecodeException(String s) {
+        DecodeException(String s) {
             super(s);
         }
 

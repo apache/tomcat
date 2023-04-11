@@ -1238,7 +1238,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
     }
 
     private Class<?> getSetterType(Class<?> clazz, String name) {
-        Method[] methods = Introspection.getDeclaredMethods(clazz);
+        Method[] methods = clazz.getDeclaredMethods();
         if (methods != null && methods.length > 0) {
             for (Method method : methods) {
                 if (Introspection.isValidSetter(method) &&
@@ -1251,7 +1251,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
     }
 
     private Class<?> getFieldType(Class<?> clazz, String name) {
-        Field[] fields = Introspection.getDeclaredFields(clazz);
+        Field[] fields = clazz.getDeclaredFields();
         if (fields != null && fields.length > 0) {
             for (Field field : fields) {
                 if (field.getName().equals(name)) {

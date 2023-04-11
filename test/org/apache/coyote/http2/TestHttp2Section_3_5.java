@@ -32,9 +32,7 @@ public class TestHttp2Section_3_5 extends Http2TestBase {
 
         // Server settings
         parser.readFrame();
-        Assert.assertEquals("0-Settings-[3]-[200]\n" +
-                "0-Settings-End\n"
-                , output.getTrace());
+        Assert.assertEquals("0-Settings-[3]-[200]\n" + "0-Settings-End\n", output.getTrace());
         output.clearTrace();
 
         // Should send client preface here. This will trigger an error.

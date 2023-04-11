@@ -54,7 +54,7 @@ public class TestDefaultServletRedirect extends TomcatBaseTest {
         parameterSets.add(new Object[] { Integer.valueOf(HttpServletResponse.SC_MOVED_PERMANENTLY) });
         parameterSets.add(new Object[] { Integer.valueOf(HttpServletResponse.SC_FOUND) });
         parameterSets.add(new Object[] { Integer.valueOf(HttpServletResponse.SC_TEMPORARY_REDIRECT) });
-        parameterSets.add(new Object[] { Integer.valueOf(308) });
+        parameterSets.add(new Object[] { Integer.valueOf(HttpServletResponse.SC_PERMANENT_REDIRECT) });
 
         return parameterSets;
     }

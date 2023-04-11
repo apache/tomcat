@@ -106,7 +106,7 @@ public interface BodyTag extends IterationTag {
      * BodyTag. This is an illegal return value for doStartTag when the class
      * does not implement BodyTag.
      */
-    public static final int EVAL_BODY_BUFFERED = 2;
+    int EVAL_BODY_BUFFERED = 2;
 
     /**
      * Set the bodyContent property. This method is invoked by the JSP page

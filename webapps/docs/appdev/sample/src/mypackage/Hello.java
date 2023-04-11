@@ -31,7 +31,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * this servlet must be mapped to correspond to the link in the
  * "index.html" file.
  *
- * @author Craig R. McClanahan <Craig.McClanahan@eng.sun.com>
+ * @author Craig R. McClanahan &lt;Craig.McClanahan@eng.sun.com>
  */
 
 public final class Hello extends HttpServlet {

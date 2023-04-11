@@ -29,9 +29,8 @@ class MessagePart {
     private volatile SendHandler endHandler;
     private final long blockingWriteTimeoutExpiry;
 
-    public MessagePart( boolean fin, int rsv, byte opCode, ByteBuffer payload,
-            SendHandler intermediateHandler, SendHandler endHandler,
-            long blockingWriteTimeoutExpiry) {
+    MessagePart(boolean fin, int rsv, byte opCode, ByteBuffer payload, SendHandler intermediateHandler,
+            SendHandler endHandler, long blockingWriteTimeoutExpiry) {
         this.fin = fin;
         this.rsv = rsv;
         this.opCode = opCode;
@@ -79,5 +78,4 @@ class MessagePart {
         return blockingWriteTimeoutExpiry;
     }
 }
-
 

@@ -24,24 +24,22 @@ import java.util.function.Supplier;
 import jakarta.servlet.ServletResponseWrapper;
 
 /**
- * Provides a convenient implementation of the HttpServletResponse interface
- * that can be subclassed by developers wishing to adapt the response from a
- * Servlet. This class implements the Wrapper or Decorator pattern. Methods
- * default to calling through to the wrapped response object.
+ * Provides a convenient implementation of the HttpServletResponse interface that can be subclassed by developers
+ * wishing to adapt the response from a Servlet. This class implements the Wrapper or Decorator pattern. Methods default
+ * to calling through to the wrapped response object.
  *
  * @since Servlet 2.3
+ *
  * @see jakarta.servlet.http.HttpServletResponse
  */
-public class HttpServletResponseWrapper extends ServletResponseWrapper
-        implements HttpServletResponse {
+public class HttpServletResponseWrapper extends ServletResponseWrapper implements HttpServletResponse {
 
     /**
      * Constructs a response adaptor wrapping the given response.
      *
      * @param response The response to be wrapped
      *
-     * @throws java.lang.IllegalArgumentException
-     *             if the response is null
+     * @throws java.lang.IllegalArgumentException if the response is null
      */
     public HttpServletResponseWrapper(HttpServletResponse response) {
         super(response);
@@ -52,8 +50,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * The default behavior of this method is to call addCookie(Cookie cookie)
-     * on the wrapped response object.
+     * The default behavior of this method is to call addCookie(Cookie cookie) on the wrapped response object.
      */
     @Override
     public void addCookie(Cookie cookie) {
@@ -61,8 +58,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * The default behavior of this method is to call containsHeader(String
-     * name) on the wrapped response object.
+     * The default behavior of this method is to call containsHeader(String name) on the wrapped response object.
      */
     @Override
     public boolean containsHeader(String name) {
@@ -70,8 +66,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * The default behavior of this method is to call encodeURL(String url) on
-     * the wrapped response object.
+     * The default behavior of this method is to call encodeURL(String url) on the wrapped response object.
      */
     @Override
     public String encodeURL(String url) {
@@ -79,8 +74,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * The default behavior of this method is to return encodeRedirectURL(String
-     * url) on the wrapped response object.
+     * The default behavior of this method is to return encodeRedirectURL(String url) on the wrapped response object.
      */
     @Override
     public String encodeRedirectURL(String url) {
@@ -88,8 +82,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * The default behavior of this method is to call sendError(int sc, String
-     * msg) on the wrapped response object.
+     * The default behavior of this method is to call sendError(int sc, String msg) on the wrapped response object.
      */
     @Override
     public void sendError(int sc, String msg) throws IOException {
@@ -97,8 +90,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * The default behavior of this method is to call sendError(int sc) on the
-     * wrapped response object.
+     * The default behavior of this method is to call sendError(int sc) on the wrapped response object.
      */
     @Override
     public void sendError(int sc) throws IOException {
@@ -106,8 +98,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * The default behavior of this method is to return sendRedirect(String
-     * location) on the wrapped response object.
+     * The default behavior of this method is to call sendRedirect(String location) on the wrapped response object.
      */
     @Override
     public void sendRedirect(String location) throws IOException {
@@ -115,8 +106,42 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * The default behavior of this method is to call setDateHeader(String name,
-     * long date) on the wrapped response object.
+     * The default behavior of this method is to call sendRedirect(String location, int sc) on the wrapped response
+     * object.
+     *
+     * @since Servlet 6.1
+     */
+    @Override
+    public void sendRedirect(String location, int sc) throws IOException {
+        this._getHttpServletResponse().sendRedirect(location, sc);
+    }
+
+    /**
+     * The default behavior of this method is to call sendRedirect(String location, boolean clearBuffer) on the wrapped
+     * response object.
+     *
+     * @since Servlet 6.1
+     */
+    @Override
+    public void sendRedirect(String location, boolean clearBuffer) throws IOException {
+        this._getHttpServletResponse().sendRedirect(location, clearBuffer);
+    }
+
+    /**
+     * The default behavior of this method is to call sendRedirect(String location, int sc, boolean clearBuffer) on the
+     * wrapped response object.
+     *
+     * @since Servlet 6.1
+     */
+    @Override
+    public void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException {
+        this._getHttpServletResponse().sendRedirect(location, sc, clearBuffer);
+    }
+
+
+    /**
+     * The default behavior of this method is to call setDateHeader(String name, long date) on the wrapped response
+     * object.
      */
     @Override
     public void setDateHeader(String name, long date) {
@@ -124,8 +149,8 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * The default behavior of this method is to call addDateHeader(String name,
-     * long date) on the wrapped response object.
+     * The default behavior of this method is to call addDateHeader(String name, long date) on the wrapped response
+     * object.
      */
     @Override
     public void addDateHeader(String name, long date) {
@@ -133,8 +158,8 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * The default behavior of this method is to return setHeader(String name,
-     * String value) on the wrapped response object.
+     * The default behavior of this method is to return setHeader(String name, String value) on the wrapped response
+     * object.
      */
     @Override
     public void setHeader(String name, String value) {
@@ -142,8 +167,8 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * The default behavior of this method is to return addHeader(String name,
-     * String value) on the wrapped response object.
+     * The default behavior of this method is to return addHeader(String name, String value) on the wrapped response
+     * object.
      */
     @Override
     public void addHeader(String name, String value) {
@@ -151,8 +176,8 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * The default behavior of this method is to call setIntHeader(String name,
-     * int value) on the wrapped response object.
+     * The default behavior of this method is to call setIntHeader(String name, int value) on the wrapped response
+     * object.
      */
     @Override
     public void setIntHeader(String name, int value) {
@@ -160,8 +185,8 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * The default behavior of this method is to call addIntHeader(String name,
-     * int value) on the wrapped response object.
+     * The default behavior of this method is to call addIntHeader(String name, int value) on the wrapped response
+     * object.
      */
     @Override
     public void addIntHeader(String name, int value) {
@@ -169,8 +194,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     }
 
     /**
-     * The default behavior of this method is to call setStatus(int sc) on the
-     * wrapped response object.
+     * The default behavior of this method is to call setStatus(int sc) on the wrapped response object.
      */
     @Override
     public void setStatus(int sc) {
@@ -180,9 +204,8 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     /**
      * {@inheritDoc}
      * <p>
-     * The default implementation is to call
-     * {@link HttpServletResponse#getStatus()}
-     * on the wrapped {@link HttpServletResponse}.
+     * The default implementation is to call {@link HttpServletResponse#getStatus()} on the wrapped
+     * {@link HttpServletResponse}.
      *
      * @since Servlet 3.0
      */
@@ -194,9 +217,8 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     /**
      * {@inheritDoc}
      * <p>
-     * The default implementation is to call
-     * {@link HttpServletResponse#getHeader(String)}
-     * on the wrapped {@link HttpServletResponse}.
+     * The default implementation is to call {@link HttpServletResponse#getHeader(String)} on the wrapped
+     * {@link HttpServletResponse}.
      *
      * @since Servlet 3.0
      */
@@ -208,9 +230,8 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     /**
      * {@inheritDoc}
      * <p>
-     * The default implementation is to call
-     * {@link HttpServletResponse#getHeaders(String)}
-     * on the wrapped {@link HttpServletResponse}.
+     * The default implementation is to call {@link HttpServletResponse#getHeaders(String)} on the wrapped
+     * {@link HttpServletResponse}.
      *
      * @since Servlet 3.0
      */
@@ -222,9 +243,8 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     /**
      * {@inheritDoc}
      * <p>
-     * The default implementation is to call
-     * {@link HttpServletResponse#getHeaderNames()}
-     * on the wrapped {@link HttpServletResponse}.
+     * The default implementation is to call {@link HttpServletResponse#getHeaderNames()} on the wrapped
+     * {@link HttpServletResponse}.
      *
      * @since Servlet 3.0
      */
@@ -236,9 +256,8 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     /**
      * {@inheritDoc}
      * <p>
-     * The default implementation is to call
-     * {@link HttpServletResponse#setTrailerFields(Supplier)}
-     * on the wrapped {@link HttpServletResponse}.
+     * The default implementation is to call {@link HttpServletResponse#setTrailerFields(Supplier)} on the wrapped
+     * {@link HttpServletResponse}.
      *
      * @since Servlet 4.0
      */
@@ -250,9 +269,8 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     /**
      * {@inheritDoc}
      * <p>
-     * The default implementation is to call
-     * {@link HttpServletResponse#getTrailerFields()}
-     * on the wrapped {@link HttpServletResponse}.
+     * The default implementation is to call {@link HttpServletResponse#getTrailerFields()} on the wrapped
+     * {@link HttpServletResponse}.
      *
      * @since Servlet 4.0
      */

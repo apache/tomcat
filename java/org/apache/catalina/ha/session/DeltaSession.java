@@ -49,7 +49,6 @@ import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- *
  * Similar to the StandardSession except that this session will keep
  * track of deltas during a request.
  */
@@ -198,16 +197,17 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     public void applyDiff(byte[] diff, int offset, int length) throws IOException, ClassNotFoundException {
         lockInternal();
         try (ObjectInputStream stream = ((ClusterManager) getManager()).getReplicationStream(diff, offset, length)) {
-            ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
+            Thread currentThread = Thread.currentThread();
+            ClassLoader contextLoader = currentThread.getContextClassLoader();
             try {
                 ClassLoader[] loaders = getClassLoaders();
                 if (loaders != null && loaders.length > 0) {
-                    Thread.currentThread().setContextClassLoader(loaders[0]);
+                    currentThread.setContextClassLoader(loaders[0]);
                 }
                 getDeltaRequest().readExternal(stream);
                 getDeltaRequest().execute(this, ((ClusterManager)getManager()).isNotifyListenersOnReplication());
             } finally {
-                Thread.currentThread().setContextClassLoader(contextLoader);
+                currentThread.setContextClassLoader(contextLoader);
             }
         } finally {
             unlockInternal();

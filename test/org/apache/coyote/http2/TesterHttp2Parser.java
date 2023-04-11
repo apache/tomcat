@@ -37,8 +37,7 @@ public class TesterHttp2Parser extends Http2Parser {
     /**
      * {@inheritDoc}
      * <p>
-     * <b>Note:</b> The test implementation always uses blocking IO for both the
-     * initial read and the remainder.
+     * <b>Note:</b> The test implementation always uses blocking IO for both the initial read and the remainder.
      */
     @Override
     public boolean readFrame() throws Http2Exception, IOException {
@@ -46,7 +45,8 @@ public class TesterHttp2Parser extends Http2Parser {
     }
 
     @Override
-    protected void readPushPromiseFrame(int streamId, int flags, int payloadSize, ByteBuffer buffer) throws Http2Exception, IOException {
+    protected void readPushPromiseFrame(int streamId, int flags, int payloadSize, ByteBuffer buffer)
+            throws Http2Exception, IOException {
 
         // Parse flags used in this method
         boolean hasPadding = Flags.hasPadding(flags);

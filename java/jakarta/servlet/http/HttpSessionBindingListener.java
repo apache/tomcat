@@ -19,11 +19,9 @@ package jakarta.servlet.http;
 import java.util.EventListener;
 
 /**
- * Causes an object to be notified when it is bound to or unbound from a
- * session. The object is notified by an {@link HttpSessionBindingEvent} object.
- * This may be as a result of a servlet programmer explicitly unbinding an
- * attribute from a session, due to a session being invalidated, or due to a
- * session timing out.
+ * Causes an object to be notified when it is bound to or unbound from a session. The object is notified by an
+ * {@link HttpSessionBindingEvent} object. This may be as a result of a servlet programmer explicitly unbinding an
+ * attribute from a session, due to a session being invalidated, or due to a session timing out.
  *
  * @see HttpSession
  * @see HttpSessionBindingEvent
@@ -31,26 +29,24 @@ import java.util.EventListener;
 public interface HttpSessionBindingListener extends EventListener {
 
     /**
-     * Notifies the object that it is being bound to a session and identifies
-     * the session.
-     * The default implementation is a NO-OP.
+     * Notifies the object that it is being bound to a session and identifies the session. The default implementation is
+     * a NO-OP.
      *
-     * @param event
-     *            the event that identifies the session
+     * @param event the event that identifies the session
+     *
      * @see #valueUnbound
      */
-    public default void valueBound(HttpSessionBindingEvent event) {
+    default void valueBound(HttpSessionBindingEvent event) {
     }
 
     /**
-     * Notifies the object that it is being unbound from a session and
-     * identifies the session.
-     * The default implementation is a NO-OP.
+     * Notifies the object that it is being unbound from a session and identifies the session. The default
+     * implementation is a NO-OP.
      *
-     * @param event
-     *            the event that identifies the session
+     * @param event the event that identifies the session
+     *
      * @see #valueBound
      */
-    public default void valueUnbound(HttpSessionBindingEvent event) {
+    default void valueUnbound(HttpSessionBindingEvent event) {
     }
 }

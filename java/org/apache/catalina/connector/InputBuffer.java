@@ -22,15 +22,11 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.ReadListener;
 
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
@@ -42,15 +38,13 @@ import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * The buffer used by Tomcat request. This is a derivative of the Tomcat 3.3
- * OutputBuffer, adapted to handle input instead of output. This allows
- * complete recycling of the facade objects (the ServletInputStream and the
+ * The buffer used by Tomcat request. This is a derivative of the Tomcat 3.3 OutputBuffer, adapted to handle input
+ * instead of output. This allows complete recycling of the facade objects (the ServletInputStream and the
  * BufferedReader).
  *
  * @author Remy Maucherat
  */
-public class InputBuffer extends Reader
-    implements ByteChunk.ByteInputChannel, ApplicationBufferHandler {
+public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, ApplicationBufferHandler {
 
     /**
      * The string manager for this package.
@@ -215,8 +209,7 @@ public class InputBuffer extends Reader
     public int available() {
         int available = availableInThisBuffer();
         if (available == 0) {
-            coyoteRequest.action(ActionCode.AVAILABLE,
-                    Boolean.valueOf(coyoteRequest.getReadListener() != null));
+            coyoteRequest.action(ActionCode.AVAILABLE, Boolean.valueOf(coyoteRequest.getReadListener() != null));
             available = (coyoteRequest.getAvailable() > 0) ? 1 : 0;
         }
         return available;
@@ -346,14 +339,14 @@ public class InputBuffer extends Reader
 
 
     /**
-     * Transfers bytes from the buffer to the specified ByteBuffer. After the
-     * operation the position of the ByteBuffer will be returned to the one
-     * before the operation, the limit will be the position incremented by
-     * the number of the transferred bytes.
+     * Transfers bytes from the buffer to the specified ByteBuffer. After the operation the position of the ByteBuffer
+     * will be returned to the one before the operation, the limit will be the position incremented by the number of the
+     * transferred bytes.
      *
      * @param to the ByteBuffer into which bytes are to be written.
-     * @return an integer specifying the actual number of bytes read, or -1 if
-     *         the end of the stream is reached
+     *
+     * @return an integer specifying the actual number of bytes read, or -1 if the end of the stream is reached
+     *
      * @throws IOException if an input or output exception has occurred
      */
     public int read(ByteBuffer to) throws IOException {
@@ -540,7 +533,7 @@ public class InputBuffer extends Reader
 
         Charset charset = null;
         if (coyoteRequest != null) {
-            charset = coyoteRequest.getCharset();
+            charset = coyoteRequest.getCharsetHolder().getValidatedCharset();
         }
 
         if (charset == null) {
@@ -556,27 +549,8 @@ public class InputBuffer extends Reader
         conv = stack.pop();
 
         if (conv == null) {
-            conv = createConverter(charset);
+            conv = new B2CConverter(charset);
         }
-    }
-
-
-    private static B2CConverter createConverter(Charset charset) throws IOException {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            try {
-                return AccessController.doPrivileged(new PrivilegedCreateConverter(charset));
-            } catch (PrivilegedActionException ex) {
-                Exception e = ex.getException();
-                if (e instanceof IOException) {
-                    throw (IOException) e;
-                } else {
-                    throw new IOException(e);
-                }
-            }
-        } else {
-            return new B2CConverter(charset);
-        }
-
     }
 
 
@@ -624,17 +598,17 @@ public class InputBuffer extends Reader
 
     private void makeSpace(int count) {
         int desiredSize = cb.limit() + count;
-        if(desiredSize > readLimit) {
+        if (desiredSize > readLimit) {
             desiredSize = readLimit;
         }
 
-        if(desiredSize <= cb.capacity()) {
+        if (desiredSize <= cb.capacity()) {
             return;
         }
 
         int newSize = 2 * cb.capacity();
-        if(desiredSize >= newSize) {
-            newSize= 2 * cb.capacity() + count;
+        if (desiredSize >= newSize) {
+            newSize = 2 * cb.capacity() + count;
         }
 
         if (newSize > readLimit) {
@@ -649,21 +623,5 @@ public class InputBuffer extends Reader
         tmp.position(oldPosition);
         cb = tmp;
         tmp = null;
-    }
-
-
-    private static class PrivilegedCreateConverter
-            implements PrivilegedExceptionAction<B2CConverter> {
-
-        private final Charset charset;
-
-        public PrivilegedCreateConverter(Charset charset) {
-            this.charset = charset;
-        }
-
-        @Override
-        public B2CConverter run() throws IOException {
-            return new B2CConverter(charset);
-        }
     }
 }

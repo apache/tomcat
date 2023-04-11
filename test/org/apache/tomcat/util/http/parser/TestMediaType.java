@@ -158,7 +158,7 @@ public class TestMediaType {
         MediaType m = MediaType.parseMediaType(sr);
 
         Assert.assertEquals(CHARSET_WS, m.getCharset());
-        Assert.assertEquals(TYPES.replaceAll(" ", ""),
+        Assert.assertEquals(TYPES.replace(" ", ""),
                 m.toStringNoCharset());
     }
 
@@ -271,7 +271,7 @@ public class TestMediaType {
         private final String name;
         private final String value;
 
-        public Parameter(String name,String value) {
+        Parameter(String name,String value) {
             this.name = name;
             this.value = value;
         }
@@ -292,11 +292,11 @@ public class TestMediaType {
         public String toString(String lws) {
             StringBuilder sb = new StringBuilder();
             sb.append(lws);
-            sb.append(";");
+            sb.append(';');
             sb.append(lws);
             sb.append(name);
             sb.append(lws);
-            sb.append("=");
+            sb.append('=');
             sb.append(lws);
             sb.append(value);
             sb.append(lws);

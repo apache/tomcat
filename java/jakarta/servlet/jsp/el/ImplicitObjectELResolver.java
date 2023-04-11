@@ -191,7 +191,7 @@ public class ImplicitObjectELResolver extends ELResolver {
 
         private Map<String,Object> sessionScope;
 
-        public ScopeManager(PageContext page) {
+        ScopeManager(PageContext page) {
             this.page = page;
         }
 
@@ -295,9 +295,7 @@ public class ImplicitObjectELResolver extends ELResolver {
 
                     @Override
                     protected String[] getAttribute(String name) {
-                        Enumeration<String> e =
-                            ((HttpServletRequest) page.getRequest())
-                                    .getHeaders(name);
+                        Enumeration<String> e = ((HttpServletRequest) page.getRequest()).getHeaders(name);
                         if (e != null) {
                             List<String> list = new ArrayList<>();
                             while (e.hasMoreElements()) {
@@ -524,7 +522,7 @@ public class ImplicitObjectELResolver extends ELResolver {
 
             private final String key;
 
-            public ScopeEntry(String key) {
+            ScopeEntry(String key) {
                 this.key = key;
             }
 

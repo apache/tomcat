@@ -18,8 +18,6 @@ package org.apache.el.lang;
 
 import java.io.StringReader;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
@@ -56,13 +54,7 @@ public final class ExpressionBuilder implements NodeVisitor {
         "org.apache.el.ExpressionBuilder.CACHE_SIZE";
 
     static {
-        String cacheSizeStr;
-        if (System.getSecurityManager() == null) {
-            cacheSizeStr = System.getProperty(CACHE_SIZE_PROP, "5000");
-        } else {
-            cacheSizeStr = AccessController.doPrivileged(
-                    (PrivilegedAction<String>) () -> System.getProperty(CACHE_SIZE_PROP, "5000"));
-        }
+        String cacheSizeStr = System.getProperty(CACHE_SIZE_PROP, "5000");
         CACHE_SIZE = Integer.parseInt(cacheSizeStr);
     }
 
@@ -90,12 +82,12 @@ public final class ExpressionBuilder implements NodeVisitor {
         }
     }
 
-    public static final Node createNode(String expr) throws ELException {
+    public static Node createNode(String expr) throws ELException {
         Node n = createNodeInternal(expr);
         return n;
     }
 
-    private static final Node createNodeInternal(String expr)
+    private static Node createNodeInternal(String expr)
             throws ELException {
         if (expr == null) {
             throw new ELException(MessageFactory.get("error.null"));
@@ -280,11 +272,11 @@ public final class ExpressionBuilder implements NodeVisitor {
         private Object[] stack;
 
 
-        public SynchronizedStack() {
+        SynchronizedStack() {
             this(DEFAULT_SIZE, DEFAULT_LIMIT);
         }
 
-        public SynchronizedStack(int size, int limit) {
+        SynchronizedStack(int size, int limit) {
             this.size = size;
             this.limit = limit;
             stack = new Object[size];

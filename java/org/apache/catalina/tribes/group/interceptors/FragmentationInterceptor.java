@@ -31,7 +31,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- *
  * The fragmentation interceptor splits up large messages into smaller messages and assembles them on the other end.
  * This is very useful when you don't want large messages hogging the sending sockets
  * and smaller messages can make it through.

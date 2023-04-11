@@ -70,7 +70,7 @@ public class TestReflectionUtil {
     @Test
     public void testStaticMethodOnInstance() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         MethodExpression methodExpression = factory.createMethodExpression(context, "${\"1\".format(2)}", String.class, new Class<?>[] {});
 

@@ -22,12 +22,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /**
- * This class represents the contents of a jar by determining whether a given
- * resource <b>might</b> be in the cache, based on a bloom filter. This is not a
- * general-purpose bloom filter because it contains logic to strip out
- * characters from the beginning of the key.
- *
- * The hash methods are simple but good enough for this purpose.
+ * This class represents the contents of a jar by determining whether a given resource <b>might</b> be in the cache,
+ * based on a bloom filter. This is not a general-purpose bloom filter because it contains logic to strip out characters
+ * from the beginning of the key. The hash methods are simple but good enough for this purpose.
  */
 public final class JarContents {
     private final BitSet bits1;
@@ -43,8 +40,7 @@ public final class JarContents {
     private static final int HASH_PRIME_2 = 17;
 
     /**
-     * Size of the fixed-length bit table. Larger reduces false positives,
-     * smaller saves memory.
+     * Size of the fixed-length bit table. Larger reduces false positives, smaller saves memory.
      */
     private static final int TABLE_SIZE = 2048;
 
@@ -91,13 +87,12 @@ public final class JarContents {
     }
 
     /**
-     * Simple hashcode of a portion of the string. Typically we would use
-     * substring, but memory and runtime speed are critical.
+     * Simple hashcode of a portion of the string. Typically we would use substring, but memory and runtime speed are
+     * critical.
      *
-     * @param content
-     *            Wrapping String.
-     * @param startPos
-     *            First character in the range.
+     * @param content  Wrapping String.
+     * @param startPos First character in the range.
+     *
      * @return hashcode of the range.
      */
     private int hashcode(String content, int startPos, int hashPrime) {
@@ -105,7 +100,7 @@ public final class JarContents {
     }
 
     private int hashcode(String content, int startPos, int endPos, int hashPrime) {
-        int h = hashPrime/2;
+        int h = hashPrime / 2;
         for (int i = startPos; i < endPos; i++) {
             h = hashPrime * h + content.charAt(i);
         }
@@ -118,17 +113,15 @@ public final class JarContents {
 
 
     /**
-     * Method that identifies whether a given path <b>MIGHT</b> be in this jar.
-     * Uses the Bloom filter mechanism.
+     * Method that identifies whether a given path <b>MIGHT</b> be in this jar. Uses the Bloom filter mechanism.
      *
-     * @param path
-     *            Requested path. Sometimes starts with "/WEB-INF/classes".
-     * @param webappRoot
-     *            The value of the webapp location, which can be stripped from
-     *            the path. Typically is "/WEB-INF/classes".
+     * @param path       Requested path. Sometimes starts with "/WEB-INF/classes".
+     * @param webappRoot The value of the webapp location, which can be stripped from the path. Typically is
+     *                       "/WEB-INF/classes".
+     *
      * @return Whether the prefix of the path is known to be in this jar.
      */
-    public final boolean mightContainResource(String path, String webappRoot) {
+    public boolean mightContainResource(String path, String webappRoot) {
         int startPos = 0;
         if (path.startsWith(webappRoot)) {
             startPos = webappRoot.length();

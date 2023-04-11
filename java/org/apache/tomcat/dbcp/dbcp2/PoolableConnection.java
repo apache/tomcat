@@ -46,7 +46,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
     static {
         try {
             MBEAN_SERVER = ManagementFactory.getPlatformMBeanServer();
-        } catch (final NoClassDefFoundError | Exception ex) {
+        } catch (final NoClassDefFoundError | Exception ignored) {
             // ignore - JMX not available
         }
     }
@@ -69,7 +69,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
 
     /**
      * SQL_STATE codes considered to signal fatal conditions. Overrides the defaults in
-     * {@link Utils#DISCONNECTION_SQL_CODES} (plus anything starting with {@link Utils#DISCONNECTION_SQL_CODE_PREFIX}).
+     * {@link Utils#getDisconnectionSqlCodes()} (plus anything starting with {@link Utils#DISCONNECTION_SQL_CODE_PREFIX}).
      */
     private final Collection<String> disconnectionSqlCodes;
 
@@ -77,7 +77,6 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
     private final boolean fastFailValidation;
 
     /**
-     *
      * @param conn
      *            my underlying connection
      * @param pool
@@ -91,7 +90,6 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
     }
 
     /**
-     *
      * @param conn
      *            my underlying connection
      * @param pool
@@ -116,7 +114,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
         if (jmxObjectName != null) {
             try {
                 MBEAN_SERVER.registerMBean(this, jmxObjectName);
-            } catch (InstanceAlreadyExistsException | MBeanRegistrationException | NotCompliantMBeanException e) {
+            } catch (InstanceAlreadyExistsException | MBeanRegistrationException | NotCompliantMBeanException ignored) {
                 // For now, simply skip registration
             }
         }
@@ -155,7 +153,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
                 // pool is closed, so close the connection
                 passivate();
                 getInnermostDelegate().close();
-            } catch (final Exception ie) {
+            } catch (final Exception ignored) {
                 // DO NOTHING the original exception will be rethrown
             }
             throw new SQLException("Cannot close connection (isClosed check failed)", e);
@@ -246,7 +244,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
      * <p>
      * If {@link #disconnectionSqlCodes} has been set, sql states are compared to those in the configured list of fatal
      * exception codes. If this property is not set, codes are compared against the default codes in
-     * {@link Utils#DISCONNECTION_SQL_CODES} and in this case anything starting with #{link
+     * {@link Utils#getDisconnectionSqlCodes()} and in this case anything starting with #{link
      * Utils.DISCONNECTION_SQL_CODE_PREFIX} is considered a disconnection.
      * </p>
      *
@@ -258,7 +256,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
         final String sqlState = e.getSQLState();
         if (sqlState != null) {
             fatalException = disconnectionSqlCodes == null
-                ? sqlState.startsWith(Utils.DISCONNECTION_SQL_CODE_PREFIX) || Utils.DISCONNECTION_SQL_CODES.contains(sqlState)
+                ? sqlState.startsWith(Utils.DISCONNECTION_SQL_CODE_PREFIX) || Utils.getDisconnectionSqlCodes().contains(sqlState)
                 : disconnectionSqlCodes.contains(sqlState);
         }
         return fatalException;
@@ -269,7 +267,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
      * <p>
      * If {@link #disconnectionSqlCodes} has been set, sql states are compared to those in the
      * configured list of fatal exception codes. If this property is not set, codes are compared against the default
-     * codes in {@link Utils#DISCONNECTION_SQL_CODES} and in this case anything starting with #{link
+     * codes in {@link Utils#getDisconnectionSqlCodes()} and in this case anything starting with #{link
      * Utils.DISCONNECTION_SQL_CODE_PREFIX} is considered a disconnection.
      * </p>
      *

@@ -31,14 +31,14 @@ public interface Registration {
      *
      * @return the name of the Servlet.
      */
-    public String getName();
+    String getName();
 
     /**
      * Obtain the name of the implementation class for the Servlet.
      *
      * @return the name of the implementation class for the Servlet.
      */
-    public String getClassName();
+    String getClassName();
 
     /**
      * Add an initialisation parameter if not already added.
@@ -53,7 +53,7 @@ public interface Registration {
      * @throws IllegalStateException if the ServletContext associated with this
      *         registration has already been initialised
      */
-    public boolean setInitParameter(String name, String value);
+    boolean setInitParameter(String name, String value);
 
     /**
      * Get the value of an initialisation parameter.
@@ -62,7 +62,7 @@ public interface Registration {
      *
      * @return The value of the named initialisation parameter
      */
-    public String getInitParameter(String name);
+    String getInitParameter(String name);
 
     /**
      * Add multiple initialisation parameters. If any of the supplied
@@ -79,7 +79,7 @@ public interface Registration {
      * @throws IllegalStateException if the ServletContext associated with this
      *         registration has already been initialised
      */
-    public Set<String> setInitParameters(Map<String,String> initParameters);
+    Set<String> setInitParameters(Map<String,String> initParameters);
 
     /**
      * Get the names and values of all the initialisation parameters.
@@ -87,14 +87,14 @@ public interface Registration {
      * @return A Map of initialisation parameter names and associated values
      *         keyed by name
      */
-    public Map<String, String> getInitParameters();
+    Map<String, String> getInitParameters();
 
     /**
      * Interface through which a Servlet or Filter registered via one of the
      * addServlet or addFilter methods, respectively, on ServletContext may be
      * further configured.
      */
-    public interface Dynamic extends Registration {
+    interface Dynamic extends Registration {
 
         /**
          * Mark this Servlet/Filter as supported asynchronous processing.
@@ -105,6 +105,6 @@ public interface Registration {
          * @throws IllegalStateException if the ServletContext associated with
          *         this registration has already been initialised
          */
-        public void setAsyncSupported(boolean isAsyncSupported);
+        void setAsyncSupported(boolean isAsyncSupported);
     }
 }

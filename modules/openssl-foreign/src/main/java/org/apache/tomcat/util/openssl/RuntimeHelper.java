@@ -24,8 +24,8 @@ import java.lang.foreign.GroupLayout;
 import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.Arena;
 import java.lang.foreign.SegmentAllocator;
-import java.lang.foreign.SegmentScope;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -42,20 +42,23 @@ import static java.lang.foreign.ValueLayout.*;
 
 final class RuntimeHelper {
 
-    private RuntimeHelper() {}
-    private final static Linker LINKER = Linker.nativeLinker();
-    private final static ClassLoader LOADER = RuntimeHelper.class.getClassLoader();
-    private final static MethodHandles.Lookup MH_LOOKUP = MethodHandles.lookup();
-    private final static SymbolLookup SYMBOL_LOOKUP;
+    private static final Linker LINKER = Linker.nativeLinker();
+    private static final ClassLoader LOADER = RuntimeHelper.class.getClassLoader();
+    private static final MethodHandles.Lookup MH_LOOKUP = MethodHandles.lookup();
+    private static final SymbolLookup SYMBOL_LOOKUP;
+    private static final SegmentAllocator THROWING_ALLOCATOR = (x, y) -> { throw new AssertionError("should not reach here"); };
 
     final static SegmentAllocator CONSTANT_ALLOCATOR =
-            (size, align) -> MemorySegment.allocateNative(size, align, SegmentScope.auto());
+            (size, align) -> Arena.ofAuto().allocate(size, align);
 
     static {
         System.loadLibrary("ssl");
         SymbolLookup loaderLookup = SymbolLookup.loaderLookup();
         SYMBOL_LOOKUP = name -> loaderLookup.find(name).or(() -> LINKER.defaultLookup().find(name));
     }
+
+    // Suppresses default constructor, ensuring non-instantiability.
+    private RuntimeHelper() {}
 
     static <T> T requireNonNull(T obj, String symbolName) {
         if (obj == null) {
@@ -64,45 +67,52 @@ final class RuntimeHelper {
         return obj;
     }
 
-    private final static SegmentAllocator THROWING_ALLOCATOR = (x, y) -> { throw new AssertionError("should not reach here"); };
-
-    static final MemorySegment lookupGlobalVariable(String name, MemoryLayout layout) {
-        return SYMBOL_LOOKUP.find(name).map(symbol -> MemorySegment.ofAddress(symbol.address(), layout.byteSize(), symbol.scope())).orElse(null);
+    static MemorySegment lookupGlobalVariable(String name, MemoryLayout layout) {
+        return SYMBOL_LOOKUP.find(name)
+                .map(s -> s.reinterpret(layout.byteSize()))
+                .orElse(null);
     }
 
-    static final MethodHandle downcallHandle(String name, FunctionDescriptor fdesc) {
+    static MethodHandle downcallHandle(String name, FunctionDescriptor fdesc) {
         return SYMBOL_LOOKUP.find(name).
                 map(addr -> LINKER.downcallHandle(addr, fdesc)).
                 orElse(null);
     }
 
-    static final MethodHandle downcallHandle(FunctionDescriptor fdesc) {
+    static MethodHandle downcallHandle(FunctionDescriptor fdesc) {
         return LINKER.downcallHandle(fdesc);
     }
 
-    static final MethodHandle downcallHandleVariadic(String name, FunctionDescriptor fdesc) {
+    static MethodHandle downcallHandleVariadic(String name, FunctionDescriptor fdesc) {
         return SYMBOL_LOOKUP.find(name).
                 map(addr -> VarargsInvoker.make(addr, fdesc)).
                 orElse(null);
     }
 
-    static final <Z> MemorySegment upcallStub(Class<Z> fi, Z z, FunctionDescriptor fdesc, SegmentScope session) {
+    static MethodHandle upcallHandle(Class<?> fi, String name, FunctionDescriptor fdesc) {
         try {
-            MethodHandle handle = MH_LOOKUP.findVirtual(fi, "apply", fdesc.toMethodType());
-            handle = handle.bindTo(z);
-            return LINKER.upcallStub(handle, fdesc, session);
+            return MH_LOOKUP.findVirtual(fi, name, fdesc.toMethodType());
         } catch (Throwable ex) {
             throw new AssertionError(ex);
         }
     }
 
-    static MemorySegment asArray(MemorySegment addr, MemoryLayout layout, int numElements, SegmentScope session) {
-         return MemorySegment.ofAddress(addr.address(), numElements * layout.byteSize(), session);
+    static <Z> MemorySegment upcallStub(MethodHandle fiHandle, Z z, FunctionDescriptor fdesc, Arena scope) {
+        try {
+            fiHandle = fiHandle.bindTo(z);
+            return LINKER.upcallStub(fiHandle, fdesc, scope);
+        } catch (Throwable ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    static MemorySegment asArray(MemorySegment addr, MemoryLayout layout, int numElements, Arena arena) {
+         return addr.reinterpret(numElements * layout.byteSize(), arena, null);
     }
 
     // Internals only below this point
 
-    private static class VarargsInvoker {
+    private static final class VarargsInvoker {
         private static final MethodHandle INVOKE_MH;
         private final MemorySegment symbol;
         private final FunctionDescriptor function;

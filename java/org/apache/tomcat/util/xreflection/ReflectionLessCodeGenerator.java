@@ -43,7 +43,7 @@ final class ReflectionLessCodeGenerator {
         StringBuilder code = new StringBuilder(AL20_HEADER)
             .append("package ")
             .append(packageName)
-            .append(";")
+            .append(';')
             .append(System.lineSeparator())
             .append(System.lineSeparator())
             .append("final class ")
@@ -60,7 +60,7 @@ final class ReflectionLessCodeGenerator {
             .append("return true;")
             .append(System.lineSeparator())
             .append(getIndent(1))
-            .append("}")
+            .append('}')
             .append(System.lineSeparator())
             .append(System.lineSeparator())
         ;
@@ -80,7 +80,7 @@ final class ReflectionLessCodeGenerator {
             .append("} catch (java.net.UnknownHostException x) { throw new RuntimeException(x); }")
             .append(System.lineSeparator())
             .append(getIndent(1))
-            .append("}")
+            .append('}')
             .append(System.lineSeparator())
             .append(System.lineSeparator())
             ;
@@ -113,19 +113,19 @@ final class ReflectionLessCodeGenerator {
 
         code
             .append(getIndent(3))
-            .append("}")
+            .append('}')
             .append(System.lineSeparator())
             .append(getIndent(3))
             .append("checkThisClass = checkThisClass.getSuperclass();")
             .append(System.lineSeparator())
             .append(getIndent(2))
-            .append("}")
+            .append('}')
             .append(System.lineSeparator())
             .append(getIndent(2))
             .append("return result;")
             .append(System.lineSeparator())
             .append(getIndent(1))
-            .append("}")
+            .append('}')
             .append(System.lineSeparator());
         //end - getPropertyInternal method
 
@@ -161,19 +161,19 @@ final class ReflectionLessCodeGenerator {
 
         code
             .append(getIndent(3))
-            .append("}")
+            .append('}')
             .append(System.lineSeparator())
             .append(getIndent(3))
             .append("checkThisClass = checkThisClass.getSuperclass();")
             .append(System.lineSeparator())
             .append(getIndent(2))
-            .append("}")
+            .append('}')
             .append(System.lineSeparator())
             .append(getIndent(2))
             .append("return false;")
             .append(System.lineSeparator())
             .append(getIndent(1))
-            .append("}")
+            .append('}')
             .append(System.lineSeparator());
         //end - setPropertyInternal method
 
@@ -181,14 +181,14 @@ final class ReflectionLessCodeGenerator {
         generateSetPropertyForMethods(baseClasses, code);
         //end - setPropertyForXXX methods
 
-        code.append("}")
+        code.append('}')
             .append(System.lineSeparator());
         //end - class
         File destination = new File(directory, className+".java");
-        BufferedWriter writer = new BufferedWriter(new FileWriter(destination, false));
-        writer.write(code.toString());
-        writer.flush();
-        writer.close();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(destination, false))) {
+            writer.write(code.toString());
+            writer.flush();
+        }
 
     }
 

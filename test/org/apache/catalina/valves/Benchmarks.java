@@ -22,20 +22,17 @@ import java.util.Date;
 import org.junit.Test;
 
 /**
- * Some simple micro-benchmarks to help determine best approach for thread
- * safety in valves, particularly the {@link AccessLogValve}. Implemented as
- * JUnit tests to make the simple to execute but does not used Test* as the
- * class name to avoid being included in the automated unit tests.
+ * Some simple micro-benchmarks to help determine best approach for thread safety in valves, particularly the
+ * {@link AccessLogValve}. Implemented as JUnit tests to make the simple to execute but does not used Test* as the class
+ * name to avoid being included in the automated unit tests.
  */
 public class Benchmarks {
     @Test
     public void testAccessLogGetDate() throws Exception {
         // Is it better to use a sync or a thread local here?
         BenchmarkTest benchmark = new BenchmarkTest();
-        Runnable[] tests = new Runnable[] { new GetDateBenchmarkTest_Sync(),
-                new GetDateBenchmarkTest_Local(),
-                new GetDateBenchmarkTest_LocalMutableLong(),
-                new GetDateBenchmarkTest_LocalStruct() };
+        Runnable[] tests = new Runnable[] { new GetDateBenchmarkTest_Sync(), new GetDateBenchmarkTest_Local(),
+                new GetDateBenchmarkTest_LocalMutableLong(), new GetDateBenchmarkTest_LocalStruct() };
         benchmark.doTest(5, tests);
     }
 
@@ -99,8 +96,7 @@ public class Benchmarks {
         }
     }
 
-    private static class GetDateBenchmarkTest_LocalMutableLong implements
-            Runnable {
+    private static class GetDateBenchmarkTest_LocalMutableLong implements Runnable {
 
         @Override
         public String toString() {
@@ -175,17 +171,15 @@ public class Benchmarks {
     public void testAccessLogTimeDateElement() throws Exception {
         // Is it better to use a sync or a thread local here?
         BenchmarkTest benchmark = new BenchmarkTest();
-        Runnable[] tests = new Runnable[] {
-                new TimeDateElementBenchmarkTest_Sync(),
-                new TimeDateElementBenchmarkTest_Local(),
-                new TimeDateElementBenchmarkTest_LocalStruct(),
+        Runnable[] tests = new Runnable[] { new TimeDateElementBenchmarkTest_Sync(),
+                new TimeDateElementBenchmarkTest_Local(), new TimeDateElementBenchmarkTest_LocalStruct(),
                 new TimeDateElementBenchmarkTest_LocalStruct_SBuilder() };
         benchmark.doTest(5, tests);
     }
 
     private abstract static class TimeDateElementBenchmarkTestBase {
-        protected static final String months[] = { "Jan", "Feb", "Mar", "Apr",
-                "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+        protected static final String months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
+                "Nov", "Dec" };
 
         protected String lookup(String month) {
             int index;
@@ -198,8 +192,8 @@ public class Benchmarks {
         }
     }
 
-    private static class TimeDateElementBenchmarkTest_Sync extends
-            TimeDateElementBenchmarkTestBase implements Runnable {
+    private static class TimeDateElementBenchmarkTest_Sync extends TimeDateElementBenchmarkTestBase
+            implements Runnable {
 
         @Override
         public String toString() {
@@ -211,8 +205,7 @@ public class Benchmarks {
         private SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");
         private SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
         private SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy");
-        private SimpleDateFormat timeFormatter = new SimpleDateFormat(
-                "hh:mm:ss");
+        private SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm:ss");
 
         @Override
         public void run() {
@@ -257,8 +250,8 @@ public class Benchmarks {
         }
     }
 
-    private static class TimeDateElementBenchmarkTest_Local extends
-            TimeDateElementBenchmarkTestBase implements Runnable {
+    private static class TimeDateElementBenchmarkTest_Local extends TimeDateElementBenchmarkTestBase
+            implements Runnable {
 
         @Override
         public String toString() {
@@ -308,17 +301,13 @@ public class Benchmarks {
             if (currentDateStringLocal.get() == null) {
                 StringBuilder current = new StringBuilder(32);
                 current.append('[');
-                current.append(dayFormatterLocal.get().format(
-                        currentDateLocal.get())); // Day
+                current.append(dayFormatterLocal.get().format(currentDateLocal.get())); // Day
                 current.append('/');
-                current.append(lookup(monthFormatterLocal.get().format(
-                        currentDateLocal.get()))); // Month
+                current.append(lookup(monthFormatterLocal.get().format(currentDateLocal.get()))); // Month
                 current.append('/');
-                current.append(yearFormatterLocal.get().format(
-                        currentDateLocal.get())); // Year
+                current.append(yearFormatterLocal.get().format(currentDateLocal.get())); // Year
                 current.append(':');
-                current.append(timeFormatterLocal.get().format(
-                        currentDateLocal.get())); // Time
+                current.append(timeFormatterLocal.get().format(currentDateLocal.get())); // Time
                 current.append(']');
                 currentDateStringLocal.set(current.toString());
             }
@@ -335,8 +324,8 @@ public class Benchmarks {
         }
     }
 
-    private static class TimeDateElementBenchmarkTest_LocalStruct extends
-            TimeDateElementBenchmarkTestBase implements Runnable {
+    private static class TimeDateElementBenchmarkTest_LocalStruct extends TimeDateElementBenchmarkTestBase
+            implements Runnable {
 
         @Override
         public String toString() {
@@ -349,8 +338,7 @@ public class Benchmarks {
             public SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");
             public SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
             public SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy");
-            public SimpleDateFormat timeFormatter = new SimpleDateFormat(
-                    "hh:mm:ss");
+            public SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm:ss");
         }
 
         private ThreadLocal<Struct> structLocal = new ThreadLocal<>() {
@@ -373,8 +361,7 @@ public class Benchmarks {
                 current.append('[');
                 current.append(struct.dayFormatter.format(struct.currentDate)); // Day
                 current.append('/');
-                current.append(lookup(struct.monthFormatter
-                        .format(struct.currentDate))); // Month
+                current.append(lookup(struct.monthFormatter.format(struct.currentDate))); // Month
                 current.append('/');
                 current.append(struct.yearFormatter.format(struct.currentDate)); // Year
                 current.append(':');
@@ -396,8 +383,8 @@ public class Benchmarks {
         }
     }
 
-    private static class TimeDateElementBenchmarkTest_LocalStruct_SBuilder extends
-            TimeDateElementBenchmarkTestBase implements Runnable {
+    private static class TimeDateElementBenchmarkTest_LocalStruct_SBuilder extends TimeDateElementBenchmarkTestBase
+            implements Runnable {
 
         @Override
         public String toString() {
@@ -410,8 +397,7 @@ public class Benchmarks {
             public SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");
             public SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
             public SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy");
-            public SimpleDateFormat timeFormatter = new SimpleDateFormat(
-                    "hh:mm:ss");
+            public SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm:ss");
         }
 
         private ThreadLocal<Struct> structLocal = new ThreadLocal<>() {
@@ -434,8 +420,7 @@ public class Benchmarks {
                 current.append('[');
                 current.append(struct.dayFormatter.format(struct.currentDate)); // Day
                 current.append('/');
-                current.append(lookup(struct.monthFormatter
-                        .format(struct.currentDate))); // Month
+                current.append(lookup(struct.monthFormatter.format(struct.currentDate))); // Month
                 current.append('/');
                 current.append(struct.yearFormatter.format(struct.currentDate)); // Year
                 current.append(':');
@@ -466,8 +451,7 @@ public class Benchmarks {
             }
         }
 
-        private void doTestInternal(int threadCount, int iterations,
-                Runnable test) throws Exception {
+        private void doTestInternal(int threadCount, int iterations, Runnable test) throws Exception {
             long start = System.currentTimeMillis();
             Thread[] threads = new Thread[threadCount];
             for (int i = 0; i < threadCount; i++) {
@@ -481,10 +465,8 @@ public class Benchmarks {
             }
             long end = System.currentTimeMillis();
 
-            System.out.println(test.getClass().getSimpleName() + ": "
-                    + threadCount + " threads and " + iterations
-                    + " iterations using " + test + " took " + (end - start)
-                    + "ms");
+            System.out.println(test.getClass().getSimpleName() + ": " + threadCount + " threads and " + iterations +
+                    " iterations using " + test + " took " + (end - start) + "ms");
         }
     }
 
@@ -492,7 +474,7 @@ public class Benchmarks {
         private int count;
         private Runnable test;
 
-        public TestThread(int count, Runnable test) {
+        TestThread(int count, Runnable test) {
             this.count = count;
             this.test = test;
         }

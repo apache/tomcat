@@ -54,10 +54,9 @@ public class TestTomcatClassLoader extends TomcatBaseTest {
     @Test
     public void testNonDefaultClassLoader() throws Exception {
 
-        ClassLoader cl = new URLClassLoader(new URL[0],
-                Thread.currentThread().getContextClassLoader());
-
-        Thread.currentThread().setContextClassLoader(cl);
+        Thread currentThread = Thread.currentThread();
+        ClassLoader cl = new URLClassLoader(new URL[0], currentThread.getContextClassLoader());
+        currentThread.setContextClassLoader(cl);
 
         Tomcat tomcat = getTomcatInstance();
         tomcat.getServer().setParentClassLoader(cl);
@@ -79,7 +78,7 @@ public class TestTomcatClassLoader extends TomcatBaseTest {
 
         private transient ClassLoader custom;
 
-        public ClassLoaderReport(ClassLoader custom) {
+        ClassLoaderReport(ClassLoader custom) {
             this.custom = custom;
         }
 

@@ -24,8 +24,10 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-class constants$24 {
+final class constants$24 {
 
+    // Suppresses default constructor, ensuring non-instantiability.
+    private constants$24() {}
     static final FunctionDescriptor ERR_clear_error$FUNC = FunctionDescriptor.ofVoid();
     static final MethodHandle ERR_clear_error$MH = RuntimeHelper.downcallHandle(
         "ERR_clear_error",

@@ -32,10 +32,6 @@ import java.util.Set;
  * {@link WebappClassLoaderBase#clearReferences()} for details - but the short
  * version is do not just create a new instance of this class with the new
  * keyword.
- *
- * Since this class is loaded by {@link WebappClassLoaderBase}, it cannot refer
- * to any internal Tomcat classes as that will cause the security manager to
- * complain.
  */
 public class JdbcLeakPrevention {
 

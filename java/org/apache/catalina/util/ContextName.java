@@ -185,7 +185,7 @@ public final class ContextName {
      */
     public static ContextName extractFromPath(String path) {
         // Convert '\' to '/'
-        path = path.replaceAll("\\\\", "/");
+        path = path.replace("\\", "/");
         // Remove trailing '/'. Use while just in case a value ends in ///
         while (path.endsWith("/")) {
             path = path.substring(0, path.length() - 1);

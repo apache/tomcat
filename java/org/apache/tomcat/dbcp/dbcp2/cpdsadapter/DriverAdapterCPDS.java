@@ -37,7 +37,6 @@ import javax.naming.spi.ObjectFactory;
 import javax.sql.ConnectionPoolDataSource;
 import javax.sql.PooledConnection;
 
-import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.apache.tomcat.dbcp.dbcp2.Constants;
 import org.apache.tomcat.dbcp.dbcp2.DelegatingPreparedStatement;
 import org.apache.tomcat.dbcp.dbcp2.PStmtKey;
@@ -50,29 +49,29 @@ import org.apache.tomcat.dbcp.pool2.impl.GenericKeyedObjectPoolConfig;
 /**
  * <p>
  * An adapter for JDBC drivers that do not include an implementation of {@link javax.sql.ConnectionPoolDataSource}, but
- * still include a {@link java.sql.DriverManager} implementation. <code>ConnectionPoolDataSource</code>s are not used
- * within general applications. They are used by <code>DataSource</code> implementations that pool
- * <code>Connection</code>s, such as {@link org.apache.tomcat.dbcp.dbcp2.datasources.SharedPoolDataSource}. A J2EE container
- * will normally provide some method of initializing the <code>ConnectionPoolDataSource</code> whose attributes are
+ * still include a {@link java.sql.DriverManager} implementation. {@code ConnectionPoolDataSource}s are not used
+ * within general applications. They are used by {@code DataSource} implementations that pool
+ * {@code Connection}s, such as {@link org.apache.tomcat.dbcp.dbcp2.datasources.SharedPoolDataSource}. A J2EE container
+ * will normally provide some method of initializing the {@code ConnectionPoolDataSource} whose attributes are
  * presented as bean getters/setters and then deploying it via JNDI. It is then available as a source of physical
- * connections to the database, when the pooling <code>DataSource</code> needs to create a new physical connection.
+ * connections to the database, when the pooling {@code DataSource} needs to create a new physical connection.
  * </p>
  * <p>
  * Although normally used within a JNDI environment, the DriverAdapterCPDS can be instantiated and initialized as any
- * bean and then attached directly to a pooling <code>DataSource</code>. <code>Jdbc2PoolDataSource</code> can use the
- * <code>ConnectionPoolDataSource</code> with or without the use of JNDI.
+ * bean and then attached directly to a pooling {@code DataSource}. {@code Jdbc2PoolDataSource} can use the
+ * {@code ConnectionPoolDataSource} with or without the use of JNDI.
  * </p>
  * <p>
- * The DriverAdapterCPDS also provides <code>PreparedStatement</code> pooling which is not generally available in jdbc2
- * <code>ConnectionPoolDataSource</code> implementation, but is addressed within the jdbc3 specification. The
- * <code>PreparedStatement</code> pool in DriverAdapterCPDS has been in the dbcp package for some time, but it has not
+ * The DriverAdapterCPDS also provides {@code PreparedStatement} pooling which is not generally available in jdbc2
+ * {@code ConnectionPoolDataSource} implementation, but is addressed within the jdbc3 specification. The
+ * {@code PreparedStatement} pool in DriverAdapterCPDS has been in the dbcp package for some time, but it has not
  * undergone extensive testing in the configuration used here. It should be considered experimental and can be toggled
  * with the poolPreparedStatements attribute.
  * </p>
  * <p>
  * The <a href="package-summary.html">package documentation</a> contains an example using catalina and JNDI. The
  * <a href="../datasources/package-summary.html">datasources package documentation</a> shows how to use
- * <code>DriverAdapterCPDS</code> as a source for <code>Jdbc2PoolDataSource</code> without the use of JNDI.
+ * {@code DriverAdapterCPDS} as a source for {@code Jdbc2PoolDataSource} without the use of JNDI.
  * </p>
  *
  * @since 2.0
@@ -92,8 +91,8 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     /** Description */
     private String description;
 
-    /** Url name */
-    private String url;
+    /** Connection string */
+    private String connectionString;
 
     /** User name */
     private String userName;
@@ -273,7 +272,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      */
     @Override
     public Object getObjectInstance(final Object refObj, final Name name, final Context context,
-        final Hashtable<?, ?> env) throws Exception {
+        final Hashtable<?, ?> env) throws ClassNotFoundException {
         // The spec says to return null if we can't create an instance
         // of the reference
         DriverAdapterCPDS cpds = null;
@@ -363,7 +362,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      * @since 2.4.0
      */
     public char[] getPasswordCharArray() {
-        return userPassword == null ? null : userPassword.clone();
+        return Utils.clone(userPassword);
     }
 
     /**
@@ -486,12 +485,12 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     }
 
     /**
-     * Gets the value of url used to locate the database for this datasource.
+     * Gets the value of connection string used to locate the database for this data source.
      *
-     * @return value of url.
+     * @return value of connection string.
      */
     public String getUrl() {
-        return url;
+        return connectionString;
     }
 
     /**
@@ -517,7 +516,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     }
 
     /**
-     * Whether to toggle the pooling of <code>PreparedStatement</code>s
+     * Whether to toggle the pooling of {@code PreparedStatement}s
      *
      * @return value of poolPreparedStatements.
      */
@@ -538,11 +537,11 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     /**
      * Sets the connection properties passed to the JDBC driver.
      * <p>
-     * If <code>props</code> contains "user" and/or "password" properties, the corresponding instance properties are
+     * If {@code props} contains "user" and/or "password" properties, the corresponding instance properties are
      * set. If these properties are not present, they are filled in using {@link #getUser()}, {@link #getPassword()}
      * when {@link #getPooledConnection()} is called, or using the actual parameters to the method call when
      * {@link #getPooledConnection(String, String)} is called. Calls to {@link #setUser(String)} or
-     * {@link #setPassword(String)} overwrite the values of these properties if <code>connectionProperties</code> is not
+     * {@link #setPassword(String)} overwrite the values of these properties if {@code connectionProperties} is not
      * null.
      * </p>
      *
@@ -675,7 +674,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      * Sets the number of statements to examine during each run of the idle object evictor thread (if any).
      * <p>
      * When a negative value is supplied,
-     * <code>ceil({@link BasicDataSource#getNumIdle})/abs({@link #getNumTestsPerEvictionRun})</code> tests will be run.
+     * {@code ceil({@link BasicDataSource#getNumIdle})/abs({@link #getNumTestsPerEvictionRun})} tests will be run.
      * I.e., when the value is <i>-n</i>, roughly one <i>n</i>th of the idle objects will be tested per run.
      * </p>
      *
@@ -714,7 +713,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     }
 
     /**
-     * Whether to toggle the pooling of <code>PreparedStatement</code>s
+     * Whether to toggle the pooling of {@code PreparedStatement}s
      *
      * @param poolPreparedStatements true to pool statements.
      * @throws IllegalStateException if {@link #getPooledConnection()} has been called
@@ -741,14 +740,14 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     }
 
     /**
-     * Sets the value of URL string used to locate the database for this datasource.
+     * Sets the value of URL string used to locate the database for this data source.
      *
-     * @param url Value to assign to url.
+     * @param connectionString Value to assign to connection string.
      * @throws IllegalStateException if {@link #getPooledConnection()} has been called
      */
-    public void setUrl(final String url) {
+    public void setUrl(final String connectionString) {
         assertInitializationAllowed();
-        this.url = url;
+        this.connectionString = connectionString;
     }
 
     /**
@@ -773,10 +772,10 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
         final StringBuilder builder = new StringBuilder(super.toString());
         builder.append("[description=");
         builder.append(description);
-        builder.append(", url=");
+        builder.append(", connectionString=");
         // TODO What if the connection string contains a 'user' or 'password' query parameter but that connection string
         // is not in a legal URL format?
-        builder.append(url);
+        builder.append(connectionString);
         builder.append(", driver=");
         builder.append(driver);
         builder.append(", loginTimeout=");

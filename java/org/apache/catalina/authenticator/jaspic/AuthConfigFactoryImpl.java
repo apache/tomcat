@@ -542,7 +542,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         private final RegistrationListener listener;
 
 
-        public RegistrationListenerWrapper(String messageLayer, String appContext,
+        RegistrationListenerWrapper(String messageLayer, String appContext,
                 RegistrationListener listener) {
             this.messageLayer = messageLayer;
             this.appContext = appContext;
@@ -570,7 +570,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
 
         private final ServerAuthModule module;
 
-        public SingleModuleServerAuthContext(ServerAuthModule module) {
+        SingleModuleServerAuthContext(ServerAuthModule module) {
             this.module = module;
         }
 
@@ -597,7 +597,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         private final ServerAuthContext context;
         private final String appContext;
 
-        public SingleContextServerAuthConfig(ServerAuthContext context, String appContext) {
+        SingleContextServerAuthConfig(ServerAuthContext context, String appContext) {
             this.context = context;
             this.appContext = appContext;
         }
@@ -638,7 +638,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
 
         private final ServerAuthConfig serverAuthConfig;
 
-        public SingleConfigAuthConfigProvider(ServerAuthConfig serverAuthConfig) {
+        SingleConfigAuthConfigProvider(ServerAuthConfig serverAuthConfig) {
             this.serverAuthConfig = serverAuthConfig;
         }
 

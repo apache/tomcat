@@ -16,9 +16,6 @@
  */
 package org.apache.el.util;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 public class Validation {
 
     // Java keywords, boolean literals & the null literal in alphabetical order
@@ -32,22 +29,7 @@ public class Validation {
         "throw", "throws", "transient", "true", "try", "void", "volatile",
         "while" };
 
-    private static final boolean IS_SECURITY_ENABLED =
-            (System.getSecurityManager() != null);
-
-    private static final boolean SKIP_IDENTIFIER_CHECK;
-
-    static {
-        String skipIdentifierCheckStr;
-        if (IS_SECURITY_ENABLED) {
-            skipIdentifierCheckStr = AccessController.doPrivileged(
-                    (PrivilegedAction<String>) () -> System.getProperty("org.apache.el.parser.SKIP_IDENTIFIER_CHECK", "false"));
-        } else {
-            skipIdentifierCheckStr = System.getProperty(
-                    "org.apache.el.parser.SKIP_IDENTIFIER_CHECK", "false");
-        }
-        SKIP_IDENTIFIER_CHECK = Boolean.parseBoolean(skipIdentifierCheckStr);
-    }
+    private static final boolean SKIP_IDENTIFIER_CHECK = Boolean.getBoolean("org.apache.el.parser.SKIP_IDENTIFIER_CHECK");
 
 
     private Validation() {

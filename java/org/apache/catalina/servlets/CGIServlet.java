@@ -255,7 +255,7 @@ public final class CGIServlet extends HttpServlet {
         DEFAULT_SUPER_METHODS.add("TRACE");
 
         if (JrePlatform.IS_WINDOWS) {
-            DEFAULT_CMD_LINE_ARGUMENTS_DECODED_PATTERN = Pattern.compile("[a-zA-Z0-9\\Q-_.\\/:\\E]+");
+            DEFAULT_CMD_LINE_ARGUMENTS_DECODED_PATTERN = Pattern.compile("[\\w\\Q-.\\/:\\E]+");
         } else {
             // No restrictions
             DEFAULT_CMD_LINE_ARGUMENTS_DECODED_PATTERN = null;
@@ -324,7 +324,7 @@ public final class CGIServlet extends HttpServlet {
      * Uses \Q...\E to avoid individual quoting.
      */
     private Pattern cmdLineArgumentsEncodedPattern =
-            Pattern.compile("[a-zA-Z0-9\\Q%;/?:@&,$-_.!~*'()\\E]+");
+            Pattern.compile("[\\w\\Q%;/?:@&,$-.!~*'()\\E]+");
 
     /**
      * Limits the decoded form of individual command line arguments. Default
@@ -765,7 +765,7 @@ public final class CGIServlet extends HttpServlet {
          *
          * @return true if the request was parsed without error, false if there
          *           was a problem
-
+         *
          * @throws UnsupportedEncodingException Unknown encoding
          */
         protected boolean setupFromRequest(HttpServletRequest req)
@@ -857,18 +857,18 @@ public final class CGIServlet extends HttpServlet {
          * CGI search algorithm: search the real path below
          *    &lt;my-webapp-root&gt; and find the first non-directory in
          *    the getPathTranslated("/"), reading/searching from left-to-right.
-         *</p>
-         *<p>
+         * </p>
+         * <p>
          *   The CGI search path will start at
          *   webAppRootDir + File.separator + cgiPathPrefix
          *   (or webAppRootDir alone if cgiPathPrefix is
          *   null).
-         *</p>
-         *<p>
+         * </p>
+         * <p>
          *   cgiPathPrefix is defined by setting
          *   this servlet's cgiPathPrefix init parameter
          *
-         *</p>
+         * </p>
          *
          * @param pathInfo       String from HttpServletRequest.getPathInfo()
          * @param webAppRootDir  String from context.getRealPath("/")
@@ -1444,7 +1444,7 @@ public final class CGIServlet extends HttpServlet {
          *  respectively.
          *
          * @param  command  string full path to command to be executed
-         * @param  env      Hashtable with the desired script environment
+         * @param  env      Map with the desired script environment
          * @param  wd       File with the script's desired working directory
          * @param  params   ArrayList with the script's query command line
          *                  parameters as strings
@@ -1508,11 +1508,11 @@ public final class CGIServlet extends HttpServlet {
 
 
         /**
-         * Converts a Hashtable to a String array by converting each
-         * key/value pair in the Hashtable to a String in the form
-         * "key=value" (hashkey + "=" + hash.get(hashkey).toString())
+         * Converts a Map to a String array by converting each
+         * key/value pair in the Map to a String in the form
+         * "key=value" (key + "=" + map.get(key).toString())
          *
-         * @param  map Hashtable to convert
+         * @param  map Map to convert
          *
          * @return     converted string array
          *

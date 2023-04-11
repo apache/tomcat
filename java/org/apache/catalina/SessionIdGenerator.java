@@ -22,7 +22,7 @@ public interface SessionIdGenerator {
      * @return the node identifier associated with this node which will be
      * included in the generated session ID.
      */
-    public String getJvmRoute();
+    String getJvmRoute();
 
     /**
      * Specify the node identifier associated with this node which will be
@@ -30,26 +30,26 @@ public interface SessionIdGenerator {
      *
      * @param jvmRoute  The node identifier
      */
-    public void setJvmRoute(String jvmRoute);
+    void setJvmRoute(String jvmRoute);
 
     /**
      * @return the number of bytes for a session ID
      */
-    public int getSessionIdLength();
+    int getSessionIdLength();
 
     /**
      * Specify the number of bytes for a session ID
      *
      * @param sessionIdLength   Number of bytes
      */
-    public void setSessionIdLength(int sessionIdLength);
+    void setSessionIdLength(int sessionIdLength);
 
     /**
      * Generate and return a new session identifier.
      *
      * @return the newly generated session id
      */
-    public String generateSessionId();
+    String generateSessionId();
 
     /**
      * Generate and return a new session identifier.
@@ -57,5 +57,5 @@ public interface SessionIdGenerator {
      * @param route   node identifier to include in generated id
      * @return the newly generated session id
      */
-    public String generateSessionId(String route);
+    String generateSessionId(String route);
 }

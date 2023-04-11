@@ -60,12 +60,6 @@ public class Constants {
     public static final int MAX_POOL_SIZE = 5;
 
     /**
-     * Has security been turned on?
-     */
-    public static final boolean IS_SECURITY_ENABLED =
-        (System.getSecurityManager() != null);
-
-    /**
      * Name of the system property containing
      * the tomcat product installation path
      */

@@ -467,7 +467,7 @@ public class PageContextImpl extends PageContext {
         return servlet;
     }
 
-    private final String getAbsolutePathRelativeToContext(String relativeUrlPath) {
+    private String getAbsolutePathRelativeToContext(String relativeUrlPath) {
         String path = relativeUrlPath;
 
         if (!path.startsWith("/")) {
@@ -696,7 +696,12 @@ public class PageContextImpl extends PageContext {
                 Set<String> classImports = ((JspSourceImports) servlet).getClassImports();
                 if (classImports != null) {
                     for (String classImport : classImports) {
-                        ih.importClass(classImport);
+                        if (classImport.startsWith("static ")) {
+                            classImport = classImport.substring(7);
+                            ih.importStatic(classImport);
+                        } else {
+                            ih.importClass(classImport);
+                        }
                     }
                 }
             }

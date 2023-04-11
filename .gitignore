@@ -46,5 +46,5 @@ java/org/apache/catalina/startup/catalina.properties
 modules/jdbc-pool/bin
 modules/jdbc-pool/includes
 modules/openssl-java17/target
-modules/openssl-panama-foreign/target
+modules/openssl-foreign/target
 webapps/docs/jdbc-pool.xml

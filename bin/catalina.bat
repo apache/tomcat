@@ -203,10 +203,6 @@ set "JSSE_OPTS=-Djdk.tls.ephemeralDHKeySize=2048"
 :gotJsseOpts
 set "JAVA_OPTS=%JAVA_OPTS% %JSSE_OPTS%"
 
-rem Register custom URL handlers
-rem Do this here so custom URL handles (specifically 'war:...') can be used in the security policy
-set "JAVA_OPTS=%JAVA_OPTS% -Djava.protocol.handler.pkgs=org.apache.catalina.webresources"
-
 if not "%CATALINA_LOGGING_CONFIG%" == "" goto noJuliConfig
 set CATALINA_LOGGING_CONFIG=-Dnop
 if not exist "%CATALINA_BASE%\conf\logging.properties" goto noJuliConfig
@@ -241,7 +237,6 @@ echo Using CATALINA_OPTS:   "%CATALINA_OPTS%"
 set _EXECJAVA=%_RUNJAVA%
 set MAINCLASS=org.apache.catalina.startup.Bootstrap
 set ACTION=start
-set SECURITY_POLICY_FILE=
 set DEBUG_OPTS=
 set JPDA=
 
@@ -272,12 +267,9 @@ if ""%1"" == ""version"" goto doVersion
 echo Usage:  catalina ( commands ... )
 echo commands:
 echo   debug             Start Catalina in a debugger
-echo   debug -security   Debug Catalina with a security manager
 echo   jpda start        Start Catalina under JPDA debugger
 echo   run               Start Catalina in the current window
-echo   run -security     Start in the current window with security manager
 echo   start             Start Catalina in a separate window
-echo   start -security   Start in a separate window with security manager
 echo   stop              Stop Catalina
 echo   configtest        Run a basic syntax check on server.xml
 echo   version           What version of tomcat are you running?
@@ -287,28 +279,16 @@ goto end
 shift
 set _EXECJAVA=%_RUNJDB%
 set DEBUG_OPTS=-sourcepath "%CATALINA_HOME%\..\..\java"
-if not ""%1"" == ""-security"" goto execCmd
-shift
-echo Using Security Manager
-set "SECURITY_POLICY_FILE=%CATALINA_BASE%\conf\catalina.policy"
 goto execCmd
 
 :doRun
 shift
-if not ""%1"" == ""-security"" goto execCmd
-shift
-echo Using Security Manager
-set "SECURITY_POLICY_FILE=%CATALINA_BASE%\conf\catalina.policy"
 goto execCmd
 
 :doStart
 shift
 if "%TITLE%" == "" set TITLE=Tomcat
 set _EXECJAVA=start "%TITLE%" %_RUNJAVA%
-if not ""%1"" == ""-security"" goto execCmd
-shift
-echo Using Security Manager
-set "SECURITY_POLICY_FILE=%CATALINA_BASE%\conf\catalina.policy"
 goto execCmd
 
 :doStop
@@ -324,7 +304,7 @@ set CATALINA_OPTS=
 goto execCmd
 
 :doVersion
-%_EXECJAVA% -classpath "%CATALINA_HOME%\lib\catalina.jar" org.apache.catalina.util.ServerInfo
+%_EXECJAVA% %JAVA_OPTS% -classpath "%CATALINA_HOME%\lib\catalina.jar" org.apache.catalina.util.ServerInfo
 goto end
 
 
@@ -340,18 +320,10 @@ goto setArgs
 
 rem Execute Java with the applicable properties
 if not "%JPDA%" == "" goto doJpda
-if not "%SECURITY_POLICY_FILE%" == "" goto doSecurity
 %_EXECJAVA% %CATALINA_LOGGING_CONFIG% %LOGGING_MANAGER% %JAVA_OPTS% %CATALINA_OPTS% %DEBUG_OPTS% -classpath "%CLASSPATH%" -Dcatalina.base="%CATALINA_BASE%" -Dcatalina.home="%CATALINA_HOME%" -Djava.io.tmpdir="%CATALINA_TMPDIR%" %MAINCLASS% %CMD_LINE_ARGS% %ACTION%
 goto end
-:doSecurity
-%_EXECJAVA% %CATALINA_LOGGING_CONFIG% %LOGGING_MANAGER% %JAVA_OPTS% %CATALINA_OPTS% %DEBUG_OPTS% -classpath "%CLASSPATH%" -Djava.security.manager -Djava.security.policy=="%SECURITY_POLICY_FILE%" -Dcatalina.base="%CATALINA_BASE%" -Dcatalina.home="%CATALINA_HOME%" -Djava.io.tmpdir="%CATALINA_TMPDIR%" %MAINCLASS% %CMD_LINE_ARGS% %ACTION%
-goto end
 :doJpda
-if not "%SECURITY_POLICY_FILE%" == "" goto doSecurityJpda
 %_EXECJAVA% %CATALINA_LOGGING_CONFIG% %LOGGING_MANAGER% %JAVA_OPTS% %JPDA_OPTS% %CATALINA_OPTS% %DEBUG_OPTS% -classpath "%CLASSPATH%" -Dcatalina.base="%CATALINA_BASE%" -Dcatalina.home="%CATALINA_HOME%" -Djava.io.tmpdir="%CATALINA_TMPDIR%" %MAINCLASS% %CMD_LINE_ARGS% %ACTION%
-goto end
-:doSecurityJpda
-%_EXECJAVA% %CATALINA_LOGGING_CONFIG% %LOGGING_MANAGER% %JAVA_OPTS% %JPDA_OPTS% %CATALINA_OPTS% %DEBUG_OPTS% -classpath "%CLASSPATH%" -Djava.security.manager -Djava.security.policy=="%SECURITY_POLICY_FILE%" -Dcatalina.base="%CATALINA_BASE%" -Dcatalina.home="%CATALINA_HOME%" -Djava.io.tmpdir="%CATALINA_TMPDIR%" %MAINCLASS% %CMD_LINE_ARGS% %ACTION%
 goto end
 
 :end

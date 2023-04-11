@@ -37,13 +37,11 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * Provides basic CSRF protection for a web application. The filter assumes
- * that:
+ * Provides basic CSRF protection for a web application. The filter assumes that:
  * <ul>
  * <li>The filter is mapped to /*</li>
- * <li>{@link HttpServletResponse#encodeRedirectURL(String)} and
- * {@link HttpServletResponse#encodeURL(String)} are used to encode all URLs
- * returned to the client
+ * <li>{@link HttpServletResponse#encodeRedirectURL(String)} and {@link HttpServletResponse#encodeURL(String)} are used
+ * to encode all URLs returned to the client
  * </ul>
  */
 public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
@@ -56,14 +54,11 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     private String nonceRequestParameterName = Constants.CSRF_NONCE_REQUEST_PARAM;
 
     /**
-     * Entry points are URLs that will not be tested for the presence of a valid
-     * nonce. They are used to provide a way to navigate back to a protected
-     * application after navigating away from it. Entry points will be limited
-     * to HTTP GET requests and should not trigger any security sensitive
-     * actions.
+     * Entry points are URLs that will not be tested for the presence of a valid nonce. They are used to provide a way
+     * to navigate back to a protected application after navigating away from it. Entry points will be limited to HTTP
+     * GET requests and should not trigger any security sensitive actions.
      *
-     * @param entryPoints   Comma separated list of URLs to be configured as
-     *                      entry points.
+     * @param entryPoints Comma separated list of URLs to be configured as entry points.
      */
     public void setEntryPoints(String entryPoints) {
         String values[] = entryPoints.split(",");
@@ -73,13 +68,11 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
     /**
-     * Sets the number of previously issued nonces that will be cached on a LRU
-     * basis to support parallel requests, limited use of the refresh and back
-     * in the browser and similar behaviors that may result in the submission
-     * of a previous nonce rather than the current one. If not set, the default
-     * value of 5 will be used.
+     * Sets the number of previously issued nonces that will be cached on a LRU basis to support parallel requests,
+     * limited use of the refresh and back in the browser and similar behaviors that may result in the submission of a
+     * previous nonce rather than the current one. If not set, the default value of 5 will be used.
      *
-     * @param nonceCacheSize    The number of nonces to cache
+     * @param nonceCacheSize The number of nonces to cache
      */
     public void setNonceCacheSize(int nonceCacheSize) {
         this.nonceCacheSize = nonceCacheSize;
@@ -88,8 +81,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     /**
      * Sets the request parameter name to use for CSRF nonces.
      *
-     * @param parameterName The request parameter name to use
-     *        for CSRF nonces.
+     * @param parameterName The request parameter name to use for CSRF nonces.
      */
     public void setNonceRequestParameterName(String parameterName) {
         this.nonceRequestParameterName = parameterName;
@@ -101,19 +93,17 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         super.init(filterConfig);
 
         // Put the expected request parameter name into the application scope
-        filterConfig.getServletContext().setAttribute(
-                Constants.CSRF_NONCE_REQUEST_PARAM_NAME_KEY,
+        filterConfig.getServletContext().setAttribute(Constants.CSRF_NONCE_REQUEST_PARAM_NAME_KEY,
                 nonceRequestParameterName);
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-            FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
 
         ServletResponse wResponse = null;
 
-        if (request instanceof HttpServletRequest &&
-                response instanceof HttpServletResponse) {
+        if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
 
             HttpServletRequest req = (HttpServletRequest) request;
             HttpServletResponse res = (HttpServletResponse) response;
@@ -128,10 +118,9 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
                 if (previousNonce == null) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Rejecting request for " + getRequestedPath(req)
-                                  + ", session "
-                                  + (null == session ? "(none)" : session.getId())
-                                  + " with no CSRF nonce found in request");
+                        log.debug("Rejecting request for " + getRequestedPath(req) + ", session " +
+                                (null == session ? "(none)" : session.getId()) +
+                                " with no CSRF nonce found in request");
                     }
 
                     res.sendError(getDenyStatus());
@@ -141,28 +130,25 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                 nonceCache = getNonceCache(req, session);
                 if (nonceCache == null) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Rejecting request for " + getRequestedPath(req)
-                                  + ", session "
-                                  + (null == session ? "(none)" : session.getId())
-                                  + " due to empty / missing nonce cache");
+                        log.debug("Rejecting request for " + getRequestedPath(req) + ", session " +
+                                (null == session ? "(none)" : session.getId()) + " due to empty / missing nonce cache");
                     }
 
                     res.sendError(getDenyStatus());
                     return;
                 } else if (!nonceCache.contains(previousNonce)) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Rejecting request for " + getRequestedPath(req)
-                                  + ", session "
-                                  + (null == session ? "(none)" : session.getId())
-                                  + " due to invalid nonce " + previousNonce);
+                        log.debug("Rejecting request for " + getRequestedPath(req) + ", session " +
+                                (null == session ? "(none)" : session.getId()) + " due to invalid nonce " +
+                                previousNonce);
                     }
 
                     res.sendError(getDenyStatus());
                     return;
                 }
                 if (log.isTraceEnabled()) {
-                    log.trace("Allowing request to " + getRequestedPath(req)
-                               + " with valid CSRF nonce " + previousNonce);
+                    log.trace(
+                            "Allowing request to " + getRequestedPath(req) + " with valid CSRF nonce " + previousNonce);
                 }
             }
 
@@ -173,12 +159,13 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                 }
                 if (nonceCache == null) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Creating new CSRF nonce cache with size=" + nonceCacheSize + " for session " + (null == session ? "(will create)" : session.getId()));
+                        log.debug("Creating new CSRF nonce cache with size=" + nonceCacheSize + " for session " +
+                                (null == session ? "(will create)" : session.getId()));
                     }
 
                     if (session == null) {
                         if (log.isDebugEnabled()) {
-                             log.debug("Creating new session to store CSRF nonce cache");
+                            log.debug("Creating new session to store CSRF nonce cache");
                         }
 
                         session = req.getSession(true);
@@ -224,15 +211,12 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
 
     /**
-     * Determines whether a nonce should be created. This method is provided
-     * primarily for the benefit of sub-classes that wish to customise this
-     * behaviour.
+     * Determines whether a nonce should be created. This method is provided primarily for the benefit of sub-classes
+     * that wish to customise this behaviour.
      *
-     * @param request   The request that triggered the need to potentially
-     *                      create the nonce.
+     * @param request The request that triggered the need to potentially create the nonce.
      *
-     * @return {@code true} if a nonce should be created, otherwise
-     *              {@code false}
+     * @return {@code true} if a nonce should be created, otherwise {@code false}
      */
     protected boolean skipNonceGeneration(HttpServletRequest request) {
         return false;
@@ -240,13 +224,12 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
 
     /**
-     * Create a new {@link NonceCache} and store in the {@link HttpSession}.
-     * This method is provided primarily for the benefit of sub-classes that
-     * wish to customise this behaviour.
+     * Create a new {@link NonceCache} and store in the {@link HttpSession}. This method is provided primarily for the
+     * benefit of sub-classes that wish to customise this behaviour.
      *
-     * @param request   The request that triggered the need to create the nonce
-     *                      cache. Unused by the default implementation.
-     * @param session   The session associated with the request.
+     * @param request The request that triggered the need to create the nonce cache. Unused by the default
+     *                    implementation.
+     * @param session The session associated with the request.
      *
      * @return A newly created {@link NonceCache}
      */
@@ -261,29 +244,26 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
 
     /**
-     * Obtain the {@link NonceCache} associated with the request and/or session.
-     * This method is provided primarily for the benefit of sub-classes that
-     * wish to customise this behaviour.
+     * Obtain the {@link NonceCache} associated with the request and/or session. This method is provided primarily for
+     * the benefit of sub-classes that wish to customise this behaviour.
      *
-     * @param request   The request that triggered the need to obtain the nonce
-     *                      cache. Unused by the default implementation.
-     * @param session   The session associated with the request.
+     * @param request The request that triggered the need to obtain the nonce cache. Unused by the default
+     *                    implementation.
+     * @param session The session associated with the request.
      *
-     * @return The {@link NonceCache} currently associated with the request
-     *         and/or session
+     * @return The {@link NonceCache} currently associated with the request and/or session
      */
     protected NonceCache<String> getNonceCache(HttpServletRequest request, HttpSession session) {
         if (session == null) {
             return null;
         }
         @SuppressWarnings("unchecked")
-        NonceCache<String> nonceCache =
-                (NonceCache<String>) session.getAttribute(Constants.CSRF_NONCE_SESSION_ATTR_NAME);
+        NonceCache<String> nonceCache = (NonceCache<String>) session
+                .getAttribute(Constants.CSRF_NONCE_SESSION_ATTR_NAME);
         return nonceCache;
     }
 
-    protected static class CsrfResponseWrapper
-            extends HttpServletResponseWrapper {
+    protected static class CsrfResponseWrapper extends HttpServletResponseWrapper {
 
         private final String nonceRequestParameterName;
         private final String nonce;
@@ -329,7 +309,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                 path = path.substring(0, question);
             }
             StringBuilder sb = new StringBuilder(path);
-            if (query.length() >0) {
+            if (query.length() > 0) {
                 sb.append(query);
                 sb.append('&');
             } else {
@@ -344,26 +324,33 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
 
-    protected static interface NonceCache<T> extends Serializable {
+    protected interface NonceCache<T> extends Serializable {
         void add(T nonce);
 
         boolean contains(T nonce);
     }
 
 
+    /**
+     * Despite its name, this is a FIFO cache not an LRU cache. Using an older nonce should not delay its removal from
+     * the cache in favour of more recent values.
+     *
+     * @param <T> The type held by this cache.
+     */
     protected static class LruCache<T> implements NonceCache<T> {
 
         private static final long serialVersionUID = 1L;
 
         // Although the internal implementation uses a Map, this cache
         // implementation is only concerned with the keys.
-        private final Map<T,T> cache;
+        private final Map<T, T> cache;
 
         public LruCache(final int cacheSize) {
             cache = new LinkedHashMap<>() {
                 private static final long serialVersionUID = 1L;
+
                 @Override
-                protected boolean removeEldestEntry(Map.Entry<T,T> eldest) {
+                protected boolean removeEldestEntry(Map.Entry<T, T> eldest) {
                     if (size() > cacheSize) {
                         return true;
                     }

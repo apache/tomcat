@@ -705,7 +705,7 @@ public class TestResponse extends TomcatBaseTest {
         Assert.assertEquals(ISO_8859_1, response.getCharacterEncoding());
         response.setCharacterEncoding(UTF_8);
         Assert.assertEquals(UTF_8, response.getCharacterEncoding());
-        response.setCharacterEncoding(null);
+        response.setCharacterEncoding((String) null);
         Assert.assertEquals(ISO_8859_1, response.getCharacterEncoding());
     }
 
@@ -923,7 +923,7 @@ public class TestResponse extends TomcatBaseTest {
         Assert.assertEquals(UTF_8, response.getCharacterEncoding());
 
         // Reset
-        response.setCharacterEncoding(null);
+        response.setCharacterEncoding((String) null);
         Assert.assertEquals(ISO_8859_1, response.getCharacterEncoding());
 
         // setLocale is over-ridden by setCharacterEncoding

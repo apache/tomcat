@@ -17,11 +17,14 @@
 package org.apache.tomcat.util.net;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -47,6 +50,7 @@ import javax.net.ssl.SSLParameters;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.Acceptor.AcceptorState;
@@ -73,12 +77,12 @@ public abstract class AbstractEndpoint<S,U> {
 
     protected static final StringManager sm = StringManager.getManager(AbstractEndpoint.class);
 
-    public static interface Handler<S> {
+    public interface Handler<S> {
 
         /**
          * Different types of socket states to react upon.
          */
-        public enum SocketState {
+        enum SocketState {
             // TODO Add a new state to the AsyncStateMachine and remove
             //      ASYNC_END (if possible)
             OPEN, CLOSED, LONG, ASYNC_END, SENDFILE, UPGRADING, UPGRADED, ASYNC_IO, SUSPENDED
@@ -93,7 +97,7 @@ public abstract class AbstractEndpoint<S,U> {
          *
          * @return The state of the socket after processing
          */
-        public SocketState process(SocketWrapperBase<S> socket,
+        SocketState process(SocketWrapperBase<S> socket,
                 SocketEvent status);
 
 
@@ -102,7 +106,7 @@ public abstract class AbstractEndpoint<S,U> {
          *
          * @return the GlobalRequestProcessor
          */
-        public Object getGlobal();
+        Object getGlobal();
 
 
         /**
@@ -110,7 +114,7 @@ public abstract class AbstractEndpoint<S,U> {
          *
          * @param socketWrapper The socketWrapper to release resources for
          */
-        public void release(SocketWrapperBase<S> socketWrapper);
+        void release(SocketWrapperBase<S> socketWrapper);
 
 
         /**
@@ -119,13 +123,13 @@ public abstract class AbstractEndpoint<S,U> {
          * afterwards but it is possible that the endpoint will be resumed so
          * the handler should not assume that a stop will follow.
          */
-        public void pause();
+        void pause();
 
 
         /**
          * Recycle resources associated with the handler.
          */
-        public void recycle();
+        void recycle();
     }
 
     protected enum BindState {
@@ -137,7 +141,7 @@ public abstract class AbstractEndpoint<S,U> {
         private final boolean bound;
         private final boolean wasBound;
 
-        private BindState(boolean bound, boolean wasBound) {
+        BindState(boolean bound, boolean wasBound) {
             this.bound = bound;
             this.wasBound = wasBound;
         }
@@ -408,9 +412,77 @@ public abstract class AbstractEndpoint<S,U> {
             }
 
             certificate.setSslContext(sslContext);
+            logCertificate(certificate);
         }
     }
 
+
+    protected void logCertificate(SSLHostConfigCertificate certificate) {
+        SSLHostConfig sslHostConfig = certificate.getSSLHostConfig();
+
+        String certificateSource = certificate.getCertificateKeystoreFile();
+        if (certificateSource == null) {
+            certificateSource = certificate.getCertificateKeyFile();
+        }
+
+        String keyAlias = certificate.getCertificateKeyAlias();
+        if (keyAlias == null) {
+            keyAlias = SSLUtilBase.DEFAULT_KEY_ALIAS;
+        }
+
+        String trustStoreSource = sslHostConfig.getTruststoreFile();
+        if (trustStoreSource == null) {
+            trustStoreSource = sslHostConfig.getCaCertificateFile();
+        }
+        if (trustStoreSource == null) {
+            trustStoreSource = sslHostConfig.getCaCertificatePath();
+        }
+
+        getLogCertificate().info(sm.getString("endpoint.tls.info", getName(), sslHostConfig.getHostName(),
+                certificate.getType(), certificateSource, keyAlias, trustStoreSource));
+
+        if (getLogCertificate().isDebugEnabled()) {
+            String alias = certificate.getCertificateKeyAlias();
+            if (alias == null) {
+                alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
+            }
+            X509Certificate[] x509Certificates = certificate.getSslContext().getCertificateChain(alias);
+            if (x509Certificates != null && x509Certificates.length > 0) {
+                getLogCertificate().debug(generateCertificateDebug(x509Certificates[0]));
+            } else {
+                getLogCertificate().debug(sm.getString("endpoint.tls.cert.noCerts"));
+            }
+        }
+    }
+
+
+    protected String generateCertificateDebug(X509Certificate certificate) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n[");
+        try {
+            byte[] certBytes = certificate.getEncoded();
+            // SHA-256 fingerprint
+            sb.append("\nSHA-256 fingerprint: ");
+            MessageDigest sha512Digest = MessageDigest.getInstance("SHA-256");
+            sha512Digest.update(certBytes);
+            sb.append(HexUtils.toHexString(sha512Digest.digest()));
+            // SHA-256 fingerprint
+            sb.append("\nSHA-1 fingerprint: ");
+            MessageDigest sha1Digest = MessageDigest.getInstance("SHA-1");
+            sha1Digest.update(certBytes);
+            sb.append(HexUtils.toHexString(sha1Digest.digest()));
+        } catch (CertificateEncodingException e) {
+            getLogCertificate().warn(sm.getString("endpoint.tls.cert.encodingError"), e);
+        } catch (NoSuchAlgorithmException e) {
+            // Unreachable code
+            // All JREs are required to support SHA-1 and SHA-256
+            throw new RuntimeException(e);
+        }
+        sb.append("\n");
+        sb.append(certificate);
+        sb.append("\n]");
+        return sb.toString();
+    }
 
     protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers,
             List<String> clientRequestedApplicationProtocols) {
@@ -947,11 +1019,6 @@ public abstract class AbstractEndpoint<S,U> {
     public boolean getUseAsyncIO() { return useAsyncIO; }
 
 
-    protected boolean getDeferAccept() {
-        return false;
-    }
-
-
     /**
      * The default behavior is to identify connectors uniquely with address
      * and port. However, certain connectors are not using that and need
@@ -1167,24 +1234,14 @@ public abstract class AbstractEndpoint<S,U> {
                     utmo = getSocketProperties().getUnlockTimeout();
                 }
                 s.setSoTimeout(stmo);
-                s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
+                // Newer MacOS versions (e.g. Ventura 13.2) appear to linger for ~1s on close when linger is disabled.
+                // That causes delays when running the unit tests. Explicitly enableing linger but with a timeout of
+                // zero seconds seems to fix the issue.
+                s.setSoLinger(true, 0);
                 if (getLog().isDebugEnabled()) {
                     getLog().debug("About to unlock socket for:" + unlockAddress);
                 }
                 s.connect(unlockAddress,utmo);
-                if (getDeferAccept()) {
-                    /*
-                     * In the case of a deferred accept / accept filters we need to
-                     * send data to wake up the accept. Send OPTIONS * to bypass
-                     * even BSD accept filters. The Acceptor will discard it.
-                     */
-                    OutputStreamWriter sw;
-
-                    sw = new OutputStreamWriter(s.getOutputStream(), "ISO-8859-1");
-                    sw.write("OPTIONS * HTTP/1.0\r\n" +
-                            "User-Agent: Tomcat wakeup connection\r\n\r\n");
-                    sw.flush();
-                }
                 if (getLog().isDebugEnabled()) {
                     getLog().debug("Socket unlock completed for:" + unlockAddress);
                 }
@@ -1487,6 +1544,10 @@ public abstract class AbstractEndpoint<S,U> {
 
 
     protected abstract Log getLog();
+
+    protected Log getLogCertificate() {
+        return getLog();
+    }
 
     protected LimitLatch initializeConnectionLatch() {
         if (maxConnections==-1) {

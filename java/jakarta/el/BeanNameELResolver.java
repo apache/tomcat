@@ -53,8 +53,7 @@ public class BeanNameELResolver extends ELResolver {
     }
 
     @Override
-    public void setValue(ELContext context, Object base, Object property,
-            Object value) {
+    public void setValue(ELContext context, Object base, Object property, Object value) {
         Objects.requireNonNull(context);
         if (base != null || !(property instanceof String)) {
             return;
@@ -75,12 +74,10 @@ public class BeanNameELResolver extends ELResolver {
         }
 
         if (isReadOnly) {
-            throw new PropertyNotWritableException(Util.message(context,
-                    "beanNameELResolver.beanReadOnly", beanName));
+            throw new PropertyNotWritableException(Util.message(context, "beanNameELResolver.beanReadOnly", beanName));
         }
 
-        if (beanNameResolver.isNameResolved(beanName) ||
-                beanNameResolver.canCreateBean(beanName)) {
+        if (beanNameResolver.isNameResolved(beanName) || beanNameResolver.canCreateBean(beanName)) {
             try {
                 beanNameResolver.setBeanValue(beanName, value);
                 context.setPropertyResolved(base, property);

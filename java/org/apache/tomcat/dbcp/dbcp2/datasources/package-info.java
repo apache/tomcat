@@ -17,8 +17,8 @@
 
 /**
  * <p>
- * This package contains two DataSources: <code>PerUserPoolDataSource</code> and
- * <code>SharedPoolDataSource</code> which provide a database connection pool.
+ * This package contains two DataSources: {@code PerUserPoolDataSource} and
+ * {@code SharedPoolDataSource} which provide a database connection pool.
  * Below are a couple of usage examples.  One shows deployment into a JNDI system.
  * The other is a simple example initializing the pool using standard java code.
  * </p>
@@ -81,12 +81,12 @@
  * Apache Tomcat deploys all objects configured similarly to above within the
  * <strong>java:comp/env</strong> namespace.  So the JNDI path given for
  * the dataSourceName parameter is valid for a
- * <code>ConnectionPoolDataSource</code> that is deployed as given in the
+ * {@code ConnectionPoolDataSource} that is deployed as given in the
  * <a href="../cpdsadapter/package-summary.html">cpdsadapter example</a>
  * </p>
  *
  * <p>
- * The <code>DataSource</code> is now available to the application as shown
+ * The {@code DataSource} is now available to the application as shown
  * below:
  * </p>
  *
@@ -112,11 +112,11 @@
  * </code>
  *
  * <p>
- * The reference to the <code>DataSource</code> could be maintained, for
- * multiple getConnection() requests.  Or the <code>DataSource</code> can be
+ * The reference to the {@code DataSource} could be maintained, for
+ * multiple getConnection() requests.  Or the {@code DataSource} can be
  * looked up in different parts of the application code.
- * <code>PerUserPoolDataSourceFactory</code> and
- * <code>SharedPoolDataSourceFactory</code> will maintain the state of the pool
+ * {@code PerUserPoolDataSourceFactory} and
+ * {@code SharedPoolDataSourceFactory} will maintain the state of the pool
  * between different lookups.  This behavior may be different in other
  * implementations.
  * </p>
@@ -125,7 +125,7 @@
  *
  * <p>
  * Connection pooling is useful in applications regardless of whether they run
- * in a J2EE environment and a <code>DataSource</code> can be used within a
+ * in a J2EE environment and a {@code DataSource} can be used within a
  * simpler environment.  The example below shows SharedPoolDataSource using
  * DriverAdapterCPDS as the back end source, though any CPDS is applicable.
  * </p>

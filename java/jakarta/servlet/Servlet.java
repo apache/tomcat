@@ -84,10 +84,9 @@ public interface Servlet {
      * @see UnavailableException
      * @see #getServletConfig
      */
-    public void init(ServletConfig config) throws ServletException;
+    void init(ServletConfig config) throws ServletException;
 
     /**
-     *
      * Returns a {@link ServletConfig} object, which contains initialization and
      * startup parameters for this servlet. The <code>ServletConfig</code>
      * object returned is the one passed to the <code>init</code> method.
@@ -103,7 +102,7 @@ public interface Servlet {
      *
      * @see #init
      */
-    public ServletConfig getServletConfig();
+    ServletConfig getServletConfig();
 
     /**
      * Called by the servlet container to allow the servlet to respond to a
@@ -144,7 +143,7 @@ public interface Servlet {
      * @exception IOException
      *                if an input or output exception occurs
      */
-    public void service(ServletRequest req, ServletResponse res)
+    void service(ServletRequest req, ServletResponse res)
             throws ServletException, IOException;
 
     /**
@@ -157,7 +156,7 @@ public interface Servlet {
      *
      * @return a <code>String</code> containing servlet information
      */
-    public String getServletInfo();
+    String getServletInfo();
 
     /**
      * Called by the servlet container to indicate to a servlet that the servlet
@@ -173,5 +172,5 @@ public interface Servlet {
      * sure that any persistent state is synchronized with the servlet's current
      * state in memory.
      */
-    public void destroy();
+    void destroy();
 }

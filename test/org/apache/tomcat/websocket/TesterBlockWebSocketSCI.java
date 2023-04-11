@@ -24,18 +24,15 @@ import jakarta.websocket.server.ServerApplicationConfig;
 import jakarta.websocket.server.ServerEndpointConfig;
 
 /**
- * This configuration blocks any endpoints discovered by the SCI from being
- * deployed. It is intended to prevent testing errors generated when the
- * WebSocket SCI scans the test classes for endpoints as it will discover
- * multiple endpoints mapped to the same path ('/'). The tests all explicitly
- * configure their required endpoints so have no need for SCI based
- * configuration.
+ * This configuration blocks any endpoints discovered by the SCI from being deployed. It is intended to prevent testing
+ * errors generated when the WebSocket SCI scans the test classes for endpoints as it will discover multiple endpoints
+ * mapped to the same path ('/'). The tests all explicitly configure their required endpoints so have no need for SCI
+ * based configuration.
  */
 public class TesterBlockWebSocketSCI implements ServerApplicationConfig {
 
     @Override
-    public Set<ServerEndpointConfig> getEndpointConfigs(
-            Set<Class<? extends Endpoint>> scanned) {
+    public Set<ServerEndpointConfig> getEndpointConfigs(Set<Class<? extends Endpoint>> scanned) {
         return Collections.emptySet();
     }
 

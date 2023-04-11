@@ -22,14 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
-import java.security.CodeSource;
-import java.security.Permission;
-import java.security.PermissionCollection;
-import java.security.Policy;
-import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,7 +47,6 @@ import javax.management.ObjectName;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.DistributedManager;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -62,7 +54,6 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Manager;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
-import org.apache.catalina.security.DeployXmlPermission;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.IOTools;
 import org.apache.juli.logging.Log;
@@ -207,33 +198,6 @@ public class HostConfig implements LifecycleListener {
      */
     public void setDeployXML(boolean deployXML) {
         this.deployXML = deployXML;
-    }
-
-
-    private boolean isDeployThisXML(File docBase, ContextName cn) {
-        boolean deployThisXML = isDeployXML();
-        if (Globals.IS_SECURITY_ENABLED && !deployThisXML) {
-            // When running under a SecurityManager, deployXML may be overridden
-            // on a per Context basis by the granting of a specific permission
-            Policy currentPolicy = Policy.getPolicy();
-            if (currentPolicy != null) {
-                URL contextRootUrl;
-                try {
-                    contextRootUrl = docBase.toURI().toURL();
-                    CodeSource cs = new CodeSource(contextRootUrl, (Certificate[]) null);
-                    PermissionCollection pc = currentPolicy.getPermissions(cs);
-                    Permission p = new DeployXmlPermission(cn.getBaseName());
-                    if (pc.implies(p)) {
-                        deployThisXML = true;
-                    }
-                } catch (MalformedURLException e) {
-                    // Should never happen
-                    log.warn(sm.getString("hostConfig.docBaseUrlInvalid"), e);
-                }
-            }
-        }
-
-        return deployThisXML;
     }
 
 
@@ -863,7 +827,7 @@ public class HostConfig implements LifecycleListener {
         }
 
         Context context = null;
-        boolean deployThisXML = isDeployThisXML(war, cn);
+        boolean deployThisXML = this.deployXML;
 
         try {
             if (deployThisXML && useXml && !copyXML) {
@@ -1087,7 +1051,7 @@ public class HostConfig implements LifecycleListener {
 
         DeployedApplication deployedApp;
         boolean copyThisXml = isCopyXML();
-        boolean deployThisXML = isDeployThisXML(dir, cn);
+        boolean deployThisXML = this.deployXML;
 
         try {
             if (deployThisXML && xml.exists()) {
@@ -1914,7 +1878,7 @@ public class HostConfig implements LifecycleListener {
         private ContextName cn;
         private File descriptor;
 
-        public DeployDescriptor(HostConfig config, ContextName cn,
+        DeployDescriptor(HostConfig config, ContextName cn,
                 File descriptor) {
             this.config = config;
             this.cn = cn;
@@ -1937,7 +1901,7 @@ public class HostConfig implements LifecycleListener {
         private ContextName cn;
         private File war;
 
-        public DeployWar(HostConfig config, ContextName cn, File war) {
+        DeployWar(HostConfig config, ContextName cn, File war) {
             this.config = config;
             this.cn = cn;
             this.war = war;
@@ -1959,7 +1923,7 @@ public class HostConfig implements LifecycleListener {
         private ContextName cn;
         private File dir;
 
-        public DeployDirectory(HostConfig config, ContextName cn, File dir) {
+        DeployDirectory(HostConfig config, ContextName cn, File dir) {
             this.config = config;
             this.cn = cn;
             this.dir = dir;
@@ -1983,7 +1947,7 @@ public class HostConfig implements LifecycleListener {
         private File source;
         private File destination;
 
-        public MigrateApp(HostConfig config, ContextName cn, File source, File destination) {
+        MigrateApp(HostConfig config, ContextName cn, File source, File destination) {
             this.config = config;
             this.cn = cn;
             this.source = source;
@@ -2026,7 +1990,7 @@ public class HostConfig implements LifecycleListener {
          *                 to be deleted
          * @param newDocBase The new docBase for the Context
          */
-        public ExpandedDirectoryRemovalListener(File toDelete, String newDocBase) {
+        ExpandedDirectoryRemovalListener(File toDelete, String newDocBase) {
             this.toDelete = toDelete;
             this.newDocBase = newDocBase;
         }

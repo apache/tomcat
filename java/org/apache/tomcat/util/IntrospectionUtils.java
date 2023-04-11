@@ -27,7 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.security.PermissionCheck;
 
 /**
  * Utils for introspection and reflection
@@ -334,14 +333,14 @@ public final class IntrospectionUtils {
                     continue;
                 }
                 String n = value.substring(pos + 2, endName);
-                String v = getProperty(n, staticProp, dynamicProp, classLoader);
+                String v = getProperty(n, staticProp, dynamicProp);
                 if (v == null) {
                     // {name:default}
                     int col = n.indexOf(":-");
                     if (col != -1) {
                         String dV = n.substring(col + 2);
                         n = n.substring(0, col);
-                        v = getProperty(n, staticProp, dynamicProp, classLoader);
+                        v = getProperty(n, staticProp, dynamicProp);
                         if (v == null) {
                             v = dV;
                         }
@@ -369,19 +368,14 @@ public final class IntrospectionUtils {
         return replaceProperties(newval, staticProp, dynamicProp, classLoader, iterationCount+1);
     }
 
-    private static String getProperty(String name, Hashtable<Object, Object> staticProp,
-            PropertySource[] dynamicProp, ClassLoader classLoader) {
+    private static String getProperty(String name, Hashtable<Object, Object> staticProp, PropertySource[] dynamicProp) {
         String v = null;
         if (staticProp != null) {
             v = (String) staticProp.get(name);
         }
         if (v == null && dynamicProp != null) {
             for (PropertySource propertySource : dynamicProp) {
-                if (propertySource instanceof SecurePropertySource) {
-                    v = ((SecurePropertySource) propertySource).getProperty(name, classLoader);
-                } else {
-                    v = propertySource.getProperty(name);
-                }
+                v = propertySource.getProperty(name);
                 if (v != null) {
                     break;
                 }
@@ -497,15 +491,14 @@ public final class IntrospectionUtils {
             if (log.isDebugEnabled()) {
                 // debug
                 StringBuilder sb = new StringBuilder();
-                sb.append(target.getClass().getName()).append('.')
-                        .append(methodN).append("( ");
+                sb.append(target.getClass().getName()).append('.').append(methodN).append('(');
                 for (int i = 0; i < params.length; i++) {
                     if (i > 0) {
                         sb.append(", ");
                     }
                     sb.append(params[i]);
                 }
-                sb.append(")");
+                sb.append(')');
                 log.debug("IntrospectionUtils:" + sb.toString());
             }
             return o;
@@ -597,28 +590,7 @@ public final class IntrospectionUtils {
     // -------------------- Get property --------------------
     // This provides a layer of abstraction
 
-    public static interface PropertySource {
-        public String getProperty(String key);
-    }
-
-
-    public static interface SecurePropertySource extends PropertySource {
-
-        /**
-         * Obtain a property value, checking that code associated with the
-         * provided class loader has permission to access the property. If the
-         * {@code classLoader} is {@code null} or if {@code classLoader} does
-         * not implement {@link PermissionCheck} then the property value will be
-         * looked up <b>without</b> a call to
-         * {@link PermissionCheck#check(java.security.Permission)}
-         *
-         * @param key           The key of the requested property
-         * @param classLoader   The class loader associated with the code that
-         *                      trigger the property lookup
-         * @return The property value or {@code null} if it could not be found
-         *         or if {@link PermissionCheck#check(java.security.Permission)}
-         *         fails
-         */
-        public String getProperty(String key, ClassLoader classLoader);
+    public interface PropertySource {
+        String getProperty(String key);
     }
 }

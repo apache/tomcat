@@ -140,7 +140,6 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     }
 
     /**
-     *
      * @return The port
      */
     @Override
@@ -589,8 +588,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         final String namePrefix;
 
         TaskThreadFactory(String namePrefix) {
-            SecurityManager s = System.getSecurityManager();
-            group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+            group = Thread.currentThread().getThreadGroup();
             this.namePrefix = namePrefix;
         }
 

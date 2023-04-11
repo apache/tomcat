@@ -24,8 +24,10 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-class constants$19 {
+final class constants$19 {
 
+    // Suppresses default constructor, ensuring non-instantiability.
+    private constants$19() {}
     static final FunctionDescriptor SSL_shutdown$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
         Constants$root.C_POINTER$LAYOUT
     );

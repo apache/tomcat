@@ -276,7 +276,7 @@ public class TesterOpenSSL {
         String ciphers[] = stdout.split("\n");
         for (String cipher : ciphers) {
             // Handle rename for 1.1.0 onwards
-            cipher = cipher.replaceAll("EDH", "DHE");
+            cipher = cipher.replace("EDH", "DHE");
             if (first) {
                 first = false;
             } else {

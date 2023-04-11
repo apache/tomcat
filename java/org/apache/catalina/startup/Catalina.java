@@ -38,7 +38,6 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.security.SecurityConfig;
 import org.apache.juli.ClassLoaderLogManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -173,7 +172,6 @@ public class Catalina {
     // ----------------------------------------------------------- Constructors
 
     public Catalina() {
-        setSecurityProtection();
         ExceptionUtils.preload();
     }
 
@@ -936,20 +934,10 @@ public class Catalina {
     }
 
 
-    /**
-     * Set the security package access/protection.
-     */
-    protected void setSecurityProtection(){
-        SecurityConfig securityConfig = SecurityConfig.newInstance();
-        securityConfig.setPackageDefinition();
-        securityConfig.setPackageAccess();
-    }
-
-
     protected void generateLoader() {
         String loaderClassName = "DigesterGeneratedCodeLoader";
         StringBuilder code = new StringBuilder();
-        code.append("package ").append(generatedCodePackage).append(";").append(System.lineSeparator());
+        code.append("package ").append(generatedCodePackage).append(';').append(System.lineSeparator());
         code.append("public class ").append(loaderClassName);
         code.append(" implements org.apache.tomcat.util.digester.Digester.GeneratedCodeLoader {").append(System.lineSeparator());
         code.append("public Object loadGeneratedCode(String className) {").append(System.lineSeparator());
@@ -972,7 +960,7 @@ public class Catalina {
 
     protected void generateClassHeader(Digester digester, boolean start) {
         StringBuilder code = digester.getGeneratedCode();
-        code.append("package ").append(generatedCodePackage).append(";").append(System.lineSeparator());
+        code.append("package ").append(generatedCodePackage).append(';').append(System.lineSeparator());
         code.append("public class ServerXml");
         if (!start) {
             code.append("Stop");
@@ -992,7 +980,7 @@ public class Catalina {
 
 
     public interface ServerXml {
-        public void load(Catalina catalina);
+        void load(Catalina catalina);
     }
 
 
@@ -1035,7 +1023,7 @@ public class Catalina {
 
     final class SetParentClassLoaderRule extends Rule {
 
-        public SetParentClassLoaderRule(ClassLoader parentClassLoader) {
+        SetParentClassLoaderRule(ClassLoader parentClassLoader) {
 
             this.parentClassLoader = parentClassLoader;
 

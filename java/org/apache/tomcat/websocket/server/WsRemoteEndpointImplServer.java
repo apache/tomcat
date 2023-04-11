@@ -23,7 +23,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
+import jakarta.servlet.http.WebConnection;
 import jakarta.websocket.SendHandler;
 import jakarta.websocket.SendResult;
 
@@ -33,21 +35,22 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.Constants;
 import org.apache.tomcat.websocket.Transformation;
 import org.apache.tomcat.websocket.WsRemoteEndpointImplBase;
 
 /**
- * This is the server side {@link jakarta.websocket.RemoteEndpoint} implementation
- * - i.e. what the server uses to send data to the client.
+ * This is the server side {@link jakarta.websocket.RemoteEndpoint} implementation - i.e. what the server uses to send
+ * data to the client.
  */
 public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
-    private static final StringManager sm =
-            StringManager.getManager(WsRemoteEndpointImplServer.class);
+    private static final StringManager sm = StringManager.getManager(WsRemoteEndpointImplServer.class);
     private final Log log = LogFactory.getLog(WsRemoteEndpointImplServer.class); // must not be static
 
     private final SocketWrapperBase<?> socketWrapper;
     private final UpgradeInfo upgradeInfo;
+    private final WebConnection connection;
     private final WsWriteTimeout wsWriteTimeout;
     private volatile SendHandler handler = null;
     private volatile ByteBuffer[] buffers = null;
@@ -55,9 +58,10 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     private volatile long timeoutExpiry = -1;
 
     public WsRemoteEndpointImplServer(SocketWrapperBase<?> socketWrapper, UpgradeInfo upgradeInfo,
-            WsServerContainer serverContainer) {
+            WsServerContainer serverContainer, WebConnection connection) {
         this.socketWrapper = socketWrapper;
         this.upgradeInfo = upgradeInfo;
+        this.connection = connection;
         this.wsWriteTimeout = serverContainer.getTimeout();
     }
 
@@ -68,9 +72,72 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The close message is a special case. It needs to be blocking else implementing the clean-up that follows the
+     * sending of the close message gets a lot more complicated. On the server, this creates additional complications as
+     * a dead-lock may occur in the following scenario:
+     * <ol>
+     * <li>Application thread writes message using non-blocking</li>
+     * <li>Write does not complete (write logic holds message pending lock)</li>
+     * <li>Socket is added to poller (or equivalent) for write
+     * <li>Client sends close message</li>
+     * <li>Container processes received close message and tries to send close message in response</li>
+     * <li>Container holds socket lock and is blocked waiting for message pending lock</li>
+     * <li>Poller fires write possible event for socket</li>
+     * <li>Container tries to process write possible event but is blocked waiting for socket lock</li>
+     * <li>Processing of the WebSocket connection is dead-locked until the original message write times out</li>
+     * </ol>
+     * The purpose of this method is to break the above dead-lock. It does this by returning control of the processor to
+     * the socket wrapper and releasing the socket lock while waiting for the pending message write to complete.
+     * Normally, that would be a terrible idea as it creates the possibility that the processor is returned to the pool
+     * more than once under various error conditions. In this instance it is safe because these are upgrade processors
+     * (isUpgrade() returns {@code true}) and upgrade processors are never pooled.
+     * <p>
+     * TODO: Despite the complications it creates, it would be worth exploring the possibility of processing a received
+     * close frame in a non-blocking manner.
+     */
     @Override
-    protected void doWrite(SendHandler handler, long blockingWriteTimeoutExpiry,
-            ByteBuffer... buffers) {
+    protected boolean acquireMessagePartInProgressSemaphore(byte opCode, long timeoutExpiry)
+            throws InterruptedException {
+
+        // Only close requires special handling.
+        if (opCode != Constants.OPCODE_CLOSE) {
+            return super.acquireMessagePartInProgressSemaphore(opCode, timeoutExpiry);
+        }
+
+        int socketWrapperLockCount = socketWrapper.getLock().getHoldCount();
+        while (!messagePartInProgress.tryAcquire()) {
+            long timeout = timeoutExpiry - System.currentTimeMillis();
+            if (timeout < 0) {
+                return false;
+            }
+            try {
+                // Release control of the processor
+                socketWrapper.setCurrentProcessor(connection);
+                // Release the per socket lock(s)
+                for (int i = 0; i < socketWrapperLockCount; i++) {
+                    socketWrapper.getLock().unlock();
+                }
+                // Provide opportunity for another thread to obtain the socketWrapper lock
+                Thread.yield();
+            } finally {
+                // Re-obtain the per socket lock(s)
+                for (int i = 0; i < socketWrapperLockCount; i++) {
+                    socketWrapper.getLock().lock();
+                }
+                // Re-take control of the processor
+                socketWrapper.takeCurrentProcessor();
+            }
+        }
+
+        return true;
+    }
+
+
+    @Override
+    protected void doWrite(SendHandler handler, long blockingWriteTimeoutExpiry, ByteBuffer... buffers) {
         if (socketWrapper.hasAsyncIO()) {
             final boolean block = (blockingWriteTimeoutExpiry != -1);
             long timeout = -1;
@@ -90,9 +157,8 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     wsWriteTimeout.register(this);
                 }
             }
-            socketWrapper.write(block ? BlockingMode.BLOCK : BlockingMode.SEMI_BLOCK, timeout,
-                    TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION,
-                    new CompletionHandler<Long, Void>() {
+            socketWrapper.write(block ? BlockingMode.BLOCK : BlockingMode.SEMI_BLOCK, timeout, TimeUnit.MILLISECONDS,
+                    null, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION, new CompletionHandler<Long, Void>() {
                         @Override
                         public void completed(Long result, Void attachment) {
                             if (block) {
@@ -107,6 +173,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                                 clearHandler(null, true);
                             }
                         }
+
                         @Override
                         public void failed(Throwable exc, Void attachment) {
                             if (block) {
@@ -239,11 +306,9 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
 
     /*
-     * Currently this is only called from the background thread so we could just
-     * call clearHandler() with useDispatch == false but the method parameter
-     * was added in case other callers started to use this method to make sure
-     * that those callers think through what the correct value of useDispatch is
-     * for them.
+     * Currently this is only called from the background thread so we could just call clearHandler() with useDispatch ==
+     * false but the method parameter was added in case other callers started to use this method to make sure that those
+     * callers think through what the correct value of useDispatch is for them.
      */
     protected void onTimeout(boolean useDispatch) {
         if (handler != null) {
@@ -261,15 +326,11 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
 
     /**
-     *
-     * @param t             The throwable associated with any error that
-     *                      occurred
-     * @param useDispatch   Should {@link SendHandler#onResult(SendResult)} be
-     *                      called from a new thread, keeping in mind the
-     *                      requirements of
-     *                      {@link jakarta.websocket.RemoteEndpoint.Async}
+     * @param t           The throwable associated with any error that occurred
+     * @param useDispatch Should {@link SendHandler#onResult(SendResult)} be called from a new thread, keeping in mind
+     *                        the requirements of {@link jakarta.websocket.RemoteEndpoint.Async}
      */
-    private void clearHandler(Throwable t, boolean useDispatch) {
+    void clearHandler(Throwable t, boolean useDispatch) {
         // Setting the result marks this (partial) message as
         // complete which means the next one may be sent which
         // could update the value of the handler. Therefore, keep a
@@ -301,6 +362,12 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 }
             }
         }
+    }
+
+
+    @Override
+    protected ReentrantLock getLock() {
+        return socketWrapper.getLock();
     }
 
 

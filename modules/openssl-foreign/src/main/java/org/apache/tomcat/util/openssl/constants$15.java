@@ -24,8 +24,10 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-class constants$15 {
+final class constants$15 {
 
+    // Suppresses default constructor, ensuring non-instantiability.
+    private constants$15() {}
     static final FunctionDescriptor SSL_SESSION_get_id$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
         Constants$root.C_POINTER$LAYOUT,
         Constants$root.C_POINTER$LAYOUT
@@ -61,8 +63,17 @@ class constants$15 {
         Constants$root.C_POINTER$LAYOUT,
         Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_set_cert_verify_callback$cb$MH = RuntimeHelper.downcallHandle(
-        constants$15.SSL_CTX_set_cert_verify_callback$cb$FUNC
+    static final FunctionDescriptor SSL_CTX_set_cert_verify_callback$cb_UP$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
+    );
+    static final MethodHandle SSL_CTX_set_cert_verify_callback$cb_UP$MH = RuntimeHelper.upcallHandle(SSL_CTX_set_cert_verify_callback$cb.class, "apply", constants$15.SSL_CTX_set_cert_verify_callback$cb_UP$FUNC);
+    static final FunctionDescriptor SSL_CTX_set_cert_verify_callback$cb_DOWN$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
+    );
+    static final MethodHandle SSL_CTX_set_cert_verify_callback$cb_DOWN$MH = RuntimeHelper.downcallHandle(
+        constants$15.SSL_CTX_set_cert_verify_callback$cb_DOWN$FUNC
     );
 }
 

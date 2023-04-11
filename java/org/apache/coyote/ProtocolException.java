@@ -17,8 +17,7 @@
 package org.apache.coyote;
 
 /**
- * Used when we need to indicate failure but the (Servlet) API doesn't declare
- * any appropriate exceptions.
+ * Used when we need to indicate failure but the (Servlet) API doesn't declare any appropriate exceptions.
  */
 public class ProtocolException extends RuntimeException {
 

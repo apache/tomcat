@@ -269,7 +269,7 @@ public class WebAnnotationSet {
 
     protected static void loadFieldsAnnotation(Context context, Class<?> clazz) {
         // Initialize the annotations
-        Field[] fields = Introspection.getDeclaredFields(clazz);
+        Field[] fields = clazz.getDeclaredFields();
         if (fields != null && fields.length > 0) {
             for (Field field : fields) {
                 Resource annotation = field.getAnnotation(Resource.class);
@@ -285,7 +285,7 @@ public class WebAnnotationSet {
 
     protected static void loadMethodsAnnotation(Context context, Class<?> clazz) {
         // Initialize the annotations
-        Method[] methods = Introspection.getDeclaredMethods(clazz);
+        Method[] methods = clazz.getDeclaredMethods();
         if (methods != null && methods.length > 0) {
             for (Method method : methods) {
                 Resource annotation = method.getAnnotation(Resource.class);

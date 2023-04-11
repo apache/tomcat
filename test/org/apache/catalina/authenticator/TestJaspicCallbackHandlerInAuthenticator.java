@@ -27,7 +27,6 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 
 import jakarta.security.auth.message.callback.CallerPrincipalCallback;
 import jakarta.security.auth.message.callback.GroupPrincipalCallback;
@@ -49,8 +48,8 @@ public class TestJaspicCallbackHandlerInAuthenticator {
 
     @Test
     public void testCustomCallbackHandlerCreation() throws Exception {
-        testCallbackHandlerCreation("org.apache.catalina.authenticator.TestCallbackHandlerImpl",
-                TestCallbackHandlerImpl.class);
+        testCallbackHandlerCreation("org.apache.catalina.authenticator.TesterCallbackHandlerImpl",
+                TesterCallbackHandlerImpl.class);
     }
 
 
@@ -184,19 +183,5 @@ public class TestJaspicCallbackHandlerInAuthenticator {
         protected Principal getPrincipal(String username) {
             return new GenericPrincipal(username);
         }
-    }
-}
-
-
-class TestCallbackHandlerImpl implements CallbackHandler {
-
-    public TestCallbackHandlerImpl() {
-        // Default constructor required by reflection
-    }
-
-
-    @Override
-    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-        // don't have to do anything; needed only for instantiation
     }
 }

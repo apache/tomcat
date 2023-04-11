@@ -24,6 +24,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
+import java.net.StandardProtocolFamily;
+import java.net.UnixDomainSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.Channel;
@@ -57,7 +59,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.collections.SynchronizedQueue;
 import org.apache.tomcat.util.collections.SynchronizedStack;
-import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.Acceptor.AcceptorState;
@@ -83,6 +84,7 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
 
 
     private static final Log log = LogFactory.getLog(NioEndpoint.class);
+    private static final Log logCertificate = LogFactory.getLog(NioEndpoint.class.getName() + ".certificate");
     private static final Log logHandshake = LogFactory.getLog(NioEndpoint.class.getName() + ".handshake");
 
 
@@ -219,8 +221,8 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                 throw new IllegalArgumentException(sm.getString("endpoint.init.bind.inherited"));
             }
         } else if (getUnixDomainSocketPath() != null) {
-            SocketAddress sa = JreCompat.getInstance().getUnixDomainSocketAddress(getUnixDomainSocketPath());
-            serverSock = JreCompat.getInstance().openUnixDomainServerSocketChannel();
+            SocketAddress sa = UnixDomainSocketAddress.of(getUnixDomainSocketPath());
+            serverSock = ServerSocketChannel.open(StandardProtocolFamily.UNIX);
             serverSock.bind(sa, getAcceptCount());
             if (getUnixDomainSocketPathPermissions() != null) {
                 Path path = Paths.get(getUnixDomainSocketPath());
@@ -393,8 +395,8 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                 return;
             }
             try {
-                SocketAddress sa = JreCompat.getInstance().getUnixDomainSocketAddress(getUnixDomainSocketPath());
-                try (SocketChannel socket = JreCompat.getInstance().openUnixDomainSocketChannel()) {
+                SocketAddress sa = UnixDomainSocketAddress.of(getUnixDomainSocketPath());
+                try (SocketChannel socket = SocketChannel.open(StandardProtocolFamily.UNIX)) {
                     // With a UDS, expect no delay connecting and no defer accept
                     socket.connect(sa);
                 }
@@ -538,6 +540,12 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
     @Override
     protected Log getLog() {
         return log;
+    }
+
+
+    @Override
+    protected Log getLogCertificate() {
+        return logCertificate;
     }
 
 

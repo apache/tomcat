@@ -17,14 +17,10 @@
 package org.apache.catalina.util;
 
 import java.beans.Introspector;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
@@ -89,40 +85,6 @@ public class Introspection {
         }
         return true;
     }
-
-    /**
-     * Obtain the declared fields for a class taking account of any security
-     * manager that may be configured.
-     * @param clazz The class to introspect
-     * @return the class fields as an array
-     */
-    public static Field[] getDeclaredFields(final Class<?> clazz) {
-        Field[] fields = null;
-        if (Globals.IS_SECURITY_ENABLED) {
-            fields = AccessController.doPrivileged((PrivilegedAction<Field[]>) clazz::getDeclaredFields);
-        } else {
-            fields = clazz.getDeclaredFields();
-        }
-        return fields;
-    }
-
-
-    /**
-     * Obtain the declared methods for a class taking account of any security
-     * manager that may be configured.
-     * @param clazz The class to introspect
-     * @return the class methods as an array
-     */
-    public static Method[] getDeclaredMethods(final Class<?> clazz) {
-        Method[] methods = null;
-        if (Globals.IS_SECURITY_ENABLED) {
-            methods = AccessController.doPrivileged((PrivilegedAction<Method[]>) clazz::getDeclaredMethods);
-        } else {
-            methods = clazz.getDeclaredMethods();
-        }
-        return methods;
-    }
-
 
     /**
      * Attempt to load a class using the given Container's class loader. If the

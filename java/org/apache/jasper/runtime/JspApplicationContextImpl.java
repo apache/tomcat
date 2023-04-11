@@ -16,8 +16,6 @@
  */
 package org.apache.jasper.runtime;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +29,6 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.jsp.JspApplicationContext;
 import jakarta.servlet.jsp.JspContext;
 
-import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.el.ELContextImpl;
 import org.apache.jasper.el.JasperELResolver;
@@ -88,12 +85,7 @@ public class JspApplicationContextImpl implements JspApplicationContext {
 
         // create ELContext for JspContext
         final ELResolver r = this.createELResolver();
-        ELContextImpl ctx;
-        if (Constants.IS_SECURITY_ENABLED) {
-            ctx = AccessController.doPrivileged((PrivilegedAction<ELContextImpl>) () -> new ELContextImpl(r));
-        } else {
-            ctx = new ELContextImpl(r);
-        }
+        ELContextImpl ctx = new ELContextImpl(r);
         ctx.putContext(JspContext.class, context);
 
         // alert all ELContextListeners

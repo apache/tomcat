@@ -64,12 +64,8 @@ public class CompositeELResolver extends ELResolver {
         return null;
     }
 
-    /**
-     * @since EL 2.2
-     */
     @Override
-    public Object invoke(ELContext context, Object base, Object method,
-            Class<?>[] paramTypes, Object[] params) {
+    public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
         context.setPropertyResolved(false);
         int sz = this.size;
         for (int i = 0; i < sz; i++) {

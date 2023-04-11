@@ -108,22 +108,21 @@ public class TestWebappClassLoaderExecutorMemoryLeak extends TomcatBaseTest {
 
             String _id;
 
-            public Task(String id) {
+            Task(String id) {
                 this._id = id;
             }
 
             @Override
             public void run() {
+                Thread currentThread = Thread.currentThread();
                 try {
-                    while (!Thread.currentThread().isInterrupted()) {
+                    while (!currentThread.isInterrupted()) {
                         Thread.sleep(20000);
-                        System.out.println(Thread.currentThread().getClass()
-                                + " [" + Thread.currentThread().getName()
-                                + "] executing " + this._id);
+                        System.out.println(
+                                currentThread.getClass() + " [" + currentThread.getName() + "] executing " + this._id);
                     }
                 } catch (InterruptedException e) {
-                    System.out.println(Thread.currentThread().getClass() + " ["
-                            + Thread.currentThread().getName() + "] EXITING");
+                    System.out.println(currentThread.getClass() + " [" + currentThread.getName() + "] EXITING");
                 }
             }
         }

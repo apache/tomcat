@@ -796,7 +796,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
      */
     @Override
     public String getServletInfo() {
-        return "HTMLManagerServlet, Copyright (c) 1999-2022, The Apache Software Foundation";
+        return "HTMLManagerServlet, Copyright (c) 1999-2023, The Apache Software Foundation";
     }
 
     /**
@@ -815,7 +815,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
     // ------------------------------------------------ Sessions administration
 
     /**
-     *
      * Extract the expiration request parameter
      *
      * @param cn Name of the application from which to expire sessions

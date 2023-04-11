@@ -607,7 +607,6 @@ public class RewriteValve extends ValveBase {
                 return rule;
             } else if (token.equals("RewriteMap")) {
                 // RewriteMap name rewriteMapClassName whateverOptionalParameterInWhateverFormat
-                // FIXME: Possibly implement more special maps from https://httpd.apache.org/docs/2.4/rewrite/rewritemap.html
                 if (tokenizer.countTokens() < 2) {
                     throw new IllegalArgumentException(sm.getString("rewriteValve.invalidLine", line));
                 }
@@ -616,8 +615,21 @@ public class RewriteValve extends ValveBase {
                 RewriteMap map = null;
                 if (rewriteMapClassName.startsWith("int:")) {
                     map = InternalRewriteMap.toMap(rewriteMapClassName.substring("int:".length()));
+                } else if (rewriteMapClassName.startsWith("txt:")) {
+                    map = new RandomizedTextRewriteMap(rewriteMapClassName.substring("txt:".length()), false);
+                } else if (rewriteMapClassName.startsWith("rnd:")) {
+                    map = new RandomizedTextRewriteMap(rewriteMapClassName.substring("rnd:".length()), true);
                 } else if (rewriteMapClassName.startsWith("prg:")) {
+                    // FIXME: https://httpd.apache.org/docs/2.4/rewrite/rewritemap.html#prg
+                    // Likely not worth implementing further since this is a simpler CGI
+                    // piping stdin/stdout from an external native process
+                    // Instead assume a class and use the RewriteMap interface
                     rewriteMapClassName = rewriteMapClassName.substring("prg:".length());
+                } else if (rewriteMapClassName.startsWith("dbm:")) {
+                    // FIXME: https://httpd.apache.org/docs/2.4/rewrite/rewritemap.html#dbm
+                    // Probably too specific to HTTP Server to implement
+                } else if (rewriteMapClassName.startsWith("dbd:") || rewriteMapClassName.startsWith("fastdbd:")) {
+                    // FIXME: https://httpd.apache.org/docs/2.4/rewrite/rewritemap.html#dbd
                 }
                 if (map == null) {
                     try {

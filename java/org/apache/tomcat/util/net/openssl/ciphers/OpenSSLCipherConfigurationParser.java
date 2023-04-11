@@ -394,7 +394,7 @@ public class OpenSSLCipherConfigurationParser {
 
     private static final Map<String,String> jsseToOpenSSL = new HashMap<>();
 
-    private static final void init() {
+    private static void init() {
 
         for (Cipher cipher : Cipher.values()) {
             String alias = cipher.getOpenSSLAlias();
@@ -536,7 +536,7 @@ public class OpenSSLCipherConfigurationParser {
         // COMPLEMENTOFDEFAULT is also not exactly as defined by the docs
         LinkedHashSet<Cipher> complementOfDefault = filterByKeyExchange(all, new HashSet<>(Arrays.asList(KeyExchange.EDH,KeyExchange.EECDH)));
         complementOfDefault = filterByAuthentication(complementOfDefault, Collections.singleton(Authentication.aNULL));
-        complementOfDefault.removeAll(aliases.get(eNULL));
+        aliases.get(eNULL).forEach(complementOfDefault::remove);
         complementOfDefault.addAll(aliases.get(Constants.SSL_PROTO_SSLv2));
         complementOfDefault.addAll(aliases.get(EXPORT));
         complementOfDefault.addAll(aliases.get(DES));
@@ -564,7 +564,7 @@ public class OpenSSLCipherConfigurationParser {
     static void moveToEnd(final LinkedHashSet<Cipher> ciphers, final Collection<Cipher> toBeMovedCiphers) {
         List<Cipher> movedCiphers = new ArrayList<>(toBeMovedCiphers);
         movedCiphers.retainAll(ciphers);
-        ciphers.removeAll(movedCiphers);
+        movedCiphers.forEach(ciphers::remove);
         ciphers.addAll(movedCiphers);
     }
 
@@ -582,7 +582,7 @@ public class OpenSSLCipherConfigurationParser {
     }
 
     static void remove(final Set<Cipher> ciphers, final String alias) {
-        ciphers.removeAll(aliases.get(alias));
+        aliases.get(alias).forEach(ciphers::remove);
     }
 
     static LinkedHashSet<Cipher> strengthSort(final LinkedHashSet<Cipher> ciphers) {

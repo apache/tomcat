@@ -130,12 +130,12 @@ public class TestCookieParsing extends TomcatBaseTest {
         private final boolean echoHeader;
 
 
-        public TestCookieParsingClient(CookieProcessor cookieProcessor,
+        TestCookieParsingClient(CookieProcessor cookieProcessor,
                 String[] cookies, String expected) {
             this(cookieProcessor, false, cookies, expected);
         }
 
-        public TestCookieParsingClient(CookieProcessor cookieProcessor,
+        TestCookieParsingClient(CookieProcessor cookieProcessor,
                 boolean echoHeader, String[] cookies, String expected) {
             this.cookieProcessor = cookieProcessor;
             this.echoHeader = echoHeader;

@@ -45,10 +45,8 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
 
         // Requests to exercise code that allows HT in place of SP
         parameterSets.add(new Object[] { Boolean.FALSE, new String[] {
-                "GET\t/test\tHTTP/1.1" + CRLF +
-                "Host: localhost:8080" + CRLF +
-               "Connection: close" + CRLF +
-                CRLF }, Boolean.TRUE } );
+                "GET\t/test\tHTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF + CRLF },
+                Boolean.TRUE });
 
         // Requests to simulate package boundaries
         // HTTP/0.9 request
@@ -68,67 +66,44 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
         addRequestWithSplits("GET /test " + LF, Boolean.FALSE, Boolean.FALSE, parameterSets);
 
         // Standard HTTP/1.1 request
-        addRequestWithSplits("GET /test HTTP/1.1" + CRLF +
-                "Host: localhost:8080" + CRLF +
-                "Connection: close" + CRLF +
-                CRLF,
+        addRequestWithSplits(
+                "GET /test HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF + CRLF,
                 Boolean.FALSE, parameterSets);
 
         // Standard HTTP/1.1 request with invalid HTTP protocol
-        addRequestWithSplits("GET /test HTTP/" + CR + "1.1" + CRLF +
-                "Host: localhost:8080" + CRLF +
-                "Connection: close" + CRLF +
-                CRLF,
-                Boolean.FALSE, Boolean.FALSE, parameterSets);
+        addRequestWithSplits("GET /test HTTP/" + CR + "1.1" + CRLF + "Host: localhost:8080" + CRLF +
+                "Connection: close" + CRLF + CRLF, Boolean.FALSE, Boolean.FALSE, parameterSets);
 
         // Invalid (request target) HTTP/1.1 request
-        addRequestWithSplits("GET /te<st HTTP/1.1" + CRLF +
-                "Host: localhost:8080" + CRLF +
-                "Connection: close" + CRLF +
-                CRLF,
+        addRequestWithSplits(
+                "GET /te<st HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF + CRLF,
                 Boolean.FALSE, Boolean.FALSE, parameterSets);
 
         // Invalid (use of CR) HTTP/1.1 request
-        addRequestWithSplits("GET /test HTTP/1.1" + CRLF +
-                "Host: localhost:8080" + CRLF +
-                "Connection: close" + CRLF +
-                "X-aaa: bbb" + CR + CRLF +
-                CRLF,
-                Boolean.FALSE, Boolean.FALSE, parameterSets);
+        addRequestWithSplits("GET /test HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF +
+                "X-aaa: bbb" + CR + CRLF + CRLF, Boolean.FALSE, Boolean.FALSE, parameterSets);
 
         // Standard HTTP/1.1 request with a query string
-        addRequestWithSplits("GET /test?a=b HTTP/1.1" + CRLF +
-                "Host: localhost:8080" + CRLF +
-                "Connection: close" + CRLF +
-                CRLF,
+        addRequestWithSplits(
+                "GET /test?a=b HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF + CRLF,
                 Boolean.FALSE, parameterSets);
 
         // Standard HTTP/1.1 request with a query string that includes ?
-        addRequestWithSplits("GET /test?a=?b HTTP/1.1" + CRLF +
-                "Host: localhost:8080" + CRLF +
-                "Connection: close" + CRLF +
-                CRLF,
+        addRequestWithSplits(
+                "GET /test?a=?b HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF + CRLF,
                 Boolean.FALSE, parameterSets);
 
         // Standard HTTP/1.1 request with an invalid query string
-        addRequestWithSplits("GET /test?a=<b HTTP/1.1" + CRLF +
-                "Host: localhost:8080" + CRLF +
-                "Connection: close" + CRLF +
-                CRLF,
+        addRequestWithSplits(
+                "GET /test?a=<b HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" + CRLF + CRLF,
                 Boolean.FALSE, Boolean.FALSE, parameterSets);
 
         // Standard HTTP/1.1 request using LF rather than CRLF
-        addRequestWithSplits("GET /test HTTP/1.1" + LF +
-                "Host: localhost:8080" + LF +
-                "Connection: close" + LF +
-                LF,
+        addRequestWithSplits("GET /test HTTP/1.1" + LF + "Host: localhost:8080" + LF + "Connection: close" + LF + LF,
                 Boolean.FALSE, parameterSets);
 
         // Invalid HTTP/1.1 request using CR rather than CRLF
-        addRequestWithSplits("GET /test HTTP/1.1" + CR +
-                "Host: localhost:8080" + CR +
-                "Connection: close" + CR +
-                CR,
+        addRequestWithSplits("GET /test HTTP/1.1" + CR + "Host: localhost:8080" + CR + "Connection: close" + CR + CR,
                 Boolean.FALSE, Boolean.FALSE, parameterSets);
 
         return parameterSets;
@@ -139,7 +114,8 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
         addRequestWithSplits(request, isHttp09, Boolean.TRUE, parameterSets);
     }
 
-    private static void addRequestWithSplits(String request, Boolean isHttp09, Boolean valid, List<Object[]> parameterSets) {
+    private static void addRequestWithSplits(String request, Boolean isHttp09, Boolean valid,
+            List<Object[]> parameterSets) {
         // Add as a single String
         parameterSets.add(new Object[] { isHttp09, new String[] { request }, valid });
 
@@ -182,7 +158,7 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
 
         if (valid) {
             Assert.assertTrue(client.isResponseBodyOK());
-        } else if (e == null){
+        } else if (e == null) {
             Assert.assertTrue(client.isResponse400());
         } else {
             // The invalid request was detected before the entire request had
@@ -194,7 +170,7 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
 
     private class Client extends SimpleHttpClient {
 
-        public Client(String[] request, boolean isHttp09) {
+        Client(String[] request, boolean isHttp09) {
             setRequest(request);
             setUseHttp09(isHttp09);
         }

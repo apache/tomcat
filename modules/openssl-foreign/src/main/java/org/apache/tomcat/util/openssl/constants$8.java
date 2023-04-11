@@ -24,8 +24,10 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-class constants$8 {
+final class constants$8 {
 
+    // Suppresses default constructor, ensuring non-instantiability.
+    private constants$8() {}
     static final FunctionDescriptor X509_STORE_CTX_set_error$FUNC = FunctionDescriptor.ofVoid(
         Constants$root.C_POINTER$LAYOUT,
         Constants$root.C_INT$LAYOUT

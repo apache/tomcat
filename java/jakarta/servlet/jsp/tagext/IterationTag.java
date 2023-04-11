@@ -78,7 +78,7 @@ public interface IterationTag extends Tag {
      * Request the reevaluation of some body.
      * Returned from doAfterBody.
      */
-    public static final int EVAL_BODY_AGAIN = 2;
+    int EVAL_BODY_AGAIN = 2;
 
     /**
      * Process body (re)evaluation.  This method is invoked by the
@@ -110,6 +110,5 @@ public interface IterationTag extends Tag {
      * @return whether additional evaluations of the body are desired
      * @throws JspException if an error occurred while processing this tag
      */
-
     int doAfterBody() throws JspException;
 }

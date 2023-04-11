@@ -56,8 +56,8 @@ public class ApplicationMapping {
                     case EXTENSION:
                         String path = mappingData.wrapperPath.toString();
                         int extIndex = path.lastIndexOf('.');
-                        mapping = new MappingImpl(path.substring(1, extIndex),
-                                "*" + path.substring(extIndex), mappingData.matchType, servletName);
+                        mapping = new MappingImpl(path.substring(1, extIndex), "*" + path.substring(extIndex),
+                                mappingData.matchType, servletName);
                         break;
                     case PATH:
                         String matchValue;
@@ -87,8 +87,7 @@ public class ApplicationMapping {
         private final MappingMatch mappingType;
         private final String servletName;
 
-        public MappingImpl(String matchValue, String pattern, MappingMatch mappingType,
-                String servletName) {
+        MappingImpl(String matchValue, String pattern, MappingMatch mappingType, String servletName) {
             this.matchValue = matchValue;
             this.pattern = pattern;
             this.mappingType = mappingType;

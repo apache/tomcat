@@ -50,7 +50,6 @@
     {"name":"org.apache.jasper.resources.LocalStrings"},
     {"name":"org.apache.naming.LocalStrings"},
     {"name":"org.apache.naming.factory.LocalStrings"},
-    {"name":"org.apache.naming.factory.webservices.LocalStrings"},
     {"name":"org.apache.tomcat.dbcp.dbcp2.LocalStrings"},
     {"name":"org.apache.tomcat.util.LocalStrings"},
     {"name":"org.apache.tomcat.util.buf.LocalStrings"},

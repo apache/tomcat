@@ -236,7 +236,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         String extName = ";foo=";
         StringBuilder extValue = new StringBuilder(len);
         for (int i = 0; i < (len - extName.length()); i++) {
-            extValue.append("x");
+            extValue.append('x');
         }
 
         String[] request = new String[]{
@@ -435,7 +435,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         private final boolean expectPass;
 
-        public EchoHeaderServlet(boolean expectPass) {
+        EchoHeaderServlet(boolean expectPass) {
             this.expectPass = expectPass;
         }
 
@@ -494,7 +494,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         private final boolean expectPass;
         private final int readLimit;
 
-        public BodyReadServlet(boolean expectPass, int readLimit) {
+        BodyReadServlet(boolean expectPass, int readLimit) {
             this.expectPass = expectPass;
             this.readLimit = readLimit;
         }
@@ -535,7 +535,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
     private static class TrailerClient extends SimpleHttpClient {
 
-        public TrailerClient(int port) {
+        TrailerClient(int port) {
             setPort(port);
         }
 

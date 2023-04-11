@@ -38,52 +38,52 @@ public interface Node {
 
   /** This method is called after the node has been made the current
     node.  It indicates that child nodes can now be added to it. */
-  public void jjtOpen();
+  void jjtOpen();
 
   /** This method is called after all the child nodes have been
     added. */
-  public void jjtClose();
+  void jjtClose();
 
   /** This pair of methods are used to inform the node of its
     parent. */
-  public void jjtSetParent(Node n);
-  public Node jjtGetParent();
+  void jjtSetParent(Node n);
+  Node jjtGetParent();
 
   /** This method tells the node to add its argument to the node's
     list of children.  */
-  public void jjtAddChild(Node n, int i);
+  void jjtAddChild(Node n, int i);
 
   /** This method returns a child node.  The children are numbered
      from zero, left to right. */
-  public Node jjtGetChild(int i);
+  Node jjtGetChild(int i);
 
   /** Return the number of children the node has. */
-  public int jjtGetNumChildren();
+  int jjtGetNumChildren();
 
-  public String getImage();
+  String getImage();
 
-  public Object getValue(EvaluationContext ctx) throws ELException;
-  public void setValue(EvaluationContext ctx, Object value) throws ELException;
-  public Class<?> getType(EvaluationContext ctx) throws ELException;
-  public boolean isReadOnly(EvaluationContext ctx) throws ELException;
-  public void accept(NodeVisitor visitor) throws Exception;
-  public MethodInfo getMethodInfo(EvaluationContext ctx, Class<?>[] paramTypes)
+  Object getValue(EvaluationContext ctx) throws ELException;
+  void setValue(EvaluationContext ctx, Object value) throws ELException;
+  Class<?> getType(EvaluationContext ctx) throws ELException;
+  boolean isReadOnly(EvaluationContext ctx) throws ELException;
+  void accept(NodeVisitor visitor) throws Exception;
+  MethodInfo getMethodInfo(EvaluationContext ctx, Class<?>[] paramTypes)
           throws ELException;
-  public Object invoke(EvaluationContext ctx, Class<?>[] paramTypes,
+  Object invoke(EvaluationContext ctx, Class<?>[] paramTypes,
           Object[] paramValues) throws ELException;
 
   /**
    * @since EL 2.2
    */
-  public ValueReference getValueReference(EvaluationContext ctx);
+  ValueReference getValueReference(EvaluationContext ctx);
 
   /**
    * @since EL 2.2
    */
-  public boolean isParametersProvided();
+  boolean isParametersProvided();
 
   /**
    * @since EL 5.0
    */
-  public MethodReference getMethodReference(EvaluationContext ctx);
+  MethodReference getMethodReference(EvaluationContext ctx);
 }

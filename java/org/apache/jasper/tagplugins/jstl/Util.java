@@ -257,8 +257,9 @@ public class Util {
         }
     }
 
-    /** Wraps responses to allow us to retrieve results as Strings.
-     * mainly taken from org.apache.taglibs.standard.tag.common.core.importSupport
+    /**
+     * Wraps responses to allow us to retrieve results as Strings. Mainly taken
+     * from org.apache.taglibs.standard.tag.common.core.importSupport.
      */
     public static class ImportResponseWrapper extends HttpServletResponseWrapper{
 

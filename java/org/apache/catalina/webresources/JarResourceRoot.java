@@ -37,13 +37,11 @@ public class JarResourceRoot extends AbstractResource {
     private final String baseUrl;
     private final String name;
 
-    public JarResourceRoot(WebResourceRoot root, File base, String baseUrl,
-            String webAppPath) {
+    public JarResourceRoot(WebResourceRoot root, File base, String baseUrl, String webAppPath) {
         super(root, webAppPath);
         // Validate the webAppPath before going any further
         if (!webAppPath.endsWith("/")) {
-            throw new IllegalArgumentException(sm.getString(
-                    "jarResourceRoot.invalidWebAppPath", webAppPath));
+            throw new IllegalArgumentException(sm.getString("jarResourceRoot.invalidWebAppPath", webAppPath));
         }
         this.base = base;
         this.baseUrl = "jar:" + baseUrl;
@@ -135,17 +133,6 @@ public class JarResourceRoot extends AbstractResource {
         }
     }
 
-    @Override
-    public URL getCodeBase() {
-        try {
-            return new URI(baseUrl).toURL();
-        } catch (MalformedURLException | URISyntaxException e) {
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("fileResource.getUrlFail", baseUrl), e);
-            }
-            return null;
-        }
-    }
     @Override
     protected Log getLog() {
         return log;

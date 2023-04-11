@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.apache.catalina.Container;
+import org.apache.catalina.Globals;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 
@@ -87,7 +88,7 @@ public class StoreContextAppender extends StoreAppender {
         File appBase;
         File file = new File(host.getAppBase());
         if (!file.isAbsolute()) {
-            file = new File(System.getProperty("catalina.base"), host
+            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), host
                     .getAppBase());
         }
         try {

@@ -18,14 +18,12 @@ package org.apache.tomcat.jni;
 
 import java.io.File;
 
-/** Library
- *
- * @author Mladen Turk
- */
 public final class Library {
 
     /* Default library names */
     private static final String [] NAMES = {"tcnative-2", "libtcnative-2", "tcnative-1", "libtcnative-1"};
+    /* System property used to define CATALINA_HOME */
+    private static final String CATALINA_HOME_PROP = "catalina.home";
     /*
      * A handle to the unique Library singleton instance.
      */
@@ -34,7 +32,7 @@ public final class Library {
     private Library() throws Exception {
         boolean loaded = false;
         StringBuilder err = new StringBuilder();
-        File binLib = new File(System.getProperty("catalina.home"), "bin");
+        File binLib = new File(System.getProperty(CATALINA_HOME_PROP), "bin");
         for (int i = 0; i < NAMES.length; i++) {
             File library = new File(binLib, System.mapLibraryName(NAMES[i]));
             try {

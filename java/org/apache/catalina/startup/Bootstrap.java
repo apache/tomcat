@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.catalina.security.SecurityClassLoad;
 import org.apache.catalina.startup.ClassLoaderFactory.Repository;
 import org.apache.catalina.startup.ClassLoaderFactory.RepositoryType;
 import org.apache.juli.logging.Log;
@@ -254,8 +253,6 @@ public final class Bootstrap {
         initClassLoaders();
 
         Thread.currentThread().setContextClassLoader(catalinaLoader);
-
-        SecurityClassLoad.securityClassLoad(catalinaLoader);
 
         // Load our startup class and call its process() method
         if (log.isDebugEnabled()) {

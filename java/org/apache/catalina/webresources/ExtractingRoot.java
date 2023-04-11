@@ -31,8 +31,8 @@ import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * If the main resources are packaged as a WAR file then any JARs will be
- * extracted to the work directory and used from there.
+ * If the main resources are packaged as a WAR file then any JARs will be extracted to the work directory and used from
+ * there.
  */
 public class ExtractingRoot extends StandardRoot {
 
@@ -53,8 +53,7 @@ public class ExtractingRoot extends StandardRoot {
         File expansionTarget = getExpansionTarget();
         if (!expansionTarget.isDirectory()) {
             if (!expansionTarget.mkdirs()) {
-                throw new LifecycleException(
-                        sm.getString("extractingRoot.targetFailed", expansionTarget));
+                throw new LifecycleException(sm.getString("extractingRoot.targetFailed", expansionTarget));
             }
         }
 
@@ -66,15 +65,13 @@ public class ExtractingRoot extends StandardRoot {
                     File dest = new File(expansionTarget, possibleJar.getName());
                     dest = dest.getCanonicalFile();
                     try (InputStream sourceStream = possibleJar.getInputStream();
-                            OutputStream destStream= new FileOutputStream(dest)) {
+                            OutputStream destStream = new FileOutputStream(dest)) {
                         IOTools.flow(sourceStream, destStream);
                     }
 
-                    createWebResourceSet(ResourceSetType.CLASSES_JAR,
-                            "/WEB-INF/classes", dest.toURI().toURL(), "/");
+                    createWebResourceSet(ResourceSetType.CLASSES_JAR, "/WEB-INF/classes", dest.toURI().toURL(), "/");
                 } catch (IOException ioe) {
-                    throw new LifecycleException(
-                            sm.getString("extractingRoot.jarFailed", possibleJar.getName()), ioe);
+                    throw new LifecycleException(sm.getString("extractingRoot.jarFailed", possibleJar.getName()), ioe);
                 }
             }
         }

@@ -18,6 +18,7 @@ package jakarta.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -32,8 +33,7 @@ import java.util.ResourceBundle;
  */
 public class ServletResponseWrapper implements ServletResponse {
     private static final String LSTRING_FILE = "jakarta.servlet.LocalStrings";
-    private static final ResourceBundle lStrings =
-        ResourceBundle.getBundle(LSTRING_FILE);
+    private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
     private ServletResponse response;
 
@@ -85,6 +85,17 @@ public class ServletResponseWrapper implements ServletResponse {
     @Override
     public void setCharacterEncoding(String charset) {
         this.response.setCharacterEncoding(charset);
+    }
+
+    /**
+     * The default behavior of this method is to call
+     * {@code setCharacterEncoding(Charset)} on the wrapped response object.
+     *
+     * @since Servlet 6.1
+     */
+    @Override
+    public void setCharacterEncoding(Charset encoding) {
+        this.response.setCharacterEncoding(encoding);
     }
 
     /**

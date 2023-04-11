@@ -95,7 +95,16 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
         rc = headUrl(path, out, headHeaders);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
-        // Headers should be the same (apart from Date)
+        // Headers should be the same part from:
+        // - Date header may be different
+        // Exclude some HTTP header fields where the value is determined only
+        // while generating the content as per section 9.3.2 of RFC 9110.
+        // (previously RFC 7231, section 4.3.2)
+        getHeaders.remove("content-length");
+        getHeaders.remove("content-range");
+        getHeaders.remove("trailer");
+        getHeaders.remove("transfer-encoding");
+
         Assert.assertEquals(getHeaders.size(), headHeaders.size());
         for (Map.Entry<String, List<String>> getHeader : getHeaders.entrySet()) {
             String headerName = getHeader.getKey();
@@ -158,15 +167,24 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
             String[] headHeaders = traceHead.split("\n");
 
             int i = 0;
+            int j = 0;
             for (; i < getHeaders.length; i++) {
-                // Headers should be the same, ignoring the first character which is the steam ID
-                Assert.assertEquals(getHeaders[i] + "\n" + traceGet + traceHead, '3', getHeaders[i].charAt(0));
-                Assert.assertEquals(headHeaders[i] + "\n" + traceGet + traceHead, '5', headHeaders[i].charAt(0));
-                Assert.assertEquals(traceGet + traceHead, getHeaders[i].substring(1), headHeaders[i].substring(1));
+                // Exclude some HTTP header fields where the value is determined
+                // only while generating the content as per section 9.3.2 of RFC
+                // 9110.
+                if (getHeaders[i].contains("content-length") || getHeaders[i].contains("content-range") ) {
+                    // Skip
+                } else {
+                    // Headers should be the same, ignoring the first character which is the steam ID
+                    Assert.assertEquals(getHeaders[i] + "\n" + traceGet + traceHead, '3', getHeaders[i].charAt(0));
+                    Assert.assertEquals(headHeaders[j] + "\n" + traceGet + traceHead, '5', headHeaders[j].charAt(0));
+                    Assert.assertEquals(traceGet + traceHead, getHeaders[i].substring(1), headHeaders[j].substring(1));
+                    j++;
+                }
             }
 
             // Stream 5 should have one more trace entry
-            Assert.assertEquals("5-EndOfStream", headHeaders[i]);
+            Assert.assertEquals("5-EndOfStream", headHeaders[j]);
         } catch (Exception t) {
             System.out.println(debug.toString());
             throw t;
@@ -207,7 +225,7 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
         private final int validWriteCount;
         private final boolean explicitFlush;
 
-        public HeadTestServlet(int bufferSize, boolean useWriter, int invalidWriteCount, ResetType resetType,
+        HeadTestServlet(int bufferSize, boolean useWriter, int invalidWriteCount, ResetType resetType,
                 int validWriteCount, boolean explicitFlush) {
             this.bufferSize = bufferSize;
             this.useWriter = useWriter;
@@ -365,7 +383,7 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
     }
 
 
-    static enum ResetType {
+    enum ResetType {
         NONE,
         BUFFER,
         FULL

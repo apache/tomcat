@@ -413,7 +413,7 @@ public final class UserConfig
         private String user;
         private String home;
 
-        public DeployUserDirectory(UserConfig config, String user, String home) {
+        DeployUserDirectory(UserConfig config, String user, String home) {
             this.config = config;
             this.user = user;
             this.home= home;

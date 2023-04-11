@@ -44,7 +44,7 @@ public interface FilterChain {
      *                     request
      * @throws ServletException if the processing fails for any other reason
      */
-    public void doFilter(ServletRequest request, ServletResponse response)
+    void doFilter(ServletRequest request, ServletResponse response)
             throws IOException, ServletException;
 
 }

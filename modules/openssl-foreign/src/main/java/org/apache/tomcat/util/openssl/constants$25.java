@@ -24,8 +24,10 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-class constants$25 {
+final class constants$25 {
 
+    // Suppresses default constructor, ensuring non-instantiability.
+    private constants$25() {}
     static final FunctionDescriptor RAND_seed$FUNC = FunctionDescriptor.ofVoid(
         Constants$root.C_POINTER$LAYOUT,
         Constants$root.C_INT$LAYOUT

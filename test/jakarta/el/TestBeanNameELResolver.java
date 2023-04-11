@@ -29,8 +29,7 @@ public class TestBeanNameELResolver {
     private static final TesterBean BEAN99 = new TesterBean(BEAN99_NAME);
 
     /**
-     * Creates the resolver that is used for the test. All the tests use a
-     * resolver with the same configuration.
+     * Creates the resolver that is used for the test. All the tests use a resolver with the same configuration.
      */
     private BeanNameELResolver createBeanNameELResolver() {
         return createBeanNameELResolver(true);
@@ -43,8 +42,7 @@ public class TestBeanNameELResolver {
         beanNameResolver.setBeanValue(BEAN02_NAME, BEAN02);
         beanNameResolver.setAllowCreate(allowCreate);
 
-        BeanNameELResolver beanNameELResolver =
-                new BeanNameELResolver(beanNameResolver);
+        BeanNameELResolver beanNameELResolver = new BeanNameELResolver(beanNameResolver);
         return beanNameELResolver;
     }
 
@@ -52,7 +50,7 @@ public class TestBeanNameELResolver {
     /**
      * Tests that a null context results in an NPE as per EL Javadoc.
      */
-    @Test(expected=NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void testGetValue01() {
         BeanNameELResolver resolver = createBeanNameELResolver();
         resolver.getValue(null, new Object(), new Object());
@@ -66,8 +64,7 @@ public class TestBeanNameELResolver {
     public void testGetValue02() {
 
         BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         Object result = resolver.getValue(context, null, BEAN01_NAME);
 
@@ -83,8 +80,7 @@ public class TestBeanNameELResolver {
     public void testGetValue03() {
 
         BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         Object result = resolver.getValue(context, new Object(), BEAN01_NAME);
 
@@ -94,15 +90,14 @@ public class TestBeanNameELResolver {
 
 
     /**
-     * Tests that a valid bean is not resolved if property is not a String even
-     * if it can be coerced to a valid bean name.
+     * Tests that a valid bean is not resolved if property is not a String even if it can be coerced to a valid bean
+     * name.
      */
     @Test
     public void testGetValue04() {
 
         BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         Object property = new Object() {
             @Override
@@ -125,8 +120,7 @@ public class TestBeanNameELResolver {
     public void testGetValue05() {
 
         BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         Object result = resolver.getValue(context, null, BEAN99_NAME);
 
@@ -140,8 +134,7 @@ public class TestBeanNameELResolver {
      */
     @Test
     public void testGetValue06() {
-        doThrowableTest(TesterBeanNameResolver.EXCEPTION_TRIGGER_NAME,
-                MethodUnderTest.GET_VALUE);
+        doThrowableTest(TesterBeanNameResolver.EXCEPTION_TRIGGER_NAME, MethodUnderTest.GET_VALUE);
     }
 
 
@@ -150,15 +143,14 @@ public class TestBeanNameELResolver {
      */
     @Test
     public void testGetValue07() {
-        doThrowableTest(TesterBeanNameResolver.THROWABLE_TRIGGER_NAME,
-                MethodUnderTest.GET_VALUE);
+        doThrowableTest(TesterBeanNameResolver.THROWABLE_TRIGGER_NAME, MethodUnderTest.GET_VALUE);
     }
 
 
     /**
      * Tests that a null context results in an NPE as per EL Javadoc.
      */
-    @Test(expected=NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void testSetValue01() {
         BeanNameELResolver resolver = createBeanNameELResolver();
         resolver.setValue(null, new Object(), new Object(), new Object());
@@ -204,20 +196,18 @@ public class TestBeanNameELResolver {
     /**
      * Test replacing a read-only bean with create enabled.
      */
-    @Test(expected=PropertyNotWritableException.class)
+    @Test(expected = PropertyNotWritableException.class)
     public void testSetValue06() {
-        doSetValueCreateReplaceTest(true,
-                TesterBeanNameResolver.READ_ONLY_NAME);
+        doSetValueCreateReplaceTest(true, TesterBeanNameResolver.READ_ONLY_NAME);
     }
 
 
     /**
      * Test replacing a read-only bean with create disable.
      */
-    @Test(expected=PropertyNotWritableException.class)
+    @Test(expected = PropertyNotWritableException.class)
     public void testSetValue07() {
-        doSetValueCreateReplaceTest(false,
-                TesterBeanNameResolver.READ_ONLY_NAME);
+        doSetValueCreateReplaceTest(false, TesterBeanNameResolver.READ_ONLY_NAME);
     }
 
 
@@ -226,8 +216,7 @@ public class TestBeanNameELResolver {
      */
     @Test
     public void testSetValue08() {
-        doThrowableTest(TesterBeanNameResolver.EXCEPTION_TRIGGER_NAME,
-                MethodUnderTest.SET_VALUE);
+        doThrowableTest(TesterBeanNameResolver.EXCEPTION_TRIGGER_NAME, MethodUnderTest.SET_VALUE);
     }
 
 
@@ -236,15 +225,14 @@ public class TestBeanNameELResolver {
      */
     @Test
     public void testSetValue09() {
-        doThrowableTest(TesterBeanNameResolver.THROWABLE_TRIGGER_NAME,
-                MethodUnderTest.SET_VALUE);
+        doThrowableTest(TesterBeanNameResolver.THROWABLE_TRIGGER_NAME, MethodUnderTest.SET_VALUE);
     }
 
 
     /**
      * Tests that a null context results in an NPE as per EL Javadoc.
      */
-    @Test(expected=NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void testGetType01() {
         BeanNameELResolver resolver = createBeanNameELResolver();
         resolver.getType(null, new Object(), new Object());
@@ -258,8 +246,7 @@ public class TestBeanNameELResolver {
     public void testGetType02() {
 
         BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         Class<?> result = resolver.getType(context, null, BEAN01_NAME);
 
@@ -275,8 +262,7 @@ public class TestBeanNameELResolver {
     public void testGetType03() {
 
         BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         Class<?> result = resolver.getType(context, new Object(), BEAN01_NAME);
 
@@ -286,15 +272,14 @@ public class TestBeanNameELResolver {
 
 
     /**
-     * Tests that a valid bean is not resolved if property is not a String even
-     * if it can be coerced to a valid bean name.
+     * Tests that a valid bean is not resolved if property is not a String even if it can be coerced to a valid bean
+     * name.
      */
     @Test
     public void testGetType04() {
 
         BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         Object property = new Object() {
             @Override
@@ -317,8 +302,7 @@ public class TestBeanNameELResolver {
     public void testGetType05() {
 
         BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         Class<?> result = resolver.getType(context, null, BEAN99_NAME);
 
@@ -332,8 +316,7 @@ public class TestBeanNameELResolver {
      */
     @Test
     public void testGetType06() {
-        doThrowableTest(TesterBeanNameResolver.EXCEPTION_TRIGGER_NAME,
-                MethodUnderTest.GET_TYPE);
+        doThrowableTest(TesterBeanNameResolver.EXCEPTION_TRIGGER_NAME, MethodUnderTest.GET_TYPE);
     }
 
 
@@ -342,15 +325,14 @@ public class TestBeanNameELResolver {
      */
     @Test
     public void testGetType07() {
-        doThrowableTest(TesterBeanNameResolver.THROWABLE_TRIGGER_NAME,
-                MethodUnderTest.GET_TYPE);
+        doThrowableTest(TesterBeanNameResolver.THROWABLE_TRIGGER_NAME, MethodUnderTest.GET_TYPE);
     }
 
 
     /**
      * Tests that a null context results in an NPE as per EL Javadoc.
      */
-    @Test(expected=NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void testIsReadOnly01() {
         BeanNameELResolver resolver = createBeanNameELResolver();
         resolver.isReadOnly(null, new Object(), new Object());
@@ -364,8 +346,7 @@ public class TestBeanNameELResolver {
     public void testIsReadOnly02() {
 
         BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         boolean result = resolver.isReadOnly(context, null, BEAN01_NAME);
 
@@ -381,11 +362,9 @@ public class TestBeanNameELResolver {
     public void testIsReadOnly03() {
 
         BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        boolean result = resolver.isReadOnly(context, null,
-                TesterBeanNameResolver.READ_ONLY_NAME);
+        boolean result = resolver.isReadOnly(context, null, TesterBeanNameResolver.READ_ONLY_NAME);
 
         Assert.assertTrue(result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -399,8 +378,7 @@ public class TestBeanNameELResolver {
     public void testIsReadOnly04() {
 
         BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         resolver.isReadOnly(context, new Object(), BEAN01_NAME);
 
@@ -409,15 +387,14 @@ public class TestBeanNameELResolver {
 
 
     /**
-     * Tests that a valid bean is not resolved if property is not a String even
-     * if it can be coerced to a valid bean name.
+     * Tests that a valid bean is not resolved if property is not a String even if it can be coerced to a valid bean
+     * name.
      */
     @Test
     public void testIsReadOnly05() {
 
         BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         Object property = new Object() {
             @Override
@@ -439,8 +416,7 @@ public class TestBeanNameELResolver {
     public void testIsReadOnly06() {
 
         BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         resolver.isReadOnly(context, null, BEAN99_NAME);
 
@@ -453,8 +429,7 @@ public class TestBeanNameELResolver {
      */
     @Test
     public void testIsReadOnly07() {
-        doThrowableTest(TesterBeanNameResolver.EXCEPTION_TRIGGER_NAME,
-                MethodUnderTest.IS_READ_ONLY);
+        doThrowableTest(TesterBeanNameResolver.EXCEPTION_TRIGGER_NAME, MethodUnderTest.IS_READ_ONLY);
     }
 
 
@@ -463,8 +438,7 @@ public class TestBeanNameELResolver {
      */
     @Test
     public void testIsReadOnly08() {
-        doThrowableTest(TesterBeanNameResolver.THROWABLE_TRIGGER_NAME,
-                MethodUnderTest.IS_READ_ONLY);
+        doThrowableTest(TesterBeanNameResolver.THROWABLE_TRIGGER_NAME, MethodUnderTest.IS_READ_ONLY);
     }
 
 
@@ -473,8 +447,7 @@ public class TestBeanNameELResolver {
      */
     public void testGetCommonPropertyType01() {
         BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         Object result = resolver.getCommonPropertyType(context, null);
 
@@ -497,8 +470,7 @@ public class TestBeanNameELResolver {
 
     private void doThrowableTest(String trigger, MethodUnderTest method) {
         BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         ELException elException = null;
         try {
@@ -540,11 +512,9 @@ public class TestBeanNameELResolver {
     /**
      * Tests adding/replacing beans beans
      */
-    private void doSetValueCreateReplaceTest(boolean canCreate,
-            String beanName) {
+    private void doSetValueCreateReplaceTest(boolean canCreate, String beanName) {
         BeanNameELResolver resolver = createBeanNameELResolver(canCreate);
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         // Get bean one to be sure it has been replaced when testing replace
         Object bean = resolver.getValue(context, null, BEAN01_NAME);

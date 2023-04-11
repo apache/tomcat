@@ -112,7 +112,7 @@ public abstract class LoggingBaseTest {
         Path tempBasePath = FileSystems.getDefault().getPath(tempBase.getAbsolutePath());
         tempDir = Files.createTempDirectory(tempBasePath, "test").toFile();
 
-        System.setProperty("catalina.base", tempDir.getAbsolutePath());
+        System.setProperty(Constants.CATALINA_BASE_PROP, tempDir.getAbsolutePath());
 
         // Configure logging
         System.setProperty("java.util.logging.manager",

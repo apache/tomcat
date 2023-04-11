@@ -102,8 +102,7 @@ public class TestAsyncTimeout extends Http2TestBase {
         }
 
         @Override
-        protected void doGet(HttpServletRequest request, HttpServletResponse response)
-                throws IOException {
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
             // The idea of this test is that the timeout kicks in after 2
             // seconds and stops the async thread early rather than letting it
@@ -132,7 +131,7 @@ public class TestAsyncTimeout extends Http2TestBase {
         private final AtomicBoolean completeCalled;
         private volatile boolean running = true;
 
-        public Ticker(AsyncContext asyncContext, AtomicBoolean completeCalled) {
+        Ticker(AsyncContext asyncContext, AtomicBoolean completeCalled) {
             this.asyncContext = asyncContext;
             this.completeCalled = completeCalled;
         }
@@ -174,7 +173,7 @@ public class TestAsyncTimeout extends Http2TestBase {
         private final Ticker ticker;
         private final AtomicBoolean completeCalled;
 
-        public TimeoutListener(CountDownLatch latch, Ticker ticker, AtomicBoolean completeCalled) {
+        TimeoutListener(CountDownLatch latch, Ticker ticker, AtomicBoolean completeCalled) {
             this.latch = latch;
             this.ticker = ticker;
             this.completeCalled = completeCalled;

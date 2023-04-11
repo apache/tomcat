@@ -20,19 +20,19 @@ import java.util.Properties;
 
 public interface MembershipProvider {
 
-    public void init(Properties properties) throws Exception;
+    void init(Properties properties) throws Exception;
 
-    public void start(int level) throws java.lang.Exception;
+    void start(int level) throws java.lang.Exception;
 
-    public boolean stop(int level) throws java.lang.Exception;
+    boolean stop(int level) throws java.lang.Exception;
 
-    public void setMembershipListener(MembershipListener listener);
+    void setMembershipListener(MembershipListener listener);
 
-    public void setMembershipService(MembershipService service);
+    void setMembershipService(MembershipService service);
 
-    public boolean hasMembers();
+    boolean hasMembers();
 
-    public Member getMember(Member mbr);
+    Member getMember(Member mbr);
 
-    public Member[] getMembers();
+    Member[] getMembers();
 }

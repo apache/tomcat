@@ -38,7 +38,7 @@ public class TextOptimizer {
         private Node.TemplateText firstTextNode = null;
         private StringBuilder textBuffer;
 
-        public TextCatVisitor(Compiler compiler) {
+        TextCatVisitor(Compiler compiler) {
             options = compiler.getCompilationContext().getOptions();
             pageInfo = compiler.getPageInfo();
         }

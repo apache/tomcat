@@ -19,5 +19,5 @@ import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.OpenDataException;
 
 public interface SlowQueryReportJmxMBean {
-    public CompositeData[] getSlowQueriesCD() throws OpenDataException;
+    CompositeData[] getSlowQueriesCD() throws OpenDataException;
 }

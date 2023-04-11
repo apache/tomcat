@@ -49,12 +49,6 @@ public class ContextAccessController {
      * @param token Security token
      */
     public static void setSecurityToken(Object name, Object token) {
-        SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            sm.checkPermission(new RuntimePermission(
-                    ContextAccessController.class.getName()
-                            + ".setSecurityToken"));
-        }
         if ((!securityTokens.containsKey(name)) && (token != null)) {
             securityTokens.put(name, token);
         }

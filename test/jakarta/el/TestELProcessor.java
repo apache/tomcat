@@ -19,7 +19,7 @@ package jakarta.el;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestELProcessor {
+public class TestELProcessor extends ELBaseTest {
 
     @Test
     public void testDefineBean01() {
@@ -29,14 +29,14 @@ public class TestELProcessor {
     }
 
 
-    @Test(expected=ELException.class)
+    @Test(expected = ELException.class)
     public void testEval01() {
         ELProcessor elp = new ELProcessor();
         elp.eval("${1+1}");
     }
 
 
-    @Test(expected=ELException.class)
+    @Test(expected = ELException.class)
     public void testEval02() {
         ELProcessor elp = new ELProcessor();
         elp.eval("#{1+1}");
@@ -55,10 +55,8 @@ public class TestELProcessor {
     @Test
     public void testDefineFunctionMethod01() throws Exception {
         ELProcessor elp = new ELProcessor();
-        elp.defineFunction("fn", "toBoolean",
-                Boolean.class.getMethod("valueOf", String.class));
-        Assert.assertEquals(Boolean.valueOf(true),
-                elp.eval("fn:toBoolean(true)"));
+        elp.defineFunction("fn", "toBoolean", Boolean.class.getMethod("valueOf", String.class));
+        Assert.assertEquals(Boolean.valueOf(true), elp.eval("fn:toBoolean(true)"));
     }
 
 
@@ -68,8 +66,7 @@ public class TestELProcessor {
         // java.lang should be automatically imported so no need for full class
         // name
         elp.defineFunction("fn", "toBoolean", "Boolean", "valueOf");
-        Assert.assertEquals(Boolean.valueOf(true),
-                elp.eval("fn:toBoolean(true)"));
+        Assert.assertEquals(Boolean.valueOf(true), elp.eval("fn:toBoolean(true)"));
     }
 
 
@@ -196,7 +193,7 @@ public class TestELProcessor {
     @Test
     public void testPrimitiveArray01() {
         ELProcessor elp = new ELProcessor();
-        TesterBean bean01= new TesterBean("bean01");
+        TesterBean bean01 = new TesterBean("bean01");
         elp.defineBean("bean01", bean01);
         elp.defineBean("bean02", new TesterBean("bean02"));
 

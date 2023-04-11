@@ -24,7 +24,7 @@ import java.util.Enumeration;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.res.StringManager;
 
-/**
+/*
  * This class is used to contain standard internet message headers,
  * used for SMTP (RFC822) and HTTP (RFC2068) messages as well as for
  * MIME (RFC 2045) applications such as transferring typed data and
@@ -89,8 +89,9 @@ import org.apache.tomcat.util.res.StringManager;
  * @author kevin seguin
  */
 public class MimeHeaders {
-    /** Initial size - should be == average number of headers per request
-     *  XXX  make it configurable ( fine-tuning of web-apps )
+    /**
+     * Initial size - should be == average number of headers per request
+     * XXX  make it configurable ( fine-tuning of web-apps )
      */
     public static final int DEFAULT_HEADER_SIZE=8;
 
@@ -418,12 +419,10 @@ public class MimeHeaders {
 
 }
 
-/** Enumerate the distinct header names.
-    Each nextElement() is O(n) ( a comparison is
-    done with all previous elements ).
-
-    This is less frequent than add() -
-    we want to keep add O(1).
+/**
+ * Enumerate the distinct header names. Each nextElement() is O(n) ( a
+ * comparison is done with all previous elements ). This is less frequent than
+ * add() - we want to keep add O(1).
  */
 class NamesEnumerator implements Enumeration<String> {
     private int pos;
@@ -431,7 +430,7 @@ class NamesEnumerator implements Enumeration<String> {
     private String next;
     private final MimeHeaders headers;
 
-    public NamesEnumerator(MimeHeaders headers) {
+    NamesEnumerator(MimeHeaders headers) {
         this.headers=headers;
         pos=0;
         size = headers.size();
@@ -472,8 +471,8 @@ class NamesEnumerator implements Enumeration<String> {
     }
 }
 
-/** Enumerate the values for a (possibly ) multiple
-    value element.
+/**
+ * Enumerate the values for a (possibly ) multiple value element.
  */
 class ValuesEnumerator implements Enumeration<String> {
     private int pos;
@@ -523,7 +522,7 @@ class MimeHeaderField {
     /**
      * Creates a new, uninitialized header field.
      */
-    public MimeHeaderField() {
+    MimeHeaderField() {
         // NO-OP
     }
 

@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.net;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -70,6 +69,8 @@ public abstract class SSLUtilBase implements SSLUtil {
 
     private static final Log log = LogFactory.getLog(SSLUtilBase.class);
     private static final StringManager sm = StringManager.getManager(SSLUtilBase.class);
+
+    public static final String DEFAULT_KEY_ALIAS = "tomcat";
 
     protected final SSLHostConfig sslHostConfig;
     protected final SSLHostConfigCertificate certificate;
@@ -216,8 +217,6 @@ public abstract class SSLUtilBase implements SSLUtil {
                 }
                 KeyStoreUtil.load(ks, istream, storePass);
             }
-        } catch (FileNotFoundException fnfe) {
-            throw fnfe;
         } catch (IOException ioe) {
             // May be expected when working with a trust store
             // Re-throw. Caller will catch and log as required
@@ -298,7 +297,7 @@ public abstract class SSLUtilBase implements SSLUtil {
         char[] keyPassArray = keyPass.toCharArray();
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
-        if (kmf.getProvider().getInfo().indexOf("FIPS") != -1) {
+        if (kmf.getProvider().getInfo().contains("FIPS")) {
             // FIPS doesn't like ANY wrapping nor key manipulation.
             if (keyAlias != null) {
                 log.warn(sm.getString("sslUtilBase.aliasIgnored", keyAlias));
@@ -324,7 +323,7 @@ public abstract class SSLUtilBase implements SSLUtil {
             }
 
             if (keyAlias == null) {
-                keyAlias = "tomcat";
+                keyAlias = DEFAULT_KEY_ALIAS;
             }
 
             // Switch to in-memory key store
@@ -465,7 +464,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                             ((X509Certificate) cert).checkValidity(now);
                         } catch (CertificateExpiredException | CertificateNotYetValidException e) {
                             String msg = sm.getString("sslUtilBase.trustedCertNotValid", alias,
-                                    ((X509Certificate) cert).getSubjectDN(), e.getMessage());
+                                    ((X509Certificate) cert).getSubjectX500Principal(), e.getMessage());
                             if (log.isDebugEnabled()) {
                                 log.debug(msg, e);
                             } else {
@@ -532,12 +531,8 @@ public abstract class SSLUtilBase implements SSLUtil {
             try (InputStream is = ConfigFileLoader.getSource().getResource(crlf).getInputStream()) {
                 crls = cf.generateCRLs(is);
             }
-        } catch(IOException iex) {
-            throw iex;
-        } catch(CRLException crle) {
-            throw crle;
-        } catch(CertificateException ce) {
-            throw ce;
+        } catch(IOException | CRLException | CertificateException e) {
+            throw e;
         }
         return crls;
     }

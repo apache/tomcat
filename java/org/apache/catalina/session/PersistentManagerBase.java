@@ -17,9 +17,6 @@
 package org.apache.catalina.session;
 
 import java.io.IOException;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +29,6 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
 import org.apache.catalina.Store;
 import org.apache.catalina.StoreManager;
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 /**
@@ -52,81 +48,6 @@ public abstract class PersistentManagerBase extends ManagerBase
 
     private final Log log = LogFactory.getLog(PersistentManagerBase.class); // must not be static
 
-    // ---------------------------------------------------- Security Classes
-
-    private class PrivilegedStoreClear
-        implements PrivilegedExceptionAction<Void> {
-
-        PrivilegedStoreClear() {
-            // NOOP
-        }
-
-        @Override
-        public Void run() throws Exception{
-           store.clear();
-           return null;
-        }
-    }
-
-    private class PrivilegedStoreRemove
-        implements PrivilegedExceptionAction<Void> {
-
-        private String id;
-
-        PrivilegedStoreRemove(String id) {
-            this.id = id;
-        }
-
-        @Override
-        public Void run() throws Exception{
-           store.remove(id);
-           return null;
-        }
-    }
-
-    private class PrivilegedStoreLoad
-        implements PrivilegedExceptionAction<Session> {
-
-        private String id;
-
-        PrivilegedStoreLoad(String id) {
-            this.id = id;
-        }
-
-        @Override
-        public Session run() throws Exception{
-           return store.load(id);
-        }
-    }
-
-    private class PrivilegedStoreSave
-        implements PrivilegedExceptionAction<Void> {
-
-        private Session session;
-
-        PrivilegedStoreSave(Session session) {
-            this.session = session;
-        }
-
-        @Override
-        public Void run() throws Exception{
-           store.save(session);
-           return null;
-        }
-    }
-
-    private class PrivilegedStoreKeys
-        implements PrivilegedExceptionAction<String[]> {
-
-        PrivilegedStoreKeys() {
-            // NOOP
-        }
-
-        @Override
-        public String[] run() throws Exception{
-           return store.keys();
-        }
-    }
 
     // ----------------------------------------------------- Instance Variables
 
@@ -404,15 +325,7 @@ public abstract class PersistentManagerBase extends ManagerBase
         }
 
         try {
-            if (SecurityUtil.isPackageProtectionEnabled()) {
-                try {
-                    AccessController.doPrivileged(new PrivilegedStoreClear());
-                } catch (PrivilegedActionException e) {
-                    log.error(sm.getString("persistentManager.storeClearError"), e.getException());
-                }
-            } else {
-                store.clear();
-            }
+            store.clear();
         } catch (IOException e) {
             log.error(sm.getString("persistentManager.storeClearError"), e);
         }
@@ -536,17 +449,7 @@ public abstract class PersistentManagerBase extends ManagerBase
 
         String[] ids = null;
         try {
-            if (SecurityUtil.isPackageProtectionEnabled()) {
-                try {
-                    ids = AccessController.doPrivileged(new PrivilegedStoreKeys());
-                } catch (PrivilegedActionException e) {
-                    log.error(sm.getString("persistentManager.storeLoadKeysError"),
-                            e.getException());
-                    return;
-                }
-            } else {
-                ids = store.keys();
-            }
+            ids = store.keys();
         } catch (IOException e) {
             log.error(sm.getString("persistentManager.storeLoadKeysError"), e);
             return;
@@ -596,15 +499,7 @@ public abstract class PersistentManagerBase extends ManagerBase
      */
     protected void removeSession(String id){
         try {
-            if (SecurityUtil.isPackageProtectionEnabled()) {
-                try {
-                    AccessController.doPrivileged(new PrivilegedStoreRemove(id));
-                } catch (PrivilegedActionException e) {
-                    log.error(sm.getString("persistentManager.removeError"), e.getException());
-                }
-            } else {
-                store.remove(id);
-            }
+            store.remove(id);
         } catch (IOException e) {
             log.error(sm.getString("persistentManager.removeError"), e);
         }
@@ -768,36 +663,13 @@ public abstract class PersistentManagerBase extends ManagerBase
 
     private Session loadSessionFromStore(String id) throws IOException {
         try {
-            if (SecurityUtil.isPackageProtectionEnabled()){
-                return securedStoreLoad(id);
-            } else {
-                 return store.load(id);
-            }
+             return store.load(id);
         } catch (ClassNotFoundException e) {
             String msg = sm.getString(
                     "persistentManager.deserializeError", id);
             log.error(msg, e);
             throw new IllegalStateException(msg, e);
         }
-    }
-
-
-    private Session securedStoreLoad(String id) throws IOException, ClassNotFoundException {
-        try {
-            return AccessController.doPrivileged(
-                    new PrivilegedStoreLoad(id));
-        } catch (PrivilegedActionException ex) {
-            Exception e = ex.getException();
-            log.error(sm.getString(
-                    "persistentManager.swapInException", id),
-                    e);
-            if (e instanceof IOException){
-                throw (IOException)e;
-            } else if (e instanceof ClassNotFoundException) {
-                throw (ClassNotFoundException)e;
-            }
-        }
-        return null;
     }
 
 
@@ -838,20 +710,7 @@ public abstract class PersistentManagerBase extends ManagerBase
         }
 
         try {
-            if (SecurityUtil.isPackageProtectionEnabled()){
-                try{
-                    AccessController.doPrivileged(new PrivilegedStoreSave(session));
-                }catch(PrivilegedActionException ex){
-                    Exception exception = ex.getException();
-                    if (exception instanceof IOException) {
-                        throw (IOException) exception;
-                    }
-                    log.error(sm.getString("persistentManager.serializeError",
-                            session.getIdInternal(), exception));
-                }
-            } else {
-                 store.save(session);
-            }
+             store.save(session);
         } catch (IOException e) {
             log.error(sm.getString("persistentManager.serializeError", session.getIdInternal(), e));
             throw e;

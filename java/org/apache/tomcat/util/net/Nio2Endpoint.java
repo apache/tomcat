@@ -59,6 +59,7 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
 
 
     private static final Log log = LogFactory.getLog(Nio2Endpoint.class);
+    private static final Log logCertificate = LogFactory.getLog(Nio2Endpoint.class.getName() + ".certificate");
     private static final Log logHandshake = LogFactory.getLog(Nio2Endpoint.class.getName() + ".handshake");
 
 
@@ -384,6 +385,12 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
     @Override
     protected Log getLog() {
         return log;
+    }
+
+
+    @Override
+    protected Log getLogCertificate() {
+        return logCertificate;
     }
 
 
@@ -1021,8 +1028,11 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
                     writeNotify = true;
                 }
                 Nio2Endpoint.startInline();
-                run();
-                Nio2Endpoint.endInline();
+                try {
+                    run();
+                } finally {
+                    Nio2Endpoint.endInline();
+                }
             }
 
             @Override

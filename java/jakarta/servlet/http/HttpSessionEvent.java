@@ -17,8 +17,7 @@
 package jakarta.servlet.http;
 
 /**
- * This is the class representing event notifications for changes to sessions
- * within a web application.
+ * This is the class representing event notifications for changes to sessions within a web application.
  *
  * @since Servlet 2.3
  */
@@ -28,7 +27,7 @@ public class HttpSessionEvent extends java.util.EventObject {
     /**
      * Construct a session event from the given source.
      *
-     * @param source    The HTTP session where the change took place
+     * @param source The HTTP session where the change took place
      */
     public HttpSessionEvent(HttpSession source) {
         super(source);

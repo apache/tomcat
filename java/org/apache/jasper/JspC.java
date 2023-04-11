@@ -289,13 +289,8 @@ public class JspC extends Task implements Options {
                 } else {
                     jspc.execute();
                 }
-            } catch (JasperException je) {
-                System.err.println(je);
-                if (jspc.dieLevel != NO_DIE_LEVEL) {
-                    System.exit(jspc.dieLevel);
-                }
-            } catch (BuildException je) {
-                System.err.println(je);
+            } catch (JasperException | BuildException e) {
+                System.err.println(e);
                 if (jspc.dieLevel != NO_DIE_LEVEL) {
                     System.exit(jspc.dieLevel);
                 }
@@ -1299,6 +1294,7 @@ public class JspC extends Task implements Options {
         }
 
         ClassLoader originalClassLoader = null;
+        Thread currentThread = Thread.currentThread();
 
         try {
             // set up a scratch/output dir if none is provided
@@ -1323,8 +1319,8 @@ public class JspC extends Task implements Options {
                 clctxt.setBasePackageName(targetPackage);
             }
 
-            originalClassLoader = Thread.currentThread().getContextClassLoader();
-            Thread.currentThread().setContextClassLoader(loader);
+            originalClassLoader = currentThread.getContextClassLoader();
+            currentThread.setContextClassLoader(loader);
 
             clctxt.setClassLoader(loader);
             clctxt.setClassPath(classPath);
@@ -1368,8 +1364,8 @@ public class JspC extends Task implements Options {
             }
             throw new JasperException(e);
         } finally {
-            if(originalClassLoader != null) {
-                Thread.currentThread().setContextClassLoader(originalClassLoader);
+            if (originalClassLoader != null) {
+                currentThread.setContextClassLoader(originalClassLoader);
             }
         }
     }

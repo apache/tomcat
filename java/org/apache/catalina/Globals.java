@@ -96,6 +96,13 @@ public final class Globals {
 
 
     /**
+     * The request attribute that is set to the value of {@code Boolean.TRUE}
+     * if {@link org.apache.catalina.filters.RemoteIpFilter} determines
+     * that this request was submitted via a secure channel.
+     */
+    public static final String REMOTE_IP_FILTER_SECURE = "org.apache.catalina.filters.RemoteIpFilter.secure";
+
+    /**
      * The request attribute that can be used by a servlet to pass
      * to the connector the name of the file that is to be served
      * by sendfile. The value should be {@code java.lang.String}
@@ -259,13 +266,7 @@ public final class Globals {
      * this flag to {@code true} will change the defaults for other settings.
      */
     public static final boolean STRICT_SERVLET_COMPLIANCE =
-            Boolean.parseBoolean(System.getProperty("org.apache.catalina.STRICT_SERVLET_COMPLIANCE", "false"));
-
-
-    /**
-     * Has security been turned on?
-     */
-    public static final boolean IS_SECURITY_ENABLED = (System.getSecurityManager() != null);
+            Boolean.getBoolean("org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
 
 
     /**

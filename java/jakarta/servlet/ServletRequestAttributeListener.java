@@ -37,7 +37,7 @@ public interface ServletRequestAttributeListener extends EventListener {
      * The default implementation is a NO-OP.
      * @param srae Information about the new request attribute
      */
-    public default void attributeAdded(ServletRequestAttributeEvent srae) {
+    default void attributeAdded(ServletRequestAttributeEvent srae) {
     }
 
     /**
@@ -46,7 +46,7 @@ public interface ServletRequestAttributeListener extends EventListener {
      * The default implementation is a NO-OP.
      * @param srae Information about the removed request attribute
      */
-    public default void attributeRemoved(ServletRequestAttributeEvent srae) {
+    default void attributeRemoved(ServletRequestAttributeEvent srae) {
     }
 
     /**
@@ -55,7 +55,7 @@ public interface ServletRequestAttributeListener extends EventListener {
      * The default implementation is a NO-OP.
      * @param srae Information about the replaced request attribute
      */
-    public default void attributeReplaced(ServletRequestAttributeEvent srae) {
+    default void attributeReplaced(ServletRequestAttributeEvent srae) {
     }
 }
 

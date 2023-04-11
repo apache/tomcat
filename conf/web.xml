@@ -180,8 +180,6 @@
   <!--   engineOptionsClass  Allows specifying the Options class used to    -->
   <!--                       configure Jasper. If not present, the default  -->
   <!--                       EmbeddedServletOptions will be used.           -->
-  <!--                       This option is ignored when running under a    -->
-  <!--                       SecurityManager.                               -->
   <!--                                                                      -->
   <!--   errorOnUseBeanInvalidClassAttribute                                -->
   <!--                       Should Jasper issue an error when the value of -->
@@ -239,8 +237,6 @@
   <!--   scratchdir          What scratch directory should we use when      -->
   <!--                       compiling JSP pages?  [default work directory  -->
   <!--                       for the current web application]               -->
-  <!--                       This option is ignored when running under a    -->
-  <!--                       SecurityManager.                               -->
   <!--                                                                      -->
   <!--   suppressSmap        Should the generation of SMAP info for JSR45   -->
   <!--                       debugging be suppressed?  [false]              -->
@@ -363,7 +359,7 @@
   <!--                        the arguments to the OS. See the CGI How-To   -->
   <!--                        for more details. The default varies by       -->
   <!--                        platform.                                     -->
-  <!--                        Windows: [[a-zA-Z0-9\Q-_.\\/:\E]+]            -->
+  <!--                        Windows: [[\w\Q-.\\/:\E]+]            -->
   <!--                        Others:  [.*]                                 -->
   <!--                        Note that internally the CGI Servlet treats   -->
   <!--                        [.*] as a special case to improve performance -->
@@ -374,7 +370,7 @@
   <!--                        command line arguments must match else the    -->
   <!--                        request will be rejected. The default matches -->
   <!--                        the allowed values defined by RFC3875.        -->
-  <!--                        [[a-zA-Z0-9\Q%;/?:@&,$-_.!~*'()\E]+]          -->
+  <!--                        [[\w\Q%;/?:@&,$-.!~*'()\E]+]          -->
   <!--                                                                      -->
   <!--   enableCmdLineArguments                                             -->
   <!--                        Are command line parameters generated from    -->
@@ -2124,7 +2120,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>js</extension>
-        <mime-type>application/javascript</mime-type>
+        <mime-type>text/javascript</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>jsf</extension>

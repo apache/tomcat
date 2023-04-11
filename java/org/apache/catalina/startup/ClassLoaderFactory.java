@@ -23,8 +23,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -128,14 +126,11 @@ public final class ClassLoaderFactory {
 
         // Construct the class loader itself
         final URL[] array = set.toArray(new URL[0]);
-        return AccessController.doPrivileged(
-                (PrivilegedAction<URLClassLoader>) () -> {
-                    if (parent == null) {
-                        return new URLClassLoader(array);
-                    } else {
-                        return new URLClassLoader(array, parent);
-                    }
-                });
+        if (parent == null) {
+            return new URLClassLoader(array);
+        } else {
+            return new URLClassLoader(array, parent);
+        }
     }
 
 
@@ -236,14 +231,11 @@ public final class ClassLoaderFactory {
             }
         }
 
-        return AccessController.doPrivileged(
-                (PrivilegedAction<URLClassLoader>) () -> {
-                    if (parent == null) {
-                        return new URLClassLoader(array);
-                    } else {
-                        return new URLClassLoader(array, parent);
-                    }
-                });
+        if (parent == null) {
+            return new URLClassLoader(array);
+        } else {
+            return new URLClassLoader(array, parent);
+        }
     }
 
     private static boolean validateFile(File file,
@@ -295,7 +287,7 @@ public final class ClassLoaderFactory {
         // JARs. If these URLs are used to construct URLs for resources in a JAR
         // the URL will be used as is. It is therefore necessary to ensure that
         // the sequence "!/" is not present in a class loader URL.
-        String result = urlString.replaceAll("!/", "%21/");
+        String result = urlString.replace("!/", "%21/");
         return new URI(result).toURL();
     }
 
@@ -303,7 +295,7 @@ public final class ClassLoaderFactory {
     private static URL buildClassLoaderUrl(File file) throws MalformedURLException, URISyntaxException {
         // Could be a directory or a file
         String fileUrlString = file.toURI().toString();
-        fileUrlString = fileUrlString.replaceAll("!/", "%21/");
+        fileUrlString = fileUrlString.replace("!/", "%21/");
         return new URI(fileUrlString).toURL();
     }
 

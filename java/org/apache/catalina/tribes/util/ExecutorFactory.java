@@ -30,37 +30,42 @@ public class ExecutorFactory {
 
     public static ExecutorService newThreadPool(int minThreads, int maxThreads, long maxIdleTime, TimeUnit unit) {
         TaskQueue taskqueue = new TaskQueue();
-        ThreadPoolExecutor service = new TribesThreadPoolExecutor(minThreads, maxThreads, maxIdleTime, unit,taskqueue);
+        ThreadPoolExecutor service = new TribesThreadPoolExecutor(minThreads, maxThreads, maxIdleTime, unit, taskqueue);
         taskqueue.setParent(service);
         return service;
     }
 
-    public static ExecutorService newThreadPool(int minThreads, int maxThreads, long maxIdleTime, TimeUnit unit, ThreadFactory threadFactory) {
+    public static ExecutorService newThreadPool(int minThreads, int maxThreads, long maxIdleTime, TimeUnit unit,
+            ThreadFactory threadFactory) {
         TaskQueue taskqueue = new TaskQueue();
-        ThreadPoolExecutor service = new TribesThreadPoolExecutor(minThreads, maxThreads, maxIdleTime, unit,taskqueue, threadFactory);
+        ThreadPoolExecutor service = new TribesThreadPoolExecutor(minThreads, maxThreads, maxIdleTime, unit, taskqueue,
+                threadFactory);
         taskqueue.setParent(service);
         return service;
     }
 
     // ---------------------------------------------- TribesThreadPoolExecutor Inner Class
     private static class TribesThreadPoolExecutor extends ThreadPoolExecutor {
-        public TribesThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, RejectedExecutionHandler handler) {
+        TribesThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
+                BlockingQueue<Runnable> workQueue, RejectedExecutionHandler handler) {
             super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, handler);
             prestartAllCoreThreads();
         }
 
-        public TribesThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory,
-                RejectedExecutionHandler handler) {
+        TribesThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
+                BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, RejectedExecutionHandler handler) {
             super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
             prestartAllCoreThreads();
         }
 
-        public TribesThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory) {
+        TribesThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
+                BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory) {
             super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory);
             prestartAllCoreThreads();
         }
 
-        public TribesThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
+        TribesThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
+                BlockingQueue<Runnable> workQueue) {
             super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
             prestartAllCoreThreads();
         }
@@ -71,7 +76,7 @@ public class ExecutorFactory {
                 super.execute(command);
             } catch (RejectedExecutionException rx) {
                 if (super.getQueue() instanceof TaskQueue) {
-                    TaskQueue queue = (TaskQueue)super.getQueue();
+                    TaskQueue queue = (TaskQueue) super.getQueue();
                     if (!queue.force(command)) {
                         throw new RejectedExecutionException(sm.getString("executorFactory.queue.full"));
                     }
@@ -80,13 +85,13 @@ public class ExecutorFactory {
         }
     }
 
-     // ---------------------------------------------- TaskQueue Inner Class
+    // ---------------------------------------------- TaskQueue Inner Class
     private static class TaskQueue extends LinkedBlockingQueue<Runnable> {
         private static final long serialVersionUID = 1L;
 
         transient ThreadPoolExecutor parent = null;
 
-        public TaskQueue() {
+        TaskQueue() {
             super();
         }
 
@@ -104,24 +109,24 @@ public class ExecutorFactory {
 
         @Override
         public boolean offer(Runnable o) {
-            //we can't do any checks
-            if (parent==null) {
+            // we can't do any checks
+            if (parent == null) {
                 return super.offer(o);
             }
-            //we are maxed out on threads, simply queue the object
+            // we are maxed out on threads, simply queue the object
             if (parent.getPoolSize() == parent.getMaximumPoolSize()) {
                 return super.offer(o);
             }
-            //we have idle threads, just add it to the queue
-            //this is an approximation, so it could use some tuning
-            if (parent.getActiveCount()<(parent.getPoolSize())) {
+            // we have idle threads, just add it to the queue
+            // this is an approximation, so it could use some tuning
+            if (parent.getActiveCount() < (parent.getPoolSize())) {
                 return super.offer(o);
             }
-            //if we have less threads than maximum force creation of a new thread
-            if (parent.getPoolSize()<parent.getMaximumPoolSize()) {
+            // if we have less threads than maximum force creation of a new thread
+            if (parent.getPoolSize() < parent.getMaximumPoolSize()) {
                 return false;
             }
-            //if we reached here, we need to add it to the queue
+            // if we reached here, we need to add it to the queue
             return super.offer(o);
         }
     }

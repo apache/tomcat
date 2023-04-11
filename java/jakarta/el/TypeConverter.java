@@ -32,8 +32,7 @@ public abstract class TypeConverter extends ELResolver {
     }
 
     @Override
-    public void setValue(ELContext context, Object base, Object property,
-            Object value) {
+    public void setValue(ELContext context, Object base, Object property, Object value) {
         // NO-OP
     }
 

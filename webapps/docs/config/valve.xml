@@ -165,8 +165,7 @@
 
       <attribute name="encoding" required="false">
         <p>Character set used to write the log file. An empty string means
-        to use the system default character set. Default value: use the
-        system default character set.
+        to use the default character set. Default value: UTF-8.
         </p>
       </attribute>
 
@@ -499,6 +498,71 @@
     <li><b><code>x-R(XXX)</code></b> for the request attribute with name XXX</li>
     <li><b><code>x-S(XXX)</code></b> for the session attribute with name XXX</li>
     </ul>
+
+  </subsection>
+
+</subsection>
+
+<subsection name="JSON Access Log Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>JSON Access Log Valve</strong> extends the
+    <a href="#Access_Log_Valve">Access Log Valve</a> class, and so
+    uses the same self-contained logging logic.  This means it
+    implements many of the same file handling attributes.  The main
+    difference to the standard <code>AccessLogValve</code> is that
+    <code>JsonAccessLogValve</code> creates log files which
+    follow the JSON syntax as defined by
+    <a href="https://www.rfc-editor.org/rfc/rfc8259.html">RFC 8259</a>.</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>JSON Access Log Valve</strong> supports all
+    configuration attributes of the standard
+    <a href="#Access_Log_Valve">Access Log Valve.</a> Only the
+    values used for <code>className</code> differ.</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.JsonAccessLogValve</strong> to
+        use the extended access log valve.</p>
+      </attribute>
+
+    </attributes>
+
+    <p>While the pattern supported are the same as for the regular access log,
+    those are mapped to specific JSON attribute names. The attributes are the
+    following:
+    <ul>
+    <li>a: remoteAddr</li>
+    <li>A: localAddr</li>
+    <li>b: size (byteSent: size)</li>
+    <li>B: byteSentNC</li>
+    <li>D: elapsedTime</li>
+    <li>F: firstByteTime</li>
+    <li>h: host</li>
+    <li>H: protocol</li>
+    <li>l: logicalUserName</li>
+    <li>m: method</li>
+    <li>p: port</li>
+    <li>q: query</li>
+    <li>r: request</li>
+    <li>s: statusCode</li>
+    <li>S: sessionId</li>
+    <li>t: time (dateTime: time)</li>
+    <li>T: elapsedTimeS</li>
+    <li>u: user</li>
+    <li>U: path (requestURI: path)</li>
+    <li>v: localServerName</li>
+    <li>I: threadName</li>
+    <li>X: connectionStatus</li>
+    </ul>
+    </p>
 
   </subsection>
 
@@ -1088,7 +1152,7 @@
         Internal proxies that appear in the <strong>remoteIpHeader</strong> will
         be trusted and will not appear in the <strong>proxiesHeader</strong>
         value. If not specified the default value of <code>
-        10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.1[6-9]{1}\.\d{1,3}\.\d{1,3}|172\.2[0-9]{1}\.\d{1,3}\.\d{1,3}|172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}|0:0:0:0:0:0:0:1
+        10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|100\.6[4-9]{1}\.\d{1,3}\.\d{1,3}|100\.[7-9]{1}\d{1}\.\d{1,3}\.\d{1,3}|100\.1[0-1]{1}\d{1}\.\d{1,3}\.\d{1,3}|100\.12[0-7]{1}\.\d{1,3}\.\d{1,3}|172\.1[6-9]{1}\.\d{1,3}\.\d{1,3}|172\.2[0-9]{1}\.\d{1,3}\.\d{1,3}|172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}|0:0:0:0:0:0:0:1
         </code> will be used.</p>
       </attribute>
 
@@ -1400,6 +1464,14 @@
         <code>true</code> will be used.</p>
       </attribute>
 
+      <attribute name="jaspicCallbackHandlerClass" required="false">
+        <p>Name of the Java class of the
+        <code>javax.security.auth.callback.CallbackHandler</code> implementation
+        which should be used by JASPIC. If none is specified the default
+        <code>org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl</code>
+        will be used.</p>
+      </attribute>
+
       <attribute name="securePagesWithPragma" required="false">
         <p>Controls the caching of pages that are protected by security
         constraints. Setting this to <code>false</code> may help work around
@@ -1455,14 +1527,6 @@
         <code>true</code>.</p>
       </attribute>
 
-      <attribute name="jaspicCallbackHandlerClass" required="false">
-        <p>Name of the Java class of the
-        <code>javax.security.auth.callback.CallbackHandler</code> implementation
-        which should be used by JASPIC. If none is specified the default
-        <code>org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl</code>
-        will be used.</p>
-      </attribute>
-
     </attributes>
 
   </subsection>
@@ -1490,6 +1554,13 @@
     configuration attributes:</p>
 
     <attributes>
+
+      <attribute name="algoirthms" required="false">
+        <p>A comma-separated list of digest algorithms to be used for the
+        authentication process. Algorithms may be specified using the Java
+        Standard names or the names used by RFC 7616. If not specified, the
+        default value of <code>SHA-256,MD5</code> will be used.</p>
+      </attribute>
 
       <attribute name="allowCorsPreflight" required="false">
         <p>Are requests that appear to be CORS preflight requests allowed to
@@ -1543,6 +1614,14 @@
         <code>securePagesWithPragma</code> offers an alternative, secure,
         workaround for browser caching issues. If not set, the default value of
         <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="jaspicCallbackHandlerClass" required="false">
+        <p>Name of the Java class of the
+        <code>javax.security.auth.callback.CallbackHandler</code> implementation
+        which should be used by JASPIC. If none is specified the default
+        <code>org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl</code>
+        will be used.</p>
       </attribute>
 
       <attribute name="key" required="false">
@@ -1637,14 +1716,6 @@
         authentication always fails.</p>
       </attribute>
 
-      <attribute name="jaspicCallbackHandlerClass" required="false">
-        <p>Name of the Java class of the
-        <code>javax.security.auth.callback.CallbackHandler</code> implementation
-        which should be used by JASPIC. If none is specified the default
-        <code>org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl</code>
-        will be used.</p>
-      </attribute>
-
     </attributes>
 
   </subsection>
@@ -1688,6 +1759,13 @@
         value is <code>never</code>.</p>
       </attribute>
 
+      <attribute name="authenticationSessionTimeout" required="false">
+        <p>If the authentication process creates a session, this is the maximum session timeout (in seconds) during the
+        authentication process. Once authentication is complete, the default session timeout will apply. Sessions that
+        exist before the authentication process starts will retain their original session timeout throughout. If not
+        set, the default value of <code>120</code> seconds will be used.</p>
+      </attribute>
+
       <attribute name="changeSessionIdOnAuthentication" required="false">
         <p>Controls if the session ID is changed if a session exists at the
         point where users are authenticated. This is to prevent session fixation
@@ -1714,6 +1792,14 @@
         <code>securePagesWithPragma</code> offers an alternative, secure,
         workaround for browser caching issues. If not set, the default value of
         <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="jaspicCallbackHandlerClass" required="false">
+        <p>Name of the Java class of the
+        <code>javax.security.auth.callback.CallbackHandler</code> implementation
+        which should be used by JASPIC. If none is specified the default
+        <code>org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl</code>
+        will be used.</p>
       </attribute>
 
       <attribute name="landingPage" required="false">
@@ -1776,14 +1862,6 @@
         <code>remote-user</code> and <code>auth-type</code> to a reverse proxy.
         This is useful, e.g., for access log consistency or other decisions to make.
         If not specified, the default value is <code>false</code>.</p>
-      </attribute>
-
-      <attribute name="jaspicCallbackHandlerClass" required="false">
-        <p>Name of the Java class of the
-        <code>javax.security.auth.callback.CallbackHandler</code> implementation
-        which should be used by JASPIC. If none is specified the default
-        <code>org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl</code>
-        will be used.</p>
       </attribute>
 
     </attributes>
@@ -1857,6 +1935,14 @@
         <code>true</code> will be used.</p>
       </attribute>
 
+      <attribute name="jaspicCallbackHandlerClass" required="false">
+        <p>Name of the Java class of the
+        <code>javax.security.auth.callback.CallbackHandler</code> implementation
+        which should be used by JASPIC. If none is specified the default
+        <code>org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl</code>
+        will be used.</p>
+      </attribute>
+
       <attribute name="securePagesWithPragma" required="false">
         <p>Controls the caching of pages that are protected by security
         constraints. Setting this to <code>false</code> may help work around
@@ -1891,14 +1977,6 @@
         session IDs. If an invalid algorithm and/or provider is specified, the
         platform default provider and the default algorithm will be used. If not
         specified, the platform default provider will be used.</p>
-      </attribute>
-
-      <attribute name="jaspicCallbackHandlerClass" required="false">
-        <p>Name of the Java class of the
-        <code>javax.security.auth.callback.CallbackHandler</code> implementation
-        which should be used by JASPIC. If none is specified the default
-        <code>org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl</code>
-        will be used.</p>
       </attribute>
 
     </attributes>
@@ -1996,6 +2074,14 @@
         <code>true</code> will be used.</p>
       </attribute>
 
+      <attribute name="jaspicCallbackHandlerClass" required="false">
+        <p>Name of the Java class of the
+        <code>javax.security.auth.callback.CallbackHandler</code> implementation
+        which should be used by JASPIC. If none is specified the default
+        <code>org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl</code>
+        will be used.</p>
+      </attribute>
+
       <attribute name="loginConfigName" required="false">
         <p>The name of the JAAS login configuration to be used to login as the
         service. If not specified, the default of
@@ -2076,14 +2162,6 @@
         available to applications (e.g. for onward authentication to external
         services) via the <code>org.apache.catalina.realm.GSS_CREDENTIAL</code>
         request attribute. If not set, the default value of <code>true</code>
-        will be used.</p>
-      </attribute>
-
-      <attribute name="jaspicCallbackHandlerClass" required="false">
-        <p>Name of the Java class of the
-        <code>javax.security.auth.callback.CallbackHandler</code> implementation
-        which should be used by JASPIC. If none is specified the default
-        <code>org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl</code>
         will be used.</p>
       </attribute>
 
@@ -2180,7 +2258,7 @@
     for HTTP status codes that will return Json error messages.</p>
 
     <p>By specifying this class in <code>errorReportValveClass</code> attribute
-    in <code>HOST</code>, it will be used instead of
+    in <code>Host</code>, it will be used instead of
     <code>ErrorReportValve</code> and will return JSON response instead of HTML.
     </p>
 
@@ -2199,6 +2277,66 @@
       </attribute>
 
     </attributes>
+
+  </subsection>
+
+</section>
+
+<section name="Proxy Error Report Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Proxy Error Report Valve</strong> is a simple error handler
+    for HTTP status codes that will redirect or proxy to another location
+    responsible for the generation of the error report.</p>
+
+    <p>By specifying this class in <code>errorReportValveClass</code> attribute
+    in <code>Host</code>, it will be used instead of
+    <code>ErrorReportValve</code> with the default attribute values. To
+    configure the attributes, the valve can be defined nested in the
+    <code>Host</code> element.</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Proxy Error Report Valve</strong> supports the following
+    configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.ProxyErrorReportValve</strong>.</p>
+      </attribute>
+
+      <attribute name="usePropertiesFile" required="false">
+        <p>If <code>true</code>, the valve will use the properties file
+        described below to associate the URLs with the status code.
+        If <code>false</code>, the configuration mechanism of the default
+        <code>ErrorReportValve</code> will be used instead. The default
+        value is <code>false</code>.</p>
+      </attribute>
+
+      <attribute name="useRedirect" required="false">
+        <p>If <code>true</code>, the valve will send a redirect to the URL.
+        If <code>false</code>, the valve will instead proxy the content from
+        the specified URL. The default value is <code>true</code>.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+  <subsection name="Configuration">
+
+    <p>The <strong>Proxy Error Report Valve</strong> can use a resource file
+    <strong>ProxyErrorReportValve.properties</strong>
+    from the class path, where each entry is a statusCode=baseUrl. baseUrl
+    should not include any url parameters, statusCode, statusDescription,
+    requestUri, and throwable which will be automatically appended. A special
+    key named <code>0</code> should be used to match any other unmapped
+    code to a redirect or proxy URL.</p>
 
   </subsection>
 
@@ -2455,8 +2593,8 @@
         notify the valve that no session required during this request. If the
         request matches this filter pattern, the valve assumes there has been no
         need to restore session. An example filter would look like <code>
-        filter=&quot;.*\.gif|.*\.js|.*\.jpeg|.*\.jpg|.*\.png|.*\.htm|.*\.html|
-        .*\.css|.*\.txt&quot;</code>. The filter is a regular expression using
+        filter=&quot;.*\.gif|.*\.js|.*\.jpeg|.*\.jpg|.*\.png|.*\.htm|.*\.html|.*\.css|.*\.txt&quot;</code>.
+        The filter is a regular expression using
         <code>java.util.regex</code>.</p>
       </attribute>
 

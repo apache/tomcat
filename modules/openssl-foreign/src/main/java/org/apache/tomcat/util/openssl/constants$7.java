@@ -24,8 +24,10 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-class constants$7 {
+final class constants$7 {
 
+    // Suppresses default constructor, ensuring non-instantiability.
+    private constants$7() {}
     static final FunctionDescriptor X509_STORE_add_lookup$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
         Constants$root.C_POINTER$LAYOUT,
         Constants$root.C_POINTER$LAYOUT

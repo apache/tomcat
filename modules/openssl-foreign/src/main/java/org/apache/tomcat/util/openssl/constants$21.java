@@ -24,15 +24,28 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-class constants$21 {
+final class constants$21 {
 
+    // Suppresses default constructor, ensuring non-instantiability.
+    private constants$21() {}
     static final FunctionDescriptor SSL_set_info_callback$cb$FUNC = FunctionDescriptor.ofVoid(
         Constants$root.C_POINTER$LAYOUT,
         Constants$root.C_INT$LAYOUT,
         Constants$root.C_INT$LAYOUT
     );
-    static final MethodHandle SSL_set_info_callback$cb$MH = RuntimeHelper.downcallHandle(
-        constants$21.SSL_set_info_callback$cb$FUNC
+    static final FunctionDescriptor SSL_set_info_callback$cb_UP$FUNC = FunctionDescriptor.ofVoid(
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT,
+        Constants$root.C_INT$LAYOUT
+    );
+    static final MethodHandle SSL_set_info_callback$cb_UP$MH = RuntimeHelper.upcallHandle(SSL_set_info_callback$cb.class, "apply", constants$21.SSL_set_info_callback$cb_UP$FUNC);
+    static final FunctionDescriptor SSL_set_info_callback$cb_DOWN$FUNC = FunctionDescriptor.ofVoid(
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT,
+        Constants$root.C_INT$LAYOUT
+    );
+    static final MethodHandle SSL_set_info_callback$cb_DOWN$MH = RuntimeHelper.downcallHandle(
+        constants$21.SSL_set_info_callback$cb_DOWN$FUNC
     );
     static final FunctionDescriptor SSL_set_info_callback$FUNC = FunctionDescriptor.ofVoid(
         Constants$root.C_POINTER$LAYOUT,
@@ -60,6 +73,12 @@ class constants$21 {
         Constants$root.C_INT$LAYOUT,
         Constants$root.C_INT$LAYOUT
     );
+    static final FunctionDescriptor SSL_CTX_set_tmp_dh_callback$dh_UP$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT,
+        Constants$root.C_INT$LAYOUT
+    );
+    static final MethodHandle SSL_CTX_set_tmp_dh_callback$dh_UP$MH = RuntimeHelper.upcallHandle(SSL_CTX_set_tmp_dh_callback$dh.class, "apply", constants$21.SSL_CTX_set_tmp_dh_callback$dh_UP$FUNC);
 }
 
 

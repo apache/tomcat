@@ -17,8 +17,6 @@
 package org.apache.tomcat.dbcp.pool2.impl;
 
 import java.lang.ref.WeakReference;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -57,11 +55,7 @@ class EvictionTimer {
         public Thread newThread(final Runnable runnable) {
             final Thread thread = new Thread(null, runnable, "commons-pool-evictor");
             thread.setDaemon(true); // POOL-363 - Required for applications using Runtime.addShutdownHook().
-            AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-                thread.setContextClassLoader(EvictorThreadFactory.class.getClassLoader());
-                return null;
-            });
-
+            thread.setContextClassLoader(EvictorThreadFactory.class.getClassLoader());
             return thread;
         }
     }

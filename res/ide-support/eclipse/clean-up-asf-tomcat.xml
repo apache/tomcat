@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<profiles version="2">
+    <profile kind="CleanUpProfile" name="asf-tomcat" version="2">
+        <setting id="cleanup.array_with_curly" value="false"/>
+        <setting id="cleanup.use_autoboxing" value="false"/>
+        <setting id="cleanup.overridden_assignment_move_decl" value="true"/>
+        <setting id="cleanup.always_use_this_for_non_static_method_access" value="false"/>
+        <setting id="cleanup.remove_trailing_whitespaces_ignore_empty" value="false"/>
+        <setting id="cleanup.primitive_comparison" value="false"/>
+        <setting id="cleanup.system_property_file_encoding" value="false"/>
+        <setting id="cleanup.format_source_code_changes_only" value="false"/>
+        <setting id="cleanup.remove_redundant_semicolons" value="false"/>
+        <setting id="cleanup.qualify_static_member_accesses_through_subtypes_with_declaring_class" value="true"/>
+        <setting id="cleanup.useless_continue" value="false"/>
+        <setting id="cleanup.remove_redundant_type_arguments" value="false"/>
+        <setting id="cleanup.remove_unused_imports" value="false"/>
+        <setting id="cleanup.break_loop" value="false"/>
+        <setting id="cleanup.pull_up_assignment" value="false"/>
+        <setting id="cleanup.stringbuilder" value="false"/>
+        <setting id="cleanup.no_super" value="false"/>
+        <setting id="cleanup.arrays_fill" value="false"/>
+        <setting id="cleanup.use_lambda" value="true"/>
+        <setting id="cleanup.operand_factorization" value="false"/>
+        <setting id="cleanup.simplify_lambda_expression_and_method_ref" value="false"/>
+        <setting id="cleanup.always_use_blocks" value="true"/>
+        <setting id="cleanup.stringconcat_to_textblock" value="false"/>
+        <setting id="cleanup.sort_members_all" value="false"/>
+        <setting id="cleanup.system_property_path_separator" value="false"/>
+        <setting id="cleanup.instanceof" value="false"/>
+        <setting id="cleanup.add_missing_annotations" value="false"/>
+        <setting id="cleanup.precompile_regex" value="false"/>
+        <setting id="cleanup.always_use_this_for_non_static_field_access" value="false"/>
+        <setting id="cleanup.boolean_literal" value="false"/>
+        <setting id="cleanup.always_use_parentheses_in_expressions" value="false"/>
+        <setting id="cleanup.sort_members" value="false"/>
+        <setting id="cleanup.remove_unused_method_parameters" value="false"/>
+        <setting id="cleanup.remove_unused_local_variables" value="false"/>
+        <setting id="cleanup.add_missing_deprecated_annotations" value="true"/>
+        <setting id="cleanup.no_string_creation" value="false"/>
+        <setting id="cleanup.use_unboxing" value="false"/>
+        <setting id="cleanup.use_blocks_only_for_return_and_throw" value="false"/>
+        <setting id="cleanup.standard_comparison" value="false"/>
+        <setting id="cleanup.if_condition" value="false"/>
+        <setting id="cleanup.system_property_line_separator" value="false"/>
+        <setting id="cleanup.remove_trailing_whitespaces" value="true"/>
+        <setting id="cleanup.map_cloning" value="false"/>
+        <setting id="cleanup.add_serial_version_id" value="false"/>
+        <setting id="cleanup.try_with_resource" value="false"/>
+        <setting id="cleanup.use_this_for_non_static_method_access" value="false"/>
+        <setting id="cleanup.use_this_for_non_static_method_access_only_if_necessary" value="true"/>
+        <setting id="cleanup.single_used_field" value="false"/>
+        <setting id="cleanup.reduce_indentation" value="false"/>
+        <setting id="cleanup.primitive_parsing" value="false"/>
+        <setting id="cleanup.make_local_variable_final" value="true"/>
+        <setting id="cleanup.add_missing_methods" value="false"/>
+        <setting id="cleanup.qualify_static_member_accesses_with_declaring_class" value="false"/>
+        <setting id="cleanup.add_missing_override_annotations" value="true"/>
+        <setting id="cleanup.use_blocks" value="false"/>
+        <setting id="cleanup.multi_catch" value="false"/>
+        <setting id="cleanup.pull_out_if_from_if_else" value="false"/>
+        <setting id="cleanup.collection_cloning" value="false"/>
+        <setting id="cleanup.convert_to_enhanced_for_loop_if_loop_var_used" value="true"/>
+        <setting id="cleanup.make_variable_declarations_final" value="false"/>
+        <setting id="cleanup.redundant_comparator" value="false"/>
+        <setting id="cleanup.remove_unused_private_types" value="true"/>
+        <setting id="cleanup.system_property_boolean" value="false"/>
+        <setting id="cleanup.qualify_static_method_accesses_with_declaring_class" value="false"/>
+        <setting id="cleanup.organize_imports" value="false"/>
+        <setting id="cleanup.lazy_logical_operator" value="false"/>
+        <setting id="cleanup.bitwise_conditional_expression" value="false"/>
+        <setting id="cleanup.use_directly_map_method" value="false"/>
+        <setting id="cleanup.add_all" value="false"/>
+        <setting id="cleanup.system_property_file_separator" value="false"/>
+        <setting id="cleanup.qualify_static_field_accesses_with_declaring_class" value="false"/>
+        <setting id="cleanup.stringbuilder_for_local_vars" value="true"/>
+        <setting id="cleanup.add_generated_serial_version_id" value="false"/>
+        <setting id="cleanup.controlflow_merge" value="false"/>
+        <setting id="cleanup.primitive_serialization" value="false"/>
+        <setting id="cleanup.comparing_on_criteria" value="false"/>
+        <setting id="cleanup.do_while_rather_than_while" value="true"/>
+        <setting id="cleanup.comparison_statement" value="false"/>
+        <setting id="cleanup.extract_increment" value="false"/>
+        <setting id="cleanup.stringbuffer_to_stringbuilder" value="false"/>
+        <setting id="cleanup.insert_inferred_type_arguments" value="false"/>
+        <setting id="cleanup.make_private_fields_final" value="true"/>
+        <setting id="cleanup.useless_return" value="false"/>
+        <setting id="cleanup.instanceof_keyword" value="false"/>
+        <setting id="cleanup.use_this_for_non_static_field_access_only_if_necessary" value="true"/>
+        <setting id="cleanup.remove_trailing_whitespaces_all" value="true"/>
+        <setting id="cleanup.one_if_rather_than_duplicate_blocks_that_fall_through" value="false"/>
+        <setting id="cleanup.valueof_rather_than_instantiation" value="false"/>
+        <setting id="cleanup.plain_replacement" value="false"/>
+        <setting id="cleanup.remove_unnecessary_array_creation" value="false"/>
+        <setting id="cleanup.remove_private_constructors" value="true"/>
+        <setting id="cleanup.make_parameters_final" value="false"/>
+        <setting id="cleanup.substring" value="false"/>
+        <setting id="cleanup.ternary_operator" value="false"/>
+        <setting id="cleanup.merge_conditional_blocks" value="false"/>
+        <setting id="cleanup.return_expression" value="false"/>
+        <setting id="cleanup.system_property" value="false"/>
+        <setting id="cleanup.unlooped_while" value="false"/>
+        <setting id="cleanup.convert_to_enhanced_for_loop" value="false"/>
+        <setting id="cleanup.remove_unused_private_fields" value="true"/>
+        <setting id="cleanup.never_use_blocks" value="false"/>
+        <setting id="cleanup.remove_redundant_modifiers" value="true"/>
+        <setting id="cleanup.unreachable_block" value="false"/>
+        <setting id="cleanup.redundant_falling_through_block_end" value="false"/>
+        <setting id="cleanup.switch" value="false"/>
+        <setting id="cleanup.number_suffix" value="false"/>
+        <setting id="cleanup.remove_unnecessary_nls_tags" value="false"/>
+        <setting id="cleanup.convert_to_switch_expressions" value="false"/>
+        <setting id="cleanup.use_this_for_non_static_field_access" value="false"/>
+        <setting id="cleanup.static_inner_class" value="false"/>
+        <setting id="cleanup.use_string_is_blank" value="false"/>
+        <setting id="cleanup.add_missing_nls_tags" value="false"/>
+        <setting id="cleanup.qualify_static_member_accesses_through_instances_with_declaring_class" value="true"/>
+        <setting id="cleanup.remove_unnecessary_casts" value="false"/>
+        <setting id="cleanup.objects_equals" value="false"/>
+        <setting id="cleanup.convert_functional_interfaces" value="false"/>
+        <setting id="cleanup.format_source_code" value="true"/>
+        <setting id="cleanup.else_if" value="false"/>
+        <setting id="cleanup.boolean_value_rather_than_comparison" value="false"/>
+        <setting id="cleanup.add_default_serial_version_id" value="true"/>
+        <setting id="cleanup.remove_unused_private_methods" value="true"/>
+        <setting id="cleanup.make_type_abstract_if_missing_method" value="false"/>
+        <setting id="cleanup.join" value="false"/>
+        <setting id="cleanup.embedded_if" value="false"/>
+        <setting id="cleanup.use_anonymous_class_creation" value="false"/>
+        <setting id="cleanup.invert_equals" value="false"/>
+        <setting id="cleanup.add_missing_override_annotations_interface_methods" value="true"/>
+        <setting id="cleanup.remove_unused_private_members" value="false"/>
+        <setting id="cleanup.strictly_equal_or_different" value="false"/>
+        <setting id="cleanup.never_use_parentheses_in_expressions" value="true"/>
+        <setting id="cleanup.push_down_negation" value="false"/>
+        <setting id="cleanup.evaluate_nullable" value="false"/>
+        <setting id="cleanup.use_parentheses_in_expressions" value="false"/>
+        <setting id="cleanup.hash" value="false"/>
+        <setting id="cleanup.double_negation" value="false"/>
+        <setting id="cleanup.overridden_assignment" value="false"/>
+        <setting id="cleanup.primitive_rather_than_wrapper" value="false"/>
+        <setting id="cleanup.correct_indentation" value="false"/>
+        <setting id="cleanup.use_var" value="false"/>
+    </profile>
+</profiles>

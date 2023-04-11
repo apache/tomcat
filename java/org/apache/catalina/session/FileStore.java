@@ -30,7 +30,6 @@ import java.util.List;
 import jakarta.servlet.ServletContext;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Session;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -226,7 +225,7 @@ public final class FileStore extends StoreBase {
             contextLog.debug(sm.getString(getStoreName()+".loading", id, file.getAbsolutePath()));
         }
 
-        ClassLoader oldThreadContextCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
+        ClassLoader oldThreadContextCL = context.bind(null);
 
         try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
                 ObjectInputStream ois = getObjectInputStream(fis)) {
@@ -241,7 +240,7 @@ public final class FileStore extends StoreBase {
             }
             return null;
         } finally {
-            context.unbind(Globals.IS_SECURITY_ENABLED, oldThreadContextCL);
+            context.unbind(oldThreadContextCL);
         }
     }
 

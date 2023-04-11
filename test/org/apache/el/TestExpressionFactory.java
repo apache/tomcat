@@ -40,7 +40,7 @@ public class TestExpressionFactory {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         Assert.assertNotNull(factory);
 
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
         Assert.assertNotNull(context);
 
         factory.createValueExpression(context, "foo", null);

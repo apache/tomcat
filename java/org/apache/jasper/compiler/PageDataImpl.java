@@ -63,7 +63,7 @@ class PageDataImpl extends PageData implements TagConstants {
      *
      * @throws JasperException If an error occurs
      */
-    public PageDataImpl(Node.Nodes page, Compiler compiler)
+    PageDataImpl(Node.Nodes page, Compiler compiler)
                 throws JasperException {
 
         // First pass
@@ -113,7 +113,7 @@ class PageDataImpl extends PageData implements TagConstants {
         /*
          * Constructor
          */
-        public FirstPassVisitor(Node.Root root, PageInfo pageInfo) {
+        FirstPassVisitor(Node.Root root, PageInfo pageInfo) {
             this.root = root;
             this.pageInfo = pageInfo;
             this.rootAttrs = new AttributesImpl();
@@ -247,7 +247,7 @@ class PageDataImpl extends PageData implements TagConstants {
         /*
          * Constructor
          */
-        public SecondPassVisitor(Node.Root root, StringBuilder buf,
+        SecondPassVisitor(Node.Root root, StringBuilder buf,
                                  Compiler compiler, String jspIdPrefix) {
             this.root = root;
             this.buf = buf;

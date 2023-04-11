@@ -16,16 +16,13 @@
  */
 package org.apache.coyote.http2;
 
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Base class for all streams including the connection (referred to as Stream 0)
- * and is used primarily when managing prioritization.
+ * Base class for all streams including the connection (referred to as Stream 0) and is used primarily when managing
+ * prioritization.
  */
 abstract class AbstractStream {
 
@@ -35,8 +32,6 @@ abstract class AbstractStream {
     private final Integer identifier;
     private final String idAsString;
 
-    private volatile AbstractStream parentStream = null;
-    private final Set<AbstractNonZeroStream> childStreams = ConcurrentHashMap.newKeySet();
     private long windowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
 
     private volatile int connectionAllocationRequested = 0;
@@ -64,46 +59,6 @@ abstract class AbstractStream {
     }
 
 
-    final void detachFromParent() {
-        if (parentStream != null) {
-            parentStream.getChildStreams().remove(this);
-            parentStream = null;
-        }
-    }
-
-
-    final void addChild(AbstractNonZeroStream child) {
-        child.setParentStream(this);
-        childStreams.add(child);
-    }
-
-
-    final boolean isDescendant(AbstractStream stream) {
-        // Is the passed in Stream a descendant of this Stream?
-        // Start at the passed in Stream and work up
-        AbstractStream parent = stream.getParentStream();
-        while (parent != null && parent != this) {
-            parent = parent.getParentStream();
-        }
-        return parent != null;
-    }
-
-
-    final AbstractStream getParentStream() {
-        return parentStream;
-    }
-
-
-    final void setParentStream(AbstractStream parentStream) {
-        this.parentStream = parentStream;
-    }
-
-
-    final Set<AbstractNonZeroStream> getChildStreams() {
-        return childStreams;
-    }
-
-
     final synchronized void setWindowSize(long windowSize) {
         this.windowSize = windowSize;
     }
@@ -116,9 +71,10 @@ abstract class AbstractStream {
 
     /**
      * Increment window size.
+     *
      * @param increment The amount by which the window size should be increased
-     * @throws Http2Exception If the window size is now higher than
-     *  the maximum allowed
+     *
+     * @throws Http2Exception If the window size is now higher than the maximum allowed
      */
     synchronized void incrementWindowSize(int increment) throws Http2Exception {
         // No need for overflow protection here.
@@ -127,8 +83,8 @@ abstract class AbstractStream {
         windowSize += increment;
 
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("abstractStream.windowSizeInc", getConnectionId(),
-                    getIdAsString(), Integer.toString(increment), Long.toString(windowSize)));
+            log.debug(sm.getString("abstractStream.windowSizeInc", getConnectionId(), getIdAsString(),
+                    Integer.toString(increment), Long.toString(windowSize)));
         }
 
         if (windowSize > ConnectionSettingsBase.MAX_WINDOW_SIZE) {
@@ -137,8 +93,7 @@ abstract class AbstractStream {
             if (identifier.intValue() == 0) {
                 throw new ConnectionException(msg, Http2Error.FLOW_CONTROL_ERROR);
             } else {
-                throw new StreamException(
-                        msg, Http2Error.FLOW_CONTROL_ERROR, identifier.intValue());
+                throw new StreamException(msg, Http2Error.FLOW_CONTROL_ERROR, identifier.intValue());
             }
         }
     }
@@ -150,8 +105,8 @@ abstract class AbstractStream {
         // decrements are permitted
         windowSize -= decrement;
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("abstractStream.windowSizeDec", getConnectionId(),
-                    getIdAsString(), Integer.toString(decrement), Long.toString(windowSize)));
+            log.debug(sm.getString("abstractStream.windowSizeDec", getConnectionId(), getIdAsString(),
+                    Integer.toString(decrement), Long.toString(windowSize)));
         }
     }
 
@@ -181,6 +136,4 @@ abstract class AbstractStream {
 
 
     abstract String getConnectionId();
-
-    abstract int getWeight();
 }

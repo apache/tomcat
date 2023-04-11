@@ -431,33 +431,33 @@ public class TestELSupport {
     }
 
 
-    private static interface FunctionalA<T> extends Predicate<T> {
+    private interface FunctionalA<T> extends Predicate<T> {
     }
 
 
-    private static interface FunctionalB<T> extends Predicate<T> {
-        public void extra();
+    private interface FunctionalB<T> extends Predicate<T> {
+        void extra();
     }
 
 
-    private static interface FunctionalC<T> extends Predicate<T> {
+    private interface FunctionalC<T> extends Predicate<T> {
         @SuppressWarnings("unused")
-        public default void extra() {
+        default void extra() {
         }
     }
 
 
-    private static interface FunctionalD<T> extends Predicate<T> {
+    private interface FunctionalD<T> extends Predicate<T> {
         @Override
-        public String toString();
+        String toString();
         @Override
-        public int hashCode();
+        int hashCode();
         @Override
-        public boolean equals(Object o);
+        boolean equals(Object o);
     }
 
 
-    private static interface FunctionalE<T> extends Predicate<T> {
-        public boolean equals(String s);
+    private interface FunctionalE<T> extends Predicate<T> {
+        boolean equals(String s);
     }
 }

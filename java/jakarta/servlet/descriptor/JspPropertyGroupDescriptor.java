@@ -30,14 +30,14 @@ public interface JspPropertyGroupDescriptor {
      *
      * @return the patterns to which this group applies
      */
-    public Collection<String> getUrlPatterns();
+    Collection<String> getUrlPatterns();
 
     /**
      * Is Expression Language ignored for this group?
      *
      * @return {@code true} if EL is ignored, otherwise {@code false}
      */
-    public String getElIgnored();
+    String getElIgnored();
 
     /**
      * Will the use of an unknown identifier in EL within a JSP page trigger an
@@ -47,21 +47,21 @@ public interface JspPropertyGroupDescriptor {
      *
      * @since Servlet 6.0
      */
-    public String getErrorOnELNotFound();
+    String getErrorOnELNotFound();
 
     /**
      * Obtain the page encoding for this group.
      *
      * @return the page encoding for this group
      */
-    public String getPageEncoding();
+    String getPageEncoding();
 
     /**
      * Is scripting disabled for this group?
      *
      * @return {@code true} if scripting is disabled, otherwise {@code false}
      */
-    public String getScriptingInvalid();
+    String getScriptingInvalid();
 
     /**
      * Should the JSPs in this group be treated as JSP documents?
@@ -69,21 +69,21 @@ public interface JspPropertyGroupDescriptor {
      * @return {@code true} if the JSPs should be treated as JSP documents,
      *         otherwise {@code false}
      */
-    public String getIsXml();
+    String getIsXml();
 
     /**
      * Obtain the preludes to include for this group.
      *
      * @return the preludes to include for this group
      */
-    public Collection<String> getIncludePreludes();
+    Collection<String> getIncludePreludes();
 
     /**
      * Obtain the codas to include for this group.
      *
      * @return the codas to include for this group.
      */
-    public Collection<String> getIncludeCodas();
+    Collection<String> getIncludeCodas();
 
     /**
      * Is the deferred El syntax <code>#{...}</code> allowed to be used as a
@@ -92,7 +92,7 @@ public interface JspPropertyGroupDescriptor {
      * @return {@code true} if the deferred EL syntax is allowed to be used as
      *         a literal, otherwise {@code false}
      */
-    public String getDeferredSyntaxAllowedAsLiteral();
+    String getDeferredSyntaxAllowedAsLiteral();
 
     /**
      * Should the JSPs in this group have template text that only contains
@@ -101,21 +101,21 @@ public interface JspPropertyGroupDescriptor {
      * @return {@code true} if the whitespace be removed, otherwise
      *         {@code false}
      */
-    public String getTrimDirectiveWhitespaces();
+    String getTrimDirectiveWhitespaces();
 
     /**
      * Obtain the default content type this group of JSP pages.#
      *
      * @return the default content type this group of JSP pages
      */
-    public String getDefaultContentType();
+    String getDefaultContentType();
 
     /**
      * Obtain the per-page buffer configuration for this group of JSP pages.
      *
      * @return the per-page buffer configuration for this group of JSP pages
      */
-    public String getBuffer();
+    String getBuffer();
 
     /**
      * Should an error be raised at translation time for a page in this group if
@@ -124,5 +124,5 @@ public interface JspPropertyGroupDescriptor {
      * @return {@code true} if an error should be raised, otherwise
      *         {@code false}
      */
-    public String getErrorOnUndeclaredNamespace();
+    String getErrorOnUndeclaredNamespace();
 }

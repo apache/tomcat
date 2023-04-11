@@ -279,14 +279,7 @@
         descriptor is present in <strong>xmlBase</strong> then the context will
         fail to start in case the descriptor contains necessary configuration
         for secure deployment (such as a RemoteAddrValve) which should not be
-        ignored. The default is <code>true</code> unless a security manager is
-        enabled when the default is <code>false</code>. When running under a
-        security manager this may be enabled on a per web application basis by
-        granting the
-        <code>org.apache.catalina.security.DeployXmlPermission</code> to the web
-        application. The Manager and Host Manager applications are granted this
-        permission by default so that they continue to work when running under a
-        security manager.</p>
+        ignored. The default is <code>true</code>.</p>
       </attribute>
 
       <attribute name="errorReportValveClass" required="false">
@@ -297,7 +290,8 @@
         implement the
         <code>org.apache.catalina.Valve</code> interface. If none is specified,
         the value <code>org.apache.catalina.valves.ErrorReportValve</code>
-        will be used by default.</p>
+        will be used by default. if set to an empty string, the error report
+        will be disabled.</p>
       </attribute>
 
       <attribute name="unpackWARs" required="false">

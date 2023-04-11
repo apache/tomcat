@@ -66,7 +66,7 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
     private final List<TagFileInfo> list;
 
 
-    public ImplicitTagLibraryInfo(JspCompilationContext ctxt,
+    ImplicitTagLibraryInfo(JspCompilationContext ctxt,
             ParserController pc,
             PageInfo pi,
             String prefix,

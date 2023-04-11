@@ -139,7 +139,7 @@ public class Stream {
             }
 
             @SuppressWarnings({ "rawtypes", "unchecked" })
-            private final void sort() {
+            private void sort() {
                 List list = new ArrayList<>();
                 while (iterator.hasNext()) {
                     list.add(iterator.next());
@@ -169,7 +169,7 @@ public class Stream {
             }
 
             @SuppressWarnings({ "rawtypes", "unchecked" })
-            private final void sort(LambdaExpression le) {
+            private void sort(LambdaExpression le) {
                 List list = new ArrayList<>();
                 Comparator<Object> c = new LambdaExpressionComparator(le);
                 while (iterator.hasNext()) {
@@ -472,7 +472,7 @@ public class Stream {
 
         private final LambdaExpression le;
 
-        public LambdaExpressionComparator(LambdaExpression le) {
+        LambdaExpressionComparator(LambdaExpression le) {
             this.le = le;
         }
 

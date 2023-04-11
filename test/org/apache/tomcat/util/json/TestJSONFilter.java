@@ -29,6 +29,10 @@ import org.junit.runners.Parameterized.Parameter;
 @RunWith(Parameterized.class)
 public class TestJSONFilter {
 
+    // Use something ...
+    private static final char SUB = 0x1A;
+    private static final char STX = 0x02;
+
     @Parameterized.Parameters(name = "{index}: input[{0}], output[{1}]")
     public static Collection<Object[]> parameters() {
         Collection<Object[]> parameterSets = new ArrayList<>();
@@ -37,34 +41,38 @@ public class TestJSONFilter {
         parameterSets.add(new String[] { "", "" });
 
         // Must escape
-        parameterSets.add(new String[] { "\"", "\\u0022" });
-        parameterSets.add(new String[] { "\\", "\\u005C" });
+        parameterSets.add(new String[] { "\"", "\\\"" });
+        parameterSets.add(new String[] { "\\", "\\\\" });
         // Sample of controls
-        parameterSets.add(new String[] { "\t", "\\u0009" });
-        parameterSets.add(new String[] { "\n", "\\u000A" });
-        parameterSets.add(new String[] { "\r", "\\u000D" });
+        parameterSets.add(new String[] { "\t", "\\t" });
+        parameterSets.add(new String[] { "\n", "\\n" });
+        parameterSets.add(new String[] { "\r", "\\r" });
 
         // No escape
         parameterSets.add(new String[] { "aaa", "aaa" });
 
         // Start
-        parameterSets.add(new String[] { "\naaa", "\\u000Aaaa" });
-        parameterSets.add(new String[] { "\n\naaa", "\\u000A\\u000Aaaa" });
+        parameterSets.add(new String[] { "\naaa", "\\naaa" });
+        parameterSets.add(new String[] { "\n\naaa", "\\n\\naaa" });
+        parameterSets.add(new String[] { "/aaa", "/aaa" });
 
         // Middle
-        parameterSets.add(new String[] { "aaa\naaa", "aaa\\u000Aaaa" });
-        parameterSets.add(new String[] { "aaa\n\naaa", "aaa\\u000A\\u000Aaaa" });
+        parameterSets.add(new String[] { "aaa\naaa", "aaa\\naaa" });
+        parameterSets.add(new String[] { "aaa\n\naaa", "aaa\\n\\naaa" });
 
         // End
-        parameterSets.add(new String[] { "aaa\n", "aaa\\u000A" });
-        parameterSets.add(new String[] { "aaa\n\n", "aaa\\u000A\\u000A" });
+        parameterSets.add(new String[] { "aaa\n", "aaa\\n" });
+        parameterSets.add(new String[] { "aaa\n\n", "aaa\\n\\n" });
 
         // Start, middle and end
-        parameterSets.add(new String[] { "\naaa\naaa\n", "\\u000Aaaa\\u000Aaaa\\u000A" });
-        parameterSets.add(new String[] { "\n\naaa\n\naaa\n\n", "\\u000A\\u000Aaaa\\u000A\\u000Aaaa\\u000A\\u000A" });
+        parameterSets.add(new String[] { "\naaa\naaa\n", "\\naaa\\naaa\\n" });
+        parameterSets.add(new String[] { "\n\naaa\n\naaa\n\n", "\\n\\naaa\\n\\naaa\\n\\n" });
 
         // Multiple
-        parameterSets.add(new String[] { "\n\n", "\\u000A\\u000A" });
+        parameterSets.add(new String[] { "\n\n", "\\n\\n" });
+        parameterSets.add(new String[] { "\n" + STX + "\n", "\\n\\u0002\\n" });
+        parameterSets.add(new String[] { "\n" + STX + "\n" + SUB, "\\n\\u0002\\n\\u001A" });
+        parameterSets.add(new String[] { SUB + "\n" + STX + "\n" + SUB, "\\u001A\\n\\u0002\\n\\u001A" });
 
         return parameterSets;
     }
@@ -77,6 +85,6 @@ public class TestJSONFilter {
 
     @Test
     public void testStringEscaping() {
-        Assert.assertEquals(output, JSONFilter.escape(input));;
+        Assert.assertEquals(output, JSONFilter.escape(input));
     }
 }

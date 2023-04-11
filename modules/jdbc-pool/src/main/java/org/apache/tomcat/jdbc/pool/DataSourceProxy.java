@@ -32,7 +32,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 
 /**
- *
  * The DataSource proxy lets us implements methods that don't exist in the current
  * compiler JDK but might be methods that are part of a future JDK DataSource interface.
  * <br>

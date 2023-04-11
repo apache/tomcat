@@ -43,14 +43,14 @@ import org.apache.juli.logging.LogFactory;
  * <br>
  * Properties available for configuration:<br>
  * <a href="https://commons.apache.org/dbcp/configuration.html">Commons DBCP properties</a><br>
- *<ol>
+ * <ol>
  *  <li>initSQL - A query that gets executed once, right after the connection is established.</li>
  *  <li>testOnConnect - run validationQuery after connection has been established.</li>
  *  <li>validationInterval - avoid excess validation, only run validation at most at this frequency - time in milliseconds.</li>
  *  <li>jdbcInterceptors - a semicolon separated list of classnames extending {@link JdbcInterceptor} class.</li>
  *  <li>jmxEnabled - true of false, whether to register the pool with JMX.</li>
  *  <li>fairQueue - true of false, whether the pool should sacrifice a little bit of performance for true fairness.</li>
- *</ol>
+ * </ol>
  * @author Craig R. McClanahan
  * @author Dirk Verbeeck
  */

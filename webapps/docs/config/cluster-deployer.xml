@@ -84,14 +84,18 @@
         attribute will have no effect.
       </attribute>
       <attribute name="maxValidTime" required="false">
-        The maximum valid time(in seconds) of FileMessageFactory.
-        FileMessageFactory will be removed immediately after receiving the
-        complete WAR file but when failing to receive a FileMessage which was
-        sent dividing, FileMessageFactory will leak without being removed.
-        FileMessageFactory that is leaking will be automatically removed after
-        maxValidTime. If a negative value specified, FileMessageFactory will
-        never be removed. If the attribute is not provided, a default of 300
-        seconds (5 minutes) is used.
+        FileMessageFactory instances used by the FarmWarDeployer are only
+        retained while they are required. When receiving a WAR file, the
+        associated FileMessageFactory instance is deleted once the WAR file has
+        been fully received. To avoid memory leaks under various error
+        conditions (part of the file never received, very slow message transfer,
+        etc.), this attribute defines the maximum time permitted between
+        receiving valid messages that contain part of the WAR file. If that
+        maximum time is exceeded, the FileMessageFactory will be deleted and the
+        WAR file transfer will fail for that node. If a negative value is
+        specified, the FileMessageFactory will only be removed once the WAR file
+        is fully received. If not specified, the default value of 300 (5
+        minutes) will be used.
       </attribute>
     </attributes>
 

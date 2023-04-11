@@ -19,8 +19,7 @@ package jakarta.servlet.http;
 import jakarta.servlet.annotation.WebServlet;
 
 /**
- * Represents how the request from which this object was obtained was mapped to
- * the associated servlet.
+ * Represents how the request from which this object was obtained was mapped to the associated servlet.
  *
  * @since Servlet 4.0
  */
@@ -32,17 +31,14 @@ public interface HttpServletMapping {
     String getMatchValue();
 
     /**
-     * @return The {@code url-pattern} that matched this request or the empty
-     *         String if not known.
+     * @return The {@code url-pattern} that matched this request or the empty String if not known.
      */
     String getPattern();
 
     /**
-     * @return The name of the servlet (as specified in web.xml,
-     *         {@link WebServlet#name()},
-     *         {@link jakarta.servlet.ServletContext#addServlet(String, Class)} or
-     *         one of the other <code>addServlet()</code> methods) that the
-     *         request was mapped to.
+     * @return The name of the servlet (as specified in web.xml, {@link WebServlet#name()},
+     *             {@link jakarta.servlet.ServletContext#addServlet(String, Class)} or one of the other
+     *             <code>addServlet()</code> methods) that the request was mapped to.
      */
     String getServletName();
 

@@ -29,9 +29,12 @@ import org.apache.tomcat.util.http.parser.StructuredField.SfListMember;
  */
 public class Priority {
 
+    public static final int DEFAULT_URGENCY = 3;
+    public static final boolean DEFAULT_INCREMENTAL = false;
+
     // Explicitly set the defaults as per RFC 9218
-    private int urgency = 3;
-    private boolean incremental = false;
+    private int urgency = DEFAULT_URGENCY;
+    private boolean incremental = DEFAULT_INCREMENTAL;
 
     public Priority() {
         // Default constructor is NO-OP.
@@ -73,7 +76,7 @@ public class Priority {
         if (urgencyListMember instanceof SfInteger) {
             long urgency = ((SfInteger) urgencyListMember).getVaue().longValue();
             // If out of range, ignore it
-            if (urgency < 0 || urgency > 7) {
+            if (urgency > -1 && urgency < 8) {
                 result.setUrgency((int) urgency);
             }
         }

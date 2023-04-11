@@ -24,9 +24,11 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-class constants$29 {
+final class constants$29 {
 
-    static final MemorySegment OPENSSL_FILE$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("/tmp/jextract$7309346795930420663.h");
+    // Suppresses default constructor, ensuring non-instantiability.
+    private constants$29() {}
+    static final MemorySegment OPENSSL_FILE$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("/tmp/jextract$5975327931591344605.h");
 }
 
 

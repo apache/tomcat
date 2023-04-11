@@ -24,11 +24,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Unit tests for Section 5.§ of
- * <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>.
- * <br>
- * The order of tests in this class is aligned with the order of the
- * requirements in the RFC.
+ * Unit tests for Section 5.§ of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
+ * The order of tests in this class is aligned with the order of the requirements in the RFC.
  */
 public class TestHttp2Section_5_1 extends Http2TestBase {
 
@@ -69,7 +66,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // This should trigger a connection error
         sendData(3, new byte[] {});
 
-        handleGoAwayResponse(3,  Http2Error.STREAM_CLOSED);
+        handleGoAwayResponse(3, Http2Error.STREAM_CLOSED);
     }
 
 
@@ -108,7 +105,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // Stream 1 is closed. This should trigger a connection error
         sendData(1, new byte[] {});
 
-        handleGoAwayResponse(1,  Http2Error.STREAM_CLOSED);
+        handleGoAwayResponse(1, Http2Error.STREAM_CLOSED);
     }
 
 
@@ -179,8 +176,10 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         // Allow second request to take up to 5 times first request or up to 1 second - whichever is the larger - mainly
         // to allow for CI systems under load that can exhibit significant timing variation.
-        Assert.assertTrue("First request took [" + durationFirst/1000000 + "ms], second request took [" +
-                durationSecond/1000000 + "ms]", durationSecond < 1000000000 || durationSecond < durationFirst * 3);
+        Assert.assertTrue(
+                "First request took [" + durationFirst / 1000000 + "ms], second request took [" +
+                        durationSecond / 1000000 + "ms]",
+                durationSecond < 1000000000 || durationSecond < durationFirst * 3);
 
         // Should trigger an error since stream 3 should have been implicitly
         // closed.
@@ -206,12 +205,8 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         parser.readFrame();
         parser.readFrame();
 
-        Assert.assertEquals("0-Settings-[3]-[1]\n" +
-                "0-Settings-End\n" +
-                "0-Settings-Ack\n" +
-                "0-Ping-[0,0,0,0,0,0,0,1]\n" +
-                getSimpleResponseTrace(1)
-                , output.getTrace());
+        Assert.assertEquals("0-Settings-[3]-[1]\n" + "0-Settings-End\n" + "0-Settings-Ack\n" +
+                "0-Ping-[0,0,0,0,0,0,0,1]\n" + getSimpleResponseTrace(1), output.getTrace());
         output.clearTrace();
 
         sendLargeGetRequest(3);
@@ -231,8 +226,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         }
 
         Assert.assertTrue(output.getTrace(),
-                output.getTrace().contains("5-RST-[" +
-                        Http2Error.REFUSED_STREAM.getCode() + "]"));
+                output.getTrace().contains("5-RST-[" + Http2Error.REFUSED_STREAM.getCode() + "]"));
         output.clearTrace();
 
         // Connection window is zero.
@@ -273,12 +267,8 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         parser.readFrame();
         parser.readFrame();
 
-        Assert.assertEquals("0-Settings-[3]-[1]\n" +
-                "0-Settings-End\n" +
-                "0-Settings-Ack\n" +
-                "0-Ping-[0,0,0,0,0,0,0,1]\n" +
-                getSimpleResponseTrace(1)
-                , output.getTrace());
+        Assert.assertEquals("0-Settings-[3]-[1]\n" + "0-Settings-End\n" + "0-Settings-Ack\n" +
+                "0-Ping-[0,0,0,0,0,0,0,1]\n" + getSimpleResponseTrace(1), output.getTrace());
         output.clearTrace();
 
         sendLargeGetRequest(3);
@@ -298,8 +288,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         }
 
         Assert.assertTrue(output.getTrace(),
-                output.getTrace().contains("5-RST-[" +
-                        Http2Error.REFUSED_STREAM.getCode() + "]"));
+                output.getTrace().contains("5-RST-[" + Http2Error.REFUSED_STREAM.getCode() + "]"));
         output.clearTrace();
 
         // Connection window is zero.
@@ -342,12 +331,8 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
             parser.readFrame();
             parser.readFrame();
 
-            Assert.assertEquals("0-Settings-[3]-[1]\n" +
-                    "0-Settings-End\n" +
-                    "0-Settings-Ack\n" +
-                    "0-Ping-[0,0,0,0,0,0,0,1]\n" +
-                    getSimpleResponseTrace(1)
-                    , output.getTrace());
+            Assert.assertEquals("0-Settings-[3]-[1]\n" + "0-Settings-End\n" + "0-Settings-Ack\n" +
+                    "0-Ping-[0,0,0,0,0,0,0,1]\n" + getSimpleResponseTrace(1), output.getTrace());
             output.clearTrace();
 
             sendLargeGetRequest(3);
@@ -401,12 +386,8 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         parser.readFrame();
         parser.readFrame();
 
-        Assert.assertEquals("0-Settings-[3]-[1]\n" +
-                "0-Settings-End\n" +
-                "0-Settings-Ack\n" +
-                "0-Ping-[0,0,0,0,0,0,0,1]\n" +
-                getSimpleResponseTrace(1)
-                , output.getTrace());
+        Assert.assertEquals("0-Settings-[3]-[1]\n" + "0-Settings-End\n" + "0-Settings-Ack\n" +
+                "0-Ping-[0,0,0,0,0,0,0,1]\n" + getSimpleResponseTrace(1), output.getTrace());
         output.clearTrace();
 
         // Default connection window size is 64k-1.

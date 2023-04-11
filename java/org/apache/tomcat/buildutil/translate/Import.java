@@ -100,7 +100,7 @@ public class Import {
         public final String key;
         public final String group;
 
-        public CompositeKey(String in) {
+        CompositeKey(String in) {
             int posPkg = in.indexOf(Constants.END_PACKAGE_MARKER);
             pkg = in.substring(0, posPkg).replace(Constants.JAVA_EE_SUBSTRING, Constants.JAKARTA_EE_SUBSTRING);
             key = in.substring(posPkg + Constants.END_PACKAGE_MARKER.length());

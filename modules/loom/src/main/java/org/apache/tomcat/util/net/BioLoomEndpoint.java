@@ -133,8 +133,6 @@ public class BioLoomEndpoint extends AbstractEndpoint<Socket, Socket> {
 
     @Override
     protected void doCloseServerSocket() throws IOException {
-        ServerSocket serverSocket = this.serverSocket;
-
         if (serverSocket != null) {
             serverSocket.close();
             serverSocket = null;

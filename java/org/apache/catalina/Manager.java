@@ -46,7 +46,7 @@ public interface Manager {
      *
      * @return The associated Context
      */
-    public Context getContext();
+    Context getContext();
 
 
     /**
@@ -58,13 +58,13 @@ public interface Manager {
      *
      * @param context The newly associated Context
      */
-    public void setContext(Context context);
+    void setContext(Context context);
 
 
     /**
      * @return the session id generator
      */
-    public SessionIdGenerator getSessionIdGenerator();
+    SessionIdGenerator getSessionIdGenerator();
 
 
     /**
@@ -72,7 +72,7 @@ public interface Manager {
      *
      * @param sessionIdGenerator The session id generator
      */
-    public void setSessionIdGenerator(SessionIdGenerator sessionIdGenerator);
+    void setSessionIdGenerator(SessionIdGenerator sessionIdGenerator);
 
 
     /**
@@ -80,7 +80,7 @@ public interface Manager {
      *
      * @return Total number of sessions created by this manager.
      */
-    public long getSessionCounter();
+    long getSessionCounter();
 
 
     /**
@@ -88,7 +88,7 @@ public interface Manager {
      *
      * @param sessionCounter Total number of sessions created by this manager.
      */
-    public void setSessionCounter(long sessionCounter);
+    void setSessionCounter(long sessionCounter);
 
 
     /**
@@ -98,7 +98,7 @@ public interface Manager {
      * @return Maximum number of sessions that have been active at the same
      * time
      */
-    public int getMaxActive();
+    int getMaxActive();
 
 
     /**
@@ -108,7 +108,7 @@ public interface Manager {
      * @param maxActive Maximum number of sessions that have been active at
      * the same time.
      */
-    public void setMaxActive(int maxActive);
+    void setMaxActive(int maxActive);
 
 
     /**
@@ -116,7 +116,7 @@ public interface Manager {
      *
      * @return Number of currently active sessions
      */
-    public int getActiveSessions();
+    int getActiveSessions();
 
 
     /**
@@ -124,7 +124,7 @@ public interface Manager {
      *
      * @return Number of sessions that have expired
      */
-    public long getExpiredSessions();
+    long getExpiredSessions();
 
 
     /**
@@ -132,7 +132,7 @@ public interface Manager {
      *
      * @param expiredSessions Number of sessions that have expired
      */
-    public void setExpiredSessions(long expiredSessions);
+    void setExpiredSessions(long expiredSessions);
 
 
     /**
@@ -141,7 +141,7 @@ public interface Manager {
      *
      * @return Number of rejected sessions
      */
-    public int getRejectedSessions();
+    int getRejectedSessions();
 
 
     /**
@@ -151,7 +151,7 @@ public interface Manager {
      * @return Longest time (in seconds) that an expired session had been
      * alive.
      */
-    public int getSessionMaxAliveTime();
+    int getSessionMaxAliveTime();
 
 
     /**
@@ -161,7 +161,7 @@ public interface Manager {
      * @param sessionMaxAliveTime Longest time (in seconds) that an expired
      * session had been alive.
      */
-    public void setSessionMaxAliveTime(int sessionMaxAliveTime);
+    void setSessionMaxAliveTime(int sessionMaxAliveTime);
 
 
     /**
@@ -171,7 +171,7 @@ public interface Manager {
      * @return Average time (in seconds) that expired sessions had been
      * alive.
      */
-    public int getSessionAverageAliveTime();
+    int getSessionAverageAliveTime();
 
 
     /**
@@ -180,7 +180,7 @@ public interface Manager {
      *
      * @return  The current rate (in sessions per minute) of session creation
      */
-    public int getSessionCreateRate();
+    int getSessionCreateRate();
 
 
     /**
@@ -189,7 +189,7 @@ public interface Manager {
      *
      * @return  The current rate (in sessions per minute) of session expiration
      */
-    public int getSessionExpireRate();
+    int getSessionExpireRate();
 
 
     // --------------------------------------------------------- Public Methods
@@ -199,7 +199,7 @@ public interface Manager {
      *
      * @param session Session to be added
      */
-    public void add(Session session);
+    void add(Session session);
 
 
     /**
@@ -207,7 +207,7 @@ public interface Manager {
      *
      * @param listener The listener to add
      */
-    public void addPropertyChangeListener(PropertyChangeListener listener);
+    void addPropertyChangeListener(PropertyChangeListener listener);
 
 
     /**
@@ -218,7 +218,7 @@ public interface Manager {
      *
      * @return  The new session ID
      */
-    public default String rotateSessionId(Session session) {
+    default String rotateSessionId(Session session) {
         String newSessionId = null;
         // Assume there new Id is a duplicate until we prove it isn't. The
         // chances of a duplicate are extremely low but the current ManagerBase
@@ -245,7 +245,7 @@ public interface Manager {
      * @param session   The session to change the session ID for
      * @param newId   new session ID
      */
-    public void changeSessionId(Session session, String newId);
+    void changeSessionId(Session session, String newId);
 
 
     /**
@@ -255,7 +255,7 @@ public interface Manager {
      *
      * @return An empty Session object
      */
-    public Session createEmptySession();
+    Session createEmptySession();
 
 
     /**
@@ -275,7 +275,7 @@ public interface Manager {
      * @return An empty Session object with the given ID or a newly created
      *         session ID if none was specified
      */
-    public Session createSession(String sessionId);
+    Session createSession(String sessionId);
 
 
     /**
@@ -292,7 +292,7 @@ public interface Manager {
      * @return the request session or {@code null} if a session with the
      *         requested ID could not be found
      */
-    public Session findSession(String id) throws IOException;
+    Session findSession(String id) throws IOException;
 
 
     /**
@@ -301,7 +301,7 @@ public interface Manager {
      *
      * @return All the currently active sessions managed by this manager
      */
-    public Session[] findSessions();
+    Session[] findSessions();
 
 
     /**
@@ -313,7 +313,7 @@ public interface Manager {
      *  found during the reload
      * @exception IOException if an input/output error occurs
      */
-    public void load() throws ClassNotFoundException, IOException;
+    void load() throws ClassNotFoundException, IOException;
 
 
     /**
@@ -321,7 +321,7 @@ public interface Manager {
      *
      * @param session Session to be removed
      */
-    public void remove(Session session);
+    void remove(Session session);
 
 
     /**
@@ -330,7 +330,7 @@ public interface Manager {
      * @param session   Session to be removed
      * @param update    Should the expiration statistics be updated
      */
-    public void remove(Session session, boolean update);
+    void remove(Session session, boolean update);
 
 
     /**
@@ -338,7 +338,7 @@ public interface Manager {
      *
      * @param listener The listener to remove
      */
-    public void removePropertyChangeListener(PropertyChangeListener listener);
+    void removePropertyChangeListener(PropertyChangeListener listener);
 
 
     /**
@@ -348,7 +348,7 @@ public interface Manager {
      *
      * @exception IOException if an input/output error occurs
      */
-    public void unload() throws IOException;
+    void unload() throws IOException;
 
 
     /**
@@ -356,7 +356,7 @@ public interface Manager {
      * basis and allows the manager to implement
      * a method that executes periodic tasks, such as expiring sessions etc.
      */
-    public void backgroundProcess();
+    void backgroundProcess();
 
 
     /**
@@ -370,7 +370,7 @@ public interface Manager {
      * @return {@code true} if the Manager would distribute the given attribute
      *         otherwise {@code false}
      */
-    public boolean willAttributeDistribute(String name, Object value);
+    boolean willAttributeDistribute(String name, Object value);
 
 
     /**
@@ -386,7 +386,7 @@ public interface Manager {
      * @return {@code true} if the listener will be notified, {@code false} if
      *         it will not
      */
-    public default boolean getNotifyBindingListenerOnUnchangedValue() {
+    default boolean getNotifyBindingListenerOnUnchangedValue() {
         return false;
     }
 
@@ -404,7 +404,7 @@ public interface Manager {
      *                                              will be called, {@code
      *                                              false} it will not
      */
-    public void setNotifyBindingListenerOnUnchangedValue(
+    void setNotifyBindingListenerOnUnchangedValue(
             boolean notifyBindingListenerOnUnchangedValue);
 
 
@@ -421,7 +421,7 @@ public interface Manager {
      * @return {@code true} if the listener will be notified, {@code false} if
      *         it will not
      */
-    public default boolean getNotifyAttributeListenerOnUnchangedValue() {
+    default boolean getNotifyAttributeListenerOnUnchangedValue() {
         return true;
     }
 
@@ -438,7 +438,7 @@ public interface Manager {
      *                                                will be called, {@code
      *                                                false} it will not
      */
-    public void setNotifyAttributeListenerOnUnchangedValue(
+    void setNotifyAttributeListenerOnUnchangedValue(
             boolean notifyAttributeListenerOnUnchangedValue);
 
 
@@ -451,7 +451,7 @@ public interface Manager {
      * else the default value will be <code>false</code>.
      * @return the flag value
      */
-    public default boolean getSessionActivityCheck() {
+    default boolean getSessionActivityCheck() {
         return Globals.STRICT_SERVLET_COMPLIANCE;
     }
 
@@ -462,7 +462,7 @@ public interface Manager {
      * least one active request will always be considered valid.
      * @param sessionActivityCheck the new flag value
      */
-    public void setSessionActivityCheck(boolean sessionActivityCheck);
+    void setSessionActivityCheck(boolean sessionActivityCheck);
 
 
     /**
@@ -476,7 +476,7 @@ public interface Manager {
      * else the default value will be <code>false</code>.
      * @return the flag value
      */
-    public default boolean getSessionLastAccessAtStart() {
+    default boolean getSessionLastAccessAtStart() {
         return Globals.STRICT_SERVLET_COMPLIANCE;
     }
 
@@ -489,6 +489,6 @@ public interface Manager {
      * is calculated.
      * @param sessionLastAccessAtStart the new flag value
      */
-    public void setSessionLastAccessAtStart(boolean sessionLastAccessAtStart);
+    void setSessionLastAccessAtStart(boolean sessionLastAccessAtStart);
 
 }

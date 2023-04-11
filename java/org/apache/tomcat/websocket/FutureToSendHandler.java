@@ -40,7 +40,7 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
     private final WsSession wsSession;
     private volatile AtomicReference<SendResult> result = new AtomicReference<>(null);
 
-    public FutureToSendHandler(WsSession wsSession) {
+    FutureToSendHandler(WsSession wsSession) {
         this.wsSession = wsSession;
     }
 
@@ -74,8 +74,7 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
     }
 
     @Override
-    public Void get() throws InterruptedException,
-            ExecutionException {
+    public Void get() throws InterruptedException, ExecutionException {
         try {
             wsSession.registerFuture(this);
             latch.await();
@@ -89,9 +88,7 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
     }
 
     @Override
-    public Void get(long timeout, TimeUnit unit)
-            throws InterruptedException, ExecutionException,
-            TimeoutException {
+    public Void get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         boolean retval = false;
         try {
             wsSession.registerFuture(this);
@@ -101,8 +98,8 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
 
         }
         if (retval == false) {
-            throw new TimeoutException(sm.getString("futureToSendHandler.timeout",
-                    Long.valueOf(timeout), unit.toString().toLowerCase()));
+            throw new TimeoutException(
+                    sm.getString("futureToSendHandler.timeout", Long.valueOf(timeout), unit.toString().toLowerCase()));
         }
         if (result.get().getException() != null) {
             throw new ExecutionException(result.get().getException());

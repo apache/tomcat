@@ -270,7 +270,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             buf.append(getDelegate());
             buf.append("; Connection=");
             buf.append(getConnection());
-            buf.append("]");
+            buf.append(']');
             return buf.toString();
         }
     }

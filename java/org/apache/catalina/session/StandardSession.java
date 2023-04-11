@@ -24,9 +24,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.io.WriteAbortedException;
-import java.security.AccessController;
 import java.security.Principal;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -50,14 +48,12 @@ import jakarta.servlet.http.HttpSessionIdListener;
 import jakarta.servlet.http.HttpSessionListener;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.SessionEvent;
 import org.apache.catalina.SessionListener;
 import org.apache.catalina.TomcatPrincipal;
 import org.apache.catalina.authenticator.SavedRequest;
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -609,11 +605,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
     @Override
     public HttpSession getSession() {
         if (facade == null) {
-            if (SecurityUtil.isPackageProtectionEnabled()) {
-                facade = AccessController.doPrivileged(new PrivilegedNewSessionFacade(this));
-            } else {
-                facade = new StandardSessionFacade(this);
-            }
+            facade = new StandardSessionFacade(this);
         }
         return facade;
     }
@@ -687,7 +679,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
         isNew = false;
 
-        /**
+        /*
          * The servlet spec mandates to ignore request handling time
          * in lastAccessedTime.
          */
@@ -771,7 +763,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
             if (notify) {
                 ClassLoader oldContextClassLoader = null;
                 try {
-                    oldContextClassLoader = context.bind(Globals.IS_SECURITY_ENABLED, null);
+                    oldContextClassLoader = context.bind(null);
                     Object listeners[] = context.getApplicationLifecycleListeners();
                     if (listeners != null && listeners.length > 0) {
                         HttpSessionEvent event =
@@ -803,7 +795,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
                         }
                     }
                 } finally {
-                    context.unbind(Globals.IS_SECURITY_ENABLED, oldContextClassLoader);
+                    context.unbind(oldContextClassLoader);
                 }
             }
 
@@ -839,12 +831,12 @@ public class StandardSession implements HttpSession, Session, Serializable {
             String keys[] = keys();
             ClassLoader oldContextClassLoader = null;
             try {
-                oldContextClassLoader = context.bind(Globals.IS_SECURITY_ENABLED, null);
+                oldContextClassLoader = context.bind(null);
                 for (String key : keys) {
                     removeAttributeInternal(key, notify);
                 }
             } finally {
-                context.unbind(Globals.IS_SECURITY_ENABLED, oldContextClassLoader);
+                context.unbind(oldContextClassLoader);
             }
         }
 
@@ -1785,22 +1777,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 }
                 manager.getContext().getLogger().error(sm.getString("standardSession.attributeEvent"), t);
             }
-        }
-    }
-
-
-    private static class PrivilegedNewSessionFacade implements
-            PrivilegedAction<StandardSessionFacade> {
-
-        private final HttpSession session;
-
-        public PrivilegedNewSessionFacade(HttpSession session) {
-            this.session = session;
-        }
-
-        @Override
-        public StandardSessionFacade run(){
-            return new StandardSessionFacade(session);
         }
     }
 }

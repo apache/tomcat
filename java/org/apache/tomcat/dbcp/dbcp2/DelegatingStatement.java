@@ -61,7 +61,6 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     }
 
     /**
-     *
      * @throws SQLException
      *             thrown by the delegating statement.
      * @since 2.4.0 made public, was protected in 2.3.0.
@@ -137,35 +136,24 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
             // ResultSet's when it is closed.
             // FIXME The PreparedStatement we're wrapping should handle this for us.
             // See bug 17301 for what could happen when ResultSets are closed twice.
-            final List<AbandonedTrace> resultSetList = getTrace();
-            if (resultSetList != null) {
-                final ResultSet[] resultSets = resultSetList.toArray(Utils.EMPTY_RESULT_SET_ARRAY);
-                for (final ResultSet resultSet : resultSets) {
-                    if (resultSet != null) {
-                        try {
-                            resultSet.close();
-                        } catch (final Exception e) {
-                            if (connection != null) {
-                                // Does not rethrow e.
-                                connection.handleExceptionNoThrow(e);
-                            }
-                            thrownList.add(e);
-                        }
-                    }
-                }
-                clearTrace();
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (final Exception e) {
+            final List<AbandonedTrace> traceList = getTrace();
+            if (traceList != null) {
+                traceList.forEach(trace -> trace.close(e -> {
                     if (connection != null) {
                         // Does not rethrow e.
                         connection.handleExceptionNoThrow(e);
                     }
                     thrownList.add(e);
-                }
+                }));
+                clearTrace();
             }
+            Utils.close(statement, e -> {
+                if (connection != null) {
+                    // Does not rethrow e.
+                    connection.handleExceptionNoThrow(e);
+                }
+                thrownList.add(e);
+            });
         } finally {
             closed = true;
             statement = null;
@@ -677,7 +665,6 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     }
 
     /**
-     *
      * @throws SQLException
      *             thrown by the delegating statement.
      * @since 2.4.0 made public, was protected in 2.3.0.

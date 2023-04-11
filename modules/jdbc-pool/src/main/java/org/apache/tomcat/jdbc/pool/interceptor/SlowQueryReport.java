@@ -388,7 +388,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
             buf.append(prepareCount);
             buf.append(", prepareTime:");
             buf.append(prepareTime);
-            buf.append("]");
+            buf.append(']');
             return buf.toString();
         }
 
@@ -487,9 +487,10 @@ public class SlowQueryReport extends AbstractQueryReport  {
         }
     }
 
-    /** Compare QueryStats by their lastInvocation value. QueryStats that
-     * have never been updated, have a lastInvocation value of {@code 0}
-     * which should be handled as the newest possible invocation.
+    /**
+     * Compare QueryStats by their lastInvocation value. QueryStats that have
+     * never been updated, have a lastInvocation value of {@code 0} which should
+     * be handled as the newest possible invocation.
      */
     // Public for unit tests
     public static class QueryStatsComparator implements Comparator<QueryStats> {

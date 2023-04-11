@@ -18,6 +18,7 @@ package jakarta.servlet;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
@@ -35,8 +36,7 @@ import java.util.ResourceBundle;
  */
 public class ServletRequestWrapper implements ServletRequest {
     private static final String LSTRING_FILE = "jakarta.servlet.LocalStrings";
-    private static final ResourceBundle lStrings =
-        ResourceBundle.getBundle(LSTRING_FILE);
+    private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
     private ServletRequest request;
 
@@ -111,6 +111,17 @@ public class ServletRequestWrapper implements ServletRequest {
     public void setCharacterEncoding(String enc)
             throws java.io.UnsupportedEncodingException {
         this.request.setCharacterEncoding(enc);
+    }
+
+    /**
+     * The default behavior of this method is to set the character encoding on
+     * the wrapped request object.
+     *
+     * @since Servlet 6.1
+     */
+    @Override
+    public void setCharacterEncoding(Charset encoding) {
+        this.request.setCharacterEncoding(encoding);
     }
 
     /**

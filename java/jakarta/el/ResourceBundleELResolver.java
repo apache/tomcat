@@ -35,8 +35,7 @@ public class ResourceBundleELResolver extends ELResolver {
 
             if (property != null) {
                 try {
-                    return ((ResourceBundle) base).getObject(property
-                            .toString());
+                    return ((ResourceBundle) base).getObject(property.toString());
                 } catch (MissingResourceException mre) {
                     return "???" + property.toString() + "???";
                 }
@@ -53,8 +52,7 @@ public class ResourceBundleELResolver extends ELResolver {
         if (base instanceof ResourceBundle) {
             context.setPropertyResolved(base, property);
             /*
-             * ResourceBundles are always read-only so fall-through to return
-             * null
+             * ResourceBundles are always read-only so fall-through to return null
              */
         }
 
@@ -62,14 +60,13 @@ public class ResourceBundleELResolver extends ELResolver {
     }
 
     @Override
-    public void setValue(ELContext context, Object base, Object property,
-            Object value) {
+    public void setValue(ELContext context, Object base, Object property, Object value) {
         Objects.requireNonNull(context);
 
         if (base instanceof ResourceBundle) {
             context.setPropertyResolved(base, property);
-            throw new PropertyNotWritableException(Util.message(context,
-                    "resolverNotWritable", base.getClass().getName()));
+            throw new PropertyNotWritableException(
+                    Util.message(context, "resolverNotWritable", base.getClass().getName()));
         }
     }
 

@@ -24,8 +24,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -47,21 +45,7 @@ public class ELSupport {
 
     private static final Long ZERO = Long.valueOf(0L);
 
-    protected static final boolean COERCE_TO_ZERO;
-
-    static {
-        String coerceToZeroStr;
-        if (System.getSecurityManager() != null) {
-            coerceToZeroStr = AccessController.doPrivileged(
-                    (PrivilegedAction<String>) () -> System.getProperty(
-                            "org.apache.el.parser.COERCE_TO_ZERO", "false")
-            );
-        } else {
-            coerceToZeroStr = System.getProperty(
-                    "org.apache.el.parser.COERCE_TO_ZERO", "false");
-        }
-        COERCE_TO_ZERO = Boolean.parseBoolean(coerceToZeroStr);
-    }
+    protected static final boolean COERCE_TO_ZERO = Boolean.getBoolean("org.apache.el.parser.COERCE_TO_ZERO");
 
 
     /**
@@ -272,7 +256,7 @@ public class ELSupport {
                 obj, obj.getClass(), Boolean.class));
     }
 
-    private static final Character coerceToCharacter(final ELContext ctx, final Object obj)
+    private static Character coerceToCharacter(final ELContext ctx, final Object obj)
             throws ELException {
 
         if (ctx != null) {
@@ -635,15 +619,15 @@ public class ELSupport {
                     if (!Modifier.isAbstract(method.getModifiers())) {
                         throw new ELException(MessageFactory.get("elSupport.coerce.nonAbstract", type, method));
                     }
-                    return lambdaExpression.invoke(ctx, args);
+                    if (ctx == null) {
+                        return lambdaExpression.invoke(args);
+                    } else {
+                        return lambdaExpression.invoke(ctx, args);
+                    }
                 });
             return result;
         };
-        if (System.getSecurityManager() !=  null) {
-            return AccessController.doPrivileged((PrivilegedAction<T>) proxy::get);
-        } else {
-            return proxy.get();
-        }
+        return proxy.get();
     }
 
 
@@ -695,6 +679,9 @@ public class ELSupport {
     }
 
 
+    /*
+     * Copied to jakarta.el.ELContext - keep in sync
+     */
     static boolean isFunctionalInterface(Class<?> type) {
 
         if (!type.isInterface()) {
@@ -722,6 +709,9 @@ public class ELSupport {
     }
 
 
+    /*
+     * Copied to jakarta.el.ELContext - keep in sync
+     */
     private static boolean overridesObjectMethod(Method method) {
         // There are three methods that can be overridden
         if ("equals".equals(method.getName())) {

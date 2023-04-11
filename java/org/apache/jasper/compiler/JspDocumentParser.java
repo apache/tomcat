@@ -19,7 +19,6 @@ package org.apache.jasper.compiler;
 import java.io.CharArrayWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.security.AccessController;
 import java.util.Collection;
 
 import javax.xml.parsers.SAXParser;
@@ -36,8 +35,6 @@ import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.descriptor.LocalResolver;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
-import org.apache.tomcat.util.security.PrivilegedGetTccl;
-import org.apache.tomcat.util.security.PrivilegedSetTccl;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -114,7 +111,7 @@ class JspDocumentParser
     /*
      * Constructor
      */
-    public JspDocumentParser(
+    JspDocumentParser(
         ParserController pc,
         String path,
         boolean isTagFile,
@@ -1431,22 +1428,10 @@ class JspDocumentParser
         JspDocumentParser jspDocParser)
         throws Exception {
 
-        ClassLoader original;
-        if (Constants.IS_SECURITY_ENABLED) {
-            PrivilegedGetTccl pa = new PrivilegedGetTccl();
-            original = AccessController.doPrivileged(pa);
-        } else {
-            original = Thread.currentThread().getContextClassLoader();
-        }
+        Thread currentThread = Thread.currentThread();
+        ClassLoader original = currentThread.getContextClassLoader();
         try {
-            if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa =
-                        new PrivilegedSetTccl(JspDocumentParser.class.getClassLoader());
-                AccessController.doPrivileged(pa);
-            } else {
-                Thread.currentThread().setContextClassLoader(
-                        JspDocumentParser.class.getClassLoader());
-            }
+            currentThread.setContextClassLoader(JspDocumentParser.class.getClassLoader());
 
             SAXParserFactory factory = SAXParserFactory.newInstance();
 
@@ -1476,12 +1461,7 @@ class JspDocumentParser
 
             return saxParser;
         } finally {
-            if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa = new PrivilegedSetTccl(original);
-                AccessController.doPrivileged(pa);
-            } else {
-                Thread.currentThread().setContextClassLoader(original);
-            }
+            currentThread.setContextClassLoader(original);
         }
     }
 

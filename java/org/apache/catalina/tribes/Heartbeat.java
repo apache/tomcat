@@ -28,6 +28,6 @@ public interface Heartbeat {
     /**
      * Heartbeat invocation for resources cleanup etc
      */
-    public void heartbeat();
+    void heartbeat();
 
 }

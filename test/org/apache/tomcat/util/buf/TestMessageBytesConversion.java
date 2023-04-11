@@ -131,7 +131,7 @@ public class TestMessageBytesConversion {
     }
 
 
-    public static enum MessageBytesType {
+    public enum MessageBytesType {
         BYTE((x) -> x.setBytes(PREVIOUS_BYTES, 0, PREVIOUS_BYTES.length),
                 (x) -> x.setBytes(EXPECTED_BYTES, 0, EXPECTED_BYTES.length),
                 (x) -> {x.toBytes(); Assert.assertTrue(x.getByteChunk().equals(EXPECTED_BYTES, 0, EXPECTED_BYTES.length) );},
@@ -157,7 +157,7 @@ public class TestMessageBytesConversion {
         private final Consumer<MessageBytes> checkExpected;
         private final Consumer<MessageBytes> checkNull;
 
-        private MessageBytesType(Consumer<MessageBytes> setPrevious, Consumer<MessageBytes> setExpected,
+        MessageBytesType(Consumer<MessageBytes> setPrevious, Consumer<MessageBytes> setExpected,
                 Consumer<MessageBytes> checkExpected, Consumer<MessageBytes> checkNull) {
             this.setPrevious = setPrevious;
             this.setExpected = setExpected;

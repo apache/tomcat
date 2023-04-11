@@ -34,12 +34,12 @@ public interface WriteListener extends java.util.EventListener{
      *
      * @throws IOException if an I/O error occurs while processing this event
      */
-    public void onWritePossible() throws IOException;
+    void onWritePossible() throws IOException;
 
     /**
      * Invoked if an error occurs while writing the response.
      *
      * @param throwable The throwable that represents the error that occurred
      */
-    public void onError(java.lang.Throwable throwable);
+    void onError(java.lang.Throwable throwable);
 }

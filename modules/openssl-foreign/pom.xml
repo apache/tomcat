@@ -31,7 +31,7 @@
     <version>0.1-SNAPSHOT</version>
 
     <properties>
-        <tomcat.version>9.0.68</tomcat.version>
+        <tomcat.version>9.0.73</tomcat.version>
         <project.build.outputTimestamp>2021-12-02T12:00:00Z</project.build.outputTimestamp>
     </properties>
 
@@ -78,8 +78,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>20</source>
-                    <target>20</target>
+                    <source>21</source>
+                    <target>21</target>
                     <compilerArgs>
                         <arg>--enable-preview</arg>
                     </compilerArgs>

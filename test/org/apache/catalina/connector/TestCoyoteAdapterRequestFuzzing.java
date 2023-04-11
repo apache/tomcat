@@ -139,7 +139,7 @@ public class TestCoyoteAdapterRequestFuzzing extends TomcatBaseTest {
 
     private static final class Client extends SimpleHttpClient {
 
-        public Client(int port) {
+        Client(int port) {
             setPort(port);
             setRequestPause(0);
         }

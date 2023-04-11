@@ -20,9 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
@@ -32,13 +29,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.jasper.Constants;
 import org.apache.jasper.EmbeddedServletOptions;
 import org.apache.jasper.Options;
 import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.runtime.ExceptionUtils;
-import org.apache.jasper.security.SecurityUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.PeriodicEventListener;
@@ -89,11 +84,6 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
         // Initialize the JSP Runtime Context
         // Check for a custom Options implementation
         String engineOptionsName = config.getInitParameter("engineOptionsClass");
-        if (Constants.IS_SECURITY_ENABLED && engineOptionsName != null) {
-            log.info(Localizer.getMessage(
-                    "jsp.info.ignoreSetting", "engineOptionsClass", engineOptionsName));
-            engineOptionsName = null;
-        }
         if (engineOptionsName != null) {
             // Instantiate the indicated Options implementation
             try {
@@ -126,21 +116,8 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                 throw new ServletException(Localizer.getMessage("jsp.error.no.jsp", jspFile), e);
             }
             try {
-                if (SecurityUtil.isPackageProtectionEnabled()){
-                   AccessController.doPrivileged((PrivilegedExceptionAction<Object>) () -> {
-                       serviceJspFile(null, null, jspFile, true);
-                       return null;
-                   });
-                } else {
-                    serviceJspFile(null, null, jspFile, true);
-                }
+                serviceJspFile(null, null, jspFile, true);
             } catch (IOException e) {
-                throw new ServletException(Localizer.getMessage("jsp.error.precompilation", jspFile), e);
-            } catch (PrivilegedActionException e) {
-                Throwable t = e.getCause();
-                if (t instanceof ServletException) {
-                    throw (ServletException)t;
-                }
                 throw new ServletException(Localizer.getMessage("jsp.error.precompilation", jspFile), e);
             }
         }

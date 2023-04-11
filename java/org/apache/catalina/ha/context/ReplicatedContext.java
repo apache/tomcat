@@ -106,13 +106,14 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
         if (loader != null) {
             classLoader = loader.getClassLoader();
         }
+        Thread currentThread = Thread.currentThread();
         if ( classLoader == null ) {
-            classLoader = Thread.currentThread().getContextClassLoader();
+            classLoader = currentThread.getContextClassLoader();
         }
-        if ( classLoader == Thread.currentThread().getContextClassLoader() ) {
+        if ( classLoader == currentThread.getContextClassLoader() ) {
             return new ClassLoader[] {classLoader};
         } else {
-            return new ClassLoader[] {classLoader,Thread.currentThread().getContextClassLoader()};
+            return new ClassLoader[] {classLoader,currentThread.getContextClassLoader()};
         }
     }
 

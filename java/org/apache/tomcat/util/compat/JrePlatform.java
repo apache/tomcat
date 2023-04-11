@@ -16,8 +16,6 @@
  */
 package org.apache.tomcat.util.compat;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Locale;
 
 public class JrePlatform {
@@ -37,13 +35,7 @@ public class JrePlatform {
          */
 
         // This check is derived from the check in Apache Commons Lang
-        String osName;
-        if (System.getSecurityManager() == null) {
-            osName = System.getProperty(OS_NAME_PROPERTY);
-        } else {
-            osName = AccessController.doPrivileged(
-                    (PrivilegedAction<String>) () -> System.getProperty(OS_NAME_PROPERTY));
-        }
+        String osName = System.getProperty(OS_NAME_PROPERTY);
 
         IS_MAC_OS = osName.toLowerCase(Locale.ENGLISH).startsWith("mac os x");
 

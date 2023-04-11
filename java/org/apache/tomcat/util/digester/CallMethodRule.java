@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.digester;
 
+import java.util.Arrays;
+
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.xml.sax.Attributes;
 
@@ -96,9 +98,7 @@ public class CallMethodRule extends Rule {
             this.paramTypes = new Class[] { String.class };
         } else {
             this.paramTypes = new Class[paramCount];
-            for (int i = 0; i < this.paramTypes.length; i++) {
-                this.paramTypes[i] = String.class;
-            }
+            Arrays.fill(this.paramTypes, String.class);
         }
     }
 
@@ -135,16 +135,14 @@ public class CallMethodRule extends Rule {
      *  for a <code>boolean</code> parameter)
      */
     public CallMethodRule(int targetOffset, String methodName, int paramCount,
-            Class<?> paramTypes[]) {
+                          Class<?>[] paramTypes) {
 
         this.targetOffset = targetOffset;
         this.methodName = methodName;
         this.paramCount = paramCount;
         if (paramTypes == null) {
             this.paramTypes = new Class[paramCount];
-            for (int i = 0; i < this.paramTypes.length; i++) {
-                this.paramTypes[i] = String.class;
-            }
+            Arrays.fill(this.paramTypes, String.class);
         } else {
             this.paramTypes = new Class[paramTypes.length];
             System.arraycopy(paramTypes, 0, this.paramTypes, 0, this.paramTypes.length);
@@ -232,10 +230,7 @@ public class CallMethodRule extends Rule {
 
         // Push an array to capture the parameter values if necessary
         if (paramCount > 0) {
-            Object parameters[] = new Object[paramCount];
-            for (int i = 0; i < parameters.length; i++) {
-                parameters[i] = null;
-            }
+            Object[] parameters = new Object[paramCount];
             digester.pushParams(parameters);
         }
 

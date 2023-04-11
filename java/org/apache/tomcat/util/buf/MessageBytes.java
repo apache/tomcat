@@ -26,9 +26,6 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
 import java.util.Locale;
 
-import org.apache.tomcat.util.compat.JreCompat;
-import org.apache.tomcat.util.res.StringManager;
-
 /**
  * This class is used to represent a subarray of bytes in an HTTP message.
  * It represents all request/response elements. The byte/char conversions are
@@ -45,20 +42,24 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final StringManager sm = StringManager.getManager(MessageBytes.class);
-
     // primary type ( whatever is set as original value )
     private int type = T_NULL;
 
     public static final int T_NULL = 0;
-    /** getType() is T_STR if the the object used to create the MessageBytes
-        was a String */
+    /**
+     * getType() is T_STR if the the object used to create the MessageBytes
+     * was a String.
+     */
     public static final int T_STR  = 1;
-    /** getType() is T_BYTES if the the object used to create the MessageBytes
-        was a byte[] */
+    /**
+     * getType() is T_BYTES if the the object used to create the MessageBytes
+     * was a byte[].
+     */
     public static final int T_BYTES = 2;
-    /** getType() is T_CHARS if the the object used to create the MessageBytes
-        was a char[] */
+    /**
+     * getType() is T_CHARS if the the object used to create the MessageBytes
+     * was a char[].
+     */
     public static final int T_CHARS = 3;
 
     public static final char[] EMPTY_CHAR_ARRAY = new char[0];
@@ -250,17 +251,6 @@ public final class MessageBytes implements Cloneable, Serializable {
             return;
         }
 
-        if (!JreCompat.isJre16Available() && getCharset() == ByteChunk.DEFAULT_CHARSET) {
-            if (type == T_CHARS) {
-                toBytesSimple(charC.getChars(), charC.getStart(), charC.getLength());
-            } else {
-                // Must be T_STR
-                char[] chars = strValue.toCharArray();
-                toBytesSimple(chars, 0, chars.length);
-            }
-            return;
-        }
-
         ByteBuffer bb;
         CharsetEncoder encoder = getCharset().newEncoder();
         encoder.onMalformedInput(CodingErrorAction.REPORT);
@@ -282,31 +272,6 @@ public final class MessageBytes implements Cloneable, Serializable {
         }
 
         byteC.setBytes(bb.array(), bb.arrayOffset(), bb.limit());
-        type = T_BYTES;
-    }
-
-
-    /**
-     * Simple conversion of chars to bytes.
-     *
-     * @throws IllegalArgumentException if any of the characters to convert are
-     *                                  above code point 0xFF.
-     */
-    private void toBytesSimple(char[] chars, int start, int len) {
-        byteC.recycle();
-        byteC.allocate(len, byteC.getLimit());
-        byte[] bytes = byteC.getBuffer();
-
-        for (int i = 0; i < len; i++) {
-            if (chars[i + start] > 255) {
-                throw new IllegalArgumentException(sm.getString("messageBytes.illegalCharacter",
-                        Character.toString(chars[i + start]), Integer.valueOf(chars[i + start])));
-            } else {
-                bytes[i] = (byte) chars[i + start];
-            }
-        }
-
-        byteC.setEnd(len);
         type = T_BYTES;
     }
 

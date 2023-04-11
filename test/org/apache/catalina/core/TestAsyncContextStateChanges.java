@@ -354,7 +354,7 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
         final boolean none;
         final boolean error;
 
-        private AsyncEnd(boolean none, boolean error) {
+        AsyncEnd(boolean none, boolean error) {
             this.none = none;
             this.error = error;
         }

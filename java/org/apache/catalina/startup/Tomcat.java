@@ -66,7 +66,6 @@ import org.apache.catalina.core.StandardService;
 import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
-import org.apache.catalina.security.SecurityClassLoad;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -240,7 +239,7 @@ public class Tomcat {
      *
      * @param contextPath The context mapping to use, "" for root context.
      * @param docBase     Base directory for the context, for static files. Must
-     *                        exist, relative to the server home
+     *                        exist and be an absolute path.
      *
      * @return the deployed context
      */
@@ -712,7 +711,7 @@ public class Tomcat {
      * @param host        The host in which the context will be deployed
      * @param contextPath The context mapping to use, "" for root context.
      * @param docBase     Base directory for the context, for static files. Must
-     *                        exist, relative to the server home
+     *                        exist and be an absolute path.
      *
      * @return the deployed context
      */
@@ -745,7 +744,7 @@ public class Tomcat {
      * @param host        The host in which the context will be deployed
      * @param contextPath The context mapping to use, "" for root context.
      * @param docBase     Base directory for the context, for static files. Must
-     *                        exist, relative to the server home
+     *                        exist and be an absolute path.
      * @param config      Custom context configuration helper. Any configuration
      *                        will be in addition to equivalent of the default
      *                        web.xml configuration described above.
@@ -1304,7 +1303,6 @@ public class Tomcat {
                 break;
             }
         }
-        SecurityClassLoad.securityClassLoad(Thread.currentThread().getContextClassLoader());
         org.apache.catalina.startup.Tomcat tomcat = new org.apache.catalina.startup.Tomcat();
         // Create a Catalina instance and let it parse the configuration files
         // It will also set a shutdown hook to stop the Server when needed

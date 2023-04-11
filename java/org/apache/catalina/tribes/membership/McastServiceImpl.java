@@ -23,7 +23,9 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
 import java.net.SocketTimeoutException;
+import java.net.StandardSocketOptions;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -217,12 +219,14 @@ public class McastServiceImpl extends MembershipProviderBase {
         } else {
             socket = new MulticastSocket(port);
         }
-        socket.setLoopbackMode(localLoopbackDisabled); //hint if we want disable loop back(local machine) messages
+        // Hint if we want disable loop back(local machine) messages
+        socket.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, Boolean.valueOf(!localLoopbackDisabled));
         if (mcastBindAddress != null) {
             if(log.isInfoEnabled()) {
                 log.info(sm.getString("mcastServiceImpl.setInterface", mcastBindAddress));
             }
-            socket.setInterface(mcastBindAddress);
+            NetworkInterface networkInterface = NetworkInterface.getByInetAddress(mcastBindAddress);
+            socket.setNetworkInterface(networkInterface);
         } //end if
         //force a so timeout so that we don't block forever
         if (mcastSoTimeout <= 0) {
@@ -258,7 +262,7 @@ public class McastServiceImpl extends MembershipProviderBase {
             }
             try {
                 if ( sender == null ) {
-                    socket.joinGroup(address);
+                    socket.joinGroup(new InetSocketAddress(address, 0), null);
                 }
             }catch (IOException iox) {
                 log.error(sm.getString("mcastServiceImpl.unable.join"));
@@ -275,7 +279,7 @@ public class McastServiceImpl extends MembershipProviderBase {
                 throw new IllegalStateException(sm.getString("mcastServiceImpl.send.running"));
             }
             if ( receiver == null ) {
-                socket.joinGroup(address);
+                socket.joinGroup(new InetSocketAddress(address, 0), null);
             }
             //make sure at least one packet gets out there
             send(false);
@@ -343,8 +347,16 @@ public class McastServiceImpl extends MembershipProviderBase {
             member.setCommand(Member.SHUTDOWN_PAYLOAD);
             send(false);
             //leave mcast group
-            try {socket.leaveGroup(address);}catch ( Exception ignore){}
-            try {socket.close();}catch ( Exception ignore){}
+            try {
+                socket.leaveGroup(new InetSocketAddress(address, 0), null);
+                } catch ( Exception ignore) {
+                    // NO-OP
+                }
+            try {
+                socket.close();
+            } catch (Exception ignore) {
+                // NO-OP
+            }
             member.setServiceStartTime(-1);
         }
         return (startLevel == 0);
@@ -388,18 +400,19 @@ public class McastServiceImpl extends MembershipProviderBase {
             log.trace("Mcast receive ping from member " + m);
         }
         Runnable t = null;
+        Thread currentThread = Thread.currentThread();
         if (Arrays.equals(m.getCommand(), Member.SHUTDOWN_PAYLOAD)) {
             if (log.isDebugEnabled()) {
                 log.debug("Member has shutdown:" + m);
             }
             membership.removeMember(m);
             t = () -> {
-                String name = Thread.currentThread().getName();
+                String name = currentThread.getName();
                 try {
-                    Thread.currentThread().setName("Membership-MemberDisappeared");
+                    currentThread.setName("Membership-MemberDisappeared");
                     service.memberDisappeared(m);
-                }finally {
-                    Thread.currentThread().setName(name);
+                } finally {
+                    currentThread.setName(name);
                 }
             };
         } else if (membership.memberAlive(m)) {
@@ -407,16 +420,16 @@ public class McastServiceImpl extends MembershipProviderBase {
                 log.debug("Mcast add member " + m);
             }
             t = () -> {
-                String name = Thread.currentThread().getName();
+                String name = currentThread.getName();
                 try {
-                    Thread.currentThread().setName("Membership-MemberAdded");
+                    currentThread.setName("Membership-MemberAdded");
                     service.memberAdded(m);
-                }finally {
-                    Thread.currentThread().setName(name);
+                } finally {
+                    currentThread.setName(name);
                 }
             };
-        } //end if
-        if ( t != null ) {
+        }
+        if (t != null) {
             executor.execute(t);
         }
     }
@@ -437,9 +450,10 @@ public class McastServiceImpl extends MembershipProviderBase {
                 }
             }
             Runnable t = () -> {
-                String name = Thread.currentThread().getName();
+                Thread currentThread = Thread.currentThread();
+                String name = currentThread.getName();
                 try {
-                    Thread.currentThread().setName("Membership-MemberAdded");
+                    currentThread.setName("Membership-MemberAdded");
                     for (ChannelData datum : data) {
                         try {
                             if (datum != null && !member.equals(datum.getAddress())) {
@@ -455,8 +469,8 @@ public class McastServiceImpl extends MembershipProviderBase {
                             log.error(sm.getString("mcastServiceImpl.unableReceive.broadcastMessage"), t1);
                         }
                     }
-                }finally {
-                    Thread.currentThread().setName(name);
+                } finally {
+                    currentThread.setName(name);
                 }
             };
             executor.execute(t);
@@ -473,12 +487,13 @@ public class McastServiceImpl extends MembershipProviderBase {
                 }
                 try {
                     Runnable t = () -> {
-                        String name = Thread.currentThread().getName();
+                        Thread currentThread = Thread.currentThread();
+                        String name = currentThread.getName();
                         try {
-                            Thread.currentThread().setName("Membership-MemberExpired");
+                            currentThread.setName("Membership-MemberExpired");
                             service.memberDisappeared(member);
                         } finally {
-                            Thread.currentThread().setName(name);
+                            currentThread.setName(name);
                         }
                     };
                     executor.execute(t);
