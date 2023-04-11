@@ -33,12 +33,10 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class HttpMessages {
 
-    private static final Map<Locale,HttpMessages> instances =
-            new ConcurrentHashMap<>();
+    private static final Map<Locale, HttpMessages> instances = new ConcurrentHashMap<>();
 
     private static final HttpMessages DEFAULT = new HttpMessages(
-            StringManager.getManager("org.apache.tomcat.util.http.res",
-                    Locale.getDefault()));
+            StringManager.getManager("org.apache.tomcat.util.http.res", Locale.getDefault()));
 
 
     // XXX move message resources in this package
@@ -56,55 +54,52 @@ public class HttpMessages {
 
 
     /**
-     * Get the status string associated with a status code. Common messages are
-     * cached.
+     * Get the status string associated with a status code. Common messages are cached.
      *
      * @param status The HTTP status code to retrieve the message for
      *
-     * @return The HTTP status string that conforms to the requirements of the
-     *         HTTP specification
+     * @return The HTTP status string that conforms to the requirements of the HTTP specification
      */
     public String getMessage(int status) {
         // method from Response.
 
         // Does HTTP requires/allow international messages or
         // are pre-defined? The user doesn't see them most of the time
-        switch( status ) {
-        case 200:
-            if(st_200 == null ) {
-                st_200 = sm.getString("sc.200");
-            }
-            return st_200;
-        case 302:
-            if(st_302 == null ) {
-                st_302 = sm.getString("sc.302");
-            }
-            return st_302;
-        case 400:
-            if(st_400 == null ) {
-                st_400 = sm.getString("sc.400");
-            }
-            return st_400;
-        case 404:
-            if(st_404 == null ) {
-                st_404 = sm.getString("sc.404");
-            }
-            return st_404;
-        case 500:
-            if (st_500 == null) {
-                st_500 = sm.getString("sc.500");
-            }
-            return st_500;
+        switch (status) {
+            case 200:
+                if (st_200 == null) {
+                    st_200 = sm.getString("sc.200");
+                }
+                return st_200;
+            case 302:
+                if (st_302 == null) {
+                    st_302 = sm.getString("sc.302");
+                }
+                return st_302;
+            case 400:
+                if (st_400 == null) {
+                    st_400 = sm.getString("sc.400");
+                }
+                return st_400;
+            case 404:
+                if (st_404 == null) {
+                    st_404 = sm.getString("sc.404");
+                }
+                return st_404;
+            case 500:
+                if (st_500 == null) {
+                    st_500 = sm.getString("sc.500");
+                }
+                return st_500;
         }
-        return sm.getString("sc."+ status);
+        return sm.getString("sc." + status);
     }
 
 
     public static HttpMessages getInstance(Locale locale) {
         HttpMessages result = instances.get(locale);
         if (result == null) {
-            StringManager sm = StringManager.getManager(
-                    "org.apache.tomcat.util.http.res", locale);
+            StringManager sm = StringManager.getManager("org.apache.tomcat.util.http.res", locale);
             if (Locale.getDefault().equals(sm.getLocale())) {
                 result = DEFAULT;
             } else {
@@ -117,12 +112,12 @@ public class HttpMessages {
 
 
     /**
-     * Is the provided message safe to use in an HTTP header. Safe messages must
-     * meet the requirements of RFC2616 - i.e. must consist only of TEXT.
+     * Is the provided message safe to use in an HTTP header. Safe messages must meet the requirements of RFC2616 - i.e.
+     * must consist only of TEXT.
      *
-     * @param msg   The message to test
-     * @return      <code>true</code> if the message is safe to use in an HTTP
-     *              header else <code>false</code>
+     * @param msg The message to test
+     *
+     * @return <code>true</code> if the message is safe to use in an HTTP header else <code>false</code>
      */
     public static boolean isSafeInHttpHeader(String msg) {
         // Nulls are fine. It is up to the calling code to address any NPE
