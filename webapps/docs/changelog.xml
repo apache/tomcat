@@ -251,6 +251,12 @@
         to the jvm in <code>catalina.sh</code> when calling <code>version</code>.
         Patch suggested by Eric Hamilton. (lihan)
       </fix>
+      <fix>
+        Improve the error messages if <code>JRE_HOME</code> or
+        <code>JAVA_HOME</code> are not set correctly. On windows, align the
+        handling of <code>JRE_HOME</code> and <code>JAVA_HOME</code> for the
+        start-up scripts and the service install script. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

@@ -103,36 +103,49 @@ exit /b 1
 cd "%CURRENT_DIR%"
 
 rem Make sure prerequisite environment variables are set
-if not "%JAVA_HOME%" == "" goto gotJdkHome
 if not "%JRE_HOME%" == "" goto gotJreHome
+if not "%JAVA_HOME%" == "" goto gotJavaHome
 echo Neither the JAVA_HOME nor the JRE_HOME environment variable is defined
 echo Service will try to guess them from the registry.
-goto okJavaHome
-:gotJreHome
-if not exist "%JRE_HOME%\bin\java.exe" goto noJavaHome
-goto okJavaHome
-:gotJdkHome
-if not exist "%JAVA_HOME%\bin\javac.exe" goto noJavaHome
+goto okJava
+
+:gotJavaHome
+rem No JRE given, check if JAVA_HOME is usable as JRE_HOME
 rem Java 9 has a different directory structure
 if exist "%JAVA_HOME%\jre\bin\java.exe" goto preJava9Layout
-if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHome
-if not "%JRE_HOME%" == "" goto okJavaHome
+if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHomeAsJre
+rem Use JAVA_HOME as JRE_HOME
 set "JRE_HOME=%JAVA_HOME%"
-goto okJavaHome
+goto okJava
+
 :preJava9Layout
-if not "%JRE_HOME%" == "" goto okJavaHome
+rem Use JAVA_HOME\jre as JRE_HOME
 set "JRE_HOME=%JAVA_HOME%\jre"
-goto okJavaHome
-:noJavaHome
-echo The JAVA_HOME environment variable is not defined correctly
-echo This environment variable is needed to run this program
-echo NB: JAVA_HOME should point to a JDK not a JRE
+goto okJava
+
+:noJavaHomeAsJre
+echo The JAVA_HOME environment variable is not defined correctly.
+echo JAVA_HOME=%JAVA_HOME%
+echo NB: JAVA_HOME should point to a JDK not a JRE.
 exit /b 1
-:okJavaHome
+
+:gotJreHome
+rem Check if we have a usable JRE
+if not exist "%JRE_HOME%\bin\java.exe" goto noJreHome
+goto okJava
+
+:noJreHome
+rem Needed at least a JRE
+echo The JRE_HOME environment variable is not defined correctly
+echo JRE_HOME=%JRE_HOME%
+echo This environment variable is needed to run this program
+exit /b 1
+
+:okJava
 if not "%CATALINA_BASE%" == "" goto gotBase
 set "CATALINA_BASE=%CATALINA_HOME%"
-:gotBase
 
+:gotBase
 rem Java 9 no longer supports the java.endorsed.dirs
 rem system property. Only try to use it if
 rem JAVA_ENDORSED_DIRS was explicitly set
