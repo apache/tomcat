@@ -189,6 +189,11 @@
         avoid possible JVM thread creation in the webapp context on some
         platforms. (remm)
       </fix>
+      <update>
+        Make the server utility executor available to webapps using a Servlet
+        context attribute named
+        <code>org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor</code>. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
