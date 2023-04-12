@@ -84,7 +84,7 @@ public class TestKeyHeader extends WebSocketBaseTest {
             // Read (and ignore) the response
             byte[] buf = new byte[256];
             while (client.read(buf) > 0) {
-            	// Ignore
+                // Ignore
             }
         }
         client.closeSocket();
