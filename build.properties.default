@@ -285,10 +285,10 @@ checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
 
 # ----- JaCoCo code coverage tool -----
-jacoco.version=0.8.8
+jacoco.version=0.8.9
 jacoco.checksum.enabled=true
 jacoco.checksum.algorithm=MD5|SHA-1
-jacoco.checksum.value=10a812712aa9d4bf02ad975e3e1364e4|1be58e3d5cd4f09d6b79cf9f43fc481e481e8f52
+jacoco.checksum.value=a158dfd8d88760ee615854fb27ad3a88|2f29cf6431a011f538c768e56a0b358a9f00f52d
 jacoco.home=${base.path}/jacoco-${jacoco.version}
 jacoco.jar=${jacoco.home}/lib/jacocoant.jar
 jacoco.loc=${base-maven.loc}/org/jacoco/jacoco/${jacoco.version}/jacoco-${jacoco.version}.zip
