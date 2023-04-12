@@ -2808,24 +2808,24 @@ asf.ldap.username=${release.asfusername}
          encoding="UTF8">
       <zipfileset file="${tomcat.dist}" fullpath="${final.name}"/>
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
-        <include name="bin/**"/>
-        <include name="conf/**"/>
-        <include name="logs/**"/>
-        <include name="lib/**"/>
-        <include name="webapps/**"/>
-        <include name="work/**"/>
-        <include name="temp/**"/>
-        <include name="LICENSE"/>
-        <include name="NOTICE"/>
-        <include name="README.md"/>
-        <include name="RELEASE-NOTES"/>
-        <include name="RUNNING.txt"/>
+        <include name="bin/**" />
         <include name="BUILDING.txt" />
-        <include name="CONTRIBUTING.md"/>
-        <exclude name="bin/service.bat"/>
-        <exclude name="bin/x64/"/>
-        <exclude name="bin/*.exe"/>
-        <exclude name="bin/*.dll"/>
+        <include name="conf/**" />
+        <include name="CONTRIBUTING.md" />
+        <include name="lib/**" />
+        <include name="LICENSE" />
+        <include name="logs/**" />
+        <include name="NOTICE" />
+        <include name="README.md" />
+        <include name="RELEASE-NOTES" />
+        <include name="RUNNING.txt" />
+        <include name="temp/**" />
+        <include name="webapps/**" />
+        <include name="work/**" />
+        <exclude name="bin/*.dll" />
+        <exclude name="bin/*.exe" />
+        <exclude name="bin/*.sh" />
+        <exclude name="bin/x64/" />
       </zipfileset>
     </zip>
 
@@ -2945,25 +2945,24 @@ asf.ldap.username=${release.asfusername}
       </tarfileset>
       <tarfileset dir="${tomcat.dist}" dirmode="750" filemode="640" prefix="${final.name}">
         <include name="bin/**" />
+        <include name="BUILDING.txt" />
+        <include name="conf/**" />
+        <include name="CONTRIBUTING.md" />
         <include name="lib/**" />
-        <include name="logs/**" />
-        <include name="temp/**" />
-        <include name="webapps/**" />
-        <include name="work/**" />
         <include name="LICENSE" />
+        <include name="logs/**" />
         <include name="NOTICE" />
         <include name="README.md" />
         <include name="RELEASE-NOTES" />
         <include name="RUNNING.txt" />
-        <include name="BUILDING.txt" />
-        <include name="CONTRIBUTING.md"/>
-        <exclude name="conf/**" />
-        <exclude name="src/**" />
-        <exclude name="bin/service.bat"/>
-        <exclude name="bin/*.sh"/>
-        <exclude name="bin/x64/"/>
-        <exclude name="bin/*.exe"/>
-        <exclude name="bin/*.dll"/>
+        <include name="temp/**" />
+        <include name="webapps/**" />
+        <include name="work/**" />
+        <exclude name="bin/*.dll" />
+        <exclude name="bin/*.exe" />
+        <exclude name="bin/*.sh" />
+        <exclude name="bin/x64/" />
+        <exclude name="bin/*.bat"/>
       </tarfileset>
       <!-- These need to be added after the bin directory is added else the  -->
       <!-- bin directory will pick up the wrong permissions.                 -->
