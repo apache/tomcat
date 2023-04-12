@@ -99,6 +99,10 @@ public class TesterWsClient {
         socket.close();
     }
 
+    public int read(byte[] bytes) throws IOException {
+        return socket.getInputStream().read(bytes);
+    }
+
     public void write(byte[] bytes) throws IOException {
         socket.getOutputStream().write(bytes);
         socket.getOutputStream().flush();
