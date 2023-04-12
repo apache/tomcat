@@ -97,17 +97,17 @@
     <!-- ~9000 errors
     <module name="MissingJavadocMethod"/>
     -->
-    <!-- ~1400 errors
+    <!-- ~1500 errors
     <module name="MissingJavadocType"/>
     -->
     <module name="NonEmptyAtclauseDescription"/>
-    <!-- ~1500 errors
+    <!-- ~1400 errors
     <module name="RequireEmptyLineBeforeBlockTagGroup"/>
     -->
     <module name="SingleLineJavadoc"/>
 
     <!-- Miscellaneous -->
-    <!-- ~4100 errors
+    <!-- ~3300 errors
     <module name="Indentation">
         <property name="lineWrappingIndentation" value="8"/>
     </module>
@@ -121,7 +121,7 @@
     <module name="GenericWhitespace"/>
     <module name="EmptyForInitializerPad"/>
     <module name="EmptyForIteratorPad"/>
-    <!--  ~ 1100 errors
+    <!--  ~ 1000 errors
     <module name="OperatorWrap">
       <property name="option" value="eol"/>
     </module>
