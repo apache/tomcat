@@ -309,7 +309,10 @@
         Update to the Eclipse JDT compiler 4.27. (markt)
       </update>
       <update>
-        Update Unboundid to 6.0.8. (markt)
+        Update UnboundID to 6.0.8. (markt)
+      </update>
+      <update>
+        Update Checkstyle to 10.9.3. (markt)
       </update>
     </changelog>
   </subsection>
