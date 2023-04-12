@@ -236,6 +236,11 @@
         <bug>66536</bug>: Fix parsing of tag files that meant that tag
         directives could be ignored for some tag files. (markt)
       </fix>
+      <add>
+        Align the EL implementation with the latest changes to the Jakarta EL
+        specification and add support for the length attribute to the
+        <code>ArrayElResolver</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">

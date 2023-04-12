@@ -24,6 +24,8 @@ import java.util.Objects;
  */
 public class ArrayELResolver extends ELResolver {
 
+    private static final String LENGTH_PROPERTY_NAME = "length";
+
     private final boolean readOnly;
 
     /**
@@ -73,6 +75,9 @@ public class ArrayELResolver extends ELResolver {
 
         if (base != null && base.getClass().isArray()) {
             context.setPropertyResolved(base, property);
+            if (LENGTH_PROPERTY_NAME.equals(property)) {
+                return Integer.valueOf(Array.getLength(base));
+            }
             int idx = coerce(property);
             if (idx < 0 || idx >= Array.getLength(base)) {
                 return null;
