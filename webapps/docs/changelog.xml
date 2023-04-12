@@ -272,6 +272,9 @@
         handling of <code>JRE_HOME</code> and <code>JAVA_HOME</code> for the
         start-up scripts and the service install script. (markt)
       </fix>
+      <update>
+        Update Unboundid to 6.0.8. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
