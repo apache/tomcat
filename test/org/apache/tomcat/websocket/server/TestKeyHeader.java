@@ -81,6 +81,11 @@ public class TestKeyHeader extends WebSocketBaseTest {
 
         if (expectedStatusCode == HttpServletResponse.SC_SWITCHING_PROTOCOLS) {
             client.sendCloseFrame(CloseCodes.NORMAL_CLOSURE);
+            // Read (and ignore) the response
+            byte[] buf = new byte[256];
+            while (client.read(buf) > 0) {
+            	// Ignore
+            }
         }
         client.closeSocket();
     }
