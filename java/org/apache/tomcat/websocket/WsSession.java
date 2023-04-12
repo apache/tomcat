@@ -545,6 +545,11 @@ public class WsSession implements Session {
     }
 
 
+    public boolean isClosed() {
+    	return state == State.CLOSED;
+    }
+
+
     @Override
     public long getMaxIdleTimeout() {
         checkState();
