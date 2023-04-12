@@ -273,7 +273,10 @@
         start-up scripts and the service install script. (markt)
       </fix>
       <update>
-        Update Unboundid to 6.0.8. (markt)
+        Update UnboundID to 6.0.8. (markt)
+      </update>
+      <update>
+        Update Checkstyle to 10.9.3. (markt)
       </update>
     </changelog>
   </subsection>
