@@ -186,10 +186,15 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                 return SocketState.CLOSED;
 
         }
-        if (wsFrame.isOpen()) {
-            return SocketState.UPGRADED;
-        } else {
+
+        /*
+         * If a CLOSE frame has been received then wsFrame will be closed but need to keep the connection open until the
+         * CLOSE frame has been sent. Hence use the wsSession.isClosed() rather than wsFrame.isOpen() here.
+         */
+        if (wsSession.isClosed()) {
             return SocketState.CLOSED;
+        } else {
+            return SocketState.UPGRADED;
         }
     }
 
