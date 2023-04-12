@@ -463,7 +463,7 @@ public class WsSession implements Session {
 
 
     public boolean isClosed() {
-    	return state == State.CLOSED;
+        return state == State.CLOSED;
     }
 
 
