@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
 
 import javax.naming.NamingException;
 
@@ -619,7 +620,8 @@ public class WsSession implements Session {
      */
     public void onClose(CloseReason closeReason) {
 
-        wsRemoteEndpoint.getLock().lock();
+        Lock lock =  wsRemoteEndpoint.getLock();
+        lock.lock();
         try {
             if (state != State.CLOSED) {
                 try {
@@ -639,7 +641,7 @@ public class WsSession implements Session {
                 wsRemoteEndpoint.close();
             }
         } finally {
-            wsRemoteEndpoint.getLock().unlock();
+            lock.unlock();
         }
     }
 
