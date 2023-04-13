@@ -2671,6 +2671,24 @@
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
   </Match>
   <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestClose" />
+    <Method name="setUp" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestWsRemoteEndpointImplServerDeadlock" />
+    <Method name="testTemporaryDeadlockOnClientClose" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestWsRemoteEndpointImplServerDeadlock$Bug66508Endpoint" />
+    <Method name="onOpen" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
     <!-- Return value of latch is intentionally ignored -->
     <Or>
       <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClient"/>
@@ -2678,12 +2696,6 @@
     </Or>
     <Method name="testConnectToServerEndpoint"/>
     <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
-  </Match>
-  <Match>
-    <!-- Statics are used deliberately as they are simpler -->
-    <Class name="org.apache.tomcat.websocket.server.TestClose" />
-    <Method name="setUp" />
-    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
   </Match>
   <Match>
     <!-- Statics are used deliberately as they are simpler -->
