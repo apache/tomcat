@@ -2565,6 +2565,18 @@
     </Or>
   </Match>
   <Match>
+    <!-- Array contents is not mutated -->
+    <Class name="org.apache.tomcat.websocket.pojo.TestEncodingDecoding$MsgByte"/>
+    <Field name="data"/>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestClose" />
+    <Method name="setUp" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
     <!-- Statics are used deliberately as they are simpler -->
     <Class name="org.apache.tomcat.websocket.server.TestWsRemoteEndpointImplServerDeadlock" />
     <Method name="testTemporaryDeadlockOnClientClose" />
@@ -2602,18 +2614,6 @@
       <Field name="running" />
       <Field name="timeout" />
     </Or>
-    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
-  </Match>
-  <Match>
-    <!-- Array contents is not mutated -->
-    <Class name="org.apache.tomcat.websocket.pojo.TestEncodingDecoding$MsgByte"/>
-    <Field name="data"/>
-    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
-  </Match>
-  <Match>
-    <!-- Statics are used deliberately as they are simpler -->
-    <Class name="org.apache.tomcat.websocket.server.TestClose" />
-    <Method name="setUp" />
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
   </Match>
   <Match>
