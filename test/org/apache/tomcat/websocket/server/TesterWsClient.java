@@ -74,10 +74,18 @@ public class TesterWsClient {
 
     public int readUpgradeResponse() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        int result = -1;
         String line = in.readLine();
-        // line expected to be "HTTP/1.1 nnn "
-        int result = Integer.parseInt(line.substring(9, 12));
         while (line != null && !line.isEmpty()) {
+            if (result == -1) {
+                if (line.length() > 11) {
+                    // First line expected to be "HTTP/1.1 nnn "
+                    result = Integer.parseInt(line.substring(9, 12));
+                } else {
+                    // No response code - treat as server error for this test
+                    result = 500;
+                }
+            }
             line = in.readLine();
         }
         return result;
