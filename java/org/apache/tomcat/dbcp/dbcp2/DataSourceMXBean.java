@@ -142,6 +142,7 @@ public interface DataSourceMXBean {
      *
      * @return {@link BasicDataSource#getMaxConnLifetimeMillis()}.
      */
+    @SuppressWarnings("javadoc")
     long getMaxConnLifetimeMillis();
 
     /**
@@ -170,6 +171,7 @@ public interface DataSourceMXBean {
      *
      * @return {@link BasicDataSource#getMaxWaitMillis()}.
      */
+    @SuppressWarnings("javadoc")
     long getMaxWaitMillis();
 
     /**
@@ -177,6 +179,7 @@ public interface DataSourceMXBean {
      *
      * @return {@link BasicDataSource#getMinEvictableIdleTimeMillis()}.
      */
+    @SuppressWarnings("javadoc")
     long getMinEvictableIdleTimeMillis();
 
     /**
@@ -226,6 +229,7 @@ public interface DataSourceMXBean {
      *
      * @return {@link BasicDataSource#getRemoveAbandonedTimeout()}.
      */
+    @SuppressWarnings("javadoc")
     int getRemoveAbandonedTimeout();
 
     /**
@@ -233,6 +237,7 @@ public interface DataSourceMXBean {
      *
      * @return {@link BasicDataSource#getSoftMinEvictableIdleTimeMillis()}.
      */
+    @SuppressWarnings("javadoc")
     long getSoftMinEvictableIdleTimeMillis();
 
     /**
@@ -261,6 +266,7 @@ public interface DataSourceMXBean {
      *
      * @return {@link BasicDataSource#getTimeBetweenEvictionRunsMillis()}.
      */
+    @SuppressWarnings("javadoc")
     long getTimeBetweenEvictionRunsMillis();
 
     /**
@@ -289,6 +295,7 @@ public interface DataSourceMXBean {
      *
      * @return {@link BasicDataSource#getValidationQueryTimeout()}.
      */
+    @SuppressWarnings("javadoc")
     int getValidationQueryTimeout();
 
     /**
