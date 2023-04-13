@@ -72,7 +72,7 @@ public abstract class AuthConfigFactory {
                     // should not be used since that would trigger a memory leak
                     // in container environments.
                     if (className.equals("org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl")) {
-                        factory =  new org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl();
+                        factory = new org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl();
                     } else {
                         Class<?> clazz = Class.forName(className);
                         factory = (AuthConfigFactory) clazz.getConstructor().newInstance();
@@ -96,13 +96,12 @@ public abstract class AuthConfigFactory {
     public abstract String registerConfigProvider(String className, Map<String,String> properties, String layer,
             String appContext, String description);
 
-    public abstract String registerConfigProvider(AuthConfigProvider provider, String layer,
-            String appContext, String description);
+    public abstract String registerConfigProvider(AuthConfigProvider provider, String layer, String appContext,
+            String description);
 
     public abstract boolean removeRegistration(String registrationID);
 
-    public abstract String[] detachListener(RegistrationListener listener, String layer,
-            String appContext);
+    public abstract String[] detachListener(RegistrationListener listener, String layer, String appContext);
 
     public abstract String[] getRegistrationIDs(AuthConfigProvider provider);
 
@@ -111,14 +110,12 @@ public abstract class AuthConfigFactory {
     public abstract void refresh();
 
     /**
-     * Convenience method for registering a {@link ServerAuthModule} that should
-     * have the same effect as calling {@link
-     * #registerConfigProvider(AuthConfigProvider, String, String, String)} with
-     * the implementation providing the appropriate {@link AuthConfigProvider}
-     * generated from the provided context.
+     * Convenience method for registering a {@link ServerAuthModule} that should have the same effect as calling
+     * {@link #registerConfigProvider(AuthConfigProvider, String, String, String)} with the implementation providing the
+     * appropriate {@link AuthConfigProvider} generated from the provided context.
      *
-     * @param serverAuthModule  The {@link ServerAuthModule} to register
-     * @param context           The associated application context
+     * @param serverAuthModule The {@link ServerAuthModule} to register
+     * @param context          The associated application context
      *
      * @return A string identifier for the created registration
      *
@@ -127,11 +124,10 @@ public abstract class AuthConfigFactory {
     public abstract String registerServerAuthModule(ServerAuthModule serverAuthModule, Object context);
 
     /**
-     * Convenience method for deregistering a {@link ServerAuthModule} that
-     * should have the same effect as calling
+     * Convenience method for deregistering a {@link ServerAuthModule} that should have the same effect as calling
      * {@link AuthConfigFactory#removeRegistration(String)}.
      *
-     * @param context           The associated application context
+     * @param context The associated application context
      *
      * @since Authentication 3.0
      */

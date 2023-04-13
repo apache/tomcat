@@ -26,8 +26,8 @@ import jakarta.security.auth.message.MessagePolicy;
 
 public interface ClientAuthModule extends ClientAuth {
 
-    void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
-            CallbackHandler handler, Map<String,Object> options) throws AuthException;
+    void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy, CallbackHandler handler,
+            Map<String,Object> options) throws AuthException;
 
     Class<?>[] getSupportedMessageTypes();
 }
