@@ -43,10 +43,8 @@ import jakarta.servlet.jsp.PageContext;
  */
 public class ImplicitObjectELResolver extends ELResolver {
 
-    private static final String[] SCOPE_NAMES = new String[] {
-            "applicationScope", "cookie", "header", "headerValues",
-            "initParam", "pageContext", "pageScope", "param", "paramValues",
-            "requestScope", "sessionScope" };
+    private static final String[] SCOPE_NAMES = new String[] { "applicationScope", "cookie", "header", "headerValues",
+            "initParam", "pageContext", "pageScope", "param", "paramValues", "requestScope", "sessionScope" };
 
     private static final int APPLICATIONSCOPE = 0;
 
@@ -85,8 +83,7 @@ public class ImplicitObjectELResolver extends ELResolver {
             int idx = Arrays.binarySearch(SCOPE_NAMES, property.toString());
 
             if (idx >= 0) {
-                PageContext page = (PageContext) context
-                        .getContext(JspContext.class);
+                PageContext page = (PageContext) context.getContext(JspContext.class);
                 context.setPropertyResolved(base, property);
                 switch (idx) {
                     case APPLICATIONSCOPE:
@@ -131,8 +128,7 @@ public class ImplicitObjectELResolver extends ELResolver {
     }
 
     @Override
-    public void setValue(ELContext context, Object base, Object property,
-            Object value) {
+    public void setValue(ELContext context, Object base, Object property, Object value) {
         Objects.requireNonNull(context);
 
         if (base == null && property != null) {
@@ -270,14 +266,12 @@ public class ImplicitObjectELResolver extends ELResolver {
                 this.header = new ScopeMap<>() {
                     @Override
                     protected Enumeration<String> getAttributeNames() {
-                        return ((HttpServletRequest) page.getRequest())
-                                .getHeaderNames();
+                        return ((HttpServletRequest) page.getRequest()).getHeaderNames();
                     }
 
                     @Override
                     protected String getAttribute(String name) {
-                        return ((HttpServletRequest) page.getRequest())
-                                .getHeader(name);
+                        return ((HttpServletRequest) page.getRequest()).getHeader(name);
                     }
                 };
             }
@@ -289,8 +283,7 @@ public class ImplicitObjectELResolver extends ELResolver {
                 this.headerValues = new ScopeMap<>() {
                     @Override
                     protected Enumeration<String> getAttributeNames() {
-                        return ((HttpServletRequest) page.getRequest())
-                                .getHeaderNames();
+                        return ((HttpServletRequest) page.getRequest()).getHeaderNames();
                     }
 
                     @Override
@@ -347,8 +340,7 @@ public class ImplicitObjectELResolver extends ELResolver {
 
                     @Override
                     protected Enumeration<String> getAttributeNames() {
-                        return page.getAttributeNamesInScope(
-                                PageContext.PAGE_SCOPE);
+                        return page.getAttributeNamesInScope(PageContext.PAGE_SCOPE);
                     }
 
                     @Override
@@ -426,8 +418,7 @@ public class ImplicitObjectELResolver extends ELResolver {
                 this.sessionScope = new ScopeMap<>() {
                     @Override
                     protected void setAttribute(String name, Object value) {
-                        ((HttpServletRequest) page.getRequest()).getSession()
-                                .setAttribute(name, value);
+                        ((HttpServletRequest) page.getRequest()).getSession().setAttribute(name, value);
                     }
 
                     @Override
@@ -480,7 +471,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         @Override
         public final Set<Map.Entry<String,V>> entrySet() {
             Enumeration<String> e = getAttributeNames();
-            Set<Map.Entry<String, V>> set = new HashSet<>();
+            Set<Map.Entry<String,V>> set = new HashSet<>();
             if (e != null) {
                 while (e.hasMoreElements()) {
                     set.add(new ScopeEntry(e.nextElement()));
