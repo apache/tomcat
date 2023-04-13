@@ -22,8 +22,8 @@ import jakarta.servlet.annotation.ServletSecurity.EmptyRoleSemantic;
 import jakarta.servlet.annotation.ServletSecurity.TransportGuarantee;
 
 /**
- * Equivalent of {@link jakarta.servlet.annotation.HttpConstraint} for
- * programmatic configuration of security constraints.
+ * Equivalent of {@link jakarta.servlet.annotation.HttpConstraint} for programmatic configuration of security
+ * constraints.
  *
  * @since Servlet 3.0
  */
@@ -47,11 +47,9 @@ public class HttpConstraintElement {
     }
 
     /**
-     * Construct a constraint with an empty role semantic. Typically used with
-     * {@link EmptyRoleSemantic#DENY}.
+     * Construct a constraint with an empty role semantic. Typically used with {@link EmptyRoleSemantic#DENY}.
      *
-     * @param emptyRoleSemantic The empty role semantic to apply to the newly
-     *                          created constraint
+     * @param emptyRoleSemantic The empty role semantic to apply to the newly created constraint
      */
     public HttpConstraintElement(EmptyRoleSemantic emptyRoleSemantic) {
         this.emptyRoleSemantic = emptyRoleSemantic;
@@ -62,36 +60,28 @@ public class HttpConstraintElement {
     /**
      * Construct a constraint with a transport guarantee and roles.
      *
-     * @param transportGuarantee The transport guarantee to apply to the newly
-     *                           created constraint
-     * @param rolesAllowed       The roles to associate with the newly created
-     *                           constraint
+     * @param transportGuarantee The transport guarantee to apply to the newly created constraint
+     * @param rolesAllowed       The roles to associate with the newly created constraint
      */
-    public HttpConstraintElement(TransportGuarantee transportGuarantee,
-            String... rolesAllowed) {
+    public HttpConstraintElement(TransportGuarantee transportGuarantee, String... rolesAllowed) {
         this.emptyRoleSemantic = EmptyRoleSemantic.PERMIT;
         this.transportGuarantee = transportGuarantee;
         this.rolesAllowed = rolesAllowed;
     }
 
     /**
-     * Construct a constraint with an empty role semantic, a transport guarantee
-     * and roles.
+     * Construct a constraint with an empty role semantic, a transport guarantee and roles.
      *
-     * @param emptyRoleSemantic The empty role semantic to apply to the newly
-     *                          created constraint
-     * @param transportGuarantee The transport guarantee to apply to the newly
-     *                           created constraint
-     * @param rolesAllowed       The roles to associate with the newly created
-     *                           constraint
+     * @param emptyRoleSemantic  The empty role semantic to apply to the newly created constraint
+     * @param transportGuarantee The transport guarantee to apply to the newly created constraint
+     * @param rolesAllowed       The roles to associate with the newly created constraint
+     *
      * @throws IllegalArgumentException if roles are specified when DENY is used
      */
-    public HttpConstraintElement(EmptyRoleSemantic emptyRoleSemantic,
-            TransportGuarantee transportGuarantee, String... rolesAllowed) {
-        if (rolesAllowed != null && rolesAllowed.length > 0 &&
-                EmptyRoleSemantic.DENY.equals(emptyRoleSemantic)) {
-            throw new IllegalArgumentException(lStrings.getString(
-                    "httpConstraintElement.invalidRolesDeny"));
+    public HttpConstraintElement(EmptyRoleSemantic emptyRoleSemantic, TransportGuarantee transportGuarantee,
+            String... rolesAllowed) {
+        if (rolesAllowed != null && rolesAllowed.length > 0 && EmptyRoleSemantic.DENY.equals(emptyRoleSemantic)) {
+            throw new IllegalArgumentException(lStrings.getString("httpConstraintElement.invalidRolesDeny"));
         }
         this.emptyRoleSemantic = emptyRoleSemantic;
         this.transportGuarantee = transportGuarantee;
@@ -100,6 +90,7 @@ public class HttpConstraintElement {
 
     /**
      * TODO
+     *
      * @return TODO
      */
     public EmptyRoleSemantic getEmptyRoleSemantic() {
@@ -108,6 +99,7 @@ public class HttpConstraintElement {
 
     /**
      * TODO
+     *
      * @return TODO
      */
     public TransportGuarantee getTransportGuarantee() {
@@ -116,6 +108,7 @@ public class HttpConstraintElement {
 
     /**
      * TODO
+     *
      * @return TODO
      */
     public String[] getRolesAllowed() {

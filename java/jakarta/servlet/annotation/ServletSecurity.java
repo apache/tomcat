@@ -24,10 +24,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Declare this annotation on a {@link jakarta.servlet.Servlet} implementation
- * class to enforce security constraints on HTTP protocol requests.<br>
- * The container applies constraints to the URL patterns mapped to each Servlet
- * which declares this annotation.<br>
+ * Declare this annotation on a {@link jakarta.servlet.Servlet} implementation class to enforce security constraints on
+ * HTTP protocol requests.<br>
+ * The container applies constraints to the URL patterns mapped to each Servlet which declares this annotation.<br>
  * <br>
  *
  * @since Servlet 3.0
@@ -39,14 +38,12 @@ import java.lang.annotation.Target;
 public @interface ServletSecurity {
 
     /**
-     * Represents the two possible values of the empty role semantic, active
-     * when a list of role names is empty.
+     * Represents the two possible values of the empty role semantic, active when a list of role names is empty.
      */
     enum EmptyRoleSemantic {
 
         /**
-         * Access MUST be permitted, regardless of authentication state or
-         * identity
+         * Access MUST be permitted, regardless of authentication state or identity
          */
         PERMIT,
 
@@ -73,16 +70,14 @@ public @interface ServletSecurity {
     }
 
     /**
-     * The default constraint to apply to requests not handled by specific
-     * method constraints
+     * The default constraint to apply to requests not handled by specific method constraints
      *
      * @return http constraint
      */
     HttpConstraint value() default @HttpConstraint;
 
     /**
-     * An array of HttpMethodConstraint objects to which the security constraint
-     * will be applied
+     * An array of HttpMethodConstraint objects to which the security constraint will be applied
      *
      * @return array of http method constraint
      */

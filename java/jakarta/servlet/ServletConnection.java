@@ -17,52 +17,43 @@
 package jakarta.servlet;
 
 /**
- * Provides information about the connection made to the Servlet container. This
- * interface is intended primarily for debugging purposes and as such provides
- * the raw information as seen by the container. Unless explicitly stated
- * otherwise in the Javadoc for a method, no adjustment is made for the presence
- * of reverse proxies or similar configurations.
+ * Provides information about the connection made to the Servlet container. This interface is intended primarily for
+ * debugging purposes and as such provides the raw information as seen by the container. Unless explicitly stated
+ * otherwise in the Javadoc for a method, no adjustment is made for the presence of reverse proxies or similar
+ * configurations.
  *
  * @since Servlet 6.0
  */
 public interface ServletConnection {
 
     /**
-     * Obtain a unique (within the lifetime of the JVM) identifier string for
-     * the network connection to the JVM that is being used for the
-     * {@code ServletRequest} from which this {@code ServletConnection} was
-     * obtained.
+     * Obtain a unique (within the lifetime of the JVM) identifier string for the network connection to the JVM that is
+     * being used for the {@code ServletRequest} from which this {@code ServletConnection} was obtained.
      * <p>
-     * There is no defined format for this string. The format is implementation
-     * dependent.
+     * There is no defined format for this string. The format is implementation dependent.
      *
      * @return A unique identifier for the network connection
      */
     String getConnectionId();
 
     /**
-     * Obtain the name of the protocol as presented to the server after the
-     * removal, if present, of any TLS or similar encryption. This may not be
-     * the same as the protocol seen by the application. For example, a reverse
-     * proxy may present AJP whereas the application will see HTTP 1.1.
+     * Obtain the name of the protocol as presented to the server after the removal, if present, of any TLS or similar
+     * encryption. This may not be the same as the protocol seen by the application. For example, a reverse proxy may
+     * present AJP whereas the application will see HTTP 1.1.
      * <p>
      * If the protocol has an entry in the <a href=
      * "https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids">IANA
-     * registry for ALPN names</a> then the identification sequence, in string
-     * form, must be returned. Registered identification sequences MUST only be
-     * used for the associated protocol. Return values for other protocols are
-     * implementation dependent. Unknown protocols should return the string
-     * "unknown".
+     * registry for ALPN names</a> then the identification sequence, in string form, must be returned. Registered
+     * identification sequences MUST only be used for the associated protocol. Return values for other protocols are
+     * implementation dependent. Unknown protocols should return the string "unknown".
      *
-     * @return The name of the protocol presented to the server after decryption
-     *         of TLS, or similar encryption, if any.
+     * @return The name of the protocol presented to the server after decryption of TLS, or similar encryption, if any.
      */
     String getProtocol();
 
     /**
-     * Obtain the connection identifier for the network connection to the server
-     * that is being used for the {@code ServletRequest} from which this
-     * {@code ServletConnection} was obtained as defined by the protocol in use.
+     * Obtain the connection identifier for the network connection to the server that is being used for the
+     * {@code ServletRequest} from which this {@code ServletConnection} was obtained as defined by the protocol in use.
      * Note that some protocols do not define such an identifier.
      * <p>
      * Examples of protocol provided connection identifiers include:
@@ -77,19 +68,16 @@ public interface ServletConnection {
      * <dd>None, so the empty string should be returned</dd>
      * </dl>
      *
-     * @return The connection identifier if one is defined, otherwise an empty
-     *         string
+     * @return The connection identifier if one is defined, otherwise an empty string
      */
     String getProtocolConnectionId();
 
     /**
-     * Determine whether or not the incoming network connection to the server
-     * used encryption or not. Note that where a reverse proxy is used, the
-     * application may have a different view as to whether encryption is being
-     * used due to the use of headers like {@code X-Forwarded-Proto}.
+     * Determine whether or not the incoming network connection to the server used encryption or not. Note that where a
+     * reverse proxy is used, the application may have a different view as to whether encryption is being used due to
+     * the use of headers like {@code X-Forwarded-Proto}.
      *
-     * @return {@code true} if the incoming network connection used encryption,
-     *         otherwise {@code false}
+     * @return {@code true} if the incoming network connection used encryption, otherwise {@code false}
      */
     boolean isSecure();
 }

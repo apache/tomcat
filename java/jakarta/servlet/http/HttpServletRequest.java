@@ -518,7 +518,7 @@ public interface HttpServletRequest extends ServletRequest {
      *
      * @since Servlet 4.0
      */
-    default Map<String, String> getTrailerFields() {
+    default Map<String,String> getTrailerFields() {
         return Collections.emptyMap();
     }
 

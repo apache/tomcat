@@ -69,7 +69,7 @@ public class Cookie implements Cloneable, Serializable {
     /**
      * Attributes encoded in the header's cookie fields.
      */
-    private volatile Map<String, String> attributes;
+    private volatile Map<String,String> attributes;
 
     private static final String DOMAIN = "Domain";
     private static final String MAX_AGE = "Max-Age";
@@ -439,7 +439,7 @@ public class Cookie implements Cloneable, Serializable {
      *
      * @since Servlet 6.0
      */
-    public Map<String, String> getAttributes() {
+    public Map<String,String> getAttributes() {
         if (attributes == null) {
             return Collections.emptyMap();
         } else {
