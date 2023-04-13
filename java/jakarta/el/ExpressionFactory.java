@@ -41,11 +41,11 @@ public abstract class ExpressionFactory {
 
     private static final String PROPERTY_NAME = "jakarta.el.ExpressionFactory";
 
-    private static final String PROPERTY_FILE = System.getProperty("java.home") + File.separator + "lib" +
-            File.separator + "el.properties";
+    private static final String PROPERTY_FILE =
+            System.getProperty("java.home") + File.separator + "lib" + File.separator + "el.properties";
 
     private static final CacheValue nullTcclFactory = new CacheValue();
-    private static final Map<CacheKey, CacheValue> factoryCache = new ConcurrentHashMap<>();
+    private static final Map<CacheKey,CacheValue> factoryCache = new ConcurrentHashMap<>();
 
     /**
      * Create a new {@link ExpressionFactory}. The class to use is determined by the following search order:
@@ -214,7 +214,7 @@ public abstract class ExpressionFactory {
      *
      * @since EL 3.0
      */
-    public Map<String, Method> getInitFunctionMap() {
+    public Map<String,Method> getInitFunctionMap() {
         return null;
     }
 

@@ -30,7 +30,7 @@ public class StandardELContext extends ELContext {
     private final FunctionMapper functionMapper;
     private final CompositeELResolver standardResolver;
     private final CompositeELResolver customResolvers;
-    private final Map<String, Object> localBeans = new HashMap<>();
+    private final Map<String,Object> localBeans = new HashMap<>();
 
 
     public StandardELContext(ExpressionFactory factory) {
@@ -108,14 +108,14 @@ public class StandardELContext extends ELContext {
     }
 
 
-    Map<String, Object> getLocalBeans() {
+    Map<String,Object> getLocalBeans() {
         return localBeans;
     }
 
 
     private static class StandardVariableMapper extends VariableMapper {
 
-        private Map<String, ValueExpression> vars;
+        private Map<String,ValueExpression> vars;
 
         @Override
         public ValueExpression resolveVariable(String variable) {
@@ -141,9 +141,9 @@ public class StandardELContext extends ELContext {
 
     private static class StandardBeanNameResolver extends BeanNameResolver {
 
-        private final Map<String, Object> beans;
+        private final Map<String,Object> beans;
 
-        StandardBeanNameResolver(Map<String, Object> beans) {
+        StandardBeanNameResolver(Map<String,Object> beans) {
             this.beans = beans;
         }
 
@@ -176,9 +176,9 @@ public class StandardELContext extends ELContext {
 
     private static class StandardFunctionMapper extends FunctionMapper {
 
-        private final Map<String, Method> methods = new HashMap<>();
+        private final Map<String,Method> methods = new HashMap<>();
 
-        StandardFunctionMapper(Map<String, Method> initFunctionMap) {
+        StandardFunctionMapper(Map<String,Method> initFunctionMap) {
             if (initFunctionMap != null) {
                 methods.putAll(initFunctionMap);
             }

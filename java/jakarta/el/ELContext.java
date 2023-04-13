@@ -32,7 +32,7 @@ public abstract class ELContext {
 
     private Locale locale;
 
-    private Map<Class<?>, Object> map;
+    private Map<Class<?>,Object> map;
 
     private boolean resolved;
 
@@ -40,7 +40,7 @@ public abstract class ELContext {
 
     private List<EvaluationListener> listeners;
 
-    private Deque<Map<String, Object>> lambdaArguments = new ArrayDeque<>();
+    private Deque<Map<String,Object>> lambdaArguments = new ArrayDeque<>();
 
     public ELContext() {
         this.resolved = false;
@@ -235,7 +235,7 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public boolean isLambdaArgument(String name) {
-        for (Map<String, Object> arguments : lambdaArguments) {
+        for (Map<String,Object> arguments : lambdaArguments) {
             if (arguments.containsKey(name)) {
                 return true;
             }
@@ -253,7 +253,7 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public Object getLambdaArgument(String name) {
-        for (Map<String, Object> arguments : lambdaArguments) {
+        for (Map<String,Object> arguments : lambdaArguments) {
             Object result = arguments.get(name);
             if (result != null) {
                 return result;
@@ -270,7 +270,7 @@ public abstract class ELContext {
      *
      * @since EL 3.0
      */
-    public void enterLambdaScope(Map<String, Object> arguments) {
+    public void enterLambdaScope(Map<String,Object> arguments) {
         lambdaArguments.push(arguments);
     }
 

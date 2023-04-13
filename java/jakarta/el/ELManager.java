@@ -73,7 +73,7 @@ public class ELManager {
     }
 
     public Object defineBean(String name, Object bean) {
-        Map<String, Object> localBeans = getELContext().getLocalBeans();
+        Map<String,Object> localBeans = getELContext().getLocalBeans();
 
         if (bean == null) {
             return localBeans.remove(name);
