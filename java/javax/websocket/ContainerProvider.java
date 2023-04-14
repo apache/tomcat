@@ -44,8 +44,8 @@ public abstract class ContainerProvider {
         if (result == null) {
             try {
                 @SuppressWarnings("unchecked")
-                Class<WebSocketContainer> clazz = (Class<WebSocketContainer>) Class
-                        .forName(DEFAULT_PROVIDER_CLASS_NAME);
+                Class<WebSocketContainer> clazz =
+                        (Class<WebSocketContainer>) Class.forName(DEFAULT_PROVIDER_CLASS_NAME);
                 result = clazz.getConstructor().newInstance();
             } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
                 // No options left. Just return null.

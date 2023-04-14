@@ -76,7 +76,7 @@ final class DefaultServerEndpointConfig implements ServerEndpointConfig {
     }
 
     @Override
-    public Map<String, Object> getUserProperties() {
+    public Map<String,Object> getUserProperties() {
         return userProperties;
     }
 

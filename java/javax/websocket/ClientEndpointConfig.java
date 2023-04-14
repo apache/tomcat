@@ -114,7 +114,7 @@ public interface ClientEndpointConfig extends EndpointConfig {
          *
          * @param headers The HTTP headers
          */
-        public void beforeRequest(Map<String, List<String>> headers) {
+        public void beforeRequest(Map<String,List<String>> headers) {
             // NO-OP
         }
 

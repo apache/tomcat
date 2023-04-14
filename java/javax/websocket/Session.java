@@ -137,7 +137,7 @@ public interface Session extends Closeable {
 
     URI getRequestURI();
 
-    Map<String, List<String>> getRequestParameterMap();
+    Map<String,List<String>> getRequestParameterMap();
 
     String getQueryString();
 

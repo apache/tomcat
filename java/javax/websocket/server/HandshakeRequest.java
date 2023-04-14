@@ -47,7 +47,7 @@ public interface HandshakeRequest {
      */
     Object getHttpSession();
 
-    Map<String, List<String>> getParameterMap();
+    Map<String,List<String>> getParameterMap();
 
     String getQueryString();
 }
