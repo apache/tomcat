@@ -127,7 +127,8 @@ public interface HttpSession {
      * @deprecated As of Version 2.1, this method is deprecated and has no replacement. It will be removed in a future
      *                 version of the Java Servlet API.
      */
-    @Deprecated HttpSessionContext getSessionContext();
+    @Deprecated
+    HttpSessionContext getSessionContext();
 
     /**
      * Returns the object bound with the specified name in this session, or <code>null</code> if no object is bound
@@ -150,7 +151,8 @@ public interface HttpSession {
      *
      * @deprecated As of Version 2.2, this method is replaced by {@link #getAttribute}.
      */
-    @Deprecated Object getValue(String name);
+    @Deprecated
+    Object getValue(String name);
 
     /**
      * Returns an <code>Enumeration</code> of <code>String</code> objects containing the names of all the objects bound
@@ -170,7 +172,8 @@ public interface HttpSession {
      *
      * @deprecated As of Version 2.2, this method is replaced by {@link #getAttributeNames}
      */
-    @Deprecated String[] getValueNames();
+    @Deprecated
+    String[] getValueNames();
 
     /**
      * Binds an object to this session, using the name specified. If an object of the same name is already bound to the
@@ -201,7 +204,8 @@ public interface HttpSession {
      *
      * @deprecated As of Version 2.2, this method is replaced by {@link #setAttribute}
      */
-    @Deprecated void putValue(String name, Object value);
+    @Deprecated
+    void putValue(String name, Object value);
 
     /**
      * Removes the object bound with the specified name from this session. If the session does not have an object bound
@@ -224,7 +228,8 @@ public interface HttpSession {
      *
      * @deprecated As of Version 2.2, this method is replaced by {@link #removeAttribute}
      */
-    @Deprecated void removeValue(String name);
+    @Deprecated
+    void removeValue(String name);
 
     /**
      * Invalidates this session then unbinds any objects bound to it.

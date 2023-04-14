@@ -61,8 +61,8 @@ public class Cookie implements Cloneable, Serializable {
         if (System.getSecurityManager() == null) {
             strictServletCompliance = Boolean.getBoolean("org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
             propStrictNaming = System.getProperty("org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING");
-            propFwdSlashIsSeparator = System
-                    .getProperty("org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
+            propFwdSlashIsSeparator =
+                    System.getProperty("org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
         } else {
             strictServletCompliance = AccessController
                     .doPrivileged((PrivilegedAction<Boolean>) () -> Boolean

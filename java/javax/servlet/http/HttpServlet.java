@@ -82,9 +82,8 @@ public abstract class HttpServlet extends GenericServlet {
     private static final String LSTRING_FILE = "javax.servlet.http.LocalStrings";
     private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
-    private static final List<String> SENSITIVE_HTTP_HEADERS = Arrays.asList("authorization", "cookie", "x-forwarded",
-            "forwarded", "proxy-authorization");
-
+    private static final List<String> SENSITIVE_HTTP_HEADERS =
+            Arrays.asList("authorization", "cookie", "x-forwarded", "forwarded", "proxy-authorization");
 
 
     /**
@@ -353,8 +352,8 @@ public abstract class HttpServlet extends GenericServlet {
             clazz = Class.forName("org.apache.catalina.connector.RequestFacade");
             Method getAllowTrace = clazz.getMethod("getAllowTrace", (Class<?>[]) null);
             ALLOW_TRACE = ((Boolean) getAllowTrace.invoke(req, (Object[]) null)).booleanValue();
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException
-                | IllegalArgumentException | InvocationTargetException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException |
+                IllegalArgumentException | InvocationTargetException e) {
             // Ignore. Not running on Tomcat. TRACE is always allowed.
         }
         // End of Tomcat specific hack
@@ -444,8 +443,8 @@ public abstract class HttpServlet extends GenericServlet {
         int responseLength;
 
         String CRLF = "\r\n";
-        StringBuilder buffer = new StringBuilder("TRACE ").append(req.getRequestURI()).append(' ')
-                .append(req.getProtocol());
+        StringBuilder buffer =
+                new StringBuilder("TRACE ").append(req.getRequestURI()).append(' ').append(req.getProtocol());
 
         Enumeration<String> reqHeaderNames = req.getHeaderNames();
 

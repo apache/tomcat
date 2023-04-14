@@ -22,8 +22,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to declare an array of application classes which are
- * passed to a {@link javax.servlet.ServletContainerInitializer}.
+ * This annotation is used to declare an array of application classes which are passed to a
+ * {@link javax.servlet.ServletContainerInitializer}.
  *
  * @since Servlet 3.0
  */

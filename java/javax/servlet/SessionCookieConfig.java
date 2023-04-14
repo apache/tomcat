@@ -17,8 +17,8 @@
 package javax.servlet;
 
 /**
- * Configures the session cookies used by the web application associated with
- * the ServletContext from which this SessionCookieConfig was obtained.
+ * Configures the session cookies used by the web application associated with the ServletContext from which this
+ * SessionCookieConfig was obtained.
  *
  * @since Servlet 3.0
  */
@@ -29,8 +29,7 @@ public interface SessionCookieConfig {
      *
      * @param name The name of the session cookie
      *
-     * @throws IllegalStateException if the associated ServletContext has
-     *         already been initialised
+     * @throws IllegalStateException if the associated ServletContext has already been initialised
      */
     void setName(String name);
 
@@ -46,8 +45,7 @@ public interface SessionCookieConfig {
      *
      * @param domain The session cookie domain
      *
-     * @throws IllegalStateException if the associated ServletContext has
-     *         already been initialised
+     * @throws IllegalStateException if the associated ServletContext has already been initialised
      */
     void setDomain(String domain);
 
@@ -63,14 +61,12 @@ public interface SessionCookieConfig {
      *
      * @param path The session cookie path
      *
-     * @throws IllegalStateException if the associated ServletContext has
-     *         already been initialised
+     * @throws IllegalStateException if the associated ServletContext has already been initialised
      */
     void setPath(String path);
 
     /**
-     * Obtain the path to use for session cookies. This is normally the context
-     * path.
+     * Obtain the path to use for session cookies. This is normally the context path.
      *
      * @return The path to use for session cookies.
      */
@@ -81,8 +77,7 @@ public interface SessionCookieConfig {
      *
      * @param comment The session cookie comment
      *
-     * @throws IllegalStateException if the associated ServletContext has
-     *         already been initialised
+     * @throws IllegalStateException if the associated ServletContext has already been initialised
      */
     void setComment(String comment);
 
@@ -98,8 +93,7 @@ public interface SessionCookieConfig {
      *
      * @param httpOnly The httpOnly setting to use for session cookies
      *
-     * @throws IllegalStateException if the associated ServletContext has
-     *         already been initialised
+     * @throws IllegalStateException if the associated ServletContext has already been initialised
      */
     void setHttpOnly(boolean httpOnly);
 
@@ -115,8 +109,7 @@ public interface SessionCookieConfig {
      *
      * @param secure The secure setting to use for session cookies
      *
-     * @throws IllegalStateException if the associated ServletContext has
-     *         already been initialised
+     * @throws IllegalStateException if the associated ServletContext has already been initialised
      */
     void setSecure(boolean secure);
 
@@ -131,8 +124,8 @@ public interface SessionCookieConfig {
      * Sets the maximum age.
      *
      * @param MaxAge the maximum age to set
-     * @throws IllegalStateException if the associated ServletContext has
-     *         already been initialised
+     *
+     * @throws IllegalStateException if the associated ServletContext has already been initialised
      */
     void setMaxAge(int MaxAge);
 

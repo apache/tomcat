@@ -375,7 +375,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements 
      * @since Servlet 4.0
      */
     @Override
-    public Map<String, String> getTrailerFields() {
+    public Map<String,String> getTrailerFields() {
         return this._getHttpServletRequest().getTrailerFields();
     }
 
