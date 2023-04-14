@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * @since Common Annotations 1.2
  */
 @Documented
-@Target(ElementType.TYPE)
+@Target({ ElementType.TYPE, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Priority {
 
