@@ -107,7 +107,7 @@ class Util {
 
 
     private static final CacheValue nullTcclFactory = new CacheValue();
-    private static final ConcurrentMap<CacheKey, CacheValue> factoryCache = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<CacheKey,CacheValue> factoryCache = new ConcurrentHashMap<>();
 
     /**
      * Provides a per class loader cache of ExpressionFactory instances without pinning any in memory as that could
@@ -246,7 +246,7 @@ class Util {
     private static <T> Wrapper<T> findWrapper(ELContext context, Class<?> clazz, List<Wrapper<T>> wrappers, String name,
             Class<?>[] paramTypes, Object[] paramValues) {
 
-        Map<Wrapper<T>, MatchResult> candidates = new HashMap<>();
+        Map<Wrapper<T>,MatchResult> candidates = new HashMap<>();
 
         int paramCount = paramTypes.length;
 
@@ -360,7 +360,7 @@ class Util {
         MatchResult bestMatch = new MatchResult(true, 0, 0, 0, 0, true);
         Wrapper<T> match = null;
         boolean multiple = false;
-        for (Map.Entry<Wrapper<T>, MatchResult> entry : candidates.entrySet()) {
+        for (Map.Entry<Wrapper<T>,MatchResult> entry : candidates.entrySet()) {
             int cmp = entry.getValue().compareTo(bestMatch);
             if (cmp > 0 || match == null) {
                 bestMatch = entry.getValue();

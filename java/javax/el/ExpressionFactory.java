@@ -49,7 +49,7 @@ public abstract class ExpressionFactory {
     private static final String PROPERTY_FILE;
 
     private static final CacheValue nullTcclFactory = new CacheValue();
-    private static final ConcurrentMap<CacheKey, CacheValue> factoryCache = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<CacheKey,CacheValue> factoryCache = new ConcurrentHashMap<>();
 
     static {
         if (IS_SECURITY_ENABLED) {
@@ -231,7 +231,7 @@ public abstract class ExpressionFactory {
      *
      * @since EL 3.0
      */
-    public Map<String, Method> getInitFunctionMap() {
+    public Map<String,Method> getInitFunctionMap() {
         return null;
     }
 
