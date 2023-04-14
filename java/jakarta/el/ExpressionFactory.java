@@ -48,13 +48,13 @@ public abstract class ExpressionFactory {
     private static final String PROPERTY_FILE;
 
     private static final CacheValue nullTcclFactory = new CacheValue();
-    private static final Map<CacheKey, CacheValue> factoryCache = new ConcurrentHashMap<>();
+    private static final Map<CacheKey,CacheValue> factoryCache = new ConcurrentHashMap<>();
 
     static {
         if (IS_SECURITY_ENABLED) {
-            PROPERTY_FILE = AccessController
-                    .doPrivileged((PrivilegedAction<String>) () -> System.getProperty("java.home") + File.separator +
-                            "lib" + File.separator + "el.properties");
+            PROPERTY_FILE =
+                    AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty("java.home") +
+                            File.separator + "lib" + File.separator + "el.properties");
         } else {
             PROPERTY_FILE = System.getProperty("java.home") + File.separator + "lib" + File.separator + "el.properties";
         }
@@ -227,7 +227,7 @@ public abstract class ExpressionFactory {
      *
      * @since EL 3.0
      */
-    public Map<String, Method> getInitFunctionMap() {
+    public Map<String,Method> getInitFunctionMap() {
         return null;
     }
 
@@ -308,8 +308,8 @@ public abstract class ExpressionFactory {
         className = getClassNameServices(tccl);
         if (className == null) {
             if (IS_SECURITY_ENABLED) {
-                className = AccessController
-                        .doPrivileged((PrivilegedAction<String>) ExpressionFactory::getClassNameJreDir);
+                className =
+                        AccessController.doPrivileged((PrivilegedAction<String>) ExpressionFactory::getClassNameJreDir);
             } else {
                 // Second el.properties file
                 className = getClassNameJreDir();

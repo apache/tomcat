@@ -53,7 +53,7 @@ public class BeanELResolver extends ELResolver {
 
     private final boolean readOnly;
 
-    private final ConcurrentCache<String, BeanProperties> cache = new ConcurrentCache<>(CACHE_SIZE);
+    private final ConcurrentCache<String,BeanProperties> cache = new ConcurrentCache<>(CACHE_SIZE);
 
     /**
      * Creates a writable instance of the standard JavaBean resolver.
@@ -150,8 +150,8 @@ public class BeanELResolver extends ELResolver {
         // Find the matching method
         Method matchingMethod = Util.findMethod(context, base.getClass(), base, methodName, paramTypes, params);
 
-        Object[] parameters = Util.buildParameters(context, matchingMethod.getParameterTypes(),
-                matchingMethod.isVarArgs(), params);
+        Object[] parameters =
+                Util.buildParameters(context, matchingMethod.getParameterTypes(), matchingMethod.isVarArgs(), params);
 
         Object result = null;
         try {
@@ -211,7 +211,7 @@ public class BeanELResolver extends ELResolver {
     }
 
     static final class BeanProperties {
-        private final Map<String, BeanProperty> properties;
+        private final Map<String,BeanProperty> properties;
 
         private final Class<?> type;
 
@@ -333,8 +333,8 @@ public class BeanELResolver extends ELResolver {
     private static final class ConcurrentCache<K, V> {
 
         private final int size;
-        private final Map<K, V> eden;
-        private final Map<K, V> longterm;
+        private final Map<K,V> eden;
+        private final Map<K,V> longterm;
 
         ConcurrentCache(int size) {
             this.size = size;
