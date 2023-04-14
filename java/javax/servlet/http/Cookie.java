@@ -189,6 +189,7 @@ public class Cookie implements Cloneable, Serializable {
         comment = purpose;
     }
 
+
     /**
      * Returns the comment describing the purpose of this cookie, or <code>null</code> if the cookie has no comment.
      *
@@ -199,6 +200,7 @@ public class Cookie implements Cloneable, Serializable {
     public String getComment() {
         return comment;
     }
+
 
     /**
      * Specifies the domain within which this cookie should be presented.
@@ -217,6 +219,7 @@ public class Cookie implements Cloneable, Serializable {
         domain = pattern.toLowerCase(Locale.ENGLISH); // IE allegedly needs this
     }
 
+
     /**
      * Returns the domain name set for this cookie. The form of the domain name is set by RFC 2109.
      *
@@ -227,6 +230,7 @@ public class Cookie implements Cloneable, Serializable {
     public String getDomain() {
         return domain;
     }
+
 
     /**
      * Sets the maximum age of the cookie in seconds.
@@ -246,6 +250,7 @@ public class Cookie implements Cloneable, Serializable {
         maxAge = expiry;
     }
 
+
     /**
      * Returns the maximum age of the cookie, specified in seconds, By default, <code>-1</code> indicating the cookie
      * will persist until browser shutdown.
@@ -258,6 +263,7 @@ public class Cookie implements Cloneable, Serializable {
     public int getMaxAge() {
         return maxAge;
     }
+
 
     /**
      * Specifies a path for the cookie to which the client should return the cookie.
@@ -276,6 +282,7 @@ public class Cookie implements Cloneable, Serializable {
         path = uri;
     }
 
+
     /**
      * Returns the path on the server to which the browser returns this cookie. The cookie is visible to all subpaths on
      * the server.
@@ -287,6 +294,7 @@ public class Cookie implements Cloneable, Serializable {
     public String getPath() {
         return path;
     }
+
 
     /**
      * Indicates to the browser whether the cookie should only be sent using a secure protocol, such as HTTPS or SSL.
@@ -302,6 +310,7 @@ public class Cookie implements Cloneable, Serializable {
         secure = flag;
     }
 
+
     /**
      * Returns <code>true</code> if the browser is sending cookies only over a secure protocol, or <code>false</code> if
      * the browser can send cookies using any protocol.
@@ -314,6 +323,7 @@ public class Cookie implements Cloneable, Serializable {
         return secure;
     }
 
+
     /**
      * Returns the name of the cookie. The name cannot be changed after creation.
      *
@@ -322,6 +332,7 @@ public class Cookie implements Cloneable, Serializable {
     public String getName() {
         return name;
     }
+
 
     /**
      * Assigns a new value to a cookie after the cookie is created. If you use a binary value, you may want to use
@@ -340,6 +351,7 @@ public class Cookie implements Cloneable, Serializable {
         value = newValue;
     }
 
+
     /**
      * Returns the value of the cookie.
      *
@@ -351,6 +363,7 @@ public class Cookie implements Cloneable, Serializable {
     public String getValue() {
         return value;
     }
+
 
     /**
      * Returns the version of the protocol this cookie complies with. Version 1 complies with RFC 2109, and version 0
@@ -364,6 +377,7 @@ public class Cookie implements Cloneable, Serializable {
     public int getVersion() {
         return version;
     }
+
 
     /**
      * Sets the version of the cookie protocol this cookie complies with. Version 0 complies with the original Netscape
@@ -380,6 +394,7 @@ public class Cookie implements Cloneable, Serializable {
         version = v;
     }
 
+
     /**
      * Overrides the standard <code>java.lang.Object.clone</code> method to return a copy of this cookie.
      */
@@ -392,6 +407,7 @@ public class Cookie implements Cloneable, Serializable {
         }
     }
 
+
     /**
      * Sets the flag that controls if this cookie will be hidden from scripts on the client side.
      *
@@ -402,6 +418,7 @@ public class Cookie implements Cloneable, Serializable {
     public void setHttpOnly(boolean httpOnly) {
         this.httpOnly = httpOnly;
     }
+
 
     /**
      * Gets the flag that controls if this cookie will be hidden from scripts on the client side.
