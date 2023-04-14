@@ -36,8 +36,7 @@ public class CloseReason {
 
     @Override
     public String toString() {
-        return "CloseReason: code [" + closeCode.getCode() +
-                "], reason [" + reasonPhrase + "]";
+        return "CloseReason: code [" + closeCode.getCode() + "], reason [" + reasonPhrase + "]";
     }
 
     public interface CloseCode {
@@ -109,8 +108,7 @@ public class CloseReason {
                 case 1015:
                     return CloseCodes.TLS_HANDSHAKE_FAILURE;
                 default:
-                    throw new IllegalArgumentException(
-                            "Invalid close code: [" + code + "]");
+                    throw new IllegalArgumentException("Invalid close code: [" + code + "]");
             }
         }
 

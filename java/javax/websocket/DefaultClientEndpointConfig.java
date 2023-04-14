@@ -30,10 +30,8 @@ final class DefaultClientEndpointConfig implements ClientEndpointConfig {
     private final Configurator configurator;
 
 
-    DefaultClientEndpointConfig(List<String> preferredSubprotocols,
-            List<Extension> extensions,
-            List<Class<? extends Encoder>> encoders,
-            List<Class<? extends Decoder>> decoders,
+    DefaultClientEndpointConfig(List<String> preferredSubprotocols, List<Extension> extensions,
+            List<Class<? extends Encoder>> encoders, List<Class<? extends Decoder>> decoders,
             Configurator configurator) {
         this.preferredSubprotocols = preferredSubprotocols;
         this.extensions = extensions;
@@ -68,7 +66,7 @@ final class DefaultClientEndpointConfig implements ClientEndpointConfig {
 
 
     @Override
-    public Map<String, Object> getUserProperties() {
+    public Map<String,Object> getUserProperties() {
         return userProperties;
     }
 
