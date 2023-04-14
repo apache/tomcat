@@ -73,24 +73,23 @@ public abstract class AuthConfigFactory {
             if (factory == null) {
                 final String className = getFactoryClassName();
                 try {
-                    factory = AccessController.doPrivileged(
-                            (PrivilegedExceptionAction<AuthConfigFactory>) () -> {
-                                // Load this class with the same class loader as used for
-                                // this class. Note that the Thread context class loader
-                                // should not be used since that would trigger a memory leak
-                                // in container environments.
-                                if (className.equals("org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl")) {
-                                    return new org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl();
-                                } else {
-                                    Class<?> clazz = Class.forName(className);
-                                    return (AuthConfigFactory) clazz.getConstructor().newInstance();
-                                }
-                            });
+                    factory = AccessController.doPrivileged((PrivilegedExceptionAction<AuthConfigFactory>) () -> {
+                        // Load this class with the same class loader as used for
+                        // this class. Note that the Thread context class loader
+                        // should not be used since that would trigger a memory leak
+                        // in container environments.
+                        if (className.equals("org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl")) {
+                            return new org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl();
+                        } else {
+                            Class<?> clazz = Class.forName(className);
+                            return (AuthConfigFactory) clazz.getConstructor().newInstance();
+                        }
+                    });
                 } catch (PrivilegedActionException e) {
                     Exception inner = e.getException();
                     if (inner instanceof InstantiationException) {
-                        throw new SecurityException("AuthConfigFactory error:" +
-                                inner.getCause().getMessage(), inner.getCause());
+                        throw new SecurityException("AuthConfigFactory error:" + inner.getCause().getMessage(),
+                                inner.getCause());
                     } else {
                         throw new SecurityException("AuthConfigFactory error: " + inner, inner);
                     }
@@ -112,13 +111,12 @@ public abstract class AuthConfigFactory {
     public abstract String registerConfigProvider(String className, Map<String,String> properties, String layer,
             String appContext, String description);
 
-    public abstract String registerConfigProvider(AuthConfigProvider provider, String layer,
-            String appContext, String description);
+    public abstract String registerConfigProvider(AuthConfigProvider provider, String layer, String appContext,
+            String description);
 
     public abstract boolean removeRegistration(String registrationID);
 
-    public abstract String[] detachListener(RegistrationListener listener, String layer,
-            String appContext);
+    public abstract String[] detachListener(RegistrationListener listener, String layer, String appContext);
 
     public abstract String[] getRegistrationIDs(AuthConfigProvider provider);
 
@@ -127,14 +125,12 @@ public abstract class AuthConfigFactory {
     public abstract void refresh();
 
     /**
-     * Convenience method for registering a {@link ServerAuthModule} that should
-     * have the same effect as calling {@link
-     * #registerConfigProvider(AuthConfigProvider, String, String, String)} with
-     * the implementation providing the appropriate {@link AuthConfigProvider}
-     * generated from the provided context.
+     * Convenience method for registering a {@link ServerAuthModule} that should have the same effect as calling
+     * {@link #registerConfigProvider(AuthConfigProvider, String, String, String)} with the implementation providing the
+     * appropriate {@link AuthConfigProvider} generated from the provided context.
      *
-     * @param serverAuthModule  The {@link ServerAuthModule} to register
-     * @param context           The associated application context
+     * @param serverAuthModule The {@link ServerAuthModule} to register
+     * @param context          The associated application context
      *
      * @return A string identifier for the created registration
      *
@@ -143,11 +139,10 @@ public abstract class AuthConfigFactory {
     public abstract String registerServerAuthModule(ServerAuthModule serverAuthModule, Object context);
 
     /**
-     * Convenience method for deregistering a {@link ServerAuthModule} that
-     * should have the same effect as calling
+     * Convenience method for deregistering a {@link ServerAuthModule} that should have the same effect as calling
      * {@link AuthConfigFactory#removeRegistration(String)}.
      *
-     * @param context           The associated application context
+     * @param context The associated application context
      *
      * @since Authentication 3.0
      */
@@ -165,8 +160,8 @@ public abstract class AuthConfigFactory {
     }
 
     private static String getFactoryClassName() {
-        String className = AccessController.doPrivileged(
-                (PrivilegedAction<String>) () -> Security.getProperty(DEFAULT_FACTORY_SECURITY_PROPERTY));
+        String className = AccessController
+                .doPrivileged((PrivilegedAction<String>) () -> Security.getProperty(DEFAULT_FACTORY_SECURITY_PROPERTY));
 
         if (className != null) {
             return className;
