@@ -58,15 +58,20 @@ public interface JspPage extends Servlet {
     /**
      * The jspInit() method is invoked when the JSP page is initialized. It is the responsibility of the JSP
      * implementation (and of the class mentioned by the extends attribute, if present) that at this point invocations
-     * to the getServletConfig() method will return the desired value. A JSP page can override this method by including
-     * a definition for it in a declaration element. A JSP page should redefine the init() method from Servlet.
+     * to the getServletConfig() method will return the desired value.
+     * <p>
+     * A JSP page can override this method by including a definition for it in a declaration element.
+     * <p>
+     * A JSP page should redefine the init() method from Servlet.
      */
     void jspInit();
 
     /**
-     * The jspDestroy() method is invoked when the JSP page is about to be destroyed. A JSP page can override this
-     * method by including a definition for it in a declaration element. A JSP page should redefine the destroy() method
-     * from Servlet.
+     * The jspDestroy() method is invoked when the JSP page is about to be destroyed.
+     * <p>
+     * A JSP page can override this method by including a definition for it in a declaration element.
+     * <p>
+     * A JSP page should redefine the destroy() method from Servlet.
      */
     void jspDestroy();
 

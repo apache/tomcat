@@ -61,7 +61,6 @@ public interface IterationTag extends Tag {
      * Request the reevaluation of some body. Returned from doAfterBody. For compatibility with JSP 1.1, the value is
      * carefully selected to be the same as the, now deprecated, BodyTag.EVAL_BODY_TAG,
      */
-
     int EVAL_BODY_AGAIN = 2;
 
     /**

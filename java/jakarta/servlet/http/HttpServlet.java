@@ -129,9 +129,9 @@ public abstract class HttpServlet extends GenericServlet {
      * Overriding this method to support a GET request also automatically supports an HTTP HEAD request. A HEAD request
      * is a GET request that returns no body in the response, only the request header fields.
      * <p>
-     * When overriding this method, read the request data, write the response headers, get the response's noBodyWriter
-     * or output stream object, and finally, write the response data. It's best to include content type and encoding.
-     * When using a <code>PrintWriter</code> object to return the response, set the content type before accessing the
+     * When overriding this method, read the request data, write the response headers, get the response's Writer or
+     * output stream object, and finally, write the response data. It's best to include content type and encoding. When
+     * using a <code>PrintWriter</code> object to return the response, set the content type before accessing the
      * <code>PrintWriter</code> object.
      * <p>
      * The servlet container must write the headers before committing the response, because in HTTP the headers must be
@@ -226,9 +226,9 @@ public abstract class HttpServlet extends GenericServlet {
      * POST method allows the client to send data of unlimited length to the Web server a single time and is useful when
      * posting information such as credit card numbers.
      * <p>
-     * When overriding this method, read the request data, write the response headers, get the response's noBodyWriter
-     * or output stream object, and finally, write the response data. It's best to include content type and encoding.
-     * When using a <code>PrintWriter</code> object to return the response, set the content type before accessing the
+     * When overriding this method, read the request data, write the response headers, get the response's Writer or
+     * output stream object, and finally, write the response data. It's best to include content type and encoding. When
+     * using a <code>PrintWriter</code> object to return the response, set the content type before accessing the
      * <code>PrintWriter</code> object.
      * <p>
      * The servlet container must write the headers before committing the response, because in HTTP the headers must be
