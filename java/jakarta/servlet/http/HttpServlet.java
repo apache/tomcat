@@ -565,7 +565,7 @@ public abstract class HttpServlet extends GenericServlet {
      * Is the provided HTTP request header considered sensitive and therefore should be excluded from the response to a
      * {@code TRACE} request?
      * <p>
-     * By default, the headers thats start with any of the following are considered sensitive:
+     * By default, the headers that start with any of the following are considered sensitive:
      * <ul>
      * <li>authorization</li>
      * <li>cookie</li>
