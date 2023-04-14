@@ -25,5 +25,5 @@ public interface EndpointConfig {
 
     List<Class<? extends Decoder>> getDecoders();
 
-    Map<String,Object> getUserProperties();
+    Map<String, Object> getUserProperties();
 }

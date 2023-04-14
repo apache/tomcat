@@ -26,14 +26,12 @@ final class DefaultClientEndpointConfig implements ClientEndpointConfig {
     private final List<Extension> extensions;
     private final List<Class<? extends Encoder>> encoders;
     private final List<Class<? extends Decoder>> decoders;
-    private final Map<String,Object> userProperties = new ConcurrentHashMap<>();
+    private final Map<String, Object> userProperties = new ConcurrentHashMap<>();
     private final Configurator configurator;
 
 
-    DefaultClientEndpointConfig(List<String> preferredSubprotocols,
-            List<Extension> extensions,
-            List<Class<? extends Encoder>> encoders,
-            List<Class<? extends Decoder>> decoders,
+    DefaultClientEndpointConfig(List<String> preferredSubprotocols, List<Extension> extensions,
+            List<Class<? extends Encoder>> encoders, List<Class<? extends Decoder>> decoders,
             Configurator configurator) {
         this.preferredSubprotocols = preferredSubprotocols;
         this.extensions = extensions;

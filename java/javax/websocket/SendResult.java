@@ -26,7 +26,7 @@ public final class SendResult {
     }
 
     public SendResult() {
-        this (null);
+        this(null);
     }
 
     public Throwable getException() {

@@ -42,8 +42,7 @@ public interface Encoder {
 
     interface TextStream<T> extends Encoder {
 
-        void encode(T object, Writer writer)
-                throws EncodeException, IOException;
+        void encode(T object, Writer writer) throws EncodeException, IOException;
     }
 
     interface Binary<T> extends Encoder {
@@ -53,7 +52,6 @@ public interface Encoder {
 
     interface BinaryStream<T> extends Encoder {
 
-        void encode(T object, OutputStream os)
-                throws EncodeException, IOException;
+        void encode(T object, OutputStream os) throws EncodeException, IOException;
     }
 }
