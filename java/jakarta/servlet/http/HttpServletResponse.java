@@ -273,7 +273,7 @@ public interface HttpServletResponse extends ServletResponse {
      *
      * @since Servlet 4.0
      */
-    default void setTrailerFields(Supplier<Map<String, String>> supplier) {
+    default void setTrailerFields(Supplier<Map<String,String>> supplier) {
         // NO-OP
     }
 
@@ -285,7 +285,7 @@ public interface HttpServletResponse extends ServletResponse {
      *
      * @since Servlet 4.0
      */
-    default Supplier<Map<String, String>> getTrailerFields() {
+    default Supplier<Map<String,String>> getTrailerFields() {
         return null;
     }
 
