@@ -27,58 +27,41 @@ import javax.servlet.jsp.PageContext;
 
 /**
  * A base class for defining new tag handlers implementing Tag.
- *
- * <p> The TagSupport class is a utility class intended to be used as
- * the base class for new tag handlers.  The TagSupport class
- * implements the Tag and IterationTag interfaces and adds additional
- * convenience methods including getter methods for the properties in
- * Tag.  TagSupport has one static method that is included to
- * facilitate coordination among cooperating tags.
- *
- * <p> Many tag handlers will extend TagSupport and only redefine a
- * few methods.
+ * <p>
+ * The TagSupport class is a utility class intended to be used as the base class for new tag handlers. The TagSupport
+ * class implements the Tag and IterationTag interfaces and adds additional convenience methods including getter methods
+ * for the properties in Tag. TagSupport has one static method that is included to facilitate coordination among
+ * cooperating tags.
+ * <p>
+ * Many tag handlers will extend TagSupport and only redefine a few methods.
  */
 public class TagSupport implements IterationTag, Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Find the instance of a given class type that is closest to a given
-     * instance.
-     * This method uses the getParent method from the Tag
-     * interface.
-     * This method is used for coordination among cooperating tags.
-     *
+     * Find the instance of a given class type that is closest to a given instance. This method uses the getParent
+     * method from the Tag interface. This method is used for coordination among cooperating tags.
      * <p>
-     * The current version of the specification only provides one formal
-     * way of indicating the observable type of a tag handler: its
-     * tag handler implementation class, described in the tag-class
-     * subelement of the tag element.  This is extended in an
-     * informal manner by allowing the tag library author to
-     * indicate in the description subelement an observable type.
-     * The type should be a subtype of the tag handler implementation
-     * class or void.
-     * This additional constraint can be exploited by a
-     * specialized container that knows about that specific tag library,
-     * as in the case of the JSP standard tag library.
-     *
+     * The current version of the specification only provides one formal way of indicating the observable type of a tag
+     * handler: its tag handler implementation class, described in the tag-class subelement of the tag element. This is
+     * extended in an informal manner by allowing the tag library author to indicate in the description subelement an
+     * observable type. The type should be a subtype of the tag handler implementation class or void. This additional
+     * constraint can be exploited by a specialized container that knows about that specific tag library, as in the case
+     * of the JSP standard tag library.
      * <p>
-     * When a tag library author provides information on the
-     * observable type of a tag handler, client programmatic code
-     * should adhere to that constraint.  Specifically, the Class
-     * passed to findAncestorWithClass should be a subtype of the
-     * observable type.
+     * When a tag library author provides information on the observable type of a tag handler, client programmatic code
+     * should adhere to that constraint. Specifically, the Class passed to findAncestorWithClass should be a subtype of
+     * the observable type.
      *
-     *
-     * @param from The instance from where to start looking.
+     * @param from  The instance from where to start looking.
      * @param klass The subclass of Tag or interface to be matched
-     * @return the nearest ancestor that implements the interface
-     * or is an instance of the class specified
+     *
+     * @return the nearest ancestor that implements the interface or is an instance of the class specified
      */
     public static final Tag findAncestorWithClass(Tag from,
             // TCK signature test fails with generics
-            @SuppressWarnings("rawtypes")
-            Class klass) {
+            @SuppressWarnings("rawtypes") Class klass) {
         boolean isInterface = false;
 
         if (from == null || klass == null ||
@@ -93,8 +76,7 @@ public class TagSupport implements IterationTag, Serializable {
                 return null;
             }
 
-            if ((isInterface && klass.isInstance(tag)) ||
-                    ((Class<?>)klass).isAssignableFrom(tag.getClass())) {
+            if ((isInterface && klass.isInstance(tag)) || ((Class<?>) klass).isAssignableFrom(tag.getClass())) {
                 return tag;
             }
             from = tag;
@@ -102,12 +84,8 @@ public class TagSupport implements IterationTag, Serializable {
     }
 
     /**
-     * Default constructor, all subclasses are required to define only
-     * a public constructor with the same signature, and to call the
-     * superclass constructor.
-     *
-     * This constructor is called by the code generated by the JSP
-     * translator.
+     * Default constructor, all subclasses are required to define only a public constructor with the same signature, and
+     * to call the superclass constructor. This constructor is called by the code generated by the JSP translator.
      */
     public TagSupport() {
         // NOOP by default
@@ -117,6 +95,7 @@ public class TagSupport implements IterationTag, Serializable {
      * Default processing of the start tag, returning SKIP_BODY.
      *
      * @return SKIP_BODY
+     *
      * @throws JspException if an error occurs while processing this tag
      *
      * @see Tag#doStartTag()
@@ -130,6 +109,7 @@ public class TagSupport implements IterationTag, Serializable {
      * Default processing of the end tag returning EVAL_PAGE.
      *
      * @return EVAL_PAGE
+     *
      * @throws JspException if an error occurs while processing this tag
      *
      * @see Tag#doEndTag()
@@ -144,6 +124,7 @@ public class TagSupport implements IterationTag, Serializable {
      * Default processing for a body.
      *
      * @return SKIP_BODY
+     *
      * @throws JspException if an error occurs while processing this tag
      *
      * @see IterationTag#doAfterBody()
@@ -165,7 +146,7 @@ public class TagSupport implements IterationTag, Serializable {
     public void release() {
         parent = null;
         id = null;
-        if( values != null ) {
+        if (values != null) {
             values.clear();
         }
         values = null;
@@ -175,6 +156,7 @@ public class TagSupport implements IterationTag, Serializable {
      * Set the nesting tag of this tag.
      *
      * @param t The parent Tag.
+     *
      * @see Tag#setParent(Tag)
      */
     @Override
@@ -184,6 +166,7 @@ public class TagSupport implements IterationTag, Serializable {
 
     /**
      * The Tag instance most closely enclosing this tag instance.
+     *
      * @see Tag#getParent()
      *
      * @return the parent tag instance or null
@@ -215,6 +198,7 @@ public class TagSupport implements IterationTag, Serializable {
      * Set the page context.
      *
      * @param pageContext The PageContext.
+     *
      * @see Tag#setPageContext
      */
     @Override
@@ -239,6 +223,7 @@ public class TagSupport implements IterationTag, Serializable {
      * Get a the value associated with a key.
      *
      * @param k The string key.
+     *
      * @return The value associated with the key, or null.
      */
     public Object getValue(String k) {
@@ -262,8 +247,8 @@ public class TagSupport implements IterationTag, Serializable {
     /**
      * Enumerate the keys for the values kept by this tag handler.
      *
-     * @return An enumeration of all the keys for the values set,
-     *     or null or an empty Enumeration if no values have been set.
+     * @return An enumeration of all the keys for the values set, or null or an empty Enumeration if no values have been
+     *             set.
      */
     public Enumeration<String> getValues() {
         if (values == null) {
@@ -280,7 +265,7 @@ public class TagSupport implements IterationTag, Serializable {
     /**
      * Map of object values keyed by Strings for this tag.
      */
-    private Map<String, Object> values;
+    private Map<String,Object> values;
 
     /**
      * The value of the id attribute of this tag; or null.
