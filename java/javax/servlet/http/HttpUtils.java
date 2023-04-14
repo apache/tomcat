@@ -61,14 +61,14 @@ public class HttpUtils {
      *
      * @exception IllegalArgumentException if the query string is invalid
      */
-    public static Hashtable<String, String[]> parseQueryString(String s) {
+    public static Hashtable<String,String[]> parseQueryString(String s) {
 
         String valArray[] = null;
 
         if (s == null) {
             throw new IllegalArgumentException();
         }
-        Hashtable<String, String[]> ht = new Hashtable<>();
+        Hashtable<String,String[]> ht = new Hashtable<>();
         StringBuilder sb = new StringBuilder();
         StringTokenizer st = new StringTokenizer(s, "&");
         while (st.hasMoreTokens()) {
@@ -114,7 +114,7 @@ public class HttpUtils {
      *
      * @exception IllegalArgumentException if the data sent by the POST method is invalid
      */
-    public static Hashtable<String, String[]> parsePostData(int len, ServletInputStream in) {
+    public static Hashtable<String,String[]> parsePostData(int len, ServletInputStream in) {
         // XXX
         // should a length of 0 be an IllegalArgumentException
 

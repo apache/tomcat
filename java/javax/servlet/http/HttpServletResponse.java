@@ -90,7 +90,7 @@ public interface HttpServletResponse extends ServletResponse {
      */
     @SuppressWarnings("dep-ann")
     // Spec API does not use @Deprecated
- String encodeUrl(String url);
+    String encodeUrl(String url);
 
     /**
      * @param url the url to be encoded.
@@ -101,7 +101,7 @@ public interface HttpServletResponse extends ServletResponse {
      */
     @SuppressWarnings("dep-ann")
     // Spec API does not use @Deprecated
- String encodeRedirectUrl(String url);
+    String encodeRedirectUrl(String url);
 
     /**
      * Sends an error response to the client using the specified status code and clears the output buffer. The server
@@ -249,7 +249,7 @@ public interface HttpServletResponse extends ServletResponse {
      */
     @SuppressWarnings("dep-ann")
     // Spec API does not use @Deprecated
- void setStatus(int sc, String sm);
+    void setStatus(int sc, String sm);
 
     /**
      * Get the HTTP status code for this Response.

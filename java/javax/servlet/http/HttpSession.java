@@ -129,7 +129,7 @@ public interface HttpSession {
      */
     @SuppressWarnings("dep-ann")
     // Spec API does not use @Deprecated
- HttpSessionContext getSessionContext();
+    HttpSessionContext getSessionContext();
 
     /**
      * Returns the object bound with the specified name in this session, or <code>null</code> if no object is bound
@@ -154,7 +154,7 @@ public interface HttpSession {
      */
     @SuppressWarnings("dep-ann")
     // Spec API does not use @Deprecated
- Object getValue(String name);
+    Object getValue(String name);
 
     /**
      * Returns an <code>Enumeration</code> of <code>String</code> objects containing the names of all the objects bound
@@ -176,7 +176,7 @@ public interface HttpSession {
      */
     @SuppressWarnings("dep-ann")
     // Spec API does not use @Deprecated
- String[] getValueNames();
+    String[] getValueNames();
 
     /**
      * Binds an object to this session, using the name specified. If an object of the same name is already bound to the
@@ -209,7 +209,7 @@ public interface HttpSession {
      */
     @SuppressWarnings("dep-ann")
     // Spec API does not use @Deprecated
- void putValue(String name, Object value);
+    void putValue(String name, Object value);
 
     /**
      * Removes the object bound with the specified name from this session. If the session does not have an object bound
@@ -234,7 +234,7 @@ public interface HttpSession {
      */
     @SuppressWarnings("dep-ann")
     // Spec API does not use @Deprecated
- void removeValue(String name);
+    void removeValue(String name);
 
     /**
      * Invalidates this session then unbinds any objects bound to it.

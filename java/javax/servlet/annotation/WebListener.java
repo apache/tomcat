@@ -23,20 +23,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The annotation used to declare a listener for various types of event, in a
- * given web application context.<br>
+ * The annotation used to declare a listener for various types of event, in a given web application context.<br>
  * <br>
- *
- * The class annotated MUST implement one, (or more), of the following
- * interfaces: {@link javax.servlet.http.HttpSessionAttributeListener},
- * {@link javax.servlet.http.HttpSessionListener},
- * {@link javax.servlet.ServletContextAttributeListener},
- * {@link javax.servlet.ServletContextListener},
- * {@link javax.servlet.ServletRequestAttributeListener},
- * {@link javax.servlet.ServletRequestListener} or
- * {@link javax.servlet.http.HttpSessionIdListener}
- * <br>
- *
+ * The class annotated MUST implement one, (or more), of the following interfaces:
+ * {@link javax.servlet.http.HttpSessionAttributeListener}, {@link javax.servlet.http.HttpSessionListener},
+ * {@link javax.servlet.ServletContextAttributeListener}, {@link javax.servlet.ServletContextListener},
+ * {@link javax.servlet.ServletRequestAttributeListener}, {@link javax.servlet.ServletRequestListener} or
+ * {@link javax.servlet.http.HttpSessionIdListener} <br>
  * E.g. <code>@WebListener</code><br>
  * <code>public TestListener implements ServletContextListener {</code><br>
  *

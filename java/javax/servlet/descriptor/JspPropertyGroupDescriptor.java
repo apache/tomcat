@@ -56,8 +56,7 @@ public interface JspPropertyGroupDescriptor {
     /**
      * Should the JSPs in this group be treated as JSP documents?
      *
-     * @return {@code true} if the JSPs should be treated as JSP documents,
-     *         otherwise {@code false}
+     * @return {@code true} if the JSPs should be treated as JSP documents, otherwise {@code false}
      */
     String getIsXml();
 
@@ -76,20 +75,16 @@ public interface JspPropertyGroupDescriptor {
     Collection<String> getIncludeCodas();
 
     /**
-     * Is the deferred El syntax <code>#{...}</code> allowed to be used as a
-     * literal in this group?
+     * Is the deferred El syntax <code>#{...}</code> allowed to be used as a literal in this group?
      *
-     * @return {@code true} if the deferred EL syntax is allowed to be used as
-     *         a literal, otherwise {@code false}
+     * @return {@code true} if the deferred EL syntax is allowed to be used as a literal, otherwise {@code false}
      */
     String getDeferredSyntaxAllowedAsLiteral();
 
     /**
-     * Should the JSPs in this group have template text that only contains
-     * whitespace removed?
+     * Should the JSPs in this group have template text that only contains whitespace removed?
      *
-     * @return {@code true} if the whitespace be removed, otherwise
-     *         {@code false}
+     * @return {@code true} if the whitespace be removed, otherwise {@code false}
      */
     String getTrimDirectiveWhitespaces();
 
@@ -108,11 +103,10 @@ public interface JspPropertyGroupDescriptor {
     String getBuffer();
 
     /**
-     * Should an error be raised at translation time for a page in this group if
-     * the page contains a reference (e.g. a tag) to a undeclared namespace.
+     * Should an error be raised at translation time for a page in this group if the page contains a reference (e.g. a
+     * tag) to a undeclared namespace.
      *
-     * @return {@code true} if an error should be raised, otherwise
-     *         {@code false}
+     * @return {@code true} if an error should be raised, otherwise {@code false}
      */
     String getErrorOnUndeclaredNamespace();
 }

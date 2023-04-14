@@ -379,7 +379,7 @@ public interface HttpServletRequest extends ServletRequest {
      */
     @SuppressWarnings("dep-ann")
     // Spec API does not use @Deprecated
- boolean isRequestedSessionIdFromUrl();
+    boolean isRequestedSessionIdFromUrl();
 
     /**
      * Triggers the same authentication process as would be triggered if the request is for a resource that is protected

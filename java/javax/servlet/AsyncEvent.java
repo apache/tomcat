@@ -30,7 +30,7 @@ public class AsyncEvent {
     /**
      * Creates an instance using the provide parameters.
      *
-     * @param context   The asynchronous context associated with the event
+     * @param context The asynchronous context associated with the event
      */
     public AsyncEvent(AsyncContext context) {
         this.context = context;
@@ -42,12 +42,11 @@ public class AsyncEvent {
     /**
      * Creates an instance using the provide parameters.
      *
-     * @param context   The asynchronous context associated with the event
-     * @param request   The request associated with the event
-     * @param response  The response associated with the event
+     * @param context  The asynchronous context associated with the event
+     * @param request  The request associated with the event
+     * @param response The response associated with the event
      */
-    public AsyncEvent(AsyncContext context, ServletRequest request,
-            ServletResponse response) {
+    public AsyncEvent(AsyncContext context, ServletRequest request, ServletResponse response) {
         this.context = context;
         this.request = request;
         this.response = response;
@@ -75,8 +74,7 @@ public class AsyncEvent {
      * @param response  The response associated with the event
      * @param throwable The throwable associated with the event
      */
-    public AsyncEvent(AsyncContext context, ServletRequest request,
-            ServletResponse response, Throwable throwable) {
+    public AsyncEvent(AsyncContext context, ServletRequest request, ServletResponse response, Throwable throwable) {
         this.context = context;
         this.request = request;
         this.response = response;
@@ -86,8 +84,7 @@ public class AsyncEvent {
     /**
      * Obtain the asynchronous context associated with the event.
      *
-     * @return  The asynchronous context associated with the event or
-     *          {@code null} if one was not specified
+     * @return The asynchronous context associated with the event or {@code null} if one was not specified
      */
     public AsyncContext getAsyncContext() {
         return context;
@@ -96,8 +93,7 @@ public class AsyncEvent {
     /**
      * Obtain the request associated with the event.
      *
-     * @return  The request associated with the event or
-     *          {@code null} if one was not specified
+     * @return The request associated with the event or {@code null} if one was not specified
      */
     public ServletRequest getSuppliedRequest() {
         return request;
@@ -106,8 +102,7 @@ public class AsyncEvent {
     /**
      * Obtain the response associated with the event.
      *
-     * @return  The response associated with the event or
-     *          {@code null} if one was not specified
+     * @return The response associated with the event or {@code null} if one was not specified
      */
     public ServletResponse getSuppliedResponse() {
         return response;
@@ -116,8 +111,7 @@ public class AsyncEvent {
     /**
      * Obtain the throwable associated with the event.
      *
-     * @return  The throwable associated with the event or
-     *          {@code null} if one was not specified
+     * @return The throwable associated with the event or {@code null} if one was not specified
      */
     public Throwable getThrowable() {
         return throwable;
