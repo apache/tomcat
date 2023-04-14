@@ -24,6 +24,5 @@ import javax.security.auth.message.AuthException;
 public interface ServerAuthConfig extends AuthConfig {
 
     @SuppressWarnings("rawtypes") // JASPIC API uses raw types
-    ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject, Map properties)
-            throws AuthException;
+    ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject, Map properties) throws AuthException;
 }
