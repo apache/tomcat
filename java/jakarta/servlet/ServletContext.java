@@ -356,8 +356,7 @@ public interface ServletContext {
      * supported attributes can be retrieved using <code>getAttributeNames</code>.
      * <p>
      * The attribute is returned as a <code>java.lang.Object</code> or some subclass. Attribute names should follow the
-     * same convention as package names. The Java Servlet API specification reserves names matching <code>java.*</code>,
-     * <code>javax.*</code>, and <code>sun.*</code>.
+     * same convention as package names. The Jakarta EE platform reserves names matching <code>jakarta.*</code>.
      *
      * @param name a <code>String</code> specifying the name of the attribute
      *
@@ -388,8 +387,8 @@ public interface ServletContext {
      * <p>
      * If a null value is passed, the effect is the same as calling <code>removeAttribute()</code>.
      * <p>
-     * Attribute names should follow the same convention as package names. The Java Servlet API specification reserves
-     * names matching <code>java.*</code>, <code>javax.*</code>, and <code>sun.*</code>.
+     * Attribute names should follow the same convention as package names. The Jakarta EE platform reserves names
+     * matching <code>jakarta.*</code>.
      *
      * @param name   a <code>String</code> specifying the name of the attribute
      * @param object an <code>Object</code> representing the attribute to be bound

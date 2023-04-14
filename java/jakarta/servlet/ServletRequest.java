@@ -46,10 +46,8 @@ public interface ServletRequest {
      * the client. Attributes can also be set programmatically using {@link ServletRequest#setAttribute}. This allows
      * information to be embedded into a request before a {@link RequestDispatcher} call.
      * <p>
-     * Attribute names should follow the same conventions as package names. Names beginning with <code>java.*</code> and
-     * <code>javax.*</code> are reserved for use by the Servlet specification. Names beginning with <code>sun.*</code>,
-     * <code>com.sun.*</code>, <code>oracle.*</code> and <code>com.oracle.*</code>) are reserved for use by Oracle
-     * Corporation.
+     * Attribute names should follow the same conventions as package names. Names beginning with <code>jakarta.*</code>
+     * are reserved for use by the Jakarta EE platform.
      *
      * @param name a <code>String</code> specifying the name of the attribute
      *
@@ -277,10 +275,9 @@ public interface ServletRequest {
      * Stores an attribute in this request. Attributes are reset between requests. This method is most often used in
      * conjunction with {@link RequestDispatcher}.
      * <p>
-     * Attribute names should follow the same conventions as package names. Names beginning with <code>java.*</code> and
-     * <code>javax.*</code> are reserved for use by the Servlet specification. Names beginning with <code>sun.*</code>,
-     * <code>com.sun.*</code>, <code>oracle.*</code> and <code>com.oracle.*</code>) are reserved for use by Oracle
-     * Corporation. <br>
+     * Attribute names should follow the same conventions as package names. Names beginning with <code>jakarta.*</code>
+     * are reserved for use by the Jakarta EE platform.
+     * <p>
      * If the object passed in is null, the effect is the same as calling {@link #removeAttribute}. <br>
      * It is warned that when the request is dispatched from the servlet resides in a different web application by
      * <code>RequestDispatcher</code>, the object set by this method may not be correctly retrieved in the caller
@@ -295,10 +292,8 @@ public interface ServletRequest {
      * Removes an attribute from this request. This method is not generally needed as attributes only persist as long as
      * the request is being handled.
      * <p>
-     * Attribute names should follow the same conventions as package names. Names beginning with <code>java.*</code> and
-     * <code>javax.*</code> are reserved for use by the Servlet specification. Names beginning with <code>sun.*</code>,
-     * <code>com.sun.*</code>, <code>oracle.*</code> and <code>com.oracle.*</code>) are reserved for use by Oracle
-     * Corporation.
+     * Attribute names should follow the same conventions as package names. Names beginning with <code>jakarta.*</code>
+     * are reserved for use by the Jakarta EE platform.
      *
      * @param name a <code>String</code> specifying the name of the attribute to remove
      */
