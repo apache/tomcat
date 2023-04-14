@@ -27,14 +27,10 @@ import java.util.Map;
 
 public abstract class AuthConfigFactory {
 
-    public static final String DEFAULT_FACTORY_SECURITY_PROPERTY =
-            "authconfigprovider.factory";
-    public static final String GET_FACTORY_PERMISSION_NAME =
-            "getProperty.authconfigprovider.factory";
-    public static final String SET_FACTORY_PERMISSION_NAME =
-            "setProperty.authconfigprovider.factory";
-    public static final String PROVIDER_REGISTRATION_PERMISSION_NAME =
-            "setProperty.authconfigfactory.provider";
+    public static final String DEFAULT_FACTORY_SECURITY_PROPERTY = "authconfigprovider.factory";
+    public static final String GET_FACTORY_PERMISSION_NAME = "getProperty.authconfigprovider.factory";
+    public static final String SET_FACTORY_PERMISSION_NAME = "setProperty.authconfigprovider.factory";
+    public static final String PROVIDER_REGISTRATION_PERMISSION_NAME = "setProperty.authconfigfactory.provider";
 
     public static final SecurityPermission getFactorySecurityPermission =
             new SecurityPermission(GET_FACTORY_PERMISSION_NAME);
@@ -63,11 +59,10 @@ public abstract class AuthConfigFactory {
             if (factory == null) {
                 final String className = getFactoryClassName();
                 try {
-                    factory = AccessController.doPrivileged(
-                            new PrivilegedExceptionAction<AuthConfigFactory>() {
+                    factory = AccessController.doPrivileged(new PrivilegedExceptionAction<AuthConfigFactory>() {
                         @Override
-                        public AuthConfigFactory run() throws ReflectiveOperationException,
-                                IllegalArgumentException, SecurityException {
+                        public AuthConfigFactory run()
+                                throws ReflectiveOperationException, IllegalArgumentException, SecurityException {
                             // Load this class with the same class loader as used for
                             // this class. Note that the Thread context class loader
                             // should not be used since that would trigger a memory leak
@@ -79,8 +74,8 @@ public abstract class AuthConfigFactory {
                 } catch (PrivilegedActionException e) {
                     Exception inner = e.getException();
                     if (inner instanceof InstantiationException) {
-                        throw new SecurityException("AuthConfigFactory error:" +
-                                inner.getCause().getMessage(), inner.getCause());
+                        throw new SecurityException("AuthConfigFactory error:" + inner.getCause().getMessage(),
+                                inner.getCause());
                     } else {
                         throw new SecurityException("AuthConfigFactory error: " + inner, inner);
                     }
@@ -100,16 +95,15 @@ public abstract class AuthConfigFactory {
             RegistrationListener listener);
 
     @SuppressWarnings("rawtypes") // JASPIC API uses raw types
-    public abstract String registerConfigProvider(String className, Map properties, String layer,
-            String appContext, String description);
+    public abstract String registerConfigProvider(String className, Map properties, String layer, String appContext,
+            String description);
 
-    public abstract String registerConfigProvider(AuthConfigProvider provider, String layer,
-            String appContext, String description);
+    public abstract String registerConfigProvider(AuthConfigProvider provider, String layer, String appContext,
+            String description);
 
     public abstract boolean removeRegistration(String registrationID);
 
-    public abstract String[] detachListener(RegistrationListener listener, String layer,
-            String appContext);
+    public abstract String[] detachListener(RegistrationListener listener, String layer, String appContext);
 
     public abstract String[] getRegistrationIDs(AuthConfigProvider provider);
 

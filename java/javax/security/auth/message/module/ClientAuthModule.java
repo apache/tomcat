@@ -26,8 +26,8 @@ import javax.security.auth.message.MessagePolicy;
 public interface ClientAuthModule extends ClientAuth {
 
     @SuppressWarnings("rawtypes") // JASPIC API uses raw types
-    void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
-            CallbackHandler handler, Map options) throws AuthException;
+    void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy, CallbackHandler handler, Map options)
+            throws AuthException;
 
     @SuppressWarnings("rawtypes") // JASPIC API uses raw types
     Class[] getSupportedMessageTypes();
