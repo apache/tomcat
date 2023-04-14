@@ -141,9 +141,9 @@ public interface Session extends Closeable {
 
     String getQueryString();
 
-    Map<String, String> getPathParameters();
+    Map<String,String> getPathParameters();
 
-    Map<String, Object> getUserProperties();
+    Map<String,Object> getUserProperties();
 
     Principal getUserPrincipal();
 

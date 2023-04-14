@@ -147,7 +147,8 @@ public interface ServerEndpointConfig extends EndpointConfig {
         private static volatile Configurator defaultImpl = null;
         private static final Object defaultImplLock = new Object();
 
-        private static final String DEFAULT_IMPL_CLASSNAME = "org.apache.tomcat.websocket.server.DefaultServerEndpointConfigurator";
+        private static final String DEFAULT_IMPL_CLASSNAME =
+                "org.apache.tomcat.websocket.server.DefaultServerEndpointConfigurator";
 
         static Configurator fetchContainerDefaultConfigurator() {
             if (defaultImpl == null) {

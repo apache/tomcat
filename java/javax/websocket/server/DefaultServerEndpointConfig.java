@@ -36,7 +36,7 @@ final class DefaultServerEndpointConfig implements ServerEndpointConfig {
     private final List<Class<? extends Encoder>> encoders;
     private final List<Class<? extends Decoder>> decoders;
     private final Configurator serverEndpointConfigurator;
-    private final Map<String, Object> userProperties = new ConcurrentHashMap<>();
+    private final Map<String,Object> userProperties = new ConcurrentHashMap<>();
 
     DefaultServerEndpointConfig(Class<?> endpointClass, String path, List<String> subprotocols,
             List<Extension> extensions, List<Class<? extends Encoder>> encoders,

@@ -31,7 +31,7 @@ public interface HandshakeRequest {
     String SEC_WEBSOCKET_VERSION = "Sec-WebSocket-Version";
     String SEC_WEBSOCKET_EXTENSIONS = "Sec-WebSocket-Extensions";
 
-    Map<String, List<String>> getHeaders();
+    Map<String,List<String>> getHeaders();
 
     Principal getUserPrincipal();
 
