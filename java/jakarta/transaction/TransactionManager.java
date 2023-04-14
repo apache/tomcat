@@ -19,19 +19,16 @@ package jakarta.transaction;
 public interface TransactionManager {
     void begin() throws NotSupportedException, SystemException;
 
-    void commit() throws RollbackException, HeuristicMixedException,
-            HeuristicRollbackException, SecurityException,
+    void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException,
             IllegalStateException, SystemException;
 
     int getStatus() throws SystemException;
 
     Transaction getTransaction() throws SystemException;
 
-    void resume(Transaction tobj) throws InvalidTransactionException,
-            IllegalStateException, SystemException;
+    void resume(Transaction tobj) throws InvalidTransactionException, IllegalStateException, SystemException;
 
-    void rollback()
-            throws IllegalStateException, SecurityException, SystemException;
+    void rollback() throws IllegalStateException, SecurityException, SystemException;
 
     void setRollbackOnly() throws IllegalStateException, SystemException;
 
