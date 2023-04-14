@@ -23,8 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Added to a method required to be called once the object is no longer required
- * and before it is discarded.
+ * Added to a method required to be called once the object is no longer required and before it is discarded.
  *
  * @since Common Annotations 1.0
  */
