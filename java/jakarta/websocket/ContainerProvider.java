@@ -20,13 +20,11 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 
 /**
- * Use the {@link ServiceLoader} mechanism to provide instances of the WebSocket
- * client container.
+ * Use the {@link ServiceLoader} mechanism to provide instances of the WebSocket client container.
  */
 public abstract class ContainerProvider {
 
-    private static final String DEFAULT_PROVIDER_CLASS_NAME =
-            "org.apache.tomcat.websocket.WsWebSocketContainer";
+    private static final String DEFAULT_PROVIDER_CLASS_NAME = "org.apache.tomcat.websocket.WsWebSocketContainer";
 
     /**
      * Create a new container used to create outgoing WebSocket connections.
@@ -36,8 +34,7 @@ public abstract class ContainerProvider {
     public static WebSocketContainer getWebSocketContainer() {
         WebSocketContainer result = null;
 
-        ServiceLoader<ContainerProvider> serviceLoader =
-                ServiceLoader.load(ContainerProvider.class);
+        ServiceLoader<ContainerProvider> serviceLoader = ServiceLoader.load(ContainerProvider.class);
         Iterator<ContainerProvider> iter = serviceLoader.iterator();
         while (result == null && iter.hasNext()) {
             result = iter.next().getContainer();
@@ -48,11 +45,9 @@ public abstract class ContainerProvider {
             try {
                 @SuppressWarnings("unchecked")
                 Class<WebSocketContainer> clazz =
-                        (Class<WebSocketContainer>) Class.forName(
-                                DEFAULT_PROVIDER_CLASS_NAME);
+                        (Class<WebSocketContainer>) Class.forName(DEFAULT_PROVIDER_CLASS_NAME);
                 result = clazz.getConstructor().newInstance();
-            } catch (ReflectiveOperationException | IllegalArgumentException |
-                    SecurityException e) {
+            } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
                 // No options left. Just return null.
             }
         }

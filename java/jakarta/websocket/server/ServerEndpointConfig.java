@@ -30,17 +30,17 @@ import jakarta.websocket.Extension;
 import jakarta.websocket.HandshakeResponse;
 
 /**
- * Provides configuration information for WebSocket endpoints published to a
- * server. Applications may provide their own implementation or use
- * {@link Builder}.
+ * Provides configuration information for WebSocket endpoints published to a server. Applications may provide their own
+ * implementation or use {@link Builder}.
  */
 public interface ServerEndpointConfig extends EndpointConfig {
 
     Class<?> getEndpointClass();
 
     /**
-     * Returns the path at which this WebSocket server endpoint has been
-     * registered. It may be a path or a level 0 URI template.
+     * Returns the path at which this WebSocket server endpoint has been registered. It may be a path or a level 0 URI
+     * template.
+     *
      * @return The registered path
      */
     String getPath();
@@ -54,26 +54,21 @@ public interface ServerEndpointConfig extends EndpointConfig {
 
     final class Builder {
 
-        public static Builder create(
-                Class<?> endpointClass, String path) {
+        public static Builder create(Class<?> endpointClass, String path) {
             return new Builder(endpointClass, path);
         }
 
 
         private final Class<?> endpointClass;
         private final String path;
-        private List<Class<? extends Encoder>> encoders =
-                Collections.emptyList();
-        private List<Class<? extends Decoder>> decoders =
-                Collections.emptyList();
+        private List<Class<? extends Encoder>> encoders = Collections.emptyList();
+        private List<Class<? extends Decoder>> decoders = Collections.emptyList();
         private List<String> subprotocols = Collections.emptyList();
         private List<Extension> extensions = Collections.emptyList();
-        private Configurator configurator =
-                Configurator.fetchContainerDefaultConfigurator();
+        private Configurator configurator = Configurator.fetchContainerDefaultConfigurator();
 
 
-        private Builder(Class<?> endpointClass,
-                String path) {
+        private Builder(Class<?> endpointClass, String path) {
             if (endpointClass == null) {
                 throw new IllegalArgumentException("Endpoint class may not be null");
             }
@@ -91,13 +86,12 @@ public interface ServerEndpointConfig extends EndpointConfig {
         }
 
         public ServerEndpointConfig build() {
-            return new DefaultServerEndpointConfig(endpointClass, path,
-                    subprotocols, extensions, encoders, decoders, configurator);
+            return new DefaultServerEndpointConfig(endpointClass, path, subprotocols, extensions, encoders, decoders,
+                    configurator);
         }
 
 
-        public Builder encoders(
-                List<Class<? extends Encoder>> encoders) {
+        public Builder encoders(List<Class<? extends Encoder>> encoders) {
             if (encoders == null || encoders.size() == 0) {
                 this.encoders = Collections.emptyList();
             } else {
@@ -107,8 +101,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
         }
 
 
-        public Builder decoders(
-                List<Class<? extends Decoder>> decoders) {
+        public Builder decoders(List<Class<? extends Decoder>> decoders) {
             if (decoders == null || decoders.size() == 0) {
                 this.decoders = Collections.emptyList();
             } else {
@@ -118,8 +111,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
         }
 
 
-        public Builder subprotocols(
-                List<String> subprotocols) {
+        public Builder subprotocols(List<String> subprotocols) {
             if (subprotocols == null || subprotocols.size() == 0) {
                 this.subprotocols = Collections.emptyList();
             } else {
@@ -129,8 +121,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
         }
 
 
-        public Builder extensions(
-                List<Extension> extensions) {
+        public Builder extensions(List<Extension> extensions) {
             if (extensions == null || extensions.size() == 0) {
                 this.extensions = Collections.emptyList();
             } else {
@@ -166,8 +157,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
                         if (System.getSecurityManager() == null) {
                             defaultImpl = loadDefault();
                         } else {
-                            defaultImpl =
-                                    AccessController.doPrivileged(new PrivilegedLoadDefault());
+                            defaultImpl = AccessController.doPrivileged(new PrivilegedLoadDefault());
                         }
                     }
                 }
@@ -179,8 +169,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
         private static Configurator loadDefault() {
             Configurator result = null;
 
-            ServiceLoader<Configurator> serviceLoader =
-                    ServiceLoader.load(Configurator.class);
+            ServiceLoader<Configurator> serviceLoader = ServiceLoader.load(Configurator.class);
 
             Iterator<Configurator> iter = serviceLoader.iterator();
             while (result == null && iter.hasNext()) {
@@ -191,12 +180,9 @@ public interface ServerEndpointConfig extends EndpointConfig {
             if (result == null) {
                 try {
                     @SuppressWarnings("unchecked")
-                    Class<Configurator> clazz =
-                            (Class<Configurator>) Class.forName(
-                                    DEFAULT_IMPL_CLASSNAME);
+                    Class<Configurator> clazz = (Class<Configurator>) Class.forName(DEFAULT_IMPL_CLASSNAME);
                     result = clazz.getConstructor().newInstance();
-                } catch (ReflectiveOperationException | IllegalArgumentException |
-                        SecurityException e) {
+                } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
                     // No options left. Just return null.
                 }
             }
@@ -224,13 +210,11 @@ public interface ServerEndpointConfig extends EndpointConfig {
             return fetchContainerDefaultConfigurator();
         }
 
-        public String getNegotiatedSubprotocol(List<String> supported,
-                List<String> requested) {
+        public String getNegotiatedSubprotocol(List<String> supported, List<String> requested) {
             return fetchContainerDefaultConfigurator().getNegotiatedSubprotocol(supported, requested);
         }
 
-        public List<Extension> getNegotiatedExtensions(List<Extension> installed,
-                List<Extension> requested) {
+        public List<Extension> getNegotiatedExtensions(List<Extension> installed, List<Extension> requested) {
             return fetchContainerDefaultConfigurator().getNegotiatedExtensions(installed, requested);
         }
 
@@ -238,15 +222,12 @@ public interface ServerEndpointConfig extends EndpointConfig {
             return fetchContainerDefaultConfigurator().checkOrigin(originHeaderValue);
         }
 
-        public void modifyHandshake(ServerEndpointConfig sec,
-                HandshakeRequest request, HandshakeResponse response) {
+        public void modifyHandshake(ServerEndpointConfig sec, HandshakeRequest request, HandshakeResponse response) {
             fetchContainerDefaultConfigurator().modifyHandshake(sec, request, response);
         }
 
-        public <T extends Object> T getEndpointInstance(Class<T> clazz)
-                throws InstantiationException {
-            return fetchContainerDefaultConfigurator().getEndpointInstance(
-                    clazz);
+        public <T extends Object> T getEndpointInstance(Class<T> clazz) throws InstantiationException {
+            return fetchContainerDefaultConfigurator().getEndpointInstance(clazz);
         }
     }
 }
