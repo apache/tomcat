@@ -90,7 +90,7 @@ public interface Servlet {
      * Servlets typically run inside multithreaded servlet containers that can handle multiple requests concurrently.
      * Developers must be aware to synchronize access to any shared resources such as files, network connections, and as
      * well as the servlet's class and instance variables. More information on multithreaded programming in Java is
-     * available in <a href ="http://java.sun.com/Series/Tutorial/java/threads/multithreaded.html"> the Java tutorial on
+     * available in <a href="http://java.sun.com/Series/Tutorial/java/threads/multithreaded.html"> the Java tutorial on
      * multi-threaded programming</a>.
      *
      * @param req the <code>ServletRequest</code> object that contains the client's request
