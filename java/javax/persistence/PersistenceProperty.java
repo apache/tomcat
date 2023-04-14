@@ -25,5 +25,6 @@ import java.lang.annotation.Target;
 
 public @interface PersistenceProperty {
     String name();
+
     String value();
 }
