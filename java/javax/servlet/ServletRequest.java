@@ -18,6 +18,7 @@ package javax.servlet;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
@@ -77,11 +78,11 @@ public interface ServletRequest {
      * Overrides the name of the character encoding used in the body of this request. This method must be called prior
      * to reading request parameters or reading input using getReader().
      *
-     * @param env a <code>String</code> containing the name of the character encoding.
+     * @param encoding a {@code String} containing the name of the character encoding
      *
-     * @throws java.io.UnsupportedEncodingException if this is not a valid encoding
+     * @throws UnsupportedEncodingException if this is not a valid encoding
      */
-    void setCharacterEncoding(String env) throws java.io.UnsupportedEncodingException;
+    void setCharacterEncoding(String encoding) throws UnsupportedEncodingException;
 
     /**
      * Returns the length, in bytes, of the request body and made available by the input stream, or -1 if the length is

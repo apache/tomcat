@@ -23,8 +23,16 @@ import java.nio.ByteBuffer;
 
 public interface Encoder {
 
+    /**
+     * Initialise the encoder.
+     *
+     * @param endpointConfig The end-point configuration
+     */
     void init(EndpointConfig endpointConfig);
 
+    /**
+     * Destroy the decoder.
+     */
     void destroy();
 
     interface Text<T> extends Encoder {

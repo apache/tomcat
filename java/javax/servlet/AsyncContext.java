@@ -17,7 +17,9 @@
 package javax.servlet;
 
 /**
- * TODO SERVLET3 - Add comments
+ * Provides the context for asynchronous request handling
+ *
+ * @since Servlet 3.0
  */
 public interface AsyncContext {
 

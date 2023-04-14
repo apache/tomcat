@@ -120,7 +120,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
     }
 
     /**
-     * The default behavior of this method is to return sendRedirect(String location) on the wrapped response object.
+     * The default behavior of this method is to call sendRedirect(String location) on the wrapped response object.
      */
     @Override
     public void sendRedirect(String location) throws IOException {

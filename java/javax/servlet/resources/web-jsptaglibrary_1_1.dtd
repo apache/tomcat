@@ -39,7 +39,7 @@ shortname   a simple default short name that could be used by
             prefix value in taglib directives
 uri         a uri uniquely identifying this taglib
 info        a simple string describing the "use" of this taglib,
-            should be user discernable
+            should be user discernible
 -->
 
 <!ELEMENT taglib (tlibversion, jspversion?, shortname, uri?, info?, tag+) >
