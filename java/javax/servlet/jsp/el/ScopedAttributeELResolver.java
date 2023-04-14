@@ -31,8 +31,7 @@ import javax.servlet.jsp.JspContext;
 import javax.servlet.jsp.PageContext;
 
 /**
- * An ELResolver for working with JSP scoped attributes which may have page,
- * request, session or application scope.
+ * An ELResolver for working with JSP scoped attributes which may have page, request, session or application scope.
  *
  * @since JSP 2.1
  */
@@ -47,7 +46,7 @@ public class ScopedAttributeELResolver extends ELResolver {
             key = Class.forName("org.apache.el.parser.AstIdentifier");
         } catch (Exception e) {
             // Ignore: Expected if not running on Tomcat. Not a problem since
-            //         this just allows a short-cut.
+            // this just allows a short-cut.
         }
         AST_IDENTIFIER_KEY = key;
     }
@@ -102,8 +101,8 @@ public class ScopedAttributeELResolver extends ELResolver {
                             if (clazz != null) {
                                 try {
                                     result = clazz.getField(key).get(null);
-                                } catch (IllegalArgumentException | IllegalAccessException |
-                                        NoSuchFieldException | SecurityException e) {
+                                } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException |
+                                        SecurityException e) {
                                     // Most (all?) of these should have been
                                     // prevented by the checks when the import
                                     // was defined.
