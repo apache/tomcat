@@ -17,23 +17,27 @@
 package jakarta.servlet.jsp.el;
 
 /**
- * <p>The interface to a map between EL function names and methods.</p>
- *
- * <p>Classes implementing this interface may, for instance, consult tag library
- * information to resolve the map. </p>
+ * <p>
+ * The interface to a map between EL function names and methods.
+ * </p>
+ * <p>
+ * Classes implementing this interface may, for instance, consult tag library information to resolve the map.
+ * </p>
  *
  * @since JSP 2.0
+ *
  * @deprecated As of JSP 2.1, replaced by jakarta.el.FunctionMapper
  */
 @Deprecated
 public interface FunctionMapper {
     /**
-     * Resolves the specified local name and prefix into a Java.lang.Method.
-     * Returns null if the prefix and local name are not found.
+     * Resolves the specified local name and prefix into a Java.lang.Method. Returns null if the prefix and local name
+     * are not found.
      *
-     * @param prefix the prefix of the function, or "" if no prefix.
+     * @param prefix    the prefix of the function, or "" if no prefix.
      * @param localName the short name of the function
-     * @return the result of the method mapping.  Null means no entry found.
+     *
+     * @return the result of the method mapping. Null means no entry found.
      */
     java.lang.reflect.Method resolveFunction(String prefix, String localName);
 }

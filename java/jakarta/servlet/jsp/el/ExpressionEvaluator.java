@@ -18,28 +18,23 @@ package jakarta.servlet.jsp.el;
 
 /**
  * <p>
- * The abstract base class for an expression-language evaluator. Classes that
- * implement an expression language expose their functionality via this abstract
- * class.
+ * The abstract base class for an expression-language evaluator. Classes that implement an expression language expose
+ * their functionality via this abstract class.
  * </p>
  * <p>
- * An instance of the ExpressionEvaluator can be obtained via the JspContext /
- * PageContext
+ * An instance of the ExpressionEvaluator can be obtained via the JspContext / PageContext
  * </p>
  * <p>
- * The parseExpression() and evaluate() methods must be thread-safe. That is,
- * multiple threads may call these methods on the same ExpressionEvaluator
- * object simultaneously. Implementations should synchronize access if they
- * depend on transient state. Implementations should not, however, assume that
- * only one object of each ExpressionEvaluator type will be instantiated; global
- * caching should therefore be static.
+ * The parseExpression() and evaluate() methods must be thread-safe. That is, multiple threads may call these methods on
+ * the same ExpressionEvaluator object simultaneously. Implementations should synchronize access if they depend on
+ * transient state. Implementations should not, however, assume that only one object of each ExpressionEvaluator type
+ * will be instantiated; global caching should therefore be static.
  * </p>
  * <p>
- * Only a single EL expression, starting with '${' and ending with '}', can be
- * parsed or evaluated at a time. EL expressions cannot be mixed with static
- * text. For example, attempting to parse or evaluate "
- * <code>abc${1+1}def${1+1}ghi</code>" or even "<code>${1+1}${1+1}</code>" will
- * cause an <code>ELException</code> to be thrown.
+ * Only a single EL expression, starting with '${' and ending with '}', can be parsed or evaluated at a time. EL
+ * expressions cannot be mixed with static text. For example, attempting to parse or evaluate "
+ * <code>abc${1+1}def${1+1}ghi</code>" or even "<code>${1+1}${1+1}</code>" will cause an <code>ELException</code> to be
+ * thrown.
  * </p>
  * <p>
  * The following are examples of syntactically legal EL expressions:
@@ -51,58 +46,48 @@ package jakarta.servlet.jsp.el;
  * </ul>
  *
  * @since JSP 2.0
+ *
  * @deprecated As of JSP 2.1, replaced by jakarta.el.ExpressionFactory
  */
 @Deprecated
 public abstract class ExpressionEvaluator {
 
     /**
-     * Prepare an expression for later evaluation. This method should perform
-     * syntactic validation of the expression; if in doing so it detects errors,
-     * it should raise an ELParseException.
+     * Prepare an expression for later evaluation. This method should perform syntactic validation of the expression; if
+     * in doing so it detects errors, it should raise an ELParseException.
      *
-     * @param expression
-     *            The expression to be evaluated.
-     * @param expectedType
-     *            The expected type of the result of the evaluation
-     * @param fMapper
-     *            A FunctionMapper to resolve functions found in the expression.
-     *            It can be null, in which case no functions are supported for
-     *            this invocation. The ExpressionEvaluator must not hold on to
-     *            the FunctionMapper reference after returning from
-     *            <code>parseExpression()</code>. The <code>Expression</code>
-     *            object returned must invoke the same functions regardless of
-     *            whether the mappings in the provided
-     *            <code>FunctionMapper</code> instance change between calling
-     *            <code>ExpressionEvaluator.parseExpression()</code> and
-     *            <code>Expression.evaluate()</code>.
+     * @param expression   The expression to be evaluated.
+     * @param expectedType The expected type of the result of the evaluation
+     * @param fMapper      A FunctionMapper to resolve functions found in the expression. It can be null, in which case
+     *                         no functions are supported for this invocation. The ExpressionEvaluator must not hold on
+     *                         to the FunctionMapper reference after returning from <code>parseExpression()</code>. The
+     *                         <code>Expression</code> object returned must invoke the same functions regardless of
+     *                         whether the mappings in the provided <code>FunctionMapper</code> instance change between
+     *                         calling <code>ExpressionEvaluator.parseExpression()</code> and
+     *                         <code>Expression.evaluate()</code>.
+     *
      * @return The Expression object encapsulating the arguments.
-     * @exception ELException
-     *                Thrown if parsing errors were found.
+     *
+     * @exception ELException Thrown if parsing errors were found.
      */
-    public abstract Expression parseExpression(String expression, Class<?> expectedType,
-            FunctionMapper fMapper) throws ELException;
+    public abstract Expression parseExpression(String expression, Class<?> expectedType, FunctionMapper fMapper)
+            throws ELException;
 
     /**
-     * Evaluates an expression. This method may perform some syntactic
-     * validation and, if so, it should raise an ELParseException error if it
-     * encounters syntactic errors. EL evaluation errors should cause an
-     * ELException to be raised.
+     * Evaluates an expression. This method may perform some syntactic validation and, if so, it should raise an
+     * ELParseException error if it encounters syntactic errors. EL evaluation errors should cause an ELException to be
+     * raised.
      *
-     * @param expression
-     *            The expression to be evaluated.
-     * @param expectedType
-     *            The expected type of the result of the evaluation
-     * @param vResolver
-     *            A VariableResolver instance that can be used at runtime to
-     *            resolve the name of implicit objects into Objects.
-     * @param fMapper
-     *            A FunctionMapper to resolve functions found in the expression.
-     *            It can be null, in which case no functions are supported for
-     *            this invocation.
+     * @param expression   The expression to be evaluated.
+     * @param expectedType The expected type of the result of the evaluation
+     * @param vResolver    A VariableResolver instance that can be used at runtime to resolve the name of implicit
+     *                         objects into Objects.
+     * @param fMapper      A FunctionMapper to resolve functions found in the expression. It can be null, in which case
+     *                         no functions are supported for this invocation.
+     *
      * @return The result of the expression evaluation.
-     * @exception ELException
-     *                Thrown if the expression evaluation failed.
+     *
+     * @exception ELException Thrown if the expression evaluation failed.
      */
     public abstract Object evaluate(String expression, Class<?> expectedType, VariableResolver vResolver,
             FunctionMapper fMapper) throws ELException;

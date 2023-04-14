@@ -17,19 +17,17 @@
 package jakarta.servlet.jsp;
 
 /**
- * Exception to indicate the calling page must cease evaluation. Thrown by a
- * simple tag handler to indicate that the remainder of the page must not be
- * evaluated. The result is propagated back to the page in the case where one
- * tag invokes another (as can be the case with tag files). The effect is
- * similar to that of a Classic Tag Handler returning Tag.SKIP_PAGE from
- * doEndTag(). Jsp Fragments may also throw this exception. This exception
- * should not be thrown manually in a JSP page or tag file - the behavior is
- * undefined. The exception is intended to be thrown inside SimpleTag handlers
- * and in JSP fragments.
+ * Exception to indicate the calling page must cease evaluation. Thrown by a simple tag handler to indicate that the
+ * remainder of the page must not be evaluated. The result is propagated back to the page in the case where one tag
+ * invokes another (as can be the case with tag files). The effect is similar to that of a Classic Tag Handler returning
+ * Tag.SKIP_PAGE from doEndTag(). Jsp Fragments may also throw this exception. This exception should not be thrown
+ * manually in a JSP page or tag file - the behavior is undefined. The exception is intended to be thrown inside
+ * SimpleTag handlers and in JSP fragments.
  *
  * @see jakarta.servlet.jsp.tagext.SimpleTag#doTag
  * @see jakarta.servlet.jsp.tagext.JspFragment#invoke
  * @see jakarta.servlet.jsp.tagext.Tag#doEndTag
+ *
  * @since JSP 2.0
  */
 public class SkipPageException extends JspException {
@@ -46,8 +44,7 @@ public class SkipPageException extends JspException {
     /**
      * Creates a SkipPageException with the provided message.
      *
-     * @param message
-     *            the detail message
+     * @param message the detail message
      */
     public SkipPageException(String message) {
         super(message);
@@ -56,10 +53,8 @@ public class SkipPageException extends JspException {
     /**
      * Creates a SkipPageException with the provided message and root cause.
      *
-     * @param message
-     *            the detail message
-     * @param rootCause
-     *            the originating cause of this exception
+     * @param message   the detail message
+     * @param rootCause the originating cause of this exception
      */
     public SkipPageException(String message, Throwable rootCause) {
         super(message, rootCause);
@@ -68,8 +63,7 @@ public class SkipPageException extends JspException {
     /**
      * Creates a SkipPageException with the provided root cause.
      *
-     * @param rootCause
-     *            the originating cause of this exception
+     * @param rootCause the originating cause of this exception
      */
     public SkipPageException(Throwable rootCause) {
         super(rootCause);

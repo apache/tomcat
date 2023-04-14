@@ -20,15 +20,13 @@ import jakarta.servlet.jsp.JspException;
 import jakarta.servlet.jsp.PageContext;
 
 /**
- * Wraps any SimpleTag and exposes it using a Tag interface. This is used to
- * allow collaboration between classic Tag handlers and SimpleTag handlers.
+ * Wraps any SimpleTag and exposes it using a Tag interface. This is used to allow collaboration between classic Tag
+ * handlers and SimpleTag handlers.
  * <p>
- * Because SimpleTag does not extend Tag, and because Tag.setParent() only
- * accepts a Tag instance, a classic tag handler (one that implements Tag)
- * cannot have a SimpleTag as its parent. To remedy this, a TagAdapter is
- * created to wrap the SimpleTag parent, and the adapter is passed to
- * setParent() instead. A classic Tag Handler can call getAdaptee() to retrieve
- * the encapsulated SimpleTag instance.
+ * Because SimpleTag does not extend Tag, and because Tag.setParent() only accepts a Tag instance, a classic tag handler
+ * (one that implements Tag) cannot have a SimpleTag as its parent. To remedy this, a TagAdapter is created to wrap the
+ * SimpleTag parent, and the adapter is passed to setParent() instead. A classic Tag Handler can call getAdaptee() to
+ * retrieve the encapsulated SimpleTag instance.
  *
  * @since JSP 2.0
  */
@@ -43,11 +41,9 @@ public class TagAdapter implements Tag {
     private boolean parentDetermined;
 
     /**
-     * Creates a new TagAdapter that wraps the given SimpleTag and returns the
-     * parent tag when getParent() is called.
+     * Creates a new TagAdapter that wraps the given SimpleTag and returns the parent tag when getParent() is called.
      *
-     * @param adaptee
-     *            The SimpleTag being adapted as a Tag.
+     * @param adaptee The SimpleTag being adapted as a Tag.
      */
     public TagAdapter(SimpleTag adaptee) {
         if (adaptee == null) {
@@ -60,37 +56,31 @@ public class TagAdapter implements Tag {
     /**
      * Must not be called.
      *
-     * @param pc
-     *            ignored.
-     * @throws UnsupportedOperationException
-     *             Must not be called
+     * @param pc ignored.
+     *
+     * @throws UnsupportedOperationException Must not be called
      */
     @Override
     public void setPageContext(PageContext pc) {
-        throw new UnsupportedOperationException(
-                "Illegal to invoke setPageContext() on TagAdapter wrapper");
+        throw new UnsupportedOperationException("Illegal to invoke setPageContext() on TagAdapter wrapper");
     }
 
     /**
-     * Must not be called. The parent of this tag is always
-     * getAdaptee().getParent().
+     * Must not be called. The parent of this tag is always getAdaptee().getParent().
      *
-     * @param parentTag
-     *            ignored.
-     * @throws UnsupportedOperationException
-     *             Must not be called.
+     * @param parentTag ignored.
+     *
+     * @throws UnsupportedOperationException Must not be called.
      */
     @Override
     public void setParent(Tag parentTag) {
-        throw new UnsupportedOperationException(
-                "Illegal to invoke setParent() on TagAdapter wrapper");
+        throw new UnsupportedOperationException("Illegal to invoke setParent() on TagAdapter wrapper");
     }
 
     /**
-     * Returns the parent of this tag, which is always getAdaptee().getParent().
-     * This will either be the enclosing Tag (if getAdaptee().getParent()
-     * implements Tag), or an adapter to the enclosing Tag (if
-     * getAdaptee().getParent() does not implement Tag).
+     * Returns the parent of this tag, which is always getAdaptee().getParent(). This will either be the enclosing Tag
+     * (if getAdaptee().getParent() implements Tag), or an adapter to the enclosing Tag (if getAdaptee().getParent()
+     * does not implement Tag).
      *
      * @return The parent of the tag being adapted.
      */
@@ -113,9 +103,8 @@ public class TagAdapter implements Tag {
     }
 
     /**
-     * Gets the tag that is being adapted to the Tag interface. This should be
-     * an instance of SimpleTag in JSP 2.0, but room is left for other kinds of
-     * tags in future spec versions.
+     * Gets the tag that is being adapted to the Tag interface. This should be an instance of SimpleTag in JSP 2.0, but
+     * room is left for other kinds of tags in future spec versions.
      *
      * @return the tag that is being adapted
      */
@@ -127,41 +116,35 @@ public class TagAdapter implements Tag {
      * Must not be called.
      *
      * @return always throws UnsupportedOperationException
-     * @throws UnsupportedOperationException
-     *             Must not be called
-     * @throws JspException
-     *             never thrown
+     *
+     * @throws UnsupportedOperationException Must not be called
+     * @throws JspException                  never thrown
      */
     @Override
     public int doStartTag() throws JspException {
-        throw new UnsupportedOperationException(
-                "Illegal to invoke doStartTag() on TagAdapter wrapper");
+        throw new UnsupportedOperationException("Illegal to invoke doStartTag() on TagAdapter wrapper");
     }
 
     /**
      * Must not be called.
      *
      * @return always throws UnsupportedOperationException
-     * @throws UnsupportedOperationException
-     *             Must not be called
-     * @throws JspException
-     *             never thrown
+     *
+     * @throws UnsupportedOperationException Must not be called
+     * @throws JspException                  never thrown
      */
     @Override
     public int doEndTag() throws JspException {
-        throw new UnsupportedOperationException(
-                "Illegal to invoke doEndTag() on TagAdapter wrapper");
+        throw new UnsupportedOperationException("Illegal to invoke doEndTag() on TagAdapter wrapper");
     }
 
     /**
      * Must not be called.
      *
-     * @throws UnsupportedOperationException
-     *             Must not be called
+     * @throws UnsupportedOperationException Must not be called
      */
     @Override
     public void release() {
-        throw new UnsupportedOperationException(
-                "Illegal to invoke release() on TagAdapter wrapper");
+        throw new UnsupportedOperationException("Illegal to invoke release() on TagAdapter wrapper");
     }
 }

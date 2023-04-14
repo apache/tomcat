@@ -17,10 +17,10 @@
 package jakarta.servlet.jsp.el;
 
 /**
- * Represents any of the exception conditions that arise during the operation
- * evaluation of the evaluator.
+ * Represents any of the exception conditions that arise during the operation evaluation of the evaluator.
  *
  * @since JSP 2.0
+ *
  * @deprecated As of JSP 2.1, replaced by jakarta.el.ELException
  */
 @Deprecated
@@ -38,8 +38,7 @@ public class ELException extends Exception {
     /**
      * Creates an ELException with the provided detail message.
      *
-     * @param pMessage
-     *            the detail message
+     * @param pMessage the detail message
      **/
     public ELException(String pMessage) {
         super(pMessage);
@@ -48,8 +47,7 @@ public class ELException extends Exception {
     /**
      * Creates an ELException with the given root cause.
      *
-     * @param pRootCause
-     *            the originating cause of this exception
+     * @param pRootCause the originating cause of this exception
      **/
     public ELException(Throwable pRootCause) {
         super(pRootCause);
@@ -59,10 +57,8 @@ public class ELException extends Exception {
     /**
      * Creates an ELException with the given detail message and root cause.
      *
-     * @param pMessage
-     *            the detail message
-     * @param pRootCause
-     *            the originating cause of this exception
+     * @param pMessage   the detail message
+     * @param pRootCause the originating cause of this exception
      **/
     public ELException(String pMessage, Throwable pRootCause) {
         super(pMessage, pRootCause);
