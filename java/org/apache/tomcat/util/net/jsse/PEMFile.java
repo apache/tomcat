@@ -78,7 +78,6 @@ public class PEMFile {
         return result.toString();
     }
 
-    private String filename;
     private List<X509Certificate> certificates = new ArrayList<>();
     private PrivateKey privateKey;
 
@@ -100,12 +99,22 @@ public class PEMFile {
 
     public PEMFile(String filename, String password, String keyAlgorithm)
             throws IOException, GeneralSecurityException {
-        this.filename = filename;
+        this(filename, ConfigFileLoader.getInputStream(filename), password, keyAlgorithm);
+    }
 
+    /**
+     * @param filename the filename to mention in error messages, not used for anything else.
+     * @param fileStream the stream containing the pem(s).
+     * @param password password to load the pem objects.
+     * @param keyAlgorithm the algorithm to help to know how to load the objects (guessed if null).
+     * @throws IOException if input can't be read.
+     * @throws GeneralSecurityException if input can't be parsed/loaded.
+     */
+    public PEMFile(String filename, InputStream fileStream, String password, String keyAlgorithm)
+            throws IOException, GeneralSecurityException {
         List<Part> parts = new ArrayList<>();
-        try (InputStream inputStream = ConfigFileLoader.getInputStream(filename)) {
-            BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.US_ASCII));
+        try (BufferedReader reader =
+                 new BufferedReader(new InputStreamReader(fileStream, StandardCharsets.US_ASCII))) {
             Part part = null;
             String line;
             while ((line = reader.readLine()) != null) {
@@ -127,28 +136,29 @@ public class PEMFile {
                             part.algorithm = pieces[0];
                             part.ivHex = pieces[1];
                         }
-                    }                }
+                    }
+                }
             }
         }
 
         for (Part part : parts) {
             switch (part.type) {
                 case Part.PRIVATE_KEY:
-                    privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS8);
+                    privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS8, filename);
                     break;
                 case Part.EC_PRIVATE_KEY:
-                    privateKey = part.toPrivateKey(null, "EC", Format.RFC5915);
+                    privateKey = part.toPrivateKey(null, "EC", Format.RFC5915, filename);
                     break;
                 case Part.ENCRYPTED_PRIVATE_KEY:
-                    privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS8);
+                    privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS8, filename);
                     break;
                 case Part.RSA_PRIVATE_KEY:
                     if (part.algorithm == null) {
                         // If no encryption algorithm was detected, ignore any
                         // (probably default) key password provided.
-                        privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS1);
+                        privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS1, filename);
                     } else {
-                        privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS1);
+                        privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS1, filename);
                     }
                     break;
                 case Part.CERTIFICATE:
@@ -185,7 +195,7 @@ public class PEMFile {
             return (X509Certificate) factory.generateCertificate(new ByteArrayInputStream(decode()));
         }
 
-        public PrivateKey toPrivateKey(String password, String keyAlgorithm, Format format)
+        public PrivateKey toPrivateKey(String password, String keyAlgorithm, Format format, String filename)
                 throws GeneralSecurityException, IOException {
             KeySpec keySpec = null;
 

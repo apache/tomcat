@@ -276,6 +276,10 @@
       <update>
         Update Jacoco to 0.8.9. (markt)
       </update>
+      <fix>
+        Enhance PEMFile to laod from an InputStream. Patch provided by
+        Romain Manni-Bucau. (schultz)
+      </fix>
     </changelog>
   </subsection>
 </section>
