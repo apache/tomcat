@@ -81,7 +81,7 @@ public abstract class AbstractStreamProvider implements StreamProvider {
         URLConnection connection;
         try {
             connection = new URI(url).toURL().openConnection();
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException | IllegalArgumentException e) {
             // Not ideal but consistent with API
             throw new IOException(e);
         }

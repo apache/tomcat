@@ -812,7 +812,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 try {
                     URI wsdlURI = new URI(service.getWsdlfile());
                     wsdlURL = wsdlURI.toURL();
-                } catch (MalformedURLException | URISyntaxException e) {
+                } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
                     // Ignore and carry on
                 }
                 if (wsdlURL == null) {
@@ -843,7 +843,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 try {
                     URI jaxrpcURI = new URI(service.getJaxrpcmappingfile());
                     jaxrpcURL = jaxrpcURI.toURL();
-                } catch (MalformedURLException | URISyntaxException e) {
+                } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
                     // Ignore and carry on
                 }
                 if (jaxrpcURL == null) {

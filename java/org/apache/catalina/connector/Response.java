@@ -1444,7 +1444,7 @@ public class Response implements HttpServletResponse {
         try {
             URI uri = new URI(location);
             url = uri.toURL();
-        } catch (MalformedURLException | URISyntaxException e) {
+        } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
             return false;
         }
 
