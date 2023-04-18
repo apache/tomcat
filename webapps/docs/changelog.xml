@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.75 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>66567</bug>: Fix missing <code>IllegalArgumentException</code>
+        after the Tomcat code was converted to using URI instead of URL. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.74 (remm)" rtext="release in progress">
   <subsection name="Catalina">

@@ -1685,7 +1685,7 @@ public class ContextConfig implements LifecycleListener {
                 URL url = uri.toURL();
                 uc = url.openConnection();
                 globalTimeStamp = uc.getLastModified();
-            } catch (IOException | URISyntaxException e) {
+            } catch (IOException | URISyntaxException | IllegalArgumentException e) {
                 globalTimeStamp = -1;
             } finally {
                 if (uc != null) {
@@ -1706,7 +1706,7 @@ public class ContextConfig implements LifecycleListener {
                 URL url = uri.toURL();
                 uc = url.openConnection();
                 hostTimeStamp = uc.getLastModified();
-            } catch (IOException | URISyntaxException e) {
+            } catch (IOException | URISyntaxException | IllegalArgumentException e) {
                 hostTimeStamp = -1;
             } finally {
                 if (uc != null) {
