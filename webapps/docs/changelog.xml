@@ -335,6 +335,7 @@
       <fix>
         Enhance PEMFile to laod from an InputStream. Patch provided by
         Romain Manni-Bucau. (schultz)
+      </fix>
     </changelog>
   </subsection>
 </section>
