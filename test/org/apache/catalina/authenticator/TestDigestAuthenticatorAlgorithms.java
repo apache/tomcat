@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.authenticator;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -57,25 +59,42 @@ public class TestDigestAuthenticatorAlgorithms extends TomcatBaseTest {
     private static String REALM_NAME = "TestRealm";
     private static String CNONCE = "cnonce";
 
+    private static final boolean HAS_SHA_512_256;
+
     private static final List<List<AuthDigest>> ALGORITHM_PERMUTATIONS = new ArrayList<>();
     static {
+        boolean digestSupported = false;
+        try {
+            MessageDigest.getInstance(AuthDigest.SHA_512_256.getJavaName());
+            digestSupported = true;
+        } catch (NoSuchAlgorithmException nsae) {
+            // Ignore
+        }
+        HAS_SHA_512_256 = digestSupported;
+
         ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.MD5));
         ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.MD5, AuthDigest.SHA_256));
-        ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.MD5, AuthDigest.SHA_256, AuthDigest.SHA_512_256));
-        ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.MD5, AuthDigest.SHA_512_256));
-        ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.MD5, AuthDigest.SHA_512_256, AuthDigest.SHA_256));
+        if (HAS_SHA_512_256) {
+            ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.MD5, AuthDigest.SHA_256, AuthDigest.SHA_512_256));
+            ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.MD5, AuthDigest.SHA_512_256));
+            ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.MD5, AuthDigest.SHA_512_256, AuthDigest.SHA_256));
+        }
 
         ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_256));
         ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_256, AuthDigest.MD5));
-        ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_256, AuthDigest.MD5, AuthDigest.SHA_512_256));
-        ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_256, AuthDigest.SHA_512_256));
-        ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_256, AuthDigest.SHA_512_256, AuthDigest.MD5));
+        if (HAS_SHA_512_256) {
+            ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_256, AuthDigest.MD5, AuthDigest.SHA_512_256));
+            ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_256, AuthDigest.SHA_512_256));
+            ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_256, AuthDigest.SHA_512_256, AuthDigest.MD5));
+        }
 
-        ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_512_256));
-        ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_512_256, AuthDigest.MD5));
-        ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_512_256, AuthDigest.MD5, AuthDigest.SHA_256));
-        ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_512_256, AuthDigest.SHA_256));
-        ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_512_256, AuthDigest.SHA_256, AuthDigest.MD5));
+        if (HAS_SHA_512_256) {
+            ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_512_256));
+            ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_512_256, AuthDigest.MD5));
+            ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_512_256, AuthDigest.MD5, AuthDigest.SHA_256));
+            ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_512_256, AuthDigest.SHA_256));
+            ALGORITHM_PERMUTATIONS.add(Arrays.asList(AuthDigest.SHA_512_256, AuthDigest.SHA_256, AuthDigest.MD5));
+        }
     }
 
     @Parameterized.Parameters(name = "{index}: Algorithms[{0}], Algorithm[{1}], PwdDigest[{2}], AuthExpected[{3}]")
@@ -90,6 +109,9 @@ public class TestDigestAuthenticatorAlgorithms extends TomcatBaseTest {
                     }
                     , algorithms);
             for (AuthDigest algorithm : AuthDigest.values()) {
+                if (algorithm.equals(AuthDigest.SHA_512_256) && !HAS_SHA_512_256) {
+                    continue;
+                }
                 boolean authExpected = algorithmPermutation.contains(algorithm);
                 for (Boolean digestPassword : booleans) {
                     String user;
