@@ -58,6 +58,9 @@ public class TestWsWebSocketContainerSSL extends WebSocketBaseTest {
         ClientEndpointConfig clientEndpointConfig = ClientEndpointConfig.Builder.create().build();
         clientEndpointConfig.getUserProperties().put(org.apache.tomcat.websocket.Constants.SSL_TRUSTSTORE_PROPERTY,
                 TesterSupport.CA_JKS);
+        // Java 7 doesn't default to TLSv1.2 but the tests do
+        clientEndpointConfig.getUserProperties().put(org.apache.tomcat.websocket.Constants.SSL_PROTOCOLS_PROPERTY,
+                TesterSupport.isTlsv13Available() ? "TLSv1.3" : "TLSv1.2");
         Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class, clientEndpointConfig,
                 new URI("wss://localhost" + ":" + getPort() + TesterEchoServer.Config.PATH_ASYNC));
         CountDownLatch latch = new CountDownLatch(1);
