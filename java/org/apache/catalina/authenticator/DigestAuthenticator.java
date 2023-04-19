@@ -248,7 +248,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 ConcurrentMessageDigest.init(algorithm.getJavaName());
             } catch (NoSuchAlgorithmException e) {
                 // In theory, a JRE can choose not to implement SHA-512/256
-                log.warn(sm.getString("digestAuthenticator.unsupportedAlgorithm", algorithm.getJavaName()), e);
+                log.warn(sm.getString("digestAuthenticator.unsupportedAlgorithm", algorithms, algorithm.getJavaName()), e);
                 algorithmIterator.remove();
             }
         }
