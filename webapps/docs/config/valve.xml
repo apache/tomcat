@@ -539,28 +539,28 @@
     those are mapped to specific JSON attribute names. The attributes are the
     following:
     <ul>
-    <li>a: remoteAddr</li>
-    <li>A: localAddr</li>
-    <li>b: size (byteSent: size)</li>
-    <li>B: byteSentNC</li>
-    <li>D: elapsedTime</li>
-    <li>F: firstByteTime</li>
-    <li>h: host</li>
-    <li>H: protocol</li>
-    <li>l: logicalUserName</li>
-    <li>m: method</li>
-    <li>p: port</li>
-    <li>q: query</li>
-    <li>r: request</li>
-    <li>s: statusCode</li>
-    <li>S: sessionId</li>
-    <li>t: time (dateTime: time)</li>
-    <li>T: elapsedTimeS</li>
-    <li>u: user</li>
-    <li>U: path (requestURI: path)</li>
-    <li>v: localServerName</li>
-    <li>I: threadName</li>
-    <li>X: connectionStatus</li>
+    <li><b><code>%a</code></b>: remoteAddr</li>
+    <li><b><code>%A</code></b>: localAddr</li>
+    <li><b><code>%b</code></b>: size (byteSent: size)</li>
+    <li><b><code>%B</code></b>: byteSentNC</li>
+    <li><b><code>%D</code></b>: elapsedTime</li>
+    <li><b><code>%F</code></b>: firstByteTime</li>
+    <li><b><code>%h</code></b>: host</li>
+    <li><b><code>%H</code></b>: protocol</li>
+    <li><b><code>%l</code></b>: logicalUserName</li>
+    <li><b><code>%m</code></b>: method</li>
+    <li><b><code>%p</code></b>: port</li>
+    <li><b><code>%q</code></b>: query</li>
+    <li><b><code>%r</code></b>: request</li>
+    <li><b><code>%s</code></b>: statusCode</li>
+    <li><b><code>%S</code></b>: sessionId</li>
+    <li><b><code>%t</code></b>: time (dateTime: time)</li>
+    <li><b><code>%T</code></b>: elapsedTimeS</li>
+    <li><b><code>%u</code></b>: user</li>
+    <li><b><code>%U</code></b>: path (requestURI: path)</li>
+    <li><b><code>%v</code></b>: localServerName</li>
+    <li><b><code>%I</code></b>: threadName</li>
+    <li><b><code>%X</code></b>: connectionStatus</li>
     </ul>
     </p>
 
