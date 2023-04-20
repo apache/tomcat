@@ -113,6 +113,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        Add support for a new character set, <code>gb18030-2022</code> -
+        introduced in Java 21, to the character set caching mechanism. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.74 (remm)" rtext="2023-04-18">
   <subsection name="Catalina">
