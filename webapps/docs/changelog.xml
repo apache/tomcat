@@ -187,7 +187,7 @@
       <fix>
         <bug>66541</bug>: Improve handling for cached resources for resources
         that use custom URL schemes. The scheme specific <code>equals()</code>
-        and <code>hashcode()</code> algorithms, if present, will now be used for
+        and <code>hashCode()</code> algorithms, if present, will now be used for
         URLs for these resources. This addresses a potential performance issue
         with some OSGi custom URL schemes that can trigger potentially slow DNS
         lookups in some configurations. Based on a patch provided by Tom
@@ -341,7 +341,7 @@
         Update Jacoco to 0.8.9. (markt)
       </update>
       <fix>
-        Enhance PEMFile to laod from an InputStream. Patch provided by
+        Enhance PEMFile to load from an InputStream. Patch provided by
         Romain Manni-Bucau. (schultz)
       </fix>
     </changelog>
