@@ -153,7 +153,9 @@ public class CharsetCache {
             // Added from OpenJDK 15 ea24
             "iso8859_16",
             // Added from HPE JVM 1.8.0.17-hp-ux
-            "cp1051", "cp1386", "cshproman8", "hp-roman8", "ibm-1051", "r8", "roman8", "roman9"
+            "cp1051", "cp1386", "cshproman8", "hp-roman8", "ibm-1051", "r8", "roman8", "roman9",
+            // Added from OpenJDK 21 ea18
+            "gb18030-2022"
             // If you add and entry to this list, ensure you run
             // TestCharsetUtil#testIsAcsiiSupersetAll()
             };
