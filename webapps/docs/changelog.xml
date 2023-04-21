@@ -121,6 +121,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>66575</bug>: Avoid unchecked use of the backing array of a
+        buffer provided by the user in the compression transformation. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.88 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
