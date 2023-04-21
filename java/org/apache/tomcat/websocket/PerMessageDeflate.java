@@ -329,9 +329,15 @@ public class PerMessageDeflate implements Transformation {
                 ByteBuffer uncompressedPayload = uncompressedPart.getPayload();
                 SendHandler uncompressedIntermediateHandler = uncompressedPart.getIntermediateHandler();
 
-                deflater.setInput(uncompressedPayload.array(),
-                        uncompressedPayload.arrayOffset() + uncompressedPayload.position(),
-                        uncompressedPayload.remaining());
+                if (uncompressedPayload.hasArray()) {
+                    deflater.setInput(uncompressedPayload.array(),
+                            uncompressedPayload.arrayOffset() + uncompressedPayload.position(),
+                            uncompressedPayload.remaining());
+                } else {
+                    byte[] bytes = new byte[uncompressedPayload.remaining()];
+                    uncompressedPayload.get(bytes);
+                    deflater.setInput(bytes, 0, bytes.length);
+                }
 
                 int flush = (uncompressedPart.isFin() ? Deflater.SYNC_FLUSH : Deflater.NO_FLUSH);
                 boolean deflateRequired = true;
