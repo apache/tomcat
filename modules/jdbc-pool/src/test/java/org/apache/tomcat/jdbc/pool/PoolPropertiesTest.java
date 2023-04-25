@@ -42,7 +42,7 @@ public class PoolPropertiesTest {
             switch (c) {
                 case '{':
                 case '(':
-                case '[': stack.add(c); break;
+                case '[': stack.add(Character.valueOf(c)); break;
                 case '}': Assert.assertEquals('{', stack.remove(stack.size() - 1).charValue()); break;
                 case ')': Assert.assertEquals('(', stack.remove(stack.size() - 1).charValue()); break;
                 case ']': Assert.assertEquals('[', stack.remove(stack.size() - 1).charValue()); break;
