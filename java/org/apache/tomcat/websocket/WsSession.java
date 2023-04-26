@@ -660,9 +660,10 @@ public class WsSession implements Session {
         // Flush any batched messages not yet sent.
         try {
             wsRemoteEndpoint.setBatchingAllowed(false);
-        } catch (IOException e) {
-            log.warn(sm.getString("wsSession.flushFailOnClose"), e);
-            fireEndpointOnError(e);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.warn(sm.getString("wsSession.flushFailOnClose"), t);
+            fireEndpointOnError(t);
         }
 
         // Send the close message to the remote endpoint.
@@ -700,9 +701,10 @@ public class WsSession implements Session {
             // Flush any batched messages not yet sent.
             try {
                 wsRemoteEndpoint.setBatchingAllowed(false);
-            } catch (IOException e) {
-                log.warn(sm.getString("wsSession.flushFailOnClose"), e);
-                fireEndpointOnError(e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.warn(sm.getString("wsSession.flushFailOnClose"), t);
+                fireEndpointOnError(t);
             }
 
             // Send the close message response to the remote endpoint.
