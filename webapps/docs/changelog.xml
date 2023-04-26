@@ -132,6 +132,10 @@
         <bug>66575</bug>: Avoid unchecked use of the backing array of a
         buffer provided by the user in the compression transformation. (remm)
       </fix>
+      <fix>
+        Improve exception handling when flushing batched messages during
+        WebSocket session close. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
