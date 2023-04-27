@@ -543,18 +543,30 @@
     <a href="#Access_Log_Valve">Access Log Valve</a>,
     there are a few differences:
     <ul>
-    <li>requests are logged as JSON objects. Each "%" prefixed pattern
+    <li>requests are logged as JSON objects.</li>
+    <li>each supported "%X" single character pattern
         identifier results in a key value pair in this object.
         See below for the list of keys used for the respective pattern
         identifiers.</li>
+    <li>each pattern identifiers using a subkey of the form <code>%{xxx}X</code>
+        where "X" is one of "a", "p" or "t"
+        results in a key value pair of the form "key-xxx".
+        See below for the list of keys used for the respective pattern
+        identifiers.</li>
+    <li>each pattern identifiers using a subkey of the form <code>%{xxx}X</code>
+        where "X" is one of "c", "i", "o", "r" or "s"
+        results in a sub object. See below for the key pointing at this
+        sub object. The keys in the sub object are the "xxx" subkeys in the pattern.</li>
+    <li>each unsupported "%X" character pattern
+        identifier results in a key value pair using the key "other-X".</li>
     <li>the values logged are the same as the ones logged by
         the standard <a href="#Access_Log_Valve">Access Log Valve</a>
         for the same pattern identifiers.</li>
-    <li>pattern identifiers using a subkey of the form <code>%{subkey}</code>
-        are not yet supported and get silently ignored.</li>
+    <li>any "xxx" subkeys get Json escaped.</li>
     <li>any verbatim text between pattern identifiers gets silently ignored.</li>
     </ul>
-    The JSON object keys used for the respective pattern identifiers are the following:
+    The JSON object keys used for the pattern identifiers which
+    do not generate a sub object are the following:
     <ul>
     <li><b><code>%a</code></b>: remoteAddr</li>
     <li><b><code>%A</code></b>: localAddr</li>
@@ -579,10 +591,16 @@
     <li><b><code>%v</code></b>: localServerName</li>
     <li><b><code>%X</code></b>: connectionStatus</li>
     </ul>
+    The JSON object keys used for the pattern identifiers which
+    generate a sub object are the following:
+    <ul>
+    <li><b><code>%c</code></b>: cookies</li>
+    <li><b><code>%i</code></b>: requestHeaders</li>
+    <li><b><code>%o</code></b>: responseHeaders</li>
+    <li><b><code>%r</code></b>: requestAttributes</li>
+    <li><b><code>%s</code></b>: sessionAttributes</li>
+    </ul>
     </p>
-
-    <p>Fields using unknown pattern identifiers will be logged with JSON object key
-    <code>other-X</code> where <code>X</code> is the unknown identifier.</p>
 
   </subsection>
 
