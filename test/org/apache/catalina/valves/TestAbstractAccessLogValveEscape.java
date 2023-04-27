@@ -40,12 +40,19 @@ public class TestAbstractAccessLogValveEscape {
         parameters.add(new String[] { null, "-" });
         parameters.add(new String[] { "", "-" });
         parameters.add(new String[] { "ok", "ok" });
+        parameters.add(new String[] { "o\fk", "o\\fk" });
+        parameters.add(new String[] { "o\nk", "o\\nk" });
+        parameters.add(new String[] { "o\rk", "o\\rk" });
         parameters.add(new String[] { "o\tk", "o\\tk" });
+        parameters.add(new String[] { "o\"k", "o\\\"k" });
+        parameters.add(new String[] { "o\\k", "o\\\\k" });
         parameters.add(new String[] { "o\u0002k", "o\\u0002k" });
         parameters.add(new String[] { "o\u007fk", "o\\u007fk" });
         parameters.add(new String[] { "o\u0080k", "o\\u0080k" });
         parameters.add(new String[] { "o\u00ffk", "o\\u00ffk" });
-        parameters.add(new String[] { "o\"k", "o\\\"k" });
+        parameters.add(new String[] { "o\u8765k", "o\\u8765k" });
+        parameters.add(new String[] { "12345\u0002\u00036\t789\"", "12345\\u0002\\u00036\\t789\\\"" });
+        parameters.add(new String[] { "\u0002\u00036\t789\"12345", "\\u0002\\u00036\\t789\\\"12345" });
 
         return parameters;
     }
