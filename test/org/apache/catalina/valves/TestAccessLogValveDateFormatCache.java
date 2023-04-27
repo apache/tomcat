@@ -24,7 +24,7 @@ import java.util.TimeZone;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestAccessLogValve {
+public class TestAccessLogValveDateFormatCache {
 
     // Note that there is a similar test:
     // org.apache.juli.TestDateFormatCache.testBug54044()
