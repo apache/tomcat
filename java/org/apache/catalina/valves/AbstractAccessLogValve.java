@@ -1865,37 +1865,74 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return;
         }
 
-        for (char c : input.toCharArray()) {
-            switch (c) {
-                // " and \
-                case '\\':
-                    dest.append("\\\\");
-                    break;
-                case '\"':
-                    dest.append("\\\"");
-                    break;
-                // Standard C escapes for whitespace (not all standard C escapes)
-                case '\f':
-                    dest.append("\\f");
-                    break;
-                case '\n':
-                    dest.append("\\n");
-                    break;
-                case '\r':
-                    dest.append("\\r");
-                    break;
-                case '\t':
-                    dest.append("\\t");
-                    break;
-                default:
-                    // Control, delete (127) or above 127
-                    if (c < 32 || c > 126) {
+        int len = input.length();
+        // As long as we don't encounter chars that need escaping,
+        // we only remember start and length of that string part.
+        // "next" is the start of the string part containing these chars,
+        // "current - 1" is its end. So writing from "next" with length
+        // "current - next" writes that part.
+        // We write that part whenever we find a character to escape and the
+        // unchanged and unwritten string part is not empty.
+        int next = 0;
+        char c;
+        for (int current = 0; current < len; current++) {
+            c = input.charAt(current);
+            // Fast path
+            if (c >= 32 && c < 127) {
+                // special case " and \
+                switch (c) {
+                    case '\\': // dec 92
+                        // Write unchanged string parts
+                        if (current > next) {
+                            dest.write(input, next, current - next);
+                        }
+                        next = current + 1;
+                        dest.append("\\\\");
+                        break;
+                    case '\"': // dec 34
+                        // Write unchanged string parts
+                        if (current > next) {
+                            dest.write(input, next, current - next);
+                        }
+                        next = current + 1;
+                        dest.append("\\\"");
+                        break;
+                    // Don't output individual unchanged chars,
+                    // write the sub string only when the first char to encode
+                    // is encountered plus at the end.
+                    default:
+                }
+            // Control (1-31), delete (127) or above 127
+            } else {
+                // Write unchanged string parts
+                if (current > next) {
+                    dest.write(input, next, current - next);
+                }
+                next = current + 1;
+                switch (c) {
+                    // Standard escapes for some control chars
+                    case '\f': // dec 12
+                        dest.append("\\f");
+                        break;
+                    case '\n': // dec 10
+                        dest.append("\\n");
+                        break;
+                    case '\r': // dec 13
+                        dest.append("\\r");
+                        break;
+                    case '\t': // dec 09
+                        dest.append("\\t");
+                        break;
+                    // Unicode escape \\uXXXX
+                    default:
                         dest.append("\\u");
                         dest.append(HexUtils.toHexString(c));
-                    } else {
-                        dest.append(c);
-                    }
+                }
             }
+        }
+        // Write remaining unchanged string parts
+        if (len > next) {
+            dest.write(input, next, len - next);
         }
     }
 }
