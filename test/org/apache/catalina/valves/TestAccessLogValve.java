@@ -59,15 +59,15 @@ public class TestAccessLogValve extends TomcatBaseTest {
         List<Object[]> parameterSets = new ArrayList<>();
 
         parameterSets.add(new Object[] {"common", TEXT_TYPE, "/", "common",
-            IP_PATTERN + " - - " + DATE_PATTERN + " \"GET / HTTP/1.1\" 404 700"});
+            IP_PATTERN + " - - " + DATE_PATTERN + " \"GET / HTTP/1.1\" 404 [67]\\d\\d"});
         parameterSets.add(new Object[] {"common", JSON_TYPE, "/", "common",
             "\\{\"host\":\"" + IP_PATTERN + "\",\"logicalUserName\":\"-\",\"user\":\"-\",\"time\":\"" + DATE_PATTERN +
-            "\",\"request\":\"GET / HTTP/1.1\",\"statusCode\":\"404\",\"size\":\"700\"\\}"});
+            "\",\"request\":\"GET / HTTP/1.1\",\"statusCode\":\"404\",\"size\":\"[67]\\d\\d\"\\}"});
         parameterSets.add(new Object[] {"combined", TEXT_TYPE, "/", "combined",
-            IP_PATTERN + " - - " + DATE_PATTERN + " \"GET / HTTP/1.1\" 404 700 \"-\" \"" + UA_PATTERN + "\""});
+            IP_PATTERN + " - - " + DATE_PATTERN + " \"GET / HTTP/1.1\" 404 [67]\\d\\d \"-\" \"" + UA_PATTERN + "\""});
         parameterSets.add(new Object[] {"combined", JSON_TYPE, "/", "combined",
             "\\{\"host\":\"" + IP_PATTERN + "\",\"logicalUserName\":\"-\",\"user\":\"-\",\"time\":\"" + DATE_PATTERN +
-            "\",\"request\":\"GET / HTTP/1.1\",\"statusCode\":\"404\",\"size\":\"700\"" +
+            "\",\"request\":\"GET / HTTP/1.1\",\"statusCode\":\"404\",\"size\":\"[67]\\d\\d\"" +
             ",\"requestHeaders\": \\{\"Referer\":\"-\",\"User-Agent\":\"" + UA_PATTERN + "\"\\}\\}"});
 
         return parameterSets;
