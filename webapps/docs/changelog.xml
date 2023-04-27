@@ -118,11 +118,16 @@
       </fix>
       <update>
         Change output of vertical tab in <code>AccessLogValve</code> from
-	<code>\v</code> to <code>\u000b</code>. (rjung)
+        <code>\v</code> to <code>\u000b</code>. (rjung)
       </update>
       <update>
         Improve performance of escaping in <code>AccessLogValve</code>
-	roughly by a factor of two. (rjung)
+        roughly by a factor of two. (rjung)
+      </update>
+      <update>
+        Improve <code>JsonAccessLogValve</code>: support more patterns
+        like for headers and attributes. Those will be logged as sub objects.
+        (rjung)
       </update>
     </changelog>
   </subsection>
