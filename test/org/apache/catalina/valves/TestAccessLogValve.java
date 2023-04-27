@@ -157,6 +157,7 @@ public class TestAccessLogValve extends TomcatBaseTest {
             valve.setPattern(logPattern);
             tomcat.getHost().getPipeline().addValve(valve);
         } else {
+            log.error("Unknown AccessLogValve type " + type);
             Assert.fail("Unknown AccessLogValve type " + type);
         }
 
@@ -180,6 +181,9 @@ public class TestAccessLogValve extends TomcatBaseTest {
         }
         String result = writer.toString();
         boolean matches = Pattern.matches(resultMatch, result);
+        if (!matches) {
+            log.error("Resulting log line '" + result + "' does not match '" + resultMatch + "'");
+        }
         Assert.assertTrue("Resulting log line '" + result + "' does not match '" + resultMatch + "'", matches);
 
         if (JSON_TYPE.equals(type)) {
