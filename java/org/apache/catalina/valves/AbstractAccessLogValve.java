@@ -1887,9 +1887,6 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 case '\t':
                     dest.append("\\t");
                     break;
-                case '\u000b':
-                    dest.append("\\v");
-                    break;
                 default:
                     // Control, delete (127) or above 127
                     if (c < 32 || c > 126) {

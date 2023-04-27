@@ -116,6 +116,10 @@
         <code>SimpleDateFormat</code> is used which contains verbatim
         characters that need escaping. (rjung)
       </fix>
+      <update>
+        Change output of vertical tab in <code>AccessLogValve</code> from
+	<code>\v</code> to <code>\u000b</code>. (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
