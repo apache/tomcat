@@ -1072,8 +1072,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return result.toString();
         }
 
-        protected DateAndTimeElement(String header) {
-            String format = header;
+        protected DateAndTimeElement(String sdf) {
+            String format = sdf;
             boolean usesBegin = false;
             FormatType type = FormatType.CLF;
 
@@ -1549,17 +1549,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * write an attribute in the ServletRequest - %{xxx}r
      */
     protected static class RequestAttributeElement implements AccessLogElement {
-        private final String header;
+        private final String attribute;
 
-        public RequestAttributeElement(String header) {
-            this.header = header;
+        public RequestAttributeElement(String attribute) {
+            this.attribute = attribute;
         }
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             Object value = null;
             if (request != null) {
-                value = request.getAttribute(header);
+                value = request.getAttribute(attribute);
             } else {
                 value = "??";
             }
@@ -1579,10 +1579,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * write an attribute in the HttpSession - %{xxx}s
      */
     protected static class SessionAttributeElement implements AccessLogElement {
-        private final String header;
+        private final String attribute;
 
-        public SessionAttributeElement(String header) {
-            this.header = header;
+        public SessionAttributeElement(String attribute) {
+            this.attribute = attribute;
         }
 
         @Override
@@ -1591,7 +1591,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             if (null != request) {
                 HttpSession sess = request.getSession(false);
                 if (null != sess) {
-                    value = sess.getAttribute(header);
+                    value = sess.getAttribute(attribute);
                 }
             } else {
                 value = "??";
