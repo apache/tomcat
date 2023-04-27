@@ -81,8 +81,8 @@ public class AsyncChannelGroupUtil {
             // These are the same settings as the default
             // AsynchronousChannelGroup
             int initialSize = Runtime.getRuntime().availableProcessors();
-            ExecutorService executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE, Long.MAX_VALUE,
-                    TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), new AsyncIOThreadFactory());
+            ExecutorService executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60,
+                    TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new AsyncIOThreadFactory());
 
             try {
                 return AsynchronousChannelGroup.withCachedThreadPool(executorService, initialSize);
