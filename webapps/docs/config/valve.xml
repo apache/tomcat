@@ -369,7 +369,7 @@
     <li><code>&quot;</code> is escaped as <code>\&quot;</code></li>
     <li><code>\</code> is escaped as <code>\\</code></li>
     <li>Standard C escaping are used for <code>\f</code>, <code>\n</code>,
-        <code>\r</code>, <code>\t</code> and <code>\v</code></li>
+        <code>\r</code> and <code>\t</code></li>
     <li>Any other control characters or characters with code points above 127
         are encoded using the standard Java unicode escaping
         (<code>\uXXXX</code>)</li>
