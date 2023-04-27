@@ -120,6 +120,10 @@
         Change output of vertical tab in <code>AccessLogValve</code> from
 	<code>\v</code> to <code>\u000b</code>. (rjung)
       </update>
+      <update>
+        Improve performance of escaping in <code>AccessLogValve</code>
+	roughly by a factor of two. (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
