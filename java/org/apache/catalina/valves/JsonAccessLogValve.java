@@ -70,12 +70,13 @@ public class JsonAccessLogValve extends AccessLogValve {
         Map<Character, String> pattern2AttributeName = new HashMap<>();
         pattern2AttributeName.put(Character.valueOf('a'), "remoteAddr");
         pattern2AttributeName.put(Character.valueOf('A'), "localAddr");
-        pattern2AttributeName.put(Character.valueOf('b'), "size"); /* byteSent -> size */
+        pattern2AttributeName.put(Character.valueOf('b'), "size");
         pattern2AttributeName.put(Character.valueOf('B'), "byteSentNC");
         pattern2AttributeName.put(Character.valueOf('D'), "elapsedTime");
         pattern2AttributeName.put(Character.valueOf('F'), "firstByteTime");
         pattern2AttributeName.put(Character.valueOf('h'), "host");
         pattern2AttributeName.put(Character.valueOf('H'), "protocol");
+        pattern2AttributeName.put(Character.valueOf('I'), "threadName");
         pattern2AttributeName.put(Character.valueOf('l'), "logicalUserName");
         pattern2AttributeName.put(Character.valueOf('m'), "method");
         pattern2AttributeName.put(Character.valueOf('p'), "port");
@@ -83,12 +84,11 @@ public class JsonAccessLogValve extends AccessLogValve {
         pattern2AttributeName.put(Character.valueOf('r'), "request");
         pattern2AttributeName.put(Character.valueOf('s'), "statusCode");
         pattern2AttributeName.put(Character.valueOf('S'), "sessionId");
-        pattern2AttributeName.put(Character.valueOf('t'), "time"); /* dateTime -> time */
+        pattern2AttributeName.put(Character.valueOf('t'), "time");
         pattern2AttributeName.put(Character.valueOf('T'), "elapsedTimeS");
         pattern2AttributeName.put(Character.valueOf('u'), "user");
-        pattern2AttributeName.put(Character.valueOf('U'), "path"); /* requestURI -> path */
+        pattern2AttributeName.put(Character.valueOf('U'), "path");
         pattern2AttributeName.put(Character.valueOf('v'), "localServerName");
-        pattern2AttributeName.put(Character.valueOf('I'), "threadName");
         pattern2AttributeName.put(Character.valueOf('X'), "connectionStatus");
         PATTERNS = Collections.unmodifiableMap(pattern2AttributeName);
     }
