@@ -93,15 +93,27 @@ public class JsonAccessLogValve extends AccessLogValve {
         PATTERNS = Collections.unmodifiableMap(pattern2AttributeName);
     }
 
+    /**
+     * write any char
+     */
+    protected static class CharElement implements AccessLogElement {
+        private final char ch;
+
+        public CharElement(char ch) {
+            this.ch = ch;
+        }
+
+        @Override
+        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+            buf.write(ch);
+        }
+    }
+
     @Override
     protected AccessLogElement[] createLogElements() {
         List<AccessLogElement> logElements = new ArrayList<>(Arrays.asList(super.createLogElements()));
         ListIterator<AccessLogElement> lit = logElements.listIterator();
-        lit.add(new AccessLogElement() {
-            @Override
-            public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
-                buf.write('{');
-            }});
+        lit.add(new CharElement('{'));
         while (lit.hasNext()) {
             AccessLogElement logElement = lit.next();
             // remove all other elements, like StringElements
@@ -109,20 +121,12 @@ public class JsonAccessLogValve extends AccessLogValve {
                 lit.remove();
                 continue;
             }
-            lit.add(new AccessLogElement() {
-                @Override
-                public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
-                    buf.write(',');
-                }});
+            lit.add(new CharElement(','));
         }
         // remove last comma again
         lit.previous();
         lit.remove();
-        lit.add(new AccessLogElement() {
-            @Override
-            public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
-                buf.write('}');
-            }});
+        lit.add(new CharElement('}'));
         return logElements.toArray(new AccessLogElement[logElements.size()]);
     }
 
