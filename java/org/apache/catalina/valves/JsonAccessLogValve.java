@@ -17,7 +17,6 @@
 package org.apache.catalina.valves;
 
 import java.io.CharArrayWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -140,40 +139,6 @@ public class JsonAccessLogValve extends AccessLogValve {
         return new JsonWrappedElement(attributeName, true, ale);
     }
 
-    /**
-     * JSON string escaping writer
-     */
-    private static class JsonCharArrayWriter extends CharArrayWriter {
-
-        JsonCharArrayWriter(int i) {
-            super(i);
-        }
-
-        @Override
-        public void write(int c) {
-            try {
-                super.write(JSONFilter.escape((char) c));
-            } catch (IOException e) {
-                // ignore
-            }
-        }
-
-        @Override
-        public void write(char[] c, int off, int len) {
-            try {
-                super.write(JSONFilter.escape(new String(c, off, len)));
-            } catch (IOException e) {
-                // ignore
-            }
-        }
-
-        @Override
-        public void write(String str, int off, int len) {
-            CharSequence escaped = JSONFilter.escape(str, off, len);
-            super.write(escaped.toString(), 0, escaped.length());
-        }
-    }
-
     private static class JsonWrappedElement implements AccessLogElement, CachedElement {
 
         private CharSequence attributeName;
@@ -196,13 +161,7 @@ public class JsonAccessLogValve extends AccessLogValve {
             if (quoteValue) {
                 buf.append('"');
             }
-            CharArrayWriter valueWriter = new JsonCharArrayWriter(8);
-            try {
-                delegate.addElement(valueWriter, date, request, response, time);
-                valueWriter.writeTo(buf);
-            } catch (IOException e) {
-                // ignore
-            }
+            delegate.addElement(buf, date, request, response, time);
             if (quoteValue) {
                 buf.append('"');
             }
