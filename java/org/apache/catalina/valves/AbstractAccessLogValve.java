@@ -1038,6 +1038,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
         /* Our format description string, null if CLF */
         private final String format;
+        /* Does the format string contain characters we need to escape */
+        private final boolean needsEscaping;
         /* Whether to use begin of request or end of response as the timestamp */
         private final boolean usesBegin;
         /* The format type */
@@ -1076,6 +1078,16 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
         protected DateAndTimeElement(String sdf) {
             String format = sdf;
+            boolean needsEscaping = false;
+            if (sdf != null) {
+                CharArrayWriter writer = new CharArrayWriter();
+                escapeAndAppend(sdf, writer);
+                String escaped = writer.toString();
+                if (!escaped.equals(sdf)) {
+                    needsEscaping = true;
+                }
+            }
+            this.needsEscaping = needsEscaping;
             boolean usesBegin = false;
             FormatType type = FormatType.CLF;
 
@@ -1160,7 +1172,11 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     temp = temp.replace(tripleMsecPattern, tripleMsec);
                     temp = temp.replace(msecPattern, Long.toString(frac));
                 }
-                buf.append(temp);
+                if (needsEscaping) {
+                    escapeAndAppend(temp, buf);
+                } else {
+                    buf.append(temp);
+                }
             }
         }
     }
