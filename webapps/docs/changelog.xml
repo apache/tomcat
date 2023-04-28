@@ -129,6 +129,11 @@
         like for headers and attributes. Those will be logged as sub objects.
         (rjung)
       </update>
+      <fix>
+        <pr>613</pr>: Fix possible partial corrupted file copies when using
+        file lockig protection or the manager servlet. Submitted
+        by Jack Shirazi. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
