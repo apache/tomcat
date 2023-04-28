@@ -53,7 +53,8 @@ public class TestAccessLogValve extends TomcatBaseTest {
     private static Log log = LogFactory.getLog(TestAccessLogValve.class);
 
     // Requests can return in the client before log() has been called
-    private static final long SLEEP = 10;
+    private static final long SLEEP = 2;
+    private static final long SLEEP_MAX = 100;
 
     private static final String TEXT_TYPE = "text";
     private static final String JSON_TYPE = "json";
@@ -307,12 +308,17 @@ public class TestAccessLogValve extends TomcatBaseTest {
         reqHead.put(REQUEST_HEADER, testHeaders);
         int status = getUrl(url, out, reqHead, resHead);
         Assert.assertEquals(HttpServletResponse.SC_OK, status);
-        try {
-            Thread.currentThread().sleep(SLEEP);
-        } catch (InterruptedException ex) {
-            log.error("Exception during sleep", ex);
-        }
+        long startWait = System.currentTimeMillis();
         String result = writer.toString();
+        while ("".equals(result) && System.currentTimeMillis() - startWait < SLEEP_MAX) {
+            try {
+                Thread.currentThread().sleep(SLEEP);
+            } catch (InterruptedException ex) {
+                log.error("Exception during sleep", ex);
+            }
+            result = writer.toString();
+        }
+        Assert.assertFalse("Access log line empty after " + (System.currentTimeMillis() - startWait) + " milliseconds", "".equals(result));
         boolean matches = Pattern.matches(resultMatch, result);
         if (!matches) {
             log.error("Resulting log line '" + result + "' does not match '" + resultMatch + "'");
