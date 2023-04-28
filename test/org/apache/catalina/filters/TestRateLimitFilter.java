@@ -74,7 +74,7 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         // Sleep for up to 10s for clients to complete
         int count = 0;
         while (count < 100 && (tc1.results[24] == 0 || tc2.results[49] == 0 || tc3.results[allowedRequests - 1] == 0 ||
-                tc3.results[allowedRequests] == 0 || tc3.results[allowedRequests - 1] == 0 ||
+                tc3.results[allowedRequests] == 0 || tc4.results[allowedRequests - 1] == 0 ||
                 tc4.results[allowedRequests] == 0)) {
             Thread.sleep(100);
             count++;
