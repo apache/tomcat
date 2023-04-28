@@ -17,6 +17,7 @@
 package org.apache.catalina.startup;
 
 import java.io.BufferedOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -268,7 +269,17 @@ public class ExpandWar {
             } else {
                 try (FileChannel ic = (new FileInputStream(fileSrc)).getChannel();
                         FileChannel oc = (new FileOutputStream(fileDest)).getChannel()) {
-                    ic.transferTo(0, ic.size(), oc);
+                    long size = ic.size();
+                    long position = 0;
+                    while (size > 0) {
+                        long count = ic.transferTo(position, size, oc);
+                        if (count > 0) {
+                            position += count;
+                            size -= count;
+                        } else {
+                            throw new EOFException();
+                        }
+                    }
                 } catch (IOException e) {
                     log.error(sm.getString("expandWar.copy", fileSrc, fileDest), e);
                     result = false;
