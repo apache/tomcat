@@ -199,7 +199,7 @@ public class JsonAccessLogValve extends AccessLogValve {
         } else {
             lit.add(new CharElement('}'));
         }
-        return logElements.toArray(new AccessLogElement[logElements.size()]);
+        return logElements.toArray(new AccessLogElement[0]);
     }
 
     @Override

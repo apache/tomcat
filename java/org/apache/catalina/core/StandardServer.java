@@ -136,7 +136,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     /**
      * The set of Services associated with this Server.
      */
-    private Service services[] = new Service[0];
+    private Service[] services = new Service[0];
     private final Object servicesLock = new Object();
 
 
@@ -176,12 +176,12 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     /**
      * The number of threads available to process utility tasks in this service.
      */
-    protected int utilityThreads = 2;
+    private int utilityThreads = 2;
 
     /**
      * The utility threads daemon flag.
      */
-    protected boolean utilityThreadsAsDaemon = false;
+    private boolean utilityThreadsAsDaemon = false;
 
     /**
      * Utility executor with scheduling capabilities.
@@ -205,7 +205,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     /**
      * The lifecycle event period in seconds.
      */
-    protected int periodicEventDelay = 10;
+    private int periodicEventDelay = 10;
 
 
     // ------------------------------------------------------------- Properties
@@ -700,7 +700,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
 
     /**
-     * @return the set of Services defined within this Server.
+     * @return The array of Services defined within this Server.
      */
     @Override
     public Service[] findServices() {
@@ -711,7 +711,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      * @return the JMX service names.
      */
     public ObjectName[] getServiceNames() {
-        ObjectName onames[] = new ObjectName[services.length];
+        ObjectName[] onames = new ObjectName[services.length];
         for (int i = 0; i < services.length; i++) {
             onames[i] = ((StandardService) services[i]).getObjectName();
         }
@@ -744,7 +744,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                 // Ignore
             }
             int k = 0;
-            Service results[] = new Service[services.length - 1];
+            Service[] results = new Service[services.length - 1];
             for (int i = 0; i < services.length; i++) {
                 if (i != j) {
                     results[k++] = services[i];
@@ -819,10 +819,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("StandardServer[");
-        sb.append(getPort());
-        sb.append(']');
-        return sb.toString();
+        return "StandardServer[" + getPort() + ']';
     }
 
 
@@ -915,15 +912,14 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         }
 
         if (periodicEventDelay > 0) {
-            monitorFuture = getUtilityExecutor().scheduleWithFixedDelay(() -> startPeriodicLifecycleEvent(), 0, 60,
+            monitorFuture = getUtilityExecutor().scheduleWithFixedDelay(this::startPeriodicLifecycleEvent, 0, 60,
                     TimeUnit.SECONDS);
         }
     }
 
 
-    protected void startPeriodicLifecycleEvent() {
-        if (periodicLifecycleEventFuture == null ||
-                (periodicLifecycleEventFuture != null && periodicLifecycleEventFuture.isDone())) {
+    private void startPeriodicLifecycleEvent() {
+        if (periodicLifecycleEventFuture == null || periodicLifecycleEventFuture.isDone()) {
             if (periodicLifecycleEventFuture != null && periodicLifecycleEventFuture.isDone()) {
                 // There was an error executing the scheduled task, get it and log it
                 try {
