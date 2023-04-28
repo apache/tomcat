@@ -377,7 +377,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
             this.cluster = cluster;
 
             // Stop the old component if necessary
-            if (getState().isAvailable() && (oldCluster != null) && (oldCluster instanceof Lifecycle)) {
+            if (getState().isAvailable() && (oldCluster instanceof Lifecycle)) {
                 try {
                     ((Lifecycle) oldCluster).stop();
                 } catch (LifecycleException e) {
@@ -390,7 +390,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
                 cluster.setContainer(this);
             }
 
-            if (getState().isAvailable() && (cluster != null) && (cluster instanceof Lifecycle)) {
+            if (getState().isAvailable() && (cluster instanceof Lifecycle)) {
                 try {
                     ((Lifecycle) cluster).start();
                 } catch (LifecycleException e) {
@@ -580,7 +580,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
             this.realm = realm;
 
             // Stop the old component if necessary
-            if (getState().isAvailable() && (oldRealm != null) && (oldRealm instanceof Lifecycle)) {
+            if (getState().isAvailable() && (oldRealm instanceof Lifecycle)) {
                 try {
                     ((Lifecycle) oldRealm).stop();
                 } catch (LifecycleException e) {
@@ -592,7 +592,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
             if (realm != null) {
                 realm.setContainer(this);
             }
-            if (getState().isAvailable() && (realm != null) && (realm instanceof Lifecycle)) {
+            if (getState().isAvailable() && (realm instanceof Lifecycle)) {
                 try {
                     ((Lifecycle) realm).start();
                 } catch (LifecycleException e) {
@@ -832,8 +832,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         }
 
         // Start our child containers, if any
-        Container children[] = findChildren();
-        List<Future<Void>> results = new ArrayList<>();
+        Container[] children = findChildren();
+        List<Future<Void>> results = new ArrayList<>(children.length);
         for (Container child : children) {
             results.add(startStopExecutor.submit(new StartChild(child)));
         }
@@ -897,8 +897,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         }
 
         // Stop our child containers, if any
-        Container children[] = findChildren();
-        List<Future<Void>> results = new ArrayList<>();
+        Container[] children = findChildren();
+        List<Future<Void>> results = new ArrayList<>(children.length);
         for (Container child : children) {
             results.add(startStopExecutor.submit(new StopChild(child)));
         }
@@ -992,7 +992,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         }
 
         AccessLogAdapter adapter = null;
-        Valve valves[] = getPipeline().getValves();
+        Valve[] valves = getPipeline().getValves();
         for (Valve valve : valves) {
             if (valve instanceof AccessLog) {
                 if (adapter == null) {
