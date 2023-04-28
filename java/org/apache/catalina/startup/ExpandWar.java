@@ -268,7 +268,19 @@ public class ExpandWar {
             } else {
                 try (FileChannel ic = (new FileInputStream(fileSrc)).getChannel();
                         FileChannel oc = (new FileOutputStream(fileDest)).getChannel()) {
-                    ic.transferTo(0, ic.size(), oc);
+                    long size = ic.size();
+                    long position = 0;
+                    while (size > 0) { // we still have bytes to transfer
+                        long count = ic.transferTo(position, size, oc);
+                        if (count > 0)
+                        {
+                            position += count;
+                            size -= count;
+                        } else {
+                            //shouldn't loop forever but just to be safe
+                            throw new IOException("file copy failed");
+                        }
+                    }
                 } catch (IOException e) {
                     log.error(sm.getString("expandWar.copy", fileSrc, fileDest), e);
                     result = false;
