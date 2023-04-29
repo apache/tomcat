@@ -103,8 +103,8 @@ public class TestAccessLogValve extends TomcatBaseTest {
         parameterSets.add(new Object[] {"pct-h", JSON_TYPE, "/", "%h", "\\{\"host\":\"" + LOCAL_IP_PATTERN + "\"\\}"});
         parameterSets.add(new Object[] {"pct-H", TEXT_TYPE, "/", "%H", "HTTP/1.1"});
         parameterSets.add(new Object[] {"pct-H", JSON_TYPE, "/", "%H", "\\{\"protocol\":\"HTTP/1.1\"\\}"});
-        parameterSets.add(new Object[] {"pct-I", TEXT_TYPE, "/", "%I", "http-nio2?-" + LOCAL_IP_PATTERN + "-auto-\\d+-exec-\\d+"});
-        parameterSets.add(new Object[] {"pct-I", JSON_TYPE, "/", "%I", "\\{\"threadName\":\"http-nio2?-" + LOCAL_IP_PATTERN + "-auto-\\d+-exec-\\d+\"\\}"});
+        parameterSets.add(new Object[] {"pct-I", TEXT_TYPE, "/", "%I", "http-(nio2?|apr)-" + LOCAL_IP_PATTERN + "-auto-\\d+-exec-\\d+"});
+        parameterSets.add(new Object[] {"pct-I", JSON_TYPE, "/", "%I", "\\{\"threadName\":\"http-(nio2?|apr)-" + LOCAL_IP_PATTERN + "-auto-\\d+-exec-\\d+\"\\}"});
         parameterSets.add(new Object[] {"pct-l", TEXT_TYPE, "/", "%l", "-"});
         parameterSets.add(new Object[] {"pct-l", JSON_TYPE, "/", "%l", "\\{\"logicalUserName\":\"-\"\\}"});
         parameterSets.add(new Object[] {"pct-m", TEXT_TYPE, "/", "%m", "GET"});
