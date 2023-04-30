@@ -312,7 +312,7 @@ public class TestAccessLogValve extends TomcatBaseTest {
         String result = writer.toString();
         while ("".equals(result) && System.currentTimeMillis() - startWait < SLEEP_MAX) {
             try {
-                Thread.currentThread().sleep(SLEEP);
+                Thread.sleep(SLEEP);
             } catch (InterruptedException ex) {
                 log.error("Exception during sleep", ex);
             }
