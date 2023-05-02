@@ -155,8 +155,7 @@ public class Http11Processor extends AbstractProcessor {
 
         httpParser = new HttpParser(protocol.getRelaxedPathChars(), protocol.getRelaxedQueryChars());
 
-        inputBuffer = new Http11InputBuffer(request, protocol.getMaxHttpRequestHeaderSize(),
-                protocol.getRejectIllegalHeader(), httpParser);
+        inputBuffer = new Http11InputBuffer(request, protocol.getMaxHttpRequestHeaderSize(), httpParser);
         request.setInputBuffer(inputBuffer);
 
         outputBuffer = new Http11OutputBuffer(response, protocol.getMaxHttpResponseHeaderSize());
@@ -733,19 +732,10 @@ public class Http11Processor extends AbstractProcessor {
                         // Any host in the request line must be consistent with
                         // the Host header
                         if (!hostValueMB.getByteChunk().equals(uriB, uriBCStart + pos, slashPos - pos)) {
-                            if (protocol.getAllowHostHeaderMismatch()) {
-                                // The requirements of RFC 2616 are being
-                                // applied. If the host header and the request
-                                // line do not agree, the request line takes
-                                // precedence
-                                hostValueMB = headers.setValue("host");
-                                hostValueMB.setBytes(uriB, uriBCStart + pos, slashPos - pos);
-                            } else {
-                                // The requirements of RFC 7230 are being
-                                // applied. If the host header and the request
-                                // line do not agree, trigger a 400 response.
-                                badRequest("http11processor.request.inconsistentHosts");
-                            }
+                            // The requirements of RFC 7230 are being
+                            // applied. If the host header and the request
+                            // line do not agree, trigger a 400 response.
+                            badRequest("http11processor.request.inconsistentHosts");
                         }
                     }
                 } else {

@@ -140,7 +140,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
     @Test
     public void testBug51557Invalid() {
 
-        Bug51557Client client = new Bug51557Client("X-Bug51557=Invalid", "1234", true);
+        Bug51557Client client = new Bug51557Client("X-Bug51557=Invalid", "1234");
 
         client.doRequest();
         Assert.assertTrue(client.isResponse400());
@@ -153,9 +153,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         Bug51557Client client = new Bug51557Client("X-Bug51557NoColon");
 
         client.doRequest();
-        Assert.assertTrue(client.isResponse200());
-        Assert.assertEquals("abcd", client.getResponseBody());
-        Assert.assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse400());
     }
 
 
@@ -218,9 +216,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         Bug51557Client client = new Bug51557Client("X-Bug=51557NoColon", "foo" + SimpleHttpClient.CRLF + " bar");
 
         client.doRequest();
-        Assert.assertTrue(client.isResponse200());
-        Assert.assertEquals("abcd", client.getResponseBody());
-        Assert.assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse400());
     }
 
 
@@ -230,9 +226,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         Bug51557Client client = new Bug51557Client("=X-Bug51557", "invalid");
 
         client.doRequest();
-        Assert.assertTrue(client.isResponse200());
-        Assert.assertEquals("abcd", client.getResponseBody());
-        Assert.assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse400());
     }
 
 
@@ -242,9 +236,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         Bug51557Client client = new Bug51557Client("X-Bug51557=", "invalid");
 
         client.doRequest();
-        Assert.assertTrue(client.isResponse200());
-        Assert.assertEquals("abcd", client.getResponseBody());
-        Assert.assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse400());
     }
 
 
@@ -252,9 +244,15 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         Bug51557Client client = new Bug51557Client("X-Bug" + s + "51557", "invalid");
 
         client.doRequest();
-        Assert.assertTrue(client.isResponse200());
-        Assert.assertEquals("abcd", client.getResponseBody());
-        Assert.assertTrue(client.isResponseBodyOK());
+        if (s == ':') {
+            // Shortens name to 'X-Bug' and makes value '51557:invalid'
+            Assert.assertTrue(client.isResponse200());
+            Assert.assertEquals("abcd", client.getResponseBody());
+            Assert.assertTrue(client.isResponseBodyOK());
+        } else {
+            Assert.assertTrue("" + s, client.isResponse400());
+        }
+
     }
 
 
@@ -262,9 +260,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         Bug51557Client client = new Bug51557Client("X-Bug51557-Invalid", "invalid" + s + "invalid");
 
         client.doRequest();
-        Assert.assertTrue("Testing [" + (int) s + "]", client.isResponse200());
-        Assert.assertEquals("Testing [" + (int) s + "]", "abcd", client.getResponseBody());
-        Assert.assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue("Testing [" + (int) s + "]", client.isResponse400());
     }
 
 
@@ -285,22 +281,15 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
         private final String headerName;
         private final String headerLine;
-        private final boolean rejectIllegalHeader;
 
         Bug51557Client(String headerName) {
             this.headerName = headerName;
             this.headerLine = headerName;
-            this.rejectIllegalHeader = false;
         }
 
         Bug51557Client(String headerName, String headerValue) {
-            this(headerName, headerValue, false);
-        }
-
-        Bug51557Client(String headerName, String headerValue, boolean rejectIllegalHeader) {
             this.headerName = headerName;
             this.headerLine = headerName + ": " + headerValue;
-            this.rejectIllegalHeader = rejectIllegalHeader;
         }
 
         private Exception doRequest() {
@@ -313,7 +302,6 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
             try {
                 Connector connector = tomcat.getConnector();
-                Assert.assertTrue(connector.setProperty("rejectIllegalHeader", Boolean.toString(rejectIllegalHeader)));
                 tomcat.start();
                 setPort(connector.getLocalPort());
 
@@ -535,73 +523,6 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
             return true;
         }
 
-    }
-
-
-    /**
-     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=59089
-     */
-    @Test
-    public void testBug59089() {
-
-        Bug59089Client client = new Bug59089Client();
-
-        client.doRequest();
-        Assert.assertTrue(client.isResponse200());
-        Assert.assertTrue(client.isResponseBodyOK());
-    }
-
-
-    /**
-     * Bug 59089 test client.
-     */
-    private class Bug59089Client extends SimpleHttpClient {
-
-        private Exception doRequest() {
-
-            // Ensure body is read correctly
-            setUseContentLength(true);
-
-            Tomcat tomcat = getTomcatInstance();
-
-            Context root = tomcat.addContext("", TEMP_DIR);
-            Tomcat.addServlet(root, "Bug59089", new TesterServlet());
-            root.addServletMappingDecoded("/test", "Bug59089");
-
-            try {
-                Connector connector = tomcat.getConnector();
-                Assert.assertTrue(connector.setProperty("rejectIllegalHeader", "false"));
-                tomcat.start();
-                setPort(connector.getLocalPort());
-
-                // Open connection
-                connect();
-
-                String[] request = new String[1];
-                request[0] = "GET http://localhost:8080/test HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF +
-                        "X-Header: Ignore" + CRLF + "X-Header" + (char) 130 + ": Broken" + CRLF + CRLF;
-
-                setRequest(request);
-                processRequest(); // blocks until response has been read
-
-                // Close the connection
-                disconnect();
-            } catch (Exception e) {
-                return e;
-            }
-            return null;
-        }
-
-        @Override
-        public boolean isResponseBodyOK() {
-            if (getResponseBody() == null) {
-                return false;
-            }
-            if (!getResponseBody().contains("OK")) {
-                return false;
-            }
-            return true;
-        }
     }
 
 

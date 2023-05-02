@@ -65,8 +65,6 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     private final MimeHeaders headers;
 
 
-    private final boolean rejectIllegalHeader;
-
     /**
      * State.
      */
@@ -148,14 +146,12 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
     // ----------------------------------------------------------- Constructors
 
-    public Http11InputBuffer(Request request, int headerBufferSize, boolean rejectIllegalHeader,
-            HttpParser httpParser) {
+    public Http11InputBuffer(Request request, int headerBufferSize, HttpParser httpParser) {
 
         this.request = request;
         headers = request.getMimeHeaders();
 
         this.headerBufferSize = headerBufferSize;
-        this.rejectIllegalHeader = rejectIllegalHeader;
         this.httpParser = httpParser;
 
         filterLibrary = new InputFilter[0];
@@ -886,7 +882,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 if (headerData.start == pos) {
                     // Zero length header name - not valid.
                     // skipLine() will handle the error
-                    return skipLine(false);
+                    return skipLine();
                 }
                 headerParsePos = HeaderParsePosition.HEADER_VALUE_START;
                 headerData.headerValue = headers.addValue(byteBuffer.array(), headerData.start, pos - headerData.start);
@@ -902,7 +898,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 headerData.lastSignificantChar = pos;
                 byteBuffer.position(byteBuffer.position() - 1);
                 // skipLine() will handle the error
-                return skipLine(false);
+                return skipLine();
             }
 
             // chr is next byte of header name. Convert to lowercase.
@@ -913,7 +909,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
         // Skip the line and ignore the header
         if (headerParsePos == HeaderParsePosition.HEADER_SKIPLINE) {
-            return skipLine(false);
+            return skipLine();
         }
 
         //
@@ -971,10 +967,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                         eol = true;
                     } else if (prevChr == Constants.CR) {
                         // Invalid value - also need to delete header
-                        return skipLine(true);
+                        return skipLine();
                     } else if (chr != Constants.HT && HttpParser.isControl(chr)) {
                         // Invalid value - also need to delete header
-                        return skipLine(true);
+                        return skipLine();
                     } else if (chr == Constants.SP || chr == Constants.HT) {
                         byteBuffer.put(headerData.realPos, chr);
                         headerData.realPos++;
@@ -1022,25 +1018,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     }
 
 
-    private HeaderParseStatus skipLine(boolean deleteHeader) throws IOException {
-        boolean rejectThisHeader = rejectIllegalHeader;
-        // Check if rejectIllegalHeader is disabled and needs to be overridden
-        // for this header. The header name is required to determine if this
-        // override is required. The header name is only available once the
-        // header has been created. If the header has been created then
-        // deleteHeader will be true.
-        if (!rejectThisHeader && deleteHeader) {
-            if (headers.getName(headers.size() - 1).equalsIgnoreCase("content-length")) {
-                // Malformed content-length headers must always be rejected
-                // RFC 9112, section 6.3, bullet 5.
-                rejectThisHeader = true;
-            } else {
-                // Only need to delete the header if the request isn't going to
-                // be rejected (it will be the most recent one)
-                headers.removeHeader(headers.size() - 1);
-            }
-        }
-
+    private HeaderParseStatus skipLine() throws IOException {
         // Parse the rest of the invalid header so we can construct a useful
         // exception and/or debug message.
         headerParsePos = HeaderParsePosition.HEADER_SKIPLINE;
@@ -1068,18 +1046,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 headerData.lastSignificantChar = pos;
             }
         }
-        if (rejectThisHeader || log.isDebugEnabled()) {
-            if (rejectThisHeader) {
-                throw new IllegalArgumentException(
-                        sm.getString("iib.invalidheader.reject", HeaderUtil.toPrintableString(byteBuffer.array(),
-                                headerData.lineStart, headerData.lastSignificantChar - headerData.lineStart + 1)));
-            }
-            log.debug(sm.getString("iib.invalidheader", HeaderUtil.toPrintableString(byteBuffer.array(),
-                    headerData.lineStart, headerData.lastSignificantChar - headerData.lineStart + 1)));
-        }
 
-        headerParsePos = HeaderParsePosition.HEADER_START;
-        return HeaderParseStatus.HAVE_MORE_HEADERS;
+        throw new IllegalArgumentException(
+                sm.getString("iib.invalidheader.reject", HeaderUtil.toPrintableString(byteBuffer.array(),
+                        headerData.lineStart, headerData.lastSignificantChar - headerData.lineStart + 1)));
     }
 
 

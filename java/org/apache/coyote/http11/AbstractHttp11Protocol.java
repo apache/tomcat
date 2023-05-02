@@ -172,69 +172,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    private boolean allowHostHeaderMismatch = false;
-
-    /**
-     * Will Tomcat accept an HTTP 1.1 request where the host header does not agree with the host specified (if any) in
-     * the request line?
-     *
-     * @return {@code true} if Tomcat will allow such requests, otherwise {@code false}
-     *
-     * @deprecated This will removed in Tomcat 11 onwards where {@code allowHostHeaderMismatch} will be hard-coded to
-     *                 {@code false}.
-     */
-    @Deprecated
-    public boolean getAllowHostHeaderMismatch() {
-        return allowHostHeaderMismatch;
-    }
-
-    /**
-     * Will Tomcat accept an HTTP 1.1 request where the host header does not agree with the host specified (if any) in
-     * the request line?
-     *
-     * @param allowHostHeaderMismatch {@code true} to allow such requests, {@code false} to reject them with a 400
-     *
-     * @deprecated This will removed in Tomcat 11 onwards where {@code allowHostHeaderMismatch} will be hard-coded to
-     *                 {@code false}.
-     */
-    @Deprecated
-    public void setAllowHostHeaderMismatch(boolean allowHostHeaderMismatch) {
-        this.allowHostHeaderMismatch = allowHostHeaderMismatch;
-    }
-
-
-    private boolean rejectIllegalHeader = true;
-
-    /**
-     * If an HTTP request is received that contains an illegal header name or value (e.g. the header name is not a
-     * token) will the request be rejected (with a 400 response) or will the illegal header be ignored?
-     *
-     * @return {@code true} if the request will be rejected or {@code false} if the header will be ignored
-     *
-     * @deprecated This will removed in Tomcat 11 onwards where {@code allowHostHeaderMismatch} will be hard-coded to
-     *                 {@code true}.
-     */
-    @Deprecated
-    public boolean getRejectIllegalHeader() {
-        return rejectIllegalHeader;
-    }
-
-    /**
-     * If an HTTP request is received that contains an illegal header name or value (e.g. the header name is not a
-     * token) should the request be rejected (with a 400 response) or should the illegal header be ignored?
-     *
-     * @param rejectIllegalHeader {@code true} to reject requests with illegal header names or values, {@code false} to
-     *                                ignore the header
-     *
-     * @deprecated This will removed in Tomcat 11 onwards where {@code allowHostHeaderMismatch} will be hard-coded to
-     *                 {@code true}.
-     */
-    @Deprecated
-    public void setRejectIllegalHeader(boolean rejectIllegalHeader) {
-        this.rejectIllegalHeader = rejectIllegalHeader;
-    }
-
-
     private int maxSavePostSize = 4 * 1024;
 
     /**
