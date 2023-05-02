@@ -270,7 +270,7 @@ public class TestAccessLogValve extends TomcatBaseTest {
     }
 
     @Test
-    public void Test() throws LifecycleException, IOException {
+    public void test() throws LifecycleException, IOException {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
