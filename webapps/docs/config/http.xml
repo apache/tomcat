@@ -345,7 +345,10 @@
       <p>By default Tomcat will reject requests that specify a host in the
       request line but specify a different host in the host header. This
       check can be disabled by setting this attribute to <code>true</code>. If
-      not specified, the default is <code>false</code>.</p>
+      not specified, the default is <code>false</code>.
+      <br/>
+      This setting will be removed in Tomcat 11 onwards where it will be
+      hard-coded to <code>false</code>.</p>
     </attribute>
 
     <attribute name="allowedTrailerHeaders" required="false">
@@ -632,7 +635,10 @@
       value (e.g. the header name is not a token) this setting determines if the
       request will be rejected with a 400 response (<code>true</code>) or if the
       illegal header be ignored (<code>false</code>). The default value is
-      <code>true</code> which will cause the request to be rejected.</p>
+      <code>true</code> which will cause the request to be rejected.
+      <br/>
+      This setting will be removed in Tomcat 11 onwards where it will be
+      hard-coded to <code>true</code>.</p>
     </attribute>
 
     <attribute name="rejectIllegalHeaderName" required="false">
