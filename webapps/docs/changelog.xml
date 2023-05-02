@@ -198,6 +198,9 @@
       <update>
         Update Checkstyle to 10.10.0. (markt)
       </update>
+      <update>
+        Update Jacoco to 0.8.10. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
