@@ -175,6 +175,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Chinese translations. (lihan)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.8 (schultz)" rtext="Release in progress">
   <subsection name="Catalina">
