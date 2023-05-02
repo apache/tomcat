@@ -632,8 +632,7 @@
       value (e.g. the header name is not a token) this setting determines if the
       request will be rejected with a 400 response (<code>true</code>) or if the
       illegal header be ignored (<code>false</code>). The default value is
-      <code>false</code> which will cause the request to be processed but the
-      illegal header will be ignored.</p>
+      <code>true</code> which will cause the request to be rejected.</p>
     </attribute>
 
     <attribute name="rejectIllegalHeaderName" required="false">

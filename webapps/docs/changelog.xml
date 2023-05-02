@@ -148,6 +148,12 @@
         <code>true</code> to <code>false</code> to harden the default
         configuration. (markt)
       </scode>
+      <scode>
+        The default for the HTTP Connector attribute
+        <code>rejectIllegalHeader</code> has been changed from
+        <code>false</code> to <code>true</code> to harden the default
+        configuration. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">

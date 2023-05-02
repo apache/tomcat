@@ -195,7 +195,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    private boolean rejectIllegalHeader = false;
+    private boolean rejectIllegalHeader = true;
 
     /**
      * If an HTTP request is received that contains an illegal header name or value (e.g. the header name is not a
