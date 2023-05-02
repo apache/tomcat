@@ -159,6 +159,11 @@
         Improve exception handling when flushing batched messages during
         WebSocket session close. (markt)
       </fix>
+      <fix>
+        <bug>66581</bug>: Update <code>AsyncChannelGroupUtil</code> to align it
+        with the current defaults for AsynchronousChannelGroup. Pull request
+        <pr>612</pr> by Matthew Painter. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
