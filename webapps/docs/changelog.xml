@@ -195,6 +195,9 @@
       <add>
         Improvements to Chinese translations. (lihan)
       </add>
+      <update>
+        Update Checkstyle to 10.10.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
