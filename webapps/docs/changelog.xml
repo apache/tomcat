@@ -144,6 +144,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>66582</bug>: Account for EL having stricter requirements for static
+        imports than JSPs when adding JSP static imports to the EL context.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>

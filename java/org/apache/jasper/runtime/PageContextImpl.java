@@ -698,7 +698,11 @@ public class PageContextImpl extends PageContext {
                     for (String classImport : classImports) {
                         if (classImport.startsWith("static ")) {
                             classImport = classImport.substring(7);
-                            ih.importStatic(classImport);
+                            try {
+                                ih.importStatic(classImport);
+                            } catch (ELException e) {
+                                // Ignore - not all static imports are valid for EL
+                            }
                         } else {
                             ih.importClass(classImport);
                         }
