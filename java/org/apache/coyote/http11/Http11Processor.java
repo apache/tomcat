@@ -148,6 +148,7 @@ public class Http11Processor extends AbstractProcessor {
     private SendfileDataBase sendfileData = null;
 
 
+    @SuppressWarnings("deprecation")
     public Http11Processor(AbstractHttp11Protocol<?> protocol, Adapter adapter) {
         super(adapter);
         this.protocol = protocol;
@@ -621,6 +622,7 @@ public class Http11Processor extends AbstractProcessor {
     /**
      * After reading the request headers, we have to setup the request filters.
      */
+    @SuppressWarnings("deprecation")
     private void prepareRequest() throws IOException {
 
         if (protocol.isSSLEnabled()) {

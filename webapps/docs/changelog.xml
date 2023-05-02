@@ -146,6 +146,11 @@
         Fix an edge case in HTTP header parsing and ensure that HTTP headers
         without names are treated as invalid. (markt)
       </fix>
+      <update>
+        Deprecate the HTTP Connector settings <code>rejectIllegalHeader</code>
+        and <code>allowHostHeaderMismatch</code> as they have been removed in
+        Tomcat 11 onwards. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
