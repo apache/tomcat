@@ -172,7 +172,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    private boolean allowHostHeaderMismatch = true;
+    private boolean allowHostHeaderMismatch = false;
 
     /**
      * Will Tomcat accept an HTTP 1.1 request where the host header does not agree with the host specified (if any) in

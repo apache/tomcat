@@ -142,6 +142,12 @@
         Add support for a new character set, <code>gb18030-2022</code> -
         introduced in Java 21, to the character set caching mechanism. (markt)
       </add>
+      <scode>
+        The default for the HTTP Connector attribute
+        <code>allowHostHeaderMismatch</code> has been changed from
+        <code>true</code> to <code>false</code> to harden the default
+        configuration. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
