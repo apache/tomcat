@@ -175,6 +175,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Chinese translations. (lihan)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.74 (remm)" rtext="2023-04-18">
   <subsection name="Catalina">
