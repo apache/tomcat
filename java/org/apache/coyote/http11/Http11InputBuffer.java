@@ -50,8 +50,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     private static final StringManager sm = StringManager.getManager(Http11InputBuffer.class);
 
 
-    private static final byte[] CLIENT_PREFACE_START = "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n"
-            .getBytes(StandardCharsets.ISO_8859_1);
+    private static final byte[] CLIENT_PREFACE_START =
+            "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n".getBytes(StandardCharsets.ISO_8859_1);
 
     /**
      * Associated Coyote request.
@@ -883,6 +883,11 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             int pos = byteBuffer.position();
             chr = byteBuffer.get();
             if (chr == Constants.COLON) {
+                if (headerData.start == pos) {
+                    // Zero length header name - not valid.
+                    // skipLine() will handle the error
+                    return skipLine(false);
+                }
                 headerParsePos = HeaderParsePosition.HEADER_VALUE_START;
                 headerData.headerValue = headers.addValue(byteBuffer.array(), headerData.start, pos - headerData.start);
                 pos = byteBuffer.position();
@@ -1064,12 +1069,13 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             }
         }
         if (rejectThisHeader || log.isDebugEnabled()) {
-            String message = sm.getString("iib.invalidheader", HeaderUtil.toPrintableString(byteBuffer.array(),
-                    headerData.lineStart, headerData.lastSignificantChar - headerData.lineStart + 1));
             if (rejectThisHeader) {
-                throw new IllegalArgumentException(message);
+                throw new IllegalArgumentException(
+                        sm.getString("iib.invalidheader.reject", HeaderUtil.toPrintableString(byteBuffer.array(),
+                                headerData.lineStart, headerData.lastSignificantChar - headerData.lineStart + 1)));
             }
-            log.debug(message);
+            log.debug(sm.getString("iib.invalidheader", HeaderUtil.toPrintableString(byteBuffer.array(),
+                    headerData.lineStart, headerData.lastSignificantChar - headerData.lineStart + 1)));
         }
 
         headerParsePos = HeaderParsePosition.HEADER_START;

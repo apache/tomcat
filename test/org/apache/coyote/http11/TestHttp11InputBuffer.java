@@ -733,4 +733,48 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
             return true;
         }
     }
+
+
+    private static final class Client extends SimpleHttpClient {
+
+        Client(int port) {
+            setPort(port);
+        }
+
+        @Override
+        public boolean isResponseBodyOK() {
+            return getResponseBody().contains("test - data");
+        }
+    }
+
+
+    @Test
+    public void testInvalidHeader02() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // This setting means the connection will be closed at the end of the
+        // request
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        // Add servlet
+        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
+        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+
+        tomcat.start();
+
+        String request = "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: localhost" + SimpleHttpClient.CRLF + ":b" +
+                SimpleHttpClient.CRLF + "X-Dummy:b" + SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] { request });
+
+        client.connect(10000, 600000);
+        client.processRequest();
+
+        // Expected response is a 400 response.
+        Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+    }
 }
