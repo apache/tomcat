@@ -151,6 +151,11 @@
         and <code>allowHostHeaderMismatch</code> as they have been removed in
         Tomcat 11 onwards. (markt)
       </update>
+      <fix>
+        <bug>66591</bug>: Fix a regression introduced in the fix for
+        <bug>66512</bug> that meant that an AJP Send Headers was not sent for
+        responses where no HTTP headers were set. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

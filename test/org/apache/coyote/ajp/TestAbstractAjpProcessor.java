@@ -885,6 +885,60 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     }
 
 
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=66591
+     */
+    @Test
+    public void testNoHeaders() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        Tomcat.addServlet(ctx, "bug66591", new NoHeadersServlet());
+        ctx.addServletMappingDecoded("/", "bug66591");
+
+        tomcat.start();
+
+        SimpleAjpClient ajpClient = new SimpleAjpClient();
+        ajpClient.setPort(getPort());
+        ajpClient.connect();
+
+        validateCpong(ajpClient.cping());
+
+        TesterAjpMessage forwardMessage = ajpClient.createForwardMessage();
+        forwardMessage.end();
+
+        TesterAjpMessage responseHeaderMessage = ajpClient.sendMessage(forwardMessage, null);
+
+        // Expect 3 messages: headers, body chunk, end
+        Map<String, List<String>> responseHeaders = validateResponseHeaders(responseHeaderMessage, 200, "200");
+        Assert.assertTrue(responseHeaders.isEmpty());
+
+        String body = extractResponseBody(ajpClient.readMessage());
+        Assert.assertTrue(body.isEmpty());
+
+        validateResponseEnd(ajpClient.readMessage(), true);
+
+        // Double check the connection is still open
+        validateCpong(ajpClient.cping());
+
+        ajpClient.disconnect();
+    }
+
+
+    private static class NoHeadersServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.flushBuffer();
+        }
+    }
+
+
     /**
      * Process response header packet and checks the status. Any other data is ignored.
      */
@@ -945,7 +999,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Assert.assertEquals(0x03, message.readByte());
 
         int len = message.readInt();
-        Assert.assertTrue(len > 0);
+        Assert.assertTrue(len >= 0);
         return message.readString(len);
     }
 
