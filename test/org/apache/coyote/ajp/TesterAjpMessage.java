@@ -66,7 +66,7 @@ public class TesterAjpMessage extends AjpMessage {
         byte b = readByte();
         if ((b & 0xFF) == 0xA0) {
             // Coded header
-            return Constants.getResponseHeaderForCode(readByte());
+            return Constants.getResponseHeaderForCode(readByte() - 1);
         } else {
             int len = (b & 0xFF) << 8;
             len += getByte() & 0xFF;
