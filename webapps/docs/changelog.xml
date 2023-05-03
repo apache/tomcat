@@ -131,7 +131,7 @@
       </update>
       <fix>
         <pr>613</pr>: Fix possible partial corrupted file copies when using
-        file lockig protection or the manager servlet. Submitted
+        file locking protection or the manager servlet. Submitted
         by Jack Shirazi. (remm)
       </fix>
     </changelog>
