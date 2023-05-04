@@ -530,7 +530,6 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             name.append(",component=Deployer");
             onameClusterDeployer = register(clusterDeployer, name.toString());
         }
-        channel.setUtilityExecutor(Container.getService(getContainer()).getServer().getUtilityExecutor());
     }
 
 
@@ -547,6 +546,8 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         if (log.isInfoEnabled()) {
             log.info(sm.getString("simpleTcpCluster.start"));
         }
+
+        channel.setUtilityExecutor(Container.getService(getContainer()).getServer().getUtilityExecutor());
 
         try {
             checkDefaults();
@@ -655,6 +656,8 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         } catch (Exception x) {
             log.error(sm.getString("simpleTcpCluster.stopUnable"), x);
         }
+
+        channel.setUtilityExecutor(null);
     }
 
 

@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.10 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <scode>
+        Move the management of the utility executor from the
+        <code>init()</code>/<code>destroy()</code> methods of components to the
+        <code>start()</code>/<code>stop()</code> methods. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <update>
