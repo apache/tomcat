@@ -32,7 +32,7 @@ import org.apache.tomcat.util.res.StringManager;
 import java.io.IOException;
 
 /**
- * Servlet filter that can help mitigate Denial of Service
+ * <p>Servlet filter that can help mitigate Denial of Service
  * (DoS) and Brute Force attacks by limiting the number of a requests that are 
  * allowed from a single IP address within a time window (also referred
  * to as a time bucket), e.g. 300 Requests per 60 seconds.</p>

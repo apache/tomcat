@@ -201,12 +201,8 @@ public class TimeBucketCounter {
                 String currentBucketPrefix = String.valueOf(getCurrentBucketPrefix());
                 ConcurrentHashMap.KeySetView<String, AtomicInteger> keys = map.keySet();
 
-                for (String k : keys) {
-                    if (!k.startsWith(currentBucketPrefix)) {
-                        // the key is obsolete, remove it
-                        keys.remove((k));
-                    }
-                }
+                // remove obsolete keys
+                keys.removeIf(k -> !k.startsWith(currentBucketPrefix));
 
                 try {
                     Thread.sleep(sleeptime);
