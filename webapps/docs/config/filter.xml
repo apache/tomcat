@@ -991,7 +991,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     a filter definition that would allow only 5 requests per 15 seconds and map
     those URIs to it.</p>
 
-    <p>You can set <code>ratelimit.enforce</code> to <code>false</code>
+    <p>You can set <code>enforce</code> to <code>false</code>
     to disable the termination of requests that exceed the allowed limit. Then
     your application code can inspect the Request Attribute 
     <code>org.apache.catalina.filters.RateLimitFilter.Count</code> and decide
@@ -1024,16 +1024,16 @@ FINE: Request "/docs/config/manager.html" with response status "200"
 
     <attributes>
 
-      <attribute name="ratelimit.bucket.duration" required="false">
+      <attribute name="bucketDuration" required="false">
         <p>The number of seconds in a time bucket. Default is <code>60</code>.</p>
       </attribute>
 
-      <attribute name="ratelimit.bucket.requests" required="false">
+      <attribute name="bucketRequests" required="false">
         <p>The number of requests that are allowed in a time bucket. 
         Default is <code>300</code>.</p>
       </attribute>
 
-      <attribute name="ratelimit.enforce" required="false">
+      <attribute name="enforce" required="false">
         <p>Set to false to allow requests through even when they exceed
         the maximum allowed per time window. Your application code can 
         still inspect the Request Attribute 
@@ -1042,12 +1042,12 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         Default is <code>true</code>.</p>
       </attribute>
 
-      <attribute name="ratelimit.status.code" required="false">
+      <attribute name="statusCode" required="false">
         <p>The status code to return when a request is dropped.
         Default is <code>429</code>.</p>
       </attribute>
 
-      <attribute name="ratelimit.status.message" required="false">
+      <attribute name="statusMessage" required="false">
         <p>The status message to return when a request is dropped.
         Default is &quot;Too many requests&quot;.</p>
       </attribute>
@@ -1073,7 +1073,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         <filter-name>RateLimitFilter Login</filter-name>
         <filter-class>org.apache.catalina.filters.RateLimitFilter</filter-class>
         <init-param>
-            <param-name>ratelimit.bucket.requests</param-name>
+            <param-name>bucketRequests</param-name>
             <param-value>20</param-value>
         </init-param>
     </filter>

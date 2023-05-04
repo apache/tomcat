@@ -31,6 +31,47 @@ import org.apache.tomcat.util.res.StringManager;
 
 import java.io.IOException;
 
+/**
+ * Servlet filter that can help mitigate Denial of Service
+ * (DoS) and Brute Force attacks by limiting the number of a requests that are 
+ * allowed from a single IP address within a time window (also referred
+ * to as a time bucket), e.g. 300 Requests per 60 seconds.</p>
+ * 
+ * <p>The filter works by incrementing a counter in a time bucket for each IP
+ * address, and if the counter exceeds the allowed limit then further requests
+ * from that IP are dropped with a &quot;429 Too many requests&quot; response 
+ * until the bucket time ends and a new bucket starts.</p>
+ * 
+ * <p>The filter is optimized for efficiency and low overhead, so it converts
+ * some configured values to more efficient values. For example, a configuration
+ * of a 60 seconds time bucket is converted to 65.536 seconds. That allows
+ * for very fast bucket calculation using bit shift arithmetic. In order to remain
+ * true to the user intent, the configured number of requests is then multiplied
+ * by the same ratio, so a configuration of 100 Requests per 60 seconds, has the
+ * real values of 109 Requests per 65 seconds.</p>
+ * 
+ * <p>It is common to set up different restrictions for different URIs.
+ * For example, a login page or authentication script is typically expected 
+ * to get far less requests than the rest of the application, so you can add 
+ * a filter definition that would allow only 5 requests per 15 seconds and map
+ * those URIs to it.</p>
+ * 
+ * <p>You can set <code>enforce</code> to <code>false</code>
+ * to disable the termination of requests that exceed the allowed limit. Then
+ * your application code can inspect the Request Attribute 
+ * <code>org.apache.catalina.filters.RateLimitFilter.Count</code> and decide
+ * how to handle the request based on other information that it has, e.g. allow
+ * more requests to certain users based on roles, etc.</p>
+ * 
+ * <p><strong>WARNING:</strong> if Tomcat is behind a reverse proxy then you must
+ * make sure that the Rate Limit Filter sees the client IP address, so if for
+ * example you are using the <a href="#Remote_IP_Filter">Remote IP Filter</a>, 
+ * then the filter mapping for the Rate Limit Filter must come <em>after</em>
+ * the mapping of the Remote IP Filter to ensure that each request has its IP
+ * address resolved before the Rate Limit Filter is applied. Failure to do so
+ * will count requests from different IPs in the same bucket and will result in
+ * a self inflicted DoS attack.</p>
+ */
 public class RateLimitFilter extends GenericFilter {
 
     /**
@@ -64,29 +105,29 @@ public class RateLimitFilter extends GenericFilter {
     public static final String RATE_LIMIT_ATTRIBUTE_COUNT = "org.apache.catalina.filters.RateLimitFilter.Count";
 
     /**
-     * filter init-param to set the bucket duration in seconds
+     * init-param to set the bucket duration in seconds
      */
-    public static final String PARAM_BUCKET_DURATION = "ratelimit.bucket.duration";
+    public static final String PARAM_BUCKET_DURATION = "bucketDuration";
 
     /**
-     * filter init-param to set the bucket number of requests
+     * init-param to set the bucket number of requests
      */
-    public static final String PARAM_BUCKET_REQUESTS = "ratelimit.bucket.requests";
+    public static final String PARAM_BUCKET_REQUESTS = "bucketRequests";
 
     /**
-     * filter init-param to set the enforce flag
+     * init-param to set the enforce flag
      */
-    public static final String PARAM_ENFORCE = "ratelimit.enforce";
+    public static final String PARAM_ENFORCE = "enforce";
 
     /**
-     * filter init-param to set a custom status code if requests per duration exceeded
+     * init-param to set a custom status code if requests per duration exceeded
      */
-    public static final String PARAM_STATUS_CODE = "ratelimit.status.code";
+    public static final String PARAM_STATUS_CODE = "statusCode";
 
     /**
-     * filter init-param to set a custom status message if requests per duration exceeded
+     * init-param to set a custom status message if requests per duration exceeded
      */
-    public static final String PARAM_STATUS_MESSAGE = "ratelimit.status.message";
+    public static final String PARAM_STATUS_MESSAGE = "statusMessage";
 
     TimeBucketCounter bucketCounter;
 
@@ -97,6 +138,7 @@ public class RateLimitFilter extends GenericFilter {
     private int bucketDuration = DEFAULT_BUCKET_DURATION;
 
     private boolean enforce = DEFAULT_ENFORCE;
+
     private int statusCode = DEFAULT_STATUS_CODE;
 
     private String statusMessage = DEFAULT_STATUS_MESSAGE;
@@ -155,36 +197,6 @@ public class RateLimitFilter extends GenericFilter {
         );
     }
 
-    /**
-     * The <code>doFilter</code> method of the Filter is called by the container
-     * each time a request/response pair is passed through the chain due to a
-     * client request for a resource at the end of the chain. The FilterChain
-     * passed in to this method allows the Filter to pass on the request and
-     * response to the next entity in the chain.
-     * <p>
-     * A typical implementation of this method would follow the following
-     * pattern:- <br>
-     * 1. Examine the request<br>
-     * 2. Optionally wrap the request object with a custom implementation to
-     * filter content or headers for input filtering <br>
-     * 3. Optionally wrap the response object with a custom implementation to
-     * filter content or headers for output filtering <br>
-     * 4. a) <strong>Either</strong> invoke the next entity in the chain using
-     * the FilterChain object (<code>chain.doFilter()</code>), <br>
-     * 4. b) <strong>or</strong> not pass on the request/response pair to the
-     * next entity in the filter chain to block the request processing<br>
-     * 5. Directly set headers on the response after invocation of the next
-     * entity in the filter chain.
-     *
-     * @param request  The request to process
-     * @param response The response associated with the request
-     * @param chain    Provides access to the next filter in the chain for this
-     *                 filter to pass the request and response to for further
-     *                 processing
-     * @throws IOException      if an I/O error occurs during this filter's
-     *                          processing of the request
-     * @throws ServletException if the processing fails for any other reason
-     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
                             throws IOException, ServletException {
@@ -207,21 +219,6 @@ public class RateLimitFilter extends GenericFilter {
         chain.doFilter(request, response);
     }
 
-    /**
-     * Called by the web container to indicate to a filter that it is being
-     * taken out of service. This method is only called once all threads within
-     * the filter's doFilter method have exited or after a timeout period has
-     * passed. After the web container calls this method, it will not call the
-     * doFilter method again on this instance of the filter. <br>
-     * <br>
-     * <p>
-     * This method gives the filter an opportunity to clean up any resources
-     * that are being held (for example, memory, file handles, threads) and make
-     * sure that any persistent state is synchronized with the filter's current
-     * state in memory.
-     * <p>
-     * The default implementation is a NO-OP.
-     */
     @Override
     public void destroy() {
         this.bucketCounter.destroy();
