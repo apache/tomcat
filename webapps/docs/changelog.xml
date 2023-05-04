@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0-M7 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <scode>
+        Move the management of the utility executor from the
+        <code>init()</code>/<code>destroy()</code> methods of components to the
+        <code>start()</code>/<code>stop()</code> methods. (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M6 (markt)" rtext="release in progress">
   <subsection name="Catalina">
@@ -136,11 +145,6 @@
         file locking protection or the manager servlet. Submitted
         by Jack Shirazi. (remm)
       </fix>
-      <scode>
-        Move the management of the utility executor from the
-        <code>init()</code>/<code>destroy()</code> methods of components to the
-        <code>start()</code>/<code>stop()</code> methods. (markt)
-      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
