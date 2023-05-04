@@ -425,27 +425,30 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             return;
         }
         this.utilityThreads = utilityThreads;
-        if (oldUtilityThreads != utilityThreads && utilityExecutor != null) {
-            reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
+        synchronized (utilityExecutorLock) {
+            if (oldUtilityThreads != utilityThreads && utilityExecutor != null) {
+                reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
+            }
         }
     }
 
 
+    /*
+     * Callers must be holding utilityExecutorLock
+     */
     private void reconfigureUtilityExecutor(int threads) {
-        synchronized (utilityExecutorLock) {
-            // The ScheduledThreadPoolExecutor doesn't use MaximumPoolSize, only CorePoolSize is available
-            if (utilityExecutor != null) {
-                utilityExecutor.setCorePoolSize(threads);
-            } else {
-                ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(threads,
-                        new TaskThreadFactory("Catalina-utility-", utilityThreadsAsDaemon, Thread.MIN_PRIORITY));
-                scheduledThreadPoolExecutor.setKeepAliveTime(10, TimeUnit.SECONDS);
-                scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
-                scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
-                utilityExecutor = scheduledThreadPoolExecutor;
-                utilityExecutorWrapper = new org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor(
-                        utilityExecutor);
-            }
+        // The ScheduledThreadPoolExecutor doesn't use MaximumPoolSize, only CorePoolSize is available
+        if (utilityExecutor != null) {
+            utilityExecutor.setCorePoolSize(threads);
+        } else {
+            ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(threads,
+                    new TaskThreadFactory("Catalina-utility-", utilityThreadsAsDaemon, Thread.MIN_PRIORITY));
+            scheduledThreadPoolExecutor.setKeepAliveTime(10, TimeUnit.SECONDS);
+            scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
+            scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+            utilityExecutor = scheduledThreadPoolExecutor;
+            utilityExecutorWrapper = new org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor(
+                    utilityExecutor);
         }
     }
 
@@ -977,8 +980,10 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         super.initInternal();
 
         // Initialize utility executor
-        reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
-        register(utilityExecutor, "type=UtilityExecutor");
+        synchronized (utilityExecutorLock) {
+            reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
+            register(utilityExecutor, "type=UtilityExecutor");
+        }
 
         // Register global String cache
         // Note although the cache is global, if there are multiple Servers
@@ -1013,10 +1018,12 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
         unregister(onameStringCache);
 
-        if (utilityExecutor != null) {
-            utilityExecutor.shutdownNow();
-            unregister("type=UtilityExecutor");
-            utilityExecutor = null;
+        synchronized (utilityExecutorLock) {
+            if (utilityExecutor != null) {
+                utilityExecutor.shutdownNow();
+                unregister("type=UtilityExecutor");
+                utilityExecutor = null;
+            }
         }
 
         super.destroyInternal();
