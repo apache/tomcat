@@ -901,6 +901,12 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         fireLifecycleEvent(CONFIGURE_START_EVENT, null);
         setState(LifecycleState.STARTING);
 
+        // Initialize utility executor
+        synchronized (utilityExecutorLock) {
+            reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
+            register(utilityExecutor, "type=UtilityExecutor");
+        }
+
         globalNamingResources.start();
 
         // Start our defined Services
@@ -961,6 +967,14 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             service.stop();
         }
 
+        synchronized (utilityExecutorLock) {
+            if (utilityExecutor != null) {
+                utilityExecutor.shutdownNow();
+                unregister("type=UtilityExecutor");
+                utilityExecutor = null;
+            }
+        }
+
         globalNamingResources.stop();
 
         stopAwait();
@@ -974,12 +988,6 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     protected void initInternal() throws LifecycleException {
 
         super.initInternal();
-
-        // Initialize utility executor
-        synchronized (utilityExecutorLock) {
-            reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
-            register(utilityExecutor, "type=UtilityExecutor");
-        }
 
         // Register global String cache
         // Note although the cache is global, if there are multiple Servers
@@ -1013,14 +1021,6 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         unregister(onameMBeanFactory);
 
         unregister(onameStringCache);
-
-        synchronized (utilityExecutorLock) {
-            if (utilityExecutor != null) {
-                utilityExecutor.shutdownNow();
-                unregister("type=UtilityExecutor");
-                utilityExecutor = null;
-            }
-        }
 
         super.destroyInternal();
     }

@@ -992,9 +992,6 @@ public class Connector extends LifecycleMBeanBase {
         // Initialize adapter
         adapter = new CoyoteAdapter(this);
         protocolHandler.setAdapter(adapter);
-        if (service != null) {
-            protocolHandler.setUtilityExecutor(service.getServer().getUtilityExecutor());
-        }
 
         // Make sure parseBodyMethodsSet has a default
         if (null == parseBodyMethodsSet) {
@@ -1035,6 +1032,11 @@ public class Connector extends LifecycleMBeanBase {
 
         setState(LifecycleState.STARTING);
 
+        // Configure the utility executor before starting the protocol handler
+        if (service != null) {
+            protocolHandler.setUtilityExecutor(service.getServer().getUtilityExecutor());
+        }
+
         try {
             protocolHandler.start();
         } catch (Exception e) {
@@ -1059,6 +1061,11 @@ public class Connector extends LifecycleMBeanBase {
             }
         } catch (Exception e) {
             throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerStopFailed"), e);
+        }
+
+        // Remove the utility executor once the protocol handler has been stopped
+        if (service != null) {
+            protocolHandler.setUtilityExecutor(null);
         }
     }
 

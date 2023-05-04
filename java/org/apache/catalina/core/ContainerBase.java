@@ -787,13 +787,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     }
 
 
-    @Override
-    protected void initInternal() throws LifecycleException {
-        reconfigureStartStopExecutor(getStartStopThreads());
-        super.initInternal();
-    }
-
-
     private void reconfigureStartStopExecutor(int threads) {
         if (threads == 1) {
             // Use a fake executor
@@ -818,6 +811,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
+
+        reconfigureStartStopExecutor(getStartStopThreads());
 
         // Start our subordinate components, if any
         logger = null;
@@ -925,6 +920,12 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         if (cluster instanceof Lifecycle) {
             ((Lifecycle) cluster).stop();
         }
+
+        // If init fails, this may be null
+        if (startStopExecutor != null) {
+            startStopExecutor.shutdownNow();
+            startStopExecutor = null;
+        }
     }
 
     @Override
@@ -952,11 +953,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         // Required if the child is destroyed directly.
         if (parent != null) {
             parent.removeChild(this);
-        }
-
-        // If init fails, this may be null
-        if (startStopExecutor != null) {
-            startStopExecutor.shutdownNow();
         }
 
         super.destroyInternal();
