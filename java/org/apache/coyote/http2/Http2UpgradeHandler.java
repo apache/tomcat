@@ -121,7 +121,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private long readTimeout = Http2Protocol.DEFAULT_READ_TIMEOUT;
     private long keepAliveTimeout = Http2Protocol.DEFAULT_KEEP_ALIVE_TIMEOUT;
     private long writeTimeout = Http2Protocol.DEFAULT_WRITE_TIMEOUT;
-    private final ConcurrentNavigableMap<Integer, AbstractNonZeroStream> streams = new ConcurrentSkipListMap<>();
+    private final ConcurrentNavigableMap<Integer,AbstractNonZeroStream> streams = new ConcurrentSkipListMap<>();
     protected final AtomicInteger activeRemoteStreamCount = new AtomicInteger(0);
     // Start at -1 so the 'add 2' logic in closeIdleStreams() works
     private volatile int maxActiveRemoteStreamId = -1;
@@ -129,8 +129,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private final AtomicInteger nextLocalStreamId = new AtomicInteger(2);
     private final PingManager pingManager = new PingManager();
     private volatile int newStreamsSinceLastPrune = 0;
-    private final Set<AbstractStream> backLogStreams = Collections
-            .newSetFromMap(new ConcurrentHashMap<AbstractStream, Boolean>());
+    private final Set<AbstractStream> backLogStreams =
+            Collections.newSetFromMap(new ConcurrentHashMap<AbstractStream,Boolean>());
     private long backLogSize = 0;
     // The time at which the connection will timeout unless data arrives before
     // then. -1 means no timeout.
@@ -1724,8 +1724,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     @Override
     public void receivedEndOfStream(int streamId) throws ConnectionException {
-        AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId,
-                connectionState.get().isNewStreamAllowed());
+        AbstractNonZeroStream abstractNonZeroStream =
+                getAbstractNonZeroStream(streamId, connectionState.get().isNewStreamAllowed());
         if (abstractNonZeroStream instanceof Stream) {
             Stream stream = (Stream) abstractNonZeroStream;
             stream.receivedEndOfStream();
@@ -1775,7 +1775,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     private void closeIdleStreams(int newMaxActiveRemoteStreamId) {
-        final ConcurrentNavigableMap<Integer, AbstractNonZeroStream> subMap = streams.subMap(
+        final ConcurrentNavigableMap<Integer,AbstractNonZeroStream> subMap = streams.subMap(
                 Integer.valueOf(maxActiveRemoteStreamId), false, Integer.valueOf(newMaxActiveRemoteStreamId), false);
         for (AbstractNonZeroStream stream : subMap.values()) {
             if (stream instanceof Stream) {
@@ -1835,8 +1835,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     @Override
     public void headersEnd(int streamId) throws Http2Exception {
-        AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId,
-                connectionState.get().isNewStreamAllowed());
+        AbstractNonZeroStream abstractNonZeroStream =
+                getAbstractNonZeroStream(streamId, connectionState.get().isNewStreamAllowed());
         if (abstractNonZeroStream instanceof Stream) {
             setMaxProcessedStream(streamId);
             Stream stream = (Stream) abstractNonZeroStream;

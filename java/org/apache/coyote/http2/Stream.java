@@ -115,8 +115,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         } else {
             // HTTP/2 Push or HTTP/1.1 upgrade
             this.coyoteRequest = coyoteRequest;
-            this.inputBuffer = new SavedRequestStreamInputBuffer(
-                    (SavedRequestInputFilter) coyoteRequest.getInputBuffer());
+            this.inputBuffer =
+                    new SavedRequestStreamInputBuffer((SavedRequestInputFilter) coyoteRequest.getInputBuffer());
             // Headers have been read by this point
             state.receivedStartOfHeaders();
             if (HTTP_UPGRADE_STREAM.equals(identifier)) {
@@ -694,9 +694,9 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     inputBuffer.swallowUnread();
                 }
             } catch (IOException ioe) {
-                ConnectionException ce = new ConnectionException(
-                        sm.getString("stream.reset.fail", getConnectionId(), getIdAsString()),
-                        Http2Error.PROTOCOL_ERROR, ioe);
+                ConnectionException ce =
+                        new ConnectionException(sm.getString("stream.reset.fail", getConnectionId(), getIdAsString()),
+                                Http2Error.PROTOCOL_ERROR, ioe);
                 handler.closeConnection(ce);
             }
         } else {

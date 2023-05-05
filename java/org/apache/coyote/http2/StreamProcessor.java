@@ -91,9 +91,9 @@ class StreamProcessor extends AbstractProcessor {
                             // fully read. This typically occurs when Tomcat rejects an upload
                             // of some form (e.g. PUT or POST). Need to tell the client not to
                             // send any more data on this stream (reset).
-                            StreamException se = new StreamException(sm.getString("streamProcessor.cancel",
-                                    stream.getConnectionId(), stream.getIdAsString()), Http2Error.NO_ERROR,
-                                    stream.getIdAsInt());
+                            StreamException se =
+                                    new StreamException(sm.getString("streamProcessor.cancel", stream.getConnectionId(),
+                                            stream.getIdAsString()), Http2Error.NO_ERROR, stream.getIdAsInt());
                             stream.close(se);
                         } else if (!getErrorState().isConnectionIoAllowed()) {
                             ConnectionException ce = new ConnectionException(

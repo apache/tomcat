@@ -92,7 +92,7 @@ public class Http2Protocol implements UpgradeProtocol {
     // change the default defined in ConnectionSettingsBase.
     private int initialWindowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
     // Limits
-    private Set<String> allowedTrailerHeaders = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+    private Set<String> allowedTrailerHeaders = Collections.newSetFromMap(new ConcurrentHashMap<String,Boolean>());
     private int maxHeaderCount = Constants.DEFAULT_MAX_HEADER_COUNT;
     private int maxHeaderSize = Constants.DEFAULT_MAX_HEADER_SIZE;
     private int maxTrailerCount = Constants.DEFAULT_MAX_TRAILER_COUNT;
