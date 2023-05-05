@@ -1033,13 +1033,14 @@ public class Connector extends LifecycleMBeanBase {
         setState(LifecycleState.STARTING);
 
         // Configure the utility executor before starting the protocol handler
-        if (service != null) {
+        if (protocolHandler != null && service != null) {
             protocolHandler.setUtilityExecutor(service.getServer().getUtilityExecutor());
         }
 
         try {
             protocolHandler.start();
         } catch (Exception e) {
+            // Includes NPE - protocolHandler will be null for invalid protocol if throwOnFailure is false
             throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerStartFailed"), e);
         }
     }
@@ -1064,7 +1065,7 @@ public class Connector extends LifecycleMBeanBase {
         }
 
         // Remove the utility executor once the protocol handler has been stopped
-        if (service != null) {
+        if (protocolHandler != null) {
             protocolHandler.setUtilityExecutor(null);
         }
     }
