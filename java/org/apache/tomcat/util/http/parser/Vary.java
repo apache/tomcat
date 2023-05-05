@@ -21,7 +21,7 @@ import java.io.StringReader;
 import java.util.Set;
 
 /**
- * @deprecated  Use {@link TokenList}.
+ * @deprecated Use {@link TokenList}.
  */
 @Deprecated
 public class Vary {

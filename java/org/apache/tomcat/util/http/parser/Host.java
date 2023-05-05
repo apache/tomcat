@@ -30,11 +30,9 @@ public class Host {
      *
      * @param mb The host header value
      *
-     * @return The position of ':' that separates the host from the port or -1
-     *         if it is not present
+     * @return The position of ':' that separates the host from the port or -1 if it is not present
      *
-     * @throws IllegalArgumentException If the host header value is not
-     *         specification compliant
+     * @throws IllegalArgumentException If the host header value is not specification compliant
      */
     public static int parse(MessageBytes mb) {
         return parse(new MessageBytesReader(mb));
@@ -46,11 +44,9 @@ public class Host {
      *
      * @param string The host header value
      *
-     * @return The position of ':' that separates the host from the port or -1
-     *         if it is not present
+     * @return The position of ':' that separates the host from the port or -1 if it is not present
      *
-     * @throws IllegalArgumentException If the host header value is not
-     *         specification compliant
+     * @throws IllegalArgumentException If the host header value is not specification compliant
      */
     public static int parse(String string) {
         return parse(new StringReader(string));
