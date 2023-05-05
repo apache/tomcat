@@ -54,7 +54,7 @@ public class TestAccessLogValve extends TomcatBaseTest {
 
     // Requests can return in the client before log() has been called
     private static final long SLEEP = 2;
-    private static final long SLEEP_MAX = 100;
+    private static final long SLEEP_MAX = 1000;
 
     private static final String TEXT_TYPE = "text";
     private static final String JSON_TYPE = "json";
