@@ -116,7 +116,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private HpackDecoder hpackDecoder;
     private HpackEncoder hpackEncoder;
 
-    private final ConcurrentNavigableMap<Integer, AbstractNonZeroStream> streams = new ConcurrentSkipListMap<>();
+    private final ConcurrentNavigableMap<Integer,AbstractNonZeroStream> streams = new ConcurrentSkipListMap<>();
     protected final AtomicInteger activeRemoteStreamCount = new AtomicInteger(0);
     // Start at -1 so the 'add 2' logic in closeIdleStreams() works
     private volatile int maxActiveRemoteStreamId = -1;
@@ -1623,8 +1623,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     @Override
     public void receivedEndOfStream(int streamId) throws ConnectionException {
-        AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId,
-                connectionState.get().isNewStreamAllowed());
+        AbstractNonZeroStream abstractNonZeroStream =
+                getAbstractNonZeroStream(streamId, connectionState.get().isNewStreamAllowed());
         if (abstractNonZeroStream instanceof Stream) {
             Stream stream = (Stream) abstractNonZeroStream;
             stream.receivedEndOfStream();
@@ -1674,7 +1674,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     private void closeIdleStreams(int newMaxActiveRemoteStreamId) {
-        final ConcurrentNavigableMap<Integer, AbstractNonZeroStream> subMap = streams.subMap(
+        final ConcurrentNavigableMap<Integer,AbstractNonZeroStream> subMap = streams.subMap(
                 Integer.valueOf(maxActiveRemoteStreamId), false, Integer.valueOf(newMaxActiveRemoteStreamId), false);
         for (AbstractNonZeroStream stream : subMap.values()) {
             if (stream instanceof Stream) {
@@ -1734,8 +1734,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     @Override
     public void headersEnd(int streamId) throws Http2Exception {
-        AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId,
-                connectionState.get().isNewStreamAllowed());
+        AbstractNonZeroStream abstractNonZeroStream =
+                getAbstractNonZeroStream(streamId, connectionState.get().isNewStreamAllowed());
         if (abstractNonZeroStream instanceof Stream) {
             setMaxProcessedStream(streamId);
             Stream stream = (Stream) abstractNonZeroStream;
