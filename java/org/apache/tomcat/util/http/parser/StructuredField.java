@@ -29,9 +29,8 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Parsing of structured fields as per RFC 8941.
  * <p>
- * The parsing implementation is complete but not all elements are currently
- * exposed via getters. Additional getters will be added as required as the
- * use of structured fields expands.
+ * The parsing implementation is complete but not all elements are currently exposed via getters. Additional getters
+ * will be added as required as the use of structured fields expands.
  * <p>
  * The serialization of structured fields has not been implemented.
  */
@@ -52,7 +51,7 @@ public class StructuredField {
             if (i == '*' || i >= 'a' && i <= 'z') {
                 IS_KEY_FIRST[i] = true;
                 IS_KEY[i] = true;
-            } else if (i  >= '0' && i <= '9' || i == '_' || i == '-' || i == '.'){
+            } else if (i >= '0' && i <= '9' || i == '_' || i == '-' || i == '.') {
                 IS_KEY[i] = true;
             }
         }
