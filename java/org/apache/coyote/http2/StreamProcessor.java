@@ -94,9 +94,9 @@ class StreamProcessor extends AbstractProcessor {
                             // fully read. This typically occurs when Tomcat rejects an upload
                             // of some form (e.g. PUT or POST). Need to tell the client not to
                             // send any more data on this stream (reset).
-                            StreamException se = new StreamException(sm.getString("streamProcessor.cancel",
-                                    stream.getConnectionId(), stream.getIdAsString()), Http2Error.NO_ERROR,
-                                    stream.getIdAsInt());
+                            StreamException se =
+                                    new StreamException(sm.getString("streamProcessor.cancel", stream.getConnectionId(),
+                                            stream.getIdAsString()), Http2Error.NO_ERROR, stream.getIdAsInt());
                             stream.close(se);
                         } else if (!getErrorState().isConnectionIoAllowed()) {
                             ConnectionException ce = new ConnectionException(
@@ -153,15 +153,16 @@ class StreamProcessor extends AbstractProcessor {
 
 
     private void prepareSendfile() {
-        String fileName = (String) stream.getCoyoteRequest()
-                .getAttribute(org.apache.coyote.Constants.SENDFILE_FILENAME_ATTR);
+        String fileName =
+                (String) stream.getCoyoteRequest().getAttribute(org.apache.coyote.Constants.SENDFILE_FILENAME_ATTR);
         if (fileName != null) {
             sendfileData = new SendfileData();
             sendfileData.path = new File(fileName).toPath();
             sendfileData.pos = ((Long) stream.getCoyoteRequest()
                     .getAttribute(org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR)).longValue();
-            sendfileData.end = ((Long) stream.getCoyoteRequest()
-                    .getAttribute(org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR)).longValue();
+            sendfileData.end =
+                    ((Long) stream.getCoyoteRequest().getAttribute(org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR))
+                            .longValue();
             sendfileData.left = sendfileData.end - sendfileData.pos;
             sendfileData.stream = stream;
         }
