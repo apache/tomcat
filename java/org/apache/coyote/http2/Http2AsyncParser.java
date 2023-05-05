@@ -52,8 +52,8 @@ class Http2AsyncParser extends Http2Parser {
         ByteBuffer preface = ByteBuffer.wrap(prefaceData);
         ByteBuffer header = ByteBuffer.allocate(9);
         ByteBuffer framePayload = ByteBuffer.allocate(input.getMaxFrameSize());
-        PrefaceCompletionHandler handler = new PrefaceCompletionHandler(webConnection, stream, prefaceData, preface,
-                header, framePayload);
+        PrefaceCompletionHandler handler =
+                new PrefaceCompletionHandler(webConnection, stream, prefaceData, preface, header, framePayload);
         socketWrapper.read(BlockingMode.NON_BLOCK, socketWrapper.getReadTimeout(), TimeUnit.MILLISECONDS, null, handler,
                 handler, preface, header, framePayload);
     }
@@ -164,7 +164,7 @@ class Http2AsyncParser extends Http2Parser {
         }
     }
 
-    private class FrameCompletionHandler implements CompletionCheck, CompletionHandler<Long, Void> {
+    private class FrameCompletionHandler implements CompletionCheck, CompletionHandler<Long,Void> {
 
         private final FrameType expected;
         protected final ByteBuffer[] buffers;

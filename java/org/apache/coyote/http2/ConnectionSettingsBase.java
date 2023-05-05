@@ -48,8 +48,8 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
     // Defaults (defined by Tomcat)
     static final long DEFAULT_NO_RFC7540_PRIORITIES = 1;
 
-    Map<Setting, Long> current = new ConcurrentHashMap<>();
-    Map<Setting, Long> pending = new ConcurrentHashMap<>();
+    Map<Setting,Long> current = new ConcurrentHashMap<>();
+    Map<Setting,Long> pending = new ConcurrentHashMap<>();
 
 
     ConnectionSettingsBase(String connectionId) {
@@ -210,9 +210,9 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
 
     private void validateMaxFrameSize(long maxFrameSize) throws T {
         if (maxFrameSize < MIN_MAX_FRAME_SIZE || maxFrameSize > MAX_MAX_FRAME_SIZE) {
-            String msg = sm.getString("connectionSettings.maxFrameSizeInvalid", connectionId,
-                    Long.toString(maxFrameSize), Integer.toString(MIN_MAX_FRAME_SIZE),
-                    Integer.toString(MAX_MAX_FRAME_SIZE));
+            String msg =
+                    sm.getString("connectionSettings.maxFrameSizeInvalid", connectionId, Long.toString(maxFrameSize),
+                            Integer.toString(MIN_MAX_FRAME_SIZE), Integer.toString(MAX_MAX_FRAME_SIZE));
             throwException(msg, Http2Error.PROTOCOL_ERROR);
         }
     }

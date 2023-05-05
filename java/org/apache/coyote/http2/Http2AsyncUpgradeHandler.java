@@ -55,7 +55,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         super(protocol, adapter, coyoteRequest, socketWrapper);
     }
 
-    private final CompletionHandler<Long, Void> errorCompletion = new CompletionHandler<>() {
+    private final CompletionHandler<Long,Void> errorCompletion = new CompletionHandler<>() {
         @Override
         public void completed(Long result, Void attachment) {
         }
@@ -65,7 +65,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             error.set(t);
         }
     };
-    private final CompletionHandler<Long, Void> applicationErrorCompletion = new CompletionHandler<>() {
+    private final CompletionHandler<Long,Void> applicationErrorCompletion = new CompletionHandler<>() {
         @Override
         public void completed(Long result, Void attachment) {
         }
@@ -320,8 +320,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                     sendfile.mappedBuffer = channel.map(MapMode.READ_ONLY, sendfile.pos, sendfile.end - sendfile.pos);
                 }
                 // Reserve as much as possible right away
-                int reservation = (sendfile.end - sendfile.pos > Integer.MAX_VALUE) ? Integer.MAX_VALUE
-                        : (int) (sendfile.end - sendfile.pos);
+                int reservation = (sendfile.end - sendfile.pos > Integer.MAX_VALUE) ? Integer.MAX_VALUE :
+                        (int) (sendfile.end - sendfile.pos);
                 sendfile.streamReservation = sendfile.stream.reserveWindowSize(reservation, true);
                 sendfile.connectionReservation = reserveWindowSize(sendfile.stream, sendfile.streamReservation, true);
             } catch (IOException e) {
@@ -337,8 +337,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             // connectionReservation will always be smaller than or the same as
             // streamReservation
             int frameSize = Integer.min(getMaxFrameSize(), sendfile.connectionReservation);
-            boolean finished = (frameSize == sendfile.left) &&
-                    sendfile.stream.getCoyoteResponse().getTrailerFields() == null;
+            boolean finished =
+                    (frameSize == sendfile.left) && sendfile.stream.getCoyoteResponse().getTrailerFields() == null;
 
             // Need to check this now since sending end of stream will change this.
             boolean writable = sendfile.stream.canWrite();
@@ -371,7 +371,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         }
     }
 
-    protected class SendfileCompletionHandler implements CompletionHandler<Long, SendfileData> {
+    protected class SendfileCompletionHandler implements CompletionHandler<Long,SendfileData> {
         @Override
         public void completed(Long nBytes, SendfileData sendfile) {
             CompletionState completionState = null;
@@ -397,12 +397,12 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 try {
                     if (sendfile.connectionReservation == 0) {
                         if (sendfile.streamReservation == 0) {
-                            int reservation = (sendfile.end - sendfile.pos > Integer.MAX_VALUE) ? Integer.MAX_VALUE
-                                    : (int) (sendfile.end - sendfile.pos);
+                            int reservation = (sendfile.end - sendfile.pos > Integer.MAX_VALUE) ? Integer.MAX_VALUE :
+                                    (int) (sendfile.end - sendfile.pos);
                             sendfile.streamReservation = sendfile.stream.reserveWindowSize(reservation, true);
                         }
-                        sendfile.connectionReservation = reserveWindowSize(sendfile.stream, sendfile.streamReservation,
-                                true);
+                        sendfile.connectionReservation =
+                                reserveWindowSize(sendfile.stream, sendfile.streamReservation, true);
                     }
                 } catch (IOException e) {
                     failed(e, sendfile);
@@ -418,8 +418,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 // connectionReservation will always be smaller than or the same as
                 // streamReservation
                 int frameSize = Integer.min(getMaxFrameSize(), sendfile.connectionReservation);
-                boolean finished = (frameSize == sendfile.left) &&
-                        sendfile.stream.getCoyoteResponse().getTrailerFields() == null;
+                boolean finished =
+                        (frameSize == sendfile.left) && sendfile.stream.getCoyoteResponse().getTrailerFields() == null;
 
                 // Need to check this now since sending end of stream will change this.
                 boolean writable = sendfile.stream.canWrite();

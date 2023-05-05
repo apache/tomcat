@@ -118,8 +118,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         } else {
             // HTTP/2 Push or HTTP/1.1 upgrade
             this.coyoteRequest = coyoteRequest;
-            this.inputBuffer = new SavedRequestStreamInputBuffer(
-                    (SavedRequestInputFilter) coyoteRequest.getInputBuffer());
+            this.inputBuffer =
+                    new SavedRequestStreamInputBuffer((SavedRequestInputFilter) coyoteRequest.getInputBuffer());
             // Headers have been read by this point
             state.receivedStartOfHeaders();
             if (HTTP_UPGRADE_STREAM.equals(identifier)) {
@@ -545,7 +545,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     final void writeTrailers() throws IOException {
-        Supplier<Map<String, String>> supplier = coyoteResponse.getTrailerFields();
+        Supplier<Map<String,String>> supplier = coyoteResponse.getTrailerFields();
         if (supplier == null) {
             // No supplier was set, end of stream will already have been sent
             return;
@@ -556,7 +556,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         MimeHeaders mimeHeaders = coyoteResponse.getMimeHeaders();
         mimeHeaders.recycle();
 
-        Map<String, String> headerMap = supplier.get();
+        Map<String,String> headerMap = supplier.get();
         if (headerMap == null) {
             headerMap = Collections.emptyMap();
         }
@@ -564,7 +564,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         // Copy the contents of the Map to the MimeHeaders
         // TODO: Is there benefit in refactoring this? Is MimeHeaders too
         // heavyweight? Can we reduce the copy/conversions?
-        for (Map.Entry<String, String> headerEntry : headerMap.entrySet()) {
+        for (Map.Entry<String,String> headerEntry : headerMap.entrySet()) {
             MessageBytes mb = mimeHeaders.addValue(headerEntry.getKey());
             mb.setString(headerEntry.getValue());
         }
@@ -743,9 +743,9 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     inputBuffer.swallowUnread();
                 }
             } catch (IOException ioe) {
-                ConnectionException ce = new ConnectionException(
-                        sm.getString("stream.reset.fail", getConnectionId(), getIdAsString()),
-                        Http2Error.PROTOCOL_ERROR, ioe);
+                ConnectionException ce =
+                        new ConnectionException(sm.getString("stream.reset.fail", getConnectionId(), getIdAsString()),
+                                Http2Error.PROTOCOL_ERROR, ioe);
                 handler.closeConnection(ce);
             }
         } else {
