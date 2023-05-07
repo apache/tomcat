@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.76 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add RateLimitFilter which can be used to mitigate DoS and Brute Force 
+        attacks. (isapir)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.75 (remm)" rtext="release in progress">
   <subsection name="Catalina">
