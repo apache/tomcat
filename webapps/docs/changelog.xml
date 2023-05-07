@@ -134,6 +134,10 @@
         file locking protection or the manager servlet. Submitted
         by Jack Shirazi. (remm)
       </fix>
+      <add>
+        Add RateLimitFilter which can be used to mitigate DoS and Brute Force 
+        attacks. (isapir)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
