@@ -112,6 +112,10 @@
         <code>init()</code>/<code>destroy()</code> methods of components to the
         <code>start()</code>/<code>stop()</code> methods. (markt)
       </scode>
+      <add>
+        Add RateLimitFilter which can be used to mitigate DoS and Brute Force 
+        attacks. (isapir)
+      </add>
     </changelog>
   </subsection>
 </section>
