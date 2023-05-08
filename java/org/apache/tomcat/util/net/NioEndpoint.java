@@ -582,10 +582,6 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
             return interestOps;
         }
 
-        public void reset() {
-            reset(null, 0);
-        }
-
         @Override
         public String toString() {
             return "Poller event: socket [" + socketWrapper.getSocket() + "], socketWrapper [" + socketWrapper +
@@ -717,7 +713,6 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                     }
                 }
                 if (running && eventCache != null) {
-                    pe.reset();
                     eventCache.push(pe);
                 }
             }
