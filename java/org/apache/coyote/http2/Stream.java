@@ -17,6 +17,7 @@
 package org.apache.coyote.http2;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
@@ -45,6 +46,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.Host;
+import org.apache.tomcat.util.http.parser.Priority;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.WriteBuffer;
 import org.apache.tomcat.util.res.StringManager;
@@ -98,6 +100,9 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     private Object pendingWindowUpdateForStreamLock = new Object();
     private int pendingWindowUpdateForStream = 0;
 
+    private volatile int urgency = Priority.DEFAULT_URGENCY;
+    private volatile boolean incremental = Priority.DEFAULT_INCREMENTAL;
+
 
     Stream(Integer identifier, Http2UpgradeHandler handler) {
         this(identifier, handler, null);
@@ -107,7 +112,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     Stream(Integer identifier, Http2UpgradeHandler handler, Request coyoteRequest) {
         super(handler.getConnectionId(), identifier);
         this.handler = handler;
-        handler.addChild(this);
         setWindowSize(handler.getRemoteSettings().getInitialWindowSize());
         if (coyoteRequest == null) {
             // HTTP/2 new request
@@ -416,6 +420,16 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     // Multiple hosts headers - illegal
                     throw new HpackException(
                             sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), "host"));
+                }
+                break;
+            }
+            case "priority": {
+                try {
+                    Priority p = Priority.parsePriority(new StringReader(value));
+                    setUrgency(p.getUrgency());
+                    setIncremental(p.getIncremental());
+                } catch (IOException ioe) {
+                    // Not possible with StringReader
                 }
                 break;
             }
@@ -834,6 +848,26 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             }
         }
         return result;
+    }
+
+
+    public int getUrgency() {
+        return urgency;
+    }
+
+
+    public void setUrgency(int urgency) {
+        this.urgency = urgency;
+    }
+
+
+    public boolean getIncremental() {
+        return incremental;
+    }
+
+
+    public void setIncremental(boolean incremental) {
+        this.incremental = incremental;
     }
 
 
