@@ -18,7 +18,6 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
-
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Map;
@@ -28,19 +27,19 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.filters.TestRemoteIpFilter.MockFilterChain;
 import org.apache.catalina.filters.TestRemoteIpFilter.MockHttpServletRequest;
+import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.unittest.TesterResponse;
 import org.apache.tomcat.unittest.TesterServletContext;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 public class TestRateLimitFilter extends TomcatBaseTest {
 
