@@ -54,6 +54,7 @@ public class TimeBucketCounter {
     volatile boolean isRunning = false;
 
     /**
+     * Creates a new TimeBucketCounter with the specified lifetime.
      *
      * @param bucketDuration duration in seconds, e.g. for 1 minute pass 60
      */
@@ -102,15 +103,13 @@ public class TimeBucketCounter {
      * calculates the current time bucket prefix by shifting bits for fast
      * division, e.g. shift 16 bits is the same as dividing by 65,536 which is
      * about 1:05m
+     *
+     * @return The current bucket prefix.
      */
     public final int getCurrentBucketPrefix() {
         return (int) (System.currentTimeMillis() >> this.numBits);
     }
 
-    /**
-     *
-     * @return
-     */
     public int getNumBits() {
         return numBits;
     }
@@ -141,9 +140,6 @@ public class TimeBucketCounter {
 
     /**
      * returns the ratio to the next power of 2 so that we can adjust the value
-     *
-     * @param value
-     * @return
      */
     static double ratioToPowerOf2(int value) {
         double nextPO2 = nextPowerOf2(value);
@@ -153,14 +149,12 @@ public class TimeBucketCounter {
     /**
      * returns the next power of 2 given a value, e.g. 256 for 250,
      * or 1024, for 1000
-     *
-     * @param value
-     * @return
      */
     static int nextPowerOf2(int value) {
         int valueOfHighestBit = Integer.highestOneBit(value);
-        if (valueOfHighestBit == value)
+        if (valueOfHighestBit == value) {
             return value;
+        }
 
         return valueOfHighestBit << 1;
     }
@@ -192,7 +186,7 @@ public class TimeBucketCounter {
 
         final long sleeptime;
 
-        public MaintenanceThread(long sleeptime) {
+        MaintenanceThread(long sleeptime) {
             super.setDaemon(true);
             this.sleeptime = sleeptime;
         }
