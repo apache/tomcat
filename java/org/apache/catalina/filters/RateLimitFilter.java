@@ -200,8 +200,9 @@ public class RateLimitFilter implements Filter {
         actualRequests = (int) Math.round(bucketCounter.getRatio() * bucketRequests);
 
         log.info(sm.getString("rateLimitFilter.initialized",
-            filterName, bucketRequests, bucketDuration, getActualRequests(),
-            getActualDurationInSeconds(), (!enforce ? "Not " : "") + "enforcing")
+            filterName, Integer.valueOf(bucketRequests), Integer.valueOf(bucketDuration),
+            Integer.valueOf(getActualRequests()), Integer.valueOf(getActualDurationInSeconds()),
+            (!enforce ? "Not " : "") + "enforcing")
         );
     }
 
@@ -212,13 +213,14 @@ public class RateLimitFilter implements Filter {
         String ipAddr = request.getRemoteAddr();
         int reqCount = bucketCounter.increment(ipAddr);
 
-        request.setAttribute(RATE_LIMIT_ATTRIBUTE_COUNT, reqCount);
+        request.setAttribute(RATE_LIMIT_ATTRIBUTE_COUNT, Integer.valueOf(reqCount));
 
         if (enforce && (reqCount > actualRequests)) {
 
             ((HttpServletResponse) response).sendError(statusCode, statusMessage);
             log.warn(sm.getString("rateLimitFilter.maxRequestsExceeded",
-                filterName, reqCount, ipAddr, getActualRequests(), getActualDurationInSeconds())
+                filterName, Integer.valueOf(reqCount), ipAddr, Integer.valueOf(getActualRequests()),
+                Integer.valueOf(getActualDurationInSeconds()))
             );
 
             return;
