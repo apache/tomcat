@@ -16,10 +16,6 @@
  */
 package org.apache.coyote.http2;
 
-import java.util.Collections;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -36,9 +32,6 @@ abstract class AbstractStream {
     private final Integer identifier;
     private final String idAsString;
 
-    private volatile AbstractStream parentStream = null;
-    private final Set<AbstractNonZeroStream> childStreams =
-            Collections.newSetFromMap(new ConcurrentHashMap<AbstractNonZeroStream,Boolean>());
     private long windowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
 
     private volatile int connectionAllocationRequested = 0;
@@ -63,46 +56,6 @@ abstract class AbstractStream {
 
     final int getIdAsInt() {
         return identifier.intValue();
-    }
-
-
-    final void detachFromParent() {
-        if (parentStream != null) {
-            parentStream.getChildStreams().remove(this);
-            parentStream = null;
-        }
-    }
-
-
-    final void addChild(AbstractNonZeroStream child) {
-        child.setParentStream(this);
-        childStreams.add(child);
-    }
-
-
-    final boolean isDescendant(AbstractStream stream) {
-        // Is the passed in Stream a descendant of this Stream?
-        // Start at the passed in Stream and work up
-        AbstractStream parent = stream.getParentStream();
-        while (parent != null && parent != this) {
-            parent = parent.getParentStream();
-        }
-        return parent != null;
-    }
-
-
-    final AbstractStream getParentStream() {
-        return parentStream;
-    }
-
-
-    final void setParentStream(AbstractStream parentStream) {
-        this.parentStream = parentStream;
-    }
-
-
-    final Set<AbstractNonZeroStream> getChildStreams() {
-        return childStreams;
     }
 
 
@@ -183,6 +136,4 @@ abstract class AbstractStream {
 
 
     abstract String getConnectionId();
-
-    abstract int getWeight();
 }

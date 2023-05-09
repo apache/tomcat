@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.90 (schultz)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Update the HTTP/2 implementation to use the prioritization scheme
+        defined in RFC 9218 rather than the one defined in RFC 7540.
+        (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.89 (schultz)" rtext="reelase in progress">
   <subsection name="Catalina">
