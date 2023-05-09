@@ -135,7 +135,7 @@
         by Jack Shirazi. (remm)
       </fix>
       <add>
-        Add RateLimitFilter which can be used to mitigate DoS and Brute Force 
+        Add RateLimitFilter which can be used to mitigate DoS and Brute Force
         attacks. (isapir)
       </add>
     </changelog>
@@ -3390,5 +3390,4 @@
 </section>
 </body>
 </document>
-
 
