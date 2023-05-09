@@ -23,6 +23,7 @@ enum Setting {
     INITIAL_WINDOW_SIZE(4),
     MAX_FRAME_SIZE(5),
     MAX_HEADER_LIST_SIZE(6),
+    NO_RFC7540_PRIORITIES(9),
     UNKNOWN(Integer.MAX_VALUE);
 
     private final int id;
@@ -59,6 +60,9 @@ enum Setting {
             }
             case 6: {
                 return MAX_HEADER_LIST_SIZE;
+            }
+            case 9: {
+                return NO_RFC7540_PRIORITIES;
             }
             default: {
                 return Setting.UNKNOWN;

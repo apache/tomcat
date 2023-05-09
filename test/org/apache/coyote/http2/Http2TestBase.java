@@ -60,6 +60,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.http.parser.Priority;
 import org.apache.tomcat.util.net.TesterSupport;
 
 /**
@@ -892,6 +893,33 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
+    void sendPriorityUpdate(int streamId, int urgency, boolean incremental) throws IOException {
+        // Need to know the payload length first
+        StringBuilder sb = new StringBuilder("u=");
+        sb.append(urgency);
+        if (incremental) {
+            sb.append(", i");
+        }
+        byte[] payload = sb.toString().getBytes(StandardCharsets.US_ASCII);
+
+        byte[] priorityUpdateFrame = new byte[13 + payload.length];
+
+        // length
+        ByteUtil.setThreeBytes(priorityUpdateFrame, 0, 4 + payload.length);
+        // type
+        priorityUpdateFrame[3] = FrameType.PRIORITY_UPDATE.getIdByte();
+        // Stream ID
+        ByteUtil.set31Bits(priorityUpdateFrame, 5, 0);
+
+        // Payload
+        ByteUtil.set31Bits(priorityUpdateFrame, 9, streamId);
+        System.arraycopy(payload, 0, priorityUpdateFrame, 13, payload.length);
+
+        os.write(priorityUpdateFrame);
+        os.flush();
+    }
+
+
     void sendSettings(int streamId, boolean ack, SettingValue... settings) throws IOException {
         // length
         int settingsCount;
@@ -1073,13 +1101,6 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             return this;
         }
 
-        @Override
-        public void reprioritise(int streamId, int parentStreamId, boolean exclusive, int weight) {
-            lastStreamId = Integer.toString(streamId);
-            trace.append(
-                    lastStreamId + "-Reprioritise-[" + parentStreamId + "]-[" + exclusive + "]-[" + weight + "]\n");
-        }
-
 
         @Override
         public void emitHeader(String name, String value) {
@@ -1185,6 +1206,13 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
+        public void priorityUpdate(int prioritizedStreamID, Priority p) throws Http2Exception {
+            trace.append(
+                    prioritizedStreamID + "-PriorityUpdate-[" + p.getUrgency() + "]-[" + p.getIncremental() + "]\n");
+        }
+
+
+        @Override
         public void onSwallowedUnknownFrame(int streamId, int frameTypeId, int flags, int size) {
             trace.append(streamId);
             trace.append(',');
@@ -1231,6 +1259,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         public long getBytesRead() {
             return bytesRead;
+        }
+
+
+        @Override
+        public void increaseOverheadCount(FrameType frameType) {
+            // NO-OP. Client doesn't track overhead.
         }
     }
 

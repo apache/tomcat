@@ -113,6 +113,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Update the HTTP/2 implementation to use the prioritization scheme
+        defined in RFC 9218 rather than the one defined in RFC 7540.
+        (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.75 (remm)" rtext="release in progress">
   <subsection name="Catalina">

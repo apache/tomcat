@@ -18,7 +18,12 @@ package org.apache.coyote.http2;
 
 public class Constants {
 
-    // Prioritisation
+    /**
+     * RFC 7540 prioritisation default weight.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 11 onwards.
+     */
+    @Deprecated
     public static final int DEFAULT_WEIGHT = 16;
 
     // Parsing

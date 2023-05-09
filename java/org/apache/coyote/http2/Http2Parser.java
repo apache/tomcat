@@ -16,7 +16,11 @@
  */
 package org.apache.coyote.http2;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
@@ -27,6 +31,7 @@ import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
+import org.apache.tomcat.util.http.parser.Priority;
 import org.apache.tomcat.util.res.StringManager;
 
 class Http2Parser {
@@ -132,6 +137,9 @@ class Http2Parser {
                 break;
             case CONTINUATION:
                 readContinuationFrame(streamId, flags, payloadSize, null);
+                break;
+            case PRIORITY_UPDATE:
+                readPriorityUpdateFrame(payloadSize, null);
                 break;
             case UNKNOWN:
                 readUnknownFrame(streamId, frameTypeId, flags, payloadSize, null);
@@ -256,21 +264,16 @@ class Http2Parser {
             } else {
                 buffer.get(optional);
             }
-            int optionalPos = 0;
             if (padding) {
-                padLength = ByteUtil.getOneByte(optional, optionalPos++);
+                padLength = ByteUtil.getOneByte(optional, 0);
                 if (padLength >= payloadSize) {
                     throw new ConnectionException(sm.getString("http2Parser.processFrame.tooMuchPadding", connectionId,
                             Integer.toString(streamId), Integer.toString(padLength), Integer.toString(payloadSize)),
                             Http2Error.PROTOCOL_ERROR);
                 }
             }
-            if (priority) {
-                boolean exclusive = ByteUtil.isBit7Set(optional[optionalPos]);
-                int parentStreamId = ByteUtil.get31Bits(optional, optionalPos);
-                int weight = ByteUtil.getOneByte(optional, optionalPos + 4) + 1;
-                output.reprioritise(streamId, parentStreamId, exclusive, weight);
-            }
+
+            // Ignore RFC 7450 priority data if present
 
             payloadSize -= optionalLen;
             payloadSize -= padLength;
@@ -288,24 +291,15 @@ class Http2Parser {
     }
 
 
-    protected void readPriorityFrame(int streamId, ByteBuffer buffer) throws Http2Exception, IOException {
-        byte[] payload = new byte[5];
-        if (buffer == null) {
-            input.fill(true, payload);
-        } else {
-            buffer.get(payload);
+    protected void readPriorityFrame(int streamId, ByteBuffer buffer) throws IOException {
+        // RFC 7450 priority frames are ignored. Still need to treat as overhead.
+        try {
+            swallowPayload(streamId, FrameType.PRIORITY.getId(), 5, false, buffer);
+        } catch (ConnectionException e) {
+            // Will never happen because swallowPayload() is called with isPadding set
+            // to false
         }
-
-        boolean exclusive = ByteUtil.isBit7Set(payload[0]);
-        int parentStreamId = ByteUtil.get31Bits(payload, 0);
-        int weight = ByteUtil.getOneByte(payload, 4) + 1;
-
-        if (streamId == parentStreamId) {
-            throw new StreamException(sm.getString("http2Parser.processFramePriority.invalidParent", connectionId,
-                    Integer.valueOf(streamId)), Http2Error.PROTOCOL_ERROR, streamId);
-        }
-
-        output.reprioritise(streamId, parentStreamId, exclusive, weight);
+        output.increaseOverheadCount(FrameType.PRIORITY);
     }
 
 
@@ -456,6 +450,36 @@ class Http2Parser {
             headersCurrentStream = -1;
             onHeadersComplete(streamId);
         }
+    }
+
+
+    protected void readPriorityUpdateFrame(int payloadSize, ByteBuffer buffer) throws Http2Exception, IOException {
+        // Identify prioritized stream ID
+        byte[] payload = new byte[payloadSize];
+        if (buffer == null) {
+            input.fill(true, payload);
+        } else {
+            buffer.get(payload);
+        }
+
+        int prioritizedStreamID = ByteUtil.get31Bits(payload, 0);
+
+        if (prioritizedStreamID == 0) {
+            throw new ConnectionException(sm.getString("http2Parser.processFramePriorityUpdate.streamZero"),
+                    Http2Error.PROTOCOL_ERROR);
+        }
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(payload, 4, payloadSize - 4);
+        Reader r = new BufferedReader(new InputStreamReader(bais, StandardCharsets.US_ASCII));
+        Priority p = Priority.parsePriority(r);
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("http2Parser.processFramePriorityUpdate.debug", connectionId,
+                    Integer.toString(prioritizedStreamID), Integer.toString(p.getUrgency()),
+                    Boolean.valueOf(p.getIncremental())));
+        }
+
+        output.priorityUpdate(prioritizedStreamID, p);
     }
 
 
@@ -772,9 +796,6 @@ class Http2Parser {
 
         void headersEnd(int streamId) throws Http2Exception;
 
-        // Priority frames (also headers)
-        void reprioritise(int streamId, int parentStreamId, boolean exclusive, int weight) throws Http2Exception;
-
         // Reset frames
         void reset(int streamId, long errorCode) throws Http2Exception;
 
@@ -792,6 +813,9 @@ class Http2Parser {
         // Window size
         void incrementWindowSize(int streamId, int increment) throws Http2Exception;
 
+        // Priority update
+        void priorityUpdate(int prioritizedStreamID, Priority p) throws Http2Exception;
+
         /**
          * Notification triggered when the parser swallows the payload of an unknown frame.
          *
@@ -803,5 +827,7 @@ class Http2Parser {
          * @throws IOException If an I/O occurred while swallowing the unknown frame
          */
         void onSwallowedUnknownFrame(int streamId, int frameTypeId, int flags, int size) throws IOException;
+
+        void increaseOverheadCount(FrameType frameType);
     }
 }
