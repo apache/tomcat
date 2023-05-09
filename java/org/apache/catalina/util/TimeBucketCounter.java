@@ -21,34 +21,29 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * this class maintains a thread safe hash map that has timestamp-based buckets
- * followed by a string for a key, and a counter for a value. each time the
- * increment() method is called it adds the key if it does not exist, increments
- * its value and returns it.
- *
- * a maintenance thread cleans up keys that are prefixed by previous timestamp
- * buckets.
+ * This class maintains a thread safe hash map that has timestamp-based buckets followed by a string for a key, and a
+ * counter for a value. each time the increment() method is called it adds the key if it does not exist, increments its
+ * value and returns it. a maintenance thread cleans up keys that are prefixed by previous timestamp buckets.
  */
 public class TimeBucketCounter {
 
     /**
      * Map to hold the buckets
      */
-    private final ConcurrentHashMap<String, AtomicInteger> map = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,AtomicInteger> map = new ConcurrentHashMap<>();
 
     /**
-     * Milliseconds bucket size as a Power of 2 for bit shift math, e.g.
-     * 16 for 65_536ms which is about 1:05 minute
+     * Milliseconds bucket size as a Power of 2 for bit shift math, e.g. 16 for 65_536ms which is about 1:05 minute
      */
     private final int numBits;
 
     /**
-     * ratio of actual duration to config duration
+     * Ratio of actual duration to config duration
      */
     private final double ratio;
 
     /**
-     * flag for the maintenance thread
+     * Flag for the maintenance thread
      */
     volatile boolean isRunning = false;
 
@@ -78,10 +73,10 @@ public class TimeBucketCounter {
     }
 
     /**
-     * increments the counter for the passed identifier in the current time
-     * bucket and returns the new value
+     * Increments the counter for the passed identifier in the current time bucket and returns the new value.
      *
      * @param identifier an identifier for which we want to maintain count, e.g. IP Address
+     *
      * @return the count within the current time bucket
      */
     public final int increment(String identifier) {
@@ -91,9 +86,8 @@ public class TimeBucketCounter {
     }
 
     /**
-     * calculates the current time bucket prefix by shifting bits for fast
-     * division, e.g. shift 16 bits is the same as dividing by 65,536 which is
-     * about 1:05m
+     * Calculates the current time bucket prefix by shifting bits for fast division, e.g. shift 16 bits is the same as
+     * dividing by 65,536 which is about 1:05m.
      *
      * @return The current bucket prefix.
      */
@@ -106,9 +100,8 @@ public class TimeBucketCounter {
     }
 
     /**
-     * the actual duration may differ from the configured duration because
-     * it is set to the next power of 2 value in order to perform very fast
-     * bit shift arithmetic
+     * The actual duration may differ from the configured duration because it is set to the next power of 2 value in
+     * order to perform very fast bit shift arithmetic.
      *
      * @return the actual bucket duration in milliseconds
      */
@@ -117,20 +110,18 @@ public class TimeBucketCounter {
     }
 
     /**
-     * returns the ratio between the configured duration param and the
-     * actual duration which will be set to the next power of 2.  we then
-     * multiply the configured requests param by the same ratio in order
-     * to compensate for the added time, if any
+     * Returns the ratio between the configured duration param and the actual duration which will be set to the next
+     * power of 2. We then multiply the configured requests param by the same ratio in order to compensate for the added
+     * time, if any.
      *
-     * @return the ratio, e.g. 1.092 if the actual duration is 65_536 for
-     *         the configured duration of 60_000
+     * @return the ratio, e.g. 1.092 if the actual duration is 65_536 for the configured duration of 60_000
      */
     public double getRatio() {
         return ratio;
     }
 
     /**
-     * returns the ratio to the next power of 2 so that we can adjust the value
+     * Returns the ratio to the next power of 2 so that we can adjust the value.
      */
     static double ratioToPowerOf2(int value) {
         double nextPO2 = nextPowerOf2(value);
@@ -138,8 +129,7 @@ public class TimeBucketCounter {
     }
 
     /**
-     * returns the next power of 2 given a value, e.g. 256 for 250,
-     * or 1024, for 1000
+     * Returns the next power of 2 given a value, e.g. 256 for 250, or 1024, for 1000.
      */
     static int nextPowerOf2(int value) {
         int valueOfHighestBit = Integer.highestOneBit(value);
@@ -151,8 +141,7 @@ public class TimeBucketCounter {
     }
 
     /**
-     * when we want to test a full bucket duration we need to sleep until the
-     * next bucket starts
+     * When we want to test a full bucket duration we need to sleep until the next bucket starts.
      *
      * @return the number of milliseconds until the next bucket
      */
@@ -164,14 +153,14 @@ public class TimeBucketCounter {
     }
 
     /**
-     * sets isRunning to false to terminate the maintenance thread
+     * Sets isRunning to false to terminate the maintenance thread.
      */
     public void destroy() {
         this.isRunning = false;
     }
 
     /**
-     * this class runs a background thread to clean up old keys from the map
+     * This class runs a background thread to clean up old keys from the map.
      */
     class MaintenanceThread extends Thread {
 
@@ -194,14 +183,15 @@ public class TimeBucketCounter {
 
             while (isRunning) {
                 String currentBucketPrefix = String.valueOf(getCurrentBucketPrefix());
-                ConcurrentHashMap.KeySetView<String, AtomicInteger> keys = map.keySet();
+                ConcurrentHashMap.KeySetView<String,AtomicInteger> keys = map.keySet();
 
                 // remove obsolete keys
                 keys.removeIf(k -> !k.startsWith(currentBucketPrefix));
 
                 try {
                     Thread.sleep(sleeptime);
-                } catch (InterruptedException e) {}
+                } catch (InterruptedException e) {
+                }
             }
         }
     }
