@@ -71,7 +71,14 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         TestClient tc3 = new TestClient(rateLimitFilter, filterChain, "10.20.20.20", 200, 20);
         TestClient tc4 = new TestClient(rateLimitFilter, filterChain, "10.20.20.40", 200, 40);
 
-        Thread.sleep(5000);
+        // Sleep for up to 10s for clients to complete
+        int count = 0;
+        while (count < 100 && (tc1.results[24] == 0 || tc2.results[49] == 0 || tc3.results[allowedRequests - 1] == 0 ||
+                tc3.results[allowedRequests] == 0 || tc3.results[allowedRequests - 1] == 0 ||
+                tc4.results[allowedRequests] == 0)) {
+            Thread.sleep(100);
+            count++;
+        }
 
         Assert.assertEquals(200, tc1.results[24]); // only 25 requests made, all allowed
 
