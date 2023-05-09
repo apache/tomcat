@@ -182,6 +182,7 @@ public class TimeBucketCounter {
             this.sleeptime = sleeptime;
         }
 
+        @SuppressWarnings("sync-override")
         @Override
         public void start() {
             isRunning = true;
