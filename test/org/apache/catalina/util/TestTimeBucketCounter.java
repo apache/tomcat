@@ -22,7 +22,7 @@ import org.junit.Test;
 
 public class TestTimeBucketCounter {
 
-    final static double DELTA = 0.001;
+    static final double DELTA = 0.001;
 
     @Test
     public void testNextPowerOf2() {

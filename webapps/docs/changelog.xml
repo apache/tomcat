@@ -113,7 +113,7 @@
         <code>start()</code>/<code>stop()</code> methods. (markt)
       </scode>
       <add>
-        Add RateLimitFilter which can be used to mitigate DoS and Brute Force 
+        Add RateLimitFilter which can be used to mitigate DoS and Brute Force
         attacks. (isapir)
       </add>
     </changelog>
@@ -1015,5 +1015,4 @@
 </section>
 </body>
 </document>
-
 
