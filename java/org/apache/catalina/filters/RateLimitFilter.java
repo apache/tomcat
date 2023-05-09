@@ -17,6 +17,8 @@
 
 package org.apache.catalina.filters;
 
+import java.io.IOException;
+
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.GenericFilter;
@@ -24,24 +26,23 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.catalina.util.TimeBucketCounter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-import java.io.IOException;
-
 /**
  * <p>Servlet filter that can help mitigate Denial of Service
- * (DoS) and Brute Force attacks by limiting the number of a requests that are 
+ * (DoS) and Brute Force attacks by limiting the number of a requests that are
  * allowed from a single IP address within a time window (also referred
  * to as a time bucket), e.g. 300 Requests per 60 seconds.</p>
- * 
+ *
  * <p>The filter works by incrementing a counter in a time bucket for each IP
  * address, and if the counter exceeds the allowed limit then further requests
- * from that IP are dropped with a &quot;429 Too many requests&quot; response 
+ * from that IP are dropped with a &quot;429 Too many requests&quot; response
  * until the bucket time ends and a new bucket starts.</p>
- * 
+ *
  * <p>The filter is optimized for efficiency and low overhead, so it converts
  * some configured values to more efficient values. For example, a configuration
  * of a 60 seconds time bucket is converted to 65.536 seconds. That allows
@@ -49,23 +50,23 @@ import java.io.IOException;
  * true to the user intent, the configured number of requests is then multiplied
  * by the same ratio, so a configuration of 100 Requests per 60 seconds, has the
  * real values of 109 Requests per 65 seconds.</p>
- * 
+ *
  * <p>It is common to set up different restrictions for different URIs.
- * For example, a login page or authentication script is typically expected 
- * to get far less requests than the rest of the application, so you can add 
+ * For example, a login page or authentication script is typically expected
+ * to get far less requests than the rest of the application, so you can add
  * a filter definition that would allow only 5 requests per 15 seconds and map
  * those URIs to it.</p>
- * 
+ *
  * <p>You can set <code>enforce</code> to <code>false</code>
  * to disable the termination of requests that exceed the allowed limit. Then
- * your application code can inspect the Request Attribute 
+ * your application code can inspect the Request Attribute
  * <code>org.apache.catalina.filters.RateLimitFilter.Count</code> and decide
  * how to handle the request based on other information that it has, e.g. allow
  * more requests to certain users based on roles, etc.</p>
- * 
+ *
  * <p><strong>WARNING:</strong> if Tomcat is behind a reverse proxy then you must
  * make sure that the Rate Limit Filter sees the client IP address, so if for
- * example you are using the <a href="#Remote_IP_Filter">Remote IP Filter</a>, 
+ * example you are using the <a href="#Remote_IP_Filter">Remote IP Filter</a>,
  * then the filter mapping for the Rate Limit Filter must come <em>after</em>
  * the mapping of the Remote IP Filter to ensure that each request has its IP
  * address resolved before the Rate Limit Filter is applied. Failure to do so
@@ -168,24 +169,29 @@ public class RateLimitFilter extends GenericFilter {
 
         String param;
         param = config.getInitParameter(PARAM_BUCKET_DURATION);
-        if (param != null)
+        if (param != null) {
             bucketDuration = Integer.parseInt(param);
+        }
 
         param = config.getInitParameter(PARAM_BUCKET_REQUESTS);
-        if (param != null)
+        if (param != null) {
             bucketRequests = Integer.parseInt(param);
+        }
 
         param = config.getInitParameter(PARAM_ENFORCE);
-        if (param != null)
+        if (param != null) {
             enforce = Boolean.parseBoolean(param);
+        }
 
         param = config.getInitParameter(PARAM_STATUS_CODE);
-        if (param != null)
+        if (param != null) {
             statusCode = Integer.parseInt(param);
+        }
 
         param = config.getInitParameter(PARAM_STATUS_MESSAGE);
-        if (param != null)
+        if (param != null) {
             statusMessage = param;
+        }
 
         bucketCounter = new TimeBucketCounter(bucketDuration);
 
