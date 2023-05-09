@@ -73,15 +73,15 @@ public class TestRateLimitFilter extends TomcatBaseTest {
 
         Thread.sleep(5000);
 
-        Assert.assertEquals(200, tc1.results[24]);    // only 25 requests made, all allowed
+        Assert.assertEquals(200, tc1.results[24]); // only 25 requests made, all allowed
 
-        Assert.assertEquals(200, tc2.results[49]);    // only 25 requests made, all allowed
+        Assert.assertEquals(200, tc2.results[49]); // only 25 requests made, all allowed
 
         Assert.assertEquals(200, tc3.results[allowedRequests - 1]); // first allowedRequests allowed
-        Assert.assertEquals(429, tc3.results[allowedRequests]);     // subsequent requests dropped
+        Assert.assertEquals(429, tc3.results[allowedRequests]); // subsequent requests dropped
 
         Assert.assertEquals(200, tc4.results[allowedRequests - 1]); // first allowedRequests allowed
-        Assert.assertEquals(429, tc4.results[allowedRequests]);     // subsequent requests dropped
+        Assert.assertEquals(429, tc4.results[allowedRequests]); // subsequent requests dropped
     }
 
     private RateLimitFilter testRateLimitFilter(FilterDef filterDef, Context root) throws ServletException {
@@ -102,7 +102,6 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         rateLimitFilter.init(filterConfig);
 
         return rateLimitFilter;
-        //*/
     }
 
     static class TestClient extends Thread {
@@ -140,8 +139,7 @@ public class TestRateLimitFilter extends TomcatBaseTest {
                             Integer.valueOf(response.getStatus()));
                     Thread.sleep(sleep);
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
@@ -167,7 +165,7 @@ public class TestRateLimitFilter extends TomcatBaseTest {
     private static FilterConfig generateFilterConfig(FilterDef filterDef) {
 
         TesterServletContext mockServletContext = new TesterServletContext();
-        Map<String, String> parameters = filterDef.getParameterMap();
+        Map<String,String> parameters = filterDef.getParameterMap();
 
         FilterConfig filterConfig = new FilterConfig() {
 

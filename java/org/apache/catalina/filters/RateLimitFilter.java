@@ -33,45 +33,41 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * <p>Servlet filter that can help mitigate Denial of Service
- * (DoS) and Brute Force attacks by limiting the number of a requests that are
- * allowed from a single IP address within a time window (also referred
- * to as a time bucket), e.g. 300 Requests per 60 seconds.</p>
- *
- * <p>The filter works by incrementing a counter in a time bucket for each IP
- * address, and if the counter exceeds the allowed limit then further requests
- * from that IP are dropped with a &quot;429 Too many requests&quot; response
- * until the bucket time ends and a new bucket starts.</p>
- *
- * <p>The filter is optimized for efficiency and low overhead, so it converts
- * some configured values to more efficient values. For example, a configuration
- * of a 60 seconds time bucket is converted to 65.536 seconds. That allows
- * for very fast bucket calculation using bit shift arithmetic. In order to remain
- * true to the user intent, the configured number of requests is then multiplied
- * by the same ratio, so a configuration of 100 Requests per 60 seconds, has the
- * real values of 109 Requests per 65 seconds.</p>
- *
- * <p>It is common to set up different restrictions for different URIs.
- * For example, a login page or authentication script is typically expected
- * to get far less requests than the rest of the application, so you can add
- * a filter definition that would allow only 5 requests per 15 seconds and map
- * those URIs to it.</p>
- *
- * <p>You can set <code>enforce</code> to <code>false</code>
- * to disable the termination of requests that exceed the allowed limit. Then
- * your application code can inspect the Request Attribute
- * <code>org.apache.catalina.filters.RateLimitFilter.Count</code> and decide
- * how to handle the request based on other information that it has, e.g. allow
- * more requests to certain users based on roles, etc.</p>
- *
- * <p><strong>WARNING:</strong> if Tomcat is behind a reverse proxy then you must
- * make sure that the Rate Limit Filter sees the client IP address, so if for
- * example you are using the <a href="#Remote_IP_Filter">Remote IP Filter</a>,
- * then the filter mapping for the Rate Limit Filter must come <em>after</em>
- * the mapping of the Remote IP Filter to ensure that each request has its IP
- * address resolved before the Rate Limit Filter is applied. Failure to do so
- * will count requests from different IPs in the same bucket and will result in
- * a self inflicted DoS attack.</p>
+ * <p>
+ * Servlet filter that can help mitigate Denial of Service (DoS) and Brute Force attacks by limiting the number of a
+ * requests that are allowed from a single IP address within a time window (also referred to as a time bucket), e.g. 300
+ * Requests per 60 seconds.
+ * </p>
+ * <p>
+ * The filter works by incrementing a counter in a time bucket for each IP address, and if the counter exceeds the
+ * allowed limit then further requests from that IP are dropped with a &quot;429 Too many requests&quot; response until
+ * the bucket time ends and a new bucket starts.
+ * </p>
+ * <p>
+ * The filter is optimized for efficiency and low overhead, so it converts some configured values to more efficient
+ * values. For example, a configuration of a 60 seconds time bucket is converted to 65.536 seconds. That allows for very
+ * fast bucket calculation using bit shift arithmetic. In order to remain true to the user intent, the configured number
+ * of requests is then multiplied by the same ratio, so a configuration of 100 Requests per 60 seconds, has the real
+ * values of 109 Requests per 65 seconds.
+ * </p>
+ * <p>
+ * It is common to set up different restrictions for different URIs. For example, a login page or authentication script
+ * is typically expected to get far less requests than the rest of the application, so you can add a filter definition
+ * that would allow only 5 requests per 15 seconds and map those URIs to it.
+ * </p>
+ * <p>
+ * You can set <code>enforce</code> to <code>false</code> to disable the termination of requests that exceed the allowed
+ * limit. Then your application code can inspect the Request Attribute
+ * <code>org.apache.catalina.filters.RateLimitFilter.Count</code> and decide how to handle the request based on other
+ * information that it has, e.g. allow more requests to certain users based on roles, etc.
+ * </p>
+ * <p>
+ * <strong>WARNING:</strong> if Tomcat is behind a reverse proxy then you must make sure that the Rate Limit Filter sees
+ * the client IP address, so if for example you are using the <a href="#Remote_IP_Filter">Remote IP Filter</a>, then the
+ * filter mapping for the Rate Limit Filter must come <em>after</em> the mapping of the Remote IP Filter to ensure that
+ * each request has its IP address resolved before the Rate Limit Filter is applied. Failure to do so will count
+ * requests from different IPs in the same bucket and will result in a self inflicted DoS attack.
+ * </p>
  */
 public class RateLimitFilter extends GenericFilter {
 
@@ -199,16 +195,14 @@ public class RateLimitFilter extends GenericFilter {
 
         actualRequests = (int) Math.round(bucketCounter.getRatio() * bucketRequests);
 
-        log.info(sm.getString("rateLimitFilter.initialized",
-            super.getFilterName(), Integer.valueOf(bucketRequests), Integer.valueOf(bucketDuration),
-            Integer.valueOf(getActualRequests()), Integer.valueOf(getActualDurationInSeconds()),
-            (!enforce ? "Not " : "") + "enforcing")
-        );
+        log.info(sm.getString("rateLimitFilter.initialized", super.getFilterName(), Integer.valueOf(bucketRequests),
+                Integer.valueOf(bucketDuration), Integer.valueOf(getActualRequests()),
+                Integer.valueOf(getActualDurationInSeconds()), (!enforce ? "Not " : "") + "enforcing"));
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-                            throws IOException, ServletException {
+            throws IOException, ServletException {
 
         String ipAddr = request.getRemoteAddr();
         int reqCount = bucketCounter.increment(ipAddr);
@@ -218,10 +212,9 @@ public class RateLimitFilter extends GenericFilter {
         if (enforce && (reqCount > actualRequests)) {
 
             ((HttpServletResponse) response).sendError(statusCode, statusMessage);
-            log.warn(sm.getString("rateLimitFilter.maxRequestsExceeded",
-                super.getFilterName(), Integer.valueOf(reqCount), ipAddr, Integer.valueOf(getActualRequests()),
-                Integer.valueOf(getActualDurationInSeconds()))
-            );
+            log.warn(sm.getString("rateLimitFilter.maxRequestsExceeded", super.getFilterName(),
+                    Integer.valueOf(reqCount), ipAddr, Integer.valueOf(getActualRequests()),
+                    Integer.valueOf(getActualDurationInSeconds())));
 
             return;
         }
