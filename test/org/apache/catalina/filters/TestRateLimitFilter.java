@@ -27,19 +27,18 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import org.apache.catalina.Context;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.filters.TestRemoteIpFilter.MockFilterChain;
 import org.apache.catalina.filters.TestRemoteIpFilter.MockHttpServletRequest;
+import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.unittest.TesterResponse;
 import org.apache.tomcat.unittest.TesterServletContext;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 public class TestRateLimitFilter extends TomcatBaseTest {
 
@@ -63,7 +62,7 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         int allowedRequests = (int) Math.round(rateLimitFilter.bucketCounter.getRatio() * bucketRequests);
 
         long sleepTime = rateLimitFilter.bucketCounter.getMillisUntilNextBucket();
-        System.out.printf("Sleeping %d millis for the next time bucket to start\n", sleepTime);
+        System.out.printf("Sleeping %d millis for the next time bucket to start\n", Long.valueOf(sleepTime));
         Thread.sleep(sleepTime);
 
         TestClient tc1 = new TestClient(rateLimitFilter, filterChain, "10.20.20.5", 200, 5);
@@ -85,8 +84,7 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         Assert.assertEquals(429, tc4.results[allowedRequests]);     // subsequent requests dropped
     }
 
-    private RateLimitFilter testRateLimitFilter(FilterDef filterDef, Context root)
-            throws LifecycleException, IOException, ServletException {
+    private RateLimitFilter testRateLimitFilter(FilterDef filterDef, Context root) throws ServletException {
 
         RateLimitFilter rateLimitFilter = new RateLimitFilter();
         filterDef.setFilterClass(RateLimitFilter.class.getName());
@@ -138,7 +136,8 @@ public class TestRateLimitFilter extends TomcatBaseTest {
                     response.setRequest(request);
                     filter.doFilter(request, response, filterChain);
                     results[i] = response.getStatus();
-                    System.out.printf("%s %s: %s %d\n", ip, Instant.now(), i + 1, response.getStatus());
+                    System.out.printf("%s %s: %s %d\n", ip, Instant.now(), Integer.valueOf(i + 1),
+                            Integer.valueOf(response.getStatus()));
                     Thread.sleep(sleep);
                 }
             }

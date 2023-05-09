@@ -75,6 +75,8 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class RateLimitFilter extends GenericFilter {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * default duration in seconds
      */
@@ -198,8 +200,9 @@ public class RateLimitFilter extends GenericFilter {
         actualRequests = (int) Math.round(bucketCounter.getRatio() * bucketRequests);
 
         log.info(sm.getString("rateLimitFilter.initialized",
-            super.getFilterName(), bucketRequests, bucketDuration, getActualRequests(),
-            getActualDurationInSeconds(), (!enforce ? "Not " : "") + "enforcing")
+            super.getFilterName(), Integer.valueOf(bucketRequests), Integer.valueOf(bucketDuration),
+            Integer.valueOf(getActualRequests()), Integer.valueOf(getActualDurationInSeconds()),
+            (!enforce ? "Not " : "") + "enforcing")
         );
     }
 
@@ -210,13 +213,14 @@ public class RateLimitFilter extends GenericFilter {
         String ipAddr = request.getRemoteAddr();
         int reqCount = bucketCounter.increment(ipAddr);
 
-        request.setAttribute(RATE_LIMIT_ATTRIBUTE_COUNT, reqCount);
+        request.setAttribute(RATE_LIMIT_ATTRIBUTE_COUNT, Integer.valueOf(reqCount));
 
         if (enforce && (reqCount > actualRequests)) {
 
             ((HttpServletResponse) response).sendError(statusCode, statusMessage);
             log.warn(sm.getString("rateLimitFilter.maxRequestsExceeded",
-                super.getFilterName(), reqCount, ipAddr, getActualRequests(), getActualDurationInSeconds())
+                super.getFilterName(), Integer.valueOf(reqCount), ipAddr, Integer.valueOf(getActualRequests()),
+                Integer.valueOf(getActualDurationInSeconds()))
             );
 
             return;
