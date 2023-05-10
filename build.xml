@@ -871,14 +871,16 @@
         <exclude name="**/*_2.xml"/>
         <exclude name="res/checkstyle/header-al2.txt"/>
         <!-- Exclude auto-generated files -->
-        <exclude name="java/org/apache/el/parser/ELParser.jj" />
         <exclude name="java/org/apache/el/parser/ELParser*.java" />
         <exclude name="java/org/apache/el/parser/Node.java" />
-        <exclude name="java/org/apache/**/parser/JJT*ParserState.java" />
-        <exclude name="java/org/apache/**/parser/ParseException.java" />
-        <exclude name="java/org/apache/**/parser/SimpleCharStream.java" />
-        <exclude name="java/org/apache/**/parser/Token*.java" />
-        <exclude name="java/org/apache/tomcat/util/json/*.java" />
+        <exclude name="java/org/apache/tomcat/util/json/JSONParser*.java" />
+        <exclude name="**/*.jj" />
+        <exclude name="java/org/apache/**/JJT*ParserState.java" />
+        <exclude name="java/org/apache/**/ParseException.java" />
+        <exclude name="java/org/apache/**/JavaCharStream.java" />
+        <exclude name="java/org/apache/**/SimpleCharStream.java" />
+        <exclude name="java/org/apache/**/Token.java" />
+        <exclude name="java/org/apache/**/TokenMgrError.java" />
         <!-- Exclude developer specific local files -->
         <exclude name="build.properties" />
         <exclude name="res/maven/mvn.properties" />
