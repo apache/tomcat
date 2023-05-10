@@ -34,10 +34,10 @@ import org.apache.tools.ant.BuildException;
  * <li>Bind Get result as Ant properties</li>
  * </ul>
  * <p>
- * Examples:
- * Set an Mbean Manager attribute maxActiveSessions.
- * Set this attribute with fresh jmx connection without save reference
+ * Examples: Set an Mbean Manager attribute maxActiveSessions. Set this attribute with fresh jmx connection without save
+ * reference
  * </p>
+ *
  * <pre>
  *   &lt;jmx:set
  *           host="127.0.0.1"
@@ -56,6 +56,7 @@ import org.apache.tools.ant.BuildException;
  * These tasks require Ant 1.6 or later interface.
  *
  * @author Peter Rossbach
+ *
  * @since 5.5.10
  */
 public class JMXAccessorSetTask extends JMXAccessorTask {
@@ -65,7 +66,7 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
     private String attribute;
     private String value;
     private String type;
-    private boolean convert = false ;
+    private boolean convert = false;
 
     // ------------------------------------------------------------- Properties
 
@@ -89,6 +90,7 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
     public String getValue() {
         return value;
     }
+
     /**
      * @param value The value to set.
      */
@@ -118,6 +120,7 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
     public boolean isConvert() {
         return convert;
     }
+
     /**
      * @param convert The convert to set.
      */
@@ -127,43 +130,40 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
     // ------------------------------------------------------ protected Methods
 
     @Override
-    public String jmxExecute(MBeanServerConnection jmxServerConnection)
-        throws Exception {
+    public String jmxExecute(MBeanServerConnection jmxServerConnection) throws Exception {
 
         if (getName() == null) {
             throw new BuildException("Must specify a 'name'");
         }
         if ((attribute == null || value == null)) {
-            throw new BuildException(
-                    "Must specify a 'attribute' and 'value' for set");
+            throw new BuildException("Must specify a 'attribute' and 'value' for set");
         }
-        return  jmxSet(jmxServerConnection, getName());
+        return jmxSet(jmxServerConnection, getName());
     }
 
     /**
      * Set property value.
      *
      * @param jmxServerConnection Connection to the JMX server
-     * @param name The MBean name
+     * @param name                The MBean name
+     *
      * @return null (no error message to report other than exception)
+     *
      * @throws Exception An error occurred
      */
-    protected String jmxSet(MBeanServerConnection jmxServerConnection,
-            String name) throws Exception {
+    protected String jmxSet(MBeanServerConnection jmxServerConnection, String name) throws Exception {
         Object realValue;
         if (type != null) {
             realValue = convertStringToType(value, type);
         } else {
             if (isConvert()) {
-                String mType = getMBeanAttributeType(jmxServerConnection, name,
-                        attribute);
+                String mType = getMBeanAttributeType(jmxServerConnection, name, attribute);
                 realValue = convertStringToType(value, mType);
             } else {
                 realValue = value;
             }
         }
-        jmxServerConnection.setAttribute(new ObjectName(name), new Attribute(
-                attribute, realValue));
+        jmxServerConnection.setAttribute(new ObjectName(name), new Attribute(attribute, realValue));
         return null;
     }
 
@@ -172,15 +172,15 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
      * Get MBean Attribute from Mbean Server
      *
      * @param jmxServerConnection The JMX connection name
-     * @param name The MBean name
-     * @param attribute The attribute name
+     * @param name                The MBean name
+     * @param attribute           The attribute name
+     *
      * @return The type of the attribute
+     *
      * @throws Exception An error occurred
      */
-    protected String getMBeanAttributeType(
-            MBeanServerConnection jmxServerConnection,
-            String name,
-            String attribute) throws Exception {
+    protected String getMBeanAttributeType(MBeanServerConnection jmxServerConnection, String name, String attribute)
+            throws Exception {
         ObjectName oname = new ObjectName(name);
         String mattrType = null;
         MBeanInfo minfo = jmxServerConnection.getMBeanInfo(oname);
