@@ -36,7 +36,7 @@ public class Jre19Compat extends JreCompat {
         try {
             c1 = Class.forName("java.lang.WrongThreadException");
         } catch (ClassNotFoundException cnfe) {
-            // Must be pre-Java 16
+            // Must be pre-Java 19
             log.debug(sm.getString("jre19Compat.javaPre19"), cnfe);
         }
 
