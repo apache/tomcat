@@ -44,7 +44,7 @@ public class TestTimeBucketCounter {
 
     @Test
     public void testTimeBucketCounter() {
-        TimeBucketCounter tbc = new TimeBucketCounter(60);
+        TimeBucketCounter tbc = new TimeBucketCounter(60, new java.util.concurrent.ScheduledThreadPoolExecutor(1));
         Assert.assertEquals(16, tbc.getNumBits());
         Assert.assertEquals(1.092, tbc.getRatio(), DELTA);
     }
@@ -54,7 +54,7 @@ public class TestTimeBucketCounter {
         long millis;
         int tb1, tb2;
 
-        TimeBucketCounter tbc = new TimeBucketCounter(2);
+        TimeBucketCounter tbc = new TimeBucketCounter(2, new java.util.concurrent.ScheduledThreadPoolExecutor(1));
         tb1 = tbc.getCurrentBucketPrefix();
         millis = tbc.getMillisUntilNextBucket();
 

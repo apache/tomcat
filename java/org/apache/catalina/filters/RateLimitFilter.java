@@ -18,6 +18,7 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
+import java.util.concurrent.ScheduledExecutorService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -31,6 +32,7 @@ import org.apache.catalina.util.TimeBucketCounter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor;
 
 /**
  * <p>
@@ -191,7 +193,12 @@ public class RateLimitFilter extends GenericFilter {
             statusMessage = param;
         }
 
-        bucketCounter = new TimeBucketCounter(bucketDuration);
+        ScheduledExecutorService executorService =
+                (ScheduledExecutorService) getServletContext().getAttribute(ScheduledThreadPoolExecutor.class.getName());
+        if (executorService == null) {
+            executorService = new java.util.concurrent.ScheduledThreadPoolExecutor(1);
+        }
+        bucketCounter = new TimeBucketCounter(bucketDuration, executorService);
 
         actualRequests = (int) Math.round(bucketCounter.getRatio() * bucketRequests);
 
