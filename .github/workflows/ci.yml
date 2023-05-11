@@ -40,7 +40,7 @@ jobs:
           java: 17
         exclude:
           - isMain: true
-            java: 17, 20
+            java: [ 17, 20 ]
     name: JDK${{ matrix.java }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
