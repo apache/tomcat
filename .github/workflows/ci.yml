@@ -37,9 +37,13 @@ jobs:
         os: [ ubuntu-latest, windows-latest ]
         exclude:
           - isMain: true
-            java: [ 17, 20 ]
+            java: 17
+          - isMain: true
+            java: 20
           - os: windows-latest
-            java: [ 20, 21-ea ]
+            java: 20
+          - os: windows-latest
+            java: 21-ea
     name: JDK${{ matrix.java }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
