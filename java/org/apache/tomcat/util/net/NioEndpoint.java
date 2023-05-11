@@ -1215,8 +1215,10 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                 if (getSocket().isOpen()) {
                     getSocket().close(true);
                 }
-                if (getEndpoint().running) {
-                    if (nioChannels == null || !nioChannels.push(getSocket())) {
+                if (getEndpoint().running && nioChannels != null) {
+                    if (nioChannels.push(getSocket())) {
+                        getSocket().reset();
+                    } else {
                         getSocket().free();
                     }
                 }

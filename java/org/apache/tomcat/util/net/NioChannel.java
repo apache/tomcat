@@ -60,6 +60,14 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
     }
 
     /**
+     * Reset the channel
+     */
+    public void reset() {
+        this.sc = null;
+        this.socketWrapper = null;
+    }
+
+    /**
      * @return the socketWrapper
      */
     NioSocketWrapper getSocketWrapper() {
