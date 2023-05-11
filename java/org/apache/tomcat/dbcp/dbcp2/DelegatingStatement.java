@@ -368,7 +368,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
         }
     }
 
-    @SuppressWarnings("deprecation") // Need Commons DBCP to address this
+    @SuppressWarnings("removal") // Need Commons DBCP to address this
     @Override
     protected void finalize() throws Throwable {
         // This is required because of statement pooling. The poolable
