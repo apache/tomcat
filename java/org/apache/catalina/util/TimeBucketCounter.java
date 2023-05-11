@@ -18,7 +18,15 @@
 package org.apache.catalina.util;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This class maintains a thread safe hash map that has timestamp-based buckets followed by a string for a key, and a
@@ -26,6 +34,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * value and returns it. a maintenance thread cleans up keys that are prefixed by previous timestamp buckets.
  */
 public class TimeBucketCounter {
+
+    private static final Log log = LogFactory.getLog(TimeBucketCounter.class);
+    private static final StringManager sm = StringManager.getManager(TimeBucketCounter.class);
 
     /**
      * Map to hold the buckets
@@ -43,16 +54,22 @@ public class TimeBucketCounter {
     private final double ratio;
 
     /**
-     * Flag for the maintenance thread
+     * The future allowing control of the background processor.
      */
-    volatile boolean isRunning = false;
+    private ScheduledFuture<?> maintenanceFuture;
+    private ScheduledFuture<?> monitorFuture;
+    private final ScheduledExecutorService executorService;
+    private final long sleeptime;
 
     /**
      * Creates a new TimeBucketCounter with the specified lifetime.
      *
      * @param bucketDuration duration in seconds, e.g. for 1 minute pass 60
+     * @param executorService the executor service which will be used to run the maintenance
      */
-    public TimeBucketCounter(int bucketDuration) {
+    public TimeBucketCounter(int bucketDuration, ScheduledExecutorService executorService) {
+
+        this.executorService = executorService;
 
         int durationMillis = bucketDuration * 1000;
 
@@ -68,8 +85,13 @@ public class TimeBucketCounter {
         this.ratio = ratioToPowerOf2(durationMillis);
 
         int cleanupsPerBucketDuration = (durationMillis >= 60_000) ? 6 : 3;
-        Thread mt = new MaintenanceThread(durationMillis / cleanupsPerBucketDuration);
-        mt.start();
+        sleeptime = durationMillis / cleanupsPerBucketDuration;
+
+        // Start our thread
+        if (sleeptime > 0) {
+            monitorFuture = executorService
+                    .scheduleWithFixedDelay(new MaintenanceMonitor(), 0, 60, TimeUnit.SECONDS);
+        }
     }
 
     /**
@@ -156,43 +178,44 @@ public class TimeBucketCounter {
      * Sets isRunning to false to terminate the maintenance thread.
      */
     public void destroy() {
-        this.isRunning = false;
+        // Stop our thread
+        if (monitorFuture != null) {
+            monitorFuture.cancel(true);
+            monitorFuture = null;
+        }
+        if (maintenanceFuture != null) {
+            maintenanceFuture.cancel(true);
+            maintenanceFuture = null;
+        }
     }
 
-    /**
-     * This class runs a background thread to clean up old keys from the map.
-     */
-    class MaintenanceThread extends Thread {
-
-        final long sleeptime;
-
-        MaintenanceThread(long sleeptime) {
-            super.setDaemon(true);
-            this.sleeptime = sleeptime;
-        }
-
-        @SuppressWarnings("sync-override")
-        @Override
-        public void start() {
-            isRunning = true;
-            super.start();
-        }
-
+    private class Maintenance implements Runnable {
         @Override
         public void run() {
+            String currentBucketPrefix = String.valueOf(getCurrentBucketPrefix());
+            ConcurrentHashMap.KeySetView<String,AtomicInteger> keys = map.keySet();
+            // remove obsolete keys
+            keys.removeIf(k -> !k.startsWith(currentBucketPrefix));
+        }
+    }
 
-            while (isRunning) {
-                String currentBucketPrefix = String.valueOf(getCurrentBucketPrefix());
-                ConcurrentHashMap.KeySetView<String,AtomicInteger> keys = map.keySet();
-
-                // remove obsolete keys
-                keys.removeIf(k -> !k.startsWith(currentBucketPrefix));
-
-                try {
-                    Thread.sleep(sleeptime);
-                } catch (InterruptedException e) {
+    private class MaintenanceMonitor implements Runnable {
+        @Override
+        public void run() {
+            if (sleeptime > 0 &&
+                    (maintenanceFuture == null || maintenanceFuture.isDone())) {
+                if (maintenanceFuture != null && maintenanceFuture.isDone()) {
+                    // There was an error executing the scheduled task, get it and log it
+                    try {
+                        maintenanceFuture.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        log.error(sm.getString("timebucket.maintenance.error"), e);
+                    }
                 }
+                maintenanceFuture = executorService.scheduleWithFixedDelay(new Maintenance(), sleeptime, sleeptime,
+                        TimeUnit.MILLISECONDS);
             }
         }
     }
+
 }
