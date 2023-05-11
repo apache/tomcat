@@ -1584,7 +1584,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
-    @SuppressWarnings("deprecation") // thread.stop()
     private void clearReferencesThreads() {
         Thread[] threads = getThreads();
         List<Thread> threadsToStop = new ArrayList<>();
@@ -1694,11 +1693,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 count++;
             }
             if (t.isAlive()) {
-                // This method is deprecated and for good reason. This is
-                // very risky code but is the only option at this point.
-                // A *very* good reason for apps to do this clean-up
-                // themselves.
-                t.stop();
+                // Unable to stop the thread. Log an error.
+                log.error(sm.getString("webappClassLoader.stopThreadFail", t.getName(), getContextName()));
             }
         }
     }
