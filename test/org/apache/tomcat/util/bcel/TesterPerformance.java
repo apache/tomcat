@@ -19,6 +19,7 @@ package org.apache.tomcat.util.bcel;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Locale;
@@ -48,7 +49,7 @@ public class TesterPerformance {
             if (!lib.toLowerCase(Locale.ENGLISH).endsWith(".jar")) {
                 continue;
             }
-            jarURLs.add(new URL("jar:" + new File (libDir, lib).toURI().toURL().toExternalForm() + "!/"));
+            jarURLs.add(URI.create("jar:" + new File (libDir, lib).toURI().toURL().toExternalForm() + "!/").toURL());
         }
 
         long duration = 0;

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -627,7 +628,7 @@ public class TestTomcat extends TomcatBaseTest {
 
     @Test
     public void testAddWebappUrl() throws Exception {
-        URL docBase = new URL("jar:" + new File("test/deployment/context.jar").toURI().toString() + "!/context.war");
+        URL docBase = URI.create("jar:" + new File("test/deployment/context.jar").toURI().toString() + "!/context.war").toURL();
 
         Tomcat tomcat = getTomcatInstance();
         tomcat.addWebapp("", docBase);

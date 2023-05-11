@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collections;
@@ -195,7 +196,7 @@ public class TestClassLoaderLogManager {
         public URL findResource(String name) {
             if ("logging.properties".equals(name)) {
                 try {
-                    return new URL("file:///path/does/not/exist");
+                    return URI.create("file:///path/does/not/exist").toURL();
                 } catch (MalformedURLException e) {
                     // Should never happen
                     throw new IllegalArgumentException(e);

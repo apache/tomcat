@@ -19,7 +19,7 @@ package org.apache.catalina.filters;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -761,8 +761,8 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         getTomcatInstance().start();
 
         // TEST
-        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(
-                "http://localhost:" + tomcat.getConnector().getLocalPort() + "/test").openConnection();
+        HttpURLConnection httpURLConnection = (HttpURLConnection) URI.create(
+                "http://localhost:" + tomcat.getConnector().getLocalPort() + "/test").toURL().openConnection();
         String expectedRemoteAddr = "my-remote-addr";
         httpURLConnection.addRequestProperty("x-forwarded-for", expectedRemoteAddr);
         httpURLConnection.addRequestProperty("x-forwarded-proto", "https");

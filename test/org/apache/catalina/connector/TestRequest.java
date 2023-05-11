@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -628,7 +629,7 @@ public class TestRequest extends TomcatBaseTest {
 
     private HttpURLConnection getConnection(String query) throws IOException {
         URL postURL;
-        postURL = new URL(query);
+        postURL = URI.create(query).toURL();
         HttpURLConnection conn = (HttpURLConnection) postURL.openConnection();
         conn.setRequestMethod("POST");
 

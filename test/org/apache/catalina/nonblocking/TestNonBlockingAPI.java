@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.Socket;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -894,7 +895,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     public static int postUrlWithDisconnect(boolean stream, BytesStreamer streamer, String path,
             Map<String, List<String>> reqHead, Map<String, List<String>> resHead) throws IOException {
 
-        URL url = new URL(path);
+        URL url = URI.create(path).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setDoOutput(true);
         connection.setReadTimeout(1000000);

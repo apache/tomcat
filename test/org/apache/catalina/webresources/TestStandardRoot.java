@@ -18,6 +18,7 @@ package org.apache.catalina.webresources;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 
 import org.junit.Assert;
@@ -44,32 +45,27 @@ public class TestStandardRoot {
 
     @Test
     public void testBaseLocation01() throws Exception {
-        doTestBaseLocation(new URL (fileUrl),
-                file.getAbsolutePath(), null);
+        doTestBaseLocation(URI.create(fileUrl).toURL(), file.getAbsolutePath(), null);
     }
 
     @Test
     public void testBaseLocation02() throws Exception {
-        doTestBaseLocation(new URL ("jar:" + fileUrl + "!/"),
-                file.getAbsolutePath(), null);
+        doTestBaseLocation(URI.create("jar:" + fileUrl + "!/").toURL(), file.getAbsolutePath(), null);
     }
 
     @Test
     public void testBaseLocation03() throws Exception {
-        doTestBaseLocation(new URL ("jar:" + fileUrl + "!/bar"),
-                file.getAbsolutePath(), "bar");
+        doTestBaseLocation(URI.create("jar:" + fileUrl + "!/bar").toURL(), file.getAbsolutePath(), "bar");
     }
 
     @Test
     public void testBaseLocation04() throws Exception {
-        doTestBaseLocation(new URL ("jar:" + fileUrl + "!/bar/bar"),
-                file.getAbsolutePath(), "bar/bar");
+        doTestBaseLocation(URI.create("jar:" + fileUrl + "!/bar/bar").toURL(), file.getAbsolutePath(), "bar/bar");
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void testBaseLocation05() throws Exception {
-        doTestBaseLocation(new URL ("http://localhost:8080/foo"),
-                null, null);
+        doTestBaseLocation(URI.create("http://localhost:8080/foo").toURL(), null, null);
     }
 
     private void doTestBaseLocation(URL url, String expectedBasePath,

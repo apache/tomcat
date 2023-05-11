@@ -17,6 +17,7 @@
 package org.apache.catalina.webresources.war;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 
 import org.junit.Assert;
@@ -56,7 +57,7 @@ public class TestHandler {
         String fileUrl = f.toURI().toURL().toString();
 
         String urlString = prefix + fileUrl + suffix;
-        URL url = new URL(urlString);
+        URL url = URI.create(urlString).toURL();
 
         Assert.assertEquals(urlString, url.toExternalForm());
     }

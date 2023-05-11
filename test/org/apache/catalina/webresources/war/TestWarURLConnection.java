@@ -17,6 +17,7 @@
 package org.apache.catalina.webresources.war;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -39,8 +40,8 @@ public class TestWarURLConnection {
         File f = new File("test/webresources/war-url-connection.war");
         String fileUrl = f.toURI().toURL().toString();
 
-        URL indexHtmlUrl = new URL("jar:war:" + fileUrl +
-                "*/WEB-INF/lib/test.jar!/META-INF/resources/index.html");
+        URL indexHtmlUrl =
+                URI.create("jar:war:" + fileUrl + "*/WEB-INF/lib/test.jar!/META-INF/resources/index.html").toURL();
 
         URLConnection urlConn = indexHtmlUrl.openConnection();
         urlConn.connect();
