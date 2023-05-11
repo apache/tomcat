@@ -38,7 +38,7 @@ public class TestThreadNameCache {
             @Override
             public void run() {
                 setName(THREAD_NAME);
-                threadId = Integer.valueOf((int) getId());
+                threadId = Integer.valueOf((int) threadId());
                 threadIdLatch.countDown();
                 try {
                     cacheLatch.await();
