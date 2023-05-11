@@ -1443,15 +1443,10 @@ public final class PoolUtils {
      *
      * @param t
      *            The Throwable to check
-     * @throws ThreadDeath
-     *             if that is passed in
      * @throws VirtualMachineError
      *             if that is passed in
      */
     public static void checkRethrow(final Throwable t) {
-        if (t instanceof ThreadDeath) {
-            throw (ThreadDeath) t;
-        }
         if (t instanceof VirtualMachineError) {
             throw (VirtualMachineError) t;
         }

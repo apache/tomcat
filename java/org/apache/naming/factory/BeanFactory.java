@@ -215,9 +215,6 @@ public class BeanFactory implements ObjectFactory {
                 throw ne;
             } catch (java.lang.ReflectiveOperationException e) {
                 Throwable cause = e.getCause();
-                if (cause instanceof ThreadDeath) {
-                    throw (ThreadDeath) cause;
-                }
                 if (cause instanceof VirtualMachineError) {
                     throw (VirtualMachineError) cause;
                 }

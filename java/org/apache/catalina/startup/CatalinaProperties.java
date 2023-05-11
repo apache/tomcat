@@ -133,9 +133,6 @@ public class CatalinaProperties {
 
     // Copied from ExceptionUtils since that class is not visible during start
     private static void handleThrowable(Throwable t) {
-        if (t instanceof ThreadDeath) {
-            throw (ThreadDeath) t;
-        }
         if (t instanceof VirtualMachineError) {
             throw (VirtualMachineError) t;
         }

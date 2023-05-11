@@ -544,9 +544,6 @@ public final class Bootstrap {
 
     // Copied from ExceptionUtils since that class is not visible during start
     static void handleThrowable(Throwable t) {
-        if (t instanceof ThreadDeath) {
-            throw (ThreadDeath) t;
-        }
         if (t instanceof StackOverflowError) {
             // Swallow silently - it should be recoverable
             return;

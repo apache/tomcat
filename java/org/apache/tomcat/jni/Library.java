@@ -38,7 +38,7 @@ public final class Library {
             try {
                 System.load(library.getAbsolutePath());
                 loaded = true;
-            } catch (ThreadDeath | VirtualMachineError t) {
+            } catch (VirtualMachineError t) {
                 throw t;
             } catch (Throwable t) {
                 if (library.exists()) {
@@ -61,7 +61,7 @@ public final class Library {
                 try {
                     System.loadLibrary(value);
                     loaded = true;
-                } catch (ThreadDeath | VirtualMachineError t) {
+                } catch (VirtualMachineError t) {
                     throw t;
                 } catch (Throwable t) {
                     String name = System.mapLibraryName(value);

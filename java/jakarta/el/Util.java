@@ -47,9 +47,6 @@ class Util {
      * @param t the Throwable to check
      */
     static void handleThrowable(Throwable t) {
-        if (t instanceof ThreadDeath) {
-            throw (ThreadDeath) t;
-        }
         if (t instanceof VirtualMachineError) {
             throw (VirtualMachineError) t;
         }

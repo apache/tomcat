@@ -255,9 +255,6 @@ public final class AstValue extends SimpleNode {
             throw new ELException(e);
         } catch (InvocationTargetException ite) {
             Throwable cause = ite.getCause();
-            if (cause instanceof ThreadDeath) {
-                throw (ThreadDeath) cause;
-            }
             if (cause instanceof VirtualMachineError) {
                 throw (VirtualMachineError) cause;
             }

@@ -77,9 +77,6 @@ public abstract class FactoryBase implements ObjectFactory {
                     if (t instanceof NamingException) {
                         throw (NamingException) t;
                     }
-                    if (t instanceof ThreadDeath) {
-                        throw (ThreadDeath) t;
-                    }
                     if (t instanceof VirtualMachineError) {
                         throw (VirtualMachineError) t;
                     }

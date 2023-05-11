@@ -74,9 +74,6 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
         }catch (Exception x) {
             if (x instanceof InvocationTargetException) {
                 Throwable cause = x.getCause();
-                if (cause instanceof ThreadDeath) {
-                    throw (ThreadDeath) cause;
-                }
                 if (cause instanceof VirtualMachineError) {
                     throw (VirtualMachineError) cause;
                 }

@@ -460,9 +460,6 @@ public class McastServiceImpl extends MembershipProviderBase {
                                 msgservice.messageReceived(datum);
                             }
                         } catch (Throwable t1) {
-                            if (t1 instanceof ThreadDeath) {
-                                throw (ThreadDeath) t1;
-                            }
                             if (t1 instanceof VirtualMachineError) {
                                 throw (VirtualMachineError) t1;
                             }
