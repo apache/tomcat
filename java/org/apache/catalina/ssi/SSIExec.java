@@ -16,11 +16,11 @@
  */
 package org.apache.catalina.ssi;
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.StringTokenizer;
 
 import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.res.StringManager;
@@ -58,7 +58,12 @@ public class SSIExec implements SSICommand {
             boolean foundProgram = false;
             try {
                 Runtime rt = Runtime.getRuntime();
-                Process proc = rt.exec(substitutedValue);
+                StringTokenizer st = new StringTokenizer(substitutedValue);
+                String[] cmdArray = new String[st.countTokens()];
+                for (int i = 0; i < cmdArray.length; i++) {
+                    cmdArray[i] = st.nextToken();
+                }
+                Process proc = rt.exec(cmdArray);
                 foundProgram = true;
                 BufferedReader stdOutReader = new BufferedReader(
                         new InputStreamReader(proc.getInputStream()));
