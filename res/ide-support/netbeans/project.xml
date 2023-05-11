@@ -178,7 +178,7 @@
             -->
             <compilation-unit>
                 <package-root>java</package-root>
-                <classpath mode="compile">@JAXRPC_JAR@:@WSDL4J_JAR@:@JDT_JAR@:@BND_JAR@:@MIGRATION_JAR@:${ant.includes}/</classpath>
+                <classpath mode="compile">@JAXRPC_JAR@:@WSDL4J_JAR@:@JDT_JAR@:${ant.includes}/</classpath>
                 <source-level>@BUILD_JAVA_VERSION@</source-level>
             </compilation-unit>
             <compilation-unit>

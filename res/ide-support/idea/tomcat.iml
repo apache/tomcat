@@ -113,7 +113,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://@BND_JAR@!/" />
+          <root url="jar://@UNBOUNDID_JAR@!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
