@@ -33,7 +33,6 @@ public final class UriUtil {
         {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     private static final Pattern PATTERN_EXCLAMATION_MARK = Pattern.compile("!/");
-    private static final Pattern PATTERN_CARET = Pattern.compile("\\^/");
     private static final Pattern PATTERN_ASTERISK = Pattern.compile("\\*/");
     private static final Pattern PATTERN_CUSTOM;
     private static final String REPLACE_CUSTOM;
@@ -170,8 +169,7 @@ public final class UriUtil {
         // Since "!/" has a special meaning in a JAR URL, make sure that the
         // sequence is properly escaped if present.
         String tmp = PATTERN_EXCLAMATION_MARK.matcher(input).replaceAll("%21/");
-        // Tomcat's custom jar:war: URL handling treats */ and ^/ as special
-        tmp = PATTERN_CARET.matcher(tmp).replaceAll("%5e/");
+        // Tomcat's custom jar:war: URL handling treats */ as special
         tmp = PATTERN_ASTERISK.matcher(tmp).replaceAll("%2a/");
         if (PATTERN_CUSTOM != null) {
             tmp = PATTERN_CUSTOM.matcher(tmp).replaceAll(REPLACE_CUSTOM);
@@ -195,8 +193,6 @@ public final class UriUtil {
         String file = warUrl.getFile();
         if (file.contains("*/")) {
             file = file.replaceFirst("\\*/", "!/");
-        } else if (file.contains("^/")) {
-            file = file.replaceFirst("\\^/", "!/");
         } else if (PATTERN_CUSTOM != null) {
             file = file.replaceFirst(PATTERN_CUSTOM.pattern(), "!/");
         }

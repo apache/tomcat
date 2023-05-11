@@ -86,12 +86,6 @@ public abstract class TesterUriUtilBase {
 
 
     @Test
-    public void testWarToJar01() throws IOException {
-        doTestWarToJar("^");
-    }
-
-
-    @Test
     public void testWarToJar02() throws IOException {
         doTestWarToJar("*");
     }

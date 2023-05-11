@@ -123,6 +123,12 @@
         Add RateLimitFilter which can be used to mitigate DoS and Brute Force
         attacks. (isapir)
       </add>
+      <scode>
+        Remove support for using the <code>^</code> character to separate the
+        WAR file and WAR contents in Tomcat's custom WAR URL handler. The
+        current default separator character of <code>*</code> remains unchanged.
+        (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
