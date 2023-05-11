@@ -354,12 +354,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     /**
      * Should Tomcat attempt to clear references to classes loaded by this class
-     * loader from the ObjectStreamClass caches?
-     */
-    private boolean clearReferencesObjectStreamClassCaches = true;
-
-    /**
-     * Should Tomcat attempt to clear references to classes loaded by this class
      * loader from ThreadLocals?
      */
     private boolean clearReferencesThreadLocals = true;
@@ -536,17 +530,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             boolean clearReferencesHttpClientKeepAliveThread) {
         this.clearReferencesHttpClientKeepAliveThread =
             clearReferencesHttpClientKeepAliveThread;
-    }
-
-
-    public boolean getClearReferencesObjectStreamClassCaches() {
-        return clearReferencesObjectStreamClassCaches;
-    }
-
-
-    public void setClearReferencesObjectStreamClassCaches(
-            boolean clearReferencesObjectStreamClassCaches) {
-        this.clearReferencesObjectStreamClassCaches = clearReferencesObjectStreamClassCaches;
     }
 
 
@@ -1518,11 +1501,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         // Stop any threads the web application started
         clearReferencesThreads();
 
-        // Clear any references retained in the serialization caches
-        if (clearReferencesObjectStreamClassCaches && !JreCompat.isGraalAvailable()) {
-            clearReferencesObjectStreamClassCaches();
-        }
-
         // Check for leaks triggered by ThreadLocals loaded by this class loader
         if (clearReferencesThreadLocals && !JreCompat.isGraalAvailable()) {
             checkThreadLocalsForLeaks();
@@ -1669,7 +1647,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     // shutting down the executor
                     boolean usingExecutor = false;
                     try {
-                        Object executor = JreCompat.getInstance().getExecutor(thread);
+                        Object executor = getExecutor(thread);
                         if (executor instanceof ThreadPoolExecutor) {
                             ((ThreadPoolExecutor) executor).shutdownNow();
                             usingExecutor = true;
@@ -1723,6 +1701,70 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 t.stop();
             }
         }
+    }
+
+
+    private Object getExecutor(Thread thread)
+            throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+
+        Object result = null;
+
+        // Runnable wrapped by Thread
+        // "target" in Sun/Oracle JDK
+        // "runnable" in IBM JDK
+        // "action" in Apache Harmony
+        Object target = null;
+        for (String fieldName : new String[] { "target", "runnable", "action" }) {
+            try {
+                Field targetField = thread.getClass().getDeclaredField(fieldName);
+                targetField.setAccessible(true);
+                target = targetField.get(thread);
+                break;
+            } catch (NoSuchFieldException nfe) {
+                continue;
+            }
+        }
+
+        // "java.util.concurrent" code is in public domain,
+        // so all implementations are similar including our
+        // internal fork.
+        if (target != null && target.getClass().getCanonicalName() != null &&
+                (target.getClass().getCanonicalName().equals(
+                        "org.apache.tomcat.util.threads.ThreadPoolExecutor.Worker") ||
+                        target.getClass().getCanonicalName().equals(
+                                "java.util.concurrent.ThreadPoolExecutor.Worker"))) {
+            Field executorField = target.getClass().getDeclaredField("this$0");
+            executorField.setAccessible(true);
+            result = executorField.get(target);
+        }
+
+        if (result == null) {
+            Object holder = null;
+            Object task = null;
+            try {
+                Field holderField = thread.getClass().getDeclaredField("holder");
+                holderField.setAccessible(true);
+                holder = holderField.get(thread);
+
+                Field taskField = holder.getClass().getDeclaredField("task");
+                taskField.setAccessible(true);
+                task = taskField.get(holder);
+            } catch (NoSuchFieldException nfe) {
+                return null;
+            }
+
+            if (task!= null && task.getClass().getCanonicalName() != null &&
+                    (task.getClass().getCanonicalName().equals(
+                            "org.apache.tomcat.util.threads.ThreadPoolExecutor.Worker") ||
+                            task.getClass().getCanonicalName().equals(
+                                    "java.util.concurrent.ThreadPoolExecutor.Worker"))) {
+                Field executorField = task.getClass().getDeclaredField("this$0");
+                executorField.setAccessible(true);
+                result = executorField.get(task);
+            }
+        }
+
+        return result;
     }
 
 
@@ -2110,56 +2152,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
-    private void clearReferencesObjectStreamClassCaches() {
-        if (JreCompat.isJre19Available()) {
-            // The memory leak this fixes has been fixed in Java 19 onwards,
-            // 17.0.4 onwards and 11.0.16 onwards
-            // See https://bugs.openjdk.java.net/browse/JDK-8277072
-            return;
-        }
-        try {
-            Class<?> clazz = Class.forName("java.io.ObjectStreamClass$Caches");
-            clearCache(clazz, "localDescs");
-            clearCache(clazz, "reflectors");
-        } catch (ReflectiveOperationException | SecurityException | ClassCastException e) {
-            log.warn(sm.getString(
-                    "webappClassLoader.clearObjectStreamClassCachesFail", getContextName()), e);
-        } catch (InaccessibleObjectException e) {
-            // Must be running on without the necessary command line options.
-            log.warn(sm.getString("webappClassLoader.addExportsJavaIo", getCurrentModuleName()));
-        }
-    }
-
-
     private String getCurrentModuleName() {
         String moduleName = this.getClass().getModule().getName();
         if (moduleName == null) {
             moduleName = "ALL-UNNAMED";
         }
         return moduleName;
-    }
-
-
-    private void clearCache(Class<?> target, String mapName)
-            throws ReflectiveOperationException, SecurityException, ClassCastException {
-        Field f = target.getDeclaredField(mapName);
-        f.setAccessible(true);
-        Object map = f.get(null);
-        // Avoid trying to clear references if Tomcat is running on a JRE that
-        // includes the fix for this memory leak
-        // See https://bugs.openjdk.java.net/browse/JDK-8277072
-        if (map instanceof Map<?,?>) {
-            Iterator<?> keys = ((Map<?,?>) map).keySet().iterator();
-            while (keys.hasNext()) {
-                Object key = keys.next();
-                if (key instanceof Reference) {
-                    Object clazz = ((Reference<?>) key).get();
-                    if (loadedByThisOrChild(clazz)) {
-                        keys.remove();
-                    }
-                }
-            }
-        }
     }
 
 
