@@ -129,7 +129,7 @@
 
   <p>The <code>className</code> attribute must be <code>org.apache.catalina.core.VirtualThreadExecutor</code> to use
      this implementation.</p>
-     
+
   <p>The virtual thread implementation does not support any additional attributes.</p>
 
   </subsection>
