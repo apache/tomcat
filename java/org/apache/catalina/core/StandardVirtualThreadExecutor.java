@@ -20,14 +20,18 @@ import org.apache.catalina.Executor;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.util.LifecycleMBeanBase;
+import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 
 /**
  * An executor that uses a new virtual thread for each task.
  */
-public class VirtualThreadExecutor extends LifecycleMBeanBase implements Executor {
+public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements Executor {
+
+    private static final StringManager sm = StringManager.getManager(StandardVirtualThreadExecutor.class);
 
     private String name;
-    private Thread.Builder threadBuilder;
+    private java.util.concurrent.Executor executor;
     private String namePrefix;
 
     public void setName(String name) {
@@ -49,19 +53,23 @@ public class VirtualThreadExecutor extends LifecycleMBeanBase implements Executo
 
     @Override
     public void execute(Runnable command) {
-        threadBuilder.start(command);
+        if (executor == null) {
+            throw new IllegalStateException(sm.getString("standardVirtualThreadExecutor.notStarted"));
+        } else {
+            executor.execute(command);
+        }
     }
 
 
     @Override
     protected void startInternal() throws LifecycleException {
-        threadBuilder = Thread.ofVirtual().name(getNamePrefix(), 0);
+        executor = new VirtualThreadExecutor(getNamePrefix());
         setState(LifecycleState.STARTING);
     }
 
     @Override
     protected void stopInternal() throws LifecycleException {
-        threadBuilder = null;
+        executor = null;
         setState(LifecycleState.STOPPING);
     }
 

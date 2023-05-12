@@ -61,6 +61,7 @@ import org.apache.tomcat.util.threads.ResizableExecutor;
 import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
+import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 
 /**
  * @param <S> The type used by the socket wrapper associated with this endpoint.
@@ -743,6 +744,15 @@ public abstract class AbstractEndpoint<S,U> {
     public Executor getExecutor() { return executor; }
 
 
+    private boolean useVirtualThreads = false;
+    public void setUseVirtualThreads(boolean useVirtualThreads) {
+        this.useVirtualThreads = useVirtualThreads;
+    }
+    public boolean getVirtualThreads() {
+        return useVirtualThreads;
+    }
+
+
     /**
      * External Executor based thread pool for utility tasks.
      */
@@ -1169,11 +1179,16 @@ public abstract class AbstractEndpoint<S,U> {
 
     public void createExecutor() {
         internalExecutor = true;
-        TaskQueue taskqueue = new TaskQueue();
-        TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-", daemon, getThreadPriority());
-        executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS,taskqueue, tf);
-        taskqueue.setParent( (ThreadPoolExecutor) executor);
+        if (useVirtualThreads) {
+            executor = new VirtualThreadExecutor(getName() + "-exec-");
+        } else {
+            TaskQueue taskqueue = new TaskQueue();
+            TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-", daemon, getThreadPriority());
+            executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS,taskqueue, tf);
+            taskqueue.setParent( (ThreadPoolExecutor) executor);
+        }
     }
+
 
     public void shutdownExecutor() {
         Executor executor = this.executor;
