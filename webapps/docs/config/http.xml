@@ -747,6 +747,13 @@
       Internet-Draft</a>. The default value is <code>true</code>.</p>
     </attribute>
 
+    <attribute name="useVirtualThreads" required="false">
+      <p>(bool) Use this attribute to enable or disable usage of virtual threads
+      with the internal executor. If an executor is associated with this
+      connector, this attribute is ignored. The default value is
+      <code>false</code>.</p>
+    </attribute>
+
   </attributes>
 
   </subsection>

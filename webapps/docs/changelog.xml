@@ -117,8 +117,8 @@
         <code>start()</code>/<code>stop()</code> methods. (markt)
       </scode>
       <add>
-        Add <code>org.apache.catalina.core.VirtualThreadExecutor</code>, a
-        virtual thread based executor that may be used with one or more
+        Add <code>org.apache.catalina.core.StandardVirtualThreadExecutor</code>,
+        a virtual thread based executor that may be used with one or more
         Connectors to process requests received by those Connectors using
         virtual threads. This Executor requires a minimum Java version of Java
         21. (markt)
