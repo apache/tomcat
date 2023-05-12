@@ -22,18 +22,17 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 
 /**
  * An executor that uses a new virtual thread for each task.
  */
-public class VirtualThreadExecutor extends LifecycleMBeanBase implements Executor {
+public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements Executor {
 
-    private static final StringManager sm = StringManager.getManager(VirtualThreadExecutor.class);
-
-    private final JreCompat jreCompat = JreCompat.getInstance();
+    private static final StringManager sm = StringManager.getManager(StandardVirtualThreadExecutor.class);
 
     private String name;
-    private Object threadBuilder;
+    private java.util.concurrent.Executor executor;
     private String namePrefix;
 
     public void setName(String name) {
@@ -55,7 +54,11 @@ public class VirtualThreadExecutor extends LifecycleMBeanBase implements Executo
 
     @Override
     public void execute(Runnable command) {
-        JreCompat.getInstance().threadBuilderStart(threadBuilder, command);
+        if (executor == null) {
+            throw new IllegalStateException(sm.getString("standardVirtualThreadExecutor.notStarted"));
+        } else {
+            executor.execute(command);
+        }
     }
 
 
@@ -63,19 +66,19 @@ public class VirtualThreadExecutor extends LifecycleMBeanBase implements Executo
     protected void initInternal() throws LifecycleException {
         super.initInternal();
         if (!JreCompat.isJre21Available()) {
-            throw new LifecycleException(sm.getString("virtualThreadExecutor.noVirtualThreads"));
+            throw new LifecycleException(sm.getString("standardVirtualThreadExecutor.noVirtualThreads"));
         }
     }
 
     @Override
     protected void startInternal() throws LifecycleException {
-        threadBuilder = jreCompat.createVirtualThreadBuilder(getNamePrefix());
+        executor = new VirtualThreadExecutor(getNamePrefix());
         setState(LifecycleState.STARTING);
     }
 
     @Override
     protected void stopInternal() throws LifecycleException {
-        threadBuilder = null;
+        executor = null;
         setState(LifecycleState.STOPPING);
     }
 
