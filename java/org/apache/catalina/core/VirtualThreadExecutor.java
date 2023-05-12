@@ -28,6 +28,7 @@ public class VirtualThreadExecutor extends LifecycleMBeanBase implements Executo
 
     private String name;
     private Thread.Builder threadBuilder;
+    private String namePrefix;
 
     public void setName(String name) {
         this.name = name;
@@ -38,6 +39,14 @@ public class VirtualThreadExecutor extends LifecycleMBeanBase implements Executo
         return name;
     }
 
+    public String getNamePrefix() {
+        return namePrefix;
+    }
+
+    public void setNamePrefix(String namePrefix) {
+        this.namePrefix = namePrefix;
+    }
+
     @Override
     public void execute(Runnable command) {
         threadBuilder.start(command);
@@ -46,7 +55,7 @@ public class VirtualThreadExecutor extends LifecycleMBeanBase implements Executo
 
     @Override
     protected void startInternal() throws LifecycleException {
-        threadBuilder = Thread.ofVirtual().name(getName() + "-", 0);
+        threadBuilder = Thread.ofVirtual().name(getNamePrefix(), 0);
         setState(LifecycleState.STARTING);
     }
 
