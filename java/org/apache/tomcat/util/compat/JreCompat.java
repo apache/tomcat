@@ -47,6 +47,7 @@ public class JreCompat {
     private static final boolean jre11Available;
     private static final boolean jre16Available;
     private static final boolean jre19Available;
+    private static final boolean jre21Available;
     private static final StringManager sm = StringManager.getManager(JreCompat.class);
 
 
@@ -54,32 +55,44 @@ public class JreCompat {
     static {
         // This is Tomcat 8 with a minimum Java version of Java 7.
         // Look for the highest supported JVM first
-        if (Jre19Compat.isSupported()) {
+        if (Jre21Compat.isSupported()) {
+            instance = new Jre21Compat();
+            jre21Available = true;
+            jre19Available = true;
+            jre16Available = true;
+            jre9Available = true;
+            jre8Available = true;
+        } else if (Jre19Compat.isSupported()) {
             instance = new Jre19Compat();
+            jre21Available = false;
             jre19Available = true;
             jre16Available = true;
             jre9Available = true;
             jre8Available = true;
         } else if (Jre16Compat.isSupported()) {
             instance = new Jre16Compat();
+            jre21Available = false;
             jre19Available = false;
             jre16Available = true;
             jre9Available = true;
             jre8Available = true;
         } else if (Jre9Compat.isSupported()) {
             instance = new Jre9Compat();
+            jre21Available = false;
             jre19Available = false;
             jre16Available = false;
             jre9Available = true;
             jre8Available = true;
         } else if (Jre8Compat.isSupported()) {
             instance = new Jre8Compat();
+            jre21Available = false;
             jre19Available = false;
             jre16Available = false;
             jre9Available = false;
             jre8Available = true;
         } else {
             instance = new JreCompat();
+            jre21Available = false;
             jre19Available = false;
             jre16Available = false;
             jre9Available = false;
@@ -121,6 +134,11 @@ public class JreCompat {
 
     public static boolean isJre19Available() {
         return jre19Available;
+    }
+
+
+    public static boolean isJre21Available() {
+        return jre21Available;
     }
 
 
@@ -356,5 +374,30 @@ public class JreCompat {
         }
 
         return result;
+    }
+
+
+    // Java 7 implementations of Java 21 methods
+
+    /**
+     * Create a thread builder for virtual threads using the given name to name the threads.
+     *
+     * @param name The base name for the threads
+     *
+     * @return The thread buidler for virtual threads
+     */
+    public Object createVirtualThreadBuilder(String name) {
+        throw new UnsupportedOperationException(sm.getString("jreCompat.noVirtualThreads"));
+    }
+
+
+    /**
+     * Create a thread with the given thread builder and use it to execute the given runnable.
+     *
+     * @param threadBuilder The thread builder to use to create a thread
+     * @param command       The command to run
+     */
+    public void threadBuilderStart(Object threadBuilder, Runnable command) {
+        throw new UnsupportedOperationException(sm.getString("jreCompat.noVirtualThreads"));
     }
 }

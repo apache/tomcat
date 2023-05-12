@@ -105,6 +105,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.90 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add <code>org.apache.catalina.core.VirtualThreadExecutor</code>, a
+        virtual thread based executor that may be used with one or more
+        Connectors to process requests received by those Connectors using
+        virtual threads. This Executor requires a minimum Java version of Java
+        21. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <update>
