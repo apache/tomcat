@@ -77,8 +77,12 @@
 
   <subsection name="Standard Implementation">
 
-  <p>
-  The default implementation supports the following attributes:</p>
+  <p>This implemtenation uses a pool of platform threads to execute the tasks assigned to the Executor.</p>
+
+  <p>The <code>className</code> attribute must be <code>org.apache.catalina.core.StandardThreadExecutor</code> to use
+     this implementation.</p>
+
+  <p>The standard implementation supports the following attributes:</p>
 
   <attributes>
 
@@ -118,6 +122,18 @@
 
 
   </subsection>
+
+  <subsection name="Virtual Thread Implementation">
+
+  <p>This implemtenation uses a new virtual thread to execute each task assigned to the Executor.</p>
+
+  <p>The <code>className</code> attribute must be <code>org.apache.catalina.core.VirtualThreadExecutor</code> to use
+     this implementation.</p>
+     
+  <p>The virtual thread implementation does not support any additional attributes.</p>
+
+  </subsection>
+
 </section>
 
 

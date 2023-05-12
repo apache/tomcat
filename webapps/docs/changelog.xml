@@ -129,6 +129,12 @@
         current default separator character of <code>*</code> remains unchanged.
         (markt)
       </scode>
+      <add>
+        Add <code>org.apache.catalina.core.VirtualThreadExecutor</code>, a
+        virtual thread based executor that may be used with one or more
+        Connectors to process requests received by those Connectors using
+        virtual threads. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
