@@ -16,9 +16,9 @@
  */
 package org.apache.tomcat.util.net.openssl.panama;
 
-import static org.apache.tomcat.util.openssl.openssl_h.*;
-
 import java.lang.foreign.MemorySegment;
+
+import static org.apache.tomcat.util.openssl.openssl_h.*;
 
 /**
  * Stats exposed by an OpenSSL session context.

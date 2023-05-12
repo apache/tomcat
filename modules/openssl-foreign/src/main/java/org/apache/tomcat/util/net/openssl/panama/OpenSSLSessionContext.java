@@ -25,7 +25,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSessionContext;
 
 import static org.apache.tomcat.util.openssl.openssl_h.*;
-
 import org.apache.tomcat.util.res.StringManager;
 
 /**

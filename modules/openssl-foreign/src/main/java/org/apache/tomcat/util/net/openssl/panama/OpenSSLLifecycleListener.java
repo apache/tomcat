@@ -17,15 +17,14 @@
 package org.apache.tomcat.util.net.openssl.panama;
 
 
-import static org.apache.tomcat.util.openssl.openssl_compat_h.FIPS_mode;
-import static org.apache.tomcat.util.openssl.openssl_compat_h.FIPS_mode_set;
-import static org.apache.tomcat.util.openssl.openssl_h.*;
-
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.security.SecureRandom;
 
+import static org.apache.tomcat.util.openssl.openssl_compat_h.FIPS_mode;
+import static org.apache.tomcat.util.openssl.openssl_compat_h.FIPS_mode_set;
+import static org.apache.tomcat.util.openssl.openssl_h.*;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;

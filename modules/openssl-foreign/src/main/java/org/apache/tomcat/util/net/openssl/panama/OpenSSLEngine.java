@@ -57,9 +57,8 @@ import javax.net.ssl.SSLSessionBindingEvent;
 import javax.net.ssl.SSLSessionBindingListener;
 import javax.net.ssl.SSLSessionContext;
 
-import static org.apache.tomcat.util.openssl.openssl_h.*;
 import static org.apache.tomcat.util.openssl.openssl_compat_h.*;
-
+import static org.apache.tomcat.util.openssl.openssl_h.*;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.Asn1Parser;

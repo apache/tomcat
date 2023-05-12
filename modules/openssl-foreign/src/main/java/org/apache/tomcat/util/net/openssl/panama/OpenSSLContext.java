@@ -16,9 +16,6 @@
  */
 package org.apache.tomcat.util.net.openssl.panama;
 
-import static org.apache.tomcat.util.openssl.openssl_h.*;
-import static org.apache.tomcat.util.openssl.openssl_compat_h.*;
-
 import java.io.File;
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
@@ -54,6 +51,8 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
+import static org.apache.tomcat.util.openssl.openssl_compat_h.*;
+import static org.apache.tomcat.util.openssl.openssl_h.*;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -648,7 +647,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         ? localArena.allocateUtf8String(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile())) : null;
                 MemorySegment caCertificatePathNative = sslHostConfig.getCaCertificatePath() != null
                         ? localArena.allocateUtf8String(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath())) : null;
-                if ((sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null) 
+                if ((sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null)
                         && SSL_CTX_load_verify_locations(state.sslCtx,
                                 caCertificateFileNative == null ? MemorySegment.NULL : caCertificateFileNative,
                                         caCertificatePathNative == null ? MemorySegment.NULL : caCertificatePathNative) <= 0) {
