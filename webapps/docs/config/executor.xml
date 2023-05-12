@@ -128,8 +128,8 @@
   <p>This implemtenation uses a new virtual thread to execute each task assigned to the Executor. This Executor requires
      a minimum Java version of Java 21.</p>
 
-  <p>The <code>className</code> attribute must be <code>org.apache.catalina.core.VirtualThreadExecutor</code> to use
-     this implementation.</p>
+  <p>The <code>className</code> attribute must be <code>org.apache.catalina.core.StandardVirtualThreadExecutor</code> to
+     use this implementation.</p>
 
   <p>The virtual thread implementation supports the follow attributes:</p>
 
