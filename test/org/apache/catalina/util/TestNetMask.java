@@ -45,7 +45,7 @@ public final class TestNetMask {
     public Boolean matches;
 
 
-    @Parameters(name="{index}: mask [{0}], input [{1}]")
+    @Parameters(name = "{index}: mask [{0}], input [{1}]")
     public static Collection<Object[]> inputs() {
         List<Object[]> result = new ArrayList<>();
 
@@ -130,8 +130,7 @@ public final class TestNetMask {
             Assert.assertNotNull(netMask);
         } else {
             Assert.assertNotNull(exception);
-            Assert.assertEquals(IllegalArgumentException.class.getName(),
-                    exception.getClass().getName());
+            Assert.assertEquals(IllegalArgumentException.class.getName(), exception.getClass().getName());
             return;
         }
 
