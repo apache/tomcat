@@ -32,7 +32,7 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
 
     private String name;
     private java.util.concurrent.Executor executor;
-    private String namePrefix;
+    private String namePrefix = "tomcat-virt-";
 
     public void setName(String name) {
         this.name = name;
