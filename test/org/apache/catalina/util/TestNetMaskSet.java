@@ -17,10 +17,10 @@
 
 package org.apache.catalina.util;
 
+import java.net.UnknownHostException;
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.net.UnknownHostException;
 
 public class TestNetMaskSet {
 
