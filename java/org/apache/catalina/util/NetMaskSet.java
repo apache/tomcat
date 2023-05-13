@@ -145,8 +145,16 @@ public class NetMaskSet {
 
         String result = netmasks.toString();
 
-        // remove the open and close brackets
-        return result.substring(1, result.length() - 1);
+        // remove open and close brackets if exist
+        if (result.startsWith("[")) {
+            result = result.substring(1);
+        }
+
+        if (result.endsWith("]")) {
+            result = result.substring(0, result.length() - 1);
+        }
+
+        return result;
     }
 
 }
