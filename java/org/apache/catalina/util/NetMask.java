@@ -18,6 +18,8 @@ package org.apache.catalina.util;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -304,4 +306,21 @@ public final class NetMask {
     public String toString() {
         return expression;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NetMask other = (NetMask) o;
+        return nrBytes == other.nrBytes &&
+            lastByteShift == other.lastByteShift &&
+            Arrays.equals(netaddr, other.netaddr);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 31 * Arrays.hashCode(netaddr) + lastByteShift;
+        return result;
+    }
+
 }

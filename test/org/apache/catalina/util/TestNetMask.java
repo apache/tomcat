@@ -163,5 +163,15 @@ public final class TestNetMask {
         }
 
         Assert.assertEquals(mask, netMask.toString());
+
+        NetMask nm1, nm2, nm3;
+        nm1 = new NetMask("192.168.0.0/24");
+        nm2 = new NetMask("192.168.0.0/24");
+        nm3 = new NetMask("192.168.1.0/24");
+
+        Assert.assertEquals(nm1, nm2);
+        Assert.assertEquals(nm1.hashCode(), nm2.hashCode());
+
+        Assert.assertNotEquals(nm1, nm3);
     }
 }
