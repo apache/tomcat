@@ -27,19 +27,19 @@ import java.util.Set;
 
 
 /**
- * This class maintains a Set of NetMask objects and allows to check if
- * a given IP address is matched by any of the NetMasks, making it easy
- * to create Allow and Deny lists of CIDR networks and hosts.
+ * This class maintains a Set of NetMask objects and allows to check if a given IP address is matched by any of the
+ * NetMasks, making it easy to create Allow and Deny lists of CIDR networks and hosts.
  */
 public class NetMaskSet {
 
     private final Set<NetMask> netmasks = new HashSet<>();
 
     /**
-     * returns true if the passed inetAddress is matched by any of the {@link NetMask}s in the set
+     * Tests if the provided InetAddress matches any of the {@link NetMask}s in the set.
      *
      * @param inetAddress An InetAddress to check
-     * @return
+     *
+     * @return {@code true} if the passed inetAddress is matched by any of the {@link NetMask}s in the set
      */
     public boolean contains(InetAddress inetAddress) {
 
@@ -53,10 +53,11 @@ public class NetMaskSet {
     }
 
     /**
-     * returns true if the passed inetAddress is matched by any of the {@link NetMask}s in the set
+     * Tests if the provided IP address matches any of the {@link NetMask}s in the set.
      *
      * @param ipAddress an IP address to check
-     * @return
+     *
+     * @return {@code true} if the passed IP address is matched by any of the {@link NetMask}s in the set
      *
      * @throws UnknownHostException if the passed input is not a valid IP address
      */
@@ -67,9 +68,10 @@ public class NetMaskSet {
     }
 
     /**
-     * adds a NetMask object to the set if the set does not contain it
+     * Adds a NetMask object to the set if the set does not contain it
      *
-     * @param netmask
+     * @param netmask The NetMask to add
+     *
      * @return true if the object was added
      */
     public boolean add(NetMask netmask) {
@@ -77,11 +79,13 @@ public class NetMaskSet {
     }
 
     /**
-     * creates a NetMask object from the input string and adds it to the set.
-     * throws UnknownHostException if the input is not a valid CIDR format.
+     * Creates a NetMask object from the input string and adds it to the set.
      *
-     * @param input
+     * @param input The string from which to construct the NetMask
+     *
      * @return true if the object was added
+     *
+     * @throws IllegalArgumentException if the input is not a valid CIDR format.
      */
     public boolean add(String input) {
         NetMask netmask = new NetMask(input);
@@ -96,9 +100,9 @@ public class NetMaskSet {
     }
 
     /**
-     * returns true if the set is empty
+     * Tests if the set is empty.
      *
-     * @return
+     * @return {@code true} if the set is empty, otherwise {@code false}
      */
     public boolean isEmpty() {
         return netmasks.isEmpty();
@@ -108,7 +112,8 @@ public class NetMaskSet {
      * Adds a {@link NetMask} list from a string input containing a comma-separated list of (hopefully valid)
      * {@link NetMask}s.
      *
-     * @param input  The input string
+     * @param input The input string
+     *
      * @return a list of processing error messages (empty when no errors)
      */
     public List<String> addAll(String input) {
@@ -131,9 +136,9 @@ public class NetMaskSet {
     }
 
     /**
-     * returns a comma separated list of the <code>NetMask</code>s in this set
+     * Provides a string representation of this NetMaskSet. The format of the String is not guaranteed to remain fixed.
      *
-     * @return
+     * @return a comma separated list of the <code>NetMask</code>s in this set
      */
     @Override
     public String toString() {
@@ -141,7 +146,7 @@ public class NetMaskSet {
         String result = netmasks.toString();
 
         // remove the open and close brackets
-        return result.substring(1, result.length() -1);
+        return result.substring(1, result.length() - 1);
     }
 
 }
