@@ -18,6 +18,8 @@
 package org.apache.catalina.util;
 
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,5 +48,15 @@ public class TestNetMaskSet {
         Assert.assertTrue(nms.contains("10.20.30.40"));
         Assert.assertFalse(nms.contains("9.10.10.10"));
         Assert.assertFalse(nms.contains("11.10.10.10"));
+
+        String s = nms.toString();
+        Assert.assertTrue(s.indexOf('[') == -1);
+        Assert.assertTrue(s.indexOf(']') == -1);
+
+        List<String> list = Arrays.asList(s.split("\\s*,\\s*"));
+        Assert.assertTrue(list.contains("192.168.0.0/24"));
+        Assert.assertTrue(list.contains("192.168.1.0/27"));
+        Assert.assertTrue(list.contains("192.168.2.2"));
+        Assert.assertTrue(list.contains("10.0.0.0/8"));
     }
 }
