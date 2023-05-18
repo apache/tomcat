@@ -75,6 +75,8 @@ public final class MessageBytes implements Cloneable, Serializable {
     // String
     private String strValue;
 
+    private boolean hasStrValue=false;
+
     /**
      * Creates a new, uninitialized MessageBytes object.
      * Use static newInstance() in order to allow
@@ -110,6 +112,7 @@ public final class MessageBytes implements Cloneable, Serializable {
 
         strValue=null;
 
+        hasStrValue=false;
         hasHashCode=false;
         hasLongValue=false;
     }
@@ -125,6 +128,7 @@ public final class MessageBytes implements Cloneable, Serializable {
     public void setBytes(byte[] b, int off, int len) {
         byteC.setBytes( b, off, len );
         type=T_BYTES;
+        hasStrValue=false;
         hasHashCode=false;
         hasLongValue=false;
     }
@@ -139,6 +143,7 @@ public final class MessageBytes implements Cloneable, Serializable {
     public void setChars( char[] c, int off, int len ) {
         charC.setChars( c, off, len );
         type=T_CHARS;
+        hasStrValue=false;
         hasHashCode=false;
         hasLongValue=false;
     }
@@ -152,8 +157,10 @@ public final class MessageBytes implements Cloneable, Serializable {
         hasHashCode = false;
         hasLongValue = false;
         if (s == null) {
+            hasStrValue = false;
             type = T_NULL;
         } else {
+            hasStrValue = true;
             type = T_STR;
         }
     }
@@ -168,19 +175,23 @@ public final class MessageBytes implements Cloneable, Serializable {
     public String toString() {
         switch (type) {
             case T_NULL:
+                return null;
             case T_STR:
                 // No conversion required
                 break;
             case T_BYTES:
-                type = T_STR;
-                strValue = byteC.toString();
+                if (!hasStrValue) {
+                    strValue = byteC.toString();
+                    hasStrValue = true;
+                }
                 break;
             case T_CHARS:
-                type = T_STR;
-                strValue = charC.toString();
+                if (!hasStrValue) {
+                    strValue = charC.toString();
+                    hasStrValue = true;
+                }
                 break;
         }
-
         return strValue;
     }
 
@@ -568,6 +579,7 @@ public final class MessageBytes implements Cloneable, Serializable {
             end--;
         }
         longValue=l;
+        hasStrValue=false;
         hasHashCode=false;
         hasLongValue=true;
         type=T_BYTES;
