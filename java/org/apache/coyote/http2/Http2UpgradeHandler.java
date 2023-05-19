@@ -1514,7 +1514,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             // the call to this method. This means the bytes read will have been
             // written to the original stream and, effectively, swallowed.
             // Therefore, need to notify that those bytes were swallowed here.
-            onSwallowedDataFramePayload(streamId, dataLength);
+            if (dataLength>0) {
+                onSwallowedDataFramePayload(streamId, dataLength);
+            }
         }
     }
 
