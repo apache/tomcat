@@ -137,6 +137,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>66602</bug>: not sending WINDOW_UPDATE when dataLength is ZERO
+        on call SwallowedDataFramePayload. Pull request #619 by
+        ledefe. (lihan)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
