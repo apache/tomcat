@@ -125,6 +125,9 @@
         defined in RFC 9218 rather than the one defined in RFC 7540.
         (markt)
       </update>
+      <fix>
+        <bug>66602</bug>: not sending WINDOW_UPDATE when dataLength is ZERO on call SwallowedDataFramePayload.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
