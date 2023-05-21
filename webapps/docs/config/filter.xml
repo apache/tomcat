@@ -1325,21 +1325,20 @@ FINE: Request "/docs/config/manager.html" with response status "200"
   </subsection>
 
   <subsection name="Example">
-    <p>To allow access only for the clients connecting from localhost:</p>
-    <pre>
-      &lt;filter>
-      &lt;filter-name>Remote CIDR Filter&lt;/filter-name>
-      &lt;filter-class>org.apache.catalina.filters.RemoteCIDRFilter&lt;/filter-class>
-      &lt;init-param>
-      &lt;param-name>allow&lt;/param-name>
-      &lt;param-value>127.0.0.0/8, ::1&lt;/param-value>
-      &lt;/init-param>
-      &lt;/filter>
-      &lt;filter-mapping>
-      &lt;filter-name>Remote CIDR Filter&lt;/filter-name>
-      &lt;url-pattern>/*&lt;/url-pattern>
-      &lt;/filter-mapping>
-    </pre>
+    <p>To allow access only for the clients connecting from localhost and from local network 192.68.0.*:</p>
+    <source><![CDATA[      <filter>
+        <filter-name>Remote CIDR Filter</filter-name>
+        <filter-class>org.apache.catalina.filters.RemoteCIDRFilter</filter-class>
+        <init-param>
+          <param-name>allow</param-name>
+          <param-value>127.0.0.1, ::1, 192.68.0.0/24</param-value>
+        </init-param>
+      </filter>
+
+      <filter-mapping>
+        <filter-name>Remote CIDR Filter</filter-name>
+        <url-pattern>/*</url-pattern>
+      </filter-mapping>]]></source>
   </subsection>
 
 </section>
