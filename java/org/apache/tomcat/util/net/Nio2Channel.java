@@ -79,7 +79,6 @@ public class Nio2Channel implements AsynchronousByteChannel {
     @Override
     public void close() throws IOException {
         sc.close();
-        reset(this.sc, null);
     }
 
 
