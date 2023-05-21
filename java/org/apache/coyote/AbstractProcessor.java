@@ -717,9 +717,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     public void recycle() {
         errorState = ErrorState.NONE;
         asyncStateMachine.recycle();
-        // Clear fields that can be cleared to aid GC and trigger NPEs if this
-        // is reused
-        socketWrapper = null;
     }
 
 

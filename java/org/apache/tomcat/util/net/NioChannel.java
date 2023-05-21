@@ -81,7 +81,6 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
     @Override
     public void close() throws IOException {
         sc.close();
-        reset(this.sc,null);
     }
 
     /**
