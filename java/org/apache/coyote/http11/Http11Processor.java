@@ -1612,6 +1612,7 @@ public class Http11Processor extends AbstractProcessor {
         inputBuffer.recycle();
         outputBuffer.recycle();
         upgradeToken = null;
+        socketWrapper = null;
         sendfileData = null;
     }
 
