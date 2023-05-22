@@ -130,7 +130,7 @@ public class RateLimitFilter extends GenericFilter {
      */
     public static final String PARAM_STATUS_MESSAGE = "statusMessage";
 
-    TimeBucketCounter bucketCounter;
+    transient TimeBucketCounter bucketCounter;
 
     private int actualRequests;
 
