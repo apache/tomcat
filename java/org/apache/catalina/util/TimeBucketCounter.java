@@ -88,7 +88,10 @@ public class TimeBucketCounter {
             // there is a small chance of a benign data race where we might not count a request or
             // two but as a tradeoff in favor of performance we do not synchronize this operation
             ai = new AtomicInteger();
-            map.putIfAbsent(key, ai);
+            AtomicInteger currentValue = map.putIfAbsent(key, ai);
+            if (currentValue != null) {
+                ai = currentValue;
+            }
         }
 
         return ai.incrementAndGet();
