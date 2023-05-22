@@ -141,6 +141,12 @@
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
   </Match>
   <Match>
+  </Match>
+    <!-- NPE is expected if Connector definition is invalid -->
+    <Class name="org.apache.catalina.connector.Connector"/>
+    <Method name="startInternal"/>
+    <Bug pattern="NP_NULL_ON_SOME_PATH"/>
+  <Match>
     <!-- req.getRemoteUser(), req.getAuthType(), request.getQueryString() can
     return null because o.a.t.util.buf.MessageBytes.toString() can return NULL
     -->
@@ -185,6 +191,12 @@
     <Class name="org.apache.catalina.core.AsyncContextImpl"/>
     <Method name="logDebug"/>
     <Bug code="RCN"/>
+  </Match>
+  <Match>
+    <!-- Sync isn't guarding this object -->
+    <Class name="org.apache.catalina.core.ContainerBase"/>
+    <Method name="setStartStopThreads"/>
+    <Bug pattern="IS2_INCONSISTENT_SYNC"/>
   </Match>
   <Match>
     <!-- Exception caught deliberately -->
