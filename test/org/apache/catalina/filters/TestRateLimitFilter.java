@@ -43,7 +43,7 @@ import org.apache.tomcat.util.descriptor.web.FilterMap;
 public class TestRateLimitFilter extends TomcatBaseTest {
 
     @Test
-    public void TestRateLimitWith4Clients() throws Exception {
+    public void testRateLimitWith4Clients() throws Exception {
 
         int bucketRequests = 40;
         int bucketDuration = 4;
