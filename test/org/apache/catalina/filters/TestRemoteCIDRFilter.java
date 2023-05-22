@@ -17,11 +17,19 @@
 
 package org.apache.catalina.filters;
 
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Map;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.startup.Tomcat;
@@ -30,12 +38,6 @@ import org.apache.tomcat.unittest.TesterResponse;
 import org.apache.tomcat.unittest.TesterServletContext;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Map;
 
 public class TestRemoteCIDRFilter extends TomcatBaseTest {
 
@@ -56,9 +58,9 @@ public class TestRemoteCIDRFilter extends TomcatBaseTest {
         TesterResponse response;
         int expected;
 
-        for (int i=0; i < 256; i++) {
-            for (int j=0; j < 256; j += 11) {
-                ipAddr = String.format("192.168.%s.%s", i, j);
+        for (int i = 0; i < 256; i++) {
+            for (int j = 0; j < 256; j += 11) {
+                ipAddr = String.format("192.168.%s.%s", Integer.valueOf(i), Integer.valueOf(j));
                 request = new TestRemoteIpFilter.MockHttpServletRequest(ipAddr);
                 response = new TestRateLimitFilter.TesterResponseWithStatus();
                 expected = (i == 10 || i == 20) ? HttpServletResponse.SC_OK : HttpServletResponse.SC_FORBIDDEN;
@@ -85,9 +87,9 @@ public class TestRemoteCIDRFilter extends TomcatBaseTest {
         TesterResponse response;
         int expected;
 
-        for (int i=0; i < 256; i++) {
-            for (int j=0; j < 256; j += 11) {
-                ipAddr = String.format("192.168.%s.%s", i, j);
+        for (int i = 0; i < 256; i++) {
+            for (int j = 0; j < 256; j += 11) {
+                ipAddr = String.format("192.168.%s.%s", Integer.valueOf(i), Integer.valueOf(j));
                 request = new TestRemoteIpFilter.MockHttpServletRequest(ipAddr);
                 response = new TestRateLimitFilter.TesterResponseWithStatus();
                 expected = (i != 10 && i != 20) ? HttpServletResponse.SC_OK : HttpServletResponse.SC_FORBIDDEN;
@@ -115,9 +117,9 @@ public class TestRemoteCIDRFilter extends TomcatBaseTest {
         TesterResponse response;
         int expected;
 
-        for (int i=0; i < 256; i++) {
-            for (int j=0; j < 256; j += 11) {
-                ipAddr = String.format("10.10.%s.%s", i, j);
+        for (int i = 0; i < 256; i++) {
+            for (int j = 0; j < 256; j += 11) {
+                ipAddr = String.format("10.10.%s.%s", Integer.valueOf(i), Integer.valueOf(j));
                 request = new TestRemoteIpFilter.MockHttpServletRequest(ipAddr);
                 response = new TestRateLimitFilter.TesterResponseWithStatus();
                 expected = (i != 10 && i != 20) ? HttpServletResponse.SC_OK : HttpServletResponse.SC_FORBIDDEN;
@@ -127,7 +129,8 @@ public class TestRemoteCIDRFilter extends TomcatBaseTest {
         }
     }
 
-    private Filter createTestFilter(FilterDef filterDef, Class testFilterClass, Context root, String urlPattern) throws ServletException {
+    private Filter createTestFilter(FilterDef filterDef, Class<?> testFilterClass, Context root, String urlPattern)
+            throws ServletException {
 
         RemoteCIDRFilter remoteCIDRFilter = new RemoteCIDRFilter();
 
