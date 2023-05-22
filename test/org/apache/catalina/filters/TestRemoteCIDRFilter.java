@@ -17,11 +17,11 @@
 
 package org.apache.catalina.filters;
 
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterConfig;
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.Filter;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.startup.Tomcat;
@@ -150,10 +150,10 @@ public class TestRemoteCIDRFilter extends TomcatBaseTest {
         return remoteCIDRFilter;
     }
 
-    private static FilterConfig generateFilterConfig(FilterDef filterDef) {
+    private static FilterConfig generateFilterConfig(final FilterDef filterDef) {
 
-        TesterServletContext mockServletContext = new TesterServletContext();
-        Map<String,String> parameters = filterDef.getParameterMap();
+        final TesterServletContext mockServletContext = new TesterServletContext();
+        final Map<String,String> parameters = filterDef.getParameterMap();
 
         FilterConfig filterConfig = new FilterConfig() {
 
