@@ -1584,6 +1584,15 @@
     <Bug pattern="NP_BOOLEAN_RETURN_NULL" />
   </Match>
   <Match>
+    <!--  Generated code -->
+    <Or>
+      <Class name="org.apache.tomcat.util.json.JSONParser"/>
+      <Class name="org.apache.tomcat.util.json.JSONParserTokenManager"/>
+      <Class name="org.apache.tomcat.util.json.ParseException"/>
+      <Class name="org.apache.tomcat.util.json.TokenMgrError"/>
+    </Or>
+  </Match>
+  <Match>
     <!-- Hiding of field in superclass is deliberate -->
     <Class name="org.apache.tomcat.util.modeler.NotificationInfo"/>
     <Field name="info" />
@@ -2575,6 +2584,18 @@
     <Class name="org.apache.tomcat.websocket.pojo.TestEncodingDecoding$MsgByte"/>
     <Field name="data"/>
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestWsRemoteEndpointImplServerDeadlock" />
+    <Method name="testTemporaryDeadlockOnClientClose" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestWsRemoteEndpointImplServerDeadlock$Bug66508Endpoint" />
+    <Method name="onOpen" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
   </Match>
   <Match>
     <!-- Return value of latch is intentionally ignored -->
