@@ -125,6 +125,11 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
             setConnector(new Connector());
         }
 
+        public MockHttpServletRequest(String ipAddress) {
+            this();
+            this.setRemoteAddr(ipAddress);
+        }
+
         public void setHeader(String name, String value) {
             getCoyoteRequest().getMimeHeaders().setValue(name).setString(value);
         }
