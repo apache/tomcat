@@ -66,7 +66,7 @@ public class StandardVirtualThreadExecutor extends LifecycleMBeanBase implements
 
     @Override
     public void execute(Runnable command, long timeout, TimeUnit unit) {
-        JreCompat.getInstance().threadBuilderStart(threadBuilder, command);
+        execute(command);
     }
 
 
