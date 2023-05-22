@@ -813,6 +813,12 @@
     <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
   </Match>
   <Match>
+    <!--  Thread start is intentional in back-port -->
+    <Class name="org.apache.catalina.util.TimeBucketCounter"/>
+    <Method name="&lt;init&gt;"/>
+    <Bug pattern="SC_START_IN_CTOR"/>
+  </Match>
+  <Match>
     <!-- the platform default encoding is a fallback -->
     <Class name="org.apache.catalina.util.URLEncoder"/>
     <Method name="encode"/>
@@ -2549,6 +2555,12 @@
     <Class name="org.apache.tomcat.util.http.TesterParametersPerformance" />
     <Method name="doCreateString" />
     <Bug pattern="UC_USELESS_OBJECT" />
+  </Match>
+  <Match>
+    <!-- Should not happen. NPE is fine if it does. -->
+    <Class name="org.apache.tomcat.util.http.parser.TesterHttpWgStructuredField"/>
+    <Method name="doTestDirectory"/>
+    <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
   </Match>
   <Match>
     <!-- Return value ignored because an exception is expected -->
