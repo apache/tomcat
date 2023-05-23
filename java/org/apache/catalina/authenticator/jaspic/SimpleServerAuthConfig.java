@@ -32,10 +32,9 @@ import javax.security.auth.message.module.ServerAuthModule;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Basic implementation primarily intended for use when using third-party
- * {@link ServerAuthModule} implementations that only provide the module. This
- * implementation supports configuring the {@link ServerAuthContext} with
- * multiple modules.
+ * Basic implementation primarily intended for use when using third-party {@link ServerAuthModule} implementations that
+ * only provide the module. This implementation supports configuring the {@link ServerAuthContext} with multiple
+ * modules.
  */
 public class SimpleServerAuthConfig implements ServerAuthConfig {
 
@@ -90,10 +89,10 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
     }
 
 
-    @SuppressWarnings({"rawtypes", "unchecked"}) // JASPIC API uses raw types
+    @SuppressWarnings({ "rawtypes", "unchecked" }) // JASPIC API uses raw types
     @Override
-    public ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject,
-            Map properties) throws AuthException {
+    public ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject, Map properties)
+            throws AuthException {
         ServerAuthContext serverAuthContext = this.serverAuthContext;
         if (serverAuthContext == null) {
             synchronized (this) {
@@ -113,12 +112,10 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
                     while (moduleClassName != null) {
                         try {
                             Class<?> clazz = Class.forName(moduleClassName);
-                            ServerAuthModule module =
-                                    (ServerAuthModule) clazz.getConstructor().newInstance();
+                            ServerAuthModule module = (ServerAuthModule) clazz.getConstructor().newInstance();
                             module.initialize(null, null, handler, mergedProperties);
                             modules.add(module);
-                        } catch (ReflectiveOperationException | IllegalArgumentException |
-                                SecurityException e) {
+                        } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
                             AuthException ae = new AuthException();
                             ae.initCause(e);
                             throw ae;

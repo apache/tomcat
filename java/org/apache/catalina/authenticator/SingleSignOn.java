@@ -76,7 +76,7 @@ public class SingleSignOn extends ValveBase {
      * The cache of SingleSignOnEntry instances for authenticated Principals, keyed by the cookie value that is used to
      * select them.
      */
-    protected Map<String, SingleSignOnEntry> cache = new ConcurrentHashMap<>();
+    protected Map<String,SingleSignOnEntry> cache = new ConcurrentHashMap<>();
 
     /**
      * Indicates whether this valve should require a downstream Authenticator to reauthenticate each request, or if it

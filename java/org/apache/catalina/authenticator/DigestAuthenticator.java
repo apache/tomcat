@@ -69,7 +69,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
     private static final String NONCE_DIGEST = "SHA-256";
 
     // List permitted algorithms and maps them to Java standard names
-    private static final Map<String, AuthDigest> PERMITTED_ALGORITHMS = new HashMap<>();
+    private static final Map<String,AuthDigest> PERMITTED_ALGORITHMS = new HashMap<>();
     static {
         // Allows the digester to be configured with either the Standard Java name or the name used the RFC.
         for (AuthDigest authDigest : AuthDigest.values()) {
@@ -92,7 +92,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
     /**
      * List of server nonce values currently being tracked
      */
-    protected Map<String, NonceInfo> nonces;
+    protected Map<String,NonceInfo> nonces;
 
 
     /**
@@ -210,10 +210,11 @@ public class DigestAuthenticator extends AuthenticatorBase {
     public String getAlgorithms() {
         StringBuilder result = new StringBuilder();
         StringUtils.join(algorithms, ',', new Function<AuthDigest>() {
-                    @Override
-                    public String apply(AuthDigest t) { return t.getRfcName(); }
-                },
-                result);
+            @Override
+            public String apply(AuthDigest t) {
+                return t.getRfcName();
+            }
+        }, result);
         return result.toString();
     }
 
@@ -238,7 +239,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     /*
-     *  Initialise algorithms, removing ones that the JRE does not support
+     * Initialise algorithms, removing ones that the JRE does not support
      */
     private void initAlgorithms(List<AuthDigest> algorithms) {
         Iterator<AuthDigest> algorithmIterator = algorithms.iterator();
@@ -248,7 +249,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 ConcurrentMessageDigest.init(algorithm.getJavaName());
             } catch (NoSuchAlgorithmException e) {
                 // In theory, a JRE can choose not to implement SHA-512/256
-                log.warn(sm.getString("digestAuthenticator.unsupportedAlgorithm", algorithms, algorithm.getJavaName()), e);
+                log.warn(sm.getString("digestAuthenticator.unsupportedAlgorithm", algorithms, algorithm.getJavaName()),
+                        e);
                 algorithmIterator.remove();
             }
         }
@@ -458,7 +460,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
          * This is a FIFO cache as using an older nonce should not delay its removal from the cache in favour of more
          * recent values.
          */
-        nonces = new LinkedHashMap<String, DigestAuthenticator.NonceInfo>() {
+        nonces = new LinkedHashMap<String,DigestAuthenticator.NonceInfo>() {
 
             private static final long serialVersionUID = 1L;
             private static final long LOG_SUPPRESS_TIME = 5 * 60 * 1000;
@@ -466,7 +468,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             private long lastLog = 0;
 
             @Override
-            protected boolean removeEldestEntry(Map.Entry<String, NonceInfo> eldest) {
+            protected boolean removeEldestEntry(Map.Entry<String,NonceInfo> eldest) {
                 // This is called from a sync so keep it simple
                 long currentTime = System.currentTimeMillis();
                 if (size() > getNonceCacheSize()) {
@@ -495,7 +497,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         private final String opaque;
         private final long nonceValidity;
         private final String key;
-        private final Map<String, NonceInfo> nonces;
+        private final Map<String,NonceInfo> nonces;
         private boolean validateUri = true;
 
         private String userName = null;
@@ -513,7 +515,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         private AuthDigest algorithm = null;
 
 
-        public DigestInfo(String opaque, long nonceValidity, String key, Map<String, NonceInfo> nonces,
+        public DigestInfo(String opaque, long nonceValidity, String key, Map<String,NonceInfo> nonces,
                 boolean validateUri) {
             this.opaque = opaque;
             this.nonceValidity = nonceValidity;
@@ -534,7 +536,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 return false;
             }
 
-            Map<String, String> directives;
+            Map<String,String> directives;
             try {
                 directives = Authorization.parseAuthorizationDigest(new StringReader(authorization));
             } catch (IOException e) {
@@ -636,8 +638,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
             }
             String serverIpTimeKey = request.getRemoteAddr() + ":" + nonceTime + ":" + key;
             // Note: The digest used to generate the nonce is independent of the the digest used for authentication/
-            byte[] buffer = ConcurrentMessageDigest.digest(NONCE_DIGEST,
-                    serverIpTimeKey.getBytes(StandardCharsets.ISO_8859_1));
+            byte[] buffer =
+                    ConcurrentMessageDigest.digest(NONCE_DIGEST, serverIpTimeKey.getBytes(StandardCharsets.ISO_8859_1));
             String digestServerIpTimeKey = HexUtils.toHexString(buffer);
             if (!digestServerIpTimeKey.equals(digestclientIpTimeKey)) {
                 return false;
@@ -703,8 +705,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
                     ConcurrentMessageDigest.digest(algorithm.getJavaName(), a2.getBytes(StandardCharsets.ISO_8859_1));
             String digestA2 = HexUtils.toHexString(buffer);
 
-            return realm.authenticate(
-                    userName, response, nonce, nc, cnonce, qop, realmName, digestA2, algorithm.getJavaName());
+            return realm.authenticate(userName, response, nonce, nc, cnonce, qop, realmName, digestA2,
+                    algorithm.getJavaName());
         }
 
     }
