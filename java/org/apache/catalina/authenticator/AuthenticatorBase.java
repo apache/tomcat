@@ -611,8 +611,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 String originHeader = request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN);
                 if (originHeader != null && !originHeader.isEmpty() && RequestUtil.isValidOrigin(originHeader) &&
                         !RequestUtil.isSameOrigin(request, originHeader)) {
-                    String accessControlRequestMethodHeader = request
-                            .getHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
+                    String accessControlRequestMethodHeader =
+                            request.getHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
                     if (accessControlRequestMethodHeader != null && !accessControlRequestMethodHeader.isEmpty()) {
                         // This appears to be a CORS Preflight request
                         if (allowCorsPreflight == AllowCorsPreflight.ALWAYS) {
@@ -698,8 +698,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
         try {
             CallbackHandler callbackHandler = getCallbackHandler();
-            ServerAuthConfig serverAuthConfig = jaspicProvider.getServerAuthConfig("HttpServlet", jaspicAppContextID,
-                    callbackHandler);
+            ServerAuthConfig serverAuthConfig =
+                    jaspicProvider.getServerAuthConfig("HttpServlet", jaspicAppContextID, callbackHandler);
             String authContextID = serverAuthConfig.getAuthContextID(jaspicState.messageInfo);
             jaspicState.serverAuthContext = serverAuthConfig.getAuthContext(authContextID, null, null);
         } catch (AuthException e) {
@@ -1170,8 +1170,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             if (client != null) {
                 ServerAuthContext serverAuthContext;
                 try {
-                    ServerAuthConfig serverAuthConfig = provider.getServerAuthConfig("HttpServlet", jaspicAppContextID,
-                            getCallbackHandler());
+                    ServerAuthConfig serverAuthConfig =
+                            provider.getServerAuthConfig("HttpServlet", jaspicAppContextID, getCallbackHandler());
                     String authContextID = serverAuthConfig.getAuthContextID(messageInfo);
                     serverAuthContext = serverAuthConfig.getAuthContext(authContextID, null, null);
                     serverAuthContext.cleanSubject(messageInfo, client);

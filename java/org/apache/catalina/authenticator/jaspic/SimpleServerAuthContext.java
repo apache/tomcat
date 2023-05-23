@@ -26,10 +26,9 @@ import javax.security.auth.message.config.ServerAuthContext;
 import javax.security.auth.message.module.ServerAuthModule;
 
 /**
- * Basic implementation primarily intended for use when using third-party
- * {@link ServerAuthModule} implementations that only provide the module. This
- * implementation supports multiple modules and will treat the user as
- * authenticated if any one module is able to authenticate the user.
+ * Basic implementation primarily intended for use when using third-party {@link ServerAuthModule} implementations that
+ * only provide the module. This implementation supports multiple modules and will treat the user as authenticated if
+ * any one module is able to authenticate the user.
  */
 public class SimpleServerAuthContext implements ServerAuthContext {
 
@@ -43,8 +42,8 @@ public class SimpleServerAuthContext implements ServerAuthContext {
 
     @SuppressWarnings("unchecked") // JASPIC API uses raw types
     @Override
-    public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject,
-            Subject serviceSubject) throws AuthException {
+    public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject)
+            throws AuthException {
         for (int moduleIndex = 0; moduleIndex < modules.size(); moduleIndex++) {
             ServerAuthModule module = modules.get(moduleIndex);
             AuthStatus result = module.validateRequest(messageInfo, clientSubject, serviceSubject);
@@ -58,8 +57,7 @@ public class SimpleServerAuthContext implements ServerAuthContext {
 
 
     @Override
-    public AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject)
-            throws AuthException {
+    public AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject) throws AuthException {
         ServerAuthModule module = modules.get(((Integer) messageInfo.getMap().get("moduleIndex")).intValue());
         return module.secureResponse(messageInfo, serviceSubject);
     }
