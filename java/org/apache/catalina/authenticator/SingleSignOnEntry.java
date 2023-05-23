@@ -52,7 +52,7 @@ public class SingleSignOnEntry implements Serializable {
     // Marked as transient so special handling can be applied to serialization
     private transient Principal principal = null;
 
-    private final Map<SingleSignOnSessionKey, SingleSignOnSessionKey> sessionKeys = new ConcurrentHashMap<>();
+    private final Map<SingleSignOnSessionKey,SingleSignOnSessionKey> sessionKeys = new ConcurrentHashMap<>();
 
     private String username = null;
 
@@ -171,8 +171,8 @@ public class SingleSignOnEntry implements Serializable {
         this.authType = authType;
         this.username = username;
         this.password = password;
-        this.canReauthenticate = (HttpServletRequest.BASIC_AUTH.equals(authType) ||
-                HttpServletRequest.FORM_AUTH.equals(authType));
+        this.canReauthenticate =
+                (HttpServletRequest.BASIC_AUTH.equals(authType) || HttpServletRequest.FORM_AUTH.equals(authType));
     }
 
 
