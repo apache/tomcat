@@ -608,4 +608,38 @@ public class TestDefaultServlet extends TomcatBaseTest {
             return true;
         }
     }
+
+    /*
+     * Bug 66609
+     */
+    @Test
+    public void testXmlDirectoryListing() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default", new DefaultServlet());
+        defaultServlet.addInitParameter("listings", "true");
+        defaultServlet.addInitParameter("localXsltFile", "_listing.xslt");
+
+        ctxt.addServletMappingDecoded("/", "default");
+
+        tomcat.start();
+
+        Map<String,List<String>> resHeaders= new HashMap<>();
+        String path = "http://localhost:" + getPort() + "/bug66609/";
+        ByteChunk out = new ByteChunk();
+
+        int rc = getUrl(path, out, resHeaders);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        String length = resHeaders.get("Content-Length").get(0);
+        Assert.assertEquals(Long.parseLong(length), out.getLength());
+        out.recycle();
+
+        rc = headUrl(path, out, resHeaders);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals(0, out.getLength());
+        Assert.assertEquals(length, resHeaders.get("Content-Length").get(0));
+    }
 }
