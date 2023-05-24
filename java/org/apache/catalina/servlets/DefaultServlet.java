@@ -1680,7 +1680,7 @@ public class DefaultServlet extends HttpServlet {
               .append('\'');
             sb.append(" urlPath='")
               .append(rewrittenContextPath)
-              .append(rewriteUrl(directoryWebappPath + entry))
+              .append(Escape.xml(rewriteUrl(directoryWebappPath + entry)))
               .append(childResource.isDirectory()?"/":"")
               .append('\'');
             if (childResource.isFile()) {
