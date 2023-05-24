@@ -135,6 +135,11 @@
         Connectors to process requests received by those Connectors using
         virtual threads. (markt)
       </add>
+      <fix>
+        <bug>66609</bug>: Ensure that the default servlet correctly escapes
+        file names in directory listings when using XML output. Based on pull
+        request <pr>621</pr> by Alex Kachanov. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -864,6 +864,7 @@
         <exclude name="test/webapp-fragments/WEB-INF/classes/*.txt"/>
         <exclude name="test/webapp/bug49nnn/*.txt"/>
         <exclude name="test/webapp/bug53257/**/*.txt"/>
+        <exclude name="test/webapp/bug66609/*.txt"/>
         <exclude name="test/webresources/**/*.txt"/>
         <exclude name="**/*.mdl"/>
         <exclude name="**/*.pem"/>
@@ -912,8 +913,9 @@
         <exclude name=".*/**"/>
         <exclude name="**/*.pem"/>
         <!-- Exclude simple test files -->
-        <exclude name="webapp/bug53257/**/*.txt"/>
         <exclude name="webapp/bug49nnn/bug49464*"/>
+        <exclude name="webapp/bug53257/**/*.txt"/>
+        <exclude name="webapp/bug66609/*.txt"/>
         <exclude name="webapp-fragments/WEB-INF/classes/*.txt"/>
         <exclude name="webresources/**"/>
         <!-- Exclude test files with unusual encodings -->
