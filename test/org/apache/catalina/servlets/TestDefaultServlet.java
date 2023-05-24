@@ -578,6 +578,44 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
         tomcat.stop();
     }
+    
+    @Test
+    public void testBug66609() throws Exception {
+	
+	Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+
+        // app dir is relative to server home
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default",
+                "org.apache.catalina.servlets.DefaultServlet");
+        defaultServlet.addInitParameter("listings", "true");
+        defaultServlet.addInitParameter("localXsltFile", "_list.xsl");
+
+        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addMimeMapping("html", "text/html");
+
+        tomcat.start();
+	
+	Map<String,List<String>> resHeaders= new HashMap<>();
+        String path = "http://localhost:" + getPort() + "/bug66609/";
+        ByteChunk out = new ByteChunk();
+        
+        int rc = getUrl(path, out, resHeaders);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        String length = resHeaders.get("Content-Length").get(0);
+        Assert.assertEquals(Long.parseLong(length), out.getLength());
+        out.recycle();
+
+        rc = headUrl(path, out, resHeaders);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals(0, out.getLength());
+        Assert.assertEquals(length, resHeaders.get("Content-Length").get(0));
+
+        tomcat.stop();
+	
+    }
 
     public static int getUrl(String path, ByteChunk out,
             Map<String, List<String>> resHead) throws IOException {
