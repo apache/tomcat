@@ -40,14 +40,12 @@ import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.SAXException;
 
 /**
- * Utility class for the loading and saving of JASPIC persistent provider
- * registrations.
+ * Utility class for the loading and saving of JASPIC persistent provider registrations.
  */
 public final class PersistentProviderRegistrations {
 
     private static final Log log = LogFactory.getLog(PersistentProviderRegistrations.class);
-    private static final StringManager sm =
-            StringManager.getManager(PersistentProviderRegistrations.class);
+    private static final StringManager sm = StringManager.getManager(PersistentProviderRegistrations.class);
 
 
     private PersistentProviderRegistrations() {
@@ -100,15 +98,13 @@ public final class PersistentProviderRegistrations {
         // Remove left over temporary files if present
         if (configFileOld.exists()) {
             if (configFileOld.delete()) {
-                throw new SecurityException(sm.getString(
-                        "persistentProviderRegistrations.existsDeleteFail",
+                throw new SecurityException(sm.getString("persistentProviderRegistrations.existsDeleteFail",
                         configFileOld.getAbsolutePath()));
             }
         }
         if (configFileNew.exists()) {
             if (configFileNew.delete()) {
-                throw new SecurityException(sm.getString(
-                        "persistentProviderRegistrations.existsDeleteFail",
+                throw new SecurityException(sm.getString("persistentProviderRegistrations.existsDeleteFail",
                         configFileNew.getAbsolutePath()));
             }
         }
@@ -116,9 +112,7 @@ public final class PersistentProviderRegistrations {
         // Write out the providers to the temporary new file
         try (OutputStream fos = new FileOutputStream(configFileNew);
                 Writer writer = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
-            writer.write(
-                    "<?xml version='1.0' encoding='utf-8'?>\n" +
-                    "<jaspic-providers\n" +
+            writer.write("<?xml version='1.0' encoding='utf-8'?>\n" + "<jaspic-providers\n" +
                     "    xmlns=\"http://tomcat.apache.org/xml\"\n" +
                     "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                     "    xsi:schemaLocation=\"http://tomcat.apache.org/xml jaspic-providers.xsd\"\n" +
@@ -143,8 +137,7 @@ public final class PersistentProviderRegistrations {
         } catch (IOException e) {
             if (!configFileNew.delete()) {
                 Log log = LogFactory.getLog(PersistentProviderRegistrations.class);
-                log.warn(sm.getString("persistentProviderRegistrations.deleteFail",
-                        configFileNew.getAbsolutePath()));
+                log.warn(sm.getString("persistentProviderRegistrations.deleteFail", configFileNew.getAbsolutePath()));
             }
             throw new SecurityException(e);
         }
@@ -166,8 +159,7 @@ public final class PersistentProviderRegistrations {
         // Remove the old file
         if (configFileOld.exists() && !configFileOld.delete()) {
             Log log = LogFactory.getLog(PersistentProviderRegistrations.class);
-            log.warn(sm.getString("persistentProviderRegistrations.deleteFail",
-                    configFileOld.getAbsolutePath()));
+            log.warn(sm.getString("persistentProviderRegistrations.deleteFail", configFileOld.getAbsolutePath()));
         }
     }
 
@@ -205,6 +197,7 @@ public final class PersistentProviderRegistrations {
         public String getClassName() {
             return className;
         }
+
         public void setClassName(String className) {
             this.className = className;
         }
@@ -213,6 +206,7 @@ public final class PersistentProviderRegistrations {
         public String getLayer() {
             return layer;
         }
+
         public void setLayer(String layer) {
             this.layer = layer;
         }
@@ -221,6 +215,7 @@ public final class PersistentProviderRegistrations {
         public String getAppContext() {
             return appContext;
         }
+
         public void setAppContext(String appContext) {
             this.appContext = appContext;
         }
@@ -229,6 +224,7 @@ public final class PersistentProviderRegistrations {
         public String getDescription() {
             return description;
         }
+
         public void setDescription(String description) {
             this.description = description;
         }
@@ -240,16 +236,20 @@ public final class PersistentProviderRegistrations {
 
         /**
          * Used by IntrospectionUtils via reflection.
-         * @param name - the name of of the property to set on this object
+         *
+         * @param name  - the name of of the property to set on this object
          * @param value - the value to set
+         *
          * @see #addProperty(String, String)
          */
         public void setProperty(String name, String value) {
             addProperty(name, value);
         }
+
         void addProperty(String name, String value) {
             properties.put(name, value);
         }
+
         public Map<String,String> getProperties() {
             return properties;
         }
@@ -264,6 +264,7 @@ public final class PersistentProviderRegistrations {
         public String getName() {
             return name;
         }
+
         public void setName(String name) {
             this.name = name;
         }
@@ -272,6 +273,7 @@ public final class PersistentProviderRegistrations {
         public String getValue() {
             return value;
         }
+
         public void setValue(String value) {
             this.value = value;
         }

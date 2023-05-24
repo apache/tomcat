@@ -40,7 +40,6 @@ public final class URLEncoder implements Cloneable {
 
     public static final URLEncoder DEFAULT = new URLEncoder();
     public static final URLEncoder QUERY = new URLEncoder();
-    public static final URLEncoder XML = new URLEncoder();
 
     static {
         /*
@@ -96,8 +95,6 @@ public final class URLEncoder implements Cloneable {
         QUERY.addSafeCharacter('_');
         QUERY.addSafeCharacter('=');
         QUERY.addSafeCharacter('&');
-        
-        XML.addSafeCharacter('/');
     }
 
     //Array containing the safe characters set.
