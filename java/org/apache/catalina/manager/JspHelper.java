@@ -24,6 +24,7 @@ import java.util.Locale;
 
 import org.apache.catalina.Session;
 import org.apache.catalina.manager.util.SessionUtils;
+import org.apache.tomcat.util.security.Escape;
 
 
 /**
@@ -191,57 +192,26 @@ public class JspHelper {
     }
 
     /**
-     * Performs the following substring replacements
-     * (to facilitate output to XML/HTML pages):
+     * Performs the following substring replacements (to facilitate output to XML/HTML pages):
+     * <ul>
+     *   <li>&amp; -&gt; &amp;amp;</li>
+     *   <li>&lt; -&gt; &amp;lt;</li>
+     *   <li>&gt; -&gt; &amp;gt;</li>
+     *   <li>" -&gt; &amp;#034;</li>
+     *   <li>' -&gt; &amp;#039;</li>
+     * </ul>
      *
-     *    &amp; -&gt; &amp;amp;
-     *    &lt; -&gt; &amp;lt;
-     *    &gt; -&gt; &amp;gt;
-     *    " -&gt; &amp;#034;
-     *    ' -&gt; &amp;#039;
-     *
-     * See also OutSupport.writeEscapedXml().
      * @param buffer The XML to escape
+     *
      * @return the escaped XML
      */
-    @SuppressWarnings("null") // escapedBuffer cannot be null
     public static String escapeXml(String buffer) {
+
         if (buffer == null) {
             return "";
         }
-        int start = 0;
-        int length = buffer.length();
-        char[] arrayBuffer = buffer.toCharArray();
-        StringBuilder escapedBuffer = null;
 
-        for (int i = 0; i < length; i++) {
-            char c = arrayBuffer[i];
-            if (c <= HIGHEST_SPECIAL) {
-                char[] escaped = specialCharactersRepresentation[c];
-                if (escaped != null) {
-                    // create StringBuilder to hold escaped xml string
-                    if (start == 0) {
-                        escapedBuffer = new StringBuilder(length + 5);
-                    }
-                    // add unescaped portion
-                    if (start < i) {
-                        escapedBuffer.append(arrayBuffer,start,i-start);
-                    }
-                    start = i + 1;
-                    // add escaped xml
-                    escapedBuffer.append(escaped);
-                }
-            }
-        }
-        // no xml escaping was necessary
-        if (start == 0) {
-            return buffer;
-        }
-        // add rest of unescaped portion
-        if (start < length) {
-            escapedBuffer.append(arrayBuffer,start,length-start);
-        }
-        return escapedBuffer.toString();
+        return Escape.xml(buffer);
     }
 
     public static String formatNumber(long number) {
