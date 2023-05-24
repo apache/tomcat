@@ -232,9 +232,9 @@ public class OutputBuffer extends Writer {
             flushCharBuffer();
         }
 
-        if ((!coyoteResponse.isCommitted()) && (coyoteResponse.getContentLengthLong() == -1)) {
-            // If this didn't cause a commit of the response, the final content
-            // length can be calculated.
+        if (!coyoteResponse.isCommitted() && coyoteResponse.getContentLengthLong() == -1 &&
+                !coyoteResponse.getRequest().method().equals("HEAD")) {
+            // If this didn't cause a commit of the response, the final content length can be calculated.
             if (!coyoteResponse.isCommitted()) {
                 coyoteResponse.setContentLength(bb.remaining());
             }
