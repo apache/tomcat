@@ -782,10 +782,6 @@ public class DefaultServlet extends HttpServlet {
         return URLEncoder.DEFAULT.encode(path, StandardCharsets.UTF_8);
     }
     
-    protected String rewriteUrl(String path, URLEncoder encoder) {
-        return encoder.encode(path, StandardCharsets.UTF_8);
-    }
-
 
     /**
      * Serve the specified resource, optionally including the data content.
@@ -1654,7 +1650,7 @@ public class DefaultServlet extends HttpServlet {
               .append('\'');
             sb.append(" urlPath='")
               .append(rewrittenContextPath)
-              .append(rewriteUrl(directoryWebappPath + entry, URLEncoder.XML))
+              .append(Escape.xml(directoryWebappPath + entry))
               .append(childResource.isDirectory()?"/":"")
               .append('\'');
             if (childResource.isFile()) {
