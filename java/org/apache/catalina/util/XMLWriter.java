@@ -19,6 +19,8 @@ package org.apache.catalina.util;
 import java.io.IOException;
 import java.io.Writer;
 
+import org.apache.tomcat.util.security.Escape;
+
 /**
  * XMLWriter helper class.
  */
@@ -199,7 +201,7 @@ public class XMLWriter {
      * @param text Text to append
      */
     public void writeText(String text) {
-        buffer.append(text);
+        buffer.append(Escape.xml(text));
     }
 
 
