@@ -636,11 +636,10 @@ public class TestDefaultServlet extends TomcatBaseTest {
         String length = resHeaders.get("Content-Length").get(0);
         Assert.assertEquals(Long.parseLong(length), out.getLength());
         out.recycle();
-        resHeaders.clear();
 
         rc = headUrl(path, out, resHeaders);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertEquals(0, out.getLength());
-        Assert.assertNull(resHeaders.get("Content-Length"));
+        Assert.assertEquals(length, resHeaders.get("Content-Length").get(0));
     }
 }
