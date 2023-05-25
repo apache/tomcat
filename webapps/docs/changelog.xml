@@ -124,11 +124,6 @@
         file names in directory listings when using XML output. Based on pull
         request <pr>621</pr> by Alex Kachanov. (markt)
       </fix>
-      <fix>
-        When processing a HEAD request, do not set an HTTP response header for
-        Content-Length with the value zero if the Servlet does not set the
-        header. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
