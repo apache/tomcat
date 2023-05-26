@@ -19,8 +19,6 @@ package org.apache.catalina.filters;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
