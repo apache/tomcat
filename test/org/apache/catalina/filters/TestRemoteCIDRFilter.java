@@ -17,27 +17,19 @@
 
 package org.apache.catalina.filters;
 
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Map;
-
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterConfig;
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.unittest.TesterResponse;
-import org.apache.tomcat.unittest.TesterServletContext;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestRemoteCIDRFilter extends TomcatBaseTest {
 
@@ -146,43 +138,11 @@ public class TestRemoteCIDRFilter extends TomcatBaseTest {
         filterMap.addURLPatternDecoded(urlPattern);
         root.addFilterMap(filterMap);
 
-        FilterConfig filterConfig = generateFilterConfig(filterDef);
+        FilterConfig filterConfig = TesterFilterConfigs.generateFilterConfig(filterDef);
 
         remoteCIDRFilter.init(filterConfig);
 
         return remoteCIDRFilter;
-    }
-
-    private static FilterConfig generateFilterConfig(FilterDef filterDef) {
-
-        TesterServletContext mockServletContext = new TesterServletContext();
-        Map<String,String> parameters = filterDef.getParameterMap();
-
-        FilterConfig filterConfig = new FilterConfig() {
-
-            @Override
-            public String getFilterName() {
-                return filterDef.getFilterName();
-            }
-
-            @Override
-            public ServletContext getServletContext() {
-                return mockServletContext;
-            }
-
-            @Override
-            public String getInitParameter(String name) {
-
-                return parameters.get(name);
-            }
-
-            @Override
-            public Enumeration<String> getInitParameterNames() {
-                return Collections.enumeration(parameters.keySet());
-            }
-        };
-
-        return filterConfig;
     }
 
 }
