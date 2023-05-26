@@ -24,7 +24,6 @@ import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 import org.junit.Assert;
@@ -36,7 +35,6 @@ import org.apache.catalina.filters.TestRemoteIpFilter.MockHttpServletRequest;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.unittest.TesterResponse;
-import org.apache.tomcat.unittest.TesterServletContext;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 
@@ -104,7 +102,7 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         filterMap.addURLPatternDecoded("*");
         root.addFilterMap(filterMap);
 
-        FilterConfig filterConfig = generateFilterConfig(filterDef);
+        FilterConfig filterConfig = TesterFilterConfigs.generateFilterConfig(filterDef);
 
         rateLimitFilter.init(filterConfig);
 
@@ -167,38 +165,6 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         public int getStatus() {
             return status;
         }
-    }
-
-    private static FilterConfig generateFilterConfig(FilterDef filterDef) {
-
-        final TesterServletContext mockServletContext = new TesterServletContext();
-        final Map<String,String> parameters = filterDef.getParameterMap();
-
-        FilterConfig filterConfig = new FilterConfig() {
-
-            @Override
-            public String getFilterName() {
-                return "rate-limit-filter";
-            }
-
-            @Override
-            public ServletContext getServletContext() {
-                return mockServletContext;
-            }
-
-            @Override
-            public String getInitParameter(String name) {
-
-                return parameters.get(name);
-            }
-
-            @Override
-            public Enumeration<String> getInitParameterNames() {
-                return null;
-            }
-        };
-
-        return filterConfig;
     }
 
 }
