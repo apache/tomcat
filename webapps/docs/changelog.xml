@@ -124,6 +124,11 @@
         file names in directory listings when using XML output. Based on pull
         request <pr>621</pr> by Alex Kachanov. (markt)
       </fix>
+      <add>
+       <bug>66618</bug>: Add a numeric last modified field to the XML directory
+       listings produced by the default servlet to enable sorting in the XSLT.
+       Pull request <pr>622</pr> by Alex Kachanov. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
