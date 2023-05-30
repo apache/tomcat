@@ -17,6 +17,10 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -39,7 +43,8 @@ import org.apache.catalina.connector.Response;
  * <p>
  * <b>USAGE CONSTRAINT</b>: To work correctly it requires a PersistentManager.
  * <p>
- * <b>USAGE CONSTRAINT</b>: To work correctly it assumes only one request exists per session at any one time.
+ * <b>USAGE CONSTRAINT</b>: To work correctly, this valve enforces the requirement that only one request per session is
+ * processed at any one time.
  *
  * @author Jean-Frederic Clere
  */
@@ -54,14 +59,19 @@ public class PersistentValve extends ValveBase {
 
     protected Pattern filter = null;
 
-    // ------------------------------------------------------ Constructor
+    private ConcurrentMap<String,UsageCountingSemaphore> sessionToSemaphoreMap = new ConcurrentHashMap<>();
+
+    private boolean semaphoreFairness = true;
+
+    private boolean semaphoreBlockOnAcquire = true;
+
+    private boolean semaphoreAcquireUninterruptibly = true;
+
 
     public PersistentValve() {
         super(true);
     }
 
-
-    // --------------------------------------------------------- Public Methods
 
     @Override
     public void setContainer(Container container) {
@@ -100,99 +110,150 @@ public class PersistentValve extends ValveBase {
             return;
         }
 
-        // Update the session last access time for our session (if any)
         String sessionId = request.getRequestedSessionId();
-        Manager manager = context.getManager();
-        if (sessionId != null && manager instanceof StoreManager) {
-            Store store = ((StoreManager) manager).getStore();
-            if (store != null) {
-                Session session = null;
-                try {
-                    session = store.load(sessionId);
-                } catch (Exception e) {
-                    container.getLogger().error("deserializeError");
-                }
-                if (session != null) {
-                    if (!session.isValid() || isSessionStale(session, System.currentTimeMillis())) {
-                        if (container.getLogger().isDebugEnabled()) {
-                            container.getLogger().debug("session swapped in is invalid or expired");
-                        }
-                        session.expire();
-                        store.remove(sessionId);
+        UsageCountingSemaphore semaphore = null;
+        boolean mustReleaseSemaphore = true;
+
+        try {
+            // Acquire the per session semaphore
+            if (sessionId != null) {
+                semaphore = sessionToSemaphoreMap.compute(sessionId,
+                        (k,v) -> v == null ? new UsageCountingSemaphore(semaphoreFairness) : v.incrementUsageCount());
+                if (semaphoreBlockOnAcquire) {
+                    if (semaphoreAcquireUninterruptibly) {
+                        semaphore.acquireUninterruptibly();
                     } else {
-                        session.setManager(manager);
-                        // session.setId(sessionId); Only if new ???
-                        manager.add(session);
-                        // ((StandardSession)session).activate();
-                        session.access();
-                        session.endAccess();
+                        try {
+                            semaphore.acquire();
+                        } catch (InterruptedException e) {
+                            mustReleaseSemaphore = false;
+                            onSemaphoreNotAcquired(request, response);
+                            return;
+                        }
+                    }
+                } else {
+                    if (!semaphore.tryAcquire()) {
+                        onSemaphoreNotAcquired(request, response);
+                        return;
                     }
                 }
             }
-        }
-        if (container.getLogger().isDebugEnabled()) {
-            container.getLogger().debug("sessionId: " + sessionId);
-        }
 
-        // Ask the next valve to process the request.
-        getNext().invoke(request, response);
-
-        // If still processing async, don't try to store the session
-        if (!request.isAsync()) {
-            // Read the sessionid after the response.
-            // HttpSession hsess = hreq.getSession(false);
-            Session hsess;
-            try {
-                hsess = request.getSessionInternal(false);
-            } catch (Exception ex) {
-                hsess = null;
+            // Update the session last access time for our session (if any)
+            Manager manager = context.getManager();
+            if (sessionId != null && manager instanceof StoreManager) {
+                Store store = ((StoreManager) manager).getStore();
+                if (store != null) {
+                    Session session = null;
+                    try {
+                        session = store.load(sessionId);
+                    } catch (Exception e) {
+                        container.getLogger().error("deserializeError");
+                    }
+                    if (session != null) {
+                        if (!session.isValid() || isSessionStale(session, System.currentTimeMillis())) {
+                            if (container.getLogger().isDebugEnabled()) {
+                                container.getLogger().debug("session swapped in is invalid or expired");
+                            }
+                            session.expire();
+                            store.remove(sessionId);
+                        } else {
+                            session.setManager(manager);
+                            // session.setId(sessionId); Only if new ???
+                            manager.add(session);
+                            // ((StandardSession)session).activate();
+                            session.access();
+                            session.endAccess();
+                        }
+                    }
+                }
             }
-            String newsessionId = null;
-            if (hsess != null) {
-                newsessionId = hsess.getIdInternal();
-            }
-
             if (container.getLogger().isDebugEnabled()) {
-                container.getLogger().debug("newsessionId: " + newsessionId);
+                container.getLogger().debug("sessionId: " + sessionId);
             }
-            if (newsessionId != null) {
-                try {
-                    bind(context);
 
-                    /* store the session and remove it from the manager */
-                    if (manager instanceof StoreManager) {
-                        Session session = manager.findSession(newsessionId);
-                        Store store = ((StoreManager) manager).getStore();
-                        boolean stored = false;
-                        if (session != null) {
-                            synchronized (session) {
-                                if (store != null && session.isValid() &&
-                                        !isSessionStale(session, System.currentTimeMillis())) {
-                                    store.save(session);
-                                    ((StoreManager) manager).removeSuper(session);
-                                    session.recycle();
-                                    stored = true;
+            // Ask the next valve to process the request.
+            getNext().invoke(request, response);
+
+            // If still processing async, don't try to store the session
+            if (!request.isAsync()) {
+                // Read the sessionid after the response.
+                // HttpSession hsess = hreq.getSession(false);
+                Session hsess;
+                try {
+                    hsess = request.getSessionInternal(false);
+                } catch (Exception ex) {
+                    hsess = null;
+                }
+                String newsessionId = null;
+                if (hsess != null) {
+                    newsessionId = hsess.getIdInternal();
+                }
+
+                if (container.getLogger().isDebugEnabled()) {
+                    container.getLogger().debug("newsessionId: " + newsessionId);
+                }
+                if (newsessionId != null) {
+                    try {
+                        bind(context);
+
+                        /* store the session and remove it from the manager */
+                        if (manager instanceof StoreManager) {
+                            Session session = manager.findSession(newsessionId);
+                            Store store = ((StoreManager) manager).getStore();
+                            boolean stored = false;
+                            if (session != null) {
+                                synchronized (session) {
+                                    if (store != null && session.isValid() &&
+                                            !isSessionStale(session, System.currentTimeMillis())) {
+                                        store.save(session);
+                                        ((StoreManager) manager).removeSuper(session);
+                                        session.recycle();
+                                        stored = true;
+                                    }
                                 }
                             }
-                        }
-                        if (!stored) {
+                            if (!stored) {
+                                if (container.getLogger().isDebugEnabled()) {
+                                    container.getLogger()
+                                            .debug("newsessionId store: " + store + " session: " + session + " valid: " +
+                                                    (session == null ? "N/A" : Boolean.toString(session.isValid())) +
+                                                    " stale: " + isSessionStale(session, System.currentTimeMillis()));
+                                }
+                            }
+                        } else {
                             if (container.getLogger().isDebugEnabled()) {
-                                container.getLogger()
-                                        .debug("newsessionId store: " + store + " session: " + session + " valid: " +
-                                                (session == null ? "N/A" : Boolean.toString(session.isValid())) +
-                                                " stale: " + isSessionStale(session, System.currentTimeMillis()));
+                                container.getLogger().debug("newsessionId Manager: " + manager);
                             }
                         }
-                    } else {
-                        if (container.getLogger().isDebugEnabled()) {
-                            container.getLogger().debug("newsessionId Manager: " + manager);
-                        }
+                    } finally {
+                        unbind(context);
                     }
-                } finally {
-                    unbind(context);
                 }
             }
+        } finally {
+            if (semaphore != null) {
+                if (mustReleaseSemaphore) {
+                    semaphore.release();
+                }
+                sessionToSemaphoreMap.computeIfPresent(
+                        sessionId, (k,v) -> v.decrementAndGetUsageCount() == 0 ? null : v);
+            }
         }
+    }
+
+
+    /**
+     * Handle the case where a semaphore cannot be obtained. The default behaviour is to return a 429 (too many
+     * requests) status code.
+     *
+     * @param request   The request that will not be processed
+     * @param response  The response that will be used for this request
+     *
+     * @throws IOException If an I/O error occurs while working with the request or response
+     */
+    protected void onSemaphoreNotAcquired(Request request, Response response) throws IOException {
+        response.sendError(429);
     }
 
 
@@ -255,6 +316,79 @@ public class PersistentValve extends ValveBase {
             } catch (PatternSyntaxException pse) {
                 container.getLogger().error(sm.getString("persistentValve.filter.failure", filter), pse);
             }
+        }
+    }
+
+
+    public boolean isSemaphoreFairness() {
+        return semaphoreFairness;
+    }
+
+
+    public void setSemaphoreFairness(boolean semaphoreFairness) {
+        this.semaphoreFairness = semaphoreFairness;
+    }
+
+
+    public boolean isSemaphoreBlockOnAcquire() {
+        return semaphoreBlockOnAcquire;
+    }
+
+
+    public void setSemaphoreBlockOnAcquire(boolean semaphoreBlockOnAcquire) {
+        this.semaphoreBlockOnAcquire = semaphoreBlockOnAcquire;
+    }
+
+
+    public boolean isSemaphoreAcquireUninterruptibly() {
+        return semaphoreAcquireUninterruptibly;
+    }
+
+
+    public void setSemaphoreAcquireUninterruptibly(boolean semaphoreAcquireUninterruptibly) {
+        this.semaphoreAcquireUninterruptibly = semaphoreAcquireUninterruptibly;
+    }
+
+
+    /*
+     * The PersistentValve uses a per session semaphore to ensure that only one request accesses a session at a time.
+     * To limit the size of the session ID to Semaphore map, the Semaphores are created when required and destroyed
+     * (made eligible for GC) as soon as they are not required. Tracking usage in a thread-safe way requires a usage
+     * counter that does not block. The Semaphore's internal tracking can't be used because the only way to increment
+     * usage is via the acquire methods and they block. Therefore, this class was created which uses a separate
+     * AtomicLong long to track usage.
+     */
+    private static class UsageCountingSemaphore {
+        private final AtomicLong usageCount = new AtomicLong(1);
+        private final Semaphore semaphore;
+
+        private UsageCountingSemaphore(boolean fairness) {
+            semaphore = new Semaphore(1, fairness);
+        }
+
+        private UsageCountingSemaphore incrementUsageCount() {
+            usageCount.incrementAndGet();
+            return this;
+        }
+
+        private long decrementAndGetUsageCount() {
+            return usageCount.decrementAndGet();
+        }
+
+        private void acquire() throws InterruptedException {
+            semaphore.acquire();
+        }
+
+        private void acquireUninterruptibly() {
+            semaphore.acquireUninterruptibly();
+        }
+
+        private boolean tryAcquire() {
+            return semaphore.tryAcquire();
+        }
+
+        private void release() {
+            semaphore.release();
         }
     }
 }
