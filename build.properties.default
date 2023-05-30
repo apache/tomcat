@@ -167,7 +167,7 @@ jdt.loc.2=http://download.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ec
 
 # ----- Tomcat native library -----
 tomcat-native.version=1.2.36
-tomcat-native-openssl.version=1.1.1u
+tomcat-native-openssl.version=1.1.1t
 tomcat-native.src.checksum.enabled=true
 tomcat-native.src.checksum.algorithm=SHA-512
 tomcat-native.src.checksum.value=ae89a872b8331035e01387665539a0c08096ae1abdb5dc7a25a197650a641ba3637f01437f1bee27b442c1c59c4d2fe2e5679d1595e8c5d121b9b219da2fb094
