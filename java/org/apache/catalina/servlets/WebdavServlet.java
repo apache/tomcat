@@ -871,9 +871,7 @@ public class WebdavServlet extends DefaultServlet {
 
         int lockDuration = DEFAULT_TIMEOUT;
         String lockDurationStr = req.getHeader("Timeout");
-        if (lockDurationStr == null) {
-            lockDuration = DEFAULT_TIMEOUT;
-        } else {
+        if (lockDurationStr != null) {
             int commaPos = lockDurationStr.indexOf(',');
             // If multiple timeouts, just use the first
             if (commaPos != -1) {
