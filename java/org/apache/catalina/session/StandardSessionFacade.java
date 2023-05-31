@@ -87,8 +87,7 @@ public class StandardSessionFacade implements HttpSession {
 
 
     /**
-     * @deprecated As of Version 2.1, this method is deprecated and has no
-     *             replacement.
+     * @deprecated As of Version 2.1, this method is deprecated and has no replacement.
      */
     @Override
     @Deprecated
@@ -104,8 +103,7 @@ public class StandardSessionFacade implements HttpSession {
 
 
     /**
-     * @deprecated As of Version 2.2, this method is replaced by
-     *             {@link #getAttribute}.
+     * @deprecated As of Version 2.2, this method is replaced by {@link #getAttribute}.
      */
     @Override
     @Deprecated
@@ -121,8 +119,7 @@ public class StandardSessionFacade implements HttpSession {
 
 
     /**
-     * @deprecated As of Version 2.2, this method is replaced by
-     *             {@link #getAttributeNames}
+     * @deprecated As of Version 2.2, this method is replaced by {@link #getAttributeNames}
      */
     @Override
     @Deprecated
@@ -138,8 +135,7 @@ public class StandardSessionFacade implements HttpSession {
 
 
     /**
-     * @deprecated As of Version 2.2, this method is replaced by
-     *             {@link #setAttribute}
+     * @deprecated As of Version 2.2, this method is replaced by {@link #setAttribute}
      */
     @Override
     @Deprecated
@@ -155,8 +151,7 @@ public class StandardSessionFacade implements HttpSession {
 
 
     /**
-     * @deprecated As of Version 2.2, this method is replaced by
-     *             {@link #removeAttribute}
+     * @deprecated As of Version 2.2, this method is replaced by {@link #removeAttribute}
      */
     @Override
     @Deprecated
