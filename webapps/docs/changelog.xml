@@ -137,6 +137,12 @@
         <bug>66621</bug>: Attempts to lock a collection with WebDAV may
         incorrectly fail if a child collection has an expired lock. (markt)
       </fix>
+      <fix>
+        <bug>66622</bug>: Deprecate the <code>xssProtectionEnabled</code>
+        setting from the <code>HttpHeaderSecurityFilter</code> and change the
+        default value to <code>false</code> as support for the associated HTTP
+        header has been removed from all major browsers. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
