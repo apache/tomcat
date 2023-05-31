@@ -665,7 +665,7 @@ public class DataSourceStore extends StoreBase {
         if (dataSourceName != null && dataSource == null) {
             org.apache.catalina.Context context = getManager().getContext();
             ClassLoader oldThreadContextCL = null;
-            if (localDataSource) {
+            if (getLocalDataSource()) {
                 oldThreadContextCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
             }
 
@@ -677,7 +677,7 @@ public class DataSourceStore extends StoreBase {
             } catch (NamingException e) {
                 context.getLogger().error(sm.getString(getStoreName() + ".wrongDataSource", this.dataSourceName), e);
             } finally {
-                if (localDataSource) {
+                if (getLocalDataSource()) {
                     context.unbind(Globals.IS_SECURITY_ENABLED, oldThreadContextCL);
                 }
             }
