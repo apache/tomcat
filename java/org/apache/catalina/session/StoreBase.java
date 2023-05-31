@@ -33,8 +33,8 @@ import org.apache.catalina.util.ToStringUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Abstract implementation of the {@link Store} interface to
- * support most of the functionality required by a {@link Store}.
+ * Abstract implementation of the {@link Store} interface to support most of the functionality required by a
+ * {@link Store}.
  *
  * @author Bip Thelin
  */
@@ -117,27 +117,24 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     }
 
     /**
-     * Get only those keys of sessions, that are saved in the Store and are to
-     * be expired.
+     * Get only those keys of sessions, that are saved in the Store and are to be expired.
      *
      * @return list of session keys, that are to be expired
-     * @throws IOException
-     *             if an input-/output error occurred
+     *
+     * @throws IOException if an input-/output error occurred
      */
     public String[] expiredKeys() throws IOException {
         return keys();
     }
 
     /**
-     * Called by our background reaper thread to check if Sessions
-     * saved in our store are subject of being expired. If so expire
-     * the Session and remove it from the Store.
-     *
+     * Called by our background reaper thread to check if Sessions saved in our store are subject of being expired. If
+     * so expire the Session and remove it from the Store.
      */
     public void processExpires() {
         String[] keys = null;
 
-        if(!getState().isAvailable()) {
+        if (!getState().isAvailable()) {
             return;
         }
 
@@ -148,7 +145,8 @@ public abstract class StoreBase extends LifecycleBase implements Store {
             return;
         }
         if (manager.getContext().getLogger().isDebugEnabled()) {
-            manager.getContext().getLogger().debug(getStoreName()+ ": processExpires check number of " + keys.length + " sessions" );
+            manager.getContext().getLogger()
+                    .debug(getStoreName() + ": processExpires check number of " + keys.length + " sessions");
         }
 
         long timeNow = System.currentTimeMillis();
@@ -164,7 +162,8 @@ public abstract class StoreBase extends LifecycleBase implements Store {
                     continue;
                 }
                 if (manager.getContext().getLogger().isDebugEnabled()) {
-                    manager.getContext().getLogger().debug(getStoreName() + ": processExpires expire store session " + key);
+                    manager.getContext().getLogger()
+                            .debug(getStoreName() + ": processExpires expire store session " + key);
                 }
                 boolean isLoaded = false;
                 if (manager instanceof PersistentManagerBase) {
@@ -201,15 +200,12 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     // --------------------------------------------------------- Protected Methods
 
     /**
-     * Create the object input stream to use to read a session from the store.
-     * Sub-classes <b>must</b> have set the thread context class loader before
-     * calling this method.
+     * Create the object input stream to use to read a session from the store. Sub-classes <b>must</b> have set the
+     * thread context class loader before calling this method.
      *
-     * @param is The input stream provided by the sub-class that will provide
-     *           the data for a session
+     * @param is The input stream provided by the sub-class that will provide the data for a session
      *
-     * @return An appropriately configured ObjectInputStream from which the
-     *         session can be read.
+     * @return An appropriately configured ObjectInputStream from which the session can be read.
      *
      * @throws IOException if a problem occurs creating the ObjectInputStream
      */
@@ -239,11 +235,10 @@ public abstract class StoreBase extends LifecycleBase implements Store {
 
 
     /**
-     * Start this component and implement the requirements
-     * of {@link LifecycleBase#startInternal()}.
+     * Start this component and implement the requirements of {@link LifecycleBase#startInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
+     *                                   used
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
@@ -253,11 +248,10 @@ public abstract class StoreBase extends LifecycleBase implements Store {
 
 
     /**
-     * Stop this component and implement the requirements
-     * of {@link LifecycleBase#stopInternal()}.
+     * Stop this component and implement the requirements of {@link LifecycleBase#stopInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
+     *                                   used
      */
     @Override
     protected synchronized void stopInternal() throws LifecycleException {
