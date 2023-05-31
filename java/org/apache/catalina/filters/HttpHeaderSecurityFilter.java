@@ -61,9 +61,12 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     private boolean blockContentTypeSniffingEnabled = true;
 
     // Cross-site scripting filter protection
+    @Deprecated
     private static final String XSS_PROTECTION_HEADER_NAME = "X-XSS-Protection";
+    @Deprecated
     private static final String XSS_PROTECTION_HEADER_VALUE = "1; mode=block";
-    private boolean xssProtectionEnabled = true;
+    @Deprecated
+    private boolean xssProtectionEnabled = false;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -238,11 +241,13 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     }
 
 
+    @Deprecated
     public boolean isXssProtectionEnabled() {
         return xssProtectionEnabled;
     }
 
 
+    @Deprecated
     public void setXssProtectionEnabled(boolean xssProtectionEnabled) {
         this.xssProtectionEnabled = xssProtectionEnabled;
     }
