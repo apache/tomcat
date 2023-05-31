@@ -1662,8 +1662,8 @@ public class DefaultServlet extends HttpServlet {
               .append(childResource.getLastModifiedHttp())
               .append('\'');
             sb.append(" longDate='")
-            .append(childResource.getLastModified())
-            .append('\'');
+              .append(childResource.getLastModified())
+              .append('\'');
 
             sb.append('>');
             sb.append(Escape.htmlElementContent(entry));
