@@ -1058,7 +1058,7 @@ public class WebdavServlet extends DefaultServlet {
                 List<String> lockPaths = new ArrayList<>();
                 for (LockInfo currentLock : collectionLocks) {
                     if (currentLock.hasExpired()) {
-                        resourceLocks.remove(currentLock.path);
+                        collectionLocks.remove(currentLock);
                         continue;
                     }
                     if (currentLock.path.startsWith(lock.path) &&

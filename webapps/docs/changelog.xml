@@ -145,6 +145,10 @@
        listings produced by the default servlet to enable sorting in the XSLT.
        Pull request <pr>622</pr> by Alex Kachanov. (markt)
       </add>
+      <fix>
+        <bug>66621</bug>: Attempts to lock a collection with WebDAV may
+        incorrectly fail if a child collection has an expired lock. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
