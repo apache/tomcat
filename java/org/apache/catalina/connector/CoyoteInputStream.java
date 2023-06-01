@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.Objects;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
@@ -169,6 +170,7 @@ public class CoyoteInputStream extends ServletInputStream {
      * @throws IOException if an input or output exception has occurred
      */
     public int read(final ByteBuffer b) throws IOException {
+        Objects.requireNonNull(b);
         checkNonBlockingRead();
 
         if (SecurityUtil.isPackageProtectionEnabled()) {

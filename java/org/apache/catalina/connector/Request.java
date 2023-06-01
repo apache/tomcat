@@ -85,6 +85,7 @@ import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.mapper.MappingData;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.util.ParameterMap;
+import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.TLSUtil;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.coyote.ActionCode;
@@ -132,7 +133,6 @@ public class Request implements HttpServletRequest {
 
     private static final Log log = LogFactory.getLog(Request.class);
 
-    // ----------------------------------------------------------- Constructors
 
     public Request() {
         formats = new SimpleDateFormat[formatsTemplate.length];
@@ -1235,6 +1235,7 @@ public class Request implements HttpServletRequest {
         }
 
         usingReader = true;
+
         inputBuffer.checkConverter();
         if (reader == null) {
             reader = new CoyoteReader(inputBuffer);
@@ -1988,13 +1989,6 @@ public class Request implements HttpServletRequest {
     }
 
 
-    // --------------------------------------------- HttpServletRequest Methods
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since Servlet 3.1
-     */
     @SuppressWarnings("unchecked")
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass)
@@ -2382,24 +2376,7 @@ public class Request implements HttpServletRequest {
 
     @Override
     public StringBuffer getRequestURL() {
-
-        StringBuffer url = new StringBuffer();
-        String scheme = getScheme();
-        int port = getServerPort();
-        if (port < 0) {
-            port = 80; // Work around java.net.URL bug
-        }
-
-        url.append(scheme);
-        url.append("://");
-        url.append(getServerName());
-        if ((scheme.equals("http") && (port != 80)) || (scheme.equals("https") && (port != 443))) {
-            url.append(':');
-            url.append(port);
-        }
-        url.append(getRequestURI());
-
-        return url;
+        return RequestUtil.getRequestURL(this);
     }
 
 
