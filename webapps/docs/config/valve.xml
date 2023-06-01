@@ -2636,6 +2636,27 @@
         <code>java.util.regex</code>.</p>
       </attribute>
 
+      <attribute name="semaphoreAcquireUninterruptibly" required="false">
+        <p>Flag to determine if a thread that blocks waiting for the per session
+        Semaphore should do so uninterruptibly. Has no effect if
+        <strong>semaphoreBlockOnAcquire</strong> is <code>false</code>. If not
+        specified, the default value of <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="semaphoreBlockOnAcquire" required="false">
+        <p>Flag to determine if a thread that wishes to acquire the per session
+        Semaphore when it is held by another thread should block until it can
+        acquire the Semaphore or if the waiting request be rejected. If not
+        specified, the default value of <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="semaphoreFairness" required="false">
+        <p>Flag to determine if the per session Semaphore will grant requests
+        for the Semaphore in the same order they were received. Has no effect if
+        <strong>semaphoreBlockOnAcquire</strong> is <code>false</code>. If not
+        specified, the default value of <code>true</code> will be used.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>
