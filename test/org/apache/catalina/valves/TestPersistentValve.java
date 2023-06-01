@@ -70,7 +70,7 @@ public class TestPersistentValve {
     }
 
 
-    private class TesterValve extends ValveBase {
+    private static class TesterValve extends ValveBase {
 
         private static AtomicInteger maximumConcurrency = new AtomicInteger();
         private static AtomicInteger concurrency = new AtomicInteger();
