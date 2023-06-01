@@ -124,9 +124,11 @@
         21. (markt)
       </add>
       <fix>
-        <bug>66513</bug>: Partial fix that adds a per session Semaphore to the
+        <bug>66513</bug>: Add a per session Semaphore to the
         <code>PersistentValve</code> that ensures that, within a single Tomcat
-        instance, there is no more than one concurrent request per session.
+        instance, there is no more than one concurrent request per session. Also
+        expand the debug logging to include whether a request bypasses the Valve
+        and the reason if a request fails to obtain the per session Semaphore.
         (markt)
       </fix>
       <fix>
