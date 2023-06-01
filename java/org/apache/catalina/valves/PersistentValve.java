@@ -117,8 +117,13 @@ public class PersistentValve extends ValveBase {
 
         // request without session
         if (isRequestWithoutSession(request.getDecodedRequestURI())) {
+            if (containerLog.isDebugEnabled()) {
+                containerLog.debug(sm.getString("persistentValve.requestIgnore", request.getDecodedRequestURI()));
+            }
             getNext().invoke(request, response);
             return;
+        } else if (containerLog.isDebugEnabled()) {
+            containerLog.debug(sm.getString("persistentValve.requestProcess", request.getDecodedRequestURI()));
         }
 
         // Select the Context to be used for this Request
@@ -153,12 +158,18 @@ public class PersistentValve extends ValveBase {
                         } catch (InterruptedException e) {
                             mustReleaseSemaphore = false;
                             onSemaphoreNotAcquired(request, response);
+                            if (containerLog.isDebugEnabled()) {
+                                containerLog.debug(sm.getString("persistentValve.acquireInterrupted", request.getDecodedRequestURI()));
+                            }
                             return;
                         }
                     }
                 } else {
                     if (!semaphore.tryAcquire()) {
                         onSemaphoreNotAcquired(request, response);
+                        if (containerLog.isDebugEnabled()) {
+                            containerLog.debug(sm.getString("persistentValve.acquireFailed", request.getDecodedRequestURI()));
+                        }
                         return;
                     }
                 }
@@ -173,12 +184,12 @@ public class PersistentValve extends ValveBase {
                     try {
                         session = store.load(sessionId);
                     } catch (Exception e) {
-                        container.getLogger().error("deserializeError");
+                        containerLog.error("deserializeError");
                     }
                     if (session != null) {
                         if (!session.isValid() || isSessionStale(session, System.currentTimeMillis())) {
-                            if (container.getLogger().isDebugEnabled()) {
-                                container.getLogger().debug("session swapped in is invalid or expired");
+                            if (containerLog.isDebugEnabled()) {
+                                containerLog.debug("session swapped in is invalid or expired");
                             }
                             session.expire();
                             store.remove(sessionId);
@@ -193,8 +204,8 @@ public class PersistentValve extends ValveBase {
                     }
                 }
             }
-            if (container.getLogger().isDebugEnabled()) {
-                container.getLogger().debug("sessionId: " + sessionId);
+            if (containerLog.isDebugEnabled()) {
+                containerLog.debug("sessionId: " + sessionId);
             }
 
             // Ask the next valve to process the request.
@@ -215,8 +226,8 @@ public class PersistentValve extends ValveBase {
                     newsessionId = hsess.getIdInternal();
                 }
 
-                if (container.getLogger().isDebugEnabled()) {
-                    container.getLogger().debug("newsessionId: " + newsessionId);
+                if (containerLog.isDebugEnabled()) {
+                    containerLog.debug("newsessionId: " + newsessionId);
                 }
                 if (newsessionId != null) {
                     try {
@@ -238,8 +249,8 @@ public class PersistentValve extends ValveBase {
 
                             }
                             if (!stored) {
-                                if (container.getLogger().isDebugEnabled()) {
-                                    container.getLogger()
+                                if (containerLog.isDebugEnabled()) {
+                                    containerLog
                                             .debug("newsessionId store: " + store + " session: " + session +
                                                     " valid: " +
                                                     (session == null ? "N/A" : Boolean.toString(session.isValid())) +
@@ -247,8 +258,8 @@ public class PersistentValve extends ValveBase {
                                 }
                             }
                         } else {
-                            if (container.getLogger().isDebugEnabled()) {
-                                container.getLogger().debug("newsessionId Manager: " + manager);
+                            if (containerLog.isDebugEnabled()) {
+                                containerLog.debug("newsessionId Manager: " + manager);
                             }
                         }
                     } finally {
