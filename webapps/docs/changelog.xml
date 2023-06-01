@@ -169,6 +169,9 @@
       <add>
         Improvements to French translations. (remm)
       </add>
+      <update>
+        Update Checkstyle to 10.12.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
