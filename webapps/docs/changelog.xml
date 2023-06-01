@@ -124,6 +124,12 @@
         21. (markt)
       </add>
       <fix>
+        <bug>66513</bug>: Partial fix that adds a per session Semaphore to the
+        <code>PersistentValve</code> that ensures that, within a single Tomcat
+        instance, there is no more than one concurrent request per session.
+        (markt)
+      </fix>
+      <fix>
         <bug>66609</bug>: Ensure that the default servlet correctly escapes
         file names in directory listings when using XML output. Based on pull
         request <pr>621</pr> by Alex Kachanov. (markt)
