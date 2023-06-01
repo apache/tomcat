@@ -24,6 +24,8 @@ package org.apache.catalina.session;
  * <li>Fault tolerance, keep sessions backed up on disk to allow recovery in the event of unplanned restarts.</li>
  * <li>Limit the number of active sessions kept in memory by swapping less active sessions out to disk.</li>
  * </ul>
+ * If used with a load-balancer, the load-balancer must be configured to use sticky sessions for this manager to operate
+ * correctly.
  *
  * @author Kief Morris (kief@kief.com)
  */
