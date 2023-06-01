@@ -1568,8 +1568,8 @@ public class Response implements HttpServletResponse {
             if (!file.startsWith(contextPath)) {
                 return false;
             }
-            String tok = ";" + SessionConfig.getSessionUriParamName(request.getContext()) + "=" +
-                    session.getIdInternal();
+            String tok =
+                    ";" + SessionConfig.getSessionUriParamName(request.getContext()) + "=" + session.getIdInternal();
             if (file.indexOf(tok, contextPath.length()) >= 0) {
                 return false;
             }
