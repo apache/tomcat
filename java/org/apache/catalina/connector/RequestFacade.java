@@ -65,10 +65,10 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    private final class GetParameterMapPrivilegedAction implements PrivilegedAction<Map<String, String[]>> {
+    private final class GetParameterMapPrivilegedAction implements PrivilegedAction<Map<String,String[]>> {
 
         @Override
-        public Map<String, String[]> run() {
+        public Map<String,String[]> run() {
             return request.getParameterMap();
         }
     }
@@ -347,7 +347,7 @@ public class RequestFacade implements HttpServletRequest {
 
 
     @Override
-    public Map<String, String[]> getParameterMap() {
+    public Map<String,String[]> getParameterMap() {
         checkFacade();
 
         if (Globals.IS_SECURITY_ENABLED) {
@@ -846,7 +846,7 @@ public class RequestFacade implements HttpServletRequest {
 
 
     @Override
-    public Map<String, String> getTrailerFields() {
+    public Map<String,String> getTrailerFields() {
         checkFacade();
         return request.getTrailerFields();
     }

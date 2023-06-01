@@ -63,8 +63,8 @@ public class Connector extends LifecycleMBeanBase {
     /**
      * Alternate flag to enable recycling of facades.
      */
-    public static final boolean RECYCLE_FACADES = Boolean
-            .parseBoolean(System.getProperty("org.apache.catalina.connector.RECYCLE_FACADES", "false"));
+    public static final boolean RECYCLE_FACADES =
+            Boolean.parseBoolean(System.getProperty("org.apache.catalina.connector.RECYCLE_FACADES", "false"));
 
 
     public static final String INTERNAL_EXECUTOR_NAME = "Internal";
@@ -257,8 +257,8 @@ public class Connector extends LifecycleMBeanBase {
      * The behavior when an encoded solidus (slash) is submitted.
      */
     @SuppressWarnings("deprecation")
-    private EncodedSolidusHandling encodedSolidusHandling = UDecoder.ALLOW_ENCODED_SLASH ? EncodedSolidusHandling.DECODE
-            : EncodedSolidusHandling.REJECT;
+    private EncodedSolidusHandling encodedSolidusHandling =
+            UDecoder.ALLOW_ENCODED_SLASH ? EncodedSolidusHandling.DECODE : EncodedSolidusHandling.REJECT;
 
 
     /**
