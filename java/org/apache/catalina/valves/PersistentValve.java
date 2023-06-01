@@ -287,8 +287,7 @@ public class PersistentValve extends ValveBase {
 
 
     /**
-     * Indicate whether the session has been idle for longer than its expiration date as of the supplied time. FIXME:
-     * Probably belongs in the Session class.
+     * Indicate whether the session has been idle for longer than its expiration date as of the supplied time.
      *
      * @param session The session to check
      * @param timeNow The current time to check for
@@ -299,7 +298,7 @@ public class PersistentValve extends ValveBase {
 
         if (session != null) {
             int maxInactiveInterval = session.getMaxInactiveInterval();
-            if (maxInactiveInterval >= 0) {
+            if (maxInactiveInterval > 0) {
                 int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
                 if (timeIdle >= maxInactiveInterval) {
                     return true;
