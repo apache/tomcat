@@ -1081,13 +1081,13 @@ public class Response implements HttpServletResponse {
 
 
     @Override
-    public void setTrailerFields(Supplier<Map<String, String>> supplier) {
+    public void setTrailerFields(Supplier<Map<String,String>> supplier) {
         getCoyoteResponse().setTrailerFields(supplier);
     }
 
 
     @Override
-    public Supplier<Map<String, String>> getTrailerFields() {
+    public Supplier<Map<String,String>> getTrailerFields() {
         return getCoyoteResponse().getTrailerFields();
     }
 
@@ -1429,8 +1429,8 @@ public class Response implements HttpServletResponse {
         }
 
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            Boolean result = AccessController
-                    .doPrivileged(new PrivilegedDoIsEncodable(getContext(), hreq, session, location));
+            Boolean result =
+                    AccessController.doPrivileged(new PrivilegedDoIsEncodable(getContext(), hreq, session, location));
             return result.booleanValue();
         } else {
             return doIsEncodeable(getContext(), hreq, session, location);
