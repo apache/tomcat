@@ -113,7 +113,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     // ----------------------------------------------- Class/Instance Variables
 
-
     /**
      * The string manager for this package.
      */
@@ -447,9 +446,9 @@ public class ResponseFacade implements HttpServletResponse {
 
 
     @Override
-    public void setCharacterEncoding(String arg0) {
+    public void setCharacterEncoding(String encoding) {
         checkFacade();
-        response.setCharacterEncoding(arg0);
+        response.setCharacterEncoding(encoding);
     }
 
     @Override

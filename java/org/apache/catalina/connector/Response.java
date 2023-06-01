@@ -746,10 +746,10 @@ public class Response implements HttpServletResponse {
      * Overrides the name of the character encoding used in the body of the request. This method must be called prior to
      * reading request parameters or reading input using getReader().
      *
-     * @param charset String containing the name of the character encoding.
+     * @param encoding String containing the name of the character encoding.
      */
     @Override
-    public void setCharacterEncoding(String charset) {
+    public void setCharacterEncoding(String encoding) {
 
         if (isCommitted()) {
             return;
@@ -767,12 +767,12 @@ public class Response implements HttpServletResponse {
         }
 
         try {
-            getCoyoteResponse().setCharacterEncoding(charset);
+            getCoyoteResponse().setCharacterEncoding(encoding);
         } catch (UnsupportedEncodingException e) {
-            log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
+            log.warn(sm.getString("coyoteResponse.encoding.invalid", encoding), e);
             return;
         }
-        if (charset == null) {
+        if (encoding == null) {
             isCharacterEncodingSet = false;
         } else {
             isCharacterEncodingSet = true;
@@ -1213,14 +1213,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Send a temporary redirect to the specified redirect location URL.
-     *
-     * @param location Location URL to redirect to
-     *
-     * @exception IllegalStateException if this response has already been committed
-     * @exception IOException           if an input/output error occurs
-     */
     @Override
     public void sendRedirect(String location) throws IOException {
         sendRedirect(location, SC_FOUND);
