@@ -51,7 +51,7 @@ public class OutputBuffer extends Writer {
     /**
      * Encoder cache.
      */
-    private final Map<Charset, C2BConverter> encoders = new HashMap<>();
+    private final Map<Charset,C2BConverter> encoders = new HashMap<>();
 
 
     /**

@@ -65,7 +65,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     /**
      * Encoder cache.
      */
-    private static final Map<Charset, SynchronizedStack<B2CConverter>> encoders = new ConcurrentHashMap<>();
+    private static final Map<Charset,SynchronizedStack<B2CConverter>> encoders = new ConcurrentHashMap<>();
 
     // ----------------------------------------------------- Instance Variables
 

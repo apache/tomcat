@@ -1090,13 +1090,13 @@ public class Response implements HttpServletResponse {
 
 
     @Override
-    public void setTrailerFields(Supplier<Map<String, String>> supplier) {
+    public void setTrailerFields(Supplier<Map<String,String>> supplier) {
         getCoyoteResponse().setTrailerFields(supplier);
     }
 
 
     @Override
-    public Supplier<Map<String, String>> getTrailerFields() {
+    public Supplier<Map<String,String>> getTrailerFields() {
         return getCoyoteResponse().getTrailerFields();
     }
 

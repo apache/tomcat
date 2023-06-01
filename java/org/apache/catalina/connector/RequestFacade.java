@@ -169,7 +169,7 @@ public class RequestFacade implements HttpServletRequest {
 
 
     @Override
-    public Map<String, String[]> getParameterMap() {
+    public Map<String,String[]> getParameterMap() {
         checkFacade();
         return request.getParameterMap();
     }
@@ -595,7 +595,7 @@ public class RequestFacade implements HttpServletRequest {
 
 
     @Override
-    public Map<String, String> getTrailerFields() {
+    public Map<String,String> getTrailerFields() {
         checkFacade();
         return request.getTrailerFields();
     }

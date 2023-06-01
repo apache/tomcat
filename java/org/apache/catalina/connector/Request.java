@@ -195,7 +195,7 @@ public class Request implements HttpServletRequest {
     /**
      * The attributes associated with this Request, keyed by attribute name.
      */
-    private final Map<String, Object> attributes = new ConcurrentHashMap<>();
+    private final Map<String,Object> attributes = new ConcurrentHashMap<>();
 
 
     /**
@@ -214,7 +214,7 @@ public class Request implements HttpServletRequest {
     /**
      * Internal notes associated with this request by Catalina components and event listeners.
      */
-    private final transient HashMap<String, Object> notes = new HashMap<>();
+    private final transient HashMap<String,Object> notes = new HashMap<>();
 
 
     /**
@@ -305,7 +305,7 @@ public class Request implements HttpServletRequest {
     /**
      * Hash map used in the getParametersMap method.
      */
-    protected ParameterMap<String, String[]> parameterMap = new ParameterMap<>();
+    protected ParameterMap<String,String[]> parameterMap = new ParameterMap<>();
 
 
     /**
@@ -1091,7 +1091,7 @@ public class Request implements HttpServletRequest {
      * @return A <code>Map</code> containing parameter names as keys and parameter values as map values.
      */
     @Override
-    public Map<String, String[]> getParameterMap() {
+    public Map<String,String[]> getParameterMap() {
 
         if (parameterMap.isLocked()) {
             return parameterMap;
@@ -1522,8 +1522,8 @@ public class Request implements HttpServletRequest {
         if ((listeners == null) || (listeners.length == 0)) {
             return;
         }
-        ServletRequestAttributeEvent event = new ServletRequestAttributeEvent(context.getServletContext(), getRequest(),
-                name, value);
+        ServletRequestAttributeEvent event =
+                new ServletRequestAttributeEvent(context.getServletContext(), getRequest(), name, value);
         for (Object o : listeners) {
             if (!(o instanceof ServletRequestAttributeListener)) {
                 continue;
@@ -1892,11 +1892,11 @@ public class Request implements HttpServletRequest {
 
 
     @Override
-    public Map<String, String> getTrailerFields() {
+    public Map<String,String> getTrailerFields() {
         if (!isTrailerFieldsReady()) {
             throw new IllegalStateException(sm.getString("coyoteRequest.trailersNotReady"));
         }
-        Map<String, String> result = new HashMap<>(coyoteRequest.getTrailerFields());
+        Map<String,String> result = new HashMap<>(coyoteRequest.getTrailerFields());
         return result;
     }
 
@@ -2877,8 +2877,8 @@ public class Request implements HttpServletRequest {
         if (!create) {
             return null;
         }
-        boolean trackModesIncludesCookie = context.getServletContext().getEffectiveSessionTrackingModes()
-                .contains(SessionTrackingMode.COOKIE);
+        boolean trackModesIncludesCookie =
+                context.getServletContext().getEffectiveSessionTrackingModes().contains(SessionTrackingMode.COOKIE);
         if (trackModesIncludesCookie && response.getResponse().isCommitted()) {
             throw new IllegalStateException(sm.getString("coyoteRequest.sessionCreateCommitted"));
         }
@@ -2926,8 +2926,8 @@ public class Request implements HttpServletRequest {
 
         // Creating a new session cookie based on that session
         if (session != null && trackModesIncludesCookie) {
-            Cookie cookie = ApplicationSessionCookieConfig.createSessionCookie(context, session.getIdInternal(),
-                    isSecure());
+            Cookie cookie =
+                    ApplicationSessionCookieConfig.createSessionCookie(context, session.getIdInternal(), isSecure());
 
             response.addSessionCookieInternal(cookie);
         }
@@ -3238,7 +3238,7 @@ public class Request implements HttpServletRequest {
         // a local collection, sorted by the quality value (so we can
         // add Locales in descending order). The values will be ArrayLists
         // containing the corresponding Locales to be added
-        TreeMap<Double, ArrayList<Locale>> locales = new TreeMap<>();
+        TreeMap<Double,ArrayList<Locale>> locales = new TreeMap<>();
 
         Enumeration<String> values = getHeaders("accept-language");
 
@@ -3263,7 +3263,7 @@ public class Request implements HttpServletRequest {
      * @param value   the header value
      * @param locales the map that will hold the result
      */
-    protected void parseLocalesHeader(String value, TreeMap<Double, ArrayList<Locale>> locales) {
+    protected void parseLocalesHeader(String value, TreeMap<Double,ArrayList<Locale>> locales) {
 
         List<AcceptLanguage> acceptLanguages;
         try {
@@ -3293,14 +3293,14 @@ public class Request implements HttpServletRequest {
         // void remove(Request request, String name);
     }
 
-    private static final Map<String, SpecialAttributeAdapter> specialAttributes = new HashMap<>();
+    private static final Map<String,SpecialAttributeAdapter> specialAttributes = new HashMap<>();
 
     static {
         specialAttributes.put(Globals.DISPATCHER_TYPE_ATTR, new SpecialAttributeAdapter() {
             @Override
             public Object get(Request request, String name) {
-                return (request.internalDispatcherType == null) ? DispatcherType.REQUEST
-                        : request.internalDispatcherType;
+                return (request.internalDispatcherType == null) ? DispatcherType.REQUEST :
+                        request.internalDispatcherType;
             }
 
             @Override
@@ -3311,8 +3311,8 @@ public class Request implements HttpServletRequest {
         specialAttributes.put(Globals.DISPATCHER_REQUEST_PATH_ATTR, new SpecialAttributeAdapter() {
             @Override
             public Object get(Request request, String name) {
-                return (request.requestDispatcherPath == null) ? request.getRequestPathMB().toString()
-                        : request.requestDispatcherPath.toString();
+                return (request.requestDispatcherPath == null) ? request.getRequestPathMB().toString() :
+                        request.requestDispatcherPath.toString();
             }
 
             @Override
