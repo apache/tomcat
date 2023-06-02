@@ -45,6 +45,9 @@ public class TestPersistentValve {
         pv.setContainer(request.getContext());
         pv.setNext(testerValve);
 
+        // Call the necessary lifecycle methods
+        pv.init();
+
         // Run the test
         Thread[] threads = new Thread[5];
 
