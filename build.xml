@@ -1782,7 +1782,9 @@
 
     <!-- Generate the reflection less XReflectionIntrospectionUtils .java file -->
     <java classname="org.apache.tomcat.util.xreflection.ObjectReflectionPropertyInspector"
-          classpath="${xreflect.directory}/classes">
+          classpath="${xreflect.directory}/classes"
+          fork="true">
+      <jvmarg value="-Dsecurity.manager=allow"/>
       <arg value="${xreflect.directory}/sources"/>
     </java>
 
