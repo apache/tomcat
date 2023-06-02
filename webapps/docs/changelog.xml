@@ -189,6 +189,11 @@
       <update>
         Update Checkstyle to 10.12.0. (markt)
       </update>
+      <update>
+        Update the packaged version of the Apache Tomcat Native Library to
+        1.2.37 to pick up the Windows binaries built with with OpenSSL 1.1.1u.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
