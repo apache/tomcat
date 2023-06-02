@@ -1012,7 +1012,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             while (len > 0) {
                 int read = is.read(data, off, len);
                 if (read == -1) {
-                    throw new IOException("End of input stream");
+                    throw new IOException("End of input stream with [" + len + "] bytes left to read");
                 }
                 off += read;
                 len -= read;
