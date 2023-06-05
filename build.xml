@@ -340,6 +340,7 @@
     <include name="**/*.xml"/>
     <include name="**/*.xsd"/>
     <include name="**/*.xsl"/>
+    <include name="**/*.xslt"/>
     <include name="**/*.yaml"/>
     <include name="**/*.yml"/>
     <include name="**/Dockerfile"/>
