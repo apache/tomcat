@@ -114,6 +114,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Improve handling of error conditions for the WebSocket server,
+        particularly during Tomcat shutdown. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M7 (markt)" rtext="release in progress">
   <subsection name="General">

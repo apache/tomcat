@@ -73,7 +73,8 @@ public class WsFrameServer extends WsFrameBase {
             inputBuffer.position(inputBuffer.limit()).limit(inputBuffer.capacity());
             int read = socketWrapper.read(false, inputBuffer);
             inputBuffer.limit(inputBuffer.position()).reset();
-            if (read < 0) {
+            // Some error conditions in NIO2 will trigger a return of zero and close the socket
+            if (read < 0 || socketWrapper.isClosed()) {
                 throw new EOFException();
             } else if (read == 0) {
                 return;
