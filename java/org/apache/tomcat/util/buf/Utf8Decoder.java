@@ -23,11 +23,9 @@ import java.nio.charset.CoderResult;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Decodes bytes to UTF-8. Extracted from Apache Harmony and modified to reject
- * code points from U+D800 to U+DFFF as per RFC3629. The standard Java decoder
- * does not reject these. It has also been modified to reject code points
- * greater than U+10FFFF which the standard Java decoder rejects but the harmony
- * one does not.
+ * Decodes bytes to UTF-8. Extracted from Apache Harmony and modified to reject code points from U+D800 to U+DFFF as per
+ * RFC3629. The standard Java decoder does not reject these. It has also been modified to reject code points greater
+ * than U+10FFFF which the standard Java decoder rejects but the harmony one does not.
  */
 public class Utf8Decoder extends CharsetDecoder {
 
@@ -39,32 +37,30 @@ public class Utf8Decoder extends CharsetDecoder {
     // -------------------------------------------------------------------
     // 0 1 2 3 Value
     // -------------------------------------------------------------------
-    // oxxxxxxx                            00000000 00000000 0xxxxxxx
-    // 11oyyyyy 1oxxxxxx                   00000000 00000yyy yyxxxxxx
-    // 111ozzzz 1oyyyyyy 1oxxxxxx          00000000 zzzzyyyy yyxxxxxx
+    // oxxxxxxx 00000000 00000000 0xxxxxxx
+    // 11oyyyyy 1oxxxxxx 00000000 00000yyy yyxxxxxx
+    // 111ozzzz 1oyyyyyy 1oxxxxxx 00000000 zzzzyyyy yyxxxxxx
     // 1111ouuu 1ouuzzzz 1oyyyyyy 1oxxxxxx 000uuuuu zzzzyyyy yyxxxxxx
     private static final int remainingBytes[] = {
             // 1owwwwww
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             // 11oyyyyy
-            -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             // 111ozzzz
             2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
             // 1111ouuu
             3, 3, 3, 3, 3, -1, -1, -1,
             // > 11110111
-            -1, -1, -1, -1, -1, -1, -1, -1};
-    private static final int remainingNumbers[] = {0, // 0 1 2 3
+            -1, -1, -1, -1, -1, -1, -1, -1 };
+    private static final int remainingNumbers[] = { 0, // 0 1 2 3
             4224, // (01o00000b << 6)+(1o000000b)
             401536, // (011o0000b << 12)+(1o000000b << 6)+(1o000000b)
             29892736 // (0111o000b << 18)+(1o000000b << 12)+(1o000000b <<
                      // 6)+(1o000000b)
     };
-    private static final int lowerEncodingLimit[] = {-1, 0x80, 0x800, 0x10000};
+    private static final int lowerEncodingLimit[] = { -1, 0x80, 0x800, 0x10000 };
 
 
     public Utf8Decoder() {
@@ -173,8 +169,7 @@ public class Utf8Decoder extends CharsetDecoder {
                 int tailAvailable = inIndexLimit - inIndex - 1;
                 if (tailAvailable > 0) {
                     // First byte C2..DF, second byte 80..BF
-                    if (jchar > 0x41 && jchar < 0x60 &&
-                            (bArr[inIndex + 1] & 0xC0) != 0x80) {
+                    if (jchar > 0x41 && jchar < 0x60 && (bArr[inIndex + 1] & 0xC0) != 0x80) {
                         in.position(inIndex - in.arrayOffset());
                         out.position(outIndex - out.arrayOffset());
                         return CoderResult.malformedForLength(1);
@@ -186,8 +181,7 @@ public class Utf8Decoder extends CharsetDecoder {
                         return CoderResult.malformedForLength(1);
                     }
                     // First byte E1..EC, second byte 80..BF
-                    if (jchar > 0x60 && jchar < 0x6D &&
-                            (bArr[inIndex + 1] & 0xC0) != 0x80) {
+                    if (jchar > 0x60 && jchar < 0x6D && (bArr[inIndex + 1] & 0xC0) != 0x80) {
                         in.position(inIndex - in.arrayOffset());
                         out.position(outIndex - out.arrayOffset());
                         return CoderResult.malformedForLength(1);
@@ -199,30 +193,25 @@ public class Utf8Decoder extends CharsetDecoder {
                         return CoderResult.malformedForLength(1);
                     }
                     // First byte EE..EF, second byte 80..BF
-                    if (jchar > 0x6D && jchar < 0x70 &&
-                            (bArr[inIndex + 1] & 0xC0) != 0x80) {
+                    if (jchar > 0x6D && jchar < 0x70 && (bArr[inIndex + 1] & 0xC0) != 0x80) {
                         in.position(inIndex - in.arrayOffset());
                         out.position(outIndex - out.arrayOffset());
                         return CoderResult.malformedForLength(1);
                     }
                     // First byte F0, second byte 90..BF
-                    if (jchar == 0x70 &&
-                            ((bArr[inIndex + 1] & 0xFF) < 0x90 ||
-                            (bArr[inIndex + 1] & 0xFF) > 0xBF)) {
+                    if (jchar == 0x70 && ((bArr[inIndex + 1] & 0xFF) < 0x90 || (bArr[inIndex + 1] & 0xFF) > 0xBF)) {
                         in.position(inIndex - in.arrayOffset());
                         out.position(outIndex - out.arrayOffset());
                         return CoderResult.malformedForLength(1);
                     }
                     // First byte F1..F3, second byte 80..BF
-                    if (jchar > 0x70 && jchar < 0x74 &&
-                            (bArr[inIndex + 1] & 0xC0) != 0x80) {
+                    if (jchar > 0x70 && jchar < 0x74 && (bArr[inIndex + 1] & 0xC0) != 0x80) {
                         in.position(inIndex - in.arrayOffset());
                         out.position(outIndex - out.arrayOffset());
                         return CoderResult.malformedForLength(1);
                     }
                     // First byte F4, second byte 80..8F
-                    if (jchar == 0x74 &&
-                            (bArr[inIndex + 1] & 0xF0) != 0x80) {
+                    if (jchar == 0x74 && (bArr[inIndex + 1] & 0xF0) != 0x80) {
                         in.position(inIndex - in.arrayOffset());
                         out.position(outIndex - out.arrayOffset());
                         return CoderResult.malformedForLength(1);
@@ -292,8 +281,6 @@ public class Utf8Decoder extends CharsetDecoder {
         }
         in.position(inIndex - in.arrayOffset());
         out.position(outIndex - out.arrayOffset());
-        return (outRemaining == 0 && inIndex < inIndexLimit) ?
-                CoderResult.OVERFLOW :
-                CoderResult.UNDERFLOW;
+        return (outRemaining == 0 && inIndex < inIndexLimit) ? CoderResult.OVERFLOW : CoderResult.UNDERFLOW;
     }
 }
