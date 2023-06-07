@@ -114,6 +114,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Improve handling of error conditions for the WebSocket server,
+        particularly during Tomcat shutdown. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.10 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
