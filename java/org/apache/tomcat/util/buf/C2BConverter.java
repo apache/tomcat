@@ -40,8 +40,7 @@ public final class C2BConverter {
 
     public C2BConverter(Charset charset) {
         encoder = charset.newEncoder();
-        encoder.onUnmappableCharacter(CodingErrorAction.REPLACE)
-                .onMalformedInput(CodingErrorAction.REPLACE);
+        encoder.onUnmappableCharacter(CodingErrorAction.REPLACE).onMalformedInput(CodingErrorAction.REPLACE);
         char[] left = new char[4];
         leftovers = CharBuffer.wrap(left);
     }
@@ -63,6 +62,7 @@ public final class C2BConverter {
      *
      * @param cc char input
      * @param bc byte output
+     *
      * @throws IOException An encoding error occurred
      */
     public void convert(CharChunk cc, ByteChunk bc) throws IOException {
@@ -127,6 +127,7 @@ public final class C2BConverter {
      *
      * @param cc char input
      * @param bc byte output
+     *
      * @throws IOException An encoding error occurred
      */
     public void convert(CharBuffer cc, ByteBuffer bc) throws IOException {

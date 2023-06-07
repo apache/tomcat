@@ -29,7 +29,7 @@ public class CharsetCache {
     static final String[] INITIAL_CHARSETS = new String[] { "iso-8859-1", "utf-8" };
 
     /*
-     *  Note: Package private to enable testing without reflection
+     * Note: Package private to enable testing without reflection
      */
     static final String[] LAZY_CHARSETS = new String[] {
             // Initial set from Oracle JDK 8 u192
@@ -158,9 +158,9 @@ public class CharsetCache {
             "gb18030-2022"
             // If you add and entry to this list, ensure you run
             // TestCharsetUtil#testIsAcsiiSupersetAll()
-            };
+    };
 
-    private static final Charset DUMMY_CHARSET = new DummyCharset("Dummy",  null);
+    private static final Charset DUMMY_CHARSET = new DummyCharset("Dummy", null);
 
     private ConcurrentMap<String,Charset> cache = new ConcurrentHashMap<>();
 
@@ -209,8 +209,7 @@ public class CharsetCache {
 
 
     /*
-     * Placeholder Charset implementation for entries that will be loaded lazily
-     * into the cache.
+     * Placeholder Charset implementation for entries that will be loaded lazily into the cache.
      */
     private static class DummyCharset extends Charset {
 
