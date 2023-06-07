@@ -117,6 +117,11 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         absPath = absPath.substring(absoluteBase.length());
         canPath = canPath.substring(canonicalBase.length());
 
+        // The remaining request path must start with '/' if it has non-zero length
+        if (canPath.length() > 0 && canPath.charAt(0) != '/') {
+            return null;
+        }
+
         // Case sensitivity check
         // The normalized requested path should be an exact match the equivalent
         // canonical path. If it is not, possible reasons include:
