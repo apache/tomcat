@@ -48,8 +48,7 @@ public class B2CConverter {
      *
      * @return The Charset corresponding to the requested encoding
      *
-     * @throws UnsupportedEncodingException If the requested Charset is not
-     *                                      available
+     * @throws UnsupportedEncodingException If the requested Charset is not available
      */
     public static Charset getCharset(String enc) throws UnsupportedEncodingException {
 
@@ -60,8 +59,7 @@ public class B2CConverter {
 
         if (charset == null) {
             // Pre-population of the cache means this must be invalid
-            throw new UnsupportedEncodingException(
-                    sm.getString("b2cConverter.unknownEncoding", lowerCaseEnc));
+            throw new UnsupportedEncodingException(sm.getString("b2cConverter.unknownEncoding", lowerCaseEnc));
         }
         return charset;
     }
@@ -105,14 +103,13 @@ public class B2CConverter {
     /**
      * Convert the given bytes to characters.
      *
-     * @param bc byte input
-     * @param cc char output
-     * @param endOfInput    Is this all of the available data
+     * @param bc         byte input
+     * @param cc         char output
+     * @param endOfInput Is this all of the available data
      *
      * @throws IOException If the conversion can not be completed
      */
-    public void convert(ByteChunk bc, CharChunk cc, boolean endOfInput)
-            throws IOException {
+    public void convert(ByteChunk bc, CharChunk cc, boolean endOfInput) throws IOException {
         if ((bb == null) || (bb.array() != bc.getBuffer())) {
             // Create a new byte buffer if anything changed
             bb = ByteBuffer.wrap(bc.getBuffer(), bc.getStart(), bc.getLength());
@@ -123,8 +120,7 @@ public class B2CConverter {
         }
         if ((cb == null) || (cb.array() != cc.getBuffer())) {
             // Create a new char buffer if anything changed
-            cb = CharBuffer.wrap(cc.getBuffer(), cc.getEnd(),
-                    cc.getBuffer().length - cc.getEnd());
+            cb = CharBuffer.wrap(cc.getBuffer(), cc.getEnd(), cc.getBuffer().length - cc.getEnd());
         } else {
             // Initialize the char buffer
             cb.limit(cc.getBuffer().length);
@@ -174,10 +170,10 @@ public class B2CConverter {
     /**
      * Convert the given bytes to characters.
      *
-     * @param bc byte input
-     * @param cc char output
-     * @param ic byte input channel
-     * @param endOfInput    Is this all of the available data
+     * @param bc         byte input
+     * @param cc         char output
+     * @param ic         byte input channel
+     * @param endOfInput Is this all of the available data
      *
      * @throws IOException If the conversion can not be completed
      */

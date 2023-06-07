@@ -48,9 +48,8 @@ public class ByteBufferUtils {
             unsafeLocal = theUnsafe.get(null);
             invokeCleanerMethodLocal = clazz.getMethod("invokeCleaner", ByteBuffer.class);
             invokeCleanerMethodLocal.invoke(unsafeLocal, tempBuffer);
-        } catch (IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException | NoSuchMethodException | SecurityException
-                | ClassNotFoundException | NoSuchFieldException e) {
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException |
+                SecurityException | ClassNotFoundException | NoSuchFieldException e) {
             log.warn(sm.getString("byteBufferUtils.cleaner"), e);
             unsafeLocal = null;
             invokeCleanerMethodLocal = null;
@@ -67,15 +66,14 @@ public class ByteBufferUtils {
 
 
     /**
-     * Expands buffer to the given size unless it is already as big or bigger.
-     * Buffers are assumed to be in 'write to' mode since there would be no need
-     * to expand a buffer while it was in 'read from' mode.
+     * Expands buffer to the given size unless it is already as big or bigger. Buffers are assumed to be in 'write to'
+     * mode since there would be no need to expand a buffer while it was in 'read from' mode.
      *
-     * @param in        Buffer to expand
-     * @param newSize   The size t which the buffer should be expanded
-     * @return          The expanded buffer with any data from the input buffer
-     *                  copied in to it or the original buffer if there was no
-     *                  need for expansion
+     * @param in      Buffer to expand
+     * @param newSize The size t which the buffer should be expanded
+     *
+     * @return The expanded buffer with any data from the input buffer copied in to it or the original buffer if there
+     *             was no need for expansion
      */
     public static ByteBuffer expand(ByteBuffer in, int newSize) {
         if (in.capacity() >= newSize) {
@@ -106,8 +104,8 @@ public class ByteBufferUtils {
         if (cleanMethod != null) {
             try {
                 cleanMethod.invoke(cleanerMethod.invoke(buf));
-            } catch (IllegalAccessException | IllegalArgumentException
-                    | InvocationTargetException | SecurityException e) {
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException |
+                    SecurityException e) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("byteBufferUtils.cleaner"), e);
                 }
@@ -115,8 +113,8 @@ public class ByteBufferUtils {
         } else if (invokeCleanerMethod != null) {
             try {
                 invokeCleanerMethod.invoke(unsafe, buf);
-            } catch (IllegalAccessException | IllegalArgumentException
-                    | InvocationTargetException | SecurityException e) {
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException |
+                    SecurityException e) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("byteBufferUtils.cleaner"), e);
                 }
