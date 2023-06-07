@@ -26,7 +26,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class HexUtils {
 
-    private static final StringManager sm = StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(HexUtils.class);
 
     // -------------------------------------------------------------- Constants
 
