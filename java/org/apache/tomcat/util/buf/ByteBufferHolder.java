@@ -20,8 +20,7 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Simple wrapper for a {@link ByteBuffer} that remembers if the buffer has been
- * flipped or not.
+ * Simple wrapper for a {@link ByteBuffer} that remembers if the buffer has been flipped or not.
  */
 public class ByteBufferHolder {
 
@@ -29,8 +28,8 @@ public class ByteBufferHolder {
     private final AtomicBoolean flipped;
 
     public ByteBufferHolder(ByteBuffer buf, boolean flipped) {
-       this.buf = buf;
-       this.flipped = new AtomicBoolean(flipped);
+        this.buf = buf;
+        this.flipped = new AtomicBoolean(flipped);
     }
 
 

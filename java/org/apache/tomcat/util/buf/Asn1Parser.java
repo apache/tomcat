@@ -21,11 +21,10 @@ import java.math.BigInteger;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * This is a very basic ASN.1 parser that provides the limited functionality
- * required by Tomcat. It is a long way from a complete parser.
+ * This is a very basic ASN.1 parser that provides the limited functionality required by Tomcat. It is a long way from a
+ * complete parser.
  * <p>
- * TODO: Consider extending this parser and refactoring the SpnegoTokenFixer to
- *       use it.
+ * TODO: Consider extending this parser and refactoring the SpnegoTokenFixer to use it.
  */
 public class Asn1Parser {
 
@@ -54,8 +53,8 @@ public class Asn1Parser {
     public void parseTag(int tag) {
         int value = next();
         if (value != tag) {
-            throw new IllegalArgumentException(sm.getString("asn1Parser.tagMismatch",
-                    Integer.valueOf(tag), Integer.valueOf(value)));
+            throw new IllegalArgumentException(
+                    sm.getString("asn1Parser.tagMismatch", Integer.valueOf(tag), Integer.valueOf(value)));
         }
     }
 
@@ -63,8 +62,8 @@ public class Asn1Parser {
     public void parseFullLength() {
         int len = parseLength();
         if (len + pos != source.length) {
-            throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid",
-                    Integer.valueOf(len), Integer.valueOf(source.length - pos)));
+            throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid", Integer.valueOf(len),
+                    Integer.valueOf(source.length - pos)));
         }
     }
 
