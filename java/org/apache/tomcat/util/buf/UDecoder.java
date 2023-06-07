@@ -393,11 +393,14 @@ public final class UDecoder {
          * Decoding is required.
          *
          * Potential complications:
+         *
          * - The source String may be partially decoded so it is not valid to
          *   assume that the source String is ASCII.
+         *
          * - Have to process as characters since there is no guarantee that the
          *   byte sequence for '%' is going to be the same in all character
          *   sets.
+         *
          * - We don't know how many '%nn' sequences are required for a single
          *   character. It varies between character sets and some use a variable
          *   length.

@@ -44,17 +44,17 @@ import java.nio.charset.StandardCharsets;
 /**
  * This class is used to represent a chunk of bytes, and utilities to manipulate
  * byte[].
- *
+ * <p>
  * The buffer can be modified and used for both input and output.
- *
+ * <p>
  * There are 2 modes: The chunk can be associated with a sink - ByteInputChannel
  * or ByteOutputChannel, which will be used when the buffer is empty (on input)
  * or filled (on output). For output, it can also grow. This operating mode is
  * selected by calling setLimit() or allocate(initial, limit) with limit != -1.
- *
+ * <p>
  * Various search and append method are defined - similar with String and
  * StringBuffer, but operating on bytes.
- *
+ * <p>
  * This is important because it allows processing the http headers directly on
  * the received bytes, without converting to chars and Strings until the strings
  * are needed. In addition, the charset is determined later, from headers or
@@ -775,7 +775,8 @@ public final class ByteChunk extends AbstractChunk {
     /**
      * Returns the first instance of the given character in this ByteChunk
      * starting at the specified byte. If the character is not found, -1 is
-     * returned. <br>
+     * returned.
+     * <p>
      * NOTE: This only works for characters in the range 0-127.
      *
      * @param c The character
@@ -791,7 +792,8 @@ public final class ByteChunk extends AbstractChunk {
 
     /**
      * Returns the first instance of the given character in the given byte array
-     * between the specified start and end. <br>
+     * between the specified start and end.
+     * <p>
      * NOTE: This only works for characters in the range 0-127.
      *
      * @param bytes The array to search
