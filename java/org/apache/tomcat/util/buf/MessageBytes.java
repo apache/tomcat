@@ -29,7 +29,7 @@ import org.apache.tomcat.util.res.StringManager;
  * This class is used to represent a subarray of bytes in an HTTP message.
  * It represents all request/response elements. The byte/char conversions are
  * delayed and cached. Everything is recyclable.
- *
+ * <p>
  * The object can represent a byte[], a char[], or a (sub) String. All
  * operations can be made in case sensitive mode or not.
  *
@@ -301,7 +301,7 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     /**
      * Convert to char[] and fill the CharChunk.
-     *
+     * <p>
      * Note: The conversion from bytes is not optimised - it converts to String
      *       first. However, Tomcat doesn't call this method to convert from
      *       bytes so there is no benefit from optimising that path.
@@ -328,7 +328,8 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     /**
      * Returns the length of the original buffer.
-     * Note that the length in bytes may be different from the length
+     * <p>
+     * Note: The length in bytes may be different from the length
      * in chars.
      * @return the length
      */
