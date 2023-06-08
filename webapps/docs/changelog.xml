@@ -107,6 +107,11 @@
 <section name="Tomcat 10.1.11 (schultz)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        Add <code>org.apache.catalina.core.ContextNamingInfoListener</code>,
+        a listener which creates context naming information environment entries.
+        (michaelo)
+      </add>
       <fix>
         Fix an edge case where intra-web application symlinks would be followed
         if the web applications were deliberately crafted to allow it even when
