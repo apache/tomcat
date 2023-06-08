@@ -153,6 +153,33 @@
 
   </subsection>
 
+  <subsection name="Context Naming Info Listener - org.apache.catalina.core.ContextNamingInfoListener">
+
+    <p>The <strong>Context Naming Info Listener</strong> adds the following
+    environment entries (<code>java:comp/env</code> implied) from the
+    <a href="context.html">Context</a>: <code>context/path</code>,
+    <code>context/encodedPath</code>, <code>context/webappVersion</code>,
+    <code>context/name</code>, <code>context/baseName</code>,
+    <code>context/displayName</code>.</p>
+
+    <p>This listener must only be nested within
+    <a href="context.html">Context</a> elements.</p>
+
+    <p>The following additional attributes are supported by the
+    <strong>Context Naming Info Listener</strong>:</p>
+
+    <attributes>
+      <attribute name="emptyOnRoot" required="false">
+        <p>Whether for the root context <code>context/path</code> and
+        <code>context/encodedPath</code> will contain <code>"/"</code> and
+        <code>context/name</code> will contain <code>"ROOT"</code> with a version,
+        if any.</p>
+        <p>The default value is <code>true</code>.</p>
+      </attribute>
+    </attributes>
+
+  </subsection>
+
   <subsection name="Global Resources Lifecycle Listener - org.apache.catalina.mbeans.GlobalResourcesLifecycleListener">
 
     <p>The <strong>Global Resources Lifecycle Listener</strong> initializes the
