@@ -114,6 +114,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>66627</bug>: Restore the documented behaviour of
+        <code>MessageBytes.getType()</code> that it returns the type of the
+        original content rather than reflecting the most recent conversion.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>

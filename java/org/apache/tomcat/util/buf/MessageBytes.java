@@ -170,11 +170,9 @@ public final class MessageBytes implements Cloneable, Serializable {
                 // No conversion required
                 break;
             case T_BYTES:
-                type = T_STR;
                 strValue = byteC.toString();
                 break;
             case T_CHARS:
-                type = T_STR;
                 strValue = charC.toString();
                 break;
         }
@@ -272,7 +270,6 @@ public final class MessageBytes implements Cloneable, Serializable {
         }
 
         byteC.setBytes(bb.array(), bb.arrayOffset(), bb.limit());
-        type = T_BYTES;
     }
 
 
@@ -316,7 +313,6 @@ public final class MessageBytes implements Cloneable, Serializable {
                 toString();
                 //$FALL-THROUGH$
             case T_STR: {
-                type = T_CHARS;
                 char cc[] = strValue.toCharArray();
                 charC.setChars(cc, 0, cc.length);
             }
