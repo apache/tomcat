@@ -26,7 +26,5 @@ Notes of things to consider for the next major Tomcat release (11.x)
 
  3. Add QUIC support using OpenSSL and Panama.
 
- 4. Update minimum Java version to 21.
-
- 5. Implement an optional Loom module that provides
+ 4. Implement an optional Loom module that provides
     o.a.c.http11.Http11BioLoomProtocol
