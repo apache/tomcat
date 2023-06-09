@@ -852,7 +852,7 @@
     <taskdef resource="${checkstyletask.properties}"
              classpath="${checkstyle.jar}" />
     <!-- Main checks -->
-    <checkstyle config="res/checkstyle/checkstyle.xml">
+    <checkstyle config="${basedir}/res/checkstyle/checkstyle.xml">
       <fileset dir="." >
         <patternset refid="text.files" />
         <include name="**/*.bat"/>
@@ -896,19 +896,19 @@
       </fileset>
     </checkstyle>
     <!-- jakarta package checks -->
-    <checkstyle config="res/checkstyle/jakarta-checkstyle.xml">
+    <checkstyle config="${basedir}/res/checkstyle/jakarta-checkstyle.xml">
       <fileset dir="java/jakarta" >
         <include name="**/*.java"/>
       </fileset>
     </checkstyle>
     <!-- org package checks -->
-    <checkstyle config="res/checkstyle/org-checkstyle.xml">
+    <checkstyle config="${basedir}/res/checkstyle/org-checkstyle.xml">
       <fileset dir="java/org" >
         <include name="**/*.java"/>
       </fileset>
     </checkstyle>
     <!-- Tests checks -->
-    <checkstyle config="res/checkstyle/test-checkstyle.xml">
+    <checkstyle config="${basedir}/res/checkstyle/test-checkstyle.xml">
       <fileset dir="test" >
         <patternset refid="text.files" />
         <exclude name=".*/**"/>
