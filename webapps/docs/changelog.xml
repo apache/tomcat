@@ -132,6 +132,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Documentation. Expand the security guidance to cover the embedded use
+        case and add notes on the uses made of the <code>java.io.tmpdir</code>
+        system property. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
