@@ -16,16 +16,16 @@
  */
 package org.apache.catalina.core;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleState;
@@ -67,7 +67,7 @@ public class TestContextNamingInfoListener extends TomcatBaseTest {
     @Parameter(2)
     public String displayName;
     @Parameter(3)
-    public Boolean emptyOnRoot;
+    public boolean emptyOnRoot;
     @Parameter(4)
     public String expectedContextPath;
     @Parameter(5)
