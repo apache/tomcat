@@ -40,10 +40,10 @@ public class SSLHostConfigCertificate implements Serializable {
 
     public static final Type DEFAULT_TYPE = Type.UNDEFINED;
 
-    static final String DEFAULT_KEYSTORE_PROVIDER =
-            System.getProperty("javax.net.ssl.keyStoreProvider");
-    static final String DEFAULT_KEYSTORE_TYPE =
-            System.getProperty("javax.net.ssl.keyStoreType", "JKS");
+    static final String DEFAULT_KEYSTORE_PROVIDER = System.getProperty("javax.net.ssl.keyStoreProvider");
+    static final String DEFAULT_KEYSTORE_TYPE = System.getProperty("javax.net.ssl.keyStoreType", "JKS");
+    private static final String DEFAULT_KEYSTORE_FILE = System.getProperty("user.home")+"/.keystore";
+    private static final String DEFAULT_KEYSTORE_PASSWORD = "changeit";
 
     // Internal
     private ObjectName oname;
@@ -60,8 +60,8 @@ public class SSLHostConfigCertificate implements Serializable {
 
     // JSSE
     private String certificateKeyAlias;
-    private String certificateKeystorePassword = "changeit";
-    private String certificateKeystoreFile = System.getProperty("user.home")+"/.keystore";
+    private String certificateKeystorePassword = DEFAULT_KEYSTORE_PASSWORD;
+    private String certificateKeystoreFile = DEFAULT_KEYSTORE_FILE;
     private String certificateKeystoreProvider = DEFAULT_KEYSTORE_PROVIDER;
     private String certificateKeystoreType = DEFAULT_KEYSTORE_TYPE;
     private transient KeyStore certificateKeystore = null;
@@ -267,7 +267,10 @@ public class SSLHostConfigCertificate implements Serializable {
         }
     }
 
-    // Nested types
+    StoreType getStoreType() {
+        return storeType;
+    }
+
 
     public enum Type {
 
