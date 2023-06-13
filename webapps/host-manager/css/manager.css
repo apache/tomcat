@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-body {
+ body {
     font-family: Tahoma, Arial, sans-serif;
 }
 
@@ -54,7 +54,13 @@ a {
 }
 
 table {
-    width: 100%;
+    width          : 100%;
+    border-color   : #00000029;
+}
+
+table:has(td.title) {
+	border-collapse: inherit;
+	border-radius  : 10px 10px 0 0;
 }
 
 td.page-title {
@@ -73,6 +79,7 @@ td.title {
     font-style    : italic;
     font-weight   : bold;
     background    : #D2A41C;
+	border-radius : 10px 10px 0 0;
 }
 
 td.header-left {
@@ -125,6 +132,16 @@ TD {
     vertical-align: middle;
     font-family   : sans-serif, Tahoma, Arial;
     color         : black;
+    padding       : 5px;
+	color         : #636363;
+    border        : unset;
+}
+
+tr {
+	background-color: #f9fafb;
+}
+tr:nth-child(odd) {
+	background-color: #ffffff;
 }
 
 form {
@@ -138,4 +155,22 @@ form.inline {
 img.tomcat-logo {
     height: 92px;
     float : left;
+}
+
+input[type="submit" i] {
+	cursor:pointer;
+}
+
+input[type="text"]{
+    -webkit-appearance: none;
+    appearance: none;
+    background-clip: padding-box;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    color: #212529;
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.5;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
