@@ -127,6 +127,12 @@
         original content rather than reflecting the most recent conversion.
         (markt)
       </fix>
+      <fix>
+        <bug>66635</bug>: Correct certificate logging on start-up so it
+        differentiates between keystore based keys/certificates and PEM file
+        based keys/certificates and logs the relevant information for each.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

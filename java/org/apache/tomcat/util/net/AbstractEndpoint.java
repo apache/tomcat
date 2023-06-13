@@ -52,6 +52,7 @@ import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.Acceptor.AcceptorState;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate.StoreType;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.LimitLatch;
 import org.apache.tomcat.util.threads.ResizableExecutor;
@@ -366,14 +367,22 @@ public abstract class AbstractEndpoint<S,U> {
     protected void logCertificate(SSLHostConfigCertificate certificate) {
         SSLHostConfig sslHostConfig = certificate.getSSLHostConfig();
 
-        String certificateSource = certificate.getCertificateKeystoreFile();
-        if (certificateSource == null) {
-            certificateSource = certificate.getCertificateKeyFile();
-        }
+        String certificateInfo;
 
-        String keyAlias = certificate.getCertificateKeyAlias();
-        if (keyAlias == null) {
-            keyAlias = SSLUtilBase.DEFAULT_KEY_ALIAS;
+        if (certificate.getStoreType() == StoreType.PEM) {
+            // PEM file based
+            String keySource = certificate.getCertificateKeystoreFile();
+            keySource = certificate.getCertificateKeyFile();
+            certificateInfo = sm.getString("endpoint.tls.info.cert.pem", keySource, certificate.getCertificateFile(),
+                    certificate.getCertificateChainFile());
+        } else {
+            // Keystore based
+            String keyStore = certificate.getCertificateKeystoreFile();
+            String keyAlias = certificate.getCertificateKeyAlias();
+            if (keyAlias == null) {
+                keyAlias = SSLUtilBase.DEFAULT_KEY_ALIAS;
+            }
+            certificateInfo = sm.getString("endpoint.tls.info.cert.keystore", keyStore, keyAlias);
         }
 
         String trustStoreSource = sslHostConfig.getTruststoreFile();
@@ -385,7 +394,7 @@ public abstract class AbstractEndpoint<S,U> {
         }
 
         getLogCertificate().info(sm.getString("endpoint.tls.info", getName(), sslHostConfig.getHostName(),
-                certificate.getType(), certificateSource, keyAlias, trustStoreSource));
+                certificate.getType(), certificateInfo, trustStoreSource));
 
         if (getLogCertificate().isDebugEnabled()) {
             String alias = certificate.getCertificateKeyAlias();
