@@ -21,7 +21,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 
 /*
@@ -521,23 +523,64 @@ public final class ByteChunk extends AbstractChunk {
 
     @Override
     public String toString() {
+        try {
+            return toString(CodingErrorAction.REPLACE, CodingErrorAction.REPLACE);
+        } catch (CharacterCodingException e) {
+            // Unreachable code. Use of REPLACE above means the exception will never be thrown.
+            throw new IllegalStateException(e);
+        }
+    }
+
+
+    public String toString(CodingErrorAction malformedInputAction, CodingErrorAction unmappableCharacterAction)
+            throws CharacterCodingException {
         if (isNull()) {
             return null;
         } else if (end - start == 0) {
             return "";
         }
-        return StringCache.toString(this);
+        return StringCache.toString(this, malformedInputAction, unmappableCharacterAction);
     }
 
 
+    /**
+     * Converts the current content of the byte buffer to a String using the configured character set.
+     *
+     * @return The result of converting the bytes to a String
+     *
+     * @deprecated Unused. This method will be removed in Tomcat 11 onwards.
+     */
+    @Deprecated
     public String toStringInternal() {
+        try {
+            return toStringInternal(CodingErrorAction.REPLACE, CodingErrorAction.REPLACE);
+        } catch (CharacterCodingException e) {
+            // Unreachable code. Use of REPLACE above means the exception will never be thrown.
+            throw new IllegalStateException(e);
+        }
+    }
+
+
+    /**
+     * Converts the current content of the byte buffer to a String using the configured character set.
+     *
+     * @param malformedInputAction      Action to take if the input is malformed
+     * @param unmappableCharacterAction Action to take if a byte sequence can't be mapped to a character
+     *
+     * @return The result of converting the bytes to a String
+     *
+     * @throws CharacterCodingException If an error occurs during the conversion
+     */
+    public String toStringInternal(CodingErrorAction malformedInputAction, CodingErrorAction unmappableCharacterAction)
+            throws CharacterCodingException {
         if (charset == null) {
             charset = DEFAULT_CHARSET;
         }
         // new String(byte[], int, int, Charset) takes a defensive copy of the
         // entire byte array. This is expensive if only a small subset of the
         // bytes will be used. The code below is from Apache Harmony.
-        CharBuffer cb = charset.decode(ByteBuffer.wrap(buff, start, end - start));
+        CharBuffer cb = charset.newDecoder().onMalformedInput(malformedInputAction)
+                .onUnmappableCharacter(unmappableCharacterAction).decode(ByteBuffer.wrap(buff, start, end - start));
         return new String(cb.array(), cb.arrayOffset(), cb.length());
     }
 
