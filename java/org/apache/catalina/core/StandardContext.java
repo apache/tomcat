@@ -232,7 +232,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The ordered set of ServletContainerInitializers for this web application.
      */
-    private Map<ServletContainerInitializer, Set<Class<?>>> initializers = new LinkedHashMap<>();
+    private Map<ServletContainerInitializer,Set<Class<?>>> initializers = new LinkedHashMap<>();
 
 
     /**
@@ -362,13 +362,13 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The set of filter configurations (and associated filter instances) we have initialized, keyed by filter name.
      */
-    private Map<String, ApplicationFilterConfig> filterConfigs = new HashMap<>();
+    private Map<String,ApplicationFilterConfig> filterConfigs = new HashMap<>();
 
 
     /**
      * The set of filter definitions for this application, keyed by filter name.
      */
-    private Map<String, FilterDef> filterDefs = new HashMap<>();
+    private Map<String,FilterDef> filterDefs = new HashMap<>();
 
 
     /**
@@ -418,19 +418,19 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The message destinations for this web application.
      */
-    private HashMap<String, MessageDestination> messageDestinations = new HashMap<>();
+    private HashMap<String,MessageDestination> messageDestinations = new HashMap<>();
 
 
     /**
      * The MIME mappings for this web application, keyed by extension.
      */
-    private Map<String, String> mimeMappings = new HashMap<>();
+    private Map<String,String> mimeMappings = new HashMap<>();
 
 
     /**
      * The context initialization parameters for this web application, keyed by name.
      */
-    private final Map<String, String> parameters = new ConcurrentHashMap<>();
+    private final Map<String,String> parameters = new ConcurrentHashMap<>();
 
 
     /**
@@ -493,7 +493,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The security role mappings for this application, keyed by role name (as used within the application).
      */
-    private Map<String, String> roleMappings = new HashMap<>();
+    private Map<String,String> roleMappings = new HashMap<>();
 
 
     /**
@@ -507,7 +507,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The servlet mappings for this web application, keyed by matching pattern.
      */
-    private Map<String, String> servletMappings = new HashMap<>();
+    private Map<String,String> servletMappings = new HashMap<>();
 
     private final Object servletMappingsLock = new Object();
 
@@ -751,8 +751,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     private boolean jndiExceptionOnFailedWrite = true;
 
-    private Map<String, String> postConstructMethods = new HashMap<>();
-    private Map<String, String> preDestroyMethods = new HashMap<>();
+    private Map<String,String> postConstructMethods = new HashMap<>();
+    private Map<String,String> preDestroyMethods = new HashMap<>();
 
     private String containerSciFilter;
 
@@ -4336,7 +4336,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         boolean ok = true;
         synchronized (filterConfigs) {
             filterConfigs.clear();
-            for (Entry<String, FilterDef> entry : filterDefs.entrySet()) {
+            for (Entry<String,FilterDef> entry : filterDefs.entrySet()) {
                 String name = entry.getKey();
                 if (getLogger().isDebugEnabled()) {
                     getLogger().debug(" Starting filter '" + name + "'");
@@ -4370,7 +4370,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Release all Filter and FilterConfig instances
         synchronized (filterConfigs) {
-            for (Entry<String, ApplicationFilterConfig> entry : filterConfigs.entrySet()) {
+            for (Entry<String,ApplicationFilterConfig> entry : filterConfigs.entrySet()) {
                 if (getLogger().isDebugEnabled()) {
                     getLogger().debug(" Stopping filter '" + entry.getKey() + "'");
                 }
@@ -4655,7 +4655,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     public boolean loadOnStartup(Container children[]) {
 
         // Collect "load on startup" servlets that need to be initialized
-        TreeMap<Integer, ArrayList<Wrapper>> map = new TreeMap<>();
+        TreeMap<Integer,ArrayList<Wrapper>> map = new TreeMap<>();
         for (Container child : children) {
             Wrapper wrapper = (Wrapper) child;
             int loadOnStartup = wrapper.getLoadOnStartup();
@@ -4706,8 +4706,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Send j2ee.state.starting notification
         if (this.getObjectName() != null) {
-            Notification notification = new Notification("j2ee.state.starting", this.getObjectName(),
-                    sequenceNumber.getAndIncrement());
+            Notification notification =
+                    new Notification("j2ee.state.starting", this.getObjectName(), sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
 
@@ -4931,7 +4931,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             mergeParameters();
 
             // Call ServletContainerInitializers
-            for (Map.Entry<ServletContainerInitializer, Set<Class<?>>> entry : initializers.entrySet()) {
+            for (Map.Entry<ServletContainerInitializer,Set<Class<?>>> entry : initializers.entrySet()) {
                 try {
                     entry.getKey().onStartup(entry.getValue(), getServletContext());
                 } catch (ServletException e) {
@@ -5003,8 +5003,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Send j2ee.state.running notification
         if (ok && (this.getObjectName() != null)) {
-            Notification notification = new Notification("j2ee.state.running", this.getObjectName(),
-                    sequenceNumber.getAndIncrement());
+            Notification notification =
+                    new Notification("j2ee.state.running", this.getObjectName(), sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
 
@@ -5019,8 +5019,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             setState(LifecycleState.FAILED);
             // Send j2ee.object.failed notification
             if (this.getObjectName() != null) {
-                Notification notification = new Notification("j2ee.object.failed", this.getObjectName(),
-                        sequenceNumber.getAndIncrement());
+                Notification notification =
+                        new Notification("j2ee.object.failed", this.getObjectName(), sequenceNumber.getAndIncrement());
                 broadcaster.sendNotification(notification);
             }
         } else {
@@ -5030,8 +5030,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     private void checkConstraintsForUncoveredMethods(SecurityConstraint[] constraints) {
-        SecurityConstraint[] newConstraints = SecurityConstraint.findUncoveredHttpMethods(constraints,
-                getDenyUncoveredHttpMethods(), getLogger());
+        SecurityConstraint[] newConstraints =
+                SecurityConstraint.findUncoveredHttpMethods(constraints, getDenyUncoveredHttpMethods(), getLogger());
         for (SecurityConstraint constraint : newConstraints) {
             addConstraint(constraint);
         }
@@ -5044,13 +5044,13 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         if (isUseNaming() && getNamingContextListener() != null) {
             context = getNamingContextListener().getEnvContext();
         }
-        Map<String, Map<String, String>> injectionMap = buildInjectionMap(
-                getIgnoreAnnotations() ? new NamingResourcesImpl() : getNamingResources());
+        Map<String,Map<String,String>> injectionMap =
+                buildInjectionMap(getIgnoreAnnotations() ? new NamingResourcesImpl() : getNamingResources());
         return new DefaultInstanceManager(context, injectionMap, this, this.getClass().getClassLoader());
     }
 
-    private Map<String, Map<String, String>> buildInjectionMap(NamingResourcesImpl namingResources) {
-        Map<String, Map<String, String>> injectionMap = new HashMap<>();
+    private Map<String,Map<String,String>> buildInjectionMap(NamingResourcesImpl namingResources) {
+        Map<String,Map<String,String>> injectionMap = new HashMap<>();
         for (Injectable resource : namingResources.findLocalEjbs()) {
             addInjectionTarget(resource, injectionMap);
         }
@@ -5075,7 +5075,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         return injectionMap;
     }
 
-    private void addInjectionTarget(Injectable resource, Map<String, Map<String, String>> injectionMap) {
+    private void addInjectionTarget(Injectable resource, Map<String,Map<String,String>> injectionMap) {
         List<InjectionTarget> injectionTargets = resource.getInjectionTargets();
         if (injectionTargets != null && injectionTargets.size() > 0) {
             String jndiName = resource.getName();
@@ -5094,7 +5094,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * the application parameters appropriately.
      */
     private void mergeParameters() {
-        Map<String, String> mergedParams = new HashMap<>();
+        Map<String,String> mergedParams = new HashMap<>();
 
         String names[] = findParameters();
         for (String s : names) {
@@ -5111,7 +5111,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         ServletContext sc = getServletContext();
-        for (Map.Entry<String, String> entry : mergedParams.entrySet()) {
+        for (Map.Entry<String,String> entry : mergedParams.entrySet()) {
             sc.setInitParameter(entry.getKey(), entry.getValue());
         }
 
@@ -5130,8 +5130,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Send j2ee.state.stopping notification
         if (this.getObjectName() != null) {
-            Notification notification = new Notification("j2ee.state.stopping", this.getObjectName(),
-                    sequenceNumber.getAndIncrement());
+            Notification notification =
+                    new Notification("j2ee.state.stopping", this.getObjectName(), sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
 
@@ -5231,8 +5231,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Send j2ee.state.stopped notification
         if (this.getObjectName() != null) {
-            Notification notification = new Notification("j2ee.state.stopped", this.getObjectName(),
-                    sequenceNumber.getAndIncrement());
+            Notification notification =
+                    new Notification("j2ee.state.stopped", this.getObjectName(), sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
 
@@ -5268,8 +5268,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         // have been set so the notification can't be created
         if (getObjectName() != null) {
             // Send j2ee.object.deleted notification
-            Notification notification = new Notification("j2ee.object.deleted", this.getObjectName(),
-                    sequenceNumber.getAndIncrement());
+            Notification notification =
+                    new Notification("j2ee.object.deleted", this.getObjectName(), sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
 
@@ -5471,8 +5471,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
             // If the pattern did not conflict, add the new constraint(s).
             if (!foundConflict) {
-                SecurityConstraint[] newSecurityConstraints = SecurityConstraint
-                        .createConstraints(servletSecurityElement, urlPattern);
+                SecurityConstraint[] newSecurityConstraints =
+                        SecurityConstraint.createConstraints(servletSecurityElement, urlPattern);
                 for (SecurityConstraint securityConstraint : newSecurityConstraints) {
                     addConstraint(securityConstraint);
                 }
@@ -5770,13 +5770,13 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     @Override
-    public Map<String, String> findPostConstructMethods() {
+    public Map<String,String> findPostConstructMethods() {
         return postConstructMethods;
     }
 
 
     @Override
-    public Map<String, String> findPreDestroyMethods() {
+    public Map<String,String> findPreDestroyMethods() {
         return preDestroyMethods;
     }
 
@@ -5962,8 +5962,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Send j2ee.object.created notification
         if (this.getObjectName() != null) {
-            Notification notification = new Notification("j2ee.object.created", this.getObjectName(),
-                    sequenceNumber.getAndIncrement());
+            Notification notification =
+                    new Notification("j2ee.object.created", this.getObjectName(), sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
     }
@@ -6334,7 +6334,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         @Override
-        public Map<String, ? extends ServletRegistration> getServletRegistrations() {
+        public Map<String,? extends ServletRegistration> getServletRegistrations() {
             throw new UnsupportedOperationException(sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
@@ -6365,7 +6365,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         @Override
-        public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
+        public Map<String,? extends FilterRegistration> getFilterRegistrations() {
             throw new UnsupportedOperationException(sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 

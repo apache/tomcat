@@ -67,7 +67,7 @@ public class ApplicationPushBuilder implements PushBuilder {
     private final boolean addSessionCookie;
     private final boolean addSessionPathParameter;
 
-    private final Map<String, List<String>> headers = new CaseInsensitiveKeyMap<>();
+    private final Map<String,List<String>> headers = new CaseInsensitiveKeyMap<>();
     private final List<Cookie> cookies = new ArrayList<>();
     private String method = "GET";
     private String path;
@@ -128,8 +128,8 @@ public class ApplicationPushBuilder implements PushBuilder {
             sessionId = request.getRequestedSessionId();
         }
         if (!request.isRequestedSessionIdFromCookie() && !request.isRequestedSessionIdFromURL() && sessionId != null) {
-            Set<SessionTrackingMode> sessionTrackingModes = request.getServletContext()
-                    .getEffectiveSessionTrackingModes();
+            Set<SessionTrackingMode> sessionTrackingModes =
+                    request.getServletContext().getEffectiveSessionTrackingModes();
             addSessionCookie = sessionTrackingModes.contains(SessionTrackingMode.COOKIE);
             addSessionPathParameter = sessionTrackingModes.contains(SessionTrackingMode.URL);
         } else {
@@ -300,7 +300,7 @@ public class ApplicationPushBuilder implements PushBuilder {
         pushTarget.scheme().setString(baseRequest.getScheme());
 
         // Copy headers
-        for (Map.Entry<String, List<String>> header : headers.entrySet()) {
+        for (Map.Entry<String,List<String>> header : headers.entrySet()) {
             for (String value : header.getValue()) {
                 pushTarget.getMimeHeaders().addValue(header.getKey()).setString(value);
             }
