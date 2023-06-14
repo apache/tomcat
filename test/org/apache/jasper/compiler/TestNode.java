@@ -28,7 +28,7 @@ public class TestNode {
     /*
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=57099
      */
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testPageDirectiveImport01() {
         doTestPageDirectiveImport("java.io.*;\r\n\timport java.net.*");
     }
@@ -53,7 +53,7 @@ public class TestNode {
         doTestPageDirectiveImport("java.util.List,java.util.ArrayList,java.util.Set");
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testPageDirectiveImport06() {
         doTestPageDirectiveImport("java.util.List;import java.util.ArrayList; import java.util.Set");
     }
