@@ -36,7 +36,6 @@ final class Constants$root {
     static final OfLong C_LONG_LONG$LAYOUT = JAVA_LONG;
     static final OfFloat C_FLOAT$LAYOUT = JAVA_FLOAT;
     static final OfDouble C_DOUBLE$LAYOUT = JAVA_DOUBLE;
-    static final AddressLayout C_POINTER$LAYOUT = ADDRESS.withBitAlignment(64).withTargetLayout(MemoryLayout.sequenceLayout(Constants$root.C_CHAR$LAYOUT));
 }
 
 

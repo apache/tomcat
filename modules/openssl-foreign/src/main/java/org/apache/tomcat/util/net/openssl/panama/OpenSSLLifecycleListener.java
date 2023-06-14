@@ -239,13 +239,13 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                     if ("auto".equals(engineName)) {
                         ENGINE_register_all_complete();
                     } else {
-                        var engine = memorySession.allocateUtf8String(engineName);
+                        var engine = memorySession.allocateString(engineName);
                         enginePointer = ENGINE_by_id(engine);
                         if (MemorySegment.NULL.equals(enginePointer)) {
-                            enginePointer = ENGINE_by_id(memorySession.allocateUtf8String("dynamic"));
+                            enginePointer = ENGINE_by_id(memorySession.allocateString("dynamic"));
                             if (enginePointer != null) {
-                                if (ENGINE_ctrl_cmd_string(enginePointer, memorySession.allocateUtf8String("SO_PATH"), engine, 0) == 0
-                                        || ENGINE_ctrl_cmd_string(enginePointer, memorySession.allocateUtf8String("LOAD"),
+                                if (ENGINE_ctrl_cmd_string(enginePointer, memorySession.allocateString("SO_PATH"), engine, 0) == 0
+                                        || ENGINE_ctrl_cmd_string(enginePointer, memorySession.allocateString("LOAD"),
                                                 MemorySegment.NULL, 0) == 0) {
                                     // Engine load error
                                     ENGINE_free(enginePointer);
@@ -269,7 +269,7 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                 // Set the random seed, translated to the Java way
                 boolean seedDone = false;
                 if (SSLRandomSeed != null || SSLRandomSeed.length() != 0 || !"builtin".equals(SSLRandomSeed)) {
-                    var randomSeed = memorySession.allocateUtf8String(SSLRandomSeed);
+                    var randomSeed = memorySession.allocateString(SSLRandomSeed);
                     seedDone = RAND_load_file(randomSeed, 128) > 0;
                 }
                 if (!seedDone) {
@@ -289,9 +289,9 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                     final boolean enterFipsMode;
                     int fipsModeState = FIPS_OFF;
                     if (usingProviders) {
-                        var md = EVP_MD_fetch(MemorySegment.NULL, memorySession.allocateUtf8String("SHA-512"), MemorySegment.NULL);
+                        var md = EVP_MD_fetch(MemorySegment.NULL, memorySession.allocateString("SHA-512"), MemorySegment.NULL);
                         var provider = EVP_MD_get0_provider(md);
-                        String name = OSSL_PROVIDER_get0_name(provider).getUtf8String(0);
+                        String name = OSSL_PROVIDER_get0_name(provider).getString(0);
                         EVP_MD_free(md);
                         if ("fips".equals(name)) {
                             fipsModeState = FIPS_ON;
@@ -376,7 +376,7 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                     }
                 }
 
-                log.info(sm.getString("listener.initializedOpenSSL", OpenSSL_version(0).getUtf8String(0)));
+                log.info(sm.getString("listener.initializedOpenSSL", OpenSSL_version(0).getString(0)));
                 OpenSSLStatus.setAvailable(true);
             }
         }

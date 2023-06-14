@@ -109,7 +109,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             var sslCtx = SSL_CTX_new(TLS_server_method());
             try {
                 SSL_CTX_set_options(sslCtx, SSL_OP_ALL());
-                SSL_CTX_set_cipher_list(sslCtx, localArena.allocateUtf8String("ALL"));
+                SSL_CTX_set_cipher_list(sslCtx, localArena.allocateString("ALL"));
                 var ssl = SSL_new(sslCtx);
                 SSL_set_accept_state(ssl);
                 try {
@@ -152,7 +152,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         for (int i = 0; i < len; i++) {
             MemorySegment cipher = OPENSSL_sk_value(sk, i);
             MemorySegment cipherName = SSL_CIPHER_get_name(cipher);
-            ciphers.add(cipherName.getUtf8String(0));
+            ciphers.add(cipherName.getString(0));
         }
         return ciphers.toArray(new String[0]);
     }
@@ -767,7 +767,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         final String cipherSuiteSpec = buf.toString();
         try (var localArena = Arena.ofConfined()) {
-            SSL_set_cipher_list(state.ssl, localArena.allocateUtf8String(cipherSuiteSpec));
+            SSL_set_cipher_list(state.ssl, localArena.allocateString(cipherSuiteSpec));
         } catch (Exception e) {
             throw new IllegalStateException(sm.getString("engine.failedCipherSuite", cipherSuiteSpec), e);
         }
@@ -992,7 +992,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
         clearLastError();
         int code;
-        if (SSL_get_version(state.ssl).getUtf8String(0).equals(Constants.SSL_PROTO_TLSv1_3)) {
+        if (SSL_get_version(state.ssl).getString(0).equals(Constants.SSL_PROTO_TLSv1_3)) {
             state.phaState = PHAState.START;
             code = SSL_verify_client_post_handshake(state.ssl);
         } else {
@@ -1048,7 +1048,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     // Loop until getLastErrorNumber() returns SSL_ERROR_NONE
                     var buf = localArena.allocateArray(ValueLayout.JAVA_BYTE, new byte[128]);
                     ERR_error_string(error, buf);
-                    String err = buf.getUtf8String(0);
+                    String err = buf.getString(0);
                     if (sslError == null) {
                         sslError = err;
                     }
@@ -1123,7 +1123,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     selectedProtocol = getProtocolNegotiated();
                 }
                 session.lastAccessedTime = System.currentTimeMillis();
-                version = SSL_get_version(state.ssl).getUtf8String(0);
+                version = SSL_get_version(state.ssl).getString(0);
                 handshakeFinished = true;
                 return SSLEngineResult.HandshakeStatus.FINISHED;
             }
@@ -1702,7 +1702,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     if (destroyed) {
                         return INVALID_CIPHER;
                     }
-                    ciphers = SSL_CIPHER_get_name(SSL_get_current_cipher(state.ssl)).getUtf8String(0);
+                    ciphers = SSL_CIPHER_get_name(SSL_get_current_cipher(state.ssl)).getString(0);
                 }
                 String c = OpenSSLCipherConfigurationParser.openSSLToJsse(ciphers);
                 if (c != null) {
@@ -1726,7 +1726,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             String version = null;
             synchronized (OpenSSLEngine.this) {
                 if (!destroyed) {
-                    version = SSL_get_version(state.ssl).getUtf8String(0);
+                    version = SSL_get_version(state.ssl).getString(0);
                 }
             }
             if (applicationProtocol.isEmpty()) {
