@@ -22,6 +22,7 @@ import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.CodingErrorAction;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -211,7 +212,7 @@ public class TestGenerator extends TomcatBaseTest {
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug56529.jsp", bc, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        String response = bc.toStringInternal();
+        String response = bc.toStringInternal(CodingErrorAction.REPORT, CodingErrorAction.REPORT);
         Assert.assertTrue(response, response.contains("[1:attribute1: '', attribute2: '']"));
         Assert.assertTrue(response, response.contains("[2:attribute1: '', attribute2: '']"));
     }
