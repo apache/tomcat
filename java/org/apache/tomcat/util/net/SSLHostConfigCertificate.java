@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.KeyStore;
@@ -42,7 +43,8 @@ public class SSLHostConfigCertificate implements Serializable {
 
     static final String DEFAULT_KEYSTORE_PROVIDER = System.getProperty("javax.net.ssl.keyStoreProvider");
     static final String DEFAULT_KEYSTORE_TYPE = System.getProperty("javax.net.ssl.keyStoreType", "JKS");
-    private static final String DEFAULT_KEYSTORE_FILE = System.getProperty("user.home")+"/.keystore";
+    private static final String DEFAULT_KEYSTORE_FILE =
+            System.getProperty("user.home") + File.pathSeparator + ".keystore";
     private static final String DEFAULT_KEYSTORE_PASSWORD = "changeit";
 
     // Internal
