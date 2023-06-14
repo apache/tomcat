@@ -32,13 +32,12 @@ import org.apache.catalina.startup.TomcatBaseTest;
  */
 public class TestTagPluginManager extends TomcatBaseTest {
 
-    private static TagInfo tagInfo = new TagInfo("ATag",
-            "org.apache.jasper.compiler.ATagSupport", "", "", null, null, null);
+    private static TagInfo tagInfo =
+            new TagInfo("ATag", "org.apache.jasper.compiler.ATagSupport", "", "", null, null, null);
 
     @Test
     public void testBug54240() throws Exception {
         Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
-
 
 
         ServletContext context = ((Context) tomcat.getHost().findChildren()[0]).getServletContext();
@@ -46,10 +45,8 @@ public class TestTagPluginManager extends TomcatBaseTest {
         TagPluginManager manager = new TagPluginManager(context);
 
         Node.Nodes nodes = new Node.Nodes();
-        Node.CustomTag c = new Node.CustomTag("test:ATag", "test", "ATag",
-                "http://tomcat.apache.org/jasper", null, null, null, null, null,
-                new TagFileInfo("ATag", "http://tomcat.apache.org/jasper",
-                        tagInfo));
+        Node.CustomTag c = new Node.CustomTag("test:ATag", "test", "ATag", "http://tomcat.apache.org/jasper", null,
+                null, null, null, null, new TagFileInfo("ATag", "http://tomcat.apache.org/jasper", tagInfo));
         c.setTagHandlerClass(TesterTag.class);
         nodes.add(c);
         manager.apply(nodes, null, null);
@@ -57,13 +54,13 @@ public class TestTagPluginManager extends TomcatBaseTest {
         Node n = nodes.getNode(0);
         Assert.assertNotNull(n);
 
-        Node.CustomTag t = (Node.CustomTag)n;
+        Node.CustomTag t = (Node.CustomTag) n;
         Assert.assertNotNull(t.getAtSTag());
 
         Node.Nodes sTag = c.getAtSTag();
         Node scriptlet = sTag.getNode(0);
         Assert.assertNotNull(scriptlet);
-        Node.Scriptlet s = (Node.Scriptlet)scriptlet;
+        Node.Scriptlet s = (Node.Scriptlet) scriptlet;
         Assert.assertEquals("//Just a comment", s.getText());
     }
 }

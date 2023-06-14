@@ -37,8 +37,7 @@ public class TestJspConfig extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/el-as-literal.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/el-as-literal.jsp");
 
         String result = res.toString();
 
@@ -50,15 +49,13 @@ public class TestJspConfig extends TomcatBaseTest {
     public void testServlet23NoEL() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir =
-            new File("test/webapp-2.3");
+        File appDir = new File("test/webapp-2.3");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
         tomcat.start();
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/el-as-literal.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/el-as-literal.jsp");
 
         String result = res.toString();
 
@@ -76,8 +73,7 @@ public class TestJspConfig extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/el-as-literal.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/el-as-literal.jsp");
 
         String result = res.toString();
 
@@ -95,8 +91,7 @@ public class TestJspConfig extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/el-as-literal.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/el-as-literal.jsp");
 
         String result = res.toString();
 
@@ -113,8 +108,7 @@ public class TestJspConfig extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/el-as-literal.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/el-as-literal.jsp");
 
         String result = res.toString();
 
@@ -131,8 +125,7 @@ public class TestJspConfig extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/el-as-literal.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/el-as-literal.jsp");
 
         String result = res.toString();
 
@@ -149,8 +142,7 @@ public class TestJspConfig extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/el-as-literal.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/el-as-literal.jsp");
 
         String result = res.toString();
 

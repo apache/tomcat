@@ -28,8 +28,7 @@ public class TestJspReader extends TomcatBaseTest {
     public void testBug53986() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug53986.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug53986.jsp");
         Assert.assertTrue(res.toString().contains("OK"));
     }
 }
