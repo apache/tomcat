@@ -23,16 +23,13 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
- * Tests are duplicated in {@link TestParser} with the strict whitespace parsing
- * enabled by default.
+ * Tests are duplicated in {@link TestParser} with the strict whitespace parsing enabled by default.
  */
 public class TestParserNoStrictWhitespace extends TomcatBaseTest {
 
     @Override
     public void setUp() throws Exception {
-        System.setProperty(
-                "org.apache.jasper.compiler.Parser.STRICT_WHITESPACE",
-                "false");
+        System.setProperty("org.apache.jasper.compiler.Parser.STRICT_WHITESPACE", "false");
         super.setUp();
     }
 
@@ -40,8 +37,7 @@ public class TestParserNoStrictWhitespace extends TomcatBaseTest {
     public void testBug48627() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug48nnn/bug48627.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug48nnn/bug48627.jsp");
 
         String result = res.toString();
         // Beware of the differences between escaping in JSP attributes and
@@ -54,8 +50,7 @@ public class TestParserNoStrictWhitespace extends TomcatBaseTest {
     public void testBug48668a() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug48nnn/bug48668a.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug48nnn/bug48668a.jsp");
         String result = res.toString();
         assertEcho(result, "00-Hello world</p>#{foo.bar}");
         assertEcho(result, "01-Hello world</p>${foo.bar}");
@@ -93,8 +88,7 @@ public class TestParserNoStrictWhitespace extends TomcatBaseTest {
     public void testBug48668b() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug48nnn/bug48668b.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug48nnn/bug48668b.jsp");
         String result = res.toString();
         assertEcho(result, "00-Hello world</p>#{foo.bar}");
         assertEcho(result, "01-Hello world</p>#{foo2");
@@ -105,8 +99,7 @@ public class TestParserNoStrictWhitespace extends TomcatBaseTest {
         getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk res = new ByteChunk();
-        int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49nnn/bug49297NoSpace.jsp", res, null);
+        int sc = getUrl("http://localhost:" + getPort() + "/test/bug49nnn/bug49297NoSpace.jsp", res, null);
 
 
         Assert.assertEquals(200, sc);
@@ -117,8 +110,8 @@ public class TestParserNoStrictWhitespace extends TomcatBaseTest {
     public void testBug49297DuplicateAttr() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49nnn/bug49297DuplicateAttr.jsp", new ByteChunk(), null);
+        int sc = getUrl("http://localhost:" + getPort() + "/test/bug49nnn/bug49297DuplicateAttr.jsp", new ByteChunk(),
+                null);
 
         Assert.assertEquals(500, sc);
     }

@@ -39,8 +39,7 @@ public class TestCompiler extends TomcatBaseTest {
         ByteChunk res = new ByteChunk();
         Map<String,List<String>> headers = new HashMap<>();
 
-        getUrl("http://localhost:" + getPort() + "/test/bug49nnn/bug49726a.jsp",
-                res, headers);
+        getUrl("http://localhost:" + getPort() + "/test/bug49nnn/bug49726a.jsp", res, headers);
 
         // Check request completed
         String result = res.toString();
@@ -58,8 +57,7 @@ public class TestCompiler extends TomcatBaseTest {
         ByteChunk res = new ByteChunk();
         Map<String,List<String>> headers = new HashMap<>();
 
-        getUrl("http://localhost:" + getPort() + "/test/bug49nnn/bug49726b.jsp",
-                res, headers);
+        getUrl("http://localhost:" + getPort() + "/test/bug49nnn/bug49726b.jsp", res, headers);
 
         // Check request completed
         String result = res.toString();
@@ -75,8 +73,7 @@ public class TestCompiler extends TomcatBaseTest {
         getTomcatInstanceTestWebapp(false, true);
 
         // foo;bar.jsp
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug53257/foo%3bbar.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug53257/foo%3bbar.jsp");
 
         // Check request completed
         String result = res.toString();
@@ -87,8 +84,7 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug53257b() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug53257/foo&bar.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug53257/foo&bar.jsp");
 
         // Check request completed
         String result = res.toString();
@@ -100,8 +96,7 @@ public class TestCompiler extends TomcatBaseTest {
         getTomcatInstanceTestWebapp(false, true);
 
         // foo#bar.jsp
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug53257/foo%23bar.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug53257/foo%23bar.jsp");
 
         // Check request completed
         String result = res.toString();
@@ -113,8 +108,7 @@ public class TestCompiler extends TomcatBaseTest {
         getTomcatInstanceTestWebapp(false, true);
 
         // foo%bar.jsp
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug53257/foo%25bar.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug53257/foo%25bar.jsp");
 
         // Check request completed
         String result = res.toString();
@@ -125,8 +119,7 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug53257e() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug53257/foo+bar.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug53257/foo+bar.jsp");
 
         // Check request completed
         String result = res.toString();
@@ -137,8 +130,7 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug53257f() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug53257/foo%20bar.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug53257/foo%20bar.jsp");
 
         // Check request completed
         String result = res.toString();
@@ -149,8 +141,7 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug53257g() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug53257/foo%20bar/foobar.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug53257/foo%20bar/foobar.jsp");
 
         // Check request completed
         String result = res.toString();
@@ -163,8 +154,7 @@ public class TestCompiler extends TomcatBaseTest {
 
         // Check that URL decoding is not done twice
         ByteChunk res = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug53257/foo%2525bar.jsp", res, null);
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug53257/foo%2525bar.jsp", res, null);
         Assert.assertEquals(404, rc);
     }
 
@@ -187,15 +177,10 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug55262() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug55262.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug55262.jsp");
         String result = res.toString();
-        Pattern prelude = Pattern.compile(
-                "(.*This is a prelude\\.){2}.*",
-                Pattern.MULTILINE | Pattern.DOTALL);
-        Pattern coda = Pattern.compile(
-                "(.*This is a coda\\.){2}.*",
-                Pattern.MULTILINE|Pattern.DOTALL);
+        Pattern prelude = Pattern.compile("(.*This is a prelude\\.){2}.*", Pattern.MULTILINE | Pattern.DOTALL);
+        Pattern coda = Pattern.compile("(.*This is a coda\\.){2}.*", Pattern.MULTILINE | Pattern.DOTALL);
         Assert.assertTrue(prelude.matcher(result).matches());
         Assert.assertTrue(coda.matcher(result).matches());
     }
