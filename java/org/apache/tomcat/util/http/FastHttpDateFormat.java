@@ -35,8 +35,8 @@ public final class FastHttpDateFormat {
     // -------------------------------------------------------------- Variables
 
 
-    private static final int CACHE_SIZE = Integer
-            .getInteger("org.apache.tomcat.util.http.FastHttpDateFormat.CACHE_SIZE", 1000).intValue();
+    private static final int CACHE_SIZE =
+            Integer.getInteger("org.apache.tomcat.util.http.FastHttpDateFormat.CACHE_SIZE", 1000).intValue();
 
 
     /**
@@ -66,8 +66,8 @@ public final class FastHttpDateFormat {
         FORMAT_OBSOLETE_RFC850 = new ConcurrentDateFormat(DATE_OBSOLETE_RFC850, Locale.US, tz);
         FORMAT_OBSOLETE_ASCTIME = new ConcurrentDateFormat(DATE_OBSOLETE_ASCTIME, Locale.US, tz);
 
-        httpParseFormats = new ConcurrentDateFormat[] { FORMAT_RFC5322, FORMAT_OBSOLETE_RFC850,
-                FORMAT_OBSOLETE_ASCTIME };
+        httpParseFormats =
+                new ConcurrentDateFormat[] { FORMAT_RFC5322, FORMAT_OBSOLETE_RFC850, FORMAT_OBSOLETE_ASCTIME };
     }
 
     /**
@@ -85,13 +85,13 @@ public final class FastHttpDateFormat {
     /**
      * Formatter cache.
      */
-    private static final Map<Long, String> formatCache = new ConcurrentHashMap<>(CACHE_SIZE);
+    private static final Map<Long,String> formatCache = new ConcurrentHashMap<>(CACHE_SIZE);
 
 
     /**
      * Parser cache.
      */
-    private static final Map<String, Long> parseCache = new ConcurrentHashMap<>(CACHE_SIZE);
+    private static final Map<String,Long> parseCache = new ConcurrentHashMap<>(CACHE_SIZE);
 
 
     // --------------------------------------------------------- Public Methods
