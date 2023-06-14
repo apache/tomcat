@@ -98,17 +98,18 @@ public class DefaultInstanceManager implements InstanceManager {
 
 
     private final Context context;
-    private final Map<String, Map<String, String>> injectionMap;
+    private final Map<String,Map<String,String>> injectionMap;
     protected final ClassLoader classLoader;
     protected final ClassLoader containerClassLoader;
     protected final boolean privileged;
     protected final boolean ignoreAnnotations;
     private final Set<String> restrictedClasses;
-    private final ManagedConcurrentWeakHashMap<Class<?>, AnnotationCacheEntry[]> annotationCache = new ManagedConcurrentWeakHashMap<>();
-    private final Map<String, String> postConstructMethods;
-    private final Map<String, String> preDestroyMethods;
+    private final ManagedConcurrentWeakHashMap<Class<?>,AnnotationCacheEntry[]> annotationCache =
+            new ManagedConcurrentWeakHashMap<>();
+    private final Map<String,String> postConstructMethods;
+    private final Map<String,String> preDestroyMethods;
 
-    public DefaultInstanceManager(Context context, Map<String, Map<String, String>> injectionMap,
+    public DefaultInstanceManager(Context context, Map<String,Map<String,String>> injectionMap,
             org.apache.catalina.Context catalinaContext, ClassLoader containerClassLoader) {
         classLoader = catalinaContext.getLoader().getClassLoader();
         privileged = catalinaContext.getPrivileged();
@@ -159,7 +160,7 @@ public class DefaultInstanceManager implements InstanceManager {
     private Object newInstance(Object instance, Class<?> clazz)
             throws IllegalAccessException, InvocationTargetException, NamingException {
         if (!ignoreAnnotations) {
-            Map<String, String> injections = assembleInjectionsFromClassHierarchy(clazz);
+            Map<String,String> injections = assembleInjectionsFromClassHierarchy(clazz);
             populateAnnotationsCache(clazz, injections);
             processAnnotations(instance, injections);
             postConstruct(instance, clazz);
@@ -167,9 +168,9 @@ public class DefaultInstanceManager implements InstanceManager {
         return instance;
     }
 
-    private Map<String, String> assembleInjectionsFromClassHierarchy(Class<?> clazz) {
-        Map<String, String> injections = new HashMap<>();
-        Map<String, String> currentInjections = null;
+    private Map<String,String> assembleInjectionsFromClassHierarchy(Class<?> clazz) {
+        Map<String,String> injections = new HashMap<>();
+        Map<String,String> currentInjections = null;
         while (clazz != null) {
             currentInjections = this.injectionMap.get(clazz.getName());
             if (currentInjections != null) {
@@ -276,7 +277,7 @@ public class DefaultInstanceManager implements InstanceManager {
      * @throws javax.naming.NamingException                if value cannot be looked up in jndi
      * @throws java.lang.reflect.InvocationTargetException if injection fails
      */
-    protected void populateAnnotationsCache(Class<?> clazz, Map<String, String> injections)
+    protected void populateAnnotationsCache(Class<?> clazz, Map<String,String> injections)
             throws IllegalAccessException, InvocationTargetException, NamingException {
 
         List<AnnotationCacheEntry> annotations = null;
@@ -324,8 +325,8 @@ public class DefaultInstanceManager implements InstanceManager {
                                 (webServiceRefAnnotation = method.getAnnotation(WebServiceRef.class)) != null) {
                             annotations.add(new AnnotationCacheEntry(method.getName(), method.getParameterTypes(),
                                     ((WebServiceRef) webServiceRefAnnotation).name(), AnnotationCacheEntryType.SETTER));
-                        } else if (JPA_PRESENT && (persistenceContextAnnotation = method
-                                .getAnnotation(PersistenceContext.class)) != null) {
+                        } else if (JPA_PRESENT && (persistenceContextAnnotation =
+                                method.getAnnotation(PersistenceContext.class)) != null) {
                             annotations.add(new AnnotationCacheEntry(method.getName(), method.getParameterTypes(),
                                     ((PersistenceContext) persistenceContextAnnotation).name(),
                                     AnnotationCacheEntryType.SETTER));
@@ -382,8 +383,8 @@ public class DefaultInstanceManager implements InstanceManager {
                                 (webServiceRefAnnotation = field.getAnnotation(WebServiceRef.class)) != null) {
                             annotations.add(new AnnotationCacheEntry(fieldName, null,
                                     ((WebServiceRef) webServiceRefAnnotation).name(), AnnotationCacheEntryType.FIELD));
-                        } else if (JPA_PRESENT && (persistenceContextAnnotation = field
-                                .getAnnotation(PersistenceContext.class)) != null) {
+                        } else if (JPA_PRESENT && (persistenceContextAnnotation =
+                                field.getAnnotation(PersistenceContext.class)) != null) {
                             annotations.add(new AnnotationCacheEntry(fieldName, null,
                                     ((PersistenceContext) persistenceContextAnnotation).name(),
                                     AnnotationCacheEntryType.FIELD));
@@ -421,7 +422,7 @@ public class DefaultInstanceManager implements InstanceManager {
      * @throws javax.naming.NamingException                if value cannot be looked up in jndi
      * @throws java.lang.reflect.InvocationTargetException if injection fails
      */
-    protected void processAnnotations(Object instance, Map<String, String> injections)
+    protected void processAnnotations(Object instance, Map<String,String> injections)
             throws IllegalAccessException, InvocationTargetException, NamingException {
 
         if (context == null) {
@@ -589,7 +590,7 @@ public class DefaultInstanceManager implements InstanceManager {
         if (properties.isEmpty()) {
             return;
         }
-        for (Map.Entry<Object, Object> e : properties.entrySet()) {
+        for (Map.Entry<Object,Object> e : properties.entrySet()) {
             if ("restricted".equals(e.getValue())) {
                 classNames.add(e.getKey().toString());
             } else {
@@ -699,7 +700,10 @@ public class DefaultInstanceManager implements InstanceManager {
 
 
     private enum AnnotationCacheEntryType {
-        FIELD, SETTER, POST_CONSTRUCT, PRE_DESTROY
+        FIELD,
+        SETTER,
+        POST_CONSTRUCT,
+        PRE_DESTROY
     }
 
 

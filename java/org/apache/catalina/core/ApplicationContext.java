@@ -113,13 +113,13 @@ public class ApplicationContext implements ServletContext {
     /**
      * The context attributes for this context.
      */
-    protected Map<String, Object> attributes = new ConcurrentHashMap<>();
+    protected Map<String,Object> attributes = new ConcurrentHashMap<>();
 
 
     /**
      * List of read only attributes for this context.
      */
-    private final Map<String, String> readOnlyAttributes = new ConcurrentHashMap<>();
+    private final Map<String,String> readOnlyAttributes = new ConcurrentHashMap<>();
 
 
     /**
@@ -143,7 +143,7 @@ public class ApplicationContext implements ServletContext {
     /**
      * The merged context initialization parameters for this Context.
      */
-    private final Map<String, String> parameters = new ConcurrentHashMap<>();
+    private final Map<String,String> parameters = new ConcurrentHashMap<>();
 
 
     /**
@@ -799,7 +799,7 @@ public class ApplicationContext implements ServletContext {
         }
 
         String jspServletClassName = null;
-        Map<String, String> jspFileInitParams = new HashMap<>();
+        Map<String,String> jspFileInitParams = new HashMap<>();
 
         Wrapper jspServlet = (Wrapper) context.findChild("jsp");
 
@@ -826,7 +826,7 @@ public class ApplicationContext implements ServletContext {
 
 
     private ServletRegistration.Dynamic addServlet(String servletName, String servletClass, Servlet servlet,
-            Map<String, String> initParams) throws IllegalStateException {
+            Map<String,String> initParams) throws IllegalStateException {
 
         if (servletName == null || servletName.equals("")) {
             throw new IllegalArgumentException(sm.getString("applicationContext.invalidServletName", servletName));
@@ -869,7 +869,7 @@ public class ApplicationContext implements ServletContext {
         }
 
         if (initParams != null) {
-            for (Map.Entry<String, String> initParam : initParams.entrySet()) {
+            for (Map.Entry<String,String> initParam : initParams.entrySet()) {
                 wrapper.addInitParameter(initParam.getKey(), initParam.getValue());
             }
         }
@@ -1136,8 +1136,8 @@ public class ApplicationContext implements ServletContext {
 
 
     @Override
-    public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
-        Map<String, ApplicationFilterRegistration> result = new HashMap<>();
+    public Map<String,? extends FilterRegistration> getFilterRegistrations() {
+        Map<String,ApplicationFilterRegistration> result = new HashMap<>();
 
         FilterDef[] filterDefs = context.findFilterDefs();
         for (FilterDef filterDef : filterDefs) {
@@ -1155,8 +1155,8 @@ public class ApplicationContext implements ServletContext {
 
 
     @Override
-    public Map<String, ? extends ServletRegistration> getServletRegistrations() {
-        Map<String, ApplicationServletRegistration> result = new HashMap<>();
+    public Map<String,? extends ServletRegistration> getServletRegistrations() {
+        Map<String,ApplicationServletRegistration> result = new HashMap<>();
 
         Container[] wrappers = context.findChildren();
         for (Container wrapper : wrappers) {

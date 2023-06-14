@@ -105,8 +105,8 @@ public final class ApplicationFilterFactory {
             if (!matchFiltersURL(filterMap, requestPath)) {
                 continue;
             }
-            ApplicationFilterConfig filterConfig = (ApplicationFilterConfig) context
-                    .findFilterConfig(filterMap.getFilterName());
+            ApplicationFilterConfig filterConfig =
+                    (ApplicationFilterConfig) context.findFilterConfig(filterMap.getFilterName());
             if (filterConfig == null) {
                 // FIXME - log configuration problem
                 continue;
@@ -122,8 +122,8 @@ public final class ApplicationFilterFactory {
             if (!matchFiltersServlet(filterMap, servletName)) {
                 continue;
             }
-            ApplicationFilterConfig filterConfig = (ApplicationFilterConfig) context
-                    .findFilterConfig(filterMap.getFilterName());
+            ApplicationFilterConfig filterConfig =
+                    (ApplicationFilterConfig) context.findFilterConfig(filterMap.getFilterName());
             if (filterConfig == null) {
                 // FIXME - log configuration problem
                 continue;

@@ -447,8 +447,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
             scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
             utilityExecutor = scheduledThreadPoolExecutor;
-            utilityExecutorWrapper = new org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor(
-                    utilityExecutor);
+            utilityExecutorWrapper = new org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor(utilityExecutor);
         }
     }
 
@@ -937,9 +936,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                     log.error(sm.getString("standardServer.periodicEventError"), e);
                 }
             }
-            periodicLifecycleEventFuture = getUtilityExecutor().scheduleAtFixedRate(
-                    () -> fireLifecycleEvent(Lifecycle.PERIODIC_EVENT, null), periodicEventDelay, periodicEventDelay,
-                    TimeUnit.SECONDS);
+            periodicLifecycleEventFuture =
+                    getUtilityExecutor().scheduleAtFixedRate(() -> fireLifecycleEvent(Lifecycle.PERIODIC_EVENT, null),
+                            periodicEventDelay, periodicEventDelay, TimeUnit.SECONDS);
         }
     }
 

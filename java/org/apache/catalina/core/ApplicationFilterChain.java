@@ -100,14 +100,14 @@ public final class ApplicationFilterChain implements FilterChain {
     /**
      * Static class array used when the SecurityManager is turned on and <code>doFilter</code> is invoked.
      */
-    private static final Class<?>[] classType = new Class[] { ServletRequest.class, ServletResponse.class,
-            FilterChain.class };
+    private static final Class<?>[] classType =
+            new Class[] { ServletRequest.class, ServletResponse.class, FilterChain.class };
 
     /**
      * Static class array used when the SecurityManager is turned on and <code>service</code> is invoked.
      */
-    private static final Class<?>[] classTypeUsedInService = new Class[] { ServletRequest.class,
-            ServletResponse.class };
+    private static final Class<?>[] classTypeUsedInService =
+            new Class[] { ServletRequest.class, ServletResponse.class };
 
 
     // ---------------------------------------------------- FilterChain Methods

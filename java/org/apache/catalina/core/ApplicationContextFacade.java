@@ -60,13 +60,13 @@ public class ApplicationContextFacade implements ServletContext {
     /**
      * Cache Class object used for reflection.
      */
-    private final Map<String, Class<?>[]> classCache;
+    private final Map<String,Class<?>[]> classCache;
 
 
     /**
      * Cache method object.
      */
-    private final Map<String, Method> objectCache;
+    private final Map<String,Method> objectCache;
 
 
     // ----------------------------------------------------------- Constructors
@@ -622,9 +622,9 @@ public class ApplicationContextFacade implements ServletContext {
 
     @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
-    public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
+    public Map<String,? extends FilterRegistration> getFilterRegistrations() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (Map<String, ? extends FilterRegistration>) doPrivileged("getFilterRegistrations", null);
+            return (Map<String,? extends FilterRegistration>) doPrivileged("getFilterRegistrations", null);
         } else {
             return context.getFilterRegistrations();
         }
@@ -643,9 +643,9 @@ public class ApplicationContextFacade implements ServletContext {
 
     @Override
     @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
-    public Map<String, ? extends ServletRegistration> getServletRegistrations() {
+    public Map<String,? extends ServletRegistration> getServletRegistrations() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (Map<String, ? extends ServletRegistration>) doPrivileged("getServletRegistrations", null);
+            return (Map<String,? extends ServletRegistration>) doPrivileged("getServletRegistrations", null);
         } else {
             return context.getServletRegistrations();
         }

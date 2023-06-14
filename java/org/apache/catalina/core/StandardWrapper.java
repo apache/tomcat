@@ -144,14 +144,14 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     /**
      * The initialization parameters for this servlet, keyed by parameter name.
      */
-    protected HashMap<String, String> parameters = new HashMap<>();
+    protected HashMap<String,String> parameters = new HashMap<>();
 
 
     /**
      * The security role references for this servlet, keyed by role name used in the servlet. The corresponding value is
      * the role name of the web application itself.
      */
-    protected HashMap<String, String> references = new HashMap<>();
+    protected HashMap<String,String> references = new HashMap<>();
 
 
     /**
