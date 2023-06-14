@@ -16,10 +16,13 @@
  */
 package org.apache.tomcat.util.buf;
 
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.CodingErrorAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.TreeMap;
 
 import org.apache.juli.logging.Log;
@@ -208,11 +211,22 @@ public class StringCache {
 
 
     public static String toString(ByteChunk bc) {
+        try {
+            return toString(bc, CodingErrorAction.REPLACE, CodingErrorAction.REPLACE);
+        } catch (CharacterCodingException e) {
+            // Unreachable code. Use of REPLACE above means the exception will never be thrown.
+            throw new IllegalStateException(e);
+        }
+    }
+
+
+    public static String toString(ByteChunk bc, CodingErrorAction malformedInputAction,
+            CodingErrorAction unmappableCharacterAction) throws CharacterCodingException {
 
         // If the cache is null, then either caching is disabled, or we're
         // still training
         if (bcCache == null) {
-            String value = bc.toStringInternal();
+            String value = bc.toStringInternal(malformedInputAction, unmappableCharacterAction);
             if (byteEnabled && (value.length() < maxStringSize)) {
                 // If training, everything is synced
                 synchronized (bcStats) {
@@ -291,6 +305,8 @@ public class StringCache {
                             System.arraycopy(bc.getBuffer(), start, entry.name, 0, end - start);
                             // Set encoding
                             entry.charset = bc.getCharset();
+                            entry.malformedInputAction = malformedInputAction;
+                            entry.unmappableCharacterAction = unmappableCharacterAction;
                             // Initialize occurrence count to one
                             count = new int[1];
                             count[0] = 1;
@@ -306,9 +322,9 @@ public class StringCache {
         } else {
             accessCount++;
             // Find the corresponding String
-            String result = find(bc);
+            String result = find(bc, malformedInputAction, unmappableCharacterAction);
             if (result == null) {
-                return bc.toStringInternal();
+                return bc.toStringInternal(malformedInputAction, unmappableCharacterAction);
             }
             // Note: We don't care about safety for the stats
             hitCount++;
@@ -473,10 +489,31 @@ public class StringCache {
      * @param name The name to find
      *
      * @return the corresponding value
+     *
+     * @deprecated Unused. Will be removed in Tomcat 11.
+     *             Use {@link #find(ByteChunk, CodingErrorAction, CodingErrorAction)}
      */
+    @Deprecated
     protected static final String find(ByteChunk name) {
+        return find(name, CodingErrorAction.REPLACE, CodingErrorAction.REPLACE);
+    }
+
+
+    /**
+     * Find an entry given its name in the cache and return the associated String.
+     *
+     * @param name                      The name to find
+     * @param malformedInputAction      Action to take if an malformed input is encountered
+     * @param unmappableCharacterAction Action to take if an unmappable character is encountered
+     *
+     * @return the corresponding value
+     */
+    protected static final String find(ByteChunk name, CodingErrorAction malformedInputAction,
+        CodingErrorAction unmappableCharacterAction) {
         int pos = findClosest(name, bcCache, bcCache.length);
-        if ((pos < 0) || (compare(name, bcCache[pos].name) != 0) || !(name.getCharset().equals(bcCache[pos].charset))) {
+        if ((pos < 0) || (compare(name, bcCache[pos].name) != 0) || !(name.getCharset().equals(bcCache[pos].charset)) ||
+                !malformedInputAction.equals(bcCache[pos].malformedInputAction) ||
+                !unmappableCharacterAction.equals(bcCache[pos].unmappableCharacterAction)) {
             return null;
         } else {
             return bcCache[pos].value;
@@ -642,11 +679,12 @@ public class StringCache {
 
     // -------------------------------------------------- ByteEntry Inner Class
 
-
     private static class ByteEntry {
 
         private byte[] name = null;
         private Charset charset = null;
+        private CodingErrorAction malformedInputAction = null;
+        private CodingErrorAction unmappableCharacterAction = null;
         private String value = null;
 
         @Override
@@ -656,17 +694,25 @@ public class StringCache {
 
         @Override
         public int hashCode() {
-            return value.hashCode();
+            return Objects.hash(malformedInputAction, unmappableCharacterAction, value);
         }
 
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof ByteEntry) {
-                return value.equals(((ByteEntry) obj).value);
+            if (this == obj) {
+                return true;
             }
-            return false;
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            ByteEntry other = (ByteEntry) obj;
+            return Objects.equals(malformedInputAction, other.malformedInputAction) &&
+                    Objects.equals(unmappableCharacterAction, other.unmappableCharacterAction) &&
+                    Objects.equals(value, other.value);
         }
-
     }
 
 
