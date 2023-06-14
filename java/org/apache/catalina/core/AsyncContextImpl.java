@@ -386,8 +386,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("asyncContextImpl.fireOnError"));
             }
-            AsyncEvent errorEvent = new AsyncEvent(event.getAsyncContext(), event.getSuppliedRequest(),
-                    event.getSuppliedResponse(), t);
+            AsyncEvent errorEvent =
+                    new AsyncEvent(event.getAsyncContext(), event.getSuppliedRequest(), event.getSuppliedResponse(), t);
             List<AsyncListenerWrapper> listenersCopy = new ArrayList<>(listeners);
             for (AsyncListenerWrapper listener : listenersCopy) {
                 try {

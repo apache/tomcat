@@ -138,7 +138,7 @@ public class NamingContextListener implements LifecycleListener, ContainerListen
     /**
      * Objectnames Map.
      */
-    protected HashMap<String, ObjectName> objectNames = new HashMap<>();
+    protected HashMap<String,ObjectName> objectNames = new HashMap<>();
 
 
     /**
@@ -224,7 +224,7 @@ public class NamingContextListener implements LifecycleListener, ContainerListen
             }
 
             try {
-                Hashtable<String, Object> contextEnv = new Hashtable<>();
+                Hashtable<String,Object> contextEnv = new Hashtable<>();
                 namingContext = new NamingContext(contextEnv, getName());
                 ContextAccessController.setSecurityToken(getName(), token);
                 ContextAccessController.setSecurityToken(container, token);
@@ -867,8 +867,8 @@ public class NamingContextListener implements LifecycleListener, ContainerListen
                 }
                 if (jaxrpcURL == null) {
                     try {
-                        jaxrpcURL = ((Context) container).getServletContext()
-                                .getResource(service.getJaxrpcmappingfile());
+                        jaxrpcURL =
+                                ((Context) container).getServletContext().getResource(service.getJaxrpcmappingfile());
                     } catch (MalformedURLException e) {
                         // Ignore and carry on
                     }
@@ -1040,8 +1040,8 @@ public class NamingContextListener implements LifecycleListener, ContainerListen
     public void addResourceLink(ContextResourceLink resourceLink) {
 
         // Create a reference to the resource.
-        Reference ref = new ResourceLinkRef(resourceLink.getType(), resourceLink.getGlobal(), resourceLink.getFactory(),
-                null);
+        Reference ref =
+                new ResourceLinkRef(resourceLink.getType(), resourceLink.getGlobal(), resourceLink.getFactory(), null);
         Iterator<String> i = resourceLink.listProperties();
         while (i.hasNext()) {
             String key = i.next();

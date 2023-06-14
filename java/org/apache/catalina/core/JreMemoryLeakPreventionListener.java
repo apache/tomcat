@@ -61,7 +61,8 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     private static final Log log = LogFactory.getLog(JreMemoryLeakPreventionListener.class);
     private static final StringManager sm = StringManager.getManager(JreMemoryLeakPreventionListener.class);
 
-    private static final String FORK_JOIN_POOL_THREAD_FACTORY_PROPERTY = "java.util.concurrent.ForkJoinPool.common.threadFactory";
+    private static final String FORK_JOIN_POOL_THREAD_FACTORY_PROPERTY =
+            "java.util.concurrent.ForkJoinPool.common.threadFactory";
     /**
      * Protect against the memory leak caused when the first call to <code>sun.awt.AppContext.getAppContext()</code> is
      * triggered by a web application. Defaults to <code>false</code> since
@@ -331,8 +332,8 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                         } else {
                             log.debug(sm.getString("jreLeakListener.gcDaemonFail"), e);
                         }
-                    } catch (SecurityException | NoSuchMethodException | IllegalArgumentException
-                            | IllegalAccessException e) {
+                    } catch (SecurityException | NoSuchMethodException | IllegalArgumentException |
+                            IllegalAccessException e) {
                         log.error(sm.getString("jreLeakListener.gcDaemonFail"), e);
                     } catch (InvocationTargetException e) {
                         ExceptionUtils.handleThrowable(e.getCause());
@@ -466,9 +467,8 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 }
 
                 /*
-                 * Initialize the SeedGenerator of the JVM, as some platforms use
-                 * a thread which could end up being associated with a webapp rather
-                 * than the container.
+                 * Initialize the SeedGenerator of the JVM, as some platforms use a thread which could end up being
+                 * associated with a webapp rather than the container.
                  */
                 if (initSeedGenerator) {
                     SecureRandom.getSeed(1);
