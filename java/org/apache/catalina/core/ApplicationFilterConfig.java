@@ -153,7 +153,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     @Override
     public String getInitParameter(String name) {
 
-        Map<String, String> map = filterDef.getParameterMap();
+        Map<String,String> map = filterDef.getParameterMap();
         if (map == null) {
             return null;
         }
@@ -168,7 +168,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
      */
     @Override
     public Enumeration<String> getInitParameterNames() {
-        Map<String, String> map = filterDef.getParameterMap();
+        Map<String,String> map = filterDef.getParameterMap();
 
         if (map == null) {
             return Collections.enumeration(emptyString);
@@ -205,7 +205,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
 
     // --------------------------------------------------------- Public Methods
 
-    public Map<String, String> getFilterInitParameterMap() {
+    public Map<String,String> getFilterInitParameterMap() {
         return Collections.unmodifiableMap(filterDef.getParameterMap());
     }
 

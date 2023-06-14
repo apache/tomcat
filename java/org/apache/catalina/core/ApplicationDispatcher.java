@@ -122,8 +122,8 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
      * @param mapping     The mapping for this resource (if any)
      * @param name        Servlet name (if a named dispatcher was created) else <code>null</code>
      */
-    ApplicationDispatcher(Wrapper wrapper, String requestURI, String servletPath, String pathInfo,
-            String queryString, HttpServletMapping mapping, String name) {
+    ApplicationDispatcher(Wrapper wrapper, String requestURI, String servletPath, String pathInfo, String queryString,
+            HttpServletMapping mapping, String name) {
 
         super();
 
@@ -519,8 +519,8 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
             wrapper.getLogger().error(sm.getString("applicationDispatcher.allocateException", wrapper.getName()), e);
-            servletException = new ServletException(
-                    sm.getString("applicationDispatcher.allocateException", wrapper.getName()), e);
+            servletException =
+                    new ServletException(sm.getString("applicationDispatcher.allocateException", wrapper.getName()), e);
             servlet = null;
         }
 

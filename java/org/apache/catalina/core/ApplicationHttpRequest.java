@@ -74,13 +74,13 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * The set of attribute names that are special for request dispatchers.
      */
-    protected static final String specials[] = { RequestDispatcher.INCLUDE_REQUEST_URI,
-            RequestDispatcher.INCLUDE_CONTEXT_PATH, RequestDispatcher.INCLUDE_SERVLET_PATH,
-            RequestDispatcher.INCLUDE_PATH_INFO, RequestDispatcher.INCLUDE_QUERY_STRING,
-            RequestDispatcher.INCLUDE_MAPPING, RequestDispatcher.FORWARD_REQUEST_URI,
-            RequestDispatcher.FORWARD_CONTEXT_PATH, RequestDispatcher.FORWARD_SERVLET_PATH,
-            RequestDispatcher.FORWARD_PATH_INFO, RequestDispatcher.FORWARD_QUERY_STRING,
-            RequestDispatcher.FORWARD_MAPPING };
+    protected static final String specials[] =
+            { RequestDispatcher.INCLUDE_REQUEST_URI, RequestDispatcher.INCLUDE_CONTEXT_PATH,
+                    RequestDispatcher.INCLUDE_SERVLET_PATH, RequestDispatcher.INCLUDE_PATH_INFO,
+                    RequestDispatcher.INCLUDE_QUERY_STRING, RequestDispatcher.INCLUDE_MAPPING,
+                    RequestDispatcher.FORWARD_REQUEST_URI, RequestDispatcher.FORWARD_CONTEXT_PATH,
+                    RequestDispatcher.FORWARD_SERVLET_PATH, RequestDispatcher.FORWARD_PATH_INFO,
+                    RequestDispatcher.FORWARD_QUERY_STRING, RequestDispatcher.FORWARD_MAPPING };
 
     private static final int SPECIALS_FIRST_FORWARD_INDEX = 6;
 
@@ -135,7 +135,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * The request parameters for this request. This is initialized from the wrapped request.
      */
-    protected Map<String, String[]> parameters = null;
+    protected Map<String,String[]> parameters = null;
 
 
     /**
@@ -400,7 +400,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getParameterMap()</code> method of the wrapped request.
      */
     @Override
-    public Map<String, String[]> getParameterMap() {
+    public Map<String,String[]> getParameterMap() {
         parseParameters();
         return parameters;
     }
@@ -719,7 +719,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         parameters = new ParameterMap<>();
         parameters.putAll(getRequest().getParameterMap());
         mergeParameters();
-        ((ParameterMap<String, String[]>) parameters).setLocked(true);
+        ((ParameterMap<String,String[]>) parameters).setLocked(true);
         parsedParams = true;
     }
 

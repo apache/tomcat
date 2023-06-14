@@ -26,8 +26,7 @@ import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- *  Implementation of {@code LifecycleListener} that will create context naming information
- *  environment entries.
+ * Implementation of {@code LifecycleListener} that will create context naming information environment entries.
  * <p>
  * This listener must only be nested within {@link Context} elements.
  * <p>
@@ -41,8 +40,8 @@ import org.apache.tomcat.util.res.StringManager;
  * <li>Display Name: {@code context/displayName} from {@link Context#getDisplayName()}</li>
  * </ul>
  * <p>
- * See the <a href="https://tomcat.apache.org/tomcat-11.0-doc/config/context.html#Naming">Tomcat
- * documentation</a> for more details on the values.
+ * See the <a href="https://tomcat.apache.org/tomcat-11.0-doc/config/context.html#Naming">Tomcat documentation</a> for
+ * more details on the values.
  */
 public class ContextNamingInfoListener implements LifecycleListener {
 
@@ -62,8 +61,8 @@ public class ContextNamingInfoListener implements LifecycleListener {
     private boolean emptyOnRoot = true;
 
     /**
-     * Sets whether for the root context {@code context/path} and {@code context/encodedPath} will
-     * contain {@code "/"} and {@code context/name} will contain {@code "ROOT"} with a version, if any.
+     * Sets whether for the root context {@code context/path} and {@code context/encodedPath} will contain {@code "/"}
+     * and {@code context/name} will contain {@code "ROOT"} with a version, if any.
      *
      * @param emptyOnRoot whether paths and name for root context shall be empty
      */
@@ -113,7 +112,7 @@ public class ContextNamingInfoListener implements LifecycleListener {
         ce.setType("java.lang.String");
         ce.setValue(value);
         if (log.isDebugEnabled()) {
-            log.info(sm.getString("contextNamingInfoListener.envEntry",name, value));
+            log.info(sm.getString("contextNamingInfoListener.envEntry", name, value));
         }
         context.getNamingResources().addEnvironment(ce);
     }

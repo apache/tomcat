@@ -50,7 +50,7 @@ public class ApplicationContextFacade implements ServletContext {
     /**
      * Cache Class object used for reflection.
      */
-    private final Map<String, Class<?>[]> classCache;
+    private final Map<String,Class<?>[]> classCache;
 
 
     // ----------------------------------------------------------- Constructors
@@ -387,7 +387,7 @@ public class ApplicationContextFacade implements ServletContext {
 
 
     @Override
-    public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
+    public Map<String,? extends FilterRegistration> getFilterRegistrations() {
         return context.getFilterRegistrations();
     }
 
@@ -399,7 +399,7 @@ public class ApplicationContextFacade implements ServletContext {
 
 
     @Override
-    public Map<String, ? extends ServletRegistration> getServletRegistrations() {
+    public Map<String,? extends ServletRegistration> getServletRegistrations() {
         return context.getServletRegistrations();
     }
 
