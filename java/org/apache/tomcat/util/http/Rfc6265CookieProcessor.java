@@ -38,8 +38,8 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
     private static final Log log = LogFactory.getLog(Rfc6265CookieProcessor.class);
 
-    private static final StringManager sm = StringManager
-            .getManager(Rfc6265CookieProcessor.class.getPackage().getName());
+    private static final StringManager sm =
+            StringManager.getManager(Rfc6265CookieProcessor.class.getPackage().getName());
 
     private static final BitSet domainValid = new BitSet(128);
 
@@ -178,7 +178,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
         }
 
         // Add the remaining attributes
-        for (Map.Entry<String, String> entry : cookie.getAttributes().entrySet()) {
+        for (Map.Entry<String,String> entry : cookie.getAttributes().entrySet()) {
             switch (entry.getKey()) {
                 case Constants.COOKIE_COMMENT_ATTR:
                 case Constants.COOKIE_DOMAIN_ATTR:
