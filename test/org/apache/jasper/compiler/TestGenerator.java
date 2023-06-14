@@ -56,8 +56,7 @@ public class TestGenerator extends TomcatBaseTest {
     public void testBug45015a() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug45nnn/bug45015a.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45015a.jsp");
 
         String result = res.toString();
         // Beware of the differences between escaping in JSP attributes and
@@ -78,8 +77,7 @@ public class TestGenerator extends TomcatBaseTest {
     public void testBug45015b() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug45nnn/bug45015b.jsp", new ByteChunk(), null);
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45015b.jsp", new ByteChunk(), null);
 
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
@@ -88,8 +86,7 @@ public class TestGenerator extends TomcatBaseTest {
     public void testBug45015c() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug45nnn/bug45015c.jsp", new ByteChunk(), null);
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45015c.jsp", new ByteChunk(), null);
 
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
@@ -98,8 +95,7 @@ public class TestGenerator extends TomcatBaseTest {
     public void testBug48701Fail() throws Exception {
         getTomcatInstanceTestWebapp(true, true);
 
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug48nnn/bug48701-fail.jsp", new ByteChunk(), null);
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug48nnn/bug48701-fail.jsp", new ByteChunk(), null);
 
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
@@ -127,8 +123,7 @@ public class TestGenerator extends TomcatBaseTest {
     private void testBug48701(String jsp) throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/" + jsp);
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/" + jsp);
 
         String result = res.toString();
         assertEcho(result, "00-PASS");
@@ -163,9 +158,7 @@ public class TestGenerator extends TomcatBaseTest {
         @Override
         public VariableInfo[] getVariableInfo(TagData data) {
             return new VariableInfo[] {
-                    new VariableInfo("now", Bean.class.getCanonicalName(),
-                            true, VariableInfo.AT_END)
-                };
+                    new VariableInfo("now", Bean.class.getCanonicalName(), true, VariableInfo.AT_END) };
         }
     }
 
@@ -185,12 +178,9 @@ public class TestGenerator extends TomcatBaseTest {
     @Test
     public void testBug49799() throws Exception {
 
-        String[] expected = { "<p style=\"color:red\">00-Red</p>",
-                              "<p>01-Not Red</p>",
-                              "<p style=\"color:red\">02-Red</p>",
-                              "<p>03-Not Red</p>",
-                              "<p style=\"color:red\">04-Red</p>",
-                              "<p>05-Not Red</p>"};
+        String[] expected =
+                { "<p style=\"color:red\">00-Red</p>", "<p>01-Not Red</p>", "<p style=\"color:red\">02-Red</p>",
+                        "<p>03-Not Red</p>", "<p style=\"color:red\">04-Red</p>", "<p>05-Not Red</p>" };
 
         getTomcatInstanceTestWebapp(false, true);
 
@@ -219,14 +209,11 @@ public class TestGenerator extends TomcatBaseTest {
         getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk bc = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug56529.jsp", bc, null);
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug56529.jsp", bc, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         String response = bc.toStringInternal();
-        Assert.assertTrue(response,
-                response.contains("[1:attribute1: '', attribute2: '']"));
-        Assert.assertTrue(response,
-                response.contains("[2:attribute1: '', attribute2: '']"));
+        Assert.assertTrue(response, response.contains("[1:attribute1: '', attribute2: '']"));
+        Assert.assertTrue(response, response.contains("[2:attribute1: '', attribute2: '']"));
     }
 
     public static class Bug56529 extends TagSupport {
@@ -256,9 +243,7 @@ public class TestGenerator extends TomcatBaseTest {
         @Override
         public int doEndTag() throws JspException {
             try {
-                pageContext.getOut().print(
-                        "attribute1: '" + attribute1 + "', " + "attribute2: '"
-                                + attribute2 + "'");
+                pageContext.getOut().print("attribute1: '" + attribute1 + "', " + "attribute2: '" + attribute2 + "'");
             } catch (IOException e) {
                 throw new JspException(e);
             }
@@ -273,8 +258,7 @@ public class TestGenerator extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
         try {
-            getUrl("http://localhost:" + getPort()
-                    + "/test/bug5nnnn/bug56581.jsp", res, null);
+            getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug56581.jsp", res, null);
             Assert.fail("An IOException was expected.");
         } catch (IOException expected) {
             // ErrorReportValve in Tomcat 8.0.9+ flushes and aborts the
@@ -607,12 +591,10 @@ public class TestGenerator extends TomcatBaseTest {
 
         @Override
         public VariableInfo[] getVariableInfo(TagData data) {
-            return new VariableInfo[] {
-                    new VariableInfo("variable01", "java.lang.String", true, VariableInfo.NESTED),
-                    new VariableInfo(data.getAttribute("attribute02").toString(),
-                            "java.lang.String", true, VariableInfo.NESTED),
-                    new VariableInfo("variable03", "java.lang.String", false, VariableInfo.NESTED)
-            };
+            return new VariableInfo[] { new VariableInfo("variable01", "java.lang.String", true, VariableInfo.NESTED),
+                    new VariableInfo(data.getAttribute("attribute02").toString(), "java.lang.String", true,
+                            VariableInfo.NESTED),
+                    new VariableInfo("variable03", "java.lang.String", false, VariableInfo.NESTED) };
         }
 
     }
@@ -622,8 +604,7 @@ public class TestGenerator extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        public void setDynamicAttribute(String uri, String localName, Object value)
-                throws JspException {
+        public void setDynamicAttribute(String uri, String localName, Object value) throws JspException {
             // NO-OP
         }
     }
@@ -961,7 +942,8 @@ public class TestGenerator extends TomcatBaseTest {
 
         // This should break all subsequent requests
         ByteChunk body = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/generator/break-string-interpreter.jsp", body, null);
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/generator/break-string-interpreter.jsp", body,
+                null);
         Assert.assertEquals(body.toString(), HttpServletResponse.SC_OK, rc);
 
         body.recycle();

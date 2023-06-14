@@ -39,9 +39,8 @@ public class TestELInterpreterFactory extends TomcatBaseTest {
     public static class SimpleELInterpreter implements ELInterpreter {
 
         @Override
-        public String interpreterCall(JspCompilationContext context,
-                boolean isTagFile, String expression, Class<?> expectedType,
-                String fnmapvar) {
+        public String interpreterCall(JspCompilationContext context, boolean isTagFile, String expression,
+                Class<?> expectedType, String fnmapvar) {
             return expression;
         }
     }
@@ -62,8 +61,7 @@ public class TestELInterpreterFactory extends TomcatBaseTest {
 
         context.removeAttribute(ELInterpreter.class.getName());
 
-        context.setAttribute(ELInterpreter.class.getName(),
-                SimpleELInterpreter.class.getName());
+        context.setAttribute(ELInterpreter.class.getName(), SimpleELInterpreter.class.getName());
         interpreter = ELInterpreterFactory.getELInterpreter(context);
         Assert.assertNotNull(interpreter);
         assertThat(interpreter, instanceOf(SimpleELInterpreter.class));

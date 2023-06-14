@@ -59,10 +59,7 @@ public class TestScriptingVariabler extends TomcatBaseTest {
          */
         @Override
         public VariableInfo[] getVariableInfo(TagData data) {
-            return new VariableInfo[] {
-                new VariableInfo("Test", "java.lang.String", true,
-                    VariableInfo.AT_END)
-            };
+            return new VariableInfo[] { new VariableInfo("Test", "java.lang.String", true, VariableInfo.AT_END) };
         }
     }
 
