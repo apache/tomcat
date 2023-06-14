@@ -381,18 +381,16 @@ public abstract class AbstractEndpoint<S,U> {
 
         if (certificate.getStoreType() == StoreType.PEM) {
             // PEM file based
-            String keySource = certificate.getCertificateKeystoreFile();
-            keySource = certificate.getCertificateKeyFile();
-            certificateInfo = sm.getString("endpoint.tls.info.cert.pem", keySource, certificate.getCertificateFile(),
-                    certificate.getCertificateChainFile());
+            certificateInfo = sm.getString("endpoint.tls.info.cert.pem", certificate.getCertificateKeyFile(),
+                    certificate.getCertificateFile(), certificate.getCertificateChainFile());
         } else {
             // Keystore based
-            String keyStore = certificate.getCertificateKeystoreFile();
             String keyAlias = certificate.getCertificateKeyAlias();
             if (keyAlias == null) {
                 keyAlias = SSLUtilBase.DEFAULT_KEY_ALIAS;
             }
-            certificateInfo = sm.getString("endpoint.tls.info.cert.keystore", keyStore, keyAlias);
+            certificateInfo =
+                    sm.getString("endpoint.tls.info.cert.keystore", certificate.getCertificateKeystoreFile(), keyAlias);
         }
 
         String trustStoreSource = sslHostConfig.getTruststoreFile();
