@@ -46,7 +46,7 @@ public final class Parameters {
 
     private static final StringManager sm = StringManager.getManager("org.apache.tomcat.util.http");
 
-    private final Map<String, ArrayList<String>> paramHashValues = new LinkedHashMap<>();
+    private final Map<String,ArrayList<String>> paramHashValues = new LinkedHashMap<>();
     private boolean didQueryParameters = false;
 
     private MessageBytes queryMB;
@@ -460,8 +460,8 @@ public final class Parameters {
                     } else if (log.isInfoEnabled()) {
                         UserDataHelper.Mode logMode = userDataLog.getNextMode();
                         if (logMode != null) {
-                            String message = sm.getString("parameters.decodeFail.info", tmpName.toString(),
-                                    tmpValue.toString());
+                            String message =
+                                    sm.getString("parameters.decodeFail.info", tmpName.toString(), tmpValue.toString());
                             switch (logMode) {
                                 case INFO_THEN_DEBUG:
                                     message += sm.getString("parameters.fallToDebug");
@@ -551,7 +551,7 @@ public final class Parameters {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, ArrayList<String>> e : paramHashValues.entrySet()) {
+        for (Map.Entry<String,ArrayList<String>> e : paramHashValues.entrySet()) {
             sb.append(e.getKey()).append('=');
             StringUtils.join(e.getValue(), ',', sb);
             sb.append('\n');

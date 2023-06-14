@@ -52,8 +52,8 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
 
     // Excludes '/' since configuration controls whether or not to treat '/' as
     // a separator
-    private static final char[] HTTP_SEPARATORS = new char[] { '\t', ' ', '\"', '(', ')', ',', ':', ';', '<', '=', '>',
-            '?', '@', '[', '\\', ']', '{', '}' };
+    private static final char[] HTTP_SEPARATORS =
+            new char[] { '\t', ' ', '\"', '(', ')', ',', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '{', '}' };
 
     static {
         for (char c : V0_SEPARATORS) {
@@ -61,8 +61,8 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
         }
     }
 
-    private final boolean STRICT_SERVLET_COMPLIANCE = Boolean
-            .getBoolean("org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
+    private final boolean STRICT_SERVLET_COMPLIANCE =
+            Boolean.getBoolean("org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
 
     private boolean allowEqualsInValue = false;
 

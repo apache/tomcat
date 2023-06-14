@@ -33,10 +33,10 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class HttpMessages {
 
-    private static final Map<Locale, HttpMessages> instances = new ConcurrentHashMap<>();
+    private static final Map<Locale,HttpMessages> instances = new ConcurrentHashMap<>();
 
-    private static final HttpMessages DEFAULT = new HttpMessages(
-            StringManager.getManager("org.apache.tomcat.util.http.res", Locale.getDefault()));
+    private static final HttpMessages DEFAULT =
+            new HttpMessages(StringManager.getManager("org.apache.tomcat.util.http.res", Locale.getDefault()));
 
 
     // XXX move message resources in this package

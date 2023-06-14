@@ -35,8 +35,8 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
     private static final Log log = LogFactory.getLog(Rfc6265CookieProcessor.class);
 
-    private static final StringManager sm = StringManager
-            .getManager(Rfc6265CookieProcessor.class.getPackage().getName());
+    private static final StringManager sm =
+            StringManager.getManager(Rfc6265CookieProcessor.class.getPackage().getName());
 
     private static final BitSet domainValid = new BitSet(128);
 
