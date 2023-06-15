@@ -152,6 +152,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Include the Windows specific binary distributions in the files uploaded
+        to Maven Central. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.76 (remm)" rtext="2023-06-09">
   <subsection name="Catalina">
