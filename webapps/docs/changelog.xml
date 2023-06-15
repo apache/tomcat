@@ -157,6 +157,10 @@
       <add>
         Improvements to French translations. (remm)
       </add>
+      <add>
+        Include the Windows specific binary distributions in the files uploaded
+        to Maven Central. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
