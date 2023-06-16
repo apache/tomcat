@@ -860,34 +860,7 @@ Function findJavaHome
     ${EndIf}
   ${EndIf}
 
-  ; If no 64-bit Java was found, look for 32-bit Java
-  ${If} $1 == ""
-    SetRegView 32
-    ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\JRE" "CurrentVersion"
-    ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\JRE\$2" "JavaHome"
-    ReadRegStr $3 HKLM "SOFTWARE\JavaSoft\JRE\$2" "RuntimeLib"
-
-    IfErrors 0 +2
-    StrCpy $1 ""
-    ClearErrors
-
-    ${If} $1 == ""
-      ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
-      ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$2" "JavaHome"
-      ReadRegStr $3 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$2" "RuntimeLib"
-
-      IfErrors 0 +2
-      StrCpy $1 ""
-      ClearErrors
-    ${EndIf}
-
-    ; If using 64-bit, go back to using 64-bit registry
-    ${If} $0 != "%PROGRAMW6432%"
-      SetRegView 64
-    ${EndIf}
-  ${EndIf}
-
-  ; If no 32-bit Java (JRE) found, look for 64-bit Java JDK
+  ; If no 64-bit Java (JRE) found, look for 64-bit Java JDK
   ${If} $1 == ""
   ${AndIf} $0 != "%PROGRAMW6432%"
     ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\JDK" "CurrentVersion"
@@ -1189,12 +1162,7 @@ FunctionEnd
     nsExec::ExecToLog '"$INSTDIR\bin\$TomcatServiceFileName" //DS//$TomcatServiceName --LogPath "$INSTDIR\logs"'
     ClearErrors
 
-    ; Don't know if 32-bit or 64-bit registry was used so, for now, remove both
-    SetRegView 32
-    DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName"
-    DeleteRegKey HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@\$TomcatServiceName"
-    DeleteRegValue HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@_$TomcatServiceName"
-    DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@_$TomcatServiceName"
+    ; Remove registry entries
     SetRegView 64
     DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName"
     DeleteRegKey HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@\$TomcatServiceName"
