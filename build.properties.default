@@ -141,6 +141,9 @@ wsdl4j-lib.loc=${base-maven.loc}/wsdl4j/wsdl4j/${wsdl4j-lib.version}/wsdl4j-${ws
 # ----- Eclipse JDT, version 4.7 or later -----#
 # See https://cwiki.apache.org/confluence/display/TOMCAT/Managing+Tomcat%27s+Dependency+on+the+Eclipse+JDT+Core+Batch+Compiler
 #
+# 4.27 is the latest release that runs on Java 11
+# Later versions can be used but the official builds need to use 4.27
+#
 # Checksum is from "SHA512 Checksums for 4.27" link at
 # https://download.eclipse.org/eclipse/downloads/drops4/R-4.27-202303020300/
 # https://download.eclipse.org/eclipse/downloads/drops4/R-4.27-202303020300/checksum/eclipse-4.27-SUMSSHA512
