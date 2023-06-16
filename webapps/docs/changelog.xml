@@ -141,6 +141,11 @@
         Improve handling of error conditions for the WebSocket server,
         particularly during Tomcat shutdown. (markt)
       </fix>
+      <fix>
+        Correct a regression in the fix for <bug>66574</bug> that meant the
+        WebSocket session could return false for <code>onOpen()</code> before
+        the <code>onClose()</code> event had been completed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
