@@ -459,7 +459,7 @@ public class WsSession implements Session {
 
     @Override
     public boolean isOpen() {
-        return state.get() == State.OPEN;
+        return state.get() == State.OPEN || state.get() == State.OUTPUT_CLOSING;
     }
 
 
