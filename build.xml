@@ -2172,19 +2172,15 @@
     <chmod      dir="${tomcat.dist}/bin" includes="*.sh"  perm="+x"/>
 
     <!-- Windows binaries -->
-    <!-- 32 bit -->
-    <copy file="${commons-daemon.home}/windows/prunsrv.exe"
-        tofile="${tomcat.dist}/bin/tomcat${version.major}.exe" />
+    <!-- 64 bit amd -->
     <copy file="${commons-daemon.home}/windows/prunmgr.exe"
         tofile="${tomcat.dist}/bin/tomcat${version.major}w.exe" />
-    <!-- 64 bit amd -->
     <copy file="${commons-daemon.home}/windows/amd64/prunsrv.exe"
-        tofile="${tomcat.dist}/bin/x64/tomcat${version.major}.exe" />
+        tofile="${tomcat.dist}/bin/tomcat${version.major}.exe" />
     <!-- tc native -->
     <copy todir="${tomcat.dist}/bin">
-      <fileset dir="${tomcat-native.home}/bin">
+      <fileset dir="${tomcat-native.home}/bin/x64">
         <include name="*.dll"/>
-        <include name="**/*.dll"/>
       </fileset>
     </copy>
 
@@ -2193,11 +2189,6 @@
             file="${tomcat-native.tar.gz}" />
     <copy tofile="${tomcat.dist}/bin/commons-daemon-native.tar.gz"
             file="${commons-daemon.native.src.tgz}" />
-
-    <!-- platform README files -->
-    <echo append="false" file="${tomcat.dist}/bin/x64/README">
-Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
-    </echo>
 
   </target>
 
@@ -2821,7 +2812,6 @@ asf.ldap.username=${release.asfusername}
         <include name="BUILDING.txt" />
         <include name="CONTRIBUTING.md"/>
         <exclude name="bin/service.bat"/>
-        <exclude name="bin/x64/"/>
         <exclude name="bin/*.exe"/>
         <exclude name="bin/*.dll"/>
       </zipfileset>
@@ -2836,34 +2826,6 @@ asf.ldap.username=${release.asfusername}
         encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files" />
     </fixcrlf>
-
-    <!-- Windows x86 package -->
-    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip"
-         modificationtime="${tstamp.iso.release}"
-         encoding="UTF8">
-      <zipfileset file="${tomcat.dist}" fullpath="${final.name}"/>
-      <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
-        <include name="bin/**"/>
-        <include name="conf/**"/>
-        <include name="logs/**"/>
-        <include name="lib/**"/>
-        <include name="webapps/**"/>
-        <include name="work/**"/>
-        <include name="temp/**"/>
-        <include name="LICENSE"/>
-        <include name="NOTICE"/>
-        <include name="README.md"/>
-        <include name="RELEASE-NOTES"/>
-        <include name="RUNNING.txt"/>
-        <include name="BUILDING.txt" />
-        <include name="CONTRIBUTING.md"/>
-        <exclude name="bin/x64/"/>
-        <exclude name="bin/commons-daemon-native.tar.gz"/>
-        <exclude name="bin/tomcat-native.tar.gz"/>
-      </zipfileset>
-
-    </zip>
-    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip" />
 
     <!-- Windows x64 package -->
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip"
@@ -2885,15 +2847,8 @@ asf.ldap.username=${release.asfusername}
         <include name="RUNNING.txt"/>
         <include name="BUILDING.txt" />
         <include name="CONTRIBUTING.md"/>
-        <exclude name="bin/x64/"/>
-        <exclude name="bin/*.dll"/>
-        <exclude name="bin/tomcat${version.major}.exe"/>
         <exclude name="bin/commons-daemon-native.tar.gz"/>
         <exclude name="bin/tomcat-native.tar.gz"/>
-      </zipfileset>
-      <zipfileset dir="${tomcat.dist}/bin/x64" prefix="${final.name}/bin">
-        <include name="*.dll"/>
-        <include name="*.exe"/>
       </zipfileset>
     </zip>
     <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip" />
@@ -2959,7 +2914,6 @@ asf.ldap.username=${release.asfusername}
         <exclude name="src/**" />
         <exclude name="bin/service.bat"/>
         <exclude name="bin/*.sh"/>
-        <exclude name="bin/x64/"/>
         <exclude name="bin/*.exe"/>
         <exclude name="bin/*.dll"/>
       </tarfileset>

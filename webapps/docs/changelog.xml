@@ -166,6 +166,10 @@
         Include the Windows specific binary distributions in the files uploaded
         to Maven Central. (markt)
       </add>
+      <update>
+        Remove support for running Tomcat on 32-bit Windows operating systems as
+        Java 21 is not available for that platform. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

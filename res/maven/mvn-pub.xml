@@ -213,7 +213,6 @@
     <delete file="${pom}.tmp"/>
     <delete file="${pom}.asc"/>
     <delete file="${file}.zip.asc"/>
-    <delete file="${file}-windows-x86.zip.asc"/>
     <delete file="${file}-windows-x64.zip.asc"/>
     <delete file="${file}.tar.gz.asc"/>
 
@@ -228,10 +227,6 @@
     <antcall target="-sign" >
       <param name="file.in" value="${file}.zip" />
       <param name="file.out" value="${file}.zip.asc" />
-    </antcall>
-    <antcall target="-sign" >
-      <param name="file.in" value="${file}-windows-x86.zip" />
-      <param name="file.out" value="${file}-windows-x86.zip.asc" />
     </antcall>
       <antcall target="-sign" >
         <param name="file.in" value="${file}-windows-x64.zip" />
@@ -255,8 +250,6 @@
       </remoterepo>
       <artifact file="${file}.zip" type="zip"/>
       <artifact file="${file}.zip.asc" type="zip.asc" if:set="gpg.passphrase"/>
-      <artifact file="${file}-windows-x86.zip" type="zip" classifier="windows-x86"/>
-      <artifact file="${file}-windows-x86.zip.asc" type="zip.asc" classifier="windows-x86" if:set="gpg.passphrase"/>
       <artifact file="${file}-windows-x64.zip" type="zip" classifier="windows-x64"/>
       <artifact file="${file}-windows-x64.zip.asc" type="zip.asc" classifier="windows-x64" if:set="gpg.passphrase"/>
       <artifact file="${file}.tar.gz" type="tar.gz"/>
@@ -267,7 +260,6 @@
     <delete file="${pom}.tmp"/>
     <delete file="${pom}.asc"/>
     <delete file="${file}.zip.asc"/>
-    <delete file="${file}-windows-x86.zip.asc"/>
     <delete file="${file}-windows-x64.zip.asc"/>
     <delete file="${file}.tar.gz.asc"/>
   </target>
