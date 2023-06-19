@@ -402,6 +402,8 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                  * Those libraries/components known to trigger this issue include: - log4j versions 1.2.15 and earlier -
                  * javax.xml.bind.JAXBContext.newInstance()
                  *
+                 * https://bugs.openjdk.java.net/browse/JDK-8163449
+                 *
                  * Java 9 onwards disables caching for JAR URLConnections Java 8 and earlier disables caching for all
                  * URLConnections
                  */

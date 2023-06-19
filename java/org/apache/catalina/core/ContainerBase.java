@@ -148,7 +148,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
     // ----------------------------------------------------- Instance Variables
 
-
     /**
      * The child Containers belonging to this Container, keyed by name.
      */
@@ -430,7 +429,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
             this.cluster = cluster;
 
             // Stop the old component if necessary
-            if (getState().isAvailable() && (oldCluster != null) && (oldCluster instanceof Lifecycle)) {
+            if (getState().isAvailable() && (oldCluster instanceof Lifecycle)) {
                 try {
                     ((Lifecycle) oldCluster).stop();
                 } catch (LifecycleException e) {
@@ -443,7 +442,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
                 cluster.setContainer(this);
             }
 
-            if (getState().isAvailable() && (cluster != null) && (cluster instanceof Lifecycle)) {
+            if (getState().isAvailable() && (cluster instanceof Lifecycle)) {
                 try {
                     ((Lifecycle) cluster).start();
                 } catch (LifecycleException e) {
@@ -633,7 +632,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
             this.realm = realm;
 
             // Stop the old component if necessary
-            if (getState().isAvailable() && (oldRealm != null) && (oldRealm instanceof Lifecycle)) {
+            if (getState().isAvailable() && (oldRealm instanceof Lifecycle)) {
                 try {
                     ((Lifecycle) oldRealm).stop();
                 } catch (LifecycleException e) {
@@ -645,7 +644,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
             if (realm != null) {
                 realm.setContainer(this);
             }
-            if (getState().isAvailable() && (realm != null) && (realm instanceof Lifecycle)) {
+            if (getState().isAvailable() && (realm instanceof Lifecycle)) {
                 try {
                     ((Lifecycle) realm).start();
                 } catch (LifecycleException e) {
@@ -1032,7 +1031,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         }
 
         AccessLogAdapter adapter = null;
-        Valve valves[] = getPipeline().getValves();
+        Valve[] valves = getPipeline().getValves();
         for (Valve valve : valves) {
             if (valve instanceof AccessLog) {
                 if (adapter == null) {
@@ -1278,8 +1277,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         return sb.toString();
     }
 
-
-    // -------------------------------------- ContainerExecuteDelay Inner Class
+    // ------------------------------- ContainerBackgroundProcessor Inner Class
 
     /**
      * Private runnable class to invoke the backgroundProcess method of this container and its children after a fixed

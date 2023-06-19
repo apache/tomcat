@@ -358,7 +358,6 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     private final ErrorPageSupport errorPageSupport = new ErrorPageSupport();
 
-
     /**
      * The set of filter configurations (and associated filter instances) we have initialized, keyed by filter name.
      */
@@ -1760,7 +1759,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 try {
                     ((Lifecycle) oldLoader).stop();
                 } catch (LifecycleException e) {
-                    log.error("StandardContext.setLoader: stop: ", e);
+                    log.error(sm.getString("standardContext.setLoader.stop"), e);
                 }
             }
 
@@ -1772,7 +1771,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 try {
                     ((Lifecycle) loader).start();
                 } catch (LifecycleException e) {
-                    log.error("StandardContext.setLoader: start: ", e);
+                    log.error(sm.getString("standardContext.setLoader.start"), e);
                 }
             }
         } finally {
@@ -1816,7 +1815,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     ((Lifecycle) oldManager).stop();
                     ((Lifecycle) oldManager).destroy();
                 } catch (LifecycleException e) {
-                    log.error("StandardContext.setManager: stop-destroy: ", e);
+                    log.error(sm.getString("standardContext.setManager.stop"), e);
                 }
             }
 
@@ -1828,7 +1827,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 try {
                     ((Lifecycle) manager).start();
                 } catch (LifecycleException e) {
-                    log.error("StandardContext.setManager: start: ", e);
+                    log.error(sm.getString("standardContext.setManager.start"), e);
                 }
             }
         } finally {
@@ -2750,10 +2749,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Add this constraint to the set for our web application
         synchronized (constraintsLock) {
-            SecurityConstraint results[] = new SecurityConstraint[constraints.length + 1];
-            for (int i = 0; i < constraints.length; i++) {
-                results[i] = constraints[i];
-            }
+            SecurityConstraint[] results = Arrays.copyOf(constraints, constraints.length + 1);
             results[constraints.length] = constraint;
             constraints = results;
         }
@@ -2976,10 +2972,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     public void addSecurityRole(String role) {
 
         synchronized (securityRolesLock) {
-            String results[] = new String[securityRoles.length + 1];
-            for (int i = 0; i < securityRoles.length; i++) {
-                results[i] = securityRoles[i];
-            }
+            String[] results = Arrays.copyOf(securityRoles, securityRoles.length + 1);
             results[securityRoles.length] = role;
             securityRoles = results;
         }
@@ -3045,10 +3038,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     public void addWatchedResource(String name) {
 
         synchronized (watchedResourcesLock) {
-            String results[] = new String[watchedResources.length + 1];
-            for (int i = 0; i < watchedResources.length; i++) {
-                results[i] = watchedResources[i];
-            }
+            String[] results = Arrays.copyOf(watchedResources, watchedResources.length + 1);
             results[watchedResources.length] = name;
             watchedResources = results;
         }
@@ -3072,10 +3062,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 welcomeFiles = new String[0];
                 setReplaceWelcomeFiles(false);
             }
-            String results[] = new String[welcomeFiles.length + 1];
-            for (int i = 0; i < welcomeFiles.length; i++) {
-                results[i] = welcomeFiles[i];
-            }
+            String[] results = Arrays.copyOf(welcomeFiles, welcomeFiles.length + 1);
             results[welcomeFiles.length] = name;
             welcomeFiles = results;
         }
@@ -3094,10 +3081,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     public void addWrapperLifecycle(String listener) {
 
         synchronized (wrapperLifecyclesLock) {
-            String results[] = new String[wrapperLifecycles.length + 1];
-            for (int i = 0; i < wrapperLifecycles.length; i++) {
-                results[i] = wrapperLifecycles[i];
-            }
+            String[] results = Arrays.copyOf(wrapperLifecycles, wrapperLifecycles.length + 1);
             results[wrapperLifecycles.length] = listener;
             wrapperLifecycles = results;
         }
@@ -3115,10 +3099,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     public void addWrapperListener(String listener) {
 
         synchronized (wrapperListenersLock) {
-            String results[] = new String[wrapperListeners.length + 1];
-            for (int i = 0; i < wrapperListeners.length; i++) {
-                results[i] = wrapperListeners[i];
-            }
+            String[] results = Arrays.copyOf(wrapperListeners, wrapperListeners.length + 1);
             results[wrapperListeners.length] = listener;
             wrapperListeners = results;
         }
@@ -3141,7 +3122,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 wrapper = (Wrapper) wrapperClass.getConstructor().newInstance();
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                log.error("createWrapper", t);
+                log.error(sm.getString("standardContext.createWrapper.error"), t);
                 return null;
             }
         } else {
@@ -3156,7 +3137,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     wrapper.addLifecycleListener(listener);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    log.error("createWrapper", t);
+                    log.error(sm.getString("standardContext.createWrapper.listenerError"), t);
                     return null;
                 }
             }
@@ -3170,7 +3151,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     wrapper.addContainerListener(listener);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    log.error("createWrapper", t);
+                    log.error(sm.getString("standardContext.createWrapper.containerListenerError"), t);
                     return null;
                 }
             }
@@ -4879,7 +4860,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                         try {
                             contextManager = getCluster().createManager(getName());
                         } catch (Exception ex) {
-                            log.error("standardContext.clusterFail", ex);
+                            log.error(sm.getString("standardContext.cluster.managerError"), ex);
                             ok = false;
                         }
                     } else {
@@ -5911,8 +5892,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             if ((urlPattern.endsWith("*") &&
                     (urlPattern.length() < 2 || urlPattern.charAt(urlPattern.length() - 2) != '/')) ||
                     urlPattern.startsWith("*.") && urlPattern.length() > 2 && urlPattern.lastIndexOf('.') > 1) {
-                log.info("Suspicious url pattern: \"" + urlPattern + "\"" + " in context [" + getName() + "] - see" +
-                        " sections 12.1 and 12.2 of the Servlet specification");
+                log.info(sm.getString("standardContext.suspiciousUrl", urlPattern, getName()));
             }
         }
     }

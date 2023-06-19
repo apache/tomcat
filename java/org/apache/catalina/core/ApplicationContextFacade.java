@@ -71,7 +71,6 @@ public class ApplicationContextFacade implements ServletContext {
 
     // ----------------------------------------------------------- Constructors
 
-
     /**
      * Construct a new instance of this class, associated with the specified Context instance.
      *
