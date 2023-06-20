@@ -111,7 +111,7 @@ public class ConnectionPool {
     /**
      * Executor service used to cancel Futures
      */
-    private ThreadPoolExecutor cancellator = new ThreadPoolExecutor(0,1,1000,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
+    private ThreadPoolExecutor cancellator = new ThreadPoolExecutor(0,1,1000,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<>());
 
     /**
      * reference to the JMX mbean
