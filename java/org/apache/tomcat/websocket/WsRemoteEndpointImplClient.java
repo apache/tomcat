@@ -54,7 +54,8 @@ public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
             } else {
                 timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
                 if (timeout < 0) {
-                    SendResult sr = new SendResult(new IOException(sm.getString("wsRemoteEndpoint.writeTimeout")));
+                    SendResult sr = new SendResult(getSession(),
+                            new IOException(sm.getString("wsRemoteEndpoint.writeTimeout")));
                     handler.onResult(sr);
                 }
             }
@@ -62,11 +63,11 @@ public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
             try {
                 channel.write(byteBuffer).get(timeout, TimeUnit.MILLISECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                handler.onResult(new SendResult(e));
+                handler.onResult(new SendResult(getSession(), e));
                 return;
             }
         }
-        handler.onResult(SENDRESULT_OK);
+        handler.onResult(new SendResult(getSession()));
     }
 
 

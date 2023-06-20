@@ -598,7 +598,7 @@ public class WsSession implements Session {
 
         // Fail any uncompleted messages.
         IOException ioe = new IOException(sm.getString("wsSession.messageFailed"));
-        SendResult sr = new SendResult(ioe);
+        SendResult sr = new SendResult(this, ioe);
         for (FutureToSendHandler f2sh : futures.keySet()) {
             f2sh.onResult(sr);
         }
@@ -825,7 +825,7 @@ public class WsSession implements Session {
         // second and subsequent attempts are ignored.
 
         IOException ioe = new IOException(sm.getString("wsSession.messageFailed"));
-        SendResult sr = new SendResult(ioe);
+        SendResult sr = new SendResult(this, ioe);
         f2sh.onResult(sr);
     }
 

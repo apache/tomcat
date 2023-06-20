@@ -146,6 +146,12 @@
         WebSocket session could return false for <code>onOpen()</code> before
         the <code>onClose()</code> event had been completed. (markt)
       </fix>
+      <add>
+        Update the WebSocket API provided by Tomcat to align with the latest
+        proposals from the Jakarta WebSocket project and make the WebSocket
+        <code>Session</code> instance available via <code>SendResult</code>.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
