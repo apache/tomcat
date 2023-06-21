@@ -161,6 +161,12 @@
         case and add notes on the uses made of the <code>java.io.tmpdir</code>
         system property. (markt)
       </add>
+      <fix>
+        <bug>66662</bug>: Documentation. Fix a typo in the name of the
+        <strong>algorithm</strong> attribute in the configuration section for
+        the Digest authentication valve. Pull request <pr>629</pr> provided by
+        gohilmca. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
