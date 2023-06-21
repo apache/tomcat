@@ -1594,7 +1594,7 @@
 
     <attributes>
 
-      <attribute name="algoirthms" required="false">
+      <attribute name="algorithms" required="false">
         <p>A comma-separated list of digest algorithms to be used for the
         authentication process. Algorithms may be specified using the Java
         Standard names or the names used by RFC 7616. If not specified, the
