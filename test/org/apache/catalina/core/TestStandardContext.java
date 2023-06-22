@@ -704,7 +704,7 @@ public class TestStandardContext extends TomcatBaseTest {
 
             PrintWriter out = resp.getWriter();
 
-            out.println("parts=" + (null == req.getParts()
+            out.print("parts=" + (null == req.getParts()
                                     ? "null"
                                     : Integer.valueOf(req.getParts().size())));
         }

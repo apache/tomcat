@@ -150,6 +150,13 @@ public abstract class SimpleHttpClient {
         return responseLine;
     }
 
+    public int getStatusCode() {
+        if (responseLine.length() < 13) {
+            throw new IllegalStateException();
+        }
+        return Integer.parseInt(responseLine.substring(9, 12));
+    }
+
     public List<String> getResponseHeaders() {
         return responseHeaders;
     }
@@ -326,11 +333,12 @@ public abstract class SimpleHttpClient {
                 builder.append(body, 0 , read);
                 Assert.assertEquals(contentLength, builder.toString().getBytes(responseBodyEncoding).length);
             } else {
-                // not using content length, so just read it line by line
-                String line = null;
+                // Not using content length, so just read until EOF
+                char[] buf = new char[1024];
+                int read;
                 try {
-                    while ((line = readLine()) != null) {
-                        builder.append(line);
+                    while ((read = reader.read(buf)) != -1) {
+                        builder.append(buf, 0, read);
                     }
                 } catch (SocketException e) {
                     // Ignore
