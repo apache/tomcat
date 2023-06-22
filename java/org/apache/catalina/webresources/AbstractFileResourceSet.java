@@ -118,7 +118,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         canPath = canPath.substring(canonicalBase.length());
 
         // The remaining request path must start with '/' if it has non-zero length
-        if (canPath.length() > 0 && canPath.charAt(0) != '/') {
+        if (canPath.length() > 0 && canPath.charAt(0) != File.separatorChar) {
             return null;
         }
 
