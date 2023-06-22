@@ -105,7 +105,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         // There should not be an end chunk
         Assert.assertFalse(client.getResponseBody().endsWith("0"));
         // The last portion of text should be there
-        Assert.assertTrue(client.getResponseBody().endsWith("line03"));
+        Assert.assertTrue(client.getResponseBody().endsWith("line03" + SimpleHttpClient.CRLF));
     }
 
     private static class ResponseWithErrorServlet extends HttpServlet {

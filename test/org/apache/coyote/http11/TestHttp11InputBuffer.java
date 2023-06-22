@@ -379,7 +379,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         private void processHeaders(String header, HttpServletRequest req, PrintWriter out) {
             Enumeration<String> values = req.getHeaders(header);
             while (values.hasMoreElements()) {
-                out.println(values.nextElement());
+                out.print(values.nextElement());
             }
         }
     }
