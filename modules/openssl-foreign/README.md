@@ -2,14 +2,14 @@
 
 ## This module is experimental
 
-It uses the JEP 442 API. More details on this API are available
-at `https://openjdk.java.net/jeps/442`.
+It uses the JEP XXX API. More details on this API are available
+at `https://openjdk.java.net/jeps/XXX`.
 
-## Building Java 21 with the JEP 442 API
+## Building Java 22 with the JEP XXX API
 
 Clone `https://github.com/openjdk/panama-foreign/` in some location and
-checkout the main branch. This is a Java 21 development JVM
-with the JEP 442 API. It may fail to build. When this happens, step back
+checkout the main branch. This is a Java 22 development JVM
+with the JEP XXX API. It may fail to build. When this happens, step back
 one commit at a time until it does.
 
 ```
