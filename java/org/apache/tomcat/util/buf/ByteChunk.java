@@ -579,8 +579,13 @@ public final class ByteChunk extends AbstractChunk {
         // new String(byte[], int, int, Charset) takes a defensive copy of the
         // entire byte array. This is expensive if only a small subset of the
         // bytes will be used. The code below is from Apache Harmony.
-        CharBuffer cb = charset.newDecoder().onMalformedInput(malformedInputAction)
-                .onUnmappableCharacter(unmappableCharacterAction).decode(ByteBuffer.wrap(buff, start, end - start));
+        CharBuffer cb;
+        if (malformedInputAction == CodingErrorAction.REPLACE && unmappableCharacterAction == CodingErrorAction.REPLACE) {
+            cb = charset.decode(ByteBuffer.wrap(buff, start, end - start));
+        } else {
+            cb = charset.newDecoder().onMalformedInput(malformedInputAction)
+                    .onUnmappableCharacter(unmappableCharacterAction).decode(ByteBuffer.wrap(buff, start, end - start));
+        }
         return new String(cb.array(), cb.arrayOffset(), cb.length());
     }
 
