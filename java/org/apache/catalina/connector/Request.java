@@ -17,6 +17,7 @@
 package org.apache.catalina.connector;
 
 import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -3216,10 +3217,7 @@ public class Request implements HttpServletRequest {
                     formData = new byte[len];
                 }
                 try {
-                    if (readPostBody(formData, len) != len) {
-                        parameters.setParseFailedReason(FailReason.REQUEST_BODY_INCOMPLETE);
-                        return;
-                    }
+                    readPostBodyFully(formData, len);
                 } catch (IOException e) {
                     // Client disconnect
                     Context context = getContext();
@@ -3266,7 +3264,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Read post body in an array.
+     * Read post body into an array.
      *
      * @param body The bytes array in which the body will be read
      * @param len  The body length
@@ -3274,7 +3272,10 @@ public class Request implements HttpServletRequest {
      * @return the bytes count that has been read
      *
      * @throws IOException if an IO exception occurred
+     *
+     * @deprecated Unused. Will be removed in Tomcat 11.0.x onwards. Use {@link #readPostBodyFully(byte[], int)}
      */
+    @Deprecated
     protected int readPostBody(byte[] body, int len) throws IOException {
 
         int offset = 0;
@@ -3287,6 +3288,26 @@ public class Request implements HttpServletRequest {
         } while ((len - offset) > 0);
         return len;
 
+    }
+
+
+    /**
+     * Read post body into an array.
+     *
+     * @param body The bytes array in which the body will be read
+     * @param len  The body length
+     *
+     * @throws IOException if an IO exception occurred or EOF is reached before the body has been fully read
+     */
+    protected void readPostBodyFully(byte[] body, int len) throws IOException {
+        int offset = 0;
+        do {
+            int inputLen = getStream().read(body, offset, len - offset);
+            if (inputLen <= 0) {
+                throw new EOFException();
+            }
+            offset += inputLen;
+        } while ((len - offset) > 0);
     }
 
 
