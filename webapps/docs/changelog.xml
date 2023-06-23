@@ -113,6 +113,12 @@
         a listener which creates context naming information environment entries.
         (michaelo)
       </add>
+      <add>
+        <bug>66665</bug>: Add
+        <code>org.apache.catalina.core.PropertiesRoleMappingListener</code>,
+        a listener which populates the context's role mapping from a properties
+        file. (michaelo)
+      </add>
       <fix>
         Fix an edge case where intra-web application symlinks would be followed
         if the web applications were deliberately crafted to allow it even when
