@@ -49,6 +49,7 @@ public class FailedRequestFilter extends FilterBase {
         return log;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
