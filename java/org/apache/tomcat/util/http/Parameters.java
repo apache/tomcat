@@ -567,6 +567,12 @@ public final class Parameters {
         IO_ERROR,
         NO_NAME,
         POST_TOO_LARGE,
+        /**
+         * Same as {@link #CLIENT_DISCONNECT}.
+         *
+         * @deprecated Unused. Will be removed in Tomcat 11.0.x onwards
+         */
+        @Deprecated
         REQUEST_BODY_INCOMPLETE,
         TOO_MANY_PARAMETERS,
         UNKNOWN,
