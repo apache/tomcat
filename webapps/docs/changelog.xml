@@ -108,6 +108,11 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        Add <code>org.apache.catalina.core.PropertiesRoleMappingListener</code>,
+        a listener which populates the context's role mapping from a properties
+        file. (michaelo)
+      </add>
+      <add>
         Add <code>org.apache.catalina.core.ContextNamingInfoListener</code>,
         a listener which creates context naming information environment entries.
         (michaelo)
