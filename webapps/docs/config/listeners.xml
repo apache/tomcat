@@ -295,6 +295,37 @@
 
   </subsection>
 
+  <subsection name="Properties Role Mapping Listener - org.apache.catalina.core.PropertiesRoleMappingListener">
+
+    <p>The <strong>Properties Role Mapping Listener</strong> populates the context's role mapping
+    from a properties file. The keys represent application roles (e.g., admin, user, uservisor,
+    etc.) while the values represent technical roles (e.g., DNs, SIDs, UUIDs, etc.). A key can
+    also be prefixed if, e.g., the properties file contains generic application configuration
+    as well: <code>app-roles.</code>.</p>
+
+    <p>This listener must only be nested within
+    <a href="context.html">Context</a> elements.</p>
+
+    <p>The following additional attributes are supported by the
+    <strong>Properties Role Mapping Listener</strong>:</p>
+
+    <attributes>
+
+      <attribute name="roleMappingFile" required="false">
+        <p>The path to the role mapping properties file. You can use protocol <code>webapp:</code>
+        and whatever <code>ConfigFileLoader</code> supports.</p>
+        <p>The default value is <code>webapp:/WEB-INF/role-mapping.properties</code>.</p>
+      </attribute>
+
+      <attribute name="keyPrefix" required="false">
+        <p>The prefix to filter from property keys. All other keys will be ignored which do
+        not have the prefix.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
   <subsection name="Security Lifecycle Listener - org.apache.catalina.security.SecurityListener">
 
     <p>The <strong>Security Lifecycle Listener</strong> performs a number of
