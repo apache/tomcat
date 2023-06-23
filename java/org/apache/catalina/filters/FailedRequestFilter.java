@@ -49,7 +49,6 @@ public class FailedRequestFilter extends FilterBase {
         return log;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -76,7 +75,6 @@ public class FailedRequestFilter extends FilterBase {
                 case INVALID_CONTENT_TYPE:
                 case MULTIPART_CONFIG_INVALID:
                 case NO_NAME:
-                case REQUEST_BODY_INCOMPLETE:
                 case URL_DECODING:
                 case CLIENT_DISCONNECT:
                     // Client is never going to see this so this is really just

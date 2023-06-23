@@ -3168,34 +3168,6 @@ public class Request implements HttpServletRequest {
      * @param body The bytes array in which the body will be read
      * @param len  The body length
      *
-     * @return the bytes count that has been read
-     *
-     * @throws IOException if an IO exception occurred
-     *
-     * @deprecated Unused. Will be removed in Tomcat 11.0.x onwards. Use {@link #readPostBodyFully(byte[], int)}
-     */
-    @Deprecated
-    protected int readPostBody(byte[] body, int len) throws IOException {
-
-        int offset = 0;
-        do {
-            int inputLen = getStream().read(body, offset, len - offset);
-            if (inputLen <= 0) {
-                return offset;
-            }
-            offset += inputLen;
-        } while ((len - offset) > 0);
-        return len;
-
-    }
-
-
-    /**
-     * Read post body into an array.
-     *
-     * @param body The bytes array in which the body will be read
-     * @param len  The body length
-     *
      * @throws IOException if an IO exception occurred or EOF is reached before the body has been fully read
      */
     protected void readPostBodyFully(byte[] body, int len) throws IOException {
