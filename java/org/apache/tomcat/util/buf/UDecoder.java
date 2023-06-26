@@ -443,7 +443,7 @@ public final class UDecoder {
      */
     @Deprecated
     public static String URLDecode(byte[] bytes, String enc, boolean isQuery) {
-        throw new IllegalArgumentException(sm.getString("udecoder.urlDecode.iae"));
+        throw new IllegalArgumentException(sm.getString("uDecoder.urlDecode.iae"));
     }
 
 
