@@ -78,7 +78,7 @@ public class SavedRequestInputFilter implements InputFilter {
 
         ByteBuffer byteBuffer = handler.getByteBuffer();
         byteBuffer.position(byteBuffer.limit()).limit(byteBuffer.capacity());
-        input.substract(byteBuffer);
+        input.subtract(byteBuffer);
 
         return byteBuffer.remaining();
     }

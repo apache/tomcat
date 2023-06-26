@@ -158,7 +158,7 @@ public class B2CConverter {
             int pos = cb.position();
             // Loop until one char is decoded or there is a decoder error
             do {
-                leftovers.put(bc.substractB());
+                leftovers.put(bc.subtractB());
                 leftovers.flip();
                 result = decoder.decode(leftovers, cb, endOfInput);
                 leftovers.position(leftovers.limit());
@@ -188,7 +188,7 @@ public class B2CConverter {
             if (bc.getLength() > 0) {
                 leftovers.limit(leftovers.array().length);
                 leftovers.position(bc.getLength());
-                bc.substract(leftovers.array(), 0, bc.getLength());
+                bc.subtract(leftovers.array(), 0, bc.getLength());
             }
         }
     }
