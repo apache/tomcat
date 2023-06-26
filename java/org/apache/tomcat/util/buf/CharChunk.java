@@ -289,7 +289,15 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
     // -------------------- Removing data from the buffer --------------------
 
+    /*
+     * @deprecated Use {@link #subtract()}. This method will be removed in Tomcat 10
+     */
+    @Deprecated
     public int substract() throws IOException {
+        return subtract();
+    }
+
+    public int subtract() throws IOException {
         if (checkEof()) {
             return -1;
         }
@@ -297,7 +305,15 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     }
 
 
+    /*
+     * @deprecated Use {@link #subtract(char[],int,int)}. This method will be removed in Tomcat 10
+     */
+    @Deprecated
     public int substract(char dest[], int off, int len) throws IOException {
+        return subtract(dest, off, len);
+    }
+
+    public int subtract(char dest[], int off, int len) throws IOException {
         if (checkEof()) {
             return -1;
         }
@@ -334,7 +350,8 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     public void flushBuffer() throws IOException {
         // assert out!=null
         if (out == null) {
-            throw new IOException("Buffer overflow, no sink " + getLimit() + " " + buff.length);
+            throw new IOException(
+                    sm.getString("chunk.overflow", Integer.valueOf(getLimit()), Integer.valueOf(buff.length)));
         }
         out.realWriteChars(buff, start, end - start);
         end = start;
@@ -395,7 +412,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
     @Override
     public String toString() {
-        if (null == buff) {
+        if (isNull()) {
             return null;
         } else if (end - start == 0) {
             return "";
