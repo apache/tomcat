@@ -2841,7 +2841,7 @@ public class Request implements HttpServletRequest {
                 partsParseException = new IllegalStateException(e);
             } catch (IOException e) {
                 parameters.setParseFailedReason(FailReason.IO_ERROR);
-                partsParseException = new IOException(e);
+                partsParseException = e;
             } catch (IllegalStateException e) {
                 // addParameters() will set parseFailedReason
                 checkSwallowInput();
