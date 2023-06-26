@@ -18,8 +18,6 @@ package org.apache.catalina.webresources;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -27,6 +25,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.cert.Certificate;
 import java.util.jar.Manifest;
@@ -57,20 +56,24 @@ public class FileResource extends AbstractResource {
     }
 
 
-    private final File resource;
+    private final Path resource;
     private final String name;
     private final boolean readOnly;
     private final Manifest manifest;
     private final boolean needConvert;
 
     public FileResource(WebResourceRoot root, String webAppPath, File resource, boolean readOnly, Manifest manifest) {
+        this(root, webAppPath, resource.toPath(), readOnly, manifest);
+    }
+
+    public FileResource(WebResourceRoot root, String webAppPath, Path resource, boolean readOnly, Manifest manifest) {
         super(root, webAppPath);
         this.resource = resource;
 
         if (webAppPath.charAt(webAppPath.length() - 1) == '/') {
-            String realName = resource.getName() + '/';
+            String realName = resource.getFileName().toString() + '/';
             if (webAppPath.endsWith(realName)) {
-                name = resource.getName();
+                name = resource.getFileName().toString();
             } else {
                 // This is the root directory of a mounted ResourceSet
                 // Need to return the mounted name, not the real name
@@ -79,7 +82,7 @@ public class FileResource extends AbstractResource {
             }
         } else {
             // Must be a file
-            name = resource.getName();
+            name = resource.getFileName().toString();
         }
 
         this.readOnly = readOnly;
@@ -89,12 +92,16 @@ public class FileResource extends AbstractResource {
 
     @Override
     public long getLastModified() {
-        return resource.lastModified();
+        try {
+            return Files.getLastModifiedTime(resource).toMillis();
+        } catch (final IOException e) {
+            return -1;
+        }
     }
 
     @Override
     public boolean exists() {
-        return resource.exists();
+        return Files.exists(resource);
     }
 
     @Override
@@ -104,12 +111,12 @@ public class FileResource extends AbstractResource {
 
     @Override
     public boolean isDirectory() {
-        return resource.isDirectory();
+        return Files.isDirectory(resource);
     }
 
     @Override
     public boolean isFile() {
-        return resource.isFile();
+        return Files.isRegularFile(resource);
     }
 
     @Override
@@ -117,7 +124,12 @@ public class FileResource extends AbstractResource {
         if (readOnly) {
             return false;
         }
-        return resource.delete();
+        try {
+            Files.delete(resource);
+            return true;
+        } catch (final IOException e) {
+            return false;
+        }
     }
 
     @Override
@@ -144,24 +156,21 @@ public class FileResource extends AbstractResource {
             return -1;
         }
 
-        return resource.length();
-    }
-
-    @Override
-    public String getCanonicalPath() {
         try {
-            return resource.getCanonicalPath();
-        } catch (IOException ioe) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("fileResource.getCanonicalPathFail", resource.getPath()), ioe);
-            }
-            return null;
+            return Files.size(resource);
+        } catch (IOException e) {
+            return -1;
         }
     }
 
     @Override
+    public String getCanonicalPath() {
+        return resource.toAbsolutePath().normalize().toString();
+    }
+
+    @Override
     public boolean canRead() {
-        return resource.canRead();
+        return Files.isReadable(resource);
     }
 
     @Override
@@ -175,8 +184,8 @@ public class FileResource extends AbstractResource {
             }
         }
         try {
-            return new FileInputStream(resource);
-        } catch (FileNotFoundException fnfe) {
+            return Files.newInputStream(resource);
+        } catch (IOException fnfe) {
             // Race condition (file has been deleted) - not an error
             return null;
         }
@@ -202,7 +211,7 @@ public class FileResource extends AbstractResource {
         byte[] result = new byte[size];
 
         int pos = 0;
-        try (InputStream is = new FileInputStream(resource)) {
+        try (InputStream is = Files.newInputStream(resource)) {
             while (pos < size) {
                 int n = is.read(result, pos, size - pos);
                 if (n < 0) {
@@ -236,11 +245,11 @@ public class FileResource extends AbstractResource {
     @Override
     public long getCreation() {
         try {
-            BasicFileAttributes attrs = Files.readAttributes(resource.toPath(), BasicFileAttributes.class);
+            BasicFileAttributes attrs = Files.readAttributes(resource, BasicFileAttributes.class);
             return attrs.creationTime().toMillis();
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("fileResource.getCreationFail", resource.getPath()), e);
+                log.debug(sm.getString("fileResource.getCreationFail", resource.toString()), e);
             }
             return 0;
         }
@@ -248,12 +257,12 @@ public class FileResource extends AbstractResource {
 
     @Override
     public URL getURL() {
-        if (resource.exists()) {
+        if (Files.exists(resource)) {
             try {
-                return resource.toURI().toURL();
+                return resource.toUri().toURL();
             } catch (MalformedURLException e) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("fileResource.getUrlFail", resource.getPath()), e);
+                    log.debug(sm.getString("fileResource.getUrlFail", resource.toString()), e);
                 }
                 return null;
             }
