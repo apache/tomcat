@@ -62,13 +62,15 @@ public abstract class ELResolver {
     }
 
     /**
-     * Obtain the type of the given property on the given object using the given context.
+     * Obtain the most generally acceptable type that may be used to set the given property on the given object using
+     * the given context.
      *
      * @param context  The EL context for this evaluation
      * @param base     The base object on which the property is to be found
      * @param property The property whose type is to be returned
      *
-     * @return the type of the provided property
+     * @return the most general type that maybe used to set the provided property or {@code null} if the resolver is
+     *             read-only.
      *
      * @throws NullPointerException      If the supplied context is <code>null</code>
      * @throws PropertyNotFoundException If the base/property combination provided to the resolver is one that the
