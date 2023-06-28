@@ -17,6 +17,8 @@
 package org.apache.catalina;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
@@ -39,6 +41,7 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.file.ConfigurationSource.Resource;
 import org.apache.tomcat.util.http.CookieProcessor;
 
@@ -1982,5 +1985,22 @@ public interface Context extends Container, ContextBind {
      * @return the resource
      * @throws IOException if an error occurs or if the resource does not exist
      */
-    Resource findConfigFileResource(String name) throws IOException;
+    default Resource findConfigFileResource(String name) throws IOException {
+        if (name.startsWith(WEBAPP_PROTOCOL)) {
+            String path = name.substring(WEBAPP_PROTOCOL.length());
+            WebResource resource = getResources().getResource(path);
+            if (resource.canRead()) {
+                InputStream stream = resource.getInputStream();
+                try {
+                    return new Resource(stream, resource.getURL().toURI());
+                } catch (URISyntaxException e) {
+                    stream.close();
+                }
+            }
+            return null;
+        } else {
+            return ConfigFileLoader.getSource().getResource(name);
+        }
+    }
+
 }

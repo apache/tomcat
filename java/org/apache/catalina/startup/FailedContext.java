@@ -18,7 +18,6 @@ package org.apache.catalina.startup;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
@@ -62,7 +61,6 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
-import org.apache.tomcat.util.file.ConfigurationSource.Resource;
 import org.apache.tomcat.util.http.CookieProcessor;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -853,6 +851,4 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     @Override
     public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {}
 
-    @Override
-    public Resource findConfigFileResource(String name) throws IOException { return null; }
 }
