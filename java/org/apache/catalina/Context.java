@@ -16,6 +16,7 @@
  */
 package org.apache.catalina;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
@@ -38,6 +39,7 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.util.file.ConfigurationSource.Resource;
 import org.apache.tomcat.util.http.CookieProcessor;
 
 /**
@@ -83,6 +85,11 @@ public interface Context extends Container, ContextBind {
      */
     String CHANGE_SESSION_ID_EVENT = "changeSessionId";
 
+
+    /**
+     * Prefix for resource lookup.
+     */
+    String WEBAPP_PROTOCOL = "webapp:";
 
     // ------------------------------------------------------------- Properties
 
@@ -1963,4 +1970,17 @@ public interface Context extends Container, ContextBind {
      * @param dispatcherWrapsSameObject the new flag value
      */
     void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject);
+
+
+    /**
+     * Find configuration file with the specified path, first looking into the
+     * webapp resources, then delegating to
+     * <code>ConfigFileLoader.getSource().getResource</code>. The
+     * <code>WEBAPP_PROTOCOL</code> constant prefix is used to denote webapp
+     * resources.
+     * @param name The resource name
+     * @return the resource
+     * @throws IOException if an error occurs or if the resource does not exist
+     */
+    Resource findConfigFileResource(String name) throws IOException;
 }

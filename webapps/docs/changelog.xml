@@ -117,6 +117,12 @@
         if the web applications were deliberately crafted to allow it even when
         <code>allowLinking</code> was set to <code>false</code>. (markt)
       </fix>
+      <update>
+        Add utlity config file resource lookup on <code>Context</code> to allow
+        looking up resources from the webapp (prefixed with
+        <code>webapp:</code>) and make the resource lookup API more visible.
+        (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
