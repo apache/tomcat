@@ -493,8 +493,10 @@ class Util {
      * This method duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
      */
     private static boolean isCoercibleFrom(ELContext context, Object src, Class<?> target) {
-        // TODO: This isn't pretty but it works. Significant refactoring would
-        // be required to avoid the exception.
+        /*
+         *  TODO: This isn't pretty but it works. Significant refactoring would be required to avoid the exception. See
+         *        also OptionalELResolver.convertToType().
+         */
         try {
             context.convertToType(src, target);
         } catch (ELException e) {

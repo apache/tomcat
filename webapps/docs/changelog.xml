@@ -135,6 +135,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        Add <code>java.util.Optional</code> support via the
+        <code>jakarta.el.OptionalELResolver</code>  to Tomcat's implementation
+        of the Jakarta EL API to align with the latest proposals for the Jakarta
+        EL 6.0 API. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
