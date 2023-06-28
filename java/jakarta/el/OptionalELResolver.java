@@ -21,32 +21,27 @@ import java.util.Optional;
 
 /**
  * Defines property resolution behaviour on {@link Optional}s.
- *
  * <p>
  * This resolver handles base objects that are instances of {@link Optional}.
- *
  * <p>
  * If the {@link Optional#isEmpty()} is {@code true} for the base object and the property is {@code null} then the
  * resulting value is {@code null}.
- *
  * <p>
  * If the {@link Optional#isEmpty()} is {@code true} for the base object and the property is not {@code null} then the
  * resulting value is the base object (an empty {@link Optional}).
- *
  * <p>
  * If the {@link Optional#isPresent()} is {@code true} for the base object and the property is {@code null} then the
  * resulting value is the result of calling {@link Optional#get()} on the base object.
- *
  * <p>
  * If the {@link Optional#isPresent()} is {@code true} for the base object and the property is not {@code null} then the
  * resulting value is the result of calling {@link ELResolver#getValue(ELContext, Object, Object)} using the
  * {@link ELResolver} obtained from {@link ELContext#getELResolver()} with the following parameters:
  * <ul>
  * <li>The {@link ELContext} is the current context</li>
- * <li>The base object is the result of calling {@link Optional#get()} on the current base object<li>
+ * <li>The base object is the result of calling {@link Optional#get()} on the current base object
+ * <li>
  * <li>The property object is the current property object</li>
  * </ul>
- *
  * <p>
  * This resolver is always a read-only resolver.
  */
@@ -77,9 +72,9 @@ public class OptionalELResolver extends ELResolver {
         return null;
     }
 
+
     /**
      * {@inheritDoc}
-     *
      * <p>
      * If the base object is an {@link Optional} this method always returns {@code null} since instances of this
      * resolver are always read-only.
@@ -95,9 +90,9 @@ public class OptionalELResolver extends ELResolver {
         return null;
     }
 
+
     /**
      * {@inheritDoc}
-     *
      * <p>
      * If the base object is an {@link Optional} this method always throws a {@link PropertyNotWritableException} since
      * instances of this resolver are always read-only.
@@ -112,9 +107,9 @@ public class OptionalELResolver extends ELResolver {
         }
     }
 
+
     /**
      * {@inheritDoc}
-     *
      * <p>
      * If the base object is an {@link Optional} this method always returns {@code true} since instances of this
      * resolver are always read-only.
@@ -131,9 +126,9 @@ public class OptionalELResolver extends ELResolver {
         return false;
     }
 
+
     /**
      * {@inheritDoc}
-     *
      * <p>
      * If the base object is an {@link Optional} this method always returns {@code Object.class}.
      */
@@ -145,6 +140,7 @@ public class OptionalELResolver extends ELResolver {
 
         return null;
     }
+
 
     @Override
     public <T> T convertToType(ELContext context, Object obj, Class<T> type) {
@@ -168,8 +164,8 @@ public class OptionalELResolver extends ELResolver {
                     return result;
                 } catch (ELException e) {
                     /*
-                     *  TODO: This isn't pretty but it works. Significant refactoring would be required to avoid the
-                     *  exception. See also OptionalELResolver.convertToType().
+                     * TODO: This isn't pretty but it works. Significant refactoring would be required to avoid the
+                     * exception. See also Util.isCoercibleFrom().
                      */
                 }
             } else {
