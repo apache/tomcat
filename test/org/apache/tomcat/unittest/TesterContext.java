@@ -18,6 +18,7 @@ package org.apache.tomcat.unittest;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +65,7 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.util.file.ConfigurationSource.Resource;
 import org.apache.tomcat.util.http.CookieProcessor;
 
 /**
@@ -1321,4 +1323,6 @@ public class TesterContext implements Context {
     @Override
     public void setMetadataComplete(boolean metadataComplete) { /* NO-OP */ }
 
+    @Override
+    public Resource findConfigFileResource(String name) throws IOException { return null; }
 }
