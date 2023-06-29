@@ -1989,7 +1989,7 @@ public interface Context extends Container, ContextBind {
         if (name.startsWith(WEBAPP_PROTOCOL)) {
             String path = name.substring(WEBAPP_PROTOCOL.length());
             WebResource resource = getResources().getResource(path);
-            if (resource.canRead()) {
+            if (resource.canRead() && resource.isFile()) {
                 InputStream stream = resource.getInputStream();
                 try {
                     return new Resource(stream, resource.getURL().toURI());
@@ -1997,10 +1997,8 @@ public interface Context extends Container, ContextBind {
                     stream.close();
                 }
             }
-            return null;
-        } else {
-            return ConfigFileLoader.getSource().getResource(name);
         }
+        return ConfigFileLoader.getSource().getResource(name);
     }
 
 }
