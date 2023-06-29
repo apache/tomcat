@@ -52,7 +52,6 @@ ${Using:StrFunc} StrLoc
 Var JavaHome
 Var JavaExe
 Var JvmDll
-Var Arch
 Var ResetInstDir
 Var TomcatPortShutdown
 Var TomcatPortHttp
