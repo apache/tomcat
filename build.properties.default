@@ -309,10 +309,10 @@ spotbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${spotbugs.version}/
 # ----- JSign, version 4.1 or later -----
 jsign.version=4.2
 
-# checksums for JSign 4.2
+# checksums for JSign 5.0
 jsign.checksum.enabled=true
 jsign.checksum.algorithm=MD5|SHA-1
-jsign.checksum.value=10fb38a1182515d583a1e252c8219eae|1e3b44e0114d599b05be243513b85a51b0c45401
+jsign.checksum.value=79c4f9bdff74a4ccee3d72f020ad45b7|5a6677625413e0d8acb52f80fa6fbb9031a6a9d0
 
 jsign.home=${base.path}/jsign-${jsign.version}
 jsign.jar=${jsign.home}/jsign-${jsign.version}.jar
