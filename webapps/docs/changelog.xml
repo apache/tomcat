@@ -218,6 +218,9 @@
       <update>
         Update to the Eclipse JDT compiler 4.28. (markt)
       </update>
+      <update>
+        Update UnboundID to 6.0.9. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
