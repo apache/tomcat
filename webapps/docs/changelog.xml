@@ -208,6 +208,9 @@
       <add>
         Improvements to Japanese translations. Contributed by tak7iji. (markt)
       </add>
+      <update>
+        Update to the Eclipse JDT compiler 4.28. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
