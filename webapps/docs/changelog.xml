@@ -108,7 +108,8 @@
   <subsection name="Catalina">
     <changelog>
       <add>
-        Add <code>org.apache.catalina.core.ContextNamingInfoListener</code>,
+        <bug>59232</bug>: Add
+        <code>org.apache.catalina.core.ContextNamingInfoListener</code>,
         a listener which creates context naming information environment entries.
         (michaelo)
       </add>
