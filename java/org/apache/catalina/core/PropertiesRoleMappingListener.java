@@ -160,7 +160,7 @@ public class PropertiesRoleMappingListener implements LifecycleListener {
             }
 
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("propertiesRoleMappingListener.linkedRoleCount", linkCount));
+                log.debug(sm.getString("propertiesRoleMappingListener.linkedRoleCount", Integer.valueOf(linkCount)));
             }
         }
     }
