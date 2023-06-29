@@ -27,6 +27,9 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.authenticator.BasicAuthenticator;
@@ -39,8 +42,6 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class TestPropertiesRoleMappingListener extends TomcatBaseTest {
 
