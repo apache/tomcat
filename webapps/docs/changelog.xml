@@ -205,6 +205,9 @@
         Remove support for running Tomcat on 32-bit Windows operating systems as
         Java 21 is not available for that platform. (markt)
       </update>
+      <add>
+        Improvements to Japanese translations. Contributed by tak7iji. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
