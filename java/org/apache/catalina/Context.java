@@ -16,6 +16,7 @@
  */
 package org.apache.catalina;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -1997,6 +1998,7 @@ public interface Context extends Container, ContextBind {
                     stream.close();
                 }
             }
+            throw new FileNotFoundException(name);
         }
         return ConfigFileLoader.getSource().getResource(name);
     }

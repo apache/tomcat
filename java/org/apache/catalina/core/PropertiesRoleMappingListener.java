@@ -16,9 +16,7 @@
  */
 package org.apache.catalina.core;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
@@ -30,6 +28,7 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.file.ConfigFileLoader;
+import org.apache.tomcat.util.file.ConfigurationSource.Resource;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -107,32 +106,10 @@ public class PropertiesRoleMappingListener implements LifecycleListener {
                 log.warn(sm.getString("listener.notContext", event.getLifecycle().getClass().getSimpleName()));
                 return;
             }
-            Context context = (Context) event.getLifecycle();
-
-            InputStream is;
-            if (roleMappingFile.startsWith(WEBAPP_PROTOCOL)) {
-                String path = roleMappingFile.substring(WEBAPP_PROTOCOL.length());
-                is = context.getServletContext().getResourceAsStream(path);
-            } else {
-                try {
-                    is = ConfigFileLoader.getSource().getResource(roleMappingFile).getInputStream();
-                } catch (FileNotFoundException e1) {
-                    is = null;
-                } catch (IOException e2) {
-                    throw new IllegalStateException(
-                            sm.getString("propertiesRoleMappingListener.roleMappingFileFail", roleMappingFile), e2);
-                }
-            }
-
-            if (is == null) {
-                throw new IllegalStateException(
-                        sm.getString("propertiesRoleMappingListener.roleMappingFileNotFound", roleMappingFile));
-            }
-
             Properties props = new Properties();
-
-            try (InputStream _is = is) {
-                props.load(_is);
+            Context context = (Context) event.getLifecycle();
+            try (Resource resource = context.findConfigFileResource(roleMappingFile)) {
+                props.load(resource.getInputStream());
             } catch (IOException e) {
                 throw new IllegalStateException(
                         sm.getString("propertiesRoleMappingListener.roleMappingFileFail", roleMappingFile), e);
