@@ -188,6 +188,9 @@
       <add>
         Improvements to Japanese translations. Contributed by tak7iji. (markt)
       </add>
+      <update>
+        Update UnboundID to 6.0.9. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
