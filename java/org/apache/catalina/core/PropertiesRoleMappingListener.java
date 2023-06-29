@@ -115,7 +115,7 @@ public class PropertiesRoleMappingListener implements LifecycleListener {
                 is = context.getServletContext().getResourceAsStream(path);
             } else {
                 try {
-                    is = ConfigFileLoader.getSource().getResource(roleMappingFile).getInputStream();
+                    is = ConfigFileLoader.getInputStream(roleMappingFile);
                 } catch (FileNotFoundException e1) {
                     is = null;
                 } catch (IOException e2) {
