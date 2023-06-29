@@ -16,6 +16,10 @@
  */
 package org.apache.catalina;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
@@ -38,6 +42,8 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.util.file.ConfigFileLoader;
+import org.apache.tomcat.util.file.ConfigurationSource.Resource;
 import org.apache.tomcat.util.http.CookieProcessor;
 
 /**
@@ -82,6 +88,12 @@ public interface Context extends Container, ContextBind {
      * Container event for changing the ID of a session.
      */
     String CHANGE_SESSION_ID_EVENT = "changeSessionId";
+
+
+    /**
+     * Prefix for resource lookup.
+     */
+    String WEBAPP_PROTOCOL = "webapp:";
 
 
     // ------------------------------------------------------------- Properties
@@ -1953,6 +1965,34 @@ public interface Context extends Container, ContextBind {
      * @param dispatcherWrapsSameObject the new flag value
      */
     void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject);
+
+
+    /**
+     * Find configuration file with the specified path, first looking into the
+     * webapp resources, then delegating to
+     * <code>ConfigFileLoader.getSource().getResource</code>. The
+     * <code>WEBAPP_PROTOCOL</code> constant prefix is used to denote webapp
+     * resources.
+     * @param name The resource name
+     * @return the resource
+     * @throws IOException if an error occurs or if the resource does not exist
+     */
+    default Resource findConfigFileResource(String name) throws IOException {
+        if (name.startsWith(WEBAPP_PROTOCOL)) {
+            String path = name.substring(WEBAPP_PROTOCOL.length());
+            WebResource resource = getResources().getResource(path);
+            if (resource.canRead() && resource.isFile()) {
+                InputStream stream = resource.getInputStream();
+                try {
+                    return new Resource(stream, resource.getURL().toURI());
+                } catch (URISyntaxException e) {
+                    stream.close();
+                }
+            }
+            throw new FileNotFoundException(name);
+        }
+        return ConfigFileLoader.getSource().getResource(name);
+    }
 
 
     /**
