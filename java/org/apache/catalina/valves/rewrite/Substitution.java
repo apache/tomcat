@@ -163,7 +163,6 @@ public class Substitution {
                     // Static text
                     StaticElement newElement = new StaticElement();
                     newElement.value = sub.substring(pos, dollarPos);
-                    pos = dollarPos;
                     elements.add(newElement);
                 }
                 if (Character.isDigit(sub.charAt(dollarPos + 1))) {
@@ -215,7 +214,6 @@ public class Substitution {
                     // Static text
                     StaticElement newElement = new StaticElement();
                     newElement.value = sub.substring(pos, percentPos);
-                    pos = percentPos;
                     elements.add(newElement);
                 }
                 if (Character.isDigit(sub.charAt(percentPos + 1))) {
