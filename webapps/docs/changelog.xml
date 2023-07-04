@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.79 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix potential database connection leaks in
+        <code>DataSourceUserDatabase</code> identified by Coverity Scan. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.78 (remm)" rtext="release in progress">
   <subsection name="Other">
