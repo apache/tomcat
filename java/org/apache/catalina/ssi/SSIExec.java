@@ -58,13 +58,12 @@ public class SSIExec implements SSICommand {
                 Runtime rt = Runtime.getRuntime();
                 Process proc = rt.exec(substitutedValue);
                 foundProgram = true;
-                BufferedReader stdOutReader = new BufferedReader(
-                        new InputStreamReader(proc.getInputStream()));
-                BufferedReader stdErrReader = new BufferedReader(
-                        new InputStreamReader(proc.getErrorStream()));
                 char[] buf = new char[BUFFER_SIZE];
-                IOTools.flow(stdErrReader, writer, buf);
-                IOTools.flow(stdOutReader, writer, buf);
+                try (BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+                        BufferedReader stdErrReader = new BufferedReader(new InputStreamReader(proc.getErrorStream()));) {
+                    IOTools.flow(stdErrReader, writer, buf);
+                    IOTools.flow(stdOutReader, writer, buf);
+                }
                 proc.waitFor();
                 lastModified = System.currentTimeMillis();
             } catch (InterruptedException e) {
