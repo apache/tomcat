@@ -307,7 +307,7 @@ spotbugs.jar=${spotbugs.home}/lib/spotbugs-ant.jar
 spotbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${spotbugs.version}/spotbugs-${spotbugs.version}.tgz
 
 # ----- JSign, version 4.1 or later -----
-jsign.version=4.2
+jsign.version=5.0
 
 # checksums for JSign 5.0
 jsign.checksum.enabled=true
