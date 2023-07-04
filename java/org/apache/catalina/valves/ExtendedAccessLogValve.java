@@ -420,9 +420,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                         parameter = true;
                         return result;
                     case ')':
-                        result = buf.toString();
-                        buf.setLength(0);
-                        break;
+                        throw new IOException(sm.getString("patternTokenizer.unexpectedParenthesis"));
                     default:
                         buf.append((char) c);
                 }

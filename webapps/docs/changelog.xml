@@ -124,6 +124,10 @@
         if the web applications were deliberately crafted to allow it even when
         <code>allowLinking</code> was set to <code>false</code>. (markt)
       </fix>
+      <fix>
+        Make parsing of <code>ExtendedAccessLogValve</code> patterns more
+        robust. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
