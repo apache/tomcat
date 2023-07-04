@@ -427,7 +427,7 @@ public abstract class AbstractEndpoint<S,U> {
             MessageDigest sha512Digest = MessageDigest.getInstance("SHA-256");
             sha512Digest.update(certBytes);
             sb.append(HexUtils.toHexString(sha512Digest.digest()));
-            // SHA-256 fingerprint
+            // SHA-1 fingerprint
             sb.append("\nSHA-1 fingerprint: ");
             MessageDigest sha1Digest = MessageDigest.getInstance("SHA-1");
             sha1Digest.update(certBytes);
