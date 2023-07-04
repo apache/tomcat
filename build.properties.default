@@ -316,7 +316,7 @@ bnd.jar=${bnd.home}/biz.aQute.bnd-${bnd.version}.jar
 bnd.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.bnd-${bnd.version}.jar
 
 # ----- JSign, version 4.1 or later -----
-jsign.version=4.2
+jsign.version=5.0
 
 # checksums for JSign 5.0
 jsign.checksum.enabled=true
