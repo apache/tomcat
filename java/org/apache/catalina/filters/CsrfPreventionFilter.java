@@ -258,8 +258,8 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             return null;
         }
         @SuppressWarnings("unchecked")
-        NonceCache<String> nonceCache = (NonceCache<String>) session
-                .getAttribute(Constants.CSRF_NONCE_SESSION_ATTR_NAME);
+        NonceCache<String> nonceCache =
+                (NonceCache<String>) session.getAttribute(Constants.CSRF_NONCE_SESSION_ATTR_NAME);
         return nonceCache;
     }
 
@@ -343,14 +343,14 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         // Although the internal implementation uses a Map, this cache
         // implementation is only concerned with the keys.
-        private final Map<T, T> cache;
+        private final Map<T,T> cache;
 
         public LruCache(final int cacheSize) {
             cache = new LinkedHashMap<>() {
                 private static final long serialVersionUID = 1L;
 
                 @Override
-                protected boolean removeEldestEntry(Map.Entry<T, T> eldest) {
+                protected boolean removeEldestEntry(Map.Entry<T,T> eldest) {
                     if (size() > cacheSize) {
                         return true;
                     }
