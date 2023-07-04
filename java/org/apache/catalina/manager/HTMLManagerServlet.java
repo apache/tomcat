@@ -342,7 +342,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         PrintWriter writer = response.getWriter();
 
         Object[] args = new Object[2];
-        args[0] = request.getContextPath();
+        args[0] = getServletContext().getContextPath();
         args[1] = smClient.getString("htmlManagerServlet.title");
 
         // HTML Header Section
@@ -367,18 +367,18 @@ public final class HTMLManagerServlet extends ManagerServlet {
         // Manager Section
         args = new Object[9];
         args[0] = smClient.getString("htmlManagerServlet.manager");
-        args[1] = response.encodeURL(request.getContextPath() + "/html/list");
+        args[1] = response.encodeURL(getServletContext().getContextPath() + "/html/list");
         args[2] = smClient.getString("htmlManagerServlet.list");
         args[3] = // External link
-            (request.getContextPath() + "/" +
+            (getServletContext().getContextPath() + "/" +
              smClient.getString("htmlManagerServlet.helpHtmlManagerFile"));
         args[4] = smClient.getString("htmlManagerServlet.helpHtmlManager");
         args[5] = // External link
-            (request.getContextPath() + "/" +
+            (getServletContext().getContextPath() + "/" +
              smClient.getString("htmlManagerServlet.helpManagerFile"));
         args[6] = smClient.getString("htmlManagerServlet.helpManager");
         args[7] = response.encodeURL
-            (request.getContextPath() + "/status");
+            (getServletContext().getContextPath() + "/status");
         args[8] = smClient.getString("statusServlet.title");
         writer.print(MessageFormat.format(Constants.MANAGER_SECTION, args));
 
@@ -469,7 +469,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     args[2] = Escape.htmlElementContent(ctxt.getDisplayName());
                 }
                 args[3] = Boolean.valueOf(ctxt.getState().isAvailable());
-                args[4] = Escape.htmlElementContent(response.encodeURL(request.getContextPath() +
+                args[4] = Escape.htmlElementContent(response.encodeURL(getServletContext().getContextPath() +
                      "/html/sessions?" + pathVersion));
                 Manager manager = ctxt.getManager();
                 if (manager instanceof DistributedManager && showProxySessions) {
@@ -535,7 +535,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         args = new Object[7];
         args[0] = smClient.getString("htmlManagerServlet.deployTitle");
         args[1] = smClient.getString("htmlManagerServlet.deployServer");
-        args[2] = response.encodeURL(request.getContextPath() + "/html/deploy");
+        args[2] = response.encodeURL(getServletContext().getContextPath() + "/html/deploy");
         args[3] = smClient.getString("htmlManagerServlet.deployPath");
         args[4] = smClient.getString("htmlManagerServlet.deployConfig");
         args[5] = smClient.getString("htmlManagerServlet.deployWar");
@@ -544,7 +544,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
         args = new Object[4];
         args[0] = smClient.getString("htmlManagerServlet.deployUpload");
-        args[1] = response.encodeURL(request.getContextPath() + "/html/upload");
+        args[1] = response.encodeURL(getServletContext().getContextPath() + "/html/upload");
         args[2] = smClient.getString("htmlManagerServlet.deployUploadFile");
         args[3] = smClient.getString("htmlManagerServlet.deployButton");
         writer.print(MessageFormat.format(UPLOAD_SECTION, args));
@@ -553,7 +553,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         args = new Object[5];
         args[0] = smClient.getString("htmlManagerServlet.configTitle");
         args[1] = smClient.getString("htmlManagerServlet.configSslReloadTitle");
-        args[2] = response.encodeURL(request.getContextPath() + "/html/sslReload");
+        args[2] = response.encodeURL(getServletContext().getContextPath() + "/html/sslReload");
         args[3] = smClient.getString("htmlManagerServlet.configSslHostName");
         args[4] = smClient.getString("htmlManagerServlet.configReloadButton");
         writer.print(MessageFormat.format(CONFIG_SECTION, args));
@@ -563,20 +563,20 @@ public final class HTMLManagerServlet extends ManagerServlet {
         args[0] = smClient.getString("htmlManagerServlet.diagnosticsTitle");
         args[1] = smClient.getString("htmlManagerServlet.diagnosticsLeak");
         args[2] = response.encodeURL(
-                request.getContextPath() + "/html/findleaks");
+                getServletContext().getContextPath() + "/html/findleaks");
         args[3] = smClient.getString("htmlManagerServlet.diagnosticsLeakWarning");
         args[4] = smClient.getString("htmlManagerServlet.diagnosticsLeakButton");
         args[5] = smClient.getString("htmlManagerServlet.diagnosticsSsl");
         args[6] = response.encodeURL(
-                request.getContextPath() + "/html/sslConnectorCiphers");
+                getServletContext().getContextPath() + "/html/sslConnectorCiphers");
         args[7] = smClient.getString("htmlManagerServlet.diagnosticsSslConnectorCipherButton");
         args[8] = smClient.getString("htmlManagerServlet.diagnosticsSslConnectorCipherText");
         args[9] = response.encodeURL(
-                request.getContextPath() + "/html/sslConnectorCerts");
+                getServletContext().getContextPath() + "/html/sslConnectorCerts");
         args[10] = smClient.getString("htmlManagerServlet.diagnosticsSslConnectorCertsButton");
         args[11] = smClient.getString("htmlManagerServlet.diagnosticsSslConnectorCertsText");
         args[12] = response.encodeURL(
-                request.getContextPath() + "/html/sslConnectorTrustedCerts");
+                getServletContext().getContextPath() + "/html/sslConnectorTrustedCerts");
         args[13] = smClient.getString("htmlManagerServlet.diagnosticsSslConnectorTrustedCertsButton");
         args[14] = smClient.getString("htmlManagerServlet.diagnosticsSslConnectorTrustedCertsText");
         writer.print(MessageFormat.format(DIAGNOSTICS_SECTION, args));
