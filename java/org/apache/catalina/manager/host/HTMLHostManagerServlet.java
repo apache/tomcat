@@ -266,7 +266,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         PrintWriter writer = response.getWriter();
 
         Object[] args = new Object[2];
-        args[0] = request.getContextPath();
+        args[0] = getServletContext().getContextPath();
         args[1] = smClient.getString("htmlHostManagerServlet.title");
 
         // HTML Header Section
@@ -291,14 +291,14 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         // Manager Section
         args = new Object[9];
         args[0] = smClient.getString("htmlHostManagerServlet.manager");
-        args[1] = response.encodeURL(request.getContextPath() + "/html/list");
+        args[1] = response.encodeURL(getServletContext().getContextPath() + "/html/list");
         args[2] = smClient.getString("htmlHostManagerServlet.list");
         args[3] = // External link
-            (request.getContextPath() + "/" +
+            (getServletContext().getContextPath() + "/" +
              smClient.getString("htmlHostManagerServlet.helpHtmlManagerFile"));
         args[4] = smClient.getString("htmlHostManagerServlet.helpHtmlManager");
         args[5] = // External link
-            (request.getContextPath() + "/" +
+            (getServletContext().getContextPath() + "/" +
              smClient.getString("htmlHostManagerServlet.helpManagerFile"));
         args[6] = smClient.getString("htmlHostManagerServlet.helpManager");
         args[7] = response.encodeURL("/manager/status");
@@ -357,19 +357,19 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                 args = new Object[5];
                 if (host.getState().isAvailable()) {
                     args[0] = response.encodeURL
-                    (request.getContextPath() +
+                    (getServletContext().getContextPath() +
                      "/html/stop?name=" +
                      URLEncoder.encode(hostName, "UTF-8"));
                     args[1] = hostsStop;
                 } else {
                     args[0] = response.encodeURL
-                        (request.getContextPath() +
+                        (getServletContext().getContextPath() +
                          "/html/start?name=" +
                          URLEncoder.encode(hostName, "UTF-8"));
                     args[1] = hostsStart;
                 }
                 args[2] = response.encodeURL
-                    (request.getContextPath() +
+                    (getServletContext().getContextPath() +
                      "/html/remove?name=" +
                      URLEncoder.encode(hostName, "UTF-8"));
                 args[3] = hostsRemove;
@@ -388,7 +388,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         args = new Object[6];
         args[0] = smClient.getString("htmlHostManagerServlet.addTitle");
         args[1] = smClient.getString("htmlHostManagerServlet.addHost");
-        args[2] = response.encodeURL(request.getContextPath() + "/html/add");
+        args[2] = response.encodeURL(getServletContext().getContextPath() + "/html/add");
         args[3] = smClient.getString("htmlHostManagerServlet.addName");
         args[4] = smClient.getString("htmlHostManagerServlet.addAliases");
         args[5] = smClient.getString("htmlHostManagerServlet.addAppBase");
@@ -430,7 +430,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         // Persist Configuration Section
         args = new Object[4];
         args[0] = smClient.getString("htmlHostManagerServlet.persistTitle");
-        args[1] = response.encodeURL(request.getContextPath() + "/html/persist");
+        args[1] = response.encodeURL(getServletContext().getContextPath() + "/html/persist");
         args[2] = smClient.getString("htmlHostManagerServlet.persistAllButton");
         args[3] = smClient.getString("htmlHostManagerServlet.persistAll");
         writer.print(MessageFormat.format(PERSIST_SECTION, args));
