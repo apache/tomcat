@@ -18,8 +18,11 @@ package org.apache.catalina.filters;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UncheckedIOException;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,6 +40,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.util.NetMask;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -493,6 +497,40 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     }
 
     @Test
+    public void testInvokeAllProxiesAreTrustedOrInternal_withNetMasks() throws Exception {
+
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("internalProxiesMasks", "192.168.1.0/24,192.168.5.0/24");
+        filterDef.addInitParameter("trustedProxiesMasks", "192.0.2.0/24,198.51.100.0/24");
+        filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
+        filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("remote-host-original-value");
+        request.setHeader("x-forwarded-for", "140.211.11.130, 192.0.2.50, 198.51.100.33, 192.168.1.100, 192.168.5.1");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        String actualXForwardedFor = actualRequest.getHeader("x-forwarded-for");
+        Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
+
+        String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1,proxy2",
+            actualXForwardedBy);
+
+        String actualRemoteAddr = actualRequest.getRemoteAddr();
+        Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+
+        String actualRemoteHost = actualRequest.getRemoteHost();
+        Assert.assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+    }
+
+    @Test
     public void testInvokeNotAllowedRemoteAddr() throws Exception {
         // PREPARE
         FilterDef filterDef = new FilterDef();
@@ -866,6 +904,40 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
     private void doTestPattern(Pattern pattern, String input, boolean expectedMatch) {
         boolean match = pattern.matcher(input).matches();
+        Assert.assertEquals(input, Boolean.valueOf(expectedMatch), Boolean.valueOf(match));
+    }
+
+    @Test
+    public void testInternalProxiesMasks() {
+        RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
+        List<NetMask> masks = remoteIpFilter.getInternalProxiesMasks();
+
+        doTestMasks(masks, "8.8.8.8", false);
+        doTestMasks(masks, "100.62.0.0", false);
+        doTestMasks(masks, "100.63.255.255", false);
+        doTestMasks(masks, "100.64.0.0", true);
+        doTestMasks(masks, "100.65.0.0", true);
+        doTestMasks(masks, "100.68.0.0", true);
+        doTestMasks(masks, "100.72.0.0", true);
+        doTestMasks(masks, "100.88.0.0", true);
+        doTestMasks(masks, "100.95.0.0", true);
+        doTestMasks(masks, "100.102.0.0", true);
+        doTestMasks(masks, "100.110.0.0", true);
+        doTestMasks(masks, "100.126.0.0", true);
+        doTestMasks(masks, "100.127.255.255", true);
+        doTestMasks(masks, "100.128.0.0", false);
+        doTestMasks(masks, "100.130.0.0", false);
+
+    }
+
+    private void doTestMasks(List<NetMask> masks, String input, boolean expectedMatch) {
+        boolean match = masks.stream().anyMatch(mask -> {
+            try {
+                return mask.matches(InetAddress.getByName(input));
+            } catch (UnknownHostException e) {
+                throw new UncheckedIOException(e);
+            }
+        });
         Assert.assertEquals(input, Boolean.valueOf(expectedMatch), Boolean.valueOf(match));
     }
 }

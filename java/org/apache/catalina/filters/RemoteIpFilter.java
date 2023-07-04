@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.Enumeration;
@@ -44,6 +45,7 @@ import jakarta.servlet.http.PushBuilder;
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
 import org.apache.catalina.connector.RequestFacade;
+import org.apache.catalina.util.NetMask;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -667,6 +669,8 @@ public class RemoteIpFilter extends GenericFilter {
 
     protected static final String INTERNAL_PROXIES_PARAMETER = "internalProxies";
 
+    protected static final String INTERNAL_PROXIES_MASKS_PARAMETER = "internalProxiesMasks";
+
     // Log must be non-static as loggers are created per class-loader and this
     // Filter may be used in multiple class loaders
     private transient Log log = LogFactory.getLog(RemoteIpFilter.class);
@@ -689,6 +693,8 @@ public class RemoteIpFilter extends GenericFilter {
     protected static final String REMOTE_IP_HEADER_PARAMETER = "remoteIpHeader";
 
     protected static final String TRUSTED_PROXIES_PARAMETER = "trustedProxies";
+
+    protected static final String TRUSTED_PROXIES_MASKS_PARAMETER = "trustedProxiesMasks";
 
     protected static final String ENABLE_LOOKUPS_PARAMETER = "enableLookups";
 
@@ -726,6 +732,11 @@ public class RemoteIpFilter extends GenericFilter {
                     "172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}|" + "0:0:0:0:0:0:0:1|::1");
 
     /**
+     * @see #setInternalProxiesMasks(String)
+     */
+    private List<NetMask> internalProxiesMasks = Arrays.asList(new NetMask("10.0.0.0/8"), new NetMask("192.168.0.0/16"), new NetMask("169.254.0.0/16"), new NetMask("127.0.0.0/8"), new NetMask("100.64.0.0/10"), new NetMask("172.16.0.0/12"), new NetMask("::1/128"));
+
+    /**
      * @see #setProtocolHeader(String)
      */
     private String protocolHeader = "X-Forwarded-Proto";
@@ -760,14 +771,19 @@ public class RemoteIpFilter extends GenericFilter {
      */
     private Pattern trustedProxies = null;
 
+    /**
+     * @see #setTrustedProxiesMasks(String)
+     */
+    private List<NetMask> trustedProxiesMasks = null;
+
     private boolean enableLookups;
 
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        boolean isInternal = internalProxies != null && internalProxies.matcher(request.getRemoteAddr()).matches();
+        boolean isInternal = matchesInternalProxies(request.getRemoteAddr());
 
-        if (isInternal || (trustedProxies != null && trustedProxies.matcher(request.getRemoteAddr()).matches())) {
+        if (isInternal || matchesTrustedProxies(request.getRemoteAddr())) {
             String remoteIp = null;
             Deque<String> proxiesHeaderValue = new ArrayDeque<>();
             StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
@@ -789,9 +805,9 @@ public class RemoteIpFilter extends GenericFilter {
             for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
                 String currentRemoteIp = remoteIpHeaderValue[idx];
                 remoteIp = currentRemoteIp;
-                if (internalProxies != null && internalProxies.matcher(currentRemoteIp).matches()) {
+                if (matchesInternalProxies(currentRemoteIp)) {
                     // do nothing, internalProxies IPs are not appended to the
-                } else if (trustedProxies != null && trustedProxies.matcher(currentRemoteIp).matches()) {
+                } else if (matchesTrustedProxies(currentRemoteIp)) {
                     proxiesHeaderValue.addFirst(currentRemoteIp);
                 } else {
                     idx--; // decrement idx because break statement doesn't do it
@@ -907,6 +923,31 @@ public class RemoteIpFilter extends GenericFilter {
 
     }
 
+    private boolean matchesInternalProxies(String remoteAddr) {
+        return matchesPatternOrNetMasks(remoteAddr, internalProxies, internalProxiesMasks);
+    }
+
+    private boolean matchesTrustedProxies(String remoteAddr) {
+        return matchesPatternOrNetMasks(remoteAddr, trustedProxies, trustedProxiesMasks);
+    }
+
+    private boolean matchesPatternOrNetMasks(String remoteAddr, Pattern pattern, List<NetMask> masks) {
+        if (pattern != null) {
+            return pattern.matcher(remoteAddr).matches();
+        } else if (masks != null && !masks.isEmpty()) {
+            try {
+                InetAddress address = InetAddress.getByName(remoteAddr);
+                return masks.stream()
+                    .anyMatch(mask -> mask.matches(address));
+            } catch (UnknownHostException e) {
+                // should never happen, as no lookups are performed with dotted-decimal address format
+                log.debug("unable to map remote address to InetAddress", e);
+                return false;
+            }
+        }
+        return false;
+    }
+
     /*
      * Considers the value to be secure if it exclusively holds forwards for {@link #protocolHeaderHttpsValue}.
      */
@@ -975,6 +1016,10 @@ public class RemoteIpFilter extends GenericFilter {
         return internalProxies;
     }
 
+    public List<NetMask> getInternalProxiesMasks() {
+        return internalProxiesMasks;
+    }
+
     public String getProtocolHeader() {
         return protocolHeader;
     }
@@ -1018,6 +1063,11 @@ public class RemoteIpFilter extends GenericFilter {
             setInternalProxies(getInitParameter(INTERNAL_PROXIES_PARAMETER));
         }
 
+        if (getInitParameter(INTERNAL_PROXIES_MASKS_PARAMETER) != null) {
+            setInternalProxiesMasks(getInitParameter(INTERNAL_PROXIES_MASKS_PARAMETER));
+            setInternalProxies(null);
+        }
+
         if (getInitParameter(PROTOCOL_HEADER_PARAMETER) != null) {
             setProtocolHeader(getInitParameter(PROTOCOL_HEADER_PARAMETER));
         }
@@ -1052,6 +1102,11 @@ public class RemoteIpFilter extends GenericFilter {
 
         if (getInitParameter(TRUSTED_PROXIES_PARAMETER) != null) {
             setTrustedProxies(getInitParameter(TRUSTED_PROXIES_PARAMETER));
+        }
+
+        if (getInitParameter(TRUSTED_PROXIES_MASKS_PARAMETER) != null) {
+            setTrustedProxiesMasks(getInitParameter(TRUSTED_PROXIES_MASKS_PARAMETER));
+            setTrustedProxies(null);
         }
 
         if (getInitParameter(HTTP_SERVER_PORT_PARAMETER) != null) {
@@ -1154,6 +1209,35 @@ public class RemoteIpFilter extends GenericFilter {
             this.internalProxies = null;
         } else {
             this.internalProxies = Pattern.compile(internalProxies);
+        }
+    }
+
+    /**
+     * <p>
+     *     List of network masks defining the internal proxies.
+     *     This value will be used if internalProxies is not defined
+     * </p>
+     * <p>
+     *     Default value:
+     *     <ul>
+     *         <li>10.0.0.0/8</li>
+     *         <li>192.168.0.0/16</li>
+     *         <li>169.254.0.0/16</li>
+     *         <li>127.0.0.0/8</li>
+     *         <li>100.64.0.0/10</li>
+     *         <li>172.16.0.0/12</li>
+     *         <li>::1/128</li>
+     *     </ul>
+     * </p>
+     * @param internalProxiesMasks The list of network masks
+     */
+    public void setInternalProxiesMasks(String internalProxiesMasks) {
+        if (internalProxiesMasks == null || internalProxiesMasks.length() == 0) {
+            this.internalProxiesMasks = null;
+        } else {
+            this.internalProxiesMasks = Arrays.stream(internalProxiesMasks.split(","))
+                .map(NetMask::new)
+                .toList();
         }
     }
 
@@ -1289,6 +1373,23 @@ public class RemoteIpFilter extends GenericFilter {
             this.trustedProxies = null;
         } else {
             this.trustedProxies = Pattern.compile(trustedProxies);
+        }
+    }
+
+    /**
+     * <p>
+     *     List of network masks defining the trusted proxies.
+     *     This value will be used if trustedProxies is not defined
+     * </p>
+     * @param trustedProxiesMasks The list of network masks
+     */
+    public void setTrustedProxiesMasks(String trustedProxiesMasks) {
+        if (trustedProxiesMasks == null || trustedProxiesMasks.length() == 0) {
+            this.trustedProxiesMasks = null;
+        } else {
+            this.trustedProxiesMasks = Arrays.stream(trustedProxiesMasks.split(","))
+                .map(NetMask::new)
+                .toList();
         }
     }
 
