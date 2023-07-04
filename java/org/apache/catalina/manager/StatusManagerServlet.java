@@ -207,12 +207,12 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
         }
         // use StatusTransformer to output status
         Object[] args = new Object[1];
-        args[0] = request.getContextPath();
+        args[0] = getServletContext().getContextPath();
         StatusTransformer.writeHeader(writer,args,mode);
 
         // Body Header Section
         args = new Object[2];
-        args[0] = request.getContextPath();
+        args[0] = getServletContext().getContextPath();
         if (completeStatus) {
             args[1] = smClient.getString("statusServlet.complete");
         } else {
@@ -224,23 +224,23 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
         // Manager Section
         args = new Object[9];
         args[0] = smClient.getString("htmlManagerServlet.manager");
-        args[1] = response.encodeURL(request.getContextPath() + "/html/list");
+        args[1] = response.encodeURL(getServletContext().getContextPath() + "/html/list");
         args[2] = smClient.getString("htmlManagerServlet.list");
         args[3] = // External link
-            (request.getContextPath() + "/" +
+            (getServletContext().getContextPath() + "/" +
              smClient.getString("htmlManagerServlet.helpHtmlManagerFile"));
         args[4] = smClient.getString("htmlManagerServlet.helpHtmlManager");
         args[5] = // External link
-            (request.getContextPath() + "/" +
+            (getServletContext().getContextPath() + "/" +
              smClient.getString("htmlManagerServlet.helpManagerFile"));
         args[6] = smClient.getString("htmlManagerServlet.helpManager");
         if (completeStatus) {
             args[7] = response.encodeURL
-                (request.getContextPath() + "/status");
+                (getServletContext().getContextPath() + "/status");
             args[8] = smClient.getString("statusServlet.title");
         } else {
             args[7] = response.encodeURL
-                (request.getContextPath() + "/status/all");
+                (getServletContext().getContextPath() + "/status/all");
             args[8] = smClient.getString("statusServlet.complete");
         }
         // use StatusTransformer to output status
