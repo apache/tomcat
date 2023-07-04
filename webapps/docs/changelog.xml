@@ -134,6 +134,10 @@
         Fix potential database connection leaks in
         <code>DataSourceUserDatabase</code> identified by Coverity Scan. (markt)
       </fix>
+      <fix>
+        Make parsing of <code>ExtendedAccessLogValve</code> patterns more
+        robust. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
