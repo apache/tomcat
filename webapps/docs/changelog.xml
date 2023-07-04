@@ -130,6 +130,10 @@
         <code>webapp:</code>) and make the resource lookup API more visible.
         (remm)
       </update>
+      <fix>
+        Fix potential database connection leaks in
+        <code>DataSourceUserDatabase</code> identified by Coverity Scan. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
