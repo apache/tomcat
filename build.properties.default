@@ -338,7 +338,7 @@ openssl-lib.jar=${openssl-lib.home}/tomcat-coyote-openssl-java17-${openssl-lib.v
 openssl-lib.loc=${base-maven.loc}/org/apache/tomcat/tomcat-coyote-openssl-java17/${openssl-lib.version}/tomcat-coyote-openssl-java17-${openssl-lib.version}.jar
 
 # ----- JSign, version 4.1 or later -----
-jsign.version=4.2
+jsign.version=5.0
 
 # checksums for JSign 5.0
 jsign.checksum.enabled=true
