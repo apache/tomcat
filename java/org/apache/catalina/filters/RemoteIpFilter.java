@@ -42,6 +42,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
+import org.apache.catalina.util.RequestUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringUtils;
@@ -633,22 +634,7 @@ public class RemoteIpFilter implements Filter {
 
         @Override
         public StringBuffer getRequestURL() {
-            StringBuffer url = new StringBuffer();
-            String scheme = getScheme();
-            int port = getServerPort();
-            if (port < 0) {
-                port = 80; // Work around java.net.URL bug
-            }
-            url.append(scheme);
-            url.append("://");
-            url.append(getServerName());
-            if ((scheme.equals("http") && (port != 80)) || (scheme.equals("https") && (port != 443))) {
-                url.append(':');
-                url.append(port);
-            }
-            url.append(getRequestURI());
-
-            return url;
+            return RequestUtil.getRequestURL(this);
         }
     }
 
