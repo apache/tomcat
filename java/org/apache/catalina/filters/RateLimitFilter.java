@@ -193,8 +193,8 @@ public class RateLimitFilter extends GenericFilter {
             statusMessage = param;
         }
 
-        ScheduledExecutorService executorService =
-                (ScheduledExecutorService) getServletContext().getAttribute(ScheduledThreadPoolExecutor.class.getName());
+        ScheduledExecutorService executorService = (ScheduledExecutorService) getServletContext()
+                .getAttribute(ScheduledThreadPoolExecutor.class.getName());
         if (executorService == null) {
             executorService = new java.util.concurrent.ScheduledThreadPoolExecutor(1);
         }
