@@ -449,8 +449,13 @@ public class ExpiresFilter extends FilterBase {
      * Duration unit
      */
     protected enum DurationUnit {
-        DAY(Calendar.DAY_OF_YEAR), HOUR(Calendar.HOUR), MINUTE(Calendar.MINUTE), MONTH(Calendar.MONTH),
-        SECOND(Calendar.SECOND), WEEK(Calendar.WEEK_OF_YEAR), YEAR(Calendar.YEAR);
+        DAY(Calendar.DAY_OF_YEAR),
+        HOUR(Calendar.HOUR),
+        MINUTE(Calendar.MINUTE),
+        MONTH(Calendar.MONTH),
+        SECOND(Calendar.SECOND),
+        WEEK(Calendar.WEEK_OF_YEAR),
+        YEAR(Calendar.YEAR);
 
         private final int calendarField;
 
@@ -509,7 +514,8 @@ public class ExpiresFilter extends FilterBase {
      * {@link StartingPoint#LAST_MODIFICATION_TIME}).
      */
     protected enum StartingPoint {
-        ACCESS_TIME, LAST_MODIFICATION_TIME
+        ACCESS_TIME,
+        LAST_MODIFICATION_TIME
     }
 
     /**
@@ -1058,8 +1064,8 @@ public class ExpiresFilter extends FilterBase {
      * @return array of patterns (non {@code null})
      */
     protected static String[] commaDelimitedListToStringArray(String commaDelimitedStrings) {
-        return (commaDelimitedStrings == null || commaDelimitedStrings.length() == 0) ? new String[0]
-                : commaSeparatedValuesPattern.split(commaDelimitedStrings);
+        return (commaDelimitedStrings == null || commaDelimitedStrings.length() == 0) ? new String[0] :
+                commaSeparatedValuesPattern.split(commaDelimitedStrings);
     }
 
     /**
@@ -1170,7 +1176,7 @@ public class ExpiresFilter extends FilterBase {
     /**
      * Expires configuration by content type. Visible for test.
      */
-    private Map<String, ExpiresConfiguration> expiresConfigurationByContentType = new LinkedHashMap<>();
+    private Map<String,ExpiresConfiguration> expiresConfigurationByContentType = new LinkedHashMap<>();
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -1374,7 +1380,7 @@ public class ExpiresFilter extends FilterBase {
         return calendar.getTime();
     }
 
-    public Map<String, ExpiresConfiguration> getExpiresConfigurationByContentType() {
+    public Map<String,ExpiresConfiguration> getExpiresConfigurationByContentType() {
         return expiresConfigurationByContentType;
     }
 
@@ -1391,8 +1397,8 @@ public class ExpiresFilter extends FilterBase {
 
             try {
                 if (name.startsWith(PARAMETER_EXPIRES_BY_TYPE)) {
-                    String contentType = name.substring(PARAMETER_EXPIRES_BY_TYPE.length()).trim()
-                            .toLowerCase(Locale.ENGLISH);
+                    String contentType =
+                            name.substring(PARAMETER_EXPIRES_BY_TYPE.length()).trim().toLowerCase(Locale.ENGLISH);
                     ExpiresConfiguration expiresConfiguration = parseExpiresConfiguration(value);
                     this.expiresConfigurationByContentType.put(contentType, expiresConfiguration);
                 } else if (name.equalsIgnoreCase(PARAMETER_EXPIRES_DEFAULT)) {
@@ -1423,8 +1429,8 @@ public class ExpiresFilter extends FilterBase {
      */
     protected boolean isEligibleToExpirationHeaderGeneration(HttpServletRequest request,
             XHttpServletResponse response) {
-        boolean expirationHeaderHasBeenSet = response.containsHeader(HEADER_EXPIRES) ||
-                contains(response.getCacheControlHeader(), "max-age");
+        boolean expirationHeaderHasBeenSet =
+                response.containsHeader(HEADER_EXPIRES) || contains(response.getCacheControlHeader(), "max-age");
         if (expirationHeaderHasBeenSet) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("expiresFilter.expirationHeaderAlreadyDefined", request.getRequestURI(),
@@ -1485,8 +1491,8 @@ public class ExpiresFilter extends FilterBase {
             String maxAgeDirective = "max-age=" + ((expirationDate.getTime() - System.currentTimeMillis()) / 1000);
 
             String cacheControlHeader = response.getCacheControlHeader();
-            String newCacheControlHeader = (cacheControlHeader == null) ? maxAgeDirective
-                    : cacheControlHeader + ", " + maxAgeDirective;
+            String newCacheControlHeader =
+                    (cacheControlHeader == null) ? maxAgeDirective : cacheControlHeader + ", " + maxAgeDirective;
             response.setHeader(HEADER_CACHE_CONTROL, newCacheControlHeader);
             response.setDateHeader(HEADER_EXPIRES, expirationDate.getTime());
         }
@@ -1604,7 +1610,7 @@ public class ExpiresFilter extends FilterBase {
     }
 
     public void setExpiresConfigurationByContentType(
-            Map<String, ExpiresConfiguration> expiresConfigurationByContentType) {
+            Map<String,ExpiresConfiguration> expiresConfigurationByContentType) {
         this.expiresConfigurationByContentType = expiresConfigurationByContentType;
     }
 

@@ -278,8 +278,8 @@ public class CorsFilter implements Filter {
         }
 
         // Section 6.2.4
-        String accessControlRequestHeadersHeader = request
-                .getHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS);
+        String accessControlRequestHeadersHeader =
+                request.getHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS);
         List<String> accessControlRequestHeaders = new ArrayList<>();
         if (accessControlRequestHeadersHeader != null && !accessControlRequestHeadersHeader.trim().isEmpty()) {
             String[] headers = accessControlRequestHeadersHeader.trim().split(",");
@@ -571,8 +571,8 @@ public class CorsFilter implements Filter {
                 String method = request.getMethod();
                 if (method != null) {
                     if ("OPTIONS".equals(method)) {
-                        String accessControlRequestMethodHeader = request
-                                .getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
+                        String accessControlRequestMethodHeader =
+                                request.getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
                         if (accessControlRequestMethodHeader != null && !accessControlRequestMethodHeader.isEmpty()) {
                             requestType = CORSRequestType.PRE_FLIGHT;
                         } else if (accessControlRequestMethodHeader != null &&
@@ -922,8 +922,8 @@ public class CorsFilter implements Filter {
     /**
      * Request headers sent as 'Access-Control-Request-Headers' header, for pre-flight request.
      */
-    public static final String HTTP_REQUEST_ATTRIBUTE_REQUEST_HEADERS = HTTP_REQUEST_ATTRIBUTE_PREFIX +
-            "request.headers";
+    public static final String HTTP_REQUEST_ATTRIBUTE_REQUEST_HEADERS =
+            HTTP_REQUEST_ATTRIBUTE_PREFIX + "request.headers";
 
     // -------------------------------------------------------------- Constants
     /**

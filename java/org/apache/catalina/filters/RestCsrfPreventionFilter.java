@@ -75,7 +75,8 @@ import javax.servlet.http.HttpSession;
  */
 public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     private enum MethodType {
-        NON_MODIFYING_METHOD, MODIFYING_METHOD
+        NON_MODIFYING_METHOD,
+        MODIFYING_METHOD
     }
 
     private static final Pattern NON_MODIFYING_METHODS_PATTERN = Pattern.compile("GET|HEAD|OPTIONS");
@@ -211,8 +212,8 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
         public boolean apply(HttpServletRequest request, HttpServletResponse response) {
             if (Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE
                     .equalsIgnoreCase(extractNonceFromRequestHeader(request, Constants.CSRF_REST_NONCE_HEADER_NAME))) {
-                String nonceFromSessionStr = extractNonceFromSession(request.getSession(false),
-                        Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME);
+                String nonceFromSessionStr =
+                        extractNonceFromSession(request.getSession(false), Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME);
                 if (nonceFromSessionStr == null) {
                     nonceFromSessionStr = generateNonce(request);
                     storeNonceToSession(Objects.requireNonNull(request.getSession(true)),

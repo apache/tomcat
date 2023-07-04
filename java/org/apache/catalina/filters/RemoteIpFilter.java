@@ -456,7 +456,7 @@ public class RemoteIpFilter implements Filter {
 
     public static class XForwardedRequest extends HttpServletRequestWrapper {
 
-        protected final Map<String, List<String>> headers;
+        protected final Map<String,List<String>> headers;
 
         protected String localName;
 
@@ -507,15 +507,15 @@ public class RemoteIpFilter implements Filter {
 
         @Override
         public String getHeader(String name) {
-            Map.Entry<String, List<String>> header = getHeaderEntry(name);
+            Map.Entry<String,List<String>> header = getHeaderEntry(name);
             if (header == null || header.getValue() == null || header.getValue().isEmpty()) {
                 return null;
             }
             return header.getValue().get(0);
         }
 
-        protected Map.Entry<String, List<String>> getHeaderEntry(String name) {
-            for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+        protected Map.Entry<String,List<String>> getHeaderEntry(String name) {
+            for (Map.Entry<String,List<String>> entry : headers.entrySet()) {
                 if (entry.getKey().equalsIgnoreCase(name)) {
                     return entry;
                 }
@@ -530,7 +530,7 @@ public class RemoteIpFilter implements Filter {
 
         @Override
         public Enumeration<String> getHeaders(String name) {
-            Map.Entry<String, List<String>> header = getHeaderEntry(name);
+            Map.Entry<String,List<String>> header = getHeaderEntry(name);
             if (header == null || header.getValue() == null) {
                 return Collections.enumeration(Collections.<String>emptyList());
             }
@@ -582,7 +582,7 @@ public class RemoteIpFilter implements Filter {
         }
 
         public void removeHeader(String name) {
-            Map.Entry<String, List<String>> header = getHeaderEntry(name);
+            Map.Entry<String,List<String>> header = getHeaderEntry(name);
             if (header != null) {
                 headers.remove(header.getKey());
             }
@@ -590,7 +590,7 @@ public class RemoteIpFilter implements Filter {
 
         public void setHeader(String name, String value) {
             List<String> values = Collections.singletonList(value);
-            Map.Entry<String, List<String>> header = getHeaderEntry(name);
+            Map.Entry<String,List<String>> header = getHeaderEntry(name);
             if (header == null) {
                 headers.put(name, values);
             } else {
@@ -697,8 +697,8 @@ public class RemoteIpFilter implements Filter {
      * @return array of patterns (non <code>null</code>)
      */
     protected static String[] commaDelimitedListToStringArray(String commaDelimitedStrings) {
-        return (commaDelimitedStrings == null || commaDelimitedStrings.length() == 0) ? new String[0]
-                : commaSeparatedValuesPattern.split(commaDelimitedStrings);
+        return (commaDelimitedStrings == null || commaDelimitedStrings.length() == 0) ? new String[0] :
+                commaSeparatedValuesPattern.split(commaDelimitedStrings);
     }
 
     /**
@@ -741,8 +741,8 @@ public class RemoteIpFilter implements Filter {
     /**
      * @see #setInternalProxies(String)
      */
-    private Pattern internalProxies = Pattern
-            .compile("10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" + "192\\.168\\.\\d{1,3}\\.\\d{1,3}|" +
+    private Pattern internalProxies =
+            Pattern.compile("10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" + "192\\.168\\.\\d{1,3}\\.\\d{1,3}|" +
                     "169\\.254\\.\\d{1,3}\\.\\d{1,3}|" + "127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" +
                     "100\\.6[4-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" + "100\\.[7-9]{1}\\d{1}\\.\\d{1,3}\\.\\d{1,3}|" +
                     "100\\.1[0-1]{1}\\d{1}\\.\\d{1,3}\\.\\d{1,3}|" + "100\\.12[0-7]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
