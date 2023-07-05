@@ -261,18 +261,18 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         }
         ByteBuffer request = createRequest(path, reqHeaders);
 
-        AsynchronousSocketChannel socketChannel;
-        try {
-            socketChannel = AsynchronousSocketChannel.open(getAsynchronousChannelGroup());
-        } catch (IOException ioe) {
-            throw new DeploymentException(sm.getString("wsWebSocketContainer.asynchronousSocketChannelFail"), ioe);
-        }
-
         // Get the connection timeout
         long timeout = Constants.IO_TIMEOUT_MS_DEFAULT;
         String timeoutValue = (String) userProperties.get(Constants.IO_TIMEOUT_MS_PROPERTY);
         if (timeoutValue != null) {
             timeout = Long.valueOf(timeoutValue).intValue();
+        }
+
+        AsynchronousSocketChannel socketChannel;
+        try {
+            socketChannel = AsynchronousSocketChannel.open(getAsynchronousChannelGroup());
+        } catch (IOException ioe) {
+            throw new DeploymentException(sm.getString("wsWebSocketContainer.asynchronousSocketChannelFail"), ioe);
         }
 
         // Set-up
