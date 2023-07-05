@@ -1057,9 +1057,11 @@ public class WebdavServlet extends DefaultServlet {
                 // Checking if a child resource of this collection is
                 // already locked
                 List<String> lockPaths = new ArrayList<>();
-                for (LockInfo currentLock : collectionLocks) {
+                Iterator<LockInfo> collectionLocksIterator = collectionLocks.iterator();
+                while (collectionLocksIterator.hasNext()) {
+                    LockInfo currentLock = collectionLocksIterator.next();
                     if (currentLock.hasExpired()) {
-                        collectionLocks.remove(currentLock);
+                        collectionLocksIterator.remove();
                         continue;
                     }
                     if (currentLock.path.startsWith(lock.path) &&
