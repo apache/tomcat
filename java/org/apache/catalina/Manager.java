@@ -220,7 +220,7 @@ public interface Manager {
      */
     default String rotateSessionId(Session session) {
         String newSessionId = null;
-        // Assume there new Id is a duplicate until we prove it isn't. The
+        // Assume the new Id is a duplicate until we prove it isn't. The
         // chances of a duplicate are extremely low but the current ManagerBase
         // code protects against duplicates so this default method does too.
         boolean duplicate = true;
