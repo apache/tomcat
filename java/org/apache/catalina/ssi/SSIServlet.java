@@ -215,19 +215,19 @@ public class SSIServlet extends HttpServlet {
         } else {
             isr = new InputStreamReader(resourceInputStream, encoding);
         }
-        BufferedReader bufferedReader = new BufferedReader(isr);
 
-        long lastModified = ssiProcessor.process(bufferedReader,
-                resourceInfo.getLastModified(), printWriter);
-        if (lastModified > 0) {
-            res.setDateHeader("last-modified", lastModified);
+        try (BufferedReader bufferedReader = new BufferedReader(isr)) {
+            long lastModified = ssiProcessor.process(bufferedReader,
+                    resourceInfo.getLastModified(), printWriter);
+            if (lastModified > 0) {
+                res.setDateHeader("last-modified", lastModified);
+            }
+            if (buffered) {
+                printWriter.flush();
+                @SuppressWarnings("null")
+                String text = stringWriter.toString();
+                res.getWriter().write(text);
+            }
         }
-        if (buffered) {
-            printWriter.flush();
-            @SuppressWarnings("null")
-            String text = stringWriter.toString();
-            res.getWriter().write(text);
-        }
-        bufferedReader.close();
     }
 }
