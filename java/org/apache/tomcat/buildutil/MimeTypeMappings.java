@@ -52,21 +52,19 @@ public class MimeTypeMappings {
         SortedMap<String, String> sortedWebXmlMimeMappings = new TreeMap<>(webXmlMimeMappings);
 
         File f = new File("java/org/apache/catalina/startup/MimeTypeMappings.properties");
-        FileOutputStream fos = new FileOutputStream(f);
-        Writer w = new OutputStreamWriter(fos, StandardCharsets.US_ASCII);
+        try (FileOutputStream fos = new FileOutputStream(f);
+                Writer w = new OutputStreamWriter(fos, StandardCharsets.US_ASCII)) {
 
-        Utils.insertLicense(w);
+            Utils.insertLicense(w);
 
-        w.write(System.lineSeparator());
-
-        for (Map.Entry<String, String> mapping : sortedWebXmlMimeMappings.entrySet()) {
-            w.write(mapping.getKey());
-            w.write("=");
-            w.write(mapping.getValue());
             w.write(System.lineSeparator());
-        }
 
-        w.close();
-        fos.close();
+            for (Map.Entry<String, String> mapping : sortedWebXmlMimeMappings.entrySet()) {
+                w.write(mapping.getKey());
+                w.write("=");
+                w.write(mapping.getValue());
+                w.write(System.lineSeparator());
+            }
+        }
     }
 }
