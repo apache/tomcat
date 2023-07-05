@@ -506,17 +506,12 @@ class StreamProcessor extends AbstractProcessor {
         }
 
         // HTTP header names must be tokens.
+        // Stream#emitHeader() checks that all the pseudo headers appear first.
         MimeHeaders headers = request.getMimeHeaders();
-        boolean previousHeaderWasPseudoHeader = true;
         Enumeration<String> names = headers.names();
         while (names.hasMoreElements()) {
             String name = names.nextElement();
-            if (H2_PSEUDO_HEADERS_REQUEST.contains(name)) {
-                if (!previousHeaderWasPseudoHeader) {
-                    return false;
-                }
-            } else if (!HttpParser.isToken(name)) {
-                previousHeaderWasPseudoHeader = false;
+            if (!H2_PSEUDO_HEADERS_REQUEST.contains(name) && !HttpParser.isToken(name)) {
                 return false;
             }
         }
