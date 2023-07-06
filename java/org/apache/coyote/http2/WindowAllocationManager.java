@@ -16,6 +16,8 @@
  */
 package org.apache.coyote.http2;
 
+import java.util.concurrent.TimeUnit;
+
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Response;
 import org.apache.juli.logging.Log;
@@ -133,7 +135,7 @@ class WindowAllocationManager {
     }
 
 
-    private void waitFor(int waitTarget, long timeout) throws InterruptedException {
+    private void waitFor(int waitTarget, final long timeout) throws InterruptedException {
         synchronized (stream) {
             if (waitingFor != NONE) {
                 throw new IllegalStateException(sm.getString("windowAllocationManager.waitFor.ise",
@@ -141,12 +143,30 @@ class WindowAllocationManager {
             }
 
             waitingFor = waitTarget;
+            long startNanos = -1;
 
-            if (timeout < 0) {
-                stream.wait();
-            } else {
-                stream.wait(timeout);
-            }
+            // Loop to handle spurious wake-ups
+            do {
+                if (timeout < 0) {
+                    stream.wait();
+                } else {
+                    long timeoutRemaining;
+                    if (startNanos == -1) {
+                        startNanos = System.nanoTime();
+                        timeoutRemaining = timeout;
+                    } else {
+                        long elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
+                        if (elapsedMillis == 0) {
+                            elapsedMillis = 1;
+                        }
+                        timeoutRemaining = timeout - elapsedMillis;
+                        if (timeoutRemaining <= 0) {
+                            return;
+                        }
+                    }
+                    stream.wait(timeoutRemaining);
+                }
+            } while (waitingFor != NONE);
         }
     }
 
