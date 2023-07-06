@@ -144,6 +144,11 @@
         based keys/certificates and logs the relevant information for each.
         (markt)
       </fix>
+      <fix>
+        Refactor blocking reads and writes for the NIO connector to remove
+        code paths that could allow a notification from the Poller to be missed
+        resuting in a timeout rather than the expected read or write. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
