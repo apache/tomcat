@@ -502,10 +502,14 @@ public abstract class SSLUtilBase implements SSLUtil {
                 new PKIXBuilderParameters(trustStore, new X509CertSelector());
         if (crlf != null && crlf.length() > 0) {
             Collection<? extends CRL> crls = getCRLs(crlf);
-            CertStoreParameters csp = new CollectionCertStoreParameters(crls);
-            CertStore store = CertStore.getInstance("Collection", csp);
-            xparams.addCertStore(store);
-            xparams.setRevocationEnabled(true);
+            if (crls != null && crls.size() > 0){
+                CertStoreParameters csp = new CollectionCertStoreParameters(crls);
+                CertStore store = CertStore.getInstance("Collection", csp);
+                xparams.addCertStore(store);
+                xparams.setRevocationEnabled(true);
+            } else {
+                xparams.setRevocationEnabled(revocationEnabled);
+            }
         } else {
             xparams.setRevocationEnabled(revocationEnabled);
         }
