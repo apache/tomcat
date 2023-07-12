@@ -219,6 +219,10 @@
       <update>
         Update JSign to 5.0. (markt/rjung)
       </update>
+      <fix>
+        Align documentation for maxParameterCount to match hard-coded defaults.
+        Contributed by Michal Sobkiewicz. (schultz)
+      </fix>
     </changelog>
   </subsection>
 </section>
