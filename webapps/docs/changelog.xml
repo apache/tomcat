@@ -134,6 +134,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Align documentation for maxParameterCount to match hard-coded defaults.
+        Contributed by Michal Sobkiewicz. (schultz)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.78 (remm)" rtext="2023-07-10">
   <subsection name="Other">
