@@ -85,7 +85,8 @@ public class RealmSF extends StoreFactoryBase {
         }
         // Store nested <CredentialHandler> element
         CredentialHandler credentialHandler = ((Realm) aRealm).getCredentialHandler();
-        if (credentialHandler != null) {
+        if (credentialHandler != null
+                && !(credentialHandler.getClass().getName().equals("org.apache.catalina.realm.CombinedRealm$CombinedRealmCredentialHandler"))) {
             storeElement(aWriter, indent, credentialHandler);
         }
     }
