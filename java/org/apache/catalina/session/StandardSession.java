@@ -1602,7 +1602,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
         if (getPersistAuthentication()) {
             sessionAuthType = getAuthType();
             sessionPrincipal = getPrincipal();
-            if (!(sessionPrincipal instanceof Serializable)) {
+            if (sessionPrincipal != null && !(sessionPrincipal instanceof Serializable)) {
                 sessionPrincipal = null;
                 manager.getContext().getLogger().warn(sm.getString("standardSession.principalNotSerializable", id));
             }
