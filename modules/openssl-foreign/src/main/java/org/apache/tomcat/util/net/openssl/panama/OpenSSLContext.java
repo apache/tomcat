@@ -223,7 +223,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     long errCode = ERR_get_error();
                     if (errCode != 0) {
                         try (var localArena = Arena.ofConfined()) {
-                            var buf = localArena.allocateArray(ValueLayout.JAVA_BYTE, new byte[128]);
+                            var buf = localArena.allocateFrom(ValueLayout.JAVA_BYTE, new byte[128]);
                             ERR_error_string(errCode, buf);
                             log.error(sm.getString("openssl.errorLoadingCertificate", buf.getString(0)));
                         }
@@ -405,11 +405,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 if (name.equals("NO_OCSP_CHECK")) {
                     rc = 1;
                 } else {
-                    int code = SSL_CONF_cmd_value_type(state.confCtx, localArena.allocateString(name));
+                    int code = SSL_CONF_cmd_value_type(state.confCtx, localArena.allocateFrom(name));
                     rc = 1;
                     long errCode = ERR_get_error();
                     if (errCode != 0) {
-                        var buf = localArena.allocateArray(ValueLayout.JAVA_BYTE, new byte[128]);
+                        var buf = localArena.allocateFrom(ValueLayout.JAVA_BYTE, new byte[128]);
                         ERR_error_string(errCode, buf);
                         log.error(sm.getString("opensslconf.checkFailed", buf.getString(0)));
                         rc = 0;
@@ -481,11 +481,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     noOcspCheck = Boolean.valueOf(value);
                     rc = 1;
                 } else {
-                    rc = SSL_CONF_cmd(state.confCtx, localArena.allocateString(name),
-                            localArena.allocateString(value));
+                    rc = SSL_CONF_cmd(state.confCtx, localArena.allocateFrom(name),
+                            localArena.allocateFrom(value));
                     long errCode = ERR_get_error();
                     if (rc <= 0 || errCode != 0) {
-                        var buf = localArena.allocateArray(ValueLayout.JAVA_BYTE, new byte[128]);
+                        var buf = localArena.allocateFrom(ValueLayout.JAVA_BYTE, new byte[128]);
                         ERR_error_string(errCode, buf);
                         log.error(sm.getString("opensslconf.commandError", name, value, buf.getString(0)));
                         rc = 0;
@@ -565,13 +565,13 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // List the ciphers that the client is permitted to negotiate
             if (minTlsVersion <= TLS1_2_VERSION()) {
                 if (SSL_CTX_set_cipher_list(state.sslCtx,
-                        localArena.allocateString(sslHostConfig.getCiphers())) <= 0) {
+                        localArena.allocateFrom(sslHostConfig.getCiphers())) <= 0) {
                     log.warn(sm.getString("engine.failedCipherList", sslHostConfig.getCiphers()));
                 }
             }
             if (maxTlsVersion >= TLS1_3_VERSION() && (sslHostConfig.getCiphers() != SSLHostConfig.DEFAULT_TLS_CIPHERS)) {
                 if (SSL_CTX_set_ciphersuites(state.sslCtx,
-                        localArena.allocateString(sslHostConfig.getCiphers())) <= 0) {
+                        localArena.allocateFrom(sslHostConfig.getCiphers())) <= 0) {
                     log.warn(sm.getString("engine.failedCipherSuite", sslHostConfig.getCiphers()));
                 }
             }
@@ -627,8 +627,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 // an acceptable certificate
                 for (X509Certificate caCert : state.x509TrustManager.getAcceptedIssuers()) {
                     //SSLContext.addClientCACertificateRaw(state.ctx, caCert.getEncoded());
-                    var rawCACertificate = localArena.allocateArray(ValueLayout.JAVA_BYTE, caCert.getEncoded());
-                    var rawCACertificatePointer = localArena.allocate(ValueLayout.ADDRESS, rawCACertificate);
+                    var rawCACertificate = localArena.allocateFrom(ValueLayout.JAVA_BYTE, caCert.getEncoded());
+                    var rawCACertificatePointer = localArena.allocateFrom(ValueLayout.ADDRESS, rawCACertificate);
                     var x509CACert = d2i_X509(MemorySegment.NULL, rawCACertificatePointer, rawCACertificate.byteSize());
                     if (MemorySegment.NULL.equals(x509CACert)) {
                         logLastError(localArena, "openssl.errorLoadingCertificate");
@@ -644,9 +644,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 //        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
                 //        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
                 MemorySegment caCertificateFileNative = sslHostConfig.getCaCertificateFile() != null
-                        ? localArena.allocateString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile())) : null;
+                        ? localArena.allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile())) : null;
                 MemorySegment caCertificatePathNative = sslHostConfig.getCaCertificatePath() != null
-                        ? localArena.allocateString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath())) : null;
+                        ? localArena.allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath())) : null;
                 if ((sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null)
                         && SSL_CTX_load_verify_locations(state.sslCtx,
                                 caCertificateFileNative == null ? MemorySegment.NULL : caCertificateFileNative,
@@ -843,7 +843,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         try (var localArena = Arena.ofConfined()) {
             for (int i = 0; i < len; i++) {
                 MemorySegment/*(X509*)*/ x509 = OPENSSL_sk_value(sk, i);
-                MemorySegment bufPointer = localArena.allocate(ValueLayout.ADDRESS, MemorySegment.NULL);
+                MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
                 int length = i2d_X509(x509, bufPointer);
                 if (length < 0) {
                     certificateChain[i] = new byte[0];
@@ -959,7 +959,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         String callbackPassword = callbackPasswordTheadLocal.get();
         if (callbackPassword != null && callbackPassword.length() > 0) {
             try (var localArena = Arena.ofConfined()) {
-                MemorySegment callbackPasswordNative = localArena.allocateString(callbackPassword);
+                MemorySegment callbackPasswordNative = localArena.allocateFrom(callbackPassword);
                 if (callbackPasswordNative.byteSize() > bufsiz) {
                     // The password is too long
                     log.error(sm.getString("openssl.passwordTooLong"));
@@ -983,9 +983,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             //        SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
             //        SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
             //        certificate.getCertificateKeyPassword(), getCertificateIndex(certificate));
-            var certificateFileNative = localArena.allocateString(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()));
+            var certificateFileNative = localArena.allocateFrom(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()));
             var certificateKeyFileNative = (certificate.getCertificateKeyFile() == null) ? certificateFileNative
-                    : localArena.allocateString(SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()));
+                    : localArena.allocateFrom(SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()));
             MemorySegment bio;
             MemorySegment cert = MemorySegment.NULL;
             MemorySegment key = MemorySegment.NULL;
@@ -1009,7 +1009,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 int passwordLength = 0;
                 String callbackPassword = certificate.getCertificateKeyPassword();
                 if (callbackPassword != null && callbackPassword.length() > 0) {
-                    passwordAddress = localArena.allocateString(callbackPassword);
+                    passwordAddress = localArena.allocateFrom(callbackPassword);
                     passwordLength = (int) (passwordAddress.byteSize() - 1);
                 }
                 if (PKCS12_verify_mac(p12, passwordAddress, passwordLength) <= 0) {
@@ -1112,7 +1112,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             // Try to read DH parameters from the (first) SSLCertificateFile
             if (index == SSL_AIDX_RSA) {
-                bio = BIO_new_file(certificateFileNative, localArena.allocateString("r"));
+                bio = BIO_new_file(certificateFileNative, localArena.allocateFrom("r"));
                 var dh = PEM_read_bio_DHparams(bio, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
                 BIO_free(bio);
                 // #  define SSL_CTX_set_tmp_dh(sslCtx,dh) \
@@ -1123,7 +1123,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
             }
             // Similarly, try to read the ECDH curve name from SSLCertificateFile...
-            bio = BIO_new_file(certificateFileNative, localArena.allocateString("r"));
+            bio = BIO_new_file(certificateFileNative, localArena.allocateFrom("r"));
             var ecparams = PEM_read_bio_ECPKParameters(bio, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
             BIO_free(bio);
             if (!MemorySegment.NULL.equals(ecparams)) {
@@ -1142,7 +1142,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // Set certificate chain file
             if (certificate.getCertificateChainFile() != null) {
                 var certificateChainFileNative =
-                        localArena.allocateString(SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()));
+                        localArena.allocateFrom(SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()));
                 // SSLContext.setCertificateChainFile(state.ctx,
                 //        SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
                 if (SSL_CTX_use_certificate_chain_file(state.sslCtx, certificateChainFileNative) <= 0) {
@@ -1159,7 +1159,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (sslHostConfig.getCertificateRevocationListFile() != null) {
                 MemorySegment x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_file());
                 var certificateRevocationListFileNative =
-                        localArena.allocateString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListFile()));
+                        localArena.allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListFile()));
                 //X509_LOOKUP_ctrl(lookup,X509_L_FILE_LOAD,file,type,NULL)
                 if (X509_LOOKUP_ctrl(x509Lookup, X509_L_FILE_LOAD(), certificateRevocationListFileNative,
                         X509_FILETYPE_PEM(), MemorySegment.NULL) <= 0) {
@@ -1169,7 +1169,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (sslHostConfig.getCertificateRevocationListPath() != null) {
                 MemorySegment x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_hash_dir());
                 var certificateRevocationListPathNative =
-                        localArena.allocateString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListPath()));
+                        localArena.allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListPath()));
                 //X509_LOOKUP_ctrl(lookup,X509_L_ADD_DIR,path,type,NULL)
                 if (X509_LOOKUP_ctrl(x509Lookup, X509_L_ADD_DIR(), certificateRevocationListPathNative,
                         X509_FILETYPE_PEM(), MemorySegment.NULL) <= 0) {
@@ -1195,9 +1195,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             //SSLContext.setCertificateRaw(state.ctx, chain[0].getEncoded(),
             //        sb.toString().getBytes(StandardCharsets.US_ASCII),
             //        getCertificateIndex(certificate));
-            var rawCertificate = localArena.allocateArray(ValueLayout.JAVA_BYTE, chain[0].getEncoded());
-            var rawCertificatePointer = localArena.allocate(ValueLayout.ADDRESS, rawCertificate);
-            var rawKey = localArena.allocateArray(ValueLayout.JAVA_BYTE, sb.toString().getBytes(StandardCharsets.US_ASCII));
+            var rawCertificate = localArena.allocateFrom(ValueLayout.JAVA_BYTE, chain[0].getEncoded());
+            var rawCertificatePointer = localArena.allocateFrom(ValueLayout.ADDRESS, rawCertificate);
+            var rawKey = localArena.allocateFrom(ValueLayout.JAVA_BYTE, sb.toString().getBytes(StandardCharsets.US_ASCII));
             var x509cert = d2i_X509(MemorySegment.NULL, rawCertificatePointer, rawCertificate.byteSize());
             if (MemorySegment.NULL.equals(x509cert)) {
                 logLastError(localArena, "openssl.errorLoadingCertificate");
@@ -1229,8 +1229,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
             for (int i = 1; i < chain.length; i++) {
                 //SSLContext.addChainCertificateRaw(state.ctx, chain[i].getEncoded());
-                var rawCertificateChain = localArena.allocateArray(ValueLayout.JAVA_BYTE, chain[i].getEncoded());
-                var rawCertificateChainPointer = localArena.allocate(ValueLayout.ADDRESS, rawCertificateChain);
+                var rawCertificateChain = localArena.allocateFrom(ValueLayout.JAVA_BYTE, chain[i].getEncoded());
+                var rawCertificateChainPointer = localArena.allocateFrom(ValueLayout.ADDRESS, rawCertificateChain);
                 var x509certChain = d2i_X509(MemorySegment.NULL, rawCertificateChainPointer, rawCertificateChain.byteSize());
                 if (MemorySegment.NULL.equals(x509certChain)) {
                     logLastError(localArena, "openssl.errorLoadingCertificate");
@@ -1309,7 +1309,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
 
     private static void logLastError(SegmentAllocator allocator, String string) {
-        var buf = allocator.allocateArray(ValueLayout.JAVA_BYTE, new byte[128]);
+        var buf = allocator.allocateFrom(ValueLayout.JAVA_BYTE, new byte[128]);
         ERR_error_string(ERR_get_error(), buf);
         String err = buf.getString(0);
         log.error(sm.getString(string, err));

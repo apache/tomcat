@@ -67,7 +67,7 @@ public class OpenSSLSessionContext implements SSLSessionContext {
             throw new IllegalArgumentException(sm.getString("sessionContext.invalidTicketKeysLength", keys.length));
         }
         try (var memorySession = Arena.ofConfined()) {
-            var array = memorySession.allocateArray(ValueLayout.JAVA_BYTE, keys);
+            var array = memorySession.allocateFrom(ValueLayout.JAVA_BYTE, keys);
             // #define SSL_CTX_set_tlsext_ticket_keys(ctx, keys, keylen)
             //     SSL_CTX_ctrl((ctx),SSL_CTRL_SET_TLSEXT_TICKET_KEYS, (keylen), (keys))
             SSL_CTX_ctrl(context.getSSLContext(), SSL_CTRL_SET_TLSEXT_TICKET_KEYS(), TICKET_KEYS_SIZE, array);
@@ -144,7 +144,7 @@ public class OpenSSLSessionContext implements SSLSessionContext {
      */
     public boolean setSessionIdContext(byte[] sidCtx) {
         try (var memorySession = Arena.ofConfined()) {
-            var array = memorySession.allocateArray(ValueLayout.JAVA_BYTE, sidCtx);
+            var array = memorySession.allocateFrom(ValueLayout.JAVA_BYTE, sidCtx);
             return (SSL_CTX_set_session_id_context(context.getSSLContext(), array, sidCtx.length) == 1);
         }
     }
