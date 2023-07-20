@@ -1046,7 +1046,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             try (var localArena = Arena.ofConfined()) {
                 do {
                     // Loop until getLastErrorNumber() returns SSL_ERROR_NONE
-                    var buf = localArena.allocateFrom(ValueLayout.JAVA_BYTE, new byte[128]);
+                    var buf = localArena.allocate(ValueLayout.JAVA_BYTE, 128);
                     ERR_error_string(error, buf);
                     String err = buf.getString(0);
                     if (sslError == null) {

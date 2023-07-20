@@ -223,7 +223,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     long errCode = ERR_get_error();
                     if (errCode != 0) {
                         try (var localArena = Arena.ofConfined()) {
-                            var buf = localArena.allocateFrom(ValueLayout.JAVA_BYTE, new byte[128]);
+                            var buf = localArena.allocate(ValueLayout.JAVA_BYTE, 128);
                             ERR_error_string(errCode, buf);
                             log.error(sm.getString("openssl.errorLoadingCertificate", buf.getString(0)));
                         }
@@ -409,7 +409,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     rc = 1;
                     long errCode = ERR_get_error();
                     if (errCode != 0) {
-                        var buf = localArena.allocateFrom(ValueLayout.JAVA_BYTE, new byte[128]);
+                        var buf = localArena.allocate(ValueLayout.JAVA_BYTE, 128);
                         ERR_error_string(errCode, buf);
                         log.error(sm.getString("opensslconf.checkFailed", buf.getString(0)));
                         rc = 0;
@@ -485,7 +485,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                             localArena.allocateFrom(value));
                     long errCode = ERR_get_error();
                     if (rc <= 0 || errCode != 0) {
-                        var buf = localArena.allocateFrom(ValueLayout.JAVA_BYTE, new byte[128]);
+                        var buf = localArena.allocate(ValueLayout.JAVA_BYTE, 128);
                         ERR_error_string(errCode, buf);
                         log.error(sm.getString("opensslconf.commandError", name, value, buf.getString(0)));
                         rc = 0;
@@ -1309,7 +1309,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
 
     private static void logLastError(SegmentAllocator allocator, String string) {
-        var buf = allocator.allocateFrom(ValueLayout.JAVA_BYTE, new byte[128]);
+        var buf = allocator.allocate(ValueLayout.JAVA_BYTE, 128);
         ERR_error_string(ERR_get_error(), buf);
         String err = buf.getString(0);
         log.error(sm.getString(string, err));
