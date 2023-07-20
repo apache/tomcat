@@ -37,7 +37,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.naming.AuthenticationException;
-import javax.naming.CommunicationException;
 import javax.naming.CompositeName;
 import javax.naming.Context;
 import javax.naming.InvalidNameException;
@@ -47,7 +46,6 @@ import javax.naming.NameParser;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.PartialResultException;
-import javax.naming.ServiceUnavailableException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
@@ -2356,7 +2354,13 @@ public class JNDIRealm extends RealmBase {
                 // Authenticate the specified username if possible
                 principal = getPrincipal(connection, username, gssCredential);
 
-            } catch (CommunicationException | ServiceUnavailableException e) {
+            } catch (NamingException e) {
+                /* While we would like to catch specialized exceptions like
+                 * CommunicationException and ServiceUnavailableException,
+                 * some network communication problems are reported as
+                 * this general exception. This is fixed in Java 18 by
+                 * https://bugs.openjdk.org/browse/JDK-8273402
+                 */
                 // log the exception so we know it's there.
                 containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
 
