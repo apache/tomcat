@@ -26,6 +26,7 @@ public abstract class AbstractNetworkChannelEndpoint<S extends Channel, U extend
         extends AbstractEndpoint<S, U> {
 
     protected abstract NetworkChannel getServerSocket();
+    protected abstract S createChannel(SocketBufferHandler buffer);
 
 
     @Override

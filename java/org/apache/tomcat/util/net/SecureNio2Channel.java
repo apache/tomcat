@@ -92,6 +92,11 @@ public class SecureNio2Channel extends Nio2Channel  {
         handshakeWriteCompletionHandler = new HandshakeWriteCompletionHandler();
     }
 
+    protected void createSSLEngine(String hostName, List<Cipher> clientRequestedCiphers, List<String> clientRequestedApplicationProtocols) {
+        sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers,
+                clientRequestedApplicationProtocols);
+    }
+
 
     private class HandshakeReadCompletionHandler
             implements CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> {
@@ -370,7 +375,7 @@ public class SecureNio2Channel extends Nio2Channel  {
      * present and, if it is, what host name has been requested. Based on the
      * provided host name, configure the SSLEngine for this connection.
      */
-    private int processSNI() throws IOException {
+    protected int processSNI() throws IOException {
         // If there is no data to process, trigger a read immediately. This is
         // an optimisation for the typical case so we don't create an
         // SNIExtractor only to discover there is no data to process
@@ -432,7 +437,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             log.debug(sm.getString("channel.nio.ssl.sniHostName", sc, hostName));
         }
 
-        sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers,
+        createSSLEngine(hostName, clientRequestedCiphers,
                 clientRequestedApplicationProtocols);
 
         // Populate additional TLS attributes obtained from the handshake that

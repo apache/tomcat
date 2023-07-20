@@ -245,7 +245,7 @@ public class SecureNioChannel extends NioChannel {
      *
      * @throws IOException If an I/O error occurs during the SNI processing
      */
-    private int processSNI() throws IOException {
+    protected int processSNI() throws IOException {
         // Read some data into the network input buffer so we can peek at it.
         int bytesRead = sc.read(netInBuffer);
         if (bytesRead == -1) {
@@ -301,7 +301,7 @@ public class SecureNioChannel extends NioChannel {
             log.debug(sm.getString("channel.nio.ssl.sniHostName", sc, hostName));
         }
 
-        sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers,
+        createSSLEngine(hostName, clientRequestedCiphers,
                 clientRequestedApplicationProtocols);
 
         // Populate additional TLS attributes obtained from the handshake that
@@ -890,6 +890,11 @@ public class SecureNioChannel extends NioChannel {
 
     public ByteBuffer getEmptyBuf() {
         return emptyBuf;
+    }
+
+    protected void createSSLEngine(String hostName, List<Cipher> clientRequestedCiphers, List<String> clientRequestedApplicationProtocols) {
+        sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers,
+                clientRequestedApplicationProtocols);
     }
 
 

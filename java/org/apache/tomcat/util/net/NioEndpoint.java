@@ -459,11 +459,7 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                         socketProperties.getAppReadBufSize(),
                         socketProperties.getAppWriteBufSize(),
                         socketProperties.getDirectBuffer());
-                if (isSSLEnabled()) {
-                    channel = new SecureNioChannel(bufhandler, this);
-                } else {
-                    channel = new NioChannel(bufhandler);
-                }
+                channel = createChannel(bufhandler);
             }
             NioSocketWrapper newWrapper = new NioSocketWrapper(channel, this);
             channel.reset(socket, newWrapper);
@@ -553,6 +549,14 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
     protected SocketProcessorBase<NioChannel> createSocketProcessor(
             SocketWrapperBase<NioChannel> socketWrapper, SocketEvent event) {
         return new SocketProcessor(socketWrapper, event);
+    }
+
+    @Override
+    protected NioChannel createChannel(SocketBufferHandler buffer) {
+        if (isSSLEnabled()) {
+            return new SecureNioChannel(buffer, this);
+        }
+        return new NioChannel(buffer);
     }
 
     // ----------------------------------------------------- Poller Inner Classes

@@ -307,11 +307,7 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
                         socketProperties.getAppReadBufSize(),
                         socketProperties.getAppWriteBufSize(),
                         socketProperties.getDirectBuffer());
-                if (isSSLEnabled()) {
-                    channel = new SecureNio2Channel(bufhandler, this);
-                } else {
-                    channel = new Nio2Channel(bufhandler);
-                }
+                channel = createChannel(bufhandler);
             }
             Nio2SocketWrapper newWrapper = new Nio2SocketWrapper(channel, this);
             channel.reset(socket, newWrapper);
@@ -400,6 +396,13 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
         return new SocketProcessor(socketWrapper, event);
     }
 
+    @Override
+    protected Nio2Channel createChannel(SocketBufferHandler buffer) {
+        if (isSSLEnabled()) {
+            return new SecureNio2Channel(buffer, this);
+        }
+        return new Nio2Channel(buffer);
+    }
 
     protected class Nio2Acceptor extends Acceptor<AsynchronousSocketChannel>
         implements CompletionHandler<AsynchronousSocketChannel, Void> {

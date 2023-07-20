@@ -132,6 +132,10 @@
         Refactor waiting for an HTTP/2 stream or connection window update to
         handle spurious wake-ups during the wait. (markt)
       </fix>
+      <update>
+        Improve extensibility of endpoints for socket channel creation and TLS.
+        Pull request <pr>639</pr> provided by Marco Fargetta. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
