@@ -119,6 +119,11 @@
         Fix failure trying to persist configuration for an internal credential
         handler. (remm)
       </fix>
+      <fix>
+        <bug>66680</bug>: When serializing a session during the session
+        presistence process, do not log a warning that null Principals are not
+        serializable. Pull request <pr>638</pr> provided by tsryo. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
