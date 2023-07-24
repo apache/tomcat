@@ -154,6 +154,16 @@ public class HostConfig implements LifecycleListener {
      */
     protected final Set<String> invalidWars = new HashSet<>();
 
+    /**
+     *  Tell that we are in check()
+     */
+    protected volatile boolean isDoingCheck = false;
+
+    /**
+     *  Tell that we are stopping (set after event beforestop).
+     */
+    protected volatile boolean isDoingStop = false;
+
     // ------------------------------------------------------------- Properties
 
 
@@ -266,13 +276,19 @@ public class HostConfig implements LifecycleListener {
 
         // Process the event that has occurred
         if (event.getType().equals(Lifecycle.PERIODIC_EVENT)) {
+            isDoingCheck = true;
             check();
+            isDoingCheck = false;
         } else if (event.getType().equals(Lifecycle.BEFORE_START_EVENT)) {
             beforeStart();
         } else if (event.getType().equals(Lifecycle.START_EVENT)) {
             start();
+        } else if (event.getType().equals(Lifecycle.BEFORE_STOP_EVENT)) {
+            beforeStop();
         } else if (event.getType().equals(Lifecycle.STOP_EVENT)) {
             stop();
+        } else if (event.getType().equals(Lifecycle.AFTER_STOP_EVENT)) {
+            isDoingStop = false;
         }
     }
 
@@ -1380,11 +1396,19 @@ public class HostConfig implements LifecycleListener {
             } else {
                 // There is a chance the the resource was only missing
                 // temporarily eg renamed during a text editor save
+                if (isDoingStop) {
+                    /* We are stopping no need to wait */
+                    return; /* it will undeployed by the stop event */
+                }
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e1) {
                     // Ignore
                 }
+                if (isDoingStop) {
+                    return; /* it will undeployed by the stop event */
+                }
+
                 // Recheck the resource to see if it was really deleted
                 if (resource.exists()) {
                     continue;
@@ -1621,6 +1645,20 @@ public class HostConfig implements LifecycleListener {
         }
     }
 
+    /**
+     * Process a "before_stop" event for this Host.
+     */
+    public void beforeStop() {
+        isDoingStop = true;
+        while (isDoingCheck) {
+            // we want to prevent the check() to interfere
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e1) {
+                // Ignore
+            }
+        }
+    }
 
     /**
      * Process a "stop" event for this Host.
