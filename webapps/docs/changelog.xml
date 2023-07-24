@@ -111,6 +111,11 @@
         Align documentation for maxParameterCount to match hard-coded defaults.
         Contributed by Michal Sobkiewicz. (schultz)
       </fix>
+      <fix>
+        <bug>66680</bug>: When serializing a session during the session
+        presistence process, do not log a warning that null Principals are not
+        serializable. Pull request <pr>638</pr> provided by tsryo. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
