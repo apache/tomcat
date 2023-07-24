@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.12 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>66680</bug>: When serializing a session during the session
+        presistence process, do not log a warning that null Principals are not
+        serializable. Pull request <pr>638</pr> provided by tsryo. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
