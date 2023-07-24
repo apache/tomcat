@@ -132,6 +132,12 @@
         Refactor waiting for an HTTP/2 stream or connection window update to
         handle spurious wake-ups during the wait. (markt)
       </fix>
+      <fix>
+        Correct a regression introduced in 9.0.78 and use the correct
+        constant when constructing the default value for the
+        <code>certificateKeystoreFile</code> attribute of an
+        <code>SSLHostConfigCertificate</code> instance. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
