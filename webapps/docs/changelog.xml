@@ -113,6 +113,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Correct a regression introduced in 8.5.91 and use the correct
+        constant when constructing the default value for the
+        <code>certificateKeystoreFile</code> attribute of an
+        <code>SSLHostConfigCertificate</code> instance. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.91 (schultz)" rtext="Released 2023-07-10">
   <subsection name="Catalina">
