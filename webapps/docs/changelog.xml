@@ -145,6 +145,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>66681</bug>: Fix a <code>NullPointerException</code> when flushing
+        batched messages with compression enabled using
+        <code>permessage-deflate</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
