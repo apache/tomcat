@@ -314,13 +314,16 @@ public class PerMessageDeflate implements Transformation {
 
         for (MessagePart uncompressedPart : uncompressedParts) {
             byte opCode = uncompressedPart.getOpCode();
-            boolean emptyPart = uncompressedPart.getPayload().limit() == 0;
-            emptyMessage = emptyMessage && emptyPart;
             if (Util.isControl(opCode)) {
                 // Control messages can appear in the middle of other messages
-                // and must not be compressed. Pass it straight through
+                // and must not be compressed. Pass it straight through.
                 allCompressedParts.add(uncompressedPart);
-            } else if (emptyMessage && uncompressedPart.isFin()) {
+                continue;
+            }
+
+            boolean emptyPart = uncompressedPart.getPayload().limit() == 0;
+            emptyMessage = emptyMessage && emptyPart;
+            if (emptyMessage && uncompressedPart.isFin()) {
                 // Zero length messages can't be compressed so pass the
                 // final (empty) part straight through.
                 allCompressedParts.add(uncompressedPart);
