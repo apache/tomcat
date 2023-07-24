@@ -136,6 +136,12 @@
         Improve extensibility of endpoints for socket channel creation and TLS.
         Pull request <pr>639</pr> provided by Marco Fargetta. (remm)
       </update>
+      <fix>
+        Correct a regression introduced in 11.0.0-M9 and use the correct
+        constant when constructing the default value for the
+        <code>certificateKeystoreFile</code> attribute of an
+        <code>SSLHostConfigCertificate</code> instance. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

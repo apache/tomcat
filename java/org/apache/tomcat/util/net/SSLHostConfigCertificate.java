@@ -44,7 +44,7 @@ public class SSLHostConfigCertificate implements Serializable {
     static final String DEFAULT_KEYSTORE_PROVIDER = System.getProperty("javax.net.ssl.keyStoreProvider");
     static final String DEFAULT_KEYSTORE_TYPE = System.getProperty("javax.net.ssl.keyStoreType", "JKS");
     private static final String DEFAULT_KEYSTORE_FILE =
-            System.getProperty("user.home") + File.pathSeparator + ".keystore";
+            System.getProperty("user.home") + File.separator + ".keystore";
     private static final String DEFAULT_KEYSTORE_PASSWORD = "changeit";
 
     // Internal
