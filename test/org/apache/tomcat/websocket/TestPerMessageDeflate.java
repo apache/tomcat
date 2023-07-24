@@ -87,7 +87,7 @@ public class TestPerMessageDeflate {
 
         MessagePart compressedPart = compressedParts.get(0);
 
-        // Set up the decompression and process the received messafe
+        // Set up the decompression and process the received message
         PerMessageDeflate perMessageDeflateRx = PerMessageDeflate.negotiate(preferences, true);
         perMessageDeflateRx.setNext(new TesterTransformation(compressedPart.getPayload()));
 
