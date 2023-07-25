@@ -136,7 +136,7 @@ public class ImportHandler {
         standardPackages.put("javax.servlet.jsp", servletJspClassNames);
 
         Set<String> javaLangClassNames = new HashSet<>();
-        // Based on Java 21 EA24
+        // Based on Java 21 EA29
         // Interfaces
         javaLangClassNames.add("Appendable");
         javaLangClassNames.add("AutoCloseable");
@@ -185,6 +185,8 @@ public class ImportHandler {
         javaLangClassNames.add("Runtime");
         javaLangClassNames.add("Runtime.Version");
         javaLangClassNames.add("RuntimePermission");
+        javaLangClassNames.add("ScopedValue");
+        javaLangClassNames.add("ScopedValue.Carrier");
         javaLangClassNames.add("SecurityManager");
         javaLangClassNames.add("Short");
         javaLangClassNames.add("StackTraceElement");
