@@ -147,6 +147,10 @@
         <code>certificateKeystoreFile</code> attribute of an
         <code>SSLHostConfigCertificate</code> instance. (markt)
       </fix>
+      <scode>
+        Refactor HTTP/2 implementation to reduce pinning when using virtual
+        threads. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
