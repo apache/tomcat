@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
 
 import javax.servlet.http.WebConnection;
 
@@ -1326,16 +1327,18 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
         Stream pushStream;
 
-        // Synchronized since PUSH_PROMISE frames have to be sent in order. Once
-        // the stream has been created we need to ensure that the PUSH_PROMISE
-        // is sent before the next stream is created for a PUSH_PROMISE.
-        socketWrapper.getLock().lock();
+        /*
+         * Uses SocketWrapper lock since PUSH_PROMISE frames have to be sent in order. Once the stream has been created
+         * we need to ensure that the PUSH_PROMISE is sent before the next stream is created for a PUSH_PROMISE.
+         */
+        Lock lock = socketWrapper.getLock();
+        lock.lock();
         try {
             pushStream = createLocalStream(request);
             writeHeaders(associatedStream, pushStream.getIdAsInt(), request.getMimeHeaders(), false,
                     Constants.DEFAULT_HEADERS_FRAME_SIZE);
         } finally {
-            socketWrapper.getLock().unlock();
+            lock.unlock();
         }
 
         pushStream.sentPushPromise();
