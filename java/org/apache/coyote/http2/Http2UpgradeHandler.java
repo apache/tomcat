@@ -1338,9 +1338,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
         Stream pushStream;
 
-        // Synchronized since PUSH_PROMISE frames have to be sent in order. Once
-        // the stream has been created we need to ensure that the PUSH_PROMISE
-        // is sent before the next stream is created for a PUSH_PROMISE.
+        /*
+         * Uses SocketWrapper lock since PUSH_PROMISE frames have to be sent in order. Once the stream has been created
+         * we need to ensure that the PUSH_PROMISE is sent before the next stream is created for a PUSH_PROMISE.
+         */
         Lock lock = socketWrapper.getLock();
         lock.lock();
         try {
