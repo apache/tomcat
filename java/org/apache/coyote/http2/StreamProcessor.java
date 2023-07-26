@@ -21,6 +21,8 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -53,6 +55,7 @@ class StreamProcessor extends AbstractProcessor {
 
     private static final Set<String> H2_PSEUDO_HEADERS_REQUEST = new HashSet<>();
 
+    private final Lock processLock = new ReentrantLock();
     private final Http2UpgradeHandler handler;
     private final Stream stream;
 
@@ -74,8 +77,9 @@ class StreamProcessor extends AbstractProcessor {
 
     final void process(SocketEvent event) {
         try {
-            // FIXME: the regular processor syncs on socketWrapper, but here this deadlocks
-            synchronized (this) {
+            // Note: The regular processor uses the socketWrapper lock, but using that here triggers a deadlock
+            processLock.lock();
+            try {
                 // HTTP/2 equivalent of AbstractConnectionHandler#process() without the
                 // socket <-> processor mapping
                 SocketState state = SocketState.CLOSED;
@@ -131,6 +135,8 @@ class StreamProcessor extends AbstractProcessor {
                         recycle();
                     }
                 }
+            } finally {
+                processLock.unlock();
             }
         } finally {
             handler.executeQueuedStream();
