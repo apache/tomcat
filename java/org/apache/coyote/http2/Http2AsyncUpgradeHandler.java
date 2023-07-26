@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import jakarta.servlet.http.WebConnection;
 
@@ -44,9 +46,9 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     // Ensures headers are generated and then written for one thread at a time.
     // Because of the compression used, headers need to be written to the
     // network in the same order they are generated.
-    private final Object headerWriteLock = new Object();
+    private final Lock headerWriteLock = new ReentrantLock();
     // Ensures thread triggers the stream reset is the first to send a RST frame
-    private final Object sendResetLock = new Object();
+    private final Lock sendResetLock = new ReentrantLock();
     private final AtomicReference<Throwable> error = new AtomicReference<>();
     private final AtomicReference<IOException> applicationIOE = new AtomicReference<>();
 
@@ -149,7 +151,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         // may see out of order RST frames which may hard to follow if
         // the client is unaware the RST frames may be received out of
         // order.
-        synchronized (sendResetLock) {
+        sendResetLock.lock();
+        try {
             if (state != null) {
                 boolean active = state.isActive();
                 state.sendReset();
@@ -160,6 +163,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
             socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,
                     SocketWrapperBase.COMPLETE_WRITE, errorCompletion, ByteBuffer.wrap(rstFrame));
+        } finally {
+            sendResetLock.unlock();
         }
         handleAsyncException();
     }
@@ -192,7 +197,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     @Override
     void writeHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders, boolean endOfStream, int payloadSize)
             throws IOException {
-        synchronized (headerWriteLock) {
+        headerWriteLock.lock();
+        try {
             AsyncHeaderFrameBuffers headerFrameBuffers = (AsyncHeaderFrameBuffers) doWriteHeaders(stream,
                     pushedStreamId, mimeHeaders, endOfStream, payloadSize);
             if (headerFrameBuffers != null) {
@@ -201,6 +207,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                         headerFrameBuffers.bufs.toArray(BYTEBUFFER_ARRAY));
                 handleAsyncException();
             }
+        } finally {
+            headerWriteLock.unlock();
         }
         if (endOfStream) {
             sentEndOfStream(stream);
