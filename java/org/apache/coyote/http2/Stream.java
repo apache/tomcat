@@ -1147,6 +1147,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     class StandardStreamInputBuffer extends StreamInputBuffer {
 
+        private final Lock readStateLock = new ReentrantLock();
         /*
          * Two buffers are required to avoid various multi-threading issues. These issues arise from the fact that the
          * Stream (or the Request/Response) used by the application is processed in one thread but the connection is
@@ -1332,7 +1333,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         final boolean isReadyForRead() {
             ensureBuffersExist();
 
-            synchronized (this) {
+            readStateLock.lock();
+            try {
                 if (available() > 0) {
                     return true;
                 }
@@ -1342,21 +1344,33 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 }
 
                 return false;
+            } finally {
+                readStateLock.unlock();
             }
         }
 
         @Override
-        final synchronized boolean isRequestBodyFullyRead() {
-            return (inBuffer == null || inBuffer.position() == 0) && isInputFinished();
+        final boolean isRequestBodyFullyRead() {
+            readStateLock.lock();
+            try {
+                return (inBuffer == null || inBuffer.position() == 0) && isInputFinished();
+            } finally {
+                readStateLock.unlock();
+            }
         }
 
 
         @Override
-        public final synchronized int available() {
-            if (inBuffer == null) {
-                return 0;
+        public final int available() {
+            readStateLock.lock();
+            try {
+                if (inBuffer == null) {
+                    return 0;
+                }
+                return inBuffer.position();
+            } finally {
+                readStateLock.unlock();
             }
-            return inBuffer.position();
         }
 
 
@@ -1364,26 +1378,31 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
          * Called after placing some data in the inBuffer.
          */
         @Override
-        final synchronized void onDataAvailable() throws IOException {
-            if (closed) {
-                swallowUnread();
-            } else if (readInterest) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("stream.inputBuffer.dispatch"));
+        final void onDataAvailable() throws IOException {
+            readStateLock.lock();
+            try {
+                if (closed) {
+                    swallowUnread();
+                } else if (readInterest) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("stream.inputBuffer.dispatch"));
+                    }
+                    readInterest = false;
+                    coyoteRequest.action(ActionCode.DISPATCH_READ, null);
+                    // Always need to dispatch since this thread is processing
+                    // the incoming connection and streams are processed on their
+                    // own.
+                    coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("stream.inputBuffer.signal"));
+                    }
+                    synchronized (inBuffer) {
+                        inBuffer.notifyAll();
+                    }
                 }
-                readInterest = false;
-                coyoteRequest.action(ActionCode.DISPATCH_READ, null);
-                // Always need to dispatch since this thread is processing
-                // the incoming connection and streams are processed on their
-                // own.
-                coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("stream.inputBuffer.signal"));
-                }
-                synchronized (inBuffer) {
-                    inBuffer.notifyAll();
-                }
+            } finally {
+                readStateLock.unlock();
             }
         }
 
@@ -1396,8 +1415,13 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
         @Override
-        final synchronized void insertReplayedBody(ByteChunk body) {
-            inBuffer = ByteBuffer.wrap(body.getBytes(), body.getOffset(), body.getLength());
+        final void insertReplayedBody(ByteChunk body) {
+            readStateLock.lock();
+            try {
+                inBuffer = ByteBuffer.wrap(body.getBytes(), body.getOffset(), body.getLength());
+            } finally {
+                readStateLock.unlock();
+            }
         }
 
 
@@ -1407,11 +1431,14 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 // this is the initial window size set by Tomcat that the client
                 // uses (i.e. the local setting is required here).
                 int size = handler.getLocalSettings().getInitialWindowSize();
-                synchronized (this) {
+                readStateLock.lock();
+                try {
                     if (inBuffer == null && !closed) {
                         inBuffer = ByteBuffer.allocate(size);
                         outBuffer = new byte[size];
                     }
+                } finally {
+                    readStateLock.unlock();
                 }
             }
         }
@@ -1438,8 +1465,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
         @Override
         final void swallowUnread() throws IOException {
-            synchronized (this) {
+            readStateLock.lock();
+            try {
                 closed = true;
+            } finally {
+                readStateLock.unlock();
             }
             if (inBuffer != null) {
                 int unreadByteCount = 0;
