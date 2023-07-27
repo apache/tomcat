@@ -896,7 +896,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         private volatile boolean endOfStreamSent = false;
 
         /*
-         * The write methods are synchronized to ensure that only one thread at a time is able to access the buffer.
+         * The write methods share a common lock to ensure that only one thread at a time is able to access the buffer.
          * Without this protection, a client that performed concurrent writes could corrupt the buffer.
          */
 
