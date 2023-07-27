@@ -110,8 +110,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
         int socketWrapperLockCount = socketWrapper.getLock().getHoldCount();
         while (!messagePartInProgress.tryAcquire()) {
-            long timeout = timeoutExpiry - System.currentTimeMillis();
-            if (timeout < 0) {
+            if (timeoutExpiry < System.currentTimeMillis()) {
                 return false;
             }
             try {
