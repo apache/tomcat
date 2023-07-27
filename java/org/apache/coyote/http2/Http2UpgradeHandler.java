@@ -919,8 +919,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // Need to be holding the stream lock so releaseBacklog() can't notify
         // this thread until after this thread enters wait()
         int allocation = 0;
-        synchronized (stream) {
-            synchronized (this) {
+        stream.windowAllocationLock.lock();
+        try {
+            windowAllocationLock.lock();
+            try {
                 if (!stream.canWrite()) {
                     stream.doStreamCancel(
                             sm.getString("upgradeHandler.stream.notWritable", stream.getConnectionId(),
@@ -945,6 +947,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     allocation = reservation;
                     decrementWindowSize(allocation);
                 }
+            } finally {
+                windowAllocationLock.unlock();
             }
             if (allocation == 0) {
                 if (block) {
@@ -991,18 +995,19 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     return 0;
                 }
             }
+        } finally {
+            stream.windowAllocationLock.unlock();
         }
         return allocation;
     }
 
 
-    @SuppressWarnings("sync-override") // notify() needs to be outside sync
-                                       // to avoid deadlock
     @Override
     protected void incrementWindowSize(int increment) throws Http2Exception {
         Set<AbstractStream> streamsToNotify = null;
 
-        synchronized (this) {
+        windowAllocationLock.lock();
+        try {
             long windowSize = getWindowSize();
             if (windowSize < 1 && windowSize + increment > 0) {
                 // Connection window is exhausted. Assume there will be streams
@@ -1011,6 +1016,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             } else {
                 super.incrementWindowSize(increment);
             }
+        } finally {
+            windowAllocationLock.unlock();
         }
 
         if (streamsToNotify != null) {
@@ -1030,146 +1037,156 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    private synchronized Set<AbstractStream> releaseBackLog(int increment) throws Http2Exception {
-        Set<AbstractStream> result = new HashSet<>();
-        if (backLogSize < increment) {
-            // Can clear the whole backlog
-            for (AbstractStream stream : backLogStreams) {
-                if (stream.getConnectionAllocationRequested() > 0) {
-                    stream.setConnectionAllocationMade(stream.getConnectionAllocationRequested());
-                    stream.setConnectionAllocationRequested(0);
-                    result.add(stream);
-                }
-            }
-            // Cast is safe due to test above
-            int remaining = increment - (int) backLogSize;
-            backLogSize = 0;
-            super.incrementWindowSize(remaining);
-
-            backLogStreams.clear();
-        } else {
-            // Can't clear the whole backlog.
-            // Need streams in priority order
-            Set<Stream> orderedStreams = new ConcurrentSkipListSet<>(new Comparator<Stream>() {
-
-                @Override
-                public int compare(Stream s1, Stream s2) {
-                    int result = Integer.compare(s1.getUrgency(), s2.getUrgency());
-                    if (result == 0) {
-                       result = Boolean.compare(s1.getIncremental(), s2.getIncremental());
-                       if (result == 0) {
-                           result = Integer.compare(s1.getIdAsInt(), s2.getIdAsInt());
-                       }
-                    }
-                    return result;
-                }
-            });
-            orderedStreams.addAll(backLogStreams);
-
-            // Iteration 1. Need to work out how much we can clear.
-            long urgencyWhereAllocationIsExhausted = 0;
-            long requestedAllocationForIncrementalStreams = 0;
-            int remaining = increment;
-            Iterator<Stream> orderedStreamsIterator = orderedStreams.iterator();
-            while (orderedStreamsIterator.hasNext()) {
-                Stream s = orderedStreamsIterator.next();
-                if (urgencyWhereAllocationIsExhausted < s.getUrgency()) {
-                    if (remaining < 1) {
-                        break;
-                    }
-                    requestedAllocationForIncrementalStreams = 0;
-                }
-                urgencyWhereAllocationIsExhausted = s.getUrgency();
-                if (s.getIncremental()) {
-                    requestedAllocationForIncrementalStreams += s.getConnectionAllocationRequested();
-                    remaining -= s.getConnectionAllocationRequested();
-                } else {
-                    remaining -= s.getConnectionAllocationRequested();
-                    if (remaining < 1) {
-                        break;
+    private Set<AbstractStream> releaseBackLog(int increment) throws Http2Exception {
+        windowAllocationLock.lock();
+        try {
+            Set<AbstractStream> result = new HashSet<>();
+            if (backLogSize < increment) {
+                // Can clear the whole backlog
+                for (AbstractStream stream : backLogStreams) {
+                    if (stream.getConnectionAllocationRequested() > 0) {
+                        stream.setConnectionAllocationMade(stream.getConnectionAllocationRequested());
+                        stream.setConnectionAllocationRequested(0);
+                        result.add(stream);
                     }
                 }
-            }
+                // Cast is safe due to test above
+                int remaining = increment - (int) backLogSize;
+                backLogSize = 0;
+                super.incrementWindowSize(remaining);
 
-            // Iteration 2. Allocate.
-            // Reset for second iteration
-            remaining = increment;
-            orderedStreamsIterator = orderedStreams.iterator();
-            while (orderedStreamsIterator.hasNext()) {
-                Stream s = orderedStreamsIterator.next();
-                if (s.getUrgency() < urgencyWhereAllocationIsExhausted) {
-                    // Can fully allocate
-                    remaining = allocate(s, remaining);
-                    result.add(s);
-                    orderedStreamsIterator.remove();
-                    backLogStreams.remove(s);
-                } else if (requestedAllocationForIncrementalStreams == 0) {
-                    // Allocation ran out in non-incremental streams so fully
-                    // allocate in iterator order until allocation is exhausted
-                    remaining = allocate(s, remaining);
-                    result.add(s);
-                    if (s.getConnectionAllocationRequested() == 0) {
-                        // Fully allocated
+                backLogStreams.clear();
+            } else {
+                // Can't clear the whole backlog.
+                // Need streams in priority order
+                Set<Stream> orderedStreams = new ConcurrentSkipListSet<>(new Comparator<Stream>() {
+
+                    @Override
+                    public int compare(Stream s1, Stream s2) {
+                        int result = Integer.compare(s1.getUrgency(), s2.getUrgency());
+                        if (result == 0) {
+                           result = Boolean.compare(s1.getIncremental(), s2.getIncremental());
+                           if (result == 0) {
+                               result = Integer.compare(s1.getIdAsInt(), s2.getIdAsInt());
+                           }
+                        }
+                        return result;
+                    }
+                });
+                orderedStreams.addAll(backLogStreams);
+
+                // Iteration 1. Need to work out how much we can clear.
+                long urgencyWhereAllocationIsExhausted = 0;
+                long requestedAllocationForIncrementalStreams = 0;
+                int remaining = increment;
+                Iterator<Stream> orderedStreamsIterator = orderedStreams.iterator();
+                while (orderedStreamsIterator.hasNext()) {
+                    Stream s = orderedStreamsIterator.next();
+                    if (urgencyWhereAllocationIsExhausted < s.getUrgency()) {
+                        if (remaining < 1) {
+                            break;
+                        }
+                        requestedAllocationForIncrementalStreams = 0;
+                    }
+                    urgencyWhereAllocationIsExhausted = s.getUrgency();
+                    if (s.getIncremental()) {
+                        requestedAllocationForIncrementalStreams += s.getConnectionAllocationRequested();
+                        remaining -= s.getConnectionAllocationRequested();
+                    } else {
+                        remaining -= s.getConnectionAllocationRequested();
+                        if (remaining < 1) {
+                            break;
+                        }
+                    }
+                }
+
+                // Iteration 2. Allocate.
+                // Reset for second iteration
+                remaining = increment;
+                orderedStreamsIterator = orderedStreams.iterator();
+                while (orderedStreamsIterator.hasNext()) {
+                    Stream s = orderedStreamsIterator.next();
+                    if (s.getUrgency() < urgencyWhereAllocationIsExhausted) {
+                        // Can fully allocate
+                        remaining = allocate(s, remaining);
+                        result.add(s);
                         orderedStreamsIterator.remove();
                         backLogStreams.remove(s);
-                    }
-                    if (remaining < 1) {
-                        break;
-                    }
-                } else {
-                    // Allocation ran out in incremental streams. Distribute
-                    // remaining allocation between the incremental streams at
-                    // this urgency level.
-                    if (s.getUrgency() != urgencyWhereAllocationIsExhausted) {
-                        break;
-                    }
+                    } else if (requestedAllocationForIncrementalStreams == 0) {
+                        // Allocation ran out in non-incremental streams so fully
+                        // allocate in iterator order until allocation is exhausted
+                        remaining = allocate(s, remaining);
+                        result.add(s);
+                        if (s.getConnectionAllocationRequested() == 0) {
+                            // Fully allocated
+                            orderedStreamsIterator.remove();
+                            backLogStreams.remove(s);
+                        }
+                        if (remaining < 1) {
+                            break;
+                        }
+                    } else {
+                        // Allocation ran out in incremental streams. Distribute
+                        // remaining allocation between the incremental streams at
+                        // this urgency level.
+                        if (s.getUrgency() != urgencyWhereAllocationIsExhausted) {
+                            break;
+                        }
 
-                    int share = (int) (s.getConnectionAllocationRequested() * remaining /
-                            requestedAllocationForIncrementalStreams);
-                    if (share == 0) {
-                        share = 1;
-                    }
-                    allocate(s, share);
-                    result.add(s);
-                    if (s.getConnectionAllocationRequested() == 0) {
-                        // Fully allocated (unlikely but possible due to
-                        // rounding if only a few bytes required).
-                        orderedStreamsIterator.remove();
-                        backLogStreams.remove(s);
+                        int share = (int) (s.getConnectionAllocationRequested() * remaining /
+                                requestedAllocationForIncrementalStreams);
+                        if (share == 0) {
+                            share = 1;
+                        }
+                        allocate(s, share);
+                        result.add(s);
+                        if (s.getConnectionAllocationRequested() == 0) {
+                            // Fully allocated (unlikely but possible due to
+                            // rounding if only a few bytes required).
+                            orderedStreamsIterator.remove();
+                            backLogStreams.remove(s);
+                        }
                     }
                 }
             }
+            return result;
+        } finally {
+            windowAllocationLock.unlock();
         }
-        return result;
     }
 
 
-    private synchronized int allocate(AbstractStream stream, int allocation) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.allocate.debug", getConnectionId(), stream.getIdAsString(),
-                    Integer.toString(allocation)));
-        }
-
-        int leftToAllocate = allocation;
-
-        if (stream.getConnectionAllocationRequested() > 0) {
-            int allocatedThisTime;
-            if (allocation >= stream.getConnectionAllocationRequested()) {
-                allocatedThisTime = stream.getConnectionAllocationRequested();
-            } else {
-                allocatedThisTime = allocation;
+    private int allocate(AbstractStream stream, int allocation) {
+        windowAllocationLock.lock();
+        try {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgradeHandler.allocate.debug", getConnectionId(), stream.getIdAsString(),
+                        Integer.toString(allocation)));
             }
-            stream.setConnectionAllocationRequested(stream.getConnectionAllocationRequested() - allocatedThisTime);
-            stream.setConnectionAllocationMade(stream.getConnectionAllocationMade() + allocatedThisTime);
-            leftToAllocate = leftToAllocate - allocatedThisTime;
-        }
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.allocate.left", getConnectionId(), stream.getIdAsString(),
-                    Integer.toString(leftToAllocate)));
-        }
+            int leftToAllocate = allocation;
 
-        return leftToAllocate;
+            if (stream.getConnectionAllocationRequested() > 0) {
+                int allocatedThisTime;
+                if (allocation >= stream.getConnectionAllocationRequested()) {
+                    allocatedThisTime = stream.getConnectionAllocationRequested();
+                } else {
+                    allocatedThisTime = allocation;
+                }
+                stream.setConnectionAllocationRequested(stream.getConnectionAllocationRequested() - allocatedThisTime);
+                stream.setConnectionAllocationMade(stream.getConnectionAllocationMade() + allocatedThisTime);
+                leftToAllocate = leftToAllocate - allocatedThisTime;
+            }
+
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgradeHandler.allocate.left", getConnectionId(), stream.getIdAsString(),
+                        Integer.toString(leftToAllocate)));
+            }
+
+            return leftToAllocate;
+        } finally {
+            windowAllocationLock.unlock();
+        }
     }
 
 
