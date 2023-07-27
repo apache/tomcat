@@ -219,52 +219,62 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     @Override
-    final synchronized void incrementWindowSize(int windowSizeIncrement) throws Http2Exception {
-        // If this is zero then any thread that has been trying to write for
-        // this stream will be waiting. Notify that thread it can continue. Use
-        // notify all even though only one thread is waiting to be on the safe
-        // side.
-        boolean notify = getWindowSize() < 1;
-        super.incrementWindowSize(windowSizeIncrement);
-        if (notify && getWindowSize() > 0) {
-            allocationManager.notifyStream();
+    final void incrementWindowSize(int windowSizeIncrement) throws Http2Exception {
+        windowAllocationLock.lock();
+        try {
+            // If this is zero then any thread that has been trying to write for
+            // this stream will be waiting. Notify that thread it can continue. Use
+            // notify all even though only one thread is waiting to be on the safe
+            // side.
+            boolean notify = getWindowSize() < 1;
+            super.incrementWindowSize(windowSizeIncrement);
+            if (notify && getWindowSize() > 0) {
+                allocationManager.notifyStream();
+            }
+        } finally {
+            windowAllocationLock.unlock();
         }
     }
 
 
-    final synchronized int reserveWindowSize(int reservation, boolean block) throws IOException {
-        long windowSize = getWindowSize();
-        while (windowSize < 1) {
-            if (!canWrite()) {
-                throw new CloseNowException(sm.getString("stream.notWritable", getConnectionId(), getIdAsString()));
-            }
-            if (block) {
-                try {
-                    long writeTimeout = handler.getProtocol().getStreamWriteTimeout();
-                    allocationManager.waitForStream(writeTimeout);
-                    windowSize = getWindowSize();
-                    if (windowSize == 0) {
-                        doStreamCancel(sm.getString("stream.writeTimeout"), Http2Error.ENHANCE_YOUR_CALM);
-                    }
-                } catch (InterruptedException e) {
-                    // Possible shutdown / rst or similar. Use an IOException to
-                    // signal to the client that further I/O isn't possible for this
-                    // Stream.
-                    throw new IOException(e);
+    final int reserveWindowSize(int reservation, boolean block) throws IOException {
+        windowAllocationLock.lock();
+        try {
+            long windowSize = getWindowSize();
+            while (windowSize < 1) {
+                if (!canWrite()) {
+                    throw new CloseNowException(sm.getString("stream.notWritable", getConnectionId(), getIdAsString()));
                 }
-            } else {
-                allocationManager.waitForStreamNonBlocking();
-                return 0;
+                if (block) {
+                    try {
+                        long writeTimeout = handler.getProtocol().getStreamWriteTimeout();
+                        allocationManager.waitForStream(writeTimeout);
+                        windowSize = getWindowSize();
+                        if (windowSize == 0) {
+                            doStreamCancel(sm.getString("stream.writeTimeout"), Http2Error.ENHANCE_YOUR_CALM);
+                        }
+                    } catch (InterruptedException e) {
+                        // Possible shutdown / rst or similar. Use an IOException to
+                        // signal to the client that further I/O isn't possible for this
+                        // Stream.
+                        throw new IOException(e);
+                    }
+                } else {
+                    allocationManager.waitForStreamNonBlocking();
+                    return 0;
+                }
             }
+            int allocation;
+            if (windowSize < reservation) {
+                allocation = (int) windowSize;
+            } else {
+                allocation = reservation;
+            }
+            decrementWindowSize(allocation);
+            return allocation;
+        } finally {
+            windowAllocationLock.unlock();
         }
-        int allocation;
-        if (windowSize < reservation) {
-            allocation = (int) windowSize;
-        } else {
-            allocation = reservation;
-        }
-        decrementWindowSize(allocation);
-        return allocation;
     }
 
 
