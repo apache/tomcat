@@ -153,6 +153,13 @@
       <update>
         Update Checkstyle to 10.12.2. (markt)
       </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations. Contributed by tak7iji and
+        Shirayuking. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
