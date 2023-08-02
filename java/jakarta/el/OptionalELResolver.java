@@ -38,8 +38,7 @@ import java.util.Optional;
  * {@link ELResolver} obtained from {@link ELContext#getELResolver()} with the following parameters:
  * <ul>
  * <li>The {@link ELContext} is the current context</li>
- * <li>The base object is the result of calling {@link Optional#get()} on the current base object
- * <li>
+ * <li>The base object is the result of calling {@link Optional#get()} on the current base object</li>
  * <li>The property object is the current property object</li>
  * </ul>
  * <p>
