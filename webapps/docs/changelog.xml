@@ -145,6 +145,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update NSIS to 3.0.9. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.91 (schultz)" rtext="Released 2023-07-10">
   <subsection name="Catalina">
