@@ -171,6 +171,9 @@
       <update>
         Update NSIS to 3.0.9. (markt)
       </update>
+      <update>
+        Update Checkstyle to 10.12.2. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
