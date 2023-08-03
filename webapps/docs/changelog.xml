@@ -145,6 +145,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        Fix the <code>ConnectionState</code> state will be inconsistent with actual
+        state on the connection when an exception occurs while writing. Pull request
+        <pr>643</pr> provided by Wenjun Xiao. (lihan)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
