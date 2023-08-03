@@ -21,14 +21,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import org.apache.tomcat.jdbc.test.driver.Driver;
+import javax.sql.PooledConnection;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.tomcat.jdbc.pool.DataSourceProxy;
 import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
-
-import javax.sql.PooledConnection;
+import org.apache.tomcat.jdbc.test.driver.Driver;
 
 public class TestConnectionState extends DefaultTestCase {
 
