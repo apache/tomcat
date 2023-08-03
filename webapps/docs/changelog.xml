@@ -190,6 +190,11 @@
         Improvements to Japanese translations. Contributed by tak7iji and
         Shirayuking. (markt)
       </add>
+      <fix>
+        <bug>66829</bug>: Fix quoting so users can use the <code>_RUNJAVA</code>
+        environment variable as intended on Windows when the path to the Java
+        executable contains spaces. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
