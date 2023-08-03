@@ -92,7 +92,7 @@ public class TestConnectionState extends DefaultTestCase {
         // use our mock driver
         datasource.setDriverClassName(MockErrorDriver.class.getName());
         datasource.setUrl(MockErrorDriver.url);
-        datasource.setDefaultAutoCommit(true);
+        datasource.setDefaultAutoCommit(Boolean.TRUE);
         datasource.setMinIdle(1);
         datasource.setMaxIdle(1);
         datasource.setMaxActive(1);
