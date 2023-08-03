@@ -124,6 +124,10 @@
         presistence process, do not log a warning that null Principals are not
         serializable. Pull request <pr>638</pr> provided by tsryo. (markt)
       </fix>
+      <fix>
+        <bug>66822</bug>: Use the same naming format in log messages for
+        Connector instances as the associated ProtocolHandler instance. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
