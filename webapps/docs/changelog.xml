@@ -120,6 +120,10 @@
         Catch <code>NamingException</code> in <code>JNDIRealm#getPrincipal</code>.
         It is used in Java up to 17 to signal closed connections. (fschumacher)
       </fix>
+      <fix>
+        <bug>66822</bug>: Use the same naming format in log messages for
+        Connector instances as the associated ProtocolHandler instance. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

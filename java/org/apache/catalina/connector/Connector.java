@@ -1143,14 +1143,19 @@ public class Connector extends LifecycleMBeanBase {
     public String toString() {
         // Not worth caching this right now
         StringBuilder sb = new StringBuilder("Connector[");
-        sb.append(getProtocol());
-        sb.append('-');
-        int port = getPortWithOffset();
-        if (port > 0) {
-            sb.append(port);
+        String name = (String) getProperty("name");
+        if (name == null) {
+            sb.append(getProtocol());
+            sb.append('-');
+            int port = getPortWithOffset();
+            if (port > 0) {
+                sb.append(port);
+            } else {
+                sb.append("auto-");
+                sb.append(getProperty("nameIndex"));
+            }
         } else {
-            sb.append("auto-");
-            sb.append(getProperty("nameIndex"));
+            sb.append(name);
         }
         sb.append(']');
         return sb.toString();
