@@ -22,7 +22,7 @@ Export-Package: \
 
 Provide-Capability: \
     osgi.contract;\
-        osgi.contract=JavaJASPIC;\
+        osgi.contract=JakartaAuthentication;\
         version:Version=${jaspic.spec.version};\
         uses:='${packages;NAMED;jakarta.security.auth.message.*}'
 

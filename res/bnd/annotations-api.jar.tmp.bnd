@@ -22,7 +22,7 @@ Export-Package: \
 
 Provide-Capability: \
     osgi.contract;\
-        osgi.contract=JavaAnnotation;\
+        osgi.contract=JakartaAnnotations;\
         version:Version=${annotation.spec.version};\
         uses:='${packages;NAMED;jakarta.annotation.*}'
 
