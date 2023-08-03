@@ -41,6 +41,7 @@ import org.apache.tomcat.util.res.StringManager;
  * initialization of OpenSSL according to specified configuration parameters.
  * Using the listener is completely optional, but is needed for configuration
  * and full cleanup of a few native memory allocations.
+ * TODO: Move to o.a.catalina.core along with AprLifecycleListener
  */
 public class OpenSSLLifecycleListener implements LifecycleListener {
 
