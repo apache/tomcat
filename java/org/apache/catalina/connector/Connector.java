@@ -1099,19 +1099,24 @@ public class Connector extends LifecycleMBeanBase {
     public String toString() {
         // Not worth caching this right now
         StringBuilder sb = new StringBuilder("Connector[");
-        sb.append(getProtocol());
-        sb.append('-');
-        String id = (protocolHandler != null) ? protocolHandler.getId() : null;
-        if (id != null) {
-            sb.append(id);
-        } else {
-            int port = getPortWithOffset();
-            if (port > 0) {
-                sb.append(port);
+        String name = (String) getProperty("name");
+        if (name == null) {
+            sb.append(getProtocol());
+            sb.append('-');
+            String id = (protocolHandler != null) ? protocolHandler.getId() : null;
+            if (id != null) {
+                sb.append(id);
             } else {
-                sb.append("auto-");
-                sb.append(getProperty("nameIndex"));
+                int port = getPortWithOffset();
+                if (port > 0) {
+                    sb.append(port);
+                } else {
+                    sb.append("auto-");
+                    sb.append(getProperty("nameIndex"));
+                }
             }
+        } else {
+            sb.append(name);
         }
         sb.append(']');
         return sb.toString();
