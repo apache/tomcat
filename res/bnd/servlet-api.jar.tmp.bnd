@@ -23,7 +23,7 @@ Export-Package: \
 
 Provide-Capability: \
     osgi.contract;\
-        osgi.contract=JavaServlet;\
+        osgi.contract=JakartaServlet;\
         version:Version=${servlet.spec.version};\
         uses:='${packages;NAMED;jakarta.servlet.*;NAMED;!jakarta.servlet.jsp.*}'
 

@@ -31,7 +31,7 @@ Export-Package: \
 
 Provide-Capability: \
     osgi.contract;\
-        osgi.contract=JavaEL;\
+        osgi.contract=JakartaExpressionLanguage;\
         version:Version=${el.spec.version};\
         uses:='${packages;NAMED;jakarta.el.*}'
 
