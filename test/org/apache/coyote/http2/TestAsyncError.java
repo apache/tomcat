@@ -19,16 +19,15 @@ package org.apache.coyote.http2;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import jakarta.servlet.AsyncContext;
-import jakarta.servlet.AsyncEvent;
-import jakarta.servlet.AsyncListener;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -120,7 +119,7 @@ public class TestAsyncError extends Http2TestBase {
         public void run() {
             try {
                 resp.setContentType("text/plain");
-                resp.setCharacterEncoding(StandardCharsets.UTF_8);
+                resp.setCharacterEncoding("UTF-8");
                 PrintWriter pw = resp.getWriter();
 
                 while (true) {
