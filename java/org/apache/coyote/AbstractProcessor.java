@@ -98,6 +98,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
      * @param errorState The error status details
      * @param t          The error which occurred
      */
+    @SuppressWarnings("deprecation")
     protected void setErrorState(ErrorState errorState, Throwable t) {
         if (getLog().isDebugEnabled()) {
             getLog().debug(sm.getString("abstractProcessor.setErrorState", errorState), t);
@@ -1012,6 +1013,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected abstract SocketState dispatchEndRequest() throws IOException;
 
 
+    @SuppressWarnings("deprecation")
     @Override
     protected final void logAccess(SocketWrapperBase<?> socketWrapper) throws IOException {
         // Set the socket wrapper so the access log can read the socket related

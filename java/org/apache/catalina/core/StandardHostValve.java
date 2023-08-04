@@ -256,6 +256,7 @@ final class StandardHostValve extends ValveBase {
      * @param response  The response being generated
      * @param throwable The exception that occurred (which possibly wraps a root cause exception
      */
+    @SuppressWarnings("deprecation")
     protected void throwable(Request request, Response response, Throwable throwable) {
         Context context = request.getContext();
         if (context == null) {
