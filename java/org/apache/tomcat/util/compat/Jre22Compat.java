@@ -31,17 +31,21 @@ public class Jre22Compat extends JreCompat {
 
 
     static {
+        // FIXME: Improve check using a new class in 22 later
         Class<?> c1 = null;
+        Class<?> c2 = null;
         Method m1 = null;
 
         try {
             c1 = Class.forName("java.lang.foreign.MemorySegment");
+            c2 = Class.forName("java.io.Console");
             m1 = c1.getMethod("getString", long.class);
+            c2.getMethod("isTerminal");
         } catch (ClassNotFoundException e) {
             // Must be pre-Java 22
             log.debug(sm.getString("jre22Compat.javaPre22"), e);
         } catch (ReflectiveOperationException e) {
-            // Likely a previous API version
+            // Likely a previous Panama API version
             log.debug(sm.getString("jre22Compat.unexpected"), e);
         }
         hasPanama = (m1 != null);
