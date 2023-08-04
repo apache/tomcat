@@ -134,6 +134,11 @@
         Refactor HTTP/2 implementation to reduce pinning when using virtual
         threads. (markt)
       </scode>
+      <fix>
+        Pass through ciphers referring to an OpenSSL profile, such as
+        <code>PROFILE=SYSTEM</code> instead of producing an error trying to
+        parse it. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
