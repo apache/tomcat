@@ -25,6 +25,7 @@ public class JreCompat {
 
     private static final JreCompat instance;
     private static final boolean graalAvailable;
+    private static final boolean jre22Available;
 
     static {
         boolean result = false;
@@ -39,7 +40,13 @@ public class JreCompat {
         graalAvailable = result || System.getProperty("org.graalvm.nativeimage.imagecode") != null;
 
         // This is Tomcat 11.0.x with a minimum Java version of Java 21.
-        instance = new JreCompat();
+        if (Jre22Compat.isSupported()) {
+            instance = new Jre22Compat();
+            jre22Available = true;
+        } else {
+            instance = new JreCompat();
+            jre22Available = false;
+        }
     }
 
 
@@ -51,4 +58,11 @@ public class JreCompat {
     public static boolean isGraalAvailable() {
         return graalAvailable;
     }
+
+
+    public static boolean isJre22Available() {
+        return jre22Available;
+    }
+
+
 }
