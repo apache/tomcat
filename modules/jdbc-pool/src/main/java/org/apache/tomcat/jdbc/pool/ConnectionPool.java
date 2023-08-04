@@ -1142,6 +1142,7 @@ public class ConnectionPool {
                         continue;
                     }
                     if (!con.validate(PooledConnection.VALIDATE_IDLE)) {
+                        releasedIdleCount.incrementAndGet();
                         idle.remove(con);
                         release(con);
                     }
