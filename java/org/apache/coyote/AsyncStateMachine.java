@@ -185,6 +185,16 @@ public class AsyncStateMachine {
      * ends badly: e.g. CVE-2018-8037.
      */
     private final AtomicLong generation = new AtomicLong(0);
+    /*
+     * Error processing should only be triggered once per async generation. These fields track the last generation of
+     * async processing for which error processing was triggered and are used to ensure that the second and subsequent
+     * attempts to trigger async error processing for a given generation are NO-OPs.
+     *
+     * Guarded by this
+     */
+    private long lastErrorGeneration = -1;
+    private long lastErrorGenerationMust = -1;
+
     // Need this to fire listener on complete
     private AsyncContextCallback asyncCtxt = null;
     private final AbstractProcessor processor;
@@ -409,6 +419,30 @@ public class AsyncStateMachine {
 
 
     public synchronized boolean asyncError() {
+        Request request = processor.getRequest();
+        boolean containerThread = (request != null && request.isRequestThread());
+
+        // Ensure the error processing is only started once per generation
+        if (lastErrorGeneration == getCurrentGeneration()) {
+            if (state == AsyncState.MUST_ERROR && containerThread && lastErrorGenerationMust != getCurrentGeneration()) {
+                // This is the first container thread call after state was set to MUST_ERROR so don't skip
+                lastErrorGenerationMust = getCurrentGeneration();
+            } else {
+                // Duplicate call. Skip.
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("asyncStateMachine.asyncError.skip"));
+                }
+                return false;
+            }
+        } else {
+            // First call for this generation, don't skip.
+            lastErrorGeneration = getCurrentGeneration();
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("asyncStateMachine.asyncError.start"));
+        }
+
         clearNonBlockingListeners();
         if (state == AsyncState.STARTING) {
             updateState(AsyncState.MUST_ERROR);
@@ -422,8 +456,8 @@ public class AsyncStateMachine {
             updateState(AsyncState.ERROR);
         }
 
-        Request request = processor.getRequest();
-        return request == null || !request.isRequestThread();
+        // Return true for non-container threads to trigger a dispatch
+        return !containerThread;
     }
 
 

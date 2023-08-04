@@ -138,6 +138,11 @@
         Refactor HTTP/2 implementation to reduce pinning when using virtual
         threads. (markt)
       </scode>
+      <fix>
+        <bug>66841</bug>: Ensure that <code>AsyncListener.onError()</code> is
+        called after an error during asynchronous processing with HTTP/2.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
