@@ -517,6 +517,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             this.coyoteRequest = coyoteRequest;
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public void run() {
             ClassLoader oldCL = context.bind(Globals.IS_SECURITY_ENABLED, null);

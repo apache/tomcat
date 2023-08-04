@@ -111,6 +111,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
+    @SuppressWarnings("deprecation")
     Stream(Integer identifier, Http2UpgradeHandler handler, Request coyoteRequest) {
         super(handler.getConnectionId(), identifier);
         this.handler = handler;
@@ -278,6 +279,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
+    @SuppressWarnings("deprecation")
     void doStreamCancel(String msg, Http2Error error) throws CloseNowException {
         StreamException se = new StreamException(msg, error, getIdAsInt());
         // Prevent the application making further writes
@@ -1189,6 +1191,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         private volatile boolean closed;
         private boolean resetReceived;
 
+        @SuppressWarnings("deprecation")
         @Override
         public final int doRead(ApplicationBufferHandler applicationBufferHandler) throws IOException {
 
