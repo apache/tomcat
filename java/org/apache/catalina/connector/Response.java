@@ -377,7 +377,10 @@ public class Response implements HttpServletResponse {
      * Set the error flag.
      *
      * @return <code>false</code> if the error flag was already set
+     *
+     * @deprecated This method will be changed to return void in Tomcat 11 onwards
      */
+    @Deprecated
     public boolean setError() {
         return getCoyoteResponse().setError();
     }
