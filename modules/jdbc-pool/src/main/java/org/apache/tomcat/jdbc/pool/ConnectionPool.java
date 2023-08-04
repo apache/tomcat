@@ -1204,6 +1204,7 @@ public class ConnectionPool {
                         release = !reconnectIfExpired(con) || !con.validate(PooledConnection.VALIDATE_IDLE);
                     }
                     if (release) {
+                        releasedIdleCount.incrementAndGet();
                         idle.remove(con);
                         release(con);
                     }

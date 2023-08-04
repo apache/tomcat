@@ -148,6 +148,11 @@
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
+        Fix the <code>releaseIdleCounter</code> does not increment when testAllIdle
+        releases them. Pull request <pr>241</pr> provided by Arun Chaitanya Miriappalli
+        (lihan)
+      </fix>
+      <fix>
         Fix the <code>ConnectionState</code> state will be inconsistent with actual
         state on the connection when an exception occurs while writing. Pull request
         <pr>643</pr> provided by Wenjun Xiao. (lihan)
