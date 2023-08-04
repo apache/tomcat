@@ -139,6 +139,11 @@
         <code>PROFILE=SYSTEM</code> instead of producing an error trying to
         parse it. (remm)
       </fix>
+      <fix>
+        <bug>66841</bug>: Ensure that <code>AsyncListener.onError()</code> is
+        called after an error during asynchronous processing with HTTP/2.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

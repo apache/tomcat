@@ -105,7 +105,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         }
         // Use the return value to avoid processing more than one async error
         // in a single async cycle.
-        boolean setError = response.setError();
+        response.setError();
         boolean blockIo = this.errorState.isIoAllowed() && !errorState.isIoAllowed();
         this.errorState = this.errorState.getMostSevere(errorState);
         // Don't change the status code for IOException since that is almost
@@ -117,7 +117,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         if (t != null) {
             request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
         }
-        if (blockIo && isAsync() && setError) {
+        if (blockIo && isAsync()) {
             if (asyncStateMachine.asyncError()) {
                 processSocketEvent(SocketEvent.ERROR, true);
             }
