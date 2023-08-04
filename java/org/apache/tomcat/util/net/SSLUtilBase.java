@@ -122,11 +122,17 @@ public abstract class SSLUtilBase implements SSLUtil {
         sslHostConfig.setTls13RenegotiationAvailable(isTls13RenegAuthAvailable());
 
         // Calculate the enabled ciphers
-        List<String> configuredCiphers = sslHostConfig.getJsseCipherNames();
-        Set<String> implementedCiphers = getImplementedCiphers();
-        List<String> enabledCiphers =
-                getEnabled("ciphers", getLog(), false, configuredCiphers, implementedCiphers);
-        this.enabledCiphers = enabledCiphers.toArray(new String[0]);
+        if (sslHostConfig.getCiphers().startsWith("PROFILE=")) {
+            // OpenSSL profiles
+            // TODO: sslHostConfig can query that with Panama, but skip for now
+            this.enabledCiphers = new String[0];
+        } else {
+            List<String> configuredCiphers = sslHostConfig.getJsseCipherNames();
+            Set<String> implementedCiphers = getImplementedCiphers();
+            List<String> enabledCiphers =
+                    getEnabled("ciphers", getLog(), false, configuredCiphers, implementedCiphers);
+            this.enabledCiphers = enabledCiphers.toArray(new String[0]);
+        }
     }
 
 
