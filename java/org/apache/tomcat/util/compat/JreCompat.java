@@ -35,6 +35,7 @@ public class JreCompat {
     private static final boolean jre16Available;
     private static final boolean jre19Available;
     private static final boolean jre21Available;
+    private static final boolean jre22Available;
     private static final StringManager sm = StringManager.getManager(JreCompat.class);
 
     static {
@@ -51,23 +52,33 @@ public class JreCompat {
 
         // This is Tomcat 10.1.x with a minimum Java version of Java 11.
         // Look for the highest supported JVM first
-        if (Jre21Compat.isSupported()) {
+        if (Jre22Compat.isSupported()) {
+            instance = new Jre22Compat();
+            jre22Available = true;
+            jre21Available = true;
+            jre19Available = true;
+            jre16Available = true;
+        } else if (Jre21Compat.isSupported()) {
             instance = new Jre21Compat();
+            jre22Available = false;
             jre21Available = true;
             jre19Available = true;
             jre16Available = true;
         } else if (Jre19Compat.isSupported()) {
             instance = new Jre19Compat();
+            jre22Available = false;
             jre21Available = false;
             jre19Available = true;
             jre16Available = true;
         } else if (Jre16Compat.isSupported()) {
             instance = new Jre16Compat();
+            jre22Available = false;
             jre21Available = false;
             jre19Available = false;
             jre16Available = true;
         } else {
             instance = new JreCompat();
+            jre22Available = false;
             jre21Available = false;
             jre19Available = false;
             jre16Available = false;
@@ -97,6 +108,11 @@ public class JreCompat {
 
     public static boolean isJre21Available() {
         return jre21Available;
+    }
+
+
+    public static boolean isJre22Available() {
+        return jre22Available;
     }
 
 
