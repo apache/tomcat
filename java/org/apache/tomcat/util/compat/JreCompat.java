@@ -51,6 +51,7 @@ public class JreCompat {
     private static final boolean jre16Available;
     private static final boolean jre19Available;
     private static final boolean jre21Available;
+    private static final boolean jre22Available;
     private static final StringManager sm = StringManager.getManager(JreCompat.class);
 
     protected static final Method setApplicationProtocolsMethod;
@@ -70,32 +71,44 @@ public class JreCompat {
 
         // This is Tomcat 9 with a minimum Java version of Java 8.
         // Look for the highest supported JVM first
-        if (Jre21Compat.isSupported()) {
+        if (Jre22Compat.isSupported()) {
+            instance = new Jre22Compat();
+            jre22Available = true;
+            jre21Available = true;
+            jre19Available = true;
+            jre16Available = true;
+            jre9Available = true;
+        } else if (Jre21Compat.isSupported()) {
             instance = new Jre21Compat();
+            jre22Available = false;
             jre21Available = true;
             jre19Available = true;
             jre16Available = true;
             jre9Available = true;
         } else if (Jre19Compat.isSupported()) {
             instance = new Jre19Compat();
+            jre22Available = false;
             jre21Available = false;
             jre19Available = true;
             jre16Available = true;
             jre9Available = true;
         } else if (Jre16Compat.isSupported()) {
             instance = new Jre16Compat();
+            jre22Available = false;
             jre21Available = false;
             jre19Available = false;
             jre16Available = true;
             jre9Available = true;
         } else if (Jre9Compat.isSupported()) {
             instance = new Jre9Compat();
+            jre22Available = false;
             jre21Available = false;
             jre19Available = false;
             jre16Available = false;
             jre9Available = true;
         } else {
             instance = new JreCompat();
+            jre22Available = false;
             jre21Available = false;
             jre19Available = false;
             jre16Available = false;
@@ -153,6 +166,11 @@ public class JreCompat {
 
     public static boolean isJre21Available() {
         return jre21Available;
+    }
+
+
+    public static boolean isJre22Available() {
+        return jre22Available;
     }
 
 
