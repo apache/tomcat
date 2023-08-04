@@ -182,6 +182,15 @@ class AsyncStateMachine {
      * ends badly: e.g. CVE-2018-8037.
      */
     private final AtomicLong generation = new AtomicLong(0);
+    /*
+     * Error processing should only be triggered once per async generation. This field tracks the last generation of
+     * async processing for which error processing was triggered and is used to ensure that the second and subsequent
+     * attempts to trigger async error processing for a given generation are NO-OPs.
+     *
+     * Guarded by this
+     */
+    private long lastErrorGeneration = -1;
+
     // Need this to fire listener on complete
     private AsyncContextCallback asyncCtxt = null;
     private final AbstractProcessor processor;
@@ -412,6 +421,19 @@ class AsyncStateMachine {
 
 
     synchronized boolean asyncError() {
+        // Ensure this is only processed once per generation.
+        if (lastErrorGeneration == getCurrentGeneration()) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("asyncStateMachine.asyncError.skip"));
+            }
+            return false;
+        }
+        lastErrorGeneration = getCurrentGeneration();
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("asyncStateMachine.asyncError.start"));
+        }
+
         clearNonBlockingListeners();
         if (state == AsyncState.STARTING) {
             updateState(AsyncState.MUST_ERROR);
