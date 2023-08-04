@@ -41,8 +41,8 @@ public class Jre22Compat extends JreCompat {
             // Must be pre-Java 22
             log.debug(sm.getString("jre22Compat.javaPre22"), e);
         } catch (ReflectiveOperationException e) {
-            // Should never happen
-            log.error(sm.getString("jre22Compat.unexpected"), e);
+            // Likely a previous API version
+            log.debug(sm.getString("jre22Compat.unexpected"), e);
         }
         hasPanama = (m1 != null);
     }
