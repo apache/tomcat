@@ -165,6 +165,11 @@
         called after an error during asynchronous processing with HTTP/2.
         (markt)
       </fix>
+      <fix>
+        <bug>66842</bug>: When using asynchronous I/O (the default for NIO and
+        NIO2), include DATA frames when calculating the HTTP/2 overhead count to
+        ensure that connections are not prematurely terminated. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
