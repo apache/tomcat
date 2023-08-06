@@ -1381,7 +1381,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    private void reduceOverheadCount(FrameType frameType) {
+    void reduceOverheadCount(FrameType frameType) {
         // A non-overhead frame reduces the overhead count by
         // Http2Protocol.DEFAULT_OVERHEAD_REDUCTION_FACTOR. A simple browser
         // request is likely to have one non-overhead frame (HEADERS) and one
