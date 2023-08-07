@@ -1083,13 +1083,6 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void receivedEndOfStream(int streamId) {
-            lastStreamId = Integer.toString(streamId);
-            trace.append(lastStreamId + "-EndOfStream\n");
-        }
-
-
-        @Override
         public HeaderEmitter headersStart(int streamId, boolean headersEndStream) {
             lastStreamId = Integer.toString(streamId);
             trace.append(lastStreamId + "-HeadersStart\n");
@@ -1137,8 +1130,18 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void headersEnd(int streamId) {
+        public void headersEnd(int streamId, boolean endOfStream) {
             trace.append(streamId + "-HeadersEnd\n");
+            if (endOfStream) {
+                receivedEndOfStream(streamId) ;
+            }
+        }
+
+
+        @Override
+        public void receivedEndOfStream(int streamId) {
+            lastStreamId = Integer.toString(streamId);
+            trace.append(lastStreamId + "-EndOfStream\n");
         }
 
 

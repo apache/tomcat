@@ -581,10 +581,9 @@ class Http2Parser {
         // going to be thrown.
         hpackDecoder.getHeaderEmitter().validateHeaders();
 
-        output.headersEnd(streamId);
+        output.headersEnd(streamId, headersEndStream);
 
         if (headersEndStream) {
-            output.receivedEndOfStream(streamId);
             headersEndStream = false;
         }
 
@@ -720,7 +719,7 @@ class Http2Parser {
 
         void headersContinue(int payloadSize, boolean endOfHeaders);
 
-        void headersEnd(int streamId) throws Http2Exception;
+        void headersEnd(int streamId, boolean endOfStream) throws Http2Exception;
 
         // Reset frames
         void reset(int streamId, long errorCode) throws Http2Exception;
