@@ -21,12 +21,15 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.apache.tomcat.util.openssl.openssl_compat_h.FIPS_mode;
 import static org.apache.tomcat.util.openssl.openssl_compat_h.FIPS_mode_set;
 import static org.apache.tomcat.util.openssl.openssl_h.*;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -394,6 +397,51 @@ public class OpenSSLLibrary {
 
     public static boolean isFIPSModeActive() {
         return fipsModeActive;
+    }
+
+    public static List<String> findCiphers(String ciphers) {
+        ArrayList<String> ciphersList = new ArrayList<>();
+        try (var localArena = Arena.ofConfined()) {
+            initLibrary();
+            var sslCtx = SSL_CTX_new(TLS_server_method());
+            try {
+                SSL_CTX_set_options(sslCtx, SSL_OP_ALL());
+                SSL_CTX_set_cipher_list(sslCtx, localArena.allocateFrom(ciphers));
+                var ssl = SSL_new(sslCtx);
+                SSL_set_accept_state(ssl);
+                try {
+                    for (String c : getCiphers(ssl)) {
+                        // Filter out bad input.
+                        if (c == null || c.length() == 0 || ciphersList.contains(c)) {
+                            continue;
+                        }
+                        ciphersList.add(OpenSSLCipherConfigurationParser.openSSLToJsse(c));
+                    }
+                } finally {
+                    SSL_free(ssl);
+                }
+            } finally {
+                SSL_CTX_free(sslCtx);
+            }
+        } catch (Exception e) {
+            log.warn(sm.getString("openssllibrary.ciphersFailure"), e);
+        }
+        return ciphersList;
+    }
+
+    static String[] getCiphers(MemorySegment ssl) {
+        MemorySegment sk = SSL_get_ciphers(ssl);
+        int len = OPENSSL_sk_num(sk);
+        if (len <= 0) {
+            return null;
+        }
+        ArrayList<String> ciphers = new ArrayList<>(len);
+        for (int i = 0; i < len; i++) {
+            MemorySegment cipher = OPENSSL_sk_value(sk, i);
+            MemorySegment cipherName = SSL_CIPHER_get_name(cipher);
+            ciphers.add(cipherName.getString(0));
+        }
+        return ciphers.toArray(new String[0]);
     }
 
 }

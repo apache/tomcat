@@ -102,33 +102,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             throw new IllegalStateException(e);
         }
 
-        OpenSSLLibrary.initLibrary();
-
         final Set<String> availableCipherSuites = new LinkedHashSet<>(128);
-        try (var localArena = Arena.ofConfined()) {
-            var sslCtx = SSL_CTX_new(TLS_server_method());
-            try {
-                SSL_CTX_set_options(sslCtx, SSL_OP_ALL());
-                SSL_CTX_set_cipher_list(sslCtx, localArena.allocateFrom("ALL"));
-                var ssl = SSL_new(sslCtx);
-                SSL_set_accept_state(ssl);
-                try {
-                    for (String c : getCiphers(ssl)) {
-                        // Filter out bad input.
-                        if (c == null || c.length() == 0 || availableCipherSuites.contains(c)) {
-                            continue;
-                        }
-                        availableCipherSuites.add(OpenSSLCipherConfigurationParser.openSSLToJsse(c));
-                    }
-                } finally {
-                    SSL_free(ssl);
-                }
-            } finally {
-                SSL_CTX_free(sslCtx);
-            }
-        } catch (Exception e) {
-            log.warn(sm.getString("engine.ciphersFailure"), e);
-        }
+        availableCipherSuites.addAll(OpenSSLLibrary.findCiphers("ALL"));
         AVAILABLE_CIPHER_SUITES = Collections.unmodifiableSet(availableCipherSuites);
 
         HashSet<String> protocols = new HashSet<>();
@@ -140,21 +115,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         protocols.add(Constants.SSL_PROTO_TLSv1_2);
         protocols.add(Constants.SSL_PROTO_TLSv1_3);
         IMPLEMENTED_PROTOCOLS_SET = Collections.unmodifiableSet(protocols);
-    }
-
-    private static String[] getCiphers(MemorySegment ssl) {
-        MemorySegment sk = SSL_get_ciphers(ssl);
-        int len = OPENSSL_sk_num(sk);
-        if (len <= 0) {
-            return null;
-        }
-        ArrayList<String> ciphers = new ArrayList<>(len);
-        for (int i = 0; i < len; i++) {
-            MemorySegment cipher = OPENSSL_sk_value(sk, i);
-            MemorySegment cipherName = SSL_CIPHER_get_name(cipher);
-            ciphers.add(cipherName.getString(0));
-        }
-        return ciphers.toArray(new String[0]);
     }
 
     private static final int MAX_PLAINTEXT_LENGTH = 16 * 1024; // 2^14
@@ -718,7 +678,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (destroyed) {
             return new String[0];
         }
-        String[] enabled = getCiphers(state.ssl);
+        String[] enabled = OpenSSLLibrary.getCiphers(state.ssl);
         if (enabled == null) {
             return new String[0];
         } else {
