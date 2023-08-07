@@ -712,6 +712,7 @@ public class OpenSSLCipherConfigurationParser {
             init();
         }
         String[] elements = expression.split(SEPARATOR);
+        // TODO: Handle PROFILE= using OpenSSL (if present, otherwise warn), then replace elements with that
         LinkedHashSet<Cipher> ciphers = new LinkedHashSet<>();
         Set<Cipher> removedCiphers = new HashSet<>();
         for (String element : elements) {

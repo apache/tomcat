@@ -102,7 +102,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             throw new IllegalStateException(e);
         }
 
-        OpenSSLLifecycleListener.initLibrary();
+        OpenSSLLibrary.initLibrary();
 
         final Set<String> availableCipherSuites = new LinkedHashSet<>(128);
         try (var localArena = Arena.ofConfined()) {

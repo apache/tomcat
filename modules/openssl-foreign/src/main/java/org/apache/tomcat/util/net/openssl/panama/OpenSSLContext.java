@@ -197,7 +197,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         // Check that OpenSSL was initialized
         if (!OpenSSLStatus.isInitialized()) {
             try {
-                OpenSSLLifecycleListener.init();
+                OpenSSLLibrary.init();
             } catch (Exception e) {
                 throw new SSLException(e);
             }
@@ -775,9 +775,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         if ((type == EVP_PKEY_RSA()) || (type == EVP_PKEY_DSA())) {
             keylen = (OPENSSL_3 ? EVP_PKEY_get_bits(pkey) : EVP_PKEY_bits(pkey));
         }
-        for (int i = 0; i < OpenSSLLifecycleListener.dhParameters.length; i++) {
-            if (keylen >= OpenSSLLifecycleListener.dhParameters[i].min) {
-                return OpenSSLLifecycleListener.dhParameters[i].dh;
+        for (int i = 0; i < OpenSSLLibrary.dhParameters.length; i++) {
+            if (keylen >= OpenSSLLibrary.dhParameters[i].min) {
+                return OpenSSLLibrary.dhParameters[i].dh;
             }
         }
         return MemorySegment.NULL;
@@ -1053,8 +1053,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
                 BIO_free(bio);
                 if (MemorySegment.NULL.equals(key)) {
-                    if (!MemorySegment.NULL.equals(OpenSSLLifecycleListener.enginePointer)) {
-                        key = ENGINE_load_private_key(OpenSSLLifecycleListener.enginePointer, certificateKeyFileNative,
+                    if (!MemorySegment.NULL.equals(OpenSSLLibrary.enginePointer)) {
+                        key = ENGINE_load_private_key(OpenSSLLibrary.enginePointer, certificateKeyFileNative,
                                 MemorySegment.NULL, MemorySegment.NULL);
                     }
                 }
