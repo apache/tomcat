@@ -220,6 +220,9 @@
         files to refer to the Jakarta EE contract names rather than the Java EE
         contract names. (markt)
       </fix>
+      <update>
+        Update Tomcat Native to 2.0.5. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
