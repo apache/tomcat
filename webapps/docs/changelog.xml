@@ -188,6 +188,10 @@
         environment variable as intended on Windows when the path to the Java
         executable contains spaces. (markt)
       </fix>
+      <update>
+        Update Tomcat Native to 1.2.38 to pick up Windows binaries built with
+        OpenSSL 1.1.1v. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
