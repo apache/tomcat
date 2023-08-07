@@ -149,6 +149,10 @@
         DATA frames when calculating the HTTP/2 overhead count to ensure that
         connections are not prematurely terminated. (markt)
       </fix>
+      <fix>
+        Correct a race condition that could cause spurious RST messages to be
+        sent after the response had been written to an HTTP/2 stream. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
