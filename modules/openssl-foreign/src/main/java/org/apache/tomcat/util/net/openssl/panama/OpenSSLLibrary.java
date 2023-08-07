@@ -71,15 +71,6 @@ public class OpenSSLLibrary {
 
     protected static final Object lock = new Object();
 
-    public static boolean isAvailable() {
-        if (OpenSSLStatus.isInstanceCreated()) {
-            synchronized (lock) {
-                init();
-            }
-        }
-        return OpenSSLStatus.isAvailable();
-    }
-
     public OpenSSLLibrary() {
         OpenSSLStatus.setInstanceCreated(true);
     }
@@ -403,10 +394,6 @@ public class OpenSSLLibrary {
 
     public static boolean isFIPSModeActive() {
         return fipsModeActive;
-    }
-
-    public static boolean isInstanceCreated() {
-        return OpenSSLStatus.isInstanceCreated();
     }
 
 }

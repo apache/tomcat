@@ -45,10 +45,6 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
     protected static final StringManager sm = StringManager.getManager(OpenSSLLifecycleListener.class);
 
 
-    public static boolean isAvailable() {
-        return OpenSSLLibrary.isAvailable();
-    }
-
     // ---------------------------------------------- LifecycleListener Methods
 
     /**
@@ -121,10 +117,6 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
 
     public boolean isFIPSModeActive() {
         return OpenSSLLibrary.isFIPSModeActive();
-    }
-
-    public static boolean isInstanceCreated() {
-        return OpenSSLStatus.isInstanceCreated();
     }
 
 }
