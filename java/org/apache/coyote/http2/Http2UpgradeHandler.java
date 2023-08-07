@@ -1542,20 +1542,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     @Override
-    public void receivedEndOfStream(int streamId) throws ConnectionException {
-        AbstractNonZeroStream abstractNonZeroStream =
-                getAbstractNonZeroStream(streamId, connectionState.get().isNewStreamAllowed());
-        if (abstractNonZeroStream instanceof Stream) {
-            Stream stream = (Stream) abstractNonZeroStream;
-            stream.receivedEndOfStream();
-            if (!stream.isActive()) {
-                setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
-            }
-        }
-    }
-
-
-    @Override
     public void onSwallowedDataFramePayload(int streamId, int swallowedDataBytesCount) throws IOException {
         AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId);
         writeWindowUpdate(abstractNonZeroStream, swallowedDataBytesCount, false);
@@ -1642,10 +1628,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     @Override
-    public void headersEnd(int streamId) throws Http2Exception {
+    public void headersEnd(int streamId, boolean endOfStream) throws Http2Exception {
         AbstractNonZeroStream abstractNonZeroStream =
                 getAbstractNonZeroStream(streamId, connectionState.get().isNewStreamAllowed());
         if (abstractNonZeroStream instanceof Stream) {
+            boolean processStream = false;
             setMaxProcessedStream(streamId);
             Stream stream = (Stream) abstractNonZeroStream;
             if (stream.isActive()) {
@@ -1663,9 +1650,40 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     // Valid new stream reduces the overhead count
                     reduceOverheadCount(FrameType.HEADERS);
 
-                    processStreamOnContainerThread(stream);
+                    processStream = true;
                 }
             }
+            /*
+             *  Need to process end of stream before calling processStreamOnContainerThread to avoid a race condition
+             *  where the container thread finishes before end of stream is processed, thinks the request hasn't been
+             *  fully read so issues a RST with error code 0 (NO_ERROR) to tell the client not to send the request body,
+             *  if any. This breaks tests and generates unnecessary RST messages for standard clients.
+             */
+            if (endOfStream) {
+                receivedEndOfStream(stream);
+            }
+            if (processStream) {
+                processStreamOnContainerThread(stream);
+            }
+        }
+    }
+
+
+    @Override
+    public void receivedEndOfStream(int streamId) throws ConnectionException {
+        AbstractNonZeroStream abstractNonZeroStream =
+                getAbstractNonZeroStream(streamId, connectionState.get().isNewStreamAllowed());
+        if (abstractNonZeroStream instanceof Stream) {
+            Stream stream = (Stream) abstractNonZeroStream;
+            receivedEndOfStream(stream);
+        }
+    }
+
+
+    private void receivedEndOfStream(Stream stream) throws ConnectionException {
+        stream.receivedEndOfStream();
+        if (!stream.isActive()) {
+            setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
         }
     }
 
