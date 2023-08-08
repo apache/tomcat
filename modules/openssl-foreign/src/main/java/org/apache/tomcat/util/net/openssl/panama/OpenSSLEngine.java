@@ -905,7 +905,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private String getProtocolNegotiated() {
         try (var localArena = Arena.ofConfined()) {
-            MemorySegment lenAddress = localArena.allocate(ValueLayout.JAVA_INT, 0);
+            MemorySegment lenAddress = localArena.allocate(ValueLayout.JAVA_INT);
             MemorySegment protocolPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
             SSL_get0_alpn_selected(state.ssl, protocolPointer, lenAddress);
             if (MemorySegment.NULL.equals(protocolPointer)) {
