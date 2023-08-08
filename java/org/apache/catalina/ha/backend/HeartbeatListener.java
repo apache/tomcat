@@ -40,8 +40,7 @@ public class HeartbeatListener implements LifecycleListener {
     protected String host = null;
 
     /**
-     * @return the host corresponding to the connector
-     * we want to proxy.
+     * @return the host corresponding to the connector we want to proxy.
      */
     public String getHost() {
         return this.host;
@@ -74,7 +73,7 @@ public class HeartbeatListener implements LifecycleListener {
 
     /* for multicasting stuff */
     protected String ip = "224.0.1.105"; /* Multicast IP */
-    protected int multiport = 23364;     /* Multicast Port */
+    protected int multiport = 23364; /* Multicast Port */
     protected int ttl = 16;
 
     /* corresponding setters and getters */
@@ -82,38 +81,50 @@ public class HeartbeatListener implements LifecycleListener {
     /**
      * @return the Multicast IP we are using for Multicast
      */
-    public String getGroup() { return ip; }
+    public String getGroup() {
+        return ip;
+    }
 
     /**
      * Set the Multicast IP to use for Multicast
      *
      * @param group the multi address to use.
      */
-    public void setGroup(String group) { this.ip = group; }
+    public void setGroup(String group) {
+        this.ip = group;
+    }
 
     /**
      * @return the Multicast Port we are using for Multicast.
      */
-    public int getMultiport() { return multiport; }
+    public int getMultiport() {
+        return multiport;
+    }
 
     /**
      * Set the Port to use for Multicast
      *
      * @param port the port to use.
      */
-    public void setMultiport(int port) { this.multiport=port; }
+    public void setMultiport(int port) {
+        this.multiport = port;
+    }
 
     /**
      * @return the TTL for Multicast packets.
      */
-    public int getTtl() { return ttl; }
+    public int getTtl() {
+        return ttl;
+    }
 
     /**
      * Set the TTL for Multicast packets.
      *
      * @param ttl value for TTL.
      */
-    public void setTtl(int ttl) { this.ttl=ttl; }
+    public void setTtl(int ttl) {
+        this.ttl = ttl;
+    }
 
     /**
      * Proxy list, format "address:port,address:port".
@@ -123,15 +134,19 @@ public class HeartbeatListener implements LifecycleListener {
     /**
      * @return the list of proxies that send us requests.
      */
-    public String getProxyList() { return proxyList; }
+    public String getProxyList() {
+        return proxyList;
+    }
 
     /**
-     * Set the list of Proxies that send is requests, when not empty it toggles
-     * the multi to off. A SetHandler heartbeat must be existing in httpd.conf.
+     * Set the list of Proxies that send is requests, when not empty it toggles the multi to off. A SetHandler heartbeat
+     * must be existing in httpd.conf.
      *
      * @param proxyList the list of proxy, format "address:port,address:port".
      */
-    public void setProxyList(String proxyList) { this.proxyList = proxyList; }
+    public void setProxyList(String proxyList) {
+        this.proxyList = proxyList;
+    }
 
     /**
      * URL prefix.
@@ -141,20 +156,26 @@ public class HeartbeatListener implements LifecycleListener {
     /**
      * @return the URL specified in &lt;Location/&gt; for the SetHandler heartbeat.
      */
-    public String getProxyURL() { return proxyURL; }
+    public String getProxyURL() {
+        return proxyURL;
+    }
 
     /**
      * Set the URL of receiver in httpd. That is the location used in
+     *
      * <pre>
      * &lt;Location "/HeartbeatListener"&gt;
      *    SetHandler heartbeat
      * &lt;/Location&gt;
      * </pre>
+     *
      * All proxies MUST use the same location.
      *
      * @param proxyURL a String with the URL starting with /
      */
-    public void setProxyURLString(String proxyURL) { this.proxyURL = proxyURL; }
+    public void setProxyURLString(String proxyURL) {
+        this.proxyURL = proxyURL;
+    }
 
     private CollectedInfo coll = null;
 
@@ -202,8 +223,7 @@ public class HeartbeatListener implements LifecycleListener {
                 coll = null;
                 return;
             }
-            String output = "v=1&ready=" + coll.ready + "&busy=" + coll.busy +
-                    "&port=" + port;
+            String output = "v=1&ready=" + coll.ready + "&busy=" + coll.busy + "&port=" + port;
             try {
                 sender.send(output);
             } catch (Exception ex) {
