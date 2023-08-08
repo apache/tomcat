@@ -303,6 +303,10 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                             result.append(req.isAsyncStarted());
                         } catch (NullPointerException npe) {
                             result.append("false");
+                        } catch (Throwable t) {
+                            // Additional debugging for intermittent test failure
+                            result.append(t.getClass().getName());
+                            t.printStackTrace();
                         }
                         done = true;
                     } catch (InterruptedException | IOException e) {
