@@ -62,11 +62,11 @@ public class CollectedInfo {
             objName = oi.getObjectName();
             String name = objName.getKeyProperty("name");
 
-            /* Name are:
-             * http-8080
-             * jk-10.33.144.3-8009
-             * jk-jfcpc%2F10.33.144.3-8009
-             */
+            // Example names:
+            // ajp-nio-8009
+            // ajp-nio-127.0.0.1-8009
+            // ajp-nio-0:0:0:0:0:0:0:1-8009
+            // ajp-nio-10.36.116.209-8009
             String [] elenames = name.split("-");
             String sport = elenames[elenames.length-1];
             iport = Integer.parseInt(sport);

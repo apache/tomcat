@@ -43,10 +43,10 @@ import org.apache.tomcat.util.res.StringManager;
  * The DeltaManager manages replicated sessions by only replicating the deltas
  * in data. For applications written to handle this, the DeltaManager is the
  * optimal way of replicating data.
- *
+ * <p>
  * This code is almost identical to StandardManager with a difference in how it
  * persists sessions and some modifications to it.
- *
+ * <p>
  * <b>IMPLEMENTATION NOTE </b>: Correct behavior of session storing and
  * reloading depends upon external calls to the <code>start()</code> and
  * <code>stop()</code> methods of this class at the correct times.
@@ -660,7 +660,9 @@ public class DeltaManager extends ClusterManagerBase{
 
     /**
      * Load sessions from other cluster node.
+     * <p>
      * FIXME replace currently sessions with same id without notification.
+     * <p>
      * FIXME SSO handling is not really correct with the session replacement!
      * @param data Serialized data
      * @exception ClassNotFoundException
@@ -1395,10 +1397,9 @@ public class DeltaManager extends ClusterManagerBase{
     }
 
     /**
-     * handle receive that other node want all sessions ( restart )
-     * a) send all sessions with one message
-     * b) send session at blocks
-     * After sending send state is complete transferred
+     * Handle a get all sessions message from another node. Depending on {@link #sendAllSessions}, sessions are either
+     * sent in a single message or in batches. Sending is complete when this method exits.
+     *
      * @param msg Session message
      * @param sender Member which sent the message
      * @throws IOException IO error sending messages
@@ -1416,7 +1417,7 @@ public class DeltaManager extends ClusterManagerBase{
         if (isSendAllSessions()) {
             sendSessions(sender, currentSessions, findSessionTimestamp);
         } else {
-            // send session at blocks
+            // send sessions in batches
             int remain = currentSessions.length;
             for (int i = 0; i < currentSessions.length; i += getSendAllSessionsSize()) {
                 int len = i + getSendAllSessionsSize() > currentSessions.length ?
@@ -1431,9 +1432,9 @@ public class DeltaManager extends ClusterManagerBase{
                         Thread.sleep(getSendAllSessionsWaitTime());
                     } catch (Exception sleep) {
                     }
-                }//end if
-            }//for
-        }//end if
+                }
+            }
+        }
 
         SessionMessage newmsg = new SessionMessageImpl(name,
                 SessionMessage.EVT_ALL_SESSION_TRANSFERCOMPLETE, null, "SESSION-STATE-TRANSFERRED",

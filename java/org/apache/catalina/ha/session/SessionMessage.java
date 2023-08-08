@@ -23,15 +23,15 @@ import org.apache.catalina.ha.ClusterMessage;
  * <p>
  * The following events are currently available:
  * <ul>
- *   <li><pre>public static final int EVT_SESSION_CREATED</pre><li>
- *   <li><pre>public static final int EVT_SESSION_EXPIRED</pre><li>
- *   <li><pre>public static final int EVT_SESSION_ACCESSED</pre><li>
- *   <li><pre>public static final int EVT_GET_ALL_SESSIONS</pre><li>
- *   <li><pre>public static final int EVT_SESSION_DELTA</pre><li>
- *   <li><pre>public static final int EVT_ALL_SESSION_DATA</pre><li>
- *   <li><pre>public static final int EVT_ALL_SESSION_TRANSFERCOMPLETE</pre><li>
- *   <li><pre>public static final int EVT_CHANGE_SESSION_ID</pre><li>
- *   <li><pre>public static final int EVT_ALL_SESSION_NOCONTEXTMANAGER</pre><li>
+ *   <li>{@code public static final int EVT_SESSION_CREATED}</li>
+ *   <li>{@code public static final int EVT_SESSION_EXPIRED}</li>
+ *   <li>{@code public static final int EVT_SESSION_ACCESSED}</li>
+ *   <li>{@code public static final int EVT_GET_ALL_SESSIONS}</li>
+ *   <li>{@code public static final int EVT_SESSION_DELTA}</li>
+ *   <li>{@code public static final int EVT_ALL_SESSION_DATA}</li>
+ *   <li>{@code public static final int EVT_ALL_SESSION_TRANSFERCOMPLETE}</li>
+ *   <li>{@code public static final int EVT_CHANGE_SESSION_ID}</li>
+ *   <li>{@code public static final int EVT_ALL_SESSION_NOCONTEXTMANAGER}</li>
  * </ul>
  */
 public interface SessionMessage extends ClusterMessage {
