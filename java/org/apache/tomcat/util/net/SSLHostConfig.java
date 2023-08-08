@@ -50,13 +50,12 @@ public class SSLHostConfig implements Serializable {
     private static final Log log = LogFactory.getLog(SSLHostConfig.class);
     private static final StringManager sm = StringManager.getManager(SSLHostConfig.class);
 
-    private static final String DEFAULT_CIPHERS = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
-
     // Must be lower case. SSL host names are always stored using lower case as
     // they are case insensitive but are used by case sensitive code such as
     // keys in Maps.
     protected static final String DEFAULT_SSL_HOST_NAME = "_default_";
     protected static final Set<String> SSL_PROTO_ALL_SET = new HashSet<>();
+    public static final String DEFAULT_TLS_CIPHERS = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
 
     static {
         /* Default used if protocols are not configured, also used if
@@ -408,9 +407,9 @@ public class SSLHostConfig implements Serializable {
     public String getCiphers() {
         if (ciphers == null) {
             if (!JreCompat.isJre8Available() && Type.JSSE.equals(configType)) {
-                ciphers = DEFAULT_CIPHERS + ":!DHE";
+                ciphers = DEFAULT_TLS_CIPHERS + ":!DHE";
             } else {
-                ciphers = DEFAULT_CIPHERS;
+                ciphers = DEFAULT_TLS_CIPHERS;
             }
 
         }
