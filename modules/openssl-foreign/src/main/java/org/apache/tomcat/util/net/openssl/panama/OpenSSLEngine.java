@@ -1463,7 +1463,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             synchronized (OpenSSLEngine.this) {
                 if (!destroyed) {
                     try (var localArena = Arena.ofConfined()) {
-                        MemorySegment lenPointer = localArena.allocate(ValueLayout.ADDRESS);
+                        MemorySegment lenPointer = localArena.allocate(ValueLayout.JAVA_INT);
                         var session = SSL_get_session(state.ssl);
                         if (MemorySegment.NULL.equals(session)) {
                             return new byte[0];
