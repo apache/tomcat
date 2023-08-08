@@ -34,7 +34,8 @@ import org.apache.tomcat.util.res.StringManager;
  * This class is used to track the series of actions that happens when
  * a request is executed. These actions will then translate into invocations of methods
  * on the actual session.
- * This class is NOT thread safe. One DeltaRequest per session
+ * <p>
+ * This class is NOT thread safe. One DeltaRequest per session.
  */
 public class DeltaRequest implements Externalizable {
 
