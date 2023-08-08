@@ -61,7 +61,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     /*--Instance Variables--------------------------------------*/
     protected boolean started = false;
 
-    protected final HashMap<String, FileMessageFactory> fileFactories = new HashMap<>();
+    protected final HashMap<String,FileMessageFactory> fileFactories = new HashMap<>();
 
     /**
      * Deployment directory.

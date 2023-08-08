@@ -51,6 +51,7 @@ public class CollectedInfo {
     public CollectedInfo(String host, int port) throws Exception {
         init(host, port);
     }
+
     public void init(String host, int port) throws Exception {
         int iport = 0;
         String shost = null;
@@ -67,16 +68,16 @@ public class CollectedInfo {
             // ajp-nio-127.0.0.1-8009
             // ajp-nio-0:0:0:0:0:0:0:1-8009
             // ajp-nio-10.36.116.209-8009
-            String [] elenames = name.split("-");
-            String sport = elenames[elenames.length-1];
+            String[] elenames = name.split("-");
+            String sport = elenames[elenames.length - 1];
             iport = Integer.parseInt(sport);
-            String [] shosts = elenames[1].split("%2F");
+            String[] shosts = elenames[1].split("%2F");
             shost = shosts[0];
 
-            if (port==0 && host==null) {
+            if (port == 0 && host == null) {
                 break; /* Done: take the first one */
             }
-            if (host==null && iport==port) {
+            if (host == null && iport == port) {
                 break; /* Only port done */
             }
             if (shost.compareTo(host) == 0) {
@@ -84,8 +85,7 @@ public class CollectedInfo {
             }
         }
         if (objName == null) {
-            throw new Exception(sm.getString("collectedInfo.noConnector",
-                    host, Integer.valueOf(port)));
+            throw new Exception(sm.getString("collectedInfo.noConnector", host, Integer.valueOf(port)));
         }
         this.port = iport;
         this.host = shost;
@@ -101,7 +101,7 @@ public class CollectedInfo {
         // the currentThreadCount could be 0 before the threads are created...
         // Integer iready = (Integer) mBeanServer.getAttribute(objName, "currentThreadCount");
 
-        Integer ibusy  = (Integer) mBeanServer.getAttribute(objName, "currentThreadsBusy");
+        Integer ibusy = (Integer) mBeanServer.getAttribute(objName, "currentThreadsBusy");
 
         busy = ibusy.intValue();
         ready = imax.intValue() - ibusy.intValue();

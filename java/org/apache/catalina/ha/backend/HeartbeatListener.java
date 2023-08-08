@@ -43,25 +43,42 @@ public class HeartbeatListener implements LifecycleListener, ContainerListener {
 
     /* for multicasting stuff */
     private final String ip = "224.0.1.105"; /* Multicast IP */
-    private final int multiport = 23364;     /* Multicast Port */
+    private final int multiport = 23364; /* Multicast Port */
     private final int ttl = 16;
 
-    public String getHost() { return host; }
-    public String getGroup() { return ip; }
-    public int getMultiport() { return multiport; }
-    public int getTtl() { return ttl; }
+    public String getHost() {
+        return host;
+    }
+
+    public String getGroup() {
+        return ip;
+    }
+
+    public int getMultiport() {
+        return multiport;
+    }
+
+    public int getTtl() {
+        return ttl;
+    }
 
     /**
      * Proxy list, format "address:port,address:port".
      */
     private final String proxyList = null;
-    public String getProxyList() { return proxyList; }
+
+    public String getProxyList() {
+        return proxyList;
+    }
 
     /**
      * URL prefix.
      */
     private final String proxyURL = "/HeartbeatListener";
-    public String getProxyURL() { return proxyURL; }
+
+    public String getProxyURL() {
+        return proxyURL;
+    }
 
     private CollectedInfo coll = null;
 
@@ -113,8 +130,7 @@ public class HeartbeatListener implements LifecycleListener, ContainerListener {
                 coll = null;
                 return;
             }
-            String output = "v=1&ready=" + coll.ready + "&busy=" + coll.busy +
-                    "&port=" + port;
+            String output = "v=1&ready=" + coll.ready + "&busy=" + coll.busy + "&port=" + port;
             try {
                 sender.send(output);
             } catch (Exception ex) {
