@@ -124,6 +124,11 @@
         <bug>66822</bug>: Use the same naming format in log messages for
         Connector instances as the associated ProtocolHandler instance. (markt)
       </fix>
+      <fix>
+        The parts count should also lower the actual
+        <code>maxParameterCount</code> used for parsing parameters if parts are
+        parsed first. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
