@@ -529,6 +529,13 @@ public class DeltaManager extends ClusterManagerBase {
         changeSessionId(session, newId, true);
     }
 
+    /**
+     * @param session The session
+     * @param notify  Notify change
+     *
+     * @deprecated Will be removed in Tomcat 10
+     */
+    @Deprecated
     protected void changeSessionId(Session session, boolean notify) {
         String orgSessionID = session.getId();
         super.changeSessionId(session);

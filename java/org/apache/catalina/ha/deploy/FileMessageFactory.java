@@ -334,7 +334,10 @@ public class FileMessageFactory {
      * @param args String[], args[0] - read from filename, args[1] write to filename
      *
      * @throws Exception An error occurred
+     *
+     * @deprecated This method will be removed in Tomcat 10.0.x
      */
+    @Deprecated
     public static void main(String[] args) throws Exception {
         System.out.println("Usage: FileMessageFactory fileToBeRead fileToBeWritten");
         System.out.println("Usage: This will make a copy of the file on the local file system");

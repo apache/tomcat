@@ -16,10 +16,8 @@
  */
 package org.apache.catalina.ha;
 
-
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSetBase;
-
 
 /**
  * <p>
@@ -48,9 +46,7 @@ public class ClusterRuleSet extends RuleSetBase {
      * Construct an instance of this <code>RuleSet</code> with the default matching pattern prefix.
      */
     public ClusterRuleSet() {
-
         this("");
-
     }
 
 
@@ -60,7 +56,6 @@ public class ClusterRuleSet extends RuleSetBase {
      * @param prefix Prefix for matching pattern rules (including the trailing slash character)
      */
     public ClusterRuleSet(String prefix) {
-        super();
         this.prefix = prefix;
     }
 

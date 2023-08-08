@@ -61,7 +61,13 @@ public class CollectedInfo {
         Set<ObjectInstance> set = mBeanServer.queryMBeans(objectName, null);
         for (ObjectInstance oi : set) {
             objName = oi.getObjectName();
+            String subtype = objName.getKeyProperty("subType");
+            if (subtype != null && subtype.equals("SocketProperties")) {
+                objName = null;
+                continue;
+            }
             String name = objName.getKeyProperty("name");
+            name = name.replace("\"", "");
 
             // Example names:
             // ajp-nio-8009
@@ -71,18 +77,22 @@ public class CollectedInfo {
             String[] elenames = name.split("-");
             String sport = elenames[elenames.length - 1];
             iport = Integer.parseInt(sport);
-            String[] shosts = elenames[1].split("%2F");
-            shost = shosts[0];
+            if (elenames.length == 4) {
+                shost = elenames[2];
+            }
 
             if (port == 0 && host == null) {
                 break; /* Done: take the first one */
             }
-            if (host == null && iport == port) {
-                break; /* Only port done */
+            if (iport == port) {
+                if (host == null) {
+                    break; /* Done: return the first with the right port */
+                } else if (shost != null && shost.compareTo(host) == 0) {
+                    break; /* Done port and host are the expected ones */
+                }
             }
-            if (shost.compareTo(host) == 0) {
-                break; /* Done port and host are the expected ones */
-            }
+            objName = null;
+            shost = null;
         }
         if (objName == null) {
             throw new Exception(sm.getString("collectedInfo.noConnector", host, Integer.valueOf(port)));

@@ -238,7 +238,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                             log.error(sm.getString("farmWarDeployer.servicingDeploy", contextName, name));
                         }
                     } catch (Exception ex) {
-                        log.error(ex);
+                        log.error(sm.getString("farmWarDeployer.fileMessageError"), ex);
                     } finally {
                         removeFactory(fmsg);
                     }
@@ -263,7 +263,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                         log.error(sm.getString("farmWarDeployer.servicingUndeploy", contextName));
                     }
                 } catch (Exception ex) {
-                    log.error(ex);
+                    log.error(sm.getString("farmWarDeployer.undeployMessageError"), ex);
                 }
             }
         } catch (java.io.IOException x) {
@@ -747,7 +747,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         }
 
         try (java.io.FileInputStream is = new java.io.FileInputStream(from);
-                java.io.FileOutputStream os = new java.io.FileOutputStream(to, false);) {
+                java.io.FileOutputStream os = new java.io.FileOutputStream(to, false)) {
             byte[] buf = new byte[4096];
             while (true) {
                 int len = is.read(buf);
