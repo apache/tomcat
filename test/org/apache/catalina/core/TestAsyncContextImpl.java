@@ -123,12 +123,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             counter++;
         }
 
-        String result = servlet.getResult();
-        Assert.assertTrue(result.startsWith("1false2true3true4true5"));
-
-        result = result.substring(22);
-        // Should be "false" (or possibly "") at this point. Must not be "true".
-        Assert.assertNotEquals("true", servlet.getResult());
+        Assert.assertEquals("1false2true3true4true5false", servlet.getResult());
 
         // Check the access log
         alv.validateAccessLog(1, 200, Bug49528Servlet.THREAD_SLEEP_TIME,
