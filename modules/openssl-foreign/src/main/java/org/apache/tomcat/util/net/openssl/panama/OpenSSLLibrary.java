@@ -39,6 +39,8 @@ import org.apache.tomcat.util.res.StringManager;
  * configuration parameters.
  * Using this from a listener is completely optional, but is needed for
  * configuration and full cleanup of a few native memory allocations.
+ * FIXME: OpenSSL 3 deprecation resolutions for the equivalent code:
+ * https://svn.apache.org/viewvc?view=revision&revision=1908537
  */
 public class OpenSSLLibrary {
 
