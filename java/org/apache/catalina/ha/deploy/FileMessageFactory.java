@@ -97,7 +97,7 @@ public class FileMessageFactory {
      * Messages received out of order are held in the buffer until required. If everything is worked as expected,
      * messages will spend very little time in the buffer.
      */
-    protected final Map<Long, FileMessage> msgBuffer = new ConcurrentHashMap<>();
+    protected final Map<Long,FileMessage> msgBuffer = new ConcurrentHashMap<>();
 
     /**
      * The bytes that we hold the data in, not thread safe.
