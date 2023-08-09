@@ -327,9 +327,6 @@ public class OutputBuffer extends Writer {
         if (closed) {
             return;
         }
-        if (coyoteResponse == null) {
-            return;
-        }
 
         // If we really have something to write
         if (buf.remaining() > 0) {
@@ -554,11 +551,7 @@ public class OutputBuffer extends Writer {
             return;
         }
 
-        Charset charset = null;
-
-        if (coyoteResponse != null) {
-            charset = coyoteResponse.getCharset();
-        }
+        Charset charset = coyoteResponse.getCharset();
 
         if (charset == null) {
             if (coyoteResponse.getCharacterEncoding() != null) {
