@@ -102,7 +102,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     /**
      * Associated Coyote request.
      */
-    private Request coyoteRequest;
+    private final Request coyoteRequest;
 
 
     /**
@@ -128,21 +128,21 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
 
     /**
      * Default constructor. Allocate the buffer with the default buffer size.
+     *
+     * @param coyoteRequest The associated Coyote request
      */
-    public InputBuffer() {
-
-        this(DEFAULT_BUFFER_SIZE);
-
+    public InputBuffer(org.apache.coyote.Request coyoteRequest) {
+        this(DEFAULT_BUFFER_SIZE, coyoteRequest);
     }
 
 
     /**
      * Alternate constructor which allows specifying the initial buffer size.
      *
-     * @param size Buffer size to use
+     * @param size          Buffer size to use
+     * @param coyoteRequest The associated Coyote request
      */
-    public InputBuffer(int size) {
-
+    public InputBuffer(int size, org.apache.coyote.Request coyoteRequest) {
         this.size = size;
         bb = ByteBuffer.allocate(size);
         clear(bb);
@@ -150,18 +150,6 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
         clear(cb);
         readLimit = size;
 
-    }
-
-
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Associated Coyote request.
-     *
-     * @param coyoteRequest Associated Coyote request
-     */
-    public void setRequest(Request coyoteRequest) {
         this.coyoteRequest = coyoteRequest;
     }
 

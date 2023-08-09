@@ -146,12 +146,11 @@ public class Request implements HttpServletRequest {
     public Request(Connector connector, org.apache.coyote.Request coyoteRequest) {
         this.connector = connector;
         this.coyoteRequest = coyoteRequest;
-        inputBuffer.setRequest(coyoteRequest);
+        inputBuffer = new InputBuffer(coyoteRequest);
     }
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * Coyote request.
@@ -228,19 +227,19 @@ public class Request implements HttpServletRequest {
     /**
      * The associated input buffer.
      */
-    protected final InputBuffer inputBuffer = new InputBuffer();
+    protected final InputBuffer inputBuffer;
 
 
     /**
      * ServletInputStream.
      */
-    protected CoyoteInputStream inputStream = new CoyoteInputStream(inputBuffer);
+    protected CoyoteInputStream inputStream;
 
 
     /**
      * Reader.
      */
-    protected CoyoteReader reader = new CoyoteReader(inputBuffer);
+    protected CoyoteReader reader;
 
 
     /**
