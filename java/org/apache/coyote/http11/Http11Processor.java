@@ -999,7 +999,12 @@ public class Http11Processor extends AbstractProcessor {
                     int keepAliveTimeout = protocol.getKeepAliveTimeout();
 
                     if (keepAliveTimeout > 0) {
-                        String value = "timeout=" + keepAliveTimeout / 1000L;
+                        StringBuilder value = new StringBuilder();
+                        value.append("timeout=").append(keepAliveTimeout / 1000L);
+                        int maxKeepAliveRequests = protocol.getMaxKeepAliveRequests();
+                        if (maxKeepAliveRequests > 0) {
+                            value.append(", max=").append(maxKeepAliveRequests);
+                        }
                         headers.setValue(Constants.KEEP_ALIVE_HEADER_NAME).setString(value);
 
                         if (http11) {
