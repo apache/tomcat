@@ -1325,16 +1325,18 @@ public final class Mapper {
             len = end - start;
         }
         for (int i = 0; (i < len) && (result == 0); i++) {
-            if (c[i + start] > compareTo.charAt(i)) {
+            char nameChar = c[i + start];
+            char compareToChar = compareTo.charAt(i);
+            if (nameChar > compareToChar) {
                 result = 1;
-            } else if (c[i + start] < compareTo.charAt(i)) {
+            } else if (nameChar < compareToChar) {
                 result = -1;
             }
         }
         if (result == 0) {
-            if (compareTo.length() > (end - start)) {
+            if (len > (end - start)) {
                 result = -1;
-            } else if (compareTo.length() < (end - start)) {
+            } else if (len < (end - start)) {
                 result = 1;
             }
         }
@@ -1354,16 +1356,18 @@ public final class Mapper {
             len = end - start;
         }
         for (int i = 0; (i < len) && (result == 0); i++) {
-            if (Ascii.toLower(c[i + start]) > Ascii.toLower(compareTo.charAt(i))) {
+            int nameLower = Ascii.toLower(c[i + start]);
+            int compareLower = Ascii.toLower(compareTo.charAt(i));
+            if (nameLower > compareLower) {
                 result = 1;
-            } else if (Ascii.toLower(c[i + start]) < Ascii.toLower(compareTo.charAt(i))) {
+            } else if (nameLower < compareLower) {
                 result = -1;
             }
         }
         if (result == 0) {
-            if (compareTo.length() > (end - start)) {
+            if (len > (end - start)) {
                 result = -1;
-            } else if (compareTo.length() < (end - start)) {
+            } else if (len < (end - start)) {
                 result = 1;
             }
         }
