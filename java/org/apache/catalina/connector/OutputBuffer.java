@@ -112,7 +112,7 @@ public class OutputBuffer extends Writer {
     /**
      * Associated Coyote response.
      */
-    private Response coyoteResponse;
+    private final Response coyoteResponse;
 
 
     /**
@@ -126,28 +126,20 @@ public class OutputBuffer extends Writer {
     /**
      * Create the buffer with the specified initial size.
      *
-     * @param size Buffer size to use
+     * @param size           Buffer size to use
+     * @param coyoteResponse The associated Coyote response
      */
-    public OutputBuffer(int size) {
+    public OutputBuffer(int size, Response coyoteResponse) {
         defaultBufferSize = size;
         bb = ByteBuffer.allocate(size);
         clear(bb);
         cb = CharBuffer.allocate(size);
         clear(cb);
+        this.coyoteResponse = coyoteResponse;
     }
 
 
     // ------------------------------------------------------------- Properties
-
-    /**
-     * Associated Coyote response.
-     *
-     * @param coyoteResponse Associated Coyote response
-     */
-    public void setResponse(Response coyoteResponse) {
-        this.coyoteResponse = coyoteResponse;
-    }
-
 
     /**
      * Is the response output suspended ?

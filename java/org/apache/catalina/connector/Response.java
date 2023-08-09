@@ -155,8 +155,7 @@ public class Response implements HttpServletResponse {
 
     public Response(org.apache.coyote.Response coyoteResponse, int outputBufferSize) {
         this.coyoteResponse = coyoteResponse;
-        outputBuffer = new OutputBuffer(outputBufferSize);
-        outputBuffer.setResponse(coyoteResponse);
+        outputBuffer = new OutputBuffer(outputBufferSize, coyoteResponse);
     }
 
 
