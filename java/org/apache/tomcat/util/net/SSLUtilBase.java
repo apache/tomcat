@@ -121,10 +121,11 @@ public abstract class SSLUtilBase implements SSLUtil {
         sslHostConfig.setTls13RenegotiationAvailable(isTls13RenegAuthAvailable());
 
         // Calculate the enabled ciphers
+        boolean warnOnSkip = !sslHostConfig.getCiphers().equals(SSLHostConfig.DEFAULT_TLS_CIPHERS);
         List<String> configuredCiphers = sslHostConfig.getJsseCipherNames();
         Set<String> implementedCiphers = getImplementedCiphers();
         List<String> enabledCiphers =
-                getEnabled("ciphers", getLog(), false, configuredCiphers, implementedCiphers);
+                getEnabled("ciphers", getLog(), warnOnSkip, configuredCiphers, implementedCiphers);
         this.enabledCiphers = enabledCiphers.toArray(new String[0]);
     }
 
