@@ -127,7 +127,7 @@ public abstract class SSLUtilBase implements SSLUtil {
             // TODO: sslHostConfig can query that with Panama, but skip for now
             this.enabledCiphers = new String[0];
         } else {
-            boolean warnOnSkip = !sslHostConfig.getCiphers().equals(sslHostConfig.DEFAULT_TLS_CIPHERS);
+            boolean warnOnSkip = !sslHostConfig.getCiphers().equals(SSLHostConfig.DEFAULT_TLS_CIPHERS);
             List<String> configuredCiphers = sslHostConfig.getJsseCipherNames();
             Set<String> implementedCiphers = getImplementedCiphers();
             List<String> enabledCiphers =
