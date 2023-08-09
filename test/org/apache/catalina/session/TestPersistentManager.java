@@ -108,7 +108,7 @@ public class TestPersistentManager {
         context.setParent(host);
 
         Connector connector = EasyMock.createNiceMock(Connector.class);
-        Request req = new Request(connector) {
+        Request req = new Request(connector, null) {
             @Override
             public Context getContext() {
                 return context;

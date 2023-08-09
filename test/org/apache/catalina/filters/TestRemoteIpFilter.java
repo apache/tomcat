@@ -120,8 +120,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
      */
     public static class MockHttpServletRequest extends Request {
         public MockHttpServletRequest() {
-            super(new Connector());
-            setCoyoteRequest(new org.apache.coyote.Request());
+            super(new Connector(), new org.apache.coyote.Request());
         }
 
         public MockHttpServletRequest(String ipAddress) {

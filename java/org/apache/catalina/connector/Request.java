@@ -136,12 +136,17 @@ public class Request implements HttpServletRequest {
     /**
      * Create a new Request object associated with the given Connector.
      *
-     * @param connector The Connector with which this Request object will always be associated. In normal usage this
-     *                      must be non-null. In some test scenarios, it may be possible to use a null Connector without
-     *                      triggering an NPE.
+     * @param connector     The Connector with which this Request object will always be associated. In normal usage this
+     *                          must be non-null. In some test scenarios, it may be possible to use a null Connector
+     *                          without triggering an NPE.
+     * @param coyoteRequest The Coyote request with which this Request object will always be associated. In normal usage
+     *                          this must be non-null. In some test scenarios, it may be possible to use a null request
+     *                          without triggering an NPE.
      */
-    public Request(Connector connector) {
+    public Request(Connector connector, org.apache.coyote.Request coyoteRequest) {
         this.connector = connector;
+        this.coyoteRequest = coyoteRequest;
+        inputBuffer.setRequest(coyoteRequest);
     }
 
 
@@ -151,17 +156,7 @@ public class Request implements HttpServletRequest {
     /**
      * Coyote request.
      */
-    protected org.apache.coyote.Request coyoteRequest;
-
-    /**
-     * Set the Coyote request.
-     *
-     * @param coyoteRequest The Coyote request
-     */
-    public void setCoyoteRequest(org.apache.coyote.Request coyoteRequest) {
-        this.coyoteRequest = coyoteRequest;
-        inputBuffer.setRequest(coyoteRequest);
-    }
+    protected final org.apache.coyote.Request coyoteRequest;
 
     /**
      * Get the Coyote request.

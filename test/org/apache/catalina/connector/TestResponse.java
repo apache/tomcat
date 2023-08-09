@@ -600,9 +600,8 @@ public class TestResponse extends TomcatBaseTest {
         Connector connector = new Connector();
         org.apache.coyote.Response cResponse = new org.apache.coyote.Response();
         Response response = new Response(cResponse);
-        Request request = new Request(connector);
         org.apache.coyote.Request cRequest = new org.apache.coyote.Request();
-        request.setCoyoteRequest(cRequest);
+        Request request = new Request(connector, cRequest);
         Context context = new TesterContext();
         request.getMappingData().context = context;
         response.setRequest(request);
@@ -963,9 +962,8 @@ public class TestResponse extends TomcatBaseTest {
         Connector connector = new Connector();
         org.apache.coyote.Response cResponse = new org.apache.coyote.Response();
         Response response = new Response(cResponse);
-        Request request = new Request(connector);
         org.apache.coyote.Request cRequest = new org.apache.coyote.Request();
-        request.setCoyoteRequest(cRequest);
+        Request request = new Request(connector, cRequest);
         Context context = new TesterContext();
         request.getMappingData().context = context;
         response.setRequest(request);

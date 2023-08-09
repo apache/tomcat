@@ -250,7 +250,7 @@ public class TesterDigestAuthenticatorPerformance {
         private String authHeader = null;
 
         TesterDigestRequest() {
-            super(null);
+            super(null, null);
         }
 
         @Override

@@ -894,10 +894,14 @@ public class Connector extends LifecycleMBeanBase {
      * Create (or allocate) and return a Request object suitable for specifying the contents of a Request to the
      * responsible Container.
      *
+     * @param coyoteRequest The Coyote request with which the Request object will always be associated. In normal usage
+     *                          this must be non-null. In some test scenarios, it may be possible to use a null request
+     *                          without triggering an NPE.
+     *
      * @return a new Servlet request object
      */
-    public Request createRequest() {
-        return new Request(this);
+    public Request createRequest(org.apache.coyote.Request coyoteRequest) {
+        return new Request(this, coyoteRequest);
     }
 
 
@@ -905,7 +909,9 @@ public class Connector extends LifecycleMBeanBase {
      * Create and return a Response object suitable for receiving the contents of a Response from the responsible
      * Container.
      *
-     * @param coyoteResponse The associated Coyote response.
+     * @param coyoteResponse The Coyote request with which the Response object will always be associated. In normal
+     *                           usage this must be non-null. In some test scenarios, it may be possible to use a null
+     *                           response without triggering an NPE.
      *
      * @return a new Servlet response object
      */

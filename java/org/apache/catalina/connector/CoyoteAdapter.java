@@ -304,8 +304,7 @@ public class CoyoteAdapter implements Adapter {
 
         if (request == null) {
             // Create objects
-            request = connector.createRequest();
-            request.setCoyoteRequest(req);
+            request = connector.createRequest(req);
             response = connector.createResponse(res);
 
             // Link objects
@@ -450,8 +449,7 @@ public class CoyoteAdapter implements Adapter {
 
         if (request == null) {
             // Create objects
-            request = connector.createRequest();
-            request.setCoyoteRequest(req);
+            request = connector.createRequest(req);
             response = connector.createResponse(res);
 
             // Link objects
