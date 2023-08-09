@@ -319,9 +319,6 @@ public class OutputBuffer extends Writer {
         if (closed) {
             return;
         }
-        if (coyoteResponse == null) {
-            return;
-        }
 
         // If we really have something to write
         if (buf.remaining() > 0) {
@@ -546,15 +543,11 @@ public class OutputBuffer extends Writer {
             return;
         }
 
-        Charset charset = null;
-
-        if (coyoteResponse != null) {
-            CharsetHolder charsetHolder = coyoteResponse.getCharsetHolder();
-            // setCharacterEncoding() was called with an invalid character set
-            // Trigger an UnsupportedEncodingException
-            charsetHolder.validate();
-            charset = charsetHolder.getCharset();
-        }
+        CharsetHolder charsetHolder = coyoteResponse.getCharsetHolder();
+        // setCharacterEncoding() was called with an invalid character set
+        // Trigger an UnsupportedEncodingException
+        charsetHolder.validate();
+        Charset charset = charsetHolder.getCharset();
 
         if (charset == null) {
             charset = org.apache.coyote.Constants.DEFAULT_BODY_CHARSET;
