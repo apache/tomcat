@@ -31,7 +31,7 @@ public class TestResponsePerformance extends LoggingBaseTest {
     @Test
     public void testToAbsolutePerformance() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         // Warm up

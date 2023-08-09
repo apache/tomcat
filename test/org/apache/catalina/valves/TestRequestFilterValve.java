@@ -79,6 +79,11 @@ public class TestRequestFilterValve {
     }
 
     public static class MockResponse extends Response {
+
+        public MockResponse() {
+            super(null);
+        }
+
         private int status = OK;
 
         @Override

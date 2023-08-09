@@ -73,49 +73,10 @@ public class Response implements HttpServletResponse {
 
     private static final MediaTypeCache MEDIA_TYPE_CACHE = new MediaTypeCache(100);
 
-    // ----------------------------------------------------- Instance Variables
-
-    public Response() {
-        this(OutputBuffer.DEFAULT_BUFFER_SIZE);
-    }
-
-
-    public Response(int outputBufferSize) {
-        outputBuffer = new OutputBuffer(outputBufferSize);
-    }
-
-
-    // ------------------------------------------------------------- Properties
-
     /**
      * Coyote response.
      */
-    protected org.apache.coyote.Response coyoteResponse;
-
-    /**
-     * Set the Coyote response.
-     *
-     * @param coyoteResponse The Coyote response
-     */
-    public void setCoyoteResponse(org.apache.coyote.Response coyoteResponse) {
-        this.coyoteResponse = coyoteResponse;
-        outputBuffer.setResponse(coyoteResponse);
-    }
-
-    /**
-     * @return the Coyote response.
-     */
-    public org.apache.coyote.Response getCoyoteResponse() {
-        return this.coyoteResponse;
-    }
-
-
-    /**
-     * @return the Context within which this Request is being processed.
-     */
-    public Context getContext() {
-        return request.getContext();
-    }
+    protected final org.apache.coyote.Response coyoteResponse;
 
 
     /**
@@ -187,7 +148,36 @@ public class Response implements HttpServletResponse {
     private HttpServletResponse applicationResponse = null;
 
 
+    public Response(org.apache.coyote.Response coyoteResponse) {
+        this(coyoteResponse, OutputBuffer.DEFAULT_BUFFER_SIZE);
+    }
+
+
+    public Response(org.apache.coyote.Response coyoteResponse, int outputBufferSize) {
+        this.coyoteResponse = coyoteResponse;
+        outputBuffer = new OutputBuffer(outputBufferSize);
+        outputBuffer.setResponse(coyoteResponse);
+    }
+
+
+
     // --------------------------------------------------------- Public Methods
+
+    /**
+     * @return the Coyote response.
+     */
+    public org.apache.coyote.Response getCoyoteResponse() {
+        return this.coyoteResponse;
+    }
+
+
+    /**
+     * @return the Context within which this Request is being processed.
+     */
+    public Context getContext() {
+        return request.getContext();
+    }
+
 
     /**
      * Release all object references, and initialize instance variables, in preparation for reuse of this object.

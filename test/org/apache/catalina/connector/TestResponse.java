@@ -163,7 +163,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062a() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("./bar.html");
@@ -176,7 +176,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062b() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute(".");
@@ -188,7 +188,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062c() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("..");
@@ -200,7 +200,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062d() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute(".././..");
@@ -212,7 +212,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test(expected=IllegalArgumentException.class)
     public void testBug53062e() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         resp.toAbsolute("../../..");
@@ -222,7 +222,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062f() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("bar.html");
@@ -235,7 +235,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062g() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("bar.html?x=/../");
@@ -248,7 +248,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062h() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("bar.html?x=/../../");
@@ -262,7 +262,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062i() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("./.?x=/../../");
@@ -275,7 +275,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062j() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("./..?x=/../../");
@@ -287,7 +287,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062k() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("./..?x=/../..");
@@ -301,7 +301,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062l() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("bar.html#/../");
@@ -314,7 +314,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062m() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("bar.html#/../../");
@@ -327,7 +327,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062n() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("./.#/../../");
@@ -340,7 +340,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062o() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("./..#/../../");
@@ -352,7 +352,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062p() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("./..#/../..");
@@ -365,7 +365,7 @@ public class TestResponse extends TomcatBaseTest {
         Request req = new TesterRequest(true);
         req.setRequestedSessionId("1234");
         req.setRequestedSessionURL(true);
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.encodeURL(location);
@@ -472,7 +472,7 @@ public class TestResponse extends TomcatBaseTest {
         Request req = new TesterRequest(true);
         req.setRequestedSessionId("1234");
         req.setRequestedSessionURL(true);
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.encodeRedirectURL(location);
@@ -599,8 +599,7 @@ public class TestResponse extends TomcatBaseTest {
         // Note: Not sufficient for testing relative -> absolute
         Connector connector = new Connector();
         org.apache.coyote.Response cResponse = new org.apache.coyote.Response();
-        Response response = new Response();
-        response.setCoyoteResponse(cResponse);
+        Response response = new Response(cResponse);
         Request request = new Request(connector);
         org.apache.coyote.Request cRequest = new org.apache.coyote.Request();
         request.setCoyoteRequest(cRequest);
@@ -617,7 +616,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53469a() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.encodeURL("../bar.html");
@@ -629,7 +628,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53469b() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.encodeURL("../../../../bar.html");
@@ -963,8 +962,7 @@ public class TestResponse extends TomcatBaseTest {
     private Response setupResponse() {
         Connector connector = new Connector();
         org.apache.coyote.Response cResponse = new org.apache.coyote.Response();
-        Response response = new Response();
-        response.setCoyoteResponse(cResponse);
+        Response response = new Response(cResponse);
         Request request = new Request(connector);
         org.apache.coyote.Request cRequest = new org.apache.coyote.Request();
         request.setCoyoteRequest(cRequest);

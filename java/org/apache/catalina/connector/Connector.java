@@ -902,17 +902,19 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * Create (or allocate) and return a Response object suitable for receiving the contents of a Response from the
-     * responsible Container.
+     * Create and return a Response object suitable for receiving the contents of a Response from the responsible
+     * Container.
+     *
+     * @param coyoteResponse The associated Coyote response.
      *
      * @return a new Servlet response object
      */
-    public Response createResponse() {
+    public Response createResponse(org.apache.coyote.Response coyoteResponse) {
         int size = protocolHandler.getDesiredBufferSize();
         if (size > 0) {
-            return new Response(size);
+            return new Response(coyoteResponse, size);
         } else {
-            return new Response();
+            return new Response(coyoteResponse);
         }
     }
 
