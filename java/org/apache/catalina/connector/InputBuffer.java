@@ -301,9 +301,6 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
         if (closed) {
             return -1;
         }
-        if (coyoteRequest == null) {
-            return -1;
-        }
 
         if (state == INITIAL_STATE) {
             state = BYTE_STATE;
@@ -531,10 +528,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
             return;
         }
 
-        Charset charset = null;
-        if (coyoteRequest != null) {
-            charset = coyoteRequest.getCharset();
-        }
+        Charset charset = coyoteRequest.getCharset();
 
         if (charset == null) {
             charset = org.apache.coyote.Constants.DEFAULT_BODY_CHARSET;
