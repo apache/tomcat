@@ -1332,7 +1332,8 @@ public final class Mapper {
     private static int compare(CharChunk name, int start, int end, String compareTo) {
         int result = 0;
         char[] c = name.getBuffer();
-        int len = compareTo.length();
+        int compareLen = compareTo.length();
+        int len = compareLen;
         if ((end - start) < len) {
             len = end - start;
         }
@@ -1346,9 +1347,9 @@ public final class Mapper {
             }
         }
         if (result == 0) {
-            if (len > (end - start)) {
+            if (compareLen > (end - start)) {
                 result = -1;
-            } else if (len < (end - start)) {
+            } else if (compareLen < (end - start)) {
                 result = 1;
             }
         }
@@ -1363,7 +1364,8 @@ public final class Mapper {
     private static int compareIgnoreCase(CharChunk name, int start, int end, String compareTo) {
         int result = 0;
         char[] c = name.getBuffer();
-        int len = compareTo.length();
+        int compareLen = compareTo.length();
+        int len = compareLen;
         if ((end - start) < len) {
             len = end - start;
         }
@@ -1377,9 +1379,9 @@ public final class Mapper {
             }
         }
         if (result == 0) {
-            if (len > (end - start)) {
+            if (compareLen > (end - start)) {
                 result = -1;
-            } else if (len < (end - start)) {
+            } else if (compareLen < (end - start)) {
                 result = 1;
             }
         }
