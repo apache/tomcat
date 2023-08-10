@@ -242,11 +242,13 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
 
     public ObjectName[] getConnectorNames() {
-        ObjectName results[] = new ObjectName[connectors.length];
-        for (int i = 0; i < results.length; i++) {
-            results[i] = connectors[i].getObjectName();
+        synchronized (connectorsLock) {
+            ObjectName results[] = new ObjectName[connectors.length];
+            for (int i = 0; i < results.length; i++) {
+                results[i] = connectors[i].getObjectName();
+            }
+            return results;
         }
-        return results;
     }
 
 
