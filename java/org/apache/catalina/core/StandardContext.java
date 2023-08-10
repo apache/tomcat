@@ -201,12 +201,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     /**
-     * The set of application listener class names configured for this application, in the order they were encountered
-     * in the resulting merged web.xml file.
+     * The list of unique application listener class names configured for this application, in the order they were
+     * encountered in the resulting merged web.xml file.
      */
-    private String applicationListeners[] = new String[0];
-
-    private final Object applicationListenersLock = new Object();
+    private CopyOnWriteArrayList<String> applicationListeners = new CopyOnWriteArrayList<>();
 
     /**
      * The set of application listeners that are required to have limited access to ServletContext methods. See Servlet
@@ -2722,21 +2720,11 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     @Override
     public void addApplicationListener(String listener) {
-
-        synchronized (applicationListenersLock) {
-            String results[] = new String[applicationListeners.length + 1];
-            for (int i = 0; i < applicationListeners.length; i++) {
-                if (listener.equals(applicationListeners[i])) {
-                    log.info(sm.getString("standardContext.duplicateListener", listener));
-                    return;
-                }
-                results[i] = applicationListeners[i];
-            }
-            results[applicationListeners.length] = listener;
-            applicationListeners = results;
+        if (applicationListeners.addIfAbsent(listener)) {
+            fireContainerEvent("addApplicationListener", listener);
+        } else {
+            log.info(sm.getString("standardContext.duplicateListener", listener));
         }
-        fireContainerEvent("addApplicationListener", listener);
-
     }
 
 
@@ -3225,7 +3213,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     @Override
     public String[] findApplicationListeners() {
-        return applicationListeners;
+        return applicationListeners.toArray(new String[0]);
     }
 
 
@@ -3576,36 +3564,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     @Override
     public void removeApplicationListener(String listener) {
-
-        synchronized (applicationListenersLock) {
-
-            // Make sure this listener is currently present
-            int n = -1;
-            for (int i = 0; i < applicationListeners.length; i++) {
-                if (applicationListeners[i].equals(listener)) {
-                    n = i;
-                    break;
-                }
-            }
-            if (n < 0) {
-                return;
-            }
-
-            // Remove the specified listener
-            int j = 0;
-            String results[] = new String[applicationListeners.length - 1];
-            for (int i = 0; i < applicationListeners.length; i++) {
-                if (i != n) {
-                    results[j++] = applicationListeners[i];
-                }
-            }
-            applicationListeners = results;
-
+        if (applicationListeners.remove(listener)) {
+            // Inform interested listeners if the specified listener was present and has been removed
+            fireContainerEvent("removeApplicationListener", listener);
         }
-
-        // Inform interested listeners
-        fireContainerEvent("removeApplicationListener", listener);
-
     }
 
 
@@ -5305,7 +5267,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         // Bugzilla 32867
         distributable = false;
 
-        applicationListeners = new String[0];
+        applicationListeners.clear();
         applicationEventListenersList.clear();
         applicationLifecycleListenersObjects = new Object[0];
         jspConfigDescriptor = null;
