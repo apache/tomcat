@@ -503,4 +503,47 @@ public class TestMapper extends LoggingBaseTest {
             Assert.assertEquals(context3, mappingData.context);
         }
     }
+
+
+    @Test
+    public void testCompareIgnoreCase() throws Exception {
+
+        Mapper mapper = new Mapper();
+
+        mapper.addHost("aaa", new String[0], createHost("a3"));
+        mapper.addHost("aaaa", new String[0], createHost("a4"));
+        mapper.addHost("aaaaa", new String[0], createHost("a5"));
+        mapper.addHost("aaaaaa", new String[0], createHost("a6"));
+        mapper.addHost("aaaaaaa", new String[0], createHost("a7"));
+
+        mapper.setDefaultHostName("aaa");
+
+        mapper.addContextVersion("aaa", createHost("a3"), "", "0", createContext("c3"), new String[0], null, null);
+        mapper.addContextVersion("aaaa", createHost("a4"), "", "0", createContext("c4"), new String[0], null, null);
+        mapper.addContextVersion("aaaaa", createHost("a5"), "", "0", createContext("c5"), new String[0], null, null);
+        mapper.addContextVersion("aaaaaa", createHost("a6"), "", "0", createContext("c6"), new String[0], null, null);
+        mapper.addContextVersion("aaaaaaa", createHost("a7"), "", "0", createContext("c7"), new String[0], null, null);
+
+        mapper.addWrappers("aaa", "", "0", Arrays.asList(new WrapperMappingInfo[] {
+                new WrapperMappingInfo("/", createWrapper("c3-default"), false, false) }));
+        mapper.addWrappers("aaaa", "", "0", Arrays.asList(new WrapperMappingInfo[] {
+                new WrapperMappingInfo("/", createWrapper("c4-default"), false, false) }));
+        mapper.addWrappers("aaaaa", "", "0", Arrays.asList(new WrapperMappingInfo[] {
+                new WrapperMappingInfo("/", createWrapper("c5-default"), false, false) }));
+        mapper.addWrappers("aaaaaa", "", "0", Arrays.asList(new WrapperMappingInfo[] {
+                new WrapperMappingInfo("/", createWrapper("c6-default"), false, false) }));
+        mapper.addWrappers("aaaaaaa", "", "0", Arrays.asList(new WrapperMappingInfo[] {
+                new WrapperMappingInfo("/", createWrapper("c7-default"), false, false) }));
+
+        MappingData mappingData = new MappingData();
+        MessageBytes hostMB = MessageBytes.newInstance();
+        hostMB.setString("aaaa");
+        MessageBytes uriMB = MessageBytes.newInstance();
+        char[] uri = "/index.html".toCharArray();
+        uriMB.setChars(uri, 0, uri.length);
+
+        mapper.map(hostMB, uriMB, null, mappingData);
+
+        Assert.assertEquals("a4", mappingData.host.getName());
+    }
 }
