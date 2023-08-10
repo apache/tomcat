@@ -266,7 +266,10 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     @Override
     public Connector[] findConnectors() {
-        return connectors;
+        synchronized (connectorsLock) {
+            // shallow copy
+            return connectors.clone();
+        }
     }
 
 
