@@ -3162,7 +3162,7 @@ public class Request implements HttpServletRequest {
                 parameters.setQueryStringCharset(charset);
             }
             // Note: If !useBodyEncodingForURI, the query string encoding is
-            // that set towards the start of CoyoyeAdapter.service()
+            // that set towards the start of CoyoteAdapter.service()
 
             parameters.handleQueryParameters();
 
