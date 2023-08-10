@@ -362,7 +362,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The set of filter configurations (and associated filter instances) we have initialized, keyed by filter name.
      */
-    private Map<String,ApplicationFilterConfig> filterConfigs = new HashMap<>();
+    private Map<String,ApplicationFilterConfig> filterConfigs = new HashMap<>(); // Guarded by filterDefs
 
 
     /**
@@ -4338,7 +4338,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
         // Instantiate and record a FilterConfig for each defined filter
         boolean ok = true;
-        synchronized (filterConfigs) {
+        synchronized (filterDefs) {
             filterConfigs.clear();
             for (Entry<String,FilterDef> entry : filterDefs.entrySet()) {
                 String name = entry.getKey();
@@ -4373,7 +4373,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         // Release all Filter and FilterConfig instances
-        synchronized (filterConfigs) {
+        synchronized (filterDefs) {
             for (Entry<String,ApplicationFilterConfig> entry : filterConfigs.entrySet()) {
                 if (getLogger().isDebugEnabled()) {
                     getLogger().debug(" Stopping filter '" + entry.getKey() + "'");
