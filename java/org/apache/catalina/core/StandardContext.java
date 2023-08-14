@@ -4290,7 +4290,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * @return the filter config object
      */
     public FilterConfig findFilterConfig(String name) {
-        return filterConfigs.get(name);
+        synchronized (filterDefs) {
+            return filterConfigs.get(name);
+        }
     }
 
 
