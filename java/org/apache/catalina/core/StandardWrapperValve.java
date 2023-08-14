@@ -19,6 +19,7 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
@@ -63,7 +64,7 @@ final class StandardWrapperValve extends ValveBase {
     // Some JMX statistics. This valve is associated with a StandardWrapper.
     // We expose the StandardWrapper as JMX ( j2eeType=Servlet ). The fields
     // are here for performance.
-    private final LongAdder processingTime = new LongAdder();
+    private final AtomicLong processingTime = new AtomicLong();
     private volatile long maxTime;
     private volatile long minTime = Long.MAX_VALUE;
     private final AtomicInteger requestCount = new AtomicInteger(0);
@@ -238,7 +239,7 @@ final class StandardWrapperValve extends ValveBase {
             long t2 = System.currentTimeMillis();
 
             long time = t2 - t1;
-            processingTime.add(time);
+            processingTime.getAndAdd(time);
             if (time > maxTime) {
                 maxTime = time;
             }
@@ -278,7 +279,7 @@ final class StandardWrapperValve extends ValveBase {
     }
 
     public long getProcessingTime() {
-        return processingTime.sum();
+        return processingTime.get();
     }
 
     public long getMaxTime() {
