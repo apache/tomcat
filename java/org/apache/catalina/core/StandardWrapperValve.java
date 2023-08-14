@@ -63,7 +63,7 @@ final class StandardWrapperValve extends ValveBase {
     // Some JMX statistics. This valve is associated with a StandardWrapper.
     // We expose the StandardWrapper as JMX ( j2eeType=Servlet ). The fields
     // are here for performance.
-    private volatile long processingTime;
+    private final LongAdder processingTime = new LongAdder();
     private volatile long maxTime;
     private volatile long minTime = Long.MAX_VALUE;
     private final AtomicInteger requestCount = new AtomicInteger(0);
@@ -238,7 +238,7 @@ final class StandardWrapperValve extends ValveBase {
             long t2 = System.currentTimeMillis();
 
             long time = t2 - t1;
-            processingTime += time;
+            processingTime.add(time);
             if (time > maxTime) {
                 maxTime = time;
             }
@@ -278,7 +278,7 @@ final class StandardWrapperValve extends ValveBase {
     }
 
     public long getProcessingTime() {
-        return processingTime;
+        return processingTime.sum();
     }
 
     public long getMaxTime() {
