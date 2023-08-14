@@ -19,6 +19,7 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
