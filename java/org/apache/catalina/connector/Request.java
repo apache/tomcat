@@ -2638,7 +2638,7 @@ public class Request implements HttpServletRequest {
     @Override
     public Collection<Part> getParts() throws IOException, IllegalStateException, ServletException {
 
-        parseParts(true);
+        parseParts();
 
         if (partsParseException != null) {
             if (partsParseException instanceof IOException) {
@@ -2653,7 +2653,7 @@ public class Request implements HttpServletRequest {
         return parts;
     }
 
-    private void parseParts(boolean explicit) {
+    private void parseParts() {
 
         // Return immediately if the parts have already been parsed
         if (parts != null || partsParseException != null) {
@@ -2668,13 +2668,8 @@ public class Request implements HttpServletRequest {
                 mce = new MultipartConfigElement(null, connector.getMaxPostSize(), connector.getMaxPostSize(),
                         connector.getMaxPostSize());
             } else {
-                if (explicit) {
-                    partsParseException = new IllegalStateException(sm.getString("coyoteRequest.noMultipartConfig"));
-                    return;
-                } else {
-                    parts = Collections.emptyList();
-                    return;
-                }
+                partsParseException = new IllegalStateException(sm.getString("coyoteRequest.noMultipartConfig"));
+                return;
             }
         }
 
@@ -3061,7 +3056,7 @@ public class Request implements HttpServletRequest {
             }
 
             if ("multipart/form-data".equals(contentType)) {
-                parseParts(false);
+                parseParts();
                 success = true;
                 return;
             }
