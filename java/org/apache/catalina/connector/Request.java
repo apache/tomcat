@@ -103,8 +103,8 @@ import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.CookieProcessor;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.InvalidParameterException;
 import org.apache.tomcat.util.http.Parameters;
-import org.apache.tomcat.util.http.Parameters.FailReason;
 import org.apache.tomcat.util.http.Rfc6265CookieProcessor;
 import org.apache.tomcat.util.http.ServerCookie;
 import org.apache.tomcat.util.http.ServerCookies;
@@ -304,6 +304,12 @@ public class Request implements HttpServletRequest {
 
 
     /**
+     * The exception thrown, if any when parsing the parameters including parts.
+     */
+    protected IllegalStateException parametersParseException = null;
+
+
+    /**
      * The parts, if any, uploaded with this request.
      */
     protected Collection<Part> parts = null;
@@ -445,6 +451,7 @@ public class Request implements HttpServletRequest {
             }
             parts = null;
         }
+        parametersParseException = null;
         partsParseException = null;
         locales.clear();
         localesParsed = false;
@@ -1061,30 +1068,13 @@ public class Request implements HttpServletRequest {
     }
 
 
-    /**
-     * @return the value of the specified request parameter, if any; otherwise, return <code>null</code>. If there is
-     *             more than one value defined, return only the first one.
-     *
-     * @param name Name of the desired request parameter
-     */
     @Override
     public String getParameter(String name) {
-
-        if (!parametersParsed) {
-            parseParameters();
-        }
-
+        parseParameters();
         return coyoteRequest.getParameters().getParameter(name);
-
     }
 
 
-    /**
-     * Returns a <code>Map</code> of the parameters of this request. Request parameters are extra information sent with
-     * the request. For HTTP servlets, parameters are contained in the query string or posted form data.
-     *
-     * @return A <code>Map</code> containing parameter names as keys and parameter values as map values.
-     */
     @Override
     public Map<String,String[]> getParameterMap() {
 
@@ -1102,39 +1092,20 @@ public class Request implements HttpServletRequest {
         parameterMap.setLocked(true);
 
         return parameterMap;
-
     }
 
 
-    /**
-     * @return the names of all defined request parameters for this request.
-     */
     @Override
     public Enumeration<String> getParameterNames() {
-
-        if (!parametersParsed) {
-            parseParameters();
-        }
-
+        parseParameters();
         return coyoteRequest.getParameters().getParameterNames();
-
     }
 
 
-    /**
-     * @return the defined values for the specified request parameter, if any; otherwise, return <code>null</code>.
-     *
-     * @param name Name of the desired request parameter
-     */
     @Override
     public String[] getParameterValues(String name) {
-
-        if (!parametersParsed) {
-            parseParameters();
-        }
-
+        parseParameters();
         return coyoteRequest.getParameters().getParameterValues(name);
-
     }
 
 
@@ -2635,6 +2606,7 @@ public class Request implements HttpServletRequest {
         getContext().getAuthenticator().logout(this);
     }
 
+
     @Override
     public Collection<Part> getParts() throws IOException, IllegalStateException, ServletException {
 
@@ -2652,6 +2624,7 @@ public class Request implements HttpServletRequest {
 
         return parts;
     }
+
 
     private void parseParts() {
 
@@ -2677,119 +2650,103 @@ public class Request implements HttpServletRequest {
         Parameters parameters = coyoteRequest.getParameters();
         parameters.setLimit(maxParameterCount);
 
-        boolean success = false;
+        File location;
+        String locationStr = mce.getLocation();
+        if (locationStr == null || locationStr.length() == 0) {
+            location = ((File) context.getServletContext().getAttribute(ServletContext.TEMPDIR));
+        } else {
+            // If relative, it is relative to TEMPDIR
+            location = new File(locationStr);
+            if (!location.isAbsolute()) {
+                location =
+                        new File((File) context.getServletContext().getAttribute(ServletContext.TEMPDIR), locationStr)
+                                .getAbsoluteFile();
+            }
+        }
+
+        if (!location.exists() && context.getCreateUploadTargets()) {
+            log.warn(sm.getString("coyoteRequest.uploadCreate", location.getAbsolutePath(),
+                    getMappingData().wrapper.getName()));
+            if (!location.mkdirs()) {
+                log.warn(sm.getString("coyoteRequest.uploadCreateFail", location.getAbsolutePath()));
+            }
+        }
+
+        if (!location.isDirectory()) {
+            partsParseException = new IOException(sm.getString("coyoteRequest.uploadLocationInvalid", location));
+            return;
+        }
+
+        // Create a new file upload handler
+        DiskFileItemFactory factory = new DiskFileItemFactory();
         try {
-            File location;
-            String locationStr = mce.getLocation();
-            if (locationStr == null || locationStr.length() == 0) {
-                location = ((File) context.getServletContext().getAttribute(ServletContext.TEMPDIR));
-            } else {
-                // If relative, it is relative to TEMPDIR
-                location = new File(locationStr);
-                if (!location.isAbsolute()) {
-                    location = new File((File) context.getServletContext().getAttribute(ServletContext.TEMPDIR),
-                            locationStr).getAbsoluteFile();
-                }
-            }
+            factory.setRepository(location.getCanonicalFile());
+        } catch (IOException ioe) {
+            partsParseException = ioe;
+            return;
+        }
+        factory.setSizeThreshold(mce.getFileSizeThreshold());
 
-            if (!location.exists() && context.getCreateUploadTargets()) {
-                log.warn(sm.getString("coyoteRequest.uploadCreate", location.getAbsolutePath(),
-                        getMappingData().wrapper.getName()));
-                if (!location.mkdirs()) {
-                    log.warn(sm.getString("coyoteRequest.uploadCreateFail", location.getAbsolutePath()));
-                }
-            }
+        FileUpload upload = new FileUpload();
+        upload.setFileItemFactory(factory);
+        upload.setFileSizeMax(mce.getMaxFileSize());
+        upload.setSizeMax(mce.getMaxRequestSize());
+        if (maxParameterCount > -1) {
+            // There is a limit. The limit for parts needs to be reduced by
+            // the number of parameters we have already parsed.
+            // Must be under the limit else parsing parameters would have
+            // triggered an exception.
+            upload.setFileCountMax(maxParameterCount - parameters.size());
+        }
 
-            if (!location.isDirectory()) {
-                parameters.setParseFailedReason(FailReason.MULTIPART_CONFIG_INVALID);
-                partsParseException = new IOException(sm.getString("coyoteRequest.uploadLocationInvalid", location));
-                return;
-            }
-
-
-            // Create a new file upload handler
-            DiskFileItemFactory factory = new DiskFileItemFactory();
-            try {
-                factory.setRepository(location.getCanonicalFile());
-            } catch (IOException ioe) {
-                parameters.setParseFailedReason(FailReason.IO_ERROR);
-                partsParseException = ioe;
-                return;
-            }
-            factory.setSizeThreshold(mce.getFileSizeThreshold());
-
-            FileUpload upload = new FileUpload();
-            upload.setFileItemFactory(factory);
-            upload.setFileSizeMax(mce.getMaxFileSize());
-            upload.setSizeMax(mce.getMaxRequestSize());
-            if (maxParameterCount > -1) {
-                // There is a limit. The limit for parts needs to be reduced by
-                // the number of parameters we have already parsed.
-                // Must be under the limit else parsing parameters would have
-                // triggered an exception.
-                upload.setFileCountMax(maxParameterCount - parameters.size());
-            }
-
-            parts = new ArrayList<>();
-            try {
-                List<FileItem> items = upload.parseRequest(new ServletRequestContext(this));
-                int maxPostSize = getConnector().getMaxPostSize();
-                int postSize = 0;
-                Charset charset = getCharset();
-                for (FileItem item : items) {
-                    ApplicationPart part = new ApplicationPart(item, location);
-                    parts.add(part);
-                    if (part.getSubmittedFileName() == null) {
-                        String name = part.getName();
-                        if (maxPostSize >= 0) {
-                            // Have to calculate equivalent size. Not completely
-                            // accurate but close enough.
-                            postSize += name.getBytes(charset).length;
-                            // Equals sign
-                            postSize++;
-                            // Value length
-                            postSize += part.getSize();
-                            // Value separator
-                            postSize++;
-                            if (postSize > maxPostSize) {
-                                parameters.setParseFailedReason(FailReason.POST_TOO_LARGE);
-                                throw new IllegalStateException(sm.getString("coyoteRequest.maxPostSizeExceeded"));
-                            }
+        parts = new ArrayList<>();
+        try {
+            List<FileItem> items = upload.parseRequest(new ServletRequestContext(this));
+            int maxPostSize = getConnector().getMaxPostSize();
+            int postSize = 0;
+            Charset charset = getCharset();
+            for (FileItem item : items) {
+                ApplicationPart part = new ApplicationPart(item, location);
+                parts.add(part);
+                if (part.getSubmittedFileName() == null) {
+                    String name = part.getName();
+                    if (maxPostSize >= 0) {
+                        // Have to calculate equivalent size. Not completely
+                        // accurate but close enough.
+                        postSize += name.getBytes(charset).length;
+                        // Equals sign
+                        postSize++;
+                        // Value length
+                        postSize += part.getSize();
+                        // Value separator
+                        postSize++;
+                        if (postSize > maxPostSize) {
+                            throw new IllegalStateException(sm.getString("coyoteRequest.maxPostSizeExceeded"));
                         }
-                        String value = null;
-                        try {
-                            value = part.getString(charset.name());
-                        } catch (UnsupportedEncodingException uee) {
-                            // Not possible
-                        }
-                        parameters.addParameter(name, value);
                     }
+                    String value = null;
+                    try {
+                        value = part.getString(charset.name());
+                    } catch (UnsupportedEncodingException uee) {
+                        // Not possible
+                    }
+                    parameters.addParameter(name, value);
                 }
-
-                success = true;
-            } catch (InvalidContentTypeException e) {
-                parameters.setParseFailedReason(FailReason.INVALID_CONTENT_TYPE);
-                partsParseException = new ServletException(e);
-            } catch (SizeException e) {
-                parameters.setParseFailedReason(FailReason.POST_TOO_LARGE);
-                checkSwallowInput();
-                partsParseException = new IllegalStateException(e);
-            } catch (IOException e) {
-                parameters.setParseFailedReason(FailReason.IO_ERROR);
-                partsParseException = e;
-            } catch (IllegalStateException e) {
-                // addParameters() will set parseFailedReason
-                checkSwallowInput();
-                partsParseException = e;
             }
-        } finally {
-            // This might look odd but is correct. setParseFailedReason() only
-            // sets the failure reason if none is currently set. This code could
-            // be more efficient but it is written this way to be robust with
-            // respect to changes in the remainder of the method.
-            if (partsParseException != null || !success) {
-                parameters.setParseFailedReason(FailReason.UNKNOWN);
-            }
+        } catch (InvalidContentTypeException e) {
+            partsParseException = new ServletException(e);
+            return;
+        } catch (SizeException e) {
+            checkSwallowInput();
+            partsParseException = new InvalidParameterException(e, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+            return;
+        } catch (IOException e) {
+            partsParseException = e;
+            return;
+        } catch (IllegalStateException e) {
+            checkSwallowInput();
+            partsParseException = e;
+            return;
         }
     }
 
@@ -3012,131 +2969,142 @@ public class Request implements HttpServletRequest {
      * Parse request parameters.
      */
     protected void parseParameters() {
+        doParseParameters();
 
+        if (parametersParseException != null) {
+            throw parametersParseException;
+        }
+    }
+
+
+    protected void doParseParameters() {
+        if (parametersParsed) {
+            return;
+        }
         parametersParsed = true;
 
         Parameters parameters = coyoteRequest.getParameters();
-        boolean success = false;
-        try {
-            // Set this every time in case limit has been changed via JMX
-            int maxParameterCount = getConnector().getMaxParameterCount();
-            if (parts != null && maxParameterCount > 0) {
-                maxParameterCount -= parts.size();
-            }
-            parameters.setLimit(maxParameterCount);
 
-            // getCharacterEncoding() may have been overridden to search for
-            // hidden form field containing request encoding
-            Charset charset = getCharset();
+        // Set this every time in case limit has been changed via JMX
+        int maxParameterCount = getConnector().getMaxParameterCount();
+        if (parts != null && maxParameterCount > 0) {
+            maxParameterCount -= parts.size();
+        }
+        parameters.setLimit(maxParameterCount);
 
-            boolean useBodyEncodingForURI = connector.getUseBodyEncodingForURI();
-            parameters.setCharset(charset);
-            if (useBodyEncodingForURI) {
-                parameters.setQueryStringCharset(charset);
-            }
-            // Note: If !useBodyEncodingForURI, the query string encoding is
-            // that set towards the start of CoyoteAdapter.service()
+        // getCharacterEncoding() may have been overridden to search for
+        // hidden form field containing request encoding
+        Charset charset = getCharset();
 
-            parameters.handleQueryParameters();
+        boolean useBodyEncodingForURI = connector.getUseBodyEncodingForURI();
+        parameters.setCharset(charset);
+        if (useBodyEncodingForURI) {
+            parameters.setQueryStringCharset(charset);
+        }
+        // Note: If !useBodyEncodingForURI, the query string encoding is
+        // that set towards the start of CoyoteAdapter.service()
 
-            if (usingInputStream || usingReader) {
-                success = true;
-                return;
-            }
+        parameters.handleQueryParameters();
 
-            String contentType = getContentType();
-            if (contentType == null) {
-                contentType = "";
-            }
-            int semicolon = contentType.indexOf(';');
-            if (semicolon >= 0) {
-                contentType = contentType.substring(0, semicolon).trim();
-            } else {
-                contentType = contentType.trim();
-            }
-
-            if ("multipart/form-data".equals(contentType)) {
-                parseParts();
-                success = true;
-                return;
-            }
-
-            if (!getConnector().isParseBodyMethod(getMethod())) {
-                success = true;
-                return;
-            }
-
-            if (!("application/x-www-form-urlencoded".equals(contentType))) {
-                success = true;
-                return;
-            }
-
-            int len = getContentLength();
-
-            if (len > 0) {
-                int maxPostSize = connector.getMaxPostSize();
-                if ((maxPostSize >= 0) && (len > maxPostSize)) {
-                    Context context = getContext();
-                    if (context != null && context.getLogger().isDebugEnabled()) {
-                        context.getLogger().debug(sm.getString("coyoteRequest.postTooLarge"));
-                    }
-                    checkSwallowInput();
-                    parameters.setParseFailedReason(FailReason.POST_TOO_LARGE);
-                    return;
-                }
-                byte[] formData = null;
-                if (len < CACHED_POST_LEN) {
-                    if (postData == null) {
-                        postData = new byte[CACHED_POST_LEN];
-                    }
-                    formData = postData;
-                } else {
-                    formData = new byte[len];
-                }
-                try {
-                    readPostBodyFully(formData, len);
-                } catch (IOException e) {
-                    // Client disconnect
-                    Context context = getContext();
-                    if (context != null && context.getLogger().isDebugEnabled()) {
-                        context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), e);
-                    }
-                    parameters.setParseFailedReason(FailReason.CLIENT_DISCONNECT);
-                    return;
-                }
-                parameters.processParameters(formData, 0, len);
-            } else if ("chunked".equalsIgnoreCase(coyoteRequest.getHeader("transfer-encoding"))) {
-                byte[] formData = null;
-                try {
-                    formData = readChunkedPostBody();
-                } catch (IllegalStateException ise) {
-                    // chunkedPostTooLarge error
-                    parameters.setParseFailedReason(FailReason.POST_TOO_LARGE);
-                    Context context = getContext();
-                    if (context != null && context.getLogger().isDebugEnabled()) {
-                        context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), ise);
-                    }
-                    return;
-                } catch (IOException e) {
-                    // Client disconnect
-                    parameters.setParseFailedReason(FailReason.CLIENT_DISCONNECT);
-                    Context context = getContext();
-                    if (context != null && context.getLogger().isDebugEnabled()) {
-                        context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), e);
-                    }
-                    return;
-                }
-                if (formData != null) {
-                    parameters.processParameters(formData, 0, formData.length);
-                }
-            }
-            success = true;
-        } finally {
-            if (!success) {
-                parameters.setParseFailedReason(FailReason.UNKNOWN);
-            }
+        if (usingInputStream || usingReader) {
+            return;
         }
 
+        String contentType = getContentType();
+        if (contentType == null) {
+            contentType = "";
+        }
+        int semicolon = contentType.indexOf(';');
+        if (semicolon >= 0) {
+            contentType = contentType.substring(0, semicolon).trim();
+        } else {
+            contentType = contentType.trim();
+        }
+
+        if ("multipart/form-data".equals(contentType)) {
+            parseParts();
+            if (partsParseException instanceof IllegalStateException) {
+                parametersParseException = (IllegalStateException) partsParseException;
+            } else if (partsParseException != null) {
+                parametersParseException = new InvalidParameterException(partsParseException);
+            }
+            return;
+        }
+
+        if (!getConnector().isParseBodyMethod(getMethod())) {
+            return;
+        }
+
+        if (!("application/x-www-form-urlencoded".equals(contentType))) {
+            return;
+        }
+
+        int len = getContentLength();
+
+        if (len > 0) {
+            int maxPostSize = connector.getMaxPostSize();
+            if ((maxPostSize >= 0) && (len > maxPostSize)) {
+                String message = sm.getString("coyoteRequest.postTooLarge");
+                Context context = getContext();
+                if (context != null && context.getLogger().isDebugEnabled()) {
+                    context.getLogger().debug(message);
+                }
+                checkSwallowInput();
+                parametersParseException =
+                        new InvalidParameterException(message, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+                return;
+            }
+            byte[] formData = null;
+            if (len < CACHED_POST_LEN) {
+                if (postData == null) {
+                    postData = new byte[CACHED_POST_LEN];
+                }
+                formData = postData;
+            } else {
+                formData = new byte[len];
+            }
+            try {
+                readPostBodyFully(formData, len);
+            } catch (IOException e) {
+                // Client disconnect
+                Context context = getContext();
+                if (context != null && context.getLogger().isDebugEnabled()) {
+                    context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), e);
+                }
+                response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
+                if (e instanceof ClientAbortException) {
+                    parametersParseException = new InvalidParameterException(e);
+                } else {
+                    parametersParseException = new InvalidParameterException(new ClientAbortException(e));
+                }
+                return;
+            }
+            parameters.processParameters(formData, 0, len);
+        } else if ("chunked".equalsIgnoreCase(coyoteRequest.getHeader("transfer-encoding"))) {
+            byte[] formData = null;
+            try {
+                formData = readChunkedPostBody();
+            } catch (IllegalStateException ise) {
+                parametersParseException = ise;
+                return;
+            } catch (IOException e) {
+                // Client disconnect
+                Context context = getContext();
+                if (context != null && context.getLogger().isDebugEnabled()) {
+                    context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), e);
+                }
+                response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
+                if (e instanceof ClientAbortException) {
+                    parametersParseException = new InvalidParameterException(e);
+                } else {
+                    parametersParseException = new InvalidParameterException(new ClientAbortException(e));
+                }
+                return;
+            }
+            if (formData != null) {
+                parameters.processParameters(formData, 0, formData.length);
+            }
+        }
     }
 
 
@@ -3178,7 +3146,8 @@ public class Request implements HttpServletRequest {
             if (connector.getMaxPostSize() >= 0 && (body.getLength() + len) > connector.getMaxPostSize()) {
                 // Too much data
                 checkSwallowInput();
-                throw new IllegalStateException(sm.getString("coyoteRequest.chunkedPostTooLarge"));
+                throw new InvalidParameterException(sm.getString("coyoteRequest.chunkedPostTooLarge"),
+                        HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
             }
             if (len > 0) {
                 body.append(buffer, 0, len);
