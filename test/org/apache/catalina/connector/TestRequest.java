@@ -86,8 +86,6 @@ public class TestRequest extends TomcatBaseTest {
         client.doRequest(1, false); // 1 byte - too small should fail
         Assert.assertTrue(client.isResponse413());
 
-        client.reset();
-
         // Edge cases around actual content length
         client.reset();
         client.doRequest(6, false); // Too small should fail
