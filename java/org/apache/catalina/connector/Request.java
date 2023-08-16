@@ -2612,9 +2612,6 @@ public class Request implements HttpServletRequest {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
         if (response.isCommitted()) {
@@ -2624,9 +2621,6 @@ public class Request implements HttpServletRequest {
         return getContext().getAuthenticator().authenticate(this, response);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void login(String username, String password) throws ServletException {
         if (getAuthType() != null || getRemoteUser() != null || getUserPrincipal() != null) {
@@ -2636,17 +2630,11 @@ public class Request implements HttpServletRequest {
         getContext().getAuthenticator().login(username, password, this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void logout() throws ServletException {
         getContext().getAuthenticator().logout(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<Part> getParts() throws IOException, IllegalStateException, ServletException {
 
@@ -2811,9 +2799,6 @@ public class Request implements HttpServletRequest {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Part getPart(String name) throws IOException, IllegalStateException, ServletException {
         for (Part part : getParts()) {

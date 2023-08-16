@@ -315,9 +315,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setId(String id, boolean notify) {
         super.setId(id, notify);

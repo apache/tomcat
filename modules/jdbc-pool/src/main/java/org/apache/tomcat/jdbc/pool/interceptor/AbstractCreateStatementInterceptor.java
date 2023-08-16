@@ -58,9 +58,6 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
         super();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (compare(CLOSE_VAL,method)) {

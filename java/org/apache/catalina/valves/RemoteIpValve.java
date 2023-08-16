@@ -581,9 +581,6 @@ public class RemoteIpValve extends ValveBase {
         return trustedProxies.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
         final String originalRemoteAddr = request.getRemoteAddr();

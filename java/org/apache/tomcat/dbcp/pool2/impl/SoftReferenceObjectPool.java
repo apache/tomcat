@@ -326,9 +326,6 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
         return idleReferences.size();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized void invalidateObject(final T obj) throws Exception {
         final PooledSoftReference<T> ref = findReference(obj);

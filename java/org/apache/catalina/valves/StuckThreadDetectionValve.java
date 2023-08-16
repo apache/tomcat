@@ -157,9 +157,6 @@ public class StuckThreadDetectionValve extends ValveBase {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
 
