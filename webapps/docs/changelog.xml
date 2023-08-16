@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.92 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        If an application or library sets both a non-500 error code and the
+        <code>jakarta.servlet.error.exception</code> request attribute, use the
+        provided error code during error page processing rather than assuming an
+        error code of 500. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.92 (markt)" rtext="2023-08-14">
   <subsection name="Catalina">
