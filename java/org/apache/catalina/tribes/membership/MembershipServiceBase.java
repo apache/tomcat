@@ -34,17 +34,11 @@ public abstract class MembershipServiceBase implements MembershipService, Member
     protected volatile MembershipListener listener;
     protected Channel channel;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setProperties(Properties properties) {
         this.properties = properties;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Properties getProperties() {
         return properties;

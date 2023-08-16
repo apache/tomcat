@@ -167,9 +167,6 @@ public class SlowQueryReport extends AbstractQueryReport  {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void poolStarted(ConnectionPool pool) {
         super.poolStarted(pool);
@@ -187,9 +184,6 @@ public class SlowQueryReport extends AbstractQueryReport  {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void poolClosed(ConnectionPool pool) {
         perPoolStats.remove(pool.getName());

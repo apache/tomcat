@@ -482,9 +482,6 @@ public class JspC extends Task implements Options {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isPoolingEnabled() {
         return poolingEnabled;
@@ -498,9 +495,6 @@ public class JspC extends Task implements Options {
         this.poolingEnabled = poolingEnabled;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isXpoweredBy() {
         return xpoweredBy;
@@ -533,9 +527,6 @@ public class JspC extends Task implements Options {
         return -1;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean getErrorOnUseBeanInvalidClassAttribute() {
         return errorOnUseBeanInvalidClassAttribute;
@@ -550,9 +541,6 @@ public class JspC extends Task implements Options {
         errorOnUseBeanInvalidClassAttribute = b;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean getMappedFile() {
         return mappedFile;
@@ -570,18 +558,12 @@ public class JspC extends Task implements Options {
         classDebugInfo=b;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean getClassDebugInfo() {
         // compile with debug info
         return classDebugInfo;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isCaching() {
         return caching;
@@ -597,9 +579,6 @@ public class JspC extends Task implements Options {
         this.caching = caching;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Map<String, TagLibraryInfo> getCache() {
         return cache;
@@ -643,9 +622,6 @@ public class JspC extends Task implements Options {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isSmapSuppressed() {
         return smapSuppressed;
@@ -659,9 +635,6 @@ public class JspC extends Task implements Options {
         this.smapSuppressed = smapSuppressed;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isSmapDumped() {
         return smapDumped;
@@ -689,9 +662,6 @@ public class JspC extends Task implements Options {
         this.genStringAsCharArray = genStringAsCharArray;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean genStringAsCharArray() {
         return genStringAsCharArray;
@@ -717,17 +687,11 @@ public class JspC extends Task implements Options {
         return ieClassId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public File getScratchDir() {
         return scratchDir;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getCompiler() {
         return compiler;
@@ -743,17 +707,11 @@ public class JspC extends Task implements Options {
         compiler=c;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getCompilerClassName() {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getCompilerTargetVM() {
         return compilerTargetVM;
@@ -769,9 +727,6 @@ public class JspC extends Task implements Options {
         compilerTargetVM = vm;
     }
 
-    /**
-     * {@inheritDoc}
-     */
      @Override
     public String getCompilerSourceVM() {
          return compilerSourceVM;
@@ -787,9 +742,6 @@ public class JspC extends Task implements Options {
         compilerSourceVM = vm;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public TldCache getTldCache() {
         return tldCache;
@@ -816,9 +768,6 @@ public class JspC extends Task implements Options {
         javaEncoding = encodingName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean getFork() {
         return fork;
@@ -828,9 +777,6 @@ public class JspC extends Task implements Options {
         this.fork = fork;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getClassPath() {
         if( classPath != null ) {
@@ -1118,17 +1064,11 @@ public class JspC extends Task implements Options {
         return failOnError;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JspConfig getJspConfig() {
         return jspConfig;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public TagPluginManager getTagPluginManager() {
         return tagPluginManager;

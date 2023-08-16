@@ -382,18 +382,12 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         notFull = lock.newCondition();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean add(final E e) {
         addLast(e);
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addFirst(final E e) {
         if (!offerFirst(e)) {
@@ -403,9 +397,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
 
     // BlockingDeque methods
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addLast(final E e) {
         if (!offerLast(e)) {
@@ -462,9 +453,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<E> descendingIterator() {
         return new DescendingItr();
@@ -538,9 +526,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         return getFirst();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public E getFirst() {
         final E x = peekFirst();
@@ -550,9 +535,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         return x;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public E getLast() {
         final E x = peekLast();
@@ -672,9 +654,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean offer(final E e) {
         return offerLast(e);
@@ -719,9 +698,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         return offerLast(e, timeout, unit);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean offerFirst(final E e) {
         Objects.requireNonNull(e, "e");
@@ -781,9 +757,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         return offerFirst(e, PoolImplUtils.toDuration(timeout, unit));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean offerLast(final E e) {
         Objects.requireNonNull(e, "e");
@@ -1008,17 +981,11 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         return pollLast(PoolImplUtils.toDuration(timeout, unit));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public E pop() {
         return removeFirst();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void push(final E e) {
         addFirst(e);
@@ -1175,9 +1142,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         return removeFirstOccurrence(o);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public E removeFirst() {
         final E x = pollFirst();
@@ -1247,9 +1211,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public E removeLast() {
         final E x = pollLast();
@@ -1379,9 +1340,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @SuppressWarnings("unchecked")
     @Override
     public <T> T[] toArray(T[] a) {

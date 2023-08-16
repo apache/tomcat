@@ -119,9 +119,6 @@ public class McastService
         return localMember.toString() ;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Member getLocalMember(boolean alive) {
         if ( alive && localMember != null && impl != null) {
@@ -130,9 +127,6 @@ public class McastService
         return localMember;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setLocalMemberProperties(String listenHost, int listenPort, int securePort, int udpPort) {
         properties.setProperty("tcpListenHost",listenHost);

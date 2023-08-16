@@ -45,9 +45,6 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
      */
     private final Map<String, List<String>> headerNameToValueListMap = new LinkedHashMap<>();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getHeader(final String name) {
         final String nameLower = name.toLowerCase(Locale.ENGLISH);
@@ -58,17 +55,11 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
         return headerValueList.get(0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<String> getHeaderNames() {
         return headerNameToValueListMap.keySet().iterator();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<String> getHeaders(final String name) {
         final String nameLower = name.toLowerCase(Locale.ENGLISH);
