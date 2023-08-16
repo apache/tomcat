@@ -84,27 +84,18 @@ public abstract class LifecycleBase implements Lifecycle {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addLifecycleListener(LifecycleListener listener) {
         lifecycleListeners.add(listener);
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public LifecycleListener[] findLifecycleListeners() {
         return lifecycleListeners.toArray(new LifecycleListener[0]);
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void removeLifecycleListener(LifecycleListener listener) {
         lifecycleListeners.remove(listener);
@@ -150,9 +141,6 @@ public abstract class LifecycleBase implements Lifecycle {
     protected abstract void initInternal() throws LifecycleException;
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final synchronized void start() throws LifecycleException {
 
@@ -216,9 +204,6 @@ public abstract class LifecycleBase implements Lifecycle {
     protected abstract void startInternal() throws LifecycleException;
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final synchronized void stop() throws LifecycleException {
 
@@ -335,18 +320,12 @@ public abstract class LifecycleBase implements Lifecycle {
     protected abstract void destroyInternal() throws LifecycleException;
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public LifecycleState getState() {
         return state;
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getStateName() {
         return getState().toString();

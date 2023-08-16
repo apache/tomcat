@@ -514,9 +514,6 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean getRequestAttributesEnabled() {
         return requestAttributesEnabled;

@@ -118,9 +118,6 @@ final class PooledConnectionImpl
         pooledObject.getObject().activate();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addConnectionEventListener(final ConnectionEventListener listener) {
         if (!eventListeners.contains(listener)) {
@@ -666,9 +663,6 @@ final class PooledConnectionImpl
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void removeConnectionEventListener(final ConnectionEventListener listener) {
         eventListeners.remove(listener);

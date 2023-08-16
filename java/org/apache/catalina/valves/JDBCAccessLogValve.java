@@ -221,9 +221,6 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
         this.requestAttributesEnabled = requestAttributesEnabled;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean getRequestAttributesEnabled() {
         return requestAttributesEnabled;
