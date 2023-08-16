@@ -148,20 +148,17 @@
       files) obtained from the query string and, for POST requests, the request
       body if the content type is
       <code>application/x-www-form-urlencoded</code> or
-      <code>multipart/form-data</code>. Request parameters beyond this limit
-      will be ignored. A value of less than 0 means no limit. If not specified,
-      a default of 1000 is used. Note that <code>FailedRequestFilter</code>
-      <a href="filter.html">filter</a> can be used to reject requests that
-      exceed the limit.</p>
+      <code>multipart/form-data</code>. Requests that exceed this limit will be
+      rejected. A value of less than 0 means no limit. If not specified, a
+      default of 1000 is used.</p>
     </attribute>
 
     <attribute name="maxPostSize" required="false">
       <p>The maximum size in bytes of the POST which will be handled by
       the container FORM URL parameter parsing. The limit can be disabled by
-      setting this attribute to a value less than zero. If not specified, this
-      attribute is set to 2097152 (2 MiB). Note that the
-      <a href="filter.html#Failed_Request_Filter"><code>FailedRequestFilter</code></a>
-      can be used to reject requests that exceed this limit.</p>
+      setting this attribute to a value less than zero. Requests that exceed
+      this limit will be rejected. If not specified, this attribute is set to
+      2097152 (2 MiB).</p>
     </attribute>
 
     <attribute name="maxSavePostSize" required="false">

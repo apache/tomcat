@@ -54,12 +54,6 @@ public final class Parameters {
     private int limit = -1;
     private int parameterCount = 0;
 
-    /**
-     * Set to the reason for the failure (the first failure if there is more than one) if there were failures during
-     * parameter parsing.
-     */
-    private FailReason parseFailedReason = null;
-
     public Parameters() {
         // NO-OP
     }
@@ -98,23 +92,6 @@ public final class Parameters {
     }
 
 
-    public boolean isParseFailed() {
-        return parseFailedReason != null;
-    }
-
-
-    public FailReason getParseFailedReason() {
-        return parseFailedReason;
-    }
-
-
-    public void setParseFailedReason(FailReason failReason) {
-        if (this.parseFailedReason == null) {
-            this.parseFailedReason = failReason;
-        }
-    }
-
-
     public int size() {
         return parameterCount;
     }
@@ -126,7 +103,6 @@ public final class Parameters {
         didQueryParameters = false;
         charset = DEFAULT_BODY_CHARSET;
         decodedQuery.recycle();
-        parseFailedReason = null;
     }
 
 
@@ -415,18 +391,5 @@ public final class Parameters {
             sb.append('\n');
         }
         return sb.toString();
-    }
-
-
-    public enum FailReason {
-        CLIENT_DISCONNECT,
-        MULTIPART_CONFIG_INVALID,
-        INVALID_CONTENT_TYPE,
-        IO_ERROR,
-        NO_NAME,
-        POST_TOO_LARGE,
-        TOO_MANY_PARAMETERS,
-        UNKNOWN,
-        URL_DECODING
     }
 }

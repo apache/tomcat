@@ -48,7 +48,6 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.BasicAuthenticator;
-import org.apache.catalina.filters.FailedRequestFilter;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
@@ -56,8 +55,6 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.EncodedSolidusHandling;
-import org.apache.tomcat.util.descriptor.web.FilterDef;
-import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 
 /**
@@ -73,7 +70,7 @@ public class TestRequest extends TomcatBaseTest {
      */
     @Test
     public void testBug37794() {
-        Bug37794Client client = new Bug37794Client(true);
+        Bug37794Client client = new Bug37794Client();
 
         // Edge cases around zero
         client.doRequest(-1, false); // Unlimited
@@ -112,22 +109,6 @@ public class TestRequest extends TomcatBaseTest {
         Assert.assertTrue(client.isResponseBodyOK());
     }
 
-    /**
-     * Additional test for failed requests handling when no FailedRequestFilter
-     * is defined.
-     */
-    @Test
-    public void testBug37794withoutFilter() {
-        Bug37794Client client = new Bug37794Client(false);
-
-        // Edge cases around actual content length
-        client.reset();
-        client.doRequest(6, false); // Too small should fail
-        // Response code will be OK, but parameters list will be empty
-        Assert.assertTrue(client.isResponse200());
-        Assert.assertEquals("", client.getResponseBody());
-    }
-
     private static class Bug37794Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -157,13 +138,7 @@ public class TestRequest extends TomcatBaseTest {
      */
     private class Bug37794Client extends SimpleHttpClient {
 
-        private final boolean createFilter;
-
         private boolean init;
-
-        Bug37794Client(boolean createFilter) {
-            this.createFilter = createFilter;
-        }
 
         private synchronized void init() throws Exception {
             if (init) {
@@ -174,18 +149,6 @@ public class TestRequest extends TomcatBaseTest {
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
             root.addServletMappingDecoded("/test", "Bug37794");
-
-            if (createFilter) {
-                FilterDef failedRequestFilter = new FilterDef();
-                failedRequestFilter.setFilterName("failedRequestFilter");
-                failedRequestFilter.setFilterClass(
-                        FailedRequestFilter.class.getName());
-                FilterMap failedRequestFilterMap = new FilterMap();
-                failedRequestFilterMap.setFilterName("failedRequestFilter");
-                failedRequestFilterMap.addURLPatternDecoded("/*");
-                root.addFilterDef(failedRequestFilter);
-                root.addFilterMap(failedRequestFilterMap);
-            }
 
             tomcat.start();
 
