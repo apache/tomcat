@@ -1551,9 +1551,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getStateName() {
         return getState().toString();

@@ -56,9 +56,6 @@ public class PooledSoftReference<T> extends DefaultPooledObject<T> {
         return reference.get();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         final StringBuilder result = new StringBuilder();

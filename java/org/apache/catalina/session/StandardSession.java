@@ -329,9 +329,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setId(String id, boolean notify) {
 

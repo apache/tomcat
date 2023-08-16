@@ -587,9 +587,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setServletSecurityAnnotationScanRequired(boolean b) {
         // NO-OP
@@ -1082,9 +1079,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void servletSecurityAnnotationScan() throws ServletException {
         // NO-OP
