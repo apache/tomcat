@@ -40,7 +40,20 @@ import org.apache.tomcat.util.descriptor.web.ErrorPage;
 public class TestStandardHostValve extends TomcatBaseTest {
 
     @Test
-    public void testErrorPageHandling() throws Exception {
+    public void testErrorPageHandling500() throws Exception {
+        doTestErrorPageHandling(500, "/500");
+    }
+
+
+    @Test
+    public void testErrorPageHandlingDefault() throws Exception {
+        doTestErrorPageHandling(501, "/default");
+    }
+
+
+    private void doTestErrorPageHandling(int error, String report)
+            throws Exception {
+
         // Set up a container
         Tomcat tomcat = getTomcatInstance();
 
@@ -68,8 +81,13 @@ public class TestStandardHostValve extends TomcatBaseTest {
 
         tomcat.start();
 
-        doTestErrorPageHandling(500, "/500");
-        doTestErrorPageHandling(501, "/default");
+        // Request a page that triggers an error
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/error?errorCode=" + error, bc, null);
+
+        Assert.assertEquals(error, rc);
+        Assert.assertEquals(report, bc.toString());
     }
 
 
@@ -131,19 +149,6 @@ public class TestStandardHostValve extends TomcatBaseTest {
     }
 
 
-    private void doTestErrorPageHandling(int error, String report)
-            throws Exception {
-
-        // Request a page that triggers an error
-        ByteChunk bc = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/error?errorCode=" + error, bc, null);
-
-        Assert.assertEquals(error, rc);
-        Assert.assertEquals(report, bc.toString());
-    }
-
-
     @Test
     public void testIncompleteResponse() throws Exception {
         // Set up a container
@@ -160,13 +165,13 @@ public class TestStandardHostValve extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "report", new ReportServlet());
         ctx.addServletMappingDecoded("/report/*", "report");
 
-        // And the handling for 500 responses
+        // Add the handling for 500 responses
         ErrorPage errorPage500 = new ErrorPage();
         errorPage500.setErrorCode(Response.SC_INTERNAL_SERVER_ERROR);
         errorPage500.setLocation("/report/500");
         ctx.addErrorPage(errorPage500);
 
-        // And the default error handling
+        // Add the default error handling
         ErrorPage errorPageDefault = new ErrorPage();
         errorPageDefault.setLocation("/report/default");
         ctx.addErrorPage(errorPageDefault);
