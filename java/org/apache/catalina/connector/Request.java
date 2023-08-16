@@ -915,7 +915,6 @@ public class Request implements HttpServletRequest {
      * <li>{@link Globals#KEY_SIZE_ATTR} (SSL connections only)</li>
      * <li>{@link Globals#SSL_SESSION_ID_ATTR} (SSL connections only)</li>
      * <li>{@link Globals#SSL_SESSION_MGR_ATTR} (SSL connections only)</li>
-     * <li>{@link Globals#PARAMETER_PARSE_FAILED_ATTR}</li>
      * </ul>
      * The underlying connector may also expose request attributes. These all have names starting with
      * "org.apache.tomcat" and include:
@@ -3280,31 +3279,6 @@ public class Request implements HttpServletRequest {
                     return ((TomcatPrincipal) request.userPrincipal).getGssCredential();
                 }
                 return null;
-            }
-
-            @Override
-            public void set(Request request, String name, Object value) {
-                // NO-OP
-            }
-        });
-        specialAttributes.put(Globals.PARAMETER_PARSE_FAILED_ATTR, new SpecialAttributeAdapter() {
-            @Override
-            public Object get(Request request, String name) {
-                if (request.getCoyoteRequest().getParameters().isParseFailed()) {
-                    return Boolean.TRUE;
-                }
-                return null;
-            }
-
-            @Override
-            public void set(Request request, String name, Object value) {
-                // NO-OP
-            }
-        });
-        specialAttributes.put(Globals.PARAMETER_PARSE_FAILED_REASON_ATTR, new SpecialAttributeAdapter() {
-            @Override
-            public Object get(Request request, String name) {
-                return request.getCoyoteRequest().getParameters().getParseFailedReason();
             }
 
             @Override

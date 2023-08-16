@@ -276,9 +276,8 @@
       total number of request parameters (including uploaded files) obtained
       from the query string and, for POST requests, the request body if the
       content type is <code>application/x-www-form-urlencoded</code> or
-      <code>multipart/form-data</code>. Excessive parameters are ignored. If you
-      want to reject such requests, configure a
-      <a href="config/filter.html">FailedRequestFilter</a>.</p>
+      <code>multipart/form-data</code>. Requests with excessive parameters are
+      rejected.</p>
 
       <p>The <strong>xpoweredBy</strong> attribute controls whether or not the
       X-Powered-By HTTP header is sent with each request. If sent, the value of
@@ -525,11 +524,6 @@
     configurations may expose the server to remote code execution. Further
     information on the potential risks and mitigations may be found by
     following the links in the <a href="cgi-howto.html">CGI How To</a>.</p>
-
-    <p><a href="config/filter.html">FailedRequestFilter</a>
-    can be configured and used to reject requests that had errors during
-    request parameter parsing. Without the filter the default behaviour is
-    to ignore invalid or excessive parameters.</p>
 
     <p><a href="config/filter.html">HttpHeaderSecurityFilter</a> can be
     used to add headers to responses to improve security. If clients access

@@ -51,22 +51,6 @@ public final class Globals {
 
 
     /**
-     * The request attribute that is set to {@code Boolean.TRUE} if some request
-     * parameters have been ignored during request parameters parsing. It can
-     * happen, for example, if there is a limit on the total count of parseable
-     * parameters, or if parameter cannot be decoded, or any other error
-     * happened during parameter parsing.
-     */
-    public static final String PARAMETER_PARSE_FAILED_ATTR = "org.apache.catalina.parameter_parse_failed";
-
-
-    /**
-     * The reason that the parameter parsing failed.
-     */
-    public static final String PARAMETER_PARSE_FAILED_REASON_ATTR = "org.apache.catalina.parameter_parse_failed_reason";
-
-
-    /**
      * The request attribute set by the RemoteIpFilter, RemoteIpValve (and may
      * be set by other similar components) that identifies for the connector the
      * remote IP address claimed to be associated with this request when a
