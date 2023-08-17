@@ -109,7 +109,7 @@
     <changelog>
       <fix>
         If an application or library sets both a non-500 error code and the
-        <code>jakarta.servlet.error.exception</code> request attribute, use the
+        <code>javax.servlet.error.exception</code> request attribute, use the
         provided error code during error page processing rather than assuming an
         error code of 500. (markt)
       </fix>
