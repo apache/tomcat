@@ -117,6 +117,14 @@
         Update code comments and Tomcat output to use MiB for 1024 * 1024 bytes
         and KiB for 1024 bytes rather than MB and kB. (martk)
       </fix>
+      <add>
+        Update the HTTP parameter handling to align with the changes in the
+        Jakarta Servlet 6.1 API Javadoc for the <code>ServletRequest</code>
+        methods used to obtain request parameters. Invalid parameters and/or
+        exceeding parameter size and/or quantity limits now trigger
+        exceptions. As a consequence, the <code>FailedRequestFilter</code> has
+        been removed. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
