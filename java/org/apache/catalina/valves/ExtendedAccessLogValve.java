@@ -361,7 +361,13 @@ public class ExtendedAccessLogValve extends AccessLogValve {
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
-            buf.append(wrap(urlEncode(request.getParameter(parameter))));
+            String parameterValue;
+            try {
+                parameterValue = request.getParameter(parameter);
+            } catch (IllegalStateException ise) {
+                parameterValue = null;
+            }
+            buf.append(wrap(urlEncode(parameterValue)));
         }
     }
 
