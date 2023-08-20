@@ -470,12 +470,17 @@ public final class CGIServlet extends HttpServlet {
             Locale locale = locales.nextElement();
             log.trace("Locale: [" +locale + "]");
         }
-        Enumeration<String> params = req.getParameterNames();
-        while (params.hasMoreElements()) {
-            String param = params.nextElement();
-            for (String value : req.getParameterValues(param)) {
-                log.trace("Request Parameter: " + param + ":  [" + value + "]");
+        Enumeration<String> params;
+        try {
+            params = req.getParameterNames();
+            while (params.hasMoreElements()) {
+                String param = params.nextElement();
+                for (String value : req.getParameterValues(param)) {
+                    log.trace("Request Parameter: " + param + ":  [" + value + "]");
+                }
             }
+        } catch (IllegalStateException ise) {
+            log.trace("Request Parameters: [Invalid]");
         }
         log.trace("Protocol: [" + req.getProtocol() + "]");
         log.trace("Remote Address: [" + req.getRemoteAddr() + "]");
