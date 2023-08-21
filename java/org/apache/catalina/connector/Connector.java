@@ -208,13 +208,13 @@ public class Connector extends LifecycleMBeanBase {
     protected int maxParameterCount = 1000;
 
     /**
-     * Maximum size of a POST which will be automatically parsed by the container. 2MiB by default.
+     * Maximum size of a POST which will be automatically parsed by the container. 2 MiB by default.
      */
     protected int maxPostSize = 2 * 1024 * 1024;
 
 
     /**
-     * Maximum size of a POST which will be saved by the container during authentication. 4KiB by default
+     * Maximum size of a POST which will be saved by the container during authentication. 4 KiB by default
      */
     protected int maxSavePostSize = 4 * 1024;
 
