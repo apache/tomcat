@@ -34,7 +34,7 @@ import org.apache.tomcat.util.http.fileupload.FileItemFactory;
  * <p>If not otherwise configured, the default configuration values are as
  * follows:</p>
  * <ul>
- *   <li>Size threshold is 10KiB.</li>
+ *   <li>Size threshold is 10 KiB.</li>
  *   <li>Repository is the system default temp directory, as returned by
  *       {@code System.getProperty("java.io.tmpdir")}.</li>
  * </ul>
