@@ -46,7 +46,7 @@ public class FileMessageFactory {
     /**
      * The number of bytes that we read from file
      */
-    public static final int READ_SIZE = 1024 * 10; // 10kb
+    public static final int READ_SIZE = 1024 * 10; // 10KiB
 
     /**
      * The file that we are reading/writing

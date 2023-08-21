@@ -164,7 +164,7 @@
       <p>The maximum size in bytes of the POST which will be handled by
       the container FORM URL parameter parsing. The limit can be disabled by
       setting this attribute to a value less than zero. If not specified, this
-      attribute is set to 2097152 (2 megabytes). Note that the
+      attribute is set to 2097152 (2 MiB). Note that the
       <a href="filter.html#Failed_Request_Filter"><code>FailedRequestFilter</code></a>
       can be used to reject requests that exceed this limit.</p>
     </attribute>
@@ -181,7 +181,7 @@
       authentication request expires. The limit can be disabled by setting this
       attribute to -1. Setting the attribute to zero will disable the saving of
       POST data during authentication. If not specified, this attribute is set
-      to 4096 (4 kilobytes).</p>
+      to 4096 (4 KiB).</p>
     </attribute>
 
     <attribute name="parseBodyMethods" required="false">
@@ -718,7 +718,7 @@
         application write buffer size + network read buffer size +
         network write buffer size</code><br/>
         The value is in bytes, the default value is <code>1024*1024*100</code>
-        (100MB).</p>
+        (100MiB).</p>
       </attribute>
 
       <attribute name="socket.processorCache" required="false">
