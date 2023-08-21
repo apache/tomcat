@@ -97,7 +97,7 @@ public class SocketTribesReceive {
         long time = System.currentTimeMillis();
         double seconds = ((double)(time-start))/1000;
         System.out.println("Throughput " + df.format(mb/seconds) +
-                " MiBseconds messages " + count + ", total " + mb +
+                " MiB/s messages " + count + ", total " + mb +
                 " MiB total " + total + " bytes.");
     }
 }
