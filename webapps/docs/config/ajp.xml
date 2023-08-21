@@ -718,7 +718,7 @@
         application write buffer size + network read buffer size +
         network write buffer size</code><br/>
         The value is in bytes, the default value is <code>1024*1024*100</code>
-        (100MiB).</p>
+        (100 MiB).</p>
       </attribute>
 
       <attribute name="socket.processorCache" required="false">

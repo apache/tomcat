@@ -123,7 +123,7 @@ public class TestSsl extends TomcatBaseTest {
     private static final int POST_DATA_SIZE = 16 * 1024 * 1024;
     private static final byte[] POST_DATA;
     static {
-        POST_DATA = new byte[POST_DATA_SIZE]; // 16MiB
+        POST_DATA = new byte[POST_DATA_SIZE]; // 16 MiB
         Arrays.fill(POST_DATA, (byte) 1);
 
     }
@@ -166,7 +166,7 @@ public class TestSsl extends TomcatBaseTest {
                         os.write("POST /post HTTP/1.1\r\n".getBytes());
                         os.write("Host: localhost\r\n".getBytes());
                         os.write(("Content-Length: " + Integer.valueOf(POST_DATA.length) + "\r\n\r\n").getBytes());
-                        // Write in 128KiB blocks
+                        // Write in 128 KiB blocks
                         for (int i = 0; i < POST_DATA.length / (128 * 1024); i++) {
                             os.write(POST_DATA, 0, 1024 * 128);
                             Thread.sleep(10);
