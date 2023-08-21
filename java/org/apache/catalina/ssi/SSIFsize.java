@@ -32,8 +32,8 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class SSIFsize implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIFsize.class);
-    static final int ONE_KILOBYTE = 1024;
-    static final int ONE_MEGABYTE = 1024 * 1024;
+    static final int ONE_KIBIBYTE = 1024;
+    static final int ONE_MEBIBYTE = 1024 * 1024;
 
 
     /**
@@ -94,8 +94,9 @@ public final class SSIFsize implements SSICommand {
     }
 
 
-    //We try to mimic Apache here, as we do everywhere
-    //All the 'magic' numbers are from the util_script.c Apache source file.
+    // We try to mimic httpd here, as we do everywhere.
+    // All the 'magic' numbers are from the util_script.c httpd source file.
+    // Should use KiB and MiB in output but use k and M for consistency with httpd.
     protected String formatSize(long size, String format) {
         String retString = "";
         if (format.equalsIgnoreCase("bytes")) {
@@ -106,17 +107,17 @@ public final class SSIFsize implements SSICommand {
                 retString = "-";
             } else if (size == 0) {
                 retString = "0k";
-            } else if (size < ONE_KILOBYTE) {
+            } else if (size < ONE_KIBIBYTE) {
                 retString = "1k";
-            } else if (size < ONE_MEGABYTE) {
-                retString = Long.toString((size + 512) / ONE_KILOBYTE);
+            } else if (size < ONE_MEBIBYTE) {
+                retString = Long.toString((size + 512) / ONE_KIBIBYTE);
                 retString += "k";
-            } else if (size < 99 * ONE_MEGABYTE) {
+            } else if (size < 99 * ONE_MEBIBYTE) {
                 DecimalFormat decimalFormat = new DecimalFormat("0.0M");
-                retString = decimalFormat.format(size / (double)ONE_MEGABYTE);
+                retString = decimalFormat.format(size / (double)ONE_MEBIBYTE);
             } else {
-                retString = Long.toString((size + (529 * ONE_KILOBYTE))
-                        / ONE_MEGABYTE);
+                retString = Long.toString((size + (529 * ONE_KIBIBYTE))
+                        / ONE_MEBIBYTE);
                 retString += "M";
             }
             retString = padLeft(retString, 5);

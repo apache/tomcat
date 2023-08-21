@@ -916,10 +916,10 @@ public class StatusTransformer {
 
 
     /**
-     * Display the given size in bytes, either as KB or MB.
+     * Display the given size in bytes, either as KiB or MiB.
      *
      * @param obj The object to format
-     * @param mb true to display megabytes, false for kilobytes
+     * @param mb true to display MiB, false for KiB
      * @return formatted size
      */
     public static String formatSize(Object obj, boolean mb) {
@@ -945,10 +945,10 @@ public class StatusTransformer {
             if (rest < 10) {
                 buff.append('0');
             }
-            buff.append(rest).append(" MB");
+            buff.append(rest).append(" MiB");
             return buff.toString();
         } else {
-            return ((bytes / 1024) + " KB");
+            return ((bytes / 1024) + " KiB");
         }
 
     }

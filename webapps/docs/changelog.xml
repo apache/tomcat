@@ -113,6 +113,18 @@
         provided error code during error page processing rather than assuming an
         error code of 500. (markt)
       </fix>
+      <fix>
+        Update code comments and Tomcat output to use MiB for 1024 * 1024 bytes
+        and KiB for 1024 bytes rather than MB and kB. (martk)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Documentation. Update documentation to use MiB for 1024 * 1024 bytes and
+        KiB for 1024 bytes rather than MB and kB. (martk)
+      </fix>
     </changelog>
   </subsection>
 </section>

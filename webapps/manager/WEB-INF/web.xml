@@ -53,7 +53,7 @@
     </init-param>
     -->
     <multipart-config>
-      <!-- 50MB max -->
+      <!-- 50MiB max -->
       <max-file-size>52428800</max-file-size>
       <max-request-size>52428800</max-request-size>
       <file-size-threshold>0</file-size-threshold>

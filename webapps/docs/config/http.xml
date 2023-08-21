@@ -149,7 +149,7 @@
       <p>The maximum size in bytes of the POST which will be handled by
       the container FORM URL parameter parsing. The limit can be disabled by
       setting this attribute to a value less than zero. If not specified, this
-      attribute is set to 2097152 (2 megabytes). Note that the
+      attribute is set to 2097152 (2 MiB). Note that the
       <a href="filter.html#Failed_Request_Filter"><code>FailedRequestFilter</code></a>
       can be used to reject requests that exceed this limit.</p>
     </attribute>
@@ -401,7 +401,7 @@
       your bandwidth) and using the sendfile feature (saving your CPU cycles).
       If the connector supports the sendfile feature, e.g. the NIO connector,
       using sendfile will take precedence over compression. The symptoms will
-      be that static files greater that 48 Kb will be sent uncompressed.
+      be that static files greater that 48 KiB will be sent uncompressed.
       You can turn off sendfile by setting <code>useSendfile</code> attribute
       of the connector, as documented below, or change the sendfile usage
       threshold in the configuration of the
@@ -528,7 +528,7 @@
       <p>Provides the default value for
       <strong>maxHttpRequestHeaderSize</strong> and
       <strong>maxHttpResponseHeaderSize</strong>. If not specified, this
-      attribute is set to 8192 (8 KB).</p>
+      attribute is set to 8192 (8 KiB).</p>
     </attribute>
 
     <attribute name="maxHttpRequestHeaderSize" required="false">
@@ -569,7 +569,7 @@
       aborted upload is when Tomcat knows that the request body is going to be
       ignored but the client still sends it. If Tomcat does not swallow the body
       the client is unlikely to see the response. If not specified the default
-      of 2097152 (2 megabytes) will be used. A value of less than zero indicates
+      of 2097152 (2 MiB) will be used. A value of less than zero indicates
       that no limit should be enforced.</p>
     </attribute>
 
