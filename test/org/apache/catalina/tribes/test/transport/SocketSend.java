@@ -62,8 +62,8 @@ public class SocketSend {
                     long time = System.currentTimeMillis();
                     double seconds = ((double)(time-start))/1000;
                     System.out.println("Throughput " + df.format(mb/seconds) +
-                            " MB/seconds messages " + count + ", total " + mb +
-                            " MB, total " + total + " bytes.");
+                            " MiB/s messages " + count + ", total " + mb +
+                            " MiB, total " + total + " bytes.");
                 }
             }
             out.flush();
