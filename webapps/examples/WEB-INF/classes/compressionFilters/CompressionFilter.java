@@ -49,7 +49,7 @@ public class CompressionFilter implements Filter {
     /**
      * Minimal reasonable buffer.
      */
-    // 8KB is what tomcat would use by default anyway
+    // 8KiB is what tomcat would use by default anyway
     private static final int MIN_BUFFER = 8192;
 
     /**

@@ -2101,7 +2101,7 @@ public class DefaultServlet extends HttpServlet {
             rightSide = 1;
         }
 
-        return ("" + leftSide + "." + rightSide + " kb");
+        return ("" + leftSide + "." + rightSide + " KiB");
 
     }
 

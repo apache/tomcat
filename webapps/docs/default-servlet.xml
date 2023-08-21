@@ -177,7 +177,7 @@ directory listings are disabled and debugging is turned off.
   </property>
   <property name="sendfileSize">
         If the connector used supports sendfile, this represents the minimal
-        file size in KB for which sendfile will be used. Use a negative value
+        file size in KiB for which sendfile will be used. Use a negative value
         to always disable sendfile. [48]
   </property>
   <property name="useAcceptRanges">
