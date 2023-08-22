@@ -34,7 +34,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 
 @RunWith(Parameterized.class)
-public class TestServletRequestParametersFormUrlEncoded extends TestServletRequestParametersBase {
+public class TestServletRequestParametersFormUrlEncoded extends ServletRequestParametersBaseTest {
 
     @Parameterized.Parameters(name = "{index}: chunked[{0}]")
     public static Collection<Object[]> parameters() {

@@ -25,7 +25,7 @@ import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 
-public class TestServletRequestParameters extends TestServletRequestParametersBase {
+public class TestServletRequestParameters extends ServletRequestParametersBaseTest {
 
     @Test
     public void testClientDisconnect() throws Exception {

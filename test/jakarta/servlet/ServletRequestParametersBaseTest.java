@@ -32,7 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestServletRequestParametersBase extends TomcatBaseTest {
+public class ServletRequestParametersBaseTest extends TomcatBaseTest {
 
     protected Map<String,List<String>> parseReportedParameters(SimpleHttpClient client) {
         Map<String,List<String>> parameters = new LinkedHashMap<>();

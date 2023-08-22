@@ -35,7 +35,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 
 @RunWith(Parameterized.class)
-public class TestServletRequestParametersQueryString extends TestServletRequestParametersBase {
+public class TestServletRequestParametersQueryString extends ServletRequestParametersBaseTest {
 
     private static final Integer SC_OK = Integer.valueOf(HttpServletResponse.SC_OK);
     private static final Integer SC_BAD_REQUEST = Integer.valueOf(HttpServletResponse.SC_BAD_REQUEST);
