@@ -117,6 +117,9 @@
         Update code comments and Tomcat output to use MiB for 1024 * 1024 bytes
         and KiB for 1024 bytes rather than MB and kB. (martk)
       </fix>
+      <fix>
+        Avoid protocol relative redirects in FORM authentication. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
