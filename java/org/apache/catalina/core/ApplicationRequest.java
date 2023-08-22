@@ -83,6 +83,7 @@ class ApplicationRequest extends ServletRequestWrapper {
 
     // ------------------------------------------------- ServletRequest Methods
 
+    private final StampedLock lock = new StampedLock();
 
     /**
      * Override the <code>getAttribute()</code> method of the wrapped request.
@@ -92,10 +93,19 @@ class ApplicationRequest extends ServletRequestWrapper {
     @Override
     public Object getAttribute(String name) {
 
-        synchronized (attributes) {
-            return attributes.get(name);
-        }
+        long stamp = lock.tryOptimisticRead();
+        Object tempHolder = attributes.get(name);
 
+        if (lock.validate(stamp)) {
+            return tempHolder;
+        } else {
+            stamp = lock.readLock();
+            try {
+                return attributes.get(name);
+            } finally {
+                lock.unlock(stamp);
+            }
+        }
     }
 
 
@@ -105,8 +115,18 @@ class ApplicationRequest extends ServletRequestWrapper {
     @Override
     public Enumeration<String> getAttributeNames() {
 
-        synchronized (attributes) {
-            return Collections.enumeration(attributes.keySet());
+        long stamp = lock.tryOptimisticRead();
+        Enumeration<String> tempHolder = Collections.enumeration(attributes.keySet());
+
+        if (lock.validate(stamp)) {
+            return tempHolder;
+        } else {
+            stamp = lock.readLock();
+            try {
+                return Collections.enumeration(attributes.keySet());
+            } finally {
+                lock.unlock(stamp);
+            }
         }
 
     }
@@ -120,11 +140,14 @@ class ApplicationRequest extends ServletRequestWrapper {
     @Override
     public void removeAttribute(String name) {
 
-        synchronized (attributes) {
+        long stamp = lock.writeLock();
+        try {
             attributes.remove(name);
             if (!isSpecial(name)) {
                 getRequest().removeAttribute(name);
             }
+        } finally {
+            lock.unlock(stamp);
         }
 
     }
@@ -139,11 +162,14 @@ class ApplicationRequest extends ServletRequestWrapper {
     @Override
     public void setAttribute(String name, Object value) {
 
-        synchronized (attributes) {
+        long stamp = lock.writeLock();
+        try {
             attributes.put(name, value);
             if (!isSpecial(name)) {
                 getRequest().setAttribute(name, value);
             }
+        } finally {
+            lock.unlock(stamp);
         }
 
     }
@@ -163,7 +189,8 @@ class ApplicationRequest extends ServletRequestWrapper {
         super.setRequest(request);
 
         // Initialize the attributes for this request
-        synchronized (attributes) {
+        long stamp = lock.writeLock();
+        try {
             attributes.clear();
             Enumeration<String> names = request.getAttributeNames();
             while (names.hasMoreElements()) {
@@ -171,6 +198,8 @@ class ApplicationRequest extends ServletRequestWrapper {
                 Object value = request.getAttribute(name);
                 attributes.put(name, value);
             }
+        } finally {
+            lock.unlock(stamp);
         }
 
     }
