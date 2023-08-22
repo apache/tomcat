@@ -125,6 +125,9 @@
         exceptions. As a consequence, the <code>FailedRequestFilter</code> has
         been removed. (markt)
       </add>
+      <fix>
+        Avoid protocol relative redirects in FORM authentication. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
