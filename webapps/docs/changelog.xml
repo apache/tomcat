@@ -138,6 +138,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to Chinese translations. (lihan)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M10 (markt)" rtext="2023-08-14">
   <subsection name="Catalina">
