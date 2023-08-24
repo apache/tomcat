@@ -37,7 +37,8 @@ public class ServletRequestParametersBaseTest extends TomcatBaseTest {
     protected Map<String,List<String>> parseReportedParameters(SimpleHttpClient client) {
         Map<String,List<String>> parameters = new LinkedHashMap<>();
         if (client.isResponse200()) {
-            String[] lines = client.getResponseBody().split(System.lineSeparator());
+            // Response is written using "\n" so need to split on that.
+            String[] lines = client.getResponseBody().split("\n");
             for (String line : lines) {
                 // Every line should be name=value
                 int equalsPos = line.indexOf('=');

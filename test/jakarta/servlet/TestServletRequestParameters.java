@@ -16,6 +16,7 @@
  */
 package jakarta.servlet;
 
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
@@ -54,7 +55,13 @@ public class TestServletRequestParameters extends ServletRequestParametersBaseTe
         client.setResponseBodyEncoding(StandardCharsets.UTF_8);
         client.connect();
         // Incomplete request will look timeout reading body and behave like a client disconnect
-        client.processRequest();
+        // What the client will see will vary by OS. Expect errors.
+
+        try {
+            client.processRequest();
+        } catch (SocketException e) {
+            // Likely a connection reset.
+        }
 
         // Connection should be closed by the server.
         //readLine() will receive an EOF reading the status line resuting in a null
