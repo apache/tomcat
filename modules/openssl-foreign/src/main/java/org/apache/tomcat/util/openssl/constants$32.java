@@ -24,33 +24,35 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-final class constants$17 {
+final class constants$32 {
 
     // Suppresses default constructor, ensuring non-instantiability.
-    private constants$17() {}
+    private constants$32() {}
     static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_timeout",
-        constants$15.const$0
+        "ENGINE_by_id",
+        constants$2.const$4
     );
     static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
-        "SSL_CTX_get_timeout",
-        constants$1.const$4
+        "ENGINE_register_all_complete",
+        constants$27.const$0
     );
-    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
-        "SSL_CTX_get_cert_store",
-        constants$2.const$4
+    static final FunctionDescriptor const$2 = FunctionDescriptor.of(JAVA_INT,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        JAVA_INT
     );
     static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
-        "SSL_get_current_cipher",
-        constants$2.const$4
+        "ENGINE_ctrl_cmd_string",
+        constants$32.const$2
     );
     static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
-        "SSL_CIPHER_get_name",
-        constants$2.const$4
+        "ENGINE_free",
+        constants$0.const$0
     );
     static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
-        "SSL_CIPHER_get_kx_nid",
-        constants$0.const$0
+        "ENGINE_load_private_key",
+        constants$13.const$4
     );
 }
 

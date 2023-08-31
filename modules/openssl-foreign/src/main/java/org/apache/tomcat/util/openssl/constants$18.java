@@ -28,45 +28,34 @@ final class constants$18 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$18() {}
-    static final FunctionDescriptor TLS_server_method$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT);
-    static final MethodHandle TLS_server_method$MH = RuntimeHelper.downcallHandle(
-        "TLS_server_method",
-        constants$18.TLS_server_method$FUNC
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
+        "SSL_CIPHER_get_auth_nid",
+        constants$0.const$0
     );
-    static final FunctionDescriptor SSL_get_ciphers$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "SSL_pending",
+        constants$0.const$0
     );
-    static final MethodHandle SSL_get_ciphers$MH = RuntimeHelper.downcallHandle(
-        "SSL_get_ciphers",
-        constants$18.SSL_get_ciphers$FUNC
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
+        "SSL_set_bio",
+        constants$15.const$4
     );
-    static final FunctionDescriptor SSL_CTX_get_ciphers$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "SSL_set_cipher_list",
+        constants$12.const$2
     );
-    static final MethodHandle SSL_CTX_get_ciphers$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_get_ciphers",
-        constants$18.SSL_CTX_get_ciphers$FUNC
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        "SSL_CTX_set_ciphersuites",
+        constants$12.const$2
     );
-    static final FunctionDescriptor SSL_do_handshake$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final FunctionDescriptor const$5 = FunctionDescriptor.ofVoid(
+        RuntimeHelper.POINTER,
+        JAVA_INT,
+        RuntimeHelper.POINTER
     );
-    static final MethodHandle SSL_do_handshake$MH = RuntimeHelper.downcallHandle(
-        "SSL_do_handshake",
-        constants$18.SSL_do_handshake$FUNC
-    );
-    static final FunctionDescriptor SSL_renegotiate$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_renegotiate$MH = RuntimeHelper.downcallHandle(
-        "SSL_renegotiate",
-        constants$18.SSL_renegotiate$FUNC
-    );
-    static final FunctionDescriptor SSL_renegotiate_pending$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_renegotiate_pending$MH = RuntimeHelper.downcallHandle(
-        "SSL_renegotiate_pending",
-        constants$18.SSL_renegotiate_pending$FUNC
+    static final MethodHandle const$6 = RuntimeHelper.downcallHandle(
+        "SSL_set_verify",
+        constants$18.const$5
     );
 }
 

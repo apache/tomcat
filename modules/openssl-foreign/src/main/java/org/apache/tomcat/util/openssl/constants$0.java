@@ -28,48 +28,25 @@ final class constants$0 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$0() {}
-    static final FunctionDescriptor OPENSSL_sk_num$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final FunctionDescriptor const$0 = FunctionDescriptor.of(JAVA_INT,
+        RuntimeHelper.POINTER
     );
-    static final MethodHandle OPENSSL_sk_num$MH = RuntimeHelper.downcallHandle(
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
         "OPENSSL_sk_num",
-        constants$0.OPENSSL_sk_num$FUNC
+        constants$0.const$0
     );
-    static final FunctionDescriptor OPENSSL_sk_value$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT
+    static final FunctionDescriptor const$2 = FunctionDescriptor.of(RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        JAVA_INT
     );
-    static final MethodHandle OPENSSL_sk_value$MH = RuntimeHelper.downcallHandle(
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
         "OPENSSL_sk_value",
-        constants$0.OPENSSL_sk_value$FUNC
+        constants$0.const$2
     );
-    static final FunctionDescriptor OpenSSL_version_num$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT);
-    static final MethodHandle OpenSSL_version_num$MH = RuntimeHelper.downcallHandle(
+    static final FunctionDescriptor const$4 = FunctionDescriptor.of(JAVA_LONG);
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
         "OpenSSL_version_num",
-        constants$0.OpenSSL_version_num$FUNC
-    );
-    static final FunctionDescriptor OpenSSL_version$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT
-    );
-    static final MethodHandle OpenSSL_version$MH = RuntimeHelper.downcallHandle(
-        "OpenSSL_version",
-        constants$0.OpenSSL_version$FUNC
-    );
-    static final FunctionDescriptor CRYPTO_free$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT
-    );
-    static final MethodHandle CRYPTO_free$MH = RuntimeHelper.downcallHandle(
-        "CRYPTO_free",
-        constants$0.CRYPTO_free$FUNC
-    );
-    static final FunctionDescriptor BIO_ctrl_pending$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle BIO_ctrl_pending$MH = RuntimeHelper.downcallHandle(
-        "BIO_ctrl_pending",
-        constants$0.BIO_ctrl_pending$FUNC
+        constants$0.const$4
     );
 }
 

@@ -24,34 +24,28 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-final class constants$17 {
+final class constants$35 {
 
     // Suppresses default constructor, ensuring non-instantiability.
-    private constants$17() {}
+    private constants$35() {}
     static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_timeout",
-        constants$15.const$0
+        "OCSP_REQUEST_new",
+        constants$2.const$0
     );
     static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
-        "SSL_CTX_get_timeout",
-        constants$1.const$4
+        "OCSP_REQUEST_free",
+        constants$7.const$0
     );
     static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
-        "SSL_CTX_get_cert_store",
-        constants$2.const$4
+        "i2d_OCSP_REQUEST",
+        constants$12.const$2
     );
     static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
-        "SSL_get_current_cipher",
+        "OSSL_PROVIDER_get0_name",
         constants$2.const$4
     );
-    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
-        "SSL_CIPHER_get_name",
-        constants$2.const$4
-    );
-    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
-        "SSL_CIPHER_get_kx_nid",
-        constants$0.const$0
-    );
+    static final MemorySegment const$4 = RuntimeHelper.CONSTANT_ALLOCATOR.allocateFrom("/tmp/jextract$5612544175128132323.h");
+    static final MemorySegment const$5 = RuntimeHelper.CONSTANT_ALLOCATOR.allocateFrom("EC PARAMETERS");
 }
 
 

@@ -28,57 +28,32 @@ final class constants$10 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$10() {}
-    static final FunctionDescriptor PEM_read_bio_ECPKParameters$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
+        "X509_LOOKUP_hash_dir",
+        constants$2.const$0
     );
-    static final MethodHandle PEM_read_bio_ECPKParameters$MH = RuntimeHelper.downcallHandle(
-        "PEM_read_bio_ECPKParameters",
-        constants$10.PEM_read_bio_ECPKParameters$FUNC
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "X509_LOOKUP_file",
+        constants$2.const$0
     );
-    static final FunctionDescriptor PEM_read_bio_DHparams$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final FunctionDescriptor const$2 = FunctionDescriptor.of(JAVA_INT,
+        RuntimeHelper.POINTER,
+        JAVA_INT,
+        RuntimeHelper.POINTER,
+        JAVA_LONG,
+        RuntimeHelper.POINTER
     );
-    static final MethodHandle PEM_read_bio_DHparams$MH = RuntimeHelper.downcallHandle(
-        "PEM_read_bio_DHparams",
-        constants$10.PEM_read_bio_DHparams$FUNC
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "X509_LOOKUP_ctrl",
+        constants$10.const$2
     );
-    static final FunctionDescriptor PEM_read_bio_PrivateKey$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        "X509_STORE_CTX_get_ex_data",
+        constants$0.const$2
     );
-    static final MethodHandle PEM_read_bio_PrivateKey$MH = RuntimeHelper.downcallHandle(
-        "PEM_read_bio_PrivateKey",
-        constants$10.PEM_read_bio_PrivateKey$FUNC
-    );
-    static final FunctionDescriptor SSL_CTX_get_options$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_CTX_get_options$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_get_options",
-        constants$10.SSL_CTX_get_options$FUNC
-    );
-    static final FunctionDescriptor SSL_get_options$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_get_options$MH = RuntimeHelper.downcallHandle(
-        "SSL_get_options",
-        constants$10.SSL_get_options$FUNC
-    );
-    static final FunctionDescriptor SSL_CTX_clear_options$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_LONG_LONG$LAYOUT
-    );
-    static final MethodHandle SSL_CTX_clear_options$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_clear_options",
-        constants$10.SSL_CTX_clear_options$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "X509_STORE_CTX_get_error",
+        constants$0.const$0
     );
 }
 

@@ -28,56 +28,31 @@ final class constants$9 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$9() {}
-    static final FunctionDescriptor d2i_X509$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_LONG_LONG$LAYOUT
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
+        "DH_free",
+        constants$7.const$0
     );
-    static final MethodHandle d2i_X509$MH = RuntimeHelper.downcallHandle(
-        "d2i_X509",
-        constants$9.d2i_X509$FUNC
+    static final FunctionDescriptor const$1 = FunctionDescriptor.of(JAVA_INT,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER
     );
-    static final FunctionDescriptor i2d_X509$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
+        "DH_set0_pqg",
+        constants$9.const$1
     );
-    static final MethodHandle i2d_X509$MH = RuntimeHelper.downcallHandle(
-        "i2d_X509",
-        constants$9.i2d_X509$FUNC
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "X509_STORE_set_flags",
+        constants$4.const$5
     );
-    static final FunctionDescriptor X509_get_ext_by_NID$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT,
-        Constants$root.C_INT$LAYOUT
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        "X509_STORE_CTX_get0_untrusted",
+        constants$2.const$4
     );
-    static final MethodHandle X509_get_ext_by_NID$MH = RuntimeHelper.downcallHandle(
-        "X509_get_ext_by_NID",
-        constants$9.X509_get_ext_by_NID$FUNC
-    );
-    static final FunctionDescriptor X509_get_ext$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT
-    );
-    static final MethodHandle X509_get_ext$MH = RuntimeHelper.downcallHandle(
-        "X509_get_ext",
-        constants$9.X509_get_ext$FUNC
-    );
-    static final FunctionDescriptor X509_EXTENSION_get_data$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle X509_EXTENSION_get_data$MH = RuntimeHelper.downcallHandle(
-        "X509_EXTENSION_get_data",
-        constants$9.X509_EXTENSION_get_data$FUNC
-    );
-    static final FunctionDescriptor PEM_read_bio_X509_AUX$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle PEM_read_bio_X509_AUX$MH = RuntimeHelper.downcallHandle(
-        "PEM_read_bio_X509_AUX",
-        constants$9.PEM_read_bio_X509_AUX$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "X509_STORE_add_lookup",
+        constants$2.const$2
     );
 }
 

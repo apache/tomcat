@@ -28,54 +28,23 @@ final class constants$27 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$27() {}
-    static final FunctionDescriptor OCSP_response_get1_basic$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final FunctionDescriptor const$0 = FunctionDescriptor.of(JAVA_INT);
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "SSL_get_ex_data_X509_STORE_CTX_idx",
+        constants$27.const$0
     );
-    static final MethodHandle OCSP_response_get1_basic$MH = RuntimeHelper.downcallHandle(
-        "OCSP_response_get1_basic",
-        constants$27.OCSP_response_get1_basic$FUNC
+    static final FunctionDescriptor const$2 = FunctionDescriptor.of(RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        JAVA_INT,
+        JAVA_INT
     );
-    static final FunctionDescriptor OCSP_resp_get0$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT
+    static final MethodHandle const$3 = RuntimeHelper.upcallHandle(SSL_CTX_set_tmp_dh_callback$dh.class, "apply", constants$27.const$2);
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        constants$27.const$2
     );
-    static final MethodHandle OCSP_resp_get0$MH = RuntimeHelper.downcallHandle(
-        "OCSP_resp_get0",
-        constants$27.OCSP_resp_get0$FUNC
-    );
-    static final FunctionDescriptor OCSP_resp_find$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT
-    );
-    static final MethodHandle OCSP_resp_find$MH = RuntimeHelper.downcallHandle(
-        "OCSP_resp_find",
-        constants$27.OCSP_resp_find$FUNC
-    );
-    static final FunctionDescriptor OCSP_single_get0_status$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle OCSP_single_get0_status$MH = RuntimeHelper.downcallHandle(
-        "OCSP_single_get0_status",
-        constants$27.OCSP_single_get0_status$FUNC
-    );
-    static final FunctionDescriptor OCSP_BASICRESP_free$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle OCSP_BASICRESP_free$MH = RuntimeHelper.downcallHandle(
-        "OCSP_BASICRESP_free",
-        constants$27.OCSP_BASICRESP_free$FUNC
-    );
-    static final FunctionDescriptor OCSP_RESPONSE_free$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle OCSP_RESPONSE_free$MH = RuntimeHelper.downcallHandle(
-        "OCSP_RESPONSE_free",
-        constants$27.OCSP_RESPONSE_free$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "SSL_CTX_set_tmp_dh_callback",
+        constants$21.const$1
     );
 }
 

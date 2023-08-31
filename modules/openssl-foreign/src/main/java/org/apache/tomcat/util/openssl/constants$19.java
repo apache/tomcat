@@ -28,49 +28,29 @@ final class constants$19 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$19() {}
-    static final FunctionDescriptor SSL_shutdown$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
+        "SSL_CTX_use_certificate_chain_file",
+        constants$12.const$2
     );
-    static final MethodHandle SSL_shutdown$MH = RuntimeHelper.downcallHandle(
-        "SSL_shutdown",
-        constants$19.SSL_shutdown$FUNC
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "SSL_load_client_CA_file",
+        constants$2.const$4
     );
-    static final FunctionDescriptor SSL_verify_client_post_handshake$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
+        "SSL_add_file_cert_subjects_to_stack",
+        constants$12.const$2
     );
-    static final MethodHandle SSL_verify_client_post_handshake$MH = RuntimeHelper.downcallHandle(
-        "SSL_verify_client_post_handshake",
-        constants$19.SSL_verify_client_post_handshake$FUNC
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "SSL_SESSION_get_time",
+        constants$1.const$4
     );
-    static final FunctionDescriptor SSL_CTX_set_client_CA_list$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        "SSL_SESSION_get_id",
+        constants$2.const$2
     );
-    static final MethodHandle SSL_CTX_set_client_CA_list$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_client_CA_list",
-        constants$19.SSL_CTX_set_client_CA_list$FUNC
-    );
-    static final FunctionDescriptor SSL_CTX_get_client_CA_list$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_CTX_get_client_CA_list$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_get_client_CA_list",
-        constants$19.SSL_CTX_get_client_CA_list$FUNC
-    );
-    static final FunctionDescriptor SSL_CTX_add_client_CA$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_CTX_add_client_CA$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_add_client_CA",
-        constants$19.SSL_CTX_add_client_CA$FUNC
-    );
-    static final FunctionDescriptor SSL_set_connect_state$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_set_connect_state$MH = RuntimeHelper.downcallHandle(
-        "SSL_set_connect_state",
-        constants$19.SSL_set_connect_state$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "SSL_get1_peer_certificate",
+        constants$2.const$4
     );
 }
 

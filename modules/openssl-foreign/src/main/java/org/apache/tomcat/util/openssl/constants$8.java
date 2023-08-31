@@ -28,49 +28,30 @@ final class constants$8 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$8() {}
-    static final FunctionDescriptor X509_STORE_CTX_set_error$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
+        "EC_GROUP_get_curve_name",
+        constants$0.const$0
     );
-    static final MethodHandle X509_STORE_CTX_set_error$MH = RuntimeHelper.downcallHandle(
-        "X509_STORE_CTX_set_error",
-        constants$8.X509_STORE_CTX_set_error$FUNC
+    static final FunctionDescriptor const$1 = FunctionDescriptor.of(RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        JAVA_LONG
     );
-    static final FunctionDescriptor X509_STORE_CTX_get_error_depth$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
+        "d2i_ECPKParameters",
+        constants$8.const$1
     );
-    static final MethodHandle X509_STORE_CTX_get_error_depth$MH = RuntimeHelper.downcallHandle(
-        "X509_STORE_CTX_get_error_depth",
-        constants$8.X509_STORE_CTX_get_error_depth$FUNC
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "EC_KEY_new_by_curve_name",
+        constants$1.const$0
     );
-    static final FunctionDescriptor X509_STORE_CTX_get_current_cert$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        "EC_KEY_free",
+        constants$7.const$0
     );
-    static final MethodHandle X509_STORE_CTX_get_current_cert$MH = RuntimeHelper.downcallHandle(
-        "X509_STORE_CTX_get_current_cert",
-        constants$8.X509_STORE_CTX_get_current_cert$FUNC
-    );
-    static final FunctionDescriptor X509_STORE_CTX_get0_current_issuer$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle X509_STORE_CTX_get0_current_issuer$MH = RuntimeHelper.downcallHandle(
-        "X509_STORE_CTX_get0_current_issuer",
-        constants$8.X509_STORE_CTX_get0_current_issuer$FUNC
-    );
-    static final FunctionDescriptor d2i_X509_bio$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle d2i_X509_bio$MH = RuntimeHelper.downcallHandle(
-        "d2i_X509_bio",
-        constants$8.d2i_X509_bio$FUNC
-    );
-    static final FunctionDescriptor X509_free$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle X509_free$MH = RuntimeHelper.downcallHandle(
-        "X509_free",
-        constants$8.X509_free$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "DH_new",
+        constants$2.const$0
     );
 }
 

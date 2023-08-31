@@ -28,48 +28,29 @@ final class constants$23 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$23() {}
-    static final FunctionDescriptor SSL_CONF_CTX_set_ssl_ctx$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
+        "SSL_get_ciphers",
+        constants$2.const$4
     );
-    static final MethodHandle SSL_CONF_CTX_set_ssl_ctx$MH = RuntimeHelper.downcallHandle(
-        "SSL_CONF_CTX_set_ssl_ctx",
-        constants$23.SSL_CONF_CTX_set_ssl_ctx$FUNC
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "SSL_CTX_get_ciphers",
+        constants$2.const$4
     );
-    static final FunctionDescriptor SSL_CONF_cmd$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
+        "SSL_do_handshake",
+        constants$0.const$0
     );
-    static final MethodHandle SSL_CONF_cmd$MH = RuntimeHelper.downcallHandle(
-        "SSL_CONF_cmd",
-        constants$23.SSL_CONF_cmd$FUNC
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "SSL_renegotiate",
+        constants$0.const$0
     );
-    static final FunctionDescriptor SSL_CONF_cmd_value_type$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        "SSL_renegotiate_pending",
+        constants$0.const$0
     );
-    static final MethodHandle SSL_CONF_cmd_value_type$MH = RuntimeHelper.downcallHandle(
-        "SSL_CONF_cmd_value_type",
-        constants$23.SSL_CONF_cmd_value_type$FUNC
-    );
-    static final FunctionDescriptor OPENSSL_init_ssl$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_LONG_LONG$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle OPENSSL_init_ssl$MH = RuntimeHelper.downcallHandle(
-        "OPENSSL_init_ssl",
-        constants$23.OPENSSL_init_ssl$FUNC
-    );
-    static final FunctionDescriptor ERR_get_error$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT);
-    static final MethodHandle ERR_get_error$MH = RuntimeHelper.downcallHandle(
-        "ERR_get_error",
-        constants$23.ERR_get_error$FUNC
-    );
-    static final FunctionDescriptor ERR_peek_last_error$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT);
-    static final MethodHandle ERR_peek_last_error$MH = RuntimeHelper.downcallHandle(
-        "ERR_peek_last_error",
-        constants$23.ERR_peek_last_error$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "SSL_shutdown",
+        constants$0.const$0
     );
 }
 

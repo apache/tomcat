@@ -33,13 +33,13 @@ public interface SSL_CTX_set_tmp_dh_callback$dh {
 
     java.lang.foreign.MemorySegment apply(java.lang.foreign.MemorySegment _x0, int _x1, int _x2);
     static MemorySegment allocate(SSL_CTX_set_tmp_dh_callback$dh fi, Arena scope) {
-        return RuntimeHelper.upcallStub(constants$21.SSL_CTX_set_tmp_dh_callback$dh_UP$MH, fi, constants$21.SSL_CTX_set_tmp_dh_callback$dh$FUNC, scope);
+        return RuntimeHelper.upcallStub(constants$27.const$3, fi, constants$27.const$2, scope);
     }
     static SSL_CTX_set_tmp_dh_callback$dh ofAddress(MemorySegment addr, Arena arena) {
         MemorySegment symbol = addr.reinterpret(arena, null);
         return (java.lang.foreign.MemorySegment __x0, int __x1, int __x2) -> {
             try {
-                return (java.lang.foreign.MemorySegment)constants$22.SSL_CTX_set_tmp_dh_callback$dh_DOWN$MH.invokeExact(symbol, __x0, __x1, __x2);
+                return (java.lang.foreign.MemorySegment)constants$27.const$4.invokeExact(symbol, __x0, __x1, __x2);
             } catch (Throwable ex$) {
                 throw new AssertionError("should not reach here", ex$);
             }

@@ -24,19 +24,37 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-final class Constants$root {
+final class constants$31 {
 
     // Suppresses default constructor, ensuring non-instantiability.
-    private Constants$root() {}
-    static final OfBoolean C_BOOL$LAYOUT = JAVA_BOOLEAN;
-    static final OfByte C_CHAR$LAYOUT = JAVA_BYTE;
-    static final OfShort C_SHORT$LAYOUT = JAVA_SHORT;
-    static final OfInt C_INT$LAYOUT = JAVA_INT;
-    static final OfLong C_LONG$LAYOUT = JAVA_LONG;
-    static final OfLong C_LONG_LONG$LAYOUT = JAVA_LONG;
-    static final OfFloat C_FLOAT$LAYOUT = JAVA_FLOAT;
-    static final OfDouble C_DOUBLE$LAYOUT = JAVA_DOUBLE;
-    static final AddressLayout C_POINTER$LAYOUT = ADDRESS.withTargetLayout(MemoryLayout.sequenceLayout(Long.MAX_VALUE, C_CHAR$LAYOUT));
+    private constants$31() {}
+    static final FunctionDescriptor const$0 = FunctionDescriptor.of(JAVA_INT,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER
+    );
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "PKCS12_parse",
+        constants$31.const$0
+    );
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
+        "d2i_PKCS12_bio",
+        constants$2.const$2
+    );
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "RAND_seed",
+        constants$11.const$0
+    );
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        "RAND_load_file",
+        constants$4.const$5
+    );
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "X509_check_issued",
+        constants$12.const$2
+    );
 }
 
 

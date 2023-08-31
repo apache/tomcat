@@ -28,48 +28,30 @@ final class constants$12 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$12() {}
-    static final FunctionDescriptor SSL_CTX_new$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
+        "X509_free",
+        constants$7.const$0
     );
-    static final MethodHandle SSL_CTX_new$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_new",
-        constants$12.SSL_CTX_new$FUNC
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "d2i_X509",
+        constants$8.const$1
     );
-    static final FunctionDescriptor SSL_CTX_free$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT
+    static final FunctionDescriptor const$2 = FunctionDescriptor.of(JAVA_INT,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER
     );
-    static final MethodHandle SSL_CTX_free$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_free",
-        constants$12.SSL_CTX_free$FUNC
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "i2d_X509",
+        constants$12.const$2
     );
-    static final FunctionDescriptor SSL_CTX_set_timeout$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_LONG_LONG$LAYOUT
+    static final FunctionDescriptor const$4 = FunctionDescriptor.of(JAVA_INT,
+        RuntimeHelper.POINTER,
+        JAVA_INT,
+        JAVA_INT
     );
-    static final MethodHandle SSL_CTX_set_timeout$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_timeout",
-        constants$12.SSL_CTX_set_timeout$FUNC
-    );
-    static final FunctionDescriptor SSL_CTX_get_timeout$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_CTX_get_timeout$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_get_timeout",
-        constants$12.SSL_CTX_get_timeout$FUNC
-    );
-    static final FunctionDescriptor SSL_CTX_get_cert_store$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_CTX_get_cert_store$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_get_cert_store",
-        constants$12.SSL_CTX_get_cert_store$FUNC
-    );
-    static final FunctionDescriptor SSL_get_current_cipher$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_get_current_cipher$MH = RuntimeHelper.downcallHandle(
-        "SSL_get_current_cipher",
-        constants$12.SSL_get_current_cipher$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "X509_get_ext_by_NID",
+        constants$12.const$4
     );
 }
 

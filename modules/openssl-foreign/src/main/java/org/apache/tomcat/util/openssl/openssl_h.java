@@ -26,14 +26,14 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 public class openssl_h  {
 
-    public static final OfByte C_CHAR = Constants$root.C_CHAR$LAYOUT;
-    public static final OfShort C_SHORT = Constants$root.C_SHORT$LAYOUT;
-    public static final OfInt C_INT = Constants$root.C_INT$LAYOUT;
-    public static final OfLong C_LONG = Constants$root.C_LONG_LONG$LAYOUT;
-    public static final OfLong C_LONG_LONG = Constants$root.C_LONG_LONG$LAYOUT;
-    public static final OfFloat C_FLOAT = Constants$root.C_FLOAT$LAYOUT;
-    public static final OfDouble C_DOUBLE = Constants$root.C_DOUBLE$LAYOUT;
-    public static final AddressLayout C_POINTER = Constants$root.C_POINTER$LAYOUT;
+    public static final OfByte C_CHAR = JAVA_BYTE;
+    public static final OfShort C_SHORT = JAVA_SHORT;
+    public static final OfInt C_INT = JAVA_INT;
+    public static final OfLong C_LONG = JAVA_LONG;
+    public static final OfLong C_LONG_LONG = JAVA_LONG;
+    public static final OfFloat C_FLOAT = JAVA_FLOAT;
+    public static final OfDouble C_DOUBLE = JAVA_DOUBLE;
+    public static final AddressLayout C_POINTER = RuntimeHelper.POINTER;
     /**
      * {@snippet :
      * #define BIO_CLOSE 1
@@ -564,6 +564,22 @@ public class openssl_h  {
     }
     /**
      * {@snippet :
+     * #define SSL_CTRL_SET_GROUPS 91
+     * }
+     */
+    public static int SSL_CTRL_SET_GROUPS() {
+        return (int)91L;
+    }
+    /**
+     * {@snippet :
+     * #define SSL_CTRL_SET_DH_AUTO 118
+     * }
+     */
+    public static int SSL_CTRL_SET_DH_AUTO() {
+        return (int)118L;
+    }
+    /**
+     * {@snippet :
      * #define SSL_CTRL_SET_MIN_PROTO_VERSION 123
      * }
      */
@@ -611,7 +627,7 @@ public class openssl_h  {
         return (int)2L;
     }
     public static MethodHandle OPENSSL_sk_num$MH() {
-        return RuntimeHelper.requireNonNull(constants$0.OPENSSL_sk_num$MH,"OPENSSL_sk_num");
+        return RuntimeHelper.requireNonNull(constants$0.const$1,"OPENSSL_sk_num");
     }
     /**
      * {@snippet :
@@ -627,7 +643,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OPENSSL_sk_value$MH() {
-        return RuntimeHelper.requireNonNull(constants$0.OPENSSL_sk_value$MH,"OPENSSL_sk_value");
+        return RuntimeHelper.requireNonNull(constants$0.const$3,"OPENSSL_sk_value");
     }
     /**
      * {@snippet :
@@ -643,7 +659,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OpenSSL_version_num$MH() {
-        return RuntimeHelper.requireNonNull(constants$0.OpenSSL_version_num$MH,"OpenSSL_version_num");
+        return RuntimeHelper.requireNonNull(constants$0.const$5,"OpenSSL_version_num");
     }
     /**
      * {@snippet :
@@ -659,7 +675,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OpenSSL_version$MH() {
-        return RuntimeHelper.requireNonNull(constants$0.OpenSSL_version$MH,"OpenSSL_version");
+        return RuntimeHelper.requireNonNull(constants$1.const$1,"OpenSSL_version");
     }
     /**
      * {@snippet :
@@ -675,7 +691,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle CRYPTO_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$0.CRYPTO_free$MH,"CRYPTO_free");
+        return RuntimeHelper.requireNonNull(constants$1.const$3,"CRYPTO_free");
     }
     /**
      * {@snippet :
@@ -691,7 +707,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BIO_ctrl_pending$MH() {
-        return RuntimeHelper.requireNonNull(constants$0.BIO_ctrl_pending$MH,"BIO_ctrl_pending");
+        return RuntimeHelper.requireNonNull(constants$1.const$5,"BIO_ctrl_pending");
     }
     /**
      * {@snippet :
@@ -707,7 +723,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BIO_s_file$MH() {
-        return RuntimeHelper.requireNonNull(constants$1.BIO_s_file$MH,"BIO_s_file");
+        return RuntimeHelper.requireNonNull(constants$2.const$1,"BIO_s_file");
     }
     /**
      * {@snippet :
@@ -723,7 +739,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BIO_new_file$MH() {
-        return RuntimeHelper.requireNonNull(constants$1.BIO_new_file$MH,"BIO_new_file");
+        return RuntimeHelper.requireNonNull(constants$2.const$3,"BIO_new_file");
     }
     /**
      * {@snippet :
@@ -739,7 +755,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BIO_new$MH() {
-        return RuntimeHelper.requireNonNull(constants$1.BIO_new$MH,"BIO_new");
+        return RuntimeHelper.requireNonNull(constants$2.const$5,"BIO_new");
     }
     /**
      * {@snippet :
@@ -755,7 +771,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BIO_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$1.BIO_free$MH,"BIO_free");
+        return RuntimeHelper.requireNonNull(constants$3.const$0,"BIO_free");
     }
     /**
      * {@snippet :
@@ -771,7 +787,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BIO_read$MH() {
-        return RuntimeHelper.requireNonNull(constants$1.BIO_read$MH,"BIO_read");
+        return RuntimeHelper.requireNonNull(constants$3.const$2,"BIO_read");
     }
     /**
      * {@snippet :
@@ -787,7 +803,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BIO_write$MH() {
-        return RuntimeHelper.requireNonNull(constants$1.BIO_write$MH,"BIO_write");
+        return RuntimeHelper.requireNonNull(constants$3.const$3,"BIO_write");
     }
     /**
      * {@snippet :
@@ -803,7 +819,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BIO_ctrl$MH() {
-        return RuntimeHelper.requireNonNull(constants$2.BIO_ctrl$MH,"BIO_ctrl");
+        return RuntimeHelper.requireNonNull(constants$3.const$5,"BIO_ctrl");
     }
     /**
      * {@snippet :
@@ -819,7 +835,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BIO_s_mem$MH() {
-        return RuntimeHelper.requireNonNull(constants$2.BIO_s_mem$MH,"BIO_s_mem");
+        return RuntimeHelper.requireNonNull(constants$4.const$0,"BIO_s_mem");
     }
     /**
      * {@snippet :
@@ -835,7 +851,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BIO_s_bio$MH() {
-        return RuntimeHelper.requireNonNull(constants$2.BIO_s_bio$MH,"BIO_s_bio");
+        return RuntimeHelper.requireNonNull(constants$4.const$1,"BIO_s_bio");
     }
     /**
      * {@snippet :
@@ -851,7 +867,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BIO_new_bio_pair$MH() {
-        return RuntimeHelper.requireNonNull(constants$2.BIO_new_bio_pair$MH,"BIO_new_bio_pair");
+        return RuntimeHelper.requireNonNull(constants$4.const$3,"BIO_new_bio_pair");
     }
     /**
      * {@snippet :
@@ -867,7 +883,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BN_new$MH() {
-        return RuntimeHelper.requireNonNull(constants$2.BN_new$MH,"BN_new");
+        return RuntimeHelper.requireNonNull(constants$4.const$4,"BN_new");
     }
     /**
      * {@snippet :
@@ -883,7 +899,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BN_set_word$MH() {
-        return RuntimeHelper.requireNonNull(constants$2.BN_set_word$MH,"BN_set_word");
+        return RuntimeHelper.requireNonNull(constants$4.const$6,"BN_set_word");
     }
     /**
      * {@snippet :
@@ -899,7 +915,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BN_get_rfc2409_prime_768$MH() {
-        return RuntimeHelper.requireNonNull(constants$3.BN_get_rfc2409_prime_768$MH,"BN_get_rfc2409_prime_768");
+        return RuntimeHelper.requireNonNull(constants$5.const$0,"BN_get_rfc2409_prime_768");
     }
     /**
      * {@snippet :
@@ -915,7 +931,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BN_get_rfc2409_prime_1024$MH() {
-        return RuntimeHelper.requireNonNull(constants$3.BN_get_rfc2409_prime_1024$MH,"BN_get_rfc2409_prime_1024");
+        return RuntimeHelper.requireNonNull(constants$5.const$1,"BN_get_rfc2409_prime_1024");
     }
     /**
      * {@snippet :
@@ -931,7 +947,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BN_get_rfc3526_prime_1536$MH() {
-        return RuntimeHelper.requireNonNull(constants$3.BN_get_rfc3526_prime_1536$MH,"BN_get_rfc3526_prime_1536");
+        return RuntimeHelper.requireNonNull(constants$5.const$2,"BN_get_rfc3526_prime_1536");
     }
     /**
      * {@snippet :
@@ -947,7 +963,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BN_get_rfc3526_prime_2048$MH() {
-        return RuntimeHelper.requireNonNull(constants$3.BN_get_rfc3526_prime_2048$MH,"BN_get_rfc3526_prime_2048");
+        return RuntimeHelper.requireNonNull(constants$5.const$3,"BN_get_rfc3526_prime_2048");
     }
     /**
      * {@snippet :
@@ -963,7 +979,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BN_get_rfc3526_prime_3072$MH() {
-        return RuntimeHelper.requireNonNull(constants$3.BN_get_rfc3526_prime_3072$MH,"BN_get_rfc3526_prime_3072");
+        return RuntimeHelper.requireNonNull(constants$5.const$4,"BN_get_rfc3526_prime_3072");
     }
     /**
      * {@snippet :
@@ -979,7 +995,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BN_get_rfc3526_prime_4096$MH() {
-        return RuntimeHelper.requireNonNull(constants$3.BN_get_rfc3526_prime_4096$MH,"BN_get_rfc3526_prime_4096");
+        return RuntimeHelper.requireNonNull(constants$5.const$5,"BN_get_rfc3526_prime_4096");
     }
     /**
      * {@snippet :
@@ -995,7 +1011,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BN_get_rfc3526_prime_6144$MH() {
-        return RuntimeHelper.requireNonNull(constants$4.BN_get_rfc3526_prime_6144$MH,"BN_get_rfc3526_prime_6144");
+        return RuntimeHelper.requireNonNull(constants$6.const$0,"BN_get_rfc3526_prime_6144");
     }
     /**
      * {@snippet :
@@ -1011,7 +1027,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BN_get_rfc3526_prime_8192$MH() {
-        return RuntimeHelper.requireNonNull(constants$4.BN_get_rfc3526_prime_8192$MH,"BN_get_rfc3526_prime_8192");
+        return RuntimeHelper.requireNonNull(constants$6.const$1,"BN_get_rfc3526_prime_8192");
     }
     /**
      * {@snippet :
@@ -1027,7 +1043,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle ASN1_STRING_length$MH() {
-        return RuntimeHelper.requireNonNull(constants$4.ASN1_STRING_length$MH,"ASN1_STRING_length");
+        return RuntimeHelper.requireNonNull(constants$6.const$2,"ASN1_STRING_length");
     }
     /**
      * {@snippet :
@@ -1043,7 +1059,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle ASN1_STRING_get0_data$MH() {
-        return RuntimeHelper.requireNonNull(constants$4.ASN1_STRING_get0_data$MH,"ASN1_STRING_get0_data");
+        return RuntimeHelper.requireNonNull(constants$6.const$3,"ASN1_STRING_get0_data");
     }
     /**
      * {@snippet :
@@ -1059,7 +1075,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle EVP_MD_get0_provider$MH() {
-        return RuntimeHelper.requireNonNull(constants$4.EVP_MD_get0_provider$MH,"EVP_MD_get0_provider");
+        return RuntimeHelper.requireNonNull(constants$6.const$4,"EVP_MD_get0_provider");
     }
     /**
      * {@snippet :
@@ -1075,7 +1091,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle EVP_MD_fetch$MH() {
-        return RuntimeHelper.requireNonNull(constants$4.EVP_MD_fetch$MH,"EVP_MD_fetch");
+        return RuntimeHelper.requireNonNull(constants$6.const$6,"EVP_MD_fetch");
     }
     /**
      * {@snippet :
@@ -1091,7 +1107,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle EVP_MD_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$5.EVP_MD_free$MH,"EVP_MD_free");
+        return RuntimeHelper.requireNonNull(constants$7.const$1,"EVP_MD_free");
     }
     /**
      * {@snippet :
@@ -1107,7 +1123,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle EVP_PKEY_get_base_id$MH() {
-        return RuntimeHelper.requireNonNull(constants$5.EVP_PKEY_get_base_id$MH,"EVP_PKEY_get_base_id");
+        return RuntimeHelper.requireNonNull(constants$7.const$2,"EVP_PKEY_get_base_id");
     }
     /**
      * {@snippet :
@@ -1123,7 +1139,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle EVP_PKEY_get_bits$MH() {
-        return RuntimeHelper.requireNonNull(constants$5.EVP_PKEY_get_bits$MH,"EVP_PKEY_get_bits");
+        return RuntimeHelper.requireNonNull(constants$7.const$3,"EVP_PKEY_get_bits");
     }
     /**
      * {@snippet :
@@ -1138,8 +1154,24 @@ public class openssl_h  {
             throw new AssertionError("should not reach here", ex$);
         }
     }
+    public static MethodHandle EVP_PKEY_free$MH() {
+        return RuntimeHelper.requireNonNull(constants$7.const$4,"EVP_PKEY_free");
+    }
+    /**
+     * {@snippet :
+     * void EVP_PKEY_free(EVP_PKEY* pkey);
+     * }
+     */
+    public static void EVP_PKEY_free(MemorySegment pkey) {
+        var mh$ = EVP_PKEY_free$MH();
+        try {
+            mh$.invokeExact(pkey);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
     public static MethodHandle EC_GROUP_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$5.EC_GROUP_free$MH,"EC_GROUP_free");
+        return RuntimeHelper.requireNonNull(constants$7.const$5,"EC_GROUP_free");
     }
     /**
      * {@snippet :
@@ -1155,7 +1187,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle EC_GROUP_get_curve_name$MH() {
-        return RuntimeHelper.requireNonNull(constants$5.EC_GROUP_get_curve_name$MH,"EC_GROUP_get_curve_name");
+        return RuntimeHelper.requireNonNull(constants$8.const$0,"EC_GROUP_get_curve_name");
     }
     /**
      * {@snippet :
@@ -1170,8 +1202,24 @@ public class openssl_h  {
             throw new AssertionError("should not reach here", ex$);
         }
     }
+    public static MethodHandle d2i_ECPKParameters$MH() {
+        return RuntimeHelper.requireNonNull(constants$8.const$2,"d2i_ECPKParameters");
+    }
+    /**
+     * {@snippet :
+     * EC_GROUP* d2i_ECPKParameters(EC_GROUP**, unsigned char** in, long len);
+     * }
+     */
+    public static MemorySegment d2i_ECPKParameters(MemorySegment x0, MemorySegment in, long len) {
+        var mh$ = d2i_ECPKParameters$MH();
+        try {
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(x0, in, len);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
     public static MethodHandle EC_KEY_new_by_curve_name$MH() {
-        return RuntimeHelper.requireNonNull(constants$5.EC_KEY_new_by_curve_name$MH,"EC_KEY_new_by_curve_name");
+        return RuntimeHelper.requireNonNull(constants$8.const$3,"EC_KEY_new_by_curve_name");
     }
     /**
      * {@snippet :
@@ -1187,7 +1235,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle EC_KEY_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$6.EC_KEY_free$MH,"EC_KEY_free");
+        return RuntimeHelper.requireNonNull(constants$8.const$4,"EC_KEY_free");
     }
     /**
      * {@snippet :
@@ -1203,7 +1251,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle DH_new$MH() {
-        return RuntimeHelper.requireNonNull(constants$6.DH_new$MH,"DH_new");
+        return RuntimeHelper.requireNonNull(constants$8.const$5,"DH_new");
     }
     /**
      * {@snippet :
@@ -1219,7 +1267,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle DH_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$6.DH_free$MH,"DH_free");
+        return RuntimeHelper.requireNonNull(constants$9.const$0,"DH_free");
     }
     /**
      * {@snippet :
@@ -1235,7 +1283,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle DH_set0_pqg$MH() {
-        return RuntimeHelper.requireNonNull(constants$6.DH_set0_pqg$MH,"DH_set0_pqg");
+        return RuntimeHelper.requireNonNull(constants$9.const$2,"DH_set0_pqg");
     }
     /**
      * {@snippet :
@@ -1251,7 +1299,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_STORE_set_flags$MH() {
-        return RuntimeHelper.requireNonNull(constants$6.X509_STORE_set_flags$MH,"X509_STORE_set_flags");
+        return RuntimeHelper.requireNonNull(constants$9.const$3,"X509_STORE_set_flags");
     }
     /**
      * {@snippet :
@@ -1267,7 +1315,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_STORE_CTX_get0_untrusted$MH() {
-        return RuntimeHelper.requireNonNull(constants$6.X509_STORE_CTX_get0_untrusted$MH,"X509_STORE_CTX_get0_untrusted");
+        return RuntimeHelper.requireNonNull(constants$9.const$4,"X509_STORE_CTX_get0_untrusted");
     }
     /**
      * {@snippet :
@@ -1283,7 +1331,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_STORE_add_lookup$MH() {
-        return RuntimeHelper.requireNonNull(constants$7.X509_STORE_add_lookup$MH,"X509_STORE_add_lookup");
+        return RuntimeHelper.requireNonNull(constants$9.const$5,"X509_STORE_add_lookup");
     }
     /**
      * {@snippet :
@@ -1299,7 +1347,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_LOOKUP_hash_dir$MH() {
-        return RuntimeHelper.requireNonNull(constants$7.X509_LOOKUP_hash_dir$MH,"X509_LOOKUP_hash_dir");
+        return RuntimeHelper.requireNonNull(constants$10.const$0,"X509_LOOKUP_hash_dir");
     }
     /**
      * {@snippet :
@@ -1315,7 +1363,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_LOOKUP_file$MH() {
-        return RuntimeHelper.requireNonNull(constants$7.X509_LOOKUP_file$MH,"X509_LOOKUP_file");
+        return RuntimeHelper.requireNonNull(constants$10.const$1,"X509_LOOKUP_file");
     }
     /**
      * {@snippet :
@@ -1331,7 +1379,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_LOOKUP_ctrl$MH() {
-        return RuntimeHelper.requireNonNull(constants$7.X509_LOOKUP_ctrl$MH,"X509_LOOKUP_ctrl");
+        return RuntimeHelper.requireNonNull(constants$10.const$3,"X509_LOOKUP_ctrl");
     }
     /**
      * {@snippet :
@@ -1347,7 +1395,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_STORE_CTX_get_ex_data$MH() {
-        return RuntimeHelper.requireNonNull(constants$7.X509_STORE_CTX_get_ex_data$MH,"X509_STORE_CTX_get_ex_data");
+        return RuntimeHelper.requireNonNull(constants$10.const$4,"X509_STORE_CTX_get_ex_data");
     }
     /**
      * {@snippet :
@@ -1363,7 +1411,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_STORE_CTX_get_error$MH() {
-        return RuntimeHelper.requireNonNull(constants$7.X509_STORE_CTX_get_error$MH,"X509_STORE_CTX_get_error");
+        return RuntimeHelper.requireNonNull(constants$10.const$5,"X509_STORE_CTX_get_error");
     }
     /**
      * {@snippet :
@@ -1379,7 +1427,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_STORE_CTX_set_error$MH() {
-        return RuntimeHelper.requireNonNull(constants$8.X509_STORE_CTX_set_error$MH,"X509_STORE_CTX_set_error");
+        return RuntimeHelper.requireNonNull(constants$11.const$1,"X509_STORE_CTX_set_error");
     }
     /**
      * {@snippet :
@@ -1395,7 +1443,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_STORE_CTX_get_error_depth$MH() {
-        return RuntimeHelper.requireNonNull(constants$8.X509_STORE_CTX_get_error_depth$MH,"X509_STORE_CTX_get_error_depth");
+        return RuntimeHelper.requireNonNull(constants$11.const$2,"X509_STORE_CTX_get_error_depth");
     }
     /**
      * {@snippet :
@@ -1411,7 +1459,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_STORE_CTX_get_current_cert$MH() {
-        return RuntimeHelper.requireNonNull(constants$8.X509_STORE_CTX_get_current_cert$MH,"X509_STORE_CTX_get_current_cert");
+        return RuntimeHelper.requireNonNull(constants$11.const$3,"X509_STORE_CTX_get_current_cert");
     }
     /**
      * {@snippet :
@@ -1427,7 +1475,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_STORE_CTX_get0_current_issuer$MH() {
-        return RuntimeHelper.requireNonNull(constants$8.X509_STORE_CTX_get0_current_issuer$MH,"X509_STORE_CTX_get0_current_issuer");
+        return RuntimeHelper.requireNonNull(constants$11.const$4,"X509_STORE_CTX_get0_current_issuer");
     }
     /**
      * {@snippet :
@@ -1443,7 +1491,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle d2i_X509_bio$MH() {
-        return RuntimeHelper.requireNonNull(constants$8.d2i_X509_bio$MH,"d2i_X509_bio");
+        return RuntimeHelper.requireNonNull(constants$11.const$5,"d2i_X509_bio");
     }
     /**
      * {@snippet :
@@ -1459,7 +1507,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$8.X509_free$MH,"X509_free");
+        return RuntimeHelper.requireNonNull(constants$12.const$0,"X509_free");
     }
     /**
      * {@snippet :
@@ -1475,7 +1523,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle d2i_X509$MH() {
-        return RuntimeHelper.requireNonNull(constants$9.d2i_X509$MH,"d2i_X509");
+        return RuntimeHelper.requireNonNull(constants$12.const$1,"d2i_X509");
     }
     /**
      * {@snippet :
@@ -1491,7 +1539,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle i2d_X509$MH() {
-        return RuntimeHelper.requireNonNull(constants$9.i2d_X509$MH,"i2d_X509");
+        return RuntimeHelper.requireNonNull(constants$12.const$3,"i2d_X509");
     }
     /**
      * {@snippet :
@@ -1507,7 +1555,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_get_ext_by_NID$MH() {
-        return RuntimeHelper.requireNonNull(constants$9.X509_get_ext_by_NID$MH,"X509_get_ext_by_NID");
+        return RuntimeHelper.requireNonNull(constants$12.const$5,"X509_get_ext_by_NID");
     }
     /**
      * {@snippet :
@@ -1523,7 +1571,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_get_ext$MH() {
-        return RuntimeHelper.requireNonNull(constants$9.X509_get_ext$MH,"X509_get_ext");
+        return RuntimeHelper.requireNonNull(constants$13.const$0,"X509_get_ext");
     }
     /**
      * {@snippet :
@@ -1539,7 +1587,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_EXTENSION_get_data$MH() {
-        return RuntimeHelper.requireNonNull(constants$9.X509_EXTENSION_get_data$MH,"X509_EXTENSION_get_data");
+        return RuntimeHelper.requireNonNull(constants$13.const$1,"X509_EXTENSION_get_data");
     }
     /**
      * {@snippet :
@@ -1554,8 +1602,24 @@ public class openssl_h  {
             throw new AssertionError("should not reach here", ex$);
         }
     }
+    public static MethodHandle PEM_ASN1_read_bio$MH() {
+        return RuntimeHelper.requireNonNull(constants$13.const$3,"PEM_ASN1_read_bio");
+    }
+    /**
+     * {@snippet :
+     * void* PEM_ASN1_read_bio(d2i_of_void* d2i, char* name, BIO* bp, void** x, pem_password_cb* cb, void* u);
+     * }
+     */
+    public static MemorySegment PEM_ASN1_read_bio(MemorySegment d2i, MemorySegment name, MemorySegment bp, MemorySegment x, MemorySegment cb, MemorySegment u) {
+        var mh$ = PEM_ASN1_read_bio$MH();
+        try {
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(d2i, name, bp, x, cb, u);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
     public static MethodHandle PEM_read_bio_X509_AUX$MH() {
-        return RuntimeHelper.requireNonNull(constants$9.PEM_read_bio_X509_AUX$MH,"PEM_read_bio_X509_AUX");
+        return RuntimeHelper.requireNonNull(constants$13.const$5,"PEM_read_bio_X509_AUX");
     }
     /**
      * {@snippet :
@@ -1571,7 +1635,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle PEM_read_bio_ECPKParameters$MH() {
-        return RuntimeHelper.requireNonNull(constants$10.PEM_read_bio_ECPKParameters$MH,"PEM_read_bio_ECPKParameters");
+        return RuntimeHelper.requireNonNull(constants$14.const$0,"PEM_read_bio_ECPKParameters");
     }
     /**
      * {@snippet :
@@ -1587,7 +1651,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle PEM_read_bio_DHparams$MH() {
-        return RuntimeHelper.requireNonNull(constants$10.PEM_read_bio_DHparams$MH,"PEM_read_bio_DHparams");
+        return RuntimeHelper.requireNonNull(constants$14.const$1,"PEM_read_bio_DHparams");
     }
     /**
      * {@snippet :
@@ -1603,7 +1667,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle PEM_read_bio_PrivateKey$MH() {
-        return RuntimeHelper.requireNonNull(constants$10.PEM_read_bio_PrivateKey$MH,"PEM_read_bio_PrivateKey");
+        return RuntimeHelper.requireNonNull(constants$14.const$2,"PEM_read_bio_PrivateKey");
     }
     /**
      * {@snippet :
@@ -1618,8 +1682,24 @@ public class openssl_h  {
             throw new AssertionError("should not reach here", ex$);
         }
     }
+    public static MethodHandle PEM_read_bio_Parameters$MH() {
+        return RuntimeHelper.requireNonNull(constants$14.const$3,"PEM_read_bio_Parameters");
+    }
+    /**
+     * {@snippet :
+     * EVP_PKEY* PEM_read_bio_Parameters(BIO* bp, EVP_PKEY** x);
+     * }
+     */
+    public static MemorySegment PEM_read_bio_Parameters(MemorySegment bp, MemorySegment x) {
+        var mh$ = PEM_read_bio_Parameters$MH();
+        try {
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(bp, x);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
     public static MethodHandle SSL_CTX_get_options$MH() {
-        return RuntimeHelper.requireNonNull(constants$10.SSL_CTX_get_options$MH,"SSL_CTX_get_options");
+        return RuntimeHelper.requireNonNull(constants$14.const$4,"SSL_CTX_get_options");
     }
     /**
      * {@snippet :
@@ -1635,7 +1715,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get_options$MH() {
-        return RuntimeHelper.requireNonNull(constants$10.SSL_get_options$MH,"SSL_get_options");
+        return RuntimeHelper.requireNonNull(constants$14.const$5,"SSL_get_options");
     }
     /**
      * {@snippet :
@@ -1651,7 +1731,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_clear_options$MH() {
-        return RuntimeHelper.requireNonNull(constants$10.SSL_CTX_clear_options$MH,"SSL_CTX_clear_options");
+        return RuntimeHelper.requireNonNull(constants$15.const$1,"SSL_CTX_clear_options");
     }
     /**
      * {@snippet :
@@ -1667,7 +1747,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_set_options$MH() {
-        return RuntimeHelper.requireNonNull(constants$11.SSL_CTX_set_options$MH,"SSL_CTX_set_options");
+        return RuntimeHelper.requireNonNull(constants$15.const$2,"SSL_CTX_set_options");
     }
     /**
      * {@snippet :
@@ -1683,7 +1763,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_set_options$MH() {
-        return RuntimeHelper.requireNonNull(constants$11.SSL_set_options$MH,"SSL_set_options");
+        return RuntimeHelper.requireNonNull(constants$15.const$3,"SSL_set_options");
     }
     /**
      * {@snippet :
@@ -1699,7 +1779,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_set_alpn_select_cb$MH() {
-        return RuntimeHelper.requireNonNull(constants$11.SSL_CTX_set_alpn_select_cb$MH,"SSL_CTX_set_alpn_select_cb");
+        return RuntimeHelper.requireNonNull(constants$15.const$5,"SSL_CTX_set_alpn_select_cb");
     }
     /**
      * {@snippet :
@@ -1715,7 +1795,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get0_alpn_selected$MH() {
-        return RuntimeHelper.requireNonNull(constants$11.SSL_get0_alpn_selected$MH,"SSL_get0_alpn_selected");
+        return RuntimeHelper.requireNonNull(constants$16.const$0,"SSL_get0_alpn_selected");
     }
     /**
      * {@snippet :
@@ -1731,7 +1811,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_in_init$MH() {
-        return RuntimeHelper.requireNonNull(constants$11.SSL_in_init$MH,"SSL_in_init");
+        return RuntimeHelper.requireNonNull(constants$16.const$1,"SSL_in_init");
     }
     /**
      * {@snippet :
@@ -1746,8 +1826,24 @@ public class openssl_h  {
             throw new AssertionError("should not reach here", ex$);
         }
     }
+    public static MethodHandle SSL_CTX_set0_tmp_dh_pkey$MH() {
+        return RuntimeHelper.requireNonNull(constants$16.const$2,"SSL_CTX_set0_tmp_dh_pkey");
+    }
+    /**
+     * {@snippet :
+     * int SSL_CTX_set0_tmp_dh_pkey(SSL_CTX* ctx, EVP_PKEY* dhpkey);
+     * }
+     */
+    public static int SSL_CTX_set0_tmp_dh_pkey(MemorySegment ctx, MemorySegment dhpkey) {
+        var mh$ = SSL_CTX_set0_tmp_dh_pkey$MH();
+        try {
+            return (int)mh$.invokeExact(ctx, dhpkey);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
     public static MethodHandle SSL_CTX_set_cipher_list$MH() {
-        return RuntimeHelper.requireNonNull(constants$11.SSL_CTX_set_cipher_list$MH,"SSL_CTX_set_cipher_list");
+        return RuntimeHelper.requireNonNull(constants$16.const$3,"SSL_CTX_set_cipher_list");
     }
     /**
      * {@snippet :
@@ -1763,7 +1859,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_new$MH() {
-        return RuntimeHelper.requireNonNull(constants$12.SSL_CTX_new$MH,"SSL_CTX_new");
+        return RuntimeHelper.requireNonNull(constants$16.const$4,"SSL_CTX_new");
     }
     /**
      * {@snippet :
@@ -1779,7 +1875,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$12.SSL_CTX_free$MH,"SSL_CTX_free");
+        return RuntimeHelper.requireNonNull(constants$16.const$5,"SSL_CTX_free");
     }
     /**
      * {@snippet :
@@ -1795,7 +1891,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_set_timeout$MH() {
-        return RuntimeHelper.requireNonNull(constants$12.SSL_CTX_set_timeout$MH,"SSL_CTX_set_timeout");
+        return RuntimeHelper.requireNonNull(constants$17.const$0,"SSL_CTX_set_timeout");
     }
     /**
      * {@snippet :
@@ -1811,7 +1907,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_get_timeout$MH() {
-        return RuntimeHelper.requireNonNull(constants$12.SSL_CTX_get_timeout$MH,"SSL_CTX_get_timeout");
+        return RuntimeHelper.requireNonNull(constants$17.const$1,"SSL_CTX_get_timeout");
     }
     /**
      * {@snippet :
@@ -1827,7 +1923,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_get_cert_store$MH() {
-        return RuntimeHelper.requireNonNull(constants$12.SSL_CTX_get_cert_store$MH,"SSL_CTX_get_cert_store");
+        return RuntimeHelper.requireNonNull(constants$17.const$2,"SSL_CTX_get_cert_store");
     }
     /**
      * {@snippet :
@@ -1843,7 +1939,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get_current_cipher$MH() {
-        return RuntimeHelper.requireNonNull(constants$12.SSL_get_current_cipher$MH,"SSL_get_current_cipher");
+        return RuntimeHelper.requireNonNull(constants$17.const$3,"SSL_get_current_cipher");
     }
     /**
      * {@snippet :
@@ -1859,7 +1955,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CIPHER_get_name$MH() {
-        return RuntimeHelper.requireNonNull(constants$13.SSL_CIPHER_get_name$MH,"SSL_CIPHER_get_name");
+        return RuntimeHelper.requireNonNull(constants$17.const$4,"SSL_CIPHER_get_name");
     }
     /**
      * {@snippet :
@@ -1875,7 +1971,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CIPHER_get_kx_nid$MH() {
-        return RuntimeHelper.requireNonNull(constants$13.SSL_CIPHER_get_kx_nid$MH,"SSL_CIPHER_get_kx_nid");
+        return RuntimeHelper.requireNonNull(constants$17.const$5,"SSL_CIPHER_get_kx_nid");
     }
     /**
      * {@snippet :
@@ -1891,7 +1987,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CIPHER_get_auth_nid$MH() {
-        return RuntimeHelper.requireNonNull(constants$13.SSL_CIPHER_get_auth_nid$MH,"SSL_CIPHER_get_auth_nid");
+        return RuntimeHelper.requireNonNull(constants$18.const$0,"SSL_CIPHER_get_auth_nid");
     }
     /**
      * {@snippet :
@@ -1907,7 +2003,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_pending$MH() {
-        return RuntimeHelper.requireNonNull(constants$13.SSL_pending$MH,"SSL_pending");
+        return RuntimeHelper.requireNonNull(constants$18.const$1,"SSL_pending");
     }
     /**
      * {@snippet :
@@ -1923,7 +2019,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_set_bio$MH() {
-        return RuntimeHelper.requireNonNull(constants$13.SSL_set_bio$MH,"SSL_set_bio");
+        return RuntimeHelper.requireNonNull(constants$18.const$2,"SSL_set_bio");
     }
     /**
      * {@snippet :
@@ -1939,7 +2035,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_set_cipher_list$MH() {
-        return RuntimeHelper.requireNonNull(constants$13.SSL_set_cipher_list$MH,"SSL_set_cipher_list");
+        return RuntimeHelper.requireNonNull(constants$18.const$3,"SSL_set_cipher_list");
     }
     /**
      * {@snippet :
@@ -1955,7 +2051,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_set_ciphersuites$MH() {
-        return RuntimeHelper.requireNonNull(constants$14.SSL_CTX_set_ciphersuites$MH,"SSL_CTX_set_ciphersuites");
+        return RuntimeHelper.requireNonNull(constants$18.const$4,"SSL_CTX_set_ciphersuites");
     }
     /**
      * {@snippet :
@@ -1971,7 +2067,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_set_verify$MH() {
-        return RuntimeHelper.requireNonNull(constants$14.SSL_set_verify$MH,"SSL_set_verify");
+        return RuntimeHelper.requireNonNull(constants$18.const$6,"SSL_set_verify");
     }
     /**
      * {@snippet :
@@ -1987,7 +2083,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_use_certificate_chain_file$MH() {
-        return RuntimeHelper.requireNonNull(constants$14.SSL_CTX_use_certificate_chain_file$MH,"SSL_CTX_use_certificate_chain_file");
+        return RuntimeHelper.requireNonNull(constants$19.const$0,"SSL_CTX_use_certificate_chain_file");
     }
     /**
      * {@snippet :
@@ -2003,7 +2099,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_load_client_CA_file$MH() {
-        return RuntimeHelper.requireNonNull(constants$14.SSL_load_client_CA_file$MH,"SSL_load_client_CA_file");
+        return RuntimeHelper.requireNonNull(constants$19.const$1,"SSL_load_client_CA_file");
     }
     /**
      * {@snippet :
@@ -2019,7 +2115,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_add_file_cert_subjects_to_stack$MH() {
-        return RuntimeHelper.requireNonNull(constants$14.SSL_add_file_cert_subjects_to_stack$MH,"SSL_add_file_cert_subjects_to_stack");
+        return RuntimeHelper.requireNonNull(constants$19.const$2,"SSL_add_file_cert_subjects_to_stack");
     }
     /**
      * {@snippet :
@@ -2035,7 +2131,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_SESSION_get_time$MH() {
-        return RuntimeHelper.requireNonNull(constants$14.SSL_SESSION_get_time$MH,"SSL_SESSION_get_time");
+        return RuntimeHelper.requireNonNull(constants$19.const$3,"SSL_SESSION_get_time");
     }
     /**
      * {@snippet :
@@ -2051,7 +2147,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_SESSION_get_id$MH() {
-        return RuntimeHelper.requireNonNull(constants$15.SSL_SESSION_get_id$MH,"SSL_SESSION_get_id");
+        return RuntimeHelper.requireNonNull(constants$19.const$4,"SSL_SESSION_get_id");
     }
     /**
      * {@snippet :
@@ -2067,7 +2163,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get1_peer_certificate$MH() {
-        return RuntimeHelper.requireNonNull(constants$15.SSL_get1_peer_certificate$MH,"SSL_get1_peer_certificate");
+        return RuntimeHelper.requireNonNull(constants$19.const$5,"SSL_get1_peer_certificate");
     }
     /**
      * {@snippet :
@@ -2083,7 +2179,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get_peer_cert_chain$MH() {
-        return RuntimeHelper.requireNonNull(constants$15.SSL_get_peer_cert_chain$MH,"SSL_get_peer_cert_chain");
+        return RuntimeHelper.requireNonNull(constants$20.const$0,"SSL_get_peer_cert_chain");
     }
     /**
      * {@snippet :
@@ -2099,7 +2195,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_set_verify$MH() {
-        return RuntimeHelper.requireNonNull(constants$15.SSL_CTX_set_verify$MH,"SSL_CTX_set_verify");
+        return RuntimeHelper.requireNonNull(constants$20.const$1,"SSL_CTX_set_verify");
     }
     /**
      * {@snippet :
@@ -2115,7 +2211,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_set_cert_verify_callback$MH() {
-        return RuntimeHelper.requireNonNull(constants$16.SSL_CTX_set_cert_verify_callback$MH,"SSL_CTX_set_cert_verify_callback");
+        return RuntimeHelper.requireNonNull(constants$20.const$4,"SSL_CTX_set_cert_verify_callback");
     }
     /**
      * {@snippet :
@@ -2131,7 +2227,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_use_PrivateKey$MH() {
-        return RuntimeHelper.requireNonNull(constants$16.SSL_CTX_use_PrivateKey$MH,"SSL_CTX_use_PrivateKey");
+        return RuntimeHelper.requireNonNull(constants$20.const$5,"SSL_CTX_use_PrivateKey");
     }
     /**
      * {@snippet :
@@ -2147,7 +2243,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_use_certificate$MH() {
-        return RuntimeHelper.requireNonNull(constants$16.SSL_CTX_use_certificate$MH,"SSL_CTX_use_certificate");
+        return RuntimeHelper.requireNonNull(constants$21.const$0,"SSL_CTX_use_certificate");
     }
     /**
      * {@snippet :
@@ -2163,7 +2259,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_set_default_passwd_cb$MH() {
-        return RuntimeHelper.requireNonNull(constants$16.SSL_CTX_set_default_passwd_cb$MH,"SSL_CTX_set_default_passwd_cb");
+        return RuntimeHelper.requireNonNull(constants$21.const$2,"SSL_CTX_set_default_passwd_cb");
     }
     /**
      * {@snippet :
@@ -2179,7 +2275,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_check_private_key$MH() {
-        return RuntimeHelper.requireNonNull(constants$16.SSL_CTX_check_private_key$MH,"SSL_CTX_check_private_key");
+        return RuntimeHelper.requireNonNull(constants$21.const$3,"SSL_CTX_check_private_key");
     }
     /**
      * {@snippet :
@@ -2195,7 +2291,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_set_session_id_context$MH() {
-        return RuntimeHelper.requireNonNull(constants$16.SSL_CTX_set_session_id_context$MH,"SSL_CTX_set_session_id_context");
+        return RuntimeHelper.requireNonNull(constants$21.const$4,"SSL_CTX_set_session_id_context");
     }
     /**
      * {@snippet :
@@ -2211,7 +2307,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_new$MH() {
-        return RuntimeHelper.requireNonNull(constants$17.SSL_new$MH,"SSL_new");
+        return RuntimeHelper.requireNonNull(constants$21.const$5,"SSL_new");
     }
     /**
      * {@snippet :
@@ -2227,7 +2323,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$17.SSL_free$MH,"SSL_free");
+        return RuntimeHelper.requireNonNull(constants$22.const$0,"SSL_free");
     }
     /**
      * {@snippet :
@@ -2243,7 +2339,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_read$MH() {
-        return RuntimeHelper.requireNonNull(constants$17.SSL_read$MH,"SSL_read");
+        return RuntimeHelper.requireNonNull(constants$22.const$1,"SSL_read");
     }
     /**
      * {@snippet :
@@ -2259,7 +2355,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_write$MH() {
-        return RuntimeHelper.requireNonNull(constants$17.SSL_write$MH,"SSL_write");
+        return RuntimeHelper.requireNonNull(constants$22.const$2,"SSL_write");
     }
     /**
      * {@snippet :
@@ -2275,7 +2371,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_ctrl$MH() {
-        return RuntimeHelper.requireNonNull(constants$17.SSL_CTX_ctrl$MH,"SSL_CTX_ctrl");
+        return RuntimeHelper.requireNonNull(constants$22.const$3,"SSL_CTX_ctrl");
     }
     /**
      * {@snippet :
@@ -2291,7 +2387,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get_version$MH() {
-        return RuntimeHelper.requireNonNull(constants$17.SSL_get_version$MH,"SSL_get_version");
+        return RuntimeHelper.requireNonNull(constants$22.const$4,"SSL_get_version");
     }
     /**
      * {@snippet :
@@ -2307,7 +2403,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle TLS_server_method$MH() {
-        return RuntimeHelper.requireNonNull(constants$18.TLS_server_method$MH,"TLS_server_method");
+        return RuntimeHelper.requireNonNull(constants$22.const$5,"TLS_server_method");
     }
     /**
      * {@snippet :
@@ -2323,7 +2419,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get_ciphers$MH() {
-        return RuntimeHelper.requireNonNull(constants$18.SSL_get_ciphers$MH,"SSL_get_ciphers");
+        return RuntimeHelper.requireNonNull(constants$23.const$0,"SSL_get_ciphers");
     }
     /**
      * {@snippet :
@@ -2339,7 +2435,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_get_ciphers$MH() {
-        return RuntimeHelper.requireNonNull(constants$18.SSL_CTX_get_ciphers$MH,"SSL_CTX_get_ciphers");
+        return RuntimeHelper.requireNonNull(constants$23.const$1,"SSL_CTX_get_ciphers");
     }
     /**
      * {@snippet :
@@ -2355,7 +2451,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_do_handshake$MH() {
-        return RuntimeHelper.requireNonNull(constants$18.SSL_do_handshake$MH,"SSL_do_handshake");
+        return RuntimeHelper.requireNonNull(constants$23.const$2,"SSL_do_handshake");
     }
     /**
      * {@snippet :
@@ -2371,7 +2467,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_renegotiate$MH() {
-        return RuntimeHelper.requireNonNull(constants$18.SSL_renegotiate$MH,"SSL_renegotiate");
+        return RuntimeHelper.requireNonNull(constants$23.const$3,"SSL_renegotiate");
     }
     /**
      * {@snippet :
@@ -2387,7 +2483,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_renegotiate_pending$MH() {
-        return RuntimeHelper.requireNonNull(constants$18.SSL_renegotiate_pending$MH,"SSL_renegotiate_pending");
+        return RuntimeHelper.requireNonNull(constants$23.const$4,"SSL_renegotiate_pending");
     }
     /**
      * {@snippet :
@@ -2403,7 +2499,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_shutdown$MH() {
-        return RuntimeHelper.requireNonNull(constants$19.SSL_shutdown$MH,"SSL_shutdown");
+        return RuntimeHelper.requireNonNull(constants$23.const$5,"SSL_shutdown");
     }
     /**
      * {@snippet :
@@ -2419,7 +2515,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_verify_client_post_handshake$MH() {
-        return RuntimeHelper.requireNonNull(constants$19.SSL_verify_client_post_handshake$MH,"SSL_verify_client_post_handshake");
+        return RuntimeHelper.requireNonNull(constants$24.const$0,"SSL_verify_client_post_handshake");
     }
     /**
      * {@snippet :
@@ -2435,7 +2531,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_set_client_CA_list$MH() {
-        return RuntimeHelper.requireNonNull(constants$19.SSL_CTX_set_client_CA_list$MH,"SSL_CTX_set_client_CA_list");
+        return RuntimeHelper.requireNonNull(constants$24.const$1,"SSL_CTX_set_client_CA_list");
     }
     /**
      * {@snippet :
@@ -2451,7 +2547,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_get_client_CA_list$MH() {
-        return RuntimeHelper.requireNonNull(constants$19.SSL_CTX_get_client_CA_list$MH,"SSL_CTX_get_client_CA_list");
+        return RuntimeHelper.requireNonNull(constants$24.const$2,"SSL_CTX_get_client_CA_list");
     }
     /**
      * {@snippet :
@@ -2467,7 +2563,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_add_client_CA$MH() {
-        return RuntimeHelper.requireNonNull(constants$19.SSL_CTX_add_client_CA$MH,"SSL_CTX_add_client_CA");
+        return RuntimeHelper.requireNonNull(constants$24.const$3,"SSL_CTX_add_client_CA");
     }
     /**
      * {@snippet :
@@ -2483,7 +2579,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_set_connect_state$MH() {
-        return RuntimeHelper.requireNonNull(constants$19.SSL_set_connect_state$MH,"SSL_set_connect_state");
+        return RuntimeHelper.requireNonNull(constants$24.const$4,"SSL_set_connect_state");
     }
     /**
      * {@snippet :
@@ -2499,7 +2595,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_set_accept_state$MH() {
-        return RuntimeHelper.requireNonNull(constants$20.SSL_set_accept_state$MH,"SSL_set_accept_state");
+        return RuntimeHelper.requireNonNull(constants$24.const$5,"SSL_set_accept_state");
     }
     /**
      * {@snippet :
@@ -2515,7 +2611,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get_privatekey$MH() {
-        return RuntimeHelper.requireNonNull(constants$20.SSL_get_privatekey$MH,"SSL_get_privatekey");
+        return RuntimeHelper.requireNonNull(constants$25.const$0,"SSL_get_privatekey");
     }
     /**
      * {@snippet :
@@ -2531,7 +2627,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get_shutdown$MH() {
-        return RuntimeHelper.requireNonNull(constants$20.SSL_get_shutdown$MH,"SSL_get_shutdown");
+        return RuntimeHelper.requireNonNull(constants$25.const$1,"SSL_get_shutdown");
     }
     /**
      * {@snippet :
@@ -2547,7 +2643,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_set_default_verify_paths$MH() {
-        return RuntimeHelper.requireNonNull(constants$20.SSL_CTX_set_default_verify_paths$MH,"SSL_CTX_set_default_verify_paths");
+        return RuntimeHelper.requireNonNull(constants$25.const$2,"SSL_CTX_set_default_verify_paths");
     }
     /**
      * {@snippet :
@@ -2563,7 +2659,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_load_verify_locations$MH() {
-        return RuntimeHelper.requireNonNull(constants$20.SSL_CTX_load_verify_locations$MH,"SSL_CTX_load_verify_locations");
+        return RuntimeHelper.requireNonNull(constants$25.const$4,"SSL_CTX_load_verify_locations");
     }
     /**
      * {@snippet :
@@ -2579,7 +2675,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get_session$MH() {
-        return RuntimeHelper.requireNonNull(constants$20.SSL_get_session$MH,"SSL_get_session");
+        return RuntimeHelper.requireNonNull(constants$25.const$5,"SSL_get_session");
     }
     /**
      * {@snippet :
@@ -2595,7 +2691,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_set_info_callback$MH() {
-        return RuntimeHelper.requireNonNull(constants$21.SSL_set_info_callback$MH,"SSL_set_info_callback");
+        return RuntimeHelper.requireNonNull(constants$26.const$3,"SSL_set_info_callback");
     }
     /**
      * {@snippet :
@@ -2611,7 +2707,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_set_verify_result$MH() {
-        return RuntimeHelper.requireNonNull(constants$21.SSL_set_verify_result$MH,"SSL_set_verify_result");
+        return RuntimeHelper.requireNonNull(constants$26.const$5,"SSL_set_verify_result");
     }
     /**
      * {@snippet :
@@ -2627,7 +2723,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get_ex_data_X509_STORE_CTX_idx$MH() {
-        return RuntimeHelper.requireNonNull(constants$21.SSL_get_ex_data_X509_STORE_CTX_idx$MH,"SSL_get_ex_data_X509_STORE_CTX_idx");
+        return RuntimeHelper.requireNonNull(constants$27.const$1,"SSL_get_ex_data_X509_STORE_CTX_idx");
     }
     /**
      * {@snippet :
@@ -2643,7 +2739,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_set_tmp_dh_callback$MH() {
-        return RuntimeHelper.requireNonNull(constants$22.SSL_CTX_set_tmp_dh_callback$MH,"SSL_CTX_set_tmp_dh_callback");
+        return RuntimeHelper.requireNonNull(constants$27.const$5,"SSL_CTX_set_tmp_dh_callback");
     }
     /**
      * {@snippet :
@@ -2659,7 +2755,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CONF_CTX_new$MH() {
-        return RuntimeHelper.requireNonNull(constants$22.SSL_CONF_CTX_new$MH,"SSL_CONF_CTX_new");
+        return RuntimeHelper.requireNonNull(constants$28.const$0,"SSL_CONF_CTX_new");
     }
     /**
      * {@snippet :
@@ -2675,7 +2771,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CONF_CTX_finish$MH() {
-        return RuntimeHelper.requireNonNull(constants$22.SSL_CONF_CTX_finish$MH,"SSL_CONF_CTX_finish");
+        return RuntimeHelper.requireNonNull(constants$28.const$1,"SSL_CONF_CTX_finish");
     }
     /**
      * {@snippet :
@@ -2691,7 +2787,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CONF_CTX_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$22.SSL_CONF_CTX_free$MH,"SSL_CONF_CTX_free");
+        return RuntimeHelper.requireNonNull(constants$28.const$2,"SSL_CONF_CTX_free");
     }
     /**
      * {@snippet :
@@ -2707,7 +2803,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CONF_CTX_set_flags$MH() {
-        return RuntimeHelper.requireNonNull(constants$22.SSL_CONF_CTX_set_flags$MH,"SSL_CONF_CTX_set_flags");
+        return RuntimeHelper.requireNonNull(constants$28.const$4,"SSL_CONF_CTX_set_flags");
     }
     /**
      * {@snippet :
@@ -2723,7 +2819,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CONF_CTX_set_ssl_ctx$MH() {
-        return RuntimeHelper.requireNonNull(constants$23.SSL_CONF_CTX_set_ssl_ctx$MH,"SSL_CONF_CTX_set_ssl_ctx");
+        return RuntimeHelper.requireNonNull(constants$28.const$5,"SSL_CONF_CTX_set_ssl_ctx");
     }
     /**
      * {@snippet :
@@ -2739,7 +2835,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CONF_cmd$MH() {
-        return RuntimeHelper.requireNonNull(constants$23.SSL_CONF_cmd$MH,"SSL_CONF_cmd");
+        return RuntimeHelper.requireNonNull(constants$29.const$0,"SSL_CONF_cmd");
     }
     /**
      * {@snippet :
@@ -2755,7 +2851,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CONF_cmd_value_type$MH() {
-        return RuntimeHelper.requireNonNull(constants$23.SSL_CONF_cmd_value_type$MH,"SSL_CONF_cmd_value_type");
+        return RuntimeHelper.requireNonNull(constants$29.const$1,"SSL_CONF_cmd_value_type");
     }
     /**
      * {@snippet :
@@ -2771,7 +2867,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OPENSSL_init_ssl$MH() {
-        return RuntimeHelper.requireNonNull(constants$23.OPENSSL_init_ssl$MH,"OPENSSL_init_ssl");
+        return RuntimeHelper.requireNonNull(constants$29.const$3,"OPENSSL_init_ssl");
     }
     /**
      * {@snippet :
@@ -2787,7 +2883,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle ERR_get_error$MH() {
-        return RuntimeHelper.requireNonNull(constants$23.ERR_get_error$MH,"ERR_get_error");
+        return RuntimeHelper.requireNonNull(constants$29.const$4,"ERR_get_error");
     }
     /**
      * {@snippet :
@@ -2803,7 +2899,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle ERR_peek_last_error$MH() {
-        return RuntimeHelper.requireNonNull(constants$23.ERR_peek_last_error$MH,"ERR_peek_last_error");
+        return RuntimeHelper.requireNonNull(constants$29.const$5,"ERR_peek_last_error");
     }
     /**
      * {@snippet :
@@ -2819,7 +2915,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle ERR_clear_error$MH() {
-        return RuntimeHelper.requireNonNull(constants$24.ERR_clear_error$MH,"ERR_clear_error");
+        return RuntimeHelper.requireNonNull(constants$30.const$1,"ERR_clear_error");
     }
     /**
      * {@snippet :
@@ -2835,7 +2931,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle ERR_error_string$MH() {
-        return RuntimeHelper.requireNonNull(constants$24.ERR_error_string$MH,"ERR_error_string");
+        return RuntimeHelper.requireNonNull(constants$30.const$3,"ERR_error_string");
     }
     /**
      * {@snippet :
@@ -2851,7 +2947,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle PKCS12_verify_mac$MH() {
-        return RuntimeHelper.requireNonNull(constants$24.PKCS12_verify_mac$MH,"PKCS12_verify_mac");
+        return RuntimeHelper.requireNonNull(constants$30.const$4,"PKCS12_verify_mac");
     }
     /**
      * {@snippet :
@@ -2867,7 +2963,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle PKCS12_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$24.PKCS12_free$MH,"PKCS12_free");
+        return RuntimeHelper.requireNonNull(constants$30.const$5,"PKCS12_free");
     }
     /**
      * {@snippet :
@@ -2883,7 +2979,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle PKCS12_parse$MH() {
-        return RuntimeHelper.requireNonNull(constants$24.PKCS12_parse$MH,"PKCS12_parse");
+        return RuntimeHelper.requireNonNull(constants$31.const$1,"PKCS12_parse");
     }
     /**
      * {@snippet :
@@ -2899,7 +2995,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle d2i_PKCS12_bio$MH() {
-        return RuntimeHelper.requireNonNull(constants$24.d2i_PKCS12_bio$MH,"d2i_PKCS12_bio");
+        return RuntimeHelper.requireNonNull(constants$31.const$2,"d2i_PKCS12_bio");
     }
     /**
      * {@snippet :
@@ -2915,7 +3011,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle RAND_seed$MH() {
-        return RuntimeHelper.requireNonNull(constants$25.RAND_seed$MH,"RAND_seed");
+        return RuntimeHelper.requireNonNull(constants$31.const$3,"RAND_seed");
     }
     /**
      * {@snippet :
@@ -2931,7 +3027,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle RAND_load_file$MH() {
-        return RuntimeHelper.requireNonNull(constants$25.RAND_load_file$MH,"RAND_load_file");
+        return RuntimeHelper.requireNonNull(constants$31.const$4,"RAND_load_file");
     }
     /**
      * {@snippet :
@@ -2947,7 +3043,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_check_issued$MH() {
-        return RuntimeHelper.requireNonNull(constants$25.X509_check_issued$MH,"X509_check_issued");
+        return RuntimeHelper.requireNonNull(constants$31.const$5,"X509_check_issued");
     }
     /**
      * {@snippet :
@@ -2963,7 +3059,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle ENGINE_by_id$MH() {
-        return RuntimeHelper.requireNonNull(constants$25.ENGINE_by_id$MH,"ENGINE_by_id");
+        return RuntimeHelper.requireNonNull(constants$32.const$0,"ENGINE_by_id");
     }
     /**
      * {@snippet :
@@ -2979,7 +3075,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle ENGINE_register_all_complete$MH() {
-        return RuntimeHelper.requireNonNull(constants$25.ENGINE_register_all_complete$MH,"ENGINE_register_all_complete");
+        return RuntimeHelper.requireNonNull(constants$32.const$1,"ENGINE_register_all_complete");
     }
     /**
      * {@snippet :
@@ -2995,7 +3091,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle ENGINE_ctrl_cmd_string$MH() {
-        return RuntimeHelper.requireNonNull(constants$25.ENGINE_ctrl_cmd_string$MH,"ENGINE_ctrl_cmd_string");
+        return RuntimeHelper.requireNonNull(constants$32.const$3,"ENGINE_ctrl_cmd_string");
     }
     /**
      * {@snippet :
@@ -3011,7 +3107,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle ENGINE_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$26.ENGINE_free$MH,"ENGINE_free");
+        return RuntimeHelper.requireNonNull(constants$32.const$4,"ENGINE_free");
     }
     /**
      * {@snippet :
@@ -3027,7 +3123,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle ENGINE_load_private_key$MH() {
-        return RuntimeHelper.requireNonNull(constants$26.ENGINE_load_private_key$MH,"ENGINE_load_private_key");
+        return RuntimeHelper.requireNonNull(constants$32.const$5,"ENGINE_load_private_key");
     }
     /**
      * {@snippet :
@@ -3043,7 +3139,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle ENGINE_set_default$MH() {
-        return RuntimeHelper.requireNonNull(constants$26.ENGINE_set_default$MH,"ENGINE_set_default");
+        return RuntimeHelper.requireNonNull(constants$33.const$0,"ENGINE_set_default");
     }
     /**
      * {@snippet :
@@ -3059,7 +3155,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OCSP_cert_to_id$MH() {
-        return RuntimeHelper.requireNonNull(constants$26.OCSP_cert_to_id$MH,"OCSP_cert_to_id");
+        return RuntimeHelper.requireNonNull(constants$33.const$1,"OCSP_cert_to_id");
     }
     /**
      * {@snippet :
@@ -3075,7 +3171,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OCSP_request_add0_id$MH() {
-        return RuntimeHelper.requireNonNull(constants$26.OCSP_request_add0_id$MH,"OCSP_request_add0_id");
+        return RuntimeHelper.requireNonNull(constants$33.const$2,"OCSP_request_add0_id");
     }
     /**
      * {@snippet :
@@ -3091,7 +3187,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OCSP_response_status$MH() {
-        return RuntimeHelper.requireNonNull(constants$26.OCSP_response_status$MH,"OCSP_response_status");
+        return RuntimeHelper.requireNonNull(constants$33.const$3,"OCSP_response_status");
     }
     /**
      * {@snippet :
@@ -3107,7 +3203,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OCSP_response_get1_basic$MH() {
-        return RuntimeHelper.requireNonNull(constants$27.OCSP_response_get1_basic$MH,"OCSP_response_get1_basic");
+        return RuntimeHelper.requireNonNull(constants$33.const$4,"OCSP_response_get1_basic");
     }
     /**
      * {@snippet :
@@ -3123,7 +3219,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OCSP_resp_get0$MH() {
-        return RuntimeHelper.requireNonNull(constants$27.OCSP_resp_get0$MH,"OCSP_resp_get0");
+        return RuntimeHelper.requireNonNull(constants$33.const$5,"OCSP_resp_get0");
     }
     /**
      * {@snippet :
@@ -3139,7 +3235,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OCSP_resp_find$MH() {
-        return RuntimeHelper.requireNonNull(constants$27.OCSP_resp_find$MH,"OCSP_resp_find");
+        return RuntimeHelper.requireNonNull(constants$34.const$0,"OCSP_resp_find");
     }
     /**
      * {@snippet :
@@ -3155,7 +3251,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OCSP_single_get0_status$MH() {
-        return RuntimeHelper.requireNonNull(constants$27.OCSP_single_get0_status$MH,"OCSP_single_get0_status");
+        return RuntimeHelper.requireNonNull(constants$34.const$1,"OCSP_single_get0_status");
     }
     /**
      * {@snippet :
@@ -3171,7 +3267,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OCSP_BASICRESP_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$27.OCSP_BASICRESP_free$MH,"OCSP_BASICRESP_free");
+        return RuntimeHelper.requireNonNull(constants$34.const$2,"OCSP_BASICRESP_free");
     }
     /**
      * {@snippet :
@@ -3187,7 +3283,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OCSP_RESPONSE_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$27.OCSP_RESPONSE_free$MH,"OCSP_RESPONSE_free");
+        return RuntimeHelper.requireNonNull(constants$34.const$3,"OCSP_RESPONSE_free");
     }
     /**
      * {@snippet :
@@ -3203,7 +3299,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle d2i_OCSP_RESPONSE$MH() {
-        return RuntimeHelper.requireNonNull(constants$28.d2i_OCSP_RESPONSE$MH,"d2i_OCSP_RESPONSE");
+        return RuntimeHelper.requireNonNull(constants$34.const$4,"d2i_OCSP_RESPONSE");
     }
     /**
      * {@snippet :
@@ -3219,7 +3315,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OCSP_CERTID_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$28.OCSP_CERTID_free$MH,"OCSP_CERTID_free");
+        return RuntimeHelper.requireNonNull(constants$34.const$5,"OCSP_CERTID_free");
     }
     /**
      * {@snippet :
@@ -3235,7 +3331,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OCSP_REQUEST_new$MH() {
-        return RuntimeHelper.requireNonNull(constants$28.OCSP_REQUEST_new$MH,"OCSP_REQUEST_new");
+        return RuntimeHelper.requireNonNull(constants$35.const$0,"OCSP_REQUEST_new");
     }
     /**
      * {@snippet :
@@ -3251,7 +3347,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OCSP_REQUEST_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$28.OCSP_REQUEST_free$MH,"OCSP_REQUEST_free");
+        return RuntimeHelper.requireNonNull(constants$35.const$1,"OCSP_REQUEST_free");
     }
     /**
      * {@snippet :
@@ -3267,7 +3363,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle i2d_OCSP_REQUEST$MH() {
-        return RuntimeHelper.requireNonNull(constants$28.i2d_OCSP_REQUEST$MH,"i2d_OCSP_REQUEST");
+        return RuntimeHelper.requireNonNull(constants$35.const$2,"i2d_OCSP_REQUEST");
     }
     /**
      * {@snippet :
@@ -3283,7 +3379,7 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OSSL_PROVIDER_get0_name$MH() {
-        return RuntimeHelper.requireNonNull(constants$28.OSSL_PROVIDER_get0_name$MH,"OSSL_PROVIDER_get0_name");
+        return RuntimeHelper.requireNonNull(constants$35.const$3,"OSSL_PROVIDER_get0_name");
     }
     /**
      * {@snippet :
@@ -3300,11 +3396,11 @@ public class openssl_h  {
     }
     /**
      * {@snippet :
-     * #define OPENSSL_FILE "/tmp/jextract$5975327931591344605.h"
+     * #define OPENSSL_FILE "/tmp/jextract$5612544175128132323.h"
      * }
      */
     public static MemorySegment OPENSSL_FILE() {
-        return constants$29.OPENSSL_FILE$SEGMENT;
+        return constants$35.const$4;
     }
     /**
      * {@snippet :
@@ -3345,6 +3441,14 @@ public class openssl_h  {
      */
     public static int EVP_PKEY_DSA() {
         return (int)116L;
+    }
+    /**
+     * {@snippet :
+     * #define PEM_STRING_ECPARAMETERS "EC PARAMETERS"
+     * }
+     */
+    public static MemorySegment PEM_STRING_ECPARAMETERS() {
+        return constants$35.const$5;
     }
     /**
      * {@snippet :

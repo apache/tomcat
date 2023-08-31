@@ -28,50 +28,28 @@ final class constants$1 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$1() {}
-    static final FunctionDescriptor BIO_s_file$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT);
-    static final MethodHandle BIO_s_file$MH = RuntimeHelper.downcallHandle(
-        "BIO_s_file",
-        constants$1.BIO_s_file$FUNC
+    static final FunctionDescriptor const$0 = FunctionDescriptor.of(RuntimeHelper.POINTER,
+        JAVA_INT
     );
-    static final FunctionDescriptor BIO_new_file$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "OpenSSL_version",
+        constants$1.const$0
     );
-    static final MethodHandle BIO_new_file$MH = RuntimeHelper.downcallHandle(
-        "BIO_new_file",
-        constants$1.BIO_new_file$FUNC
+    static final FunctionDescriptor const$2 = FunctionDescriptor.ofVoid(
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        JAVA_INT
     );
-    static final FunctionDescriptor BIO_new$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "CRYPTO_free",
+        constants$1.const$2
     );
-    static final MethodHandle BIO_new$MH = RuntimeHelper.downcallHandle(
-        "BIO_new",
-        constants$1.BIO_new$FUNC
+    static final FunctionDescriptor const$4 = FunctionDescriptor.of(JAVA_LONG,
+        RuntimeHelper.POINTER
     );
-    static final FunctionDescriptor BIO_free$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle BIO_free$MH = RuntimeHelper.downcallHandle(
-        "BIO_free",
-        constants$1.BIO_free$FUNC
-    );
-    static final FunctionDescriptor BIO_read$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT
-    );
-    static final MethodHandle BIO_read$MH = RuntimeHelper.downcallHandle(
-        "BIO_read",
-        constants$1.BIO_read$FUNC
-    );
-    static final FunctionDescriptor BIO_write$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT
-    );
-    static final MethodHandle BIO_write$MH = RuntimeHelper.downcallHandle(
-        "BIO_write",
-        constants$1.BIO_write$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "BIO_ctrl_pending",
+        constants$1.const$4
     );
 }
 

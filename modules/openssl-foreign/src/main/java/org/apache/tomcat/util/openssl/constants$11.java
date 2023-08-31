@@ -28,54 +28,29 @@ final class constants$11 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$11() {}
-    static final FunctionDescriptor SSL_CTX_set_options$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_LONG_LONG$LAYOUT
+    static final FunctionDescriptor const$0 = FunctionDescriptor.ofVoid(
+        RuntimeHelper.POINTER,
+        JAVA_INT
     );
-    static final MethodHandle SSL_CTX_set_options$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_options",
-        constants$11.SSL_CTX_set_options$FUNC
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "X509_STORE_CTX_set_error",
+        constants$11.const$0
     );
-    static final FunctionDescriptor SSL_set_options$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_LONG_LONG$LAYOUT
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
+        "X509_STORE_CTX_get_error_depth",
+        constants$0.const$0
     );
-    static final MethodHandle SSL_set_options$MH = RuntimeHelper.downcallHandle(
-        "SSL_set_options",
-        constants$11.SSL_set_options$FUNC
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "X509_STORE_CTX_get_current_cert",
+        constants$2.const$4
     );
-    static final FunctionDescriptor SSL_CTX_set_alpn_select_cb$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        "X509_STORE_CTX_get0_current_issuer",
+        constants$2.const$4
     );
-    static final MethodHandle SSL_CTX_set_alpn_select_cb$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_alpn_select_cb",
-        constants$11.SSL_CTX_set_alpn_select_cb$FUNC
-    );
-    static final FunctionDescriptor SSL_get0_alpn_selected$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_get0_alpn_selected$MH = RuntimeHelper.downcallHandle(
-        "SSL_get0_alpn_selected",
-        constants$11.SSL_get0_alpn_selected$FUNC
-    );
-    static final FunctionDescriptor SSL_in_init$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_in_init$MH = RuntimeHelper.downcallHandle(
-        "SSL_in_init",
-        constants$11.SSL_in_init$FUNC
-    );
-    static final FunctionDescriptor SSL_CTX_set_cipher_list$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_CTX_set_cipher_list$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_cipher_list",
-        constants$11.SSL_CTX_set_cipher_list$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "d2i_X509_bio",
+        constants$2.const$2
     );
 }
 

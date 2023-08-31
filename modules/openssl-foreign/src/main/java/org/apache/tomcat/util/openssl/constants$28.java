@@ -28,48 +28,29 @@ final class constants$28 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$28() {}
-    static final FunctionDescriptor d2i_OCSP_RESPONSE$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_LONG_LONG$LAYOUT
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
+        "SSL_CONF_CTX_new",
+        constants$2.const$0
     );
-    static final MethodHandle d2i_OCSP_RESPONSE$MH = RuntimeHelper.downcallHandle(
-        "d2i_OCSP_RESPONSE",
-        constants$28.d2i_OCSP_RESPONSE$FUNC
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "SSL_CONF_CTX_finish",
+        constants$0.const$0
     );
-    static final FunctionDescriptor OCSP_CERTID_free$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
+        "SSL_CONF_CTX_free",
+        constants$7.const$0
     );
-    static final MethodHandle OCSP_CERTID_free$MH = RuntimeHelper.downcallHandle(
-        "OCSP_CERTID_free",
-        constants$28.OCSP_CERTID_free$FUNC
+    static final FunctionDescriptor const$3 = FunctionDescriptor.of(JAVA_INT,
+        RuntimeHelper.POINTER,
+        JAVA_INT
     );
-    static final FunctionDescriptor OCSP_REQUEST_new$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT);
-    static final MethodHandle OCSP_REQUEST_new$MH = RuntimeHelper.downcallHandle(
-        "OCSP_REQUEST_new",
-        constants$28.OCSP_REQUEST_new$FUNC
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        "SSL_CONF_CTX_set_flags",
+        constants$28.const$3
     );
-    static final FunctionDescriptor OCSP_REQUEST_free$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle OCSP_REQUEST_free$MH = RuntimeHelper.downcallHandle(
-        "OCSP_REQUEST_free",
-        constants$28.OCSP_REQUEST_free$FUNC
-    );
-    static final FunctionDescriptor i2d_OCSP_REQUEST$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle i2d_OCSP_REQUEST$MH = RuntimeHelper.downcallHandle(
-        "i2d_OCSP_REQUEST",
-        constants$28.i2d_OCSP_REQUEST$FUNC
-    );
-    static final FunctionDescriptor OSSL_PROVIDER_get0_name$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle OSSL_PROVIDER_get0_name$MH = RuntimeHelper.downcallHandle(
-        "OSSL_PROVIDER_get0_name",
-        constants$28.OSSL_PROVIDER_get0_name$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "SSL_CONF_CTX_set_ssl_ctx",
+        constants$21.const$1
     );
 }
 

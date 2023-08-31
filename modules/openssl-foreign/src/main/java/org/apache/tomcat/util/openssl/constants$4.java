@@ -28,49 +28,35 @@ final class constants$4 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$4() {}
-    static final FunctionDescriptor BN_get_rfc3526_prime_6144$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
+        "BIO_s_mem",
+        constants$2.const$0
     );
-    static final MethodHandle BN_get_rfc3526_prime_6144$MH = RuntimeHelper.downcallHandle(
-        "BN_get_rfc3526_prime_6144",
-        constants$4.BN_get_rfc3526_prime_6144$FUNC
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "BIO_s_bio",
+        constants$2.const$0
     );
-    static final FunctionDescriptor BN_get_rfc3526_prime_8192$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final FunctionDescriptor const$2 = FunctionDescriptor.of(JAVA_INT,
+        RuntimeHelper.POINTER,
+        JAVA_LONG,
+        RuntimeHelper.POINTER,
+        JAVA_LONG
     );
-    static final MethodHandle BN_get_rfc3526_prime_8192$MH = RuntimeHelper.downcallHandle(
-        "BN_get_rfc3526_prime_8192",
-        constants$4.BN_get_rfc3526_prime_8192$FUNC
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "BIO_new_bio_pair",
+        constants$4.const$2
     );
-    static final FunctionDescriptor ASN1_STRING_length$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        "BN_new",
+        constants$2.const$0
     );
-    static final MethodHandle ASN1_STRING_length$MH = RuntimeHelper.downcallHandle(
-        "ASN1_STRING_length",
-        constants$4.ASN1_STRING_length$FUNC
+    static final FunctionDescriptor const$5 = FunctionDescriptor.of(JAVA_INT,
+        RuntimeHelper.POINTER,
+        JAVA_LONG
     );
-    static final FunctionDescriptor ASN1_STRING_get0_data$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle ASN1_STRING_get0_data$MH = RuntimeHelper.downcallHandle(
-        "ASN1_STRING_get0_data",
-        constants$4.ASN1_STRING_get0_data$FUNC
-    );
-    static final FunctionDescriptor EVP_MD_get0_provider$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle EVP_MD_get0_provider$MH = RuntimeHelper.downcallHandle(
-        "EVP_MD_get0_provider",
-        constants$4.EVP_MD_get0_provider$FUNC
-    );
-    static final FunctionDescriptor EVP_MD_fetch$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle EVP_MD_fetch$MH = RuntimeHelper.downcallHandle(
-        "EVP_MD_fetch",
-        constants$4.EVP_MD_fetch$FUNC
+    static final MethodHandle const$6 = RuntimeHelper.downcallHandle(
+        "BN_set_word",
+        constants$4.const$5
     );
 }
 

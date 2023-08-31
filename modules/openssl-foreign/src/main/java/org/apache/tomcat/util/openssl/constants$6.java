@@ -28,49 +28,34 @@ final class constants$6 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$6() {}
-    static final FunctionDescriptor EC_KEY_free$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
+        "BN_get_rfc3526_prime_6144",
+        constants$2.const$4
     );
-    static final MethodHandle EC_KEY_free$MH = RuntimeHelper.downcallHandle(
-        "EC_KEY_free",
-        constants$6.EC_KEY_free$FUNC
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "BN_get_rfc3526_prime_8192",
+        constants$2.const$4
     );
-    static final FunctionDescriptor DH_new$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT);
-    static final MethodHandle DH_new$MH = RuntimeHelper.downcallHandle(
-        "DH_new",
-        constants$6.DH_new$FUNC
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
+        "ASN1_STRING_length",
+        constants$0.const$0
     );
-    static final FunctionDescriptor DH_free$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "ASN1_STRING_get0_data",
+        constants$2.const$4
     );
-    static final MethodHandle DH_free$MH = RuntimeHelper.downcallHandle(
-        "DH_free",
-        constants$6.DH_free$FUNC
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        "EVP_MD_get0_provider",
+        constants$2.const$4
     );
-    static final FunctionDescriptor DH_set0_pqg$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final FunctionDescriptor const$5 = FunctionDescriptor.of(RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER
     );
-    static final MethodHandle DH_set0_pqg$MH = RuntimeHelper.downcallHandle(
-        "DH_set0_pqg",
-        constants$6.DH_set0_pqg$FUNC
-    );
-    static final FunctionDescriptor X509_STORE_set_flags$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_LONG_LONG$LAYOUT
-    );
-    static final MethodHandle X509_STORE_set_flags$MH = RuntimeHelper.downcallHandle(
-        "X509_STORE_set_flags",
-        constants$6.X509_STORE_set_flags$FUNC
-    );
-    static final FunctionDescriptor X509_STORE_CTX_get0_untrusted$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle X509_STORE_CTX_get0_untrusted$MH = RuntimeHelper.downcallHandle(
-        "X509_STORE_CTX_get0_untrusted",
-        constants$6.X509_STORE_CTX_get0_untrusted$FUNC
+    static final MethodHandle const$6 = RuntimeHelper.downcallHandle(
+        "EVP_MD_fetch",
+        constants$6.const$5
     );
 }
 

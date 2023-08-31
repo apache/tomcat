@@ -28,53 +28,29 @@ final class constants$24 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$24() {}
-    static final FunctionDescriptor ERR_clear_error$FUNC = FunctionDescriptor.ofVoid();
-    static final MethodHandle ERR_clear_error$MH = RuntimeHelper.downcallHandle(
-        "ERR_clear_error",
-        constants$24.ERR_clear_error$FUNC
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
+        "SSL_verify_client_post_handshake",
+        constants$0.const$0
     );
-    static final FunctionDescriptor ERR_error_string$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_LONG_LONG$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "SSL_CTX_set_client_CA_list",
+        constants$21.const$1
     );
-    static final MethodHandle ERR_error_string$MH = RuntimeHelper.downcallHandle(
-        "ERR_error_string",
-        constants$24.ERR_error_string$FUNC
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
+        "SSL_CTX_get_client_CA_list",
+        constants$2.const$4
     );
-    static final FunctionDescriptor PKCS12_verify_mac$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "SSL_CTX_add_client_CA",
+        constants$12.const$2
     );
-    static final MethodHandle PKCS12_verify_mac$MH = RuntimeHelper.downcallHandle(
-        "PKCS12_verify_mac",
-        constants$24.PKCS12_verify_mac$FUNC
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        "SSL_set_connect_state",
+        constants$7.const$0
     );
-    static final FunctionDescriptor PKCS12_free$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle PKCS12_free$MH = RuntimeHelper.downcallHandle(
-        "PKCS12_free",
-        constants$24.PKCS12_free$FUNC
-    );
-    static final FunctionDescriptor PKCS12_parse$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle PKCS12_parse$MH = RuntimeHelper.downcallHandle(
-        "PKCS12_parse",
-        constants$24.PKCS12_parse$FUNC
-    );
-    static final FunctionDescriptor d2i_PKCS12_bio$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle d2i_PKCS12_bio$MH = RuntimeHelper.downcallHandle(
-        "d2i_PKCS12_bio",
-        constants$24.d2i_PKCS12_bio$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "SSL_set_accept_state",
+        constants$7.const$0
     );
 }
 

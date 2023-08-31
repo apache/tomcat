@@ -28,52 +28,30 @@ final class constants$15 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$15() {}
-    static final FunctionDescriptor SSL_SESSION_get_id$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final FunctionDescriptor const$0 = FunctionDescriptor.of(JAVA_LONG,
+        RuntimeHelper.POINTER,
+        JAVA_LONG
     );
-    static final MethodHandle SSL_SESSION_get_id$MH = RuntimeHelper.downcallHandle(
-        "SSL_SESSION_get_id",
-        constants$15.SSL_SESSION_get_id$FUNC
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "SSL_CTX_clear_options",
+        constants$15.const$0
     );
-    static final FunctionDescriptor SSL_get1_peer_certificate$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
+        "SSL_CTX_set_options",
+        constants$15.const$0
     );
-    static final MethodHandle SSL_get1_peer_certificate$MH = RuntimeHelper.downcallHandle(
-        "SSL_get1_peer_certificate",
-        constants$15.SSL_get1_peer_certificate$FUNC
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "SSL_set_options",
+        constants$15.const$0
     );
-    static final FunctionDescriptor SSL_get_peer_cert_chain$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final FunctionDescriptor const$4 = FunctionDescriptor.ofVoid(
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER
     );
-    static final MethodHandle SSL_get_peer_cert_chain$MH = RuntimeHelper.downcallHandle(
-        "SSL_get_peer_cert_chain",
-        constants$15.SSL_get_peer_cert_chain$FUNC
-    );
-    static final FunctionDescriptor SSL_CTX_set_verify$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_CTX_set_verify$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_verify",
-        constants$15.SSL_CTX_set_verify$FUNC
-    );
-    static final FunctionDescriptor SSL_CTX_set_cert_verify_callback$cb$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final FunctionDescriptor SSL_CTX_set_cert_verify_callback$cb_UP$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_CTX_set_cert_verify_callback$cb_UP$MH = RuntimeHelper.upcallHandle(SSL_CTX_set_cert_verify_callback$cb.class, "apply", constants$15.SSL_CTX_set_cert_verify_callback$cb_UP$FUNC);
-    static final FunctionDescriptor SSL_CTX_set_cert_verify_callback$cb_DOWN$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_CTX_set_cert_verify_callback$cb_DOWN$MH = RuntimeHelper.downcallHandle(
-        constants$15.SSL_CTX_set_cert_verify_callback$cb_DOWN$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "SSL_CTX_set_alpn_select_cb",
+        constants$15.const$4
     );
 }
 

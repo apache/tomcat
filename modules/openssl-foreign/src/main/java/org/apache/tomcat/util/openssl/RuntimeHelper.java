@@ -37,8 +37,12 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import java.lang.foreign.AddressLayout;
+import java.lang.foreign.MemoryLayout;
+
 import static java.lang.foreign.Linker.*;
 import static java.lang.foreign.ValueLayout.*;
+import static java.lang.Long.MAX_VALUE;
 
 final class RuntimeHelper {
 
@@ -47,6 +51,7 @@ final class RuntimeHelper {
     private static final MethodHandles.Lookup MH_LOOKUP = MethodHandles.lookup();
     private static final SymbolLookup SYMBOL_LOOKUP;
     private static final SegmentAllocator THROWING_ALLOCATOR = (x, y) -> { throw new AssertionError("should not reach here"); };
+    static final AddressLayout POINTER = ValueLayout.ADDRESS.withTargetLayout(MemoryLayout.sequenceLayout(MAX_VALUE, JAVA_BYTE));
 
     final static SegmentAllocator CONSTANT_ALLOCATOR =
             (size, align) -> Arena.ofAuto().allocate(size, align);

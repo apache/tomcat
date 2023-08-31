@@ -28,48 +28,29 @@ final class constants$22 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$22() {}
-    static final FunctionDescriptor SSL_CTX_set_tmp_dh_callback$dh_DOWN$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT,
-        Constants$root.C_INT$LAYOUT
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
+        "SSL_free",
+        constants$7.const$0
     );
-    static final MethodHandle SSL_CTX_set_tmp_dh_callback$dh_DOWN$MH = RuntimeHelper.downcallHandle(
-        constants$22.SSL_CTX_set_tmp_dh_callback$dh_DOWN$FUNC
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "SSL_read",
+        constants$3.const$1
     );
-    static final FunctionDescriptor SSL_CTX_set_tmp_dh_callback$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
+        "SSL_write",
+        constants$3.const$1
     );
-    static final MethodHandle SSL_CTX_set_tmp_dh_callback$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_tmp_dh_callback",
-        constants$22.SSL_CTX_set_tmp_dh_callback$FUNC
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "SSL_CTX_ctrl",
+        constants$3.const$4
     );
-    static final FunctionDescriptor SSL_CONF_CTX_new$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT);
-    static final MethodHandle SSL_CONF_CTX_new$MH = RuntimeHelper.downcallHandle(
-        "SSL_CONF_CTX_new",
-        constants$22.SSL_CONF_CTX_new$FUNC
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        "SSL_get_version",
+        constants$2.const$4
     );
-    static final FunctionDescriptor SSL_CONF_CTX_finish$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_CONF_CTX_finish$MH = RuntimeHelper.downcallHandle(
-        "SSL_CONF_CTX_finish",
-        constants$22.SSL_CONF_CTX_finish$FUNC
-    );
-    static final FunctionDescriptor SSL_CONF_CTX_free$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_CONF_CTX_free$MH = RuntimeHelper.downcallHandle(
-        "SSL_CONF_CTX_free",
-        constants$22.SSL_CONF_CTX_free$FUNC
-    );
-    static final FunctionDescriptor SSL_CONF_CTX_set_flags$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT
-    );
-    static final MethodHandle SSL_CONF_CTX_set_flags$MH = RuntimeHelper.downcallHandle(
-        "SSL_CONF_CTX_set_flags",
-        constants$22.SSL_CONF_CTX_set_flags$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "TLS_server_method",
+        constants$2.const$0
     );
 }
 

@@ -28,51 +28,30 @@ final class constants$25 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$25() {}
-    static final FunctionDescriptor RAND_seed$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
+        "SSL_get_privatekey",
+        constants$2.const$4
     );
-    static final MethodHandle RAND_seed$MH = RuntimeHelper.downcallHandle(
-        "RAND_seed",
-        constants$25.RAND_seed$FUNC
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "SSL_get_shutdown",
+        constants$0.const$0
     );
-    static final FunctionDescriptor RAND_load_file$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_LONG_LONG$LAYOUT
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
+        "SSL_CTX_set_default_verify_paths",
+        constants$0.const$0
     );
-    static final MethodHandle RAND_load_file$MH = RuntimeHelper.downcallHandle(
-        "RAND_load_file",
-        constants$25.RAND_load_file$FUNC
+    static final FunctionDescriptor const$3 = FunctionDescriptor.of(JAVA_INT,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER
     );
-    static final FunctionDescriptor X509_check_issued$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        "SSL_CTX_load_verify_locations",
+        constants$25.const$3
     );
-    static final MethodHandle X509_check_issued$MH = RuntimeHelper.downcallHandle(
-        "X509_check_issued",
-        constants$25.X509_check_issued$FUNC
-    );
-    static final FunctionDescriptor ENGINE_by_id$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle ENGINE_by_id$MH = RuntimeHelper.downcallHandle(
-        "ENGINE_by_id",
-        constants$25.ENGINE_by_id$FUNC
-    );
-    static final FunctionDescriptor ENGINE_register_all_complete$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT);
-    static final MethodHandle ENGINE_register_all_complete$MH = RuntimeHelper.downcallHandle(
-        "ENGINE_register_all_complete",
-        constants$25.ENGINE_register_all_complete$FUNC
-    );
-    static final FunctionDescriptor ENGINE_ctrl_cmd_string$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT
-    );
-    static final MethodHandle ENGINE_ctrl_cmd_string$MH = RuntimeHelper.downcallHandle(
-        "ENGINE_ctrl_cmd_string",
-        constants$25.ENGINE_ctrl_cmd_string$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "SSL_get_session",
+        constants$2.const$4
     );
 }
 

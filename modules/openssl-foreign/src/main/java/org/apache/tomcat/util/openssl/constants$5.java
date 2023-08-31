@@ -28,47 +28,29 @@ final class constants$5 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$5() {}
-    static final FunctionDescriptor EVP_MD_free$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
+        "BN_get_rfc2409_prime_768",
+        constants$2.const$4
     );
-    static final MethodHandle EVP_MD_free$MH = RuntimeHelper.downcallHandle(
-        "EVP_MD_free",
-        constants$5.EVP_MD_free$FUNC
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "BN_get_rfc2409_prime_1024",
+        constants$2.const$4
     );
-    static final FunctionDescriptor EVP_PKEY_get_base_id$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
+        "BN_get_rfc3526_prime_1536",
+        constants$2.const$4
     );
-    static final MethodHandle EVP_PKEY_get_base_id$MH = RuntimeHelper.downcallHandle(
-        "EVP_PKEY_get_base_id",
-        constants$5.EVP_PKEY_get_base_id$FUNC
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "BN_get_rfc3526_prime_2048",
+        constants$2.const$4
     );
-    static final FunctionDescriptor EVP_PKEY_get_bits$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        "BN_get_rfc3526_prime_3072",
+        constants$2.const$4
     );
-    static final MethodHandle EVP_PKEY_get_bits$MH = RuntimeHelper.downcallHandle(
-        "EVP_PKEY_get_bits",
-        constants$5.EVP_PKEY_get_bits$FUNC
-    );
-    static final FunctionDescriptor EC_GROUP_free$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle EC_GROUP_free$MH = RuntimeHelper.downcallHandle(
-        "EC_GROUP_free",
-        constants$5.EC_GROUP_free$FUNC
-    );
-    static final FunctionDescriptor EC_GROUP_get_curve_name$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle EC_GROUP_get_curve_name$MH = RuntimeHelper.downcallHandle(
-        "EC_GROUP_get_curve_name",
-        constants$5.EC_GROUP_get_curve_name$FUNC
-    );
-    static final FunctionDescriptor EC_KEY_new_by_curve_name$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT
-    );
-    static final MethodHandle EC_KEY_new_by_curve_name$MH = RuntimeHelper.downcallHandle(
-        "EC_KEY_new_by_curve_name",
-        constants$5.EC_KEY_new_by_curve_name$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "BN_get_rfc3526_prime_4096",
+        constants$2.const$4
     );
 }
 

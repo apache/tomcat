@@ -28,50 +28,35 @@ final class constants$13 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$13() {}
-    static final FunctionDescriptor SSL_CIPHER_get_name$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
+        "X509_get_ext",
+        constants$0.const$2
     );
-    static final MethodHandle SSL_CIPHER_get_name$MH = RuntimeHelper.downcallHandle(
-        "SSL_CIPHER_get_name",
-        constants$13.SSL_CIPHER_get_name$FUNC
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "X509_EXTENSION_get_data",
+        constants$2.const$4
     );
-    static final FunctionDescriptor SSL_CIPHER_get_kx_nid$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final FunctionDescriptor const$2 = FunctionDescriptor.of(RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER
     );
-    static final MethodHandle SSL_CIPHER_get_kx_nid$MH = RuntimeHelper.downcallHandle(
-        "SSL_CIPHER_get_kx_nid",
-        constants$13.SSL_CIPHER_get_kx_nid$FUNC
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "PEM_ASN1_read_bio",
+        constants$13.const$2
     );
-    static final FunctionDescriptor SSL_CIPHER_get_auth_nid$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final FunctionDescriptor const$4 = FunctionDescriptor.of(RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER
     );
-    static final MethodHandle SSL_CIPHER_get_auth_nid$MH = RuntimeHelper.downcallHandle(
-        "SSL_CIPHER_get_auth_nid",
-        constants$13.SSL_CIPHER_get_auth_nid$FUNC
-    );
-    static final FunctionDescriptor SSL_pending$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_pending$MH = RuntimeHelper.downcallHandle(
-        "SSL_pending",
-        constants$13.SSL_pending$FUNC
-    );
-    static final FunctionDescriptor SSL_set_bio$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_set_bio$MH = RuntimeHelper.downcallHandle(
-        "SSL_set_bio",
-        constants$13.SSL_set_bio$FUNC
-    );
-    static final FunctionDescriptor SSL_set_cipher_list$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_set_cipher_list$MH = RuntimeHelper.downcallHandle(
-        "SSL_set_cipher_list",
-        constants$13.SSL_set_cipher_list$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "PEM_read_bio_X509_AUX",
+        constants$13.const$4
     );
 }
 

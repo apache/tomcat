@@ -63,7 +63,7 @@ public class openssl_compat_h  {
 
     // OpenSSL 1.1 EVP_PKEY_base_id
     static final FunctionDescriptor EVP_PKEY_base_id$FUNC = FunctionDescriptor
-            .of(Constants$root.C_INT$LAYOUT, Constants$root.C_POINTER$LAYOUT);
+            .of(JAVA_INT, RuntimeHelper.POINTER);
     static final MethodHandle EVP_PKEY_base_id$MH = RuntimeHelper
             .downcallHandle("EVP_PKEY_base_id", EVP_PKEY_base_id$FUNC);
     public static MethodHandle EVP_PKEY_base_id$MH() {
@@ -81,7 +81,7 @@ public class openssl_compat_h  {
 
     // OpenSSL 1.1 EVP_PKEY_bits
     static final FunctionDescriptor EVP_PKEY_bits$FUNC = FunctionDescriptor
-            .of(Constants$root.C_INT$LAYOUT, Constants$root.C_POINTER$LAYOUT);
+            .of(JAVA_INT, RuntimeHelper.POINTER);
     static final MethodHandle EVP_PKEY_bits$MH = RuntimeHelper
             .downcallHandle("EVP_PKEY_bits", EVP_PKEY_bits$FUNC);
     public static MethodHandle EVP_PKEY_bits$MH() {
@@ -98,8 +98,7 @@ public class openssl_compat_h  {
 
     // OpenSSL 1.1 SSL_get_peer_certificate
     static final FunctionDescriptor SSL_get_peer_certificate$FUNC = FunctionDescriptor
-            .of(Constants$root.C_POINTER$LAYOUT,
-                    Constants$root.C_POINTER$LAYOUT);
+            .of(RuntimeHelper.POINTER, RuntimeHelper.POINTER);
     static final MethodHandle SSL_get_peer_certificate$MH = RuntimeHelper
             .downcallHandle("SSL_get_peer_certificate",
                     SSL_get_peer_certificate$FUNC);

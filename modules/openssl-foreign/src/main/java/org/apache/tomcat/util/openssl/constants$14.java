@@ -28,52 +28,29 @@ final class constants$14 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$14() {}
-    static final FunctionDescriptor SSL_CTX_set_ciphersuites$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
+        "PEM_read_bio_ECPKParameters",
+        constants$13.const$4
     );
-    static final MethodHandle SSL_CTX_set_ciphersuites$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_ciphersuites",
-        constants$14.SSL_CTX_set_ciphersuites$FUNC
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
+        "PEM_read_bio_DHparams",
+        constants$13.const$4
     );
-    static final FunctionDescriptor SSL_set_verify$FUNC = FunctionDescriptor.ofVoid(
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
+        "PEM_read_bio_PrivateKey",
+        constants$13.const$4
     );
-    static final MethodHandle SSL_set_verify$MH = RuntimeHelper.downcallHandle(
-        "SSL_set_verify",
-        constants$14.SSL_set_verify$FUNC
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "PEM_read_bio_Parameters",
+        constants$2.const$2
     );
-    static final FunctionDescriptor SSL_CTX_use_certificate_chain_file$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
+        "SSL_CTX_get_options",
+        constants$1.const$4
     );
-    static final MethodHandle SSL_CTX_use_certificate_chain_file$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_use_certificate_chain_file",
-        constants$14.SSL_CTX_use_certificate_chain_file$FUNC
-    );
-    static final FunctionDescriptor SSL_load_client_CA_file$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_load_client_CA_file$MH = RuntimeHelper.downcallHandle(
-        "SSL_load_client_CA_file",
-        constants$14.SSL_load_client_CA_file$FUNC
-    );
-    static final FunctionDescriptor SSL_add_file_cert_subjects_to_stack$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_add_file_cert_subjects_to_stack$MH = RuntimeHelper.downcallHandle(
-        "SSL_add_file_cert_subjects_to_stack",
-        constants$14.SSL_add_file_cert_subjects_to_stack$FUNC
-    );
-    static final FunctionDescriptor SSL_SESSION_get_time$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle SSL_SESSION_get_time$MH = RuntimeHelper.downcallHandle(
-        "SSL_SESSION_get_time",
-        constants$14.SSL_SESSION_get_time$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "SSL_get_options",
+        constants$1.const$4
     );
 }
 

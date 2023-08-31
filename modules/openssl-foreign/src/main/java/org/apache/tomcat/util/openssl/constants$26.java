@@ -28,54 +28,26 @@ final class constants$26 {
 
     // Suppresses default constructor, ensuring non-instantiability.
     private constants$26() {}
-    static final FunctionDescriptor ENGINE_free$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final FunctionDescriptor const$0 = FunctionDescriptor.ofVoid(
+        RuntimeHelper.POINTER,
+        JAVA_INT,
+        JAVA_INT
     );
-    static final MethodHandle ENGINE_free$MH = RuntimeHelper.downcallHandle(
-        "ENGINE_free",
-        constants$26.ENGINE_free$FUNC
+    static final MethodHandle const$1 = RuntimeHelper.upcallHandle(SSL_set_info_callback$cb.class, "apply", constants$26.const$0);
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
+        constants$26.const$0
     );
-    static final FunctionDescriptor ENGINE_load_private_key$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
+        "SSL_set_info_callback",
+        constants$21.const$1
     );
-    static final MethodHandle ENGINE_load_private_key$MH = RuntimeHelper.downcallHandle(
-        "ENGINE_load_private_key",
-        constants$26.ENGINE_load_private_key$FUNC
+    static final FunctionDescriptor const$4 = FunctionDescriptor.ofVoid(
+        RuntimeHelper.POINTER,
+        JAVA_LONG
     );
-    static final FunctionDescriptor ENGINE_set_default$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_INT$LAYOUT
-    );
-    static final MethodHandle ENGINE_set_default$MH = RuntimeHelper.downcallHandle(
-        "ENGINE_set_default",
-        constants$26.ENGINE_set_default$FUNC
-    );
-    static final FunctionDescriptor OCSP_cert_to_id$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle OCSP_cert_to_id$MH = RuntimeHelper.downcallHandle(
-        "OCSP_cert_to_id",
-        constants$26.OCSP_cert_to_id$FUNC
-    );
-    static final FunctionDescriptor OCSP_request_add0_id$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle OCSP_request_add0_id$MH = RuntimeHelper.downcallHandle(
-        "OCSP_request_add0_id",
-        constants$26.OCSP_request_add0_id$FUNC
-    );
-    static final FunctionDescriptor OCSP_response_status$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
-        Constants$root.C_POINTER$LAYOUT
-    );
-    static final MethodHandle OCSP_response_status$MH = RuntimeHelper.downcallHandle(
-        "OCSP_response_status",
-        constants$26.OCSP_response_status$FUNC
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
+        "SSL_set_verify_result",
+        constants$26.const$4
     );
 }
 

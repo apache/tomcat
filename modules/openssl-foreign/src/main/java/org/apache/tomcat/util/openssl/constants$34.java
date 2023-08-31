@@ -24,33 +24,33 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-final class constants$17 {
+final class constants$34 {
 
     // Suppresses default constructor, ensuring non-instantiability.
-    private constants$17() {}
+    private constants$34() {}
     static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_timeout",
-        constants$15.const$0
+        "OCSP_resp_find",
+        constants$3.const$1
     );
     static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
-        "SSL_CTX_get_timeout",
-        constants$1.const$4
+        "OCSP_single_get0_status",
+        constants$31.const$0
     );
     static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
-        "SSL_CTX_get_cert_store",
-        constants$2.const$4
+        "OCSP_BASICRESP_free",
+        constants$7.const$0
     );
     static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
-        "SSL_get_current_cipher",
-        constants$2.const$4
+        "OCSP_RESPONSE_free",
+        constants$7.const$0
     );
     static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
-        "SSL_CIPHER_get_name",
-        constants$2.const$4
+        "d2i_OCSP_RESPONSE",
+        constants$8.const$1
     );
     static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
-        "SSL_CIPHER_get_kx_nid",
-        constants$0.const$0
+        "OCSP_CERTID_free",
+        constants$7.const$0
     );
 }
 
