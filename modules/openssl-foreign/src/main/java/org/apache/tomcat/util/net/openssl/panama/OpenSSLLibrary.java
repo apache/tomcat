@@ -39,8 +39,6 @@ import org.apache.tomcat.util.res.StringManager;
  * configuration parameters.
  * Using this from a listener is completely optional, but is needed for
  * configuration and full cleanup of a few native memory allocations.
- * FIXME: OpenSSL 3 deprecation resolutions for the equivalent code:
- * https://svn.apache.org/viewvc?view=revision&revision=1908537
  */
 public class OpenSSLLibrary {
 
@@ -178,9 +176,12 @@ public class OpenSSLLibrary {
                 // Main library init
                 initLibrary();
 
+                // OpenSSL 3 onwards uses providers
+                boolean usingProviders = (OpenSSL_version_num() >= 0x3000000fL);
+
                 // Setup engine
                 String engineName = "on".equalsIgnoreCase(SSLEngine) ? null : SSLEngine;
-                if (engineName != null) {
+                if (!usingProviders && engineName != null) {
                     if ("auto".equals(engineName)) {
                         ENGINE_register_all_complete();
                     } else {
@@ -224,10 +225,9 @@ public class OpenSSLLibrary {
                     RAND_seed(memorySession.allocateFrom(ValueLayout.JAVA_BYTE, randomBytes), 128);
                 }
 
-                initDHParameters();
-
-                // OpenSSL 3 onwards uses providers
-                boolean usingProviders = (OpenSSL_version_num() >= 0x3000000fL);
+                if (!usingProviders) {
+                    initDHParameters();
+                }
 
                 if (usingProviders || !(null == FIPSMode || "off".equalsIgnoreCase(FIPSMode))) {
                     fipsModeActive = false;
@@ -335,11 +335,11 @@ public class OpenSSLLibrary {
             OpenSSLStatus.setAvailable(false);
 
             try {
-                freeDHParameters();
-                if (!MemorySegment.NULL.equals(enginePointer)) {
-                    ENGINE_free(enginePointer);
-                }
                 if (OpenSSL_version_num() < 0x3000000fL) {
+                    freeDHParameters();
+                    if (!MemorySegment.NULL.equals(enginePointer)) {
+                        ENGINE_free(enginePointer);
+                    }
                     FIPS_mode_set(0);
                 }
             } finally {

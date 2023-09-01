@@ -1226,6 +1226,7 @@ public class openssl_h  {
      * EC_KEY* EC_KEY_new_by_curve_name(int nid);
      * }
      */
+    @Deprecated
     public static MemorySegment EC_KEY_new_by_curve_name(int nid) {
         var mh$ = EC_KEY_new_by_curve_name$MH();
         try {
@@ -1242,6 +1243,7 @@ public class openssl_h  {
      * void EC_KEY_free(EC_KEY* key);
      * }
      */
+    @Deprecated
     public static void EC_KEY_free(MemorySegment key) {
         var mh$ = EC_KEY_free$MH();
         try {
@@ -1258,6 +1260,7 @@ public class openssl_h  {
      * DH* DH_new();
      * }
      */
+    @Deprecated
     public static MemorySegment DH_new() {
         var mh$ = DH_new$MH();
         try {
@@ -1274,6 +1277,7 @@ public class openssl_h  {
      * void DH_free(DH* dh);
      * }
      */
+    @Deprecated
     public static void DH_free(MemorySegment dh) {
         var mh$ = DH_free$MH();
         try {
@@ -1290,6 +1294,7 @@ public class openssl_h  {
      * int DH_set0_pqg(DH* dh, BIGNUM* p, BIGNUM* q, BIGNUM* g);
      * }
      */
+    @Deprecated
     public static int DH_set0_pqg(MemorySegment dh, MemorySegment p, MemorySegment q, MemorySegment g) {
         var mh$ = DH_set0_pqg$MH();
         try {
@@ -1642,6 +1647,7 @@ public class openssl_h  {
      * EC_GROUP* PEM_read_bio_ECPKParameters(BIO* out, EC_GROUP** x, pem_password_cb* cb, void* u);
      * }
      */
+    @Deprecated
     public static MemorySegment PEM_read_bio_ECPKParameters(MemorySegment out, MemorySegment x, MemorySegment cb, MemorySegment u) {
         var mh$ = PEM_read_bio_ECPKParameters$MH();
         try {
@@ -1658,6 +1664,7 @@ public class openssl_h  {
      * DH* PEM_read_bio_DHparams(BIO* out, DH** x, pem_password_cb* cb, void* u);
      * }
      */
+    @Deprecated
     public static MemorySegment PEM_read_bio_DHparams(MemorySegment out, MemorySegment x, MemorySegment cb, MemorySegment u) {
         var mh$ = PEM_read_bio_DHparams$MH();
         try {
@@ -2746,6 +2753,7 @@ public class openssl_h  {
      * void SSL_CTX_set_tmp_dh_callback(SSL_CTX* ctx, DH* (*dh)(SSL*,int,int));
      * }
      */
+    @Deprecated
     public static void SSL_CTX_set_tmp_dh_callback(MemorySegment ctx, MemorySegment dh) {
         var mh$ = SSL_CTX_set_tmp_dh_callback$MH();
         try {
@@ -3066,6 +3074,7 @@ public class openssl_h  {
      * ENGINE* ENGINE_by_id(char* id);
      * }
      */
+    @Deprecated
     public static MemorySegment ENGINE_by_id(MemorySegment id) {
         var mh$ = ENGINE_by_id$MH();
         try {
@@ -3082,6 +3091,7 @@ public class openssl_h  {
      * int ENGINE_register_all_complete();
      * }
      */
+    @Deprecated
     public static int ENGINE_register_all_complete() {
         var mh$ = ENGINE_register_all_complete$MH();
         try {
@@ -3098,6 +3108,7 @@ public class openssl_h  {
      * int ENGINE_ctrl_cmd_string(ENGINE* e, char* cmd_name, char* arg, int cmd_optional);
      * }
      */
+    @Deprecated
     public static int ENGINE_ctrl_cmd_string(MemorySegment e, MemorySegment cmd_name, MemorySegment arg, int cmd_optional) {
         var mh$ = ENGINE_ctrl_cmd_string$MH();
         try {
@@ -3114,6 +3125,7 @@ public class openssl_h  {
      * int ENGINE_free(ENGINE* e);
      * }
      */
+    @Deprecated
     public static int ENGINE_free(MemorySegment e) {
         var mh$ = ENGINE_free$MH();
         try {
@@ -3130,6 +3142,7 @@ public class openssl_h  {
      * EVP_PKEY* ENGINE_load_private_key(ENGINE* e, char* key_id, UI_METHOD* ui_method, void* callback_data);
      * }
      */
+    @Deprecated
     public static MemorySegment ENGINE_load_private_key(MemorySegment e, MemorySegment key_id, MemorySegment ui_method, MemorySegment callback_data) {
         var mh$ = ENGINE_load_private_key$MH();
         try {
@@ -3146,6 +3159,7 @@ public class openssl_h  {
      * int ENGINE_set_default(ENGINE* e, unsigned int flags);
      * }
      */
+    @Deprecated
     public static int ENGINE_set_default(MemorySegment e, int flags) {
         var mh$ = ENGINE_set_default$MH();
         try {

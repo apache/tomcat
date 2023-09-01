@@ -22,6 +22,7 @@ import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SegmentAllocator;
+import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -1113,32 +1114,65 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // Try to read DH parameters from the (first) SSLCertificateFile
             if (index == SSL_AIDX_RSA) {
                 bio = BIO_new_file(certificateFileNative, localArena.allocateFrom("r"));
-                var dh = PEM_read_bio_DHparams(bio, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
-                BIO_free(bio);
-                // #  define SSL_CTX_set_tmp_dh(sslCtx,dh) \
-                //           SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_TMP_DH,0,(char *)(dh))
-                if (!MemorySegment.NULL.equals(dh)) {
-                    SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_TMP_DH(), 0, dh);
-                    DH_free(dh);
+                if (OpenSSL_version_num() < 0x3000000fL) {
+                    var dh = PEM_read_bio_DHparams(bio, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
+                    BIO_free(bio);
+                    // #  define SSL_CTX_set_tmp_dh(sslCtx,dh) \
+                    //           SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_TMP_DH,0,(char *)(dh))
+                    if (!MemorySegment.NULL.equals(dh)) {
+                        SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_TMP_DH(), 0, dh);
+                        DH_free(dh);
+                    }
+                } else {
+                    var pkey = PEM_read_bio_Parameters(bio, MemorySegment.NULL);
+                    if (!MemorySegment.NULL.equals(pkey)) {
+                        int numBits = EVP_PKEY_get_bits(pkey);
+                        if (SSL_CTX_set0_tmp_dh_pkey(state.sslCtx, pkey) <= 0) {
+                            EVP_PKEY_free(pkey);
+                        } else {
+                            log.debug(sm.getString("openssl.setCustomDHParameters", numBits, certificate.getCertificateFile()));
+                        }
+                    } else {
+                        SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_DH_AUTO(), 1, MemorySegment.NULL);
+                    }
                 }
             }
             // Similarly, try to read the ECDH curve name from SSLCertificateFile...
             bio = BIO_new_file(certificateFileNative, localArena.allocateFrom("r"));
-            var ecparams = PEM_read_bio_ECPKParameters(bio, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
-            BIO_free(bio);
-            if (!MemorySegment.NULL.equals(ecparams)) {
-                int nid = EC_GROUP_get_curve_name(ecparams);
-                var eckey = EC_KEY_new_by_curve_name(nid);
-                // #  define SSL_CTX_set_tmp_ecdh(sslCtx,ecdh) \
-                //           SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_TMP_ECDH,0,(char *)(ecdh))
-                SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_TMP_ECDH(), 0, eckey);
-                EC_KEY_free(eckey);
-                EC_GROUP_free(ecparams);
+            if (OpenSSL_version_num() < 0x3000000fL) {
+                var ecparams = PEM_read_bio_ECPKParameters(bio, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
+                BIO_free(bio);
+                if (!MemorySegment.NULL.equals(ecparams)) {
+                    int nid = EC_GROUP_get_curve_name(ecparams);
+                    var eckey = EC_KEY_new_by_curve_name(nid);
+                    // #  define SSL_CTX_set_tmp_ecdh(sslCtx,ecdh) \
+                    //           SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_TMP_ECDH,0,(char *)(ecdh))
+                    SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_TMP_ECDH(), 0, eckey);
+                    EC_KEY_free(eckey);
+                    EC_GROUP_free(ecparams);
+                }
+                // Set callback for DH parameters
+                var openSSLCallbackTmpDH = Linker.nativeLinker().upcallStub(openSSLCallbackTmpDHHandle,
+                        openSSLCallbackTmpDHFunctionDescriptor, contextArena);
+                SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
+            } else {
+                var d2i_ECPKParameters = SymbolLookup.loaderLookup().find("d2i_ECPKParameters").get();
+                var ecparams = PEM_ASN1_read_bio(d2i_ECPKParameters,
+                        PEM_STRING_ECPARAMETERS(), bio, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
+                BIO_free(bio);
+                if (!MemorySegment.NULL.equals(ecparams)) {
+                    int curveNid = EC_GROUP_get_curve_name(ecparams);
+                    var curveNidAddress = localArena.allocateFrom(ValueLayout.JAVA_INT, curveNid);
+                    // SSL_CTX_set1_curves(state.sslCtx, &curveNid, 1)
+                    if (SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_GROUPS(), 1, curveNidAddress) <= 0) {
+                        curveNid = 0;
+                    }
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("openssl.setECDHCurve", curveNid, certificate.getCertificateFile()));
+                    }
+                    EC_GROUP_free(ecparams);
+                }
             }
-            // Set callback for DH parameters
-            var openSSLCallbackTmpDH = Linker.nativeLinker().upcallStub(openSSLCallbackTmpDHHandle,
-                    openSSLCallbackTmpDHFunctionDescriptor, contextArena);
-            SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
             // Set certificate chain file
             if (certificate.getCertificateChainFile() != null) {
                 var certificateChainFileNative =
@@ -1223,10 +1257,27 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 logLastError(localArena, "openssl.errorPrivateKeyCheck");
                 return;
             }
-            // Set callback for DH parameters
-            var openSSLCallbackTmpDH = Linker.nativeLinker().upcallStub(openSSLCallbackTmpDHHandle,
-                    openSSLCallbackTmpDHFunctionDescriptor, contextArena);
-            SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
+            if (OpenSSL_version_num() < 0x3000000fL) {
+                // Set callback for DH parameters
+                var openSSLCallbackTmpDH = Linker.nativeLinker().upcallStub(openSSLCallbackTmpDHHandle,
+                        openSSLCallbackTmpDHFunctionDescriptor, contextArena);
+                SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
+            } else {
+                bio = BIO_new(BIO_s_mem());
+                BIO_write(bio, rawKey, (int) rawKey.byteSize());
+                var pkey = PEM_read_bio_Parameters(bio, MemorySegment.NULL);
+                if (!MemorySegment.NULL.equals(pkey)) {
+                    int numBits = EVP_PKEY_get_bits(pkey);
+                    if (SSL_CTX_set0_tmp_dh_pkey(state.sslCtx, pkey) <= 0) {
+                        EVP_PKEY_free(pkey);
+                    } else {
+                        log.debug(sm.getString("openssl.setCustomDHParameters", numBits, certificate.getCertificateFile()));
+                    }
+                } else {
+                    SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_DH_AUTO(), 1, MemorySegment.NULL);
+                }
+                BIO_free(bio);
+            }
             for (int i = 1; i < chain.length; i++) {
                 //SSLContext.addChainCertificateRaw(state.ctx, chain[i].getEncoded());
                 var rawCertificateChain = localArena.allocateFrom(ValueLayout.JAVA_BYTE, chain[i].getEncoded());
