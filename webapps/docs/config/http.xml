@@ -1033,7 +1033,7 @@
       <attribute name="socket.processorCache" required="false">
         <p>(int)Tomcat will cache SocketProcessor objects to reduce garbage
         collection. The integer value specifies how many objects to keep in the
-        cache at most. The default is <code>500</code>. Other values are
+        cache at most. The default is <code>0</code>. Other values are
         <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
       </attribute>
 
