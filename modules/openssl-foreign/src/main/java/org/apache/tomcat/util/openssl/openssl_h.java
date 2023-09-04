@@ -3429,6 +3429,7 @@ public class openssl_h  {
      * #define OPENSSL_INIT_ENGINE_ALL_BUILTIN 30208
      * }
      */
+    @Deprecated
     public static long OPENSSL_INIT_ENGINE_ALL_BUILTIN() {
         return 30208L;
     }

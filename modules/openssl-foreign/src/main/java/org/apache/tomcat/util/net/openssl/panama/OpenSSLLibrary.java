@@ -85,7 +85,8 @@ public class OpenSSLLibrary {
             if (OpenSSLStatus.isLibraryInitialized()) {
                 return;
             }
-            OPENSSL_init_ssl(OPENSSL_INIT_ENGINE_ALL_BUILTIN(), MemorySegment.NULL);
+            long initParam = (OpenSSL_version_num() >= 0x3000000fL) ? 0 : OPENSSL_INIT_ENGINE_ALL_BUILTIN();
+            OPENSSL_init_ssl(initParam, MemorySegment.NULL);
             OpenSSLStatus.setLibraryInitialized(true);
         }
     }
