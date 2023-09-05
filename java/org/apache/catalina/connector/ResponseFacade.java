@@ -174,7 +174,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void flushBuffer() throws IOException {
-        checkFacade();
         if (isFinished()) {
             return;
         }
@@ -408,3 +407,5 @@ public class ResponseFacade implements HttpServletResponse {
         }
     }
 }
+
+
