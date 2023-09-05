@@ -2288,7 +2288,7 @@ public class Request implements HttpServletRequest {
      */
     @Override
     public HttpSession getSession() {
-        getSession(true);
+        return getSession(true);
     }
 
 
