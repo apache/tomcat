@@ -37,9 +37,9 @@ public final class Constants {
     public static final int STAGE_PARSE = 1;
     public static final int STAGE_PREPARE = 2;
     public static final int STAGE_SERVICE = 3;
-    public static final int STAGE_ENDINPUT = 4;
-    public static final int STAGE_ENDOUTPUT = 5;
-    public static final int STAGE_KEEPALIVE = 6;
+    public static final int STAGE_END_INPUT = 4;
+    public static final int STAGE_END_OUTPUT = 5;
+    public static final int STAGE_KEEP_ALIVE = 6;
     public static final int STAGE_ENDED = 7;
 
     // Default protocol settings

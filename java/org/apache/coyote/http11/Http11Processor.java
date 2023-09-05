@@ -421,14 +421,14 @@ public class Http11Processor extends AbstractProcessor {
             }
 
             // Finish the handling of the request
-            rp.setStage(org.apache.coyote.Constants.STAGE_ENDINPUT);
+            rp.setStage(org.apache.coyote.Constants.STAGE_END_INPUT);
             if (!isAsync()) {
                 // If this is an async request then the request ends when it has
                 // been completed. The AsyncContext is responsible for calling
                 // endRequest() in that case.
                 endRequest();
             }
-            rp.setStage(org.apache.coyote.Constants.STAGE_ENDOUTPUT);
+            rp.setStage(org.apache.coyote.Constants.STAGE_END_OUTPUT);
 
             // If there was an error, make sure the request is counted as
             // and error, and update the statistics counter
@@ -453,7 +453,7 @@ public class Http11Processor extends AbstractProcessor {
                 }
             }
 
-            rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
+            rp.setStage(org.apache.coyote.Constants.STAGE_KEEP_ALIVE);
 
             sendfileState = processSendfile(socketWrapper);
         }
@@ -929,7 +929,7 @@ public class Http11Processor extends AbstractProcessor {
             // If trailer fields are set, always use chunking
             outputBuffer.addActiveFilter(outputFilters[Constants.CHUNKED_FILTER]);
             contentDelimitation = true;
-            headers.addValue(Constants.TRANSFERENCODING).setString(Constants.CHUNKED);
+            headers.addValue(Constants.TRANSFER_ENCODING).setString(Constants.CHUNKED);
         } else if (contentLength != -1) {
             headers.setValue("Content-Length").setLong(contentLength);
             outputBuffer.addActiveFilter(outputFilters[Constants.IDENTITY_FILTER]);
@@ -940,7 +940,7 @@ public class Http11Processor extends AbstractProcessor {
             if (http11 && entityBody && !connectionClosePresent) {
                 outputBuffer.addActiveFilter(outputFilters[Constants.CHUNKED_FILTER]);
                 contentDelimitation = true;
-                headers.addValue(Constants.TRANSFERENCODING).setString(Constants.CHUNKED);
+                headers.addValue(Constants.TRANSFER_ENCODING).setString(Constants.CHUNKED);
             } else {
                 outputBuffer.addActiveFilter(outputFilters[Constants.IDENTITY_FILTER]);
             }
