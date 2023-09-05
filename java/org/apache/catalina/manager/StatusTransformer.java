@@ -375,33 +375,33 @@ public class StatusTransformer {
 
         switch (stage) {
 
-        case (Constants.STAGE_PARSE):
+        case (org.apache.coyote.Constants.STAGE_PARSE):
             stageStr = "P";
             fullStatus = false;
             break;
-        case (Constants.STAGE_PREPARE):
+        case (org.apache.coyote.Constants.STAGE_PREPARE):
             stageStr = "P";
             fullStatus = false;
             break;
-        case (Constants.STAGE_SERVICE):
+        case (org.apache.coyote.Constants.STAGE_SERVICE):
             stageStr = "S";
             break;
-        case (Constants.STAGE_END_INPUT):
+        case (org.apache.coyote.Constants.STAGE_ENDINPUT):
             stageStr = "F";
             break;
-        case (Constants.STAGE_END_OUTPUT):
+        case (org.apache.coyote.Constants.STAGE_ENDOUTPUT):
             stageStr = "F";
             break;
-        case (Constants.STAGE_ENDED):
+        case (org.apache.coyote.Constants.STAGE_ENDED):
             stageStr = "R";
             fullStatus = false;
             break;
-        case (Constants.STAGE_KEEP_ALIVE):
+        case (org.apache.coyote.Constants.STAGE_KEEPALIVE):
             stageStr = "K";
             fullStatus = true;
             showRequest = false;
             break;
-        case (Constants.STAGE_NEW):
+        case (org.apache.coyote.Constants.STAGE_NEW):
             stageStr = "R";
             fullStatus = false;
             break;
