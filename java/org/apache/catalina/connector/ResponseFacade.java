@@ -407,5 +407,3 @@ public class ResponseFacade implements HttpServletResponse {
         }
     }
 }
-
-
