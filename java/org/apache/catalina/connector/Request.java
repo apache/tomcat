@@ -2894,7 +2894,7 @@ public class Request implements HttpServletRequest {
         if (context == null) {
             // No context. Possible call from Valve before a Host level
             // context rewrite when no ROOT content is configured. Use the
-            // default CookiePreocessor.
+            // default CookieProcessor.
             return new Rfc6265CookieProcessor();
         } else {
             return context.getCookieProcessor();
