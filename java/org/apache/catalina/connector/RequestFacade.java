@@ -646,7 +646,6 @@ public class RequestFacade implements HttpServletRequest {
 
     @Override
     public HttpSession getSession() {
-        checkFacade();
         return getSession(true);
     }
 
