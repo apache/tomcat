@@ -136,6 +136,16 @@ public class Constants {
             "</html>";
     }
 
+    // Request states
+    public static final int STAGE_NEW = 0;
+    public static final int STAGE_PARSE = 1;
+    public static final int STAGE_PREPARE = 2;
+    public static final int STAGE_SERVICE = 3;
+    public static final int STAGE_END_INPUT = 4;
+    public static final int STAGE_END_OUTPUT = 5;
+    public static final int STAGE_KEEP_ALIVE = 6;
+    public static final int STAGE_ENDED = 7;
+
     public static final String CHARSET="utf-8";
 
     public static final String XML_DECLARATION =
