@@ -196,7 +196,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void setContentLength(int len) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -206,7 +205,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void setContentLengthLong(long length) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -216,7 +214,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void setContentType(String type) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -245,7 +242,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void flushBuffer() throws IOException {
-        checkFacade();
         if (isFinished()) {
             return;
         }
@@ -289,7 +285,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void setLocale(Locale loc) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -306,7 +301,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void addCookie(Cookie cookie) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -375,7 +369,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void setDateHeader(String name, long date) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -390,7 +383,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void addDateHeader(String name, long date) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -405,7 +397,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void setHeader(String name, String value) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -415,7 +406,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void addHeader(String name, String value) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -425,7 +415,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void setIntHeader(String name, int value) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -435,7 +424,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void addIntHeader(String name, int value) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -445,7 +433,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void setStatus(int sc) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -524,7 +511,6 @@ public class ResponseFacade implements HttpServletResponse {
 
 
     private void checkCommitted(String messageKey) {
-        checkFacade();
         if (isCommitted()) {
             throw new IllegalStateException(sm.getString(messageKey));
         }
