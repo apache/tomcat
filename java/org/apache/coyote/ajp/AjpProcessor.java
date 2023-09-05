@@ -26,11 +26,7 @@ import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.ServletConnection;
@@ -1127,42 +1123,36 @@ public class AjpProcessor extends AbstractProcessor {
         }
     }
 
-
     @Override
     protected final void populateSslRequestAttributes() {
-        if (!certificates.isNull()) {
-            ByteChunk certData = certificates.getByteChunk();
-            X509Certificate jsseCerts[] = null;
-            ByteArrayInputStream bais = new ByteArrayInputStream(certData.getBytes(), certData.getStart(),
-                    certData.getLength());
-            // Fill the elements.
-            try {
-                CertificateFactory cf;
-                String clientCertProvider = protocol.getClientCertProvider();
-                if (clientCertProvider == null) {
-                    cf = CertificateFactory.getInstance("X.509");
-                } else {
-                    cf = CertificateFactory.getInstance("X.509", clientCertProvider);
-                }
-                while (bais.available() > 0) {
-                    X509Certificate cert = (X509Certificate) cf.generateCertificate(bais);
-                    if (jsseCerts == null) {
-                        jsseCerts = new X509Certificate[1];
-                        jsseCerts[0] = cert;
-                    } else {
-                        X509Certificate[] temp = new X509Certificate[jsseCerts.length + 1];
-                        System.arraycopy(jsseCerts, 0, temp, 0, jsseCerts.length);
-                        temp[jsseCerts.length] = cert;
-                        jsseCerts = temp;
-                    }
-                }
-            } catch (CertificateException | NoSuchProviderException e) {
-                getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
-                return;
-            }
-            request.setAttribute(SSLSupport.CERTIFICATE_KEY, jsseCerts);
+        ByteChunk certData = certificates.getByteChunk();
+        if (certData.getLength() == 0) {
+            return;
         }
+
+        List<X509Certificate> jsseCerts = new ArrayList<>();
+        ByteArrayInputStream bais = new ByteArrayInputStream(certData.getBytes(), certData.getStart(), certData.getLength());
+
+        try {
+            CertificateFactory cf;
+            String clientCertProvider = protocol.getClientCertProvider();
+            if (clientCertProvider == null) {
+                cf = CertificateFactory.getInstance("X.509");
+            } else {
+                cf = CertificateFactory.getInstance("X.509", clientCertProvider);
+            }
+
+            while (bais.available() > 0) {
+                X509Certificate cert = (X509Certificate) cf.generateCertificate(bais);
+                jsseCerts.add(cert);
+            }
+        } catch (CertificateException | NoSuchProviderException e) {
+            getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
+            return;
+        }
+        request.setAttribute(SSLSupport.CERTIFICATE_KEY, jsseCerts.toArray(new X509Certificate[0]));
     }
+
 
 
     @Override
