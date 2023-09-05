@@ -998,7 +998,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
             byte peek = byteBuffer.get(byteBuffer.position());
             if (headerParsePos == HeaderParsePosition.HEADER_MULTI_LINE) {
-                if ((peek != Constants.SP) && (peek != Constants.HT)) {
+                if (!(peek == Constants.SP || peek == Constants.HT)) {
                     headerParsePos = HeaderParsePosition.HEADER_START;
                     break;
                 } else {
