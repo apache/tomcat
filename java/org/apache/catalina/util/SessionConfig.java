@@ -32,14 +32,10 @@ public class SessionConfig {
      * @return the cookie name for the context
      */
     public static String getSessionCookieName(Context context) {
-
-        String result = getConfiguredSessionCookieName(context);
-
-        if (result == null) {
-            result = DEFAULT_SESSION_COOKIE_NAME;
+        if (context == null) {
+            return DEFAULT_SESSION_COOKIE_NAME;
         }
-
-        return result;
+        return getConfiguredSessionCookieName(context);
     }
 
     /**
@@ -49,38 +45,28 @@ public class SessionConfig {
      * @return the parameter name for the session
      */
     public static String getSessionUriParamName(Context context) {
-
-        String result = getConfiguredSessionCookieName(context);
-
-        if (result == null) {
-            result = DEFAULT_SESSION_PARAMETER_NAME;
+        if (context == null) {
+            return DEFAULT_SESSION_PARAMETER_NAME;
         }
-
-        return result;
+        return getConfiguredSessionCookieName(context);
     }
 
 
     private static String getConfiguredSessionCookieName(Context context) {
-
         // Priority is:
         // 1. Cookie name defined in context
         // 2. Cookie name configured for app
         // 3. Default defined by spec
-        if (context != null) {
-            String cookieName = context.getSessionCookieName();
-            if (cookieName != null && cookieName.length() > 0) {
-                return cookieName;
-            }
-
-            SessionCookieConfig scc =
-                context.getServletContext().getSessionCookieConfig();
-            cookieName = scc.getName();
-            if (cookieName != null && cookieName.length() > 0) {
-                return cookieName;
-            }
+        String cookieName = context.getSessionCookieName();
+        if (cookieName != null && cookieName.length() > 0) {
+            return cookieName;
         }
 
-        return null;
+        SessionCookieConfig scc = context.getServletContext().getSessionCookieConfig();
+        cookieName = scc.getName();
+        if (cookieName != null && cookieName.length() > 0) {
+            return cookieName;
+        }
     }
 
 
