@@ -233,7 +233,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 int ch = reader.read();
                 if (ch < 0) {
                     break;
-                } else if ((ch == '\r') || (ch == '\n')) {
+                } else if (ch == '\r' || ch == '\n') {
                     // in Win \r\n would cause handleOutput() to be called
                     // twice, the second time with an empty string,
                     // producing blank lines

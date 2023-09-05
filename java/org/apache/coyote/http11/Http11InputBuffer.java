@@ -369,7 +369,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     request.setStartTimeNanos(System.nanoTime());
                 }
                 chr = byteBuffer.get();
-            } while ((chr == Constants.CR) || (chr == Constants.LF));
+            } while (chr == Constants.CR || chr == Constants.LF);
             byteBuffer.position(byteBuffer.position() - 1);
 
             parsingRequestLineStart = byteBuffer.position();
