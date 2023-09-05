@@ -32,9 +32,6 @@ public class SessionConfig {
      * @return the cookie name for the context
      */
     public static String getSessionCookieName(Context context) {
-        if (context == null) {
-            return DEFAULT_SESSION_COOKIE_NAME;
-        }
         return getConfiguredSessionCookieName(context, DEFAULT_SESSION_COOKIE_NAME);
     }
 
@@ -45,14 +42,14 @@ public class SessionConfig {
      * @return the parameter name for the session
      */
     public static String getSessionUriParamName(Context context) {
-        if (context == null) {
-            return DEFAULT_SESSION_PARAMETER_NAME;
-        }
         return getConfiguredSessionCookieName(context, DEFAULT_SESSION_PARAMETER_NAME);
     }
 
 
     private static String getConfiguredSessionCookieName(Context context, String defaultName) {
+        if (context == null) {
+            return defaultName;
+        }
         // Priority is:
         // 1. Cookie name defined in context
         // 2. Cookie name configured for app
