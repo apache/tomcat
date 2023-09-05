@@ -2288,12 +2288,7 @@ public class Request implements HttpServletRequest {
      */
     @Override
     public HttpSession getSession() {
-        Session session = doGetSession(true);
-        if (session == null) {
-            return null;
-        }
-
-        return session.getSession();
+        return getSession(true);
     }
 
 
