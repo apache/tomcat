@@ -123,7 +123,7 @@ public class ResponseFacade implements HttpServletResponse {
         if (isFinished()) {
             response.setSuspended(true);
         }
-        return  response.getWriter();
+        return response.getWriter();
     }
 
 
