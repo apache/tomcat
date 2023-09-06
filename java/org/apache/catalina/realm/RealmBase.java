@@ -532,7 +532,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         ArrayList<SecurityConstraint> results = null;
         // Are there any defined security constraints?
         SecurityConstraint constraints[] = context.findConstraints();
-        if ((constraints == null) || (constraints.length == 0)) {
+        if (constraints == null || constraints.length == 0) {
             if (log.isDebugEnabled()) {
                 log.debug("  No applicable constraints defined");
             }

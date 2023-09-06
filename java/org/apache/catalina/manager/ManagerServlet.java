@@ -475,7 +475,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     public void init() throws ServletException {
 
         // Ensure that our ContainerServlet properties have been set
-        if ((wrapper == null) || (context == null)) {
+        if (wrapper == null || context == null) {
             throw new UnavailableException(
                     sm.getString("managerServlet.noWrapper"));
         }

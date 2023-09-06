@@ -503,10 +503,10 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
     private boolean matchPattern(String path, String pattern) {
 
         // Normalize the argument strings
-        if ((path == null) || (path.length() == 0)) {
+        if (path == null || path.length() == 0) {
             path = "/";
         }
-        if ((pattern == null) || (pattern.length() == 0)) {
+        if (pattern == null || pattern.length() == 0) {
             pattern = "/";
         }
 
