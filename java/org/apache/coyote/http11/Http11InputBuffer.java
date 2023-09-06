@@ -416,7 +416,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     }
                 }
                 chr = byteBuffer.get();
-                if (!(chr == Constants.SP || chr == Constants.HT)) {
+                if (chr != Constants.SP && chr != Constants.HT) {
                     space = false;
                     byteBuffer.position(byteBuffer.position() - 1);
                 }
