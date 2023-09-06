@@ -172,23 +172,19 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
-        checkFacade();
-        ServletOutputStream sos = response.getOutputStream();
         if (isFinished()) {
             response.setSuspended(true);
         }
-        return sos;
+        return response.getOutputStream();
     }
 
 
     @Override
     public PrintWriter getWriter() throws IOException {
-        checkFacade();
-        PrintWriter writer = response.getWriter();
         if (isFinished()) {
             response.setSuspended(true);
         }
-        return writer;
+        return response.getWriter();
     }
 
 
