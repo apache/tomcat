@@ -45,30 +45,24 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Classloader implementation which is specialized for handling web
- * applications in the most efficient way, while being Catalina aware (all
- * accesses to resources are made through
- * {@link org.apache.catalina.WebResourceRoot}).
- * This class loader supports detection of modified
- * Java classes, which can be used to implement auto-reload support.
+ * Classloader implementation which is specialized for handling web applications in the most efficient way, while being
+ * Catalina aware (all accesses to resources are made through {@link org.apache.catalina.WebResourceRoot}). This class
+ * loader supports detection of modified Java classes, which can be used to implement auto-reload support.
  * <p>
- * This class loader is configured via the Resources children of its Context
- * prior to calling <code>start()</code>.  When a new class is required,
- * these Resources will be consulted first to locate the class.  If it
- * is not present, the system class loader will be used instead.
+ * This class loader is configured via the Resources children of its Context prior to calling <code>start()</code>. When
+ * a new class is required, these Resources will be consulted first to locate the class. If it is not present, the
+ * system class loader will be used instead.
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-public class WebappLoader extends LifecycleMBeanBase
-    implements Loader, PropertyChangeListener {
+public class WebappLoader extends LifecycleMBeanBase implements Loader, PropertyChangeListener {
 
 
     // ----------------------------------------------------------- Constructors
 
     /**
-     * Construct a new WebappLoader. The parent class loader will be defined by
-     * {@link Context#getParentClassLoader()}.
+     * Construct a new WebappLoader. The parent class loader will be defined by {@link Context#getParentClassLoader()}.
      */
     public WebappLoader() {
         this(null);
@@ -76,14 +70,13 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
     /**
-     * Construct a new WebappLoader with the specified class loader
-     * to be defined as the parent of the ClassLoader we ultimately create.
+     * Construct a new WebappLoader with the specified class loader to be defined as the parent of the ClassLoader we
+     * ultimately create.
      *
      * @param parent The parent class loader
      *
-     * @deprecated Use {@link Context#setParentClassLoader(ClassLoader)} to
-     *             specify the required class loader. This method will be
-     *             removed in Tomcat 10 onwards.
+     * @deprecated Use {@link Context#setParentClassLoader(ClassLoader)} to specify the required class loader. This
+     *                 method will be removed in Tomcat 10 onwards.
      */
     @Deprecated
     public WebappLoader(ClassLoader parent) {
@@ -107,16 +100,14 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
     /**
-     * The "follow standard delegation model" flag that will be used to
-     * configure our ClassLoader.
+     * The "follow standard delegation model" flag that will be used to configure our ClassLoader.
      */
     private boolean delegate = false;
 
 
     /**
-     * The Java class name of the ClassLoader implementation to be used.
-     * This class should extend WebappClassLoaderBase, otherwise, a different
-     * loader implementation must be used.
+     * The Java class name of the ClassLoader implementation to be used. This class should extend WebappClassLoaderBase,
+     * otherwise, a different loader implementation must be used.
      */
     private String loaderClass = ParallelWebappClassLoader.class.getName();
 
@@ -136,8 +127,7 @@ public class WebappLoader extends LifecycleMBeanBase
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
     /**
@@ -177,8 +167,7 @@ public class WebappLoader extends LifecycleMBeanBase
         }
 
         if (getState().isAvailable()) {
-            throw new IllegalStateException(
-                    sm.getString("webappLoader.setContext.ise"));
+            throw new IllegalStateException(sm.getString("webappLoader.setContext.ise"));
         }
 
         // Deregister from the old Context (if any)
@@ -200,8 +189,7 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
     /**
-     * Return the "follow standard delegation model" flag used to configure
-     * our ClassLoader.
+     * Return the "follow standard delegation model" flag used to configure our ClassLoader.
      */
     @Override
     public boolean getDelegate() {
@@ -210,8 +198,7 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
     /**
-     * Set the "follow standard delegation model" flag used to configure
-     * our ClassLoader.
+     * Set the "follow standard delegation model" flag used to configure our ClassLoader.
      *
      * @param delegate The new flag
      */
@@ -219,8 +206,7 @@ public class WebappLoader extends LifecycleMBeanBase
     public void setDelegate(boolean delegate) {
         boolean oldDelegate = this.delegate;
         this.delegate = delegate;
-        support.firePropertyChange("delegate", Boolean.valueOf(oldDelegate),
-                                   Boolean.valueOf(this.delegate));
+        support.firePropertyChange("delegate", Boolean.valueOf(oldDelegate), Boolean.valueOf(this.delegate));
     }
 
 
@@ -261,9 +247,7 @@ public class WebappLoader extends LifecycleMBeanBase
         // Process this property change
         boolean oldReloadable = this.reloadable;
         this.reloadable = reloadable;
-        support.firePropertyChange("reloadable",
-                                   Boolean.valueOf(oldReloadable),
-                                   Boolean.valueOf(this.reloadable));
+        support.firePropertyChange("reloadable", Boolean.valueOf(oldReloadable), Boolean.valueOf(this.reloadable));
     }
 
 
@@ -283,9 +267,8 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
     /**
-     * Execute a periodic task, such as reloading, etc. This method will be
-     * invoked inside the classloading context of this container. Unexpected
-     * throwables will be caught and logged.
+     * Execute a periodic task, such as reloading, etc. This method will be invoked inside the classloading context of
+     * this container. Unexpected throwables will be caught and logged.
      */
     @Override
     public void backgroundProcess() {
@@ -318,8 +301,8 @@ public class WebappLoader extends LifecycleMBeanBase
     }
 
     public String getLoaderRepositoriesString() {
-        String repositories[]=getLoaderRepositories();
-        StringBuilder sb=new StringBuilder();
+        String repositories[] = getLoaderRepositories();
+        StringBuilder sb = new StringBuilder();
         for (String repository : repositories) {
             sb.append(repository).append(':');
         }
@@ -328,8 +311,7 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
     /**
-     * Classpath, as set in org.apache.catalina.jsp_classpath context
-     * property
+     * Classpath, as set in org.apache.catalina.jsp_classpath context property
      *
      * @return The classpath
      */
@@ -339,12 +321,12 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
     /**
-     * Has the internal repository associated with this Loader been modified,
-     * such that the loaded classes should be reloaded?
+     * Has the internal repository associated with this Loader been modified, such that the loaded classes should be
+     * reloaded?
      */
     @Override
     public boolean modified() {
-        return classLoader != null ? classLoader.modified() : false ;
+        return classLoader != null ? classLoader.modified() : false;
     }
 
 
@@ -369,16 +351,16 @@ public class WebappLoader extends LifecycleMBeanBase
             sb.append(context.getName());
         }
         sb.append("]");
-        return (sb.toString());
+        return sb.toString();
     }
 
 
     /**
-     * Start associated {@link ClassLoader} and implement the requirements
-     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
+     * Start associated {@link ClassLoader} and implement the requirements of
+     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
+     *                                   used
      */
     @Override
     protected void startInternal() throws LifecycleException {
@@ -411,16 +393,15 @@ public class WebappLoader extends LifecycleMBeanBase
             if (!contextName.startsWith("/")) {
                 contextName = "/" + contextName;
             }
-            ObjectName cloname = new ObjectName(context.getDomain() + ":type=" +
-                    classLoader.getClass().getSimpleName() + ",host=" +
-                    context.getParent().getName() + ",context=" + contextName);
-            Registry.getRegistry(null, null)
-                .registerComponent(classLoader, cloname, null);
+            ObjectName cloname =
+                    new ObjectName(context.getDomain() + ":type=" + classLoader.getClass().getSimpleName() + ",host=" +
+                            context.getParent().getName() + ",context=" + contextName);
+            Registry.getRegistry(null, null).registerComponent(classLoader, cloname, null);
 
         } catch (Throwable t) {
             t = ExceptionUtils.unwrapInvocationTargetException(t);
             ExceptionUtils.handleThrowable(t);
-            log.error( "LifecycleException ", t );
+            log.error("LifecycleException ", t);
             throw new LifecycleException("start: ", t);
         }
 
@@ -429,11 +410,11 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
     /**
-     * Stop associated {@link ClassLoader} and implement the requirements
-     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
+     * Stop associated {@link ClassLoader} and implement the requirements of
+     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
+     *                                   used
      */
     @Override
     protected void stopInternal() throws LifecycleException {
@@ -462,9 +443,9 @@ public class WebappLoader extends LifecycleMBeanBase
                 if (!contextName.startsWith("/")) {
                     contextName = "/" + contextName;
                 }
-                ObjectName cloname = new ObjectName(context.getDomain() + ":type=" +
-                        classLoader.getClass().getSimpleName() + ",host=" +
-                        context.getParent().getName() + ",context=" + contextName);
+                ObjectName cloname =
+                        new ObjectName(context.getDomain() + ":type=" + classLoader.getClass().getSimpleName() +
+                                ",host=" + context.getParent().getName() + ",context=" + contextName);
                 Registry.getRegistry(null, null).unregisterComponent(cloname);
             } catch (Exception e) {
                 log.warn("LifecycleException ", e);
@@ -495,11 +476,9 @@ public class WebappLoader extends LifecycleMBeanBase
         // Process a relevant property change
         if (event.getPropertyName().equals("reloadable")) {
             try {
-                setReloadable
-                    ( ((Boolean) event.getNewValue()).booleanValue() );
+                setReloadable(((Boolean) event.getNewValue()).booleanValue());
             } catch (NumberFormatException e) {
-                log.error(sm.getString("webappLoader.reloadable",
-                                 event.getNewValue().toString()));
+                log.error(sm.getString("webappLoader.reloadable", event.getNewValue().toString()));
             }
         }
     }
@@ -510,8 +489,7 @@ public class WebappLoader extends LifecycleMBeanBase
     /**
      * Create associated classLoader.
      */
-    private WebappClassLoaderBase createClassLoader()
-        throws Exception {
+    private WebappClassLoaderBase createClassLoader() throws Exception {
 
         Class<?> clazz = Class.forName(loaderClass);
         WebappClassLoaderBase classLoader = null;
@@ -546,30 +524,25 @@ public class WebappLoader extends LifecycleMBeanBase
         ServletContext servletContext = context.getServletContext();
 
         // Assigning permissions for the work directory
-        File workDir =
-            (File) servletContext.getAttribute(ServletContext.TEMPDIR);
+        File workDir = (File) servletContext.getAttribute(ServletContext.TEMPDIR);
         if (workDir != null) {
             try {
                 String workDirPath = workDir.getCanonicalPath();
-                classLoader.addPermission
-                    (new FilePermission(workDirPath, "read,write"));
-                classLoader.addPermission
-                    (new FilePermission(workDirPath + File.separator + "-",
-                                        "read,write,delete"));
+                classLoader.addPermission(new FilePermission(workDirPath, "read,write"));
+                classLoader.addPermission(new FilePermission(workDirPath + File.separator + "-", "read,write,delete"));
             } catch (IOException e) {
                 // Ignore
             }
         }
 
         for (URL url : context.getResources().getBaseUrls()) {
-           classLoader.addPermission(url);
+            classLoader.addPermission(url);
         }
     }
 
 
     /**
-     * Set the appropriate context attribute for our class path.  This
-     * is required only because Jasper depends on it.
+     * Set the appropriate context attribute for our class path. This is required only because Jasper depends on it.
      */
     private void setClassPath() {
 
@@ -634,7 +607,7 @@ public class WebappLoader extends LifecycleMBeanBase
                 }
                 classpath.append(repository);
             }
-        } else if (loader == ClassLoader.getSystemClassLoader()){
+        } else if (loader == ClassLoader.getSystemClassLoader()) {
             // Java 9 onwards. The internal class loaders no longer extend
             // URLCLassLoader
             String cp = System.getProperty("java.class.path");
@@ -646,7 +619,7 @@ public class WebappLoader extends LifecycleMBeanBase
             }
             return false;
         } else {
-            log.info( "Unknown loader " + loader + " " + loader.getClass());
+            log.info("Unknown loader " + loader + " " + loader.getClass());
             return false;
         }
         return true;
