@@ -386,7 +386,8 @@ public final class Request {
      * Get the character encoding used for this request.
      *
      * @return The value set via {@link #setCharset(Charset)} or if no call has been made to that method try to obtain
-     * if from the content type.
+     *             if from the content type.
+     *
      * @deprecated Unused. This method will be removed in Tomcat 12.
      */
     @Deprecated
@@ -403,8 +404,10 @@ public final class Request {
      * Get the character encoding used for this request.
      *
      * @return The value set via {@link #setCharset(Charset)} or if no call has been made to that method try to obtain
-     * if from the content type.
+     *             if from the content type.
+     *
      * @throws UnsupportedEncodingException If the user agent has specified an invalid character encoding
+     *
      * @deprecated Unused. This method will be removed in Tomcat 12.
      */
     @Deprecated
@@ -422,6 +425,7 @@ public final class Request {
      * Unused.
      *
      * @param charset The Charset to use for the request
+     *
      * @deprecated Unused. This method will be removed in Tomcat 12.
      */
     @Deprecated
@@ -639,7 +643,9 @@ public final class Request {
      * InputStream. Unlike InputStream, this interface allows the app to process data in place, without copy.
      *
      * @param handler The destination to which to copy the data
+     *
      * @return The number of bytes copied
+     *
      * @throws IOException If an I/O error occurs during the copy
      */
     public int doRead(ApplicationBufferHandler handler) throws IOException {
