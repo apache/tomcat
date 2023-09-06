@@ -929,7 +929,7 @@ public class Http11Processor extends AbstractProcessor {
             // If trailer fields are set, always use chunking
             outputBuffer.addActiveFilter(outputFilters[Constants.CHUNKED_FILTER]);
             contentDelimitation = true;
-            headers.addValue(Constants.TRANSFER_ENCODING).setString(Constants.CHUNKED);
+            headers.addValue(Constants.TRANSFERENCODING).setString(Constants.CHUNKED);
         } else if (contentLength != -1) {
             headers.setValue("Content-Length").setLong(contentLength);
             outputBuffer.addActiveFilter(outputFilters[Constants.IDENTITY_FILTER]);
@@ -940,7 +940,7 @@ public class Http11Processor extends AbstractProcessor {
             if (http11 && entityBody && !connectionClosePresent) {
                 outputBuffer.addActiveFilter(outputFilters[Constants.CHUNKED_FILTER]);
                 contentDelimitation = true;
-                headers.addValue(Constants.TRANSFER_ENCODING).setString(Constants.CHUNKED);
+                headers.addValue(Constants.TRANSFERENCODING).setString(Constants.CHUNKED);
             } else {
                 outputBuffer.addActiveFilter(outputFilters[Constants.IDENTITY_FILTER]);
             }
