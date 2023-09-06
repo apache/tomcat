@@ -555,7 +555,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 }
             }
 
-            if ((end - parsingRequestLineStart) > 0) {
+            if (end - parsingRequestLineStart > 0) {
                 request.protocol().setBytes(byteBuffer.array(), parsingRequestLineStart, end - parsingRequestLineStart);
                 parsingRequestLinePhase = 7;
             }
@@ -902,7 +902,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             }
 
             // chr is next byte of header name. Convert to lowercase.
-            if ((chr >= Constants.A) && (chr <= Constants.Z)) {
+            if (chr >= Constants.A && chr <= Constants.Z) {
                 byteBuffer.put(pos, (byte) (chr - Constants.LC_OFFSET));
             }
         }
