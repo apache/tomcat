@@ -465,7 +465,7 @@ public class AjpProcessor extends AbstractProcessor {
             }
             request.updateCounters();
 
-            rp.setStage(org.apache.coyote.Constants.STAGE_KEEP_ALIVE);
+            rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
             // Set keep alive timeout for next request
             socketWrapper.setReadTimeout(protocol.getKeepAliveTimeout());

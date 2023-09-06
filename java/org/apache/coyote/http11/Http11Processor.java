@@ -421,14 +421,14 @@ public class Http11Processor extends AbstractProcessor {
             }
 
             // Finish the handling of the request
-            rp.setStage(org.apache.coyote.Constants.STAGE_END_INPUT);
+            rp.setStage(org.apache.coyote.Constants.STAGE_ENDINPUT);
             if (!isAsync()) {
                 // If this is an async request then the request ends when it has
                 // been completed. The AsyncContext is responsible for calling
                 // endRequest() in that case.
                 endRequest();
             }
-            rp.setStage(org.apache.coyote.Constants.STAGE_END_OUTPUT);
+            rp.setStage(org.apache.coyote.Constants.STAGE_ENDOUTPUT);
 
             // If there was an error, make sure the request is counted as
             // and error, and update the statistics counter
@@ -453,7 +453,7 @@ public class Http11Processor extends AbstractProcessor {
                 }
             }
 
-            rp.setStage(org.apache.coyote.Constants.STAGE_KEEP_ALIVE);
+            rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
             sendfileState = processSendfile(socketWrapper);
         }
