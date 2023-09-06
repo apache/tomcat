@@ -574,7 +574,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
             }
 
             chr = readChunk.get(readChunk.position());
-            if (!(chr == Constants.SP || chr == Constants.HT)) {
+            if (peek != Constants.SP && peek != Constants.HT) {
                 validLine = false;
             } else {
                 eol = false;
