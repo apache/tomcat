@@ -289,7 +289,7 @@ public class AjpMessage {
 
     private void doGetBytes(MessageBytes mb, boolean terminated) {
         int length = getInt();
-        if ((length == 0xFFFF) || (length == -1)) {
+        if (length == 0xFFFF || length == -1) {
             mb.recycle();
             return;
         }

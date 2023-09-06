@@ -1943,7 +1943,7 @@ public class JNDIRealm extends RealmBase {
         }
 
         // Are we configured to do role searches?
-        if ((connection.roleFormat == null) || (roleName == null)) {
+        if (connection.roleFormat == null || roleName == null) {
             return list;
         }
 

@@ -373,7 +373,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     request.setStartTimeNanos(System.nanoTime());
                 }
                 chr = byteBuffer.get();
-            } while ((chr == Constants.CR) || (chr == Constants.LF));
+            } while (chr == Constants.CR || chr == Constants.LF);
             byteBuffer.position(byteBuffer.position() - 1);
 
             parsingRequestLineStart = byteBuffer.position();
@@ -420,7 +420,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     }
                 }
                 chr = byteBuffer.get();
-                if (!(chr == Constants.SP || chr == Constants.HT)) {
+                if (chr != Constants.SP && chr != Constants.HT) {
                     space = false;
                     byteBuffer.position(byteBuffer.position() - 1);
                 }
@@ -516,7 +516,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     }
                 }
                 byte chr = byteBuffer.get();
-                if (!(chr == Constants.SP || chr == Constants.HT)) {
+                if (chr != Constants.SP && chr != Constants.HT) {
                     space = false;
                     byteBuffer.position(byteBuffer.position() - 1);
                 }
@@ -936,7 +936,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     }
 
                     chr = byteBuffer.get();
-                    if (!(chr == Constants.SP || chr == Constants.HT)) {
+                    if (chr != Constants.SP && chr != Constants.HT) {
                         headerParsePos = HeaderParsePosition.HEADER_VALUE;
                         byteBuffer.position(byteBuffer.position() - 1);
                         // Avoids prevChr = chr at start of header value
@@ -1002,7 +1002,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
             byte peek = byteBuffer.get(byteBuffer.position());
             if (headerParsePos == HeaderParsePosition.HEADER_MULTI_LINE) {
-                if ((peek != Constants.SP) && (peek != Constants.HT)) {
+                if (peek != Constants.SP && peek != Constants.HT) {
                     headerParsePos = HeaderParsePosition.HEADER_START;
                     break;
                 } else {

@@ -82,7 +82,7 @@ public final class ApplicationFilterFactory {
         FilterMap filterMaps[] = context.findFilterMaps();
 
         // If there are no filter mappings, we are done
-        if ((filterMaps == null) || (filterMaps.length == 0)) {
+        if (filterMaps == null || filterMaps.length == 0) {
             return filterChain;
         }
 

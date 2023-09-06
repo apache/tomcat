@@ -2989,7 +2989,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     @Override
     public void addParameter(String name, String value) {
         // Validate the proposed context initialization parameter
-        if ((name == null) || (value == null)) {
+        if (name == null || value == null) {
             throw new IllegalArgumentException(sm.getString("standardContext.parameter.required"));
         }
 

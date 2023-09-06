@@ -1691,7 +1691,7 @@ public class Response implements HttpServletResponse {
      * @return the encoded URL
      */
     protected String toEncoded(String url, String sessionId) {
-        if ((url == null) || (sessionId == null)) {
+        if (url == null || sessionId == null) {
             return url;
         }
 
