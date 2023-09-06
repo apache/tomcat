@@ -17,6 +17,7 @@
 package org.apache.coyote;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.http.ServerCookies;
+import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -852,23 +854,18 @@ public final class Request {
      *
      * @param contentType a content type header
      */
-    private static String getCharsetFromContentType(String contentType) {
+    private static String getCharsetFromContentType(String contentType) throws IOException {
+
         if (contentType == null) {
             return null;
         }
-        int start = contentType.indexOf("charset=");
-        if (start < 0) {
-            return null;
+        StringReader reader = new StringReader(contentType);
+        MediaType mediaType = MediaType.parseMediaType(reader);
+        if (mediaType != null) {
+            return mediaType.getCharset();
         }
-        start += 8;
-        int end = contentType.indexOf(';', start);
-        String encoding;
-        if (end >= 0) {
-            encoding = contentType.substring(start, end).trim();
-        } else {
-            encoding = contentType.substring(start).trim();
-        }
-        return encoding.replaceAll("\"", "");
+
+        return null;
     }
 
 }
