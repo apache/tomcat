@@ -16,17 +16,6 @@
  */
 package org.apache.coyote;
 
-import jakarta.servlet.ReadListener;
-import jakarta.servlet.ServletConnection;
-import org.apache.tomcat.util.buf.CharsetHolder;
-import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.buf.UDecoder;
-import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.http.Parameters;
-import org.apache.tomcat.util.http.ServerCookies;
-import org.apache.tomcat.util.net.ApplicationBufferHandler;
-import org.apache.tomcat.util.res.StringManager;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -36,6 +25,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+
+import jakarta.servlet.ReadListener;
+import jakarta.servlet.ServletConnection;
+
+import org.apache.tomcat.util.buf.CharsetHolder;
+import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.buf.UDecoder;
+import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.http.Parameters;
+import org.apache.tomcat.util.http.ServerCookies;
+import org.apache.tomcat.util.net.ApplicationBufferHandler;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This is a low-level, efficient representation of a server request. Most fields are GC-free, expensive operations are
