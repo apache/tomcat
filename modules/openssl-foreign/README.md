@@ -60,7 +60,7 @@ export JAVA_OPTS="--enable-preview --enable-native-access=ALL-UNNAMED"
 
 jextract is now available in its own standalone repository. Clone
 `https://github.com/openjdk/jextract` in some location and
-checkout the branch that supports Java 21. Please refer to the
+checkout the branch that supports Java 22. Please refer to the
 instructions from the repository for building. It should be the
 `panama` branch.
 

@@ -303,7 +303,7 @@ public class HostManagerServlet
     public void init() throws ServletException {
 
         // Ensure that our ContainerServlet properties have been set
-        if ((wrapper == null) || (context == null)) {
+        if (wrapper == null || context == null) {
             throw new UnavailableException
                 (sm.getString("hostManagerServlet.noWrapper"));
         }

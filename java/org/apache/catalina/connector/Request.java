@@ -1443,7 +1443,7 @@ public class Request implements HttpServletRequest {
             return;
         }
         Object listeners[] = context.getApplicationEventListeners();
-        if ((listeners == null) || (listeners.length == 0)) {
+        if (listeners == null || listeners.length == 0) {
             return;
         }
         boolean replaced = (oldValue != null);
@@ -1484,7 +1484,7 @@ public class Request implements HttpServletRequest {
     private void notifyAttributeRemoved(String name, Object value) {
         Context context = getContext();
         Object listeners[] = context.getApplicationEventListeners();
-        if ((listeners == null) || (listeners.length == 0)) {
+        if (listeners == null || listeners.length == 0) {
             return;
         }
         ServletRequestAttributeEvent event =

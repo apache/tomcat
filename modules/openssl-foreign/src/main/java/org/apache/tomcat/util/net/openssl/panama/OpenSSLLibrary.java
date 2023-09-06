@@ -24,9 +24,8 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.tomcat.util.openssl.openssl_compat_h.FIPS_mode;
-import static org.apache.tomcat.util.openssl.openssl_compat_h.FIPS_mode_set;
 import static org.apache.tomcat.util.openssl.openssl_h.*;
+import static org.apache.tomcat.util.openssl.openssl_h_Compatibility.*;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;

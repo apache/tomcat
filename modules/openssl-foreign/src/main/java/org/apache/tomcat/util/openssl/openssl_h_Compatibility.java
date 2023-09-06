@@ -24,7 +24,7 @@ import static java.lang.foreign.ValueLayout.*;
 /**
  * Methods used present in older OpenSSL versions but not in the current major version.
  */
-public class openssl_compat_h  {
+public class openssl_h_Compatibility  {
 
     // OpenSSL 1.1 FIPS_mode
     static final FunctionDescriptor FIPS_mode$FUNC = FunctionDescriptor
