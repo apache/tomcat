@@ -484,7 +484,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
             // readBytes() above will set readChunk unless it returns a value < 0
             chr = readChunk.get(readChunk.position());
-            if ((chr >= Constants.A) && (chr <= Constants.Z)) {
+            if (chr >= Constants.A && chr <= Constants.Z) {
                 chr = (byte) (chr - Constants.LC_OFFSET);
             }
 
@@ -522,7 +522,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                 }
 
                 chr = readChunk.get(readChunk.position());
-                if ((chr == Constants.SP) || (chr == Constants.HT)) {
+                if (chr == Constants.SP || chr == Constants.HT) {
                     readChunk.position(readChunk.position() + 1);
                     // If we swallow whitespace, make sure it counts towards the
                     // limit placed on trailing header size
@@ -574,7 +574,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
             }
 
             chr = readChunk.get(readChunk.position());
-            if ((chr != Constants.SP) && (chr != Constants.HT)) {
+            if (!(chr == Constants.SP || chr == Constants.HT)) {
                 validLine = false;
             } else {
                 eol = false;

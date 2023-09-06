@@ -474,7 +474,7 @@ public final class Request {
 
     public String getContentType() {
         contentType();
-        if ((contentTypeMB == null) || contentTypeMB.isNull()) {
+        if (contentTypeMB == null || contentTypeMB.isNull()) {
             return null;
         }
         return contentTypeMB.toString();
