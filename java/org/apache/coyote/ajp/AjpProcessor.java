@@ -363,22 +363,23 @@ public class AjpProcessor extends AbstractProcessor {
                 // Check message type, process right away and break if
                 // not regular request processing
                 int type = requestHeaderMessage.getByte();
-                if (type == Constants.JK_AJP13_CPING_REQUEST && protocol.isPaused()) {
-                    recycle();
-                    break;
-                }
-                cping = true;
-                try {
-                    socketWrapper.write(true, pongMessageArray, 0, pongMessageArray.length);
-                    socketWrapper.flush(true);
-                } catch (IOException e) {
-                    if (getLog().isDebugEnabled()) {
-                        getLog().debug("Pong message failed", e);
+                if (type == Constants.JK_AJP13_CPING_REQUEST) {
+                    if (protocol.isPaused()) {
+                        recycle();
+                        break;
                     }
-                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
-                }
-                recycle();
-                continue;
+                    cping = true;
+                    try {
+                        socketWrapper.write(true, pongMessageArray, 0, pongMessageArray.length);
+                        socketWrapper.flush(true);
+                    } catch (IOException e) {
+                        if (getLog().isDebugEnabled()) {
+                            getLog().debug("Pong message failed", e);
+                        }
+                        setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+                    }
+                    recycle();
+                    continue;
                 } else if (type != Constants.JK_AJP13_FORWARD_REQUEST) {
                     // Unexpected packet type. Unread body packets should have
                     // been swallowed in finish().
