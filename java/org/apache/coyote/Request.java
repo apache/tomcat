@@ -17,6 +17,7 @@
 package org.apache.coyote;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.http.ServerCookies;
+import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -814,20 +816,17 @@ public final class Request {
         if (contentType == null) {
             return null;
         }
-        int start = contentType.indexOf("charset=");
-        if (start < 0) {
-            return null;
+
+        MediaType mediaType = null;
+        try {
+            mediaType = MediaType.parseMediaType(new StringReader(contentType));
+        } catch (IOException e) {
+            // Ignore - null test below handles this
         }
-        String encoding = contentType.substring(start + 8);
-        int end = encoding.indexOf(';');
-        if (end >= 0) {
-            encoding = encoding.substring(0, end);
-        }
-        encoding = encoding.trim();
-        if (encoding.length() > 2 && encoding.startsWith("\"") && encoding.endsWith("\"")) {
-            encoding = encoding.substring(1, encoding.length() - 1);
+        if (mediaType != null) {
+            return mediaType.getCharset();
         }
 
-        return encoding.trim();
+        return null;
     }
 }
