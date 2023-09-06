@@ -291,7 +291,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
          */
         private String addNonce(String url) {
 
-            if ((url == null) || (nonce == null)) {
+            if (url == null || nonce == null) {
                 return url;
             }
 
