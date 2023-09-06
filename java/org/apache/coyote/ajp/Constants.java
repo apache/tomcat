@@ -173,8 +173,7 @@ public final class Constants {
 
     static {
         try {
-            int i;
-            for (i = 0; i < SC_RESP_AJP13_MAX; i++) {
+            for (int i = 0; i < SC_RESP_AJP13_MAX; i++) {
                 responseTransMap.put(getResponseHeaderForCode(i), Integer.valueOf(0xA001 + i));
             }
         } catch (Exception e) {
