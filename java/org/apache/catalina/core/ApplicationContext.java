@@ -608,7 +608,7 @@ public class ApplicationContext implements ServletContext {
 
         // Notify interested application event listeners
         Object listeners[] = context.getApplicationEventListeners();
-        if ((listeners == null) || (listeners.length == 0)) {
+        if (listeners == null || listeners.length == 0) {
             return;
         }
         ServletContextAttributeEvent event = new ServletContextAttributeEvent(context.getServletContext(), name, value);
@@ -655,7 +655,7 @@ public class ApplicationContext implements ServletContext {
 
         // Notify interested application event listeners
         Object listeners[] = context.getApplicationEventListeners();
-        if ((listeners == null) || (listeners.length == 0)) {
+        if (listeners == null || listeners.length == 0) {
             return;
         }
         ServletContextAttributeEvent event = null;

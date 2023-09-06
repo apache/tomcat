@@ -773,7 +773,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
          * callback).
          */
         int keylen = 0;
-        if ((type == EVP_PKEY_RSA()) || (type == EVP_PKEY_DSA())) {
+        if (type == EVP_PKEY_RSA() || type == EVP_PKEY_DSA()) {
             keylen = (OPENSSL_3 ? EVP_PKEY_get_bits(pkey) : EVP_PKEY_bits(pkey));
         }
         for (int i = 0; i < OpenSSLLibrary.dhParameters.length; i++) {
