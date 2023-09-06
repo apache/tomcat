@@ -47,24 +47,22 @@ public class SessionConfig {
 
 
     private static String getConfiguredSessionCookieName(Context context, String defaultName) {
-        if (context == null) {
-            return defaultName;
-        }
         // Priority is:
         // 1. Cookie name defined in context
         // 2. Cookie name configured for app
         // 3. Default defined by spec
-        String cookieName = context.getSessionCookieName();
-        if (cookieName != null && cookieName.length() > 0) {
-            return cookieName;
-        }
+        if (context != null) {
+            String cookieName = context.getSessionCookieName();
+            if (cookieName != null && cookieName.length() > 0) {
+                return cookieName;
+            }
 
-        SessionCookieConfig scc = context.getServletContext().getSessionCookieConfig();
-        cookieName = scc.getName();
-        if (cookieName != null && cookieName.length() > 0) {
-            return cookieName;
+            SessionCookieConfig scc = context.getServletContext().getSessionCookieConfig();
+            cookieName = scc.getName();
+            if (cookieName != null && cookieName.length() > 0) {
+                return cookieName;
+            }
         }
-
         return defaultName;
     }
 
