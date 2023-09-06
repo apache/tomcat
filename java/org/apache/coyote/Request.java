@@ -854,18 +854,23 @@ public final class Request {
      *
      * @param contentType a content type header
      */
-    private static String getCharsetFromContentType(String contentType) throws IOException {
+    private static String getCharsetFromContentType(String contentType) {
 
         if (contentType == null) {
             return null;
         }
-        StringReader reader = new StringReader(contentType);
-        MediaType mediaType = MediaType.parseMediaType(reader);
+
+        MediaType mediaType = null;
+        try {
+            mediaType = MediaType.parseMediaType(new StringReader(contentType));
+        } catch (IOException e) {
+            // Ignore - null test below handles this
+        }
         if (mediaType != null) {
             return mediaType.getCharset();
         }
 
         return null;
-    }
 
+    }
 }
