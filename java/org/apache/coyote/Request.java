@@ -824,7 +824,7 @@ public final class Request {
             encoding = encoding.substring(0, end);
         }
         encoding = encoding.trim();
-        if ((encoding.length() > 2) && (encoding.startsWith("\"")) && (encoding.endsWith("\""))) {
+        if (encoding.length() > 2 && encoding.startsWith("\"") && encoding.endsWith("\"")) {
             encoding = encoding.substring(1, encoding.length() - 1);
         }
 
