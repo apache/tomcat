@@ -26,12 +26,12 @@
 
     <groupId>org.apache.tomcat</groupId>
     <artifactId>tomcat-coyote-openssl</artifactId>
-    <name>Apache Tomcat OpenSSL support for Java 21</name>
-    <description>OpenSSL support using new APIs included in Java 21</description>
+    <name>Apache Tomcat OpenSSL support for Java 22</name>
+    <description>OpenSSL support using FFM API included in Java 22</description>
     <version>0.1-SNAPSHOT</version>
 
     <properties>
-        <tomcat.version>9.0.78</tomcat.version>
+        <tomcat.version>9.0.80</tomcat.version>
         <project.build.outputTimestamp>2021-12-02T12:00:00Z</project.build.outputTimestamp>
     </properties>
 
