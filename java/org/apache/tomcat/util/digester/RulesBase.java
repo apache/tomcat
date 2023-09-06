@@ -250,7 +250,7 @@ public class RulesBase implements Rules {
         if (list == null) {
             return null;
         }
-        if ((namespaceURI == null) || (namespaceURI.length() == 0)) {
+        if (namespaceURI == null || namespaceURI.length() == 0) {
             return list;
         }
 
