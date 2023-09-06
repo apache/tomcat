@@ -52,8 +52,9 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
-import static org.apache.tomcat.util.openssl.openssl_compat_h.*;
 import static org.apache.tomcat.util.openssl.openssl_h.*;
+import static org.apache.tomcat.util.openssl.openssl_h_Compatibility.*;
+import static org.apache.tomcat.util.openssl.openssl_h_Macros.*;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -280,9 +281,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 prot = SSL3_VERSION();
             }
             maxTlsVersion = prot;
-            // # define SSL_CTX_set_max_proto_version(sslCtx, version) \
-            //          SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MAX_PROTO_VERSION, version, NULL)
-            SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MAX_PROTO_VERSION(), prot, MemorySegment.NULL);
+            SSL_CTX_set_max_proto_version(sslCtx, prot);
             if (prot == TLS1_3_VERSION() && (protocol & SSL_PROTOCOL_TLSV1_2) > 0) {
                 prot = TLS1_2_VERSION();
             }
@@ -296,9 +295,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 prot = SSL3_VERSION();
             }
             minTlsVersion = prot;
-            //# define SSL_CTX_set_min_proto_version(sslCtx, version) \
-            //         SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MIN_PROTO_VERSION, version, NULL)
-            SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MIN_PROTO_VERSION(), prot, MemorySegment.NULL);
+            SSL_CTX_set_min_proto_version(sslCtx, prot);
 
             // Disable compression, usually unsafe
             SSL_CTX_set_options(sslCtx, SSL_OP_NO_COMPRESSION());
@@ -311,14 +308,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             SSL_CTX_set_options(sslCtx, SSL_OP_SINGLE_ECDH_USE());
 
             // Default session context id and cache size
-            // # define SSL_CTX_sess_set_cache_size(sslCtx,t) \
-            //          SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_SESS_CACHE_SIZE,t,NULL)
-            SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_SESS_CACHE_SIZE(), 256, MemorySegment.NULL);
+            SSL_CTX_sess_set_cache_size(sslCtx, 256);
 
             // Session cache is disabled by default
-            // # define SSL_CTX_set_session_cache_mode(sslCtx,m) \
-            //          SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_SESS_CACHE_MODE,m,NULL)
-            SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_SESS_CACHE_MODE(), SSL_SESS_CACHE_OFF(), MemorySegment.NULL);
+            SSL_CTX_set_session_cache_mode(sslCtx, SSL_SESS_CACHE_OFF());
 
             // Longer session timeout
             SSL_CTX_set_timeout(sslCtx, 14400);
@@ -1287,8 +1280,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     logLastError(localArena, "openssl.errorLoadingCertificate");
                     return;
                 }
-                // # define SSL_CTX_add0_chain_cert(sslCtx,x509) SSL_CTX_ctrl(sslCtx,SSL_CTRL_CHAIN_CERT,0,(char *)(x509))
-                if (SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_CHAIN_CERT(), 0, x509certChain) <= 0) {
+                if (SSL_CTX_add0_chain_cert(state.sslCtx, x509certChain) <= 0) {
                     logLastError(localArena, "openssl.errorAddingCertificate");
                     return;
                 }

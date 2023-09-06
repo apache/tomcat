@@ -25,6 +25,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSessionContext;
 
 import static org.apache.tomcat.util.openssl.openssl_h.*;
+import static org.apache.tomcat.util.openssl.openssl_h_Macros.*;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -68,9 +69,7 @@ public class OpenSSLSessionContext implements SSLSessionContext {
         }
         try (var memorySession = Arena.ofConfined()) {
             var array = memorySession.allocateFrom(ValueLayout.JAVA_BYTE, keys);
-            // #define SSL_CTX_set_tlsext_ticket_keys(ctx, keys, keylen)
-            //     SSL_CTX_ctrl((ctx),SSL_CTRL_SET_TLSEXT_TICKET_KEYS, (keylen), (keys))
-            SSL_CTX_ctrl(context.getSSLContext(), SSL_CTRL_SET_TLSEXT_TICKET_KEYS(), TICKET_KEYS_SIZE, array);
+            SSL_CTX_set_tlsext_ticket_keys(context.getSSLContext(), array, TICKET_KEYS_SIZE);
         }
     }
 
@@ -81,9 +80,7 @@ public class OpenSSLSessionContext implements SSLSessionContext {
      */
     public void setSessionCacheEnabled(boolean enabled) {
         long mode = enabled ? SSL_SESS_CACHE_SERVER() : SSL_SESS_CACHE_OFF();
-        // # define SSL_CTX_set_session_cache_mode(ctx,m) \
-        //     SSL_CTX_ctrl(ctx,SSL_CTRL_SET_SESS_CACHE_MODE,m,NULL)
-        SSL_CTX_ctrl(context.getSSLContext(), SSL_CTRL_SET_SESS_CACHE_MODE(), mode, null);
+        SSL_CTX_set_session_cache_mode(context.getSSLContext(), mode);
     }
 
     /**
@@ -91,9 +88,7 @@ public class OpenSSLSessionContext implements SSLSessionContext {
      *         otherwise.
      */
     public boolean isSessionCacheEnabled() {
-        // # define SSL_CTX_get_session_cache_mode(ctx) \
-        //    SSL_CTX_ctrl(ctx,SSL_CTRL_GET_SESS_CACHE_MODE,0,NULL)
-        return SSL_CTX_ctrl(context.getSSLContext(), SSL_CTRL_GET_SESS_CACHE_MODE(), 0, null) == SSL_SESS_CACHE_SERVER();
+        return SSL_CTX_get_session_cache_mode(context.getSSLContext()) == SSL_SESS_CACHE_SERVER();
     }
 
     /**
@@ -121,16 +116,12 @@ public class OpenSSLSessionContext implements SSLSessionContext {
         if (size < 0) {
             throw new IllegalArgumentException();
         }
-        // # define SSL_CTX_sess_set_cache_size(ctx,t) \
-        //     SSL_CTX_ctrl(ctx,SSL_CTRL_SET_SESS_CACHE_SIZE,t,NULL)
-        SSL_CTX_ctrl(context.getSSLContext(), SSL_CTRL_SET_SESS_CACHE_SIZE(), size, null);
+        SSL_CTX_sess_set_cache_size(context.getSSLContext(), size);
     }
 
     @Override
     public int getSessionCacheSize() {
-        // # define SSL_CTX_sess_get_cache_size(ctx) \
-        //     SSL_CTX_ctrl(ctx,SSL_CTRL_GET_SESS_CACHE_SIZE,0,NULL)
-        return (int) SSL_CTX_ctrl(context.getSSLContext(), SSL_CTRL_GET_SESS_CACHE_SIZE(), 0, null);
+        return (int) SSL_CTX_sess_get_cache_size(context.getSSLContext());
     }
 
     /**
