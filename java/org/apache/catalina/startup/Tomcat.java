@@ -1290,9 +1290,9 @@ public class Tomcat {
         // Process some command line parameters
         String[] catalinaArguments = null;
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("--no-jmx")) {
+            if ("--no-jmx".equals(args[i])) {
                 Registry.disableRegistry();
-            } else if (args[i].equals("--catalina")) {
+            } else if ("--catalina".equals(args[i])) {
                 // This was already processed before
                 // Skip the rest of the arguments as they are for Catalina
                 ArrayList<String> result = new ArrayList<>();
@@ -1312,22 +1312,22 @@ public class Tomcat {
         String path = "";
         // Process command line parameters
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("--war")) {
+            if ("--war".equals(args[i])) {
                 if (++i >= args.length) {
                     throw new IllegalArgumentException(sm.getString("tomcat.invalidCommandLine", args[i - 1]));
                 }
                 File war = new File(args[i]);
                 tomcat.addWebapp(path, war.getAbsolutePath());
-            } else if (args[i].equals("--path")) {
+            } else if ("--path".equals(args[i])) {
                 if (++i >= args.length) {
                     throw new IllegalArgumentException(sm.getString("tomcat.invalidCommandLine", args[i - 1]));
                 }
                 path = args[i];
-            } else if (args[i].equals("--await")) {
+            } else if ("--await".equals(args[i])) {
                 await = true;
-            } else if (args[i].equals("--no-jmx")) {
+            } else if ("--no-jmx".equals(args[i])) {
                 // This was already processed before
-            } else if (args[i].equals("--catalina")) {
+            } else if ("--catalina".equals(args[i])) {
                 // This was already processed before
                 // Skip the rest of the arguments as they are for Catalina
                 break;
