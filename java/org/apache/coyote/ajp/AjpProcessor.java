@@ -1278,8 +1278,13 @@ public class AjpProcessor extends AbstractProcessor {
         @Override
         public int doRead(ApplicationBufferHandler handler) throws IOException {
 
-            if (emty && refillReadBuffer(false) || endOfStream) {
+            if (endOfStream) {
                 return -1;
+            }
+            if (empty) {
+                if (!refillReadBuffer(true)) {
+                    return -1;
+                }
             }
             ByteChunk bc = bodyBytes.getByteChunk();
             handler.setByteBuffer(ByteBuffer.wrap(bc.getBuffer(), bc.getStart(), bc.getLength()));

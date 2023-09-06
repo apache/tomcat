@@ -135,7 +135,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
         }
         int count = 0, c;
 
-        while (c = readInternal() != -1) {
+        while ((c = readInternal()) != -1) {
             b[off++] = (byte) c;
             count++;
             if (c == '\n' || count == len) {
