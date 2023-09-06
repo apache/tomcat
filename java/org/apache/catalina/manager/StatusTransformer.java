@@ -398,7 +398,6 @@ public class StatusTransformer {
             break;
         case (org.apache.coyote.Constants.STAGE_KEEPALIVE):
             stageStr = "K";
-            fullStatus = true;
             showRequest = false;
             break;
         case (org.apache.coyote.Constants.STAGE_NEW):
