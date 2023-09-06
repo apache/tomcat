@@ -16,6 +16,17 @@
  */
 package org.apache.coyote;
 
+import jakarta.servlet.ReadListener;
+import jakarta.servlet.ServletConnection;
+import org.apache.tomcat.util.buf.CharsetHolder;
+import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.buf.UDecoder;
+import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.http.Parameters;
+import org.apache.tomcat.util.http.ServerCookies;
+import org.apache.tomcat.util.net.ApplicationBufferHandler;
+import org.apache.tomcat.util.res.StringManager;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -25,18 +36,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-
-import jakarta.servlet.ReadListener;
-import jakarta.servlet.ServletConnection;
-
-import org.apache.tomcat.util.buf.CharsetHolder;
-import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.buf.UDecoder;
-import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.http.Parameters;
-import org.apache.tomcat.util.http.ServerCookies;
-import org.apache.tomcat.util.net.ApplicationBufferHandler;
-import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This is a low-level, efficient representation of a server request. Most fields are GC-free, expensive operations are
@@ -386,8 +385,7 @@ public final class Request {
      * Get the character encoding used for this request.
      *
      * @return The value set via {@link #setCharset(Charset)} or if no call has been made to that method try to obtain
-     *             if from the content type.
-     *
+     * if from the content type.
      * @deprecated Unused. This method will be removed in Tomcat 12.
      */
     @Deprecated
@@ -404,10 +402,8 @@ public final class Request {
      * Get the character encoding used for this request.
      *
      * @return The value set via {@link #setCharset(Charset)} or if no call has been made to that method try to obtain
-     *             if from the content type.
-     *
+     * if from the content type.
      * @throws UnsupportedEncodingException If the user agent has specified an invalid character encoding
-     *
      * @deprecated Unused. This method will be removed in Tomcat 12.
      */
     @Deprecated
@@ -425,7 +421,6 @@ public final class Request {
      * Unused.
      *
      * @param charset The Charset to use for the request
-     *
      * @deprecated Unused. This method will be removed in Tomcat 12.
      */
     @Deprecated
@@ -643,9 +638,7 @@ public final class Request {
      * InputStream. Unlike InputStream, this interface allows the app to process data in place, without copy.
      *
      * @param handler The destination to which to copy the data
-     *
      * @return The number of bytes copied
-     *
      * @throws IOException If an I/O error occurs during the copy
      */
     public int doRead(ApplicationBufferHandler handler) throws IOException {
@@ -853,7 +846,6 @@ public final class Request {
      * @param contentType a content type header
      */
     private static String getCharsetFromContentType(String contentType) {
-
         if (contentType == null) {
             return null;
         }
@@ -861,16 +853,15 @@ public final class Request {
         if (start < 0) {
             return null;
         }
-        String encoding = contentType.substring(start + 8);
-        int end = encoding.indexOf(';');
+        start += 8;
+        int end = contentType.indexOf(';', start);
+        String encoding;
         if (end >= 0) {
-            encoding = encoding.substring(0, end);
+            encoding = contentType.substring(start, end).trim();
+        } else {
+            encoding = contentType.substring(start).trim();
         }
-        encoding = encoding.trim();
-        if ((encoding.length() > 2) && (encoding.startsWith("\"")) && (encoding.endsWith("\""))) {
-            encoding = encoding.substring(1, encoding.length() - 1);
-        }
-
-        return encoding.trim();
+        return encoding.replaceAll("\"", "");
     }
+
 }
