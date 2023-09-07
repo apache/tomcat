@@ -187,6 +187,7 @@ public class MemoryRealm extends RealmBase {
      *             necessary.
      */
     protected Digester getDigester() {
+        // Keep locking for subclass compatibility
         synchronized (digesterLock) {
             if (digester == null) {
                 digester = new Digester();
@@ -226,16 +227,16 @@ public class MemoryRealm extends RealmBase {
                 log.debug(sm.getString("memoryRealm.loadPath", pathName));
             }
 
-            Digester digester = getDigester();
-            try {
-                synchronized (digester) {
+            synchronized (digesterLock) {
+                Digester digester = getDigester();
+                try {
                     digester.push(this);
                     digester.parse(is);
+                } catch (Exception e) {
+                    throw new LifecycleException(sm.getString("memoryRealm.readXml"), e);
+                } finally {
+                    digester.reset();
                 }
-            } catch (Exception e) {
-                throw new LifecycleException(sm.getString("memoryRealm.readXml"), e);
-            } finally {
-                digester.reset();
             }
         } catch (IOException ioe) {
             throw new LifecycleException(sm.getString("memoryRealm.loadExist", pathName), ioe);
