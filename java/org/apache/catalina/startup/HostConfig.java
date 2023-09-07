@@ -541,9 +541,9 @@ public class HostConfig implements LifecycleListener {
         boolean isExternal = false;
         File expandedDocBase = null;
 
-        try (FileInputStream fis = new FileInputStream(contextXml)) {
+        try {
             synchronized (digesterLock) {
-                try {
+                try (FileInputStream fis = new FileInputStream(contextXml)) {
                     context = (Context) digester.parse(fis);
                 } catch (Exception e) {
                     log.error(sm.getString("hostConfig.deployDescriptor.error", contextXml.getAbsolutePath()), e);
