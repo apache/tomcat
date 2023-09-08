@@ -301,7 +301,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
      */
     protected void changeSessionID(Request request, String sessionId, String newSessionID, Session catalinaSession) {
         fireLifecycleEvent("Before session migration", catalinaSession);
-        catalinaSession.getManager().changeSessionId(catalinaSession, newSessionID);
+        getManager(request).changeSessionId(catalinaSession, newSessionID);
         changeRequestSessionID(request, sessionId, newSessionID);
         changeSessionAuthenticationNote(sessionId, newSessionID, catalinaSession);
         fireLifecycleEvent("After session migration", catalinaSession);
