@@ -112,6 +112,10 @@ public class ServiceMBean extends BaseCatalinaMBean<Service> {
     public String getExecutor(String name) throws MBeanException{
         Service service = doGetManagedResource();
         Executor executor = service.getExecutor(name);
-        return executor.toString();
+        if (executor != null) {
+            return executor.toString();
+        } else {
+            return null;
+        }
     }
 }
