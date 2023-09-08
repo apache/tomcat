@@ -18,6 +18,7 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.sql.XAConnection;
@@ -100,6 +101,10 @@ public class ProxyConnection extends JdbcInterceptor {
             }
             PooledConnection poolc = this.connection;
             this.connection = null;
+            if (!poolc.getAutoCommit() && !poolc.isReadOnly()) {
+                Connection con = poolc.getConnection();
+                con.rollback();
+            }
             pool.returnConnection(poolc);
             return null;
         } else if (compare(TOSTRING_VAL,method)) {
