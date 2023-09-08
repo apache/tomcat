@@ -242,7 +242,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     break;
                 }
                 String filename = warPart.getSubmittedFileName();
-                if (!filename.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
+                if (filename == null || !filename.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                     message = smClient.getString(
                             "htmlManagerServlet.deployUploadNotWar", filename);
                     break;
@@ -1014,8 +1014,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         }
         int nbAffectedSessions = 0;
         for (String sessionId : sessionIds) {
-            HttpSession session =
-                    getSessionForNameAndId(cn, sessionId, smClient).getSession();
+            Session session = getSessionForNameAndId(cn, sessionId, smClient);
             if (null == session) {
                 // Shouldn't happen, but let's play nice...
                 if (debug >= 1) {
@@ -1024,7 +1023,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 continue;
             }
             try {
-                session.invalidate();
+                session.getSession().invalidate();
                 ++nbAffectedSessions;
                 if (debug >= 1) {
                     log("Invalidating session id " + sessionId);
@@ -1049,8 +1048,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
      */
     protected boolean removeSessionAttribute(ContextName cn, String sessionId,
             String attributeName, StringManager smClient) {
-        HttpSession session =
-            getSessionForNameAndId(cn, sessionId, smClient).getSession();
+        Session session = getSessionForNameAndId(cn, sessionId, smClient);
         if (null == session) {
             // Shouldn't happen, but let's play nice...
             if (debug >= 1) {
@@ -1058,9 +1056,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
             }
             return false;
         }
-        boolean wasPresent = (null != session.getAttribute(attributeName));
+        HttpSession httpSession = session.getSession();
+        boolean wasPresent = (null != httpSession.getAttribute(attributeName));
         try {
-            session.removeAttribute(attributeName);
+            httpSession.removeAttribute(attributeName);
         } catch (IllegalStateException ise) {
             if (debug >= 1) {
                 log("Can't remote attribute '" + attributeName + "' for invalidated session id " + sessionId);
