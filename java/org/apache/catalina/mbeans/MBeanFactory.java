@@ -238,6 +238,9 @@ public class MBeanFactory {
     private String addRealmToParent(String parent, Realm realm) throws Exception {
         ObjectName pname = new ObjectName(parent);
         Container container = getParentContainerFromParent(pname);
+        if (container == null) {
+            throw new IllegalArgumentException(sm.getString("mBeanFactory.noParent", parent));
+        }
         // Add the new instance to its parent component
         container.setRealm(realm);
         // Return the corresponding MBean name
@@ -603,8 +606,7 @@ public class MBeanFactory {
         Container container = getParentContainerFromParent(parentName);
 
         if (container == null) {
-            // TODO
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(sm.getString("mBeanFactory.noParent", parent));
         }
 
         Valve valve = (Valve) Class.forName(className).getConstructor().newInstance();
@@ -837,7 +839,7 @@ public class MBeanFactory {
     public void removeService(String name) throws Exception {
 
         if (!(container instanceof Server)) {
-            throw new Exception();
+            throw new Exception(sm.getString("mBeanFactory.notServer"));
         }
 
         // Acquire a reference to the component to be removed
