@@ -77,7 +77,12 @@ public class ContextMBean extends BaseCatalinaMBean<Context> {
      */
     public String findErrorPage(int errorCode) throws MBeanException {
         Context context = doGetManagedResource();
-        return context.findErrorPage(errorCode).toString();
+        ErrorPage errorPage = context.findErrorPage(errorCode);
+        if (errorPage != null) {
+            return context.findErrorPage(errorCode).toString();
+        } else {
+            return null;
+        }
     }
 
 
@@ -108,7 +113,12 @@ public class ContextMBean extends BaseCatalinaMBean<Context> {
      */
     public String findErrorPage(Throwable exceptionType) throws MBeanException {
         Context context = doGetManagedResource();
-        return context.findErrorPage(exceptionType).toString();
+        ErrorPage errorPage = context.findErrorPage(exceptionType);
+        if (errorPage != null) {
+            return errorPage.toString();
+        } else {
+            return null;
+        }
     }
 
 
@@ -145,7 +155,11 @@ public class ContextMBean extends BaseCatalinaMBean<Context> {
         Context context = doGetManagedResource();
 
         FilterDef filterDef = context.findFilterDef(name);
-        return filterDef.toString();
+        if (filterDef != null) {
+            return filterDef.toString();
+        } else {
+            return null;
+        }
     }
 
 
