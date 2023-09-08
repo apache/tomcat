@@ -232,6 +232,9 @@ public class MBeanFactory {
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
         Container container = getParentContainerFromParent(pname);
+        if (container == null) {
+            throw new IllegalArgumentException(sm.getString("mBeanFactory.noParent", parent));
+        }
         // Add the new instance to its parent component
         container.setRealm(realm);
         // Return the corresponding MBean name
