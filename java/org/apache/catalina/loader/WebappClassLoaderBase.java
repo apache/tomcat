@@ -1039,7 +1039,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     @Override
     public Enumeration<URL> getResources(String name) throws IOException {
 
-        Enumeration<URL> parentResources = getParent().getResources(name);
+        Enumeration<URL> parentResources = parent.getResources(name);
         Enumeration<URL> localResources = findResources(name);
 
         // Need to combine these enumerations. The order in which the
