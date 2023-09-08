@@ -79,7 +79,7 @@ public class ContextMBean extends BaseCatalinaMBean<Context> {
         Context context = doGetManagedResource();
         ErrorPage errorPage = context.findErrorPage(errorCode);
         if (errorPage != null) {
-            return context.findErrorPage(errorCode).toString();
+            return errorPage.toString();
         } else {
             return null;
         }
