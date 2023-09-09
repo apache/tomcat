@@ -209,8 +209,6 @@ mvn package</source>
   <p>
     Missing items for better Tomcat functionality:
     <ul>
-      <li><a href="https://github.com/oracle/graal/issues/2103">JMX</a>:
-        The usual monitoring and management is not usable</li>
       <li>java.util.logging LogManager: Configuration through a system property
         is not implemented, so standard java.util.logging must be used instead
         of JULI</li>
