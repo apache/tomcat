@@ -904,12 +904,6 @@ public class Http11Processor extends AbstractProcessor {
             prepareSendfile(outputFilters);
         }
 
-        // Check for compression
-        boolean useCompression = false;
-        if (entityBody && sendfileData == null) {
-            useCompression = protocol.useCompression(request, response);
-        }
-
         MimeHeaders headers = response.getMimeHeaders();
         // A SC_NO_CONTENT response may include entity headers
         if (entityBody || statusCode == HttpServletResponse.SC_NO_CONTENT) {
@@ -946,8 +940,11 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
 
-        if (useCompression) {
-            outputBuffer.addActiveFilter(outputFilters[Constants.GZIP_FILTER]);
+        // Check for compression
+        if (entityBody && sendfileData == null) {
+            if (protocol.useCompression(request, response)) {
+                outputBuffer.addActiveFilter(outputFilters[Constants.GZIP_FILTER]);
+            }
         }
 
         // Add date header unless application has already set one (e.g. in a
