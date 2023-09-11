@@ -28,6 +28,7 @@ import javax.naming.Context;
 import org.apache.catalina.Group;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Role;
+import org.apache.catalina.Server;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.naming.ContextBindings;
@@ -214,6 +215,11 @@ public class UserDatabaseRealm extends RealmBase {
                             context = ContextBindings.getClassLoader();
                             context = (Context) context.lookup("comp/env");
                         } else {
+                            Server server = getServer();
+                            if (server == null) {
+                                containerLog.error(sm.getString("userDatabaseRealm.noNamingContext"));
+                                return null;
+                            }
                             context = getServer().getGlobalNamingContext();
                         }
                         database = (UserDatabase) context.lookup(resourceName);
