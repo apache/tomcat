@@ -28,6 +28,7 @@ import javax.naming.Context;
 import javax.sql.DataSource;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Server;
 import org.apache.naming.ContextBindings;
 
 /**
@@ -375,7 +376,13 @@ public class DataSourceRealm extends RealmBase {
                 context = ContextBindings.getClassLoader();
                 context = (Context) context.lookup("comp/env");
             } else {
-                context = getServer().getGlobalNamingContext();
+                Server server = getServer();
+                if (server == null) {
+                    connectionSuccess = false;
+                    containerLog.error(sm.getString("dataSourceRealm.noNamingContext"));
+                    return null;
+                }
+                context = server.getGlobalNamingContext();
             }
             DataSource dataSource = (DataSource) context.lookup(dataSourceName);
             Connection connection = dataSource.getConnection();
