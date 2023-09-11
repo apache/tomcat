@@ -855,6 +855,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
                     // For AllRolesMode.STRICT_AUTH_ONLY_MODE there must be zero roles
                     roles = request.getContext().findSecurityRoles();
+                    if (roles == null) {
+                        roles = new String[0];
+                    }
                     if (roles.length == 0 && allRolesMode == AllRolesMode.STRICT_AUTH_ONLY_MODE) {
                         if (log.isDebugEnabled()) {
                             log.debug("Granting access for role-name=*, strict auth-only");
