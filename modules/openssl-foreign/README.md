@@ -2,14 +2,14 @@
 
 ## This module is experimental
 
-It uses the JEP XXX API. More details on this API are available
-at `https://openjdk.java.net/jeps/XXX`.
+It uses the JEP 454 API. More details on this API are available
+at `https://openjdk.java.net/jeps/454`.
 
-## Building Java 22 with the JEP XXX API
+## Building Java 22 with the JEP 454 API
 
 Clone `https://github.com/openjdk/panama-foreign/` in some location and
 checkout the main branch. This is a Java 22 development JVM
-with the JEP XXX API. It may fail to build. When this happens, step back
+with the JEP 454 API. It may fail to build. When this happens, step back
 one commit at a time until it does.
 
 ```
@@ -53,7 +53,7 @@ Example connector:
 Run Tomcat using the additional Java options that allow access to the API and
 native code:
 ```
-export JAVA_OPTS="--enable-preview --enable-native-access=ALL-UNNAMED"
+export JAVA_OPTS="--enable-native-access=ALL-UNNAMED"
 ```
 
 ## Generating the OpenSSL API code using jextract (optional)
