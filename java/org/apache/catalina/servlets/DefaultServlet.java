@@ -1317,7 +1317,10 @@ public class DefaultServlet extends HttpServlet {
         is.reset();
         if (stripBom) {
             while (skip-- > 0) {
-                is.read();
+                if (is.read() < 0) {
+                    // Ignore since included
+                    break;
+                }
             }
         }
     }
