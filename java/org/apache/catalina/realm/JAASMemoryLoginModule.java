@@ -266,7 +266,8 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         try {
             callbackHandler.handle(callbacks);
             username = ((NameCallback) callbacks[0]).getName();
-            password = new String(((PasswordCallback) callbacks[1]).getPassword());
+            char[] passwordArray = ((PasswordCallback) callbacks[1]).getPassword();
+            password = (passwordArray == null) ? null : new String(passwordArray);
             nonce = ((TextInputCallback) callbacks[2]).getText();
             nc = ((TextInputCallback) callbacks[3]).getText();
             cnonce = ((TextInputCallback) callbacks[4]).getText();
