@@ -1257,7 +1257,7 @@ public class JNDIRealm extends RealmBase {
                                 // Search for additional roles
                                 List<String> roles = getRoles(connection, user);
                                 if (containerLog.isDebugEnabled()) {
-                                    containerLog.debug("Found roles: " + roles.toString());
+                                    containerLog.debug("Found roles: " + ((roles == null) ? "" : roles.toString()));
                                 }
                                 return new GenericPrincipal(username, roles);
                             }
@@ -1287,7 +1287,7 @@ public class JNDIRealm extends RealmBase {
                 // Search for additional roles
                 List<String> roles = getRoles(connection, user);
                 if (containerLog.isDebugEnabled()) {
-                    containerLog.debug("Found roles: " + roles.toString());
+                    containerLog.debug("Found roles: " + ((roles == null) ? "" : roles.toString()));
                 }
 
                 // Create and return a suitable Principal for this user
