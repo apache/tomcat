@@ -910,8 +910,7 @@ public final class CGIServlet extends HttpServlet {
             String name = null;
             String scriptname = null;
 
-            if (webAppRootDir != null &&
-                    webAppRootDir.lastIndexOf(File.separator) == (webAppRootDir.length() - 1)) {
+            if (webAppRootDir.lastIndexOf(File.separator) == (webAppRootDir.length() - 1)) {
                 //strip the trailing "/" from the webAppRootDir
                 webAppRootDir = webAppRootDir.substring(0, (webAppRootDir.length() - 1));
             }
