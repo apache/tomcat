@@ -605,11 +605,15 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
         // Ensure caches for timing stats are the right size by filling with
         // nulls.
-        while (sessionCreationTiming.size() < TIMING_STATS_CACHE_SIZE) {
-            sessionCreationTiming.add(null);
+        synchronized (sessionCreationTiming) {
+            while (sessionCreationTiming.size() < TIMING_STATS_CACHE_SIZE) {
+                sessionCreationTiming.add(null);
+            }
         }
-        while (sessionExpirationTiming.size() < TIMING_STATS_CACHE_SIZE) {
-            sessionExpirationTiming.add(null);
+        synchronized (sessionExpirationTiming) {
+            while (sessionExpirationTiming.size() < TIMING_STATS_CACHE_SIZE) {
+                sessionExpirationTiming.add(null);
+            }
         }
 
         /* Create sessionIdGenerator if not explicitly configured */
