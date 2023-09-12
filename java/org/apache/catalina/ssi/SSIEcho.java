@@ -57,7 +57,8 @@ public class SSIEcho implements SSICommand {
                 writer.write(ssiMediator.encode(errorMessage, SSIMediator.ENCODING_ENTITY));
             }
         }
-        String variableValue = ssiMediator.getVariableValue(originalValue, encoding);
+        String variableValue = (originalValue == null) ? MISSING_VARIABLE_VALUE
+                : ssiMediator.getVariableValue(originalValue, encoding);
         if (variableValue == null) {
             variableValue = MISSING_VARIABLE_VALUE;
         }
