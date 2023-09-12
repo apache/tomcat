@@ -601,8 +601,12 @@ public class ContextConfig implements LifecycleListener {
                         ConfigFileLoader.getSource().getResource(defaultContextXml)) {
                     if (generateCode) {
                         contextXmlJavaSource = getContextXmlJavaSource(contextXmlPackageName, contextXmlSimpleClassName);
-                        digester.startGeneratingCode();
-                        generateClassHeader(digester, contextXmlPackageName, contextXmlSimpleClassName);
+                        if (contextXmlJavaSource != null) {
+                            digester.startGeneratingCode();
+                            generateClassHeader(digester, contextXmlPackageName, contextXmlSimpleClassName);
+                        } else {
+                            generateCode = false;
+                        }
                     }
                     URL defaultContextUrl = contextXmlResource.getURI().toURL();
                     processContextConfig(digester, defaultContextUrl, contextXmlResource.getInputStream());
@@ -2197,19 +2201,25 @@ public class ContextConfig implements LifecycleListener {
     protected void processAnnotationsInParallel(Set<WebXml> fragments, boolean handlesTypesOnly,
                                                 Map<String, JavaClassCacheEntry> javaClassCache) {
         Server s = getServer();
-        ExecutorService pool = null;
-        pool = s.getUtilityExecutor();
-        List<Future<?>> futures = new ArrayList<>(fragments.size());
-        for (WebXml fragment : fragments) {
-            Runnable task = new AnnotationScanTask(fragment, handlesTypesOnly, javaClassCache);
-            futures.add(pool.submit(task));
-        }
-        try {
-            for (Future<?> future : futures) {
-                future.get();
+        ExecutorService pool = (s == null) ? null : s.getUtilityExecutor();
+        if (pool != null) {
+            List<Future<?>> futures = new ArrayList<>(fragments.size());
+            for (WebXml fragment : fragments) {
+                Runnable task = new AnnotationScanTask(fragment, handlesTypesOnly, javaClassCache);
+                futures.add(pool.submit(task));
             }
-        } catch (Exception e) {
-            throw new RuntimeException(sm.getString("contextConfig.processAnnotationsInParallelFailure"), e);
+            try {
+                for (Future<?> future : futures) {
+                    future.get();
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(sm.getString("contextConfig.processAnnotationsInParallelFailure"), e);
+            }
+        } else {
+            // Fallback to regular processing
+            for (WebXml fragment : fragments) {
+                scanWebXmlFragment(handlesTypesOnly, fragment, javaClassCache);
+            }
         }
     }
 
