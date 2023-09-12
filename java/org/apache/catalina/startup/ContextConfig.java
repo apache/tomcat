@@ -604,6 +604,7 @@ public class ContextConfig implements LifecycleListener {
                         if (contextXmlJavaSource != null) {
                             digester.startGeneratingCode();
                             generateClassHeader(digester, contextXmlPackageName, contextXmlSimpleClassName);
+                        } else {
                             generateCode = false;
                         }
                     }
