@@ -22,7 +22,6 @@ import java.util.concurrent.Semaphore;
 import jakarta.servlet.ServletException;
 
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 
@@ -123,10 +122,8 @@ public class SemaphoreValve extends ValveBase {
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
-
         semaphore = new Semaphore(concurrency, fairness);
-
-        setState(LifecycleState.STARTING);
+        super.startInternal();
     }
 
 
@@ -139,9 +136,7 @@ public class SemaphoreValve extends ValveBase {
      */
     @Override
     protected synchronized void stopInternal() throws LifecycleException {
-
-        setState(LifecycleState.STOPPING);
-
+        super.stopInternal();
         semaphore = null;
     }
 
