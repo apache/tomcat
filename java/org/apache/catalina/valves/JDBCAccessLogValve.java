@@ -29,7 +29,6 @@ import jakarta.servlet.ServletException;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -624,14 +623,12 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
-
         try {
             open();
         } catch (SQLException e) {
             throw new LifecycleException(e);
         }
-
-        setState(LifecycleState.STARTING);
+        super.startInternal();
     }
 
 
@@ -644,9 +641,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
      */
     @Override
     protected synchronized void stopInternal() throws LifecycleException {
-
-        setState(LifecycleState.STOPPING);
-
+        super.stopInternal();
         close();
     }
 
