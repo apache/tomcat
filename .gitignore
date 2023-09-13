@@ -28,9 +28,10 @@ mvn.properties
 .classpath
 .externalToolBuilders
 .fbprefs
-.project
-.settings
 .idea
+.project
+.sdkmanrc
+.settings
 .vscode
 *.iml
 *.ipr
