@@ -39,8 +39,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.catalina.connector.Request;
@@ -554,7 +552,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             this.pattern = pattern;
         }
         logElements = createLogElements();
-        cachedElements = createCachedElements(logElements);
+        if (logElements != null) {
+            cachedElements = createCachedElements(logElements);
+        }
     }
 
     /**
@@ -753,33 +753,6 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         return fallback;
     }
 
-
-    /**
-     * Start this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
-    @Override
-    protected synchronized void startInternal() throws LifecycleException {
-
-        setState(LifecycleState.STARTING);
-    }
-
-
-    /**
-     * Stop this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
-    @Override
-    protected synchronized void stopInternal() throws LifecycleException {
-
-        setState(LifecycleState.STOPPING);
-    }
 
     /**
      * AccessLogElement writes the partial message into the buffer.
