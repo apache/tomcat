@@ -271,12 +271,16 @@ public class StoreConfig implements IStoreConfig {
         StoreDescription desc = null;
         try {
             desc = getRegistry().findDescription(aContext.getClass());
-            oldSeparate = desc.isStoreSeparate();
-            desc.setStoreSeparate(false);
-            desc.getStoreFactory().store(aWriter, indent, aContext);
+            if (desc != null) {
+                oldSeparate = desc.isStoreSeparate();
+                desc.setStoreSeparate(false);
+                desc.getStoreFactory().store(aWriter, indent, aContext);
+            }
         } finally {
             if (desc != null) {
                 desc.setStoreSeparate(oldSeparate);
+            } else {
+                log.warn(sm.getString("factory.storeNoDescriptor", aContext.getClass()));
             }
         }
     }
@@ -290,7 +294,11 @@ public class StoreConfig implements IStoreConfig {
             throws Exception {
         StoreDescription desc = getRegistry().findDescription(
                 aHost.getClass());
-        desc.getStoreFactory().store(aWriter, indent, aHost);
+        if (desc != null) {
+            desc.getStoreFactory().store(aWriter, indent, aHost);
+        } else {
+            log.warn(sm.getString("factory.storeNoDescriptor", aHost.getClass()));
+        }
     }
 
     /**
@@ -302,7 +310,11 @@ public class StoreConfig implements IStoreConfig {
             Service aService) throws Exception {
         StoreDescription desc = getRegistry().findDescription(
                 aService.getClass());
-        desc.getStoreFactory().store(aWriter, indent, aService);
+        if (desc != null) {
+            desc.getStoreFactory().store(aWriter, indent, aService);
+        } else {
+            log.warn(sm.getString("factory.storeNoDescriptor", aService.getClass()));
+        }
     }
 
     /**
@@ -314,7 +326,11 @@ public class StoreConfig implements IStoreConfig {
             Server aServer) throws Exception {
         StoreDescription desc = getRegistry().findDescription(
                 aServer.getClass());
-        desc.getStoreFactory().store(writer, indent, aServer);
+        if (desc != null) {
+            desc.getStoreFactory().store(writer, indent, aServer);
+        } else {
+            log.warn(sm.getString("factory.storeNoDescriptor", aServer.getClass()));
+        }
     }
 
 }
