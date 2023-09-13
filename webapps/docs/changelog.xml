@@ -111,6 +111,10 @@
         Fix handling of an error reading a context descriptor on deployment.
         (remm)
       </fix>
+      <fix>
+        Fix rewrite rule qsd (query string discard) being ignored if qsa was
+        also use, while it should instead take precedence. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

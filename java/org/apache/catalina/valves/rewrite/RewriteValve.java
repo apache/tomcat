@@ -340,7 +340,7 @@ public class RewriteValve extends ValveBase {
                     qsa = true;
                 }
 
-                if (!qsa && newtest != null && rule.isQsdiscard()) {
+                if (!qsd && newtest != null && rule.isQsdiscard()) {
                     qsd = true;
                 }
 
