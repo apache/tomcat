@@ -1,0 +1,51 @@
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+
+# Experimenting with the Semgrep service
+
+# Name of this GitHub Actions workflow.
+name: Semgrep
+
+on:
+  # Scan changed files in PRs (diff-aware scanning):
+  pull_request: {}
+  # Scan on-demand through GitHub Actions interface:
+  workflow_dispatch: {}
+  # Scan mainline branches and report all findings:
+  push:
+    branches:
+      - main
+      - 10.1.x
+      - 9.0.x
+      - 8.5.x
+  # Schedule the CI job (this method uses cron syntax):
+  schedule:
+    - cron: '12 11 * * *' # Sets Semgrep to scan every day at 11:12 UTC.
+
+jobs:
+  semgrep:
+    # User definable name of this GitHub Actions job.
+    name: semgrep/ci 
+    runs-on: ubuntu-latest
+    env:
+      # Connect to Semgrep Cloud Platform through SEMGREP_APP_TOKEN.
+      SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+    container:
+      # A Docker image with Semgrep installed. Do not change this.
+      image: returntocorp/semgrep
+
+    # Skip any PR created by dependabot to avoid permission issues:
+    if: (github.actor != 'dependabot[bot]')
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: semgrep ci
