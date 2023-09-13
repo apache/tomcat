@@ -65,7 +65,9 @@ public class StoreContextAppender extends StoreAppender {
             StandardContext context = ((StandardContext) bean);
             if ("workDir".equals(attrName)) {
                 String defaultWorkDir = getDefaultWorkDir(context);
-                isPrint = !defaultWorkDir.equals(context.getWorkDir());
+                if (defaultWorkDir != null) {
+                    isPrint = !defaultWorkDir.equals(context.getWorkDir());
+                }
             } else if ("path".equals(attrName)) {
                 isPrint = desc.isStoreSeparate()
                             && desc.isExternalAllowed()

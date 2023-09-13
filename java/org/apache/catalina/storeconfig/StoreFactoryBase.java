@@ -167,8 +167,13 @@ public class StoreFactoryBase implements IStoreFactory {
             if (elementFactory != null) {
                 StoreDescription desc = getRegistry().findDescription(
                         aTagElement.getClass());
-                if (!desc.isTransientChild(aTagElement.getClass().getName())) {
-                    elementFactory.store(aWriter, indent, aTagElement);
+                if (desc != null) {
+                    if (!desc.isTransientChild(aTagElement.getClass().getName())) {
+                        elementFactory.store(aWriter, indent, aTagElement);
+                    }
+                } else {
+                    log.warn(sm.getString("factory.storeNoDescriptor", aTagElement
+                            .getClass()));
                 }
             } else {
                 log.warn(sm.getString("factory.storeNoDescriptor", aTagElement

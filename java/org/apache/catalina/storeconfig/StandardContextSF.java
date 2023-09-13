@@ -71,7 +71,7 @@ public class StandardContextSF extends StoreFactoryBase {
         if (aContext instanceof StandardContext) {
             StoreDescription desc = getRegistry().findDescription(
                     aContext.getClass());
-            if (desc.isStoreSeparate()) {
+            if (desc != null && desc.isStoreSeparate()) {
                 URL configFile = ((StandardContext) aContext)
                         .getConfigFile();
                 if (configFile != null) {
