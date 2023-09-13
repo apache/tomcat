@@ -50,7 +50,6 @@ import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.net.TesterSupport;
-import org.apache.tomcat.util.security.KeyStoreUtil;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.SleepingText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
@@ -98,7 +97,7 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
         File trustStoreFile = new File(TesterSupport.CA_JKS);
         KeyStore ks = KeyStore.getInstance("JKS");
         try (InputStream is = new FileInputStream(trustStoreFile)) {
-            KeyStoreUtil.load(ks, is, TesterSupport.JKS_PASS.toCharArray());
+            ks.load(is, TesterSupport.JKS_PASS.toCharArray());
         }
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(ks);
@@ -146,7 +145,7 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
         File trustStoreFile = new File(TesterSupport.CA_JKS);
         KeyStore ks = KeyStore.getInstance("JKS");
         try (InputStream is = new FileInputStream(trustStoreFile)) {
-            KeyStoreUtil.load(ks, is, TesterSupport.JKS_PASS.toCharArray());
+            ks.load(is, TesterSupport.JKS_PASS.toCharArray());
         }
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(ks);

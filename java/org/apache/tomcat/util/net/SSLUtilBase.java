@@ -60,7 +60,6 @@ import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.net.jsse.JSSEKeyManager;
 import org.apache.tomcat.util.net.jsse.PEMFile;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.security.KeyStoreUtil;
 
 /**
  * Common base class for {@link SSLUtil} implementations.
@@ -222,7 +221,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                         "JKS".equalsIgnoreCase(type) || "PKCS12".equalsIgnoreCase(type))) {
                     storePass = pass.toCharArray();
                 }
-                KeyStoreUtil.load(ks, istream, storePass);
+                ks.load(istream, storePass);
             }
         } catch (IOException ioe) {
             // May be expected when working with a trust store
