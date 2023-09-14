@@ -17,9 +17,11 @@
 package org.apache.catalina.webresources;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.IOError;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
@@ -33,16 +35,20 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
 
     protected static final String[] EMPTY_STRING_ARRAY = new String[0];
 
-    private File fileBase;
+    private Path fileBase;
     private String absoluteBase;
-    private String canonicalBase;
     private boolean readOnly = false;
 
     protected AbstractFileResourceSet(String internalPath) {
         setInternalPath(internalPath);
     }
 
+    @Deprecated
     protected final File getFileBase() {
+        return fileBase.toFile();
+    }
+
+    protected final Path getPathBase() {
         return fileBase;
     }
 
@@ -56,23 +62,32 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         return readOnly;
     }
 
+    /**
+     * @deprecated use {@link #path(String, boolean)} instead.
+     */
+    @Deprecated
     protected final File file(String name, boolean mustExist) {
+        final var path = path(name, mustExist);
+        return path == null ? null : path.toFile();
+    }
+
+    protected final Path path(String name, boolean mustExist) {
 
         if (name.equals("/")) {
             name = "";
         }
-        File file = new File(fileBase, name);
+        Path file = fileBase.resolve(name);
 
         // If the requested names ends in '/', the Java File API will return a
         // matching file if one exists. This isn't what we want as it is not
         // consistent with the Servlet spec rules for request mapping.
-        if (name.endsWith("/") && file.isFile()) {
+        if (name.endsWith("/") && Files.isRegularFile(file)) {
             return null;
         }
 
         // If the file/dir must exist but the identified file/dir can't be read
         // then signal that the resource was not found
-        if (mustExist && !file.canRead()) {
+        if (mustExist && !Files.isReadable(file)) {
             return null;
         }
 
@@ -91,11 +106,11 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         // Check that this file is located under the WebResourceSet's base
         String canPath = null;
         try {
-            canPath = file.getCanonicalPath();
-        } catch (IOException e) {
+            canPath = file.toAbsolutePath().toString();
+        } catch (IOError e) {
             // Ignore
         }
-        if (canPath == null || !canPath.startsWith(canonicalBase)) {
+        if (canPath == null || !canPath.startsWith(absoluteBase)) {
             return null;
         }
 
@@ -106,7 +121,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         // checks are retained as an additional safety measure
         // absoluteBase has been normalized so absPath needs to be normalized as
         // well.
-        String absPath = normalize(file.getAbsolutePath());
+        String absPath = normalize(canPath);
         if (absoluteBase.length() > absPath.length()) {
             return null;
         }
@@ -115,10 +130,9 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         // was not part of the requested path and the remaining check only
         // applies to the request path
         absPath = absPath.substring(absoluteBase.length());
-        canPath = canPath.substring(canonicalBase.length());
 
         // The remaining request path must start with '/' if it has non-zero length
-        if (canPath.length() > 0 && canPath.charAt(0) != File.separatorChar) {
+        if (absPath.length() > 0 && absPath.charAt(0) != File.separatorChar) {
             return null;
         }
 
@@ -225,26 +239,26 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
 
     @Override
     protected void initInternal() throws LifecycleException {
-        fileBase = new File(getBase(), getInternalPath());
+        fileBase = getInternalBase().resolve(getInternalPath());
         checkType(fileBase);
 
-        this.absoluteBase = normalize(fileBase.getAbsolutePath());
-
-        try {
-            this.canonicalBase = fileBase.getCanonicalPath();
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
-        }
+        this.absoluteBase = normalize(fileBase.toAbsolutePath().toString());
 
         // Need to handle mapping of the file system root as a special case
         if ("/".equals(this.absoluteBase)) {
             this.absoluteBase = "";
         }
-        if ("/".equals(this.canonicalBase)) {
-            this.canonicalBase = "";
-        }
     }
 
 
-    protected abstract void checkType(File file);
+    @Deprecated
+    protected void checkType(File file) {
+        checkType(file.toPath());
+    }
+
+    protected abstract void checkType(Path file);
+
+    protected Path getInternalBase() { // absolute Path.of() can fail on windows depending the path in some version
+        return new File(getBase()).toPath();
+    }
 }

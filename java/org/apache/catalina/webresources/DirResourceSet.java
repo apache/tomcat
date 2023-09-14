@@ -17,10 +17,10 @@
 package org.apache.catalina.webresources;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Set;
 import java.util.jar.Manifest;
@@ -32,6 +32,8 @@ import org.apache.catalina.WebResourceRoot.ResourceSetType;
 import org.apache.catalina.util.ResourceSet;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+
+import static java.util.stream.Collectors.toSet;
 
 /**
  * Represents a {@link org.apache.catalina.WebResourceSet} based on a directory.
@@ -67,11 +69,9 @@ public class DirResourceSet extends AbstractFileResourceSet {
         setBase(base);
 
         if (root.getContext().getAddWebinfClassesResources()) {
-            File f = new File(base, internalPath);
-            f = new File(f, "/WEB-INF/classes/META-INF/resources");
-
-            if (f.isDirectory()) {
-                root.createWebResourceSet(ResourceSetType.RESOURCE_JAR, "/", f.getAbsolutePath(), null, "/");
+            final Path f = getInternalBase().resolve(internalPath).resolve("/WEB-INF/classes/META-INF/resources");
+            if (Files.isDirectory(f)) {
+                root.createWebResourceSet(ResourceSetType.RESOURCE_JAR, "/", f.toAbsolutePath().toString(), null, "/");
             }
         }
 
@@ -84,21 +84,20 @@ public class DirResourceSet extends AbstractFileResourceSet {
         }
     }
 
-
     @Override
     public WebResource getResource(String path) {
         checkPath(path);
         String webAppMount = getWebAppMount();
         WebResourceRoot root = getRoot();
         if (path.startsWith(webAppMount)) {
-            File f = file(path.substring(webAppMount.length()), false);
+            Path f = path(path.substring(webAppMount.length()), false);
             if (f == null) {
                 return new EmptyResource(root, path);
             }
-            if (!f.exists()) {
+            if (Files.notExists(f)) {
                 return new EmptyResource(root, path, f);
             }
-            if (f.isDirectory() && path.charAt(path.length() - 1) != '/') {
+            if (Files.isDirectory(f) && path.charAt(path.length() - 1) != '/') {
                 path = path + '/';
             }
             return new FileResource(root, path, f, isReadOnly(), getManifest());
@@ -112,15 +111,14 @@ public class DirResourceSet extends AbstractFileResourceSet {
         checkPath(path);
         String webAppMount = getWebAppMount();
         if (path.startsWith(webAppMount)) {
-            File f = file(path.substring(webAppMount.length()), true);
+            Path f = path(path.substring(webAppMount.length()), true);
             if (f == null) {
                 return EMPTY_STRING_ARRAY;
             }
-            String[] result = f.list();
-            if (result == null) {
+            try (final var result = Files.list(f)) {
+                return result.map(Path::getFileName).map(Path::toString).toArray(String[]::new);
+            } catch (final IOException e) {
                 return EMPTY_STRING_ARRAY;
-            } else {
-                return result;
             }
         } else {
             if (!path.endsWith("/")) {
@@ -139,64 +137,63 @@ public class DirResourceSet extends AbstractFileResourceSet {
     }
 
     @Override
-    public Set<String> listWebAppPaths(String path) {
+    public Set<String> listWebAppPaths(final String path) {
         checkPath(path);
         String webAppMount = getWebAppMount();
         ResourceSet<String> result = new ResourceSet<>();
         if (path.startsWith(webAppMount)) {
-            File f = file(path.substring(webAppMount.length()), true);
+            Path f = path(path.substring(webAppMount.length()), true);
             if (f != null) {
-                File[] list = f.listFiles();
-                if (list != null) {
-                    for (File entry : list) {
-                        // f has already been validated so the following checks
-                        // can be much simpler than those in file()
-                        if (!getRoot().getAllowLinking()) {
-                            // allow linking is disabled so need to check for
-                            // symlinks
-                            boolean symlink = true;
-                            String absPath = null;
-                            String canPath = null;
-                            try {
+                try (final var list = Files.list(f)) {
+                    return list
+                        .filter(entry -> {
+                            if (!getRoot().getAllowLinking()) {
+                                // allow linking is disabled so need to check for
+                                // symlinks
+                                boolean symlink = true;
+                                String absPath = null;
+                                String canPath = null;
                                 // We know that 'f' must be valid since it will
                                 // have been checked in the call to file()
                                 // above. Therefore strip off the path of the
                                 // path that was contributed by 'f' and check
                                 // that what is left does not contain a symlink.
-                                absPath = entry.getAbsolutePath().substring(f.getAbsolutePath().length());
-                                if (entry.getCanonicalPath().length() >= f.getCanonicalPath().length()) {
-                                    canPath = entry.getCanonicalPath().substring(f.getCanonicalPath().length());
+                                final var entryPath = entry.toAbsolutePath().normalize().toString();
+                                final var fPath = f.toAbsolutePath().normalize().toString();
+                                absPath = entryPath.substring(fPath.length());
+                                if (entryPath.length() >= fPath.length()) {
+                                    canPath = entryPath.substring(fPath.length());
                                     if (absPath.equals(canPath)) {
                                         symlink = false;
                                     }
                                 }
-                            } catch (IOException ioe) {
-                                // Ignore the exception. Assume we have a symlink.
-                                canPath = "Unknown";
+                                if (symlink) {
+                                    logIgnoredSymlink(getRoot().getContext().getName(), absPath, canPath);
+                                    return false;
+                                }
                             }
-                            if (symlink) {
-                                logIgnoredSymlink(getRoot().getContext().getName(), absPath, canPath);
-                                continue;
+                            return true;
+                        })
+                        .map(entry -> {
+                            final StringBuilder sb = new StringBuilder(path);
+                            if (path.charAt(path.length() - 1) != '/') {
+                                sb.append('/');
                             }
-                        }
-                        StringBuilder sb = new StringBuilder(path);
-                        if (path.charAt(path.length() - 1) != '/') {
-                            sb.append('/');
-                        }
-                        sb.append(entry.getName());
-                        if (entry.isDirectory()) {
-                            sb.append('/');
-                        }
-                        result.add(sb.toString());
-                    }
+                            sb.append(entry.getFileName().toString());
+                            if (Files.isDirectory(entry)) {
+                                sb.append('/');
+                            }
+                            return sb.toString();
+                        })
+                        .collect(toSet());
+                } catch (IOException e) {
+                    throw new IllegalStateException(e);
                 }
             }
         } else {
-            if (!path.endsWith("/")) {
-                path = path + "/";
-            }
-            if (webAppMount.startsWith(path)) {
-                int i = webAppMount.indexOf('/', path.length());
+            final var fixedPath = path.endsWith("/") ? path : (path + '/');
+            if (webAppMount.startsWith(fixedPath)) {
+                int i = webAppMount.indexOf('/', fixedPath.length());
                 if (i == -1) {
                     result.add(webAppMount + "/");
                 } else {
@@ -216,11 +213,16 @@ public class DirResourceSet extends AbstractFileResourceSet {
         }
         String webAppMount = getWebAppMount();
         if (path.startsWith(webAppMount)) {
-            File f = file(path.substring(webAppMount.length()), false);
+            Path f = path(path.substring(webAppMount.length()), false);
             if (f == null) {
                 return false;
             }
-            return f.mkdir();
+            try {
+                Files.createDirectory(f);
+                return true;
+            } catch (final IOException e) {
+                return false;
+            }
         } else {
             return false;
         }
@@ -244,10 +246,10 @@ public class DirResourceSet extends AbstractFileResourceSet {
             return false;
         }
 
-        File dest = null;
+        Path dest = null;
         String webAppMount = getWebAppMount();
         if (path.startsWith(webAppMount)) {
-            dest = file(path.substring(webAppMount.length()), false);
+            dest = path(path.substring(webAppMount.length()), false);
             if (dest == null) {
                 return false;
             }
@@ -255,15 +257,15 @@ public class DirResourceSet extends AbstractFileResourceSet {
             return false;
         }
 
-        if (dest.exists() && !overwrite) {
+        if (Files.exists(dest) && !overwrite) {
             return false;
         }
 
         try {
             if (overwrite) {
-                Files.copy(is, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(is, dest, StandardCopyOption.REPLACE_EXISTING);
             } else {
-                Files.copy(is, dest.toPath());
+                Files.copy(is, dest);
             }
         } catch (IOException ioe) {
             return false;
@@ -273,8 +275,8 @@ public class DirResourceSet extends AbstractFileResourceSet {
     }
 
     @Override
-    protected void checkType(File file) {
-        if (file.isDirectory() == false) {
+    protected void checkType(Path file) {
+        if (!Files.isDirectory(file)) {
             throw new IllegalArgumentException(
                     sm.getString("dirResourceSet.notDirectory", getBase(), File.separator, getInternalPath()));
         }
@@ -287,12 +289,12 @@ public class DirResourceSet extends AbstractFileResourceSet {
         // Is this an exploded web application?
         if (getWebAppMount().equals("")) {
             // Look for a manifest
-            File mf = file("META-INF/MANIFEST.MF", true);
-            if (mf != null && mf.isFile()) {
-                try (FileInputStream fis = new FileInputStream(mf)) {
+            Path mf = path("META-INF/MANIFEST.MF", true);
+            if (mf != null && Files.isRegularFile(mf)) {
+                try (final var fis = Files.newInputStream(mf)) {
                     setManifest(new Manifest(fis));
                 } catch (IOException e) {
-                    log.warn(sm.getString("dirResourceSet.manifestFail", mf.getAbsolutePath()), e);
+                    log.warn(sm.getString("dirResourceSet.manifestFail", mf.toString()), e);
                 }
             }
         }

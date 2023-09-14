@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
 import java.security.cert.Certificate;
 import java.util.jar.Manifest;
 
@@ -30,13 +31,21 @@ public class EmptyResource implements WebResource {
 
     private final WebResourceRoot root;
     private final String webAppPath;
-    private final File file;
+    private final Path file;
 
     public EmptyResource(WebResourceRoot root, String webAppPath) {
-        this(root, webAppPath, null);
+        this(root, webAppPath, (Path) null);
     }
 
+    /**
+     * @deprecated use Path flavor.
+     */
+    @Deprecated
     public EmptyResource(WebResourceRoot root, String webAppPath, File file) {
+        this(root, webAppPath, file.toPath());
+    }
+
+    public EmptyResource(WebResourceRoot root, String webAppPath, Path file) {
         this.root = root;
         this.webAppPath = webAppPath;
         this.file = file;
@@ -96,13 +105,8 @@ public class EmptyResource implements WebResource {
     public String getCanonicalPath() {
         if (file == null) {
             return null;
-        } else {
-            try {
-                return file.getCanonicalPath();
-            } catch (IOException e) {
-                return null;
-            }
         }
+        return file.toAbsolutePath().toString();
     }
 
     @Override

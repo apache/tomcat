@@ -18,6 +18,8 @@ package org.apache.catalina.webresources;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Set;
 
 import org.apache.catalina.LifecycleException;
@@ -159,8 +161,8 @@ public class FileResourceSet extends AbstractFileResourceSet {
     }
 
     @Override
-    protected void checkType(File file) {
-        if (file.isFile() == false) {
+    protected void checkType(Path file) {
+        if (!Files.isRegularFile(file)) {
             throw new IllegalArgumentException(
                     sm.getString("fileResourceSet.notFile", getBase(), File.separator, getInternalPath()));
         }
