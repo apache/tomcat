@@ -183,14 +183,12 @@ class AsyncStateMachine {
      */
     private final AtomicLong generation = new AtomicLong(0);
     /*
-     * Error processing should only be triggered once per async generation. These fields track the last generation of
-     * async processing for which error processing was triggered and are used to ensure that the second and subsequent
-     * attempts to trigger async error processing for a given generation are NO-OPs.
+     * Error processing should only be triggered once per async generation. This field tracks whether the async
+     * processing has entered the error state during this async cycle.
      *
      * Guarded by this
      */
-    private long lastErrorGeneration = -1;
-    private long lastErrorGenerationMust = -1;
+    private boolean hasProcessedError = false;
 
     // Need this to fire listener on complete
     private AsyncContextCallback asyncCtxt = null;
@@ -425,23 +423,6 @@ class AsyncStateMachine {
         Request request = processor.getRequest();
         boolean containerThread = (request != null && request.isRequestThread());
 
-        // Ensure the error processing is only started once per generation
-        if (lastErrorGeneration == getCurrentGeneration()) {
-            if (state == AsyncState.MUST_ERROR && containerThread && lastErrorGenerationMust != getCurrentGeneration()) {
-                // This is the first container thread call after state was set to MUST_ERROR so don't skip
-                lastErrorGenerationMust = getCurrentGeneration();
-            } else {
-                // Duplicate call. Skip.
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("asyncStateMachine.asyncError.skip"));
-                }
-                return false;
-            }
-        } else {
-            // First call for this generation, don't skip.
-            lastErrorGeneration = getCurrentGeneration();
-        }
-
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("asyncStateMachine.asyncError.start"));
         }
@@ -449,14 +430,23 @@ class AsyncStateMachine {
         clearNonBlockingListeners();
         if (state == AsyncState.STARTING) {
             updateState(AsyncState.MUST_ERROR);
-        } else if (state == AsyncState.DISPATCHED) {
-            // Async error handling has moved processing back into an async
-            // state. Need to increment in progress count as it will decrement
-            // when the async state is exited again.
-            asyncCtxt.incrementInProgressAsyncCount();
-            updateState(AsyncState.ERROR);
         } else {
-            updateState(AsyncState.ERROR);
+            if (hasProcessedError) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("asyncStateMachine.asyncError.skip"));
+                }
+                return false;
+            }
+            hasProcessedError = true;
+            if (state == AsyncState.DISPATCHED) {
+                // Async error handling has moved processing back into an async
+                // state. Need to increment in progress count as it will decrement
+                // when the async state is exited again.
+                asyncCtxt.incrementInProgressAsyncCount();
+                updateState(AsyncState.ERROR);
+            } else {
+                updateState(AsyncState.ERROR);
+            }
         }
 
         // Return true for non-container threads to trigger a dispatch
@@ -505,6 +495,7 @@ class AsyncStateMachine {
         asyncCtxt = null;
         state = AsyncState.DISPATCHED;
         lastAsyncStart = 0;
+        hasProcessedError = false;
     }
 
 
