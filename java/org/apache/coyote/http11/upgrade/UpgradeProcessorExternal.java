@@ -43,7 +43,9 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
             UpgradeGroupInfo upgradeGroupInfo) {
         super(upgradeToken);
         this.upgradeInfo = new UpgradeInfo();
-        upgradeGroupInfo.addUpgradeInfo(upgradeInfo);
+        if (upgradeGroupInfo != null) {
+            upgradeGroupInfo.addUpgradeInfo(upgradeInfo);
+        }
         this.upgradeServletInputStream = new UpgradeServletInputStream(this, wrapper, upgradeInfo);
         this.upgradeServletOutputStream = new UpgradeServletOutputStream(this, wrapper, upgradeInfo);
 
