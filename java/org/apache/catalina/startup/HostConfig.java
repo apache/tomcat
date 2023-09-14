@@ -394,7 +394,7 @@ public class HostConfig implements LifecycleListener {
      * @return 0L if no application with that name is deployed, or the instant
      *  on which the application was deployed
      */
-    public long getDeploymentTime(String name) {
+    public synchronized long getDeploymentTime(String name) {
         DeployedApplication app = deployed.get(name);
         if (app == null) {
             return 0L;
