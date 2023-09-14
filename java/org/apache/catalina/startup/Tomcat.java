@@ -376,6 +376,9 @@ public class Tomcat {
                                       String servletClass) {
         // will do class for name and set init params
         Wrapper sw = ctx.createWrapper();
+        if (sw == null) {
+            return null;
+        }
         sw.setServletClass(servletClass);
         sw.setName(servletName);
         ctx.addChild(sw);
