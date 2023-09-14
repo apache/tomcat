@@ -344,7 +344,7 @@ public class HostConfig implements LifecycleListener {
      * @return 0L if no application with that name is deployed, or the instant
      *  on which the application was deployed
      */
-    public long getDeploymentTime(String name) {
+    public synchronized long getDeploymentTime(String name) {
         DeployedApplication app = deployed.get(name);
         if (app == null) {
             return 0L;
@@ -1188,6 +1188,9 @@ public class HostConfig implements LifecycleListener {
 
         // Should not be null as we test above if this is a directory
         String[] migrationCandidates = legacyAppBase.list();
+        if (migrationCandidates == null) {
+            return;
+        }
         for (String migrationCandidate : migrationCandidates) {
             File source = new File(legacyAppBase, migrationCandidate);
             File destination = new File(appBase, migrationCandidate);
