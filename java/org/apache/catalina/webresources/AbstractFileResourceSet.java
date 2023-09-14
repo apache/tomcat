@@ -107,7 +107,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         // absoluteBase has been normalized so absPath needs to be normalized as
         // well.
         String absPath = normalize(file.getAbsolutePath());
-        if (absoluteBase.length() > absPath.length()) {
+        if (absPath == null || absoluteBase.length() > absPath.length()) {
             return null;
         }
 
