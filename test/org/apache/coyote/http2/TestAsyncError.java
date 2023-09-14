@@ -86,7 +86,7 @@ public class TestAsyncError extends Http2TestBase {
             Thread.sleep(100);
         }
 
-        Assert.assertTrue(TestListener.getErrorCount() > 0);
+        Assert.assertEquals(1, TestListener.getErrorCount());
     }
 
 

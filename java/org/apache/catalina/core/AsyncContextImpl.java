@@ -74,6 +74,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     private long timeout = -1;
     private AsyncEvent event = null;
     private volatile Request request;
+    AtomicBoolean hasProcessedError = new AtomicBoolean(false);
 
     public AsyncContextImpl(Request request) {
         if (log.isDebugEnabled()) {
@@ -280,6 +281,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         request = null;
         clearServletRequestResponse();
         timeout = -1;
+        hasProcessedError.set(false);
     }
 
     private void clearServletRequestResponse() {
@@ -378,6 +380,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
 
     public void setErrorState(Throwable t, boolean fireOnError) {
+        if (!hasProcessedError.compareAndSet(false, true)) {
+            // Skip duplicate error processing
+            return;
+        }
         if (t != null) {
             request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
         }

@@ -124,6 +124,11 @@
         <code>AsyncListener</code> handles an error with a dispatch rather than
         a complete. (markt)
       </fix>
+      <fix>
+        When an error occurs during asynchronous processing, ensure that the
+        error handling process is only triggered once per asynchronous cycle.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
