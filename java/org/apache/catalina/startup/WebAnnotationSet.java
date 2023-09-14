@@ -427,6 +427,8 @@ public class WebAnnotationSet {
         if (type == null || type.equals(Object.class)) {
             if (defaultType != null) {
                 type = defaultType;
+            } else {
+                type = Object.class;
             }
         }
         return Introspection.convertPrimitiveType(type).getCanonicalName();
