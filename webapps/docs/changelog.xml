@@ -129,6 +129,10 @@
         error handling process is only triggered once per asynchronous cycle.
         (markt)
       </fix>
+      <fix>
+        Fix logic issue trying to match no argument method in IntropectionUtil.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>

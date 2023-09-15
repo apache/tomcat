@@ -429,8 +429,12 @@ public final class IntrospectionUtils {
         for (Method method : methods) {
             if (method.getName().equals(name)) {
                 Class<?> methodParams[] = method.getParameterTypes();
-                if (params == null && methodParams.length == 0) {
-                    return method;
+                if (params == null) {
+                    if (methodParams.length == 0) {
+                        return method;
+                    } else {
+                        continue;
+                    }
                 }
                 if (params.length != methodParams.length) {
                     continue;
