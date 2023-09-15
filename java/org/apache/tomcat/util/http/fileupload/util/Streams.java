@@ -55,10 +55,10 @@ public final class Streams {
      * @param outputStream The output stream, to which data should
      * be written. May be null, in which case the input streams
      * contents are simply discarded.
-     * @param closeOutputStream True guarantees, that
-     * {@link OutputStream#close()} is called on the stream.
-     * False indicates, that only
+     * @param closeOutputStream True guarantees, that {@link OutputStream#close()}
+     * is called on the stream. False indicates, that only
      * {@link OutputStream#flush()} should be called finally.
+     *
      * @return Number of bytes, which have been copied.
      * @throws IOException An I/O error occurred.
      */
@@ -145,8 +145,7 @@ public final class Streams {
      * @return The streams contents, as a string.
      * @throws IOException An I/O error occurred.
      */
-    public static String asString(final InputStream inputStream, final String encoding)
-            throws IOException {
+    public static String asString(final InputStream inputStream, final String encoding) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         copy(inputStream, baos, true);
         return baos.toString(encoding);

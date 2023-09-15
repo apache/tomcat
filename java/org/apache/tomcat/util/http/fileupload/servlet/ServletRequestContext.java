@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.tomcat.util.http.fileupload.FileUploadBase;
 import org.apache.tomcat.util.http.fileupload.UploadContext;
 
-
 /**
  * <p>Provides access to the request information needed for a request made to
  * an HTTP servlet.</p>
@@ -110,8 +109,7 @@ public class ServletRequestContext implements UploadContext {
     @Override
     public String toString() {
         return String.format("ContentLength=%s, ContentType=%s",
-                Long.valueOf(this.contentLength()),
-                this.getContentType());
+                Long.valueOf(this.contentLength()), this.getContentType());
     }
 
 }
