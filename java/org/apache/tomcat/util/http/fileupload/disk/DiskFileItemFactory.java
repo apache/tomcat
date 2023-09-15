@@ -47,12 +47,12 @@ import org.apache.tomcat.util.http.fileupload.FileItemFactory;
  * implementation in an environment with local, untrusted users,
  * {@link #setRepository(File)} MUST be used to configure a repository location
  * that is not publicly writable. In a Servlet container the location identified
- * by the ServletContext attribute {@code java.servlet.context.tempdir}
+ * by the ServletContext attribute {@code javax.servlet.context.tempdir}
  * may be used.
  * </p>
  *
- * <p>Temporary files, which are created for file items, should be
- * deleted later on.</p>
+ * <p>Temporary files, which are created for file items, will be deleted when
+ * the associated request is recycled.</p>
  *
  * @since 1.1
  */
