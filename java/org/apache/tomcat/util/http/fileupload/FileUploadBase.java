@@ -196,11 +196,11 @@ public abstract class FileUploadBase {
     }
 
     /**
-     * Sets the maximum number of files allowed per request/
+     * Sets the maximum number of files allowed per request.
      *
      * @param fileCountMax The new limit. {@code -1} means no limit.
      */
-    public void setFileCountMax(long fileCountMax) {
+    public void setFileCountMax(final long fileCountMax) {
         this.fileCountMax = fileCountMax;
     }
 
@@ -507,8 +507,7 @@ public abstract class FileUploadBase {
             return;
         }
         final String headerName = header.substring(0, colonOffset).trim();
-        final String headerValue =
-            header.substring(colonOffset + 1).trim();
+        final String headerValue = header.substring(colonOffset + 1).trim();
         headers.addHeader(headerName, headerValue);
     }
 
