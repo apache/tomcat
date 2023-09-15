@@ -45,14 +45,9 @@ public class SetPropertiesRule extends Rule {
         // Populate the corresponding properties of the top object
         Object top = digester.peek();
         if (digester.log.isDebugEnabled()) {
-            if (top != null) {
-                digester.log.debug("[SetPropertiesRule]{" + digester.match +
-                                   "} Set " + top.getClass().getName() +
-                                   " properties");
-            } else {
-                digester.log.debug("[SetPropertiesRule]{" + digester.match +
-                                   "} Set NULL properties");
-            }
+            digester.log.debug("[SetPropertiesRule]{" + digester.match +
+                    "} Set " + top.getClass().getName() +
+                    " properties");
         }
 
         for (int i = 0; i < attributes.getLength(); i++) {
