@@ -53,8 +53,8 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  * {@link #getInputStream()} and process the file without attempting to load
  * it into memory, which may come handy with large files.
  *
- * <p>Temporary files, which are created for file items, should be
- * deleted later on.</p>
+ * <p>Temporary files, which are created for file items, will be deleted when
+ * the associated request is recycled.</p>
  *
  * @since 1.1
  */
@@ -193,7 +193,7 @@ public class DiskFileItem
     public InputStream getInputStream()
         throws IOException {
         if (!isInMemory()) {
-            // Uses old code to avoid JVM bug
+            // Avoid JVM bug
             // https://bz.apache.org/bugzilla/show_bug.cgi?id=65710
             return new FileInputStream(dfos.getFile());
         }
