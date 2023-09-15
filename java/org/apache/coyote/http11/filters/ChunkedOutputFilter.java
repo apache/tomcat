@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http11.filters;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
