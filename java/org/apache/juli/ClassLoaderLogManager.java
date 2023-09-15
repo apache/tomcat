@@ -293,7 +293,7 @@ public class ClassLoaderLogManager extends LogManager {
     }
 
     @Override
-    public void reset() throws SecurityException {
+    public synchronized void reset() throws SecurityException {
         Thread thread = Thread.currentThread();
         if (thread.getClass().getName().startsWith("java.util.logging.LogManager$")) {
             // Ignore the call from java.util.logging.LogManager.Cleaner,
@@ -329,22 +329,20 @@ public class ClassLoaderLogManager extends LogManager {
         // method can use handlers from the parent class loaders, and closing
         // handlers that the current class loader does not own would be not
         // good.
-        synchronized (clLogInfo) {
-            for (Logger logger : clLogInfo.loggers.values()) {
-                Handler[] handlers = logger.getHandlers();
-                for (Handler handler : handlers) {
-                    logger.removeHandler(handler);
-                }
+        for (Logger logger : clLogInfo.loggers.values()) {
+            Handler[] handlers = logger.getHandlers();
+            for (Handler handler : handlers) {
+                logger.removeHandler(handler);
             }
-            for (Handler handler : clLogInfo.handlers.values()) {
-                try {
-                    handler.close();
-                } catch (Exception e) {
-                    // Ignore
-                }
-            }
-            clLogInfo.handlers.clear();
         }
+        for (Handler handler : clLogInfo.handlers.values()) {
+            try {
+                handler.close();
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+        clLogInfo.handlers.clear();
     }
 
     // ------------------------------------------------------ Protected Methods
