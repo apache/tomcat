@@ -529,6 +529,21 @@ public class DiskFileItem
     // ------------------------------------------------------ Protected methods
 
     /**
+     * Removes the file contents from the temporary storage.
+     */
+    @Override
+    protected void finalize() {
+        if (dfos == null || dfos.isInMemory()) {
+            return;
+        }
+        final File outputFile = dfos.getFile();
+
+        if (outputFile != null && outputFile.exists()) {
+            outputFile.delete();
+        }
+    }
+
+    /**
      * Creates and returns a {@link java.io.File File} representing a uniquely
      * named temporary file in the configured repository path. The lifetime of
      * the file is tied to the lifetime of the {@code FileItem} instance;
