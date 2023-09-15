@@ -375,8 +375,6 @@ public class DiskFileItem
         if (isInMemory()) {
             try (OutputStream fout = Files.newOutputStream(file.toPath())) {
                 fout.write(get());
-            } catch (final IOException e) {
-                throw new IOException("Unexpected output data");
             }
         } else {
             final File outputFile = getStoreLocation();
