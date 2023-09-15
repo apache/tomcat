@@ -291,7 +291,7 @@ public class CallMethodRule extends Rule {
                 return;
             }
 
-        } else if (paramTypes != null && paramTypes.length != 0) {
+        } else if (paramTypes.length != 0) {
 
             // In the case where the parameter for the method
             // is taken from the body text, but there is no
