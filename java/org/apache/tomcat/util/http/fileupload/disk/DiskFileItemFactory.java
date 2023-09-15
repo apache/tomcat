@@ -51,8 +51,8 @@ import org.apache.tomcat.util.http.fileupload.FileItemFactory;
  * may be used.
  * </p>
  *
- * <p>Temporary files, which are created for file items, should be
- * deleted later on.</p>
+ * <p>Temporary files, which are created for file items, will be deleted when
+ * the associated request is recycled.</p>
  *
  * @since 1.1
  */
