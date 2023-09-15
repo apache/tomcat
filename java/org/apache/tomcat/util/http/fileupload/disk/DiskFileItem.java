@@ -398,8 +398,7 @@ public class DiskFileItem
              * desired file.
              */
             if (file.exists() && !file.delete()) {
-                throw new FileUploadException(
-                        "Cannot write uploaded file to disk!");
+                throw new FileUploadException("Cannot write uploaded file to disk!");
             }
             if (!outputFile.renameTo(file)) {
                 BufferedInputStream in = null;
@@ -588,8 +587,7 @@ public class DiskFileItem
     @Override
     public String toString() {
         return String.format("name=%s, StoreLocation=%s, size=%s bytes, isFormField=%s, FieldName=%s",
-                      getName(), getStoreLocation(), Long.valueOf(getSize()),
-                      Boolean.valueOf(isFormField()), getFieldName());
+                getName(), getStoreLocation(), Long.valueOf(getSize()), Boolean.valueOf(isFormField()), getFieldName());
     }
 
     /**
