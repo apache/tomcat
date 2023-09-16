@@ -351,6 +351,13 @@
     <Bug code="MSF" />
   </Match>
   <Match>
+    <!-- Spotbugs error - it missed the return if is is null -->
+    <Class name="org.apache.catalina.manager.host.HostManagerServlet" />
+    <Method name="add" />
+    <Local name="is" />
+    <Pattern code="NP_LOAD_OF_KNOWN_NULL_VALUE" />
+  </Match>
+  <Match>
     <!-- Catching exception is simpler than handling all the individual ones -->
     <Class name="org.apache.catalina.manager.util.SessionUtils" />
     <Method name="guessLocaleFromSession" />
