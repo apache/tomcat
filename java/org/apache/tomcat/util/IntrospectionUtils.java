@@ -417,7 +417,6 @@ public final class IntrospectionUtils {
         return methods;
     }
 
-    @SuppressWarnings("null") // params cannot be null when comparing lengths
     public static Method findMethod(Class<?> c, String name,
             Class<?> params[]) {
         Method methods[] = findMethods(c);
