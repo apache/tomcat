@@ -135,6 +135,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the internal fork of Apache Commons FileUpload to 7a8c324
+        (2023-09-16, 1.x-SNAPSHOT). Due to significant refactoring in the 2.x
+        branch requiring additional Commons IO dependencies, Tomcat has switched
+        to tracking the 1.x branch. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.13 (markt)" rtext="2023-08-25">
   <subsection name="Catalina">
