@@ -1548,31 +1548,10 @@
     <Bug code="SF" />
   </Match>
   <Match>
-    <!-- the platform default encoding is a fallback -->
-    <Class name="org.apache.tomcat.util.http.fileupload.MultipartStream"/>
-    <Method name="readHeaders"/>
-    <Bug code="Dm" />
-  </Match>
-  <Match>
     <!-- Deletion failure should never happen -->
     <Class name="org.apache.tomcat.util.http.fileupload.disk.DiskFileItem"/>
-    <Or>
-      <Method name="delete"/>
-      <Method name="finalize"/>
-    </Or>
+    <Method name="finalize"/>
     <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
-  </Match>
-  <Match>
-    <!-- the platform default encoding is a fallback -->
-    <Class name="org.apache.tomcat.util.http.fileupload.disk.DiskFileItem"/>
-    <Method name="getString"/>
-    <Bug code="Dm" />
-  </Match>
-  <Match>
-    <!-- the platform default encoding is deliberate -->
-    <Class name="org.apache.tomcat.util.http.fileupload.util.Streams"/>
-    <Method name="asString"/>
-    <Bug code="Dm" />
   </Match>
   <Match>
     <!-- Fall-through expected -->
