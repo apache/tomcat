@@ -76,6 +76,9 @@ public class TesterWsClient {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         String line = in.readLine();
         // line expected to be "HTTP/1.1 nnn "
+        if (line == null) {
+            throw new IOException("No response line");
+        }
         int result = Integer.parseInt(line.substring(9, 12));
         while (line != null && !line.isEmpty()) {
             line = in.readLine();
