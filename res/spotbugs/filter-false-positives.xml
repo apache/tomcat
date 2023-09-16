@@ -1042,6 +1042,12 @@
     <Bug pattern="WA_NOT_IN_LOOP" />
   </Match>
   <Match>
+    <!-- Surrounding loop takes correct action for all return values. -->
+    <Class name="org.apache.coyote.http2.WindowAllocationManager" />
+    <Method name="waitFor" />
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
+  </Match>
+  <Match>
     <!-- Returning null is required by the EL specification -->
     <Class name="org.apache.el.lang.ELSupport" />
     <Method name="coerceToBoolean"/>
