@@ -199,7 +199,8 @@ public class TesterHttpServletResponse implements HttpServletResponse {
     }
 
     public void recycle() {
-        /* NOOP */}
+        /* NOOP */
+    }
 
     /**
      * @param b Unused
