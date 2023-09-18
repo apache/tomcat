@@ -15,6 +15,7 @@
 
 -include: build-defaults.bnd, spec-defaults.bnd
 
+Bundle-License: https://www.apache.org/licenses/LICENSE-2.0.txt
 Bundle-Name: tomcat-annotations-api
 Bundle-SymbolicName: org.apache.tomcat-annotations-api
 Export-Package: \

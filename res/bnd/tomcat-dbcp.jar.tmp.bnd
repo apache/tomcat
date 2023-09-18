@@ -15,6 +15,7 @@
 
 -include: build-defaults.bnd
 
+Bundle-License: https://www.apache.org/licenses/LICENSE-2.0.txt
 Bundle-Name: tomcat-dbcp
 Bundle-SymbolicName: org.apache.tomcat-dbcp
 Export-Package: \
