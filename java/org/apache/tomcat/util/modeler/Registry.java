@@ -42,16 +42,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.modules.ModelerSource;
 import org.apache.tomcat.util.res.StringManager;
 
-/*
-   Issues:
-   - exceptions - too many "throws Exception"
-   - double check the interfaces
-   - start removing the use of the experimental methods in tomcat, then remove
-     the methods ( before 1.1 final )
-   - is the security enough to prevent Registry being used to avoid the
-     permission checks in the mbean server ?
- */
-
 /**
  * Registry for modeler MBeans.
  *
@@ -59,9 +49,6 @@ import org.apache.tomcat.util.res.StringManager;
  * manipulate model mbeans and simplify their use.
  *
  * This class is itself an mbean.
- *
- * IMPORTANT: public methods not marked with {@code @since x.x} are experimental
- * or internal. Should not be used.
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
@@ -520,7 +507,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     /**
-     * EXPERIMENTAL Convert a string to object, based on type. Used by several
+     * Convert a string to object, based on type. Used by several
      * components. We could provide some pluggability. It is here to keep things
      * consistent and avoid duplication in other tasks
      *
@@ -552,7 +539,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     /**
-     * Experimental. Load descriptors.
+     * Load descriptors.
      *
      * @param sourceType The source type
      * @param source The bean
@@ -593,6 +580,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             if (sourceType == null) {
                 sourceType = "MbeansDescriptorsIntrospectionSource";
             }
+        } else {
+            throw new IllegalArgumentException(sm.getString("registry.invalidSource"));
         }
 
         if (sourceType == null) {
