@@ -1452,8 +1452,12 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
         public SendfileState processSendfile(SendfileDataBase sendfileData) {
             setSendfileData((SendfileData) sendfileData);
             SelectionKey key = getSocket().getIOChannel().keyFor(getPoller().getSelector());
-            // Might as well do the first write on this thread
-            return getPoller().processSendfile(key, this, true);
+            if (key == null) {
+                return SendfileState.ERROR;
+            } else {
+                // Might as well do the first write on this thread
+                return getPoller().processSendfile(key, this, true);
+            }
         }
 
 
