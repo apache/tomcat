@@ -265,7 +265,9 @@ public class SecureNioChannel extends NioChannel {
                     Integer.toString(newLimit)));
 
             netInBuffer = ByteBufferUtils.expand(netInBuffer, newLimit);
-            sc.read(netInBuffer);
+            if (sc.read(netInBuffer) < 0) {
+                return -1;
+            }
             extractor = new TLSClientHelloExtractor(netInBuffer);
         }
 
