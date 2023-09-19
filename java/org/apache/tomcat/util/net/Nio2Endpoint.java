@@ -622,8 +622,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     if (log.isDebugEnabled()) {
                         log.debug("Socket: [" + Nio2SocketWrapper.this + "], Interest: [" + readInterest + "]");
                     }
-                    readNotify = false;
+                    boolean notify = false;
                     synchronized (readCompletionHandler) {
+                        readNotify = false;
                         if (nBytes.intValue() < 0) {
                             failed(new EOFException(), attachment);
                         } else {
@@ -636,8 +637,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                             }
                             readInterest = false;
                         }
+                        notify = readNotify;
                     }
-                    if (readNotify) {
+                    if (notify) {
                         getEndpoint().processSocket(Nio2SocketWrapper.this, SocketEvent.OPEN_READ, false);
                     }
                 }
@@ -665,9 +667,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             this.writeCompletionHandler = new CompletionHandler<Integer, ByteBuffer>() {
                 @Override
                 public void completed(Integer nBytes, ByteBuffer attachment) {
-                    writeNotify = false;
                     boolean notify = false;
                     synchronized (writeCompletionHandler) {
+                        writeNotify = false;
                         if (nBytes.intValue() < 0) {
                             failed(new EOFException(sm.getString("iob.failedwrite")), attachment);
                         } else if (!nonBlockingWriteBuffer.isEmpty()) {
@@ -719,9 +721,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             gatheringWriteCompletionHandler = new CompletionHandler<Long, ByteBuffer[]>() {
                 @Override
                 public void completed(Long nBytes, ByteBuffer[] attachment) {
-                    writeNotify = false;
                     boolean notify = false;
                     synchronized (writeCompletionHandler) {
+                        writeNotify = false;
                         if (nBytes.longValue() < 0) {
                             failed(new EOFException(sm.getString("iob.failedwrite")), attachment);
                         } else if (!nonBlockingWriteBuffer.isEmpty() || buffersArrayHasRemaining(attachment, 0, attachment.length)) {
@@ -838,7 +840,12 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 throw new IOException(sm.getString("socket.closed"));
             }
 
-            if (!readNotify) {
+            boolean notify = false;
+            synchronized (readCompletionHandler) {
+                notify = readNotify;
+            }
+
+            if (!notify) {
                 if (block) {
                     try {
                         readPending.acquire();
@@ -858,7 +865,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             int nRead = populateReadBuffer(b, off, len);
             if (nRead > 0) {
                 // The code that was notified is now reading its data
-                readNotify = false;
+                synchronized (readCompletionHandler) {
+                    readNotify = false;
+                }
                 // This may be sufficient to complete the request and we
                 // don't want to trigger another read since if there is no
                 // more data to read and this request takes a while to
@@ -895,7 +904,12 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 throw new IOException(sm.getString("socket.closed"));
             }
 
-            if (!readNotify) {
+            boolean notify = false;
+            synchronized (readCompletionHandler) {
+                notify = readNotify;
+            }
+
+            if (!notify) {
                 if (block) {
                     try {
                         readPending.acquire();
@@ -915,7 +929,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             int nRead = populateReadBuffer(to);
             if (nRead > 0) {
                 // The code that was notified is now reading its data
-                readNotify = false;
+                synchronized (readCompletionHandler) {
+                    readNotify = false;
+                }
                 // This may be sufficient to complete the request and we
                 // don't want to trigger another read since if there is no
                 // more data to read and this request takes a while to
@@ -1033,10 +1049,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             protected void start() {
                 if (read) {
                     // Disable any regular read notifications caused by registerReadInterest
-                    readNotify = true;
+                    synchronized (readCompletionHandler) {
+                        readNotify = true;
+                    }
                 } else {
                     // Disable any regular write notifications caused by registerWriteInterest
-                    writeNotify = true;
+                    synchronized (writeCompletionHandler) {
+                        writeNotify = true;
+                    }
                 }
                 Nio2Endpoint.startInline();
                 try {
