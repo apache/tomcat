@@ -278,10 +278,9 @@ public abstract class AbstractEndpoint<S,U> {
                 isSSLEnabled()) {
             try {
                 createSSLContext(sslHostConfig);
+            } catch (IllegalArgumentException e) {
+                throw e;
             } catch (Exception e) {
-                if (e instanceof IllegalArgumentException) {
-                    throw e;
-                }
                 throw new IllegalArgumentException(e);
             }
         }
