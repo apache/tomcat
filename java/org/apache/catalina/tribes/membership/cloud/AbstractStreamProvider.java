@@ -54,7 +54,7 @@ public abstract class AbstractStreamProvider implements StreamProvider {
                 public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
                 @Override
                 public X509Certificate[] getAcceptedIssuers() {
-                    return null;
+                    return new X509Certificate[0];
                 }
             }
         };
