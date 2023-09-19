@@ -472,7 +472,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                             String msg = sm.getString("sslUtilBase.trustedCertNotValid", alias,
                                     ((X509Certificate) cert).getSubjectX500Principal(), e.getMessage());
                             if (log.isDebugEnabled()) {
-                                log.debug(msg, e);
+                                log.warn(msg, e);
                             } else {
                                 log.warn(msg);
                             }
