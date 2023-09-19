@@ -279,6 +279,9 @@ public abstract class AbstractEndpoint<S,U> {
             try {
                 createSSLContext(sslHostConfig);
             } catch (Exception e) {
+                if (e instanceof IllegalArgumentException) {
+                    throw e;
+                }
                 throw new IllegalArgumentException(e);
             }
         }
