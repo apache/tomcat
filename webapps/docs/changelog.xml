@@ -133,6 +133,10 @@
         Fix logic issue trying to match no argument method in IntropectionUtil.
         (remm)
       </fix>
+      <fix>
+        Improve thread safety around readNotify and writeNotify in the NIO2
+        endpoint. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
