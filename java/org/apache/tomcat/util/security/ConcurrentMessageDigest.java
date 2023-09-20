@@ -18,9 +18,9 @@ package org.apache.tomcat.util.security;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.tomcat.util.res.StringManager;
@@ -38,7 +38,7 @@ public class ConcurrentMessageDigest {
     private static final String SHA1 = "SHA-1";
 
     private static final Map<String,Queue<MessageDigest>> queues =
-            new HashMap<>();
+            new ConcurrentHashMap<>();
 
 
     private ConcurrentMessageDigest() {
@@ -117,13 +117,11 @@ public class ConcurrentMessageDigest {
      *                                  JVM
      */
     public static void init(String algorithm) throws NoSuchAlgorithmException {
-        synchronized (queues) {
-            if (!queues.containsKey(algorithm)) {
-                MessageDigest md = MessageDigest.getInstance(algorithm);
-                Queue<MessageDigest> queue = new ConcurrentLinkedQueue<>();
-                queue.add(md);
-                queues.put(algorithm, queue);
-            }
+        if (!queues.containsKey(algorithm)) {
+            MessageDigest md = MessageDigest.getInstance(algorithm);
+            Queue<MessageDigest> queue = new ConcurrentLinkedQueue<>();
+            queue.add(md);
+            queues.putIfAbsent(algorithm, queue);
         }
     }
 }

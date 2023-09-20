@@ -137,6 +137,9 @@
         Improve thread safety around readNotify and writeNotify in the NIO2
         endpoint. (remm)
       </fix>
+      <fix>
+        Avoid rare thread safety issue accessing message digest map. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
