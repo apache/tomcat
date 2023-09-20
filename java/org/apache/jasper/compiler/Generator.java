@@ -1226,15 +1226,7 @@ class Generator {
                         + property
                         + "\")));");
             } else {
-                StringBuilder msg = new StringBuilder();
-                msg.append("file:");
-                msg.append(n.getStart());
-                msg.append(" jsp:getProperty for bean with name '");
-                msg.append(name);
-                msg.append(
-                        "'. Name was not previously introduced as per JSP.5.3");
-
-                throw new JasperException(msg.toString());
+                throw new JasperException(Localizer.getMessage("jsp.error.invalid.name", n.getStart(), name));
             }
 
             n.setEndJavaLine(out.getJavaLine());
@@ -1359,7 +1351,7 @@ class Generator {
                     if (!Modifier.isPublic(modifiers) ||
                             Modifier.isAbstract(modifiers) ||
                             !constructor.canAccess(null) ) {
-                        throw new Exception(Localizer.getMessage("jsp.error.invalid.bean",
+                        throw new JasperException(Localizer.getMessage("jsp.error.invalid.bean",
                                 Integer.valueOf(modifiers)));
                     }
                     // At compile time, we have determined that the bean class

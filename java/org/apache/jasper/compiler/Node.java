@@ -1597,6 +1597,8 @@ abstract class Node implements TagConstants {
             case VariableInfo.NESTED:
                 this.nestedScriptingVars = vec;
                 break;
+            default:
+                throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.varscope", scope));
             }
         }
 
@@ -1617,6 +1619,8 @@ abstract class Node implements TagConstants {
             case VariableInfo.NESTED:
                 vec = this.nestedScriptingVars;
                 break;
+            default:
+                throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.varscope", scope));
             }
 
             return vec;
