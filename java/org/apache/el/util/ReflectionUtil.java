@@ -250,7 +250,13 @@ public class ReflectionUtil {
             // If a method is found where every parameter matches exactly,
             // and no vars args are present, return it
             if (exactMatch == paramCount && varArgsMatch == 0) {
-                return getMethod(base.getClass(), base, m);
+                Method result = getMethod(base.getClass(), base, m);
+                if (result == null) {
+                    throw new MethodNotFoundException(MessageFactory.get(
+                            "error.method.notfound", base, property,
+                            paramString(paramTypes)));
+                }
+                return result;
             }
 
             candidates.put(m, new MatchResult(
@@ -297,7 +303,13 @@ public class ReflectionUtil {
                         paramString(paramTypes)));
         }
 
-        return getMethod(base.getClass(), base, match);
+        Method result = getMethod(base.getClass(), base, match);
+        if (result == null) {
+            throw new MethodNotFoundException(MessageFactory.get(
+                    "error.method.notfound", base, property,
+                    paramString(paramTypes)));
+        }
+        return result;
     }
 
     /*
