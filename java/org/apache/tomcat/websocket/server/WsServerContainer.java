@@ -96,11 +96,13 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
         }
 
         FilterRegistration.Dynamic fr = servletContext.addFilter("Tomcat WebSocket (JSR356) Filter", new WsFilter());
-        fr.setAsyncSupported(true);
+        if (fr != null) {
+            fr.setAsyncSupported(true);
 
-        EnumSet<DispatcherType> types = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD);
+            EnumSet<DispatcherType> types = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD);
 
-        fr.addMappingForUrlPatterns(types, true, "/*");
+            fr.addMappingForUrlPatterns(types, true, "/*");
+        }
     }
 
 
