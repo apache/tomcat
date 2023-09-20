@@ -113,11 +113,13 @@ public class ConcurrentMessageDigest {
      *                                  JVM
      */
     public static void init(String algorithm) throws NoSuchAlgorithmException {
-        if (!queues.containsKey(algorithm)) {
-            MessageDigest md = MessageDigest.getInstance(algorithm);
-            Queue<MessageDigest> queue = new ConcurrentLinkedQueue<>();
-            queue.add(md);
-            queues.putIfAbsent(algorithm, queue);
+        synchronized (queues) {
+            if (!queues.containsKey(algorithm)) {
+                MessageDigest md = MessageDigest.getInstance(algorithm);
+                Queue<MessageDigest> queue = new ConcurrentLinkedQueue<>();
+                queue.add(md);
+                queues.put(algorithm, queue);
+            }
         }
     }
 }
