@@ -193,6 +193,9 @@ public class JasperELResolver extends CompositeELResolver {
         @Override
         public Object getValue(ELContext context, Object base,
                 Object property) {
+            if (base == null || property == null) {
+                return null;
+            }
             Object value = null;
             Method method = getReadMethod(base.getClass(), property.toString());
             if (method != null) {
