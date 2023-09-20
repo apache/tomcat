@@ -32,7 +32,6 @@ import java.security.cert.Certificate;
 import java.text.Collator;
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -624,13 +623,5 @@ public class CachedResource implements WebResource {
             return ((JarURLConnection) resourceURL.openConnection()).getJarFile();
         }
 
-        @Override
-        public JarEntry getJarEntry() throws IOException {
-            if (getEntryName() == null) {
-                return null;
-            } else {
-                return super.getJarEntry();
-            }
-        }
     }
 }
