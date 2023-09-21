@@ -185,10 +185,12 @@ public class ResolverImpl extends Resolver {
                 }
             } else if (key.equals("SSL_CIPHER_ALGKEYSIZE")) {
                 String cipherSuite = sslSupport.getCipherSuite();
-                Set<Cipher> cipherList = OpenSSLCipherConfigurationParser.parse(cipherSuite);
-                if (cipherList.size() == 1) {
-                    Cipher cipher = cipherList.iterator().next();
-                    return String.valueOf(cipher.getAlg_bits());
+                if (cipherSuite != null) {
+                    Set<Cipher> cipherList = OpenSSLCipherConfigurationParser.parse(cipherSuite);
+                    if (cipherList.size() == 1) {
+                        Cipher cipher = cipherList.iterator().next();
+                        return String.valueOf(cipher.getAlg_bits());
+                    }
                 }
             } else if (key.equals("SSL_CIPHER_USEKEYSIZE")) {
                 Integer keySize = sslSupport.getKeySize();
@@ -261,6 +263,7 @@ public class ResolverImpl extends Resolver {
             try {
                 return PEMFile.toPEM(certificates[0]);
             } catch (CertificateEncodingException e) {
+                // Ignore
             }
         } else if (key.startsWith("CERT_CHAIN_")) {
             key = key.substring("CERT_CHAIN_".length());
