@@ -412,7 +412,7 @@ public abstract class HttpServlet extends GenericServlet {
 
     private static Method[] getAllDeclaredMethods(Class<?> c) {
 
-        if (c.equals(jakarta.servlet.http.HttpServlet.class)) {
+        if (c.equals(HttpServlet.class)) {
             return null;
         }
 
