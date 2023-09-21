@@ -142,6 +142,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>67080</bug>: Improve performance of EL expressions in JSPs that use
+        implicit objects. Based on suggestions by John Engebretson, Anurag Dubey
+        and Christopher Schultz. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
