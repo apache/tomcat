@@ -1282,7 +1282,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
             "<tr>\n" +
             " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
-
             "<tr>\n" +
             " <td colspan=\"2\" class=\"header-left\"><small>{1}</small></td>\n" +
             "</tr>\n" +
