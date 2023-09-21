@@ -21,6 +21,8 @@ import jakarta.servlet.jsp.JspException;
 import jakarta.servlet.jsp.tagext.Tag;
 
 import org.apache.jasper.Constants;
+import org.apache.jasper.compiler.Localizer;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 
 /**
@@ -50,7 +52,7 @@ public class TagHandlerPool {
                 Class<?> c = Class.forName(tpClassName);
                 result = (TagHandlerPool) c.getConstructor().newInstance();
             } catch (Exception e) {
-                e.printStackTrace();
+                LogFactory.getLog(TagHandlerPool.class).info(Localizer.getMessage("jsp.error.tagHandlerPool"), e);
                 result = null;
             }
         }
