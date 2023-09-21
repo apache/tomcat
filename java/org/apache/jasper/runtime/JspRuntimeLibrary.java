@@ -905,6 +905,9 @@ public class JspRuntimeLibrary {
         if (rd != null) {
             rd.include(request,
                     new ServletResponseWrapperInclude(response, out));
+        } else {
+            throw new JasperException(
+                    Localizer.getMessage("jsp.error.include.exception", resourcePath));
         }
 
     }
