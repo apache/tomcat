@@ -30,7 +30,7 @@ public @interface EJB {
     String description() default "";
 
     @SuppressWarnings("rawtypes") // Can't use Class<?> because API needs to match specification
-    Class beanInterface() default java.lang.Object.class;
+    Class beanInterface() default Object.class;
 
     String beanName() default "";
 
