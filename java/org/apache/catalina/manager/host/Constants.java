@@ -23,6 +23,7 @@ public class Constants {
 
     public static final String REL_EXTERNAL = org.apache.catalina.manager.Constants.REL_EXTERNAL;
 
+    //@formatter:off
     public static final String MESSAGE_SECTION =
         "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
         " <tr>\n" +
@@ -84,6 +85,8 @@ public class Constants {
         "\n" +
         "</body>\n" +
         "</html>";
-    public static final String CHARSET="utf-8";
+    //@formatter:on
+
+    public static final String CHARSET = "utf-8";
 }
 

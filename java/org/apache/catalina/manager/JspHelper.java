@@ -28,8 +28,9 @@ import org.apache.tomcat.util.security.Escape;
 
 
 /**
- * Helper JavaBean for JSPs, because JSTL 1.1/EL 2.0 is too dumb to
- * to what I need (call methods with parameters), or I am too dumb to use it correctly. :)
+ * Helper JavaBean for JSPs, because JSTL 1.1/EL 2.0 is too dumb to to what I need (call methods with parameters), or I
+ * am too dumb to use it correctly. :)
+ *
  * @author C&eacute;drik LIME
  */
 public class JspHelper {
@@ -45,8 +46,8 @@ public class JspHelper {
 
     /**
      * Try to get user locale from the session, if possible.
-     * IMPLEMENTATION NOTE: this method has explicit support for Tapestry 3 and
-     * Struts 1.x
+     * <p>
+     * IMPLEMENTATION NOTE: this method has explicit support for Tapestry 3 and Struts 1.x
      *
      * @param in_session Session from which the locale should be guessed
      *
@@ -55,9 +56,10 @@ public class JspHelper {
     public static String guessDisplayLocaleFromSession(Session in_session) {
         return localeToString(SessionUtils.guessLocaleFromSession(in_session));
     }
+
     private static String localeToString(Locale locale) {
         if (locale != null) {
-            return escapeXml(locale.toString());//locale.getDisplayName();
+            return escapeXml(locale.toString()); // locale.getDisplayName();
         } else {
             return "";
         }
@@ -65,7 +67,9 @@ public class JspHelper {
 
     /**
      * Try to get user name from the session, if possible.
+     *
      * @param in_session The Servlet session
+     *
      * @return the user name
      */
     public static String guessDisplayUserFromSession(Session in_session) {
@@ -82,7 +86,7 @@ public class JspHelper {
             DateFormat formatter = new SimpleDateFormat(DATE_TIME_FORMAT);
             return formatter.format(new Date(in_session.getCreationTime()));
         } catch (IllegalStateException ise) {
-            //ignore: invalidated session
+            // ignore: invalidated session
             return "";
         }
     }
@@ -95,7 +99,7 @@ public class JspHelper {
             DateFormat formatter = new SimpleDateFormat(DATE_TIME_FORMAT);
             return formatter.format(new Date(in_session.getLastAccessedTime()));
         } catch (IllegalStateException ise) {
-            //ignore: invalidated session
+            // ignore: invalidated session
             return "";
         }
     }
@@ -106,10 +110,10 @@ public class JspHelper {
                 return "";
             }
         } catch (IllegalStateException ise) {
-            //ignore: invalidated session
+            // ignore: invalidated session
             return "";
         }
-        return secondsToTimeString(SessionUtils.getUsedTimeForSession(in_session)/1000);
+        return secondsToTimeString(SessionUtils.getUsedTimeForSession(in_session) / 1000);
     }
 
     public static String getDisplayTTLForSession(Session in_session) {
@@ -118,10 +122,10 @@ public class JspHelper {
                 return "";
             }
         } catch (IllegalStateException ise) {
-            //ignore: invalidated session
+            // ignore: invalidated session
             return "";
         }
-        return secondsToTimeString(SessionUtils.getTTLForSession(in_session)/1000);
+        return secondsToTimeString(SessionUtils.getTTLForSession(in_session) / 1000);
     }
 
     public static String getDisplayInactiveTimeForSession(Session in_session) {
@@ -130,10 +134,10 @@ public class JspHelper {
                 return "";
             }
         } catch (IllegalStateException ise) {
-            //ignore: invalidated session
+            // ignore: invalidated session
             return "";
         }
-        return secondsToTimeString(SessionUtils.getInactiveTimeForSession(in_session)/1000);
+        return secondsToTimeString(SessionUtils.getInactiveTimeForSession(in_session) / 1000);
     }
 
     public static String secondsToTimeString(long in_seconds) {
@@ -171,8 +175,7 @@ public class JspHelper {
      */
 
     private static final int HIGHEST_SPECIAL = '>';
-    private static final char[][] specialCharactersRepresentation =
-            new char[HIGHEST_SPECIAL + 1][];
+    private static final char[][] specialCharactersRepresentation = new char[HIGHEST_SPECIAL + 1][];
     static {
         specialCharactersRepresentation['&'] = "&amp;".toCharArray();
         specialCharactersRepresentation['<'] = "&lt;".toCharArray();
@@ -184,7 +187,7 @@ public class JspHelper {
     public static String escapeXml(Object obj) {
         String value = null;
         try {
-            value = (obj == null) ? null : obj.toString();
+            value = obj == null ? null : obj.toString();
         } catch (Exception e) {
             // Ignore
         }
@@ -194,11 +197,11 @@ public class JspHelper {
     /**
      * Performs the following substring replacements (to facilitate output to XML/HTML pages):
      * <ul>
-     *   <li>&amp; -&gt; &amp;amp;</li>
-     *   <li>&lt; -&gt; &amp;lt;</li>
-     *   <li>&gt; -&gt; &amp;gt;</li>
-     *   <li>" -&gt; &amp;#034;</li>
-     *   <li>' -&gt; &amp;#039;</li>
+     * <li>&amp; -&gt; &amp;amp;</li>
+     * <li>&lt; -&gt; &amp;lt;</li>
+     * <li>&gt; -&gt; &amp;gt;</li>
+     * <li>" -&gt; &amp;#034;</li>
+     * <li>' -&gt; &amp;#039;</li>
      * </ul>
      *
      * @param buffer The XML to escape

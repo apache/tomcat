@@ -34,7 +34,9 @@ public abstract class BaseSessionComparator<T> implements Comparator<Session> {
 
     public abstract Comparable<T> getComparableObject(Session session);
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
     @SuppressWarnings("unchecked")
@@ -42,6 +44,6 @@ public abstract class BaseSessionComparator<T> implements Comparator<Session> {
     public final int compare(Session s1, Session s2) {
         Comparable<T> c1 = getComparableObject(s1);
         Comparable<T> c2 = getComparableObject(s2);
-        return c1==null ? (c2==null ? 0 : -1) : (c2==null ? 1 : c1.compareTo((T)c2));
+        return c1 == null ? c2 == null ? 0 : -1 : c2 == null ? 1 : c1.compareTo((T) c2);
     }
 }
