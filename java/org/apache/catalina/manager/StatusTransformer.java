@@ -23,7 +23,6 @@ import java.lang.management.MemoryUsage;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedMap;
@@ -46,9 +45,7 @@ import org.apache.tomcat.util.security.Escape;
  */
 public class StatusTransformer {
 
-
     // --------------------------------------------------------- Public Methods
-
 
     public static void setContentType(HttpServletResponse response, int mode) {
         if (mode == 0) {
@@ -321,10 +318,8 @@ public class StatusTransformer {
 
             ObjectName grpName = null;
 
-            Enumeration<ObjectName> enumeration = globalRequestProcessors.elements();
-            // Find the HTTP/1.1 RequestGroupInfo - BZ 65404
-            while (enumeration.hasMoreElements()) {
-                ObjectName objectName = enumeration.nextElement();
+            for (ObjectName objectName : globalRequestProcessors) {
+                // Find the HTTP/1.1 RequestGroupInfo - BZ 65404
                 if (name.equals(objectName.getKeyProperty("name")) && objectName.getKeyProperty("Upgrade") == null) {
                     grpName = objectName;
                 }
@@ -363,9 +358,7 @@ public class StatusTransformer {
                     "</th><th>" + args[13] + "</th><th>" + args[14] + "</th><th>" + args[15] + "</th><th>" + args[16] +
                     "</th><th>" + args[17] + "</th></tr>");
 
-            enumeration = requestProcessors.elements();
-            while (enumeration.hasMoreElements()) {
-                ObjectName objectName = enumeration.nextElement();
+            for (ObjectName objectName : requestProcessors) {
                 if (name.equals(objectName.getKeyProperty("worker"))) {
                     writer.print("<tr>");
                     writeProcessorState(writer, objectName, mBeanServer, mode);
@@ -389,10 +382,8 @@ public class StatusTransformer {
 
             ObjectName grpName = null;
 
-            Enumeration<ObjectName> enumeration = globalRequestProcessors.elements();
-            // Find the HTTP/1.1 RequestGroupInfo - BZ 65404
-            while (enumeration.hasMoreElements()) {
-                ObjectName objectName = enumeration.nextElement();
+            for (ObjectName objectName : globalRequestProcessors) {
+                // Find the HTTP/1.1 RequestGroupInfo - BZ 65404
                 if (name.equals(objectName.getKeyProperty("name")) && objectName.getKeyProperty("Upgrade") == null) {
                     grpName = objectName;
                 }
@@ -410,9 +401,7 @@ public class StatusTransformer {
                 writer.write(" />");
 
                 writer.write("<workers>");
-                enumeration = requestProcessors.elements();
-                while (enumeration.hasMoreElements()) {
-                    ObjectName objectName = enumeration.nextElement();
+                for (ObjectName objectName : requestProcessors) {
                     if (name.equals(objectName.getKeyProperty("worker"))) {
                         writeProcessorState(writer, objectName, mBeanServer, mode);
                     }
@@ -422,7 +411,6 @@ public class StatusTransformer {
 
             writer.write("</connector>");
         }
-
     }
 
 
@@ -633,7 +621,7 @@ public class StatusTransformer {
                 }
 
                 writer.print("<a href=\"#" + count++ + ".0\">");
-                writer.print(Escape.htmlElementContext(webModuleName));
+                writer.print(Escape.htmlElementContent(webModuleName));
                 writer.print("</a>");
                 if (iterator.hasNext()) {
                     writer.print("<br>");
@@ -709,7 +697,7 @@ public class StatusTransformer {
             }
 
             writer.print("<h1>");
-            writer.print(Escape.htmlElementContext(name));
+            writer.print(Escape.htmlElementContent(name));
             writer.print("</h1>");
             writer.print("</a>");
 
@@ -834,11 +822,11 @@ public class StatusTransformer {
             String[] mappings = (String[]) mBeanServer.invoke(objectName, "findMappings", null, null);
 
             writer.print("<h2>");
-            writer.print(Escape.htmlElementContext(servletName));
+            writer.print(Escape.htmlElementContent(servletName));
             if (mappings != null && mappings.length > 0) {
                 writer.print(" [ ");
                 for (int i = 0; i < mappings.length; i++) {
-                    writer.print(Escape.htmlElementContext(mappings[i]));
+                    writer.print(Escape.htmlElementContent(mappings[i]));
                     if (i < mappings.length - 1) {
                         writer.print(" , ");
                     }

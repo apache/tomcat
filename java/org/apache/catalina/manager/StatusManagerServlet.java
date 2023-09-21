@@ -16,12 +16,10 @@
  */
 package org.apache.catalina.manager;
 
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
@@ -88,7 +86,6 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
 
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Initialize this servlet.
@@ -298,9 +295,7 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
             // use StatusTransformer to output status
             StatusTransformer.writeVMState(writer, mode, args);
 
-            Enumeration<ObjectName> enumeration = threadPools.elements();
-            while (enumeration.hasMoreElements()) {
-                ObjectName objectName = enumeration.nextElement();
+            for (ObjectName objectName : threadPools) {
                 String name = objectName.getKeyProperty("name");
                 args = new Object[19];
                 args[0] = smClient.getString("htmlManagerServlet.connectorStateMaxThreads");
@@ -339,11 +334,10 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
 
         // use StatusTransformer to output status
         StatusTransformer.writeFooter(writer, mode);
-
     }
 
-    // ------------------------------------------- NotificationListener Methods
 
+    // ------------------------------------------- NotificationListener Methods
 
     @Override
     public void handleNotification(Notification notification, java.lang.Object handback) {

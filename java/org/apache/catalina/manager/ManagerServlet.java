@@ -291,6 +291,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         if (command == null) {
             command = request.getServletPath();
         }
+
         String config = request.getParameter("config");
         String path = request.getParameter("path");
         ContextName cn = null;
@@ -654,7 +655,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 mBeanServer.invoke(storeConfigOname, "storeConfig", null, null);
                 writer.println(smClient.getString("managerServlet.saved"));
             } catch (Exception e) {
-                log("managerServlet.storeConfig", e);
+                log(sm.getString("managerServlet.error.storeConfig"), e);
                 writer.println(smClient.getString("managerServlet.exception", e.toString()));
             }
         } else {
@@ -676,7 +677,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     writer.println(smClient.getString("managerServlet.savedContextFail", path));
                 }
             } catch (Exception e) {
-                log("managerServlet.save[" + path + "]", e);
+                log(sm.getString("managerServlet.error.storeContextConfig", path), e);
                 writer.println(smClient.getString("managerServlet.exception", e.toString()));
             }
         }
@@ -773,7 +774,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 writer.println(smClient.getString("managerServlet.inService", displayPath));
             }
         } catch (Exception e) {
-            log("managerServlet.check[" + displayPath + "]", e);
+            log(sm.getString("managerServlet.error.deploy", displayPath), e);
             writer.println(smClient.getString("managerServlet.exception", e.toString()));
             return;
         }
@@ -826,7 +827,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 writer.println(smClient.getString("managerServlet.inService", displayPath));
             }
         } catch (Exception e) {
-            log("managerServlet.check[" + displayPath + "]", e);
+            log(sm.getString("managerServlet.error.deploy", displayPath), e);
             writer.println(smClient.getString("managerServlet.exception", e.toString()));
             return;
         }
@@ -933,7 +934,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             writeDeployResult(writer, smClient, name, displayPath);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log("ManagerServlet.install[" + displayPath + "]", t);
+            log(sm.getString("managerServlet.error.deploy", displayPath), t);
             writer.println(smClient.getString("managerServlet.exception", t.toString()));
         }
 
@@ -1020,7 +1021,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             writer.println(smClient.getString("managerServlet.reloaded", cn.getDisplayName()));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log("ManagerServlet.reload[" + cn.getDisplayName() + "]", t);
+            log(sm.getString("managerServlet.error.reload", cn.getDisplayName()), t);
             writer.println(smClient.getString("managerServlet.exception", t.toString()));
         }
 
@@ -1116,7 +1117,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log("ManagerServlet.resources[" + type + "]", t);
+            log(sm.getString("managerServlet.error.resources", type), t);
             writer.println(smClient.getString("managerServlet.exception", t.toString()));
         }
     }
@@ -1138,7 +1139,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     System.getProperty("java.runtime.version"), System.getProperty("java.vm.vendor")));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            getServletContext().log("ManagerServlet.serverinfo", t);
+            log(sm.getString("managerServlet.error.serverInfo"), t);
             writer.println(smClient.getString("managerServlet.exception", t.toString()));
         }
     }
@@ -1238,7 +1239,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log("ManagerServlet.sessions[" + displayPath + "]", t);
+            log(sm.getString("managerServlet.error.sessions", displayPath), t);
             writer.println(smClient.getString("managerServlet.exception", t.toString()));
         }
 
@@ -1260,7 +1261,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             try {
                 idle = Integer.parseInt(idleParam);
             } catch (NumberFormatException e) {
-                log("Could not parse idle parameter to an int: " + idleParam);
+                log(sm.getString("managerServlet.error.idleParam", idleParam));
             }
         }
         sessions(writer, cn, idle, smClient);
@@ -1299,7 +1300,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            getServletContext().log(sm.getString("managerServlet.startFailed", displayPath), t);
+            log(sm.getString("managerServlet.error.start", displayPath), t);
             writer.println(smClient.getString("managerServlet.startFailed", displayPath));
             writer.println(smClient.getString("managerServlet.exception", t.toString()));
         }
@@ -1341,7 +1342,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             writer.println(smClient.getString("managerServlet.stopped", displayPath));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log("ManagerServlet.stop[" + displayPath + "]", t);
+            log(sm.getString("managerServlet.error.stop", displayPath), t);
             writer.println(smClient.getString("managerServlet.exception", t.toString()));
         }
 
@@ -1416,7 +1417,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             writer.println(smClient.getString("managerServlet.undeployed", displayPath));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log("ManagerServlet.undeploy[" + displayPath + "]", t);
+            log(sm.getString("managerServlet.error.undeploy", displayPath), t);
             writer.println(smClient.getString("managerServlet.exception", t.toString()));
         }
 
@@ -1590,7 +1591,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             }
             throw e;
         }
-
     }
 
 
