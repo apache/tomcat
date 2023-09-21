@@ -39,9 +39,8 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.security.Escape;
 
 /**
- * This is a refactoring of the servlet to externalize
- * the output into a simple class. Although we could
- * use XSLT, that is unnecessarily complex.
+ * This is a refactoring of the servlet to externalize the output into a simple class. Although we could use XSLT, that
+ * is unnecessarily complex.
  *
  * @author Peter Lin
  */
@@ -51,12 +50,11 @@ public class StatusTransformer {
     // --------------------------------------------------------- Public Methods
 
 
-    public static void setContentType(HttpServletResponse response,
-                                      int mode) {
-        if (mode == 0){
-            response.setContentType("text/html;charset="+Constants.CHARSET);
-        } else if (mode == 1){
-            response.setContentType("text/xml;charset="+Constants.CHARSET);
+    public static void setContentType(HttpServletResponse response, int mode) {
+        if (mode == 0) {
+            response.setContentType("text/html;charset=" + Constants.CHARSET);
+        } else if (mode == 1) {
+            response.setContentType("text/xml;charset=" + Constants.CHARSET);
         }
     }
 
@@ -65,37 +63,31 @@ public class StatusTransformer {
      * Write an HTML or XML header.
      *
      * @param writer the PrintWriter to use
-     * @param args Path prefix for URLs
-     * @param mode - 0 = HTML header, 1 = XML declaration
-     *
+     * @param args   Path prefix for URLs
+     * @param mode   - 0 = HTML header, 1 = XML declaration
      */
     public static void writeHeader(PrintWriter writer, Object[] args, int mode) {
-        if (mode == 0){
+        if (mode == 0) {
             // HTML Header Section
-            writer.print(MessageFormat.format(
-                Constants.HTML_HEADER_SECTION, args
-            ));
-        } else if (mode == 1){
+            writer.print(MessageFormat.format(Constants.HTML_HEADER_SECTION, args));
+        } else if (mode == 1) {
             writer.write(Constants.XML_DECLARATION);
-            writer.print(MessageFormat.format
-                     (Constants.XML_STYLE, args));
+            writer.print(MessageFormat.format(Constants.XML_STYLE, args));
             writer.write("<status>");
         }
     }
 
 
     /**
-     * Write the header body. XML output doesn't bother
-     * to output this stuff, since it's just title.
+     * Write the header body. XML output doesn't bother to output this stuff, since it's just title.
      *
      * @param writer The output writer
-     * @param args What to write
-     * @param mode 0 means write
+     * @param args   What to write
+     * @param mode   0 means write
      */
     public static void writeBody(PrintWriter writer, Object[] args, int mode) {
-        if (mode == 0){
-            writer.print(MessageFormat.format
-                         (Constants.BODY_HEADER_SECTION, args));
+        if (mode == 0) {
+            writer.print(MessageFormat.format(Constants.BODY_HEADER_SECTION, args));
         }
     }
 
@@ -104,39 +96,35 @@ public class StatusTransformer {
      * Write the manager webapp information.
      *
      * @param writer The output writer
-     * @param args What to write
-     * @param mode 0 means write
+     * @param args   What to write
+     * @param mode   0 means write
      */
-    public static void writeManager(PrintWriter writer, Object[] args,
-                                    int mode) {
-        if (mode == 0){
+    public static void writeManager(PrintWriter writer, Object[] args, int mode) {
+        if (mode == 0) {
             writer.print(MessageFormat.format(Constants.MANAGER_SECTION, args));
         }
     }
 
 
-    public static void writePageHeading(PrintWriter writer, Object[] args,
-                                        int mode) {
-        if (mode == 0){
-            writer.print(MessageFormat.format
-                         (Constants.SERVER_HEADER_SECTION, args));
+    public static void writePageHeading(PrintWriter writer, Object[] args, int mode) {
+        if (mode == 0) {
+            writer.print(MessageFormat.format(Constants.SERVER_HEADER_SECTION, args));
         }
     }
 
 
-    public static void writeServerInfo(PrintWriter writer, Object[] args,
-                                       int mode){
-        if (mode == 0){
+    public static void writeServerInfo(PrintWriter writer, Object[] args, int mode) {
+        if (mode == 0) {
             writer.print(MessageFormat.format(Constants.SERVER_ROW_SECTION, args));
         }
     }
 
 
     public static void writeFooter(PrintWriter writer, int mode) {
-        if (mode == 0){
+        if (mode == 0) {
             // HTML Tail Section
             writer.print(Constants.HTML_TAIL_SECTION);
-        } else if (mode == 1){
+        } else if (mode == 1) {
             writer.write("</status>");
         }
     }
@@ -146,9 +134,8 @@ public class StatusTransformer {
      * Write the OS state.
      *
      * @param writer The output writer
-     * @param mode Mode <code>0</code> will generate HTML.
-     *             Mode <code>1</code> will generate XML.
-     * @param args I18n labels for the OS state values
+     * @param mode   Mode <code>0</code> will generate HTML. Mode <code>1</code> will generate XML.
+     * @param args   I18n labels for the OS state values
      */
     public static void writeOSState(PrintWriter writer, int mode, Object[] args) {
         long[] result = new long[16];
@@ -159,8 +146,7 @@ public class StatusTransformer {
             paramTypes[0] = result.getClass();
             Object paramValues[] = new Object[1];
             paramValues[0] = result;
-            Method method = Class.forName("org.apache.tomcat.jni.OS")
-                .getMethod(methodName, paramTypes);
+            Method method = Class.forName("org.apache.tomcat.jni.OS").getMethod(methodName, paramTypes);
             method.invoke(null, paramValues);
             ok = true;
         } catch (Throwable t) {
@@ -169,11 +155,11 @@ public class StatusTransformer {
         }
 
         if (ok) {
-            if (mode == 0){
+            if (mode == 0) {
                 writer.print("<h1>OS</h1>");
 
                 writer.print("<p>");
-                writer.print( args[0] );
+                writer.print(args[0]);
                 writer.print(' ');
                 writer.print(formatSize(Long.valueOf(result[0]), true));
                 writer.print(' ');
@@ -201,7 +187,7 @@ public class StatusTransformer {
                 writer.print(' ');
                 writer.print(formatTime(Long.valueOf(result[12] / 1000), true));
                 writer.print("</p>");
-            } else if (mode == 1){
+            } else if (mode == 1) {
                 // NO-OP
             }
         }
@@ -211,42 +197,41 @@ public class StatusTransformer {
 
     /**
      * Write the VM state.
+     *
      * @param writer The output writer
-     * @param mode Mode <code>0</code> will generate HTML.
-     *             Mode <code>1</code> will generate XML.
-     * @param args I18n labels for the VM state values
+     * @param mode   Mode <code>0</code> will generate HTML. Mode <code>1</code> will generate XML.
+     * @param args   I18n labels for the VM state values
+     *
      * @throws Exception Propagated JMX error
      */
-    public static void writeVMState(PrintWriter writer, int mode, Object[] args)
-        throws Exception {
+    public static void writeVMState(PrintWriter writer, int mode, Object[] args) throws Exception {
 
-        SortedMap<String, MemoryPoolMXBean> memoryPoolMBeans = new TreeMap<>();
-        for (MemoryPoolMXBean mbean: ManagementFactory.getMemoryPoolMXBeans()) {
+        SortedMap<String,MemoryPoolMXBean> memoryPoolMBeans = new TreeMap<>();
+        for (MemoryPoolMXBean mbean : ManagementFactory.getMemoryPoolMXBeans()) {
             String sortKey = mbean.getType() + ":" + mbean.getName();
             memoryPoolMBeans.put(sortKey, mbean);
         }
 
-        if (mode == 0){
+        if (mode == 0) {
             writer.print("<h1>JVM</h1>");
 
             writer.print("<p>");
-            writer.print( args[0] );
+            writer.print(args[0]);
             writer.print(' ');
-            writer.print(formatSize(
-                    Long.valueOf(Runtime.getRuntime().freeMemory()), true));
+            writer.print(formatSize(Long.valueOf(Runtime.getRuntime().freeMemory()), true));
             writer.print(' ');
             writer.print(args[1]);
             writer.print(' ');
-            writer.print(formatSize(
-                    Long.valueOf(Runtime.getRuntime().totalMemory()), true));
+            writer.print(formatSize(Long.valueOf(Runtime.getRuntime().totalMemory()), true));
             writer.print(' ');
             writer.print(args[2]);
             writer.print(' ');
-            writer.print(formatSize(
-                    Long.valueOf(Runtime.getRuntime().maxMemory()), true));
+            writer.print(formatSize(Long.valueOf(Runtime.getRuntime().maxMemory()), true));
             writer.print("</p>");
 
-            writer.write("<table border=\"0\"><thead><tr><th>" + args[3] + "</th><th>" + args[4] + "</th><th>" + args[5] + "</th><th>" + args[6] + "</th><th>" + args[7] + "</th><th>" + args[8] + "</th></tr></thead><tbody>");
+            writer.write("<table border=\"0\"><thead><tr><th>" + args[3] + "</th><th>" + args[4] + "</th><th>" +
+                    args[5] + "</th><th>" + args[6] + "</th><th>" + args[7] + "</th><th>" + args[8] +
+                    "</th></tr></thead><tbody>");
             for (MemoryPoolMXBean memoryPoolMBean : memoryPoolMBeans.values()) {
                 MemoryUsage usage = memoryPoolMBean.getUsage();
                 writer.write("<tr><td>");
@@ -262,13 +247,12 @@ public class StatusTransformer {
                 writer.write("</td><td>");
                 writer.print(formatSize(Long.valueOf(usage.getUsed()), true));
                 if (usage.getMax() > 0) {
-                    writer.write(" ("
-                            + (usage.getUsed() * 100 / usage.getMax()) + "%)");
+                    writer.write(" (" + usage.getUsed() * 100 / usage.getMax() + "%)");
                 }
                 writer.write("</td></tr>");
             }
             writer.write("</tbody></table>");
-        } else if (mode == 1){
+        } else if (mode == 1) {
             writer.write("<jvm>");
 
             writer.write("<memory");
@@ -295,21 +279,21 @@ public class StatusTransformer {
 
     /**
      * Write connector state.
-     * @param writer The output writer
-     * @param tpName MBean name of the thread pool
-     * @param name Connector name
-     * @param mBeanServer MBean server
+     *
+     * @param writer                  The output writer
+     * @param tpName                  MBean name of the thread pool
+     * @param name                    Connector name
+     * @param mBeanServer             MBean server
      * @param globalRequestProcessors MBean names for the global request processors
-     * @param requestProcessors MBean names for the request processors
-     * @param mode Mode <code>0</code> will generate HTML.
-     *             Mode <code>1</code> will generate XML.
-     * @param args I18n labels for the Connector state values
+     * @param requestProcessors       MBean names for the request processors
+     * @param mode                    Mode <code>0</code> will generate HTML. Mode <code>1</code> will generate XML.
+     * @param args                    I18n labels for the Connector state values
+     *
      * @throws Exception Propagated JMX error
      */
-    public static void writeConnectorState(PrintWriter writer,
-            ObjectName tpName, String name, MBeanServer mBeanServer,
-            Vector<ObjectName> globalRequestProcessors,
-            Vector<ObjectName> requestProcessors, int mode, Object[] args) throws Exception {
+    public static void writeConnectorState(PrintWriter writer, ObjectName tpName, String name, MBeanServer mBeanServer,
+            Vector<ObjectName> globalRequestProcessors, Vector<ObjectName> requestProcessors, int mode, Object[] args)
+            throws Exception {
 
         if (mode == 0) {
             writer.print("<h1>");
@@ -317,7 +301,7 @@ public class StatusTransformer {
             writer.print("</h1>");
 
             writer.print("<p>");
-            writer.print( args[0] );
+            writer.print(args[0]);
             writer.print(' ');
             writer.print(mBeanServer.getAttribute(tpName, "maxThreads"));
             writer.print(' ');
@@ -350,15 +334,13 @@ public class StatusTransformer {
                 return;
             }
 
-            writer.print( args[4] );
+            writer.print(args[4]);
             writer.print(' ');
-            writer.print(formatTime(mBeanServer.getAttribute
-                                    (grpName, "maxTime"), false));
+            writer.print(formatTime(mBeanServer.getAttribute(grpName, "maxTime"), false));
             writer.print(' ');
             writer.print(args[5]);
             writer.print(' ');
-            writer.print(formatTime(mBeanServer.getAttribute
-                                    (grpName, "processingTime"), true));
+            writer.print(formatTime(mBeanServer.getAttribute(grpName, "processingTime"), true));
             writer.print(' ');
             writer.print(args[6]);
             writer.print(' ');
@@ -370,16 +352,16 @@ public class StatusTransformer {
             writer.print(' ');
             writer.print(args[8]);
             writer.print(' ');
-            writer.print(formatSize(mBeanServer.getAttribute
-                                    (grpName, "bytesReceived"), true));
+            writer.print(formatSize(mBeanServer.getAttribute(grpName, "bytesReceived"), true));
             writer.print(' ');
             writer.print(args[9]);
             writer.print(' ');
-            writer.print(formatSize(mBeanServer.getAttribute
-                                    (grpName, "bytesSent"), true));
+            writer.print(formatSize(mBeanServer.getAttribute(grpName, "bytesSent"), true));
             writer.print("</p>");
 
-            writer.print("<table border=\"0\"><tr><th>"+ args[10] + "</th><th>" + args[11] + "</th><th>" + args[12] +"</th><th>" + args[13] +"</th><th>" + args[14] + "</th><th>" + args[15] + "</th><th>" + args[16] + "</th><th>" + args[17] + "</th></tr>");
+            writer.print("<table border=\"0\"><tr><th>" + args[10] + "</th><th>" + args[11] + "</th><th>" + args[12] +
+                    "</th><th>" + args[13] + "</th><th>" + args[14] + "</th><th>" + args[15] + "</th><th>" + args[16] +
+                    "</th><th>" + args[17] + "</th></tr>");
 
             enumeration = requestProcessors.elements();
             while (enumeration.hasMoreElements()) {
@@ -394,9 +376,9 @@ public class StatusTransformer {
             writer.print("</table>");
 
             writer.print("<p>");
-            writer.print( args[18] );
+            writer.print(args[18]);
             writer.print("</p>");
-        } else if (mode == 1){
+        } else if (mode == 1) {
             writer.write("<connector name='" + name + "'>");
 
             writer.write("<threadInfo ");
@@ -446,21 +428,18 @@ public class StatusTransformer {
 
     /**
      * Write processor state.
-     * @param writer The output writer
-     * @param pName MBean name of the processor
-     * @param  mBeanServer MBean server
-     * @param mode Mode <code>0</code> will generate HTML.
-     *   Mode <code>1</code> will generate XML.
+     *
+     * @param writer      The output writer
+     * @param pName       MBean name of the processor
+     * @param mBeanServer MBean server
+     * @param mode        Mode <code>0</code> will generate HTML. Mode <code>1</code> will generate XML.
+     *
      * @throws Exception Propagated JMX error
      */
-    protected static void writeProcessorState(PrintWriter writer,
-                                              ObjectName pName,
-                                              MBeanServer mBeanServer,
-                                              int mode)
-        throws Exception {
+    protected static void writeProcessorState(PrintWriter writer, ObjectName pName, MBeanServer mBeanServer, int mode)
+            throws Exception {
 
-        Integer stageValue =
-            (Integer) mBeanServer.getAttribute(pName, "stage");
+        Integer stageValue = (Integer) mBeanServer.getAttribute(pName, "stage");
         int stage = stageValue.intValue();
         boolean fullStatus = true;
         boolean showRequest = true;
@@ -468,39 +447,39 @@ public class StatusTransformer {
 
         switch (stage) {
 
-        case (org.apache.coyote.Constants.STAGE_PARSE):
-            stageStr = "P";
-            fullStatus = false;
-            break;
-        case (org.apache.coyote.Constants.STAGE_PREPARE):
-            stageStr = "P";
-            fullStatus = false;
-            break;
-        case (org.apache.coyote.Constants.STAGE_SERVICE):
-            stageStr = "S";
-            break;
-        case (org.apache.coyote.Constants.STAGE_ENDINPUT):
-            stageStr = "F";
-            break;
-        case (org.apache.coyote.Constants.STAGE_ENDOUTPUT):
-            stageStr = "F";
-            break;
-        case (org.apache.coyote.Constants.STAGE_ENDED):
-            stageStr = "R";
-            fullStatus = false;
-            break;
-        case (org.apache.coyote.Constants.STAGE_KEEPALIVE):
-            stageStr = "K";
-            showRequest = false;
-            break;
-        case (org.apache.coyote.Constants.STAGE_NEW):
-            stageStr = "R";
-            fullStatus = false;
-            break;
-        default:
-            // Unknown stage
-            stageStr = "?";
-            fullStatus = false;
+            case org.apache.coyote.Constants.STAGE_PARSE:
+                stageStr = "P";
+                fullStatus = false;
+                break;
+            case org.apache.coyote.Constants.STAGE_PREPARE:
+                stageStr = "P";
+                fullStatus = false;
+                break;
+            case org.apache.coyote.Constants.STAGE_SERVICE:
+                stageStr = "S";
+                break;
+            case org.apache.coyote.Constants.STAGE_ENDINPUT:
+                stageStr = "F";
+                break;
+            case org.apache.coyote.Constants.STAGE_ENDOUTPUT:
+                stageStr = "F";
+                break;
+            case org.apache.coyote.Constants.STAGE_ENDED:
+                stageStr = "R";
+                fullStatus = false;
+                break;
+            case org.apache.coyote.Constants.STAGE_KEEPALIVE:
+                stageStr = "K";
+                showRequest = false;
+                break;
+            case org.apache.coyote.Constants.STAGE_NEW:
+                stageStr = "R";
+                fullStatus = false;
+                break;
+            default:
+                // Unknown stage
+                stageStr = "?";
+                fullStatus = false;
 
         }
 
@@ -511,54 +490,43 @@ public class StatusTransformer {
 
             if (fullStatus) {
                 writer.write("<td>");
-                writer.print(formatTime(mBeanServer.getAttribute
-                                        (pName, "requestProcessingTime"), false));
+                writer.print(formatTime(mBeanServer.getAttribute(pName, "requestProcessingTime"), false));
                 writer.write("</td>");
                 writer.write("<td>");
                 if (showRequest) {
-                    writer.print(formatSize(mBeanServer.getAttribute
-                                            (pName, "requestBytesSent"), false));
+                    writer.print(formatSize(mBeanServer.getAttribute(pName, "requestBytesSent"), false));
                 } else {
                     writer.write("?");
                 }
                 writer.write("</td>");
                 writer.write("<td>");
                 if (showRequest) {
-                    writer.print(formatSize(mBeanServer.getAttribute
-                                            (pName, "requestBytesReceived"),
-                                            false));
+                    writer.print(formatSize(mBeanServer.getAttribute(pName, "requestBytesReceived"), false));
                 } else {
                     writer.write("?");
                 }
                 writer.write("</td>");
                 writer.write("<td>");
-                writer.print(Escape.htmlElementContext(mBeanServer.getAttribute
-                                    (pName, "remoteAddrForwarded")));
+                writer.print(Escape.htmlElementContext(mBeanServer.getAttribute(pName, "remoteAddrForwarded")));
                 writer.write("</td>");
                 writer.write("<td>");
-                writer.print(Escape.htmlElementContext(mBeanServer.getAttribute
-                                    (pName, "remoteAddr")));
+                writer.print(Escape.htmlElementContext(mBeanServer.getAttribute(pName, "remoteAddr")));
                 writer.write("</td>");
                 writer.write("<td nowrap>");
-                writer.write(Escape.htmlElementContext(mBeanServer.getAttribute
-                                    (pName, "virtualHost")));
+                writer.write(Escape.htmlElementContext(mBeanServer.getAttribute(pName, "virtualHost")));
                 writer.write("</td>");
                 writer.write("<td nowrap class=\"row-left\">");
                 if (showRequest) {
-                    writer.write(Escape.htmlElementContext(mBeanServer.getAttribute
-                                        (pName, "method")));
+                    writer.write(Escape.htmlElementContext(mBeanServer.getAttribute(pName, "method")));
                     writer.write(' ');
-                    writer.write(Escape.htmlElementContext(mBeanServer.getAttribute
-                                        (pName, "currentUri")));
-                    String queryString = (String) mBeanServer.getAttribute
-                        (pName, "currentQueryString");
-                    if ((queryString != null) && (!queryString.equals(""))) {
+                    writer.write(Escape.htmlElementContext(mBeanServer.getAttribute(pName, "currentUri")));
+                    String queryString = (String) mBeanServer.getAttribute(pName, "currentQueryString");
+                    if (queryString != null && !queryString.equals("")) {
                         writer.write("?");
                         writer.print(Escape.htmlElementContent(queryString));
                     }
                     writer.write(' ');
-                    writer.write(Escape.htmlElementContext(mBeanServer.getAttribute
-                                        (pName, "protocol")));
+                    writer.write(Escape.htmlElementContext(mBeanServer.getAttribute(pName, "protocol")));
                 } else {
                     writer.write("?");
                 }
@@ -566,56 +534,46 @@ public class StatusTransformer {
             } else {
                 writer.write("<td>?</td><td>?</td><td>?</td><td>?</td><td>?</td><td>?</td>");
             }
-        } else if (mode == 1){
+        } else if (mode == 1) {
             writer.write("<worker ");
             writer.write(" stage=\"" + stageStr + "\"");
 
             if (fullStatus) {
-                writer.write(" requestProcessingTime=\""
-                             + mBeanServer.getAttribute
-                             (pName, "requestProcessingTime") + "\"");
+                writer.write(
+                        " requestProcessingTime=\"" + mBeanServer.getAttribute(pName, "requestProcessingTime") + "\"");
                 writer.write(" requestBytesSent=\"");
                 if (showRequest) {
-                    writer.write("" + mBeanServer.getAttribute
-                                 (pName, "requestBytesSent"));
+                    writer.write("" + mBeanServer.getAttribute(pName, "requestBytesSent"));
                 } else {
                     writer.write("0");
                 }
                 writer.write("\"");
                 writer.write(" requestBytesReceived=\"");
                 if (showRequest) {
-                    writer.write("" + mBeanServer.getAttribute
-                                 (pName, "requestBytesReceived"));
+                    writer.write("" + mBeanServer.getAttribute(pName, "requestBytesReceived"));
                 } else {
                     writer.write("0");
                 }
                 writer.write("\"");
-                writer.write(" remoteAddr=\""
-                             + Escape.htmlElementContext(mBeanServer.getAttribute
-                                      (pName, "remoteAddr")) + "\"");
-                writer.write(" virtualHost=\""
-                             + Escape.htmlElementContext(mBeanServer.getAttribute
-                                      (pName, "virtualHost")) + "\"");
+                writer.write(" remoteAddr=\"" +
+                        Escape.htmlElementContext(mBeanServer.getAttribute(pName, "remoteAddr")) + "\"");
+                writer.write(" virtualHost=\"" +
+                        Escape.htmlElementContext(mBeanServer.getAttribute(pName, "virtualHost")) + "\"");
 
                 if (showRequest) {
-                    writer.write(" method=\""
-                                 + Escape.htmlElementContext(mBeanServer.getAttribute
-                                          (pName, "method")) + "\"");
-                    writer.write(" currentUri=\""
-                                 + Escape.htmlElementContext(mBeanServer.getAttribute
-                                          (pName, "currentUri")) + "\"");
+                    writer.write(
+                            " method=\"" + Escape.htmlElementContext(mBeanServer.getAttribute(pName, "method")) + "\"");
+                    writer.write(" currentUri=\"" +
+                            Escape.htmlElementContext(mBeanServer.getAttribute(pName, "currentUri")) + "\"");
 
-                    String queryString = (String) mBeanServer.getAttribute
-                        (pName, "currentQueryString");
-                    if ((queryString != null) && (!queryString.equals(""))) {
-                        writer.write(" currentQueryString=\""
-                                     + Escape.htmlElementContent(queryString) + "\"");
+                    String queryString = (String) mBeanServer.getAttribute(pName, "currentQueryString");
+                    if (queryString != null && !queryString.equals("")) {
+                        writer.write(" currentQueryString=\"" + Escape.htmlElementContent(queryString) + "\"");
                     } else {
                         writer.write(" currentQueryString=\"&#63;\"");
                     }
-                    writer.write(" protocol=\""
-                                 + Escape.htmlElementContext(mBeanServer.getAttribute
-                                          (pName, "protocol")) + "\"");
+                    writer.write(" protocol=\"" +
+                            Escape.htmlElementContext(mBeanServer.getAttribute(pName, "protocol")) + "\"");
                 } else {
                     writer.write(" method=\"&#63;\"");
                     writer.write(" currentUri=\"&#63;\"");
@@ -641,17 +599,16 @@ public class StatusTransformer {
 
     /**
      * Write applications state.
-     * @param writer The output writer
+     *
+     * @param writer      The output writer
      * @param mBeanServer MBean server
-     * @param mode Mode <code>0</code> will generate HTML.
-     *   Mode <code>1</code> will generate XML.
+     * @param mode        Mode <code>0</code> will generate HTML. Mode <code>1</code> will generate XML.
+     *
      * @throws Exception Propagated JMX error
      */
-    public static void writeDetailedState(PrintWriter writer,
-                                          MBeanServer mBeanServer, int mode)
-        throws Exception {
+    public static void writeDetailedState(PrintWriter writer, MBeanServer mBeanServer, int mode) throws Exception {
 
-        if (mode == 0){
+        if (mode == 0) {
             ObjectName queryHosts = new ObjectName("*:j2eeType=WebModule,*");
             Set<ObjectName> hostsON = mBeanServer.queryNames(queryHosts, null);
 
@@ -675,7 +632,7 @@ public class StatusTransformer {
                     continue;
                 }
 
-                writer.print("<a href=\"#" + (count++) + ".0\">");
+                writer.print("<a href=\"#" + count++ + ".0\">");
                 writer.print(Escape.htmlElementContext(webModuleName));
                 writer.print("</a>");
                 if (iterator.hasNext()) {
@@ -690,12 +647,11 @@ public class StatusTransformer {
             iterator = hostsON.iterator();
             while (iterator.hasNext()) {
                 ObjectName contextON = iterator.next();
-                writer.print("<a class=\"A.name\" name=\""
-                             + (count++) + ".0\">");
+                writer.print("<a class=\"A.name\" name=\"" + count++ + ".0\">");
                 writeContext(writer, contextON, mBeanServer, mode);
             }
 
-        } else if (mode == 1){
+        } else if (mode == 1) {
             // for now we don't write out the Detailed state in XML
         }
 
@@ -704,19 +660,18 @@ public class StatusTransformer {
 
     /**
      * Write context state.
-     * @param writer The output writer
-     * @param objectName The context MBean name
+     *
+     * @param writer      The output writer
+     * @param objectName  The context MBean name
      * @param mBeanServer MBean server
-     * @param mode Mode <code>0</code> will generate HTML.
-     *   Mode <code>1</code> will generate XML.
+     * @param mode        Mode <code>0</code> will generate HTML. Mode <code>1</code> will generate XML.
+     *
      * @throws Exception Propagated JMX error
      */
-    protected static void writeContext(PrintWriter writer,
-                                       ObjectName objectName,
-                                       MBeanServer mBeanServer, int mode)
-        throws Exception {
+    protected static void writeContext(PrintWriter writer, ObjectName objectName, MBeanServer mBeanServer, int mode)
+            throws Exception {
 
-        if (mode == 0){
+        if (mode == 0) {
             String webModuleName = objectName.getKeyProperty("name");
             String name = webModuleName;
             if (name == null) {
@@ -736,21 +691,17 @@ public class StatusTransformer {
                 return;
             }
 
-            ObjectName queryManager = new ObjectName
-                (objectName.getDomain() + ":type=Manager,context=" + contextName
-                 + ",host=" + hostName + ",*");
-            Set<ObjectName> managersON =
-                mBeanServer.queryNames(queryManager, null);
+            ObjectName queryManager = new ObjectName(
+                    objectName.getDomain() + ":type=Manager,context=" + contextName + ",host=" + hostName + ",*");
+            Set<ObjectName> managersON = mBeanServer.queryNames(queryManager, null);
             ObjectName managerON = null;
             for (ObjectName aManagersON : managersON) {
                 managerON = aManagersON;
             }
 
-            ObjectName queryJspMonitor = new ObjectName
-                (objectName.getDomain() + ":type=JspMonitor,WebModule=" +
-                 webModuleName + ",*");
-            Set<ObjectName> jspMonitorONs =
-                mBeanServer.queryNames(queryJspMonitor, null);
+            ObjectName queryJspMonitor =
+                    new ObjectName(objectName.getDomain() + ":type=JspMonitor,WebModule=" + webModuleName + ",*");
+            Set<ObjectName> jspMonitorONs = mBeanServer.queryNames(queryJspMonitor, null);
 
             // Special case for the root context
             if (contextName.equals("/")) {
@@ -763,16 +714,12 @@ public class StatusTransformer {
             writer.print("</a>");
 
             writer.print("<p>");
-            Object startTime = mBeanServer.getAttribute(objectName,
-                                                        "startTime");
-            writer.print(" Start time: " +
-                         new Date(((Long) startTime).longValue()));
+            Object startTime = mBeanServer.getAttribute(objectName, "startTime");
+            writer.print(" Start time: " + new Date(((Long) startTime).longValue()));
             writer.print(" Startup time: ");
-            writer.print(formatTime(mBeanServer.getAttribute
-                                    (objectName, "startupTime"), false));
+            writer.print(formatTime(mBeanServer.getAttribute(objectName, "startupTime"), false));
             writer.print(" TLD scan time: ");
-            writer.print(formatTime(mBeanServer.getAttribute
-                                    (objectName, "tldScanTime"), false));
+            writer.print(formatTime(mBeanServer.getAttribute(objectName, "tldScanTime"), false));
             if (managerON != null) {
                 writeManager(writer, managerON, mBeanServer, mode);
             }
@@ -781,16 +728,14 @@ public class StatusTransformer {
             }
             writer.print("</p>");
 
-            String onStr = objectName.getDomain()
-                + ":j2eeType=Servlet,WebModule=" + webModuleName + ",*";
+            String onStr = objectName.getDomain() + ":j2eeType=Servlet,WebModule=" + webModuleName + ",*";
             ObjectName servletObjectName = new ObjectName(onStr);
-            Set<ObjectInstance> set =
-                mBeanServer.queryMBeans(servletObjectName, null);
+            Set<ObjectInstance> set = mBeanServer.queryMBeans(servletObjectName, null);
             for (ObjectInstance oi : set) {
                 writeWrapper(writer, oi.getObjectName(), mBeanServer, mode);
             }
 
-        } else if (mode == 1){
+        } else if (mode == 1) {
             // for now we don't write out the context in XML
         }
 
@@ -799,44 +744,35 @@ public class StatusTransformer {
 
     /**
      * Write detailed information about a manager.
-     * @param writer The output writer
-     * @param objectName The manager MBean name
+     *
+     * @param writer      The output writer
+     * @param objectName  The manager MBean name
      * @param mBeanServer MBean server
-     * @param mode Mode <code>0</code> will generate HTML.
-     *   Mode <code>1</code> will generate XML.
+     * @param mode        Mode <code>0</code> will generate HTML. Mode <code>1</code> will generate XML.
+     *
      * @throws Exception Propagated JMX error
      */
-    public static void writeManager(PrintWriter writer, ObjectName objectName,
-                                    MBeanServer mBeanServer, int mode)
-        throws Exception {
+    public static void writeManager(PrintWriter writer, ObjectName objectName, MBeanServer mBeanServer, int mode)
+            throws Exception {
 
         if (mode == 0) {
             writer.print("<br>");
             writer.print(" Active sessions: ");
-            writer.print(mBeanServer.getAttribute
-                         (objectName, "activeSessions"));
+            writer.print(mBeanServer.getAttribute(objectName, "activeSessions"));
             writer.print(" Session count: ");
-            writer.print(mBeanServer.getAttribute
-                         (objectName, "sessionCounter"));
+            writer.print(mBeanServer.getAttribute(objectName, "sessionCounter"));
             writer.print(" Max active sessions: ");
             writer.print(mBeanServer.getAttribute(objectName, "maxActive"));
             writer.print(" Rejected session creations: ");
-            writer.print(mBeanServer.getAttribute
-                         (objectName, "rejectedSessions"));
+            writer.print(mBeanServer.getAttribute(objectName, "rejectedSessions"));
             writer.print(" Expired sessions: ");
-            writer.print(mBeanServer.getAttribute
-                         (objectName, "expiredSessions"));
+            writer.print(mBeanServer.getAttribute(objectName, "expiredSessions"));
             writer.print(" Longest session alive time: ");
-            writer.print(formatSeconds(mBeanServer.getAttribute(
-                                                    objectName,
-                                                    "sessionMaxAliveTime")));
+            writer.print(formatSeconds(mBeanServer.getAttribute(objectName, "sessionMaxAliveTime")));
             writer.print(" Average session alive time: ");
-            writer.print(formatSeconds(mBeanServer.getAttribute(
-                                                    objectName,
-                                                    "sessionAverageAliveTime")));
+            writer.print(formatSeconds(mBeanServer.getAttribute(objectName, "sessionAverageAliveTime")));
             writer.print(" Processing time: ");
-            writer.print(formatTime(mBeanServer.getAttribute
-                                    (objectName, "processingTime"), false));
+            writer.print(formatTime(mBeanServer.getAttribute(objectName, "processingTime"), false));
         } else if (mode == 1) {
             // for now we don't write out the wrapper details
         }
@@ -846,18 +782,16 @@ public class StatusTransformer {
 
     /**
      * Write JSP monitoring information.
-     * @param writer The output writer
+     *
+     * @param writer        The output writer
      * @param jspMonitorONs The JSP MBean names
-     * @param mBeanServer MBean server
-     * @param mode Mode <code>0</code> will generate HTML.
-     *   Mode <code>1</code> will generate XML.
+     * @param mBeanServer   MBean server
+     * @param mode          Mode <code>0</code> will generate HTML. Mode <code>1</code> will generate XML.
+     *
      * @throws Exception Propagated JMX error
      */
-    public static void writeJspMonitor(PrintWriter writer,
-                                       Set<ObjectName> jspMonitorONs,
-                                       MBeanServer mBeanServer,
-                                       int mode)
-            throws Exception {
+    public static void writeJspMonitor(PrintWriter writer, Set<ObjectName> jspMonitorONs, MBeanServer mBeanServer,
+            int mode) throws Exception {
 
         int jspCount = 0;
         int jspReloadCount = 0;
@@ -883,26 +817,25 @@ public class StatusTransformer {
 
     /**
      * Write detailed information about a wrapper.
-     * @param writer The output writer
-     * @param objectName The wrapper MBean names
+     *
+     * @param writer      The output writer
+     * @param objectName  The wrapper MBean names
      * @param mBeanServer MBean server
-     * @param mode Mode <code>0</code> will generate HTML.
-     *   Mode <code>1</code> will generate XML.
+     * @param mode        Mode <code>0</code> will generate HTML. Mode <code>1</code> will generate XML.
+     *
      * @throws Exception Propagated JMX error
      */
-    public static void writeWrapper(PrintWriter writer, ObjectName objectName,
-                                    MBeanServer mBeanServer, int mode)
-        throws Exception {
+    public static void writeWrapper(PrintWriter writer, ObjectName objectName, MBeanServer mBeanServer, int mode)
+            throws Exception {
 
         if (mode == 0) {
             String servletName = objectName.getKeyProperty("name");
 
-            String[] mappings = (String[])
-                mBeanServer.invoke(objectName, "findMappings", null, null);
+            String[] mappings = (String[]) mBeanServer.invoke(objectName, "findMappings", null, null);
 
             writer.print("<h2>");
             writer.print(Escape.htmlElementContext(servletName));
-            if ((mappings != null) && (mappings.length > 0)) {
+            if (mappings != null && mappings.length > 0) {
                 writer.print(" [ ");
                 for (int i = 0; i < mappings.length; i++) {
                     writer.print(Escape.htmlElementContext(mappings[i]));
@@ -916,23 +849,19 @@ public class StatusTransformer {
 
             writer.print("<p>");
             writer.print(" Processing time: ");
-            writer.print(formatTime(mBeanServer.getAttribute
-                                    (objectName, "processingTime"), true));
+            writer.print(formatTime(mBeanServer.getAttribute(objectName, "processingTime"), true));
             writer.print(" Max time: ");
-            writer.print(formatTime(mBeanServer.getAttribute
-                                    (objectName, "maxTime"), false));
+            writer.print(formatTime(mBeanServer.getAttribute(objectName, "maxTime"), false));
             writer.print(" Request count: ");
             writer.print(mBeanServer.getAttribute(objectName, "requestCount"));
             writer.print(" Error count: ");
             writer.print(mBeanServer.getAttribute(objectName, "errorCount"));
             writer.print(" Load time: ");
-            writer.print(formatTime(mBeanServer.getAttribute
-                                    (objectName, "loadTime"), false));
+            writer.print(formatTime(mBeanServer.getAttribute(objectName, "loadTime"), false));
             writer.print(" Classloading time: ");
-            writer.print(formatTime(mBeanServer.getAttribute
-                                    (objectName, "classLoadTime"), false));
+            writer.print(formatTime(mBeanServer.getAttribute(objectName, "classLoadTime"), false));
             writer.print("</p>");
-        } else if (mode == 1){
+        } else if (mode == 1) {
             // for now we don't write out the wrapper details
         }
 
@@ -940,11 +869,11 @@ public class StatusTransformer {
 
 
     /**
-     * Filter the specified message string for characters that are sensitive
-     * in HTML.  This avoids potential attacks caused by including JavaScript
-     * codes in the request URL that is often reported in error messages.
+     * Filter the specified message string for characters that are sensitive in HTML. This avoids potential attacks
+     * caused by including JavaScript codes in the request URL that is often reported in error messages.
      *
      * @param obj The message string to be filtered
+     *
      * @return filtered HTML content
      *
      * @deprecated This method will be removed in Tomcat 9
@@ -953,7 +882,7 @@ public class StatusTransformer {
     public static String filter(Object obj) {
 
         if (obj == null) {
-            return ("?");
+            return "?";
         }
         String message = obj.toString();
 
@@ -962,20 +891,20 @@ public class StatusTransformer {
         StringBuilder result = new StringBuilder(content.length + 50);
         for (int i = 0; i < content.length; i++) {
             switch (content[i]) {
-            case '<':
-                result.append("&lt;");
-                break;
-            case '>':
-                result.append("&gt;");
-                break;
-            case '&':
-                result.append("&amp;");
-                break;
-            case '"':
-                result.append("&quot;");
-                break;
-            default:
-                result.append(content[i]);
+                case '<':
+                    result.append("&lt;");
+                    break;
+                case '>':
+                    result.append("&gt;");
+                    break;
+                case '&':
+                    result.append("&amp;");
+                    break;
+                case '"':
+                    result.append("&quot;");
+                    break;
+                default:
+                    result.append(content[i]);
             }
         }
         return result.toString();
@@ -985,7 +914,9 @@ public class StatusTransformer {
 
     /**
      * Escape the 5 entities defined by XML.
+     *
      * @param s The message string to be filtered
+     *
      * @return filtered XML content
      *
      * @deprecated This method will be removed in Tomcat 9
@@ -1020,7 +951,8 @@ public class StatusTransformer {
      * Display the given size in bytes, either as KiB or MiB.
      *
      * @param obj The object to format
-     * @param mb true to display MiB, false for KiB
+     * @param mb  true to display MiB, false for KiB
+     *
      * @return formatted size
      */
     public static String formatSize(Object obj, boolean mb) {
@@ -1040,8 +972,7 @@ public class StatusTransformer {
                 bytes = -bytes;
             }
             long mbytes = bytes / (1024 * 1024);
-            long rest =
-                ((bytes - (mbytes * (1024 * 1024))) * 100) / (1024 * 1024);
+            long rest = (bytes - mbytes * (1024 * 1024)) * 100 / (1024 * 1024);
             buff.append(mbytes).append('.');
             if (rest < 10) {
                 buff.append('0');
@@ -1049,7 +980,7 @@ public class StatusTransformer {
             buff.append(rest).append(" MiB");
             return buff.toString();
         } else {
-            return ((bytes / 1024) + " KiB");
+            return bytes / 1024 + " KiB";
         }
 
     }
@@ -1058,8 +989,9 @@ public class StatusTransformer {
     /**
      * Display the given time in ms, either as ms or s.
      *
-     * @param obj The object to format
+     * @param obj     The object to format
      * @param seconds true to display seconds, false for milliseconds
+     *
      * @return formatted time
      */
     public static String formatTime(Object obj, boolean seconds) {
@@ -1073,9 +1005,9 @@ public class StatusTransformer {
         }
 
         if (seconds) {
-            return ((((float) time ) / 1000) + " s");
+            return (float) time / 1000 + " s";
         } else {
-            return (time + " ms");
+            return time + " ms";
         }
     }
 
@@ -1084,6 +1016,7 @@ public class StatusTransformer {
      * Formats the given time (given in seconds) as a string.
      *
      * @param obj Time object to be formatted as string
+     *
      * @return formatted time
      */
     public static String formatSeconds(Object obj) {
@@ -1096,7 +1029,7 @@ public class StatusTransformer {
             time = ((Integer) obj).intValue();
         }
 
-        return (time + " s");
+        return time + " s";
     }
 
 }
