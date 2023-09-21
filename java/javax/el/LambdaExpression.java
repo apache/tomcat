@@ -81,7 +81,7 @@ public class LambdaExpression {
         }
     }
 
-    public java.lang.Object invoke(Object... args) {
+    public Object invoke(Object... args) {
         return invoke(context, args);
     }
 }

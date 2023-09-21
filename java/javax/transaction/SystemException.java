@@ -16,7 +16,7 @@
  */
 package javax.transaction;
 
-public class SystemException extends java.lang.Exception {
+public class SystemException extends Exception {
 
     private static final long serialVersionUID = 8615483418828223571L;
 

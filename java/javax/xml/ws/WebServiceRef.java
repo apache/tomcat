@@ -28,10 +28,10 @@ public @interface WebServiceRef {
     String name() default "";
 
     @SuppressWarnings("rawtypes") // Can't use Class<?> because API needs to match specification
-    Class type() default java.lang.Object.class;
+    Class type() default Object.class;
 
     @SuppressWarnings("rawtypes") // Can't use Class<?> because API needs to match specification
-    Class value() default java.lang.Object.class;
+    Class value() default Object.class;
 
     String wsdlLocation() default "";
 
