@@ -899,11 +899,12 @@ public class AjpProcessor extends AbstractProcessor {
                     break;
 
                 case Constants.SC_A_AUTH_TYPE:
-                    if (tomcatAuthentication) {
-                        // ignore server
-                        requestHeaderMessage.getBytes(tmpMB);
-                    } else {
+                    if (tomcatAuthorization || !tomcatAuthentication) {
+                        // Implies tomcatAuthentication == false
                         requestHeaderMessage.getBytes(request.getAuthType());
+                    } else {
+                        // Ignore user information from reverse proxy
+                        requestHeaderMessage.getBytes(tmpMB);
                     }
                     break;
 
