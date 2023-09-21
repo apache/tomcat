@@ -331,7 +331,7 @@ public abstract class ServletOutputStream extends OutputStream {
      *
      * @since Servlet 3.1
      */
-    public abstract void setWriteListener(jakarta.servlet.WriteListener listener);
+    public abstract void setWriteListener(WriteListener listener);
 
     /**
      * {@inheritDoc}

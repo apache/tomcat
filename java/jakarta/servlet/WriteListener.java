@@ -39,5 +39,5 @@ public interface WriteListener extends java.util.EventListener {
      *
      * @param throwable The throwable that represents the error that occurred
      */
-    void onError(java.lang.Throwable throwable);
+    void onError(Throwable throwable);
 }

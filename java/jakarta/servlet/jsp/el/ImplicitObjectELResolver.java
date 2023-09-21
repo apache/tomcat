@@ -596,7 +596,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         private static final Map<String,Scope> lookupMap = new HashMap<>();
 
         static {
-            for (Scope scope : Scope.values()) {
+            for (Scope scope : values()) {
                 lookupMap.put(scope.implicitName, scope);
             }
         }

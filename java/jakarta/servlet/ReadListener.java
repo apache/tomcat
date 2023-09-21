@@ -46,5 +46,5 @@ public interface ReadListener extends java.util.EventListener {
      *
      * @param throwable The exception that occurred
      */
-    void onError(java.lang.Throwable throwable);
+    void onError(Throwable throwable);
 }

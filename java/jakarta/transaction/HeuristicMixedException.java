@@ -16,7 +16,7 @@
  */
 package jakarta.transaction;
 
-public class HeuristicMixedException extends java.lang.Exception {
+public class HeuristicMixedException extends Exception {
 
     private static final long serialVersionUID = 2345014349685956666L;
 

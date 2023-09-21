@@ -211,7 +211,7 @@ public abstract class TagLibraryInfo {
      *
      * @since JSP 2.1
      */
-    public abstract jakarta.servlet.jsp.tagext.TagLibraryInfo[] getTagLibraryInfos();
+    public abstract TagLibraryInfo[] getTagLibraryInfos();
 
     // Protected fields
 
