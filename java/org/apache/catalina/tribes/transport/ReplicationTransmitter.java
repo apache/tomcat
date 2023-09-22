@@ -72,7 +72,7 @@ public class ReplicationTransmitter implements ChannelSender {
      * @see org.apache.catalina.tribes.ChannelSender#start()
      */
     @Override
-    public void start() throws java.io.IOException {
+    public synchronized void start() throws java.io.IOException {
         getTransport().connect();
         // register jmx
         JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
