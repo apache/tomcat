@@ -27,7 +27,6 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.catalina.tribes.ByteMessage;
-import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelInterceptor;
 import org.apache.catalina.tribes.ChannelListener;
@@ -372,9 +371,8 @@ public class GroupChannel extends ChannelInterceptorBase
             if ( msg instanceof RpcMessage.NoRpcChannelReply) {
                 return;
             }
-            RpcMessage.NoRpcChannelReply reply =
-                    new RpcMessage.NoRpcChannelReply(msg.rpcId, msg.uuid);
-            send(new Member[]{destination},reply,Channel.SEND_OPTIONS_ASYNCHRONOUS);
+            RpcMessage.NoRpcChannelReply reply = new RpcMessage.NoRpcChannelReply(msg.rpcId, msg.uuid);
+            send(new Member[]{destination}, reply, SEND_OPTIONS_ASYNCHRONOUS);
         } catch ( Exception x ) {
             log.error(sm.getString("groupChannel.sendFail.noRpcChannelReply"),x);
         }

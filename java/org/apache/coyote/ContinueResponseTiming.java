@@ -56,7 +56,7 @@ public enum ContinueResponseTiming {
         if (IMMEDIATELY.toString().equalsIgnoreCase(value)) {
             return IMMEDIATELY;
         } else if (ON_REQUEST_BODY_READ.toString().equalsIgnoreCase(value)) {
-            return ContinueResponseTiming.ON_REQUEST_BODY_READ;
+            return ON_REQUEST_BODY_READ;
         } else {
             throw new IllegalArgumentException(sm.getString("continueResponseTiming.invalid", value));
         }

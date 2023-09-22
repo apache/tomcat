@@ -316,7 +316,7 @@ public class Response implements HttpServletResponse {
     /**
      * @return the Request with which this Response is associated.
      */
-    public org.apache.catalina.connector.Request getRequest() {
+    public Request getRequest() {
         return this.request;
     }
 
@@ -325,7 +325,7 @@ public class Response implements HttpServletResponse {
      *
      * @param request The new associated request
      */
-    public void setRequest(org.apache.catalina.connector.Request request) {
+    public void setRequest(Request request) {
         this.request = request;
     }
 

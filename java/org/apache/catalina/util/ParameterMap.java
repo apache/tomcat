@@ -246,7 +246,7 @@ public final class ParameterMap<K,V> implements Map<K,V>, Serializable {
      * contained in this map if it is locked.
      */
     @Override
-    public Set<java.util.Map.Entry<K, V>> entrySet() {
+    public Set<Map.Entry<K, V>> entrySet() {
         if (locked) {
             return unmodifiableDelegatedMap.entrySet();
         }

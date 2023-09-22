@@ -255,7 +255,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         try {
             doTestRewrite("RewriteRule /b/(.*).html$ /c%_{SERVLET_PATH}", "/b/x.html", "/c");
             Assert.fail("IAE expected.");
-        } catch (java.lang.IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             // expected as %_{ is invalid
         }
     }
@@ -265,7 +265,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         try {
             doTestRewrite("RewriteRule /b/(.*).html$ /c$_{SERVLET_PATH}", "/b/x.html", "/c");
             Assert.fail("IAE expected.");
-        } catch (java.lang.IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             // expected as $_{ is invalid
         }
     }

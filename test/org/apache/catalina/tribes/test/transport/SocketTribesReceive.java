@@ -57,7 +57,7 @@ public class SocketTribesReceive {
                 public void run() {
                     while ( true ) {
                         try {
-                            Thread.sleep(1000);
+                            sleep(1000);
                             printStats(start, mb, count, df, total);
                         }catch ( Exception x ) { /* Ignore */ }
                     }

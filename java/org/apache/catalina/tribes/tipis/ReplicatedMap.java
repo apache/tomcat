@@ -87,7 +87,8 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
      * @param cls Class loaders
      */
     public ReplicatedMap(MapOwner owner, Channel channel, long timeout, String mapContextName, int initialCapacity, ClassLoader[] cls) {
-        super(owner,channel, timeout, mapContextName, initialCapacity, AbstractReplicatedMap.DEFAULT_LOAD_FACTOR,Channel.SEND_OPTIONS_DEFAULT, cls, true);
+        super(owner,channel, timeout, mapContextName, initialCapacity, DEFAULT_LOAD_FACTOR,
+                Channel.SEND_OPTIONS_DEFAULT, cls, true);
     }
 
     /**
@@ -99,7 +100,8 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
      * @param cls Class loaders
      */
     public ReplicatedMap(MapOwner owner, Channel channel, long timeout, String mapContextName, ClassLoader[] cls) {
-        super(owner, channel, timeout, mapContextName,AbstractReplicatedMap.DEFAULT_INITIAL_CAPACITY, AbstractReplicatedMap.DEFAULT_LOAD_FACTOR, Channel.SEND_OPTIONS_DEFAULT, cls, true);
+        super(owner, channel, timeout, mapContextName, DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR,
+                Channel.SEND_OPTIONS_DEFAULT, cls, true);
     }
 
     /**
@@ -112,8 +114,8 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
      * @param terminate boolean - Flag for whether to terminate this map that failed to start.
      */
     public ReplicatedMap(MapOwner owner, Channel channel, long timeout, String mapContextName, ClassLoader[] cls, boolean terminate) {
-        super(owner, channel, timeout, mapContextName,AbstractReplicatedMap.DEFAULT_INITIAL_CAPACITY,
-                AbstractReplicatedMap.DEFAULT_LOAD_FACTOR, Channel.SEND_OPTIONS_DEFAULT, cls, terminate);
+        super(owner, channel, timeout, mapContextName, DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR,
+                Channel.SEND_OPTIONS_DEFAULT, cls, terminate);
     }
 
 //------------------------------------------------------------------------------

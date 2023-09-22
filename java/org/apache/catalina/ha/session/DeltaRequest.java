@@ -171,7 +171,7 @@ public class DeltaRequest implements Externalizable {
 
     public void execute(DeltaSession session, boolean notifyListeners) {
         if (!this.sessionId.equals(session.getId())) {
-            throw new java.lang.IllegalArgumentException(sm.getString("deltaRequest.ssid.mismatch"));
+            throw new IllegalArgumentException(sm.getString("deltaRequest.ssid.mismatch"));
         }
         session.access();
         for (AttributeInfo info : actions) {
@@ -308,7 +308,7 @@ public class DeltaRequest implements Externalizable {
 
 
     @Override
-    public void writeExternal(java.io.ObjectOutput out) throws java.io.IOException {
+    public void writeExternal(java.io.ObjectOutput out) throws IOException {
         // sessionId - String
         // recordAll - boolean
         // size - int
@@ -339,7 +339,7 @@ public class DeltaRequest implements Externalizable {
         return bos.toByteArray();
     }
 
-    private static class AttributeInfo implements java.io.Externalizable {
+    private static class AttributeInfo implements Externalizable {
         private String name = null;
         private Object value = null;
         private int action;

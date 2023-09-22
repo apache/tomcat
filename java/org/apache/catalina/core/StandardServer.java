@@ -492,7 +492,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         if (random == null) {
                             random = new Random();
                         }
-                        expected += (random.nextInt() % 1024);
+                        expected += random.nextInt() % 1024;
                     }
                     while (expected > 0) {
                         int ch = -1;
@@ -748,7 +748,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         boolean useNaming = true;
         // Reading the "catalina.useNaming" environment variable
         String useNamingProperty = System.getProperty("catalina.useNaming");
-        if ((useNamingProperty != null) && (useNamingProperty.equals("false"))) {
+        if (useNamingProperty != null && useNamingProperty.equals("false")) {
             useNaming = false;
         }
         return useNaming;

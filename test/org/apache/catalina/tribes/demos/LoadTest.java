@@ -150,7 +150,7 @@ public class LoadTest implements MembershipListener, ChannelListener, Runnable {
                     counter = addSendStats(counter);
                     // print from the global counter
                     // printSendStats(LoadTest.messagesSent, LoadTest.messageSize, LoadTest.messageSendTime);
-                    printSendStats(LoadTest.messagesSent, LoadTest.messageSize);
+                    printSendStats(messagesSent, messageSize);
 
                 }
 
@@ -160,7 +160,7 @@ public class LoadTest implements MembershipListener, ChannelListener, Runnable {
             if (debug) {
                 log.error("", x);
             }
-            printSendStats(LoadTest.messagesSent, LoadTest.messageSize);
+            printSendStats(messagesSent, messageSize);
         }
         endTest();
     }
@@ -398,7 +398,7 @@ public class LoadTest implements MembershipListener, ChannelListener, Runnable {
         @Override
         public void run() {
             try {
-                Thread.sleep(delay);
+                sleep(delay);
             } catch (Exception x) {
                 x.printStackTrace();
             }

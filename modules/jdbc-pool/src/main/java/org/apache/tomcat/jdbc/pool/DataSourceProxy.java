@@ -461,8 +461,7 @@ public class DataSourceProxy implements PoolConfiguration {
     @Override
     public void setConnectionProperties(String properties) {
         try {
-            java.util.Properties prop = DataSourceFactory
-                    .getProperties(properties);
+            Properties prop = DataSourceFactory.getProperties(properties);
             Iterator<?> i = prop.keySet().iterator();
             while (i.hasNext()) {
                 String key = (String) i.next();

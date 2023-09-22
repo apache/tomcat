@@ -140,7 +140,7 @@ public class TestRateLimitFilter extends TomcatBaseTest {
                     results[i] = response.getStatus();
                     System.out.printf("%s %s: %s %d\n", ip, new Date(), Integer.valueOf(i + 1),
                             Integer.valueOf(response.getStatus()));
-                    Thread.sleep(sleep);
+                    sleep(sleep);
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();

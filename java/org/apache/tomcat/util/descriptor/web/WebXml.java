@@ -2190,7 +2190,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
             Set<String> requestedOrder = getAbsoluteOrdering();
 
             for (String requestedName : requestedOrder) {
-                if (WebXml.ORDER_OTHERS.equals(requestedName)) {
+                if (ORDER_OTHERS.equals(requestedName)) {
                     // Add all fragments not named explicitly at this point
                     for (Entry<String, WebXml> entry : fragments.entrySet()) {
                         if (!requestedOrder.contains(entry.getKey())) {

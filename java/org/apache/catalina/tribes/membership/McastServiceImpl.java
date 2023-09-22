@@ -603,7 +603,11 @@ public class McastServiceImpl {
                         log.debug("Error receiving mcast package"+(doRunReceiver?". Sleeping 500ms":"."),x);
                     }
                     if (doRunReceiver) {
-                        try { Thread.sleep(500); } catch ( Exception ignore ){}
+                        try {
+                            sleep(500);
+                        } catch (Exception ignore){
+                            // Ignore
+                        }
                         if ( (++errorCounter)>=recoveryCounter ) {
                             errorCounter=0;
                             RecoveryThread.recover(McastServiceImpl.this);
@@ -643,7 +647,11 @@ public class McastServiceImpl {
                         RecoveryThread.recover(McastServiceImpl.this);
                     }
                 }
-                try { Thread.sleep(time); } catch ( Exception ignore ) {}
+                try {
+                    sleep(time);
+                } catch (Exception ignore) {
+                    // Ignore
+                }
             }
         }
     }//class SenderThread
@@ -719,7 +727,7 @@ public class McastServiceImpl {
                                         Integer.toString(++attempt),
                                         Long.toString(parent.recoverySleepTime)));
                             }
-                            Thread.sleep(parent.recoverySleepTime);
+                            sleep(parent.recoverySleepTime);
                         }
                     }catch (InterruptedException ignore) {
                     }

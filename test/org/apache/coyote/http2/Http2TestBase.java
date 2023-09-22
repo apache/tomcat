@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Assume;
+import org.junit.runners.Parameterized.Parameters;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -64,7 +65,7 @@ import org.apache.tomcat.util.net.TesterSupport;
 @org.junit.runner.RunWith(org.junit.runners.Parameterized.class)
 public abstract class Http2TestBase extends TomcatBaseTest {
 
-    @org.junit.runners.Parameterized.Parameters
+    @Parameters
     public static Object[][] data() {
         return new Object[Integer.getInteger("tomcat.test.http2.loopCount", 1).intValue()][0];
     }

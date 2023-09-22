@@ -340,7 +340,7 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
     // ------------------------------------------- NotificationListener Methods
 
     @Override
-    public void handleNotification(Notification notification, java.lang.Object handback) {
+    public void handleNotification(Notification notification, Object handback) {
 
         if (notification instanceof MBeanServerNotification) {
             ObjectName objectName = ((MBeanServerNotification) notification).getMBeanName();

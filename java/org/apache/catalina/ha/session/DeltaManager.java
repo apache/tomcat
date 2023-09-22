@@ -31,7 +31,6 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
-import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.juli.logging.Log;
@@ -1095,13 +1094,13 @@ public class DeltaManager extends ClusterManagerBase {
         expiredSessions.set(0);
         synchronized (sessionCreationTiming) {
             sessionCreationTiming.clear();
-            while (sessionCreationTiming.size() < ManagerBase.TIMING_STATS_CACHE_SIZE) {
+            while (sessionCreationTiming.size() < TIMING_STATS_CACHE_SIZE) {
                 sessionCreationTiming.add(null);
             }
         }
         synchronized (sessionExpirationTiming) {
             sessionExpirationTiming.clear();
-            while (sessionExpirationTiming.size() < ManagerBase.TIMING_STATS_CACHE_SIZE) {
+            while (sessionExpirationTiming.size() < TIMING_STATS_CACHE_SIZE) {
                 sessionExpirationTiming.add(null);
             }
         }

@@ -850,7 +850,7 @@ public class PageContextImpl extends PageContext {
              * not been committed (the response will have been committed if the
              * error page is a JSP page).
              */
-            request.setAttribute(PageContext.EXCEPTION, t);
+            request.setAttribute(EXCEPTION, t);
             request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE,
                     Integer.valueOf(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
             request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI,
@@ -877,7 +877,7 @@ public class PageContextImpl extends PageContext {
             request.removeAttribute(RequestDispatcher.ERROR_STATUS_CODE);
             request.removeAttribute(RequestDispatcher.ERROR_REQUEST_URI);
             request.removeAttribute(RequestDispatcher.ERROR_SERVLET_NAME);
-            request.removeAttribute(PageContext.EXCEPTION);
+            request.removeAttribute(EXCEPTION);
 
         } else {
             // Otherwise throw the exception wrapped inside a ServletException.

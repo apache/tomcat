@@ -331,9 +331,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                     // remove key from selected set, it's been handled
                     it.remove();
                 }
-            } catch (java.nio.channels.ClosedSelectorException cse) {
+            } catch (ClosedSelectorException cse) {
                 // ignore is normal at shutdown or stop listen socket
-            } catch (java.nio.channels.CancelledKeyException nx) {
+            } catch (CancelledKeyException nx) {
                 log.warn(sm.getString("nioReceiver.clientDisconnect"));
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);

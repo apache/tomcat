@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,7 +99,7 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     }
 
     @Override
-    public java.security.cert.X509Certificate[] getPeerCertificateChain() throws IOException {
+    public X509Certificate[] getPeerCertificateChain() throws IOException {
         // Look up the current SSLSession
         if (session == null) {
             return null;
@@ -115,24 +116,19 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
             return null;
         }
 
-        java.security.cert.X509Certificate [] x509Certs =
-            new java.security.cert.X509Certificate[certs.length];
+        X509Certificate [] x509Certs = new X509Certificate[certs.length];
         for(int i=0; i < certs.length; i++) {
-            if (certs[i] instanceof java.security.cert.X509Certificate ) {
+            if (certs[i] instanceof X509Certificate ) {
                 // always currently true with the JSSE 1.1.x
-                x509Certs[i] = (java.security.cert.X509Certificate) certs[i];
+                x509Certs[i] = (X509Certificate) certs[i];
             } else {
                 try {
                     byte [] buffer = certs[i].getEncoded();
-                    CertificateFactory cf =
-                        CertificateFactory.getInstance("X.509");
-                    ByteArrayInputStream stream =
-                        new ByteArrayInputStream(buffer);
-                    x509Certs[i] = (java.security.cert.X509Certificate)
-                            cf.generateCertificate(stream);
+                    CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                    ByteArrayInputStream stream = new ByteArrayInputStream(buffer);
+                    x509Certs[i] = (X509Certificate) cf.generateCertificate(stream);
                 } catch(Exception ex) {
-                    log.info(sm.getString(
-                            "jsseSupport.certTranslationError", certs[i]), ex);
+                    log.info(sm.getString("jsseSupport.certTranslationError", certs[i]), ex);
                     return null;
                 }
             }
@@ -215,7 +211,7 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
         if (additionalAttributes == null) {
             return null;
         }
-        return StringUtils.join(additionalAttributes.get(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY));
+        return StringUtils.join(additionalAttributes.get(REQUESTED_PROTOCOL_VERSIONS_KEY));
     }
 
     @Override
@@ -223,7 +219,7 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
         if (additionalAttributes == null) {
             return null;
         }
-        return StringUtils.join(additionalAttributes.get(SSLSupport.REQUESTED_CIPHERS_KEY));
+        return StringUtils.join(additionalAttributes.get(REQUESTED_CIPHERS_KEY));
     }
 }
 

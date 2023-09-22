@@ -43,8 +43,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
     /*
      * (non-Javadoc)
      *
-     * @see javax.el.FunctionMapper#resolveFunction(java.lang.String,
-     *      java.lang.String)
+     * @see javax.el.FunctionMapper#resolveFunction(String, String)
      */
     @Override
     public Method resolveFunction(String prefix, String localName) {

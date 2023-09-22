@@ -971,8 +971,7 @@ public class NamingContext implements Context {
             return true;
         } else {
             if (exceptionOnFailedWrite) {
-                throw new javax.naming.OperationNotSupportedException(
-                        sm.getString("namingContext.readOnly"));
+                throw new OperationNotSupportedException(sm.getString("namingContext.readOnly"));
             }
         }
         return false;

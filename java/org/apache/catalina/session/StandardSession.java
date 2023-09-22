@@ -354,7 +354,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
     public void tellNew() {
 
         // Notify interested session event listeners
-        fireSessionEvent(Session.SESSION_CREATED_EVENT, null);
+        fireSessionEvent(SESSION_CREATED_EVENT, null);
 
         // Notify interested application event listeners
         Context context = manager.getContext();
@@ -792,7 +792,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
             // Notify interested session event listeners
             if (notify) {
-                fireSessionEvent(Session.SESSION_DESTROYED_EVENT, null);
+                fireSessionEvent(SESSION_DESTROYED_EVENT, null);
             }
 
             // Call the logout method
@@ -831,7 +831,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
     public void passivate() {
 
         // Notify interested session event listeners
-        fireSessionEvent(Session.SESSION_PASSIVATED_EVENT, null);
+        fireSessionEvent(SESSION_PASSIVATED_EVENT, null);
 
         // Notify ActivationListeners
         HttpSessionEvent event = null;
@@ -865,7 +865,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
         }
 
         // Notify interested session event listeners
-        fireSessionEvent(Session.SESSION_ACTIVATED_EVENT, null);
+        fireSessionEvent(SESSION_ACTIVATED_EVENT, null);
 
         // Notify ActivationListeners
         HttpSessionEvent event = null;

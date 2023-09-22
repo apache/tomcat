@@ -722,10 +722,10 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             if (clazz==null) {
                 if (getClassName().indexOf('.')<0) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Loading interceptor class:"+PoolConfiguration.PKG_PREFIX+getClassName());
+                        log.debug("Loading interceptor class:" +  PKG_PREFIX + getClassName());
                     }
                     clazz = ClassLoaderUtil.loadClass(
-                        PoolConfiguration.PKG_PREFIX+getClassName(),
+                        PKG_PREFIX + getClassName(),
                         PoolProperties.class.getClassLoader(),
                         Thread.currentThread().getContextClassLoader()
                     );

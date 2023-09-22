@@ -167,17 +167,17 @@ public class Util {
 
 
     static Class<?> getMessageType(MessageHandler listener) {
-        return Util.getGenericType(MessageHandler.class, listener.getClass()).getClazz();
+        return getGenericType(MessageHandler.class, listener.getClass()).getClazz();
     }
 
 
     private static Class<?> getDecoderType(Class<? extends Decoder> decoder) {
-        return Util.getGenericType(Decoder.class, decoder).getClazz();
+        return getGenericType(Decoder.class, decoder).getClazz();
     }
 
 
     static Class<?> getEncoderType(Class<? extends Encoder> encoder) {
-        return Util.getGenericType(Encoder.class, encoder).getClazz();
+        return getGenericType(Encoder.class, encoder).getClazz();
     }
 
 
@@ -368,7 +368,7 @@ public class Util {
                     throw new DeploymentException(
                             sm.getString("pojoMethodMapping.invalidDecoder", decoderClazz.getName()), e);
                 }
-                DecoderEntry entry = new DecoderEntry(Util.getDecoderType(decoderClazz), decoderClazz);
+                DecoderEntry entry = new DecoderEntry(getDecoderType(decoderClazz), decoderClazz);
                 result.add(entry);
             }
         }

@@ -354,7 +354,7 @@ public class NioReplicationTask extends AbstractRxTask {
                           ((SocketChannel)channel).socket().getInetAddress() :
                           ((DatagramChannel)channel).socket().getInetAddress()));
             }
-        } catch ( java.io.IOException x ) {
+        } catch (IOException x) {
             log.warn(sm.getString("nioReplicationTask.unable.ack", x.getMessage()));
         }
     }

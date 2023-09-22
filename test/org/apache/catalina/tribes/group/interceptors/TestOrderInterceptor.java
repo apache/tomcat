@@ -70,7 +70,7 @@ public class TestOrderInterceptor {
                 public void run() {
                     try {
                         channels[j].start(Channel.DEFAULT);
-                        Thread.sleep(50);
+                        sleep(50);
                     } catch (Exception x) {
                         x.printStackTrace();
                     }

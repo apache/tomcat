@@ -4801,7 +4801,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 }
 
                 // Notify our interested LifecycleListeners
-                fireLifecycleEvent(Lifecycle.CONFIGURE_START_EVENT, null);
+                fireLifecycleEvent(CONFIGURE_START_EVENT, null);
 
                 // Start our child containers, if not already started
                 for (Container child : findChildren()) {
@@ -5142,7 +5142,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 namingResources.stop();
             }
 
-            fireLifecycleEvent(Lifecycle.CONFIGURE_STOP_EVENT, null);
+            fireLifecycleEvent(CONFIGURE_STOP_EVENT, null);
 
             // Stop the Valves in our pipeline (including the basic), if any
             if (pipeline instanceof Lifecycle && ((Lifecycle) pipeline).getState().isAvailable()) {
@@ -6264,17 +6264,17 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         @Override
-        public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName, String className) {
+        public FilterRegistration.Dynamic addFilter(String filterName, String className) {
             throw new UnsupportedOperationException(sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
-        public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
+        public FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
             throw new UnsupportedOperationException(sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
-        public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName,
+        public FilterRegistration.Dynamic addFilter(String filterName,
                 Class<? extends Filter> filterClass) {
             throw new UnsupportedOperationException(sm.getString("noPluggabilityServletContext.notAllowed"));
         }

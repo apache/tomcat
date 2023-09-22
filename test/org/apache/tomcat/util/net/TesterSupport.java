@@ -198,14 +198,12 @@ public final class TesterSupport {
         ClientSSLSocketFactory clientSSLSocketFactory = null;
         try {
             SSLContext sc;
-            if (TesterSupport.TLSV13_AVAILABLE) {
+            if (TLSV13_AVAILABLE) {
                  sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
             } else {
                 sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_2);
             }
-            sc.init(TesterSupport.getUser1KeyManagers(),
-                    TesterSupport.getTrustManagers(),
-                    null);
+            sc.init(getUser1KeyManagers(), getTrustManagers(), null);
             clientSSLSocketFactory = new ClientSSLSocketFactory(sc.getSocketFactory());
             javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(clientSSLSocketFactory);
         } catch (Exception e) {
@@ -257,7 +255,7 @@ public final class TesterSupport {
     }
 
     public static void configureClientCertContext(Tomcat tomcat) {
-        TesterSupport.initSsl(tomcat);
+        initSsl(tomcat);
 
         /* When running on Java 11, TLSv1.3 is enabled by default. The JSSE
          * implementation of TLSv1.3 does not support

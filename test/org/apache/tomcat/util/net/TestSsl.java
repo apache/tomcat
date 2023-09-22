@@ -64,8 +64,7 @@ public class TestSsl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
-        org.apache.catalina.Context ctxt  = tomcat.addWebapp(
-                null, "/examples", appDir.getAbsolutePath());
+        Context ctxt  = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         ctxt.addApplicationListener(WsContextListener.class.getName());
 
         TesterSupport.initSsl(tomcat);
@@ -118,7 +117,7 @@ public class TestSsl extends TomcatBaseTest {
                         // Write in 128 KiB blocks
                         for (int i = 0; i < POST_DATA.length / (128 * 1024); i++) {
                             os.write(POST_DATA, 0, 1024 * 128);
-                            Thread.sleep(10);
+                            sleep(10);
                         }
                         os.flush();
 
@@ -170,8 +169,7 @@ public class TestSsl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
-        org.apache.catalina.Context ctxt  = tomcat.addWebapp(
-                null, "/examples", appDir.getAbsolutePath());
+        Context ctxt  = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         ctxt.addApplicationListener(WsContextListener.class.getName());
 
         TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS,

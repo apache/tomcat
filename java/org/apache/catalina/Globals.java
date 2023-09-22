@@ -121,7 +121,7 @@ public final class Globals {
     /**
      * The request attribute that can be used by a servlet to pass
      * to the connector the name of the file that is to be served
-     * by sendfile. The value should be {@code java.lang.String}
+     * by sendfile. The value should be {@code String}
      * that is {@code File.getCanonicalPath()} of the file to be served.
      *
      * Duplicated here for neater code in the catalina packages.
@@ -133,7 +133,7 @@ public final class Globals {
      * The request attribute that can be used by a servlet to pass
      * to the connector the start offset of the part of a file
      * that is to be served by sendfile. The value should be
-     * {@code java.lang.Long}. To serve complete file
+     * {@code Long}. To serve complete file
      * the value should be {@code Long.valueOf(0)}.
      *
      * Duplicated here for neater code in the catalina packages.
@@ -163,22 +163,21 @@ public final class Globals {
 
     /**
      * The request attribute under which we store the name of the cipher suite
-     * being used on an SSL connection (as an object of type
-     * java.lang.String).
+     * being used on an SSL connection (as an object of type {@link String}).
      */
     public static final String CIPHER_SUITE_ATTR = "javax.servlet.request.cipher_suite";
 
 
     /**
      * The request attribute under which we store the key size being used for
-     * this SSL connection (as an object of type java.lang.Integer).
+     * this SSL connection (as an object of type {@link Integer}).
      */
     public static final String KEY_SIZE_ATTR = "javax.servlet.request.key_size";
 
 
     /**
      * The request attribute under which we store the session id being used
-     * for this SSL connection (as an object of type java.lang.String).
+     * for this SSL connection (as an object of type {@link String}).
      */
     public static final String SSL_SESSION_ID_ATTR = "javax.servlet.request.ssl_session_id";
 
