@@ -168,6 +168,7 @@
       <fix>
         <bug>67472</bug>: Send fewer CORS-related headers when CORS is not
         actually being engaged. (schultz)
+      </fix>
     </changelog>
   </subsection>
 </section>
