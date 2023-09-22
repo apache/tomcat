@@ -14,6 +14,7 @@
 # limitations under the License.
 
 Bundle-Version: ${version_cleanup;${version}}
+Bundle-License: https://www.apache.org/licenses/LICENSE-2.0.txt
 
 Specification-Title: Apache Tomcat
 Specification-Version: ${version.major.minor}
