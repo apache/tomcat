@@ -90,7 +90,9 @@ public class RxTaskPool {
     }
 
     public int available() {
-        return idle.size();
+        synchronized (mutex) {
+            return idle.size();
+        }
     }
 
     /**
