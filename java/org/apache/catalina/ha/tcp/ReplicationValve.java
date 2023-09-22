@@ -148,7 +148,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
     /**
      * compile filter string to regular expression
      *
-     * @see Pattern#compile(java.lang.String)
+     * @see Pattern#compile(String)
      *
      * @param filter The filter to set.
      */

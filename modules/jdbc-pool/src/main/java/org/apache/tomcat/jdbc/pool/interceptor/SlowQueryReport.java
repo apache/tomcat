@@ -171,7 +171,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
     public void poolStarted(ConnectionPool pool) {
         super.poolStarted(pool);
         //see if we already created a map for this pool
-        queries = SlowQueryReport.perPoolStats.get(pool.getName());
+        queries = perPoolStats.get(pool.getName());
         if (queries==null) {
             //create the map to hold our stats
             //however TODO we need to improve the eviction
@@ -179,7 +179,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
             queries = new ConcurrentHashMap<>();
             if (perPoolStats.putIfAbsent(pool.getName(), queries)!=null) {
                 //there already was one
-                queries = SlowQueryReport.perPoolStats.get(pool.getName());
+                queries = perPoolStats.get(pool.getName());
             }
         }
     }
@@ -239,7 +239,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
     public void reset(ConnectionPool parent, PooledConnection con) {
         super.reset(parent, con);
         if (parent!=null) {
-          queries = SlowQueryReport.perPoolStats.get(parent.getName());
+          queries = perPoolStats.get(parent.getName());
         } else {
           queries = null;
         }

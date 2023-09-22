@@ -169,16 +169,16 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
         try {
             javaType.getConstructor(new Class[]{});
-        } catch (java.lang.NoSuchMethodException e) {
+        } catch (NoSuchMethodException e) {
             return false;
         }
 
         // Make sure superclass is compatible
         Class<?> superClass = javaType.getSuperclass();
         if (superClass != null &&
-            superClass != java.lang.Object.class &&
-            superClass != java.lang.Exception.class &&
-            superClass != java.lang.Throwable.class) {
+            superClass != Object.class &&
+            superClass != Exception.class &&
+            superClass != Throwable.class) {
             if (!isBeanCompatible(superClass)) {
                 return false;
             }

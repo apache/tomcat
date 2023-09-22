@@ -317,7 +317,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
 
         wrapResponse(state);
         // Handle an HTTP named dispatcher forward
-        if ((servletPath == null) && (pathInfo == null)) {
+        if (servletPath == null && pathInfo == null) {
 
             ApplicationHttpRequest wrequest = (ApplicationHttpRequest) wrapRequest(state);
             HttpServletRequest hrequest = state.hrequest;
@@ -335,13 +335,13 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
 
             ApplicationHttpRequest wrequest = (ApplicationHttpRequest) wrapRequest(state);
             HttpServletRequest hrequest = state.hrequest;
-            if (hrequest.getAttribute(RequestDispatcher.FORWARD_REQUEST_URI) == null) {
-                wrequest.setAttribute(RequestDispatcher.FORWARD_REQUEST_URI, hrequest.getRequestURI());
-                wrequest.setAttribute(RequestDispatcher.FORWARD_CONTEXT_PATH, hrequest.getContextPath());
-                wrequest.setAttribute(RequestDispatcher.FORWARD_SERVLET_PATH, hrequest.getServletPath());
-                wrequest.setAttribute(RequestDispatcher.FORWARD_PATH_INFO, hrequest.getPathInfo());
-                wrequest.setAttribute(RequestDispatcher.FORWARD_QUERY_STRING, hrequest.getQueryString());
-                wrequest.setAttribute(RequestDispatcher.FORWARD_MAPPING, hrequest.getHttpServletMapping());
+            if (hrequest.getAttribute(FORWARD_REQUEST_URI) == null) {
+                wrequest.setAttribute(FORWARD_REQUEST_URI, hrequest.getRequestURI());
+                wrequest.setAttribute(FORWARD_CONTEXT_PATH, hrequest.getContextPath());
+                wrequest.setAttribute(FORWARD_SERVLET_PATH, hrequest.getServletPath());
+                wrequest.setAttribute(FORWARD_PATH_INFO, hrequest.getPathInfo());
+                wrequest.setAttribute(FORWARD_QUERY_STRING, hrequest.getQueryString());
+                wrequest.setAttribute(FORWARD_MAPPING, hrequest.getHttpServletMapping());
             }
 
             wrequest.setContextPath(context.getEncodedPath());
@@ -513,23 +513,23 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
             ApplicationHttpRequest wrequest = (ApplicationHttpRequest) wrapRequest(state);
             String contextPath = context.getPath();
             if (requestURI != null) {
-                wrequest.setAttribute(RequestDispatcher.INCLUDE_REQUEST_URI, requestURI);
+                wrequest.setAttribute(INCLUDE_REQUEST_URI, requestURI);
             }
             if (contextPath != null) {
-                wrequest.setAttribute(RequestDispatcher.INCLUDE_CONTEXT_PATH, contextPath);
+                wrequest.setAttribute(INCLUDE_CONTEXT_PATH, contextPath);
             }
             if (servletPath != null) {
-                wrequest.setAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH, servletPath);
+                wrequest.setAttribute(INCLUDE_SERVLET_PATH, servletPath);
             }
             if (pathInfo != null) {
-                wrequest.setAttribute(RequestDispatcher.INCLUDE_PATH_INFO, pathInfo);
+                wrequest.setAttribute(INCLUDE_PATH_INFO, pathInfo);
             }
             if (queryString != null) {
-                wrequest.setAttribute(RequestDispatcher.INCLUDE_QUERY_STRING, queryString);
+                wrequest.setAttribute(INCLUDE_QUERY_STRING, queryString);
                 wrequest.setQueryParams(queryString);
             }
             if (mapping != null) {
-                wrequest.setAttribute(RequestDispatcher.INCLUDE_MAPPING, mapping);
+                wrequest.setAttribute(INCLUDE_MAPPING, mapping);
             }
 
             wrequest.setAttribute(Globals.DISPATCHER_TYPE_ATTR, DispatcherType.INCLUDE);
@@ -626,7 +626,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         if (wrapper.isUnavailable()) {
             wrapper.getLogger().warn(sm.getString("applicationDispatcher.isUnavailable", wrapper.getName()));
             long available = wrapper.getAvailable();
-            if ((available > 0L) && (available < Long.MAX_VALUE)) {
+            if (available > 0L && available < Long.MAX_VALUE) {
                 hresponse.setDateHeader("Retry-After", available);
             }
             hresponse.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
@@ -657,7 +657,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         // Call the service() method for the allocated servlet instance
         try {
             // for includes/forwards
-            if ((servlet != null) && (filterChain != null)) {
+            if (servlet != null && filterChain != null) {
                 filterChain.doFilter(request, response);
             }
             // Servlet Service Method is called by the FilterChain
@@ -745,7 +745,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         while (current != null) {
 
             // If we run into the container request we are done
-            if ((current instanceof Request) || (current instanceof RequestFacade)) {
+            if (current instanceof Request || current instanceof RequestFacade) {
                 break;
             }
 
@@ -788,7 +788,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         while (current != null) {
 
             // If we run into the container response we are done
-            if ((current instanceof Response) || (current instanceof ResponseFacade)) {
+            if (current instanceof Response || current instanceof ResponseFacade) {
                 break;
             }
 
@@ -821,7 +821,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         ServletRequest previous = null;
         ServletRequest current = state.outerRequest;
         while (current != null) {
-            if (state.hrequest == null && (current instanceof HttpServletRequest)) {
+            if (state.hrequest == null && current instanceof HttpServletRequest) {
                 state.hrequest = (HttpServletRequest) current;
             }
             if (!(current instanceof ServletRequestWrapper)) {
@@ -839,20 +839,20 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
 
         // Instantiate a new wrapper at this point and insert it in the chain
         ServletRequest wrapper = null;
-        if ((current instanceof ApplicationHttpRequest) || (current instanceof Request) ||
-                (current instanceof HttpServletRequest)) {
+        if (current instanceof ApplicationHttpRequest || current instanceof Request ||
+                current instanceof HttpServletRequest) {
             // Compute a crossContext flag
             HttpServletRequest hcurrent = (HttpServletRequest) current;
             boolean crossContext = false;
-            if ((state.outerRequest instanceof ApplicationHttpRequest) || (state.outerRequest instanceof Request) ||
-                    (state.outerRequest instanceof HttpServletRequest)) {
+            if (state.outerRequest instanceof ApplicationHttpRequest || state.outerRequest instanceof Request ||
+                    state.outerRequest instanceof HttpServletRequest) {
                 HttpServletRequest houterRequest = (HttpServletRequest) state.outerRequest;
-                Object contextPath = houterRequest.getAttribute(RequestDispatcher.INCLUDE_CONTEXT_PATH);
+                Object contextPath = houterRequest.getAttribute(INCLUDE_CONTEXT_PATH);
                 if (contextPath == null) {
                     // Forward
                     contextPath = houterRequest.getContextPath();
                 }
-                crossContext = !(context.getPath().equals(contextPath));
+                crossContext = !context.getPath().equals(contextPath);
             }
             wrapper = new ApplicationHttpRequest(hcurrent, context, crossContext);
         } else {
@@ -878,7 +878,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         ServletResponse previous = null;
         ServletResponse current = state.outerResponse;
         while (current != null) {
-            if (state.hresponse == null && (current instanceof HttpServletResponse)) {
+            if (state.hresponse == null && current instanceof HttpServletResponse) {
                 state.hresponse = (HttpServletResponse) current;
                 if (!state.including) { // Forward only needs hresponse
                     return null;
@@ -899,8 +899,8 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
 
         // Instantiate a new wrapper at this point and insert it in the chain
         ServletResponse wrapper = null;
-        if ((current instanceof ApplicationHttpResponse) || (current instanceof Response) ||
-                (current instanceof HttpServletResponse)) {
+        if (current instanceof ApplicationHttpResponse || current instanceof Response ||
+                current instanceof HttpServletResponse) {
             wrapper = new ApplicationHttpResponse((HttpServletResponse) current, state.including);
         } else {
             wrapper = new ApplicationResponse(current, state.including);

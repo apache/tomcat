@@ -926,7 +926,7 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     }
 
     @Override
-    public void writeExternal(ObjectOutput out) throws java.io.IOException {
+    public void writeExternal(ObjectOutput out) throws IOException {
         lockInternal();
         try {
             doWriteObject(out);

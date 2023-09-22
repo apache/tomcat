@@ -292,7 +292,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
 
                 if (sender == null) {
                     sender = new NioSender();
-                    AbstractSender.transferProperties(this, sender);
+                    transferProperties(this, sender);
                     nioSenders.put(destination[i], sender);
                 }
                 sender.reset();

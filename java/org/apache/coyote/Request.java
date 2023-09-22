@@ -778,7 +778,7 @@ public final class Request {
     }
 
     public boolean isProcessing() {
-        return reqProcessorMX.getStage() == org.apache.coyote.Constants.STAGE_SERVICE;
+        return reqProcessorMX.getStage() == Constants.STAGE_SERVICE;
     }
 
     /**

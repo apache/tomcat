@@ -191,7 +191,7 @@ public class XByteBuffer implements Serializable {
         if (newcount > buf.length) {
             expand(newcount);
         }
-        XByteBuffer.toBytes(i,buf,bufSize);
+        toBytes(i,buf,bufSize);
         bufSize = newcount;
         return true;
     }
@@ -201,7 +201,7 @@ public class XByteBuffer implements Serializable {
         if (newcount > buf.length) {
             expand(newcount);
         }
-        XByteBuffer.toBytes(i,buf,bufSize);
+        toBytes(i,buf,bufSize);
         bufSize = newcount;
         return true;
     }
@@ -211,7 +211,7 @@ public class XByteBuffer implements Serializable {
         if (newcount > buf.length) {
             expand(newcount);
         }
-        XByteBuffer.toBytes(i,buf,bufSize);
+        toBytes(i,buf,bufSize);
         bufSize = newcount;
         return true;
     }
@@ -270,7 +270,7 @@ public class XByteBuffer implements Serializable {
 
         while ( start < bufSize ) {
             //first check start header
-            int index = XByteBuffer.firstIndexOf(buf,start,START_DATA);
+            int index = firstIndexOf(buf,start,START_DATA);
             //if the header (START_DATA) isn't the first thing or
             //the buffer isn't even 14 bytes
             if ( index != start || ((bufSize-start)<14) ) {
@@ -321,7 +321,7 @@ public class XByteBuffer implements Serializable {
     public XByteBuffer extractDataPackage(boolean clearFromBuffer) {
         int psize = countPackages(true);
         if (psize == 0) {
-            throw new java.lang.IllegalStateException(sm.getString("xByteBuffer.no.package"));
+            throw new IllegalStateException(sm.getString("xByteBuffer.no.package"));
         }
         int size = toInt(buf, START_DATA.length);
         XByteBuffer xbuf = BufferPool.getBufferPool().getBuffer(size,false);
@@ -514,7 +514,7 @@ public class XByteBuffer implements Serializable {
             return result;
         }
         if (srcOff >= src.length ) {
-            throw new java.lang.ArrayIndexOutOfBoundsException();
+            throw new ArrayIndexOutOfBoundsException();
         }
         boolean found = false;
         int srclen = src.length;

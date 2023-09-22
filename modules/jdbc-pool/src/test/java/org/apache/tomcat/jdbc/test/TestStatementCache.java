@@ -180,7 +180,7 @@ public class TestStatementCache extends DefaultTestCase {
 
     public static class TestStatementCacheInterceptor extends StatementCache {
         public TestStatementCacheInterceptor() {
-            TestStatementCache.interceptor = this;
+            interceptor = this;
         }
     }
 

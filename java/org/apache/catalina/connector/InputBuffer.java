@@ -32,7 +32,6 @@ import javax.servlet.ReadListener;
 
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
@@ -106,7 +105,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     /**
      * Associated Coyote request.
      */
-    private Request coyoteRequest;
+    private org.apache.coyote.Request coyoteRequest;
 
 
     /**
@@ -165,7 +164,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
      *
      * @param coyoteRequest Associated Coyote request
      */
-    public void setRequest(Request coyoteRequest) {
+    public void setRequest(org.apache.coyote.Request coyoteRequest) {
         this.coyoteRequest = coyoteRequest;
     }
 

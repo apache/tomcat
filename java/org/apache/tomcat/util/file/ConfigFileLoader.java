@@ -31,7 +31,7 @@ public class ConfigFileLoader {
     private static ConfigurationSource source;
 
     public static final ConfigurationSource getSource() {
-        if (ConfigFileLoader.source == null) {
+        if (source == null) {
             return ConfigurationSource.DEFAULT;
         }
         return source;

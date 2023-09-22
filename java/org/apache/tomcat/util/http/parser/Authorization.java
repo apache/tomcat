@@ -67,7 +67,7 @@ public class Authorization {
      *             conform to RFC 2617.
      *
      * @throws IllegalArgumentException If the header does not conform to RFC 2617
-     * @throws java.io.IOException      If an error occurs while reading the input
+     * @throws IOException              If an error occurs while reading the input
      */
     public static Map<String,String> parseAuthorizationDigest(StringReader input)
             throws IllegalArgumentException, IOException {

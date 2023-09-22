@@ -849,7 +849,7 @@ public class HttpParser {
                 // Can't start with a single :
                 throw new IllegalArgumentException(sm.getString("http.singleColonStart"));
             }
-            if (HttpParser.isHex(c)) {
+            if (isHex(c)) {
                 if (h16Size == 0) {
                     // Start of a new h16 block
                     precedingColonsCount = 0;
@@ -1018,9 +1018,9 @@ public class HttpParser {
                 } else {
                     throw new IllegalArgumentException(sm.getString("http.invalidSegmentEndState", this.name()));
                 }
-            } else if (HttpParser.isAlpha(c)) {
+            } else if (isAlpha(c)) {
                 return ALPHA;
-            } else if (HttpParser.isNumeric(c)) {
+            } else if (isNumeric(c)) {
                 return NUMERIC;
             } else if (c == '.') {
                 if (allowsPeriod) {

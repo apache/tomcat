@@ -106,7 +106,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
     }
 
 
-    @Test(expected = javax.websocket.DeploymentException.class)
+    @Test(expected = DeploymentException.class)
     public void testConnectToServerEndpointInvalidScheme() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
@@ -121,7 +121,11 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
     }
 
 
+<<<<<<< HEAD
     @Test(expected = javax.websocket.DeploymentException.class)
+=======
+    @Test(expected = DeploymentException.class)
+>>>>>>> dd9262f4c4 (Remove unnecessary use of FQCN)
     public void testConnectToServerEndpointNoHost() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
@@ -304,7 +308,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
          */
         public static void clearBlock() {
             synchronized (monitor) {
-                BlockingPojo.block = false;
+                block = false;
                 monitor.notifyAll();
             }
         }

@@ -213,7 +213,7 @@ public class BeanFactory implements ObjectFactory {
                 NamingException ne = new NamingException(ie.getMessage());
                 ne.setRootCause(ie);
                 throw ne;
-            } catch (java.lang.ReflectiveOperationException e) {
+            } catch (ReflectiveOperationException e) {
                 Throwable cause = e.getCause();
                 if (cause instanceof ThreadDeath) {
                     throw (ThreadDeath) cause;

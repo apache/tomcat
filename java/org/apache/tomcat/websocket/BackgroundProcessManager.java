@@ -128,7 +128,7 @@ public class BackgroundProcessManager {
         public void run() {
             while (running) {
                 try {
-                    Thread.sleep(1000);
+                    sleep(1000);
                 } catch (InterruptedException e) {
                     // Ignore
                 }

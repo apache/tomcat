@@ -26,9 +26,9 @@ import java.io.IOException;
  * This interface is intended to wrap servlets, but a servlet container can create <code>RequestDispatcher</code>
  * objects to wrap any type of resource.
  *
- * @see ServletContext#getRequestDispatcher(java.lang.String)
- * @see ServletContext#getNamedDispatcher(java.lang.String)
- * @see ServletRequest#getRequestDispatcher(java.lang.String)
+ * @see ServletContext#getRequestDispatcher(String)
+ * @see ServletContext#getNamedDispatcher(String)
+ * @see ServletRequest#getRequestDispatcher(String)
  */
 public interface RequestDispatcher {
 
@@ -178,8 +178,8 @@ public interface RequestDispatcher {
 
     /**
      * The name of the request attribute that should be set by the container when custom error-handling servlet or JSP
-     * page is invoked. The value of the attribute is of type {@code java.lang.String}. See the chapter "Error Handling"
-     * in the Servlet Specification for details.
+     * page is invoked. The value of the attribute is of type {@code String}. See the chapter "Error Handling" in the
+     * Servlet Specification for details.
      *
      * @since Servlet 3.0
      */
@@ -187,8 +187,8 @@ public interface RequestDispatcher {
 
     /**
      * The name of the request attribute that should be set by the container when custom error-handling servlet or JSP
-     * page is invoked. The value of the attribute is of type {@code java.lang.String}. See the chapter "Error Handling"
-     * in the Servlet Specification for details.
+     * page is invoked. The value of the attribute is of type {@code String}. See the chapter "Error Handling" in the
+     * Servlet Specification for details.
      *
      * @since Servlet 3.0
      */
@@ -196,8 +196,8 @@ public interface RequestDispatcher {
 
     /**
      * The name of the request attribute that should be set by the container when custom error-handling servlet or JSP
-     * page is invoked. The value of the attribute is of type {@code java.lang.String}. See the chapter "Error Handling"
-     * in the Servlet Specification for details.
+     * page is invoked. The value of the attribute is of type {@code String}. See the chapter "Error Handling" in the
+     * Servlet Specification for details.
      *
      * @since Servlet 3.0
      */

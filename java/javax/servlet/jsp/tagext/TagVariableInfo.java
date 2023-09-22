@@ -62,7 +62,7 @@ public class TagVariableInfo {
     /**
      * The body of the &lt;variable-class&gt; element.
      *
-     * @return The name of the class of the variable or 'java.lang.String' if not defined in the TLD.
+     * @return The name of the class of the variable or {@link String} if not defined in the TLD.
      */
     public String getClassName() {
         return className;

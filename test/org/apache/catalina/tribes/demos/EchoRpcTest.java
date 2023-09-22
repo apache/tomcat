@@ -197,7 +197,7 @@ public class EchoRpcTest implements RpcCallback, Runnable {
         @Override
         public void run() {
             try {
-                Thread.sleep(delay);
+                sleep(delay);
             } catch (Exception x) {
                 x.printStackTrace();
             }

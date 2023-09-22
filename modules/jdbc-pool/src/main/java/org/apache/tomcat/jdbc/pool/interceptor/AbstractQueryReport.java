@@ -27,7 +27,6 @@ import java.sql.Statement;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 /**
  * Abstract class that wraps statements and intercepts query executions.
  *
@@ -191,13 +190,13 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             //get the name of the method for comparison
             final String name = method.getName();
             //was close invoked?
-            boolean close = compare(JdbcInterceptor.CLOSE_VAL,name);
+            boolean close = compare(CLOSE_VAL, name);
             //allow close to be called multiple times
             if (close && closed) {
               return null;
             }
             //are we calling isClosed?
-            if (compare(JdbcInterceptor.ISCLOSED_VAL,name)) {
+            if (compare(ISCLOSED_VAL, name)) {
               return Boolean.valueOf(closed);
             }
             //if we are calling anything else, bail out

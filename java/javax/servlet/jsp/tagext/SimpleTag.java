@@ -16,7 +16,11 @@
  */
 package javax.servlet.jsp.tagext;
 
+import java.io.IOException;
+
 import javax.servlet.jsp.JspContext;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.SkipPageException;
 
 /**
  * Interface for defining Simple Tag Handlers.
@@ -69,16 +73,15 @@ public interface SimpleTag extends JspTag {
      * The JSP container will resynchronize any AT_BEGIN and AT_END variables (defined by the associated tag file,
      * TagExtraInfo, or TLD) after the invocation of doTag().
      *
-     * @throws javax.servlet.jsp.JspException      If an error occurred while processing this tag.
-     * @throws javax.servlet.jsp.SkipPageException If the page that (either directly or indirectly) invoked this tag is
-     *                                                 to cease evaluation. A Simple Tag Handler generated from a tag
-     *                                                 file must throw this exception if an invoked Classic Tag Handler
-     *                                                 returned SKIP_PAGE or if an invoked Simple Tag Handler threw
-     *                                                 SkipPageException or if an invoked Jsp Fragment threw a
-     *                                                 SkipPageException.
-     * @throws java.io.IOException                 If there was an error writing to the output stream.
+     * @throws JspException      If an error occurred while processing this tag.
+     * @throws SkipPageException If the page that (either directly or indirectly) invoked this tag is to cease
+     *                               evaluation. A Simple Tag Handler generated from a tag file must throw this
+     *                               exception if an invoked Classic Tag Handler returned SKIP_PAGE or if an invoked
+     *                               Simple Tag Handler threw SkipPageException or if an invoked Jsp Fragment threw a
+     *                               SkipPageException.
+     * @throws IOException       If there was an error writing to the output stream.
      */
-    void doTag() throws javax.servlet.jsp.JspException, java.io.IOException;
+    void doTag() throws JspException, IOException;
 
     /**
      * Sets the parent of this tag, for collaboration purposes.
@@ -115,6 +118,4 @@ public interface SimpleTag extends JspTag {
      * @param jspBody The fragment encapsulating the body of this tag.
      */
     void setJspBody(JspFragment jspBody);
-
-
 }

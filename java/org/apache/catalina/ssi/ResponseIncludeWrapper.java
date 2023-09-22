@@ -88,7 +88,7 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
      *                if the outputstream already been called
      */
     @Override
-    public PrintWriter getWriter() throws java.io.IOException {
+    public PrintWriter getWriter() throws IOException {
         if (servletOutputStream == null) {
             if (printWriter == null) {
                 setCharacterEncoding(getCharacterEncoding());
@@ -111,7 +111,7 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
      *                if the printwriter already been called
      */
     @Override
-    public ServletOutputStream getOutputStream() throws java.io.IOException {
+    public ServletOutputStream getOutputStream() throws IOException {
         if (printWriter == null) {
             if (servletOutputStream == null) {
                 servletOutputStream = captureServletOutputStream;

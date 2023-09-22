@@ -156,7 +156,7 @@ public class TesterFirehoseServer {
         }
 
         public void doRun() throws IOException {
-            session.getUserProperties().put(org.apache.tomcat.websocket.Constants.BLOCKING_SEND_TIMEOUT_PROPERTY,
+            session.getUserProperties().put(Constants.BLOCKING_SEND_TIMEOUT_PROPERTY,
                     Long.valueOf(SEND_TIME_OUT_MILLIS));
 
             Basic remote = session.getBasicRemote();

@@ -322,7 +322,7 @@ public class TestMethodExpressionImpl {
         MethodExpression me = factory.createMethodExpression(context, "#{beanA.setName('New value')}", null, null);
         // The rest is to check it worked correctly
         me.invoke(context, null);
-        ValueExpression ve = factory.createValueExpression(context, "#{beanA.name}", java.lang.String.class);
+        ValueExpression ve = factory.createValueExpression(context, "#{beanA.name}", String.class);
         Assert.assertEquals("New value", ve.getValue(context));
     }
 
@@ -330,7 +330,7 @@ public class TestMethodExpressionImpl {
     public void testBugPrimitives() throws Exception {
         MethodExpression me = factory.createMethodExpression(context, "${beanA.setValLong(5)}", null, null);
         me.invoke(context, null);
-        ValueExpression ve = factory.createValueExpression(context, "#{beanA.valLong}", java.lang.String.class);
+        ValueExpression ve = factory.createValueExpression(context, "#{beanA.valLong}", String.class);
         Assert.assertEquals("5", ve.getValue(context));
     }
 
@@ -350,16 +350,16 @@ public class TestMethodExpressionImpl {
 
     @Test
     public void testBug50790a() throws Exception {
-        ValueExpression ve = factory.createValueExpression(context, "#{beanAA.name.contains(beanA.name)}",
-                java.lang.Boolean.class);
+        ValueExpression ve =
+                factory.createValueExpression(context, "#{beanAA.name.contains(beanA.name)}", Boolean.class);
         Boolean actual = (Boolean) ve.getValue(context);
         Assert.assertEquals(Boolean.TRUE, actual);
     }
 
     @Test
     public void testBug50790b() throws Exception {
-        ValueExpression ve = factory.createValueExpression(context, "#{beanA.name.contains(beanAA.name)}",
-                java.lang.Boolean.class);
+        ValueExpression ve =
+                factory.createValueExpression(context, "#{beanA.name.contains(beanAA.name)}", Boolean.class);
         Boolean actual = (Boolean) ve.getValue(context);
         Assert.assertEquals(Boolean.FALSE, actual);
     }
@@ -396,7 +396,7 @@ public class TestMethodExpressionImpl {
                 new Class<?>[] { TesterBeanB.class });
         me.invoke(context, null);
 
-        ValueExpression ve = factory.createValueExpression(context, "#{beanA.getBean().name}", java.lang.String.class);
+        ValueExpression ve = factory.createValueExpression(context, "#{beanA.getBean().name}", String.class);
         String actual = (String) ve.getValue(context);
         Assert.assertEquals(BUG53792, actual);
     }
@@ -410,8 +410,7 @@ public class TestMethodExpressionImpl {
                 new Class<?>[] { TesterBeanB.class });
         me.invoke(context, null);
 
-        ValueExpression ve = factory.createValueExpression(context, "#{beanA.getBean().name.length()}",
-                java.lang.Integer.class);
+        ValueExpression ve = factory.createValueExpression(context, "#{beanA.getBean().name.length()}", Integer.class);
         Integer actual = (Integer) ve.getValue(context);
         Assert.assertEquals(Integer.valueOf(BUG53792.length()), actual);
     }
