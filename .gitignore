@@ -29,14 +29,15 @@ mvn.properties
 .externalToolBuilders
 .fbprefs
 .idea
+.pmd
 .project
 .sdkmanrc
 .settings
 .vscode
+*.asc
 *.iml
 *.ipr
 *.iws
-*.asc
 *.jj
 *.tmp
 maven-resolver-ant-tasks-*.jar
