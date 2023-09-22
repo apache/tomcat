@@ -40,7 +40,7 @@ import org.apache.naming.SelectorContext;
  * <li>Setting an environment variable named Context.URL_PKG_PREFIXES with
  * its value including the org.apache.naming package name.
  * More detail about this can be found in the JNDI documentation :
- * {@link javax.naming.spi.NamingManager#getURLContext(java.lang.String, java.util.Hashtable)}.</li>
+ * {@link javax.naming.spi.NamingManager#getURLContext(String, java.util.Hashtable)}.</li>
  * </ul>
  *
  * @author Remy Maucherat

@@ -1205,8 +1205,7 @@ class Generator {
                 // Bean is defined using useBean, introspect at compile time
                 Class<?> bean = beanInfo.getBeanType(name);
                 String beanName = bean.getCanonicalName();
-                java.lang.reflect.Method meth = JspRuntimeLibrary
-                        .getReadMethod(bean, property);
+                Method meth = JspRuntimeLibrary.getReadMethod(bean, property);
                 String methodName = meth.getName();
                 out.printil("out.write(org.apache.jasper.runtime.JspRuntimeLibrary.toString("
                         + "((("

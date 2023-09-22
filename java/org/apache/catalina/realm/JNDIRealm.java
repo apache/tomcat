@@ -514,7 +514,7 @@ public class JNDIRealm extends RealmBase {
     /**
      * @return the derefAliases setting to be used.
      */
-    public java.lang.String getDerefAliases() {
+    public String getDerefAliases() {
         return derefAliases;
     }
 
@@ -524,7 +524,7 @@ public class JNDIRealm extends RealmBase {
      *
      * @param derefAliases New value of property derefAliases.
      */
-    public void setDerefAliases(java.lang.String derefAliases) {
+    public void setDerefAliases(String derefAliases) {
         this.derefAliases = derefAliases;
     }
 
@@ -2685,7 +2685,7 @@ public class JNDIRealm extends RealmBase {
             env.put(Context.REFERRAL, referrals);
         }
         if (derefAliases != null) {
-            env.put(JNDIRealm.DEREF_ALIASES, derefAliases);
+            env.put(DEREF_ALIASES, derefAliases);
         }
         if (connectionTimeout != null) {
             env.put("com.sun.jndi.ldap.connect.timeout", connectionTimeout);

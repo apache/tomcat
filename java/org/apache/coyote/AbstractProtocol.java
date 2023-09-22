@@ -16,7 +16,9 @@
  */
 package org.apache.coyote;
 
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1025,10 +1027,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                     wrapper.setCurrentProcessor(processor);
                 }
                 return state;
-            } catch (java.net.SocketException e) {
+            } catch (SocketException e) {
                 // SocketExceptions are normal
                 getLog().debug(sm.getString("abstractConnectionHandler.socketexception.debug"), e);
-            } catch (java.io.IOException e) {
+            } catch (IOException e) {
                 // IOExceptions are normal
                 getLog().debug(sm.getString("abstractConnectionHandler.ioexception.debug"), e);
             } catch (ProtocolException e) {

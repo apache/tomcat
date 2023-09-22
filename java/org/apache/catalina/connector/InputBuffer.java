@@ -28,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import jakarta.servlet.ReadListener;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
@@ -102,7 +101,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     /**
      * Associated Coyote request.
      */
-    private final Request coyoteRequest;
+    private final org.apache.coyote.Request coyoteRequest;
 
 
     /**

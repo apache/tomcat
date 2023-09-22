@@ -17,6 +17,7 @@
 package org.apache.catalina.ha.deploy;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -266,7 +267,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                     log.error(sm.getString("farmWarDeployer.undeployMessageError"), ex);
                 }
             }
-        } catch (java.io.IOException x) {
+        } catch (IOException x) {
             log.error(sm.getString("farmWarDeployer.msgIoe"), x);
         }
     }
@@ -278,11 +279,10 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      *
      * @return Factory for all app message (war files)
      *
-     * @throws java.io.FileNotFoundException Missing file error
-     * @throws java.io.IOException           Other IO error
+     * @throws FileNotFoundException Missing file error
+     * @throws IOException           Other IO error
      */
-    public synchronized FileMessageFactory getFactory(FileMessage msg)
-            throws java.io.FileNotFoundException, java.io.IOException {
+    public synchronized FileMessageFactory getFactory(FileMessage msg) throws FileNotFoundException, IOException {
         File writeToFile = new File(getTempDirFile(), msg.getFileName());
         FileMessageFactory factory = fileFactories.get(msg.getFileName());
         if (factory == null) {
@@ -313,7 +313,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      */
     @Override
     public boolean accept(ClusterMessage msg) {
-        return (msg instanceof FileMessage) || (msg instanceof UndeployMessage);
+        return msg instanceof FileMessage || msg instanceof UndeployMessage;
     }
 
     /**

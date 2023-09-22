@@ -660,12 +660,12 @@ public class Request implements HttpServletRequest {
     /**
      * The response with which this request is associated.
      */
-    protected org.apache.catalina.connector.Response response = null;
+    protected Response response = null;
 
     /**
      * @return the Response with which this Request is associated.
      */
-    public org.apache.catalina.connector.Response getResponse() {
+    public Response getResponse() {
         return this.response;
     }
 
@@ -674,7 +674,7 @@ public class Request implements HttpServletRequest {
      *
      * @param response The new associated response
      */
-    public void setResponse(org.apache.catalina.connector.Response response) {
+    public void setResponse(Response response) {
         this.response = response;
     }
 
@@ -1886,7 +1886,7 @@ public class Request implements HttpServletRequest {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass)
-            throws java.io.IOException, ServletException {
+            throws IOException, ServletException {
         T handler;
         InstanceManager instanceManager = null;
         try {

@@ -130,7 +130,7 @@ public class TestMaxConnections extends TomcatBaseTest {
 
             System.out.println("Processing thread: " + Thread.currentThread().getName());
             try {
-                Thread.sleep(TestMaxConnections.soTimeout*4/5);
+                Thread.sleep(soTimeout*4/5);
             } catch (InterruptedException x) {
 
             }

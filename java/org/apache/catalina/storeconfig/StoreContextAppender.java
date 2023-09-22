@@ -54,9 +54,8 @@ public class StoreContextAppender extends StoreAppender {
      * </li><li> Don't save path at external context.xml </li><li> Don't
      * generate docBase for host.appBase webapps <LI></ul>
      *
-     * @see org.apache.catalina.storeconfig.StoreAppender#isPrintValue(java.lang.Object,
-     *      java.lang.Object, java.lang.String,
-     *      org.apache.catalina.storeconfig.StoreDescription)
+     * @see org.apache.catalina.storeconfig.StoreAppender#isPrintValue(Object,
+     *      Object, String, StoreDescription)
      */
     @Override
     public boolean isPrintValue(Object bean, Object bean2, String attrName,

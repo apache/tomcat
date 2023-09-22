@@ -189,7 +189,7 @@ public class MapDemo implements ChannelListener, MembershipListener {
         @Override
         public void run() {
             try {
-                Thread.sleep(delay);
+                sleep(delay);
             } catch (Exception x) {
                 x.printStackTrace();
             }
@@ -399,9 +399,9 @@ public class MapDemo implements ChannelListener, MembershipListener {
                             dataModel.fireTableDataChanged();
                             table.paint(table.getGraphics());
                             try {
-                                Thread.sleep(500);
+                                sleep(500);
                             } catch (InterruptedException x) {
-                                Thread.interrupted();
+                                interrupted();
                             }
                         }
                     }

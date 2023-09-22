@@ -50,7 +50,7 @@ public class TestLargeUpload extends Http2TestBase {
 
     @Parameters(name = "{0}: {1}]")
     public static Collection<Object[]> parameters() {
-        Collection<Object[]> baseData = Http2TestBase.data();
+        Collection<Object[]> baseData = data();
 
         List<Object[]> parameterSets = new ArrayList<>();
         for (Object[] base : baseData) {

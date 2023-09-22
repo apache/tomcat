@@ -106,7 +106,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
     }
 
 
-    @Test(expected = jakarta.websocket.DeploymentException.class)
+    @Test(expected = DeploymentException.class)
     public void testConnectToServerEndpointInvalidScheme() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
@@ -121,7 +121,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
     }
 
 
-    @Test(expected = jakarta.websocket.DeploymentException.class)
+    @Test(expected = DeploymentException.class)
     public void testConnectToServerEndpointNoHost() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
@@ -304,7 +304,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
          */
         public static void clearBlock() {
             synchronized (monitor) {
-                BlockingPojo.block = false;
+                block = false;
                 monitor.notifyAll();
             }
         }

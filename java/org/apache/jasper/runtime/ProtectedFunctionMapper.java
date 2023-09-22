@@ -79,7 +79,7 @@ public final class ProtectedFunctionMapper extends jakarta.el.FunctionMapper {
         if (fnQName == null) {
             return;
         }
-        java.lang.reflect.Method method;
+        Method method;
         try {
             method = c.getMethod(methodName, args);
         } catch (NoSuchMethodException e) {
@@ -110,7 +110,7 @@ public final class ProtectedFunctionMapper extends jakarta.el.FunctionMapper {
      */
     public static ProtectedFunctionMapper getMapForFunction(String fnQName,
             final Class<?> c, final String methodName, final Class<?>[] args) {
-        java.lang.reflect.Method method = null;
+        Method method = null;
         ProtectedFunctionMapper funcMapper = new ProtectedFunctionMapper();
         // Skip if null values were passed in. They indicate a function
         // added via a lambda or ImportHandler; nether of which need to be

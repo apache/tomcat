@@ -22,9 +22,9 @@ public interface MembershipProvider {
 
     void init(Properties properties) throws Exception;
 
-    void start(int level) throws java.lang.Exception;
+    void start(int level) throws Exception;
 
-    boolean stop(int level) throws java.lang.Exception;
+    boolean stop(int level) throws Exception;
 
     void setMembershipListener(MembershipListener listener);
 

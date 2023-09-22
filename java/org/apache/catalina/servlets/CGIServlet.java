@@ -643,7 +643,7 @@ public final class CGIServlet extends HttpServlet {
         //       case does nto need to be handled here.
         Set<String> allowedMethods = new HashSet<>();
         allowedMethods.addAll(cgiMethods);
-        allowedMethods.addAll(CGIServlet.DEFAULT_SUPER_METHODS);
+        allowedMethods.addAll(DEFAULT_SUPER_METHODS);
 
         StringBuilder headerValue = new StringBuilder();
 

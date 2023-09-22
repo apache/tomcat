@@ -40,7 +40,7 @@ public enum EncodedSolidusHandling {
     public static EncodedSolidusHandling fromString(String from) {
         String trimmedLower = from.trim().toLowerCase(Locale.ENGLISH);
 
-        for (EncodedSolidusHandling value : EncodedSolidusHandling.values()) {
+        for (EncodedSolidusHandling value : values()) {
             if (value.getValue().equals(trimmedLower)) {
                 return value;
             }

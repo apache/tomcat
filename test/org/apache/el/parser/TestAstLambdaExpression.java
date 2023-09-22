@@ -225,7 +225,7 @@ public class TestAstLambdaExpression {
     }
 
 
-    @Test(expected=jakarta.el.ELException.class)
+    @Test(expected=ELException.class)
     public void testLambdaAsFunction08() {
         // Using a name space for the function is not allowed
         ELProcessor processor = new ELProcessor();

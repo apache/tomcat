@@ -493,7 +493,7 @@ public class TestRequest extends TomcatBaseTest {
             for(String name: parameters.keySet()) {
                 String[] values = req.getParameterValues(name);
 
-                java.util.Arrays.sort(values);
+                Arrays.sort(values);
 
                 for (String value : values) {
                     if (first) {
