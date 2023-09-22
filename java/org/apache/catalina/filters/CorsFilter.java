@@ -321,7 +321,11 @@ public class CorsFilter extends GenericFilter {
     private void handleNonCORS(final HttpServletRequest request, final HttpServletResponse response,
             final FilterChain filterChain) throws IOException, ServletException {
 
-        addStandardHeaders(request, response);
+        if (!isAnyOriginAllowed()) {
+            // If only specific origins are allowed, the response will vary by
+            // origin
+            ResponseUtil.addVaryFieldName(response, CorsFilter.REQUEST_HEADER_ORIGIN);
+        }
 
         // Let request pass.
         filterChain.doFilter(request, response);
