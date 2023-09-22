@@ -165,6 +165,10 @@
         branch requiring additional Commons IO dependencies, Tomcat has switched
         to tracking the 1.x branch. (markt)
       </update>
+      <fix>
+        <bug>67472</bug>: Send fewer CORS-related headers when CORS is not
+        actually being engaged. (schultz)
+      </fix>
     </changelog>
   </subsection>
 </section>
