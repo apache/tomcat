@@ -289,11 +289,6 @@ public class DeltaRequest implements Externalizable {
         sessionId = in.readUTF();
         recordAllActions = in.readBoolean();
         int cnt = in.readInt();
-        if (actions == null) {
-            actions = new ArrayDeque<>();
-        } else {
-            actions.clear();
-        }
         for (int i = 0; i < cnt; i++) {
             AttributeInfo info = null;
             if (this.actionPool.size() > 0) {
