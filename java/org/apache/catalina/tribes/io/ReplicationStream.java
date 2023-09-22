@@ -105,7 +105,7 @@ public final class ReplicationStream extends ObjectInputStream {
             throws IOException, ClassNotFoundException {
 
         ClassLoader latestLoader;
-        if (classLoaders != null && classLoaders.length > 0) {
+        if (classLoaders.length > 0) {
             latestLoader = classLoaders[0];
         } else {
             latestLoader = null;
