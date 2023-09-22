@@ -169,6 +169,10 @@
         branch requiring additional Commons IO dependencies, Tomcat has switched
         to tracking the 1.x branch. (markt)
       </update>
+      <add>
+        Add the <code>Bundle-License</code> header to the JAR manifest for all
+        Tomcat JARs. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
