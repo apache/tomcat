@@ -77,7 +77,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         List<Object[]> parameterSets = new ArrayList<>();
 
         for (int loop = 0; loop < loopCount; loop++) {
-            for (Boolean useAsyncIO : TomcatBaseTest.booleans) {
+            for (Boolean useAsyncIO : booleans) {
                 parameterSets.add(new Object[] { Integer.valueOf(loop), useAsyncIO });
             }
         }

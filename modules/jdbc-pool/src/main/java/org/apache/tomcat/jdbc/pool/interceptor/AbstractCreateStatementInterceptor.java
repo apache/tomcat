@@ -51,8 +51,7 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
     /**
      * the constructors that are used to create statement proxies
      */
-    protected static final Constructor<?>[] constructors =
-            new Constructor[AbstractCreateStatementInterceptor.STATEMENT_TYPE_COUNT];
+    protected static final Constructor<?>[] constructors = new Constructor[STATEMENT_TYPE_COUNT];
 
     public  AbstractCreateStatementInterceptor() {
         super();

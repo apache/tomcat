@@ -213,7 +213,7 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
                      * this does mean that there is a real chance of an ISE. We
                      * may need to increase this delay for some CI systems.
                      */
-                    Thread.sleep(1000);
+                    sleep(1000);
                 } catch (InterruptedException e) {
                     // Ignore
                 }

@@ -649,7 +649,7 @@ public class JspUtil {
                     "jsp.error.file.not.found", fname));
         }
 
-        return new BufferedInputStream(in, JspUtil.JSP_INPUT_STREAM_BUFFER_SIZE);
+        return new BufferedInputStream(in, JSP_INPUT_STREAM_BUFFER_SIZE);
     }
 
     public static InputSource getInputSource(String fname, Jar jar, JspCompilationContext ctxt)

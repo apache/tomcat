@@ -21,6 +21,7 @@ import java.io.Writer;
 
 import jakarta.servlet.jsp.JspContext;
 import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.SkipPageException;
 
 /**
  * Encapsulates a portion of JSP code in an object that can be invoked as many times as needed. JSP Fragments are
@@ -59,13 +60,12 @@ public abstract class JspFragment {
      *
      * @param out The Writer to output the fragment to, or null if output should be sent to JspContext.getOut().
      *
-     * @throws jakarta.servlet.jsp.JspException      Thrown if an error occurred while invoking this fragment.
-     * @throws jakarta.servlet.jsp.SkipPageException Thrown if the page that (either directly or indirectly) invoked the
-     *                                                   tag handler that invoked this fragment is to cease evaluation.
-     *                                                   The container must throw this exception if a Classic Tag
-     *                                                   Handler returned Tag.SKIP_PAGE or if a Simple Tag Handler threw
-     *                                                   SkipPageException.
-     * @throws java.io.IOException                   If there was an error writing to the stream.
+     * @throws JspException      Thrown if an error occurred while invoking this fragment.
+     * @throws SkipPageException Thrown if the page that (either directly or indirectly) invoked the tag handler that
+     *                               invoked this fragment is to cease evaluation. The container must throw this
+     *                               exception if a Classic Tag Handler returned Tag.SKIP_PAGE or if a Simple Tag
+     *                               Handler threw SkipPageException.
+     * @throws IOException       If there was an error writing to the stream.
      */
     public abstract void invoke(Writer out) throws JspException, IOException;
 

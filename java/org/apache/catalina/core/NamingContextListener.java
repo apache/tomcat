@@ -258,7 +258,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 }
 
                 if (container instanceof Server) {
-                    org.apache.naming.factory.ResourceLinkFactory.setGlobalContext(namingContext);
+                    ResourceLinkFactory.setGlobalContext(namingContext);
                     try {
                         ContextBindings.bindClassLoader(container, token, this.getClass().getClassLoader());
                     } catch (NamingException e) {

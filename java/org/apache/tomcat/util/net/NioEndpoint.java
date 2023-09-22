@@ -231,7 +231,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     FileAttribute<Set<PosixFilePermission>> attrs = PosixFilePermissions.asFileAttribute(permissions);
                     Files.setAttribute(path, attrs.name(), attrs.value());
                 } else {
-                    java.io.File file = path.toFile();
+                    File file = path.toFile();
                     if (permissions.contains(PosixFilePermission.OTHERS_READ) && !file.setReadable(true, false)) {
                         log.warn(sm.getString("endpoint.nio.perms.readFail", file.getPath()));
                     }

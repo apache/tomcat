@@ -412,9 +412,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
             String echo = req.getParameter("echo");
             AsyncContext actxt = req.startAsync();
-            TestAsyncContextImpl.track("OK");
+            track("OK");
             if (echo != null) {
-                TestAsyncContextImpl.track("-" + echo);
+                track("-" + echo);
             }
             // Speed up the test by reducing the timeout
             actxt.setTimeout(ASYNC_TIMEOUT);
@@ -611,7 +611,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
             if (req.isAsyncSupported()) {
-                TestAsyncContextImpl.track("TimeoutServletGet-");
+                track("TimeoutServletGet-");
                 final AsyncContext ac = req.startAsync();
                 ac.setTimeout(ASYNC_TIMEOUT);
 
@@ -783,7 +783,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            TestAsyncContextImpl.track("NonAsyncServletGet-");
+            track("NonAsyncServletGet-");
         }
     }
 
@@ -844,7 +844,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            TestAsyncContextImpl.track("DispatchingServletGet-");
+            track("DispatchingServletGet-");
             resp.flushBuffer();
 
             final boolean first = TrackingServlet.first;
@@ -891,14 +891,14 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         @Override
         public void onComplete(AsyncEvent event) throws IOException {
-            TestAsyncContextImpl.track("onComplete-");
+            track("onComplete-");
         }
 
         @Override
         public void onTimeout(AsyncEvent event) throws IOException {
             boolean expectedAsyncStarted = true;
 
-            TestAsyncContextImpl.track("onTimeout-");
+            track("onTimeout-");
             if (completeOnTimeout){
                 event.getAsyncContext().complete();
                 expectedAsyncStarted = false;
@@ -916,7 +916,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         public void onError(AsyncEvent event) throws IOException {
             boolean expectedAsyncStarted = true;
 
-            TestAsyncContextImpl.track("onError-");
+            track("onError-");
             if (completeOnError) {
                 event.getAsyncContext().complete();
                 expectedAsyncStarted = false;
@@ -928,7 +928,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         @Override
         public void onStartAsync(AsyncEvent event) throws IOException {
-            TestAsyncContextImpl.track("onStartAsync-");
+            track("onStartAsync-");
         }
 
         public boolean isAsyncStartedCorrect() {
@@ -956,12 +956,12 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         @Override
         public void requestDestroyed(ServletRequestEvent sre) {
-            TestAsyncContextImpl.track("requestDestroyed");
+            track("requestDestroyed");
         }
 
         @Override
         public void requestInitialized(ServletRequestEvent sre) {
-            TestAsyncContextImpl.track("requestInitialized-");
+            track("requestInitialized-");
         }
     }
 
@@ -1097,7 +1097,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            TestAsyncContextImpl.track("ErrorServletGet-");
+            track("ErrorServletGet-");
             try {
                 // Give the original thread a chance to exit the
                 // ErrorReportValve before we throw this exception
@@ -1167,7 +1167,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 public void run() {
                     try {
                         Thread.sleep(THREAD_SLEEP_TIME);
-                        TestAsyncContextImpl.track("Runnable-");
+                        track("Runnable-");
                         asyncContext.complete();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -1768,21 +1768,21 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            TestAsyncContextImpl.track("AsyncErrorPageGet-");
+            track("AsyncErrorPageGet-");
 
             final AsyncContext ctxt = req.getAsyncContext();
 
             switch(mode) {
                 case COMPLETE:
-                    TestAsyncContextImpl.track("Complete-");
+                    track("Complete-");
                     ctxt.complete();
                     break;
                 case DISPATCH:
-                    TestAsyncContextImpl.track("Dispatch-");
+                    track("Dispatch-");
                     ctxt.dispatch("/error/nonasync");
                     break;
                 case NO_COMPLETE:
-                    TestAsyncContextImpl.track("NoOp-");
+                    track("NoOp-");
                     break;
                 default:
                     // Impossible
@@ -2034,12 +2034,12 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 }
                 try {
                     asyncContext.dispatch("/nonExistingServlet");
-                    TestAsyncContextImpl.track("FAIL");
+                    track("FAIL");
                 } catch (IllegalStateException e) {
-                    TestAsyncContextImpl.track("OK");
+                    track("OK");
                 }
             } else {
-                TestAsyncContextImpl.track("DispatchingGenericServletGet-");
+                track("DispatchingGenericServletGet-");
             }
         }
     }
@@ -2147,7 +2147,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 throws ServletException, IOException {
             if (req instanceof ServletRequestWrapper
                     && res instanceof ServletResponseWrapper) {
-                TestAsyncContextImpl.track("CustomGenericServletGet-");
+                track("CustomGenericServletGet-");
             }
         }
 
@@ -2422,7 +2422,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             }
 
             req.getServletContext().setAttribute(key, req.startAsync());
-            TestAsyncContextImpl.track("AsyncStashServletGet-");
+            track("AsyncStashServletGet-");
         }
     }
 
@@ -2441,9 +2441,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
             AsyncContext ac = (AsyncContext) req.getServletContext().getAttribute(key);
             if (ac == null) {
-                TestAsyncContextImpl.track("FAIL:nullAsyncContext-");
+                track("FAIL:nullAsyncContext-");
             } else {
-                TestAsyncContextImpl.track("AsyncRetrieveServletGet-");
+                track("AsyncRetrieveServletGet-");
                 ac.dispatch("/target");
             }
         }

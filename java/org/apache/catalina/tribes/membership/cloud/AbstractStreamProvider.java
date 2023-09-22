@@ -145,7 +145,7 @@ public abstract class AbstractStreamProvider implements StreamProvider {
             }
         } else {
             log.warn(sm.getString("abstractStream.CACertUndefined"));
-            return InsecureStreamProvider.INSECURE_TRUST_MANAGERS;
+            return INSECURE_TRUST_MANAGERS;
         }
     }
 }

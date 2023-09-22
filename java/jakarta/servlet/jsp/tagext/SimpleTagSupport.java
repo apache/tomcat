@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import jakarta.servlet.jsp.JspContext;
 import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.SkipPageException;
 
 /**
  * A base class for defining tag handlers implementing SimpleTag.
@@ -50,16 +51,14 @@ public class SimpleTagSupport implements SimpleTag {
     /**
      * Default processing of the tag does nothing.
      *
-     * @throws JspException                          Subclasses can throw JspException to indicate an error occurred
-     *                                                   while processing this tag.
-     * @throws jakarta.servlet.jsp.SkipPageException If the page that (either directly or indirectly) invoked this tag
-     *                                                   is to cease evaluation. A Simple Tag Handler generated from a
-     *                                                   tag file must throw this exception if an invoked Classic Tag
-     *                                                   Handler returned SKIP_PAGE or if an invoked Simple Tag Handler
-     *                                                   threw SkipPageException or if an invoked Jsp Fragment threw a
-     *                                                   SkipPageException.
-     * @throws IOException                           Subclasses can throw IOException if there was an error writing to
-     *                                                   the output stream
+     * @throws JspException      Subclasses can throw JspException to indicate an error occurred while processing this
+     *                               tag.
+     * @throws SkipPageException If the page that (either directly or indirectly) invoked this tag is to cease
+     *                               evaluation. A Simple Tag Handler generated from a tag file must throw this
+     *                               exception if an invoked Classic Tag Handler returned SKIP_PAGE or if an invoked
+     *                               Simple Tag Handler threw SkipPageException or if an invoked Jsp Fragment threw a
+     *                               SkipPageException.
+     * @throws IOException       Subclasses can throw IOException if there was an error writing to the output stream
      *
      * @see SimpleTag#doTag()
      */
@@ -162,7 +161,7 @@ public class SimpleTagSupport implements SimpleTag {
         boolean isInterface = false;
 
         if (from == null || klass == null ||
-                (!JspTag.class.isAssignableFrom(klass) && !(isInterface = klass.isInterface()))) {
+                !JspTag.class.isAssignableFrom(klass) && !(isInterface = klass.isInterface())) {
             return null;
         }
 
@@ -181,7 +180,7 @@ public class SimpleTagSupport implements SimpleTag {
                 parent = ((TagAdapter) parent).getAdaptee();
             }
 
-            if ((isInterface && klass.isInstance(parent)) || klass.isAssignableFrom(parent.getClass())) {
+            if (isInterface && klass.isInstance(parent) || klass.isAssignableFrom(parent.getClass())) {
                 return parent;
             }
 

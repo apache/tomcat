@@ -66,7 +66,7 @@ public class Bug51582 {
                     public void run() {
                         try {
                             if (i == 0) {
-                                Thread.sleep(1000);
+                                sleep(1000);
                                 s.cancel();
                             } else if (i == 1) {
                                 // or use some other statement which will block
@@ -80,7 +80,7 @@ public class Bug51582 {
                                         (System.currentTimeMillis() - start) +
                                         "]");
                             } else {
-                                Thread.sleep(1000);
+                                sleep(1000);
                                 connection.close();
                             }
                         } catch (InterruptedException e) {

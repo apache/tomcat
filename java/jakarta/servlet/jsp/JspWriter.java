@@ -24,7 +24,7 @@ import java.io.IOException;
  * variable out which is initialized automatically using methods in the PageContext object.
  * <p>
  * This abstract class emulates some of the functionality found in the java.io.BufferedWriter and java.io.PrintWriter
- * classes, however it differs in that it throws java.io.IOException from the print methods while PrintWriter does not.
+ * classes, however it differs in that it throws IOException from the print methods while PrintWriter does not.
  * <p>
  * <B>Buffering</B>
  * <p>
@@ -99,12 +99,12 @@ public abstract class JspWriter extends java.io.Writer {
 
     /**
      * Print a boolean value. The string produced by <code>{@link
-     * java.lang.String#valueOf(boolean)}</code> is written to the JspWriter's buffer or, if no buffer is used, directly
-     * to the underlying writer.
+     * String#valueOf(boolean)}</code> is written to the JspWriter's buffer or, if no buffer is used, directly to the
+     * underlying writer.
      *
      * @param b The <code>boolean</code> to be printed
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void print(boolean b) throws IOException;
 
@@ -114,59 +114,59 @@ public abstract class JspWriter extends java.io.Writer {
      *
      * @param c The <code>char</code> to be printed
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void print(char c) throws IOException;
 
     /**
      * Print an integer. The string produced by <code>{@link
-     * java.lang.String#valueOf(int)}</code> is written to the JspWriter's buffer or, if no buffer is used, directly to
-     * the underlying writer.
+     * String#valueOf(int)}</code> is written to the JspWriter's buffer or, if no buffer is used, directly to the
+     * underlying writer.
      *
      * @param i The <code>int</code> to be printed
      *
      * @see java.lang.Integer#toString(int)
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void print(int i) throws IOException;
 
     /**
      * Print a long integer. The string produced by <code>{@link
-     * java.lang.String#valueOf(long)}</code> is written to the JspWriter's buffer or, if no buffer is used, directly to
-     * the underlying writer.
+     * String#valueOf(long)}</code> is written to the JspWriter's buffer or, if no buffer is used, directly to the
+     * underlying writer.
      *
      * @param l The <code>long</code> to be printed
      *
      * @see java.lang.Long#toString(long)
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void print(long l) throws IOException;
 
     /**
      * Print a floating-point number. The string produced by <code>{@link
-     * java.lang.String#valueOf(float)}</code> is written to the JspWriter's buffer or, if no buffer is used, directly
-     * to the underlying writer.
+     * String#valueOf(float)}</code> is written to the JspWriter's buffer or, if no buffer is used, directly to the
+     * underlying writer.
      *
      * @param f The <code>float</code> to be printed
      *
      * @see java.lang.Float#toString(float)
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void print(float f) throws IOException;
 
     /**
      * Print a double-precision floating-point number. The string produced by
-     * <code>{@link java.lang.String#valueOf(double)}</code> is written to the JspWriter's buffer or, if no buffer is
-     * used, directly to the underlying writer.
+     * <code>{@link String#valueOf(double)}</code> is written to the JspWriter's buffer or, if no buffer is used,
+     * directly to the underlying writer.
      *
      * @param d The <code>double</code> to be printed
      *
      * @see java.lang.Double#toString(double)
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void print(double d) throws IOException;
 
@@ -177,7 +177,7 @@ public abstract class JspWriter extends java.io.Writer {
      * @param s The array of chars to be printed
      *
      * @throws NullPointerException If <code>s</code> is <code>null</code>
-     * @throws java.io.IOException  If an error occurred while writing
+     * @throws IOException          If an error occurred while writing
      */
     public abstract void print(char s[]) throws IOException;
 
@@ -188,20 +188,20 @@ public abstract class JspWriter extends java.io.Writer {
      *
      * @param s The <code>String</code> to be printed
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void print(String s) throws IOException;
 
     /**
      * Print an object. The string produced by the <code>{@link
-     * java.lang.String#valueOf(Object)}</code> method is written to the JspWriter's buffer or, if no buffer is used,
-     * directly to the underlying writer.
+     * String#valueOf(Object)}</code> method is written to the JspWriter's buffer or, if no buffer is used, directly to
+     * the underlying writer.
      *
      * @param obj The <code>Object</code> to be printed
      *
      * @see java.lang.Object#toString()
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void print(Object obj) throws IOException;
 
@@ -210,7 +210,7 @@ public abstract class JspWriter extends java.io.Writer {
      * system property <code>line.separator</code>, and is not necessarily a single newline character
      * (<code>'\n'</code>).
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void println() throws IOException;
 
@@ -220,7 +220,7 @@ public abstract class JspWriter extends java.io.Writer {
      *
      * @param x the boolean to write
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void println(boolean x) throws IOException;
 
@@ -231,7 +231,7 @@ public abstract class JspWriter extends java.io.Writer {
      *
      * @param x the char to write
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void println(char x) throws IOException;
 
@@ -242,7 +242,7 @@ public abstract class JspWriter extends java.io.Writer {
      *
      * @param x the int to write
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void println(int x) throws IOException;
 
@@ -252,7 +252,7 @@ public abstract class JspWriter extends java.io.Writer {
      *
      * @param x the long to write
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void println(long x) throws IOException;
 
@@ -262,7 +262,7 @@ public abstract class JspWriter extends java.io.Writer {
      *
      * @param x the float to write
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void println(float x) throws IOException;
 
@@ -273,7 +273,7 @@ public abstract class JspWriter extends java.io.Writer {
      *
      * @param x the double to write
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void println(double x) throws IOException;
 
@@ -283,7 +283,7 @@ public abstract class JspWriter extends java.io.Writer {
      *
      * @param x the char[] to write
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void println(char x[]) throws IOException;
 
@@ -293,7 +293,7 @@ public abstract class JspWriter extends java.io.Writer {
      *
      * @param x the String to write
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void println(String x) throws IOException;
 
@@ -303,7 +303,7 @@ public abstract class JspWriter extends java.io.Writer {
      *
      * @param x the Object to write
      *
-     * @throws java.io.IOException If an error occurred while writing
+     * @throws IOException If an error occurred while writing
      */
     public abstract void println(Object x) throws IOException;
 

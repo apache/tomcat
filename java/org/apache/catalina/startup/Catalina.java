@@ -747,7 +747,7 @@ public class Catalina {
             getServer().init();
         } catch (LifecycleException e) {
             if (throwOnInitFailure) {
-                throw new java.lang.Error(e);
+                throw new Error(e);
             } else {
                 log.error(sm.getString("catalina.initError"), e);
             }

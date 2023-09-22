@@ -137,7 +137,7 @@ public abstract class MembershipServiceBase implements MembershipService, Member
 
     @Override
     public void start() throws Exception {
-        start(MembershipService.MBR_RX);
-        start(MembershipService.MBR_TX);
+        start(MBR_RX);
+        start(MBR_TX);
     }
 }

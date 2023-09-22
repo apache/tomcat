@@ -73,7 +73,7 @@ public final class SSL {
     public static final int SSL_PROTOCOL_ALL;
 
     static {
-        if (SSL.version() >= 0x1010100f) {
+        if (version() >= 0x1010100f) {
             SSL_PROTOCOL_ALL = (SSL_PROTOCOL_TLSV1 | SSL_PROTOCOL_TLSV1_1 | SSL_PROTOCOL_TLSV1_2 |
                     SSL_PROTOCOL_TLSV1_3);
         } else {

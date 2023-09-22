@@ -77,7 +77,7 @@ public class RxTaskPool {
                 } else {
                     try {
                         mutex.wait();
-                    } catch (java.lang.InterruptedException x) {
+                    } catch (InterruptedException x) {
                         Thread.currentThread().interrupt();
                     }
                 }

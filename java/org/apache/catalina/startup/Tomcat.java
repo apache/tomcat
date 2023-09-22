@@ -1308,7 +1308,7 @@ public class Tomcat {
             }
         }
         SecurityClassLoad.securityClassLoad(Thread.currentThread().getContextClassLoader());
-        org.apache.catalina.startup.Tomcat tomcat = new org.apache.catalina.startup.Tomcat();
+        Tomcat tomcat = new Tomcat();
         // Create a Catalina instance and let it parse the configuration files
         // It will also set a shutdown hook to stop the Server when needed
         // Use the default configuration source

@@ -629,7 +629,7 @@ public class JspCServletContext implements ServletContext {
 
 
     @Override
-    public jakarta.servlet.ServletRegistration.Dynamic addJspFile(String jspName, String jspFile) {
+    public ServletRegistration.Dynamic addJspFile(String jspName, String jspFile) {
         return null;
     }
 

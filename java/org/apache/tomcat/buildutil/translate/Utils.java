@@ -153,10 +153,10 @@ public class Utils {
         }
 
         // Determine language
-        String language = Utils.getLanguage(name);
+        String language = getLanguage(name);
 
         String keyPrefix = getKeyPrefix(root, f);
-        Properties props = Utils.load(f);
+        Properties props = load(f);
 
         // Create a Map for the language if one does not exist.
         Properties translation = translations.get(language);
@@ -195,7 +195,7 @@ public class Utils {
             String[] keys = translation.keySet().toArray(new String[0]);
             Arrays.sort(keys);
             for (Object key : keys) {
-                w.write(key + "=" + Utils.formatValueExport(translation.getProperty((String) key)) + "\n");
+                w.write(key + "=" + formatValueExport(translation.getProperty((String) key)) + "\n");
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();

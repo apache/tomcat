@@ -271,7 +271,7 @@ public class McastService
     }
 
     @Override
-    public void start(int level) throws java.lang.Exception {
+    public void start(int level) throws Exception {
         hasProperty(properties,"mcastPort");
         hasProperty(properties,"mcastAddress");
         hasProperty(properties,"memberDropTime");
@@ -532,7 +532,7 @@ public class McastService
      */
     public static void main(String args[]) throws Exception {
         McastService service = new McastService();
-        java.util.Properties p = new java.util.Properties();
+        Properties p = new Properties();
         p.setProperty("mcastPort","5555");
         p.setProperty("mcastAddress","224.10.10.10");
         p.setProperty("mcastClusterDomain","catalina");

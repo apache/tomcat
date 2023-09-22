@@ -225,23 +225,18 @@ public class TesterServletContext implements ServletContext {
     }
 
     @Override
-    public jakarta.servlet.FilterRegistration.Dynamic addFilter(
-            String filterName, String className) {
+    public FilterRegistration.Dynamic addFilter(String filterName, String className) {
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public jakarta.servlet.FilterRegistration.Dynamic addFilter(
-            String filterName, Filter filter) {
-        return new ApplicationFilterRegistration(
-                new FilterDef(), new TesterContext());
+    public FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
+        return new ApplicationFilterRegistration(new FilterDef(), new TesterContext());
     }
 
     @Override
-    public jakarta.servlet.FilterRegistration.Dynamic addFilter(
-            String filterName, Class<? extends Filter> filterClass) {
-        return new ApplicationFilterRegistration(
-                new FilterDef(), new TesterContext());
+    public FilterRegistration.Dynamic addFilter(String filterName, Class<? extends Filter> filterClass) {
+        return new ApplicationFilterRegistration(new FilterDef(), new TesterContext());
     }
 
     @Override

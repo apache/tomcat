@@ -1095,7 +1095,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
             }
             current = current.getNext();
         }
-        fireLifecycleEvent(Lifecycle.PERIODIC_EVENT, null);
+        fireLifecycleEvent(PERIODIC_EVENT, null);
     }
 
 

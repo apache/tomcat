@@ -549,12 +549,12 @@ public class DataSourceFactory implements ObjectFactory {
         return createDataSource(properties,null,false);
     }
     public DataSource createDataSource(Properties properties,Context context, boolean XA) throws Exception {
-        PoolConfiguration poolProperties = DataSourceFactory.parsePoolProperties(properties);
+        PoolConfiguration poolProperties = parsePoolProperties(properties);
         if (poolProperties.getDataSourceJNDI()!=null && poolProperties.getDataSource()==null) {
             performJNDILookup(context, poolProperties);
         }
-        org.apache.tomcat.jdbc.pool.DataSource dataSource = XA?
-                new org.apache.tomcat.jdbc.pool.XADataSource(poolProperties) :
+        org.apache.tomcat.jdbc.pool.DataSource dataSource = XA ?
+                new XADataSource(poolProperties) :
                 new org.apache.tomcat.jdbc.pool.DataSource(poolProperties);
         //initialise the pool itself
         dataSource.createPool();

@@ -380,8 +380,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
         File appDir = new File(getBuildDirectory(), "webapps" + contextPath);
         // app dir is relative to server home
-        org.apache.catalina.Context ctx =
-            tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        Context ctx = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         ctx.addApplicationListener(WsContextListener.class.getName());
 
         // Override the default servlet with our own mappings

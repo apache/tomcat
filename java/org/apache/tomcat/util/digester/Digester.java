@@ -152,7 +152,7 @@ public class Digester extends DefaultHandler2 {
     private static GeneratedCodeLoader generatedCodeLoader;
 
     public static boolean isGeneratedCodeLoaderSet() {
-        return (Digester.generatedCodeLoader != null);
+        return generatedCodeLoader != null;
     }
 
     public static void setGeneratedCodeLoader(GeneratedCodeLoader generatedCodeLoader) {

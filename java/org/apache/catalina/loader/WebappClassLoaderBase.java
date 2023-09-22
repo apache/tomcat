@@ -131,7 +131,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     static {
         if (!JreCompat.isGraalAvailable()) {
-            ClassLoader.registerAsParallelCapable();
+            registerAsParallelCapable();
         }
         JVM_THREAD_GROUP_NAMES.add(JVM_THREAD_GROUP_SYSTEM);
         JVM_THREAD_GROUP_NAMES.add("RMI Runtime");
@@ -1622,7 +1622,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         // Clear the classloader reference in common-logging
         if (clearReferencesLogFactoryRelease) {
-            org.apache.juli.logging.LogFactory.release(this);
+            LogFactory.release(this);
         }
 
         // Clear the classloader reference in the VM's bean introspector

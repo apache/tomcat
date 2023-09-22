@@ -95,7 +95,7 @@ public final class UriUtil {
             char c = uri.charAt(i);
             if (c == ':') {
                 return i > 0;
-            } else if (!UriUtil.isSchemeChar(c)) {
+            } else if (!isSchemeChar(c)) {
                 return false;
             }
         }

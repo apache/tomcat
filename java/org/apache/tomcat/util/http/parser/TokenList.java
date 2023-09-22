@@ -46,7 +46,7 @@ public class TokenList {
         while (inputs.hasMoreElements()) {
             String nextHeaderValue = inputs.nextElement();
             if (nextHeaderValue != null) {
-                if (!TokenList.parseTokenList(new StringReader(nextHeaderValue), collection)) {
+                if (!parseTokenList(new StringReader(nextHeaderValue), collection)) {
                     result = false;
                 }
             }

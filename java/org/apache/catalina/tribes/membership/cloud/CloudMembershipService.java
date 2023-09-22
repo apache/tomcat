@@ -22,7 +22,6 @@ import javax.management.ObjectName;
 
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipProvider;
-import org.apache.catalina.tribes.MembershipService;
 import org.apache.catalina.tribes.jmx.JmxRegistry;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.membership.MembershipServiceBase;
@@ -123,7 +122,7 @@ public class CloudMembershipService extends MembershipServiceBase
 
     @Override
     public void start(int level) throws Exception {
-        if ((level & MembershipService.MBR_RX) == 0) {
+        if ((level & MBR_RX) == 0) {
             return;
         }
 

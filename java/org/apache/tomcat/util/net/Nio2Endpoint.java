@@ -617,7 +617,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         if (nBytes.intValue() < 0) {
                             failed(new EOFException(), attachment);
                         } else {
-                            if (readInterest && !Nio2Endpoint.isInline()) {
+                            if (readInterest && !isInline()) {
                                 readNotify = true;
                             } else {
                                 // Release here since there will be no
@@ -673,7 +673,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                                     TimeUnit.MILLISECONDS, attachment, writeCompletionHandler);
                         } else {
                             // All data has been written
-                            if (writeInterest && !Nio2Endpoint.isInline()) {
+                            if (writeInterest && !isInline()) {
                                 writeNotify = true;
                                 // Set extra flag so that write nesting does not cause multiple notifications
                                 notify = true;
@@ -723,7 +723,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                                     array, gatheringWriteCompletionHandler);
                         } else {
                             // All data has been written
-                            if (writeInterest && !Nio2Endpoint.isInline()) {
+                            if (writeInterest && !isInline()) {
                                 writeNotify = true;
                                 // Set extra flag so that write nesting does not cause multiple notifications
                                 notify = true;
@@ -1047,11 +1047,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         writeNotify = true;
                     }
                 }
-                Nio2Endpoint.startInline();
+                startInline();
                 try {
                     run();
                 } finally {
-                    Nio2Endpoint.endInline();
+                    endInline();
                 }
             }
 
@@ -1150,10 +1150,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     readPending.release();
                 }
             } else {
-                Nio2Endpoint.startInline();
+                startInline();
                 getSocket().read(to, toTimeout(getReadTimeout()), TimeUnit.MILLISECONDS, to,
                         readCompletionHandler);
-                Nio2Endpoint.endInline();
+                endInline();
                 if (readPending.availablePermits() == 1) {
                     nRead = to.position();
                 }
@@ -1318,17 +1318,17 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     socketBufferHandler.configureWriteBufferForRead();
                     if (!nonBlockingWriteBuffer.isEmpty()) {
                         ByteBuffer[] array = nonBlockingWriteBuffer.toArray(socketBufferHandler.getWriteBuffer());
-                        Nio2Endpoint.startInline();
+                        startInline();
                         getSocket().write(array, 0, array.length, toTimeout(getWriteTimeout()),
                                 TimeUnit.MILLISECONDS, array, gatheringWriteCompletionHandler);
-                        Nio2Endpoint.endInline();
+                        endInline();
                     } else if (socketBufferHandler.getWriteBuffer().hasRemaining()) {
                         // Regular write
-                        Nio2Endpoint.startInline();
+                        startInline();
                         getSocket().write(socketBufferHandler.getWriteBuffer(), toTimeout(getWriteTimeout()),
                                 TimeUnit.MILLISECONDS, socketBufferHandler.getWriteBuffer(),
                                 writeCompletionHandler);
-                        Nio2Endpoint.endInline();
+                        endInline();
                     } else {
                         // Nothing was written
                         if (!hasPermit) {
@@ -1441,8 +1441,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             if (data.fchannel == null || !data.fchannel.isOpen()) {
                 java.nio.file.Path path = new File(sendfileData.fileName).toPath();
                 try {
-                    data.fchannel = java.nio.channels.FileChannel
-                            .open(path, StandardOpenOption.READ).position(sendfileData.pos);
+                    data.fchannel = FileChannel.open(path, StandardOpenOption.READ).position(sendfileData.pos);
                 } catch (IOException e) {
                     return SendfileState.ERROR;
                 }
@@ -1459,10 +1458,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             if (nRead >= 0) {
                 data.length -= nRead;
                 getSocket().getBufHandler().configureWriteBufferForRead();
-                Nio2Endpoint.startInline();
+                startInline();
                 getSocket().write(buffer, toTimeout(getWriteTimeout()), TimeUnit.MILLISECONDS,
                         data, sendfileHandler);
-                Nio2Endpoint.endInline();
+                endInline();
                 if (data.doneInline) {
                     if (data.error) {
                         return SendfileState.ERROR;

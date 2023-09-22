@@ -176,7 +176,7 @@ public abstract class JspContext {
      *
      * @param scope the scope to enumerate all the attributes for
      *
-     * @return an enumeration of names (java.lang.String) of all the attributes the specified scope
+     * @return an enumeration of names ({@link String}) of all the attributes the specified scope
      *
      * @throws IllegalArgumentException if the scope is invalid
      * @throws IllegalStateException    if the scope is PageContext.SESSION_SCOPE but the page that was requested does

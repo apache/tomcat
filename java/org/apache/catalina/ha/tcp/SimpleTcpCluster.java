@@ -30,7 +30,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Manager;
@@ -407,7 +406,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
      *
      * @param name Context Name of this manager
      *
-     * @see org.apache.catalina.Cluster#createManager(java.lang.String)
+     * @see org.apache.catalina.Cluster#createManager(String)
      * @see DeltaManager#start()
      */
     @Override
@@ -422,7 +421,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             manager.setName(name);
         } catch (Exception x) {
             log.error(sm.getString("simpleTcpCluster.clustermanager.cloneFailed"), x);
-            manager = new org.apache.catalina.ha.session.DeltaManager();
+            manager = new DeltaManager();
         } finally {
             if (manager != null) {
                 manager.setCluster(this);
@@ -512,7 +511,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         }
 
         // periodic event
-        fireLifecycleEvent(Lifecycle.PERIODIC_EVENT, null);
+        fireLifecycleEvent(PERIODIC_EVENT, null);
     }
 
 

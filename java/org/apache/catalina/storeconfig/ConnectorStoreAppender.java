@@ -243,7 +243,7 @@ public class ConnectorStoreAppender extends StoreAppender {
      * Print a value but replace certain attribute names.
      *
      * @see org.apache.catalina.storeconfig.StoreAppender#printValue(java.io.PrintWriter,
-     *      int, java.lang.String, java.lang.Object)
+     *      int, String, Object)
      */
     @Override
     public void printValue(PrintWriter writer, int indent, String name,
@@ -259,9 +259,8 @@ public class ConnectorStoreAppender extends StoreAppender {
      * Print Connector Values. <ul><li> Special handling to default jkHome.
      * </li><li> Don't save catalina.base path at server.xml</li><li></ul>
      *
-     * @see org.apache.catalina.storeconfig.StoreAppender#isPrintValue(java.lang.Object,
-     *      java.lang.Object, java.lang.String,
-     *      org.apache.catalina.storeconfig.StoreDescription)
+     * @see org.apache.catalina.storeconfig.StoreAppender#isPrintValue(Object,
+     *      Object, String, StoreDescription)
      */
     @Override
     public boolean isPrintValue(Object bean, Object bean2, String attrName,

@@ -27,7 +27,7 @@ public class ParallelWebappClassLoader extends WebappClassLoaderBase {
 
     static {
         if (!JreCompat.isGraalAvailable()) {
-            if (!ClassLoader.registerAsParallelCapable()) {
+            if (!registerAsParallelCapable()) {
                 log.warn(sm.getString("webappClassLoaderParallel.registrationFailed"));
             }
         }

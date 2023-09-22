@@ -239,7 +239,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
         RequestInfo rp = request.getRequestProcessor();
         try {
-            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
+            rp.setStage(Constants.STAGE_SERVICE);
             if (!getAdapter().asyncDispatch(request, response, status)) {
                 setErrorState(ErrorState.CLOSE_NOW, null);
             }
@@ -251,7 +251,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             getLog().error(sm.getString("http11processor.request.process"), t);
         }
 
-        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
+        rp.setStage(Constants.STAGE_ENDED);
 
         SocketState state;
 

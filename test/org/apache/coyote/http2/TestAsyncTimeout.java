@@ -149,7 +149,7 @@ public class TestAsyncTimeout extends Http2TestBase {
                 // If the test works running will be set to false before
                 // counter reaches 50.
                 while (running && counter < 50) {
-                    Thread.sleep(100);
+                    sleep(100);
                     counter++;
                     pw.print("Tick " + counter);
                 }
