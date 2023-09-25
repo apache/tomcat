@@ -232,7 +232,13 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
 
     @Override
     public int size() {
-        return items.size();
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return items.size();
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
