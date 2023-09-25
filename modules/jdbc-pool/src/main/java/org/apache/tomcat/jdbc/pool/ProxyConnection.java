@@ -106,7 +106,7 @@ public class ProxyConnection extends JdbcInterceptor {
             return this.toString();
         } else if (compare(GETCONNECTION_VAL,method) && connection!=null) {
             return connection.getConnection();
-        } else if (method.getDeclaringClass().isAssignableFrom(XAConnection.class)) {
+        } else if (method.getDeclaringClass().isAssignableFrom(XAConnection.class) && connection != null) {
             try {
                 return method.invoke(connection.getXAConnection(),args);
             }catch (Throwable t) {
