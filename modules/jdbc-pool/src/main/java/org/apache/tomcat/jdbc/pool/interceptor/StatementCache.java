@@ -218,7 +218,11 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         if (cache == null) {
           return null;
         }
-        return cache.get(createCacheKey(method, args));
+        CacheKey key = createCacheKey(method, args);
+        if (key == null) {
+            throw new IllegalArgumentException("Null key");
+        }
+        return cache.get(key);
     }
 
     public boolean cacheStatement(CachedStatement proxy) {
