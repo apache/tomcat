@@ -63,7 +63,7 @@ public class DeltaRequest implements Externalizable {
     public static final String NAME_LISTENER = "__SET__LISTENER__";
 
     private String sessionId;
-    private Deque<AttributeInfo> actions = new ArrayDeque<>();
+    private final Deque<AttributeInfo> actions = new ArrayDeque<>();
     private final Deque<AttributeInfo> actionPool = new ArrayDeque<>();
 
     private boolean recordAllActions = false;
