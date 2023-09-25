@@ -107,6 +107,12 @@
 <section name="Tomcat 10.1.14 (schultz)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>65770</bug>: Provide a lifecycle listener that will automatically
+        reload TLS configurations a set time before the certificate is due to
+        expire. This is intended to be used with third-party tools that
+        regularly renew TLS certificates. (markt)
+      </add>
       <fix>
         Fix handling of an error reading a context descriptor on deployment.
         (remm)

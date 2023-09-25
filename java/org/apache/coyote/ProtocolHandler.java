@@ -164,6 +164,19 @@ public interface ProtocolHandler {
 
 
     /**
+     * Add a new SSL configuration for a virtual host.
+     *
+     * @param sslHostConfig the configuration
+     * @param replace       If {@code true} replacement of an existing configuration is permitted, otherwise any such
+     *                          attempted replacement will trigger an exception
+     *
+     * @throws IllegalArgumentException If the host name is not valid or if a configuration has already been provided
+     *                                      for that host and replacement is not allowed
+     */
+    void addSslHostConfig(SSLHostConfig sslHostConfig, boolean replace);
+
+
+    /**
      * Find all configured SSL virtual host configurations which will be used by SNI.
      *
      * @return the configurations
