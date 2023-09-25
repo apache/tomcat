@@ -520,6 +520,43 @@
 
   </subsection>
 
+  <subsection name="TLS configuration reload listener - org.apache.catalina.security.TLSCertificateReloadListener">
+
+    <p>This listener may be used to monitor the expiration dates of TLS
+    certificates and trigger automatic reloading of the TLS configuration a set
+    number of days before the TLS certificate expires.</p>
+
+    <p>This listener assumes there is some other process (certbot, cloud
+    infrastructure, etc) that renews the certificate on a regular basis and
+    replaces the current certificate with the new one.</p>
+
+    <p>This listener does <b>NOT</b> re-read the Tomcat configuration from
+    server.xml. If you make changes to server.xml you must restart the Tomcat
+    process to pick up those changes.</p>
+
+    <p>This listener must only be nested within <a href="server.html">Server</a>
+    elements.</p>
+
+    <attributes>
+
+      <attribute name="checkPeriod" required="false">
+        <p>The time, in seconds, between reloading checks. The periodic process
+        for <code>LifecycleListener</code> typically runs much more frequently
+        than this listener requires. This attribute controls the period between
+        checks. If not specified, a default of 86,400 seconds (24 hours) is
+        used.</p>
+      </attribute>
+
+      <attribute name="daysBefore" required="false">
+        <p>The number of days before the expiry of a TLS certificate that it is
+        expected that the new certificate will be in place and the reloading can
+        be triggered. If not specified, a default of 14 days is used.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
   <subsection name="UserConfig - org.apache.catalina.startup.UserConfig">
 
     <p>The <strong>UserConfig</strong> provides feature of User Web Applications.
