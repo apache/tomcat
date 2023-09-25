@@ -1090,7 +1090,7 @@ public class ConnectionPool {
                     long time = con.getTimestamp();
                     long now = System.currentTimeMillis();
                     if (shouldAbandon() && (now - time) > con.getAbandonTimeout()) {
-                        busy.remove(con);
+                        locked.remove();
                         abandon(con);
                         setToNull = true;
                     } else if (sto > 0 && (now - time) > (sto * 1000L)) {
@@ -1141,7 +1141,7 @@ public class ConnectionPool {
                     if (shouldReleaseIdle(now, con, time)) {
                         releasedIdleCount.incrementAndGet();
                         release(con);
-                        idle.remove(con);
+                        unlocked.remove();
                         setToNull = true;
                     } else {
                         //do nothing
@@ -1205,7 +1205,7 @@ public class ConnectionPool {
                     }
                     if (release) {
                         releasedIdleCount.incrementAndGet();
-                        idle.remove(con);
+                        unlocked.remove();
                         release(con);
                     }
                 } finally {
@@ -1460,7 +1460,9 @@ public class ConnectionPool {
                 if (configured.compareAndSet(false, true)) {
                     try {
                         pc = borrowConnection(System.currentTimeMillis(),pc, null, null);
-                        result = ConnectionPool.this.setupConnection(pc);
+                        if (pc != null) {
+                            result = ConnectionPool.this.setupConnection(pc);
+                        }
                     } catch (SQLException x) {
                         cause = x;
                     } finally {
@@ -1502,7 +1504,9 @@ public class ConnectionPool {
         public void run() {
             try {
                 Connection con = get(); //complete this future
-                con.close(); //return to the pool
+                if (con != null) {
+                    con.close(); //return to the pool
+                }
             }catch (ExecutionException ex) {
                 //we can ignore this
             }catch (Exception x) {
@@ -1551,7 +1555,8 @@ public class ConnectionPool {
         }
     }
 
-    public static Set<TimerTask> getPoolCleaners() {
+    // Testing use only
+    public static synchronized Set<TimerTask> getPoolCleaners() {
         return Collections.<TimerTask>unmodifiableSet(cleaners);
     }
 
@@ -1559,7 +1564,8 @@ public class ConnectionPool {
         return poolVersion.get();
     }
 
-    public static Timer getPoolTimer() {
+    // Testing use only
+    public static synchronized Timer getPoolTimer() {
         return poolCleanTimer;
     }
 
