@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.KeyStore;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -883,6 +885,30 @@ public class SSLHostConfig implements Serializable {
 
 
     // --------------------------------------------------------- Support methods
+
+    public Set<X509Certificate> certificatesExpiringBefore(Date date) {
+        Set<X509Certificate> result = new HashSet<>();
+        Set<SSLHostConfigCertificate> sslHostConfigCertificates = getCertificates();
+        for (SSLHostConfigCertificate sslHostConfigCertificate : sslHostConfigCertificates) {
+            SSLContext sslContext = sslHostConfigCertificate.getSslContext();
+            if (sslContext != null) {
+                String alias = sslHostConfigCertificate.getCertificateKeyAlias();
+                if (alias == null) {
+                    alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
+                }
+                X509Certificate[] certificates = sslContext.getCertificateChain(alias);
+                if (certificates != null && certificates.length > 0) {
+                    X509Certificate certificate = certificates[0];
+                    Date expirationDate = certificate.getNotAfter();
+                    if (date.after(expirationDate)) {
+                        result.add(certificate);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
 
     public static String adjustRelativePath(String path) throws FileNotFoundException {
         // Empty or null path can't point to anything useful. The assumption is

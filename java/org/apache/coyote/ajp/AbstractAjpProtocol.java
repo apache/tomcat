@@ -232,6 +232,12 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
 
 
     @Override
+    public void addSslHostConfig(SSLHostConfig sslHostConfig, boolean replace) {
+        getLog().warn(sm.getString("ajpprotocol.noSSL", sslHostConfig.getHostName()));
+    }
+
+
+    @Override
     public SSLHostConfig[] findSslHostConfigs() {
         return new SSLHostConfig[0];
     }
