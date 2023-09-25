@@ -698,6 +698,12 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
 
     @Override
+    public void addSslHostConfig(SSLHostConfig sslHostConfig, boolean replace) {
+        getEndpoint().addSslHostConfig(sslHostConfig, replace);
+    }
+
+
+    @Override
     public SSLHostConfig[] findSslHostConfigs() {
         return getEndpoint().findSslHostConfigs();
     }
