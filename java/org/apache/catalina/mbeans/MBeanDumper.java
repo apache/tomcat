@@ -28,6 +28,7 @@ import javax.management.ObjectName;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * General helper to dump MBean contents to the log.
@@ -35,8 +36,10 @@ import org.apache.tomcat.util.ExceptionUtils;
 public class MBeanDumper {
 
     private static final Log log = LogFactory.getLog(MBeanDumper.class);
+    protected static final StringManager sm = StringManager.getManager(MBeanDumper.class);
 
     private static final String CRLF = "\r\n";
+
 
     /**
      * The following code to dump MBeans has been copied from JMXProxyServlet.
@@ -67,11 +70,11 @@ public class MBeanDumper {
                 MBeanAttributeInfo attrs[] = minfo.getAttributes();
                 Object value = null;
 
-                for (int i = 0; i < attrs.length; i++) {
-                    if (!attrs[i].isReadable()) {
+                for (MBeanAttributeInfo attr : attrs) {
+                    if (!attr.isReadable()) {
                         continue;
                     }
-                    String attName = attrs[i].getName();
+                    String attName = attr.getName();
                     if ("modelerType".equals(attName)) {
                         continue;
                     }
@@ -85,19 +88,19 @@ public class MBeanDumper {
                         Throwable cause = rme.getCause();
                         if (cause instanceof UnsupportedOperationException) {
                             if (log.isDebugEnabled()) {
-                                log.debug("Error getting attribute " + oname + " " + attName, rme);
+                                log.debug(sm.getString("mBeanDumper.getAttributeError", attName, oname), rme);
                             }
                         } else if (cause instanceof NullPointerException) {
                             if (log.isDebugEnabled()) {
-                                log.debug("Error getting attribute " + oname + " " + attName, rme);
+                                log.debug(sm.getString("mBeanDumper.getAttributeError", attName, oname), rme);
                             }
                         } else {
-                            log.error("Error getting attribute " + oname + " " + attName, rme);
+                            log.error(sm.getString("mBeanDumper.getAttributeError", attName, oname), rme);
                         }
                         continue;
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
-                        log.error("Error getting attribute " + oname + " " + attName, t);
+                        log.error(sm.getString("mBeanDumper.getAttributeError", attName, oname), t);
                         continue;
                     }
                     if (value == null) {
@@ -148,8 +151,8 @@ public class MBeanDumper {
             buf.append(CRLF);
         }
         return buf.toString();
-
     }
+
 
     public static String escape(String value) {
         // The only invalid char is \n
@@ -164,7 +167,6 @@ public class MBeanDumper {
         StringBuilder sb = new StringBuilder();
         while (idx >= 0) {
             appendHead(sb, value, prev, idx);
-
             sb.append("\\n\n ");
             prev = idx + 1;
             if (idx == value.length() - 1) {
@@ -177,6 +179,7 @@ public class MBeanDumper {
         }
         return sb.toString();
     }
+
 
     private static void appendHead(StringBuilder sb, String value, int start, int end) {
         if (end < 1) {

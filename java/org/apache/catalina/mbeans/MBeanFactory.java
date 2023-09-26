@@ -27,6 +27,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.JmxEnabled;
+import org.apache.catalina.Realm;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.Valve;
@@ -175,7 +176,7 @@ public class MBeanFactory {
             }
         }
         if (service == null || !service.getObjectName().getDomain().equals(domain)) {
-            throw new Exception("Service with the domain is not found");
+            throw new Exception(sm.getString("mBeanFactory.noService", domain));
         }
         return service;
 
@@ -227,6 +228,11 @@ public class MBeanFactory {
         realm.setUserTable(userTable);
 
         // Add the new instance to its parent component
+        return addRealmToParent(parent, realm);
+    }
+
+
+    private String addRealmToParent(String parent, Realm realm) throws Exception {
         ObjectName pname = new ObjectName(parent);
         Container container = getParentContainerFromParent(pname);
         if (container == null) {
@@ -235,7 +241,10 @@ public class MBeanFactory {
         // Add the new instance to its parent component
         container.setRealm(realm);
         // Return the corresponding MBean name
-        ObjectName oname = realm.getObjectName();
+        ObjectName oname = null;
+        if (realm instanceof JmxEnabled) {
+            oname = ((JmxEnabled) realm).getObjectName();
+        }
         if (oname != null) {
             return oname.toString();
         } else {
@@ -273,7 +282,7 @@ public class MBeanFactory {
      */
     private String createConnector(String parent, String address, int port, boolean isAjp, boolean isSSL)
             throws Exception {
-        // Set the protocol
+        // Set the protocol in the constructor
         String protocol = isAjp ? "AJP/1.3" : "HTTP/1.1";
         Connector retobj = new Connector(protocol);
         if ((address != null) && (address.length() > 0)) {
@@ -340,18 +349,7 @@ public class MBeanFactory {
         realm.setConnectionURL(connectionURL);
 
         // Add the new instance to its parent component
-        ObjectName pname = new ObjectName(parent);
-        Container container = getParentContainerFromParent(pname);
-        // Add the new instance to its parent component
-        container.setRealm(realm);
-        // Return the corresponding MBean name
-        ObjectName oname = realm.getObjectName();
-
-        if (oname != null) {
-            return (oname.toString());
-        } else {
-            return null;
-        }
+        return addRealmToParent(parent, realm);
     }
 
 
@@ -370,18 +368,7 @@ public class MBeanFactory {
         JNDIRealm realm = new JNDIRealm();
 
         // Add the new instance to its parent component
-        ObjectName pname = new ObjectName(parent);
-        Container container = getParentContainerFromParent(pname);
-        // Add the new instance to its parent component
-        container.setRealm(realm);
-        // Return the corresponding MBean name
-        ObjectName oname = realm.getObjectName();
-
-        if (oname != null) {
-            return (oname.toString());
-        } else {
-            return null;
-        }
+        return addRealmToParent(parent, realm);
     }
 
 
@@ -400,17 +387,7 @@ public class MBeanFactory {
         MemoryRealm realm = new MemoryRealm();
 
         // Add the new instance to its parent component
-        ObjectName pname = new ObjectName(parent);
-        Container container = getParentContainerFromParent(pname);
-        // Add the new instance to its parent component
-        container.setRealm(realm);
-        // Return the corresponding MBean name
-        ObjectName oname = realm.getObjectName();
-        if (oname != null) {
-            return (oname.toString());
-        } else {
-            return null;
-        }
+        return addRealmToParent(parent, realm);
     }
 
 
@@ -484,7 +461,7 @@ public class MBeanFactory {
                         sm.getString("mBeanFactory.contextCreate.addServicedFail", contextName));
             }
         } else {
-            log.warn("Deployer not found for " + pname.getKeyProperty("host"));
+            log.warn(sm.getString("mBeanFactory.noDeployer", pname.getKeyProperty("host")));
             Service service = getService(pname);
             Engine engine = service.getContainer();
             Host host = (Host) engine.findChild(pname.getKeyProperty("host"));
@@ -553,7 +530,7 @@ public class MBeanFactory {
     public String createStandardServiceEngine(String domain, String defaultHost, String baseDir) throws Exception {
 
         if (!(container instanceof Server)) {
-            throw new Exception("Container not Server");
+            throw new Exception(sm.getString("mBeanFactory.notServer"));
         }
 
         StandardEngine engine = new StandardEngine();
@@ -620,21 +597,7 @@ public class MBeanFactory {
         realm.setResourceName(resourceName);
 
         // Add the new instance to its parent component
-        ObjectName pname = new ObjectName(parent);
-        Container container = getParentContainerFromParent(pname);
-        // Add the new instance to its parent component
-        container.setRealm(realm);
-        // Return the corresponding MBean name
-        ObjectName oname = realm.getObjectName();
-        // FIXME getObjectName() returns null
-        // ObjectName oname =
-        // MBeanUtils.createObjectName(pname.getDomain(), realm);
-        if (oname != null) {
-            return (oname.toString());
-        } else {
-            return null;
-        }
-
+        return addRealmToParent(parent, realm);
     }
 
 
@@ -656,8 +619,7 @@ public class MBeanFactory {
         Container container = getParentContainerFromParent(parentName);
 
         if (container == null) {
-            // TODO
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(sm.getString("mBeanFactory.noParent", parent));
         }
 
         Valve valve = (Valve) Class.forName(className).getConstructor().newInstance();
@@ -782,7 +744,7 @@ public class MBeanFactory {
                 throw new IllegalStateException(sm.getString("mBeanFactory.removeContext.addServicedFail", pathStr));
             }
         } else {
-            log.warn("Deployer not found for " + hostName);
+            log.warn(sm.getString("mBeanFactory.noDeployer", hostName));
             Host host = (Host) engine.findChild(hostName);
             Context context = (Context) host.findChild(pathStr);
             // Remove this component from its parent component
@@ -791,7 +753,7 @@ public class MBeanFactory {
                 try {
                     ((StandardContext) context).destroy();
                 } catch (Exception e) {
-                    log.warn("Error during context [" + context.getName() + "] destroy ", e);
+                    log.warn(sm.getString("mBeanFactory.contextDestroyError"), e);
                 }
             }
 
@@ -884,7 +846,7 @@ public class MBeanFactory {
     public void removeService(String name) throws Exception {
 
         if (!(container instanceof Server)) {
-            throw new Exception();
+            throw new Exception(sm.getString("mBeanFactory.notServer"));
         }
 
         // Acquire a reference to the component to be removed

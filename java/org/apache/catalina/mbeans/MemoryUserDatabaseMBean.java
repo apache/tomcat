@@ -18,8 +18,8 @@ package org.apache.catalina.mbeans;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
-import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import org.apache.catalina.Group;
@@ -29,6 +29,7 @@ import org.apache.catalina.UserDatabase;
 import org.apache.tomcat.util.modeler.BaseModelMBean;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>
@@ -39,6 +40,8 @@ import org.apache.tomcat.util.modeler.Registry;
  * @author Craig R. McClanahan
  */
 public class MemoryUserDatabaseMBean extends BaseModelMBean {
+
+    private static final StringManager sm = StringManager.getManager(MemoryUserDatabaseMBean.class);
 
     // ----------------------------------------------------- Instance Variables
 
@@ -79,7 +82,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
      */
     public String[] getGroups() {
         UserDatabase database = (UserDatabase) this.resource;
-        ArrayList<String> results = new ArrayList<>();
+        List<String> results = new ArrayList<>();
         Iterator<Group> groups = database.getGroups();
         while (groups.hasNext()) {
             Group group = groups.next();
@@ -94,7 +97,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
      */
     public String[] getRoles() {
         UserDatabase database = (UserDatabase) this.resource;
-        ArrayList<String> results = new ArrayList<>();
+        List<String> results = new ArrayList<>();
         Iterator<Role> roles = database.getRoles();
         while (roles.hasNext()) {
             Role role = roles.next();
@@ -109,7 +112,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
      */
     public String[] getUsers() {
         UserDatabase database = (UserDatabase) this.resource;
-        ArrayList<String> results = new ArrayList<>();
+        List<String> results = new ArrayList<>();
         Iterator<User> users = database.getUsers();
         while (users.hasNext()) {
             User user = users.next();
@@ -135,7 +138,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
         try {
             MBeanUtils.createMBean(group);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Exception creating group [" + groupname + "] MBean", e);
+            throw new IllegalArgumentException(sm.getString("userMBean.createMBeanError.group", groupname), e);
         }
         return findGroup(groupname);
     }
@@ -155,7 +158,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
         try {
             MBeanUtils.createMBean(role);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Exception creating role [" + rolename + "] MBean", e);
+            throw new IllegalArgumentException(sm.getString("userMBean.createMBeanError.role", rolename), e);
         }
         return findRole(rolename);
     }
@@ -176,7 +179,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
         try {
             MBeanUtils.createMBean(user);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Exception creating user [" + username + "] MBean", e);
+            throw new IllegalArgumentException(sm.getString("userMBean.createMBeanError.user", username), e);
         }
         return findUser(username);
     }
@@ -198,8 +201,8 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
         try {
             ObjectName oname = MBeanUtils.createObjectName(managedGroup.getDomain(), group);
             return oname.toString();
-        } catch (MalformedObjectNameException e) {
-            throw new IllegalArgumentException("Cannot create object name for group [" + groupname + "]", e);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(sm.getString("userMBean.createError.group", groupname), e);
         }
     }
 
@@ -220,8 +223,8 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
         try {
             ObjectName oname = MBeanUtils.createObjectName(managedRole.getDomain(), role);
             return oname.toString();
-        } catch (MalformedObjectNameException e) {
-            throw new IllegalArgumentException("Cannot create object name for role [" + rolename + "]", e);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(sm.getString("userMBean.createError.role", rolename), e);
         }
 
     }
@@ -243,8 +246,8 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
         try {
             ObjectName oname = MBeanUtils.createObjectName(managedUser.getDomain(), user);
             return oname.toString();
-        } catch (MalformedObjectNameException e) {
-            throw new IllegalArgumentException("Cannot create object name for user [" + username + "]", e);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(sm.getString("userMBean.createError.user", username), e);
         }
     }
 
@@ -264,7 +267,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
             MBeanUtils.destroyMBean(group);
             database.removeGroup(group);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Exception destroying group [" + groupname + "] MBean", e);
+            throw new IllegalArgumentException(sm.getString("userMBean.destroyError.group", groupname), e);
         }
     }
 
@@ -284,7 +287,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
             MBeanUtils.destroyMBean(role);
             database.removeRole(role);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Exception destroying role [" + rolename + "] MBean", e);
+            throw new IllegalArgumentException(sm.getString("userMBean.destroyError.role", rolename), e);
         }
     }
 
@@ -304,7 +307,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
             MBeanUtils.destroyMBean(user);
             database.removeUser(user);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Exception destroying user [" + username + "] MBean", e);
+            throw new IllegalArgumentException(sm.getString("userMBean.destroyError.user", username), e);
         }
     }
 }
