@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -90,18 +92,13 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
      */
     protected boolean doProcessingStats = false;
 
-    /*
-     * Note: The statistics are volatile to ensure the concurrent updates do not corrupt them but it is still possible
-     * that: - some updates may be lost; - the individual statistics may not be consistent which each other. This is a
-     * deliberate design choice to reduce the requirement for synchronization.
-     */
-    protected volatile long totalRequestTime = 0;
-    protected volatile long totalSendTime = 0;
-    protected volatile long nrOfRequests = 0;
-    protected volatile long lastSendTime = 0;
-    protected volatile long nrOfFilterRequests = 0;
-    protected volatile long nrOfSendRequests = 0;
-    protected volatile long nrOfCrossContextSendRequests = 0;
+    protected LongAdder totalRequestTime = new LongAdder();
+    protected LongAdder totalSendTime = new LongAdder();
+    protected LongAdder nrOfRequests = new LongAdder();
+    protected AtomicLong lastSendTime = new AtomicLong();
+    protected LongAdder nrOfFilterRequests = new LongAdder();
+    protected LongAdder nrOfSendRequests = new LongAdder();
+    protected LongAdder nrOfCrossContextSendRequests = new LongAdder();
 
     /**
      * must primary change indicator set
@@ -220,49 +217,49 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
      * @return the lastSendTime.
      */
     public long getLastSendTime() {
-        return lastSendTime;
+        return lastSendTime.longValue();
     }
 
     /**
      * @return the nrOfRequests.
      */
     public long getNrOfRequests() {
-        return nrOfRequests;
+        return nrOfRequests.longValue();
     }
 
     /**
      * @return the nrOfFilterRequests.
      */
     public long getNrOfFilterRequests() {
-        return nrOfFilterRequests;
+        return nrOfFilterRequests.longValue();
     }
 
     /**
      * @return the nrOfCrossContextSendRequests.
      */
     public long getNrOfCrossContextSendRequests() {
-        return nrOfCrossContextSendRequests;
+        return nrOfCrossContextSendRequests.longValue();
     }
 
     /**
      * @return the nrOfSendRequests.
      */
     public long getNrOfSendRequests() {
-        return nrOfSendRequests;
+        return nrOfSendRequests.longValue();
     }
 
     /**
      * @return the totalRequestTime.
      */
     public long getTotalRequestTime() {
-        return totalRequestTime;
+        return totalRequestTime.longValue();
     }
 
     /**
      * @return the totalSendTime.
      */
     public long getTotalSendTime() {
-        return totalSendTime;
+        return totalSendTime.longValue();
     }
 
     // --------------------------------------------------------- Public Methods
@@ -349,13 +346,13 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
      * reset the active statistics
      */
     public void resetStatistics() {
-        totalRequestTime = 0;
-        totalSendTime = 0;
-        lastSendTime = 0;
-        nrOfFilterRequests = 0;
-        nrOfRequests = 0;
-        nrOfSendRequests = 0;
-        nrOfCrossContextSendRequests = 0;
+        totalRequestTime.reset();
+        totalSendTime.reset();
+        lastSendTime.set(0);
+        nrOfFilterRequests.reset();
+        nrOfRequests.reset();
+        nrOfSendRequests.reset();
+        nrOfCrossContextSendRequests.reset();
     }
 
     /**
@@ -405,7 +402,6 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
             // FIXME we have a lot of sends, but the trouble with one node stops the correct replication to other nodes!
             log.error(sm.getString("ReplicationValve.send.failure"), x);
         } finally {
-            // FIXME this stats update are not cheap!!
             if (doStatistics()) {
                 updateStats(totalstart, start);
             }
@@ -425,7 +421,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
                 }
                 sendMessage(session, (ClusterManager) session.getManager());
                 if (doStatistics()) {
-                    nrOfCrossContextSendRequests++;
+                    nrOfCrossContextSendRequests.increment();
                 }
             }
         }
@@ -488,7 +484,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
                 }
                 sendMessage(session, manager);
             } else if (doStatistics()) {
-                nrOfFilterRequests++;
+                nrOfFilterRequests.increment();
             }
         }
 
@@ -521,7 +517,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
         if (msg != null && cluster != null) {
             cluster.send(msg);
             if (doStatistics()) {
-                nrOfSendRequests++;
+                nrOfSendRequests.increment();
             }
         }
     }
@@ -566,18 +562,18 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
         // TODO: Async requests may trigger multiple replication requests. How,
         // if at all, should the stats handle this?
         long currentTime = System.currentTimeMillis();
-        lastSendTime = currentTime;
-        totalSendTime += currentTime - clusterTime;
-        totalRequestTime += currentTime - requestTime;
-        nrOfRequests++;
+        lastSendTime.set(currentTime);
+        totalSendTime.add(currentTime - clusterTime);
+        totalRequestTime.add(currentTime - requestTime);
+        nrOfRequests.increment();
         if (log.isInfoEnabled()) {
-            if ((nrOfRequests % 100) == 0) {
+            if ((nrOfRequests.longValue() % 100) == 0) {
                 log.info(sm.getString("ReplicationValve.stats",
-                        new Object[] { Long.valueOf(totalRequestTime / nrOfRequests),
-                                Long.valueOf(totalSendTime / nrOfRequests), Long.valueOf(nrOfRequests),
-                                Long.valueOf(nrOfSendRequests), Long.valueOf(nrOfCrossContextSendRequests),
-                                Long.valueOf(nrOfFilterRequests), Long.valueOf(totalRequestTime),
-                                Long.valueOf(totalSendTime) }));
+                        new Object[] { Long.valueOf(totalRequestTime.longValue() / nrOfRequests.longValue()),
+                                Long.valueOf(totalSendTime.longValue() / nrOfRequests.longValue()), Long.valueOf(nrOfRequests.longValue()),
+                                Long.valueOf(nrOfSendRequests.longValue()), Long.valueOf(nrOfCrossContextSendRequests.longValue()),
+                                Long.valueOf(nrOfFilterRequests.longValue()), Long.valueOf(totalRequestTime.longValue()),
+                                Long.valueOf(totalSendTime.longValue()) }));
             }
         }
     }
