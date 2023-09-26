@@ -389,7 +389,9 @@ public abstract class AbstractReplicatedMap<K,V>
         }
         this.rpcChannel = null;
         this.channel = null;
-        this.mapMembers.clear();
+        synchronized (mapMembers) {
+            this.mapMembers.clear();
+        }
         innerMap.clear();
         this.stateTransferred = false;
         this.externalLoaders = null;
@@ -417,12 +419,12 @@ public abstract class AbstractReplicatedMap<K,V>
 //              GROUP COM INTERFACES
 //------------------------------------------------------------------------------
     public Member[] getMapMembers(HashMap<Member, Long> members) {
-        synchronized (members) {
-            return members.keySet().toArray(new Member[0]);
-        }
+        return members.keySet().toArray(new Member[0]);
     }
     public Member[] getMapMembers() {
-        return getMapMembers(this.mapMembers);
+        synchronized (mapMembers) {
+            return getMapMembers(mapMembers);
+        }
     }
 
     public Member[] getMapMembersExcl(Member[] exclude) {
@@ -970,16 +972,18 @@ public abstract class AbstractReplicatedMap<K,V>
     }
 
     public int getNextBackupIndex() {
-        int size = mapMembers.size();
-        if (mapMembers.size() == 0) {
-            return -1;
+        synchronized (mapMembers) {
+            int size = mapMembers.size();
+            if (mapMembers.size() == 0) {
+                return -1;
+            }
+            int node = currentNode++;
+            if (node >= size) {
+                node = 0;
+                currentNode = 1;
+            }
+            return node;
         }
-        int node = currentNode++;
-        if (node >= size) {
-            node = 0;
-            currentNode = 1;
-        }
-        return node;
     }
     public Member getNextBackupNode() {
         Member[] members = getMapMembers();
