@@ -965,8 +965,7 @@ public class Http11Processor extends AbstractProcessor {
             keepAlive = false;
         }
 
-        // This may disabled keep-alive to check before working out the
-        // Connection header.
+        // This may disable keep-alive so check before working out the Connection header
         checkExpectationAndResponseStatus();
 
         // This may disable keep-alive if there is more body to swallow
