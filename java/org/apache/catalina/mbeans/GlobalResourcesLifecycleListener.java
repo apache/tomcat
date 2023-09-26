@@ -40,13 +40,13 @@ import org.apache.tomcat.util.modeler.Registry;
 
 
 /**
- * Implementation of <code>LifecycleListener</code> that instantiates the
- * set of MBeans associated with global JNDI resources that are subject to
- * management.
+ * Implementation of <code>LifecycleListener</code> that instantiates the set of MBeans associated with global JNDI
+ * resources that are subject to management.
  * <p>
  * This listener must only be nested within {@link Server} elements.
  *
  * @author Craig R. McClanahan
+ *
  * @since 4.1
  */
 public class GlobalResourcesLifecycleListener implements LifecycleListener {
@@ -117,10 +117,9 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
 
 
     /**
-     * Create the MBeans for the interesting global JNDI resources in
-     * the specified naming context.
+     * Create the MBeans for the interesting global JNDI resources in the specified naming context.
      *
-     * @param prefix Prefix for complete object name paths
+     * @param prefix  Prefix for complete object name paths
      * @param context Context to be scanned
      *
      * @exception NamingException if a JNDI exception occurs
@@ -128,8 +127,7 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
     protected void createMBeans(String prefix, Context context) throws NamingException {
 
         if (log.isDebugEnabled()) {
-            log.debug("Creating MBeans for Global JNDI Resources in Context '" +
-                prefix + "'");
+            log.debug("Creating MBeans for Global JNDI Resources in Context '" + prefix + "'");
         }
 
         try {
@@ -151,9 +149,9 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
                     }
                 }
             }
-        } catch( RuntimeException ex) {
+        } catch (RuntimeException ex) {
             log.error("RuntimeException " + ex);
-        } catch( OperationNotSupportedException ex) {
+        } catch (OperationNotSupportedException ex) {
             log.error("Operation not supported " + ex);
         }
     }
@@ -162,7 +160,7 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
     /**
      * Create the MBeans for the specified UserDatabase and its contents.
      *
-     * @param name Complete resource name of this UserDatabase
+     * @param name     Complete resource name of this UserDatabase
      * @param database The UserDatabase to be processed
      *
      * @exception Exception if an exception occurs while creating MBeans
@@ -176,9 +174,8 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
         }
         try {
             MBeanUtils.createMBean(database);
-        } catch(Exception e) {
-            throw new IllegalArgumentException(
-                    "Cannot create UserDatabase MBean for resource " + name, e);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Cannot create UserDatabase MBean for resource " + name, e);
         }
 
         // Create the MBeans for each defined Role
@@ -205,8 +202,7 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
             try {
                 MBeanUtils.createMBean(group);
             } catch (Exception e) {
-                throw new IllegalArgumentException(
-                        "Cannot create Group MBean for group " + group, e);
+                throw new IllegalArgumentException("Cannot create Group MBean for group " + group, e);
             }
         }
 
@@ -220,8 +216,7 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
             try {
                 MBeanUtils.createMBean(user);
             } catch (Exception e) {
-                throw new IllegalArgumentException(
-                        "Cannot create User MBean for user " + user, e);
+                throw new IllegalArgumentException("Cannot create User MBean for user " + user, e);
             }
         }
     }

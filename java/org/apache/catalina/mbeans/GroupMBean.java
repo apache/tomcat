@@ -30,8 +30,9 @@ import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
 
 /**
- * <p>A <strong>ModelMBean</strong> implementation for the
- * <code>org.apache.catalina.Group</code> component.</p>
+ * <p>
+ * A <strong>ModelMBean</strong> implementation for the <code>org.apache.catalina.Group</code> component.
+ * </p>
  *
  * @author Craig R. McClanahan
  */

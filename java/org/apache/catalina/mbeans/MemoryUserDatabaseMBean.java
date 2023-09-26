@@ -31,8 +31,10 @@ import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
 
 /**
- * <p>A <strong>ModelMBean</strong> implementation for the
- * <code>org.apache.catalina.users.MemoryUserDatabase</code> component.</p>
+ * <p>
+ * A <strong>ModelMBean</strong> implementation for the <code>org.apache.catalina.users.MemoryUserDatabase</code>
+ * component.
+ * </p>
  *
  * @author Craig R. McClanahan
  */
@@ -122,8 +124,9 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
     /**
      * Create a new Group and return the corresponding MBean Name.
      *
-     * @param groupname Group name of the new group
+     * @param groupname   Group name of the new group
      * @param description Description of the new group
+     *
      * @return the new group object name
      */
     public String createGroup(String groupname, String description) {
@@ -141,8 +144,9 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
     /**
      * Create a new Role and return the corresponding MBean Name.
      *
-     * @param rolename Group name of the new group
+     * @param rolename    Group name of the new group
      * @param description Description of the new group
+     *
      * @return the new role object name
      */
     public String createRole(String rolename, String description) {
@@ -163,6 +167,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
      * @param username User name of the new user
      * @param password Password for the new user
      * @param fullName Full name for the new user
+     *
      * @return the new user object name
      */
     public String createUser(String username, String password, String fullName) {
@@ -178,10 +183,10 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
 
 
     /**
-     * Return the MBean Name for the specified group name (if any);
-     * otherwise return <code>null</code>.
+     * Return the MBean Name for the specified group name (if any); otherwise return <code>null</code>.
      *
      * @param groupname Group name to look up
+     *
      * @return the group object name
      */
     public String findGroup(String groupname) {
@@ -200,10 +205,10 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
 
 
     /**
-     * Return the MBean Name for the specified role name (if any);
-     * otherwise return <code>null</code>.
+     * Return the MBean Name for the specified role name (if any); otherwise return <code>null</code>.
      *
      * @param rolename Role name to look up
+     *
      * @return the role object name
      */
     public String findRole(String rolename) {
@@ -223,10 +228,10 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
 
 
     /**
-     * Return the MBean Name for the specified user name (if any);
-     * otherwise return <code>null</code>.
+     * Return the MBean Name for the specified user name (if any); otherwise return <code>null</code>.
      *
      * @param username User name to look up
+     *
      * @return the user object name
      */
     public String findUser(String username) {
