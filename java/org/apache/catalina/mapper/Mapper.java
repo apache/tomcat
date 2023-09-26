@@ -51,8 +51,8 @@ public final class Mapper {
 
     private static final StringManager sm = StringManager.getManager(Mapper.class);
 
-    // ----------------------------------------------------- Instance Variables
 
+    // ----------------------------------------------------- Instance Variables
 
     /**
      * Array containing the virtual hosts definitions.
