@@ -102,7 +102,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
      * @param attributes    - If provided, additional attributes associated with this Principal
      */
     public GenericPrincipal(String name, List<String> roles, Principal userPrincipal, LoginContext loginContext,
-            GSSCredential gssCredential, Map<String, Object> attributes) {
+            GSSCredential gssCredential, Map<String,Object> attributes) {
         super();
         this.name = name;
         this.userPrincipal = userPrincipal;
@@ -180,7 +180,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     /**
      * The additional attributes associated with this Principal.
      */
-    protected final Map<String, Object> attributes;
+    protected final Map<String,Object> attributes;
 
 
     // ---------------------------------------------------------- Public Methods
@@ -260,9 +260,9 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         private final String name;
         private final String[] roles;
         private final Principal principal;
-        private final Map<String, Object> attributes;
+        private final Map<String,Object> attributes;
 
-        SerializablePrincipal(String name, String[] roles, Principal principal, Map<String, Object> attributes) {
+        SerializablePrincipal(String name, String[] roles, Principal principal, Map<String,Object> attributes) {
             this.name = name;
             this.roles = roles;
             if (principal instanceof Serializable) {

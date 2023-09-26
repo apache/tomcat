@@ -92,7 +92,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     /**
      * The configuration information for this <code>LoginModule</code>.
      */
-    protected Map<String, ?> options = null;
+    protected Map<String,?> options = null;
 
 
     /**
@@ -110,7 +110,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     /**
      * The state information that is shared with other configured <code>LoginModule</code> instances.
      */
-    protected Map<String, ?> sharedState = null;
+    protected Map<String,?> sharedState = null;
 
 
     /**
@@ -181,8 +181,8 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
 
 
     @Override
-    public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
-            Map<String, ?> options) {
+    public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String,?> sharedState,
+            Map<String,?> options) {
         if (log.isDebugEnabled()) {
             log.debug("Init");
         }
@@ -213,7 +213,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             credentialHandler = new MessageDigestCredentialHandler();
         }
 
-        for (Entry<String, ?> entry : options.entrySet()) {
+        for (Entry<String,?> entry : options.entrySet()) {
             if ("pathname".equals(entry.getKey())) {
                 continue;
             }
