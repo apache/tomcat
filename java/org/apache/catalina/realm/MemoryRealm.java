@@ -65,7 +65,7 @@ public class MemoryRealm extends RealmBase {
     /**
      * The set of valid Principals for this Realm, keyed by user name.
      */
-    private final Map<String, GenericPrincipal> principals = new HashMap<>();
+    private final Map<String,GenericPrincipal> principals = new HashMap<>();
 
 
     // ------------------------------------------------------------- Properties

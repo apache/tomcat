@@ -81,14 +81,15 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     protected static final String USER_ATTRIBUTES_DELIMITER = ",";
 
     /**
-     * The character used as wildcard in user attribute lists. Using it means
-     * <i>query all available user attributes</i>.
+     * The character used as wildcard in user attribute lists. Using it means <i>query all available user
+     * attributes</i>.
      * <p>
      * Applies to some of the Realm implementations only.
      */
     protected static final String USER_ATTRIBUTES_WILDCARD = "*";
 
-    private static final List<Class<? extends DigestCredentialHandlerBase>> credentialHandlerClasses = new ArrayList<>();
+    private static final List<Class<? extends DigestCredentialHandlerBase>> credentialHandlerClasses =
+            new ArrayList<>();
 
     static {
         // Order is important since it determines the search order for a
@@ -160,17 +161,15 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
-     * The comma separated names of user attributes to additionally query from the
-     * realm. These will be provided to the user through the created
-     * Principal's <i>attributes</i> map. Support for this feature is optional.
+     * The comma separated names of user attributes to additionally query from the realm. These will be provided to the
+     * user through the created Principal's <i>attributes</i> map. Support for this feature is optional.
      */
     protected String userAttributes = null;
 
 
     /**
-     * The list of user attributes to additionally query from the
-     * realm. These will be provided to the user through the created
-     * Principal's <i>attributes</i> map. Support for this feature is optional.
+     * The list of user attributes to additionally query from the realm. These will be provided to the user through the
+     * created Principal's <i>attributes</i> map. Support for this feature is optional.
      */
     protected List<String> userAttributesList = null;
 
@@ -304,18 +303,14 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     }
 
     /**
-     * Set the comma separated names of user attributes to additionally query from
-     * the realm. These will be provided to the user through the created
-     * Principal's <i>attributes</i> map. In this map, each field value is bound to
-     * the field's name, that is, the name of the field serves as the key of the
-     * mapping.
+     * Set the comma separated names of user attributes to additionally query from the realm. These will be provided to
+     * the user through the created Principal's <i>attributes</i> map. In this map, each field value is bound to the
+     * field's name, that is, the name of the field serves as the key of the mapping.
      * <p>
-     * If set to the wildcard character, or, if the wildcard character is part of
-     * the comma separated list, all available attributes - except the
-     * <i>password</i> attribute (as specified by <code>userCredCol</code>) - are
-     * queried. The wildcard character is defined by constant
-     * {@link RealmBase#USER_ATTRIBUTES_WILDCARD}. It defaults to the asterisk (*)
-     * character.
+     * If set to the wildcard character, or, if the wildcard character is part of the comma separated list, all
+     * available attributes - except the <i>password</i> attribute (as specified by <code>userCredCol</code>) - are
+     * queried. The wildcard character is defined by constant {@link RealmBase#USER_ATTRIBUTES_WILDCARD}. It defaults to
+     * the asterisk (*) character.
      *
      * @param userAttributes the comma separated names of user attributes
      */
@@ -916,15 +911,14 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
-     * Parse the specified delimiter separated attribute names and return a list of
-     * that names or <code>null</code>, if no attributes have been specified.
+     * Parse the specified delimiter separated attribute names and return a list of that names or <code>null</code>, if
+     * no attributes have been specified.
      * <p>
-     * If a wildcard character is found, return a list consisting of a single
-     * wildcard character only.
+     * If a wildcard character is found, return a list consisting of a single wildcard character only.
      *
      * @param userAttributes comma separated names of attributes to parse
-     * @return a list containing the parsed attribute names or <code>null</code>, if
-     *         no attributes have been specified
+     *
+     * @return a list containing the parsed attribute names or <code>null</code>, if no attributes have been specified
      */
     protected List<String> parseUserAttributes(String userAttributes) {
         if (userAttributes == null) {
@@ -1548,8 +1542,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         try {
             @SuppressWarnings("unchecked")
-            Class<? extends X509UsernameRetriever> clazz = (Class<? extends X509UsernameRetriever>) Class
-                    .forName(className);
+            Class<? extends X509UsernameRetriever> clazz =
+                    (Class<? extends X509UsernameRetriever>) Class.forName(className);
             return clazz.getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
             throw new LifecycleException(sm.getString("realmBase.createUsernameRetriever.newInstance", className), e);

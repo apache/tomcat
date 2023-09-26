@@ -1120,9 +1120,9 @@ public class JNDIRealm extends RealmBase {
     /**
      * {@inheritDoc}
      * <p>
-     * If there are any errors with the JNDI connection, executing the query or anything we return
-     * null (don't authenticate). This event is also logged, and the connection will be closed so that a subsequent
-     * request will automatically re-open it.
+     * If there are any errors with the JNDI connection, executing the query or anything we return null (don't
+     * authenticate). This event is also logged, and the connection will be closed so that a subsequent request will
+     * automatically re-open it.
      */
     @Override
     public Principal authenticate(String username, String credentials) {
@@ -1232,7 +1232,7 @@ public class JNDIRealm extends RealmBase {
         }
 
         ClassLoader ocl = null;
-        Thread currentThread= null;
+        Thread currentThread = null;
         try {
             // https://bz.apache.org/bugzilla/show_bug.cgi?id=65553
             // This can move back to open() once it is known that Tomcat must be
@@ -1977,14 +1977,14 @@ public class JNDIRealm extends RealmBase {
         }
 
         // Perform the configured search and process the results
-        NamingEnumeration<SearchResult> results = searchAsUser(connection.context, user, base, filter, controls,
-                isRoleSearchAsUser());
+        NamingEnumeration<SearchResult> results =
+                searchAsUser(connection.context, user, base, filter, controls, isRoleSearchAsUser());
 
         if (results == null) {
             return list; // Should never happen, but just in case ...
         }
 
-        Map<String, String> groupMap = new HashMap<>();
+        Map<String,String> groupMap = new HashMap<>();
         try {
             while (results.hasMore()) {
                 SearchResult result = results.next();
@@ -2007,9 +2007,9 @@ public class JNDIRealm extends RealmBase {
         }
 
         if (containerLog.isTraceEnabled()) {
-            Set<Entry<String, String>> entries = groupMap.entrySet();
+            Set<Entry<String,String>> entries = groupMap.entrySet();
             containerLog.trace("  Found " + entries.size() + " direct roles");
-            for (Entry<String, String> entry : entries) {
+            for (Entry<String,String> entry : entries) {
                 containerLog.trace("  Found direct role " + entry.getKey() + " -> " + entry.getValue());
             }
         }
@@ -2021,11 +2021,11 @@ public class JNDIRealm extends RealmBase {
             // Directory Groups". It avoids group slurping and handles cyclic group memberships as well.
             // See http://middleware.internet2.edu/dir/ for details
 
-            Map<String, String> newGroups = new HashMap<>(groupMap);
+            Map<String,String> newGroups = new HashMap<>(groupMap);
             while (!newGroups.isEmpty()) {
-                Map<String, String> newThisRound = new HashMap<>(); // Stores the groups we find in this iteration
+                Map<String,String> newThisRound = new HashMap<>(); // Stores the groups we find in this iteration
 
-                for (Entry<String, String> group : newGroups.entrySet()) {
+                for (Entry<String,String> group : newGroups.entrySet()) {
                     // Group key is already value escaped if required
                     // Group value is not value escaped
                     // Everything needs to be filter escaped
@@ -2355,11 +2355,10 @@ public class JNDIRealm extends RealmBase {
                 principal = getPrincipal(connection, username, gssCredential);
 
             } catch (NamingException e) {
-                /* While we would like to catch specialized exceptions like
-                 * CommunicationException and ServiceUnavailableException,
-                 * some network communication problems are reported as
-                 * this general exception. This is fixed in Java 18 by
-                 * https://bugs.openjdk.org/browse/JDK-8273402
+                /*
+                 * While we would like to catch specialized exceptions like CommunicationException and
+                 * ServiceUnavailableException, some network communication problems are reported as this general
+                 * exception. This is fixed in Java 18 by https://bugs.openjdk.org/browse/JDK-8273402
                  */
                 // log the exception so we know it's there.
                 containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
@@ -2411,7 +2410,7 @@ public class JNDIRealm extends RealmBase {
 
         User user = null;
         List<String> roles = null;
-        Hashtable<?, ?> preservedEnvironment = null;
+        Hashtable<?,?> preservedEnvironment = null;
         DirContext context = connection.context;
 
         try {
@@ -2446,7 +2445,7 @@ public class JNDIRealm extends RealmBase {
 
 
     private void restoreEnvironmentParameter(DirContext context, String parameterName,
-            Hashtable<?, ?> preservedEnvironment) {
+            Hashtable<?,?> preservedEnvironment) {
         try {
             context.removeFromEnvironment(parameterName);
             if (preservedEnvironment != null && preservedEnvironment.containsKey(parameterName)) {
@@ -2566,7 +2565,7 @@ public class JNDIRealm extends RealmBase {
     }
 
 
-    private DirContext createDirContext(Hashtable<String, String> env) throws NamingException {
+    private DirContext createDirContext(Hashtable<String,String> env) throws NamingException {
         if (useStartTls) {
             return createTlsDirContext(env);
         } else {
@@ -2631,8 +2630,8 @@ public class JNDIRealm extends RealmBase {
      *
      * @throws NamingException when something goes wrong while negotiating the connection
      */
-    private DirContext createTlsDirContext(Hashtable<String, String> env) throws NamingException {
-        Map<String, Object> savedEnv = new HashMap<>();
+    private DirContext createTlsDirContext(Hashtable<String,String> env) throws NamingException {
+        Map<String,Object> savedEnv = new HashMap<>();
         for (String key : Arrays.asList(Context.SECURITY_AUTHENTICATION, Context.SECURITY_CREDENTIALS,
                 Context.SECURITY_PRINCIPAL, Context.SECURITY_PROTOCOL)) {
             Object entry = env.remove(key);
@@ -2658,7 +2657,7 @@ public class JNDIRealm extends RealmBase {
             }
         } finally {
             if (result != null) {
-                for (Map.Entry<String, Object> savedEntry : savedEnv.entrySet()) {
+                for (Map.Entry<String,Object> savedEntry : savedEnv.entrySet()) {
                     result.addToEnvironment(savedEntry.getKey(), savedEntry.getValue());
                 }
             }
@@ -2672,9 +2671,9 @@ public class JNDIRealm extends RealmBase {
      *
      * @return java.util.Hashtable the configuration for the directory context.
      */
-    protected Hashtable<String, String> getDirectoryContextEnvironment() {
+    protected Hashtable<String,String> getDirectoryContextEnvironment() {
 
-        Hashtable<String, String> env = new Hashtable<>();
+        Hashtable<String,String> env = new Hashtable<>();
 
         // Configure our directory context environment.
         if (containerLog.isDebugEnabled() && connectionAttempt == 0) {
