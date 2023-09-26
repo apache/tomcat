@@ -71,7 +71,7 @@ public final class Mapper {
     /**
      * Mapping from Context object to Context version to support RequestDispatcher mappings.
      */
-    private final Map<Context, ContextVersion> contextObjectToContextVersionMap = new ConcurrentHashMap<>();
+    private final Map<Context,ContextVersion> contextObjectToContextVersionMap = new ConcurrentHashMap<>();
 
 
     // --------------------------------------------------------- Public Methods
@@ -272,8 +272,8 @@ public final class Mapper {
         }
         int slashCount = slashCount(path);
         synchronized (mappedHost) {
-            ContextVersion newContextVersion = new ContextVersion(version, path, slashCount, context, resources,
-                    welcomeResources);
+            ContextVersion newContextVersion =
+                    new ContextVersion(version, path, slashCount, context, resources, welcomeResources);
             if (wrappers != null) {
                 addWrappers(newContextVersion, wrappers);
             }
@@ -1433,8 +1433,7 @@ public final class Mapper {
     /**
      * Insert into the right place in a sorted MapElement array, and prevent duplicates.
      */
-    private static <T> boolean insertMap(MapElement<T>[] oldMap, MapElement<T>[] newMap,
-            MapElement<T> newElement) {
+    private static <T> boolean insertMap(MapElement<T>[] oldMap, MapElement<T>[] newMap, MapElement<T> newElement) {
         int pos = find(oldMap, newElement.name);
         if ((pos != -1) && (newElement.name.equals(oldMap[pos].name))) {
             return false;
