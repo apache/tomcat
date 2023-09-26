@@ -105,7 +105,8 @@ public class CombinedRealm extends RealmBase {
                 log.debug(sm.getString("combinedRealm.authStart", username, realm.getClass().getName()));
             }
 
-            authenticatedUser = realm.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realmName, digestA2, algorithm);
+            authenticatedUser =
+                    realm.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realmName, digestA2, algorithm);
 
             if (authenticatedUser == null) {
                 if (log.isDebugEnabled()) {
@@ -377,8 +378,8 @@ public class CombinedRealm extends RealmBase {
     protected String getPassword(String username) {
         // This method should never be called
         // Stack trace will show where this was called from
-        UnsupportedOperationException uoe = new UnsupportedOperationException(
-                sm.getString("combinedRealm.getPassword"));
+        UnsupportedOperationException uoe =
+                new UnsupportedOperationException(sm.getString("combinedRealm.getPassword"));
         log.error(sm.getString("combinedRealm.unexpectedMethod"), uoe);
         throw uoe;
     }
@@ -387,8 +388,8 @@ public class CombinedRealm extends RealmBase {
     protected Principal getPrincipal(String username) {
         // This method should never be called
         // Stack trace will show where this was called from
-        UnsupportedOperationException uoe = new UnsupportedOperationException(
-                sm.getString("combinedRealm.getPrincipal"));
+        UnsupportedOperationException uoe =
+                new UnsupportedOperationException(sm.getString("combinedRealm.getPrincipal"));
         log.error(sm.getString("combinedRealm.unexpectedMethod"), uoe);
         throw uoe;
     }

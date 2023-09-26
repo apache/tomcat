@@ -127,8 +127,7 @@ public class UserDatabaseRealm extends RealmBase {
 
 
     /**
-     * Calls {@link MemoryUserDatabase#backgroundProcess()} if the Realm is
-     * configured with a MemoryUserDatabase.
+     * Calls {@link MemoryUserDatabase#backgroundProcess()} if the Realm is configured with a MemoryUserDatabase.
      */
     @Override
     public void backgroundProcess() {

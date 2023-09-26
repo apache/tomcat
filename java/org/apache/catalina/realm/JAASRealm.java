@@ -615,8 +615,8 @@ public class JAASRealm extends RealmBase {
                 URL resource = Thread.currentThread().getContextClassLoader().getResource(configFile);
                 URI uri = resource.toURI();
                 @SuppressWarnings("unchecked")
-                Class<Configuration> sunConfigFile = (Class<Configuration>) Class
-                        .forName("com.sun.security.auth.login.ConfigFile");
+                Class<Configuration> sunConfigFile =
+                        (Class<Configuration>) Class.forName("com.sun.security.auth.login.ConfigFile");
                 Constructor<Configuration> constructor = sunConfigFile.getConstructor(URI.class);
                 Configuration config = constructor.newInstance(uri);
                 this.jaasConfiguration = config;
