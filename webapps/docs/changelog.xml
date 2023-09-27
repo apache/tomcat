@@ -156,6 +156,10 @@
       <fix>
         Avoid rare thread safety issue accessing message digest map. (remm)
       </fix>
+      <fix>
+        Improve statistics collection for upgraded connections under load.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
