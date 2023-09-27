@@ -1013,6 +1013,17 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    public String getKeystorePassFile() {
+        registerDefaultSSLHostConfig();
+        return defaultSSLHostConfig.getCertificateKeystorePasswordFile();
+    }
+
+    public void setKeystorePassFile(String certificateKeystorePasswordFile) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateKeystorePasswordFile(certificateKeystorePasswordFile);
+    }
+
+
     public String getKeyPass() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateKeyPassword();
@@ -1023,6 +1034,18 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         defaultSSLHostConfig.setCertificateKeyPassword(certificateKeyPassword);
     }
 
+
+    public String getKeyPassFile() {
+        registerDefaultSSLHostConfig();
+        return defaultSSLHostConfig.getCertificateKeyPasswordFile();
+    }
+
+    public void setKeyPassFile(String certificateKeyPasswordFile) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateKeyPasswordFile(certificateKeyPasswordFile);
+    }
+
+
     public String getSSLPassword() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateKeyPassword();
@@ -1031,6 +1054,17 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public void setSSLPassword(String certificateKeyPassword) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateKeyPassword(certificateKeyPassword);
+    }
+
+
+    public String getSSLPasswordFile() {
+        registerDefaultSSLHostConfig();
+        return defaultSSLHostConfig.getCertificateKeyPasswordFile();
+    }
+
+    public void setSSLPasswordFile(String certificateKeyPasswordFile) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateKeyPasswordFile(certificateKeyPasswordFile);
     }
 
 

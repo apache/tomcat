@@ -102,15 +102,30 @@ public class PEMFile {
         this(filename, ConfigFileLoader.getInputStream(filename), password, keyAlgorithm);
     }
 
+    public PEMFile(String filename, String password, String passwordFilename, String keyAlgorithm)
+            throws IOException, GeneralSecurityException {
+        this(filename, ConfigFileLoader.getInputStream(filename), password,
+             passwordFilename, passwordFilename != null ? ConfigFileLoader.getInputStream(passwordFilename) : null,
+             keyAlgorithm);
+    }
+
+    public PEMFile(String filename, InputStream fileStream, String password, String keyAlgorithm)
+            throws IOException, GeneralSecurityException {
+        this(filename, fileStream, password, null, null, keyAlgorithm);
+    }
+
     /**
      * @param filename the filename to mention in error messages, not used for anything else.
      * @param fileStream the stream containing the pem(s).
      * @param password password to load the pem objects.
+     * @param passwordFilename the password filename to mention in error messages, not used for anything else.
+     * @param passwordFileStream stream containing the password to load the pem objects.
      * @param keyAlgorithm the algorithm to help to know how to load the objects (guessed if null).
      * @throws IOException if input can't be read.
      * @throws GeneralSecurityException if input can't be parsed/loaded.
      */
-    public PEMFile(String filename, InputStream fileStream, String password, String keyAlgorithm)
+    public PEMFile(String filename, InputStream fileStream, String password, String passwordFilename,
+                   InputStream passwordFileStream, String keyAlgorithm)
             throws IOException, GeneralSecurityException {
         List<Part> parts = new ArrayList<>();
         try (BufferedReader reader =
@@ -141,6 +156,16 @@ public class PEMFile {
             }
         }
 
+        String passwordToUse = null;
+        if (passwordFileStream != null) {
+            try (BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(passwordFileStream, StandardCharsets.UTF_8))) {
+                passwordToUse = reader.readLine();
+            }
+        } else {
+            passwordToUse = password;
+        }
+
         for (Part part : parts) {
             switch (part.type) {
                 case Part.PRIVATE_KEY:
@@ -150,7 +175,7 @@ public class PEMFile {
                     privateKey = part.toPrivateKey(null, "EC", Format.RFC5915, filename);
                     break;
                 case Part.ENCRYPTED_PRIVATE_KEY:
-                    privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS8, filename);
+                    privateKey = part.toPrivateKey(passwordToUse, keyAlgorithm, Format.PKCS8, filename);
                     break;
                 case Part.RSA_PRIVATE_KEY:
                     if (part.algorithm == null) {
@@ -158,7 +183,7 @@ public class PEMFile {
                         // (probably default) key password provided.
                         privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS1, filename);
                     } else {
-                        privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS1, filename);
+                        privateKey = part.toPrivateKey(passwordToUse, keyAlgorithm, Format.PKCS1, filename);
                     }
                     break;
                 case Part.CERTIFICATE:

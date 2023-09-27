@@ -77,7 +77,9 @@ public final class TesterSupport {
     public static final String LOCALHOST_RSA_JKS = SSL_DIR + "localhost-rsa.jks";
     public static final String LOCALHOST_KEYPASS_JKS = SSL_DIR + "localhost-rsa-copy1.jks";
     public static final String JKS_PASS = "changeit";
+    public static final String JKS_PASS_FILE = SSL_DIR + "keystore-password";
     public static final String JKS_KEY_PASS = "tomcatpass";
+    public static final String JKS_KEY_PASS_FILE = SSL_DIR + "key-password";
     public static final String CA_CERT_PEM = SSL_DIR + CA_ALIAS + "-cert.pem";
     public static final String LOCALHOST_EC_CERT_PEM = SSL_DIR + "localhost-ec-cert.pem";
     public static final String LOCALHOST_EC_KEY_PEM = SSL_DIR + "localhost-ec-key.pem";
@@ -129,11 +131,11 @@ public final class TesterSupport {
     }
 
     public static void initSsl(Tomcat tomcat) {
-        initSsl(tomcat, LOCALHOST_RSA_JKS, null, null);
+        initSsl(tomcat, LOCALHOST_RSA_JKS, null, null, null, null);
     }
 
     protected static void initSsl(Tomcat tomcat, String keystore,
-            String keystorePass, String keyPass) {
+            String keystorePass, String keystorePassFile, String keyPass, String keyPassFile) {
 
         Connector connector = tomcat.getConnector();
         connector.setSecure(true);
@@ -157,8 +159,14 @@ public final class TesterSupport {
             sslHostConfig.setSslProtocol("tls");
             certificate.setCertificateKeystoreFile(new File(keystore).getAbsolutePath());
             sslHostConfig.setTruststoreFile(new File(CA_JKS).getAbsolutePath());
+            if (keystorePassFile != null) {
+                certificate.setCertificateKeystorePasswordFile(new File(keystorePassFile).getAbsolutePath());
+            }
             if (keystorePass != null) {
                 certificate.setCertificateKeystorePassword(keystorePass);
+            }
+            if (keyPassFile != null) {
+                certificate.setCertificateKeyPasswordFile(new File(keyPassFile).getAbsolutePath());
             }
             if (keyPass != null) {
                 certificate.setCertificateKeyPassword(keyPass);
