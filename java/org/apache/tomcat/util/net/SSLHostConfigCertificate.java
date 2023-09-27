@@ -59,10 +59,12 @@ public class SSLHostConfigCertificate implements Serializable {
     private final SSLHostConfig sslHostConfig;
     private final Type type;
     private String certificateKeyPassword = null;
+    private String certificateKeyPasswordFile = null;
 
     // JSSE
     private String certificateKeyAlias;
     private String certificateKeystorePassword = DEFAULT_KEYSTORE_PASSWORD;
+    private String certificateKeystorePasswordFile = null;
     private String certificateKeystoreFile = DEFAULT_KEYSTORE_FILE;
     private String certificateKeystoreProvider = DEFAULT_KEYSTORE_PROVIDER;
     private String certificateKeystoreType = DEFAULT_KEYSTORE_TYPE;
@@ -131,6 +133,16 @@ public class SSLHostConfigCertificate implements Serializable {
     }
 
 
+    public String getCertificateKeyPasswordFile() {
+        return certificateKeyPasswordFile;
+    }
+
+
+    public void setCertificateKeyPasswordFile(String certificateKeyPasswordFile) {
+        this.certificateKeyPasswordFile = certificateKeyPasswordFile;
+    }
+
+
     // JSSE
 
     public void setCertificateKeyAlias(String certificateKeyAlias) {
@@ -171,6 +183,19 @@ public class SSLHostConfigCertificate implements Serializable {
     }
 
 
+    public void setCertificateKeystorePasswordFile(String certificateKeystorePasswordFile) {
+        sslHostConfig.setProperty(
+                "Certificate.certificateKeystorePasswordFile", SSLHostConfig.Type.JSSE);
+        setStoreType("Certificate.certificateKeystorePasswordFile", StoreType.KEYSTORE);
+        this.certificateKeystorePasswordFile = certificateKeystorePasswordFile;
+    }
+
+
+    public String getCertificateKeystorePasswordFile() {
+        return certificateKeystorePasswordFile;
+    }
+
+
     public void setCertificateKeystoreProvider(String certificateKeystoreProvider) {
         sslHostConfig.setProperty(
                 "Certificate.certificateKeystoreProvider", SSLHostConfig.Type.JSSE);
@@ -208,7 +233,7 @@ public class SSLHostConfigCertificate implements Serializable {
         if (result == null && storeType == StoreType.KEYSTORE) {
             result = SSLUtilBase.getStore(getCertificateKeystoreType(),
                     getCertificateKeystoreProvider(), getCertificateKeystoreFile(),
-                    getCertificateKeystorePassword());
+                    getCertificateKeystorePassword(), getCertificateKeystorePasswordFile());
         }
 
         return result;

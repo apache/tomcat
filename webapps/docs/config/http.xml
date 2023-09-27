@@ -1470,7 +1470,18 @@
       certificate from the specified file.</p>
       <p>If not specified, the default behaviour for JSSE is to use the
       <strong>certificateKeystorePassword</strong>. For OpenSSL the default
-      behaviour is not to use a password.</p>
+      behaviour is not to use a password, but OpenSSL will prompt for one,
+      if required.</p>
+    </attribute>
+
+    <attribute name="certificateKeyPasswordFile" required="false">
+      <p>The password file used to access the private key associated with the server
+      certificate from the specified file. This attribute takes precedence over
+      <strong>certificateKeyPassword</strong>.</p>
+      <p>If not specified, the default behaviour for JSSE is to use the
+      <strong>certificateKeystorePasswordFile</strong>. For OpenSSL the default
+      behaviour is not to use a password (file), but OpenSSL will prompt for one,
+      if required.</p>
     </attribute>
 
     <attribute name="certificateKeystoreFile" required="false">
@@ -1494,6 +1505,13 @@
       <p>The password to use to access the keystore containing the server&apos;s
       private key and certificate. If not specified, a default of
       <code>changeit</code> will be used.</p>
+    </attribute>
+
+    <attribute name="certificateKeystorePasswordFile" required="false">
+      <p>JSSE only.</p>
+      <p>The password file to use to access the keystore containing the server&apos;s
+      private key and certificate. This attribute takes precedence over
+      <strong>certificateKeystorePassword</strong>.</p>
     </attribute>
 
     <attribute name="certificateKeystoreProvider" required="false">
