@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.net.openssl;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
 import java.nio.charset.StandardCharsets;
@@ -466,10 +469,22 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         // Load Server key and certificate
         if (certificate.getCertificateFile() != null) {
             // Set certificate
+            String passwordToUse = null;
+            if (certificate.getCertificateKeyPasswordFile() != null) {
+                try (BufferedReader reader =
+                        new BufferedReader(new InputStreamReader(
+                            new FileInputStream(
+                                SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyPasswordFile())),
+                                StandardCharsets.UTF_8))) {
+                    passwordToUse = reader.readLine();
+                }
+            } else {
+                passwordToUse = certificate.getCertificateKeyPassword();
+            }
             SSLContext.setCertificate(state.ctx,
                     SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
                     SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
-                    certificate.getCertificateKeyPassword(), getCertificateIndex(certificate));
+                    passwordToUse, getCertificateIndex(certificate));
             // Set certificate chain file
             SSLContext.setCertificateChainFile(state.ctx,
                     SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
