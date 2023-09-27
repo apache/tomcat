@@ -232,8 +232,7 @@ public class JAASRealm extends RealmBase {
 
         if (appName == null) {
             appName = makeLegalForJAAS(container.getName());
-
-            log.info("Set JAAS app name " + appName);
+            log.info(sm.getString("jaasRealm.appName", appName));
         }
     }
 
@@ -286,11 +285,10 @@ public class JAASRealm extends RealmBase {
                 if (Principal.class.isAssignableFrom(principalClass)) {
                     classNamesList.add(className);
                 } else {
-                    log.error("Class " + className + " is not implementing " +
-                            "java.security.Principal! Class not added.");
+                    log.error(sm.getString("jaasRealm.notPrincipal", className));
                 }
             } catch (ClassNotFoundException e) {
-                log.error("Class " + className + " not found! Class not added.");
+                log.error(sm.getString("jaasRealm.classNotFound", className));
             }
         }
     }
@@ -399,7 +397,7 @@ public class JAASRealm extends RealmBase {
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("jaasRealm.failedLogin", username));
                     }
-                    return (null);
+                    return null;
                 }
             } catch (AccountExpiredException e) {
                 if (log.isDebugEnabled()) {
@@ -451,7 +449,7 @@ public class JAASRealm extends RealmBase {
                 return null;
             }
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("jaasRealm.authenticateSuccess", username));
+                log.debug(sm.getString("jaasRealm.authenticateSuccess", username, principal));
             }
 
             return principal;
@@ -623,21 +621,10 @@ public class JAASRealm extends RealmBase {
                 this.jaasConfigurationLoaded = true;
                 return this.jaasConfiguration;
             }
-        } catch (URISyntaxException ex) {
-            throw new RuntimeException(ex);
-        } catch (NoSuchMethodException ex) {
-            throw new RuntimeException(ex);
-        } catch (SecurityException ex) {
-            throw new RuntimeException(ex);
-        } catch (InstantiationException ex) {
-            throw new RuntimeException(ex);
-        } catch (IllegalAccessException ex) {
-            throw new RuntimeException(ex);
-        } catch (IllegalArgumentException ex) {
-            throw new RuntimeException(ex);
         } catch (InvocationTargetException ex) {
             throw new RuntimeException(ex.getCause());
-        } catch (ClassNotFoundException ex) {
+        } catch (SecurityException | URISyntaxException | ClassNotFoundException | IllegalAccessException |
+                InstantiationException | NoSuchMethodException | IllegalArgumentException ex) {
             throw new RuntimeException(ex);
         }
     }

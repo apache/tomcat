@@ -16,12 +16,10 @@
  */
 package org.apache.catalina.realm;
 
-
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.Rule;
 import org.apache.tomcat.util.digester.RuleSetBase;
 import org.xml.sax.Attributes;
-
 
 /**
  * <p>
@@ -36,7 +34,6 @@ public class MemoryRuleSet extends RuleSetBase {
 
     // ----------------------------------------------------- Instance Variables
 
-
     /**
      * The matching pattern prefix to use for recognizing our elements.
      */
@@ -45,14 +42,11 @@ public class MemoryRuleSet extends RuleSetBase {
 
     // ------------------------------------------------------------ Constructor
 
-
     /**
      * Construct an instance of this <code>RuleSet</code> with the default matching pattern prefix.
      */
     public MemoryRuleSet() {
-
         this("tomcat-users/");
-
     }
 
 

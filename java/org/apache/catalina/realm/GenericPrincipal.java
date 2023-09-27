@@ -138,7 +138,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     /**
      * The set of roles associated with this user.
      */
-    protected final String roles[];
+    protected final String[] roles;
 
     public String[] getRoles() {
         return this.roles;
@@ -217,14 +217,6 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     }
 
 
-    /**
-     * Calls logout, if necessary, on any associated JAASLoginContext. May in the future be extended to cover other
-     * logout requirements.
-     *
-     * @throws Exception If something goes wrong with the logout. Uses Exception to allow for future expansion of this
-     *                       method to cover other logout mechanisms that might throw a different exception to
-     *                       LoginContext
-     */
     @Override
     public void logout() throws Exception {
         if (loginContext != null) {

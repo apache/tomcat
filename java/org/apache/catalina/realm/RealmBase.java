@@ -48,6 +48,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.SessionConfig;
+import org.apache.catalina.util.ToStringUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
@@ -411,8 +412,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
         try {
             valueBytes = serverDigestValue.getBytes(getDigestCharset());
         } catch (UnsupportedEncodingException uee) {
-            log.error("Illegal digestEncoding: " + getDigestEncoding(), uee);
-            throw new IllegalArgumentException(uee.getMessage());
+            throw new IllegalArgumentException(sm.getString("realmBase.invalidDigestEncoding", getDigestEncoding()),
+                    uee);
         }
 
         String serverDigest = HexUtils.toHexString(ConcurrentMessageDigest.digest(algorithm, valueBytes));
@@ -1103,10 +1104,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("Realm[");
-        sb.append(getName());
-        sb.append(']');
-        return sb.toString();
+        return ToStringUtil.toString(this);
     }
 
 
@@ -1165,8 +1163,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
         try {
             valueBytes = digestValue.getBytes(getDigestCharset());
         } catch (UnsupportedEncodingException uee) {
-            log.error("Illegal digestEncoding: " + getDigestEncoding(), uee);
-            throw new IllegalArgumentException(uee.getMessage());
+            throw new IllegalArgumentException(sm.getString("realmBase.invalidDigestEncoding", getDigestEncoding()),
+                    uee);
         }
 
         return HexUtils.toHexString(ConcurrentMessageDigest.digest(algorithm, valueBytes));
@@ -1225,7 +1223,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
             log.debug(sm.getString("realmBase.gotX509Username", username));
         }
 
-        return (getPrincipal(username));
+        return getPrincipal(username);
     }
 
 
@@ -1558,7 +1556,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
             } else if (name.equalsIgnoreCase(STRICT_AUTH_ONLY_MODE.name)) {
                 mode = STRICT_AUTH_ONLY_MODE;
             } else {
-                throw new IllegalStateException("Unknown mode, must be one of: strict, authOnly, strictAuthOnly");
+                throw new IllegalStateException(sm.getString("realmBase.unknownAllRolesMode", name));
             }
             return mode;
         }
