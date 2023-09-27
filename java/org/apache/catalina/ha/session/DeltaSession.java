@@ -123,7 +123,7 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
      */
     @Override
     public boolean isDirty() {
-        return getDeltaRequest().getSize() > 0;
+        return deltaRequest.getSize() > 0;
     }
 
     /**
@@ -194,22 +194,19 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
      */
     @Override
     public void applyDiff(byte[] diff, int offset, int length) throws IOException, ClassNotFoundException {
+        Thread currentThread = Thread.currentThread();
+        ClassLoader contextLoader = currentThread.getContextClassLoader();
         lockInternal();
         try (ObjectInputStream stream = ((ClusterManager) getManager()).getReplicationStream(diff, offset, length)) {
-            Thread currentThread = Thread.currentThread();
-            ClassLoader contextLoader = currentThread.getContextClassLoader();
-            try {
-                ClassLoader[] loaders = getClassLoaders();
-                if (loaders != null && loaders.length > 0) {
-                    currentThread.setContextClassLoader(loaders[0]);
-                }
-                getDeltaRequest().readExternal(stream);
-                getDeltaRequest().execute(this, ((ClusterManager) getManager()).isNotifyListenersOnReplication());
-            } finally {
-                currentThread.setContextClassLoader(contextLoader);
+            ClassLoader[] loaders = getClassLoaders();
+            if (loaders != null && loaders.length > 0) {
+                currentThread.setContextClassLoader(loaders[0]);
             }
+            deltaRequest.readExternal(stream);
+            deltaRequest.execute(this, ((ClusterManager) getManager()).isNotifyListenersOnReplication());
         } finally {
             unlockInternal();
+            currentThread.setContextClassLoader(contextLoader);
         }
     }
 
@@ -647,6 +644,12 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
         }
     }
 
+    /**
+     * Get the request.
+     * @return the request
+     * @deprecated Unused. This method will be removed in Tomcat 12.
+     */
+    @Deprecated
     public DeltaRequest getDeltaRequest() {
         return deltaRequest;
     }

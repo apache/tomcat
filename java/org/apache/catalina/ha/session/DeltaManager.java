@@ -277,7 +277,9 @@ public class DeltaManager extends ClusterManagerBase {
     }
 
     public int getReceivedQueueSize() {
-        return receivedMessageQueue.size();
+        synchronized (receivedMessageQueue) {
+            return receivedMessageQueue.size();
+        }
     }
 
     /**
