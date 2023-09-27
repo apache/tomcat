@@ -381,7 +381,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
     }
 
     @Override
-    public boolean keepalive() {
+    public synchronized boolean keepalive() {
         boolean result = false;
         for (Iterator<Entry<Member,NioSender>> i = nioSenders.entrySet().iterator(); i.hasNext();) {
             Map.Entry<Member, NioSender> entry = i.next();
