@@ -305,9 +305,26 @@ public class SSLHostConfig implements Serializable {
             return defaultCertificate.getCertificateKeyPassword();
         }
     }
+
+
     public void setCertificateKeyPassword(String certificateKeyPassword) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeyPassword(certificateKeyPassword);
+    }
+
+
+    public String getCertificateKeyPasswordFile() {
+        if (defaultCertificate == null) {
+            return null;
+        } else {
+            return defaultCertificate.getCertificateKeyPasswordFile();
+        }
+    }
+
+
+    public void setCertificateKeyPasswordFile(String certificateKeyPasswordFile) {
+        registerDefaultCertificate();
+        defaultCertificate.setCertificateKeyPasswordFile(certificateKeyPasswordFile);
     }
 
 
@@ -586,6 +603,19 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    public String getCertificateKeystorePasswordFile() {
+        if (defaultCertificate == null) {
+            return null;
+        } else {
+            return defaultCertificate.getCertificateKeystorePasswordFile();
+        }
+    }
+    public void setCertificateKeystorePasswordFile(String certificateKeystorePasswordFile) {
+        registerDefaultCertificate();
+        defaultCertificate.setCertificateKeystorePasswordFile(certificateKeystorePasswordFile);
+    }
+
+
     public String getCertificateKeystoreProvider() {
         if (defaultCertificate == null) {
             return null;
@@ -743,7 +773,7 @@ public class SSLHostConfig implements Serializable {
             if (truststoreFile != null){
                 try {
                     result = SSLUtilBase.getStore(getTruststoreType(), getTruststoreProvider(),
-                            getTruststoreFile(), getTruststorePassword());
+                            getTruststoreFile(), getTruststorePassword(), null);
                 } catch (IOException ioe) {
                     Throwable cause = ioe.getCause();
                     if (cause instanceof UnrecoverableKeyException) {
@@ -752,7 +782,7 @@ public class SSLHostConfig implements Serializable {
                                 cause);
                         // Re-try
                         result = SSLUtilBase.getStore(getTruststoreType(), getTruststoreProvider(),
-                                getTruststoreFile(), null);
+                                getTruststoreFile(), null, null);
                     } else {
                         // Something else went wrong - re-throw
                         throw ioe;

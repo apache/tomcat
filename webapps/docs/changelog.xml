@@ -107,6 +107,10 @@
 <section name="Tomcat 9.0.83 (remm)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>66670</bug>: Add <code>SSLHostConfig#certificateKeyPasswordFile</code> and
+        <code>SSLHostConfig#certificateKeystorePasswordFile</code>. (michaelo)
+      </add>
       <fix>
         <bug>67667</bug>: <code>TLSCertificateReloadListener</code> prints unreadable
         rendering of <code>X509Certificate#getNotAfter()</code>. (michaelo)
