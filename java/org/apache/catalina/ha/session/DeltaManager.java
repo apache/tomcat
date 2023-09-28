@@ -86,25 +86,25 @@ public class DeltaManager extends ClusterManagerBase {
 
     // -------------------------------------------------------- stats attributes
 
-    private long sessionReplaceCounter = 0;
-    private long counterReceive_EVT_GET_ALL_SESSIONS = 0;
-    private long counterReceive_EVT_ALL_SESSION_DATA = 0;
-    private long counterReceive_EVT_SESSION_CREATED = 0;
-    private long counterReceive_EVT_SESSION_EXPIRED = 0;
-    private long counterReceive_EVT_SESSION_ACCESSED = 0;
-    private long counterReceive_EVT_SESSION_DELTA = 0;
-    private int counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE = 0;
-    private long counterReceive_EVT_CHANGE_SESSION_ID = 0;
-    private long counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER = 0;
-    private long counterSend_EVT_GET_ALL_SESSIONS = 0;
-    private long counterSend_EVT_ALL_SESSION_DATA = 0;
-    private long counterSend_EVT_SESSION_CREATED = 0;
-    private long counterSend_EVT_SESSION_DELTA = 0;
-    private long counterSend_EVT_SESSION_ACCESSED = 0;
-    private long counterSend_EVT_SESSION_EXPIRED = 0;
-    private int counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE = 0;
-    private long counterSend_EVT_CHANGE_SESSION_ID = 0;
-    private int counterNoStateTransferred = 0;
+    private volatile long sessionReplaceCounter = 0;
+    private volatile long counterReceive_EVT_GET_ALL_SESSIONS = 0;
+    private volatile long counterReceive_EVT_ALL_SESSION_DATA = 0;
+    private volatile long counterReceive_EVT_SESSION_CREATED = 0;
+    private volatile long counterReceive_EVT_SESSION_EXPIRED = 0;
+    private volatile long counterReceive_EVT_SESSION_ACCESSED = 0;
+    private volatile long counterReceive_EVT_SESSION_DELTA = 0;
+    private volatile int counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE = 0;
+    private volatile long counterReceive_EVT_CHANGE_SESSION_ID = 0;
+    private volatile long counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER = 0;
+    private volatile long counterSend_EVT_GET_ALL_SESSIONS = 0;
+    private volatile long counterSend_EVT_ALL_SESSION_DATA = 0;
+    private volatile long counterSend_EVT_SESSION_CREATED = 0;
+    private volatile long counterSend_EVT_SESSION_DELTA = 0;
+    private volatile long counterSend_EVT_SESSION_ACCESSED = 0;
+    private volatile long counterSend_EVT_SESSION_EXPIRED = 0;
+    private volatile int counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE = 0;
+    private volatile long counterSend_EVT_CHANGE_SESSION_ID = 0;
+    private volatile int counterNoStateTransferred = 0;
 
 
     // ------------------------------------------------------------- Constructor
@@ -242,14 +242,6 @@ public class DeltaManager extends ClusterManagerBase {
      */
     public long getCounterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER() {
         return counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER;
-    }
-
-    /**
-     * @return Returns the processingTime.
-     */
-    @Override
-    public long getProcessingTime() {
-        return processingTime;
     }
 
     /**
