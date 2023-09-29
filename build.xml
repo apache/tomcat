@@ -2768,7 +2768,7 @@ asf.ldap.username=${release.asfusername}
   </target>
 
   <!-- Sets properties only required for releases -->
-  <target name="release-init" depends="gpg-init-1,gpg-init-2,compile" >
+  <target name="release-init" depends="gpg-init-1,gpg-init-2,gpg-init-3,compile" >
     <taskdef name="forceUtcTimeZone"
              classname="org.apache.tomcat.buildutil.ForceUtcTimeZone"
              classpath="${tomcat.classes}" />
@@ -2780,9 +2780,21 @@ asf.ldap.username=${release.asfusername}
   </target>
 
   <target name="gpg-init-2" if="${gpg.exec.available}">
-    <input message="Enter GPG pass-phrase" addproperty="gpg.passphrase" >
-      <handler type="secure"/>
-    </input>
+<echo>gpg.exec.available=${gpg.exec.available}</echo>
+<echo>gpg.exec=${gpg.exec}</echo>
+    <input addproperty="gpg.passphrase"><handler type="secure"/>Enter GPG passphrase
+</input>
+  </target>
+
+  <!-- Test GPG by signing build.xml as a sample file. -->
+  <target name="gpg-init-3" if="gpg.passphrase">
+    <delete file="build.xml.asc" quiet="true" />
+    <antcall target="sign">
+      <param name="file" value="build.xml" />
+    </antcall>
+    <uptodate srcfile="build.xml" targetfile="build.xml.asc" property="gpg.success" />
+    <delete file="build.xml.asc" quiet="true" />
+    <fail unless="gpg.success" />
   </target>
 
   <!-- Packages the core zip distro -->
