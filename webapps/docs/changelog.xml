@@ -183,6 +183,9 @@
         Add the <code>Bundle-License</code> header to the JAR manifest for all
         Tomcat JARs. (markt)
       </add>
+      <update>
+        Update UnboundID to 6.0.9. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
