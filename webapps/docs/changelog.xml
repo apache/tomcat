@@ -183,6 +183,9 @@
         Add the <code>Bundle-License</code> header to the JAR manifest for all
         Tomcat JARs. (markt)
       </add>
+      <update>
+        Update to the Eclipse JDT compiler 4.29. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
