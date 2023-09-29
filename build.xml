@@ -2788,13 +2788,21 @@ asf.ldap.username=${release.asfusername}
 
   <!-- Test GPG by signing build.xml as a sample file. -->
   <target name="gpg-init-3" if="gpg.passphrase">
-    <delete file="build.xml.asc" quiet="true" />
-    <antcall target="sign">
-      <param name="file" value="build.xml" />
-    </antcall>
-    <uptodate srcfile="build.xml" targetfile="build.xml.asc" property="gpg.success" />
-    <delete file="build.xml.asc" quiet="true" />
-    <fail unless="gpg.success" />
+    <exec executable="${gpg.exec}"
+          inputstring="${gpg.passphrase}"
+          failonerror="true"
+          discardOutput="true"
+          logError="true">
+      <arg value="--batch"/>
+      <arg value="--pinentry-mode"/>
+      <arg value="loopback"/>
+      <arg value="--passphrase-fd"/>
+      <arg value="0"/>
+      <arg value="-o" /><!-- write to stdout -->
+      <arg value="-" />
+      <arg value="--detach-sign"/>
+      <arg value="build.xml"/>
+    </exec>
   </target>
 
   <!-- Packages the core zip distro -->
