@@ -175,6 +175,9 @@
         branch requiring additional Commons IO dependencies, Tomcat has switched
         to tracking the 1.x branch. (markt)
       </update>
+      <update>
+        Update UnboundID to 6.0.9. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
