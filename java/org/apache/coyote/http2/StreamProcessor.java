@@ -362,23 +362,6 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
-    protected final boolean isPushSupported() {
-        return stream.isPushSupported();
-    }
-
-
-    @Override
-    protected final void doPush(Request pushTarget) {
-        try {
-            stream.push(pushTarget);
-        } catch (IOException ioe) {
-            setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
-            response.setErrorException(ioe);
-        }
-    }
-
-
-    @Override
     protected boolean isTrailerFieldsReady() {
         return stream.isTrailerFieldsReady();
     }

@@ -118,7 +118,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             this.inputBuffer = new StandardStreamInputBuffer();
             this.coyoteRequest.setInputBuffer(inputBuffer);
         } else {
-            // HTTP/2 Push or HTTP/1.1 upgrade
+            // HTTP/1.1 upgrade
             this.coyoteRequest = coyoteRequest;
             this.inputBuffer =
                     new SavedRequestStreamInputBuffer((SavedRequestInputFilter) coyoteRequest.getInputBuffer());
@@ -162,8 +162,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         if (hostValueMB == null) {
             throw new IllegalArgumentException();
         }
-        // This processing expects bytes. Server push will have used a String
-        // so trigger a conversion if required.
+        // This processing expects bytes. Trigger a conversion if required.
         hostValueMB.toBytes();
         ByteChunk valueBC = hostValueMB.getByteChunk();
         byte[] valueB = valueBC.getBytes();
@@ -546,8 +545,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     final void writeHeaders() throws IOException {
         boolean endOfStream = streamOutputBuffer.hasNoBody() && coyoteResponse.getTrailerFields() == null;
-        handler.writeHeaders(this, 0, coyoteResponse.getMimeHeaders(), endOfStream,
-                Constants.DEFAULT_HEADERS_FRAME_SIZE);
+        handler.writeHeaders(this, coyoteResponse.getMimeHeaders(), endOfStream, Constants.DEFAULT_HEADERS_FRAME_SIZE);
     }
 
 
@@ -581,12 +579,12 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             mb.setString(headerEntry.getValue());
         }
 
-        handler.writeHeaders(this, 0, mimeHeaders, true, Constants.DEFAULT_HEADERS_FRAME_SIZE);
+        handler.writeHeaders(this, mimeHeaders, true, Constants.DEFAULT_HEADERS_FRAME_SIZE);
     }
 
 
     final void writeAck() throws IOException {
-        handler.writeHeaders(this, 0, ACK_HEADERS, false, Constants.DEFAULT_HEADERS_ACK_FRAME_SIZE);
+        handler.writeHeaders(this, ACK_HEADERS, false, Constants.DEFAULT_HEADERS_ACK_FRAME_SIZE);
     }
 
 
@@ -609,9 +607,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     @Override
     final ByteBuffer getInputByteBuffer() {
         if (inputBuffer == null) {
-            // This must either be a push or an HTTP upgrade. Either way there
-            // should not be a request body so return a zero length ByteBuffer
-            // to trigger a flow control error.
+            // This must either be an HTTP upgrade. There should not be a request body so return a zero length
+            //ByteBuffer to trigger a flow control error.
             return ZERO_LENGTH_BYTEBUFFER;
         }
         return inputBuffer.getInBuffer();
@@ -708,11 +705,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
-    final void sentPushPromise() {
-        state.sentPushPromise();
-    }
-
-
     final boolean isActive() {
         return state.isActive();
     }
@@ -786,40 +778,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             remaining = inputByteBuffer.remaining();
         }
         handler.replaceStream(this, new RecycledStream(getConnectionId(), getIdentifier(), state, remaining));
-    }
-
-
-    final boolean isPushSupported() {
-        return handler.getRemoteSettings().getEnablePush();
-    }
-
-
-    final void push(Request request) throws IOException {
-        // Can only push when supported and from a peer initiated stream
-        if (!isPushSupported() || getIdAsInt() % 2 == 0) {
-            return;
-        }
-        // Set the special HTTP/2 headers
-        request.getMimeHeaders().addValue(":method").duplicate(request.method());
-        request.getMimeHeaders().addValue(":scheme").duplicate(request.scheme());
-        StringBuilder path = new StringBuilder(request.requestURI().toString());
-        if (!request.queryString().isNull()) {
-            path.append('?');
-            path.append(request.queryString().toString());
-        }
-        request.getMimeHeaders().addValue(":path").setString(path.toString());
-
-        // Authority needs to include the port only if a non-standard port is
-        // being used.
-        if (!(request.scheme().equals("http") && request.getServerPort() == 80) &&
-                !(request.scheme().equals("https") && request.getServerPort() == 443)) {
-            request.getMimeHeaders().addValue(":authority")
-                    .setString(request.serverName().getString() + ":" + request.getServerPort());
-        } else {
-            request.getMimeHeaders().addValue(":authority").duplicate(request.serverName());
-        }
-
-        handler.push(request, this);
     }
 
 

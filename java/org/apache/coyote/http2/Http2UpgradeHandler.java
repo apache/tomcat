@@ -121,7 +121,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     // Start at -1 so the 'add 2' logic in closeIdleStreams() works
     private volatile int maxActiveRemoteStreamId = -1;
     private volatile int maxProcessedStreamId;
-    private final AtomicInteger nextLocalStreamId = new AtomicInteger(2);
     private final PingManager pingManager = getPingManager();
     private volatile int newStreamsSinceLastPrune = 0;
     private final Set<Stream> backLogStreams = new HashSet<>();
@@ -698,13 +697,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
     }
 
-    void writeHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders, boolean endOfStream, int payloadSize)
+    void writeHeaders(Stream stream, MimeHeaders mimeHeaders, boolean endOfStream, int payloadSize)
             throws IOException {
         // This ensures the Stream processing thread has control of the socket.
         Lock lock = socketWrapper.getLock();
         lock.lock();
         try {
-            doWriteHeaders(stream, pushedStreamId, mimeHeaders, endOfStream, payloadSize);
+            doWriteHeaders(stream, mimeHeaders, endOfStream, payloadSize);
         } finally {
             lock.unlock();
         }
@@ -719,17 +718,12 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
      * Separate method to allow Http2AsyncUpgradeHandler to call this code without synchronizing on socketWrapper since
      * it doesn't need to.
      */
-    protected HeaderFrameBuffers doWriteHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders,
-            boolean endOfStream, int payloadSize) throws IOException {
+    protected HeaderFrameBuffers doWriteHeaders(Stream stream, MimeHeaders mimeHeaders, boolean endOfStream,
+            int payloadSize) throws IOException {
 
         if (log.isDebugEnabled()) {
-            if (pushedStreamId == 0) {
-                log.debug(sm.getString("upgradeHandler.writeHeaders", connectionId, stream.getIdAsString(),
-                        Boolean.valueOf(endOfStream)));
-            } else {
-                log.debug(sm.getString("upgradeHandler.writePushHeaders", connectionId, stream.getIdAsString(),
-                        Integer.valueOf(pushedStreamId), Boolean.valueOf(endOfStream)));
-            }
+            log.debug(sm.getString("upgradeHandler.writeHeaders", connectionId, stream.getIdAsString(),
+                    Boolean.valueOf(endOfStream)));
         }
 
         if (!stream.canWrite()) {
@@ -738,31 +732,18 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
         HeaderFrameBuffers headerFrameBuffers = getHeaderFrameBuffers(payloadSize);
 
-        byte[] pushedStreamIdBytes = null;
-        if (pushedStreamId > 0) {
-            pushedStreamIdBytes = new byte[4];
-            ByteUtil.set31Bits(pushedStreamIdBytes, 0, pushedStreamId);
-        }
-
         boolean first = true;
         State state = null;
 
         while (state != State.COMPLETE) {
             headerFrameBuffers.startFrame();
-            if (first && pushedStreamIdBytes != null) {
-                headerFrameBuffers.getPayload().put(pushedStreamIdBytes);
-            }
             state = getHpackEncoder().encode(mimeHeaders, headerFrameBuffers.getPayload());
             headerFrameBuffers.getPayload().flip();
             if (state == State.COMPLETE || headerFrameBuffers.getPayload().limit() > 0) {
                 ByteUtil.setThreeBytes(headerFrameBuffers.getHeader(), 0, headerFrameBuffers.getPayload().limit());
                 if (first) {
                     first = false;
-                    if (pushedStreamIdBytes == null) {
-                        headerFrameBuffers.getHeader()[3] = FrameType.HEADERS.getIdByte();
-                    } else {
-                        headerFrameBuffers.getHeader()[3] = FrameType.PUSH_PROMISE.getIdByte();
-                    }
+                    headerFrameBuffers.getHeader()[3] = FrameType.HEADERS.getIdByte();
                     if (endOfStream) {
                         headerFrameBuffers.getHeader()[4] = FLAG_END_OF_STREAM;
                     }
@@ -1255,17 +1236,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    private Stream createLocalStream(Request request) {
-        int streamId = nextLocalStreamId.getAndAdd(2);
-
-        Integer key = Integer.valueOf(streamId);
-
-        Stream result = new Stream(key, this, request);
-        streams.put(key, result);
-        return result;
-    }
-
-
     private void close() {
         ConnectionState previous = connectionState.getAndSet(ConnectionState.CLOSED);
         if (previous == ConnectionState.CLOSED) {
@@ -1342,36 +1312,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             log.warn(sm.getString("upgradeHandler.pruneIncomplete", connectionId, Integer.toString(streamId),
                     Integer.toString(toClose)));
         }
-    }
-
-
-    void push(Request request, Stream associatedStream) throws IOException {
-        if (localSettings.getMaxConcurrentStreams() < activeRemoteStreamCount.incrementAndGet()) {
-            // If there are too many open streams, simply ignore the push
-            // request.
-            setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
-            return;
-        }
-
-        Stream pushStream;
-
-        /*
-         * Uses SocketWrapper lock since PUSH_PROMISE frames have to be sent in order. Once the stream has been created
-         * we need to ensure that the PUSH_PROMISE is sent before the next stream is created for a PUSH_PROMISE.
-         */
-        Lock lock = socketWrapper.getLock();
-        lock.lock();
-        try {
-            pushStream = createLocalStream(request);
-            writeHeaders(associatedStream, pushStream.getIdAsInt(), request.getMimeHeaders(), false,
-                    Constants.DEFAULT_HEADERS_FRAME_SIZE);
-        } finally {
-            lock.unlock();
-        }
-
-        pushStream.sentPushPromise();
-
-        processStreamOnContainerThread(pushStream);
     }
 
 

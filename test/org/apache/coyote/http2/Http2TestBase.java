@@ -1267,14 +1267,6 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         }
 
 
-        public void pushPromise(int streamId, int pushedStreamId) {
-            trace.append(streamId);
-            trace.append("-PushPromise-");
-            trace.append(pushedStreamId);
-            trace.append("\n");
-        }
-
-
         public void clearTrace() {
             trace = new StringBuffer();
             bytesRead = 0;

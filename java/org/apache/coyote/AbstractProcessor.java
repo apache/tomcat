@@ -608,17 +608,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 break;
             }
 
-            // Servlet 4.0 Push requests
-            case IS_PUSH_SUPPORTED: {
-                AtomicBoolean result = (AtomicBoolean) param;
-                result.set(isPushSupported());
-                break;
-            }
-            case PUSH_REQUEST: {
-                doPush((Request) param);
-                break;
-            }
-
             // Servlet 4.0 Trailers
             case IS_TRAILER_FIELDS_READY: {
                 AtomicBoolean result = (AtomicBoolean) param;
@@ -927,29 +916,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     @Override
     public boolean isUpgrade() {
         return false;
-    }
-
-
-    /**
-     * Protocols that support push should override this method and return {@code
-     * true}.
-     *
-     * @return {@code true} if push is supported by this processor, otherwise {@code false}.
-     */
-    protected boolean isPushSupported() {
-        return false;
-    }
-
-
-    /**
-     * Process a push. Processors that support push should override this method and process the provided token.
-     *
-     * @param pushTarget Contains all the information necessary for the Processor to process the push request
-     *
-     * @throws UnsupportedOperationException if the protocol does not support push
-     */
-    protected void doPush(Request pushTarget) {
-        throw new UnsupportedOperationException(sm.getString("abstractProcessor.pushrequest.notsupported"));
     }
 
 
