@@ -37,10 +37,12 @@ import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.OperationInfo;
 import org.apache.tomcat.util.modeler.ParameterInfo;
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.res.StringManager;
 
 public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 {
     private static final Log log = LogFactory.getLog(MbeansDescriptorsIntrospectionSource.class);
+    private static final StringManager sm = StringManager.getManager(MbeansDescriptorsIntrospectionSource.class);
 
     private Registry registry;
     private String type;
@@ -367,7 +369,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
             return mbean;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(sm.getString("source.introspectionError", realClass.getName()), ex);
             return null;
         }
     }
