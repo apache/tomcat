@@ -161,7 +161,7 @@ public final class Parameters {
             decodedQuery.duplicate(queryMB);
         } catch (IOException e) {
             // Can't happen, as decodedQuery can't overflow
-            e.printStackTrace();
+            log.error(sm.getString("parameters.copyFail"), e);
         }
         processParameters(decodedQuery, queryStringCharset);
     }
