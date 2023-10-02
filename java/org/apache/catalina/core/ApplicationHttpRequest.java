@@ -32,19 +32,15 @@ import java.util.NoSuchElementException;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletRequestWrapper;
 import jakarta.servlet.http.HttpServletMapping;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.PushBuilder;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
-import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.URLEncoder;
@@ -593,20 +589,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         } else {
             return super.isRequestedSessionIdValid();
-        }
-    }
-
-
-    @Override
-    public PushBuilder newPushBuilder() {
-        ServletRequest current = getRequest();
-        while (current instanceof ServletRequestWrapper) {
-            current = ((ServletRequestWrapper) current).getRequest();
-        }
-        if (current instanceof RequestFacade) {
-            return ((RequestFacade) current).newPushBuilder(this);
-        } else {
-            return null;
         }
     }
 

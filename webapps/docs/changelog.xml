@@ -165,6 +165,11 @@
         for the Servlet 6.1 specification. It will be replaced in a future
         Tomcat 11 milestone with support for 103 early hints. (markt)
       </update>
+      <update>
+        Remove support for HTTP/2 server push. Calls to
+        <code>newPushBuilder()</code> will always return <code>null</code>.
+        (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">

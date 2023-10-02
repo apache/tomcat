@@ -65,7 +65,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpUpgradeHandler;
 import jakarta.servlet.http.Part;
-import jakarta.servlet.http.PushBuilder;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -79,7 +78,6 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ApplicationFilterChain;
 import org.apache.catalina.core.ApplicationMapping;
 import org.apache.catalina.core.ApplicationPart;
-import org.apache.catalina.core.ApplicationPushBuilder;
 import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.mapper.MappingData;
@@ -1863,23 +1861,6 @@ public class Request implements HttpServletRequest {
         }
         Map<String,String> result = new HashMap<>(coyoteRequest.getTrailerFields());
         return result;
-    }
-
-
-    @Override
-    public PushBuilder newPushBuilder() {
-        return newPushBuilder(this);
-    }
-
-
-    public PushBuilder newPushBuilder(HttpServletRequest request) {
-        AtomicBoolean result = new AtomicBoolean();
-        coyoteRequest.action(ActionCode.IS_PUSH_SUPPORTED, result);
-        if (result.get()) {
-            return new ApplicationPushBuilder(this, request);
-        } else {
-            return null;
-        }
     }
 
 

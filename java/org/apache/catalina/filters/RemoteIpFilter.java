@@ -34,16 +34,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.GenericFilter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletRequestWrapper;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.PushBuilder;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
-import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -639,19 +636,6 @@ public class RemoteIpFilter extends GenericFilter {
         @Override
         public StringBuffer getRequestURL() {
             return RequestUtil.getRequestURL(this);
-        }
-
-        @Override
-        public PushBuilder newPushBuilder() {
-            ServletRequest current = getRequest();
-            while (current instanceof ServletRequestWrapper) {
-                current = ((ServletRequestWrapper) current).getRequest();
-            }
-            if (current instanceof RequestFacade) {
-                return ((RequestFacade) current).newPushBuilder(this);
-            } else {
-                return null;
-            }
         }
     }
 
