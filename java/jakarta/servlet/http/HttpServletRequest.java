@@ -223,12 +223,15 @@ public interface HttpServletRequest extends ServletRequest {
      * instance obtained.
      *
      * @return A builder that can be used to generate push requests based on this request or {@code null} if push is not
-     *             supported. Note that even if a PushBuilder instance is returned, by the time that
-     *             {@link PushBuilder#push()} is called, it may no longer be valid to push a request and the push
-     *             request will be ignored.
+     *             supported. Some implementations may opt not to support server push and will therefore always return
+     *             {@code null}. If a PushBuilder instance is returned, by the time that {@link PushBuilder#push()} is
+     *             called, it may no longer be valid to push a request and the push request will be ignored.
      *
      * @since Servlet 4.0
+     *
+     * @deprecated In favor of 103 early hints
      */
+    @Deprecated
     default PushBuilder newPushBuilder() {
         return null;
     }

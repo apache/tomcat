@@ -160,6 +160,11 @@
         Improve statistics collection for upgraded connections under load.
         (remm)
       </fix>
+      <update>
+        <code>PushBuilder</code> has been deprecated in line with the changes
+        for the Servlet 6.1 specification. It will be replaced in a future
+        Tomcat 11 milestone with support for 103 early hints. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
