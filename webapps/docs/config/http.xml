@@ -1331,7 +1331,8 @@
       <code>optionalNoCA</code> if you want client certificates to be optional
       and you don't want Tomcat to check them against the list of trusted CAs.
       If the TLS provider doesn't support this option (OpenSSL does, JSSE does
-      not) it is treated as if <code>optional</code> was specified. A
+      not) it is treated as if <code>optional</code> was specified. If
+      <code>optionalNoCA</code> is configured then OCSP will also be disabled.
       <code>none</code> value (which is the default) will not require a
       certificate chain unless the client requests a resource protected by a
       security constraint that uses <code>CLIENT-CERT</code> authentication.</p>
