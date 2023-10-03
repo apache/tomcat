@@ -132,7 +132,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
         if (shouldDestroy) {
             try {
                 destroy(ref);
-            } catch (final Exception e) {
+            } catch (final Exception ignored) {
                 // ignored
             }
         }
@@ -238,8 +238,8 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
                     if (null != ref.getObject()) {
                         factory.destroyObject(ref);
                     }
-                } catch (final Exception e) {
-                    // ignore error, keep destroying the rest
+                } catch (final Exception ignored) {
+                    // ignored, keep destroying the rest
                 }
             });
         }
@@ -348,8 +348,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
         // Remove wrappers for enqueued references from idle and allReferences lists
         removeClearedReferences(idleReferences.iterator());
         removeClearedReferences(allReferences.iterator());
-        while (refQueue.poll() != null) {
-            // empty
+        while (refQueue.poll() != null) { // NOPMD
         }
     }
 
@@ -421,7 +420,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
         if (shouldDestroy && factory != null) {
             try {
                 destroy(ref);
-            } catch (final Exception e) {
+            } catch (final Exception ignored) {
                 // ignored
             }
         }

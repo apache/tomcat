@@ -17,7 +17,7 @@
 package org.apache.tomcat.dbcp.pool2.impl;
 
 /**
- * A simple "struct" encapsulating the configuration for a
+ * A simple structure encapsulating the configuration for a
  * {@link GenericKeyedObjectPool}.
  *
  * <p>

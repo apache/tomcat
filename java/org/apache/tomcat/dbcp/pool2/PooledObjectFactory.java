@@ -131,7 +131,7 @@ public interface PooledObjectFactory<T> {
    * Creates an instance that can be served by the pool and wrap it in a
    * {@link PooledObject} to be managed by the pool.
    *
-   * @return a {@code PooledObject} wrapping an instance that can be served by the pool
+   * @return a {@code PooledObject} wrapping an instance that can be served by the pool, not null.
    *
    * @throws Exception if there is a problem creating a new instance,
    *    this will be propagated to the code requesting an object.
