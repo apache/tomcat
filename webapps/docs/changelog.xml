@@ -189,6 +189,10 @@
       <update>
         Update Checkstyle to 10.12.3. (markt)
       </update>
+      <update>
+        Update Tomcat Native to 1.2.39 to pick up Windows binaries built with
+        OpenSSL 3.0.11. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
