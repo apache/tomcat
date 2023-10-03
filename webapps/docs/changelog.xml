@@ -192,6 +192,9 @@
       <update>
         Update Tomcat Native to 2.0.6. (markt)
       </update>
+      <update>
+        Update Commons Pool to 2.12.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

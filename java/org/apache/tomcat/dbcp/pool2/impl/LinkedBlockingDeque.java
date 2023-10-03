@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.dbcp.pool2.impl;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.AbstractQueue;
@@ -954,7 +956,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         lock.lockInterruptibly();
         try {
             E x;
-            while ( (x = unlinkLast()) == null) {
+            while ((x = unlinkLast()) == null) {
                 if (nanos <= 0) {
                     return null;
                 }
@@ -1060,8 +1062,8 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * deserialize it).
      * @param s the stream
      */
-    private void readObject(final java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(final ObjectInputStream s)
+        throws IOException, ClassNotFoundException {
         s.defaultReadObject();
         count = 0;
         first = null;
@@ -1069,8 +1071,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         // Read in all elements and place in queue
         for (;;) {
             @SuppressWarnings("unchecked")
-            final
-            E item = (E)s.readObject();
+            final E item = (E)s.readObject();
             if (item == null) {
                 break;
             }
@@ -1280,7 +1281,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         lock.lock();
         try {
             E x;
-            while ( (x = unlinkFirst()) == null) {
+            while ((x = unlinkFirst()) == null) {
                 notEmpty.await();
             }
             return x;
@@ -1300,7 +1301,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         lock.lock();
         try {
             E x;
-            while ( (x = unlinkLast()) == null) {
+            while ((x = unlinkLast()) == null) {
                 notEmpty.await();
             }
             return x;
@@ -1456,8 +1457,9 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * @serialData The capacity (int), followed by elements (each an
      * {@code Object}) in the proper order, followed by a null
      * @param s the stream
+     * @throws  IOException if I/O errors occur while writing to the underlying {@code OutputStream}
      */
-    private void writeObject(final java.io.ObjectOutputStream s) throws java.io.IOException {
+    private void writeObject(final java.io.ObjectOutputStream s) throws IOException {
         lock.lock();
         try {
             // Write out capacity and any hidden stuff
