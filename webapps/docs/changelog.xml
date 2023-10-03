@@ -193,6 +193,9 @@
         Update Tomcat Native to 1.2.39 to pick up Windows binaries built with
         OpenSSL 3.0.11. (markt)
       </update>
+      <update>
+        Update Commons Pool to 2.12.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

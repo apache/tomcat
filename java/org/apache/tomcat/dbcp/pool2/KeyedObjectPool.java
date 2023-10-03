@@ -18,6 +18,8 @@ package org.apache.tomcat.dbcp.pool2;
 
 import java.io.Closeable;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -60,6 +62,7 @@ import java.util.NoSuchElementException;
  * @param <K> The type of keys maintained by this pool.
  * @param <V> Type of element pooled in this pool.
  *
+ *
  * @see KeyedPooledObjectFactory
  * @see ObjectPool
  * @see org.apache.tomcat.dbcp.pool2.impl.GenericKeyedObjectPool GenericKeyedObjectPool
@@ -83,8 +86,7 @@ public interface KeyedObjectPool<K, V> extends Closeable {
      * @throws UnsupportedOperationException
      *              when this pool cannot add new idle objects.
      */
-    void addObject(K key) throws Exception, IllegalStateException,
-            UnsupportedOperationException;
+    void addObject(K key) throws Exception;
 
     /**
      * Calls {@link KeyedObjectPool#addObject(Object)} with each
@@ -103,11 +105,11 @@ public interface KeyedObjectPool<K, V> extends Closeable {
      *             in {@code keys} is {@code null}.
      * @see #addObjects(Object, int)
      */
-    default void addObjects(final Collection<K> keys, final int count) throws Exception, IllegalArgumentException {
+    default void addObjects(final Collection<K> keys, final int count) throws Exception {
         if (keys == null) {
             throw new IllegalArgumentException(PoolUtils.MSG_NULL_KEYS);
         }
-        for (K key : keys) {
+        for (final K key : keys) {
             addObjects(key, count);
         }
     }
@@ -126,7 +128,7 @@ public interface KeyedObjectPool<K, V> extends Closeable {
      *             when {@code key} is {@code null}.
      * @since 2.8.0
      */
-    default void addObjects(final K key, final int count) throws Exception, IllegalArgumentException {
+    default void addObjects(final K key, final int count) throws Exception {
         if (key == null) {
             throw new IllegalArgumentException(PoolUtils.MSG_NULL_KEY);
         }
@@ -171,7 +173,7 @@ public interface KeyedObjectPool<K, V> extends Closeable {
      *              when the pool is exhausted and cannot or will not return
      *              another instance
      */
-    V borrowObject(K key) throws Exception, NoSuchElementException, IllegalStateException;
+    V borrowObject(K key) throws Exception;
 
     /**
      * Clears the pool, removing all pooled instances (optional operation).
@@ -181,7 +183,7 @@ public interface KeyedObjectPool<K, V> extends Closeable {
      *
      * @throws Exception if the pool cannot be cleared
      */
-    void clear() throws Exception, UnsupportedOperationException;
+    void clear() throws Exception;
 
     /**
      * Clears the specified pool, removing all pooled instances corresponding to
@@ -194,7 +196,7 @@ public interface KeyedObjectPool<K, V> extends Closeable {
      *
      * @throws Exception if the key cannot be cleared
      */
-    void clear(K key) throws Exception, UnsupportedOperationException;
+    void clear(K key) throws Exception;
 
     /**
      * Closes this pool, and free any resources associated with it.
@@ -209,6 +211,20 @@ public interface KeyedObjectPool<K, V> extends Closeable {
      */
     @Override
     void close();
+
+    /**
+     * Gets a copy of the pool key list.
+     * <p>
+     * Note: The default implementation returns an empty list.
+     * Implementations should override this method.
+     * </p>
+     *
+     * @return a copy of the pool key list.
+     * @since 2.12.0
+     */
+    default List<K> getKeys() {
+        return Collections.emptyList();
+    }
 
     /**
      * Gets the total number of instances currently borrowed from this pool but

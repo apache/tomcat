@@ -28,11 +28,21 @@ import java.util.Deque;
  * Implementations of this class are required to be thread-safe.
  * </p>
  *
- * @param <T> the type of object in the pool
- *
+ * @param <T> the type of object in the pool.
  * @since 2.0
  */
 public interface PooledObject<T> extends Comparable<PooledObject<T>> {
+
+    /**
+     * Tests whether the given PooledObject is null <em>or</em> contains a null.
+     *
+     * @param pooledObject the PooledObject to test.
+     * @return whether the given PooledObject is null <em>or</em> contains a null.
+     * @since 2.12.0
+     */
+    static boolean isNull(final PooledObject<?> pooledObject) {
+        return pooledObject == null || pooledObject.getObject() == null;
+    }
 
     /**
      * Allocates the object.
@@ -68,7 +78,6 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
      *
      * @param idleQueue The queue of idle objects to which the object should be
      *                  returned.
-     *
      * @return  Currently not used.
      */
     boolean endEvictionTest(Deque<PooledObject<T>> idleQueue);
@@ -140,7 +149,7 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
 
     /**
      * Gets the time (using the same basis as
-     * {@link System#currentTimeMillis()}) that this object was created.
+     * {@link java.time.Clock#instant()}) that this object was created.
      *
      * @return The creation time for the wrapped object.
      * @deprecated Use {@link #getCreateInstant()} which offers the best precision.
@@ -149,7 +158,7 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
     long getCreateTime();
 
     /**
-     * Computes the duration since this object was created (using {@link Instant#now()}).
+     * Gets the duration since this object was created (using {@link Instant#now()}).
      *
      * @return The duration since this object was created.
      * @since 2.12.0
@@ -268,6 +277,7 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
 
     /**
      * Gets the state of this object.
+     *
      * @return state
      */
     PooledObjectState getState();
