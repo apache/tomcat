@@ -723,15 +723,15 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         pool.setMaxIdle(getPerUserMaxIdle(userName));
         pool.setMaxTotal(getPerUserMaxTotal(userName));
         pool.setMaxWait(Duration.ofMillis(getPerUserMaxWaitMillis(userName)));
-        pool.setMinEvictableIdle(getPerUserMinEvictableIdleDuration(userName));
+        pool.setMinEvictableIdleDuration(getPerUserMinEvictableIdleDuration(userName));
         pool.setMinIdle(getPerUserMinIdle(userName));
         pool.setNumTestsPerEvictionRun(getPerUserNumTestsPerEvictionRun(userName));
-        pool.setSoftMinEvictableIdle(getPerUserSoftMinEvictableIdleDuration(userName));
+        pool.setSoftMinEvictableIdleDuration(getPerUserSoftMinEvictableIdleDuration(userName));
         pool.setTestOnCreate(getPerUserTestOnCreate(userName));
         pool.setTestOnBorrow(getPerUserTestOnBorrow(userName));
         pool.setTestOnReturn(getPerUserTestOnReturn(userName));
         pool.setTestWhileIdle(getPerUserTestWhileIdle(userName));
-        pool.setTimeBetweenEvictionRuns(getPerUserDurationBetweenEvictionRuns(userName));
+        pool.setDurationBetweenEvictionRuns(getPerUserDurationBetweenEvictionRuns(userName));
 
         pool.setSwallowedExceptionListener(new SwallowedExceptionLogger(log));
 
