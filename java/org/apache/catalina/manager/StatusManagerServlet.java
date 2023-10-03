@@ -144,7 +144,7 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
             mBeanServer.addNotificationListener(objectName, this, null, null);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log(sm.getString("managerServlet.error.jmx"), e);
         }
 
     }
@@ -163,7 +163,7 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
             objectName = new ObjectName(onStr);
             mBeanServer.removeNotificationListener(objectName, this, null, null);
         } catch (Exception e) {
-            e.printStackTrace();
+            log(sm.getString("managerServlet.error.jmx"), e);
         }
 
     }
