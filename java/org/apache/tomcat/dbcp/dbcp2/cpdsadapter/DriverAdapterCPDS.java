@@ -112,7 +112,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     // PreparedStatement pool properties
     private boolean poolPreparedStatements;
     private int maxIdle = 10;
-    private Duration durationBetweenEvictionRuns = BaseObjectPoolConfig.DEFAULT_TIME_BETWEEN_EVICTION_RUNS;
+    private Duration durationBetweenEvictionRuns = BaseObjectPoolConfig.DEFAULT_DURATION_BETWEEN_EVICTION_RUNS;
     private int numTestsPerEvictionRun = -1;
     private Duration minEvictableIdleDuration = BaseObjectPoolConfig.DEFAULT_MIN_EVICTABLE_IDLE_DURATION;
 
@@ -418,7 +418,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
                 // evictor settings are the same as the connection pool settings.
                 config.setTimeBetweenEvictionRuns(getDurationBetweenEvictionRuns());
                 config.setNumTestsPerEvictionRun(getNumTestsPerEvictionRun());
-                config.setMinEvictableIdleTime(getMinEvictableIdleDuration());
+                config.setMinEvictableIdleDuration(getMinEvictableIdleDuration());
             } else {
                 // Since there is a limit, create a prepared statement pool without an eviction thread;
                 // pool has LRU functionality so when the limit is reached, 15% of the pool is cleared.
@@ -426,7 +426,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
                 config.setMaxTotal(getMaxPreparedStatements());
                 config.setTimeBetweenEvictionRuns(Duration.ofMillis(-1));
                 config.setNumTestsPerEvictionRun(0);
-                config.setMinEvictableIdleTime(Duration.ZERO);
+                config.setMinEvictableIdleDuration(Duration.ZERO);
             }
             stmtPool = new GenericKeyedObjectPool<>(pooledConnection, config);
             pooledConnection.setStatementPool(stmtPool);
