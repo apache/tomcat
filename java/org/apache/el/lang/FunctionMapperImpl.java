@@ -158,7 +158,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
                     Class<?>[] p = ReflectionUtil.toTypeArray(this.types);
                     this.m = t.getMethod(this.name, p);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // Ignore: this results in ELException after further resolution
                 }
             }
             return this.m;

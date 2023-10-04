@@ -266,7 +266,8 @@ public class DeltaRequest implements Externalizable {
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
         if (sessionId == null) {
-            new Exception(sm.getString("deltaRequest.ssid.null")).fillInStackTrace().printStackTrace();
+            Exception e = new Exception(sm.getString("deltaRequest.ssid.null"));
+            log.error(sm.getString("deltaRequest.ssid.null"), e.fillInStackTrace());
         }
     }
 

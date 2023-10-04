@@ -1142,7 +1142,9 @@ public abstract class AbstractReplicatedMap<K,V>
             }
             System.out.println("EndMap]\n\n");
         }catch ( Exception ignore) {
-            ignore.printStackTrace();
+            if (log.isTraceEnabled()) {
+                log.trace("Error printing map", ignore);
+            }
         }
     }
 
