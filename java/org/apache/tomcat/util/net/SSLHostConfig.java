@@ -796,9 +796,6 @@ public class SSLHostConfig implements Serializable {
             newPath = System.getProperty(Constants.CATALINA_BASE_PROP) + File.separator + newPath;
             f = new File(newPath);
         }
-        if (!f.exists()) {
-            throw new FileNotFoundException(sm.getString("sslHostConfig.fileNotFound", newPath));
-        }
         return newPath;
     }
 
