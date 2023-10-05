@@ -1231,11 +1231,6 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                     // NO-OP. Leave state as is.
                 } else if (state == State.STREAM_WRITING) {
                     // NO-OP. Leave state as is.
-                } else {
-                    // Should never happen
-                    // The if ... else ... blocks above should cover all states
-                    // permitted by the preceding checkState() call
-                    throw new IllegalStateException("BUG: This code should never be called");
                 }
             }
         }

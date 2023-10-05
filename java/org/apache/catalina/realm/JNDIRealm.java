@@ -2927,11 +2927,11 @@ public class JNDIRealm extends RealmBase {
                 String pathComponent = userNameUri.getPath();
                 // Should not ever have an empty path component, since that is /{DN}
                 if (pathComponent.length() < 1) {
-                    throw new InvalidNameException("Search returned unparseable absolute name: " + resultName);
+                    throw new InvalidNameException(sm.getString("jndiRealm.invalidName", resultName));
                 }
                 name = parser.parse(pathComponent.substring(1));
             } catch (URISyntaxException e) {
-                throw new InvalidNameException("Search returned unparseable absolute name: " + resultName);
+                throw new InvalidNameException(sm.getString("jndiRealm.invalidName", resultName));
             }
         }
 

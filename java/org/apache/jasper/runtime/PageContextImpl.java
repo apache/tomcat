@@ -257,7 +257,7 @@ public class PageContextImpl extends PageContext {
                 break;
 
             default:
-                throw new IllegalArgumentException("Invalid scope");
+                throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
             }
         }
     }
