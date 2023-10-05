@@ -53,10 +53,10 @@ public final class UDecoder {
     private static final IOException EXCEPTION_EOF = new DecodeException(sm.getString("uDecoder.eof"));
 
     /** %xx with not-hex digit */
-    private static final IOException EXCEPTION_NOT_HEX_DIGIT = new DecodeException("isHexDigit");
+    private static final IOException EXCEPTION_NOT_HEX_DIGIT = new DecodeException(sm.getString("uDecoder.isHexDigit"));
 
     /** %-encoded slash is forbidden in resource path */
-    private static final IOException EXCEPTION_SLASH = new DecodeException("noSlash");
+    private static final IOException EXCEPTION_SLASH = new DecodeException(sm.getString("uDecoder.noSlash"));
 
 
     /**
