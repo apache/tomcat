@@ -156,6 +156,9 @@
       <fix>
         Avoid rare thread safety issue accessing message digest map. (remm)
       </fix>
+      <fix>
+        Align validation of HTTP trailer fields with standard fields. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
