@@ -160,6 +160,9 @@
         Improve statistics collection for upgraded connections under load.
         (remm)
       </fix>
+      <fix>
+        Align validation of HTTP trailer fields with standard fields. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
