@@ -296,12 +296,12 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                             // may be recycled at any point. Normally
                             // there is enough time for this call to
                             // complete but not always. If this call
-                            // fails in Tomcat an NPE will result so
+                            // fails in Tomcat an ISE will result so
                             // handle this here with a hack. What we are
                             // really checking here is that it does not
                             // return true.
                             result.append(req.isAsyncStarted());
-                        } catch (NullPointerException npe) {
+                        } catch (IllegalStateException npe) {
                             result.append("false");
                         } catch (Throwable t) {
                             // Additional debugging for intermittent test failure
