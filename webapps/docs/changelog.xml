@@ -177,6 +177,9 @@
       <fix>
         Align validation of HTTP trailer fields with standard fields. (markt)
       </fix>
+      <fix>
+        Improvements to HTTP/2 overhead protection. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
