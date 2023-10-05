@@ -222,12 +222,19 @@
       count starts at <code>-10 * overheadCountFactor</code>. The count is
       decreased by 20 for each data frame sent or received and each headers frame
       received. The count is increased by the <code>overheadCountFactor</code>
-      for each setting received, priority frame received and ping received. If
+      for each setting, priority, priority update and ping frame received. If
       the overhead count exceeds zero, the connection is closed. A value of less
       than <code>1</code> disables this protection. In normal usage a value of
       approximately <code>20</code> or higher will close the connection before
       any streams can complete. If not specified, a default value of
       <code>10</code> will be used.</p>
+    </attribute>
+
+    <attribute name="overheadResetFactor" required="false">
+      <p>The amount by which the overhead count (see
+      <strong>overheadCountFactor</strong>) will be increased for each reset
+      frame received. If not specified, a default value of <code>50</code> will
+      be used. A value of less than zero will be treated as zero.</p>
     </attribute>
 
     <attribute name="overheadDataThreshold" required="false">
