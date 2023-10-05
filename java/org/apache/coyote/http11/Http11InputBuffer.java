@@ -830,6 +830,12 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
      */
     private HeaderParseStatus parseHeader() throws IOException {
 
+        /*
+         * Implementation note: Any changes to this method probably need to be echoed in
+         * ChunkedInputFilter.parseHeader(). Why not use a common implementation? In short, this code uses non-blocking
+         * reads whereas ChunkedInputFilter using blocking reads. The code is just different enough that a common
+         * implementation wasn't viewed as practical.
+         */
         while (headerParsePos == HeaderParsePosition.HEADER_START) {
 
             // Read new bytes if needed
@@ -972,7 +978,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     } else if (prevChr == Constants.CR) {
                         // Invalid value - also need to delete header
                         return skipLine(true);
-                    } else if (chr != Constants.HT && HttpParser.isControl(chr)) {
+                    } else if (HttpParser.isControl(chr) && chr != Constants.HT) {
                         // Invalid value - also need to delete header
                         return skipLine(true);
                     } else if (chr == Constants.SP || chr == Constants.HT) {
