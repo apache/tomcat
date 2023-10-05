@@ -44,6 +44,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.Parameters;
@@ -600,7 +601,12 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     public void recycle() {
         if (session != null) {
-            session.endAccess();
+            try {
+                session.endAccess();
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                context.getLogger().warn(sm.getString("applicationHttpRequest.sessionEndAccessFail"), t);
+            }
         }
     }
 

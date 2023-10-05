@@ -125,6 +125,10 @@
         <bug>67472</bug>: Send fewer CORS-related headers when CORS is not
         actually being engaged. (schultz)
       </fix>
+      <add>
+        Improve handling of failures within <code>recycle()</code> methods.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
