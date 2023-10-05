@@ -170,6 +170,9 @@
         <code>newPushBuilder()</code> will always return <code>null</code>.
         (markt)
       </update>
+      <fix>
+        Align validation of HTTP trailer fields with standard fields. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
