@@ -24,10 +24,18 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * NIO based character encoder.
  */
 public final class C2BConverter {
+
+    private static final Log log = LogFactory.getLog(C2BConverter.class);
+    private static final StringManager sm = StringManager.getManager(C2BConverter.class);
 
     private final CharsetEncoder encoder;
     private ByteBuffer bb = null;
@@ -49,7 +57,12 @@ public final class C2BConverter {
      * Reset the encoder state.
      */
     public void recycle() {
-        encoder.reset();
+        try {
+            encoder.reset();
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.warn(sm.getString("c2bConverter.decoderResetFail", encoder.charset()), t);
+        }
         leftovers.position(0);
     }
 
