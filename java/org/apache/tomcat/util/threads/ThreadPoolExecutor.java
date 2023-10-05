@@ -1762,7 +1762,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      */
     public void allowCoreThreadTimeOut(boolean value) {
         if (value && keepAliveTime <= 0) {
-            throw new IllegalArgumentException("Core threads must have nonzero keep alive times");
+            throw new IllegalArgumentException(sm.getString("threadPoolExecutor.invalidKeepAlive"));
         }
         if (value != allowCoreThreadTimeOut) {
             allowCoreThreadTimeOut = value;
@@ -1822,10 +1822,10 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      */
     public void setKeepAliveTime(long time, TimeUnit unit) {
         if (time < 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(sm.getString("threadPoolExecutor.invalidKeepAlive"));
         }
         if (time == 0 && allowsCoreThreadTimeOut()) {
-            throw new IllegalArgumentException("Core threads must have nonzero keep alive times");
+            throw new IllegalArgumentException(sm.getString("threadPoolExecutor.invalidKeepAlive"));
         }
         long keepAliveTime = unit.toNanos(time);
         long delta = keepAliveTime - this.keepAliveTime;
@@ -2290,9 +2290,8 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
          */
         @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
-            throw new RejectedExecutionException("Task " + r.toString() +
-                                                 " rejected from " +
-                                                 e.toString());
+            throw new RejectedExecutionException(
+                    sm.getString("threadPoolExecutor.taskRejected", r.toString(), e.toString()));
         }
     }
 

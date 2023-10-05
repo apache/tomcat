@@ -42,8 +42,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler {
 
-    private static final StringManager sm = StringManager.getManager(
-            ChunkedInputFilter.class.getPackage().getName());
+    private static final StringManager sm = StringManager.getManager(ChunkedInputFilter.class);
 
 
     // -------------------------------------------------------------- Constants
