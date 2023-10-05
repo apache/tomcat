@@ -466,8 +466,9 @@ public class Request implements HttpServletRequest {
             for (Part part : parts) {
                 try {
                     part.delete();
-                } catch (IOException ignored) {
-                    // ApplicationPart.delete() never throws an IOEx
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    log.warn(sm.getString("coyoteRequest.deletePartFailed", part.getName()), t);
                 }
             }
             parts = null;
@@ -520,8 +521,8 @@ public class Request implements HttpServletRequest {
         asyncSupported = null;
         if (asyncContext != null) {
             asyncContext.recycle();
+            asyncContext = null;
         }
-        asyncContext = null;
     }
 
 
