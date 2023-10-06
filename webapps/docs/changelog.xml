@@ -208,6 +208,9 @@
       <update>
         Update Commons Pool to 2.12.0. (markt)
       </update>
+      <fix>
+        <bug>67611</bug>: Correct the download link in BUILDING.txt. (lihan)
+      </fix>
     </changelog>
   </subsection>
 </section>

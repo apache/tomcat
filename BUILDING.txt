@@ -104,7 +104,7 @@ package.
 
  *  Source packages can be downloaded from:
 
-        https://tomcat.apache.org/download-@VERSION_MAJOR@0.cgi
+        https://tomcat.apache.org/download-@VERSION_MAJOR@.cgi
 
 The location where the source has been placed will be further referred as
 ${tomcat.source}.
