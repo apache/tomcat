@@ -715,12 +715,22 @@ public class OpenSSLCipherConfigurationParser {
         // Handle PROFILE= using OpenSSL (if present, otherwise warn), then replace elements with that
         if (elements.length == 1 && elements[0].startsWith("PROFILE=")) {
             // Only use with Panama and if OpenSSL has been successfully loaded before
-            /* FIXME: Merge OpenSSL code first
-            if (JreCompat.isJre22Available() && OpenSSLStatus.isLibraryInitialized()) {
-                List<String> cipherList = OpenSSLLibrary.findCiphers(elements[0]);
-                // Replace the original list with the profile contents
-                elements = cipherList.toArray(new String[0]);
-            }*/
+            /* FIXME: Merge OpenSSL Panama code
+            if (JreCompat.isJre22Available()) {
+                if (OpenSSLStatus.isLibraryInitialized()) {
+                    List<String> cipherList = OpenSSLLibrary.findCiphers(elements[0]);
+                    // Replace the original list with the profile contents
+                    elements = cipherList.toArray(new String[0]);
+                } else {
+                    // OpenSSL is not available
+                    log.error(sm.getString("opensslCipherConfigurationParser.unknownProfile", elements[0]));
+                }
+            } else {
+                // No way to resolve using OpenSSL, log an info about this
+                // but it might still work if using tomcat-native
+                log.info(sm.getString("opensslCipherConfigurationParser.unknownProfile", elements[0]));
+            }
+            */
         }
         LinkedHashSet<Cipher> ciphers = new LinkedHashSet<>();
         Set<Cipher> removedCiphers = new HashSet<>();

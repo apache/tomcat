@@ -121,9 +121,9 @@ public abstract class SSLUtilBase implements SSLUtil {
         sslHostConfig.setTls13RenegotiationAvailable(isTls13RenegAuthAvailable());
 
         // Calculate the enabled ciphers
-        if (sslHostConfig.getCiphers().startsWith("PROFILE=")) {
-            // OpenSSL profiles
-            // TODO: sslHostConfig can query that with Panama, but skip for now
+        if (/*!JreCompat.isJre22Available() && */sslHostConfig.getCiphers().startsWith("PROFILE=")) {
+            // OpenSSL profiles cannot be resolved without Java 22
+            // TODO: sslHostConfig should query that with Panama if possible
             this.enabledCiphers = new String[0];
         } else {
             boolean warnOnSkip = !sslHostConfig.getCiphers().equals(SSLHostConfig.DEFAULT_TLS_CIPHERS);
