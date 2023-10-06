@@ -198,6 +198,9 @@
       <fix>
         <bug>67611</bug>: Correct the download link in BUILDING.txt. (lihan)
       </fix>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
