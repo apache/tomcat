@@ -42,32 +42,27 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 
 /**
- * <p>A Valve to wrap a Filter, allowing a user to run Servlet Filters as a
- * part of the Valve chain.</p>
- *
- * <p>There are some caveats you must be aware of when using this Valve
- * to wrap a Filter:</p>
- *
+ * <p>
+ * A Valve to wrap a Filter, allowing a user to run Servlet Filters as a part of the Valve chain.
+ * </p>
+ * <p>
+ * There are some caveats you must be aware of when using this Valve to wrap a Filter:
+ * </p>
  * <ul>
- *   <li>You get a <i>separate instance</i> of your Filter class distinct
- *       from any that may be instantiated within your application.</li>
- *   <li>Calls to {@link FilterConfig#getFilterName()} will return <code>null</code>.</li>
- *   <li>Calling {@link FilterConfig#getServletContext()} will return
- *       the proper ServletContext for a Valve/Filter attached to a
- *       <code>&lt;Context&gt;</code>, but will return a ServletContext
- *       which is nearly useless for any Valve/Filter specified on
- *       an <code>&lt;Engine&gt;</code> or <code>&gt;Host&lt;</code>.</li>
- *   <li>Your Filter <b>MUST NOT</b> wrap the {@link ServletRequest} or
- *       {@link ServletResponse} objects, or an exception will be thrown.</li>
+ * <li>You get a <i>separate instance</i> of your Filter class distinct from any that may be instantiated within your
+ * application.</li>
+ * <li>Calls to {@link FilterConfig#getFilterName()} will return <code>null</code>.</li>
+ * <li>Calling {@link FilterConfig#getServletContext()} will return the proper ServletContext for a Valve/Filter
+ * attached to a <code>&lt;Context&gt;</code>, but will return a ServletContext which is nearly useless for any
+ * Valve/Filter specified on an <code>&lt;Engine&gt;</code> or <code>&gt;Host&lt;</code>.</li>
+ * <li>Your Filter <b>MUST NOT</b> wrap the {@link ServletRequest} or {@link ServletResponse} objects, or an exception
+ * will be thrown.</li>
  * </ul>
  *
  * @see Valve
  * @see Filter
  */
-public class FilterValve
-    extends ValveBase
-    implements FilterConfig
-{
+public class FilterValve extends ValveBase implements FilterConfig {
     /**
      * The name of the Filter class that will be instantiated.
      */
@@ -118,11 +113,11 @@ public class FilterValve
     /**
      * Adds an initialization parameter for the Filter.
      *
-     * @param paramName The name of the parameter.
+     * @param paramName  The name of the parameter.
      * @param paramValue The value of the parameter.
      */
     public void addInitParam(String paramName, String paramValue) {
-        if(null == filterInitParams) {
+        if (null == filterInitParams) {
             filterInitParams = new HashMap<>();
         }
 
@@ -140,15 +135,14 @@ public class FilterValve
     }
 
     /**
-     * Gets the ServletContext.
-     *
-     * Note that this will be of limited use if the Valve/Filter is not
-     * attached to a <code>&lt;Context&gt;</code>.
+     * Gets the ServletContext. Note that this will be of limited use if the Valve/Filter is not attached to a
+     * <code>&lt;Context&gt;</code>.
      */
     @Override
     public ServletContext getServletContext() {
-        if(null == application) {
-            throw new IllegalStateException("Filter " + filter + " has called getServletContext from FilterValve, but this FilterValve is not ");
+        if (null == application) {
+            throw new IllegalStateException("Filter " + filter +
+                    " has called getServletContext from FilterValve, but this FilterValve is not ");
         } else {
             return application;
         }
@@ -159,13 +153,12 @@ public class FilterValve
      *
      * @param name The name of the initialization parameter.
      *
-     * @return The value for the initialization parameter, or
-     *         <code>null</code> if there is no value for the
-     *         specified initialization parameter name.
+     * @return The value for the initialization parameter, or <code>null</code> if there is no value for the specified
+     *             initialization parameter name.
      */
     @Override
     public String getInitParameter(String name) {
-        if(null == filterInitParams) {
+        if (null == filterInitParams) {
             return null;
         } else {
             return filterInitParams.get(name);
@@ -179,7 +172,7 @@ public class FilterValve
      */
     @Override
     public Enumeration<String> getInitParameterNames() {
-        if(null == filterInitParams) {
+        if (null == filterInitParams) {
             return Collections.emptyEnumeration();
         } else {
             return Collections.enumeration(filterInitParams.keySet());
@@ -190,38 +183,38 @@ public class FilterValve
     protected synchronized void startInternal() throws LifecycleException {
         super.startInternal();
 
-        if(null == getFilterClassName()) {
+        if (null == getFilterClassName()) {
             throw new LifecycleException("No filterClass specified for FilterValve: a filterClass is required");
         }
         Container parent = super.getContainer();
-        if(parent instanceof Context) {
-            application = ((Context)parent).getServletContext();
+        if (parent instanceof Context) {
+            application = ((Context) parent).getServletContext();
         } else {
-            final ScheduledExecutorService executor = Container.getService(super.getContainer()).getServer().getUtilityExecutor();
+            final ScheduledExecutorService executor =
+                    Container.getService(super.getContainer()).getServer().getUtilityExecutor();
 
             // I don't feel like writing a whole trivial class just for this one thing.
-            application = (ServletContext)Proxy.newProxyInstance(getClass().getClassLoader(),
-                    new Class<?>[] { ServletContext.class },
-                    new InvocationHandler() {
+            application = (ServletContext) Proxy.newProxyInstance(getClass().getClassLoader(),
+                    new Class<?>[] { ServletContext.class }, new InvocationHandler() {
                         @Override
                         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                            if("getAttribute".equals(method.getName())
-                                    && null != args
-                                    && 1 == args.length
-                                    && ScheduledThreadPoolExecutor.class.getName().equals(args[0])) {
+                            if ("getAttribute".equals(method.getName()) && null != args && 1 == args.length &&
+                                    ScheduledThreadPoolExecutor.class.getName().equals(args[0])) {
                                 return executor;
                             } else {
-                                throw new UnsupportedOperationException("This ServletContet is not really meant to be used.");
+                                throw new UnsupportedOperationException(
+                                        "This ServletContet is not really meant to be used.");
                             }
                         }
-            });
+                    });
         }
 
         try {
             filter = (Filter) Class.forName(getFilterClassName()).getConstructor(new Class[0]).newInstance();
 
             filter.init(this);
-        } catch (ServletException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException se) {
+        } catch (ServletException | InstantiationException | IllegalAccessException | IllegalArgumentException |
+                InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException se) {
             throw new LifecycleException("Failed to start FilterValve for filter " + filter, se);
         }
     }
@@ -230,7 +223,7 @@ public class FilterValve
     protected synchronized void stopInternal() throws LifecycleException {
         super.stopInternal();
 
-        if(null != filter) {
+        if (null != filter) {
             try {
                 filter.destroy();
             } finally {
@@ -250,12 +243,12 @@ public class FilterValve
 
         filter.doFilter(request, response, filterCallInfo);
 
-        if(!filterCallInfo.stop) {
-            if(request != filterCallInfo.request) {
+        if (!filterCallInfo.stop) {
+            if (request != filterCallInfo.request) {
                 throw new IllegalStateException("Filter " + filter + " has illegally changed or wrapped the request");
             }
 
-            if(response != filterCallInfo.response) {
+            if (response != filterCallInfo.response) {
                 throw new IllegalStateException("Filter " + filter + " has illegally changed or wrapped the response");
             }
 
