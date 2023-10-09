@@ -59,7 +59,7 @@ import org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor;
  * will be thrown.</li>
  * </ul>
  *
- * @see Valve
+ * @see org.apache.catalina.Valve
  * @see Filter
  */
 public class FilterValve extends ValveBase implements FilterConfig {
