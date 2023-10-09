@@ -447,7 +447,7 @@ public final class Bootstrap {
                     bootstrap.init();
                 } catch (Throwable t) {
                     handleThrowable(t);
-                    t.printStackTrace();
+                    log.error("Init exception", t);
                     return;
                 }
                 daemon = bootstrap;
@@ -497,7 +497,7 @@ public final class Bootstrap {
                 t = t.getCause();
             }
             handleThrowable(t);
-            t.printStackTrace();
+            log.error("Error running command", t);
             System.exit(1);
         }
     }
