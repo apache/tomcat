@@ -40,7 +40,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * This listener does <b>NOT</b> re-read the Tomcat configuration from server.xml. If you make changes to server.xml you
  * must restart the Tomcat process to pick up those changes.
- * <p>
  */
 public class TLSCertificateReloadListener implements LifecycleListener {
 
