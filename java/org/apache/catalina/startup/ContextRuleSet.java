@@ -212,6 +212,9 @@ public class ContextRuleSet implements RuleSet {
                                  null, // MUST be specified in the element
                                  "className");
         digester.addSetProperties(prefix + "Context/Valve");
+        digester.addCallMethod(prefix + "Context/Valve/init-param", "addInitParam", 2);
+        digester.addCallParam(prefix + "Context/Valve/init-param/param-name", 0);
+        digester.addCallParam(prefix + "Context/Valve/init-param/param-value", 1);
         digester.addSetNext(prefix + "Context/Valve",
                             "addValve",
                             "org.apache.catalina.Valve");

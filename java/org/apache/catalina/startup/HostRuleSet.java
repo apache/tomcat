@@ -115,6 +115,9 @@ public class HostRuleSet implements RuleSet {
                                  null, // MUST be specified in the element
                                  "className");
         digester.addSetProperties(prefix + "Host/Valve");
+        digester.addCallMethod(prefix + "Host/Valve/init-param", "addInitParam", 2);
+        digester.addCallParam(prefix + "Host/Valve/init-param/param-name", 0);
+        digester.addCallParam(prefix + "Host/Valve/init-param/param-value", 1);
         digester.addSetNext(prefix + "Host/Valve",
                             "addValve",
                             "org.apache.catalina.Valve");

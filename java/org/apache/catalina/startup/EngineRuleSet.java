@@ -111,6 +111,9 @@ public class EngineRuleSet implements RuleSet {
                                  null, // MUST be specified in the element
                                  "className");
         digester.addSetProperties(prefix + "Engine/Valve");
+        digester.addCallMethod(prefix + "Engine/Valve/init-param", "addInitParam", 2);
+        digester.addCallParam(prefix + "Engine/Valve/init-param/param-name", 0);
+        digester.addCallParam(prefix + "Engine/Valve/init-param/param-value", 1);
         digester.addSetNext(prefix + "Engine/Valve",
                             "addValve",
                             "org.apache.catalina.Valve");
