@@ -30,6 +30,7 @@ import jakarta.el.ELResolver;
 import jakarta.el.ListELResolver;
 import jakarta.el.MapELResolver;
 import jakarta.el.PropertyNotFoundException;
+import jakarta.el.RecordELResolver;
 import jakarta.el.ResourceBundleELResolver;
 import jakarta.el.StaticFieldELResolver;
 import jakarta.servlet.jsp.el.ImplicitObjectELResolver;
@@ -71,6 +72,7 @@ public class JasperELResolver extends CompositeELResolver {
         if (JspRuntimeLibrary.GRAAL) {
             add(new GraalBeanELResolver());
         }
+        add(new RecordELResolver());
         add(new BeanELResolver());
         add(new ScopedAttributeELResolver());
         add(new ImportELResolver());

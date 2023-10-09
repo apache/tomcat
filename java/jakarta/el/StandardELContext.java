@@ -53,6 +53,7 @@ public class StandardELContext extends ELContext {
         standardResolver.add(new ResourceBundleELResolver());
         standardResolver.add(new ListELResolver());
         standardResolver.add(new ArrayELResolver());
+        standardResolver.add(new RecordELResolver());
         standardResolver.add(new BeanELResolver());
     }
 

@@ -29,6 +29,7 @@ import jakarta.el.ELResolver;
 import jakarta.el.FunctionMapper;
 import jakarta.el.ListELResolver;
 import jakarta.el.MapELResolver;
+import jakarta.el.RecordELResolver;
 import jakarta.el.ResourceBundleELResolver;
 import jakarta.el.StaticFieldELResolver;
 import jakarta.el.ValueExpression;
@@ -85,6 +86,7 @@ public class ELContextImpl extends ELContext {
         ((CompositeELResolver) DefaultResolver).add(new ResourceBundleELResolver());
         ((CompositeELResolver) DefaultResolver).add(new ListELResolver());
         ((CompositeELResolver) DefaultResolver).add(new ArrayELResolver());
+        ((CompositeELResolver) DefaultResolver).add(new RecordELResolver());
         ((CompositeELResolver) DefaultResolver).add(new BeanELResolver());
     }
 
