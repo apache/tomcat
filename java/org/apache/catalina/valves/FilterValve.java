@@ -203,7 +203,7 @@ public class FilterValve extends ValveBase implements FilterConfig {
                                 return executor;
                             } else {
                                 throw new UnsupportedOperationException(
-                                        "This ServletContet is not really meant to be used.");
+                                        "This ServletContext is not really meant to be used.");
                             }
                         }
                     });
