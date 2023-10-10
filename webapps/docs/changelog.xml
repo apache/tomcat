@@ -108,8 +108,9 @@
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
-        Correct a regression in the clean-up of unencessary use of fully
-        qualified class names in 9.0.81 that broke the jdbc-pool. (markt)
+        <bug>67664</bug>: Correct a regression in the clean-up of unencessary
+        use of fully qualified class names in 9.0.81 that broke the jdbc-pool.
+        (markt)
       </fix>
     </changelog>
   </subsection>
