@@ -366,8 +366,10 @@ public class ConnectionPool {
         //cache the constructor
         if (proxyClassConstructor == null ) {
             Class<?> proxyClass = xa ?
-                Proxy.getProxyClass(ConnectionPool.class.getClassLoader(), new Class[] {Connection.class, PooledConnection.class, XAConnection.class}) :
-                Proxy.getProxyClass(ConnectionPool.class.getClassLoader(), new Class[] {Connection.class, PooledConnection.class});
+                    Proxy.getProxyClass(ConnectionPool.class.getClassLoader(),
+                            new Class[] {Connection.class, javax.sql.PooledConnection.class, XAConnection.class}) :
+                    Proxy.getProxyClass(ConnectionPool.class.getClassLoader(),
+                            new Class[] {Connection.class, javax.sql.PooledConnection.class});
             proxyClassConstructor = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
         }
         return proxyClassConstructor;
