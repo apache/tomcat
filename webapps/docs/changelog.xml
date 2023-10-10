@@ -105,6 +105,9 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.14 (schultz)" rtext="in development">
+</section>
+
+<section name="Tomcat 10.1.14 (schultz)" rtext="2023-10-10">
   <subsection name="Catalina">
     <changelog>
       <add>
