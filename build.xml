@@ -4165,7 +4165,10 @@ reproducible-10=${reproducible-10}
         <isset property="reproducible-3" />
 -->
         <isset property="reproducible-4" />
-        <isset property="reproducible-5" />
+        <or>
+          <isset property="reproducible-5" />
+          <contains string="${version}" substring="11.0." /><!-- Super hack -->
+        </or>
         <isset property="reproducible-6" />
         <isset property="reproducible-7" />
 	<isset property="reproducible-8" />
