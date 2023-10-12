@@ -3628,16 +3628,24 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
       <!-- Release hashes can be either 'released' or staged-for-release -->
       <!-- First, try to find a released version hash. -->
       <antcall target="trydownload">
-        <param name="sourcefile" value="https://dist.apache.org/repos/dist/release/tomcat/tomcat-${version.major}/v${version.major}.${version.minor}.${version.build}/@{src-or-bin}/@{basefile}.sha512" />
+        <param name="sourcefile" value="https://dist.apache.org/repos/dist/release/tomcat/tomcat-${version.major}/v${version}/@{src-or-bin}/@{basefile}.sha512" />
         <param name="destfile" value="verify/@{basefile}.sha512" />
       </antcall>
       <!-- If necessary, try to find a dev version hash. -->
       <antcall target="trydownload">
-        <param name="sourcefile" value="https://dist.apache.org/repos/dist/dev/tomcat/tomcat-${version.major}/v${version.major}.${version.minor}.${version.build}/@{src-or-bin}/@{basefile}.sha512" />
+        <param name="sourcefile" value="https://dist.apache.org/repos/dist/dev/tomcat/tomcat-${version.major}/v${version}/@{src-or-bin}/@{basefile}.sha512" />
         <param name="destfile" value="verify/@{basefile}.sha512" />
       </antcall>
 
-      <available property="success" file="verify/@{basefile}.sha512" />
+      <condition property="success">
+        <or>
+          <available file="verify/@{basefile}.sha512" />
+          <and>
+            <contains string="${version}" substring="11.0." /><!-- Super hack -->
+            <contains string="@{basefile}" substring="x86" />
+          </and>
+        </or>
+      </condition>
 
       <fail unless="success">
 Unable to locate release hash for @{basefile}
@@ -3661,7 +3669,7 @@ Unable to locate release hash for @{basefile}
       <echo unless:set="reproducible-@{num}">
 Signature mismatch for @{basefile}:
   </echo>
-      <printfile unless:set="reproducible-@{num}" file="output/release/v${version.major}.${version.minor}.${version.build}/@{src-or-bin}/@{basefile}.sha512" />
+      <printfile unless:set="reproducible-@{num}" file="output/release/v${version}/@{src-or-bin}/@{basefile}.sha512" />
       <printfile unless:set="reproducible-@{num}" file="verify/@{basefile}.sha512" />
     </sequential>
   </macrodef>
@@ -3673,7 +3681,7 @@ Signature mismatch for @{basefile}:
 
 This does not appear to be a copy of a released tag; no build.properties.release file exists.
 </fail>
-    <available property="built" file="output/release/v${version.major}.${version.minor}.${version.build}/bin/${final.name}.tar.gz" />
+    <available property="built" file="output/release/v${version}/bin/${final.name}.tar.gz" />
     <fail unless="built">
 
 It appears there are no build artifacts to verify. Please run 'ant release' first.
