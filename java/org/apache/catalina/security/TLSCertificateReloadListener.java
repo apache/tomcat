@@ -17,6 +17,7 @@
 package org.apache.catalina.security;
 
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Set;
 
@@ -45,6 +46,7 @@ public class TLSCertificateReloadListener implements LifecycleListener {
 
     private static final Log log = LogFactory.getLog(TLSCertificateReloadListener.class);
     private static final StringManager sm = StringManager.getManager(TLSCertificateReloadListener.class);
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 
     // Configuration
     private int checkPeriod = 24 * 60 * 60;
@@ -160,7 +162,7 @@ public class TLSCertificateReloadListener implements LifecycleListener {
                                     log.warn(sm.getString("tlsCertRenewalListener.notRenewed", connector,
                                             sslHostConfig.getHostName(),
                                             expiringCertificate.getSubjectX500Principal().getName(),
-                                            expiringCertificate.getNotAfter()));
+                                            dateFormat.format(expiringCertificate.getNotAfter())));
                                 }
                             }
                         } catch (IllegalArgumentException iae) {
