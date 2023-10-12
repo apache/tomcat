@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.16 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>67667</bug>: <code>TLSCertificateReloadListener</code> prints unreadable
+        rendering of <code>X509Certificate#getNotAfter()</code>. (michaelo)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.15 (schultz)" rtext="release in progress">
   <subsection name="Coyote">
