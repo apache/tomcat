@@ -2699,7 +2699,7 @@ gpg.exec=${gpg.exec}
 # Java Version:    ${java.vm.version}
 
 # The following is provided for information only. Builds will be repeatable
-# whether or not the build environment in consistent with this information.
+# whether or not the build environment is consistent with this information.
 #
 # OS:              ${os.arch} ${os.name} ${os.version}
 # File encoding:   ${file.encoding}
@@ -4007,4 +4007,165 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     </exec>
   </target>
 
+  <macrodef name="printfile">
+    <attribute name="file" />
+
+    <sequential>
+      <local name="contents" />
+      <loadfile property="contents" srcfile="@{file}" />
+      <echo>${contents}</echo>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="get-release-hash">
+    <attribute name="basefile" />
+    <attribute name="src-or-bin" />
+
+    <sequential>
+      <local name="success" />
+
+      <!-- Release hashes can be either 'released' or staged-for-release -->
+      <!-- First, try to find a released version hash. -->
+      <antcall target="trydownload">
+        <param name="sourcefile" value="https://dist.apache.org/repos/dist/release/tomcat/tomcat-${version.major}/v${version.major}.${version.minor}.${version.build}/@{src-or-bin}/@{basefile}.sha512" />
+        <param name="destfile" value="verify/@{basefile}.sha512" />
+      </antcall>
+      <!-- If necessary, try to find a dev version hash. -->
+      <antcall target="trydownload">
+        <param name="sourcefile" value="https://dist.apache.org/repos/dist/dev/tomcat/tomcat-${version.major}/v${version.major}.${version.minor}.${version.build}/@{src-or-bin}/@{basefile}.sha512" />
+        <param name="destfile" value="verify/@{basefile}.sha512" />
+      </antcall>
+
+      <available property="success" file="verify/@{basefile}.sha512" />
+
+      <fail unless="success">
+Unable to locate release hash for @{basefile}
+</fail>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="compare-hashes">
+    <attribute name="basefile" />
+    <attribute name="num" />
+    <attribute name="src-or-bin" />
+
+    <sequential>
+<!--
+      <echo>Comparing hash files output/release/v${version.major}.${version.minor}.${version.build}/@{src-or-bin}/@{basefile}.sha512 verify/@{basefile}.sha512</echo>
+-->
+      <condition property="reproducible-@{num}">
+        <filesmatch file1="output/release/v${version.major}.${version.minor}.${version.build}/@{src-or-bin}/@{basefile}.sha512"
+                    file2="verify/@{basefile}.sha512"/>
+      </condition>
+      <echo unless:set="reproducible-@{num}">
+Signature mismatch for @{basefile}:
+  </echo>
+      <printfile unless:set="reproducible-@{num}" file="output/release/v${version.major}.${version.minor}.${version.build}/@{src-or-bin}/@{basefile}.sha512" />
+      <printfile unless:set="reproducible-@{num}" file="verify/@{basefile}.sha512" />
+    </sequential>
+  </macrodef>
+
+  <target name="verify-release" description="Verifies a release build against published hashes.">
+    <available property="released" file="build.properties.release" />
+    <fail unless="released">
+
+This does not appear to be a copy of a released tag; no build.properties.release file exists.
+</fail>
+    <available property="built" file="output/release/v${version.major}.${version.minor}.${version.build}/bin/${final.name}.tar.gz" />
+    <fail unless="built">
+
+It appears there are no build artifacts to verify. Please run 'ant release' first.
+</fail>
+    <delete dir="verify" />
+    <mkdir dir="verify" />
+    <get-release-hash src-or-bin="bin" basefile="${final.name}-deployer.tar.gz" />
+    <get-release-hash src-or-bin="bin" basefile="${final.name}-deployer.zip" />
+    <get-release-hash src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
+    <get-release-hash src-or-bin="bin" basefile="${final.name}-windows-x64.zip" />
+    <get-release-hash src-or-bin="bin" basefile="${final.name}-windows-x86.zip" />
+    <get-release-hash src-or-bin="bin" basefile="${final.name}.exe" />
+    <get-release-hash src-or-bin="bin" basefile="${final.name}.tar.gz" />
+    <get-release-hash src-or-bin="bin" basefile="${final.name}.zip" />
+    <get-release-hash src-or-bin="src" basefile="${final-src.name}.tar.gz" />
+    <get-release-hash src-or-bin="src" basefile="${final-src.name}.zip" />
+
+    <compare-hashes num="1"  src-or-bin="bin" basefile="${final.name}-deployer.tar.gz" />
+    <compare-hashes num="2"  src-or-bin="bin" basefile="${final.name}-deployer.zip" />
+    <compare-hashes num="3"  src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
+    <compare-hashes num="4"  src-or-bin="bin" basefile="${final.name}-windows-x64.zip" />
+    <compare-hashes num="5"  src-or-bin="bin" basefile="${final.name}-windows-x86.zip" />
+    <compare-hashes num="6"  src-or-bin="bin" basefile="${final.name}.exe" />
+    <compare-hashes num="7"  src-or-bin="bin" basefile="${final.name}.tar.gz" />
+    <compare-hashes num="8"  src-or-bin="bin" basefile="${final.name}.zip" />
+    <compare-hashes num="9"  src-or-bin="src" basefile="${final-src.name}.tar.gz" />
+    <compare-hashes num="10" src-or-bin="src" basefile="${final-src.name}.zip" />
+
+<!--
+<echo>
+reproducible-1=${reproducible-1}
+reproducible-2=${reproducible-2}
+reproducible-3=${reproducible-3}
+reproducible-4=${reproducible-4}
+reproducible-5=${reproducible-5}
+reproducible-6=${reproducible-6}
+reproducible-7=${reproducible-7}
+reproducible-8=${reproducible-8}
+reproducible-9=${reproducible-9}
+reproducible-10=${reproducible-10}
+</echo>
+-->
+
+    <condition property="reproducible">
+      <and>
+        <isset property="reproducible-1" />
+        <isset property="reproducible-2" />
+<!--
+        <isset property="reproducible-3" />
+-->
+        <isset property="reproducible-4" />
+        <isset property="reproducible-5" />
+        <isset property="reproducible-6" />
+        <isset property="reproducible-7" />
+	<isset property="reproducible-8" />
+<!--
+        <isset property="reproducible-9" />
+	<isset property="reproducible-10" />
+-->
+      </and>
+    </condition>
+
+    <fail unless="reproducible">
+One or more signatures failed.
+</fail>
+    <echo>
+
+                SSSS                   SSSS
+                S  SS                 SS  S
+               SS   S                 S   SS
+               SS   S                 S   SS
+              SS   SS                 S   SS
+             SS    S                  S    SS
+           SSS    SS                  SS    SSS
+          SS     SS                    SS     SS
+         SS      SS                    SS      SS
+        SS       S                       S       SS
+       SS        SSSSSSS           SSSSSSS        SS
+   SSSSS               SSS       SSS               SSSS
+  SSS            SSSS    SS     SS    SSSS            SS
+ SS            SSS  SSS   S     S   SSS  SSS           S
+ S            SSS        SS     SS        SSS           S
+ S            SSSSSS    SS       SS    SSSSSS           S
+ S           SS    SSSSSSS       SSSSSSS    SS          S
+ S           SSSS       SS       SS       SSSS          S
+ SS         SS  SSSSSSSSS         SSSSSSSSS  SS        S
+  SSSS     SSSS        S           S        SSSS      SS
+   SSSSS    SSSSSS    SS           SS    SSSSSS    SSSS
+       SS  SS    SSSSSS             SSSSSS    SS  SS
+        SSS SSS     S                S     SSS SSS
+          SSSSSSSSSS                  SSSSSSSSS
+
+
+All (important) signatures are verified; the build appears to be reproducible.
+</echo>
+  </target>
 </project>
