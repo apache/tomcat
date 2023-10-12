@@ -109,6 +109,16 @@
   <property name="min.java.version" value="8"/>
   <property name="build.java.version" value="11"/>
 
+  <!-- Check Java Build Version -->
+  <fail message="Java version ${build.java.version} or newer is required (${java.version} is installed)">
+    <condition>
+      <and>
+        <not><javaversion atleast="${build.java.version}" /></not>
+        <not><isset property="skip.build.java.version"/></not>
+      </and>
+    </condition>
+  </fail>
+
   <!-- Locations to create the JAR artifacts -->
   <!-- Standard JARs -->
   <property name="bootstrap.jar" value="${tomcat.build}/bin/bootstrap.jar"/>

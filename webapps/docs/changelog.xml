@@ -113,6 +113,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        <bug>67538</bug>: Make use of Ant's <code>&lt;javaversion /&gt;</code> task
+        to enfore the mininum Java build version. (michaelo)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.82 (remm)" rtext="release in progress">
   <subsection name="Coyote">
