@@ -2636,6 +2636,7 @@ skip.installer property in build.properties" />
 
   <target name="pre-release" depends="-pre-release-lone-target-check, -pre-release-read-asf-username"
       description="Prepares for a release build by writing build.properties.release which contains information about the release-build environment.">
+    <antversion property="antversion"/>
     <echo file="build.properties.release"># -----------------------------------------------------------------------------
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -2688,6 +2689,8 @@ gpg.exec=${gpg.exec}
 # File encoding:   ${file.encoding}
 #
 # Release Manager: ${release.asfusername}
+release-java-version=${java.vm.version}
+release-ant-version=${antversion}
 </echo>
     <echo file="res/maven/mvn.properties.release"># -----------------------------------------------------------------------------
 # Licensed to the Apache Software Foundation (ASF) under one or more
@@ -4095,7 +4098,8 @@ Signature mismatch for @{basefile}:
     </sequential>
   </macrodef>
 
-  <target name="verify-release" description="Verifies a release build against published hashes.">
+  <target name="verify-release" depends="-check-release-toolchain-versions, -require-release-toolchain-versions" description="Verifies a release build against published hashes.">
+
     <available property="released" file="build.properties.release" />
     <fail unless="released">
 
@@ -4196,6 +4200,41 @@ One or more signatures failed.
 
 
 All (important) signatures are verified; the build appears to be reproducible.
+</echo>
+  </target>
+
+  <target name="-check-release-toolchain-versions" if="release-java-version">
+    <!-- Establish default value -->
+    <property name="check-release-toolchain" value="true" />
+    <condition property="check-release-toolchain-versions">
+      <not>
+        <isfalse value="${check-release-toolchain}" />
+      </not>
+    </condition>
+  </target>
+
+  <target name="-require-release-toolchain-versions" if="check-release-toolchain-versions">
+    <antversion property="antversion"/>
+    <condition property="release-toolchain-versions-match">
+      <and>
+        <antversion exactly="${antversion}" />
+        <equals arg1="${java.vm.version}" arg2="${release-java-version}" />
+      </and>
+    </condition>
+
+    <fail unless="release-toolchain-versions-match">
+Release toolchain versions do not match local toolchain:
+
+Release Java: ${release-java-version}
+Local Java:   ${java.vm.version}
+Release Ant:  ${release-ant-version}
+Local Ant:    ${antversion}
+
+You may not be able to verify that this build is reproducible.
+
+Re-run with -Dcheck-release-toolchain=false to disable this check.
+</fail>
+    <echo>Local toolchain versions match release toolchain (Java ${release-java-version}, Ant ${release-ant-version}).
 </echo>
   </target>
 </project>
