@@ -183,11 +183,15 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
 
         StringManager smClient = StringManager.getManager(Constants.Package, request.getLocales());
 
-        // mode is flag for HTML or XML output
+        // mode is flag for HTML, JSON or XML output
         int mode = 0;
         // if ?XML=true, set the mode to XML
         if (request.getParameter("XML") != null && request.getParameter("XML").equals("true")) {
             mode = 1;
+        }
+        // if ?JSON=true, set the mode to JSON
+        if (request.getParameter("JSON") != null && request.getParameter("JSON").equals("true")) {
+            mode = 2;
         }
         StatusTransformer.setContentType(response, mode);
 
@@ -295,32 +299,28 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
             // use StatusTransformer to output status
             StatusTransformer.writeVMState(writer, mode, args);
 
-            for (ObjectName objectName : threadPools) {
-                String name = objectName.getKeyProperty("name");
-                args = new Object[19];
-                args[0] = smClient.getString("htmlManagerServlet.connectorStateMaxThreads");
-                args[1] = smClient.getString("htmlManagerServlet.connectorStateThreadCount");
-                args[2] = smClient.getString("htmlManagerServlet.connectorStateThreadBusy");
-                args[3] = smClient.getString("htmlManagerServlet.connectorStateAliveSocketCount");
-                args[4] = smClient.getString("htmlManagerServlet.connectorStateMaxProcessingTime");
-                args[5] = smClient.getString("htmlManagerServlet.connectorStateProcessingTime");
-                args[6] = smClient.getString("htmlManagerServlet.connectorStateRequestCount");
-                args[7] = smClient.getString("htmlManagerServlet.connectorStateErrorCount");
-                args[8] = smClient.getString("htmlManagerServlet.connectorStateBytesReceived");
-                args[9] = smClient.getString("htmlManagerServlet.connectorStateBytesSent");
-                args[10] = smClient.getString("htmlManagerServlet.connectorStateTableTitleStage");
-                args[11] = smClient.getString("htmlManagerServlet.connectorStateTableTitleTime");
-                args[12] = smClient.getString("htmlManagerServlet.connectorStateTableTitleBSent");
-                args[13] = smClient.getString("htmlManagerServlet.connectorStateTableTitleBRecv");
-                args[14] = smClient.getString("htmlManagerServlet.connectorStateTableTitleClientForw");
-                args[15] = smClient.getString("htmlManagerServlet.connectorStateTableTitleClientAct");
-                args[16] = smClient.getString("htmlManagerServlet.connectorStateTableTitleVHost");
-                args[17] = smClient.getString("htmlManagerServlet.connectorStateTableTitleRequest");
-                args[18] = smClient.getString("htmlManagerServlet.connectorStateHint");
-                // use StatusTransformer to output status
-                StatusTransformer.writeConnectorState(writer, objectName, name, mBeanServer, globalRequestProcessors,
-                        requestProcessors, mode, args);
-            }
+            args = new Object[19];
+            args[0] = smClient.getString("htmlManagerServlet.connectorStateMaxThreads");
+            args[1] = smClient.getString("htmlManagerServlet.connectorStateThreadCount");
+            args[2] = smClient.getString("htmlManagerServlet.connectorStateThreadBusy");
+            args[3] = smClient.getString("htmlManagerServlet.connectorStateAliveSocketCount");
+            args[4] = smClient.getString("htmlManagerServlet.connectorStateMaxProcessingTime");
+            args[5] = smClient.getString("htmlManagerServlet.connectorStateProcessingTime");
+            args[6] = smClient.getString("htmlManagerServlet.connectorStateRequestCount");
+            args[7] = smClient.getString("htmlManagerServlet.connectorStateErrorCount");
+            args[8] = smClient.getString("htmlManagerServlet.connectorStateBytesReceived");
+            args[9] = smClient.getString("htmlManagerServlet.connectorStateBytesSent");
+            args[10] = smClient.getString("htmlManagerServlet.connectorStateTableTitleStage");
+            args[11] = smClient.getString("htmlManagerServlet.connectorStateTableTitleTime");
+            args[12] = smClient.getString("htmlManagerServlet.connectorStateTableTitleBSent");
+            args[13] = smClient.getString("htmlManagerServlet.connectorStateTableTitleBRecv");
+            args[14] = smClient.getString("htmlManagerServlet.connectorStateTableTitleClientForw");
+            args[15] = smClient.getString("htmlManagerServlet.connectorStateTableTitleClientAct");
+            args[16] = smClient.getString("htmlManagerServlet.connectorStateTableTitleVHost");
+            args[17] = smClient.getString("htmlManagerServlet.connectorStateTableTitleRequest");
+            args[18] = smClient.getString("htmlManagerServlet.connectorStateHint");
+            StatusTransformer.writeConnectorsState(writer, mBeanServer, threadPools, globalRequestProcessors,
+                    requestProcessors, mode, args);
 
             if (request.getPathInfo() != null && request.getPathInfo().equals("/all")) {
                 // Note: Retrieving the full status is much slower
