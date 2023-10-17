@@ -2451,7 +2451,9 @@
             <filename name="**/.settings/**" />
             <filename name="**/.classpath"/>
             <filename name="**/.checkstyle"/>
+            <filename name="**/.pmd"/>
             <filename name="**/.project"/>
+            <filename name="**/.sdkmanrc"/>
             <filename name="**/nbproject/**"/>
             <filename name="**/output/**"/>
             <!-- Commented out, because
