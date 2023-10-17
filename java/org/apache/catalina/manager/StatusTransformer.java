@@ -34,6 +34,7 @@ import javax.management.ObjectName;
 
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.tomcat.util.json.JSONFilter;
 import org.apache.tomcat.util.security.Escape;
 
 /**
@@ -51,6 +52,8 @@ public class StatusTransformer {
             response.setContentType("text/html;charset=" + Constants.CHARSET);
         } else if (mode == 1) {
             response.setContentType("text/xml;charset=" + Constants.CHARSET);
+        } else if (mode == 2) {
+            response.setContentType("application/json");
         }
     }
 
@@ -60,7 +63,7 @@ public class StatusTransformer {
      *
      * @param writer the PrintWriter to use
      * @param args   Path prefix for URLs
-     * @param mode   - 0 = HTML header, 1 = XML declaration
+     * @param mode   - 0 = HTML header, 1 = XML declaration, 2 = JSON
      */
     public static void writeHeader(PrintWriter writer, Object[] args, int mode) {
         if (mode == 0) {
@@ -70,6 +73,8 @@ public class StatusTransformer {
             writer.write(Constants.XML_DECLARATION);
             writer.print(MessageFormat.format(Constants.XML_STYLE, args));
             writer.write("<status>");
+        } else if (mode == 2) {
+            writer.append('{').append('"').append("tomcat").append('"').append(':').append('{').println();
         }
     }
 
@@ -122,6 +127,8 @@ public class StatusTransformer {
             writer.print(Constants.HTML_TAIL_SECTION);
         } else if (mode == 1) {
             writer.write("</status>");
+        } else if (mode == 2) {
+            writer.append('}').append('}');
         }
     }
 
@@ -203,8 +210,84 @@ public class StatusTransformer {
             }
 
             writer.write("</jvm>");
+        } else if (mode == 2) {
+            writer.append('"').append("jvm").append('"').append(':').append('{').println();
+
+            writer.append('"').append("memory").append('"').append(':').append('{');
+            appendJSonValue(writer, "free", Long.toString(Runtime.getRuntime().freeMemory())).append(',');
+            appendJSonValue(writer, "total", Long.toString(Runtime.getRuntime().totalMemory())).append(',');
+            appendJSonValue(writer, "max", Long.toString(Runtime.getRuntime().maxMemory()));
+            writer.append('}').append(',').println();
+
+            writer.append('"').append("memorypool").append('"').append(':').append('[');
+            boolean first = true;
+            for (MemoryPoolMXBean memoryPoolMBean : memoryPoolMBeans.values()) {
+                MemoryUsage usage = memoryPoolMBean.getUsage();
+                if (first) {
+                    first = false;
+                } else {
+                    writer.append(',').println();
+                }
+                writer.append('{');
+                appendJSonValue(writer, "name", JSONFilter.escape(memoryPoolMBean.getName())).append(',');
+                appendJSonValue(writer, "type", memoryPoolMBean.getType().toString()).append(',');
+                appendJSonValue(writer, "usageInit", Long.toString(usage.getInit())).append(',');
+                appendJSonValue(writer, "usageCommitted", Long.toString(usage.getCommitted())).append(',');
+                appendJSonValue(writer, "usageMax", Long.toString(usage.getMax())).append(',');
+                appendJSonValue(writer, "usageUsed", Long.toString(usage.getUsed()));
+                writer.append('}');
+            }
+            writer.append(']').println();
+
+            writer.append('}');
         }
 
+    }
+
+
+    private static PrintWriter appendJSonValue(PrintWriter writer, String name, String value) {
+        return writer.append('"').append(name).append('"').append(':').append('"').append(value).append('"');
+    }
+
+
+    /**
+     * Write connector state.
+     *
+     * @param writer                  The output writer
+     * @param mBeanServer             MBean server
+     * @param threadPools             MBean names for the thread pools of the connectors
+     * @param globalRequestProcessors MBean names for the global request processors
+     * @param requestProcessors       MBean names for the request processors
+     * @param mode                    Mode <code>0</code> will generate HTML. Mode <code>1</code> will generate XML.
+     * @param args                    I18n labels for the Connector state values
+     *
+     * @throws Exception Propagated JMX error
+     */
+    public static void writeConnectorsState(PrintWriter writer, MBeanServer mBeanServer,
+            List<ObjectName> threadPools,
+            List<ObjectName> globalRequestProcessors, List<ObjectName> requestProcessors, int mode, Object[] args)
+            throws Exception {
+        if (mode == 2) {
+            writer.append(',').println();
+            writer.append('"').append("connector").append('"').append(':').append('[').println();
+        }
+        boolean first = true;
+        for (ObjectName objectName : threadPools) {
+            if (first) {
+                first = false;
+            } else {
+                if (mode == 2) {
+                    writer.append(',').println();
+                }
+            }
+            String name = objectName.getKeyProperty("name");
+            // use StatusTransformer to output status
+            StatusTransformer.writeConnectorState(writer, objectName, name, mBeanServer, globalRequestProcessors,
+                    requestProcessors, mode, args);
+        }
+        if (mode == 2) {
+            writer.append(']').println();
+        }
     }
 
 
@@ -344,6 +427,38 @@ public class StatusTransformer {
             }
 
             writer.write("</connector>");
+        } else if (mode == 2) {
+            writer.append('{').println();
+
+            appendJSonValue(writer, "name", JSONFilter.escape(name)).append(',').println();
+            writer.append('"').append("threadInfo").append('"').append(':').append('{');
+            appendJSonValue(writer, "maxThreads", mBeanServer.getAttribute(tpName, "maxThreads").toString()).append(',');
+            appendJSonValue(writer, "currentThreadCount", mBeanServer.getAttribute(tpName, "currentThreadCount").toString()).append(',');
+            appendJSonValue(writer, "currentThreadsBusy", mBeanServer.getAttribute(tpName, "currentThreadsBusy").toString());
+            writer.append('}');
+
+            ObjectName grpName = null;
+            for (ObjectName objectName : globalRequestProcessors) {
+                // Find the HTTP/1.1 RequestGroupInfo - BZ 65404
+                if (name.equals(objectName.getKeyProperty("name")) && objectName.getKeyProperty("Upgrade") == null) {
+                    grpName = objectName;
+                }
+            }
+
+            if (grpName != null) {
+                writer.append(',').println();
+                writer.append('"').append("requestInfo").append('"').append(':').append('{');
+                appendJSonValue(writer, "maxTime", mBeanServer.getAttribute(grpName, "maxTime").toString()).append(',');
+                appendJSonValue(writer, "processingTime", mBeanServer.getAttribute(grpName, "processingTime").toString()).append(',');
+                appendJSonValue(writer, "requestCount", mBeanServer.getAttribute(grpName, "requestCount").toString()).append(',');
+                appendJSonValue(writer, "errorCount", mBeanServer.getAttribute(grpName, "errorCount").toString()).append(',');
+                appendJSonValue(writer, "bytesReceived", mBeanServer.getAttribute(grpName, "bytesReceived").toString()).append(',');
+                appendJSonValue(writer, "bytesSent", mBeanServer.getAttribute(grpName, "bytesSent").toString());
+                writer.append('}').println();
+                // Note: No detailed per processor info
+            }
+
+            writer.append('}');
         }
     }
 
@@ -530,9 +645,9 @@ public class StatusTransformer {
      */
     public static void writeDetailedState(PrintWriter writer, MBeanServer mBeanServer, int mode) throws Exception {
 
+        ObjectName queryHosts = new ObjectName("*:j2eeType=WebModule,*");
+        Set<ObjectName> hostsON = mBeanServer.queryNames(queryHosts, null);
         if (mode == 0) {
-            ObjectName queryHosts = new ObjectName("*:j2eeType=WebModule,*");
-            Set<ObjectName> hostsON = mBeanServer.queryNames(queryHosts, null);
 
             // Navigation menu
             writer.print("<h1>");
@@ -575,6 +690,21 @@ public class StatusTransformer {
 
         } else if (mode == 1) {
             // for now we don't write out the Detailed state in XML
+        } else if (mode == 2) {
+            writer.append(',').println();
+            writer.append('"').append("context").append('"').append(':').append('[');
+            Iterator<ObjectName> iterator = hostsON.iterator();
+            boolean first = true;
+            while (iterator.hasNext()) {
+                if (first) {
+                    first = false;
+                } else {
+                    writer.append(',').println();
+                }
+                ObjectName contextON = iterator.next();
+                writeContext(writer, contextON, mBeanServer, mode);
+            }
+            writer.append(']').println();
         }
 
     }
@@ -593,42 +723,43 @@ public class StatusTransformer {
     protected static void writeContext(PrintWriter writer, ObjectName objectName, MBeanServer mBeanServer, int mode)
             throws Exception {
 
+        String webModuleName = objectName.getKeyProperty("name");
+        String name = webModuleName;
+        if (name == null) {
+            return;
+        }
+
+        String hostName = null;
+        String contextName = null;
+        if (name.startsWith("//")) {
+            name = name.substring(2);
+        }
+        int slash = name.indexOf('/');
+        if (slash != -1) {
+            hostName = name.substring(0, slash);
+            contextName = name.substring(slash);
+        } else {
+            return;
+        }
+
+        ObjectName queryManager = new ObjectName(
+                objectName.getDomain() + ":type=Manager,context=" + contextName + ",host=" + hostName + ",*");
+        Set<ObjectName> managersON = mBeanServer.queryNames(queryManager, null);
+        ObjectName managerON = null;
+        for (ObjectName aManagersON : managersON) {
+            managerON = aManagersON;
+        }
+
+        ObjectName queryJspMonitor =
+                new ObjectName(objectName.getDomain() + ":type=JspMonitor,WebModule=" + webModuleName + ",*");
+        Set<ObjectName> jspMonitorONs = mBeanServer.queryNames(queryJspMonitor, null);
+
+        // Special case for the root context
+        if (contextName.equals("/")) {
+            contextName = "";
+        }
+
         if (mode == 0) {
-            String webModuleName = objectName.getKeyProperty("name");
-            String name = webModuleName;
-            if (name == null) {
-                return;
-            }
-
-            String hostName = null;
-            String contextName = null;
-            if (name.startsWith("//")) {
-                name = name.substring(2);
-            }
-            int slash = name.indexOf('/');
-            if (slash != -1) {
-                hostName = name.substring(0, slash);
-                contextName = name.substring(slash);
-            } else {
-                return;
-            }
-
-            ObjectName queryManager = new ObjectName(
-                    objectName.getDomain() + ":type=Manager,context=" + contextName + ",host=" + hostName + ",*");
-            Set<ObjectName> managersON = mBeanServer.queryNames(queryManager, null);
-            ObjectName managerON = null;
-            for (ObjectName aManagersON : managersON) {
-                managerON = aManagersON;
-            }
-
-            ObjectName queryJspMonitor =
-                    new ObjectName(objectName.getDomain() + ":type=JspMonitor,WebModule=" + webModuleName + ",*");
-            Set<ObjectName> jspMonitorONs = mBeanServer.queryNames(queryJspMonitor, null);
-
-            // Special case for the root context
-            if (contextName.equals("/")) {
-                contextName = "";
-            }
 
             writer.print("<h1>");
             writer.print(Escape.htmlElementContent(name));
@@ -659,6 +790,35 @@ public class StatusTransformer {
 
         } else if (mode == 1) {
             // for now we don't write out the context in XML
+        } else if (mode == 2) {
+            writer.append('{');
+            appendJSonValue(writer, "name", JSONFilter.escape(JSONFilter.escape(name))).append(',');
+            appendJSonValue(writer, "startTime",
+                    new Date(((Long) mBeanServer.getAttribute(objectName, "startTime")).longValue()).toString()).append(',');
+            appendJSonValue(writer, "startupTime", mBeanServer.getAttribute(objectName, "startupTime").toString()).append(',');
+            appendJSonValue(writer, "tldScanTime", mBeanServer.getAttribute(objectName, "tldScanTime").toString());
+            if (managerON != null) {
+                writeManager(writer, managerON, mBeanServer, mode);
+            }
+            if (jspMonitorONs != null) {
+                writeJspMonitor(writer, jspMonitorONs, mBeanServer, mode);
+            }
+            writer.append(',').println();
+            writer.append('"').append("wrapper").append('"').append(':').append('[');
+            String onStr = objectName.getDomain() + ":j2eeType=Servlet,WebModule=" + webModuleName + ",*";
+            ObjectName servletObjectName = new ObjectName(onStr);
+            Set<ObjectInstance> set = mBeanServer.queryMBeans(servletObjectName, null);
+            boolean first = true;
+            for (ObjectInstance oi : set) {
+                if (first) {
+                    first = false;
+                } else {
+                    writer.append(',').println();
+                }
+                writeWrapper(writer, oi.getObjectName(), mBeanServer, mode);
+            }
+            writer.append(']').println();
+            writer.append('}');
         }
 
     }
@@ -697,6 +857,18 @@ public class StatusTransformer {
             writer.print(formatTime(mBeanServer.getAttribute(objectName, "processingTime"), false));
         } else if (mode == 1) {
             // for now we don't write out the wrapper details
+        } else if (mode == 2) {
+            writer.append(',').println();
+            writer.append('"').append("manager").append('"').append(':').append('{');
+            appendJSonValue(writer, "activeSessions", mBeanServer.getAttribute(objectName, "activeSessions").toString()).append(',');
+            appendJSonValue(writer, "sessionCounter", mBeanServer.getAttribute(objectName, "sessionCounter").toString()).append(',');
+            appendJSonValue(writer, "maxActive", mBeanServer.getAttribute(objectName, "maxActive").toString()).append(',');
+            appendJSonValue(writer, "rejectedSessions", mBeanServer.getAttribute(objectName, "rejectedSessions").toString()).append(',');
+            appendJSonValue(writer, "expiredSessions", mBeanServer.getAttribute(objectName, "expiredSessions").toString()).append(',');
+            appendJSonValue(writer, "sessionMaxAliveTime", mBeanServer.getAttribute(objectName, "sessionMaxAliveTime").toString()).append(',');
+            appendJSonValue(writer, "sessionAverageAliveTime", mBeanServer.getAttribute(objectName, "sessionAverageAliveTime").toString()).append(',');
+            appendJSonValue(writer, "processingTime", mBeanServer.getAttribute(objectName, "processingTime").toString());
+            writer.append('}');
         }
 
     }
@@ -733,6 +905,12 @@ public class StatusTransformer {
             writer.print(jspReloadCount);
         } else if (mode == 1) {
             // for now we don't write out anything
+        } else if (mode == 2) {
+            writer.append(',').println();
+            writer.append('"').append("jsp").append('"').append(':').append('{');
+            appendJSonValue(writer, "jspCount", Integer.toString(jspCount)).append(',');
+            appendJSonValue(writer, "jspReloadCount", Integer.toString(jspReloadCount));
+            writer.append('}');
         }
     }
 
@@ -750,11 +928,11 @@ public class StatusTransformer {
     public static void writeWrapper(PrintWriter writer, ObjectName objectName, MBeanServer mBeanServer, int mode)
             throws Exception {
 
+        String servletName = objectName.getKeyProperty("name");
+
+        String[] mappings = (String[]) mBeanServer.invoke(objectName, "findMappings", null, null);
+
         if (mode == 0) {
-            String servletName = objectName.getKeyProperty("name");
-
-            String[] mappings = (String[]) mBeanServer.invoke(objectName, "findMappings", null, null);
-
             writer.print("<h2>");
             writer.print(Escape.htmlElementContent(servletName));
             if (mappings != null && mappings.length > 0) {
@@ -785,6 +963,16 @@ public class StatusTransformer {
             writer.print("</p>");
         } else if (mode == 1) {
             // for now we don't write out the wrapper details
+        } else if (mode == 2) {
+            writer.append('{');
+            appendJSonValue(writer, "servletName", JSONFilter.escape(servletName)).append(',');
+            appendJSonValue(writer, "processingTime", mBeanServer.getAttribute(objectName, "processingTime").toString()).append(',');
+            appendJSonValue(writer, "maxTime", mBeanServer.getAttribute(objectName, "maxTime").toString()).append(',');
+            appendJSonValue(writer, "requestCount", mBeanServer.getAttribute(objectName, "requestCount").toString()).append(',');
+            appendJSonValue(writer, "errorCount", mBeanServer.getAttribute(objectName, "errorCount").toString()).append(',');
+            appendJSonValue(writer, "loadTime", mBeanServer.getAttribute(objectName, "loadTime").toString()).append(',');
+            appendJSonValue(writer, "classLoadTime", mBeanServer.getAttribute(objectName, "classLoadTime").toString());
+            writer.append('}');
         }
 
     }
