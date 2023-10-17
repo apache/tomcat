@@ -111,6 +111,11 @@
         <bug>67667</bug>: <code>TLSCertificateReloadListener</code> prints unreadable
         rendering of <code>X509Certificate#getNotAfter()</code>. (michaelo)
       </fix>
+      <update>
+        The status servlet included in the manager webapp can now output
+        statistics as JSON, using the <code>JSON=true</code> URL parameter.
+        (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
