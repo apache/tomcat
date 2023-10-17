@@ -5,17 +5,10 @@
 It uses the JEP 454 API. More details on this API are available
 at `https://openjdk.java.net/jeps/454`.
 
-## Building Java 22 with the JEP 454 API
+## Building
 
-Clone `https://github.com/openjdk/panama-foreign/` in some location and
-checkout the main branch. This is a Java 22 development JVM
-with the JEP 454 API. It may fail to build. When this happens, step back
-one commit at a time until it does.
-
-```
-bash configure
-make images
-```
+The module can be built using Java 22 preview 20+. It can be built and run
+with Apache Tomcat 9.0 or newer.
 
 ## Running
 

@@ -1983,7 +1983,6 @@
 
   <!-- Set native specific properties -->
   <property name="native.nativeaccess" value="--enable-native-access=ALL-UNNAMED"/>
-  <property name="native.addmodules" value="--enable-preview" />
   <condition property="runtests.librarypath" value="-Dtest.4=4">
     <resourceexists>
       <file file="${openssl-lib.jar}"/>
@@ -2027,7 +2026,6 @@
           <jvmarg value="${opens.javautil}"/>
           <jvmarg value="${opens.javautilconcurrent}"/>
           <jvmarg value="${native.nativeaccess}"/>
-          <jvmarg value="${native.addmodules}"/>
 
           <classpath refid="tomcat.test.classpath" />
 
