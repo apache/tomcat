@@ -621,7 +621,7 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
             // catch InstanceNotFoundException when StoreConfig is not enabled instead of printing
             // the failure message
             if (e instanceof InstanceNotFoundException) {
-                writer.println("Please enable StoreConfig to use this feature.");
+                writer.println(smClient.getString("hostManagerServlet.noStoreConfig"));
             } else {
                 writer.println(smClient.getString("hostManagerServlet.exception", e.toString()));
             }
