@@ -139,7 +139,7 @@ public class TestPropertiesRoleMappingListener extends TomcatBaseTest {
 
         for (String role : Arrays.asList("admin", "user", "unmapped")) {
             SecurityCollection securityCollection = new SecurityCollection();
-            securityCollection.addPattern("/" + role);
+            securityCollection.addPattern("/" + role + ".txt");
             SecurityConstraint constraint = new SecurityConstraint();
             constraint.addAuthRole(role);
             constraint.addCollection(securityCollection);
@@ -149,10 +149,10 @@ public class TestPropertiesRoleMappingListener extends TomcatBaseTest {
 
         tomcat.start();
 
-        testRequest("foo:bar", "/admin", 200);
-        testRequest("waldo:fred", "/user", 200);
-        testRequest("waldo:fred", "/unmapped", 403);
-        testRequest("bar:baz", "/user", 401);
+        testRequest("foo:bar", "/admin.txt", 200);
+        testRequest("waldo:fred", "/user.txt", 200);
+        testRequest("waldo:fred", "/unmapped.txt", 403);
+        testRequest("bar:baz", "/user.txt", 401);
     }
 
     private void testRequest(String credentials, String path, int statusCode) throws IOException {
