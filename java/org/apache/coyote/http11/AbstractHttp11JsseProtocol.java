@@ -39,7 +39,7 @@ public abstract class AbstractHttp11JsseProtocol<S> extends AbstractHttp11Protoc
         }
         if (getSslImplementationName() != null &&
                 getSslImplementationName().endsWith(".panama.OpenSSLImplementation")) {
-            return "opensslforeign";
+            return "opensslffm";
         }
         return "jsse";
     }
