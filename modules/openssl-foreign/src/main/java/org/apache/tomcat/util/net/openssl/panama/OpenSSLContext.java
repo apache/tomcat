@@ -986,9 +986,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (certificate.getCertificateFile().endsWith(".pkcs12")) {
                 // Load pkcs12
                 bio = BIO_new(BIO_s_file());
-                //#  define BIO_read_filename(b,name)
-                //        (int)BIO_ctrl(b,BIO_C_SET_FILENAME, BIO_CLOSE|BIO_FP_READ,(char *)(name))
-                if (BIO_ctrl(bio, BIO_C_SET_FILENAME(), BIO_CLOSE() | BIO_FP_READ(), certificateFileNative) <= 0) {
+                if (BIO_read_filename(bio, certificateFileNative) <= 0) {
                     BIO_free(bio);
                     log.error(sm.getString("openssl.errorLoadingCertificate", "[0]:" + certificate.getCertificateFile()));
                     return;
@@ -1025,9 +1023,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             } else {
                 // Load key
                 bio = BIO_new(BIO_s_file());
-                //#  define BIO_read_filename(b,name)
-                //        (int)BIO_ctrl(b,BIO_C_SET_FILENAME, BIO_CLOSE|BIO_FP_READ,(char *)(name))
-                if (BIO_ctrl(bio, BIO_C_SET_FILENAME(), BIO_CLOSE() | BIO_FP_READ(), certificateKeyFileNative) <= 0) {
+                if (BIO_read_filename(bio, certificateKeyFileNative) <= 0) {
                     BIO_free(bio);
                     log.error(sm.getString("openssl.errorLoadingCertificate", certificate.getCertificateKeyFile()));
                     return;
@@ -1110,10 +1106,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 if (OpenSSL_version_num() < 0x3000000fL) {
                     var dh = PEM_read_bio_DHparams(bio, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
                     BIO_free(bio);
-                    // #  define SSL_CTX_set_tmp_dh(sslCtx,dh) \
-                    //           SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_TMP_DH,0,(char *)(dh))
                     if (!MemorySegment.NULL.equals(dh)) {
-                        SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_TMP_DH(), 0, dh);
+                        SSL_CTX_set_tmp_dh(state.sslCtx, dh);
                         DH_free(dh);
                     }
                 } else {
@@ -1138,9 +1132,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 if (!MemorySegment.NULL.equals(ecparams)) {
                     int nid = EC_GROUP_get_curve_name(ecparams);
                     var eckey = EC_KEY_new_by_curve_name(nid);
-                    // #  define SSL_CTX_set_tmp_ecdh(sslCtx,ecdh) \
-                    //           SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_TMP_ECDH,0,(char *)(ecdh))
-                    SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_TMP_ECDH(), 0, eckey);
+                    SSL_CTX_set_tmp_ecdh(state.sslCtx, eckey);
                     EC_KEY_free(eckey);
                     EC_GROUP_free(ecparams);
                 }

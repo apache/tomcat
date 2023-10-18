@@ -131,6 +131,45 @@ public class openssl_h_Macros {
     }
 
 
+    /**
+     * Read the specified file.
+     * #  define BIO_read_filename(b,name) \
+     *           (int)BIO_ctrl(b,BIO_C_SET_FILENAME, BIO_CLOSE|BIO_FP_READ,(char *)(name))
+     * @param bio The BIO to read into
+     * @param name the file name
+     * @return > 0 if successful
+     */
+    public static long BIO_read_filename(MemorySegment bio, MemorySegment name) {
+        return BIO_ctrl(bio, BIO_C_SET_FILENAME(), BIO_CLOSE() | BIO_FP_READ(), name);
+    }
+
+
+    /**
+     * Set tmp dh.
+     * #  define SSL_CTX_set_tmp_dh(sslCtx,dh) \
+     *           SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_TMP_DH,0,(char *)(dh))
+     * @param sslCtx the SSL context
+     * @param dh the dh
+     * @return > 0 if successful
+     */
+    public static long SSL_CTX_set_tmp_dh(MemorySegment sslCtx, MemorySegment dh) {
+        return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_TMP_DH(), 0, dh);
+    }
+
+
+    /**
+     * Set tmp ecdh.
+     * #  define SSL_CTX_set_tmp_ecdh(sslCtx,ecdh) \
+     *           SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_TMP_ECDH,0,(char *)(ecdh))
+     * @param sslCtx the SSL context
+     * @param ecdh the ecdh
+     * @return > 0 if successful
+     */
+    public static long SSL_CTX_set_tmp_ecdh(MemorySegment sslCtx, MemorySegment ecdh) {
+        return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_TMP_ECDH(), 0, ecdh);
+    }
+
+
 }
 
 
