@@ -24,6 +24,7 @@ import org.apache.catalina.Server;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -61,6 +62,10 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                 log.warn(sm.getString("listener.notServer",
                         event.getLifecycle().getClass().getSimpleName()));
             }
+            if (!JreCompat.isJre22Available()) {
+                log.warn(sm.getString("openssllistener.java22"));
+                return;
+            }
             try {
                 OpenSSLLibrary.init();
             } catch (Throwable t) {
@@ -79,6 +84,9 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
             }
         }
         if (initError || Lifecycle.AFTER_DESTROY_EVENT.equals(event.getType())) {
+            if (!JreCompat.isJre22Available()) {
+                return;
+            }
             // Note: Without the listener, destroy will never be called (which is not a significant problem)
             try {
                 OpenSSLLibrary.destroy();
