@@ -98,6 +98,7 @@ public class OpenSSLLibrary {
     { BN_get_rfc3526_prime_2048, NULL, 1025 },
     { BN_get_rfc2409_prime_1024, NULL, 0 }
      */
+    @Deprecated
     static final class DHParam {
         final MemorySegment dh;
         final int min;
@@ -108,6 +109,7 @@ public class OpenSSLLibrary {
     }
     static final DHParam[] dhParameters = new DHParam[6];
 
+    @Deprecated
     private static void initDHParameters() {
         var dh = DH_new();
         var p = BN_get_rfc3526_prime_8192(MemorySegment.NULL);
@@ -147,6 +149,7 @@ public class OpenSSLLibrary {
         dhParameters[5] = new DHParam(dh, 0);
     }
 
+    @Deprecated
     private static void freeDHParameters() {
         for (int i = 0; i < dhParameters.length; i++) {
             if (dhParameters[i] != null) {
@@ -177,11 +180,11 @@ public class OpenSSLLibrary {
                 initLibrary();
 
                 // OpenSSL 3 onwards uses providers
-                boolean usingProviders = (OpenSSL_version_num() >= 0x3000000fL);
+                boolean isOpenSSL3 = (OpenSSL_version_num() >= 0x3000000fL);
 
                 // Setup engine
                 String engineName = "on".equalsIgnoreCase(SSLEngine) ? null : SSLEngine;
-                if (!usingProviders && engineName != null) {
+                if (!isOpenSSL3 && engineName != null) {
                     if ("auto".equals(engineName)) {
                         ENGINE_register_all_complete();
                     } else {
@@ -225,15 +228,15 @@ public class OpenSSLLibrary {
                     RAND_seed(memorySession.allocateFrom(ValueLayout.JAVA_BYTE, randomBytes), 128);
                 }
 
-                if (!usingProviders) {
+                if (!isOpenSSL3) {
                     initDHParameters();
                 }
 
-                if (usingProviders || !(null == FIPSMode || "off".equalsIgnoreCase(FIPSMode))) {
+                if (isOpenSSL3 || !(null == FIPSMode || "off".equalsIgnoreCase(FIPSMode))) {
                     fipsModeActive = false;
                     final boolean enterFipsMode;
                     int fipsModeState = FIPS_OFF;
-                    if (usingProviders) {
+                    if (isOpenSSL3) {
                         var md = EVP_MD_fetch(MemorySegment.NULL, memorySession.allocateFrom("SHA-512"), MemorySegment.NULL);
                         var provider = EVP_MD_get0_provider(md);
                         String name = OSSL_PROVIDER_get0_name(provider).getString(0);
@@ -256,13 +259,13 @@ public class OpenSSLLibrary {
                         enterFipsMode = false;
                     } else if ("on".equalsIgnoreCase(FIPSMode)) {
                         if (fipsModeState == FIPS_ON) {
-                            if (!usingProviders) {
+                            if (!isOpenSSL3) {
                                 log.info(sm.getString("openssllibrary.skipFIPSInitialization"));
                             }
                             fipsModeActive = true;
                             enterFipsMode = false;
                         } else {
-                            if (usingProviders) {
+                            if (isOpenSSL3) {
                                 throw new IllegalStateException(sm.getString("openssllibrary.FIPSProviderNotDefault", FIPSMode));
                             } else {
                                 enterFipsMode = true;
@@ -273,7 +276,7 @@ public class OpenSSLLibrary {
                             fipsModeActive = true;
                             enterFipsMode = false;
                         } else {
-                            if (usingProviders) {
+                            if (isOpenSSL3) {
                                 throw new IllegalStateException(sm.getString("openssllibrary.FIPSProviderNotDefault", FIPSMode));
                             } else {
                                 throw new IllegalStateException(sm.getString("openssllibrary.requireNotInFIPSMode"));
@@ -281,13 +284,13 @@ public class OpenSSLLibrary {
                         }
                     } else if ("enter".equalsIgnoreCase(FIPSMode)) {
                         if (fipsModeState == FIPS_OFF) {
-                            if (usingProviders) {
+                            if (isOpenSSL3) {
                                 throw new IllegalStateException(sm.getString("openssllibrary.FIPSProviderNotDefault", FIPSMode));
                             } else {
                                 enterFipsMode = true;
                             }
                         } else {
-                            if (usingProviders) {
+                            if (isOpenSSL3) {
                                 fipsModeActive = true;
                                 enterFipsMode = false;
                             } else {
@@ -316,7 +319,7 @@ public class OpenSSLLibrary {
                         log.info(sm.getString("openssllibrary.initializeFIPSSuccess"));
                     }
 
-                    if (usingProviders && fipsModeActive) {
+                    if (isOpenSSL3 && fipsModeActive) {
                         log.info(sm.getString("aprListener.usingFIPSProvider"));
                     }
                 }
