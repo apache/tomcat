@@ -89,6 +89,11 @@ public class ServiceBindingPropertySource implements IntrospectionUtils.Property
         }
 
         Path path = Paths.get(serviceBindingRoot, parts[0], parts[1]);
+
+        if (!path.toFile().exists()) {
+            return null;
+        }
+
         try {
             return new String(Files.readAllBytes(path));
         } catch (IOException e) {
