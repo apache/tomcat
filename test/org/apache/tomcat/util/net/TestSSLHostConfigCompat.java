@@ -56,7 +56,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
             parameterSets.add(new Object[] {
                     "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation", storeType});
             parameterSets.add(new Object[] {
-                    "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation", storeType});
+                    "OpenSSL-FFM", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation", storeType});
         }
 
         return parameterSets;

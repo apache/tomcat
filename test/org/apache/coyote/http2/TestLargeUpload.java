@@ -58,7 +58,7 @@ public class TestLargeUpload extends Http2TestBase {
                     "org.apache.tomcat.util.net.jsse.JSSEImplementation" });
             parameterSets.add(new Object[] { base[0], base[1], "OpenSSL", Boolean.TRUE,
                     "org.apache.tomcat.util.net.openssl.OpenSSLImplementation" });
-            parameterSets.add(new Object[] { base[0], base[1], "OpenSSL-Panama", Boolean.FALSE,
+            parameterSets.add(new Object[] { base[0], base[1], "OpenSSL-FFM", Boolean.FALSE,
                     "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" });
         }
 

@@ -76,7 +76,7 @@ public class TestSsl extends TomcatBaseTest {
         parameterSets.add(new Object[] {
                 "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
         parameterSets.add(new Object[] {
-                "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+                "OpenSSL-FFM", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
 
         return parameterSets;
     }
