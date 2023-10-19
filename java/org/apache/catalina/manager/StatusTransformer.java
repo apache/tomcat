@@ -53,7 +53,7 @@ public class StatusTransformer {
         } else if (mode == 1) {
             response.setContentType("text/xml;charset=" + Constants.CHARSET);
         } else if (mode == 2) {
-            response.setContentType("application/json");
+            response.setContentType("application/json;charset=" + Constants.CHARSET);
         }
     }
 
