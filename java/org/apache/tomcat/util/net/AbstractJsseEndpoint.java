@@ -99,14 +99,15 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
                 sslHostConfig.setEnabledCiphers(sslUtil.getEnabledCiphers());
             }
 
-            SSLContext sslContext;
-            try {
-                sslContext = sslUtil.createSSLContext(negotiableProtocols);
-            } catch (Exception e) {
-                throw new IllegalArgumentException(e.getMessage(), e);
+            SSLContext sslContext = certificate.getSslContext();
+            if (sslContext == null) {
+                try {
+                    sslContext = sslUtil.createSSLContext(negotiableProtocols);
+                    certificate.setSslContext(sslContext);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(e.getMessage(), e);
+                }
             }
-
-            certificate.setSslContext(sslContext);
             logCertificate(certificate);
         }
     }
