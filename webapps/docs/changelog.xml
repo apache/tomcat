@@ -120,6 +120,11 @@
         Optionally allow ServiceBindingPropertySource to trim a trailing newline
         from a file containing a property-value. (schultz)
       </update>
+      <update>
+        Use Files.move instead of File.renameTo in the FarmWebDeployer to
+        support a broader range of environments, and to give better information
+        in the event of a failure. (schultz)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">

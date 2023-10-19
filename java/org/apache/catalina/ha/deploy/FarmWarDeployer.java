@@ -19,6 +19,7 @@ package org.apache.catalina.ha.deploy;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 
 import javax.management.MBeanServer;
@@ -224,10 +225,10 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                         if (tryAddServiced(contextName)) {
                             try {
                                 remove(contextName);
-                                if (!factory.getFile().renameTo(deployable)) {
-                                    log.error(
-                                            sm.getString("farmWarDeployer.renameFail", factory.getFile(), deployable));
-                                }
+
+                                Files.move(factory.getFile().toPath(), deployable.toPath());
+                            } catch (IOException ioe) {
+                                log.error(sm.getString("farmWarDeployer.renameFail", factory.getFile(), deployable), ioe);
                             } finally {
                                 removeServiced(contextName);
                             }
