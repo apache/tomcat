@@ -118,7 +118,7 @@
       </update>
       <update>
         Optionally allow ServiceBindingPropertySource to trim a trailing newline
-        from a file containing a property-value.
+        from a file containing a property-value. (schultz)
       </update>
     </changelog>
   </subsection>
