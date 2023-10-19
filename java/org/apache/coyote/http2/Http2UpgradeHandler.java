@@ -283,6 +283,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
+    protected void decrementActiveRemoteStreamCount() {
+        setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
+    }
+
+
     void processStreamOnContainerThread(StreamProcessor streamProcessor, SocketEvent event) {
         StreamRunnable streamRunnable = new StreamRunnable(streamProcessor, event);
         if (streamConcurrency == null) {
@@ -586,7 +591,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 boolean active = state.isActive();
                 state.sendReset();
                 if (active) {
-                    activeRemoteStreamCount.decrementAndGet();
+                    decrementActiveRemoteStreamCount();
                 }
             }
             socketWrapper.write(true, rstFrame, 0, rstFrame.length);
@@ -830,7 +835,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     protected void sentEndOfStream(Stream stream) {
         stream.sentEndOfStream();
         if (!stream.isActive()) {
-            setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
+            decrementActiveRemoteStreamCount();
         }
     }
 
@@ -1750,7 +1755,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 if (stream.receivedEndOfHeaders()) {
 
                     if (localSettings.getMaxConcurrentStreams() < activeRemoteStreamCount.incrementAndGet()) {
-                        setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
+                        decrementActiveRemoteStreamCount();
                         // Ignoring maxConcurrentStreams increases the overhead count
                         increaseOverheadCount(FrameType.HEADERS);
                         throw new StreamException(
@@ -1794,7 +1799,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private void receivedEndOfStream(Stream stream) throws ConnectionException {
         stream.receivedEndOfStream();
         if (!stream.isActive()) {
-            setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
+            decrementActiveRemoteStreamCount();
         }
     }
 
@@ -1820,7 +1825,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             boolean active = stream.isActive();
             stream.receiveReset(errorCode);
             if (active) {
-                activeRemoteStreamCount.decrementAndGet();
+                decrementActiveRemoteStreamCount();
             }
         }
     }
