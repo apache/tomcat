@@ -105,6 +105,11 @@ public class ServiceBindingPropertySource implements IntrospectionUtils.SecurePr
         }
 
         Path path = Paths.get(serviceBindingRoot, parts[0], parts[1]);
+
+        if (!path.toFile().exists()) {
+            return null;
+        }
+
         try {
             if (classLoader instanceof PermissionCheck) {
                 Permission p = new FilePermission(path.toString(), "read");
