@@ -116,6 +116,10 @@
         statistics as JSON, using the <code>JSON=true</code> URL parameter.
         (remm)
       </update>
+      <update>
+        Optionally allow ServiceBindingPropertySource to trim a trailing newline
+        from a file containing a property-value.
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
