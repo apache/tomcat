@@ -180,6 +180,15 @@ public class openssl_h_Macros {
     }
 
 
+    /**
+     * Reset BIO position.
+     * # define BIO_reset(b) \
+     *          (int)BIO_ctrl(b,BIO_CTRL_RESET,0,NULL)
+     */
+    public static long BIO_reset(MemorySegment bio) {
+        return BIO_ctrl(bio, BIO_CTRL_RESET(), 0, MemorySegment.NULL);
+    }
+
 }
 
 
