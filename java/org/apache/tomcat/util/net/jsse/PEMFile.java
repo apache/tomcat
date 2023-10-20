@@ -286,6 +286,7 @@ public class PEMFile {
                     }
 
                     byte[] iv = fromHex(ivHex);
+                    // The IV is also used as salt for the password generation
                     byte[] key = deriveKey(keyLength, password, iv);
                     SecretKey secretKey = new SecretKeySpec(key, secretKeyAlgorithm);
                     Cipher cipher = Cipher.getInstance(cipherTransformation);
@@ -337,7 +338,7 @@ public class PEMFile {
         }
 
 
-        private byte[] deriveKey(int keyLength, String password, byte[] iv) throws NoSuchAlgorithmException {
+        private byte[] deriveKey(int keyLength, String password, byte[] salt) throws NoSuchAlgorithmException {
             // PBKDF1-MD5 as specified by PKCS#5
             byte[] key = new byte[keyLength];
 
@@ -348,7 +349,7 @@ public class PEMFile {
 
             while (insertPosition < keyLength) {
                 digest.update(pw);
-                digest.update(iv, 0, 8);
+                digest.update(salt, 0, 8);
                 byte[] round = digest.digest();
                 digest.update(round);
 
