@@ -170,6 +170,16 @@ public class openssl_h_Macros {
     }
 
 
+    /**
+     * Free memory.
+     * #  define OPENSSL_free(addr) \
+     *           CRYPTO_free(addr, OPENSSL_FILE, OPENSSL_LINE)
+     */
+    public static void OPENSSL_free(MemorySegment segment) {
+        CRYPTO_free(segment, MemorySegment.NULL, 0);
+    }
+
+
 }
 
 

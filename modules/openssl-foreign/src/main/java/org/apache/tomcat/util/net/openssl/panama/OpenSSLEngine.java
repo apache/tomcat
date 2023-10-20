@@ -59,6 +59,7 @@ import javax.net.ssl.SSLSessionContext;
 
 import static org.apache.tomcat.util.openssl.openssl_h.*;
 import static org.apache.tomcat.util.openssl.openssl_h_Compatibility.*;
+import static org.apache.tomcat.util.openssl.openssl_h_Macros.*;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.Asn1Parser;
@@ -873,7 +874,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
             byte[] certificate = buf.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
             X509_free(x509);
-            CRYPTO_free(buf, MemorySegment.NULL, 0); // OPENSSL_free macro
+            OPENSSL_free(buf);
             return certificate;
         }
     }
@@ -897,7 +898,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
                 byte[] certificate = buf.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
                 certificateChain[i] = certificate;
-                CRYPTO_free(buf, MemorySegment.NULL, 0); // OPENSSL_free macro
+                OPENSSL_free(buf);
             }
             return certificateChain;
         }
