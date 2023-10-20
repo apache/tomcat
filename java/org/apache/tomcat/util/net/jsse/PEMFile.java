@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.security.AlgorithmParameters;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -39,10 +38,12 @@ import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.crypto.Cipher;
-import javax.crypto.EncryptedPrivateKeyInfo;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
@@ -51,6 +52,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.tomcat.util.buf.Asn1Parser;
 import org.apache.tomcat.util.buf.Asn1Writer;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.res.StringManager;
@@ -64,9 +66,40 @@ public class PEMFile {
 
     private static final byte[] OID_EC_PUBLIC_KEY =
             new byte[] { 0x06, 0x07, 0x2A, (byte) 0x86, 0x48, (byte) 0xCE, 0x3D, 0x02, 0x01 };
+    // 1.2.840.113549.1.5.13
+    private static final byte[] OID_PBES2 =
+            new byte[] { 0x2A, (byte) 0x86, 0x48, (byte) 0x86, (byte) 0xF7, 0x0D, 0x01, 0x05, 0x0D };
+    // 1.2.840.113549.1.5.12
+    private static final byte[] OID_PBKDF2 =
+            new byte[] { 0x2A, (byte) 0x86, 0x48, (byte) 0x86, (byte) 0xF7, 0x0D, 0x01, 0x05, 0x0C };
 
-    private static final String OID_PKCS5_PBES2 = "1.2.840.113549.1.5.13";
-    private static final String PBES2 = "PBES2";
+    private static final Map<String,String> OID_TO_PRF = new HashMap<>();
+    static {
+        // 1.2.840.113549.2.7
+        OID_TO_PRF.put("2a864886f70d0207", "HmacSHA1");
+        // 1.2.840.113549.2.8
+        OID_TO_PRF.put("2a864886f70d0208", "HmacSHA224");
+        // 1.2.840.113549.2.9
+        OID_TO_PRF.put("2a864886f70d0209", "HmacSHA256");
+        // 1.2.840.113549.2.10
+        OID_TO_PRF.put("2a864886f70d020a", "HmacSHA384");
+        // 1.2.840.113549.2.11
+        OID_TO_PRF.put("2a864886f70d020b", "HmacSHA512");
+        // 1.2.840.113549.2.12
+        OID_TO_PRF.put("2a864886f70d020c", "HmacSHA512/224");
+        // 1.2.840.113549.2.13
+        OID_TO_PRF.put("2a864886f70d020d", "HmacSHA512/256");
+    }
+
+    private static final Map<String,Algorithm> OID_TO_ALGORITHM = new HashMap<>();
+    static {
+        // 1.2.840.113549.3.7
+        OID_TO_ALGORITHM.put("2a864886f70d0307", Algorithm.DES_EDE3_CBC);
+        // 2.16.840.1.101.3.4.1.2
+        OID_TO_ALGORITHM.put("608648016503040102", Algorithm.AES128_CBC_PAD);
+        // 2.16.840.1.101.3.4.1.42
+        OID_TO_ALGORITHM.put("60864801650304012a", Algorithm.AES256_CBC_PAD);
+    }
 
     public static String toPEM(X509Certificate certificate) throws CertificateEncodingException {
         StringBuilder result = new StringBuilder();
@@ -169,10 +202,10 @@ public class PEMFile {
         for (Part part : parts) {
             switch (part.type) {
                 case Part.PRIVATE_KEY:
-                    privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS8, filename);
+                    privateKey = part.toPrivateKey(keyAlgorithm, Format.PKCS8, filename);
                     break;
                 case Part.EC_PRIVATE_KEY:
-                    privateKey = part.toPrivateKey(null, "EC", Format.RFC5915, filename);
+                    privateKey = part.toPrivateKey("EC", Format.RFC5915, filename);
                     break;
                 case Part.ENCRYPTED_PRIVATE_KEY:
                     privateKey = part.toPrivateKey(passwordToUse, keyAlgorithm, Format.PKCS8, filename);
@@ -181,7 +214,7 @@ public class PEMFile {
                     if (part.algorithm == null) {
                         // If no encryption algorithm was detected, ignore any
                         // (probably default) key password provided.
-                        privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS1, filename);
+                        privateKey = part.toPrivateKey(keyAlgorithm, Format.PKCS1, filename);
                     } else {
                         privateKey = part.toPrivateKey(passwordToUse, keyAlgorithm, Format.PKCS1, filename);
                     }
@@ -194,7 +227,7 @@ public class PEMFile {
         }
     }
 
-    private class Part {
+    private static class Part {
         public static final String BEGIN_BOUNDARY = "-----BEGIN ";
         public static final String END_BOUNDARY   = "-----END ";
         public static final String FINISH_BOUNDARY = "-----";
@@ -220,45 +253,46 @@ public class PEMFile {
             return (X509Certificate) factory.generateCertificate(new ByteArrayInputStream(decode()));
         }
 
+
+        /**
+         * Extracts the private key from an unencrypted PEMFile.
+         *
+         * @param keyAlgorithm Key algorithm if known or null if it needs to be obtained from the PEM file
+         * @param format       The format used to encode the private key
+         * @param filename     The name of the PEM file
+         *
+         * @return The clear text private key extracted from the PEM file
+         *
+         * @throws GeneralSecurityException If there is a cryptographic error processing the PEM file
+         */
+        public PrivateKey toPrivateKey(String keyAlgorithm, Format format, String filename) throws GeneralSecurityException {
+            return toPrivateKey(keyAlgorithm, format, filename, decode());
+        }
+
+
+        /**
+         * Extracts the private key from an encrypted PEMFile.
+         *
+         * @param password     Password to decrypt the private key
+         * @param keyAlgorithm Key algorithm if known or null if it needs to be obtained from the PEM file
+         * @param format       The format used to encode the private key
+         * @param filename     The name of the PEM file
+         *
+         * @return The clear text private key extracted from the PEM file
+         *
+         * @throws GeneralSecurityException If there is a cryptographic error processing the PEM file
+         * @throws IOException              If there is an I/O error reading the PEM file
+         */
         public PrivateKey toPrivateKey(String password, String keyAlgorithm, Format format, String filename)
                 throws GeneralSecurityException, IOException {
-            KeySpec keySpec = null;
 
-            if (password == null) {
-                switch (format) {
-                    case PKCS1: {
-                        keySpec = parsePKCS1(decode());
-                        break;
-                    }
-                    case PKCS8: {
-                        keySpec = new PKCS8EncodedKeySpec(decode());
-                        break;
-                    }
-                    case RFC5915: {
-                        keySpec = new PKCS8EncodedKeySpec(rfc5915ToPkcs8(decode()));
-                        break;
-                    }
-                }
-            } else {
-                if (algorithm == null) {
-                    // PKCS 8
-                    EncryptedPrivateKeyInfo privateKeyInfo = new EncryptedPrivateKeyInfo(decode());
-                    String pbeAlgorithm = getPBEAlgorithm(privateKeyInfo);
-                    SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(pbeAlgorithm);
-                    SecretKey secretKey = secretKeyFactory.generateSecret(new PBEKeySpec(password.toCharArray()));
+            String secretKeyAlgorithm;
+            String cipherTransformation;
+            int keyLength;
 
-                    Cipher cipher = Cipher.getInstance(pbeAlgorithm);
-                    cipher.init(Cipher.DECRYPT_MODE, secretKey, privateKeyInfo.getAlgParameters());
+            switch (format) {
+                case PKCS1: {
 
-                    keySpec = privateKeyInfo.getKeySpec(cipher);
-                } else {
-                    // PKCS 1
-                    String secretKeyAlgorithm;
-                    String cipherTransformation;
-                    int keyLength;
-
-                    // Is there a generic way to derive these three values from
-                    // just the algorithm name?
                     switch (algorithm) {
                         case "DES-CBC": {
                             secretKeyAlgorithm = "DES";
@@ -288,12 +322,147 @@ public class PEMFile {
 
                     byte[] iv = fromHex(ivHex);
                     // The IV is also used as salt for the password generation
-                    byte[] key = deriveKey(keyLength, password, iv);
+                    byte[] key = deriveKeyPBKDF1(keyLength, password, iv);
                     SecretKey secretKey = new SecretKeySpec(key, secretKeyAlgorithm);
                     Cipher cipher = Cipher.getInstance(cipherTransformation);
                     cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
                     byte[] pkcs1 = cipher.doFinal(decode());
-                    keySpec = parsePKCS1(pkcs1);
+                    return toPrivateKey(keyAlgorithm, format, filename, pkcs1);
+                }
+                case PKCS8: {
+                    // Encrypted PEM file is PKCS8
+                    Asn1Parser p = new Asn1Parser(decode());
+
+                    //@formatter:off
+                    /*
+                     * RFC 5208 - PKCS #8
+                     * RFC 8108 - PKCS #5
+                     *
+                     * SEQ                    - PKCS #8
+                     *   SEQ                  - PKCS #8 encryptionAlgorithm
+                     *     OID                - PKCS #5 PBES2 OID
+                     *     SEQ                - PKCS #5 PBES2-params
+                     *       SEQ              - PKCS #5 PBES2 key derivation function
+                     *         OID            - PKCS #5 PBES2 KDF OID - must be PBKDF2
+                     *         SEQ            - PKCS #5 PBKDF2-params
+                     *           OCTET STRING - PKCS #5 PBKDF2 salt
+                     *           INT          - PKCS #5 PBKDF2 interationCount
+                     *           INT          - PKCS #5 PBKDF2 key length OPTIONAL
+                     *           SEQ          - PKCS #5 PBKDF2 PRF
+                     *             OID        - PKCS #5 PBKDF2 PRF OID
+                     *             NULL       - PKCS #5 PBKDF2 PRF parameters
+                     *       SEQ              - PKCS #5 PBES2 encryption scheme
+                     *         OID            - PKCS #5 PBES2 algorithm OID
+                     *         OCTET STRING   - PKCS #5 PBES2 algorithm iv
+                     *   OCTET STRING         - PKCS #8 encryptedData
+                     */
+                    //@formatter:on
+
+                    // Parse the PKCS #8 outer sequence and validate the length
+                    p.parseTagSequence();
+                    p.parseFullLength();
+
+                    // Parse the PKCS #8 encryption algorithm
+                    p.parseTagSequence();
+                    p.parseLength();
+
+                    // PBES2 OID
+                    byte[] oidEncryptionAlgorithm = p.parseOIDAsBytes();
+                    /*
+                     * Implementation note. If other algorithms are ever supported, the KDF check below is likely to
+                     * need to be adjusted.
+                     */
+                    if (!Arrays.equals(oidEncryptionAlgorithm, OID_PBES2)) {
+                        throw new NoSuchAlgorithmException(sm.getString("pemFile.unknownPkcs8Algorithm",
+                                HexUtils.toHexString(oidEncryptionAlgorithm)));
+                    }
+
+                    // PBES2-params
+                    p.parseTagSequence();
+                    p.parseLength();
+
+                    // PBES2 KDF
+                    p.parseTagSequence();
+                    p.parseLength();
+                    byte[] oidKDF = p.parseOIDAsBytes();
+                    if (!Arrays.equals(oidKDF, OID_PBKDF2)) {
+                        throw new NoSuchAlgorithmException(sm.getString("pemFile.notPbkdf2",
+                                HexUtils.toHexString(oidKDF)));
+                    }
+
+                    // PBES2 KDF-params
+                    p.parseTagSequence();
+                    p.parseLength();
+                    byte[] salt = p.parseOctetString();
+                    int iterationCount = p.parseInt().intValue();
+                    if (p.peekTag() == Asn1Parser.TAG_INTEGER) {
+                        keyLength = p.parseInt().intValue();
+                    }
+
+                    // PBKDF2 PRF
+                    p.parseTagSequence();
+                    p.parseLength();
+                    byte[] oidPRF = p.parseOIDAsBytes();
+                    String prf = OID_TO_PRF.get(HexUtils.toHexString(oidPRF));
+                    if (prf == null) {
+                        throw new NoSuchAlgorithmException(sm.getString("pemFile.unknownPrfAlgorithm", prf));
+                    }
+                    p.parseNull();
+
+                    // PBES2 encryption scheme
+                    p.parseTagSequence();
+                    p.parseLength();
+                    byte[] oidCipher = p.parseOIDAsBytes();
+                    Algorithm algorithm = OID_TO_ALGORITHM.get(HexUtils.toHexString(oidCipher));
+                    if (algorithm == null) {
+                        throw new NoSuchAlgorithmException(sm.getString("pemFile.unknownEncryptionAlgorithm",
+                                HexUtils.toHexString(oidCipher)));
+                    }
+
+                    byte[] iv = p.parseOctetString();
+
+                    // Encrypted data
+                    byte[] encryptedData = p.parseOctetString();
+
+                    // ASN.1 parsing complete
+
+                    // Build secret key to decrypt encrypted data
+                    byte[] key = deriveKeyPBKDF2("PBKDF2With" + prf, password, salt, iterationCount, algorithm.getKeyLength());
+                    SecretKey secretKey = new SecretKeySpec(key, algorithm.getSecretKeyAlgorithm());
+
+                    // Configure algorithm to decrypt encrypted data
+                    Cipher cipher = Cipher.getInstance(algorithm.getTransformation());
+                    cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
+
+                    // Decrypt the encrypted key and call this method again to process the key
+                    byte[] decryptedData = cipher.doFinal(encryptedData);
+                    return toPrivateKey(keyAlgorithm, format, filename, decryptedData);
+                }
+                default: {
+                    // Expected to be unencrypted
+                    throw new NoSuchAlgorithmException(sm.getString("pemFile.unknownEncryptedFormat", format));
+                }
+            }
+        }
+
+
+        private PrivateKey toPrivateKey(String keyAlgorithm, Format format, String filename, byte[] source)
+                throws GeneralSecurityException {
+
+            KeySpec keySpec = null;
+
+            switch (format) {
+                case PKCS1: {
+                    keySpec = parsePKCS1(source);
+                    break;
+                }
+                case PKCS8: {
+                    keySpec = new PKCS8EncodedKeySpec(source);
+                    break;
+                }
+                case RFC5915: {
+                    keySpec = new PKCS8EncodedKeySpec(rfc5915ToPkcs8(source));
+                    break;
                 }
             }
 
@@ -318,29 +487,7 @@ public class PEMFile {
         }
 
 
-        private String getPBEAlgorithm(EncryptedPrivateKeyInfo privateKeyInfo) {
-            AlgorithmParameters parameters = privateKeyInfo.getAlgParameters();
-            String algName = privateKeyInfo.getAlgName();
-            // Java 11 returns OID_PKCS5_PBES2
-            // Java 17 returns PBES2
-            if (parameters != null && (OID_PKCS5_PBES2.equals(algName) || PBES2.equals(algName))) {
-                /*
-                 * This should be "PBEWith<prf>And<encryption>".
-                 * Relying on the toString() implementation is potentially
-                 * fragile but acceptable in this case since the JRE depends on
-                 * the toString() implementation as well.
-                 * In the future, if necessary, we can parse the value of
-                 * parameters.getEncoded() but the associated complexity and
-                 * unlikeliness of the JRE implementation changing means that
-                 * Tomcat will use to toString() approach for now.
-                 */
-                return parameters.toString();
-            }
-            return privateKeyInfo.getAlgName();
-        }
-
-
-        private byte[] deriveKey(int keyLength, String password, byte[] salt) throws NoSuchAlgorithmException {
+        private byte[] deriveKeyPBKDF1(int keyLength, String password, byte[] salt) throws NoSuchAlgorithmException {
             // PBKDF1-MD5 as specified by PKCS#5
             byte[] key = new byte[keyLength];
 
@@ -363,6 +510,17 @@ public class PEMFile {
         }
 
 
+        private byte[] deriveKeyPBKDF2(String algorithm, String password, byte[] salt, int iterations, int keyLength)
+                throws GeneralSecurityException {
+            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorithm);
+            KeySpec keySpec;
+            keySpec = new PBEKeySpec(password.toCharArray(), salt, iterations, keyLength);
+            SecretKey secretKey = secretKeyFactory.generateSecret(keySpec);
+            return secretKey.getEncoded();
+        }
+
+
+        //@formatter:off
         /*
          * RFC5915: SEQ
          *           INT               value = 1
@@ -385,6 +543,7 @@ public class PEMFile {
          *                 BIT STRING  len = 520 bits
          *
          */
+        //@formatter:on
         private byte[] rfc5915ToPkcs8(byte[] source) {
             // Parse RFC 5915 format EC private key
             Asn1Parser p = new Asn1Parser(source);
@@ -480,5 +639,34 @@ public class PEMFile {
         PKCS1,
         PKCS8,
         RFC5915
+    }
+
+
+    private enum Algorithm {
+        AES128_CBC_PAD("AES/CBC/PKCS5PADDING", "AES", 128),
+        AES256_CBC_PAD("AES/CBC/PKCS5PADDING", "AES", 256),
+        DES_EDE3_CBC("DESede/CBC/PKCS5Padding", "DESede", 192);
+
+        private final String transformation;
+        private final String secretKeyAlgorithm;
+        private final int keyLength;
+
+        Algorithm(String transformation, String secretKeyAlgorithm, int keyLength) {
+            this.transformation = transformation;
+            this.secretKeyAlgorithm = secretKeyAlgorithm;
+            this.keyLength = keyLength;
+        }
+
+        public String getTransformation() {
+            return transformation;
+        }
+
+        public String getSecretKeyAlgorithm() {
+            return secretKeyAlgorithm;
+        }
+
+        public int getKeyLength() {
+            return keyLength;
+        }
     }
 }
