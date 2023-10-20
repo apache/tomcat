@@ -30,6 +30,13 @@ public class Asn1Parser {
 
     private static final StringManager sm = StringManager.getManager(Asn1Parser.class);
 
+    public static final int TAG_INTEGER = 0x02;
+    public static final int TAG_OCTET_STRING = 0x04;
+    public static final int TAG_NULL = 0x05;
+    public static final int TAG_OID = 0x06;
+    public static final int TAG_SEQUENCE = 0x30;
+    public static final int TAG_ATTRIBUTE_BASE = 0xA0;
+
     private final byte[] source;
 
     private int pos = 0;
@@ -47,6 +54,11 @@ public class Asn1Parser {
 
     public int peekTag() {
         return source[pos] & 0xFF;
+    }
+
+
+    public void parseTagSequence() {
+        parseTag(TAG_SEQUENCE);
     }
 
 
@@ -83,12 +95,38 @@ public class Asn1Parser {
 
 
     public BigInteger parseInt() {
-        parseTag(0x02);
-        int len = parseLength();
-        byte[] val = new byte[len];
-        System.arraycopy(source, pos, val, 0, len);
-        pos += len;
+        byte[] val = parseBytes(TAG_INTEGER);
         return new BigInteger(val);
+    }
+
+
+    public byte[] parseOctetString() {
+        return parseBytes(TAG_OCTET_STRING);
+    }
+
+
+    public void parseNull() {
+        parseBytes(TAG_NULL);
+    }
+
+
+    public byte[] parseOIDAsBytes() {
+        return parseBytes(TAG_OID);
+    }
+
+
+    public byte[] parseAttributeAsBytes(int index) {
+        return parseBytes(TAG_ATTRIBUTE_BASE + index);
+    }
+
+
+    private byte[] parseBytes(int tag) {
+        parseTag(tag);
+        int len = parseLength();
+        byte[] result = new byte[len];
+        System.arraycopy(source, pos, result, 0, result.length);
+        pos += result.length;
+        return result;
     }
 
 
