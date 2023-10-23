@@ -130,16 +130,16 @@ public class PEMFile {
         this(filename, password, null);
     }
 
-    public PEMFile(String filename, String password, String keyAlgorithm)
-            throws IOException, GeneralSecurityException {
+    public PEMFile(String filename, String password, String keyAlgorithm) throws IOException, GeneralSecurityException {
         this(filename, ConfigFileLoader.getSource().getResource(filename).getInputStream(), password, keyAlgorithm);
     }
 
     public PEMFile(String filename, String password, String passwordFilename, String keyAlgorithm)
             throws IOException, GeneralSecurityException {
-        this(filename, ConfigFileLoader.getSource().getResource(filename).getInputStream(), password,
-             passwordFilename, passwordFilename != null ? ConfigFileLoader.getSource().getResource(passwordFilename).getInputStream() : null,
-             keyAlgorithm);
+        this(filename, ConfigFileLoader.getSource().getResource(filename).getInputStream(), password, passwordFilename,
+                passwordFilename != null ? ConfigFileLoader.getSource().getResource(passwordFilename).getInputStream() :
+                        null,
+                keyAlgorithm);
     }
 
     public PEMFile(String filename, InputStream fileStream, String password, String keyAlgorithm)
@@ -148,28 +148,28 @@ public class PEMFile {
     }
 
     /**
-     * @param filename the filename to mention in error messages, not used for anything else.
-     * @param fileStream the stream containing the pem(s).
-     * @param password password to load the pem objects.
-     * @param passwordFilename the password filename to mention in error messages, not used for anything else.
+     * @param filename           the filename to mention in error messages, not used for anything else.
+     * @param fileStream         the stream containing the pem(s).
+     * @param password           password to load the pem objects.
+     * @param passwordFilename   the password filename to mention in error messages, not used for anything else.
      * @param passwordFileStream stream containing the password to load the pem objects.
-     * @param keyAlgorithm the algorithm to help to know how to load the objects (guessed if null).
-     * @throws IOException if input can't be read.
+     * @param keyAlgorithm       the algorithm to help to know how to load the objects (guessed if null).
+     *
+     * @throws IOException              if input can't be read.
      * @throws GeneralSecurityException if input can't be parsed/loaded.
      */
     public PEMFile(String filename, InputStream fileStream, String password, String passwordFilename,
-                   InputStream passwordFileStream, String keyAlgorithm)
-            throws IOException, GeneralSecurityException {
+            InputStream passwordFileStream, String keyAlgorithm) throws IOException, GeneralSecurityException {
         List<Part> parts = new ArrayList<>();
-        try (BufferedReader reader =
-                 new BufferedReader(new InputStreamReader(fileStream, StandardCharsets.US_ASCII))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(fileStream, StandardCharsets.US_ASCII))) {
             Part part = null;
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith(Part.BEGIN_BOUNDARY)) {
                     part = new Part();
-                    part.type = line.substring(Part.BEGIN_BOUNDARY.length(),
-                            line.length() - Part.FINISH_BOUNDARY.length()).trim();
+                    part.type =
+                            line.substring(Part.BEGIN_BOUNDARY.length(), line.length() - Part.FINISH_BOUNDARY.length())
+                                    .trim();
                 } else if (line.startsWith(Part.END_BOUNDARY)) {
                     parts.add(part);
                     part = null;
@@ -229,7 +229,7 @@ public class PEMFile {
 
     private static class Part {
         public static final String BEGIN_BOUNDARY = "-----BEGIN ";
-        public static final String END_BOUNDARY   = "-----END ";
+        public static final String END_BOUNDARY = "-----END ";
         public static final String FINISH_BOUNDARY = "-----";
 
         public static final String PRIVATE_KEY = "PRIVATE KEY";
@@ -265,7 +265,8 @@ public class PEMFile {
          *
          * @throws GeneralSecurityException If there is a cryptographic error processing the PEM file
          */
-        public PrivateKey toPrivateKey(String keyAlgorithm, Format format, String filename) throws GeneralSecurityException {
+        public PrivateKey toPrivateKey(String keyAlgorithm, Format format, String filename)
+                throws GeneralSecurityException {
             return toPrivateKey(keyAlgorithm, format, filename, decode());
         }
 
@@ -386,8 +387,8 @@ public class PEMFile {
                     p.parseLength();
                     byte[] oidKDF = p.parseOIDAsBytes();
                     if (!Arrays.equals(oidKDF, OID_PBKDF2)) {
-                        throw new NoSuchAlgorithmException(sm.getString("pemFile.notPbkdf2",
-                                HexUtils.toHexString(oidKDF)));
+                        throw new NoSuchAlgorithmException(
+                                sm.getString("pemFile.notPbkdf2", HexUtils.toHexString(oidKDF)));
                     }
 
                     // PBES2 KDF-params
@@ -415,8 +416,8 @@ public class PEMFile {
                     byte[] oidCipher = p.parseOIDAsBytes();
                     Algorithm algorithm = OID_TO_ALGORITHM.get(HexUtils.toHexString(oidCipher));
                     if (algorithm == null) {
-                        throw new NoSuchAlgorithmException(sm.getString("pemFile.unknownEncryptionAlgorithm",
-                                HexUtils.toHexString(oidCipher)));
+                        throw new NoSuchAlgorithmException(
+                                sm.getString("pemFile.unknownEncryptionAlgorithm", HexUtils.toHexString(oidCipher)));
                     }
 
                     byte[] iv = p.parseOctetString();
@@ -427,7 +428,8 @@ public class PEMFile {
                     // ASN.1 parsing complete
 
                     // Build secret key to decrypt encrypted data
-                    byte[] key = deriveKeyPBKDF2("PBKDF2With" + prf, password, salt, iterationCount, algorithm.getKeyLength());
+                    byte[] key = deriveKeyPBKDF2("PBKDF2With" + prf, password, salt, iterationCount,
+                            algorithm.getKeyLength());
                     SecretKey secretKey = new SecretKeySpec(key, algorithm.getSecretKeyAlgorithm());
 
                     // Configure algorithm to decrypt encrypted data
@@ -468,7 +470,7 @@ public class PEMFile {
 
             InvalidKeyException exception = new InvalidKeyException(sm.getString("pemFile.parseError", filename));
             if (keyAlgorithm == null) {
-                for (String algorithm : new String[] {"RSA", "DSA", "EC"}) {
+                for (String algorithm : new String[] { "RSA", "DSA", "EC" }) {
                     try {
                         return KeyFactory.getInstance(algorithm).generatePrivate(keySpec);
                     } catch (InvalidKeySpecException e) {
@@ -585,18 +587,10 @@ public class PEMFile {
 
 
             // Write out PKCS#8 format
-            return Asn1Writer.writeSequence(
-                    Asn1Writer.writeInteger(0),
-                    Asn1Writer.writeSequence(
-                            OID_EC_PUBLIC_KEY,
-                            oid),
-                    Asn1Writer.writeOctetString(
-                            Asn1Writer.writeSequence(
-                                    Asn1Writer.writeInteger(1),
-                                    Asn1Writer.writeOctetString(privateKey),
-                                    Asn1Writer.writeTag((byte) 0xA1, publicKey))
-                            )
-                    );
+            return Asn1Writer.writeSequence(Asn1Writer.writeInteger(0),
+                    Asn1Writer.writeSequence(OID_EC_PUBLIC_KEY, oid),
+                    Asn1Writer.writeOctetString(Asn1Writer.writeSequence(Asn1Writer.writeInteger(1),
+                            Asn1Writer.writeOctetString(privateKey), Asn1Writer.writeTag((byte) 0xA1, publicKey))));
         }
 
 
@@ -617,18 +611,16 @@ public class PEMFile {
                 // keys
                 throw new IllegalArgumentException(sm.getString("pemFile.noMultiPrimes"));
             }
-            return new RSAPrivateCrtKeySpec(p.parseInt(), p.parseInt(), p.parseInt(), p.parseInt(),
-                    p.parseInt(), p.parseInt(), p.parseInt(), p.parseInt());
+            return new RSAPrivateCrtKeySpec(p.parseInt(), p.parseInt(), p.parseInt(), p.parseInt(), p.parseInt(),
+                    p.parseInt(), p.parseInt(), p.parseInt());
         }
-
 
 
         private byte[] fromHex(String hexString) {
             byte[] bytes = new byte[hexString.length() / 2];
-            for (int i = 0; i < hexString.length(); i += 2)
-            {
-                bytes[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
-                    + Character.digit(hexString.charAt(i + 1), 16));
+            for (int i = 0; i < hexString.length(); i += 2) {
+                bytes[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4) +
+                        Character.digit(hexString.charAt(i + 1), 16));
             }
             return bytes;
         }
