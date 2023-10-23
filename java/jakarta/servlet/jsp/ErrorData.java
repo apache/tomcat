@@ -40,10 +40,7 @@ public final class ErrorData {
      * @param statusCode  The status code of the error
      * @param uri         The request URI
      * @param servletName The name of the servlet invoked
-     *
-     * @deprecated Use {#link {@link ErrorData#ErrorData(Throwable, int, String, String, String)}
      */
-    @Deprecated(since = "4.0", forRemoval = true)
     public ErrorData(Throwable throwable, int statusCode, String uri, String servletName) {
         this(throwable, statusCode, uri, servletName, null);
     }
