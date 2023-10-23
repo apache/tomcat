@@ -224,6 +224,9 @@ public class SSLHostConfigCertificate implements Serializable {
 
     public void setCertificateKeystore(KeyStore certificateKeystore) {
         this.certificateKeystore = certificateKeystore;
+        if (certificateKeystore != null) {
+            setCertificateKeystoreType(certificateKeystore.getType());
+        }
     }
 
 

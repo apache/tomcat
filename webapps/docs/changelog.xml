@@ -126,6 +126,16 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        When calling
+        <code>SSLHostConfigCertificate.setCertificateKeystore(ks)</code>,
+        automatically call
+        <code>setCertificateKeystoreType(ks.getType())</code>. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
