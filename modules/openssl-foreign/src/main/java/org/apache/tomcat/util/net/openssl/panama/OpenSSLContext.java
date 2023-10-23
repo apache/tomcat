@@ -16,8 +16,10 @@
  */
 package org.apache.tomcat.util.net.openssl.panama;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
@@ -977,6 +979,29 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         int index = getCertificateIndex(certificate);
         // Load Server key and certificate
         if (certificate.getCertificateFile() != null) {
+            // Pick right key password
+            String keyPassToUse = null;
+            String keyPass = certificate.getCertificateKeyPassword();
+            if (keyPass == null) {
+                keyPass = certificate.getCertificateKeystorePassword();
+            }
+            String keyPassFile = null;//FIXME Tomcat 9.0.83:certificate.getCertificateKeyPasswordFile();
+            if (keyPassFile == null) {
+                keyPassFile = null;//FIXME Tomcat 9.0.83:certificate.getCertificateKeystorePasswordFile();
+            }
+            if (keyPassFile != null) {
+                try (BufferedReader reader =
+                        new BufferedReader(new InputStreamReader(
+                                ConfigFileLoader.getSource().getResource(keyPassFile).getInputStream(),
+                                StandardCharsets.UTF_8))) {
+                    keyPassToUse = reader.readLine();
+                } catch (IOException e) {
+                    log.error(sm.getString("openssl.errorLoadingPassword", keyPassFile), e);
+                    return false;
+                }
+            } else {
+                keyPassToUse = keyPass;
+            }
             // Set certificate
             //SSLContext.setCertificate(state.ctx,
             //        SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
@@ -1007,9 +1032,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     }
                     MemorySegment passwordAddress = MemorySegment.NULL;
                     int passwordLength = 0;
-                    String callbackPassword = certificate.getCertificateKeyPassword();
-                    if (callbackPassword != null && callbackPassword.length() > 0) {
-                        passwordAddress = localArena.allocateFrom(callbackPassword);
+                    if (keyPassToUse != null && keyPassToUse.length() > 0) {
+                        passwordAddress = localArena.allocateFrom(keyPassToUse);
                         passwordLength = (int) (passwordAddress.byteSize() - 1);
                     }
                     if (PKCS12_verify_mac(p12, passwordAddress, passwordLength) <= 0) {
@@ -1049,7 +1073,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         key = MemorySegment.NULL;
                         for (int i = 0; i < 3; i++) {
                             try {
-                                callbackPasswordTheadLocal.set(certificate.getCertificateKeyPassword());
+                                callbackPasswordTheadLocal.set(keyPassToUse);
                                 key = PEM_read_bio_PrivateKey(keyBIO, MemorySegment.NULL, openSSLCallbackPassword, MemorySegment.NULL);
                             } finally {
                                 callbackPasswordTheadLocal.set(null);
@@ -1076,7 +1100,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     }
                     // Load certificate
                     try {
-                        callbackPasswordTheadLocal.set(certificate.getCertificateKeyPassword());
+                        callbackPasswordTheadLocal.set(keyPassToUse);
                         cert = PEM_read_bio_X509_AUX(certificateBIO, MemorySegment.NULL, openSSLCallbackPassword, MemorySegment.NULL);
                     } finally {
                         callbackPasswordTheadLocal.set(null);
@@ -1118,7 +1142,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 // Try to read DH parameters from the (first) SSLCertificateFile
                 if (index == SSL_AIDX_RSA) {
                     BIO_reset(certificateBIO);
-                    if (OpenSSL_version_num() < 0x3000000fL) {
+                    if (!OPENSSL_3) {
                         var dh = PEM_read_bio_DHparams(certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
                         if (!MemorySegment.NULL.equals(dh)) {
                             SSL_CTX_set_tmp_dh(state.sslCtx, dh);
@@ -1140,7 +1164,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
                 // Similarly, try to read the ECDH curve name from SSLCertificateFile...
                 BIO_reset(certificateBIO);
-                if (OpenSSL_version_num() < 0x3000000fL) {
+                if (!OPENSSL_3) {
                     var ecparams = PEM_read_bio_ECPKParameters(certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
                     if (!MemorySegment.NULL.equals(ecparams)) {
                         int nid = EC_GROUP_get_curve_name(ecparams);
@@ -1256,7 +1280,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     logLastError(localArena, "openssl.errorPrivateKeyCheck");
                     return false;
                 }
-                if (OpenSSL_version_num() < 0x3000000fL) {
+                if (!OPENSSL_3) {
                     // Set callback for DH parameters
                     var openSSLCallbackTmpDH = Linker.nativeLinker().upcallStub(openSSLCallbackTmpDHHandle,
                             openSSLCallbackTmpDHFunctionDescriptor, contextArena);
