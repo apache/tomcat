@@ -134,6 +134,11 @@
         automatically call
         <code>setCertificateKeystoreType(ks.getType())</code>. (markt)
       </add>
+      <fix>
+        <bug>67666</bug>: Ensure TLS connectors using PEM files either work with
+        the <code>TLSCertificateReloadListener</code> or, in the rare case that
+        they do not, log a warning on Connector start. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
