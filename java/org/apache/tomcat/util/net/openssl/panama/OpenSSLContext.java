@@ -477,7 +477,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             try (var localArena = Arena.ofConfined()) {
                 // rc = SSLConf.apply(confCtx, name, value);
                 if (name.equals("NO_OCSP_CHECK")) {
-                    noOcspCheck = Boolean.valueOf(value);
+                    noOcspCheck = Boolean.parseBoolean(value);
                     rc = 1;
                 } else {
                     rc = SSL_CONF_cmd(state.confCtx, localArena.allocateFrom(name),
