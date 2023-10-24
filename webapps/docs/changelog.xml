@@ -142,7 +142,7 @@
       <fix>
         <bug>67675</bug>: Support a wider range of KDF and ciphers for PEM files
         than the combinations supported by the JVM by default. Specifically,
-        support the OpenSSL default of HmacSHA256 and DES-EDE3-CBC. (markt) 
+        support the OpenSSL default of HmacSHA256 and DES-EDE3-CBC. (markt)
       </fix>
     </changelog>
   </subsection>
