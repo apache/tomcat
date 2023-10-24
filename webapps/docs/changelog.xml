@@ -107,10 +107,6 @@
 <section name="Tomcat 8.5.96 (schultz)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
-      <add>
-        <bug>66670</bug>: Add <code>SSLHostConfig#certificateKeyPasswordFile</code> and
-        <code>SSLHostConfig#certificateKeystorePasswordFile</code>. (michaelo)
-      </add>
       <fix>
         <bug>67667</bug>: <code>TLSCertificateReloadListener</code> prints unreadable
         rendering of <code>X509Certificate#getNotAfter()</code>. (michaelo)
@@ -128,6 +124,10 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <add>
+        <bug>66670</bug>: Add <code>SSLHostConfig#certificateKeyPasswordFile</code> and
+        <code>SSLHostConfig#certificateKeystorePasswordFile</code>. (michaelo)
+      </add>
       <add>
         When calling
         <code>SSLHostConfigCertificate.setCertificateKeystore(ks)</code>,
