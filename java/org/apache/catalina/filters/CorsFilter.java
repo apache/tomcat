@@ -326,7 +326,7 @@ public class CorsFilter implements Filter {
         if (!isAnyOriginAllowed()) {
             // If only specific origins are allowed, the response will vary by
             // origin
-            ResponseUtil.addVaryFieldName(response, CorsFilter.REQUEST_HEADER_ORIGIN);
+            ResponseUtil.addVaryFieldName(response, REQUEST_HEADER_ORIGIN);
         }
 
         // Let request pass.

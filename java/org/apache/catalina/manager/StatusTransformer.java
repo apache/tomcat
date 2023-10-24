@@ -348,8 +348,8 @@ public class StatusTransformer {
             }
             String name = objectName.getKeyProperty("name");
             // use StatusTransformer to output status
-            StatusTransformer.writeConnectorState(writer, objectName, name, mBeanServer, globalRequestProcessors,
-                    requestProcessors, mode, args);
+            writeConnectorState(
+                    writer, objectName, name, mBeanServer, globalRequestProcessors, requestProcessors, mode, args);
         }
         if (mode == 2) {
             writer.append(']').println();
