@@ -59,6 +59,7 @@ import javax.net.ssl.X509KeyManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.net.jsse.JSSEKeyManager;
 import org.apache.tomcat.util.net.jsse.PEMFile;
@@ -124,9 +125,8 @@ public abstract class SSLUtilBase implements SSLUtil {
         sslHostConfig.setTls13RenegotiationAvailable(isTls13RenegAuthAvailable());
 
         // Calculate the enabled ciphers
-        if (/*!JreCompat.isJre22Available() && */sslHostConfig.getCiphers().startsWith("PROFILE=")) {
+        if (!JreCompat.isJre22Available() && sslHostConfig.getCiphers().startsWith("PROFILE=")) {
             // OpenSSL profiles cannot be resolved without Java 22
-            // TODO: sslHostConfig should query that with Panama if possible
             this.enabledCiphers = new String[0];
         } else {
             boolean warnOnSkip = !sslHostConfig.getCiphers().equals(SSLHostConfig.DEFAULT_TLS_CIPHERS);
