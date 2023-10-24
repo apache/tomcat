@@ -1156,7 +1156,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                             if (SSL_CTX_set0_tmp_dh_pkey(state.sslCtx, pkey) <= 0) {
                                 EVP_PKEY_free(pkey);
                             } else {
-                                log.debug(sm.getString("openssl.setCustomDHParameters", numBits, certificate.getCertificateFile()));
+                                log.debug(sm.getString("openssl.setCustomDHParameters", Integer.valueOf(numBits), certificate.getCertificateFile()));
                             }
                         } else {
                             SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_DH_AUTO(), 1, MemorySegment.NULL);
