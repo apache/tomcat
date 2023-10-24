@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-for generated in src/main/java/org/apache/tomcat/util/openssl/*.java; do
+for generated in ../../java/org/apache/tomcat/util/openssl/*.java; do
     cat license.header $generated >> $generated.$$
     mv $generated.$$ $generated
     echo Updated $generated
