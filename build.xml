@@ -1971,11 +1971,6 @@
               extension=".NIO2" />
   </target>
 
-  <target name="test-apr-exists" description="Checks for APR lib"
-          if="${execute.test.apr}">
-    <available file="${test.apr.loc}" property="apr.exists" />
-  </target>
-
   <target name="test-openssl-exists" description="Checks for the OpenSSL binary">
     <property environment="env" />
     <condition property="test.openssl.exists">
@@ -1994,11 +1989,7 @@
 
   <!-- Set native specific properties -->
   <property name="native.nativeaccess" value="--enable-native-access=ALL-UNNAMED"/>
-  <condition property="runtests.librarypath" value="-Dtest.4=4">
-    <!-- TODO: Find something better here, but the library path would conflict between tomcat-native and OpenSSL FFM -->
-    <javaversion atleast="${release.java.version}" />
-  </condition>
-  <property name="runtests.librarypath" value="-Djava.library.path=${test.apr.loc}"/>
+  <property name="runtests.librarypath" value="-Djava.library.path=${test.apr.loc}${path.separator}${java.library.path}"/>
   <property name="opens.javalang" value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
   <property name="opens.javaio" value="--add-opens=java.base/java.io=ALL-UNNAMED"/>
   <property name="opens.sunrmi" value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
