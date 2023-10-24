@@ -74,7 +74,13 @@ public class OpenSSLUtil extends SSLUtilBase {
     }
 
 
+    @Deprecated
     public static X509KeyManager chooseKeyManager(KeyManager[] managers) throws Exception {
+        return chooseKeyManager(managers, true);
+    }
+
+
+    public static X509KeyManager chooseKeyManager(KeyManager[] managers, boolean throwOnMissing) throws Exception {
         if (managers == null) {
             return null;
         }
@@ -88,7 +94,12 @@ public class OpenSSLUtil extends SSLUtilBase {
                 return (X509KeyManager) manager;
             }
         }
-        throw new IllegalStateException(sm.getString("openssl.keyManagerMissing"));
+        if (throwOnMissing) {
+            throw new IllegalStateException(sm.getString("openssl.keyManagerMissing"));
+        }
+
+        log.warn(sm.getString("openssl.keyManagerMissing.warn"));
+        return null;
     }
 
 
