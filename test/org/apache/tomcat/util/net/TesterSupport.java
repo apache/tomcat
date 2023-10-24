@@ -240,8 +240,8 @@ public final class TesterSupport {
     public static void configureSSLImplementation(Tomcat tomcat, String sslImplementationName) {
         try {
             Class.forName(sslImplementationName);
-        } catch (Exception e) {
-            Assume.assumeNoException(e);
+        } catch (Throwable t) {
+            Assume.assumeNoException(t);
         }
         Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
     }
