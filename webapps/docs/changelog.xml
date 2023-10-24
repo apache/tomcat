@@ -136,6 +136,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Correct missing metadata int he MANIFEST of the for WebSocket client API
+        JAR file. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
