@@ -69,9 +69,23 @@ output/deployer/deployer-howto.html
 **/MANIFEST.MF
 **/*.manifest
 
-output/dist/webapps/docs/*/package-list
+output/dist/webapps/docs/*/copy.svg
+output/dist/webapps/docs/*/element-list
+output/dist/webapps/docs/*/jquery/**
+output/dist/webapps/docs/*/legal/**
+output/dist/webapps/docs/*/member-search-index.js
+output/dist/webapps/docs/*/module-search-index.js
+output/dist/webapps/docs/*/package-search-index.js
 output/dist/webapps/docs/*/script.js
+output/dist/webapps/docs/*/script-dir/**
+output/dist/webapps/docs/*/search.js
+output/dist/webapps/docs/*/search-page.js
+output/dist/webapps/docs/*/tag-search-index.js
+output/dist/webapps/docs/*/type-search-index.js
 
+output/dist/src/test/org/apache/tomcat/util/net/jsse/key-password
+output/dist/src/test/org/apache/tomcat/util/net/key-password
+output/dist/src/test/org/apache/tomcat/util/net/keystore-password
 output/dist/src/test/webapp/404.html
 output/dist/src/test/webapp/index.html.br
 output/dist/src/test/webapp/bug49nnn/bug49464-cp1252.txt
@@ -81,10 +95,15 @@ output/dist/src/test/webapp/bug49nnn/bug49464-utf-8-bom.txt
 output/dist/src/test/webapp/bug49nnn/bug49464-utf-8.txt
 output/dist/src/test/webapp/bug53257/*.txt
 output/dist/src/test/webapp/bug53257/foo bar/foobar.txt
+output/dist/src/test/webapp/bug66609/a&a.txt
+output/dist/src/test/webapp/bug66609/b'b.txt
 output/dist/src/test/webapp-fragments/WEB-INF/classes/*.txt
 output/dist/src/test/webresources/dir1/d1/d1-f1.txt
 output/dist/src/test/webresources/dir1/d2/d2-f1.txt
 output/dist/src/test/webresources/dir1/*.txt
+test/org/apache/tomcat/util/net/jsse/key-password
+test/org/apache/tomcat/util/net/key-password
+test/org/apache/tomcat/util/net/keystore-password
 test/webapp/404.html
 test/webapp/index.html.br
 test/webapp/bug49nnn/bug49464-cp1252.txt
@@ -94,6 +113,8 @@ test/webapp/bug49nnn/bug49464-utf-8-bom.txt
 test/webapp/bug49nnn/bug49464-utf-8.txt
 test/webapp/bug53257/*.txt
 test/webapp/bug53257/foo bar/foobar.txt
+test/webapp/bug66609/a&a.txt
+test/webapp/bug66609/b'b.txt
 test/webapp-fragments/WEB-INF/classes/*.txt
 test/webresources/dir1/d1/d1-f1.txt
 test/webresources/dir1/d2/d2-f1.txt
@@ -105,9 +126,9 @@ test/webresources/dir1/*.txt
 build.properties
 res/maven/mvn.properties
 
-output/dist/confinstall/tomcat-users_2.xml
-output/dist/src/res/confinstall/tomcat-users_2.xml
-res/confinstall/tomcat-users_2.xml
+output/dist/src/res/install-win/tomcat-users_2.xml
+output/dist/tomcat-users_2.xml
+res/install-win/tomcat-users_2.xml
 
 java/javax/servlet/resources/javaee_5.xsd
 java/javax/servlet/resources/javaee_6.xsd
