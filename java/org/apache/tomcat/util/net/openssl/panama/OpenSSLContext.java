@@ -70,6 +70,7 @@ import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
+import org.apache.tomcat.util.net.openssl.OpenSSLUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
@@ -576,9 +577,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
             }
 
-            if (certificate.getCertificateFile() == null) {
-                certificate.setCertificateKeyManager(OpenSSLUtil.chooseKeyManager(kms));
-            }
+            // If there is no certificate file must be using a KeyStore so a KeyManager is required.
+            // If there is a certificate file a KeyManager is helpful but not strictly necessary.
+            certificate.setCertificateKeyManager(
+                    OpenSSLUtil.chooseKeyManager(kms, certificate.getCertificateFile() == null));
 
             success = addCertificate(certificate, localArena);
 
