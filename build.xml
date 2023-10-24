@@ -2366,6 +2366,8 @@
         <include name="org/**"/>
         <exclude name="org/apache/el/parser/**"/>
         <exclude name="org/apache/tomcat/util/json/**"/>
+        <exclude name="org/apache/tomcat/util/net/openssl/panama/**"/>
+        <exclude name="org/apache/tomcat/util/openssl/**"/>
       </packageset>
       <!--jdbc-pool src files for javadoc-->
       <packageset dir="${tomcat.dist}/src/modules/jdbc-pool/src/main/java"/>
@@ -2654,6 +2656,10 @@ skip.installer property in build.properties" />
         <not><javaversion atleast="${release.java.version}" /></not>
       </condition>
     </fail>-->
+    <condition property="no-ffm">
+      <not><javaversion atleast="${release.java.version}" /></not>
+    </condition>
+  	<echo level="error" if:set="no-ffm">JAVA VERSION 22 OR NEWER IS REQUIRED FOR RELEASE</echo>
   </target>
 
   <target name="-pre-release-lone-target-check">
