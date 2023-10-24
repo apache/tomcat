@@ -66,6 +66,7 @@ import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.jsse.JSSEImplementation;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 
 public final class TesterSupport {
 
@@ -240,8 +241,16 @@ public final class TesterSupport {
     public static void configureSSLImplementation(Tomcat tomcat, String sslImplementationName) {
         try {
             Class.forName(sslImplementationName);
+            if ("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation".equals(sslImplementationName)) {
+                Class<?> openSSLLibraryClass = Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
+                openSSLLibraryClass.getMethod("init").invoke(null);
+                Assume.assumeTrue(OpenSSLStatus.isAvailable());
+            }
         } catch (Throwable t) {
-            Assume.assumeNoException(t);
+            while (t.getCause() != null) {
+                t = t.getCause();
+            }
+            Assume.assumeFalse(t.getMessage(), Boolean.TRUE);
         }
         Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
     }
