@@ -73,11 +73,6 @@ public class OpenSSLUtil extends SSLUtilBase {
         return new OpenSSLContext(certificate, negotiableProtocols);
     }
 
-    @Deprecated
-    public static X509KeyManager chooseKeyManager(KeyManager[] managers) throws Exception {
-        return chooseKeyManager(managers, true);
-    }
-
 
     public static X509KeyManager chooseKeyManager(KeyManager[] managers, boolean throwOnMissing) throws Exception {
         if (managers == null) {
