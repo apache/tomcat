@@ -334,9 +334,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // List the ciphers that the client is permitted to negotiate
             SSLContext.setCipherSuite(state.ctx, sslHostConfig.getCiphers());
 
-            if (certificate.getCertificateFile() == null) {
-                certificate.setCertificateKeyManager(OpenSSLUtil.chooseKeyManager(kms));
-            }
+            // If there is no certificate file must be using a KeyStore so a KeyManager is required.
+            // If there is a certificate file a KeyManager is helpful but not strictly necessary.
+            certificate.setCertificateKeyManager(
+                    OpenSSLUtil.chooseKeyManager(kms, certificate.getCertificateFile() == null));
 
             addCertificate(certificate);
 
