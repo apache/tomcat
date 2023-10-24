@@ -108,6 +108,7 @@
   <property name="compile.release" value="21"/>
   <property name="min.java.version" value="21"/>
   <property name="build.java.version" value="21"/>
+  <property name="release.java.version" value="22"/>
 
   <!-- Check Java Build Version -->
   <fail message="Java version ${build.java.version} or newer is required (${java.version} is installed)">
@@ -246,7 +247,6 @@
     <pathelement location="${derby.jar}"/>
     <pathelement location="${derby-shared.jar}"/>
     <pathelement location="${derby-tools.jar}"/>
-    <pathelement location="${openssl-lib.jar}"/>
     <path refid="compile.classpath" />
     <path refid="tomcat.classpath" />
   </path>
@@ -449,6 +449,7 @@
     <exclude name="org/apache/tomcat/util/log" />
     <exclude name="org/apache/tomcat/util/modeler" />
     <exclude name="org/apache/tomcat/util/net" />
+    <exclude name="org/apache/tomcat/util/openssl"/>
     <exclude name="org/apache/tomcat/util/scan" />
   </patternset>
 
@@ -533,6 +534,7 @@
     <include name="org/apache/tomcat/util/json/**" />
     <include name="org/apache/tomcat/util/log/**" />
     <include name="org/apache/tomcat/util/net/**" />
+    <include name="org/apache/tomcat/util/openssl/**"/>
     <include name="org/apache/tomcat/util/res/**" />
     <include name="org/apache/tomcat/util/security/**" />
     <include name="org/apache/tomcat/util/threads/**" />
@@ -744,6 +746,7 @@
     <include name="org/apache/tomcat/util/log/**" />
     <include name="org/apache/tomcat/util/modeler/**" />
     <include name="org/apache/tomcat/util/net/**" />
+    <include name="org/apache/tomcat/util/openssl/**"/>
   </patternset>
 
   <patternset id="files.jasper">
@@ -883,6 +886,7 @@
         <exclude name="java/org/apache/el/parser/ELParser*.java" />
         <exclude name="java/org/apache/el/parser/Node.java" />
         <exclude name="java/org/apache/tomcat/util/json/JSONParser*.java" />
+        <exclude name="java/org/apache/tomcat/util/openssl/*.java" />
         <exclude name="**/*.jj" />
         <exclude name="java/org/apache/**/JJT*ParserState.java" />
         <exclude name="java/org/apache/**/ParseException.java" />
@@ -1001,6 +1005,26 @@
       <compilerarg value="-Xlint:unchecked"/>
       -->
       <classpath refid="compile.classpath" />
+      <exclude name="org/apache/tomcat/util/net/openssl/panama/**"/>
+      <exclude name="org/apache/tomcat/util/openssl/**"/>
+    </javac>
+    <!-- Compile internal server components that use FFM -->
+    <condition property="has-ffm">
+      <javaversion atleast="${release.java.version}" />
+    </condition>
+    <javac srcdir="java" destdir="${tomcat.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           release="${release.java.version}"
+           encoding="ISO-8859-1"
+           includeAntRuntime="true"
+           if:set="has-ffm" >
+      <!-- Uncomment this to show unchecked warnings:
+      <compilerarg value="-Xlint:unchecked"/>
+      -->
+      <classpath refid="compile.classpath" />
+      <include name="org/apache/tomcat/util/net/openssl/panama/**"/>
+      <include name="org/apache/tomcat/util/openssl/**"/>
     </javac>
     <!-- Copy static resource files -->
     <copy todir="${tomcat.classes}" encoding="UTF-8">
@@ -1536,19 +1560,6 @@
     </delete>
     <copy file="${migration-lib.jar}" todir="${tomcat.build}/lib"/>
 
-    <!-- Delete all other versions of OpenSSL support for Tomcat and copy the current one -->
-    <!-- After module release
-    <local name="openssl-lib.jar.filename" />
-    <basename property="openssl-lib.jar.filename" file="${openssl-lib.jar}"/>
-    <delete verbose="true">
-      <fileset dir="${tomcat.build}/lib">
-        <include name="tomcat-coyote-openssl-*.jar"/>
-        <exclude name="${openssl-lib.jar.filename}"/>
-      </fileset>
-    </delete>
-    <copy file="${openssl-lib.jar}" todir="${tomcat.build}/lib"/>
-    -->
-
     <!-- Add sources for examples -->
     <antcall target="examples-sources" />
   </target>
@@ -1984,9 +1995,8 @@
   <!-- Set native specific properties -->
   <property name="native.nativeaccess" value="--enable-native-access=ALL-UNNAMED"/>
   <condition property="runtests.librarypath" value="-Dtest.4=4">
-    <resourceexists>
-      <file file="${openssl-lib.jar}"/>
-    </resourceexists>
+    <!-- TODO: Find something better here, but the library path would conflict between tomcat-native and OpenSSL FFM -->
+    <javaversion atleast="${release.java.version}" />
   </condition>
   <property name="runtests.librarypath" value="-Djava.library.path=${test.apr.loc}"/>
   <property name="opens.javalang" value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
@@ -2637,6 +2647,14 @@ skip.installer property in build.properties" />
     <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe" />
   </target>
 
+  <target name="-release-java-check">
+    <fail message="Java version ${release.java.version} or newer is required for release (${java.version} is installed)">
+      <condition>
+        <not><javaversion atleast="${release.java.version}" /></not>
+      </condition>
+    </fail>
+  </target>
+
   <target name="-pre-release-lone-target-check">
     <fail message="The pre-release target must be called all on its own. Specifically, you must run 'ant release' /after/ 'ant pre-release' in order to properly configure the build.">
       <condition>
@@ -2651,7 +2669,7 @@ skip.installer property in build.properties" />
     <input message="Enter ASF username" addproperty="release.asfusername" defaultValue="${user.name}" />
   </target>
 
-  <target name="pre-release" depends="-pre-release-lone-target-check, -pre-release-read-asf-username"
+  <target name="pre-release" depends="-release-java-check,-pre-release-lone-target-check, -pre-release-read-asf-username"
       description="Prepares for a release build by writing build.properties.release which contains information about the release-build environment.">
     <antversion property="antversion"/>
     <echo file="build.properties.release"># -----------------------------------------------------------------------------
@@ -2778,7 +2796,7 @@ asf.ldap.username=${release.asfusername}
   </target>
 
   <!-- Sets properties only required for releases -->
-  <target name="release-init" depends="gpg-init-1,gpg-init-2,gpg-init-3,compile" >
+  <target name="release-init" depends="-release-java-check,gpg-init-1,gpg-init-2,gpg-init-3,compile" >
     <taskdef name="forceUtcTimeZone"
              classname="org.apache.tomcat.buildutil.ForceUtcTimeZone"
              classpath="${tomcat.classes}" />
