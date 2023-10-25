@@ -404,7 +404,7 @@ public class PEMFile {
                     byte[] oidPRF = p.parseOIDAsBytes();
                     String prf = OID_TO_PRF.get(HexUtils.toHexString(oidPRF));
                     if (prf == null) {
-                        throw new NoSuchAlgorithmException(sm.getString("pemFile.unknownPrfAlgorithm", prf));
+                        throw new NoSuchAlgorithmException(sm.getString("pemFile.unknownPrfAlgorithm", HexUtils.toHexString(oidPRF)));
                     }
                     p.parseNull();
 
