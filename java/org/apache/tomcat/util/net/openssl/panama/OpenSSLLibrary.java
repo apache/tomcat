@@ -74,10 +74,6 @@ public class OpenSSLLibrary {
 
     protected static final Object lock = new Object();
 
-    public OpenSSLLibrary() {
-        OpenSSLStatus.setInstanceCreated(true);
-    }
-
     static MemorySegment enginePointer = MemorySegment.NULL;
 
     static void initLibrary() {
