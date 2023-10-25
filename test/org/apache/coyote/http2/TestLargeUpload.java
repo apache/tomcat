@@ -30,7 +30,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -39,8 +38,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.core.AprLifecycleListener;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.tomcat.util.net.TesterSupport;
@@ -58,7 +55,7 @@ public class TestLargeUpload extends Http2TestBase {
                     "org.apache.tomcat.util.net.jsse.JSSEImplementation" });
             parameterSets.add(new Object[] { base[0], base[1], "OpenSSL", Boolean.TRUE,
                     "org.apache.tomcat.util.net.openssl.OpenSSLImplementation" });
-            parameterSets.add(new Object[] { base[0], base[1], "OpenSSL-FFM", Boolean.FALSE,
+            parameterSets.add(new Object[] { base[0], base[1], "OpenSSL-FFM", Boolean.TRUE,
                     "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" });
         }
 
@@ -162,13 +159,6 @@ public class TestLargeUpload extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
-
-        if (needApr) {
-            AprLifecycleListener listener = new AprLifecycleListener();
-            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
-            StandardServer server = (StandardServer) tomcat.getServer();
-            server.addLifecycleListener(listener);
-        }
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
     }
 }

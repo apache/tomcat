@@ -52,8 +52,6 @@ import org.junit.runners.Parameterized.Parameter;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
-import org.apache.catalina.core.AprLifecycleListener;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -76,7 +74,7 @@ public class TestSsl extends TomcatBaseTest {
         parameterSets.add(new Object[] {
                 "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
         parameterSets.add(new Object[] {
-                "OpenSSL-FFM", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+                "OpenSSL-FFM", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
 
         return parameterSets;
     }
@@ -102,14 +100,7 @@ public class TestSsl extends TomcatBaseTest {
         ctxt.addApplicationListener(WsContextListener.class.getName());
 
         TesterSupport.initSsl(tomcat);
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
-
-        if (needApr) {
-            AprLifecycleListener listener = new AprLifecycleListener();
-            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
-            StandardServer server = (StandardServer) tomcat.getServer();
-            server.addLifecycleListener(listener);
-        }
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
@@ -136,14 +127,7 @@ public class TestSsl extends TomcatBaseTest {
         Connector connector = tomcat.getConnector();
         // Increase timeout as default (3s) can be too low for some CI systems
         Assert.assertTrue(connector.setProperty("connectionTimeout", "20000"));
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
-
-        if (needApr) {
-            AprLifecycleListener listener = new AprLifecycleListener();
-            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
-            StandardServer server = (StandardServer) tomcat.getServer();
-            server.addLifecycleListener(listener);
-        }
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
 
         Context ctxt = tomcat.addContext("", null);
         Tomcat.addServlet(ctxt, "post", new SimplePostServlet());
@@ -226,14 +210,7 @@ public class TestSsl extends TomcatBaseTest {
         TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS,
                 TesterSupport.JKS_PASS, null, TesterSupport.JKS_KEY_PASS, null);
 
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
-
-        if (needApr) {
-            AprLifecycleListener listener = new AprLifecycleListener();
-            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
-            StandardServer server = (StandardServer) tomcat.getServer();
-            server.addLifecycleListener(listener);
-        }
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
@@ -270,17 +247,10 @@ public class TestSsl extends TomcatBaseTest {
 
         TesterSupport.initSsl(tomcat);
 
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
 
         Assume.assumeTrue("SSL renegotiation has to be supported for this test",
                 TesterSupport.isClientRenegotiationSupported(getTomcatInstance()));
-
-        if (needApr) {
-            AprLifecycleListener listener = new AprLifecycleListener();
-            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
-            StandardServer server = (StandardServer) tomcat.getServer();
-            server.addLifecycleListener(listener);
-        }
 
         Context root = tomcat.addContext("", TEMP_DIR);
         Wrapper w =
