@@ -1199,6 +1199,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
                 // Set certificate chain file
                 if (certificate.getCertificateChainFile() != null) {
+                    // FIXME: Ideally this should be loaded in Java but still processed through OpenSSL
                     var certificateChainFileNative =
                             localArena.allocateFrom(SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()));
                     // SSLContext.setCertificateChainFile(state.ctx,
