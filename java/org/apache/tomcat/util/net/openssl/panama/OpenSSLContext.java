@@ -43,6 +43,7 @@ import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLEngine;
@@ -1461,9 +1462,20 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             this.negotiableProtocols = negotiableProtocols;
             // Use another arena to avoid keeping a reference through segments
             // This also allows making further accesses to the main pointers safer
-            this.sslCtx = sslCtx.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena, null);
+            this.sslCtx = sslCtx.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena,
+                    new Consumer<MemorySegment>() {
+                        @Override
+                        public void accept(MemorySegment t) {
+                            SSL_CTX_free(t);
+                        }});
             if (!MemorySegment.NULL.equals(confCtx)) {
-                this.confCtx = confCtx.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena, null);
+                this.confCtx = confCtx.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena,
+                        new Consumer<MemorySegment>() {
+                            @Override
+                            public void accept(MemorySegment t) {
+                                SSL_CONF_CTX_free(t);
+                            }
+                });
             } else {
                 this.confCtx = null;
             }
@@ -1471,15 +1483,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
         @Override
         public void run() {
-            try {
-                states.remove(Long.valueOf(sslCtx.address()));
-                SSL_CTX_free(sslCtx);
-                if (confCtx != null) {
-                    SSL_CONF_CTX_free(confCtx);
-                }
-            } finally {
-                stateArena.close();
-            }
+            states.remove(Long.valueOf(sslCtx.address()));
+            stateArena.close();
         }
     }
 }
