@@ -94,7 +94,7 @@ public class RecordELResolver extends ELResolver {
      * @param base     The {@link Record} to analyze.
      * @param property The name of the property to analyze. Will be coerced to a String.
      *
-     * @return Always {@null}
+     * @return Always {@code null}
      *
      * @throws NullPointerException      if the provided {@link ELContext} is {@code null}.
      * @throws PropertyNotFoundException if the {@code base} is an instance of {@link Record} and the specified property
