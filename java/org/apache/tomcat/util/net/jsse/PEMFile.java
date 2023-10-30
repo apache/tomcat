@@ -56,6 +56,8 @@ import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.res.StringManager;
+import org.ietf.jgss.GSSException;
+import org.ietf.jgss.Oid;
 
 /**
  * RFC 1421 PEM file containing X509 certificates or private keys.
@@ -373,7 +375,7 @@ public class PEMFile {
                      */
                     if (!Arrays.equals(oidEncryptionAlgorithm, OID_PBES2)) {
                         throw new NoSuchAlgorithmException(sm.getString("pemFile.unknownPkcs8Algorithm",
-                                HexUtils.toHexString(oidEncryptionAlgorithm)));
+                                toDottedOidString(oidEncryptionAlgorithm)));
                     }
 
                     // PBES2-params
@@ -386,7 +388,7 @@ public class PEMFile {
                     byte[] oidKDF = p.parseOIDAsBytes();
                     if (!Arrays.equals(oidKDF, OID_PBKDF2)) {
                         throw new NoSuchAlgorithmException(
-                                sm.getString("pemFile.notPbkdf2", HexUtils.toHexString(oidKDF)));
+                                sm.getString("pemFile.notPbkdf2", toDottedOidString(oidKDF)));
                     }
 
                     // PBES2 KDF-params
@@ -404,7 +406,7 @@ public class PEMFile {
                     byte[] oidPRF = p.parseOIDAsBytes();
                     String prf = OID_TO_PRF.get(HexUtils.toHexString(oidPRF));
                     if (prf == null) {
-                        throw new NoSuchAlgorithmException(sm.getString("pemFile.unknownPrfAlgorithm", HexUtils.toHexString(oidPRF)));
+                        throw new NoSuchAlgorithmException(sm.getString("pemFile.unknownPrfAlgorithm", toDottedOidString(oidPRF)));
                     }
                     p.parseNull();
 
@@ -415,7 +417,7 @@ public class PEMFile {
                     Algorithm algorithm = OID_TO_ALGORITHM.get(HexUtils.toHexString(oidCipher));
                     if (algorithm == null) {
                         throw new NoSuchAlgorithmException(
-                                sm.getString("pemFile.unknownEncryptionAlgorithm", HexUtils.toHexString(oidCipher)));
+                                sm.getString("pemFile.unknownEncryptionAlgorithm", toDottedOidString(oidCipher)));
                     }
 
                     byte[] iv = p.parseOctetString();
@@ -621,6 +623,16 @@ public class PEMFile {
                         Character.digit(hexString.charAt(i + 1), 16));
             }
             return bytes;
+        }
+
+
+        private String toDottedOidString(byte[] oidBytes) {
+            try {
+                Oid oid = new Oid(oidBytes);
+                return oid.toString();
+            } catch (GSSException e) {
+                return HexUtils.toHexString(oidBytes);
+            }
         }
     }
 

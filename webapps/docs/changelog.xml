@@ -120,6 +120,10 @@
         Optionally allow ServiceBindingPropertySource to trim a trailing newline
         from a file containing a property-value. (schultz)
       </update>
+      <update>
+        <bug>67926</bug>: <code>PEMFile</code> prints unidentifiable string representation
+         of ASN.1 OIDs. (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
