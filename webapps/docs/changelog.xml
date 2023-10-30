@@ -125,6 +125,10 @@
         support a broader range of environments, and to give better information
         in the event of a failure. (schultz)
       </update>
+      <update>
+        <bug>67926</bug>: <code>PEMFile</code> prints unidentifiable string representation
+         of ASN.1 OIDs. (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
