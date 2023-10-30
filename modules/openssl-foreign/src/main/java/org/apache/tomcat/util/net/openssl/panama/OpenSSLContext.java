@@ -600,12 +600,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 break;
             }
 
-            // SSLContext.setVerify(state.ctx, value, sslHostConfig.getCertificateVerificationDepth());
-            if (SSL_CTX_set_default_verify_paths(state.sslCtx) > 0) {
-                var store = SSL_CTX_get_cert_store(state.sslCtx);
-                X509_STORE_set_flags(store, 0);
-            }
-
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
             var openSSLCallbackVerify =
                     Linker.nativeLinker().upcallStub(openSSLCallbackVerifyHandle,
