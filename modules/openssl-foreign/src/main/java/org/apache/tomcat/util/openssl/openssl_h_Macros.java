@@ -189,6 +189,48 @@ public class openssl_h_Macros {
         return BIO_ctrl(bio, BIO_CTRL_RESET(), 0, MemorySegment.NULL);
     }
 
+
+    /**
+     * Set NIDs of groups in preference order. 
+     * # define SSL_CTX_set1_curves           SSL_CTX_set1_groups
+     * # define SSL_CTX_set1_groups(ctx, glist, glistlen) \
+     *          SSL_CTX_ctrl(ctx,SSL_CTRL_SET_GROUPS,glistlen,(int *)(glist))
+     * @param sslCtx the SSL context
+     * @param groupsList the groups list
+     * @param listLength the list length
+     * @return > 0 if successful
+     */
+    public static long SSL_CTX_set1_groups(MemorySegment sslCtx, MemorySegment groupsList, int listLength) {
+        return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_GROUPS(), listLength, groupsList);
+    }
+
+
+    /**
+     * Pass a path from which certificates are loaded into the store.
+     * # define X509_LOOKUP_add_dir(x,name,type) \
+     *          X509_LOOKUP_ctrl((x),X509_L_ADD_DIR,(name),(long)(type),NULL)
+     * @param x509Lookup the X509 lookup
+     * @param name the path name
+     * @param type the type used
+     * @return > 0 if successful
+     */
+    public static long X509_LOOKUP_add_dir(MemorySegment x509Lookup, MemorySegment name, long type) {
+        return X509_LOOKUP_ctrl(x509Lookup, X509_L_ADD_DIR(), name, X509_FILETYPE_PEM(), MemorySegment.NULL);
+    }
+
+    /**
+     * Pass a file which will be loaded into the store.
+     * # define X509_LOOKUP_load_file(x,name,type) \
+     *          X509_LOOKUP_ctrl((x),X509_L_FILE_LOAD,(name),(long)(type),NULL)
+     * @param x509Lookup
+     * @param name
+     * @param type
+     * @return
+     */
+    public static long X509_LOOKUP_load_file(MemorySegment x509Lookup, MemorySegment name, long type) {
+        return X509_LOOKUP_ctrl(x509Lookup, X509_L_FILE_LOAD(), name, X509_FILETYPE_PEM(), MemorySegment.NULL);
+    }
+
 }
 
 
