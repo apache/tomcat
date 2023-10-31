@@ -1182,8 +1182,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     if (!MemorySegment.NULL.equals(ecparams)) {
                         int curveNid = EC_GROUP_get_curve_name(ecparams);
                         var curveNidAddress = localArena.allocateFrom(ValueLayout.JAVA_INT, curveNid);
-                        // SSL_CTX_set1_curves(state.sslCtx, &curveNid, 1)
-                        if (SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_GROUPS(), 1, curveNidAddress) <= 0) {
+                        if (SSL_CTX_set1_groups(state.sslCtx, curveNidAddress, 1) <= 0) {
                             curveNid = 0;
                         }
                         if (log.isDebugEnabled()) {
@@ -1192,9 +1191,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         EC_GROUP_free(ecparams);
                     }
                 }
+                // FIXME: Ideally these should be loaded in Java but still processed through OpenSSL
                 // Set certificate chain file
                 if (certificate.getCertificateChainFile() != null) {
-                    // FIXME: Ideally this should be loaded in Java but still processed through OpenSSL
                     var certificateChainFileNative =
                             localArena.allocateFrom(SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()));
                     // SSLContext.setCertificateChainFile(state.ctx,
@@ -1214,9 +1213,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     MemorySegment x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_file());
                     var certificateRevocationListFileNative =
                             localArena.allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListFile()));
-                    //X509_LOOKUP_ctrl(lookup,X509_L_FILE_LOAD,file,type,NULL)
-                    if (X509_LOOKUP_ctrl(x509Lookup, X509_L_FILE_LOAD(), certificateRevocationListFileNative,
-                            X509_FILETYPE_PEM(), MemorySegment.NULL) <= 0) {
+                    if (X509_LOOKUP_load_file(x509Lookup, certificateRevocationListFileNative,
+                            X509_FILETYPE_PEM()) <= 0) {
                         log.error(sm.getString("openssl.errorLoadingCertificateRevocationList", sslHostConfig.getCertificateRevocationListFile()));
                     }
                 }
@@ -1224,9 +1222,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     MemorySegment x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_hash_dir());
                     var certificateRevocationListPathNative =
                             localArena.allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListPath()));
-                    //X509_LOOKUP_ctrl(lookup,X509_L_ADD_DIR,path,type,NULL)
-                    if (X509_LOOKUP_ctrl(x509Lookup, X509_L_ADD_DIR(), certificateRevocationListPathNative,
-                            X509_FILETYPE_PEM(), MemorySegment.NULL) <= 0) {
+                    if (X509_LOOKUP_add_dir(x509Lookup, certificateRevocationListPathNative,
+                            X509_FILETYPE_PEM()) <= 0) {
                         log.error(sm.getString("openssl.errorLoadingCertificateRevocationList", sslHostConfig.getCertificateRevocationListPath()));
                     }
                 }
