@@ -937,7 +937,7 @@ public class Http11Processor extends AbstractProcessor {
         } else {
             // If the response code supports an entity body and we're on
             // HTTP 1.1 then we chunk unless we have a Connection: close header
-            if (http11 && entityBody && !connectionClosePresent) {
+            if (http11 && entityBody && (!connectionClosePresent || isChunked(headers))) {
                 outputBuffer.addActiveFilter(outputFilters[Constants.CHUNKED_FILTER]);
                 contentDelimitation = true;
                 headers.addValue(Constants.TRANSFERENCODING).setString(Constants.CHUNKED);
@@ -1069,6 +1069,17 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         outputBuffer.commit();
+    }
+
+    /**
+     * Checks if the given headers indicate chunked transfer encoding.
+     *
+     * @param headers The MimeHeaders object containing the headers to check.
+     * @return {@code true} if the headers indicate chunked transfer encoding, {@code false} otherwise.
+     */
+    private static boolean isChunked(MimeHeaders headers) {
+        MessageBytes transferEncoding = headers.getValue(Constants.TRANSFERENCODING);
+        return transferEncoding != null && Constants.CHUNKED.equals(transferEncoding.getString());
     }
 
     private static boolean isConnectionToken(MimeHeaders headers, String token) throws IOException {
