@@ -124,6 +124,11 @@
         <bug>67926</bug>: <code>PEMFile</code> prints unidentifiable string representation
          of ASN.1 OIDs. (michaelo)
       </update>
+      <fix>
+        <bug>66875</bug>: Ensure that setting the request attribute
+        <code>jakarta.servlet.error.exception</code> is not sufficient to
+        trigger error handling for the current request and response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
