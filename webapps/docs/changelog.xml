@@ -108,8 +108,9 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        <bug>67667</bug>: <code>TLSCertificateReloadListener</code> prints unreadable
-        rendering of <code>X509Certificate#getNotAfter()</code>. (michaelo)
+        <bug>67667</bug>: <code>TLSCertificateReloadListener</code> prints
+        unreadable rendering of <code>X509Certificate#getNotAfter()</code>.
+        (michaelo)
       </fix>
       <update>
         The status servlet included in the manager webapp can now output
@@ -121,8 +122,8 @@
         from a file containing a property-value. (schultz)
       </update>
       <update>
-        <bug>67926</bug>: <code>PEMFile</code> prints unidentifiable string representation
-         of ASN.1 OIDs. (michaelo)
+        <bug>67926</bug>: <code>PEMFile</code> prints unidentifiable string
+        representation of ASN.1 OIDs. (michaelo)
       </update>
       <fix>
         <bug>66875</bug>: Ensure that setting the request attribute
@@ -134,7 +135,8 @@
   <subsection name="Coyote">
     <changelog>
       <add>
-        <bug>66670</bug>: Add <code>SSLHostConfig#certificateKeyPasswordFile</code> and
+        <bug>66670</bug>: Add
+        <code>SSLHostConfig#certificateKeyPasswordFile</code> and
         <code>SSLHostConfig#certificateKeystorePasswordFile</code>. (michaelo)
       </add>
       <add>
