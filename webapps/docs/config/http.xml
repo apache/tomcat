@@ -1361,11 +1361,19 @@
       documentation for the list of ciphers supported and the syntax).
       Alternatively, a comma separated list of ciphers using the standard
       OpenSSL cipher names or the standard JSSE cipher names may be used.</p>
-      <p>When converting from OpenSSL syntax to JSSE ciphers for JSSE based
-      connectors, the behaviour of the OpenSSL syntax parsing is kept aligned
-      with the behaviour of the OpenSSL 1.1.0 development branch.</p>
+      <p>Different versions of OpenSSL may interpret the same cipher string
+      differently. For example, the <code>CCM8</code> ciphers were moved from
+      <code>HIGH</code> to <code>MEDIUM</code> in OpenSSL 3.2. Regardless of
+      the OpenSSL or JSSE version used, Tomcat converts the provided cipher
+      value to a list of ciphers in a manner consistent with the latest OpenSSL
+      development branch. This list of ciphers is then passed to the SSL
+      implementation.</p>
       <p>Only the ciphers that are supported by the SSL implementation will be
-      used.</p>
+      used. Any ciphers in the list derived from a non-default cipher string
+      that are not supported by the SSL implementation will be logged in a
+      <code>WARNING</code> message when the Connector starts. The warning can be
+      avoided by providing an explicit list of ciphers that are supported by the
+      configured SSL implementation.</p>
       <p>If not specified, a default (using the OpenSSL notation) of
       <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA</code> will be
       used.</p>
