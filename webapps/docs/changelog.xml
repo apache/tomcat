@@ -187,7 +187,11 @@
         Update SpotBugs to 4.8.0. (markt)
       </update>
       <update>
-        Update BDN to 7.0.0. (markt)
+        Update BND to 7.0.0. (markt)
+      </update>
+      <update>
+        The minimum Java version required to build Tomcat has been raised to
+        Java 17. (markt)
       </update>
     </changelog>
   </subsection>
