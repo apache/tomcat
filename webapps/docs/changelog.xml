@@ -167,6 +167,9 @@
         <bug>67538</bug>: Make use of Ant's <code>&lt;javaversion /&gt;</code> task
         to enfore the mininum Java build version. (michaelo)
       </add>
+      <update>
+        Update Checkstyle to 10.12.4. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
