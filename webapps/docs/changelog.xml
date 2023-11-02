@@ -126,6 +126,12 @@
         support a broader range of environments, and to give better information
         in the event of a failure. (schultz)
       </update>
+      <fix>
+        <bug>67793</bug>: Ensure the original session timeout is restored after
+        FORM authentication if the user refreshes a page during the FORM
+        authentication process. Based on a suggestion by Mircea Butmalai.
+        (markt)
+      </fix>
       <update>
         <bug>67926</bug>: <code>PEMFile</code> prints unidentifiable string
         representation of ASN.1 OIDs. (michaelo)
