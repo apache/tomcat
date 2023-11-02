@@ -716,11 +716,21 @@ public class FormAuthenticator extends AuthenticatorBase {
         saved.setRequestURI(request.getRequestURI());
         saved.setDecodedRequestURI(request.getDecodedRequestURI());
 
-        if (session instanceof HttpSession && ((HttpSession) session).isNew()) {
-            int originalMaxInactiveInterval = session.getMaxInactiveInterval();
-            if (originalMaxInactiveInterval > getAuthenticationSessionTimeout()) {
-                saved.setOriginalMaxInactiveInterval(originalMaxInactiveInterval);
-                session.setMaxInactiveInterval(getAuthenticationSessionTimeout());
+        SavedRequest previousSavedRequest = (SavedRequest) session.getNote(Constants.FORM_REQUEST_NOTE);
+        if (session instanceof HttpSession) {
+            if (((HttpSession) session).isNew()) {
+                int originalMaxInactiveInterval = session.getMaxInactiveInterval();
+                if (originalMaxInactiveInterval > getAuthenticationSessionTimeout()) {
+                    saved.setOriginalMaxInactiveInterval(originalMaxInactiveInterval);
+                    session.setMaxInactiveInterval(getAuthenticationSessionTimeout());
+                }
+            } else if (previousSavedRequest != null && previousSavedRequest.getOriginalMaxInactiveInterval() > 0) {
+                /*
+                 * The user may have refreshed the browser page during authentication. Transfer the original max inactive
+                 * interval from previous saved request to current one else, once authentication is completed, the session
+                 * will retain the the shorter authentication session timeout
+                 */
+                saved.setOriginalMaxInactiveInterval(previousSavedRequest.getOriginalMaxInactiveInterval());
             }
         }
 
