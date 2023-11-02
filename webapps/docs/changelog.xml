@@ -173,6 +173,9 @@
       <update>
         Update JaCoCo to 0.8.11. (markt)
       </update>
+      <update>
+        Update SpotBugs to 4.8.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
