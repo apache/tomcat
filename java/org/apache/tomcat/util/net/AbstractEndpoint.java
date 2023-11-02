@@ -284,6 +284,9 @@ public abstract class AbstractEndpoint<S,U> {
         }
         if (replace) {
             SSLHostConfig previous = sslHostConfigs.put(key, sslHostConfig);
+            if (key.equals(getDefaultSSLHostConfigName())) {
+                setDefaultSslHostConfig(sslHostConfig);
+            }
             if (previous != null) {
                 unregisterJmx(sslHostConfig);
             }
@@ -372,6 +375,9 @@ public abstract class AbstractEndpoint<S,U> {
      *                   SSLHostConfig
      */
     protected abstract void createSSLContext(SSLHostConfig sslHostConfig) throws Exception;
+
+
+    protected abstract void setDefaultSslHostConfig(SSLHostConfig sslHostConfig);
 
 
     protected void logCertificate(SSLHostConfigCertificate certificate) {
