@@ -113,9 +113,9 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
 
     /**
-     * SSL context.
+     * Default SSL context. SNI callback may select a different SSL context.
      */
-    protected long sslContext = 0;
+    protected volatile long sslContext = 0;
 
 
     private int previousAcceptedPort = -1;
@@ -437,9 +437,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 throw new IllegalArgumentException(sm.getString("endpoint.noSslHostConfig",
                         getDefaultSSLHostConfigName(), getName()));
             }
-            Long defaultSSLContext = defaultSSLHostConfig.getOpenSslContext();
-            sslContext = defaultSSLContext.longValue();
-            SSLContext.registerDefault(defaultSSLContext, this);
+            setDefaultSslHostConfig(defaultSSLHostConfig);
 
             // For now, sendfile is not supported with SSL
             if (getUseSendfile()) {
@@ -503,6 +501,12 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         return 0;
     }
 
+
+    protected void setDefaultSslHostConfig(SSLHostConfig sslHostConfig) {
+        Long ctx = sslHostConfig.getOpenSslContext();
+        sslContext = ctx.longValue();
+        SSLContext.registerDefault(ctx, this);
+    }
 
 
     @Override

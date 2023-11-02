@@ -169,6 +169,10 @@
         than the combinations supported by the JVM by default. Specifically,
         support the OpenSSL default of HmacSHA256 and DES-EDE3-CBC. (markt)
       </fix>
+      <fix>
+        <bug>67927</bug>: Reloading TLS configuration can cause the Connector to
+        refuse new connections or the JVM to crash. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
