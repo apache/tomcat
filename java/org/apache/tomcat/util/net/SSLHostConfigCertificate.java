@@ -53,7 +53,7 @@ public class SSLHostConfigCertificate implements Serializable {
     // OpenSSL can handle multiple certs in a single config so the reference to
     // the context is at the virtual host level. JSSE can't so the reference is
     // held here on the certificate.
-    private transient SSLContext sslContext;
+    private transient volatile SSLContext sslContext;
 
     // Common
     private final SSLHostConfig sslHostConfig;
