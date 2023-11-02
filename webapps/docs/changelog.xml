@@ -141,6 +141,10 @@
         <code>jakarta.servlet.error.exception</code> is not sufficient to
         trigger error handling for the current request and response. (markt)
       </fix>
+      <fix>
+        <bug>68054</bug>: Avoid some file canonicalization calls introduced
+        by the fix for <bug>65433</bug>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
