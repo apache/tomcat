@@ -76,8 +76,10 @@ output/dist/webapps/docs/*/legal/**
 output/dist/webapps/docs/*/member-search-index.js
 output/dist/webapps/docs/*/module-search-index.js
 output/dist/webapps/docs/*/package-search-index.js
+output/dist/webapps/docs/*/resource-files/**
 output/dist/webapps/docs/*/script.js
 output/dist/webapps/docs/*/script-dir/**
+output/dist/webapps/docs/*/script-files/**
 output/dist/webapps/docs/*/search.js
 output/dist/webapps/docs/*/search-page.js
 output/dist/webapps/docs/*/tag-search-index.js
