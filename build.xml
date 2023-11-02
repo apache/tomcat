@@ -107,7 +107,7 @@
   <!-- Keep in sync with webapps/docs/tomcat-docs.xsl -->
   <property name="compile.release" value="11"/>
   <property name="min.java.version" value="11"/>
-  <property name="build.java.version" value="11"/>
+  <property name="build.java.version" value="17"/>
 
   <!-- Check Java Build Version -->
   <fail message="Java version ${build.java.version} or newer is required (${java.version} is installed)">
