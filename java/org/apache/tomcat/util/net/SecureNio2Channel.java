@@ -326,10 +326,6 @@ public class SecureNio2Channel extends Nio2Channel  {
                             handshakeStatus = tasks();
                         }
                     } else if (handshake.getStatus() == Status.BUFFER_UNDERFLOW) {
-                        if (netInBuffer.position() == netInBuffer.limit()) {
-                            //clear the buffer if we have emptied it out on data
-                            netInBuffer.clear();
-                        }
                         //read more data
                         if (async) {
                             sc.read(netInBuffer, AbstractEndpoint.toTimeout(timeout),
@@ -567,7 +563,12 @@ public class SecureNio2Channel extends Nio2Channel  {
             //call unwrap
             getBufHandler().configureReadBufferForWrite();
             result = sslEngine.unwrap(netInBuffer, getBufHandler().getReadBuffer());
-            //compact the buffer, this is an optional method, wonder what would happen if we didn't
+            /*
+             * ByteBuffer.compact() is an optional method but netInBuffer is created from either ByteBuffer.allocate()
+             * or ByteBuffer.allocateDirect() and the ByteBuffers returned by those methods do implement compact().
+             * The ByteBuffer must be in 'read from' mode when compact() is called and will be in 'write to' mode
+             * afterwards.
+             */
             netInBuffer.compact();
             //read in the status
             handshakeStatus = result.getHandshakeStatus();
