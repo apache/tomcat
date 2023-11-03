@@ -246,6 +246,7 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
     }
 
 
+    @Override
     protected void setDefaultSslHostConfig(SSLHostConfig sslHostConfig) {
         // NO-OP for JSSE
     }
