@@ -20,7 +20,7 @@ import java.io.File;
 
 public final class Library {
 
-    /* Default library names */
+    /* Default library names - use 2.x in preference to 1.x if both are available */
     private static final String [] NAMES = {"tcnative-2", "libtcnative-2", "tcnative-1", "libtcnative-1"};
     /* System property used to define CATALINA_HOME */
     private static final String CATALINA_HOME_PROP = "catalina.home";
