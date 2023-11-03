@@ -436,6 +436,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
     }
 
 
+    @Override
     protected void setDefaultSslHostConfig(SSLHostConfig sslHostConfig) {
         Long ctx = sslHostConfig.getOpenSslContext();
         sslContext = ctx.longValue();
