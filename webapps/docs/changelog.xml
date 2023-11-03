@@ -173,6 +173,11 @@
         <bug>67927</bug>: Reloading TLS configuration can cause the Connector to
         refuse new connections or the JVM to crash. (markt)
       </fix>
+      <fix>
+        <bug>67934</bug>: If both Tomcat Native 1.2.x and 2.0.x are available,
+        prefer 1.2.x since it supports the APR/Native connector whereas 2.0.x
+        does not. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
