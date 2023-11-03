@@ -72,6 +72,7 @@ output/deployer/deployer-howto.html
 output/dist/webapps/docs/*/copy.svg
 output/dist/webapps/docs/*/element-list
 output/dist/webapps/docs/*/jquery/**
+output/dist/webapps/docs/*/jquery-ui.overrides.css
 output/dist/webapps/docs/*/legal/**
 output/dist/webapps/docs/*/member-search-index.js
 output/dist/webapps/docs/*/module-search-index.js
