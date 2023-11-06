@@ -19,7 +19,9 @@ package org.apache.tomcat.jdbc.pool;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -137,6 +139,13 @@ public class ConnectionPool {
     private final AtomicLong reconnectedCount = new AtomicLong(0);
     private final AtomicLong removeAbandonedCount = new AtomicLong(0);
     private final AtomicLong releasedIdleCount = new AtomicLong(0);
+
+    /**
+     * Request boundaries
+     */
+    private volatile boolean requestBoundaryMethodsInitialised = false;
+    private Method beginRequest = null;
+    private Method endRequest = null;
 
     //===============================================================================
     //         PUBLIC METHODS
@@ -342,6 +351,14 @@ public class ConnectionPool {
                 connection = (Connection)proxyClassConstructor.newInstance(new Object[] { new DisposableConnectionFacade(handler) });
             } else {
                 connection = (Connection)proxyClassConstructor.newInstance(new Object[] {handler});
+            }
+            Connection underlyingConnection = con.getConnection();
+            if (hasRequestBoundaryMethods(underlyingConnection)) {
+                try {
+                    beginRequest.invoke(underlyingConnection);
+                } catch (InvocationTargetException | IllegalAccessException ex) {
+                    log.warn("Error calling beginRequest on connection", ex);
+                }
             }
             //return the connection
             return connection;
@@ -813,6 +830,28 @@ public class ConnectionPool {
     }
 
     /**
+     * If request boundaries are not initialised, checks if beginRequest and
+     * endRequest methods are implemented on connection object.
+     *
+     * @param connection The connection
+     * @return Returns true if connection is not null and connection  implements
+     * JDBC 4.3 beginRequest and endRequest methods
+     */
+    private boolean hasRequestBoundaryMethods(Connection connection) {
+        if (!requestBoundaryMethodsInitialised && connection != null) {
+            try {
+                beginRequest = connection.getClass().getMethod("beginRequest");
+                endRequest = connection.getClass().getMethod("endRequest");
+            } catch (NoSuchMethodException ex) {
+                // begin and end request not implemented, will not be invoked
+            } finally {
+                requestBoundaryMethodsInitialised = true;
+            }
+        }
+        return (connection != null && beginRequest != null && endRequest != null);
+    }
+
+    /**
      * Validates and configures a previously idle connection
      * @param now - timestamp
      * @param con - the connection to validate and configure
@@ -1027,6 +1066,14 @@ public class ConnectionPool {
                         con.clearWarnings();
                         con.setStackTrace(null);
                         con.setTimestamp(System.currentTimeMillis());
+                        Connection underlyingConnection = con.getConnection();
+                        if (hasRequestBoundaryMethods(underlyingConnection)) {
+                            try {
+                                endRequest.invoke(underlyingConnection);
+                            } catch (InvocationTargetException | IllegalAccessException ex) {
+                                log.warn("Error calling endRequest on connection", ex);
+                            }
+                        }
                         if (((idle.size()>=poolProperties.getMaxIdle()) && !poolProperties.isPoolSweeperEnabled()) || (!idle.offer(con))) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Connection ["+con+"] will be closed and not returned to the pool, idle["+idle.size()+"]>=maxIdle["+poolProperties.getMaxIdle()+"] idle.offer failed.");
