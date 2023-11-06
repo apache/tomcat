@@ -179,8 +179,13 @@
         does not. (markt)
       </fix>
       <fix>
-        <bug>67938</bug>: Correct handling of large TLS client hello messages that
-        were causing the TLS handshake to fail. (markt)
+        <bug>67938</bug>: Correct handling of large TLS client hello messages
+        that were causing the TLS handshake to fail. (markt)
+      </fix>
+      <fix>
+        <bug>68026</bug>: Convert selected <code>MessageByte</code> values to
+        String when first accessed to speed up subsequent accesses and reduce
+        garbage collection. (markt)
       </fix>
     </changelog>
   </subsection>

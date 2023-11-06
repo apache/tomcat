@@ -180,6 +180,30 @@ public final class MessageBytes implements Cloneable, Serializable {
         return strValue;
     }
 
+
+    /**
+     * Convert to String (if not already of the String type) and then return the String value.
+     *
+     * @return The current value as a String
+     */
+    public String toStringType() {
+        switch (type) {
+            case T_NULL:
+            case T_STR:
+                // No conversion required
+                break;
+            case T_BYTES:
+                setString(byteC.toString());
+                break;
+            case T_CHARS:
+                setString(charC.toString());
+                break;
+        }
+
+        return strValue;
+    }
+
+
     // ----------------------------------------
     /**
      * Return the type of the original content. Can be T_STR, T_BYTES, T_CHARS or T_NULL
