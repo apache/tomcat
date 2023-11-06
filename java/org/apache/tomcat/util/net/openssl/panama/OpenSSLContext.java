@@ -756,8 +756,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     // DH *(*tmp_dh_callback)(SSL *ssl, int is_export, int keylength)
     public static MemorySegment openSSLCallbackTmpDH(MemorySegment ssl, int isExport, int keylength) {
         var pkey = SSL_get_privatekey(ssl);
-        int type = (MemorySegment.NULL.equals(pkey)) ? EVP_PKEY_NONE()
-                : (OPENSSL_3 ? EVP_PKEY_get_base_id(pkey) : EVP_PKEY_base_id(pkey));
+        int type = (MemorySegment.NULL.equals(pkey)) ? EVP_PKEY_NONE() : EVP_PKEY_base_id(pkey);
         /*
          * OpenSSL will call us with either keylen == 512 or keylen == 1024
          * (see the definition of SSL_EXPORT_PKEYLENGTH in ssl_locl.h).
@@ -772,7 +771,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
          */
         int keylen = 0;
         if (type == EVP_PKEY_RSA() || type == EVP_PKEY_DSA()) {
-            keylen = (OPENSSL_3 ? EVP_PKEY_get_bits(pkey) : EVP_PKEY_bits(pkey));
+            keylen = EVP_PKEY_bits(pkey);
         }
         for (int i = 0; i < OpenSSLLibrary.dhParameters.length; i++) {
             if (keylen >= OpenSSLLibrary.dhParameters[i].min) {
@@ -850,7 +849,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
                 MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
                 certificateChain[i] = buf.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
-                CRYPTO_free(buf, MemorySegment.NULL, 0); // OPENSSL_free macro
+                OPENSSL_free(buf);
             }
             MemorySegment cipher = SSL_get_current_cipher(ssl);
             String authMethod = (MemorySegment.NULL.equals(cipher)) ? "UNKNOWN"
