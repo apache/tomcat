@@ -903,8 +903,7 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
 
-        MessageBytes methodMB = request.method();
-        if (methodMB.equals("HEAD")) {
+        if (request.method().equals("HEAD")) {
             // No entity body
             outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
             contentDelimitation = true;
