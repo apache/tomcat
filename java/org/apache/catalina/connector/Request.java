@@ -1112,7 +1112,7 @@ public class Request implements HttpServletRequest {
      */
     @Override
     public String getProtocol() {
-        return coyoteRequest.protocol().toString();
+        return coyoteRequest.protocol().toStringType();
     }
 
 
@@ -1334,7 +1334,7 @@ public class Request implements HttpServletRequest {
      */
     @Override
     public String getScheme() {
-        return coyoteRequest.scheme().toString();
+        return coyoteRequest.scheme().toStringType();
     }
 
 
@@ -2167,7 +2167,7 @@ public class Request implements HttpServletRequest {
      */
     @Override
     public String getMethod() {
-        return coyoteRequest.method().toString();
+        return coyoteRequest.method().toStringType();
     }
 
 
@@ -2176,7 +2176,7 @@ public class Request implements HttpServletRequest {
      */
     @Override
     public String getPathInfo() {
-        return mappingData.pathInfo.toString();
+        return mappingData.pathInfo.toStringType();
     }
 
 
@@ -2261,7 +2261,7 @@ public class Request implements HttpServletRequest {
      */
     @Override
     public String getServletPath() {
-        return mappingData.wrapperPath.toString();
+        return mappingData.wrapperPath.toStringType();
     }
 
 
