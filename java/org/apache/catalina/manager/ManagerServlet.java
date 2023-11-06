@@ -932,25 +932,33 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                             writer.println(smClient.getString("managerServlet.mkdirFail", configBase));
                             return;
                         }
-                        File localConfig = new File(configBase, baseName + ".xml");
-                        if (localConfig.isFile() && !localConfig.delete()) {
-                            writer.println(smClient.getString("managerServlet.deleteFail", localConfig));
-                            return;
+                        File localConfigFile = new File(configBase, baseName + ".xml");
+                        File configFile = new File(config);
+                        // Skip delete and copy if source == destination
+                        if (!configFile.getCanonicalPath().equals(localConfigFile.getCanonicalPath())) {
+                            if (localConfigFile.isFile() && !localConfigFile.delete()) {
+                                writer.println(smClient.getString("managerServlet.deleteFail", localConfigFile));
+                                return;
+                            }
+                            ExpandWar.copy(configFile, localConfigFile);
                         }
-                        ExpandWar.copy(new File(config), localConfig);
                     }
                     if (war != null) {
-                        File localWar;
+                        File localWarFile;
                         if (war.endsWith(".war")) {
-                            localWar = new File(host.getAppBaseFile(), baseName + ".war");
+                            localWarFile = new File(host.getAppBaseFile(), baseName + ".war");
                         } else {
-                            localWar = new File(host.getAppBaseFile(), baseName);
+                            localWarFile = new File(host.getAppBaseFile(), baseName);
                         }
-                        if (localWar.exists() && !ExpandWar.delete(localWar)) {
-                            writer.println(smClient.getString("managerServlet.deleteFail", localWar));
-                            return;
+                        File warFile = new File(war);
+                        // Skip delete and copy if source == destination
+                        if (!warFile.getCanonicalPath().equals(localWarFile.getCanonicalPath())) {
+                            if (localWarFile.exists() && !ExpandWar.delete(localWarFile)) {
+                                writer.println(smClient.getString("managerServlet.deleteFail", localWarFile));
+                                return;
+                            }
+                            ExpandWar.copy(warFile, localWarFile);
                         }
-                        ExpandWar.copy(new File(war), localWar);
                     }
                 } finally {
                     removeServiced(name);
