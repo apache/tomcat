@@ -192,6 +192,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>68035</bug>: Correct a regression in the fix for <bug>56248</bug>
+        that prevented deployment via the Manager of a WAR or directory that was
+        already present in the <code>appBase</code> or a context file that was
+        already present in the <code>xmlBase</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
