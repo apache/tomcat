@@ -2640,8 +2640,8 @@ skip.installer property in build.properties" />
     <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe" />
   </target>
 
-  <target name="-release-java-check">
-    <!--FIXME: add version check for release
+  <target name="release-version-check">
+    <!--FIXME: add version check for release once Java 22 has reasonable availability
     <fail message="Java version ${release.java.version} or newer is required for release (${java.version} is installed)">
       <condition>
         <not><javaversion atleast="${release.java.version}" /></not>
@@ -2667,7 +2667,7 @@ skip.installer property in build.properties" />
     <input message="Enter ASF username" addproperty="release.asfusername" defaultValue="${user.name}" />
   </target>
 
-  <target name="pre-release" depends="-release-java-check,-pre-release-lone-target-check, -pre-release-read-asf-username"
+  <target name="pre-release" depends="release-version-check,-pre-release-lone-target-check, -pre-release-read-asf-username"
       description="Prepares for a release build by writing build.properties.release which contains information about the release-build environment.">
     <antversion property="antversion"/>
     <echo file="build.properties.release"># -----------------------------------------------------------------------------
@@ -2794,7 +2794,7 @@ asf.ldap.username=${release.asfusername}
   </target>
 
   <!-- Sets properties only required for releases -->
-  <target name="release-init" depends="-release-java-check,gpg-init-1,gpg-init-2,gpg-init-3,compile" >
+  <target name="release-init" depends="release-version-check,gpg-init-1,gpg-init-2,gpg-init-3,compile" >
     <taskdef name="forceUtcTimeZone"
              classname="org.apache.tomcat.buildutil.ForceUtcTimeZone"
              classpath="${tomcat.classes}" />
