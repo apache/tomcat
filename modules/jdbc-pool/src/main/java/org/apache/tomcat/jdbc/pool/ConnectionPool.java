@@ -843,7 +843,7 @@ public class ConnectionPool {
                 beginRequest = connection.getClass().getMethod("beginRequest");
                 endRequest = connection.getClass().getMethod("endRequest");
             } catch (NoSuchMethodException ex) {
-                // begin and end request not implemented, will not be invoked
+                // begin and end request not implemented, ignore exception
             } finally {
                 requestBoundaryMethodsInitialised = true;
             }
