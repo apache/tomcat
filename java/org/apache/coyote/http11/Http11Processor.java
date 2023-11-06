@@ -891,8 +891,7 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
 
-        MessageBytes methodMB = request.method();
-        boolean head = methodMB.equals("HEAD");
+        boolean head = request.method().equals("HEAD");
         if (head) {
             // No entity body
             outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
