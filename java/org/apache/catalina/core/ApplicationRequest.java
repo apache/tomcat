@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.core;
 
-
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -24,7 +23,6 @@ import java.util.HashMap;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletRequestWrapper;
-
 
 /**
  * Wrapper around a <code>jakarta.servlet.ServletRequest</code> that transforms an application request object (which
@@ -41,9 +39,6 @@ import jakarta.servlet.ServletRequestWrapper;
 class ApplicationRequest extends ServletRequestWrapper {
 
 
-    // ------------------------------------------------------- Static Variables
-
-
     /**
      * The set of attribute names that are special for request dispatchers.
      */
@@ -56,7 +51,10 @@ class ApplicationRequest extends ServletRequestWrapper {
                     RequestDispatcher.FORWARD_QUERY_STRING, RequestDispatcher.FORWARD_MAPPING };
 
 
-    // ----------------------------------------------------------- Constructors
+    /**
+     * The request attributes for this request. This is initialized from the wrapped request, but updates are allowed.
+     */
+    protected final HashMap<String,Object> attributes = new HashMap<>();
 
 
     /**
@@ -65,24 +63,12 @@ class ApplicationRequest extends ServletRequestWrapper {
      * @param request The servlet request being wrapped
      */
     ApplicationRequest(ServletRequest request) {
-
         super(request);
         setRequest(request);
-
     }
 
 
-    // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * The request attributes for this request. This is initialized from the wrapped request, but updates are allowed.
-     */
-    protected final HashMap<String,Object> attributes = new HashMap<>();
-
-
     // ------------------------------------------------- ServletRequest Methods
-
 
     /**
      * Override the <code>getAttribute()</code> method of the wrapped request.
@@ -91,11 +77,9 @@ class ApplicationRequest extends ServletRequestWrapper {
      */
     @Override
     public Object getAttribute(String name) {
-
         synchronized (attributes) {
             return attributes.get(name);
         }
-
     }
 
 
@@ -104,11 +88,9 @@ class ApplicationRequest extends ServletRequestWrapper {
      */
     @Override
     public Enumeration<String> getAttributeNames() {
-
         synchronized (attributes) {
             return Collections.enumeration(attributes.keySet());
         }
-
     }
 
 
@@ -119,14 +101,12 @@ class ApplicationRequest extends ServletRequestWrapper {
      */
     @Override
     public void removeAttribute(String name) {
-
         synchronized (attributes) {
             attributes.remove(name);
             if (!isSpecial(name)) {
                 getRequest().removeAttribute(name);
             }
         }
-
     }
 
 
@@ -138,19 +118,16 @@ class ApplicationRequest extends ServletRequestWrapper {
      */
     @Override
     public void setAttribute(String name, Object value) {
-
         synchronized (attributes) {
             attributes.put(name, value);
             if (!isSpecial(name)) {
                 getRequest().setAttribute(name, value);
             }
         }
-
     }
 
 
     // ------------------------------------------ ServletRequestWrapper Methods
-
 
     /**
      * Set the request that we are wrapping.
@@ -159,7 +136,6 @@ class ApplicationRequest extends ServletRequestWrapper {
      */
     @Override
     public void setRequest(ServletRequest request) {
-
         super.setRequest(request);
 
         // Initialize the attributes for this request
@@ -172,12 +148,10 @@ class ApplicationRequest extends ServletRequestWrapper {
                 attributes.put(name, value);
             }
         }
-
     }
 
 
     // ------------------------------------------------------ Protected Methods
-
 
     /**
      * Is this attribute name one of the special ones that is added only for included servlets?
@@ -185,15 +159,11 @@ class ApplicationRequest extends ServletRequestWrapper {
      * @param name Attribute name to be tested
      */
     protected boolean isSpecial(String name) {
-
         for (String special : specials) {
             if (special.equals(name)) {
                 return true;
             }
         }
         return false;
-
     }
-
-
 }
