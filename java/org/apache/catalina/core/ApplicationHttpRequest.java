@@ -773,13 +773,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @return true if the attribute was a special attribute, false otherwise
      */
     protected boolean removeSpecial(String name) {
-        for (int i = 0; i < specials.length; i++) {
-            if (specials[i].equals(name)) {
-                specialAttributes[i] = null;
-                return true;
-            }
-        }
-        return false;
+        return setSpecial(name, null);
     }
 
 
