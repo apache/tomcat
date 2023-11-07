@@ -385,7 +385,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
         }
 
         // limit < buf.length (the buffer is already big)
-        // or we already have space XXX
+        // or we already have space
         if (desiredSize <= buff.length) {
             return;
         }
