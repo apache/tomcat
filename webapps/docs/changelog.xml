@@ -145,6 +145,11 @@
         <bug>68054</bug>: Avoid some file canonicalization calls introduced
         by the fix for <bug>65433</bug>. (remm)
       </fix>
+      <fix>
+        <bug>68089</bug>: Improve performance of request attribute access for
+        <code>ApplicationHttpRequest</code> and <code>ApplicationRequest</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
