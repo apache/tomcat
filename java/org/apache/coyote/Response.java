@@ -619,7 +619,7 @@ public final class Response {
         commitTime = -1;
         errorException = null;
         errorState.set(0);
-        headers.clear();
+        headers.recycle();
         // Servlet 3.1 non-blocking write listener
         listener = null;
         synchronized (nonBlockingStateLock) {

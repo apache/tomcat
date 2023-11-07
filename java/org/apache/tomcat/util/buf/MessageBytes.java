@@ -571,9 +571,7 @@ public final class MessageBytes implements Cloneable, Serializable {
         setCharset(src.getCharset());
     }
 
-    // -------------------- Deprecated code --------------------
     // efficient long
-    // XXX used only for headers - shouldn't be stored here.
     private long longValue;
     private boolean hasLongValue = false;
 
@@ -620,9 +618,8 @@ public final class MessageBytes implements Cloneable, Serializable {
         type = T_BYTES;
     }
 
-    // Used for headers conversion
     /**
-     * Convert the buffer to an long, cache the value.
+     * Convert the buffer to a long, cache the value. Used for headers conversion.
      *
      * @return the long value
      */

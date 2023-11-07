@@ -26,23 +26,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 
-/*
- * In a server it is very important to be able to operate on
- * the original byte[] without converting everything to chars.
- * Some protocols are ASCII only, and some allow different
- * non-UNICODE encodings. The encoding is not known beforehand,
- * and can even change during the execution of the protocol.
- * ( for example a multipart message may have parts with different
- *  encoding )
- *
- * For HTTP it is not very clear how the encoding of RequestURI
- * and mime values can be determined, but it is a great advantage
- * to be able to parse the request without converting to string.
- */
-
-// TODO: This class could either extend ByteBuffer, or better a ByteBuffer
-// inside this way it could provide the search/etc on ByteBuffer, as a helper.
-
 /**
  * This class is used to represent a chunk of bytes, and utilities to manipulate byte[].
  * <p>
@@ -57,6 +40,18 @@ import java.nio.charset.StandardCharsets;
  * This is important because it allows processing the http headers directly on the received bytes, without converting to
  * chars and Strings until the strings are needed. In addition, the charset is determined later, from headers or user
  * code.
+ * <p>
+ * In a server it is very important to be able to operate on
+ * the original byte[] without converting everything to chars.
+ * Some protocols are ASCII only, and some allow different
+ * non-UNICODE encodings. The encoding is not known beforehand,
+ * and can even change during the execution of the protocol.
+ * ( for example a multipart message may have parts with different
+ *  encoding )
+ * <p>
+ * For HTTP it is not very clear how the encoding of RequestURI
+ * and mime values can be determined, but it is a great advantage
+ * to be able to parse the request without converting to string.
  *
  * @author dac@sun.com
  * @author James Todd [gonzo@sun.com]
@@ -537,7 +532,7 @@ public final class ByteChunk extends AbstractChunk {
         }
 
         // limit < buf.length (the buffer is already big)
-        // or we already have space XXX
+        // or we already have space
         if (desiredSize <= buff.length) {
             return;
         }
@@ -651,15 +646,14 @@ public final class ByteChunk extends AbstractChunk {
 
     /**
      * Compares the message bytes to the specified String object.
+     * <p>
+     * NOTE: This only works for characters in the range 0-127.
      *
      * @param s the String to compare
      *
      * @return <code>true</code> if the comparison succeeded, <code>false</code> otherwise
      */
     public boolean equals(String s) {
-        // XXX ENCODING - this only works if encoding is UTF8-compat
-        // ( ok for tomcat, where we compare ascii - header names, etc )!!!
-
         byte[] b = buff;
         int len = end - start;
         if (b == null || len != s.length()) {
@@ -677,6 +671,8 @@ public final class ByteChunk extends AbstractChunk {
 
     /**
      * Compares the message bytes to the specified String object.
+     * <p>
+     * NOTE: This only works for characters in the range 0-127.
      *
      * @param s the String to compare
      *
@@ -730,8 +726,17 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
+    /**
+     * Compares the message bytes to the specified char array.
+     * <p>
+     * NOTE: This only works for characters in the range 0-127.
+     *
+     * @param c2 the array to compare to
+     * @param off2 offset
+     * @param len2 length
+     * @return <code>true</code> if the comparison succeeded, <code>false</code> otherwise
+     */
     public boolean equals(char c2[], int off2, int len2) {
-        // XXX works only for enc compatible with ASCII/UTF !!!
         byte b1[] = buff;
         if (c2 == null && b1 == null) {
             return true;
@@ -754,6 +759,8 @@ public final class ByteChunk extends AbstractChunk {
 
     /**
      * Returns true if the buffer starts with the specified string when tested in a case sensitive manner.
+     * <p>
+     * NOTE: This only works for characters in the range 0-127.
      *
      * @param s   the string
      * @param pos The position
@@ -778,6 +785,8 @@ public final class ByteChunk extends AbstractChunk {
 
     /**
      * Returns true if the buffer starts with the specified string when tested in a case insensitive manner.
+     * <p>
+     * NOTE: This only works for characters in the range 0-127.
      *
      * @param s   the string
      * @param pos The position
