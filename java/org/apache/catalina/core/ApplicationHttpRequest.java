@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.core;
 
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -54,7 +53,6 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.res.StringManager;
 
-
 /**
  * Wrapper around a <code>jakarta.servlet.http.HttpServletRequest</code> that transforms an application request object
  * (which might be the original one passed to a servlet, or might be based on the 2.3
@@ -84,29 +82,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
                     RequestDispatcher.FORWARD_QUERY_STRING, RequestDispatcher.FORWARD_MAPPING };
 
     private static final int SPECIALS_FIRST_FORWARD_INDEX = 6;
-
-
-    // ----------------------------------------------------------- Constructors
-
-
-    /**
-     * Construct a new wrapped request around the specified servlet request.
-     *
-     * @param request      The servlet request being wrapped
-     * @param context      The target context for the wrapped request
-     * @param crossContext {@code true} if the wrapped request will be a cross-context request, otherwise {@code false}
-     */
-    ApplicationHttpRequest(HttpServletRequest request, Context context, boolean crossContext) {
-
-        super(request);
-        this.context = context;
-        this.crossContext = crossContext;
-        setRequest(request);
-
-    }
-
-
-    // ----------------------------------------------------- Instance Variables
 
 
     /**
@@ -199,6 +174,21 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     protected final Object[] specialAttributes = new Object[specials.length];
 
 
+    /**
+     * Construct a new wrapped request around the specified servlet request.
+     *
+     * @param request      The servlet request being wrapped
+     * @param context      The target context for the wrapped request
+     * @param crossContext {@code true} if the wrapped request will be a cross-context request, otherwise {@code false}
+     */
+    ApplicationHttpRequest(HttpServletRequest request, Context context, boolean crossContext) {
+        super(request);
+        this.context = context;
+        this.crossContext = crossContext;
+        setRequest(request);
+    }
+
+
     // ------------------------------------------------- ServletRequest Methods
 
     @Override
@@ -242,7 +232,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
                 return specialAttributes[pos];
             }
         }
-
     }
 
 
@@ -262,11 +251,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     @Override
     public void removeAttribute(String name) {
-
         if (!removeSpecial(name)) {
             getRequest().removeAttribute(name);
         }
-
     }
 
 
@@ -290,7 +277,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (!setSpecial(name, value)) {
             getRequest().setAttribute(name, value);
         }
-
     }
 
 
@@ -355,7 +341,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         }
 
         return context.getServletContext().getRequestDispatcher(relative);
-
     }
 
 
@@ -369,7 +354,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     // --------------------------------------------- HttpServletRequest Methods
-
 
     /**
      * Override the <code>getContextPath()</code> method of the wrapped request.
@@ -553,7 +537,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         } else {
             return super.getSession(create);
         }
-
     }
 
 
@@ -635,9 +618,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param contextPath The new context path
      */
     void setContextPath(String contextPath) {
-
         this.contextPath = contextPath;
-
     }
 
 
@@ -647,9 +628,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param pathInfo The new path info
      */
     void setPathInfo(String pathInfo) {
-
         this.pathInfo = pathInfo;
-
     }
 
 
@@ -659,9 +638,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param queryString The new query string
      */
     void setQueryString(String queryString) {
-
         this.queryString = queryString;
-
     }
 
 
@@ -694,9 +671,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param requestURI The new request URI
      */
     void setRequestURI(String requestURI) {
-
         this.requestURI = requestURI;
-
     }
 
 
@@ -706,9 +681,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param servletPath The new servlet path
      */
     void setServletPath(String servletPath) {
-
         this.servletPath = servletPath;
-
     }
 
 
@@ -760,7 +733,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             }
         }
         return false;
-
     }
 
 
@@ -839,7 +811,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
     // ------------------------------------------------------ Private Methods
 
-
     /**
      * Merge the parameters from the saved query parameter string (if any), and the parameters already present on this
      * request (if any), such that the parameter values from the query string show up first if there are duplicate
@@ -894,7 +865,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     // ----------------------------------- AttributeNamesEnumerator Inner Class
-
 
     /**
      * Utility class used to expose the special attributes as being available as request attributes.
@@ -952,8 +922,5 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             }
             return result;
         }
-
     }
-
-
 }
