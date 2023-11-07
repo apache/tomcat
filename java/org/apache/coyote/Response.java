@@ -655,7 +655,7 @@ public final class Response {
         commitTimeNanos = -1;
         errorException = null;
         errorState.set(0);
-        headers.clear();
+        headers.recycle();
         trailerFieldsSupplier = null;
         // Servlet 3.1 non-blocking write listener
         listener = null;

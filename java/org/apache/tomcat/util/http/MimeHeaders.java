@@ -24,46 +24,6 @@ import java.util.Enumeration;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.res.StringManager;
 
-/*
- * This class is used to contain standard internet message headers,
- * used for SMTP (RFC822) and HTTP (RFC2068) messages as well as for
- * MIME (RFC 2045) applications such as transferring typed data and
- * grouping related items in multipart message bodies.
- *
- * <P> Message headers, as specified in RFC822, include a field name
- * and a field body.  Order has no semantic significance, and several
- * fields with the same name may exist.  However, most fields do not
- * (and should not) exist more than once in a header.
- *
- * <P> Many kinds of field body must conform to a specified syntax,
- * including the standard parenthesized comment syntax.  This class
- * supports only two simple syntaxes, for dates and integers.
- *
- * <P> When processing headers, care must be taken to handle the case of
- * multiple same-name fields correctly.  The values of such fields are
- * only available as strings.  They may be accessed by index (treating
- * the header as an array of fields), or by name (returning an array
- * of string values).
- */
-
-/* Headers are first parsed and stored in the order they are
-   received. This is based on the fact that most servlets will not
-   directly access all headers, and most headers are single-valued.
-   ( the alternative - a hash or similar data structure - will add
-   an overhead that is not needed in most cases )
-
-   Apache seems to be using a similar method for storing and manipulating
-   headers.
-
-   Future enhancements:
-   - hash the headers the first time a header is requested ( i.e. if the
-   servlet needs direct access to headers).
-   - scan "common" values ( length, cookies, etc ) during the parse
-   ( addHeader hook )
-
- */
-
-
 /**
  * Memory-efficient repository for Mime Headers. When the object is recycled, it will keep the allocated headers[] and
  * all the MimeHeaderField - no GC is generated.
@@ -74,13 +34,34 @@ import org.apache.tomcat.util.res.StringManager;
  * calls header methods, but is easy to avoid inside tomcat. The goal is to use _only_ MessageByte-based Fields, and
  * reduce to 0 the memory overhead of tomcat.
  * <p>
- * TODO:
- * <ul>
- * <li>one-buffer parsing - for http (other protocols don't need that)</li>
- * <li>remove unused methods</li>
- * <li>External enumerations, with 0 GC.</li>
- * <li>use HeaderName ID</li>
- * </ul>
+ * This class is used to contain standard internet message headers,
+ * used for SMTP (RFC822) and HTTP (RFC2068) messages as well as for
+ * MIME (RFC 2045) applications such as transferring typed data and
+ * grouping related items in multipart message bodies.
+ * <p>
+ * Message headers, as specified in RFC822, include a field name
+ * and a field body.  Order has no semantic significance, and several
+ * fields with the same name may exist.  However, most fields do not
+ * (and should not) exist more than once in a header.
+ * <p>
+ * Many kinds of field body must conform to a specified syntax,
+ * including the standard parenthesized comment syntax.  This class
+ * supports only two simple syntaxes, for dates and integers.
+ * <p>
+ * When processing headers, care must be taken to handle the case of
+ * multiple same-name fields correctly.  The values of such fields are
+ * only available as strings.  They may be accessed by index (treating
+ * the header as an array of fields), or by name (returning an array
+ * of string values).
+ * <p>
+ * Headers are first parsed and stored in the order they are
+ * received. This is based on the fact that most servlets will not
+ * directly access all headers, and most headers are single-valued.
+ * (the alternative - a hash or similar data structure - will add
+ * an overhead that is not needed in most cases)
+ * <p>
+ * Apache seems to be using a similar method for storing and manipulating
+ * headers.
  *
  * @author dac@eng.sun.com
  * @author James Todd [gonzo@eng.sun.com]
@@ -88,10 +69,9 @@ import org.apache.tomcat.util.res.StringManager;
  * @author kevin seguin
  */
 public class MimeHeaders {
+
     /**
      * Initial size - should be == average number of headers per request
-     * <p>
-     * TODO make it configurable (fine-tuning of web-apps)
      */
     public static final int DEFAULT_HEADER_SIZE = 8;
 
@@ -137,24 +117,18 @@ public class MimeHeaders {
     /**
      * Clears all header fields.
      */
-    // [seguin] added for consistency -- most other objects have recycle().
     public void recycle() {
-        clear();
-    }
-
-    /**
-     * Clears all header fields.
-     */
-    public void clear() {
         for (int i = 0; i < count; i++) {
             headers[i].recycle();
         }
         count = 0;
     }
 
-    /**
-     * EXPENSIVE!!! only for debugging.
-     */
+    @Deprecated
+    public void clear() {
+        recycle();
+    }
+
     @Override
     public String toString() {
         StringWriter sw = new StringWriter();
@@ -334,6 +308,7 @@ public class MimeHeaders {
     }
 
     // -------------------- Getting headers --------------------
+
     /**
      * Finds and returns a header field with the given name. If no such field exists, null is returned. If more than one
      * such field is in the header, an arbitrary one is returned.
@@ -375,23 +350,19 @@ public class MimeHeaders {
         return result;
     }
 
-    // bad shortcut - it'll convert to string ( too early probably,
-    // encoding is guessed very late )
     public String getHeader(String name) {
         MessageBytes mh = getValue(name);
         return mh != null ? mh.toString() : null;
     }
 
     // -------------------- Removing --------------------
+
     /**
      * Removes a header field with the specified name. Does nothing if such a field could not be found.
      *
      * @param name the name of the header field to be removed
      */
     public void removeHeader(String name) {
-        // XXX
-        // warning: rather sticky code; heavily tuned
-
         for (int i = 0; i < count; i++) {
             if (headers[i].getName().equalsIgnoreCase(name)) {
                 removeHeader(i--);
