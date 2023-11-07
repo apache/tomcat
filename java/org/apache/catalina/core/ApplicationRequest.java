@@ -16,9 +16,12 @@
  */
 package org.apache.catalina.core;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletRequest;
@@ -38,23 +41,28 @@ import javax.servlet.ServletRequestWrapper;
  */
 class ApplicationRequest extends ServletRequestWrapper {
 
-
     /**
      * The set of attribute names that are special for request dispatchers.
+     *
+     * @deprecated Will be removed without replacement in Tomcat 11 onwards.
      */
+    @Deprecated
     protected static final String specials[] =
             { RequestDispatcher.INCLUDE_REQUEST_URI, RequestDispatcher.INCLUDE_CONTEXT_PATH,
                     RequestDispatcher.INCLUDE_SERVLET_PATH, RequestDispatcher.INCLUDE_PATH_INFO,
                     RequestDispatcher.INCLUDE_QUERY_STRING, RequestDispatcher.FORWARD_REQUEST_URI,
                     RequestDispatcher.FORWARD_CONTEXT_PATH, RequestDispatcher.FORWARD_SERVLET_PATH,
                     RequestDispatcher.FORWARD_PATH_INFO, RequestDispatcher.FORWARD_QUERY_STRING };
+    /*
+     * This duplicates specials but has been added to improve the performance of isSpecial().
+     */
+    private static final Set<String> specialsSet = new HashSet<>(Arrays.asList(specials));
 
 
     /**
      * The request attributes for this request. This is initialized from the wrapped request, but updates are allowed.
      */
     protected final HashMap<String,Object> attributes = new HashMap<>();
-
 
     /**
      * Construct a new wrapped request around the specified servlet request.
@@ -156,13 +164,11 @@ class ApplicationRequest extends ServletRequestWrapper {
      * Is this attribute name one of the special ones that is added only for included servlets?
      *
      * @param name Attribute name to be tested
+     *
+     * @deprecated Will be removed without replacement in Tomcat 11 onwards.
      */
+    @Deprecated
     protected boolean isSpecial(String name) {
-        for (String special : specials) {
-            if (special.equals(name)) {
-                return true;
-            }
-        }
-        return false;
+        return specialsSet.contains(name);
     }
 }

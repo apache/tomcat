@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -77,6 +78,17 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
                     RequestDispatcher.FORWARD_REQUEST_URI, RequestDispatcher.FORWARD_CONTEXT_PATH,
                     RequestDispatcher.FORWARD_SERVLET_PATH, RequestDispatcher.FORWARD_PATH_INFO,
                     RequestDispatcher.FORWARD_QUERY_STRING, ApplicationDispatcher.FORWARD_MAPPING };
+    /*
+     * This duplicates specials to some extent but has been added to improve the performance of [get|set|is]Special().
+     * It may be possible to remove specials but that will require changes to AttributeNamesEnumerator.
+     */
+    private static final Map<String,Integer> specialsMap = new HashMap<>();
+    static {
+        for (int i = 0; i < specials.length; i++) {
+            specialsMap.put(specials[i], Integer.valueOf(i));
+        }
+    }
+
 
     private static final int SPECIALS_FIRST_FORWARD_INDEX = 6;
 
@@ -721,13 +733,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param name Attribute name to be tested
      */
     protected boolean isSpecial(String name) {
-
-        for (String special : specials) {
-            if (special.equals(name)) {
-                return true;
-            }
-        }
-        return false;
+        return specialsMap.containsKey(name);
     }
 
 
@@ -737,12 +743,11 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @return the special attribute pos, or -1 if it is not a special attribute
      */
     protected int getSpecial(String name) {
-        for (int i = 0; i < specials.length; i++) {
-            if (specials[i].equals(name)) {
-                return i;
-            }
+        Integer index = specialsMap.get(name);
+        if (index == null) {
+            return -1;
         }
-        return -1;
+        return index.intValue();
     }
 
 
@@ -752,13 +757,12 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @return true if the attribute was a special attribute, false otherwise
      */
     protected boolean setSpecial(String name, Object value) {
-        for (int i = 0; i < specials.length; i++) {
-            if (specials[i].equals(name)) {
-                specialAttributes[i] = value;
-                return true;
-            }
+        Integer index = specialsMap.get(name);
+        if (index == null) {
+            return false;
         }
-        return false;
+        specialAttributes[index.intValue()] = value;
+        return true;
     }
 
 
