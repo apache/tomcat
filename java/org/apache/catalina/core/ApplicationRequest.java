@@ -50,9 +50,10 @@ class ApplicationRequest extends ServletRequestWrapper {
     protected static final String specials[] =
             { RequestDispatcher.INCLUDE_REQUEST_URI, RequestDispatcher.INCLUDE_CONTEXT_PATH,
                     RequestDispatcher.INCLUDE_SERVLET_PATH, RequestDispatcher.INCLUDE_PATH_INFO,
-                    RequestDispatcher.INCLUDE_QUERY_STRING, RequestDispatcher.FORWARD_REQUEST_URI,
-                    RequestDispatcher.FORWARD_CONTEXT_PATH, RequestDispatcher.FORWARD_SERVLET_PATH,
-                    RequestDispatcher.FORWARD_PATH_INFO, RequestDispatcher.FORWARD_QUERY_STRING };
+                    RequestDispatcher.INCLUDE_QUERY_STRING, ApplicationDispatcher.INCLUDE_MAPPING,
+                    RequestDispatcher.FORWARD_REQUEST_URI, RequestDispatcher.FORWARD_CONTEXT_PATH,
+                    RequestDispatcher.FORWARD_SERVLET_PATH, RequestDispatcher.FORWARD_PATH_INFO,
+                    RequestDispatcher.FORWARD_QUERY_STRING, ApplicationDispatcher.FORWARD_MAPPING };
     /*
      * This duplicates specials but has been added to improve the performance of isSpecial().
      */
