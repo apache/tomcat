@@ -143,9 +143,13 @@ public class ConnectionPool {
     /**
      * Request boundaries
      */
-    private volatile boolean requestBoundaryMethodsInitialised = false;
-    private Method beginRequest = null;
-    private Method endRequest = null;
+    private static final Method beginRequest;
+    private static final Method endRequest;
+
+    static {
+        beginRequest = getConnectionMethod("beginRequest");
+        endRequest = getConnectionMethod("endRequest");
+    }
 
     //===============================================================================
     //         PUBLIC METHODS
@@ -352,8 +356,8 @@ public class ConnectionPool {
             } else {
                 connection = (Connection)proxyClassConstructor.newInstance(new Object[] {handler});
             }
-            Connection underlyingConnection = con.getConnection();
-            if (hasRequestBoundaryMethods(underlyingConnection)) {
+            if (beginRequest != null) {
+                Connection underlyingConnection = con.getConnection();
                 try {
                     beginRequest.invoke(underlyingConnection);
                 } catch (InvocationTargetException | IllegalAccessException ex) {
@@ -830,25 +834,18 @@ public class ConnectionPool {
     }
 
     /**
-     * If request boundaries are not initialised, checks if beginRequest and
-     * endRequest methods are implemented on connection object.
-     *
-     * @param connection The connection
-     * @return Returns true if connection is not null and connection  implements
-     * JDBC 4.3 beginRequest and endRequest methods
+     * Uses reflection to get the method form the Connection interface
+     * @param methodName name of the method to get
+     * @return the method if it exists, otherwise null
      */
-    private boolean hasRequestBoundaryMethods(Connection connection) {
-        if (!requestBoundaryMethodsInitialised && connection != null) {
-            try {
-                beginRequest = connection.getClass().getMethod("beginRequest");
-                endRequest = connection.getClass().getMethod("endRequest");
-            } catch (NoSuchMethodException ex) {
-                // begin and end request not implemented, ignore exception
-            } finally {
-                requestBoundaryMethodsInitialised = true;
-            }
+    private static Method getConnectionMethod(String methodName) {
+        Method method = null;
+        try {
+            method = Connection.class.getMethod(methodName);
+        } catch (NoSuchMethodException ex) {
+            // Ignore exception and set both methods to null
         }
-        return (connection != null && beginRequest != null && endRequest != null);
+        return method;
     }
 
     /**
@@ -1066,8 +1063,8 @@ public class ConnectionPool {
                         con.clearWarnings();
                         con.setStackTrace(null);
                         con.setTimestamp(System.currentTimeMillis());
-                        Connection underlyingConnection = con.getConnection();
-                        if (hasRequestBoundaryMethods(underlyingConnection)) {
+                        if (endRequest != null) {
+                            Connection underlyingConnection = con.getConnection();
                             try {
                                 endRequest.invoke(underlyingConnection);
                             } catch (InvocationTargetException | IllegalAccessException ex) {

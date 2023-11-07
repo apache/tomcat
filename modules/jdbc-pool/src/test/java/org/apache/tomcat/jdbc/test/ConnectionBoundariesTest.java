@@ -40,7 +40,8 @@ public class ConnectionBoundariesTest extends DefaultTestCase {
     }
     @Test
     public void connectionWithRequestBoundariesTest() throws Exception {
-        datasource.getPoolProperties().getDbProperties().setProperty("requestBoundaries", "true");
+        double javaVersion = Double.valueOf(System.getProperty("java.class.version"));
+        org.junit.Assume.assumeTrue(javaVersion >= 53);
         Connection connection = datasource.getConnection();
         Assert.assertEquals("Connection.beginRequest() count", 1, Driver.beginRequestCount.get());
         Assert.assertEquals("Connection.endRequest() count", 0, Driver.endRequestCount.get());
@@ -49,5 +50,16 @@ public class ConnectionBoundariesTest extends DefaultTestCase {
         Assert.assertEquals("Connection.endRequest() count", 1, Driver.endRequestCount.get());
     }
 
+    @Test
+    public void connectionWithoutRequestBoundariesTest() throws Exception {
+        double javaVersion = Double.valueOf(System.getProperty("java.class.version"));
+        org.junit.Assume.assumeTrue(javaVersion < 53);
+        Connection connection = datasource.getConnection();
+        Assert.assertEquals("Connection.beginRequest() count", 0, Driver.beginRequestCount.get());
+        Assert.assertEquals("Connection.endRequest() count", 0, Driver.endRequestCount.get());
+        connection.close();
+        Assert.assertEquals("Connection.beginRequest() count", 0, Driver.beginRequestCount.get());
+        Assert.assertEquals("Connection.endRequest() count", 0, Driver.endRequestCount.get());
+    }
 
 }
