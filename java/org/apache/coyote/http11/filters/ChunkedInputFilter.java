@@ -560,6 +560,8 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
             } else if (!HttpParser.isToken(chr)) {
                 // Non-token characters are illegal in header names
                 throwIOException(sm.getString("chunkedInputFilter.invalidTrailerHeaderName"));
+            } else if (trailingHeaders.getEnd() >= trailingHeaders.getLimit()) {
+                throwIOException(sm.getString("chunkedInputFilter.maxTrailer"));
             } else {
                 trailingHeaders.append(chr);
             }
