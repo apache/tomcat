@@ -293,25 +293,26 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
         try {
             return coyoteRequest.doRead(this);
         } catch (BadRequestException bre) {
-            // Set flag used by asynchronous processing to detect errors on non-container threads
-            coyoteRequest.setErrorException(bre);
-            // In synchronous processing, this exception may be swallowed by the application so set error flags here.
-            coyoteRequest.setAttribute(RequestDispatcher.ERROR_EXCEPTION, bre);
-            coyoteRequest.getResponse().setStatus(400);
-            coyoteRequest.getResponse().setError();
             // Make the exception visible to the application
+            handleReadException(bre);
             throw bre;
         } catch (IOException ioe) {
-            // Set flag used by asynchronous processing to detect errors on non-container threads
-            coyoteRequest.setErrorException(ioe);
-            // In synchronous processing, this exception may be swallowed by the application so set error flags here.
-            coyoteRequest.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
-            coyoteRequest.getResponse().setStatus(400);
-            coyoteRequest.getResponse().setError();
+            handleReadException(ioe);
             // Any other IOException on a read is almost always due to the remote client aborting the request.
             // Make the exception visible to the application
             throw new ClientAbortException(ioe);
         }
+    }
+
+
+    private void handleReadException(Exception e) throws IOException {
+        // Set flag used by asynchronous processing to detect errors on non-container threads
+        coyoteRequest.setErrorException(e);
+        // In synchronous processing, this exception may be swallowed by the application so set error flags here.
+        Request request = (Request) coyoteRequest.getNote(CoyoteAdapter.ADAPTER_NOTES);
+        Response response = request.getResponse();
+        request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, e);
+        response.sendError(400);
     }
 
 
