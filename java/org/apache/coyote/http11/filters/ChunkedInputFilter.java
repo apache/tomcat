@@ -559,7 +559,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                 colon = true;
             } else if (!HttpParser.isToken(chr)) {
                 // Non-token characters are illegal in header names
-                throw new IOException(sm.getString("chunkedInputFilter.invalidTrailerHeaderName"));
+                throwIOException(sm.getString("chunkedInputFilter.invalidTrailerHeaderName"));
             } else {
                 trailingHeaders.append(chr);
             }
