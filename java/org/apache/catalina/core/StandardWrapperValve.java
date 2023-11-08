@@ -286,7 +286,11 @@ final class StandardWrapperValve extends ValveBase {
      * @param exception The exception that occurred (which possibly wraps a root cause exception
      */
     private void exception(Request request, Response response, Throwable exception) {
-        exception(request, response, exception, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        if (exception.getCause() instanceof InvalidParameterException) {
+            exception(request, response, exception, ((InvalidParameterException) exception.getCause()).getErrorCode());
+        } else {
+            exception(request, response, exception, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
     }
 
     private void exception(Request request, Response response, Throwable exception, int errorCode) {
