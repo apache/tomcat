@@ -33,6 +33,7 @@ import javax.servlet.RequestDispatcher;
 
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.BadRequestException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
