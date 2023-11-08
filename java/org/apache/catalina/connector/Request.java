@@ -3048,10 +3048,10 @@ public class Request implements HttpServletRequest {
                     context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), e);
                 }
                 response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
-                if (e instanceof ClientAbortException) {
+                if (e instanceof BadRequestException) {
                     parametersParseException = new InvalidParameterException(e);
                 } else {
-                    parametersParseException = new InvalidParameterException(new ClientAbortException(e));
+                    parametersParseException = new InvalidParameterException(new BadRequestException(e));
                 }
                 return;
             }
@@ -3070,10 +3070,10 @@ public class Request implements HttpServletRequest {
                     context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), e);
                 }
                 response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
-                if (e instanceof ClientAbortException) {
+                if (e instanceof BadRequestException) {
                     parametersParseException = new InvalidParameterException(e);
                 } else {
-                    parametersParseException = new InvalidParameterException(new ClientAbortException(e));
+                    parametersParseException = new InvalidParameterException(new BadRequestException(e));
                 }
                 return;
             }
