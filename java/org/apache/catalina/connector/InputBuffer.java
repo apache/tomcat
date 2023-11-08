@@ -29,6 +29,7 @@ import jakarta.servlet.ReadListener;
 import jakarta.servlet.RequestDispatcher;
 
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.BadRequestException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
