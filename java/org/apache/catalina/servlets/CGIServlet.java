@@ -653,11 +653,12 @@ public final class CGIServlet extends HttpServlet {
     }
 
 
-    /**
+    /*
      * Behaviour depends on the status code.
      *
      * Status < 400  - Calls setStatus. Returns false. CGI servlet will provide
      *                 the response body.
+     *
      * Status >= 400 - Calls sendError(status), returns true. Standard error
      *                 page mechanism will provide the response body.
      */
@@ -1878,22 +1879,26 @@ public final class CGIServlet extends HttpServlet {
 
             int i = input.read();
 
-            // Update the state
-            // State machine looks like this
-            //
-            //    -------->--------
-            //   |      (CR)       |
-            //   |                 |
-            //  CR1--->---         |
-            //   |        |        |
-            //   ^(CR)    |(LF)    |
-            //   |        |        |
-            // CHAR--->--LF1--->--EOH
-            //      (LF)  |  (LF)  |
-            //            |(CR)    ^(LF)
-            //            |        |
-            //          (CR2)-->---
-
+            /*
+             * Update the state
+             * State machine looks like this
+             * @formatter:off
+             *
+             *    -------->--------
+             *   |      (CR)       |
+             *   |                 |
+             *  CR1--->---         |
+             *   |        |        |
+             *   ^(CR)    |(LF)    |
+             *   |        |        |
+             * CHAR--->--LF1--->--EOH
+             *      (LF)  |  (LF)  |
+             *            |(CR)    ^(LF)
+             *            |        |
+             *          (CR2)-->---
+             *
+             * @formatter:on
+             */
             if (i == 10) {
                 // LF
                 switch(state) {
