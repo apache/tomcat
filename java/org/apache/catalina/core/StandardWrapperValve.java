@@ -169,7 +169,14 @@ final class StandardWrapperValve extends ValveBase {
                 }
 
             }
-        } catch (BadRequestException | CloseNowException e) {
+        } catch (BadRequestException e) {
+            if (container.getLogger().isDebugEnabled()) {
+                container.getLogger().debug(
+                        sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), e);
+            }
+            throwable = e;
+            exception(request, response, e, HttpServletResponse.SC_BAD_REQUEST);
+        } catch (CloseNowException e) {
             if (container.getLogger().isDebugEnabled()) {
                 container.getLogger().debug(
                         sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), e);

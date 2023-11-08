@@ -145,6 +145,10 @@
         <code>ApplicationHttpRequest</code> and <code>ApplicationRequest</code>.
         (markt)
       </fix>
+      <fix>
+        Use a 400 status code to report an error due to a bad request (e.g. an
+        invalid trailer header) rather than a 500 status code. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
