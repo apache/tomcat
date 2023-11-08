@@ -169,7 +169,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
         if (remaining <= 0) {
             if (!parseChunkHeader()) {
-                throwIOException(sm.getString("chunkedInputFilter.invalidHeader"));
+                throwBadRequestException(sm.getString("chunkedInputFilter.invalidHeader"));
             }
             if (endChunk) {
                 parseEndChunk();
@@ -181,7 +181,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
         if (readChunk == null || readChunk.position() >= readChunk.limit()) {
             if (readBytes() < 0) {
-                throwIOException(sm.getString("chunkedInputFilter.eos"));
+                throwEOFException(sm.getString("chunkedInputFilter.eos"));
             }
         }
 
