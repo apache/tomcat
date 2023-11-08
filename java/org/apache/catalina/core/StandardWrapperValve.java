@@ -278,10 +278,14 @@ final class StandardWrapperValve extends ValveBase {
      * @param response  The response being generated
      * @param exception The exception that occurred (which possibly wraps a root cause exception
      */
-    @SuppressWarnings("deprecation")
     private void exception(Request request, Response response, Throwable exception) {
+        exception(request, response, exception, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+
+    @SuppressWarnings("deprecation")
+    private void exception(Request request, Response response, Throwable exception, int errorCode) {
         request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, exception);
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        response.setStatus(errorCode);
         response.setError();
     }
 
