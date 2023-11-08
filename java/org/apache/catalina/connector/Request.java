@@ -3043,12 +3043,14 @@ public class Request implements HttpServletRequest {
             try {
                 readPostBodyFully(formData, len);
             } catch (IOException e) {
-                // Client disconnect
                 Context context = getContext();
                 if (context != null && context.getLogger().isDebugEnabled()) {
                     context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), e);
                 }
-                response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
+                if (e instanceof ClientAbortException) {
+                    // Client has disconnected. Close immediately.
+                    response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
+                }
                 if (e instanceof BadRequestException) {
                     parametersParseException = new InvalidParameterException(e);
                 } else {
@@ -3065,12 +3067,14 @@ public class Request implements HttpServletRequest {
                 parametersParseException = ise;
                 return;
             } catch (IOException e) {
-                // Client disconnect
                 Context context = getContext();
                 if (context != null && context.getLogger().isDebugEnabled()) {
                     context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), e);
                 }
-                response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
+                if (e instanceof ClientAbortException) {
+                    // Client has disconnected. Close immediately.
+                    response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
+                }
                 if (e instanceof BadRequestException) {
                     parametersParseException = new InvalidParameterException(e);
                 } else {
