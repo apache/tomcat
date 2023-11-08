@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.connector;
 
+import org.apache.coyote.BadRequestException;
+
 /**
  * Extend IOException to identify it as being caused by an abort of a request by a remote client.
  *
