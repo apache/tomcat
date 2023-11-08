@@ -39,7 +39,7 @@ import org.apache.catalina.AsyncDispatcher;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.connector.ClientAbortException;
+import org.apache.catalina.connector.BadRequestException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.connector.Response;
@@ -662,7 +662,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
                 filterChain.doFilter(request, response);
             }
             // Servlet Service Method is called by the FilterChain
-        } catch (ClientAbortException e) {
+        } catch (BadRequestException e) {
             ioException = e;
         } catch (IOException e) {
             wrapper.getLogger().error(sm.getString("applicationDispatcher.serviceException", wrapper.getName()), e);
@@ -673,7 +673,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
             wrapper.unavailable(e);
         } catch (ServletException e) {
             Throwable rootCause = StandardWrapper.getRootCause(e);
-            if (!(rootCause instanceof ClientAbortException)) {
+            if (!(rootCause instanceof BadRequestException)) {
                 wrapper.getLogger().error(sm.getString("applicationDispatcher.serviceException", wrapper.getName()),
                         rootCause);
             }
