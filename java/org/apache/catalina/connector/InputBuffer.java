@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.ReadListener;
+import jakarta.servlet.RequestDispatcher;
 
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.coyote.ActionCode;
@@ -308,11 +309,23 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
         try {
             return coyoteRequest.doRead(this);
         } catch (BadRequestException bre) {
+            // Set flag used by asynchronous processing to detect errors on non-container threads
             coyoteRequest.setErrorException(bre);
+            // In synchronous processing, this exception may be swallowed by the application so set error flags here.
+            coyoteRequest.setAttribute(RequestDispatcher.ERROR_EXCEPTION, bre);
+            coyoteRequest.getResponse().setStatus(400);
+            coyoteRequest.getResponse().setError();
+            // Make the exception visible to the application
             throw bre;
         } catch (IOException ioe) {
+            // Set flag used by asynchronous processing to detect errors on non-container threads
             coyoteRequest.setErrorException(ioe);
+            // In synchronous processing, this exception may be swallowed by the application so set error flags here.
+            coyoteRequest.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
+            coyoteRequest.getResponse().setStatus(400);
+            coyoteRequest.getResponse().setError();
             // Any other IOException on a read is almost always due to the remote client aborting the request.
+            // Make the exception visible to the application
             throw new ClientAbortException(ioe);
         }
     }

@@ -149,6 +149,11 @@
         Use a 400 status code to report an error due to a bad request (e.g. an
         invalid trailer header) rather than a 500 status code. (markt)
       </fix>
+      <fix>
+        Ensure that an <code>IOException</code> during the reading of the
+        request triggers always error handling, regardless of whether the
+        application swallows the exception. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
