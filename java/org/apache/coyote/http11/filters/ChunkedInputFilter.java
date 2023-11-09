@@ -566,6 +566,8 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                     eol = true;
                 } else if (HttpParser.isControl(chr) && chr != Constants.HT) {
                     throw new IOException(sm.getString("chunkedInputFilter.invalidTrailerHeaderValue"));
+                } else if (trailingHeaders.getEnd() >= trailingHeaders.getLimit()) {
+                    throwBadRequestException(sm.getString("chunkedInputFilter.maxTrailer"));
                 } else if (chr == Constants.SP || chr == Constants.HT) {
                     trailingHeaders.append(chr);
                 } else {
@@ -591,6 +593,8 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
             chr = readChunk.get(readChunk.position());
             if (chr != Constants.SP && chr != Constants.HT) {
                 validLine = false;
+            } else if (trailingHeaders.getEnd() >= trailingHeaders.getLimit()) {
+                throwBadRequestException(sm.getString("chunkedInputFilter.maxTrailer"));
             } else {
                 eol = false;
                 // Copying one extra space in the buffer (since there must
