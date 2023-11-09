@@ -4234,10 +4234,10 @@ reproducible-10=${reproducible-10}
         </or>
         <isset property="reproducible-6" />
         <isset property="reproducible-7" />
-	<isset property="reproducible-8" />
+        <isset property="reproducible-8" />
 <!--
         <isset property="reproducible-9" />
-	<isset property="reproducible-10" />
+        <isset property="reproducible-10" />
 -->
       </and>
     </condition>
