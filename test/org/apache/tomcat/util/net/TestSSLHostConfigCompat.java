@@ -77,8 +77,6 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
     @Parameter(3)
     public StoreType storeType;
 
-    private SSLHostConfig sslHostConfig = new SSLHostConfig();
-
 
     @Test
     public void testHostEC() throws Exception {
@@ -247,6 +245,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
 
     private void configureHostRSA() {
+        SSLHostConfig sslHostConfig = getSSLHostConfig();
         switch (storeType) {
         case KEYSTORE: {
             SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
@@ -266,6 +265,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
 
     private void configureHostEC() {
+        SSLHostConfig sslHostConfig = getSSLHostConfig();
         switch (storeType) {
         case KEYSTORE: {
             SSLHostConfigCertificate sslHostConfigCertificateEc = new SSLHostConfigCertificate(sslHostConfig, Type.EC);
@@ -329,6 +329,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
             // Skip this for APR. It is not supported.
             Assert.assertTrue(connector.setProperty("sslImplementationName", sslImplementationName));
         }
+        SSLHostConfig sslHostConfig = new SSLHostConfig();
         sslHostConfig.setProtocols("TLSv1.2");
         connector.addSslHostConfig(sslHostConfig);
 
@@ -339,6 +340,13 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         Context ctxt = tomcat.addContext("", null);
         Tomcat.addServlet(ctxt, "TesterServlet", new TesterServlet());
         ctxt.addServletMappingDecoded("/*", "TesterServlet");
+    }
+
+
+    private SSLHostConfig getSSLHostConfig() {
+        Tomcat tomcat = getTomcatInstance();
+        Connector connector = tomcat.getConnector();
+        return connector.findSslHostConfigs()[0];
     }
 
 
