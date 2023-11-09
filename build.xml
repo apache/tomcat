@@ -307,9 +307,12 @@
     <include name="**/.gitignore"/>
     <include name="**/*.bnd"/>
     <include name="**/*.classpath"/>
+    <include name="**/*.conf"/>
     <include name="**/*.css"/>
     <include name="**/*.dtd"/>
     <include name="**/*.editorconfig"/>
+    <include name="**/*.h"/>
+    <include name="**/*.header"/>
     <include name="**/*.htm"/>
     <include name="**/*.html"/>
     <include name="**/*.iml"/>
@@ -3060,6 +3063,7 @@ asf.ldap.username=${release.asfusername}
       <include name="bin/*.sh" />
       <include name=".travis/*.sh" />
       <include name="res/graal/*.sh" />
+      <include name="res/openssl/*.sh" />
     </fixcrlf>
 
     <zip zipfile="${tomcat.release}/v${version}/src/${final-src.name}.zip"
