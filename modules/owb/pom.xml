@@ -78,6 +78,11 @@
             <artifactId>openwebbeans-web</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.openwebbeans</groupId>
+            <artifactId>openwebbeans-el22</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- Allows building integration code, temporarily located here -->
         <dependency>
             <groupId>org.apache.tomcat</groupId>
@@ -116,6 +121,12 @@
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.properties.OpenWebBeansPropertiesTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer" />
                             </transformers>
+                            <artifactSet>
+                                <excludes>
+                                    <!-- Already present in Tomcat or in the CDI bundle -->
+                                    <exclude>jakarta.el:*</exclude>
+                                </excludes>
+                            </artifactSet>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
