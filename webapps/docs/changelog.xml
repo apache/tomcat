@@ -246,6 +246,9 @@
         The minimum Java version required to build Tomcat has been raised to
         Java 17. (markt)
       </update>
+      <update>
+        Update the OWB module to Apache OpenWebBeans 4.0.0. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
