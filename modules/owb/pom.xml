@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>27</version>
+        <version>30</version>
     </parent>
 
     <groupId>org.apache.tomcat</groupId>
@@ -97,16 +97,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -123,7 +121,7 @@
                             </transformers>
                             <artifactSet>
                                 <excludes>
-                                    <!-- Already present in Tomcat or in the CDI bundle -->
+                                    <!-- Already present in Tomcat -->
                                     <exclude>jakarta.el:*</exclude>
                                 </excludes>
                             </artifactSet>
@@ -132,7 +130,13 @@
                                     <artifact>*:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/DEPENDENCIES</exclude>
+                                        <exclude>META-INF/LICENSE.txt</exclude>
+                                        <exclude>META-INF/LICENSE</exclude>
                                         <exclude>META-INF/MANIFEST.MF</exclude>
+                                        <exclude>META-INF/NOTICE.txt</exclude>
+                                        <exclude>META-INF/NOTICE</exclude>
+                                        <!-- Unneeded configuration files -->
+                                        <exclude>module-info.class</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
