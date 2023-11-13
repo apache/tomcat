@@ -980,9 +980,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (keyPass == null) {
                 keyPass = certificate.getCertificateKeystorePassword();
             }
-            String keyPassFile = null;//FIXME Tomcat 9.0.83:certificate.getCertificateKeyPasswordFile();
+            String keyPassFile = certificate.getCertificateKeyPasswordFile();
             if (keyPassFile == null) {
-                keyPassFile = null;//FIXME Tomcat 9.0.83:certificate.getCertificateKeystorePasswordFile();
+                keyPassFile = certificate.getCertificateKeystorePasswordFile();
             }
             if (keyPassFile != null) {
                 try (BufferedReader reader =
