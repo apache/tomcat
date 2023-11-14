@@ -596,6 +596,14 @@ public class openssl_h  {
     }
     /**
      * {@snippet :
+     * #define ERR_REASON_MASK 8388607
+     * }
+     */
+    public static int ERR_REASON_MASK() {
+        return (int)8388607L;
+    }
+    /**
+     * {@snippet :
      * #define OCSP_RESPONSE_STATUS_SUCCESSFUL 0
      * }
      */
