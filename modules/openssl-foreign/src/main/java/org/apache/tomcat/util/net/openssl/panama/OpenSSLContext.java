@@ -1112,7 +1112,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                              *# define ERR_SYSTEM_MASK                ((unsigned int)INT_MAX)
                              *# define ERR_REASON_MASK                0X7FFFFF
                              */
-                            ((ERR_peek_last_error() & 0X7FFFFF) == PEM_R_NO_START_LINE())) {
+                            ((ERR_peek_last_error() & ERR_REASON_MASK()) == PEM_R_NO_START_LINE())) {
                         ERR_clear_error();
                         BIO_reset(certificateBIO);
                         cert = d2i_X509_bio(certificateBIO, MemorySegment.NULL);
@@ -1188,15 +1188,41 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         EC_GROUP_free(ecparams);
                     }
                 }
-                // FIXME: Ideally these should be loaded in Java but still processed through OpenSSL
                 // Set certificate chain file
                 if (certificate.getCertificateChainFile() != null) {
-                    var certificateChainFileNative =
-                            localArena.allocateFrom(SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()));
+                    byte[] certificateChainBytes = null;
+                    try (Resource resource = ConfigFileLoader.getSource().getResource(certificate.getCertificateChainFile())) {
+                        certificateChainBytes = resource.getInputStream().readAllBytes();
+                    } catch (IOException e) {
+                        log.error(sm.getString("openssl.errorLoadingCertificate", certificate.getCertificateChainFile()), e);
+                        return false;
+                    }
                     // SSLContext.setCertificateChainFile(state.ctx,
                     //        SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
-                    if (SSL_CTX_use_certificate_chain_file(state.sslCtx, certificateChainFileNative) <= 0) {
-                        log.error(sm.getString("openssl.errorLoadingCertificate", certificate.getCertificateChainFile()));
+                    MemorySegment certificateChainBytesNative = localArena.allocateFrom(ValueLayout.JAVA_BYTE, certificateChainBytes);
+                    MemorySegment certificateChainBIO = BIO_new(BIO_s_mem());
+                    try {
+                        if (BIO_write(certificateChainBIO, certificateChainBytesNative, certificateChainBytes.length) <= 0) {
+                            log.error(sm.getString("openssl.errorLoadingCertificate", "[0]:" + certificate.getCertificateChainFile()));
+                            return false;
+                        }
+                        MemorySegment certChainEntry =
+                                PEM_read_bio_X509_AUX(certificateChainBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
+                        while (!MemorySegment.NULL.equals(certChainEntry)) {
+                            if (SSL_CTX_add0_chain_cert(state.sslCtx, certChainEntry) <= 0) {
+                                log.error(sm.getString("openssl.errorLoadingCertificate", "[1]:" + certificate.getCertificateChainFile()));
+                            }
+                            certChainEntry =
+                                    PEM_read_bio_X509_AUX(certificateChainBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
+                        }
+                        // EOF is accepted, otherwise log an error
+                        if ((ERR_peek_last_error() & ERR_REASON_MASK()) == PEM_R_NO_START_LINE()) {
+                            ERR_clear_error();
+                        } else {
+                            log.error(sm.getString("openssl.errorLoadingCertificate", "[2]:" + certificate.getCertificateChainFile()));
+                        }
+                    } finally {
+                        BIO_free(certificateChainBIO);
                     }
                 }
                 // Set revocation
