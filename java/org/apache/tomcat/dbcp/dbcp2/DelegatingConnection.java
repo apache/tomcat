@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.dbcp.dbcp2;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -41,6 +43,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.dbcp.dbcp2.managed.ManagedConnection;
 
 /**
@@ -76,6 +80,20 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     private String cachedCatalog;
     private String cachedSchema;
     private Duration defaultQueryTimeoutDuration;
+    /**
+     * Logger
+     */
+    private static final Log log = LogFactory.getLog(DelegatingConnection.class);
+    /**
+     * Request boundaries
+     */
+    private static final Method beginRequest;
+    private static final Method endRequest;
+
+    static {
+        beginRequest = getConnectionMethod("beginRequest");
+        endRequest = getConnectionMethod("endRequest");
+    }
 
     /**
      * Creates a wrapper for the Connection which traces this Connection in the AbandonedObjectPool.
@@ -84,6 +102,22 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
      */
     public DelegatingConnection(final C connection) {
         this.connection = connection;
+    }
+
+
+    /**
+     * Uses reflection to get the method form the Connection interface
+     * @param methodName name of the method to get
+     * @return the method if it exists, otherwise null
+     */
+    private static Method getConnectionMethod(String methodName) {
+        Method method = null;
+        try {
+            method = Connection.class.getMethod(methodName);
+        } catch (NoSuchMethodException ex) {
+            // Ignore exception and set both methods to null
+        }
+        return method;
     }
 
     @Override
@@ -100,6 +134,13 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
         setLastUsed();
         if (connection instanceof DelegatingConnection) {
             ((DelegatingConnection<?>) connection).activate();
+        }
+        if (beginRequest != null) {
+            try {
+                beginRequest.invoke(connection);
+            } catch (InvocationTargetException | IllegalAccessException ex) {
+                log.warn("Error calling beginRequest on connection", ex);
+            }
         }
     }
 
@@ -655,6 +696,13 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
             clearTrace();
             if (!thrownList.isEmpty()) {
                 throw new SQLExceptionList(thrownList);
+            }
+        }
+        if (endRequest != null) {
+            try {
+                endRequest.invoke(connection);
+            } catch (InvocationTargetException | IllegalAccessException ex) {
+                log.warn("Error calling endRequest on connection", ex);
             }
         }
         setLastUsed(Instant.EPOCH);
