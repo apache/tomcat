@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>27</version>
+        <version>30</version>
     </parent>
 
     <groupId>org.apache.tomcat</groupId>
@@ -78,8 +78,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>22</source>
-                    <target>22</target>
+                    <release>22</release>
                 </configuration>
             </plugin>
             <plugin>
