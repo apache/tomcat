@@ -1031,7 +1031,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      * this container. Unexpected throwables will be caught and logged.
      */
     @Override
-    public void backgroundProcess() {
+    public synchronized void backgroundProcess() {
 
         if (!getState().isAvailable()) {
             return;

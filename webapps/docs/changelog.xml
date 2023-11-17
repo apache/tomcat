@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0-M15 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Background processes should not be run concurrently with lifecycle
+        oprations of a container. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
