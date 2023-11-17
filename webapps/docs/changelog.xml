@@ -104,7 +104,17 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 10.1.16 (schultz)" rtext="in development">
+<section name="Tomcat 10.1.17 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Background processes should not be run concurrently with lifecycle
+        oprations of a container. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 10.1.16 (schultz)" rtext="2023-11-14">
   <subsection name="Catalina">
     <changelog>
       <fix>
