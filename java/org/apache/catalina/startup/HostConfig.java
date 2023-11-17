@@ -1680,15 +1680,22 @@ public class HostConfig implements LifecycleListener {
      * @param name The name of the web application to check
      */
     public void check(String name) {
-        if (tryAddServiced(name)) {
-            try {
-                DeployedApplication app = deployed.get(name);
-                if (app != null) {
-                    checkResources(app, true);
+        synchronized (host) {
+            if (host instanceof Lifecycle) {
+                if (!((Lifecycle) host).getState().isAvailable()) {
+                    return;
                 }
-                deployApps(name);
-            } finally {
-                removeServiced(name);
+            }
+            if (tryAddServiced(name)) {
+                try {
+                    DeployedApplication app = deployed.get(name);
+                    if (app != null) {
+                        checkResources(app, true);
+                    }
+                    deployApps(name);
+                } finally {
+                    removeServiced(name);
+                }
             }
         }
     }
