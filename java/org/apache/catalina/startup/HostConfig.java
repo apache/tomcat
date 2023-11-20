@@ -1385,10 +1385,13 @@ public class HostConfig implements LifecycleListener {
             } else {
                 // There is a chance the the resource was only missing
                 // temporarily eg renamed during a text editor save
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e1) {
-                    // Ignore
+                if (resource.exists() ||
+                    !resource.getName().toLowerCase(Locale.ENGLISH).endsWith(".war")) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e1) {
+                        // Ignore
+                    }
                 }
                 // Recheck the resource to see if it was really deleted
                 if (resource.exists()) {
