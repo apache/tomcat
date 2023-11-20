@@ -126,6 +126,9 @@
       <update>
         Update the OWB module to Apache OpenWebBeans 4.0.0. (remm)
       </update>
+      <fix>
+        <bug>68124</bug>: Migrate sample.war from javax to jakarta. (lihan)
+      </fix>
     </changelog>
   </subsection>
 </section>
