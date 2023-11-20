@@ -113,6 +113,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>68124</bug>: Migrate sample.war from javax to jakarta. (lihan)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.16 (schultz)" rtext="2023-11-14">
   <subsection name="Catalina">
