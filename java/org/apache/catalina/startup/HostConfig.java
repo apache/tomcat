@@ -308,13 +308,15 @@ public class HostConfig implements LifecycleListener {
      * @return 0L if no application with that name is deployed, or the instant
      *  on which the application was deployed
      */
-    public synchronized long getDeploymentTime(String name) {
-        DeployedApplication app = deployed.get(name);
-        if (app == null) {
-            return 0L;
-        }
+    public long getDeploymentTime(String name) {
+        synchronized (host) {
+            DeployedApplication app = deployed.get(name);
+            if (app == null) {
+                return 0L;
+            }
 
-        return app.timestamp;
+            return app.timestamp;
+        }
     }
 
 
@@ -1311,7 +1313,7 @@ public class HostConfig implements LifecycleListener {
      *              least as long ago as the resolution of the file time stamp
      *              be skipped
      */
-    protected synchronized void checkResources(DeployedApplication app,
+    protected void checkResources(DeployedApplication app,
             boolean skipFileModificationResolutionCheck) {
         String[] resources =
             app.redeployResources.keySet().toArray(new String[0]);
@@ -1710,57 +1712,59 @@ public class HostConfig implements LifecycleListener {
      * Check for old versions of applications using parallel deployment that are
      * now unused (have no active sessions) and undeploy any that are found.
      */
-    public synchronized void checkUndeploy() {
-        if (deployed.size() < 2) {
-            return;
-        }
+    public void checkUndeploy() {
+        synchronized (host) {
+            if (deployed.size() < 2) {
+                return;
+            }
 
-        // Need ordered set of names
-        SortedSet<String> sortedAppNames = new TreeSet<>(deployed.keySet());
+            // Need ordered set of names
+            SortedSet<String> sortedAppNames = new TreeSet<>(deployed.keySet());
 
-        Iterator<String> iter = sortedAppNames.iterator();
+            Iterator<String> iter = sortedAppNames.iterator();
 
-        ContextName previous = new ContextName(iter.next(), false);
-        do {
-            ContextName current = new ContextName(iter.next(), false);
+            ContextName previous = new ContextName(iter.next(), false);
+            do {
+                ContextName current = new ContextName(iter.next(), false);
 
-            if (current.getPath().equals(previous.getPath())) {
-                // Current and previous are same path - current will always
-                // be a later version
-                Context previousContext = (Context) host.findChild(previous.getName());
-                Context currentContext = (Context) host.findChild(current.getName());
-                if (previousContext != null && currentContext != null &&
-                        currentContext.getState().isAvailable() &&
-                        tryAddServiced(previous.getName())) {
-                    try {
-                        Manager manager = previousContext.getManager();
-                        if (manager != null) {
-                            int sessionCount;
-                            if (manager instanceof DistributedManager) {
-                                sessionCount = ((DistributedManager) manager).getActiveSessionsFull();
-                            } else {
-                                sessionCount = manager.getActiveSessions();
-                            }
-                            if (sessionCount == 0) {
-                                if (log.isInfoEnabled()) {
-                                    log.info(sm.getString("hostConfig.undeployVersion", previous.getName()));
+                if (current.getPath().equals(previous.getPath())) {
+                    // Current and previous are same path - current will always
+                    // be a later version
+                    Context previousContext = (Context) host.findChild(previous.getName());
+                    Context currentContext = (Context) host.findChild(current.getName());
+                    if (previousContext != null && currentContext != null &&
+                            currentContext.getState().isAvailable() &&
+                            tryAddServiced(previous.getName())) {
+                        try {
+                            Manager manager = previousContext.getManager();
+                            if (manager != null) {
+                                int sessionCount;
+                                if (manager instanceof DistributedManager) {
+                                    sessionCount = ((DistributedManager) manager).getActiveSessionsFull();
+                                } else {
+                                    sessionCount = manager.getActiveSessions();
                                 }
-                                DeployedApplication app = deployed.get(previous.getName());
-                                String[] resources = app.redeployResources.keySet().toArray(new String[0]);
-                                // Version is unused - undeploy it completely
-                                // The -1 is a 'trick' to ensure all redeploy
-                                // resources are removed
-                                undeploy(app);
-                                deleteRedeployResources(app, resources, -1, true);
+                                if (sessionCount == 0) {
+                                    if (log.isInfoEnabled()) {
+                                        log.info(sm.getString("hostConfig.undeployVersion", previous.getName()));
+                                    }
+                                    DeployedApplication app = deployed.get(previous.getName());
+                                    String[] resources = app.redeployResources.keySet().toArray(new String[0]);
+                                    // Version is unused - undeploy it completely
+                                    // The -1 is a 'trick' to ensure all redeploy
+                                    // resources are removed
+                                    undeploy(app);
+                                    deleteRedeployResources(app, resources, -1, true);
+                                }
                             }
+                        } finally {
+                            removeServiced(previous.getName());
                         }
-                    } finally {
-                        removeServiced(previous.getName());
                     }
                 }
-            }
-            previous = current;
-        } while (iter.hasNext());
+                previous = current;
+            } while (iter.hasNext());
+        }
     }
 
     /**
