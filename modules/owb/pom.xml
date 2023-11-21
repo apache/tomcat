@@ -29,7 +29,7 @@
     <name>Apache Tomcat CDI 4 support</name>
     <description>Apache Tomcat CDI 4 support using Apache OpenWebBeans</description>
     <!-- This is the Apache OpenWebBeans version -->
-    <version>4.0.0</version>
+    <version>4.0.1</version>
     <packaging>jar</packaging>
 
     <properties>
