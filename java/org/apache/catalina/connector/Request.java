@@ -836,6 +836,7 @@ public class Request implements HttpServletRequest {
      *
      * @param name Name of the request attribute to return
      */
+    @SuppressWarnings("deprecation")
     @Override
     public Object getAttribute(String name) {
         // Special attributes
@@ -860,6 +861,11 @@ public class Request implements HttpServletRequest {
             if (attr != null) {
                 attributes.put(Globals.CERTIFICATES_ATTR, attr);
             }
+            attr = coyoteRequest.getAttribute(Globals.SECURE_PROTOCOL_ATTR);
+            if (attr != null) {
+                attributes.put(Globals.SECURE_PROTOCOL_ATTR, attr);
+                attributes.put(SSLSupport.PROTOCOL_VERSION_KEY, attr);
+            }
             attr = coyoteRequest.getAttribute(Globals.CIPHER_SUITE_ATTR);
             if (attr != null) {
                 attributes.put(Globals.CIPHER_SUITE_ATTR, attr);
@@ -875,10 +881,6 @@ public class Request implements HttpServletRequest {
             attr = coyoteRequest.getAttribute(Globals.SSL_SESSION_MGR_ATTR);
             if (attr != null) {
                 attributes.put(Globals.SSL_SESSION_MGR_ATTR, attr);
-            }
-            attr = coyoteRequest.getAttribute(SSLSupport.PROTOCOL_VERSION_KEY);
-            if (attr != null) {
-                attributes.put(SSLSupport.PROTOCOL_VERSION_KEY, attr);
             }
             attr = coyoteRequest.getAttribute(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY);
             if (attr != null) {
@@ -911,6 +913,7 @@ public class Request implements HttpServletRequest {
      * <li>{@link Globals#DISPATCHER_REQUEST_PATH_ATTR}</li>
      * <li>{@link Globals#ASYNC_SUPPORTED_ATTR}</li>
      * <li>{@link Globals#CERTIFICATES_ATTR} (SSL connections only)</li>
+     * <li>{@link Globals#SECURE_PROTOCOL_ATTR} (SSL connections only)</li>
      * <li>{@link Globals#CIPHER_SUITE_ATTR} (SSL connections only)</li>
      * <li>{@link Globals#KEY_SIZE_ATTR} (SSL connections only)</li>
      * <li>{@link Globals#SSL_SESSION_ID_ATTR} (SSL connections only)</li>

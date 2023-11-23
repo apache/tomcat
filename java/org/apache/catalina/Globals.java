@@ -130,6 +130,13 @@ public final class Globals {
 
 
     /**
+     * The request attribute under which we store the name of the security protocol (e.g. TLSv1.3) being used on a
+     * secured connection (as an object of type {@link String}).
+     */
+    public static final String SECURE_PROTOCOL_ATTR = "jakarta.servlet.request.secure_protocol";
+
+
+    /**
      * The request attribute under which we store the name of the cipher suite
      * being used on an SSL connection (as an object of type {@link String}).
      */

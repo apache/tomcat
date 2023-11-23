@@ -132,6 +132,7 @@ public class AjpProcessor extends AbstractProcessor {
 
         // Build Map of Java Servlet to Jakarta Servlet attribute names
         Map<String, String> m = new HashMap<>();
+        m.put("jakarta.servlet.request.secure_protocol", "jakarta.servlet.request.secure_protocol");
         m.put("jakarta.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite");
         m.put("jakarta.servlet.request.key_size", "jakarta.servlet.request.key_size");
         m.put("jakarta.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session");
@@ -643,6 +644,7 @@ public class AjpProcessor extends AbstractProcessor {
     /**
      * After reading the request headers, we have to setup the request filters.
      */
+    @SuppressWarnings("deprecation")
     private void prepareRequest() {
 
         // Translate the HTTP method code to a String.
@@ -751,6 +753,7 @@ public class AjpProcessor extends AbstractProcessor {
                             // Ignore invalid value
                         }
                     } else if (n.equals(Constants.SC_A_SSL_PROTOCOL)) {
+                        request.setAttribute(SSLSupport.SECURE_PROTOCOL_KEY, v);
                         request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, v);
                     } else if (n.equals("JK_LB_ACTIVATION")) {
                         request.setAttribute(n, v);

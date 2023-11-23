@@ -46,6 +46,7 @@ import org.apache.tomcat.util.buf.UDecoder;
  * <pre>
  * &lt;IfModule ssl_module&gt;
  *   RequestHeader set SSL_CLIENT_CERT "%{SSL_CLIENT_CERT}s"
+ *   RequestHeader set SSL_SECURE_PROTOCOL "%{SSL_PROTOCOL}s"
  *   RequestHeader set SSL_CIPHER "%{SSL_CIPHER}s"
  *   RequestHeader set SSL_SESSION_ID "%{SSL_SESSION_ID}s"
  *   RequestHeader set SSL_CIPHER_USEKEYSIZE "%{SSL_CIPHER_USEKEYSIZE}s"
@@ -67,6 +68,7 @@ public class SSLValve extends ValveBase {
 
     private String sslClientCertHeader = "ssl_client_cert";
     private String sslClientEscapedCertHeader = "ssl_client_escaped_cert";
+    private String sslSecureProtocolHeader = "ssl_secure_protocol";
     private String sslCipherHeader = "ssl_cipher";
     private String sslSessionIdHeader = "ssl_session_id";
     private String sslCipherUserKeySizeHeader = "ssl_cipher_usekeysize";
@@ -91,6 +93,14 @@ public class SSLValve extends ValveBase {
 
     public void setSslClientEscapedCertHeader(String sslClientEscapedCertHeader) {
         this.sslClientEscapedCertHeader = sslClientEscapedCertHeader;
+    }
+
+    public String getSslSecureProtocolHeader() {
+        return sslSecureProtocolHeader;
+    }
+
+    public void setSslSecureProtocolHeader(String sslSecureProtocolHeader) {
+        this.sslSecureProtocolHeader = sslSecureProtocolHeader;
     }
 
     public String getSslCipherHeader() {
@@ -177,6 +187,10 @@ public class SSLValve extends ValveBase {
                 }
                 request.setAttribute(Globals.CERTIFICATES_ATTR, jsseCerts);
             }
+        }
+        headerValue = mygetHeader(request, sslSecureProtocolHeader);
+        if (headerValue != null) {
+            request.setAttribute(Globals.SECURE_PROTOCOL_ATTR, headerValue);
         }
         headerValue = mygetHeader(request, sslCipherHeader);
         if (headerValue != null) {

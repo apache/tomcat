@@ -269,6 +269,17 @@ public class TestSSLValve {
 
 
     @Test
+    public void testSslSecureProtocolHeaderPresent() throws Exception {
+        String protocol = "secured-with";
+        mockRequest.setHeader(valve.getSslSecureProtocolHeader(), protocol);
+
+        valve.invoke(mockRequest, null);
+
+        Assert.assertEquals(protocol, mockRequest.getAttribute(Globals.SECURE_PROTOCOL_ATTR));
+    }
+
+
+    @Test
     public void testSslCipherHeaderPresent() throws Exception {
         String cipher = "ciphered-with";
         mockRequest.setHeader(valve.getSslCipherHeader(), cipher);
