@@ -438,6 +438,7 @@ public abstract class PageContext extends JspContext {
         }
 
         return new ErrorData((Throwable) getRequest().getAttribute(RequestDispatcher.ERROR_EXCEPTION), status,
+                (String) getRequest().getAttribute(RequestDispatcher.ERROR_METHOD),
                 (String) getRequest().getAttribute(RequestDispatcher.ERROR_REQUEST_URI),
                 (String) getRequest().getAttribute(RequestDispatcher.ERROR_SERVLET_NAME),
                 (String) getRequest().getAttribute(RequestDispatcher.ERROR_QUERY_STRING));

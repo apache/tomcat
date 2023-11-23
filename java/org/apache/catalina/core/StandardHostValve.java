@@ -218,6 +218,7 @@ final class StandardHostValve extends ValveBase {
             if (wrapper != null) {
                 request.setAttribute(RequestDispatcher.ERROR_SERVLET_NAME, wrapper.getName());
             }
+            request.setAttribute(RequestDispatcher.ERROR_METHOD, request.getMethod());
             request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI, request.getRequestURI());
             request.setAttribute(RequestDispatcher.ERROR_QUERY_STRING, request.getQueryString());
             if (custom(request, response, errorPage)) {
@@ -283,6 +284,7 @@ final class StandardHostValve extends ValveBase {
                 if (wrapper != null) {
                     request.setAttribute(RequestDispatcher.ERROR_SERVLET_NAME, wrapper.getName());
                 }
+                request.setAttribute(RequestDispatcher.ERROR_METHOD, request.getMethod());
                 request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI, request.getRequestURI());
                 request.setAttribute(RequestDispatcher.ERROR_QUERY_STRING, request.getQueryString());
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE, realError.getClass());

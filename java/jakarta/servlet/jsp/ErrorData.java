@@ -29,6 +29,7 @@ public final class ErrorData {
 
     private final Throwable throwable;
     private final int statusCode;
+    private final String method;
     private final String uri;
     private final String servletName;
     private final String queryString;
@@ -41,11 +42,11 @@ public final class ErrorData {
      * @param uri         The request URI
      * @param servletName The name of the servlet invoked
      *
-     * @deprecated Use {#link {@link ErrorData#ErrorData(Throwable, int, String, String, String)}
+     * @deprecated Use {#link {@link ErrorData#ErrorData(Throwable, int, String, String, String, String)}
      */
     @Deprecated(since = "4.0", forRemoval = true)
     public ErrorData(Throwable throwable, int statusCode, String uri, String servletName) {
-        this(throwable, statusCode, uri, servletName, null);
+        this(throwable, statusCode, null, uri, servletName, null);
     }
 
     /**
@@ -53,15 +54,18 @@ public final class ErrorData {
      *
      * @param throwable   The Throwable that is the cause of the error
      * @param statusCode  The status code of the error
+     * @param method      The request method
      * @param uri         The request URI
      * @param servletName The name of the servlet invoked
      * @param queryString The request query string
      *
      * @since JSP 4.0
      */
-    public ErrorData(Throwable throwable, int statusCode, String uri, String servletName, String queryString) {
+    public ErrorData(Throwable throwable, int statusCode, String method, String uri, String servletName,
+            String queryString) {
         this.throwable = throwable;
         this.statusCode = statusCode;
+        this.method = method;
         this.uri = uri;
         this.servletName = servletName;
         this.queryString = queryString;
@@ -83,6 +87,15 @@ public final class ErrorData {
      */
     public int getStatusCode() {
         return this.statusCode;
+    }
+
+    /**
+     * Returns the request method.
+     *
+     * @return The request method
+     */
+    public String getMethod() {
+        return this.method;
     }
 
     /**

@@ -186,6 +186,14 @@ public interface RequestDispatcher {
     String ERROR_MESSAGE = "jakarta.servlet.error.message";
 
     /**
+     * The name of the request attribute under which the method of the request whose processing caused the error is
+     * propagated during an error dispatch.
+     *
+     * @since Servlet 6.1
+     */
+    String ERROR_METHOD = "jakarta.servlet.error.method";
+
+    /**
      * The name of the request attribute that should be set by the container when custom error-handling servlet or JSP
      * page is invoked. The value of the attribute is of type {@code String}. See the chapter "Error Handling" in the
      * Servlet Specification for details.

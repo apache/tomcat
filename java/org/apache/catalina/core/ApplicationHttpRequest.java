@@ -115,6 +115,10 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     protected DispatcherType dispatcherType = null;
 
+    /**
+     * The HTTP method for this request.
+     */
+    private String method;
 
     /**
      * The request parameters for this request. This is initialized from the wrapped request.
@@ -369,6 +373,13 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     @Override
     public String getContextPath() {
         return this.contextPath;
+    }
+
+
+
+    @Override
+    public String getMethod() {
+        return method;
     }
 
 
@@ -651,11 +662,22 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         // Initialize the path elements for this request
         contextPath = request.getContextPath();
+        method = request.getMethod();
         pathInfo = request.getPathInfo();
         queryString = request.getQueryString();
         requestURI = request.getRequestURI();
         servletPath = request.getServletPath();
         mapping = request.getHttpServletMapping();
+    }
+
+
+    /**
+     * Set the request method for this request.
+     *
+     * @param method The new request method
+     */
+    void setMethod(String method) {
+        this.method = method;
     }
 
 

@@ -234,6 +234,13 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
 
             ApplicationHttpRequest wrequest = (ApplicationHttpRequest) wrapRequest(state);
             HttpServletRequest hrequest = state.hrequest;
+            /*
+             * All ERROR dispatches must be GET requests. Use the presence of ERROR_METHOD to determine if this is an
+             * error dispatch as not all components (JSP) set the dispatcher type.
+             */
+            if (request.getAttribute(ERROR_METHOD) != null) {
+                wrequest.setMethod("GET");
+            }
             wrequest.setRequestURI(hrequest.getRequestURI());
             wrequest.setContextPath(hrequest.getContextPath());
             wrequest.setServletPath(hrequest.getServletPath());
@@ -257,6 +264,13 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
                 wrequest.setAttribute(FORWARD_MAPPING, hrequest.getHttpServletMapping());
             }
 
+            /*
+             * All ERROR dispatches must be GET requests. Use the presence of ERROR_METHOD to determine if this is an
+             * error dispatch as not all components (JSP) set the dispatcher type.
+             */
+            if (request.getAttribute(ERROR_METHOD) != null) {
+                wrequest.setMethod("GET");
+            }
             wrequest.setContextPath(context.getEncodedPath());
             wrequest.setRequestURI(requestURI);
             wrequest.setServletPath(servletPath);
