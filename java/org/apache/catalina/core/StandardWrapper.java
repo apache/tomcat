@@ -512,7 +512,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
      * this container. Unexpected throwables will be caught and logged.
      */
     @Override
-    public void backgroundProcess() {
+    public synchronized void backgroundProcess() {
         super.backgroundProcess();
 
         if (!getState().isAvailable()) {
