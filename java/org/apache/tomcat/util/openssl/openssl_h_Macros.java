@@ -60,7 +60,6 @@ public class openssl_h_Macros {
      * SSL_CTRL_GET_SESS_CACHE_SIZE, 0, NULL)
      *
      * @param sslCtx    the SSL context
-     * @param cacheSize the session cache size
      *
      * @return > 0 if successful
      */
@@ -182,6 +181,8 @@ public class openssl_h_Macros {
 
     /**
      * Free memory. # define OPENSSL_free(addr) \ CRYPTO_free(addr, OPENSSL_FILE, OPENSSL_LINE)
+     *
+     * @param segment The address to free
      */
     public static void OPENSSL_free(MemorySegment segment) {
         CRYPTO_free(segment, MemorySegment.NULL, 0);
@@ -190,6 +191,10 @@ public class openssl_h_Macros {
 
     /**
      * Reset BIO position. # define BIO_reset(b) \ (int)BIO_ctrl(b,BIO_CTRL_RESET,0,NULL)
+     *
+     * @param bio The BIO to reset
+     *
+     * @return > 0 if successful
      */
     public static long BIO_reset(MemorySegment bio) {
         return BIO_ctrl(bio, BIO_CTRL_RESET(), 0, MemorySegment.NULL);
@@ -229,11 +234,11 @@ public class openssl_h_Macros {
      * Pass a file which will be loaded into the store. # define X509_LOOKUP_load_file(x,name,type) \
      * X509_LOOKUP_ctrl((x),X509_L_FILE_LOAD,(name),(long)(type),NULL)
      *
-     * @param x509Lookup
-     * @param name
-     * @param type
+     * @param x509Lookup the X509 lookup
+     * @param name       the path name
+     * @param type       the type used
      *
-     * @return
+     * @return > 0 if successful
      */
     public static long X509_LOOKUP_load_file(MemorySegment x509Lookup, MemorySegment name, long type) {
         return X509_LOOKUP_ctrl(x509Lookup, X509_L_FILE_LOAD(), name, X509_FILETYPE_PEM(), MemorySegment.NULL);
