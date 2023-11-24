@@ -25,6 +25,7 @@ import java.lang.foreign.*;
  * {@snippet : * void (*SSL_set_info_callback$cb)(const SSL*,int,int);
  * }
  */
+@SuppressWarnings("javadoc")
 public interface SSL_set_info_callback$cb {
 
     void apply(java.lang.foreign.MemorySegment _x0, int _x1, int _x2);

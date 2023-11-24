@@ -23,6 +23,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 
+@SuppressWarnings("javadoc")
 public class openssl_h {
 
     public static final OfByte C_CHAR = JAVA_BYTE;

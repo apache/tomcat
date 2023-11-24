@@ -25,6 +25,7 @@ import java.lang.foreign.*;
  * {@snippet : * DH* (*SSL_CTX_set_tmp_dh_callback$dh)(SSL*,int,int);
  * }
  */
+@SuppressWarnings("javadoc")
 public interface SSL_CTX_set_tmp_dh_callback$dh {
 
     java.lang.foreign.MemorySegment apply(java.lang.foreign.MemorySegment _x0, int _x1, int _x2);

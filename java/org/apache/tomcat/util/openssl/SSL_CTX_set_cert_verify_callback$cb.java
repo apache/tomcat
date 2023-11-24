@@ -25,6 +25,7 @@ import java.lang.foreign.*;
  * {@snippet : * int (*SSL_CTX_set_cert_verify_callback$cb)(X509_STORE_CTX*,void*);
  * }
  */
+@SuppressWarnings("javadoc")
 public interface SSL_CTX_set_cert_verify_callback$cb {
 
     int apply(java.lang.foreign.MemorySegment _x0, java.lang.foreign.MemorySegment _x1);
