@@ -1692,10 +1692,8 @@ public class HostConfig implements LifecycleListener {
      */
     public void check(String name) {
         synchronized (host) {
-            if (host instanceof Lifecycle) {
-                if (!((Lifecycle) host).getState().isAvailable()) {
-                    return;
-                }
+            if (!((Lifecycle) host).getState().isAvailable()) {
+                return;
             }
             if (tryAddServiced(name)) {
                 try {
