@@ -333,13 +333,15 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     openSSLCallbackPasswordFunctionDescriptor, contextArena);
             SSL_CTX_set_default_passwd_cb(sslCtx, openSSLCallbackPassword);
 
-            alpn = (negotiableProtocols != null && negotiableProtocols.size() > 0);
-            if (alpn) {
+            if (negotiableProtocols != null && negotiableProtocols.size() > 0) {
+                alpn = true;
                 negotiableProtocolsBytes = new ArrayList<>(negotiableProtocols.size() + 1);
                 for (String negotiableProtocol : negotiableProtocols) {
                     negotiableProtocolsBytes.add(negotiableProtocol.getBytes(StandardCharsets.ISO_8859_1));
                 }
                 negotiableProtocolsBytes.add(HTTP_11_PROTOCOL);
+            } else {
+                alpn = false;
             }
 
             success = true;
@@ -737,7 +739,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // this is set so always set it in case an app is configured to
             // require it
             sessionContext.setSessionIdContext(DEFAULT_SESSION_ID_CONTEXT);
-            sslHostConfig.setOpenSslContext(state.sslCtx.address());
+            sslHostConfig.setOpenSslContext(Long.valueOf(state.sslCtx.address()));
             initialized = true;
         } catch (Exception e) {
             log.warn(sm.getString("openssl.errorSSLCtxInit"), e);
@@ -754,7 +756,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     // DH *(*tmp_dh_callback)(SSL *ssl, int is_export, int keylength)
-    public static MemorySegment openSSLCallbackTmpDH(MemorySegment ssl, int isExport, int keylength) {
+    @SuppressWarnings("deprecation")
+    public static MemorySegment openSSLCallbackTmpDH(MemorySegment ssl, @SuppressWarnings("unused") int isExport,
+            @SuppressWarnings("unused") int keylength) {
         var pkey = SSL_get_privatekey(ssl);
         int type = (MemorySegment.NULL.equals(pkey)) ? EVP_PKEY_NONE() : EVP_PKEY_base_id(pkey);
         /*
@@ -783,8 +787,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     // int SSL_callback_alpn_select_proto(SSL* ssl, const unsigned char **out, unsigned char *outlen,
     //        const unsigned char *in, unsigned int inlen, void *arg)
-    public static int openSSLCallbackAlpnSelectProto(MemorySegment ssl, MemorySegment out, MemorySegment outlen,
-            MemorySegment in, int inlen, MemorySegment arg) {
+    public static int openSSLCallbackAlpnSelectProto(@SuppressWarnings("unused") MemorySegment ssl, MemorySegment out,
+            MemorySegment outlen, MemorySegment in, int inlen, MemorySegment arg) {
         ContextState state = getState(arg);
         if (state == null) {
             log.warn(sm.getString("context.noSSL", Long.valueOf(arg.address())));
@@ -950,7 +954,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static ThreadLocal<String> callbackPasswordTheadLocal = new ThreadLocal<>();
 
-    public static int openSSLCallbackPassword(MemorySegment /*char **/ buf, int bufsiz, int verify, MemorySegment /*void **/ cb) {
+    public static int openSSLCallbackPassword(MemorySegment /*char **/ buf, int bufsiz,
+            @SuppressWarnings("unused") int verify, @SuppressWarnings("unused") MemorySegment /*void **/ cb) {
         if (log.isDebugEnabled()) {
             log.debug("Return password for certificate");
         }
@@ -972,6 +977,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
 
+    @SuppressWarnings("deprecation")
     private boolean addCertificate(SSLHostConfigCertificate certificate, Arena localArena) throws Exception {
         int index = getCertificateIndex(certificate);
         // Load Server key and certificate
@@ -1185,7 +1191,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                             curveNid = 0;
                         }
                         if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("openssl.setECDHCurve", curveNid, certificate.getCertificateFile()));
+                            log.debug(sm.getString("openssl.setECDHCurve", Integer.valueOf(curveNid),
+                                    certificate.getCertificateFile()));
                         }
                         EC_GROUP_free(ecparams);
                     }
@@ -1314,7 +1321,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         if (SSL_CTX_set0_tmp_dh_pkey(state.sslCtx, pkey) <= 0) {
                             EVP_PKEY_free(pkey);
                         } else {
-                            log.debug(sm.getString("openssl.setCustomDHParameters", numBits, certificate.getCertificateFile()));
+                            log.debug(sm.getString("openssl.setCustomDHParameters", Integer.valueOf(numBits),
+                                    certificate.getCertificateFile()));
                         }
                     } else {
                         SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_DH_AUTO(), 1, MemorySegment.NULL);

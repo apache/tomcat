@@ -1172,7 +1172,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
     }
 
-    public static void openSSLCallbackInfo(MemorySegment ssl, int where, int ret) {
+    public static void openSSLCallbackInfo(MemorySegment ssl, int where, @SuppressWarnings("unused") int ret) {
         EngineState state = getState(ssl);
         if (state == null) {
             log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.address())));
