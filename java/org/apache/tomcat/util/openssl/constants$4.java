@@ -20,44 +20,22 @@
 package org.apache.tomcat.util.openssl;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
+
 final class constants$4 {
 
     // Suppresses default constructor, ensuring non-instantiability.
-    private constants$4() {}
-    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
-        "BIO_s_mem",
-        constants$2.const$0
-    );
-    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
-        "BIO_s_bio",
-        constants$2.const$0
-    );
-    static final FunctionDescriptor const$2 = FunctionDescriptor.of(JAVA_INT,
-        RuntimeHelper.POINTER,
-        JAVA_LONG,
-        RuntimeHelper.POINTER,
-        JAVA_LONG
-    );
-    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
-        "BIO_new_bio_pair",
-        constants$4.const$2
-    );
-    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
-        "BN_new",
-        constants$2.const$0
-    );
-    static final FunctionDescriptor const$5 = FunctionDescriptor.of(JAVA_INT,
-        RuntimeHelper.POINTER,
-        JAVA_LONG
-    );
-    static final MethodHandle const$6 = RuntimeHelper.downcallHandle(
-        "BN_set_word",
-        constants$4.const$5
-    );
-}
+    private constants$4() {
+    }
 
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle("BIO_s_mem", constants$2.const$0);
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle("BIO_s_bio", constants$2.const$0);
+    static final FunctionDescriptor const$2 =
+            FunctionDescriptor.of(JAVA_INT, RuntimeHelper.POINTER, JAVA_LONG, RuntimeHelper.POINTER, JAVA_LONG);
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle("BIO_new_bio_pair", constants$4.const$2);
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle("BN_new", constants$2.const$0);
+    static final FunctionDescriptor const$5 = FunctionDescriptor.of(JAVA_INT, RuntimeHelper.POINTER, JAVA_LONG);
+    static final MethodHandle const$6 = RuntimeHelper.downcallHandle("BN_set_word", constants$4.const$5);
+}
 

@@ -20,39 +20,22 @@
 package org.apache.tomcat.util.openssl;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
+
 final class constants$12 {
 
     // Suppresses default constructor, ensuring non-instantiability.
-    private constants$12() {}
-    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
-        "X509_free",
-        constants$7.const$0
-    );
-    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
-        "d2i_X509",
-        constants$8.const$1
-    );
-    static final FunctionDescriptor const$2 = FunctionDescriptor.of(JAVA_INT,
-        RuntimeHelper.POINTER,
-        RuntimeHelper.POINTER
-    );
-    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
-        "i2d_X509",
-        constants$12.const$2
-    );
-    static final FunctionDescriptor const$4 = FunctionDescriptor.of(JAVA_INT,
-        RuntimeHelper.POINTER,
-        JAVA_INT,
-        JAVA_INT
-    );
-    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
-        "X509_get_ext_by_NID",
-        constants$12.const$4
-    );
-}
+    private constants$12() {
+    }
 
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle("X509_free", constants$7.const$0);
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle("d2i_X509", constants$8.const$1);
+    static final FunctionDescriptor const$2 =
+            FunctionDescriptor.of(JAVA_INT, RuntimeHelper.POINTER, RuntimeHelper.POINTER);
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle("i2d_X509", constants$12.const$2);
+    static final FunctionDescriptor const$4 =
+            FunctionDescriptor.of(JAVA_INT, RuntimeHelper.POINTER, JAVA_INT, JAVA_INT);
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle("X509_get_ext_by_NID", constants$12.const$4);
+}
 

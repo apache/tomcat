@@ -20,41 +20,22 @@
 package org.apache.tomcat.util.openssl;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
+
 final class constants$3 {
 
     // Suppresses default constructor, ensuring non-instantiability.
-    private constants$3() {}
-    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
-        "BIO_free",
-        constants$0.const$0
-    );
-    static final FunctionDescriptor const$1 = FunctionDescriptor.of(JAVA_INT,
-        RuntimeHelper.POINTER,
-        RuntimeHelper.POINTER,
-        JAVA_INT
-    );
-    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
-        "BIO_read",
-        constants$3.const$1
-    );
-    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
-        "BIO_write",
-        constants$3.const$1
-    );
-    static final FunctionDescriptor const$4 = FunctionDescriptor.of(JAVA_LONG,
-        RuntimeHelper.POINTER,
-        JAVA_INT,
-        JAVA_LONG,
-        RuntimeHelper.POINTER
-    );
-    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
-        "BIO_ctrl",
-        constants$3.const$4
-    );
-}
+    private constants$3() {
+    }
 
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle("BIO_free", constants$0.const$0);
+    static final FunctionDescriptor const$1 =
+            FunctionDescriptor.of(JAVA_INT, RuntimeHelper.POINTER, RuntimeHelper.POINTER, JAVA_INT);
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle("BIO_read", constants$3.const$1);
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle("BIO_write", constants$3.const$1);
+    static final FunctionDescriptor const$4 =
+            FunctionDescriptor.of(JAVA_LONG, RuntimeHelper.POINTER, JAVA_INT, JAVA_LONG, RuntimeHelper.POINTER);
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle("BIO_ctrl", constants$3.const$4);
+}
 

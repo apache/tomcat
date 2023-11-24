@@ -20,43 +20,22 @@
 package org.apache.tomcat.util.openssl;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
+
 final class constants$18 {
 
     // Suppresses default constructor, ensuring non-instantiability.
-    private constants$18() {}
-    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
-        "SSL_CIPHER_get_auth_nid",
-        constants$0.const$0
-    );
-    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
-        "SSL_pending",
-        constants$0.const$0
-    );
-    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
-        "SSL_set_bio",
-        constants$15.const$4
-    );
-    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
-        "SSL_set_cipher_list",
-        constants$12.const$2
-    );
-    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_ciphersuites",
-        constants$12.const$2
-    );
-    static final FunctionDescriptor const$5 = FunctionDescriptor.ofVoid(
-        RuntimeHelper.POINTER,
-        JAVA_INT,
-        RuntimeHelper.POINTER
-    );
-    static final MethodHandle const$6 = RuntimeHelper.downcallHandle(
-        "SSL_set_verify",
-        constants$18.const$5
-    );
-}
+    private constants$18() {
+    }
 
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle("SSL_CIPHER_get_auth_nid", constants$0.const$0);
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle("SSL_pending", constants$0.const$0);
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle("SSL_set_bio", constants$15.const$4);
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle("SSL_set_cipher_list", constants$12.const$2);
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle("SSL_CTX_set_ciphersuites", constants$12.const$2);
+    static final FunctionDescriptor const$5 =
+            FunctionDescriptor.ofVoid(RuntimeHelper.POINTER, JAVA_INT, RuntimeHelper.POINTER);
+    static final MethodHandle const$6 = RuntimeHelper.downcallHandle("SSL_set_verify", constants$18.const$5);
+}
 

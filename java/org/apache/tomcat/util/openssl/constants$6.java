@@ -20,43 +20,21 @@
 package org.apache.tomcat.util.openssl;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
 import java.lang.foreign.*;
-import static java.lang.foreign.ValueLayout.*;
+
 final class constants$6 {
 
     // Suppresses default constructor, ensuring non-instantiability.
-    private constants$6() {}
-    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
-        "BN_get_rfc3526_prime_6144",
-        constants$2.const$4
-    );
-    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
-        "BN_get_rfc3526_prime_8192",
-        constants$2.const$4
-    );
-    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
-        "ASN1_STRING_length",
-        constants$0.const$0
-    );
-    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
-        "ASN1_STRING_get0_data",
-        constants$2.const$4
-    );
-    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
-        "EVP_MD_get0_provider",
-        constants$2.const$4
-    );
-    static final FunctionDescriptor const$5 = FunctionDescriptor.of(RuntimeHelper.POINTER,
-        RuntimeHelper.POINTER,
-        RuntimeHelper.POINTER,
-        RuntimeHelper.POINTER
-    );
-    static final MethodHandle const$6 = RuntimeHelper.downcallHandle(
-        "EVP_MD_fetch",
-        constants$6.const$5
-    );
-}
+    private constants$6() {
+    }
 
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle("BN_get_rfc3526_prime_6144", constants$2.const$4);
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle("BN_get_rfc3526_prime_8192", constants$2.const$4);
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle("ASN1_STRING_length", constants$0.const$0);
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle("ASN1_STRING_get0_data", constants$2.const$4);
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle("EVP_MD_get0_provider", constants$2.const$4);
+    static final FunctionDescriptor const$5 = FunctionDescriptor.of(RuntimeHelper.POINTER, RuntimeHelper.POINTER,
+            RuntimeHelper.POINTER, RuntimeHelper.POINTER);
+    static final MethodHandle const$6 = RuntimeHelper.downcallHandle("EVP_MD_fetch", constants$6.const$5);
+}
 

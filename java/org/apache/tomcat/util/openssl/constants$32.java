@@ -20,40 +20,22 @@
 package org.apache.tomcat.util.openssl;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
+
 final class constants$32 {
 
     // Suppresses default constructor, ensuring non-instantiability.
-    private constants$32() {}
-    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
-        "ENGINE_by_id",
-        constants$2.const$4
-    );
-    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
-        "ENGINE_register_all_complete",
-        constants$27.const$0
-    );
-    static final FunctionDescriptor const$2 = FunctionDescriptor.of(JAVA_INT,
-        RuntimeHelper.POINTER,
-        RuntimeHelper.POINTER,
-        RuntimeHelper.POINTER,
-        JAVA_INT
-    );
-    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
-        "ENGINE_ctrl_cmd_string",
-        constants$32.const$2
-    );
-    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
-        "ENGINE_free",
-        constants$0.const$0
-    );
-    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
-        "ENGINE_load_private_key",
-        constants$13.const$4
-    );
-}
+    private constants$32() {
+    }
 
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle("ENGINE_by_id", constants$2.const$4);
+    static final MethodHandle const$1 =
+            RuntimeHelper.downcallHandle("ENGINE_register_all_complete", constants$27.const$0);
+    static final FunctionDescriptor const$2 = FunctionDescriptor.of(JAVA_INT, RuntimeHelper.POINTER,
+            RuntimeHelper.POINTER, RuntimeHelper.POINTER, JAVA_INT);
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle("ENGINE_ctrl_cmd_string", constants$32.const$2);
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle("ENGINE_free", constants$0.const$0);
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle("ENGINE_load_private_key", constants$13.const$4);
+}
 

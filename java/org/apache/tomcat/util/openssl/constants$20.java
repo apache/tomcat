@@ -20,34 +20,20 @@
 package org.apache.tomcat.util.openssl;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
-import java.lang.foreign.*;
-import static java.lang.foreign.ValueLayout.*;
+
 final class constants$20 {
 
     // Suppresses default constructor, ensuring non-instantiability.
-    private constants$20() {}
-    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
-        "SSL_get_peer_cert_chain",
-        constants$2.const$4
-    );
-    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_verify",
-        constants$18.const$5
-    );
-    static final MethodHandle const$2 = RuntimeHelper.upcallHandle(SSL_CTX_set_cert_verify_callback$cb.class, "apply", constants$12.const$2);
-    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
-        constants$12.const$2
-    );
-    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_cert_verify_callback",
-        constants$15.const$4
-    );
-    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
-        "SSL_CTX_use_PrivateKey",
-        constants$12.const$2
-    );
-}
+    private constants$20() {
+    }
 
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle("SSL_get_peer_cert_chain", constants$2.const$4);
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle("SSL_CTX_set_verify", constants$18.const$5);
+    static final MethodHandle const$2 =
+            RuntimeHelper.upcallHandle(SSL_CTX_set_cert_verify_callback$cb.class, "apply", constants$12.const$2);
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(constants$12.const$2);
+    static final MethodHandle const$4 =
+            RuntimeHelper.downcallHandle("SSL_CTX_set_cert_verify_callback", constants$15.const$4);
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle("SSL_CTX_use_PrivateKey", constants$12.const$2);
+}
 

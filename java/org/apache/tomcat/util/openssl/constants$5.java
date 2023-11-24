@@ -20,38 +20,18 @@
 package org.apache.tomcat.util.openssl;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
-import java.lang.foreign.*;
-import static java.lang.foreign.ValueLayout.*;
+
 final class constants$5 {
 
     // Suppresses default constructor, ensuring non-instantiability.
-    private constants$5() {}
-    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
-        "BN_get_rfc2409_prime_768",
-        constants$2.const$4
-    );
-    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
-        "BN_get_rfc2409_prime_1024",
-        constants$2.const$4
-    );
-    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
-        "BN_get_rfc3526_prime_1536",
-        constants$2.const$4
-    );
-    static final MethodHandle const$3 = RuntimeHelper.downcallHandle(
-        "BN_get_rfc3526_prime_2048",
-        constants$2.const$4
-    );
-    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
-        "BN_get_rfc3526_prime_3072",
-        constants$2.const$4
-    );
-    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
-        "BN_get_rfc3526_prime_4096",
-        constants$2.const$4
-    );
-}
+    private constants$5() {
+    }
 
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle("BN_get_rfc2409_prime_768", constants$2.const$4);
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle("BN_get_rfc2409_prime_1024", constants$2.const$4);
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle("BN_get_rfc3526_prime_1536", constants$2.const$4);
+    static final MethodHandle const$3 = RuntimeHelper.downcallHandle("BN_get_rfc3526_prime_2048", constants$2.const$4);
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle("BN_get_rfc3526_prime_3072", constants$2.const$4);
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle("BN_get_rfc3526_prime_4096", constants$2.const$4);
+}
 

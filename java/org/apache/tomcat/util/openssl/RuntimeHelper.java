@@ -30,17 +30,7 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import java.lang.foreign.AddressLayout;
-import java.lang.foreign.MemoryLayout;
-
-import static java.lang.foreign.Linker.*;
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.Long.MAX_VALUE;
 
@@ -50,11 +40,13 @@ final class RuntimeHelper {
     private static final ClassLoader LOADER = RuntimeHelper.class.getClassLoader();
     private static final MethodHandles.Lookup MH_LOOKUP = MethodHandles.lookup();
     private static final SymbolLookup SYMBOL_LOOKUP;
-    private static final SegmentAllocator THROWING_ALLOCATOR = (x, y) -> { throw new AssertionError("should not reach here"); };
-    static final AddressLayout POINTER = ValueLayout.ADDRESS.withTargetLayout(MemoryLayout.sequenceLayout(MAX_VALUE, JAVA_BYTE));
+    private static final SegmentAllocator THROWING_ALLOCATOR = (x, y) -> {
+        throw new AssertionError("should not reach here");
+    };
+    static final AddressLayout POINTER =
+            ValueLayout.ADDRESS.withTargetLayout(MemoryLayout.sequenceLayout(MAX_VALUE, JAVA_BYTE));
 
-    final static SegmentAllocator CONSTANT_ALLOCATOR =
-            (size, align) -> Arena.ofAuto().allocate(size, align);
+    final static SegmentAllocator CONSTANT_ALLOCATOR = (size, align) -> Arena.ofAuto().allocate(size, align);
 
     static {
         System.loadLibrary("ssl");
@@ -63,7 +55,8 @@ final class RuntimeHelper {
     }
 
     // Suppresses default constructor, ensuring non-instantiability.
-    private RuntimeHelper() {}
+    private RuntimeHelper() {
+    }
 
     static <T> T requireNonNull(T obj, String symbolName) {
         if (obj == null) {
@@ -73,15 +66,11 @@ final class RuntimeHelper {
     }
 
     static MemorySegment lookupGlobalVariable(String name, MemoryLayout layout) {
-        return SYMBOL_LOOKUP.find(name)
-                .map(s -> s.reinterpret(layout.byteSize()))
-                .orElse(null);
+        return SYMBOL_LOOKUP.find(name).map(s -> s.reinterpret(layout.byteSize())).orElse(null);
     }
 
     static MethodHandle downcallHandle(String name, FunctionDescriptor fdesc) {
-        return SYMBOL_LOOKUP.find(name).
-                map(addr -> LINKER.downcallHandle(addr, fdesc)).
-                orElse(null);
+        return SYMBOL_LOOKUP.find(name).map(addr -> LINKER.downcallHandle(addr, fdesc)).orElse(null);
     }
 
     static MethodHandle downcallHandle(FunctionDescriptor fdesc) {
@@ -89,9 +78,7 @@ final class RuntimeHelper {
     }
 
     static MethodHandle downcallHandleVariadic(String name, FunctionDescriptor fdesc) {
-        return SYMBOL_LOOKUP.find(name).
-                map(addr -> VarargsInvoker.make(addr, fdesc)).
-                orElse(null);
+        return SYMBOL_LOOKUP.find(name).map(addr -> VarargsInvoker.make(addr, fdesc)).orElse(null);
     }
 
     static MethodHandle upcallHandle(Class<?> fi, String name, FunctionDescriptor fdesc) {
@@ -112,7 +99,7 @@ final class RuntimeHelper {
     }
 
     static MemorySegment asArray(MemorySegment addr, MemoryLayout layout, int numElements, Arena arena) {
-         return addr.reinterpret(numElements * layout.byteSize(), arena, null);
+        return addr.reinterpret(numElements * layout.byteSize(), arena, null);
     }
 
     // Internals only below this point
@@ -129,7 +116,8 @@ final class RuntimeHelper {
 
         static {
             try {
-                INVOKE_MH = MethodHandles.lookup().findVirtual(VarargsInvoker.class, "invoke", MethodType.methodType(Object.class, SegmentAllocator.class, Object[].class));
+                INVOKE_MH = MethodHandles.lookup().findVirtual(VarargsInvoker.class, "invoke",
+                        MethodType.methodType(Object.class, SegmentAllocator.class, Object[].class));
             } catch (ReflectiveOperationException e) {
                 throw new RuntimeException(e);
             }
@@ -137,14 +125,16 @@ final class RuntimeHelper {
 
         static MethodHandle make(MemorySegment symbol, FunctionDescriptor function) {
             VarargsInvoker invoker = new VarargsInvoker(symbol, function);
-            MethodHandle handle = INVOKE_MH.bindTo(invoker).asCollector(Object[].class, function.argumentLayouts().size() + 1);
-            MethodType mtype = MethodType.methodType(function.returnLayout().isPresent() ? carrier(function.returnLayout().get(), true) : void.class);
+            MethodHandle handle =
+                    INVOKE_MH.bindTo(invoker).asCollector(Object[].class, function.argumentLayouts().size() + 1);
+            MethodType mtype = MethodType.methodType(
+                    function.returnLayout().isPresent() ? carrier(function.returnLayout().get(), true) : void.class);
             for (MemoryLayout layout : function.argumentLayouts()) {
                 mtype = mtype.appendParameterTypes(carrier(layout, false));
             }
             mtype = mtype.appendParameterTypes(Object[].class);
-            boolean needsAllocator = function.returnLayout().isPresent() &&
-                                function.returnLayout().get() instanceof GroupLayout;
+            boolean needsAllocator =
+                    function.returnLayout().isPresent() && function.returnLayout().get() instanceof GroupLayout;
             if (needsAllocator) {
                 mtype = mtype.insertParameterTypes(0, SegmentAllocator.class);
             } else {
@@ -166,7 +156,7 @@ final class RuntimeHelper {
         private Object invoke(SegmentAllocator allocator, Object[] args) throws Throwable {
             // one trailing Object[]
             int nNamedArgs = function.argumentLayouts().size();
-            assert(args.length == nNamedArgs + 1);
+            assert (args.length == nNamedArgs + 1);
             // The last argument is the array of vararg collector
             Object[] unnamedArgs = (Object[]) args[args.length - 1];
 
@@ -180,18 +170,17 @@ final class RuntimeHelper {
             }
 
             assert pos == nNamedArgs;
-            for (Object o: unnamedArgs) {
+            for (Object o : unnamedArgs) {
                 argLayouts[pos] = variadicLayout(normalize(o.getClass()));
                 pos++;
             }
             assert pos == argsCount;
 
-            FunctionDescriptor f = (function.returnLayout().isEmpty()) ?
-                    FunctionDescriptor.ofVoid(argLayouts) :
+            FunctionDescriptor f = (function.returnLayout().isEmpty()) ? FunctionDescriptor.ofVoid(argLayouts) :
                     FunctionDescriptor.of(function.returnLayout().get(), argLayouts);
             MethodHandle mh = LINKER.downcallHandle(symbol, f);
-            boolean needsAllocator = function.returnLayout().isPresent() &&
-                                            function.returnLayout().get() instanceof GroupLayout;
+            boolean needsAllocator =
+                    function.returnLayout().isPresent() && function.returnLayout().get() instanceof GroupLayout;
             if (needsAllocator) {
                 mh = mh.bindTo(allocator);
             }

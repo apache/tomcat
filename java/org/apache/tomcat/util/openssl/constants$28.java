@@ -20,38 +20,20 @@
 package org.apache.tomcat.util.openssl;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
+
 final class constants$28 {
 
     // Suppresses default constructor, ensuring non-instantiability.
-    private constants$28() {}
-    static final MethodHandle const$0 = RuntimeHelper.downcallHandle(
-        "SSL_CONF_CTX_new",
-        constants$2.const$0
-    );
-    static final MethodHandle const$1 = RuntimeHelper.downcallHandle(
-        "SSL_CONF_CTX_finish",
-        constants$0.const$0
-    );
-    static final MethodHandle const$2 = RuntimeHelper.downcallHandle(
-        "SSL_CONF_CTX_free",
-        constants$7.const$0
-    );
-    static final FunctionDescriptor const$3 = FunctionDescriptor.of(JAVA_INT,
-        RuntimeHelper.POINTER,
-        JAVA_INT
-    );
-    static final MethodHandle const$4 = RuntimeHelper.downcallHandle(
-        "SSL_CONF_CTX_set_flags",
-        constants$28.const$3
-    );
-    static final MethodHandle const$5 = RuntimeHelper.downcallHandle(
-        "SSL_CONF_CTX_set_ssl_ctx",
-        constants$21.const$1
-    );
-}
+    private constants$28() {
+    }
 
+    static final MethodHandle const$0 = RuntimeHelper.downcallHandle("SSL_CONF_CTX_new", constants$2.const$0);
+    static final MethodHandle const$1 = RuntimeHelper.downcallHandle("SSL_CONF_CTX_finish", constants$0.const$0);
+    static final MethodHandle const$2 = RuntimeHelper.downcallHandle("SSL_CONF_CTX_free", constants$7.const$0);
+    static final FunctionDescriptor const$3 = FunctionDescriptor.of(JAVA_INT, RuntimeHelper.POINTER, JAVA_INT);
+    static final MethodHandle const$4 = RuntimeHelper.downcallHandle("SSL_CONF_CTX_set_flags", constants$28.const$3);
+    static final MethodHandle const$5 = RuntimeHelper.downcallHandle("SSL_CONF_CTX_set_ssl_ctx", constants$21.const$1);
+}
 

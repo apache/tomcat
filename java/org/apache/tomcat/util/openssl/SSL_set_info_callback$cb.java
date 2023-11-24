@@ -19,22 +19,20 @@
 
 package org.apache.tomcat.util.openssl;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
 import java.lang.foreign.*;
-import static java.lang.foreign.ValueLayout.*;
+
 /**
- * {@snippet :
- * void (*SSL_set_info_callback$cb)(const SSL*,int,int);
+ * {@snippet : * void (*SSL_set_info_callback$cb)(const SSL*,int,int);
  * }
  */
 public interface SSL_set_info_callback$cb {
 
     void apply(java.lang.foreign.MemorySegment _x0, int _x1, int _x2);
+
     static MemorySegment allocate(SSL_set_info_callback$cb fi, Arena scope) {
         return RuntimeHelper.upcallStub(constants$26.const$1, fi, constants$26.const$0, scope);
     }
+
     static SSL_set_info_callback$cb ofAddress(MemorySegment addr, Arena arena) {
         MemorySegment symbol = addr.reinterpret(arena, null);
         return (java.lang.foreign.MemorySegment __x0, int __x1, int __x2) -> {
@@ -46,5 +44,4 @@ public interface SSL_set_info_callback$cb {
         };
     }
 }
-
 

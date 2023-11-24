@@ -24,16 +24,16 @@ import static java.lang.foreign.ValueLayout.*;
 /**
  * Methods used present in older OpenSSL versions but not in the current major version.
  */
-public class openssl_h_Compatibility  {
+public class openssl_h_Compatibility {
 
     // OpenSSL 1.1 FIPS_mode
-    static final FunctionDescriptor FIPS_mode$FUNC = FunctionDescriptor
-            .of(JAVA_INT);
-    static final MethodHandle FIPS_mode$MH = RuntimeHelper
-            .downcallHandle("FIPS_mode", FIPS_mode$FUNC);
+    static final FunctionDescriptor FIPS_mode$FUNC = FunctionDescriptor.of(JAVA_INT);
+    static final MethodHandle FIPS_mode$MH = RuntimeHelper.downcallHandle("FIPS_mode", FIPS_mode$FUNC);
+
     public static MethodHandle FIPS_mode$MH() {
         return RuntimeHelper.requireNonNull(FIPS_mode$MH, "FIPS_mode");
     }
+
     public static int FIPS_mode() {
         var mh$ = RuntimeHelper.requireNonNull(FIPS_mode$MH, "FIPS_mode");
         try {
@@ -44,16 +44,15 @@ public class openssl_h_Compatibility  {
     }
 
     // OpenSSL 1.1 FIPS_mode_set
-    static final FunctionDescriptor FIPS_mode_set$FUNC = FunctionDescriptor
-            .of(JAVA_INT, JAVA_INT);
-    static final MethodHandle FIPS_mode_set$MH = RuntimeHelper
-            .downcallHandle("FIPS_mode_set", FIPS_mode_set$FUNC);
+    static final FunctionDescriptor FIPS_mode_set$FUNC = FunctionDescriptor.of(JAVA_INT, JAVA_INT);
+    static final MethodHandle FIPS_mode_set$MH = RuntimeHelper.downcallHandle("FIPS_mode_set", FIPS_mode_set$FUNC);
+
     public static MethodHandle FIPS_mode_set$MH() {
         return RuntimeHelper.requireNonNull(FIPS_mode_set$MH, "FIPS_mode_set");
     }
+
     public static int FIPS_mode_set(int r) {
-        var mh$ = RuntimeHelper.requireNonNull(FIPS_mode_set$MH,
-                "FIPS_mode_set");
+        var mh$ = RuntimeHelper.requireNonNull(FIPS_mode_set$MH, "FIPS_mode_set");
         try {
             return (int) mh$.invokeExact(r);
         } catch (Throwable ex$) {
@@ -62,14 +61,14 @@ public class openssl_h_Compatibility  {
     }
 
     // OpenSSL 1.1 EVP_PKEY_base_id
-    static final FunctionDescriptor EVP_PKEY_base_id$FUNC = FunctionDescriptor
-            .of(JAVA_INT, RuntimeHelper.POINTER);
-    static final MethodHandle EVP_PKEY_base_id$MH = RuntimeHelper
-            .downcallHandle("EVP_PKEY_base_id", EVP_PKEY_base_id$FUNC);
+    static final FunctionDescriptor EVP_PKEY_base_id$FUNC = FunctionDescriptor.of(JAVA_INT, RuntimeHelper.POINTER);
+    static final MethodHandle EVP_PKEY_base_id$MH =
+            RuntimeHelper.downcallHandle("EVP_PKEY_base_id", EVP_PKEY_base_id$FUNC);
+
     public static MethodHandle EVP_PKEY_base_id$MH() {
-        return RuntimeHelper.requireNonNull(EVP_PKEY_base_id$MH,
-                "EVP_PKEY_base_id");
+        return RuntimeHelper.requireNonNull(EVP_PKEY_base_id$MH, "EVP_PKEY_base_id");
     }
+
     public static int EVP_PKEY_base_id(MemorySegment pkey) {
         var mh$ = EVP_PKEY_base_id$MH();
         try {
@@ -80,13 +79,13 @@ public class openssl_h_Compatibility  {
     }
 
     // OpenSSL 1.1 EVP_PKEY_bits
-    static final FunctionDescriptor EVP_PKEY_bits$FUNC = FunctionDescriptor
-            .of(JAVA_INT, RuntimeHelper.POINTER);
-    static final MethodHandle EVP_PKEY_bits$MH = RuntimeHelper
-            .downcallHandle("EVP_PKEY_bits", EVP_PKEY_bits$FUNC);
+    static final FunctionDescriptor EVP_PKEY_bits$FUNC = FunctionDescriptor.of(JAVA_INT, RuntimeHelper.POINTER);
+    static final MethodHandle EVP_PKEY_bits$MH = RuntimeHelper.downcallHandle("EVP_PKEY_bits", EVP_PKEY_bits$FUNC);
+
     public static MethodHandle EVP_PKEY_bits$MH() {
         return RuntimeHelper.requireNonNull(EVP_PKEY_bits$MH, "EVP_PKEY_bits");
     }
+
     public static int EVP_PKEY_bits(MemorySegment pkey) {
         var mh$ = EVP_PKEY_bits$MH();
         try {
@@ -97,15 +96,15 @@ public class openssl_h_Compatibility  {
     }
 
     // OpenSSL 1.1 SSL_get_peer_certificate
-    static final FunctionDescriptor SSL_get_peer_certificate$FUNC = FunctionDescriptor
-            .of(RuntimeHelper.POINTER, RuntimeHelper.POINTER);
-    static final MethodHandle SSL_get_peer_certificate$MH = RuntimeHelper
-            .downcallHandle("SSL_get_peer_certificate",
-                    SSL_get_peer_certificate$FUNC);
+    static final FunctionDescriptor SSL_get_peer_certificate$FUNC =
+            FunctionDescriptor.of(RuntimeHelper.POINTER, RuntimeHelper.POINTER);
+    static final MethodHandle SSL_get_peer_certificate$MH =
+            RuntimeHelper.downcallHandle("SSL_get_peer_certificate", SSL_get_peer_certificate$FUNC);
+
     public static MethodHandle SSL_get_peer_certificate$MH() {
-        return RuntimeHelper.requireNonNull(SSL_get_peer_certificate$MH,
-                "SSL_get_peer_certificate");
+        return RuntimeHelper.requireNonNull(SSL_get_peer_certificate$MH, "SSL_get_peer_certificate");
     }
+
     public static MemorySegment SSL_get_peer_certificate(MemorySegment s) {
         var mh$ = SSL_get_peer_certificate$MH();
         try {
@@ -116,5 +115,4 @@ public class openssl_h_Compatibility  {
     }
 
 }
-
 
