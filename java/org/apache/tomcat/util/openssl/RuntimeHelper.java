@@ -34,6 +34,7 @@ import java.lang.foreign.AddressLayout;
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.Long.MAX_VALUE;
 
+@SuppressWarnings("unused")
 final class RuntimeHelper {
 
     private static final Linker LINKER = Linker.nativeLinker();
