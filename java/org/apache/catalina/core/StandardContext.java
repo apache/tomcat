@@ -5264,7 +5264,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     @Override
-    public void backgroundProcess() {
+    public synchronized void backgroundProcess() {
 
         if (!getState().isAvailable()) {
             return;
