@@ -46,6 +46,10 @@ public class CompositeELResolver extends ELResolver {
     public void add(ELResolver elResolver) {
         Objects.requireNonNull(elResolver);
 
+        /*
+         * resolversSize should never be larger than resolvers.length. If it ever is, the code will fail when execution
+         * reaches System.arraycopy with an IndexOutOfBoundsException.
+         */
         if (resolversSize >= resolvers.length) {
             ELResolver[] nr = new ELResolver[resolversSize * 2];
             System.arraycopy(resolvers, 0, nr, 0, resolversSize);
