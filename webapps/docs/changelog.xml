@@ -113,6 +113,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <scode>
+        <bug>68119</bug>: Refactor the <code>CompositeELResolver</code> to
+        improve performance during type conversion operations. (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.96 (schultz)" rtext="Release in progres">
   <subsection name="Catalina">
