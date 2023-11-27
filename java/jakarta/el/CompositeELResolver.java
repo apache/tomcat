@@ -39,7 +39,6 @@ public class CompositeELResolver extends ELResolver {
         KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(BeanNameELResolver.class.getName());
         KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(ListELResolver.class.getName());
         KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(MapELResolver.class.getName());
-        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(OptionalELResolver.class.getName());
         KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(RecordELResolver.class.getName());
         KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(ResourceBundleELResolver.class.getName());
         KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(StaticFieldELResolver.class.getName());
@@ -49,7 +48,7 @@ public class CompositeELResolver extends ELResolver {
         KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("jakarta.servlet.jsp.el.NotFoundELResolver");
         KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("jakarta.servlet.jsp.el.ScopedAttributeELResolver");
         // Tomcat internal resolvers - referenced by name to avoid creating dependency
-        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("org.apache.jasper.el.JasperELResolver");
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("org.apache.jasper.el.JasperELResolver$GraalBeanELResolver");
         KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("org.apache.el.stream.StreamELResolverImpl");
     }
 
@@ -192,7 +191,7 @@ public class CompositeELResolver extends ELResolver {
         context.setPropertyResolved(false);
         int sz = typeConvertersSize;
         for (int i = 0; i < sz; i++) {
-            T result = this.resolvers[i].convertToType(context, obj, type);
+            T result = this.typeConverters[i].convertToType(context, obj, type);
             if (context.isPropertyResolved()) {
                 return result;
             }
