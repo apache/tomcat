@@ -31,32 +31,32 @@ public class CompositeELResolver extends ELResolver {
         SCOPED_ATTRIBUTE_EL_RESOLVER = clazz;
     }
 
-    private int size;
+    private int resolversSize;
 
     private ELResolver[] resolvers;
 
     public CompositeELResolver() {
-        this.size = 0;
-        this.resolvers = new ELResolver[8];
+        resolversSize = 0;
+        resolvers = new ELResolver[8];
     }
 
     public void add(ELResolver elResolver) {
         Objects.requireNonNull(elResolver);
 
-        if (this.size >= this.resolvers.length) {
-            ELResolver[] nr = new ELResolver[this.size * 2];
-            System.arraycopy(this.resolvers, 0, nr, 0, this.size);
-            this.resolvers = nr;
+        if (resolversSize >= resolvers.length) {
+            ELResolver[] nr = new ELResolver[resolversSize * 2];
+            System.arraycopy(resolvers, 0, nr, 0, resolversSize);
+            resolvers = nr;
         }
-        this.resolvers[this.size++] = elResolver;
+        resolvers[resolversSize++] = elResolver;
     }
 
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
         context.setPropertyResolved(false);
-        int sz = this.size;
+        int sz = resolversSize;
         for (int i = 0; i < sz; i++) {
-            Object result = this.resolvers[i].getValue(context, base, property);
+            Object result = resolvers[i].getValue(context, base, property);
             if (context.isPropertyResolved()) {
                 return result;
             }
@@ -67,7 +67,7 @@ public class CompositeELResolver extends ELResolver {
     @Override
     public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
         context.setPropertyResolved(false);
-        int sz = this.size;
+        int sz = this.resolversSize;
         for (int i = 0; i < sz; i++) {
             Object obj = this.resolvers[i].invoke(context, base, method, paramTypes, params);
             if (context.isPropertyResolved()) {
@@ -80,7 +80,7 @@ public class CompositeELResolver extends ELResolver {
     @Override
     public Class<?> getType(ELContext context, Object base, Object property) {
         context.setPropertyResolved(false);
-        int sz = this.size;
+        int sz = this.resolversSize;
         for (int i = 0; i < sz; i++) {
             Class<?> type = this.resolvers[i].getType(context, base, property);
             if (context.isPropertyResolved()) {
@@ -103,7 +103,7 @@ public class CompositeELResolver extends ELResolver {
     @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
         context.setPropertyResolved(false);
-        int sz = this.size;
+        int sz = this.resolversSize;
         for (int i = 0; i < sz; i++) {
             this.resolvers[i].setValue(context, base, property, value);
             if (context.isPropertyResolved()) {
@@ -115,7 +115,7 @@ public class CompositeELResolver extends ELResolver {
     @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         context.setPropertyResolved(false);
-        int sz = this.size;
+        int sz = this.resolversSize;
         for (int i = 0; i < sz; i++) {
             boolean readOnly = this.resolvers[i].isReadOnly(context, base, property);
             if (context.isPropertyResolved()) {
@@ -128,7 +128,7 @@ public class CompositeELResolver extends ELResolver {
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
         Class<?> commonType = null;
-        int sz = this.size;
+        int sz = this.resolversSize;
         for (int i = 0; i < sz; i++) {
             Class<?> type = this.resolvers[i].getCommonPropertyType(context, base);
             if (type != null && (commonType == null || commonType.isAssignableFrom(type))) {
@@ -141,7 +141,7 @@ public class CompositeELResolver extends ELResolver {
     @Override
     public <T> T convertToType(ELContext context, Object obj, Class<T> type) {
         context.setPropertyResolved(false);
-        int sz = this.size;
+        int sz = this.resolversSize;
         for (int i = 0; i < sz; i++) {
             T result = this.resolvers[i].convertToType(context, obj, type);
             if (context.isPropertyResolved()) {
