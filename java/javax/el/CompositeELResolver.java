@@ -17,13 +17,16 @@
 package javax.el;
 
 import java.beans.FeatureDescriptor;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Set;
 
 public class CompositeELResolver extends ELResolver {
 
     private static final Class<?> SCOPED_ATTRIBUTE_EL_RESOLVER;
+    private static final Set<String> KNOWN_NON_TYPE_CONVERTING_RESOLVERS = new HashSet<>();
     static {
         Class<?> clazz = null;
         try {
@@ -32,15 +35,39 @@ public class CompositeELResolver extends ELResolver {
             // Ignore. This is expected if using the EL stand-alone
         }
         SCOPED_ATTRIBUTE_EL_RESOLVER = clazz;
+
+        // EL API Resolvers
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(ArrayELResolver.class.getName());
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(BeanELResolver.class.getName());
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(BeanNameELResolver.class.getName());
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(ListELResolver.class.getName());
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(MapELResolver.class.getName());
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(ResourceBundleELResolver.class.getName());
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(StaticFieldELResolver.class.getName());
+        // JSP API Resolvers - referenced by name to avoid creating dependency
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("jakarta.servlet.jsp.el.ImplicitObjectELResolver");
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("jakarta.servlet.jsp.el.ScopedAttributeELResolver");
+        // Tomcat internal resolvers - referenced by name to avoid creating dependency
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("org.apache.jasper.el.JasperELResolver$GraalBeanELResolver");
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("org.apache.el.stream.StreamELResolverImpl");
     }
 
     private int resolversSize;
-
     private ELResolver[] resolvers;
+
+    /*
+     * Use a separate array for ELResolvers that might implement type conversion as a performance optimisation. See
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=68119
+     */
+    private int typeConvertersSize;
+    private ELResolver[] typeConverters;
 
     public CompositeELResolver() {
         resolversSize = 0;
         resolvers = new ELResolver[8];
+
+        typeConvertersSize = 0;
+        typeConverters = new ELResolver[0];
     }
 
     public void add(ELResolver elResolver) {
@@ -56,6 +83,20 @@ public class CompositeELResolver extends ELResolver {
             resolvers = nr;
         }
         resolvers[resolversSize++] = elResolver;
+
+        if (KNOWN_NON_TYPE_CONVERTING_RESOLVERS.contains(elResolver.getClass().getName())) {
+            // Performance optimisation. ELResolver known not to perform type conversion
+            return;
+        }
+
+        if (typeConvertersSize == 0) {
+            typeConverters = new ELResolver[1];
+        } else if (typeConvertersSize == typeConverters.length) {
+            ELResolver[] expandedTypeConverters = new ELResolver[typeConvertersSize * 2];
+            System.arraycopy(typeConverters, 0, expandedTypeConverters, 0, typeConvertersSize);
+            typeConverters = expandedTypeConverters;
+        }
+        typeConverters[typeConvertersSize++] = elResolver;
     }
 
     @Override
@@ -153,9 +194,9 @@ public class CompositeELResolver extends ELResolver {
     @Override
     public Object convertToType(ELContext context, Object obj, Class<?> type) {
         context.setPropertyResolved(false);
-        int sz = this.resolversSize;
+        int sz = typeConvertersSize;
         for (int i = 0; i < sz; i++) {
-            Object result = this.resolvers[i].convertToType(context, obj, type);
+            Object result = this.typeConverters[i].convertToType(context, obj, type);
             if (context.isPropertyResolved()) {
                 return result;
             }
