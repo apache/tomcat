@@ -48,7 +48,6 @@ public class CompositeELResolver extends ELResolver {
         KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("jakarta.servlet.jsp.el.ImplicitObjectELResolver");
         KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("jakarta.servlet.jsp.el.ScopedAttributeELResolver");
         // Tomcat internal resolvers - referenced by name to avoid creating dependency
-        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("org.apache.jasper.el.JasperELResolver$GraalBeanELResolver");
         KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("org.apache.el.stream.StreamELResolverImpl");
     }
 
