@@ -100,7 +100,7 @@ final class RuntimeHelper {
     }
 
     static MemorySegment asArray(MemorySegment addr, MemoryLayout layout, int numElements, Arena arena) {
-        return addr.reinterpret(numElements * layout.byteSize(), arena, null);
+         return addr.reinterpret(numElements * layout.byteSize(), arena, null);
     }
 
     // Internals only below this point
@@ -157,7 +157,7 @@ final class RuntimeHelper {
         private Object invoke(SegmentAllocator allocator, Object[] args) throws Throwable {
             // one trailing Object[]
             int nNamedArgs = function.argumentLayouts().size();
-            assert (args.length == nNamedArgs + 1);
+            assert(args.length == nNamedArgs + 1);
             // The last argument is the array of vararg collector
             Object[] unnamedArgs = (Object[]) args[args.length - 1];
 
@@ -171,7 +171,7 @@ final class RuntimeHelper {
             }
 
             assert pos == nNamedArgs;
-            for (Object o : unnamedArgs) {
+            for (Object o: unnamedArgs) {
                 argLayouts[pos] = variadicLayout(normalize(o.getClass()));
                 pos++;
             }
@@ -232,7 +232,7 @@ final class RuntimeHelper {
             if (c.isPrimitive()) {
                 return promote(c);
             }
-            if (c == MemorySegment.class) {
+            if (MemorySegment.class.isAssignableFrom(c)) {
                 return MemorySegment.class;
             }
             throw new IllegalArgumentException("Invalid type for ABI: " + c.getTypeName());

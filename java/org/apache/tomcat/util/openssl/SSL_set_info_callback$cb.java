@@ -20,29 +20,39 @@
 package org.apache.tomcat.util.openssl;
 
 import java.lang.foreign.*;
+import java.lang.invoke.MethodHandle;
 
 /**
- * {@snippet : * void (*SSL_set_info_callback$cb)(const SSL*,int,int);
+ * {@snippet lang=c :
+ * void (*SSL_set_info_callback$cb)(const SSL*,int,int);
  * }
  */
 @SuppressWarnings("javadoc")
 public interface SSL_set_info_callback$cb {
 
-    void apply(java.lang.foreign.MemorySegment _x0, int _x1, int _x2);
-
+    FunctionDescriptor $DESC = FunctionDescriptor.ofVoid(
+        RuntimeHelper.POINTER,
+        ValueLayout.JAVA_INT,
+        ValueLayout.JAVA_INT
+    );
+    void apply(MemorySegment _x0, int _x1, int _x2);
+    MethodHandle UP$MH = RuntimeHelper.upcallHandle(SSL_set_info_callback$cb.class, "apply", $DESC);
+    
     static MemorySegment allocate(SSL_set_info_callback$cb fi, Arena scope) {
-        return RuntimeHelper.upcallStub(constants$26.const$1, fi, constants$26.const$0, scope);
+        return RuntimeHelper.upcallStub(UP$MH, fi, $DESC, scope);
     }
-
+    MethodHandle DOWN$MH = RuntimeHelper.downcallHandle($DESC);
+    
     static SSL_set_info_callback$cb ofAddress(MemorySegment addr, Arena arena) {
         MemorySegment symbol = addr.reinterpret(arena, null);
-        return (java.lang.foreign.MemorySegment __x0, int __x1, int __x2) -> {
+        return (MemorySegment __x0, int __x1, int __x2) -> {
             try {
-                constants$26.const$2.invokeExact(symbol, __x0, __x1, __x2);
+                 DOWN$MH.invokeExact(symbol, __x0, __x1, __x2);
             } catch (Throwable ex$) {
                 throw new AssertionError("should not reach here", ex$);
             }
         };
     }
 }
+
 

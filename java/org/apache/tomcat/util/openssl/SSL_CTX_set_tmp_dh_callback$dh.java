@@ -20,29 +20,40 @@
 package org.apache.tomcat.util.openssl;
 
 import java.lang.foreign.*;
+import java.lang.invoke.MethodHandle;
 
 /**
- * {@snippet : * DH* (*SSL_CTX_set_tmp_dh_callback$dh)(SSL*,int,int);
+ * {@snippet lang=c :
+ * DH* (*SSL_CTX_set_tmp_dh_callback$dh)(SSL*,int,int);
  * }
  */
 @SuppressWarnings("javadoc")
 public interface SSL_CTX_set_tmp_dh_callback$dh {
 
-    java.lang.foreign.MemorySegment apply(java.lang.foreign.MemorySegment _x0, int _x1, int _x2);
-
+    FunctionDescriptor $DESC = FunctionDescriptor.of(
+        RuntimeHelper.POINTER,
+        RuntimeHelper.POINTER,
+        ValueLayout.JAVA_INT,
+        ValueLayout.JAVA_INT
+    );
+    MemorySegment apply(MemorySegment _x0, int _x1, int _x2);
+    MethodHandle UP$MH = RuntimeHelper.upcallHandle(SSL_CTX_set_tmp_dh_callback$dh.class, "apply", $DESC);
+    
     static MemorySegment allocate(SSL_CTX_set_tmp_dh_callback$dh fi, Arena scope) {
-        return RuntimeHelper.upcallStub(constants$27.const$3, fi, constants$27.const$2, scope);
+        return RuntimeHelper.upcallStub(UP$MH, fi, $DESC, scope);
     }
-
+    MethodHandle DOWN$MH = RuntimeHelper.downcallHandle($DESC);
+    
     static SSL_CTX_set_tmp_dh_callback$dh ofAddress(MemorySegment addr, Arena arena) {
         MemorySegment symbol = addr.reinterpret(arena, null);
-        return (java.lang.foreign.MemorySegment __x0, int __x1, int __x2) -> {
+        return (MemorySegment __x0, int __x1, int __x2) -> {
             try {
-                return (java.lang.foreign.MemorySegment) constants$27.const$4.invokeExact(symbol, __x0, __x1, __x2);
+                return (MemorySegment) DOWN$MH.invokeExact(symbol, __x0, __x1, __x2);
             } catch (Throwable ex$) {
                 throw new AssertionError("should not reach here", ex$);
             }
         };
     }
 }
+
 
