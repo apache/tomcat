@@ -1953,7 +1953,7 @@ public class WebdavServlet extends DefaultServlet {
                         "<D:lockscope><D:shared/></D:lockscope>" + "<D:locktype><D:write/></D:locktype>" +
                         "</D:lockentry>";
                 generatedXML.writeElement("D", "supportedlock", XMLWriter.OPENING);
-                generatedXML.writeText(supportedLocks);
+                generatedXML.writeRaw(supportedLocks);
                 generatedXML.writeElement("D", "supportedlock", XMLWriter.CLOSING);
 
                 generateLockDiscovery(path, generatedXML);
@@ -2061,7 +2061,7 @@ public class WebdavServlet extends DefaultServlet {
                                 "<D:lockscope><D:shared/></D:lockscope>" + "<D:locktype><D:write/></D:locktype>" +
                                 "</D:lockentry>";
                         generatedXML.writeElement("D", "supportedlock", XMLWriter.OPENING);
-                        generatedXML.writeText(supportedLocks);
+                        generatedXML.writeRaw(supportedLocks);
                         generatedXML.writeElement("D", "supportedlock", XMLWriter.CLOSING);
                     } else if (property.equals("lockdiscovery")) {
                         if (!generateLockDiscovery(path, generatedXML)) {

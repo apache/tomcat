@@ -111,6 +111,11 @@
         Background processes should not be run concurrently with lifecycle
         oprations of a container. (remm)
       </fix>
+      <fix>
+        Correct unintended escaping of XML in some WebDAV responses. The XML
+        list of support locks when provided in response to a PROPFIND request
+        was incorrectly XML escaped. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

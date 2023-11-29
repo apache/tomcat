@@ -206,6 +206,16 @@ public class XMLWriter {
 
 
     /**
+     * Write raw XML data.
+     *
+     * @param raw Raw XML to append
+     */
+    public void writeRaw(String raw) {
+        buffer.append(raw);
+    }
+
+
+    /**
      * Write data.
      *
      * @param data Data to append
