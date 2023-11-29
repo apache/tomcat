@@ -122,6 +122,11 @@
         specification that requires that all HTTP error dispatches use the GET
         method. (markt)
       </add>
+      <fix>
+        Correct unintended escaping of XML in some WebDAV responses. The XML
+        list of support locks when provided in response to a PROPFIND request
+        was incorrectly XML escaped. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
