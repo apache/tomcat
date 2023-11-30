@@ -289,6 +289,7 @@ public class AsyncStateMachine {
             updateState(AsyncState.DISPATCHING);
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.DISPATCHING) {
+            asyncCtxt.fireOnComplete();
             updateState(AsyncState.DISPATCHED);
             asyncCtxt.decrementInProgressAsyncCount();
             return SocketState.ASYNC_END;
