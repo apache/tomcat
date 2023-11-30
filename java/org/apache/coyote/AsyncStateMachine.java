@@ -292,6 +292,7 @@ class AsyncStateMachine {
             if (processor.getErrorState().isIoAllowed() && processor.flushBufferedWrite()) {
                 return SocketState.LONG;
             }
+            asyncCtxt.fireOnComplete();
             updateState(AsyncState.DISPATCHED);
             asyncCtxt.decrementInProgressAsyncCount();
             return SocketState.ASYNC_END;

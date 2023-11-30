@@ -127,6 +127,11 @@
         list of support locks when provided in response to a PROPFIND request
         was incorrectly XML escaped. (markt)
       </fix>
+      <fix>
+        <bug>68227</bug>: Ensure that <code>AsyncListener.onComplete()</code> is
+        called if <code>AsyncListener.onError()</code> calls
+        <code>AsyncContext.dispatch()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
