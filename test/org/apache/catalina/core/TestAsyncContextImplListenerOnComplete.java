@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.AsyncEvent;
 import jakarta.servlet.AsyncListener;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -89,7 +90,7 @@ public class TestAsyncContextImplListenerOnComplete extends TomcatBaseTest {
     }
 
 
-    private static class ReproServlet extends jakarta.servlet.http.HttpServlet {
+    private static class ReproServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
         private final EventSource eventSource = new EventSource();
