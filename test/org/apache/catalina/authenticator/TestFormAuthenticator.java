@@ -259,7 +259,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
 
 
     @Test
-    public void doTestSelectedMethods() throws Exception {
+    public void testSelectedMethods() throws Exception {
 
         FormAuthClientSelectedMethods client =
                 new FormAuthClientSelectedMethods(true, true, true, true);
