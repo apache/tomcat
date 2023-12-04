@@ -70,7 +70,7 @@ public class TestClientReadTimeout extends TomcatBaseTest {
         InputStream is = socket.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
         String opening = reader.readLine();
-        Assert.assertNotNull(opening, "Didn't get back a response");
+        Assert.assertNotNull("Didn't get back a response", opening);
         StringBuilder sb = new StringBuilder(opening);
 
         try {
