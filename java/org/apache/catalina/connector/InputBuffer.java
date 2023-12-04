@@ -18,6 +18,7 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.net.SocketTimeoutException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -27,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.BadRequestException;
@@ -313,7 +315,11 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
         Request request = (Request) coyoteRequest.getNote(CoyoteAdapter.ADAPTER_NOTES);
         Response response = request.getResponse();
         request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, e);
-        response.sendError(400);
+        if (e instanceof SocketTimeoutException) {
+            response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT);
+        } else {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
     }
 
 
