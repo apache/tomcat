@@ -72,7 +72,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
  * but it makes no claims to generality).
  *
  */
-public class TestFormAuthenticator extends TomcatBaseTest {
+public class TestFormAuthenticatorA extends TomcatBaseTest {
 
     // these should really be singletons to be type-safe,
     // we are in a unit test and don't need to paranoid.
@@ -107,31 +107,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
                 CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
-    @Test
-    public void testPostNoContinueWithCookies() throws Exception {
-        doTest("POST", "GET", NO_100_CONTINUE,
-                CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
-    }
 
-    @Test
-    public void testPostWithContinueAndCookies() throws Exception {
-        doTest("POST", "GET", USE_100_CONTINUE,
-               CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
-    }
-
-    // Bug 49779
-    @Test
-    public void testPostNoContinuePostRedirectWithCookies() throws Exception {
-        doTest("POST", "POST", NO_100_CONTINUE,
-                CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
-    }
-
-    // Bug 49779
-    @Test
-    public void testPostWithContinuePostRedirectWithCookies() throws Exception {
-        doTest("POST", "POST", USE_100_CONTINUE,
-                CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
-    }
 
 
     // next, a set of tests where the server Context is configured to never
@@ -144,33 +120,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
                 CLIENT_NO_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
     }
 
-    @Test
-    public void testPostNoContinueNoServerCookies() throws Exception {
-        doTest("POST", "GET", NO_100_CONTINUE,
-                CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
-    }
 
-    @Test
-    public void testPostWithContinueNoServerCookies() throws Exception {
-        doTest("POST", "GET", USE_100_CONTINUE,
-                CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
-    }
-
-    // variant of Bug 49779
-    @Test
-    public void testPostNoContinuePostRedirectNoServerCookies()
-            throws Exception {
-        doTest("POST", "POST", NO_100_CONTINUE,
-                CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
-    }
-
-    // variant of Bug 49779
-    @Test
-    public void testPostWithContinuePostRedirectNoServerCookies()
-            throws Exception {
-        doTest("POST", "POST", USE_100_CONTINUE,
-                CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
-    }
 
 
     // next, a set of tests where the server Context uses cookies,
@@ -180,34 +130,6 @@ public class TestFormAuthenticator extends TomcatBaseTest {
     @Test
     public void testGetNoClientCookies() throws Exception {
         doTest("GET", "GET", NO_100_CONTINUE,
-                CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
-    }
-
-    @Test
-    public void testPostNoContinueNoClientCookies() throws Exception {
-        doTest("POST", "GET", NO_100_CONTINUE,
-                CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
-    }
-
-    @Test
-    public void testPostWithContinueNoClientCookies() throws Exception {
-        doTest("POST", "GET", USE_100_CONTINUE,
-                CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
-    }
-
-    // variant of Bug 49779
-    @Test
-    public void testPostNoContinuePostRedirectNoClientCookies()
-            throws Exception {
-        doTest("POST", "POST", NO_100_CONTINUE,
-                CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
-    }
-
-    // variant of Bug 49779
-    @Test
-    public void testPostWithContinuePostRedirectNoClientCookies()
-            throws Exception {
-        doTest("POST", "POST", USE_100_CONTINUE,
                 CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
