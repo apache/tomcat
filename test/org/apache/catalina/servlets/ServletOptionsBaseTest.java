@@ -33,6 +33,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.scan.StandardJarScanner;
 
 public abstract class ServletOptionsBaseTest extends TomcatBaseTest {
 
@@ -85,6 +86,9 @@ public abstract class ServletOptionsBaseTest extends TomcatBaseTest {
         w.addInitParameter("readonly", Boolean.toString(readonly));
 
         ctx.addServletMappingDecoded("/*", "servlet");
+
+        // Disable class path scanning - it slows the tests down by almost an order of magnitude
+        ((StandardJarScanner) ctx.getJarScanner()).setScanClassPath(false);
 
         tomcat.start();
 
