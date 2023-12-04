@@ -59,7 +59,7 @@ public class TestServletRequestParametersMultipartEncoded extends ServletRequest
         tomcat.getConnector().setMaxPostSize(50);
 
         // No file system docBase required
-        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
         ctx.setAllowCasualMultipartParsing(true);
 
         // Map the test Servlet

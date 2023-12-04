@@ -59,7 +59,7 @@ public class TestServletRequestParametersFormUrlEncoded extends ServletRequestPa
         tomcat.getConnector().setMaxPostSize(20);
 
         // No file system docBase required
-        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
 
         // Map the test Servlet
         ParameterParsingServlet parameterParsingServlet = new ParameterParsingServlet();

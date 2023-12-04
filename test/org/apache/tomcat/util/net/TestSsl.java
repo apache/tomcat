@@ -129,7 +129,7 @@ public class TestSsl extends TomcatBaseTest {
         Assert.assertTrue(connector.setProperty("connectionTimeout", "20000"));
         TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "post", new SimplePostServlet());
         ctxt.addServletMappingDecoded("/post", "post");
         tomcat.start();

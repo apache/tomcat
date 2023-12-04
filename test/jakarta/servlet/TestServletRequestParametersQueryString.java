@@ -83,7 +83,7 @@ public class TestServletRequestParametersQueryString extends ServletRequestParam
         tomcat.getConnector().setMaxParameterCount(3);
 
         // No file system docBase required
-        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
 
         // Map the test Servlet
         ParameterParsingServlet parameterParsingServlet = new ParameterParsingServlet();

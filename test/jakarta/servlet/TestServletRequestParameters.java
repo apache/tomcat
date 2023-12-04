@@ -37,7 +37,7 @@ public class TestServletRequestParameters extends ServletRequestParametersBaseTe
         Assert.assertTrue(tomcat.getConnector().setProperty("connectionTimeout", "1000"));
 
         // No file system docBase required
-        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
 
         // Map the test Servlet
         ParameterParsingServlet parameterParsingServlet = new ParameterParsingServlet();

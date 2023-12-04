@@ -50,7 +50,7 @@ public class TestAsyncError extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
         Wrapper w = Tomcat.addServlet(ctxt, "async", new AsyncErrorServlet());

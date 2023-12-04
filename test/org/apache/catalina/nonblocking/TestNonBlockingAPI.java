@@ -130,7 +130,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         NBReadServlet servlet = new NBReadServlet(ignoreIsReady, async);
         String servletName = NBReadServlet.class.getName();
@@ -170,7 +170,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         NBWriteServlet servlet = new NBWriteServlet(asyncContextIsComplete);
         String servletName = NBWriteServlet.class.getName();
@@ -350,7 +350,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         TesterAccessLogValve alv = new TesterAccessLogValve();
         ctx.getPipeline().addValve(alv);
@@ -446,7 +446,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         NBReadWriteServlet servlet = new NBReadWriteServlet();
         String servletName = NBReadWriteServlet.class.getName();
@@ -952,7 +952,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     public void testDelayedNBWrite() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         CountDownLatch latch1 = new CountDownLatch(1);
         DelayedNBWriteServlet servlet = new DelayedNBWriteServlet(latch1);
         String servletName = DelayedNBWriteServlet.class.getName();
@@ -985,7 +985,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     public void testDelayedNBReadWrite() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         CountDownLatch latch1 = new CountDownLatch(2);
         DelayedNBReadWriteServlet servlet = new DelayedNBReadWriteServlet(latch1);
         String servletName = DelayedNBReadWriteServlet.class.getName();
@@ -1243,7 +1243,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         NBReadWithDispatchServlet servlet = new NBReadWithDispatchServlet();
         String servletName = NBReadWithDispatchServlet.class.getName();
@@ -1371,7 +1371,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         PostServlet postServlet = new PostServlet(partialReadLatch, completeLatch, testFailed);
         Wrapper wrapper = Tomcat.addServlet(ctx, "postServlet", postServlet);
@@ -1549,7 +1549,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         NBWriteServlet02 writeServlet =
                 new NBWriteServlet02(responseCommitLatch, clientCloseLatch, asyncCompleteLatch, swallowIoException);
@@ -1716,7 +1716,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("socket.txBufSize", "524228"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         TesterAccessLogValve alv = new TesterAccessLogValve();
         ctx.getPipeline().addValve(alv);

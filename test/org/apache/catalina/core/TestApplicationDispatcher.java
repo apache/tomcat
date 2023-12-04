@@ -43,7 +43,7 @@ public class TestApplicationDispatcher extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "errorTrigger", new ErrorTriggerServlet());
         ctx.addServletMappingDecoded("/trigger", "errorTrigger");
