@@ -81,7 +81,6 @@ public class OpenSSLLibrary {
             if (OpenSSLStatus.isLibraryInitialized()) {
                 return;
             }
-            @SuppressWarnings("deprecation")
             long initParam = (OpenSSL_version_num() >= 0x3000000fL) ? 0 : OPENSSL_INIT_ENGINE_ALL_BUILTIN();
             OPENSSL_init_ssl(initParam, MemorySegment.NULL);
             OpenSSLStatus.setLibraryInitialized(true);
@@ -160,7 +159,6 @@ public class OpenSSLLibrary {
         }
     }
 
-    @SuppressWarnings("deprecation")
     public static void init() {
         synchronized (lock) {
 
@@ -329,7 +327,7 @@ public class OpenSSLLibrary {
         }
     }
 
-    @SuppressWarnings("deprecation")
+
     public static void destroy() {
         synchronized (lock) {
             if (!OpenSSLStatus.isInitialized()) {
