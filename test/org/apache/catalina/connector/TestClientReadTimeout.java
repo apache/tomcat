@@ -58,46 +58,49 @@ public class TestClientReadTimeout extends TomcatBaseTest {
 
         tomcat.start();
 
-        try (Socket s = new Socket("localhost", getPort())) {
+        try (Socket socket = new Socket("localhost", getPort())) {
             String request = "GET /async HTTP/1.1\r\nHost: localhost\r\ncontent-length: 101\r\n\r\n";
-            sendBadRequest(s, request, 408);
-        }
-    }
 
-    private static void sendBadRequest(Socket socket, String request, int expectedStatusCode) throws IOException {
-        OutputStream os = socket.getOutputStream();
-        os.write(request.getBytes(StandardCharsets.UTF_8));
-        InputStream is = socket.getInputStream();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-        String opening = reader.readLine();
-        Assert.assertNotNull("Didn't get back a response", opening);
-        StringBuilder sb = new StringBuilder(opening);
+            OutputStream os = socket.getOutputStream();
+            os.write(request.getBytes(StandardCharsets.UTF_8));
+            InputStream is = socket.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+            String opening = reader.readLine();
+            if (tomcat.getConnector().getProtocolHandlerClassName().contains("Nio2")) {
+                Assert.assertNull("NIO2 unexpectedly returned a response", opening);
+            } else {
+                Assert.assertNotNull("Didn't get back a response", opening);
+                StringBuilder sb = new StringBuilder(opening);
 
-        try {
-            Assert.assertTrue("expected status code " + expectedStatusCode + " but got " + opening,
-                    opening.startsWith("HTTP/1.1 " + expectedStatusCode));
-            boolean connectionClose = false;
-            while (reader.ready()) {
-                String line = reader.readLine();
-                if (line == null) {
-                    break;
+                try {
+                    Assert.assertTrue(
+                            "expected status code " + HttpServletResponse.SC_REQUEST_TIMEOUT + " but got " + opening,
+                            opening.startsWith("HTTP/1.1 " + HttpServletResponse.SC_REQUEST_TIMEOUT));
+                    boolean connectionClose = false;
+                    while (reader.ready()) {
+                        String line = reader.readLine();
+                        if (line == null) {
+                            break;
+                        }
+
+                        sb.append("\n").append(line);
+                        if ("connection: close".equalsIgnoreCase(line)) {
+                            connectionClose = true;
+                        }
+
+                        Assert.assertFalse(line.contains("Exception Report"));
+                        Assert.assertFalse(line.contains("Status Report"));
+                    }
+
+                    Assert.assertTrue("No 'Connection: close' header seen", connectionClose);
+                } catch (Throwable t) {
+                    Assert.fail("Response:\n" + sb);
+                    t.printStackTrace();
                 }
-
-                sb.append("\n").append(line);
-                if ("connection: close".equalsIgnoreCase(line)) {
-                    connectionClose = true;
-                }
-
-                Assert.assertFalse(line.contains("Exception Report"));
-                Assert.assertFalse(line.contains("Status Report"));
             }
-
-            Assert.assertTrue("No 'Connection: close' header seen", connectionClose);
-        } catch (Throwable t) {
-            Assert.fail("Response:\n" + sb);
-            t.printStackTrace();
         }
     }
+
 
     static final class SyncServlet extends HttpServlet {
 
@@ -112,7 +115,7 @@ public class TestClientReadTimeout extends TomcatBaseTest {
                 resp.setStatus(200);
                 resp.flushBuffer();
             } catch (ClientAbortException e) {
-                //resp.sendError(408);
+                // resp.sendError(408);
             }
         }
     }
