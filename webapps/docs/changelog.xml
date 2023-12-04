@@ -121,6 +121,11 @@
         called if <code>AsyncListener.onError()</code> calls
         <code>AsyncContext.dispatch()</code>. (markt)
       </fix>
+      <fix>
+        <bug>68228</bug>: Use a 408 status code if a read timeout occurs during
+        HTTP request processing. Includes a test case based on code provided by
+        adwsingh. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
