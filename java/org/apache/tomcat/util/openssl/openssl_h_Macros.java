@@ -18,6 +18,7 @@
 package org.apache.tomcat.util.openssl;
 
 import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
@@ -256,11 +257,11 @@ public class openssl_h_Macros {
      */
     public static MethodHandle X509_free$MH() {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(RuntimeHelper.POINTER);
+            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
-            static final MethodHandle MH = RuntimeHelper.downcallHandle("X509_free", DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("X509_free"), DESC);
         }
-        return RuntimeHelper.requireNonNull(Holder.MH, "X509_free");
+        return Holder.MH;
     }
 
     public static void X509_free(MemorySegment a) {
@@ -278,12 +279,12 @@ public class openssl_h_Macros {
      */
     public static MethodHandle d2i_X509$MH() {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.of(RuntimeHelper.POINTER, RuntimeHelper.POINTER,
-                    RuntimeHelper.POINTER, ValueLayout.JAVA_LONG);
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
+                    openssl_h.C_POINTER, ValueLayout.JAVA_LONG);
 
-            static final MethodHandle MH = RuntimeHelper.downcallHandle("d2i_X509", DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("d2i_X509"), DESC);
         }
-        return RuntimeHelper.requireNonNull(Holder.MH, "d2i_X509");
+        return Holder.MH;
     }
 
     public static MemorySegment d2i_X509(MemorySegment a, MemorySegment in, long len) {
@@ -301,12 +302,12 @@ public class openssl_h_Macros {
      */
     public static MethodHandle i2d_X509$MH() {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.of(ValueLayout.JAVA_INT, RuntimeHelper.POINTER,
-                    RuntimeHelper.POINTER);
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(ValueLayout.JAVA_INT, openssl_h.C_POINTER,
+                    openssl_h.C_POINTER);
 
-            static final MethodHandle MH = RuntimeHelper.downcallHandle("i2d_X509", DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("i2d_X509"), DESC);
         }
-        return RuntimeHelper.requireNonNull(Holder.MH, "i2d_X509");
+        return Holder.MH;
     }
 
     public static int i2d_X509(MemorySegment a, MemorySegment out) {
@@ -324,12 +325,12 @@ public class openssl_h_Macros {
      */
     public static MethodHandle PEM_read_bio_X509_AUX$MH() {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.of(RuntimeHelper.POINTER, RuntimeHelper.POINTER,
-                    RuntimeHelper.POINTER, RuntimeHelper.POINTER, RuntimeHelper.POINTER);
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
+                    openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
-            static final MethodHandle MH = RuntimeHelper.downcallHandle("PEM_read_bio_X509_AUX", DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("PEM_read_bio_X509_AUX"), DESC);
         }
-        return RuntimeHelper.requireNonNull(Holder.MH, "PEM_read_bio_X509_AUX");
+        return Holder.MH;
     }
 
     public static MemorySegment PEM_read_bio_X509_AUX(MemorySegment out, MemorySegment x, MemorySegment cb,
@@ -349,12 +350,12 @@ public class openssl_h_Macros {
      */
     public static MethodHandle PEM_read_bio_ECPKParameters$MH() {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.of(RuntimeHelper.POINTER, RuntimeHelper.POINTER,
-                    RuntimeHelper.POINTER, RuntimeHelper.POINTER, RuntimeHelper.POINTER);
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
+                    openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
-            static final MethodHandle MH = RuntimeHelper.downcallHandle("PEM_read_bio_ECPKParameters", DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("PEM_read_bio_ECPKParameters"), DESC);
         }
-        return RuntimeHelper.requireNonNull(Holder.MH, "PEM_read_bio_ECPKParameters");
+        return Holder.MH;
     }
 
     @Deprecated
@@ -374,12 +375,12 @@ public class openssl_h_Macros {
      */
     public static MethodHandle PEM_read_bio_DHparams$MH() {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.of(RuntimeHelper.POINTER, RuntimeHelper.POINTER,
-                    RuntimeHelper.POINTER, RuntimeHelper.POINTER, RuntimeHelper.POINTER);
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
+                    openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
-            static final MethodHandle MH = RuntimeHelper.downcallHandle("PEM_read_bio_DHparams", DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("PEM_read_bio_DHparams"), DESC);
         }
-        return RuntimeHelper.requireNonNull(Holder.MH, "PEM_read_bio_DHparams");
+        return Holder.MH;
     }
 
     @Deprecated
@@ -399,12 +400,12 @@ public class openssl_h_Macros {
      */
     public static MethodHandle PEM_read_bio_PrivateKey$MH() {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.of(RuntimeHelper.POINTER, RuntimeHelper.POINTER,
-                    RuntimeHelper.POINTER, RuntimeHelper.POINTER, RuntimeHelper.POINTER);
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
+                    openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
-            static final MethodHandle MH = RuntimeHelper.downcallHandle("PEM_read_bio_PrivateKey", DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("PEM_read_bio_PrivateKey"), DESC);
         }
-        return RuntimeHelper.requireNonNull(Holder.MH, "PEM_read_bio_PrivateKey");
+        return Holder.MH;
     }
 
     public static MemorySegment PEM_read_bio_PrivateKey(MemorySegment out, MemorySegment x, MemorySegment cb,
@@ -423,11 +424,11 @@ public class openssl_h_Macros {
      */
     public static MethodHandle PKCS12_free$MH() {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(RuntimeHelper.POINTER);
+            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
-            static final MethodHandle MH = RuntimeHelper.downcallHandle("PKCS12_free", DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("PKCS12_free"), DESC);
         }
-        return RuntimeHelper.requireNonNull(Holder.MH, "PKCS12_free");
+        return Holder.MH;
     }
 
     public static void PKCS12_free(MemorySegment a) {
@@ -446,11 +447,11 @@ public class openssl_h_Macros {
      */
     public static MethodHandle OCSP_BASICRESP_free$MH() {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(RuntimeHelper.POINTER);
+            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
-            static final MethodHandle MH = RuntimeHelper.downcallHandle("OCSP_BASICRESP_free", DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("OCSP_BASICRESP_free"), DESC);
         }
-        return RuntimeHelper.requireNonNull(Holder.MH, "OCSP_BASICRESP_free");
+        return Holder.MH;
     }
 
     public static void OCSP_BASICRESP_free(MemorySegment a) {
@@ -468,11 +469,11 @@ public class openssl_h_Macros {
      */
     public static MethodHandle OCSP_RESPONSE_free$MH() {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(RuntimeHelper.POINTER);
+            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
-            static final MethodHandle MH = RuntimeHelper.downcallHandle("OCSP_RESPONSE_free", DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("OCSP_RESPONSE_free"), DESC);
         }
-        return RuntimeHelper.requireNonNull(Holder.MH, "OCSP_RESPONSE_free");
+        return Holder.MH;
     }
 
     public static void OCSP_RESPONSE_free(MemorySegment a) {
@@ -490,12 +491,12 @@ public class openssl_h_Macros {
      */
     public static MethodHandle d2i_OCSP_RESPONSE$MH() {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.of(RuntimeHelper.POINTER, RuntimeHelper.POINTER,
-                    RuntimeHelper.POINTER, ValueLayout.JAVA_LONG);
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
+                    openssl_h.C_POINTER, ValueLayout.JAVA_LONG);
 
-            static final MethodHandle MH = RuntimeHelper.downcallHandle("d2i_OCSP_RESPONSE", DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("d2i_OCSP_RESPONSE"), DESC);
         }
-        return RuntimeHelper.requireNonNull(Holder.MH, "d2i_OCSP_RESPONSE");
+        return Holder.MH;
     }
 
     public static MemorySegment d2i_OCSP_RESPONSE(MemorySegment a, MemorySegment in, long len) {
@@ -513,11 +514,11 @@ public class openssl_h_Macros {
      */
     public static MethodHandle OCSP_CERTID_free$MH() {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(RuntimeHelper.POINTER);
+            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
-            static final MethodHandle MH = RuntimeHelper.downcallHandle("OCSP_CERTID_free", DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("OCSP_CERTID_free"), DESC);
         }
-        return RuntimeHelper.requireNonNull(Holder.MH, "OCSP_CERTID_free");
+        return Holder.MH;
     }
 
     public static void OCSP_CERTID_free(MemorySegment a) {
@@ -535,11 +536,11 @@ public class openssl_h_Macros {
      */
     public static MethodHandle OCSP_REQUEST_new$MH() {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.of(RuntimeHelper.POINTER);
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER);
 
-            static final MethodHandle MH = RuntimeHelper.downcallHandle("OCSP_REQUEST_new", DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("OCSP_REQUEST_new"), DESC);
         }
-        return RuntimeHelper.requireNonNull(Holder.MH, "OCSP_REQUEST_new");
+        return Holder.MH;
     }
 
     public static MemorySegment OCSP_REQUEST_new() {
@@ -557,11 +558,11 @@ public class openssl_h_Macros {
      */
     public static MethodHandle OCSP_REQUEST_free$MH() {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(RuntimeHelper.POINTER);
+            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
-            static final MethodHandle MH = RuntimeHelper.downcallHandle("OCSP_REQUEST_free", DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("OCSP_REQUEST_free"), DESC);
         }
-        return RuntimeHelper.requireNonNull(Holder.MH, "OCSP_REQUEST_free");
+        return Holder.MH;
     }
 
     public static void OCSP_REQUEST_free(MemorySegment a) {
@@ -579,12 +580,12 @@ public class openssl_h_Macros {
      */
     public static MethodHandle i2d_OCSP_REQUEST$MH() {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.of(ValueLayout.JAVA_INT, RuntimeHelper.POINTER,
-                    RuntimeHelper.POINTER);
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(ValueLayout.JAVA_INT, openssl_h.C_POINTER,
+                    openssl_h.C_POINTER);
 
-            static final MethodHandle MH = RuntimeHelper.downcallHandle("i2d_OCSP_REQUEST", DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("i2d_OCSP_REQUEST"), DESC);
         }
-        return RuntimeHelper.requireNonNull(Holder.MH, "i2d_OCSP_REQUEST");
+        return Holder.MH;
     }
 
     public static int i2d_OCSP_REQUEST(MemorySegment a, MemorySegment out) {
