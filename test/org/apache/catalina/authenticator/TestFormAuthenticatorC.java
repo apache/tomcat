@@ -17,14 +17,8 @@
 package org.apache.catalina.authenticator;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,12 +27,8 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Valve;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterMapRealm;
-import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.descriptor.web.LoginConfig;
-import org.apache.tomcat.util.descriptor.web.SecurityCollection;
-import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
 /*
@@ -72,7 +62,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
  * but it makes no claims to generality).
  *
  */
-public class TestFormAuthenticator extends TomcatBaseTest {
+public class TestFormAuthenticatorC extends TomcatBaseTest {
 
     // these should really be singletons to be type-safe,
     // we are in a unit test and don't need to paranoid.
@@ -91,10 +81,6 @@ public class TestFormAuthenticator extends TomcatBaseTest {
     protected static final boolean SERVER_CHANGE_SESSID = true;
     protected static final boolean SERVER_FREEZE_SESSID = !SERVER_CHANGE_SESSID;
 
-    // minimum session timeout
-    private static final int SHORT_SESSION_TIMEOUT_SECS = 1;
-    private static final long TIMEOUT_DELAY_MSECS = ((SHORT_SESSION_TIMEOUT_SECS + 10) * 1000);
-
     private FormAuthClient client;
 
     // first, a set of tests where the server uses a cookie to carry
@@ -102,28 +88,9 @@ public class TestFormAuthenticator extends TomcatBaseTest {
     // the client is prepared to return cookies with each request
 
     @Test
-    public void testGetWithCookies() throws Exception {
-        doTest("GET", "GET", NO_100_CONTINUE,
-                CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
-    }
-
-    @Test
-    public void testPostNoContinueWithCookies() throws Exception {
-        doTest("POST", "GET", NO_100_CONTINUE,
-                CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
-    }
-
-    @Test
     public void testPostWithContinueAndCookies() throws Exception {
         doTest("POST", "GET", USE_100_CONTINUE,
                CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
-    }
-
-    // Bug 49779
-    @Test
-    public void testPostNoContinuePostRedirectWithCookies() throws Exception {
-        doTest("POST", "POST", NO_100_CONTINUE,
-                CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     // Bug 49779
@@ -137,30 +104,9 @@ public class TestFormAuthenticator extends TomcatBaseTest {
     // next, a set of tests where the server Context is configured to never
     // use cookies and the session ID is only carried as a url path parameter
 
-    // Bug 53584
-    @Test
-    public void testGetNoServerCookies() throws Exception {
-        doTest("GET", "GET", NO_100_CONTINUE,
-                CLIENT_NO_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
-    }
-
-    @Test
-    public void testPostNoContinueNoServerCookies() throws Exception {
-        doTest("POST", "GET", NO_100_CONTINUE,
-                CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
-    }
-
     @Test
     public void testPostWithContinueNoServerCookies() throws Exception {
         doTest("POST", "GET", USE_100_CONTINUE,
-                CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
-    }
-
-    // variant of Bug 49779
-    @Test
-    public void testPostNoContinuePostRedirectNoServerCookies()
-            throws Exception {
-        doTest("POST", "POST", NO_100_CONTINUE,
                 CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
     }
 
@@ -184,22 +130,8 @@ public class TestFormAuthenticator extends TomcatBaseTest {
     }
 
     @Test
-    public void testPostNoContinueNoClientCookies() throws Exception {
-        doTest("POST", "GET", NO_100_CONTINUE,
-                CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
-    }
-
-    @Test
     public void testPostWithContinueNoClientCookies() throws Exception {
         doTest("POST", "GET", USE_100_CONTINUE,
-                CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
-    }
-
-    // variant of Bug 49779
-    @Test
-    public void testPostNoContinuePostRedirectNoClientCookies()
-            throws Exception {
-        doTest("POST", "POST", NO_100_CONTINUE,
                 CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
@@ -214,85 +146,6 @@ public class TestFormAuthenticator extends TomcatBaseTest {
 
     // finally, a set of tests to explore quirky situations
     // but there is not need to replicate all the scenarios above.
-
-    @Test
-    public void testNoChangedSessidWithCookies() throws Exception {
-        doTest("GET", "GET", NO_100_CONTINUE,
-                CLIENT_USE_COOKIES, SERVER_USE_COOKIES,
-                SERVER_FREEZE_SESSID);
-    }
-
-    @Test
-    public void testNoChangedSessidWithoutCookies() throws Exception {
-        doTest("GET", "GET", NO_100_CONTINUE,
-                CLIENT_NO_COOKIES, SERVER_USE_COOKIES,
-                SERVER_FREEZE_SESSID);
-    }
-
-    @Test
-    public void testTimeoutWithoutCookies() throws Exception {
-        String protectedUri = doTest("GET", "GET", NO_100_CONTINUE,
-                CLIENT_NO_COOKIES, SERVER_USE_COOKIES,
-                SERVER_FREEZE_SESSID);
-
-        // Force session to expire one second from now
-        Context context = (Context) getTomcatInstance().getHost().findChildren()[0];
-        forceSessionMaxInactiveInterval(context, SHORT_SESSION_TIMEOUT_SECS);
-
-        // wait long enough for my session to expire
-        Thread.sleep(TIMEOUT_DELAY_MSECS);
-
-        // then try to continue using the expired session to get the
-        // protected resource once more.
-        // should get login challenge or timeout status 408
-        doTestProtected("GET", protectedUri, NO_100_CONTINUE,
-                FormAuthClient.LOGIN_REQUIRED, 1);
-    }
-
-    // HTTP 1.0 test
-    @Test
-    public void testGetWithCookiesHttp10() throws Exception {
-        doTest("GET", "GET", NO_100_CONTINUE,
-                CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID,
-                CLIENT_USE_HTTP_10);
-    }
-
-
-    @Test
-    public void testSelectedMethods() throws Exception {
-
-        FormAuthClientSelectedMethods client =
-                new FormAuthClientSelectedMethods(true, true, true, true);
-
-        // First request for protected resource gets the login page
-        client.doResourceRequest("PUT", true, "/test?" +
-                SelectedMethodsServlet.PARAM + "=" +
-                SelectedMethodsServlet.VALUE, null);
-        Assert.assertTrue(client.getResponseLine(), client.isResponse200());
-        Assert.assertTrue(client.isResponseBodyOK());
-        String originalSessionId = client.getSessionId();
-        client.reset();
-
-        // Second request replies to the login challenge
-        client.doResourceRequest("POST", true, "/test/j_security_check",
-                FormAuthClientBase.LOGIN_REPLY);
-        Assert.assertTrue("login failed " + client.getResponseLine(),
-                client.isResponse303());
-        Assert.assertTrue(client.isResponseBodyOK());
-        String redirectUri = client.getRedirectUri();
-        client.reset();
-
-        // Third request - the login was successful so
-        // follow the redirect to the protected resource
-        client.doResourceRequest("GET", true, redirectUri, null);
-        Assert.assertTrue(client.isResponse200());
-        Assert.assertTrue(client.isResponseBodyOK());
-        String newSessionId = client.getSessionId();
-
-        Assert.assertTrue(!originalSessionId.equals(newSessionId));
-        client.reset();
-    }
-
 
     /*
      * Choreograph the steps of the test dialogue with the server
@@ -664,126 +517,6 @@ public class TestFormAuthenticator extends TomcatBaseTest {
 
             // Port only known after Tomcat starts
             setPort(getPort());
-        }
-    }
-
-
-    /**
-     * Encapsulate the logic needed to run a suitably-configured Tomcat
-     * instance, send it an HTTP request and process the server response when
-     * the protected resource is only protected for some HTTP methods. The use
-     * case of particular interest is when GET and POST are not protected since
-     * those are the methods used by the login form and the redirect and if
-     * those methods are not protected the authenticator may not process the
-     * associated requests.
-     */
-    private class FormAuthClientSelectedMethods extends FormAuthClientBase {
-
-        private FormAuthClientSelectedMethods(boolean clientShouldUseCookies,
-                boolean clientShouldUseHttp11,
-                boolean serverShouldUseCookies,
-                boolean serverShouldChangeSessid) throws Exception {
-
-            this.clientShouldUseHttp11 = clientShouldUseHttp11;
-
-            Tomcat tomcat = getTomcatInstance();
-
-            Context ctx = tomcat.addContext(
-                    "", System.getProperty("java.io.tmpdir"));
-            Tomcat.addServlet(ctx, "SelectedMethods",
-                    new SelectedMethodsServlet());
-            ctx.addServletMappingDecoded("/test", "SelectedMethods");
-            // Login servlet just needs to respond "OK". Client will handle
-            // creating a valid response. No need for a form.
-            Tomcat.addServlet(ctx, "Login",
-                    new TesterServlet());
-            ctx.addServletMappingDecoded("/login", "Login");
-
-            // Configure the security constraints
-            SecurityConstraint constraint = new SecurityConstraint();
-            SecurityCollection collection = new SecurityCollection();
-            collection.setName("Protect PUT");
-            collection.addMethod("PUT");
-            collection.addPatternDecoded("/test");
-            constraint.addCollection(collection);
-            constraint.addAuthRole("tomcat");
-            ctx.addConstraint(constraint);
-
-            // Configure authentication
-            LoginConfig lc = new LoginConfig();
-            lc.setAuthMethod("FORM");
-            lc.setLoginPage("/login");
-            ctx.setLoginConfig(lc);
-            ctx.getPipeline().addValve(new FormAuthenticator());
-
-            setUseCookies(clientShouldUseCookies);
-            ctx.setCookies(serverShouldUseCookies);
-
-            TesterMapRealm realm = new TesterMapRealm();
-            realm.addUser("tomcat", "tomcat");
-            realm.addUserRole("tomcat", "tomcat");
-            ctx.setRealm(realm);
-
-            tomcat.start();
-
-            // Valve pipeline is only established after tomcat starts
-            Valve[] valves = ctx.getPipeline().getValves();
-            for (Valve valve : valves) {
-                if (valve instanceof AuthenticatorBase) {
-                    ((AuthenticatorBase)valve)
-                            .setChangeSessionIdOnAuthentication(
-                                                serverShouldChangeSessid);
-                    break;
-                }
-            }
-
-            // Port only known after Tomcat starts
-            setPort(getPort());
-        }
-
-        @Override
-        public boolean isResponseBodyOK() {
-            if (isResponse303()) {
-                return true;
-            }
-            Assert.assertTrue(getResponseBody(), getResponseBody().contains("OK"));
-            Assert.assertFalse(getResponseBody().contains("FAIL"));
-            return true;
-        }
-    }
-
-
-    private static final class SelectedMethodsServlet extends HttpServlet {
-
-        private static final long serialVersionUID = 1L;
-        public static final String PARAM = "TestParam";
-        public static final String VALUE = "TestValue";
-
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
-            resp.setContentType("text/plain;charset=UTF-8");
-
-            if (VALUE.equals(req.getParameter(PARAM)) &&
-                    req.isUserInRole("tomcat")) {
-                resp.getWriter().print("OK");
-            } else {
-                resp.getWriter().print("FAIL");
-            }
-        }
-
-        @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
-            // Same as GET for this test case
-            doGet(req, resp);
-        }
-
-        @Override
-        protected void doPut(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
-            // Same as GET for this test case
-            doGet(req, resp);
         }
     }
 }
