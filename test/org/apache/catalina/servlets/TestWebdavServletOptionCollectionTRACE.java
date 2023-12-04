@@ -16,11 +16,8 @@
  */
 package org.apache.catalina.servlets;
 
-import java.util.ArrayList;
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
-import java.util.List;
-
-import jakarta.servlet.Servlet;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -31,32 +28,11 @@ import org.junit.runners.Parameterized.Parameters;
  * of an entire test run.
  */
 @RunWith(Parameterized.class)
-public class TestWebdavServletOptionsUnknown extends ServletOptionsBaseTest {
+public class TestWebdavServletOptionCollectionTRACE extends WebdavServletOptionBaseTestCollection {
 
     @Parameters
     public static Collection<Object[]> inputs() {
-        String[] methods = new String[] { "GET", "POST", "HEAD", "TRACE", "PUT", "DELETE",
-                "MKCOL", "LOCK", "UNLOCK", "COPY", "MOVE", "PROPFIND", "PROPPATCH" };
-
-        List<Object[]> result = new ArrayList<>();
-
-        for (Boolean listingsValue : booleans) {
-            for (Boolean readOnlyValue : booleans) {
-                for (Boolean traceValue : booleans) {
-                    for (String method : methods) {
-                        result.add(new Object[] {
-                                listingsValue, readOnlyValue, traceValue, UNKNOWN_NAME, method } );
-                    }
-                }
-            }
-
-        }
-        return result;
-    }
-
-
-    @Override
-    protected Servlet createServlet() {
-        return new WebdavServlet();
+        // Use the name of this class to derive the HTTP method to test
+        return DefaultServletOptionsBaseTest.inputs(MethodHandles.lookup().lookupClass());
     }
 }
