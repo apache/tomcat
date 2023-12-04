@@ -40,12 +40,8 @@ import java.lang.invoke.MethodHandles;
 final class RuntimeHelper {
 
     private static final Linker LINKER = Linker.nativeLinker();
-    private static final ClassLoader LOADER = RuntimeHelper.class.getClassLoader();
     private static final MethodHandles.Lookup MH_LOOKUP = MethodHandles.lookup();
     private static final SymbolLookup SYMBOL_LOOKUP;
-    private static final SegmentAllocator THROWING_ALLOCATOR = (x, y) -> {
-        throw new AssertionError("should not reach here");
-    };
     static final AddressLayout POINTER = ValueLayout.ADDRESS
             .withTargetLayout(MemoryLayout.sequenceLayout(MAX_VALUE, JAVA_BYTE));
 

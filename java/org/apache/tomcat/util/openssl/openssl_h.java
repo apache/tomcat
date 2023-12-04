@@ -4808,7 +4808,7 @@ public class openssl_h  {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    private static final MemorySegment OPENSSL_FILE = RuntimeHelper.CONSTANT_ALLOCATOR.allocateFrom("/tmp/jextract$1835734468149172322.h");;
+    private static final MemorySegment OPENSSL_FILE = RuntimeHelper.CONSTANT_ALLOCATOR.allocateFrom("/tmp/jextract$1835734468149172322.h");
     
     /**
      * {@snippet lang=c :
@@ -4869,7 +4869,7 @@ public class openssl_h  {
     public static int EVP_PKEY_DSA() {
         return EVP_PKEY_DSA;
     }
-    private static final MemorySegment PEM_STRING_ECPARAMETERS = RuntimeHelper.CONSTANT_ALLOCATOR.allocateFrom("EC PARAMETERS");;
+    private static final MemorySegment PEM_STRING_ECPARAMETERS = RuntimeHelper.CONSTANT_ALLOCATOR.allocateFrom("EC PARAMETERS");
     
     /**
      * {@snippet lang=c :
