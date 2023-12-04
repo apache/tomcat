@@ -267,7 +267,7 @@ public class TestRequest extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add the Servlet
         Tomcat.addServlet(ctx, "servlet", new EchoQueryStringServlet());
@@ -311,7 +311,7 @@ public class TestRequest extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         LoginConfig config = new LoginConfig();
         config.setAuthMethod("BASIC");
@@ -935,7 +935,7 @@ public class TestRequest extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new Bug61264GetReaderServlet());
         ctx.addServletMappingDecoded("/", "servlet");

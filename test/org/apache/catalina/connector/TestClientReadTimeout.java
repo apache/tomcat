@@ -49,7 +49,7 @@ public class TestClientReadTimeout extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         ((StandardHost) tomcat.getHost()).setErrorReportValveClass(null);
 

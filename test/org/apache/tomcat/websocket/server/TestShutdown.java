@@ -51,7 +51,7 @@ public class TestShutdown extends WebSocketBaseTest {
     public void testShutdownBufferedMessages() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(EchoBufferedConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");

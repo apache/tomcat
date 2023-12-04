@@ -596,7 +596,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void configureAndStartWebApplication() throws LifecycleException {
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "empty", new EmptyServlet());
         ctxt.addServletMappingDecoded("/empty", "empty");
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());

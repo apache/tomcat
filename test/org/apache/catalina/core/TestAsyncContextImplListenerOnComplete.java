@@ -54,7 +54,7 @@ public class TestAsyncContextImplListenerOnComplete extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Latch to track that complete has been called
         CountDownLatch completeLatch = new CountDownLatch(1);

@@ -45,7 +45,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "errorServlet", new ErrorServlet());
         ctx.addServletMappingDecoded("/", "errorServlet");
@@ -78,7 +78,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug54220", new Bug54220Servlet(false));
         ctx.addServletMappingDecoded("/", "bug54220");
@@ -98,7 +98,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug54220", new Bug54220Servlet(true));
         ctx.addServletMappingDecoded("/", "bug54220");
@@ -141,7 +141,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug54536", new Bug54536Servlet());
         ctx.addServletMappingDecoded("/", "bug54536");
@@ -176,7 +176,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Bug56042Servlet bug56042Servlet = new Bug56042Servlet();
         Wrapper wrapper = Tomcat.addServlet(ctx, "bug56042Servlet", bug56042Servlet);

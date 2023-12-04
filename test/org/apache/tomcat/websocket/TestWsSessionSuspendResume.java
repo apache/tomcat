@@ -48,7 +48,7 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
     public void test() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(Config.class.getName());
 
         Tomcat.addServlet(ctx, "default", new DefaultServlet());

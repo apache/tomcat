@@ -42,7 +42,7 @@ public class TestStream extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
         Tomcat.addServlet(ctxt, "pathparam", new PathParam());

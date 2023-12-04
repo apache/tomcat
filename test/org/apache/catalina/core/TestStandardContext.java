@@ -417,7 +417,7 @@ public class TestStandardContext extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Setup realm
         TesterMapRealm realm = new TesterMapRealm();
@@ -486,7 +486,7 @@ public class TestStandardContext extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         ctx.setDenyUncoveredHttpMethods(enableDeny);
 
@@ -567,7 +567,7 @@ public class TestStandardContext extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add ServletContainerInitializer
         Bug51376SCI sci = new Bug51376SCI(loadOnStartUp);

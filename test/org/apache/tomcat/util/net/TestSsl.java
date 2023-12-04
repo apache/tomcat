@@ -94,7 +94,7 @@ public class TestSsl extends TomcatBaseTest {
         // Increase timeout as default (3s) can be too low for some CI systems
         Assert.assertTrue(tomcat.getConnector().setProperty("connectionTimeout", "20000"));
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "post", new SimplePostServlet());
         ctxt.addServletMappingDecoded("/post", "post");
         tomcat.start();

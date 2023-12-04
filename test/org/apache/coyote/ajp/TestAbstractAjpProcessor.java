@@ -92,7 +92,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("packetSize", Integer.toString(ajpPacketSize)));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
         ctx.addServletMappingDecoded("/", "snoop");
@@ -509,7 +509,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         tomcat.start();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "helloWorld", new HelloWorldServlet());
         ctx.addServletMappingDecoded("/", "helloWorld");
@@ -573,7 +573,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         tomcat.start();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "helloWorld", new HelloWorldServlet());
         ctx.addServletMappingDecoded("/", "helloWorld");
@@ -680,7 +680,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug55453", new Tester304WithBodyServlet());
         ctx.addServletMappingDecoded("/", "bug55453");
@@ -734,7 +734,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         ReadBodyServlet servlet = new ReadBodyServlet(callAvailable);
         Tomcat.addServlet(ctx, "ReadBody", servlet);
@@ -789,7 +789,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("packetSize", Integer.toString(ajpPacketSize)));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         FixedResponseSizeServlet servlet = new FixedResponseSizeServlet(15000, 16000);
         Tomcat.addServlet(ctx, "FixedResponseSizeServlet", servlet);
@@ -831,7 +831,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug66512", new InvalidHeaderServlet());
         ctx.addServletMappingDecoded("/", "bug66512");
@@ -894,7 +894,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug66591", new NoHeadersServlet());
         ctx.addServletMappingDecoded("/", "bug66591");

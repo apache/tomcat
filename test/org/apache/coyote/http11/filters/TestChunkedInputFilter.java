@@ -97,7 +97,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Configure allowed trailer headers
         Assert.assertTrue(tomcat.getConnector().setProperty("allowedTrailerHeaders", "x-trailer1,x-trailer2"));
@@ -163,7 +163,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet(false));
         ctx.addServletMappingDecoded("/", "servlet");
@@ -226,7 +226,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
                 "maxExtensionSize", Integer.toString(EXT_SIZE_LIMIT)));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet(ok));
         ctx.addServletMappingDecoded("/", "servlet");
@@ -274,7 +274,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet(true));
         ctx.addServletMappingDecoded("/", "servlet");
@@ -373,7 +373,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         BodyReadServlet servlet = new BodyReadServlet(expectPass, readLimit);
         Tomcat.addServlet(ctx, "servlet", servlet);
@@ -445,7 +445,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new SwallowBodyServlet(swallowException));
         ctx.addServletMappingDecoded("/", "servlet");

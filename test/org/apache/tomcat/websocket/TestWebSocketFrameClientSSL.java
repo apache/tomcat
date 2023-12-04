@@ -50,7 +50,7 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
     public void testConnectToServerEndpoint() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterFirehoseServer.ConfigInline.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
@@ -89,7 +89,7 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
     public void testBug56032() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterFirehoseServer.ConfigInline.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
