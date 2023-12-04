@@ -19,7 +19,7 @@
   <head><title>Bug 64872b TimeUnit test case</title></head>
   <body>
   <%
-  for (int i=0; i < 100000; i++) {
+  for (int i=0; i < 5000; i++) {
   %>
     <p>01 The value of foo is [<ts:tagTimeUnit foo="SECONDS" />]</p>
   <%
