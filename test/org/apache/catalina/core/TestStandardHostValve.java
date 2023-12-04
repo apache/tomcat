@@ -112,9 +112,6 @@ public class TestStandardHostValve extends TomcatBaseTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void testInvalidErrorPage() throws Exception {
-        // Set up a container
-        Tomcat tomcat = getTomcatInstance();
-
         // No file system docBase required
         Context ctx = getProgrammaticRootContext();
 
