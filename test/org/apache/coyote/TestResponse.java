@@ -44,7 +44,7 @@ public class TestResponse extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add  servlet
         Tomcat.addServlet(ctx, "CharsetServlet", new CharsetServlet());
@@ -95,7 +95,7 @@ public class TestResponse extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add  servlet
         Tomcat.addServlet(ctx, "ContentTypeServlet", new ContentTypeServlet());

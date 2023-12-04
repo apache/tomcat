@@ -126,7 +126,7 @@ public class TestDigestAuthenticatorAlgorithms extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
 
         // Add protected servlet
         Tomcat.addServlet(ctxt, "TesterServlet", new TesterServlet());

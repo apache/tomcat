@@ -258,7 +258,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addRoleMapping("testRole", "very-complex-role-name");
 
         Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", RoleAllowServlet.class.getName());
@@ -326,7 +326,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Servlet s = new DenyAllServlet();
         ServletContainerInitializer sci = new SCI(s, useCreateServlet);
@@ -355,7 +355,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         ctx.setDenyUncoveredHttpMethods(denyUncovered);
 

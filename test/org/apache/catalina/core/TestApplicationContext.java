@@ -184,7 +184,7 @@ public class TestApplicationContext extends TomcatBaseTest {
         Context bar = tomcat.addContext("/bar", null);
         bar.addLifecycleListener(new SetIdListener("bar"));
 
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addLifecycleListener(new SetIdListener("ROOT"));
         ctx.setCrossContext(true);
 

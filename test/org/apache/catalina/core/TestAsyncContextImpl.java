@@ -99,7 +99,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Bug49528Servlet servlet = new Bug49528Servlet();
 
@@ -136,7 +136,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Bug49567Servlet servlet = new Bug49567Servlet();
 
@@ -177,7 +177,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("connectionTimeout", "3000"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         AsyncStartNoCompleteServlet servlet =
             new AsyncStartNoCompleteServlet();
@@ -216,7 +216,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         AsyncStartWithCompleteServlet servlet =
             new AsyncStartWithCompleteServlet();
@@ -499,7 +499,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         TimeoutServlet timeout = new TimeoutServlet(completeOnTimeout, dispatchUrl);
 
@@ -667,7 +667,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         DispatchingServlet dispatch = new DispatchingServlet(false, false);
         Wrapper wrapper = Tomcat.addServlet(ctx, "dispatch", dispatch);
@@ -794,7 +794,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         TrackingServlet tracking = new TrackingServlet();
         Wrapper wrapper = Tomcat.addServlet(ctx, "tracking", tracking);
@@ -1036,7 +1036,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         DispatchingServlet dispatch =
             new DispatchingServlet(true, completeOnError);
@@ -1116,7 +1116,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         AsyncStartRunnable servlet = new AsyncStartRunnable();
         Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", servlet);
@@ -1183,7 +1183,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Bug50753Servlet servlet = new Bug50753Servlet();
 
@@ -1246,7 +1246,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         ErrorServlet error = new ErrorServlet();
         Tomcat.addServlet(ctx, "error", error);
@@ -1280,7 +1280,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         AsyncStatusServlet asyncStatusServlet =
             new AsyncStatusServlet(HttpServletResponse.SC_BAD_REQUEST);
@@ -1358,7 +1358,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         AsyncErrorServlet asyncErrorServlet =
             new AsyncErrorServlet(HttpServletResponse.SC_BAD_REQUEST, threaded);
@@ -1475,7 +1475,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Wrapper a = Tomcat.addServlet(ctx, "ServletA", new Bug53337ServletA());
         a.setAsyncSupported(true);
@@ -1555,7 +1555,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Bug53843ServletA servletA = new Bug53843ServletA();
         Wrapper a = Tomcat.addServlet(ctx, "ServletA", servletA);
@@ -1668,7 +1668,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         TimeoutServlet timeout = new TimeoutServlet(null, null);
         Wrapper w1 = Tomcat.addServlet(ctx, "time", timeout);
@@ -1797,7 +1797,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Bug54178ServletA bug54178ServletA = new Bug54178ServletA();
         Wrapper wrapper =
@@ -1910,7 +1910,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         resetTracker();
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         Bug59219Servlet bug59219Servlet = new Bug59219Servlet();
         Wrapper w = tomcat.addServlet("", "async", bug59219Servlet);
         w.setAsyncSupported(true);
@@ -1972,7 +1972,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         NonAsyncServlet nonAsyncServlet = new NonAsyncServlet();
         Wrapper wrapper = Tomcat.addServlet(ctx, "nonAsyncServlet",
@@ -2062,7 +2062,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         AsyncISEServlet servlet = new AsyncISEServlet();
 
@@ -2242,7 +2242,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Servlet stage1 = new DispatchingServletTracking("/stage2", true);
         Wrapper wrapper1 = Tomcat.addServlet(ctx, "stage1", stage1);
@@ -2315,7 +2315,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Servlet servlet = new AsyncRequestUriServlet();
         Wrapper wrapper1 = Tomcat.addServlet(ctx, "bug57559", servlet);
@@ -2354,7 +2354,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         NonAsyncServlet nonAsyncServlet = new NonAsyncServlet();
         Tomcat.addServlet(ctx, "nonAsyncServlet", nonAsyncServlet);
@@ -2456,7 +2456,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     @Test
     public void testTimeoutDispatchCustomErrorPage() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        Context context = tomcat.addContext("", null);
+        Context context = getProgrammaticRootContext();
         tomcat.addServlet("", "timeout", Bug58751AsyncServlet.class.getName())
                 .setAsyncSupported(true);
         CustomErrorServlet customErrorServlet = new CustomErrorServlet();
@@ -2581,7 +2581,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
     private void doTestDispatchWithSpaces(boolean async) throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        Context context = tomcat.addContext("", null);
+        Context context = getProgrammaticRootContext();
         if (async) {
             Servlet s = new AsyncDispatchUrlWithSpacesServlet();
             Wrapper w = Tomcat.addServlet(context, "space", s);
@@ -2681,7 +2681,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         tomcat.getConnector().setEncodedSolidusHandling(EncodedSolidusHandling.DECODE.getValue());
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         EncodedDispatchServlet encodedDispatchServlet = new EncodedDispatchServlet();
         Wrapper wrapper = Tomcat.addServlet(ctx, "encodedDispatchServlet", encodedDispatchServlet);
@@ -2751,7 +2751,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             Tomcat tomcat = getTomcatInstance();
 
             // No file system docBase required
-            Context ctx = tomcat.addContext("", null);
+            Context ctx = getProgrammaticRootContext();
 
             AsyncIoEndServlet asyncIoEndServlet = new AsyncIoEndServlet(useThread, useComplete);
             Wrapper wrapper = Tomcat.addServlet(ctx, "asyncIoEndServlet", asyncIoEndServlet);
@@ -2914,7 +2914,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Bug63816Servlet bug63816Servlet = new Bug63816Servlet(doGetLatch, clientCloseLatch, threadCompleteLatch, ise);
         Wrapper wrapper = Tomcat.addServlet(ctx, "bug63816Servlet", bug63816Servlet);
@@ -3083,7 +3083,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         PostServlet postServlet = new PostServlet(partialReadLatch, clientCloseLatch, threadCompleteLatch, testFailed);
         Wrapper wrapper = Tomcat.addServlet(ctx, "postServlet", postServlet);

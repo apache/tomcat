@@ -52,7 +52,7 @@ public class TestResponse extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new Bug49598Servlet());
         ctx.addServletMappingDecoded("/", "servlet");
@@ -108,7 +108,7 @@ public class TestResponse extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new CharsetServlet());
         ctx.addServletMappingDecoded("/", "servlet");
@@ -147,7 +147,7 @@ public class TestResponse extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new Bug52811Servlet());
         ctx.addServletMappingDecoded("/", "servlet");

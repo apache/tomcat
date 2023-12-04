@@ -41,7 +41,7 @@ public class TestListener extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context context = tomcat.addContext("", null);
+        Context context = getProgrammaticRootContext();
 
         context.addServletContainerInitializer(new SCI(), null);
         tomcat.start();
@@ -58,7 +58,7 @@ public class TestListener extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context context = tomcat.addContext("", null);
+        Context context = getProgrammaticRootContext();
 
         // SCL2 pretends to be in web.xml, and tries to install a
         // ServletContainerInitializer.

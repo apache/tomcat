@@ -45,7 +45,7 @@ public class TestWsSubprotocols extends WebSocketBaseTest {
     public void testWsSubprotocols() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(Config.class.getName());
 
         Tomcat.addServlet(ctx, "default", new DefaultServlet());

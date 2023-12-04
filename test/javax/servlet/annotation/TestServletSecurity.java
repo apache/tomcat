@@ -50,7 +50,7 @@ public class TestServletSecurity extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "Foo", Foo.class.getName());
         ctx.addServletMappingDecoded("/foo/*", "Foo");

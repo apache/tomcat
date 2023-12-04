@@ -138,6 +138,16 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         return tomcat;
     }
 
+
+    public Context getProgrammaticRootContext() {
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+        // Disable class path scanning - it slows the tests down by almost an order of magnitude
+        ((StandardJarScanner) ctx.getJarScanner()).setScanClassPath(false);
+        return ctx;
+    }
+
+
     /*
      * Sub-classes need to know port so they can connect
      */

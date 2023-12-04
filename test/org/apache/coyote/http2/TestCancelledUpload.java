@@ -138,7 +138,7 @@ public class TestCancelledUpload extends Http2TestBase {
         Tomcat tomcat = getTomcatInstance();
 
         // Retain '/simple' url-pattern since it enables code re-use
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "cancel", new CancelServlet());
         ctxt.addServletMappingDecoded("/simple", "cancel");
 

@@ -130,7 +130,7 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         if (async) {
             Wrapper w = Tomcat.addServlet(ctx, "target",

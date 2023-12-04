@@ -61,7 +61,7 @@ public class TestPropertiesRoleMappingListener extends TomcatBaseTest {
     public void testNotFoundRoleMappingFile() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         PropertiesRoleMappingListener listener = new PropertiesRoleMappingListener();
         ctx.addLifecycleListener(listener);

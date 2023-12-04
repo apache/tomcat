@@ -45,7 +45,7 @@ public class TestAsyncTimeout extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         // This is the target of the HTTP/2 upgrade request
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");

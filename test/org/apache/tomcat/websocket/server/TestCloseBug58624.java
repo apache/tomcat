@@ -47,7 +47,7 @@ public class TestCloseBug58624 extends WebSocketBaseTest {
     public void testOnErrorNotCalledWhenClosingConnection() throws Throwable {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(Bug58624ServerConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
