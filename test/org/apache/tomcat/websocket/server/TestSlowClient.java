@@ -40,7 +40,7 @@ public class TestSlowClient extends WebSocketBaseTest {
     @Test
     public void testSendingFromAppThread() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         // Server side endpoint that sends a stream of messages on a new thread
         // in response to any message received.
         ctx.addApplicationListener(TesterFirehoseServer.ConfigThread.class.getName());

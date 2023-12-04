@@ -130,7 +130,7 @@ public class TesterWebSocketClientProxy extends WebSocketBaseTest {
         tomcat.getConnector().setProperty("address", "0.0.0.0");
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");

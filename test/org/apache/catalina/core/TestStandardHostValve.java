@@ -71,7 +71,7 @@ public class TestStandardHostValve extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add the error page
         Tomcat.addServlet(ctx, "error", new ErrorServlet());
@@ -116,7 +116,7 @@ public class TestStandardHostValve extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add a broken error page configuration
         ErrorPage errorPage500 = new ErrorPage();
@@ -132,7 +132,7 @@ public class TestStandardHostValve extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add the error page
         Tomcat.addServlet(ctx, "error", new ErrorServlet());
@@ -174,7 +174,7 @@ public class TestStandardHostValve extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add the error page
         Tomcat.addServlet(ctx, "error", new ExceptionServlet());

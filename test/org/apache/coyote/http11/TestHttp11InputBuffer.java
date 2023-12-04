@@ -756,7 +756,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());

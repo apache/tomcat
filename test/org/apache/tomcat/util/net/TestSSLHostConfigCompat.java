@@ -326,7 +326,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         }
 
         // Simple webapp
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "TesterServlet", new TesterServlet());
         ctxt.addServletMappingDecoded("/*", "TesterServlet");
     }

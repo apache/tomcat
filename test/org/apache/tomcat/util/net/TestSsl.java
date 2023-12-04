@@ -145,7 +145,7 @@ public class TestSsl extends TomcatBaseTest {
             server.addLifecycleListener(listener);
         }
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "post", new SimplePostServlet());
         ctxt.addServletMappingDecoded("/post", "post");
         tomcat.start();

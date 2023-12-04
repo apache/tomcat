@@ -734,7 +734,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         RewriteValve rewriteValve = new RewriteValve();
         ctx.getPipeline().addValve(rewriteValve);

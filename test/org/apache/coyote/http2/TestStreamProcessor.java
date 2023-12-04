@@ -50,7 +50,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         // Map the async servlet to /simple so we can re-use the HTTP/2 handling
         // logic from the super class.
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
         Wrapper w = Tomcat.addServlet(ctxt, "async", new AsyncComplete());
@@ -89,7 +89,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         // Map the async servlet to /simple so we can re-use the HTTP/2 handling
         // logic from the super class.
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
         Wrapper w = Tomcat.addServlet(ctxt, "async", new AsyncDispatch());
@@ -499,7 +499,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
         Tomcat.addServlet(ctxt, "compression", new CompressionServlet());

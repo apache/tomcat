@@ -180,7 +180,7 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        StandardContext ctxt = (StandardContext) tomcat.addContext("", null);
+        StandardContext ctxt = (StandardContext) getProgrammaticRootContext();
 
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
