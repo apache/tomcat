@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http2;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -673,7 +674,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         s = socketFactory.createSocket("localhost", getPort());
         s.setSoTimeout(30000);
 
-        os = s.getOutputStream();
+        os = new BufferedOutputStream(s.getOutputStream());
         InputStream is = s.getInputStream();
 
         input = new TestInput(is);
