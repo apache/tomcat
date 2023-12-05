@@ -33,8 +33,10 @@ public class openssl_h_Macros {
 
 
     /**
-     * Set maximum protocol version on the given context. # define SSL_CTX_set_max_proto_version(sslCtx, version) \
-     * SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MAX_PROTO_VERSION, version, NULL)
+     * Set maximum protocol version on the given context.
+     * {@snippet lang = c : # define SSL_CTX_set_max_proto_version(sslCtx, version) \
+     *    SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MAX_PROTO_VERSION, version, NULL)
+     * }
      *
      * @param sslCtx  the SSL context
      * @param version the maximum version
@@ -47,8 +49,10 @@ public class openssl_h_Macros {
 
 
     /**
-     * Set minimum protocol version on the given context. # define SSL_CTX_set_min_proto_version(sslCtx, version) \
-     * SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MIN_PROTO_VERSION, version, NULL)
+     * Set minimum protocol version on the given context.
+     * {@snippet lang = c : # define SSL_CTX_set_min_proto_version(sslCtx, version) \
+     *    SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MIN_PROTO_VERSION, version, NULL)
+     * }
      *
      * @param sslCtx  the SSL context
      * @param version the maximum version
@@ -61,8 +65,10 @@ public class openssl_h_Macros {
 
 
     /**
-     * Get the session cache size. # define SSL_CTX_sess_get_cache_size(sslCtx) \ SSL_CTX_ctrl(sslCtx,
-     * SSL_CTRL_GET_SESS_CACHE_SIZE, 0, NULL)
+     * Get the session cache size.
+     * {@snippet lang = c : # define SSL_CTX_sess_get_cache_size(sslCtx) \
+     *    SSL_CTX_ctrl(sslCtx, SSL_CTRL_GET_SESS_CACHE_SIZE, 0, NULL)
+     * }
      *
      * @param sslCtx the SSL context
      *
@@ -74,8 +80,10 @@ public class openssl_h_Macros {
 
 
     /**
-     * Set the session cache size. # define SSL_CTX_sess_set_cache_size(sslCtx, t) \ SSL_CTX_ctrl(sslCtx,
-     * SSL_CTRL_SET_SESS_CACHE_SIZE, t, NULL)
+     * Set the session cache size.
+     * {@snippet lang = c : # define SSL_CTX_sess_set_cache_size(sslCtx, t) \
+     *    SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_SESS_CACHE_SIZE, t, NULL)
+     * }
      *
      * @param sslCtx    the SSL context
      * @param cacheSize the session cache size
@@ -88,8 +96,10 @@ public class openssl_h_Macros {
 
 
     /**
-     * Get the session cache mode. # define SSL_CTX_get_session_cache_mode(sslCtx) \ SSL_CTX_ctrl(sslCtx,
-     * SSL_CTRL_GET_SESS_CACHE_MODE, 0, NULL)
+     * Get the session cache mode.
+     * {@snippet lang = c : # define SSL_CTX_get_session_cache_mode(sslCtx) \
+     *    SSL_CTX_ctrl(sslCtx, SSL_CTRL_GET_SESS_CACHE_MODE, 0, NULL)
+     * }
      *
      * @param sslCtx the SSL context
      *
@@ -101,8 +111,10 @@ public class openssl_h_Macros {
 
 
     /**
-     * Set the session cache mode. # define SSL_CTX_set_session_cache_mode(sslCtx, m) \ SSL_CTX_ctrl(sslCtx,
-     * SSL_CTRL_SET_SESS_CACHE_MODE, m, NULL)
+     * Set the session cache mode.
+     * {@snippet lang = c : # define SSL_CTX_set_session_cache_mode(sslCtx, m) \
+     *    SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_SESS_CACHE_MODE, m, NULL)
+     * }
      *
      * @param sslCtx    the SSL context
      * @param cacheMode the cache mode, SSL_SESS_CACHE_OFF to disable
@@ -115,8 +127,10 @@ public class openssl_h_Macros {
 
 
     /**
-     * Set the certificate. # define SSL_CTX_add0_chain_cert(sslCtx,x509) \ SSL_CTX_ctrl(sslCtx, SSL_CTRL_CHAIN_CERT, 0,
-     * (char *)(x509))
+     * Set the certificate.
+     * {@snippet lang = c : # define SSL_CTX_add0_chain_cert(sslCtx,x509) \
+     *    SSL_CTX_ctrl(sslCtx, SSL_CTRL_CHAIN_CERT, 0, (char *)(x509))
+     * }
      *
      * @param sslCtx the SSL context
      * @param x509   the certificate
@@ -129,8 +143,10 @@ public class openssl_h_Macros {
 
 
     /**
-     * Set ticket keys. # define SSL_CTX_set_tlsext_ticket_keys(ctx, keys, keylen) \
-     * SSL_CTX_ctrl((ctx),SSL_CTRL_SET_TLSEXT_TICKET_KEYS, (keylen), (keys))
+     * Set ticket keys.
+     * {@snippet lang = c : # define SSL_CTX_set_tlsext_ticket_keys(ctx, keys, keylen) \
+     *    SSL_CTX_ctrl((ctx),SSL_CTRL_SET_TLSEXT_TICKET_KEYS, (keylen), (keys))
+     * }
      *
      * @param sslCtx    the SSL context
      * @param keys      the keys
@@ -144,8 +160,10 @@ public class openssl_h_Macros {
 
 
     /**
-     * Read the specified file. # define BIO_read_filename(b,name) \ (int)BIO_ctrl(b,BIO_C_SET_FILENAME,
-     * BIO_CLOSE|BIO_FP_READ,(char *)(name))
+     * Read the specified file.
+     * {@snippet lang = c : # define BIO_read_filename(b,name) \
+     *    (int)BIO_ctrl(b,BIO_C_SET_FILENAME,BIO_CLOSE|BIO_FP_READ,(char *)(name))
+     * }
      *
      * @param bio  The BIO to read into
      * @param name the file name
@@ -158,7 +176,10 @@ public class openssl_h_Macros {
 
 
     /**
-     * Set tmp dh. # define SSL_CTX_set_tmp_dh(sslCtx,dh) \ SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_TMP_DH,0,(char *)(dh))
+     * Set tmp dh.
+     * {@snippet lang = c : # define SSL_CTX_set_tmp_dh(sslCtx,dh) \
+     *    SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_TMP_DH,0,(char *)(dh))
+     * }
      *
      * @param sslCtx the SSL context
      * @param dh     the dh
@@ -171,8 +192,10 @@ public class openssl_h_Macros {
 
 
     /**
-     * Set tmp ecdh. # define SSL_CTX_set_tmp_ecdh(sslCtx,ecdh) \ SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_TMP_ECDH,0,(char
-     * *)(ecdh))
+     * Set tmp ecdh.
+     * {@snippet lang = c : # define SSL_CTX_set_tmp_ecdh(sslCtx,ecdh) \
+     *    SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_TMP_ECDH,0,(char *)(ecdh))
+     * }
      *
      * @param sslCtx the SSL context
      * @param ecdh   the ecdh
@@ -185,7 +208,9 @@ public class openssl_h_Macros {
 
 
     /**
-     * Free memory. # define OPENSSL_free(addr) \ CRYPTO_free(addr, OPENSSL_FILE, OPENSSL_LINE)
+     * Free memory.
+     * {@snippet lang = c : # define OPENSSL_free(addr) CRYPTO_free(addr, OPENSSL_FILE, OPENSSL_LINE)
+     * }
      *
      * @param segment The address to free
      */
@@ -195,7 +220,9 @@ public class openssl_h_Macros {
 
 
     /**
-     * Reset BIO position. # define BIO_reset(b) \ (int)BIO_ctrl(b,BIO_CTRL_RESET,0,NULL)
+     * Reset BIO position.
+     * {@snippet lang = c : # define BIO_reset(b) (int)BIO_ctrl(b,BIO_CTRL_RESET,0,NULL)
+     * }
      *
      * @param bio The BIO to reset
      *
@@ -207,8 +234,11 @@ public class openssl_h_Macros {
 
 
     /**
-     * Set NIDs of groups in preference order. # define SSL_CTX_set1_curves SSL_CTX_set1_groups # define
-     * SSL_CTX_set1_groups(ctx, glist, glistlen) \ SSL_CTX_ctrl(ctx,SSL_CTRL_SET_GROUPS,glistlen,(int *)(glist))
+     * Set NIDs of groups in preference order.
+     * {@snippet lang = c : # define SSL_CTX_set1_curves SSL_CTX_set1_groups
+     *    # define SSL_CTX_set1_groups(ctx, glist, glistlen) \
+     *       SSL_CTX_ctrl(ctx,SSL_CTRL_SET_GROUPS,glistlen,(int *)(glist))
+     * }
      *
      * @param sslCtx     the SSL context
      * @param groupsList the groups list
@@ -222,8 +252,10 @@ public class openssl_h_Macros {
 
 
     /**
-     * Pass a path from which certificates are loaded into the store. # define X509_LOOKUP_add_dir(x,name,type) \
-     * X509_LOOKUP_ctrl((x),X509_L_ADD_DIR,(name),(long)(type),NULL)
+     * Pass a path from which certificates are loaded into the store.
+     * {@snippet lang = c : # define X509_LOOKUP_add_dir(x,name,type) \
+     *    X509_LOOKUP_ctrl((x),X509_L_ADD_DIR,(name),(long)(type),NULL)
+     * }
      *
      * @param x509Lookup the X509 lookup
      * @param name       the path name
@@ -236,8 +268,10 @@ public class openssl_h_Macros {
     }
 
     /**
-     * Pass a file which will be loaded into the store. # define X509_LOOKUP_load_file(x,name,type) \
-     * X509_LOOKUP_ctrl((x),X509_L_FILE_LOAD,(name),(long)(type),NULL)
+     * Pass a file which will be loaded into the store.
+     * {@snippet lang = c : # define X509_LOOKUP_load_file(x,name,type) \
+     *    X509_LOOKUP_ctrl((x),X509_L_FILE_LOAD,(name),(long)(type),NULL)
+     * }
      *
      * @param x509Lookup the X509 lookup
      * @param name       the path name
