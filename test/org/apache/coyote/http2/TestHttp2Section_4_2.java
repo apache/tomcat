@@ -51,6 +51,7 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
         }
 
         os.write(settings);
+        os.flush();
 
         handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
     }
@@ -73,6 +74,7 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
         // Empty payload
 
         os.write(ping);
+        os.flush();
 
         handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
     }
@@ -95,6 +97,7 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
         // Empty payload
 
         os.write(ping);
+        os.flush();
 
         handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
     }
@@ -118,6 +121,7 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
         // Empty payload
 
         os.write(priority);
+        os.flush();
 
         // Read Stream reset frame
         parser.readFrame();
