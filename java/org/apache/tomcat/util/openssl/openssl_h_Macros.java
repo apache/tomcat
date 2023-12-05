@@ -255,17 +255,13 @@ public class openssl_h_Macros {
      * {@snippet lang = c : * void X509_free(X509* a);
      * }
      */
-    public static MethodHandle X509_free$MH() {
+    public static void X509_free(MemorySegment a) {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
-
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("X509_free"), DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("X509_free"),
+                    DESC);
         }
-        return Holder.MH;
-    }
-
-    public static void X509_free(MemorySegment a) {
-        var mh$ = X509_free$MH();
+        var mh$ = Holder.MH;
         try {
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
@@ -277,18 +273,14 @@ public class openssl_h_Macros {
      * {@snippet lang = c : * X509* d2i_X509(X509** a, unsigned char** in, long len);
      * }
      */
-    public static MethodHandle d2i_X509$MH() {
+    public static MemorySegment d2i_X509(MemorySegment a, MemorySegment in, long len) {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
                     openssl_h.C_POINTER, ValueLayout.JAVA_LONG);
-
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("d2i_X509"), DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("d2i_X509"),
+                    DESC);
         }
-        return Holder.MH;
-    }
-
-    public static MemorySegment d2i_X509(MemorySegment a, MemorySegment in, long len) {
-        var mh$ = d2i_X509$MH();
+        var mh$ = Holder.MH;
         try {
             return (MemorySegment) mh$.invokeExact(a, in, len);
         } catch (Throwable ex$) {
@@ -300,18 +292,14 @@ public class openssl_h_Macros {
      * {@snippet lang = c : * int i2d_X509(const X509* a, unsigned char** out);
      * }
      */
-    public static MethodHandle i2d_X509$MH() {
+    public static int i2d_X509(MemorySegment a, MemorySegment out) {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(ValueLayout.JAVA_INT, openssl_h.C_POINTER,
                     openssl_h.C_POINTER);
-
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("i2d_X509"), DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("i2d_X509"),
+                    DESC);
         }
-        return Holder.MH;
-    }
-
-    public static int i2d_X509(MemorySegment a, MemorySegment out) {
-        var mh$ = i2d_X509$MH();
+        var mh$ = Holder.MH;
         try {
             return (int) mh$.invokeExact(a, out);
         } catch (Throwable ex$) {
@@ -323,19 +311,15 @@ public class openssl_h_Macros {
      * {@snippet lang = c : * X509* PEM_read_bio_X509_AUX(BIO* out, X509** x, pem_password_cb* cb, void* u);
      * }
      */
-    public static MethodHandle PEM_read_bio_X509_AUX$MH() {
+    public static MemorySegment PEM_read_bio_X509_AUX(MemorySegment out, MemorySegment x, MemorySegment cb,
+            MemorySegment u) {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
                     openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
-
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("PEM_read_bio_X509_AUX"), DESC);
+            static final MethodHandle MH = Linker.nativeLinker()
+                    .downcallHandle(openssl_h.findOrThrow("PEM_read_bio_X509_AUX"), DESC);
         }
-        return Holder.MH;
-    }
-
-    public static MemorySegment PEM_read_bio_X509_AUX(MemorySegment out, MemorySegment x, MemorySegment cb,
-            MemorySegment u) {
-        var mh$ = PEM_read_bio_X509_AUX$MH();
+        var mh$ = Holder.MH;
         try {
             return (MemorySegment) mh$.invokeExact(out, x, cb, u);
         } catch (Throwable ex$) {
@@ -348,20 +332,16 @@ public class openssl_h_Macros {
      * : * EC_GROUP* PEM_read_bio_ECPKParameters(BIO* out, EC_GROUP** x, pem_password_cb* cb, void* u);
      * }
      */
-    public static MethodHandle PEM_read_bio_ECPKParameters$MH() {
-        class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
-                    openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
-
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("PEM_read_bio_ECPKParameters"), DESC);
-        }
-        return Holder.MH;
-    }
-
     @Deprecated
     public static MemorySegment PEM_read_bio_ECPKParameters(MemorySegment out, MemorySegment x, MemorySegment cb,
             MemorySegment u) {
-        var mh$ = PEM_read_bio_ECPKParameters$MH();
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
+                    openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
+            static final MethodHandle MH = Linker.nativeLinker()
+                    .downcallHandle(openssl_h.findOrThrow("PEM_read_bio_ECPKParameters"), DESC);
+        }
+        var mh$ = Holder.MH;
         try {
             return (MemorySegment) mh$.invokeExact(out, x, cb, u);
         } catch (Throwable ex$) {
@@ -373,20 +353,17 @@ public class openssl_h_Macros {
      * {@snippet lang = c : * DH* PEM_read_bio_DHparams(BIO* out, DH** x, pem_password_cb* cb, void* u);
      * }
      */
-    public static MethodHandle PEM_read_bio_DHparams$MH() {
+    @Deprecated
+    public static MemorySegment PEM_read_bio_DHparams(MemorySegment out, MemorySegment x, MemorySegment cb,
+            MemorySegment u) {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
                     openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("PEM_read_bio_DHparams"), DESC);
+            static final MethodHandle MH = Linker.nativeLinker()
+                    .downcallHandle(openssl_h.findOrThrow("PEM_read_bio_DHparams"), DESC);
         }
-        return Holder.MH;
-    }
-
-    @Deprecated
-    public static MemorySegment PEM_read_bio_DHparams(MemorySegment out, MemorySegment x, MemorySegment cb,
-            MemorySegment u) {
-        var mh$ = PEM_read_bio_DHparams$MH();
+        var mh$ = Holder.MH;
         try {
             return (MemorySegment) mh$.invokeExact(out, x, cb, u);
         } catch (Throwable ex$) {
@@ -398,19 +375,15 @@ public class openssl_h_Macros {
      * {@snippet lang = c : * EVP_PKEY* PEM_read_bio_PrivateKey(BIO* out, EVP_PKEY** x, pem_password_cb* cb, void* u);
      * }
      */
-    public static MethodHandle PEM_read_bio_PrivateKey$MH() {
+    public static MemorySegment PEM_read_bio_PrivateKey(MemorySegment out, MemorySegment x, MemorySegment cb,
+            MemorySegment u) {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
                     openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
-
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("PEM_read_bio_PrivateKey"), DESC);
+            static final MethodHandle MH = Linker.nativeLinker()
+                    .downcallHandle(openssl_h.findOrThrow("PEM_read_bio_PrivateKey"), DESC);
         }
-        return Holder.MH;
-    }
-
-    public static MemorySegment PEM_read_bio_PrivateKey(MemorySegment out, MemorySegment x, MemorySegment cb,
-            MemorySegment u) {
-        var mh$ = PEM_read_bio_PrivateKey$MH();
+        var mh$ = Holder.MH;
         try {
             return (MemorySegment) mh$.invokeExact(out, x, cb, u);
         } catch (Throwable ex$) {
@@ -422,17 +395,13 @@ public class openssl_h_Macros {
      * {@snippet lang = c : * void PKCS12_free(PKCS12* a);
      * }
      */
-    public static MethodHandle PKCS12_free$MH() {
+    public static void PKCS12_free(MemorySegment a) {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
-
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("PKCS12_free"), DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("PKCS12_free"),
+                    DESC);
         }
-        return Holder.MH;
-    }
-
-    public static void PKCS12_free(MemorySegment a) {
-        var mh$ = PKCS12_free$MH();
+        var mh$ = Holder.MH;
         try {
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
@@ -445,17 +414,13 @@ public class openssl_h_Macros {
      * {@snippet lang = c : * void OCSP_BASICRESP_free(OCSP_BASICRESP* a);
      * }
      */
-    public static MethodHandle OCSP_BASICRESP_free$MH() {
+    public static void OCSP_BASICRESP_free(MemorySegment a) {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
-
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("OCSP_BASICRESP_free"), DESC);
+            static final MethodHandle MH = Linker.nativeLinker()
+                    .downcallHandle(openssl_h.findOrThrow("OCSP_BASICRESP_free"), DESC);
         }
-        return Holder.MH;
-    }
-
-    public static void OCSP_BASICRESP_free(MemorySegment a) {
-        var mh$ = OCSP_BASICRESP_free$MH();
+        var mh$ = Holder.MH;
         try {
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
@@ -467,17 +432,13 @@ public class openssl_h_Macros {
      * {@snippet lang = c : * void OCSP_RESPONSE_free(OCSP_RESPONSE* a);
      * }
      */
-    public static MethodHandle OCSP_RESPONSE_free$MH() {
+    public static void OCSP_RESPONSE_free(MemorySegment a) {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
-
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("OCSP_RESPONSE_free"), DESC);
+            static final MethodHandle MH = Linker.nativeLinker()
+                    .downcallHandle(openssl_h.findOrThrow("OCSP_RESPONSE_free"), DESC);
         }
-        return Holder.MH;
-    }
-
-    public static void OCSP_RESPONSE_free(MemorySegment a) {
-        var mh$ = OCSP_RESPONSE_free$MH();
+        var mh$ = Holder.MH;
         try {
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
@@ -489,18 +450,14 @@ public class openssl_h_Macros {
      * {@snippet lang = c : * OCSP_RESPONSE* d2i_OCSP_RESPONSE(OCSP_RESPONSE** a, unsigned char** in, long len);
      * }
      */
-    public static MethodHandle d2i_OCSP_RESPONSE$MH() {
+    public static MemorySegment d2i_OCSP_RESPONSE(MemorySegment a, MemorySegment in, long len) {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
                     openssl_h.C_POINTER, ValueLayout.JAVA_LONG);
-
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("d2i_OCSP_RESPONSE"), DESC);
+            static final MethodHandle MH = Linker.nativeLinker()
+                    .downcallHandle(openssl_h.findOrThrow("d2i_OCSP_RESPONSE"), DESC);
         }
-        return Holder.MH;
-    }
-
-    public static MemorySegment d2i_OCSP_RESPONSE(MemorySegment a, MemorySegment in, long len) {
-        var mh$ = d2i_OCSP_RESPONSE$MH();
+        var mh$ = Holder.MH;
         try {
             return (MemorySegment) mh$.invokeExact(a, in, len);
         } catch (Throwable ex$) {
@@ -512,17 +469,13 @@ public class openssl_h_Macros {
      * {@snippet lang = c : * void OCSP_CERTID_free(OCSP_CERTID* a);
      * }
      */
-    public static MethodHandle OCSP_CERTID_free$MH() {
+    public static void OCSP_CERTID_free(MemorySegment a) {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
-
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("OCSP_CERTID_free"), DESC);
+            static final MethodHandle MH = Linker.nativeLinker()
+                    .downcallHandle(openssl_h.findOrThrow("OCSP_CERTID_free"), DESC);
         }
-        return Holder.MH;
-    }
-
-    public static void OCSP_CERTID_free(MemorySegment a) {
-        var mh$ = OCSP_CERTID_free$MH();
+        var mh$ = Holder.MH;
         try {
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
@@ -534,17 +487,13 @@ public class openssl_h_Macros {
      * {@snippet lang = c : * OCSP_REQUEST* OCSP_REQUEST_new();
      * }
      */
-    public static MethodHandle OCSP_REQUEST_new$MH() {
+    public static MemorySegment OCSP_REQUEST_new() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER);
-
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("OCSP_REQUEST_new"), DESC);
+            static final MethodHandle MH = Linker.nativeLinker()
+                    .downcallHandle(openssl_h.findOrThrow("OCSP_REQUEST_new"), DESC);
         }
-        return Holder.MH;
-    }
-
-    public static MemorySegment OCSP_REQUEST_new() {
-        var mh$ = OCSP_REQUEST_new$MH();
+        var mh$ = Holder.MH;
         try {
             return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
@@ -556,17 +505,13 @@ public class openssl_h_Macros {
      * {@snippet lang = c : * void OCSP_REQUEST_free(OCSP_REQUEST* a);
      * }
      */
-    public static MethodHandle OCSP_REQUEST_free$MH() {
+    public static void OCSP_REQUEST_free(MemorySegment a) {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
-
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("OCSP_REQUEST_free"), DESC);
+            static final MethodHandle MH = Linker.nativeLinker()
+                    .downcallHandle(openssl_h.findOrThrow("OCSP_REQUEST_free"), DESC);
         }
-        return Holder.MH;
-    }
-
-    public static void OCSP_REQUEST_free(MemorySegment a) {
-        var mh$ = OCSP_REQUEST_free$MH();
+        var mh$ = Holder.MH;
         try {
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
@@ -578,18 +523,14 @@ public class openssl_h_Macros {
      * {@snippet lang = c : * int i2d_OCSP_REQUEST(const OCSP_REQUEST* a, unsigned char** out);
      * }
      */
-    public static MethodHandle i2d_OCSP_REQUEST$MH() {
+    public static int i2d_OCSP_REQUEST(MemorySegment a, MemorySegment out) {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(ValueLayout.JAVA_INT, openssl_h.C_POINTER,
                     openssl_h.C_POINTER);
-
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("i2d_OCSP_REQUEST"), DESC);
+            static final MethodHandle MH = Linker.nativeLinker()
+                    .downcallHandle(openssl_h.findOrThrow("i2d_OCSP_REQUEST"), DESC);
         }
-        return Holder.MH;
-    }
-
-    public static int i2d_OCSP_REQUEST(MemorySegment a, MemorySegment out) {
-        var mh$ = i2d_OCSP_REQUEST$MH();
+        var mh$ = Holder.MH;
         try {
             return (int) mh$.invokeExact(a, out);
         } catch (Throwable ex$) {

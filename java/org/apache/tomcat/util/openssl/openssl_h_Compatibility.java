@@ -27,67 +27,43 @@ import static java.lang.foreign.ValueLayout.*;
 public class openssl_h_Compatibility {
 
     // OpenSSL 1.1 FIPS_mode
-    public static MethodHandle FIPS_mode$MH() {
+    public static int FIPS_mode() {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT
-            );
-    
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
-                    openssl_h.findOrThrow("FIPS_mode"),
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(JAVA_INT);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("FIPS_mode"),
                     DESC);
         }
-        return Holder.MH;
-    }
-
-    public static int FIPS_mode() {
-        var mh$ = FIPS_mode$MH();
+        var mh$ = Holder.MH;
         try {
             return (int) mh$.invokeExact();
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     // OpenSSL 1.1 FIPS_mode_set
-    public static MethodHandle FIPS_mode_set$MH() {
+    public static int FIPS_mode_set(int r) {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT, JAVA_INT
-            );
-    
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
-                    openssl_h.findOrThrow("FIPS_mode_set"),
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(JAVA_INT, JAVA_INT);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("FIPS_mode_set"),
                     DESC);
         }
-        return Holder.MH;
-    }
-
-    public static int FIPS_mode_set(int r) {
-        var mh$ = FIPS_mode_set$MH();
+        var mh$ = Holder.MH;
         try {
             return (int) mh$.invokeExact(r);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     // OpenSSL 1.1 EVP_PKEY_base_id
-    public static MethodHandle EVP_PKEY_base_id$MH() {
-        class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT, openssl_h.C_POINTER
-            );
-    
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
-                    openssl_h.findOrThrow("EVP_PKEY_base_id"),
-                    DESC);
-        }
-        return Holder.MH;
-    }
-
     public static int EVP_PKEY_base_id(MemorySegment pkey) {
-        var mh$ = EVP_PKEY_base_id$MH();
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(JAVA_INT, openssl_h.C_POINTER);
+            static final MethodHandle MH = Linker.nativeLinker()
+                    .downcallHandle(openssl_h.findOrThrow("EVP_PKEY_base_id"), DESC);
+        }
+        var mh$ = Holder.MH;
         try {
             return (int) mh$.invokeExact(pkey);
         } catch (Throwable ex$) {
@@ -96,21 +72,13 @@ public class openssl_h_Compatibility {
     }
 
     // OpenSSL 1.1 EVP_PKEY_bits
-    public static MethodHandle EVP_PKEY_bits$MH() {
+    public static int EVP_PKEY_bits(MemorySegment pkey) {
         class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT, openssl_h.C_POINTER
-            );
-    
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
-                    openssl_h.findOrThrow("EVP_PKEY_bits"),
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(JAVA_INT, openssl_h.C_POINTER);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("EVP_PKEY_bits"),
                     DESC);
         }
-        return Holder.MH;
-    }
-
-    public static int EVP_PKEY_bits(MemorySegment pkey) {
-        var mh$ = EVP_PKEY_bits$MH();
+        var mh$ = Holder.MH;
         try {
             return (int) mh$.invokeExact(pkey);
         } catch (Throwable ex$) {
@@ -119,21 +87,13 @@ public class openssl_h_Compatibility {
     }
 
     // OpenSSL 1.1 SSL_get_peer_certificate
-    public static MethodHandle SSL_get_peer_certificate$MH() {
-        class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                    openssl_h.C_POINTER, openssl_h.C_POINTER
-            );
-    
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
-                    openssl_h.findOrThrow("SSL_get_peer_certificate"),
-                    DESC);
-        }
-        return Holder.MH;
-    }
-
     public static MemorySegment SSL_get_peer_certificate(MemorySegment s) {
-        var mh$ = SSL_get_peer_certificate$MH();
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
+            static final MethodHandle MH = Linker.nativeLinker()
+                    .downcallHandle(openssl_h.findOrThrow("SSL_get_peer_certificate"), DESC);
+        }
+        var mh$ = Holder.MH;
         try {
             return (java.lang.foreign.MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {
