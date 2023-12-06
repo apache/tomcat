@@ -136,6 +136,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Web Applications">
+    <changelog>
+      <fix>
+        Examples. Improve the error handling so snakes associated with a user
+        that drops from the network are removed from the game. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
