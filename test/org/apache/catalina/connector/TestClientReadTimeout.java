@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.ServletException;
@@ -65,7 +66,12 @@ public class TestClientReadTimeout extends TomcatBaseTest {
             os.write(request.getBytes(StandardCharsets.UTF_8));
             InputStream is = socket.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-            String opening = reader.readLine();
+            String opening = null;
+            try {
+            	opening = reader.readLine();
+            } catch (SocketException e) {
+            	// Handled below. An exception here means opening will be null
+            }
             if (tomcat.getConnector().getProtocolHandlerClassName().contains("Nio2")) {
                 Assert.assertNull("NIO2 unexpectedly returned a response", opening);
             } else {
