@@ -136,6 +136,13 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update UnboundID to 6.0.11. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.96 (schultz)" rtext="Release in progres">
   <subsection name="Catalina">
@@ -363,7 +370,7 @@
         to tracking the 1.x branch. (markt)
       </update>
       <update>
-        Update UnboundID to 6.0.9. (markt)
+        Update UnboundID to 6.0.10. (markt)
       </update>
       <update>
         Update Checkstyle to 10.12.3. (markt)
