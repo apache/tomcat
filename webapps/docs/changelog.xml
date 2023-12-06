@@ -141,6 +141,9 @@
       <fix>
         <bug>68124</bug>: Migrate sample.war from javax to jakarta. (lihan)
       </fix>
+      <update>
+        Update UnboundID to 6.0.11. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
@@ -401,7 +404,7 @@
         Tomcat JARs. (markt)
       </add>
       <update>
-        Update UnboundID to 6.0.9. (markt)
+        Update UnboundID to 6.0.10. (markt)
       </update>
       <update>
         Update Checkstyle to 10.12.3. (markt)
