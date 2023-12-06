@@ -68,9 +68,9 @@ public class TestClientReadTimeout extends TomcatBaseTest {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
             String opening = null;
             try {
-            	opening = reader.readLine();
+                opening = reader.readLine();
             } catch (SocketException e) {
-            	// Handled below. An exception here means opening will be null
+                // Handled below. An exception here means opening will be null
             }
             if (tomcat.getConnector().getProtocolHandlerClassName().contains("Nio2")) {
                 Assert.assertNull("NIO2 unexpectedly returned a response", opening);
