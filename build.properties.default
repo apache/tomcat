@@ -303,8 +303,6 @@ spotbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${spotbugs.version}/
 # ----- bnd, version 6.3.0 or later  -----
 # ----- provides OSGI metadata for JARs       -----
 bnd.version=7.0.0
-
-# checksums for biz.aQute.bnd-6.4.1.jar
 bnd.checksum.enabled=true
 bnd.checksum.algorithm=MD5|SHA-1
 bnd.checksum.value=654776477ed942fc53f581fec66e253a|9937f6b7528628964a4ab8e50ba6b964d0310bce
@@ -315,8 +313,6 @@ bnd.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.b
 
 # ----- Tomcat Migration Tool for Jakarta EE -----
 migration-lib.version=1.0.7
-
-# checksums for jakartaee-migration-1.0.7-shaded.jar
 migration-lib.checksum.enabled=true
 migration-lib.checksum.algorithm=MD5|SHA-1
 migration-lib.checksum.value=378eeda7171284210688349f31e60e73|2baf7f729b409b47467c2ea998216441bf1c33cc
@@ -339,8 +335,6 @@ openssl-lib.loc=${base-maven.loc}/org/apache/tomcat/tomcat-coyote-openssl-java17
 
 # ----- JSign, version 4.1 or later -----
 jsign.version=5.0
-
-# checksums for JSign 5.0
 jsign.checksum.enabled=true
 jsign.checksum.algorithm=MD5|SHA-1
 jsign.checksum.value=79c4f9bdff74a4ccee3d72f020ad45b7|5a6677625413e0d8acb52f80fa6fbb9031a6a9d0
@@ -350,18 +344,16 @@ jsign.jar=${jsign.home}/jsign-${jsign.version}.jar
 jsign.loc=${base-maven.loc}/net/jsign/jsign/${jsign.version}/jsign-${jsign.version}.jar
 
 # ----- Derby, used by unit tests -----
-derby.version=10.16.1.1
-
-# checksums for Derby 10.16.1.1
+derby.version=10.17.1.0
 derby.checksum.enabled=true
 derby.checksum.algorithm=MD5|SHA-1
-derby.checksum.value=d9c38ece80f4ec0756f54b06716a3dd6|f9ca2054b3e33ec3f3f19df4a7490352d82de54a
+derby.checksum.value=0665c8f3365fca01eb639e41f7685991|e90e61e8ee731614a9bafd3d81155e09fff5e80c
 derby-shared.checksum.enabled=true
 derby-shared.checksum.algorithm=MD5|SHA-1
-derby-shared.checksum.value=e423cba3150f195debaf7ff0d307ecf6|77a3ec6b9791c7c29c76148c5d56fc1f3f12d638
+derby-shared.checksum.value=ce2d7164d5cda8ac3a1ede81023814d4|e6eac60d1b80b3781dff97ccef88fa131043f2a5
 derby-tools.checksum.enabled=true
 derby-tools.checksum.algorithm=MD5|SHA-1
-derby-tools.checksum.value=25b138905deb681ff167a5a04d29c3c6|32a5335f9087022cd8ca5c85f35f8c844b1360a9
+derby-tools.checksum.value=ea7b7cba09a4056219e888bcdc1a3bb7|6d1a4e5e0f5c26516abbba85ece081506b9ad2e1
 
 derby.home=${base.path}/derby-${derby.version}
 derby.jar=${derby.home}/derby-${derby.version}.jar
