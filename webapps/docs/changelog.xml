@@ -147,6 +147,9 @@
       <update>
         Update SpotBugs to 4.8.2. (markt)
       </update>
+      <update>
+        Update Derby to 10.17.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
