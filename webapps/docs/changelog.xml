@@ -144,6 +144,9 @@
       <update>
         Update Checkstyle to 10.12.5. (markt)
       </update>
+      <update>
+        Update SpotBugs to 4.8.2. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
