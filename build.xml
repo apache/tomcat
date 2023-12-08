@@ -4082,14 +4082,16 @@ Unable to locate release hash for @{basefile}
 
     <sequential>
 <!--
-      <echo>Comparing hash files output/release/v${version.major}.${version.minor}.${version.build}/@{src-or-bin}/@{basefile}.sha512 verify/@{basefile}.sha512</echo>
+      <echo>Comparing hash files output/release/v${version}/@{src-or-bin}/@{basefile}.sha512 verify/@{basefile}.sha512</echo>
 -->
       <condition property="reproducible-@{num}">
-        <filesmatch file1="output/release/v${version.major}.${version.minor}.${version.build}/@{src-or-bin}/@{basefile}.sha512"
+        <filesmatch file1="output/release/v${version}/@{src-or-bin}/@{basefile}.sha512"
                     file2="verify/@{basefile}.sha512"/>
       </condition>
+      <echo if:set="reproducible-@{num}">Signature MATCH for @{src-or-bin}/@{basefile}
+      </echo>
       <echo unless:set="reproducible-@{num}">
-Signature mismatch for @{basefile}:
+Signature mismatch for @{src-or-bin}/@{basefile}:
   </echo>
       <printfile unless:set="reproducible-@{num}" file="output/release/v${version}/@{src-or-bin}/@{basefile}.sha512" />
       <printfile unless:set="reproducible-@{num}" file="verify/@{basefile}.sha512" />
@@ -4218,7 +4220,7 @@ All (important) signatures are verified; the build appears to be reproducible.
     <antversion property="antversion"/>
     <condition property="release-toolchain-versions-match">
       <and>
-        <antversion exactly="${antversion}" />
+        <antversion exactly="${release-ant-version}" />
         <equals arg1="${java.vm.version}" arg2="${release-java-version}" />
       </and>
     </condition>
