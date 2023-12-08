@@ -29,11 +29,6 @@ import org.apache.tomcat.util.net.jsse.JSSESupport;
 
 public class OpenSSLImplementation extends SSLImplementation {
 
-    @Deprecated
-    public SSLSupport getSSLSupport(SSLSession session) {
-        return new JSSESupport(session, null);
-    }
-
     @Override
     public SSLSupport getSSLSupport(SSLSession session, Map<String, List<String>> additionalAttributes) {
         return new JSSESupport(session, additionalAttributes);
@@ -44,8 +39,4 @@ public class OpenSSLImplementation extends SSLImplementation {
         return new OpenSSLUtil(certificate);
     }
 
-    public boolean isAlpnSupported() {
-        // OpenSSL supported ALPN
-        return true;
-    }
 }

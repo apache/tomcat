@@ -95,7 +95,6 @@ public class OpenSSLLibrary {
     { BN_get_rfc3526_prime_2048, NULL, 1025 },
     { BN_get_rfc2409_prime_1024, NULL, 0 }
      */
-    @Deprecated
     static final class DHParam {
         final MemorySegment dh;
         final int min;
@@ -106,7 +105,6 @@ public class OpenSSLLibrary {
     }
     static final DHParam[] dhParameters = new DHParam[6];
 
-    @Deprecated
     private static void initDHParameters() {
         var dh = DH_new();
         var p = BN_get_rfc3526_prime_8192(MemorySegment.NULL);
@@ -146,7 +144,6 @@ public class OpenSSLLibrary {
         dhParameters[5] = new DHParam(dh, 0);
     }
 
-    @Deprecated
     private static void freeDHParameters() {
         for (int i = 0; i < dhParameters.length; i++) {
             if (dhParameters[i] != null) {
