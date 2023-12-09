@@ -2455,6 +2455,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
             </and>
             <filename name="**/*.asc" />
             <filename name="**/*.tmp" />
+            <filename name="**/.*.sw*" />
             <filename name="**/maven-resolver-ant-tasks-*.jar" />
             <filename name="**/thumbs.db" />
             <filename name="**/Thumbs.db" />
@@ -2474,6 +2475,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
                 <filename name="modules/jdbc-pool/**" />
               </not>
             </and>
+            <!-- Do not inculde any files  user for release-verification -->
+            <filename name="verify" />
+            <filename name="verify/**" />
           </or>
         </not>
       </fileset>
@@ -4098,8 +4102,7 @@ Unable to locate release hash for @{basefile}
         <filesmatch file1="output/release/v${version}/@{src-or-bin}/@{basefile}.sha512"
                     file2="verify/@{basefile}.sha512"/>
       </condition>
-      <echo if:set="reproducible-@{num}">Signature MATCH for @{src-or-bin}/@{basefile}
-      </echo>
+      <echo if:set="reproducible-@{num}">Signature MATCH for @{src-or-bin}/@{basefile}</echo>
       <echo unless:set="reproducible-@{num}">
 Signature mismatch for @{src-or-bin}/@{basefile}:
   </echo>
@@ -4174,10 +4177,8 @@ reproducible-10=${reproducible-10}
         <isset property="reproducible-6" />
         <isset property="reproducible-7" />
         <isset property="reproducible-8" />
-<!--
         <isset property="reproducible-9" />
         <isset property="reproducible-10" />
--->
       </and>
     </condition>
 
