@@ -4110,7 +4110,8 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
 
     <sequential>
       <local name="contents" />
-      <loadfile property="contents" srcfile="@{file}" />
+      <loadfile property="contents" srcfile="@{file}" quiet="true" failonerror="false" />
+      <property name="contents" value="(missing file)" /><!-- Establish default value -->
       <echo>${contents}</echo>
     </sequential>
   </macrodef>
