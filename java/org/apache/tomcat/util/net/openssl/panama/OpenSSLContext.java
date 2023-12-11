@@ -756,7 +756,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     // DH *(*tmp_dh_callback)(SSL *ssl, int is_export, int keylength)
-    @SuppressWarnings("deprecation")
     public static MemorySegment openSSLCallbackTmpDH(MemorySegment ssl, @SuppressWarnings("unused") int isExport,
             @SuppressWarnings("unused") int keylength) {
         var pkey = SSL_get_privatekey(ssl);
