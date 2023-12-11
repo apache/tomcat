@@ -65,7 +65,8 @@ public class OpenSSLSessionContext implements SSLSessionContext {
             throw new IllegalArgumentException(sm.getString("sessionContext.nullTicketKeys"));
         }
         if (keys.length != TICKET_KEYS_SIZE) {
-            throw new IllegalArgumentException(sm.getString("sessionContext.invalidTicketKeysLength", keys.length));
+            throw new IllegalArgumentException(sm.getString("sessionContext.invalidTicketKeysLength",
+                    Integer.valueOf(keys.length)));
         }
         try (var memorySession = Arena.ofConfined()) {
             var array = memorySession.allocateFrom(ValueLayout.JAVA_BYTE, keys);
