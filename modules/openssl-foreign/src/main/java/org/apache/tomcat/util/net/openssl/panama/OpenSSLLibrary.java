@@ -28,6 +28,7 @@ import static org.apache.tomcat.util.openssl.openssl_h.*;
 import static org.apache.tomcat.util.openssl.openssl_h_Compatibility.*;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -73,10 +74,6 @@ public class OpenSSLLibrary {
 
     protected static final Object lock = new Object();
 
-    public OpenSSLLibrary() {
-        OpenSSLStatus.setInstanceCreated(true);
-    }
-
     static MemorySegment enginePointer = MemorySegment.NULL;
 
     static void initLibrary() {
@@ -98,7 +95,6 @@ public class OpenSSLLibrary {
     { BN_get_rfc3526_prime_2048, NULL, 1025 },
     { BN_get_rfc2409_prime_1024, NULL, 0 }
      */
-    @Deprecated
     static final class DHParam {
         final MemorySegment dh;
         final int min;
@@ -109,7 +105,6 @@ public class OpenSSLLibrary {
     }
     static final DHParam[] dhParameters = new DHParam[6];
 
-    @Deprecated
     private static void initDHParameters() {
         var dh = DH_new();
         var p = BN_get_rfc3526_prime_8192(MemorySegment.NULL);
@@ -149,7 +144,6 @@ public class OpenSSLLibrary {
         dhParameters[5] = new DHParam(dh, 0);
     }
 
-    @Deprecated
     private static void freeDHParameters() {
         for (int i = 0; i < dhParameters.length; i++) {
             if (dhParameters[i] != null) {
@@ -162,7 +156,7 @@ public class OpenSSLLibrary {
         }
     }
 
-    static void init() {
+    public static void init() {
         synchronized (lock) {
 
             if (OpenSSLStatus.isInitialized()) {
@@ -330,7 +324,8 @@ public class OpenSSLLibrary {
         }
     }
 
-    static void destroy() {
+
+    public static void destroy() {
         synchronized (lock) {
             if (!OpenSSLStatus.isInitialized()) {
                 return;
