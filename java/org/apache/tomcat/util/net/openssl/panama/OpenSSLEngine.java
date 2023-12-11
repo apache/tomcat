@@ -19,13 +19,8 @@ package org.apache.tomcat.util.net.openssl.panama;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.lang.foreign.Arena;
-import java.lang.foreign.FunctionDescriptor;
-import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
 import java.net.HttpURLConnection;
@@ -67,6 +62,8 @@ import org.apache.tomcat.util.buf.Asn1Parser;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLUtil;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
+import org.apache.tomcat.util.openssl.SSL_set_info_callback$cb;
+import org.apache.tomcat.util.openssl.SSL_set_verify$callback;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -85,29 +82,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     public static final Set<String> IMPLEMENTED_PROTOCOLS_SET;
 
-    private static final MethodHandle openSSLCallbackInfoHandle;
-    private static final MethodHandle openSSLCallbackVerifyHandle;
-
-    private static final FunctionDescriptor openSSLCallbackInfoFunctionDescriptor =
-            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT);
-    private static final FunctionDescriptor openSSLCallbackVerifyFunctionDescriptor =
-            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS);
-
     static {
-        MethodHandles.Lookup lookup = MethodHandles.lookup();
-        try {
-            openSSLCallbackInfoHandle = lookup.findStatic(OpenSSLEngine.class, "openSSLCallbackInfo",
-                    MethodType.methodType(void.class, MemorySegment.class, int.class, int.class));
-            openSSLCallbackVerifyHandle = lookup.findStatic(OpenSSLEngine.class, "openSSLCallbackVerify",
-                    MethodType.methodType(int.class, int.class, MemorySegment.class));
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-
         final Set<String> availableCipherSuites = new LinkedHashSet<>(128);
         availableCipherSuites.addAll(OpenSSLLibrary.findCiphers("ALL"));
         AVAILABLE_CIPHER_SUITES = Collections.unmodifiableSet(availableCipherSuites);
-
         HashSet<String> protocols = new HashSet<>();
         protocols.add(Constants.SSL_PROTO_SSLv2Hello);
         protocols.add(Constants.SSL_PROTO_SSLv2);
@@ -212,9 +190,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         session = new OpenSSLSession();
         var ssl = SSL_new(sslCtx);
         // Set ssl_info_callback
-        var openSSLCallbackInfo = Linker.nativeLinker().upcallStub(openSSLCallbackInfoHandle,
-                openSSLCallbackInfoFunctionDescriptor, engineArena);
-        SSL_set_info_callback(ssl, openSSLCallbackInfo);
+        SSL_set_info_callback(ssl, SSL_set_info_callback$cb.allocate(new InfoCallback(), engineArena));
         if (clientMode) {
             SSL_set_connect_state(ssl);
         } else {
@@ -1159,27 +1135,34 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             };
             // SSL.setVerify(state.ssl, value, certificateVerificationDepth);
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
-            var openSSLCallbackVerify =
-                    Linker.nativeLinker().upcallStub(openSSLCallbackVerifyHandle,
-                    openSSLCallbackVerifyFunctionDescriptor, engineArena);
             int value = switch (mode) {
                 case NONE -> SSL_VERIFY_NONE();
                 case REQUIRE -> SSL_VERIFY_PEER() | SSL_VERIFY_FAIL_IF_NO_PEER_CERT();
                 case OPTIONAL -> SSL_VERIFY_PEER();
             };
-            SSL_set_verify(state.ssl, value, openSSLCallbackVerify);
+            SSL_set_verify(state.ssl, value, SSL_set_verify$callback.allocate(new VerifyCallback(), engineArena));
             clientAuth = mode;
         }
     }
 
-    public static void openSSLCallbackInfo(MemorySegment ssl, int where, @SuppressWarnings("unused") int ret) {
-        EngineState state = getState(ssl);
-        if (state == null) {
-            log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.address())));
-            return;
+    private static class InfoCallback implements SSL_set_info_callback$cb {
+        @Override
+        public void apply(MemorySegment ssl, int where, @SuppressWarnings("unused") int ret) {
+            EngineState state = getState(ssl);
+            if (state == null) {
+                log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.address())));
+                return;
+            }
+            if (0 != (where & SSL_CB_HANDSHAKE_DONE())) {
+                state.handshakeCount++;
+            }
         }
-        if (0 != (where & SSL_CB_HANDSHAKE_DONE())) {
-            state.handshakeCount++;
+    }
+
+    private static class VerifyCallback implements SSL_set_verify$callback {
+        @Override
+        public int apply(int preverify_ok, MemorySegment /*X509_STORE_CTX*/ x509ctx) {
+            return openSSLCallbackVerify(preverify_ok, x509ctx);
         }
     }
 
