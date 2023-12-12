@@ -952,6 +952,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                             localWarFile = new File(host.getAppBaseFile(), baseName);
                         }
                         File warFile = new File(war);
+                        if (!warFile.isAbsolute()) {
+                            warFile = new File(host.getAppBaseFile(), war);
+                        }
                         // Skip delete and copy if source == destination
                         if (!warFile.getCanonicalPath().equals(localWarFile.getCanonicalPath())) {
                             if (localWarFile.exists() && !ExpandWar.delete(localWarFile)) {
