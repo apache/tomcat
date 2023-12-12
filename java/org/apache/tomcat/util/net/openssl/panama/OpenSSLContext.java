@@ -710,8 +710,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     // DH *(*tmp_dh_callback)(SSL *ssl, int is_export, int keylength)
     private static class TmpDHCallback implements SSL_CTX_set_tmp_dh_callback$dh {
         @Override
-        public MemorySegment apply(MemorySegment ssl, @SuppressWarnings("unused") int isExport,
-                @SuppressWarnings("unused") int keylength) {
+        public MemorySegment apply(MemorySegment ssl, int isExport, int keylength) {
             var pkey = SSL_get_privatekey(ssl);
             int type = (MemorySegment.NULL.equals(pkey)) ? EVP_PKEY_NONE() : EVP_PKEY_base_id(pkey);
             /*
@@ -743,7 +742,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     //        const unsigned char *in, unsigned int inlen, void *arg)
     private static class ALPNSelectCallback implements SSL_CTX_set_alpn_select_cb$cb {
         @Override
-        public int apply(@SuppressWarnings("unused") MemorySegment ssl, MemorySegment out,
+        public int apply(MemorySegment ssl, MemorySegment out,
                 MemorySegment outlen, MemorySegment in, int inlen, MemorySegment arg) {
             ContextState state = getState(arg);
             if (state == null) {
@@ -920,8 +919,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static class PasswordCallback implements SSL_CTX_set_default_passwd_cb$cb {
         @Override
-        public int apply(MemorySegment /*char **/ buf, int bufsiz,
-                @SuppressWarnings("unused") int verify, @SuppressWarnings("unused") MemorySegment /*void **/ cb) {
+        public int apply(MemorySegment /* char **/ buf, int bufsiz, int verify, MemorySegment /* void **/ cb) {
             if (log.isDebugEnabled()) {
                 log.debug("Return password for certificate");
             }
@@ -1462,8 +1460,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                             @Override
                             public void accept(MemorySegment t) {
                                 SSL_CONF_CTX_free(t);
-                            }
-                });
+                            }});
             } else {
                 this.confCtx = null;
             }

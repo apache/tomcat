@@ -1147,7 +1147,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static class InfoCallback implements SSL_set_info_callback$cb {
         @Override
-        public void apply(MemorySegment ssl, int where, @SuppressWarnings("unused") int ret) {
+        public void apply(MemorySegment ssl, int where, int ret) {
             EngineState state = getState(ssl);
             if (state == null) {
                 log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.address())));
