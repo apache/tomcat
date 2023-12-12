@@ -3739,7 +3739,7 @@ reproducible-10=${reproducible-10}
         <isset property="reproducible-4" />
         <or>
           <isset property="reproducible-5" />
-          <contains string="${version}" substring="11.0." /><!-- Super hack -->
+          <contains string="${version}" substring="11.0." /><!-- Super hack, Tomcat 11 does not produce x86 binaries. -->
         </or>
         <isset property="reproducible-6" />
         <isset property="reproducible-7" />
@@ -3788,6 +3788,13 @@ differences that should not be considered troublesome.
 
 All (important) signatures are verified; the build appears to be reproducible.
 </echo>
+
+    <echo unless:set="reprodicible-3">
+The fulldocs bundle appears to be different than that of the release.
+It is likely due to this JDK bug:
+
+  https://bugs.openjdk.org/browse/JDK-8306980
+    </echo>
   </target>
 
   <target name="-check-release-toolchain-versions" if="release-java-version">
