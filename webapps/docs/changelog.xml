@@ -114,6 +114,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web Applications">
+    <changelog>
+      <fix>
+        <bug>68035</bug>: Additional fix to the Manager application to enable
+        the deployment of a web application located in a Host's
+        <code>appBase</code> where the web application is specified by a bare
+        (no path) WAR or directory name as shown in the documentation. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.84 (remm)" rtext="release in progress">
   <subsection name="Catalina">
