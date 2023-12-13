@@ -19,20 +19,22 @@
 
 package org.apache.tomcat.util.openssl;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker;
+import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
-import java.lang.foreign.*;
-import static java.lang.foreign.ValueLayout.*;
 
 /**
- * {@snippet lang = c : * int (*SSL_CTX_set_default_passwd_cb$cb)(char*,int,int,void*);
+ * {@snippet lang = c : * int (*SSL_CTX_set_default_passwd_cb$cb)(char* buf,int size,int rwflag,void* userdata);
  * }
  */
 public interface SSL_CTX_set_default_passwd_cb$cb {
 
-    FunctionDescriptor $DESC = FunctionDescriptor.of(JAVA_INT, openssl_h.C_POINTER, JAVA_INT, JAVA_INT,
-            openssl_h.C_POINTER);
+    FunctionDescriptor $DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_INT,
+            openssl_h.C_INT, openssl_h.C_POINTER);
 
-    int apply(MemorySegment _x0, int _x1, int _x2, MemorySegment _x3);
+    int apply(MemorySegment buf, int size, int rwflag, MemorySegment userdata);
 
     MethodHandle UP$MH = openssl_h.upcallHandle(SSL_CTX_set_default_passwd_cb$cb.class, "apply", $DESC);
 
@@ -44,12 +46,13 @@ public interface SSL_CTX_set_default_passwd_cb$cb {
 
     static SSL_CTX_set_default_passwd_cb$cb ofAddress(MemorySegment addr, Arena arena) {
         MemorySegment symbol = addr.reinterpret(arena, null);
-        return (MemorySegment __x0, int __x1, int __x2, MemorySegment __x3) -> {
+        return (MemorySegment _buf, int _size, int _rwflag, MemorySegment _userdata) -> {
             try {
-                return (int) DOWN$MH.invokeExact(symbol, __x0, __x1, __x2, __x3);
+                return (int) DOWN$MH.invokeExact(symbol, _buf, _size, _rwflag, _userdata);
             } catch (Throwable ex$) {
                 throw new AssertionError("should not reach here", ex$);
             }
         };
     }
 }
+
