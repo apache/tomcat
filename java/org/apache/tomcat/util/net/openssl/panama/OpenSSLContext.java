@@ -100,6 +100,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     public static final int SSL_PROTOCOL_ALL = (SSL_PROTOCOL_TLSV1 | SSL_PROTOCOL_TLSV1_1 | SSL_PROTOCOL_TLSV1_2 |
             SSL_PROTOCOL_TLSV1_3);
 
+    static final int OPTIONAL_NO_CA = 3;
+
     private static final String BEGIN_KEY = "-----BEGIN PRIVATE KEY-----\n";
     private static final Object END_KEY = "\n-----END PRIVATE KEY-----";
 
@@ -136,8 +138,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private final MemorySegment openSSLCallbackPassword;
 
     private static final ConcurrentHashMap<Long, ContextState> states = new ConcurrentHashMap<>();
-
-    static ContextState getState(MemorySegment ctx) {
+    private static ContextState getState(MemorySegment ctx) {
         return states.get(Long.valueOf(ctx.address()));
     }
 
@@ -477,8 +478,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         return result;
     }
 
-    private static final int OPTIONAL_NO_CA = 3;
-
     /**
      * Setup the SSL_CTX.
      *
@@ -564,9 +563,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
 
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
-            // Leave this just in case but in Tomcat this is always set again by the engine
             SSL_CTX_set_verify(state.sslCtx, value,
-                    SSL_CTX_set_verify$callback.allocate(new VerifyCallback(), contextArena));
+                    SSL_CTX_set_verify$callback.allocate(new OpenSSLEngine.VerifyCallback(), contextArena));
 
             // Trust and certificate verification
             if (tms != null) {
@@ -778,14 +776,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
 
-    private static class VerifyCallback implements SSL_CTX_set_verify$callback {
-        @Override
-        public int apply(int preverify_ok, MemorySegment /*X509_STORE_CTX*/ x509ctx) {
-            return OpenSSLEngine.openSSLCallbackVerify(preverify_ok, x509ctx);
-        }
-    }
-
-
     private static class CertVerifyCallback implements SSL_CTX_set_cert_verify_callback$cb {
         @Override
         public int apply(MemorySegment /*X509_STORE_CTX*/ x509_ctx, MemorySegment param) {
@@ -942,7 +932,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
 
-    @SuppressWarnings("deprecation")
     private boolean addCertificate(SSLHostConfigCertificate certificate, Arena localArena) throws Exception {
         int index = getCertificateIndex(certificate);
         // Load Server key and certificate
@@ -1375,10 +1364,26 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
 
     private static void logLastError(SegmentAllocator allocator, String string) {
-        var buf = allocator.allocate(ValueLayout.JAVA_BYTE, 128);
-        ERR_error_string(ERR_get_error(), buf);
-        String err = buf.getString(0);
-        log.error(sm.getString(string, err));
+        String sslError = null;
+        long error = ERR_get_error();
+        if (error != SSL_ERROR_NONE()) {
+            do {
+                // Loop until getLastErrorNumber() returns SSL_ERROR_NONE
+                var buf = allocator.allocate(ValueLayout.JAVA_BYTE, 128);
+                ERR_error_string(error, buf);
+                String err = buf.getString(0);
+                if (sslError == null) {
+                    sslError = err;
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("engine.openSSLError", Long.toString(error), err));
+                }
+            } while ((error = ERR_get_error()) != SSL_ERROR_NONE());
+        }
+        if (sslError == null) {
+            sslError = "";
+        }
+        log.error(sm.getString(string, sslError));
     }
 
 

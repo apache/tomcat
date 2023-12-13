@@ -17,18 +17,13 @@
 
 package org.apache.tomcat.util.openssl;
 
-import java.lang.foreign.FunctionDescriptor;
-import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
-import java.lang.invoke.MethodHandle;
 
 import static org.apache.tomcat.util.openssl.openssl_h.*;
 
 /**
  * Functional macros not handled by jextract.
  */
-@SuppressWarnings("javadoc")
 public class openssl_h_Macros {
 
 
