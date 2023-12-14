@@ -17,6 +17,8 @@
 package org.apache.tomcat.util.buf;
 
 import java.math.BigInteger;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -24,7 +26,7 @@ import org.apache.tomcat.util.res.StringManager;
  * This is a very basic ASN.1 parser that provides the limited functionality required by Tomcat. It is a long way from a
  * complete parser.
  * <p>
- * TODO: Consider extending this parser and refactoring the SpnegoTokenFixer to use it.
+ * TODO: Consider extending/re-writing this parser and refactoring the SpnegoTokenFixer to use it.
  */
 public class Asn1Parser {
 
@@ -40,6 +42,15 @@ public class Asn1Parser {
     private final byte[] source;
 
     private int pos = 0;
+
+    /*
+     * This is somewhat of a hack to work around the simplified design of the parsing API that could result in ambiguous
+     * results when nested sequences were optional. Checking the current nesting level of sequence tags enables a user
+     * of the parser to determine if an optional sequence is present or not.
+     *
+     * See https://bz.apache.org/bugzilla/show_bug.cgi?id=67675#c24
+     */
+    private Deque<Integer> nestedSequenceEndPositions = new ArrayDeque<>();
 
 
     public Asn1Parser(byte[] source) {
@@ -58,7 +69,21 @@ public class Asn1Parser {
 
 
     public void parseTagSequence() {
+        /*
+         * Check to see if the parser has completely parsed, based on end position for the sequence, any previous
+         * sequences and remove those sequences from the sequence nesting tracking mechanism if they have been
+         * completely parsed.
+         */
+        while (nestedSequenceEndPositions.size() > 0) {
+            if (nestedSequenceEndPositions.peekLast().intValue() <= pos) {
+                nestedSequenceEndPositions.pollLast();
+            } else {
+                break;
+            }
+        }
+        // Add the new sequence to the sequence nesting tracking mechanism.
         parseTag(TAG_SEQUENCE);
+        nestedSequenceEndPositions.addLast(Integer.valueOf(-1));
     }
 
 
@@ -89,6 +114,15 @@ public class Asn1Parser {
                 len = len << 8;
                 len = len + next();
             }
+        }
+        /*
+         * If this is the first length parsed after a sequence has been added to the sequence nesting tracking mechansim
+         * it must be the length of the sequence so update the entry to record the end position of the sequence. Note
+         * that position recorded is actually the start of the first element after the sequence ends.
+         */
+        if (nestedSequenceEndPositions.peekLast() != null && nestedSequenceEndPositions.peekLast().intValue() == -1) {
+            nestedSequenceEndPositions.pollLast();
+            nestedSequenceEndPositions.addLast(Integer.valueOf(pos + len));
         }
         return len;
     }
@@ -138,5 +172,10 @@ public class Asn1Parser {
 
     private int next() {
         return source[pos++] & 0xFF;
+    }
+
+
+    public int getNestedSequenceLevel() {
+        return nestedSequenceEndPositions.size();
     }
 }
