@@ -39,6 +39,7 @@ public class TestPEMFile {
     private static final String KEY_ENCRYPTED_PKCS1_DES_CBC = "key-encrypted-pkcs1-des-cbc.pem";
     private static final String KEY_ENCRYPTED_PKCS1_DES_EDE3_CBC = "key-encrypted-pkcs1-des-ede3-cbc.pem";
     private static final String KEY_ENCRYPTED_PKCS1_AES256 = "key-encrypted-pkcs1-aes256.pem";
+    private static final String KEY_ENCRYPTED_PKCS8_HMACSHA1DEFAULT_DES_EDE3_CBC = "key-encrypted-pkcs8-hmacsha1default-des-ede3-cbc.pem";
     private static final String KEY_ENCRYPTED_PKCS8_HMACSHA256_AES_128_CBC = "key-encrypted-pkcs8-hmacsha256-aes-128-cbc.pem";
     private static final String KEY_ENCRYPTED_PKCS8_HMACSHA256_AES_256_CBC = "key-encrypted-pkcs8-hmacsha256-aes-256-cbc.pem";
     private static final String KEY_ENCRYPTED_PKCS8_HMACSHA256_DES_EDE3_CBC = "key-encrypted-pkcs8-hmacsha256-des-ede3-cbc.pem";
@@ -89,6 +90,12 @@ public class TestPEMFile {
     @Test
     public void testKeyEncryptedPkcs1Aes256() throws Exception {
         testKeyEncrypted(KEY_ENCRYPTED_PKCS1_AES256);
+    }
+
+
+    @Test
+    public void testKeyEncryptedPkcs8HmacSha1DefaultDesEde3Cbc() throws Exception {
+        testKeyEncrypted(KEY_ENCRYPTED_PKCS8_HMACSHA1DEFAULT_DES_EDE3_CBC);
     }
 
 

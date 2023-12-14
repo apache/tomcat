@@ -75,10 +75,13 @@ public class PEMFile {
     private static final byte[] OID_PBKDF2 =
             new byte[] { 0x2A, (byte) 0x86, 0x48, (byte) 0x86, (byte) 0xF7, 0x0D, 0x01, 0x05, 0x0C };
 
+    // Default defined in RFC 8018
+    private static final String DEFAULT_PRF = "HmacSHA1";
+
     private static final Map<String,String> OID_TO_PRF = new HashMap<>();
     static {
         // 1.2.840.113549.2.7
-        OID_TO_PRF.put("2a864886f70d0207", "HmacSHA1");
+        OID_TO_PRF.put("2a864886f70d0207", DEFAULT_PRF);
         // 1.2.840.113549.2.8
         OID_TO_PRF.put("2a864886f70d0208", "HmacSHA224");
         // 1.2.840.113549.2.9
@@ -337,25 +340,26 @@ public class PEMFile {
                     //@formatter:off
                     /*
                      * RFC 5208 - PKCS #8
-                     * RFC 8108 - PKCS #5
+                     * RFC 8018 - PKCS #5
                      *
-                     * SEQ                    - PKCS #8
-                     *   SEQ                  - PKCS #8 encryptionAlgorithm
-                     *     OID                - PKCS #5 PBES2 OID
-                     *     SEQ                - PKCS #5 PBES2-params
-                     *       SEQ              - PKCS #5 PBES2 key derivation function
-                     *         OID            - PKCS #5 PBES2 KDF OID - must be PBKDF2
-                     *         SEQ            - PKCS #5 PBKDF2-params
-                     *           OCTET STRING - PKCS #5 PBKDF2 salt
-                     *           INT          - PKCS #5 PBKDF2 interationCount
-                     *           INT          - PKCS #5 PBKDF2 key length OPTIONAL
-                     *           SEQ          - PKCS #5 PBKDF2 PRF
-                     *             OID        - PKCS #5 PBKDF2 PRF OID
-                     *             NULL       - PKCS #5 PBKDF2 PRF parameters
-                     *       SEQ              - PKCS #5 PBES2 encryption scheme
-                     *         OID            - PKCS #5 PBES2 algorithm OID
-                     *         OCTET STRING   - PKCS #5 PBES2 algorithm iv
-                     *   OCTET STRING         - PKCS #8 encryptedData
+                     *                  Nesting
+                     * SEQ                    1 - PKCS #8
+                     *   SEQ                  2 - PKCS #8 encryptionAlgorithm
+                     *     OID                  - PKCS #5 PBES2 OID
+                     *     SEQ                3 - PKCS #5 PBES2-params
+                     *       SEQ              4 - PKCS #5 PBES2 key derivation function
+                     *         OID              - PKCS #5 PBES2 KDF OID - must be PBKDF2
+                     *         SEQ            5 - PKCS #5 PBKDF2-params
+                     *           OCTET STRING   - PKCS #5 PBKDF2 salt
+                     *           INT            - PKCS #5 PBKDF2 interationCount
+                     *           INT            - PKCS #5 PBKDF2 key length OPTIONAL
+                     *           SEQ          6 - PKCS #5 PBKDF2 PRF defaults to HmacSHA1 if not present
+                     *             OID          - PKCS #5 PBKDF2 PRF OID
+                     *             NULL         - PKCS #5 PBKDF2 PRF parameters
+                     *       SEQ              4 - PKCS #5 PBES2 encryption scheme
+                     *         OID              - PKCS #5 PBES2 algorithm OID
+                     *         OCTET STRING     - PKCS #5 PBES2 algorithm iv
+                     *   OCTET STRING           - PKCS #8 encryptedData
                      */
                     //@formatter:on
 
@@ -403,16 +407,25 @@ public class PEMFile {
                     // PBKDF2 PRF
                     p.parseTagSequence();
                     p.parseLength();
-                    byte[] oidPRF = p.parseOIDAsBytes();
-                    String prf = OID_TO_PRF.get(HexUtils.toHexString(oidPRF));
-                    if (prf == null) {
-                        throw new NoSuchAlgorithmException(sm.getString("pemFile.unknownPrfAlgorithm", toDottedOidString(oidPRF)));
+                    String prf = null;
+                    // This tag is optional. If present the nested sequence level will be 6 else if will be 4.
+                    if (p.getNestedSequenceLevel() == 6) {
+                        byte[] oidPRF = p.parseOIDAsBytes();
+                        prf = OID_TO_PRF.get(HexUtils.toHexString(oidPRF));
+                        if (prf == null) {
+                            throw new NoSuchAlgorithmException(sm.getString("pemFile.unknownPrfAlgorithm", toDottedOidString(oidPRF)));
+                        }
+                        p.parseNull();
+
+                        // Read the sequence tag for the PBES2 encryption scheme
+                        p.parseTagSequence();
+                        p.parseLength();
+                    } else {
+                        // Use the default
+                        prf = DEFAULT_PRF;
                     }
-                    p.parseNull();
 
                     // PBES2 encryption scheme
-                    p.parseTagSequence();
-                    p.parseLength();
                     byte[] oidCipher = p.parseOIDAsBytes();
                     Algorithm algorithm = OID_TO_ALGORITHM.get(HexUtils.toHexString(oidCipher));
                     if (algorithm == null) {
