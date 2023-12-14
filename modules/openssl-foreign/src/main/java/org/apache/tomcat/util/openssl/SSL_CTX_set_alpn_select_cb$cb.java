@@ -19,9 +19,11 @@
 
 package org.apache.tomcat.util.openssl;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker;
+import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
-import java.lang.foreign.*;
-import static java.lang.foreign.ValueLayout.*;
 
 /**
  * {@snippet lang = c
@@ -30,8 +32,8 @@ import static java.lang.foreign.ValueLayout.*;
  */
 public interface SSL_CTX_set_alpn_select_cb$cb {
 
-    FunctionDescriptor $DESC = FunctionDescriptor.of(JAVA_INT, openssl_h.C_POINTER, openssl_h.C_POINTER,
-            openssl_h.C_POINTER, openssl_h.C_POINTER, JAVA_INT, openssl_h.C_POINTER);
+    FunctionDescriptor $DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER,
+            openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT, openssl_h.C_POINTER);
 
     int apply(MemorySegment _x0, MemorySegment _x1, MemorySegment _x2, MemorySegment _x3, int _x4, MemorySegment _x5);
 
@@ -55,3 +57,4 @@ public interface SSL_CTX_set_alpn_select_cb$cb {
         };
     }
 }
+
