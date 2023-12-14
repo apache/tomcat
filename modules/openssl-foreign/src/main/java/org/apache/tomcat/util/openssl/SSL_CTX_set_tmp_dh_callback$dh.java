@@ -19,17 +19,20 @@
 
 package org.apache.tomcat.util.openssl;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker;
+import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
-import java.lang.foreign.*;
-import static java.lang.foreign.ValueLayout.*;
 
 /**
- * {@snippet lang = c : * struct dh_st* (*SSL_CTX_set_tmp_dh_callback$dh)(struct ssl_st*,int,int);
+ * {@snippet lang = c : * DH* (*SSL_CTX_set_tmp_dh_callback$dh)(SSL*,int,int);
  * }
  */
 public interface SSL_CTX_set_tmp_dh_callback$dh {
 
-    FunctionDescriptor $DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, JAVA_INT, JAVA_INT);
+    FunctionDescriptor $DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT,
+            openssl_h.C_INT);
 
     MemorySegment apply(MemorySegment _x0, int _x1, int _x2);
 
@@ -52,3 +55,4 @@ public interface SSL_CTX_set_tmp_dh_callback$dh {
         };
     }
 }
+
