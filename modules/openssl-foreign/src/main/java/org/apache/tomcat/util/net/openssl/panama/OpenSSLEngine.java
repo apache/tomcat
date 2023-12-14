@@ -62,6 +62,7 @@ import org.apache.tomcat.util.buf.Asn1Parser;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLUtil;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
+import org.apache.tomcat.util.openssl.SSL_CTX_set_verify$callback;
 import org.apache.tomcat.util.openssl.SSL_set_info_callback$cb;
 import org.apache.tomcat.util.openssl.SSL_set_verify$callback;
 import org.apache.tomcat.util.res.StringManager;
@@ -101,15 +102,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private static final int MAX_COMPRESSED_LENGTH = MAX_PLAINTEXT_LENGTH + 1024;
     private static final int MAX_CIPHERTEXT_LENGTH = MAX_COMPRESSED_LENGTH + 1024;
 
-    // Protocols
-    static final int VERIFY_DEPTH = 10;
-
     // Header (5) + Data (2^14) + Compression (1024) + Encryption (1024) + MAC (20) + Padding (256)
-    static final int MAX_ENCRYPTED_PACKET_LENGTH = MAX_CIPHERTEXT_LENGTH + 5 + 20 + 256;
+    private static final int MAX_ENCRYPTED_PACKET_LENGTH = MAX_CIPHERTEXT_LENGTH + 5 + 20 + 256;
 
-    static final int MAX_ENCRYPTION_OVERHEAD_LENGTH = MAX_ENCRYPTED_PACKET_LENGTH - MAX_PLAINTEXT_LENGTH;
-
-    enum ClientAuthMode {
+    private enum ClientAuthMode {
         NONE,
         OPTIONAL,
         REQUIRE,
@@ -924,7 +920,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
     }
 
-    private synchronized void renegotiate() throws SSLException {
+    private void renegotiate() throws SSLException {
         if (log.isDebugEnabled()) {
             log.debug("Start renegotiate");
         }
@@ -964,7 +960,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     /**
      * Clear out any errors, but log a warning.
      */
-    private void clearLastError() {
+    private static void clearLastError() {
         getLastError();
     }
 
@@ -977,7 +973,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * zero result.
      * @return the first error in the stack
      */
-    private String getLastError() {
+    private static String getLastError() {
         String sslError = null;
         long error = ERR_get_error();
         if (error != SSL_ERROR_NONE()) {
@@ -1118,8 +1114,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         return clientAuth == ClientAuthMode.OPTIONAL;
     }
 
-    private static final int OPTIONAL_NO_CA = 3;
-
     private void setClientAuth(ClientAuthMode mode) {
         if (clientMode) {
             return;
@@ -1131,7 +1125,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             state.certificateVerifyMode = switch (mode) {
                 case NONE -> SSL_VERIFY_NONE();
                 case REQUIRE -> SSL_VERIFY_FAIL_IF_NO_PEER_CERT();
-                case OPTIONAL -> certificateVerificationOptionalNoCA ? OPTIONAL_NO_CA : SSL_VERIFY_PEER();
+                case OPTIONAL -> certificateVerificationOptionalNoCA ? OpenSSLContext.OPTIONAL_NO_CA : SSL_VERIFY_PEER();
             };
             // SSL.setVerify(state.ssl, value, certificateVerificationDepth);
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
@@ -1140,6 +1134,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 case REQUIRE -> SSL_VERIFY_PEER() | SSL_VERIFY_FAIL_IF_NO_PEER_CERT();
                 case OPTIONAL -> SSL_VERIFY_PEER();
             };
+            // Note: Since a callback is always set by the context, the callback here could in theory
+            // be set to NULL (at the time of creation of the SSL, the SSL_CTX will have a non null callback)
             SSL_set_verify(state.ssl, value, SSL_set_verify$callback.allocate(new VerifyCallback(), engineArena));
             clientAuth = mode;
         }
@@ -1147,7 +1143,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static class InfoCallback implements SSL_set_info_callback$cb {
         @Override
-        public void apply(MemorySegment ssl, int where, @SuppressWarnings("unused") int ret) {
+        public void apply(MemorySegment ssl, int where, int ret) {
             EngineState state = getState(ssl);
             if (state == null) {
                 log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.address())));
@@ -1159,94 +1155,90 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
     }
 
-    private static class VerifyCallback implements SSL_set_verify$callback {
+    static class VerifyCallback implements SSL_set_verify$callback, SSL_CTX_set_verify$callback {
         @Override
         public int apply(int preverify_ok, MemorySegment /*X509_STORE_CTX*/ x509ctx) {
-            return openSSLCallbackVerify(preverify_ok, x509ctx);
-        }
-    }
-
-    public static int openSSLCallbackVerify(int preverify_ok, MemorySegment /*X509_STORE_CTX*/ x509ctx) {
-        MemorySegment ssl = X509_STORE_CTX_get_ex_data(x509ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
-        EngineState state = getState(ssl);
-        if (state == null) {
-            log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.address())));
-            return 0;
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("Verification in engine with mode [" + state.certificateVerifyMode + "] for " + state.ssl);
-        }
-        int ok = preverify_ok;
-        int errnum = X509_STORE_CTX_get_error(x509ctx);
-        int errdepth = X509_STORE_CTX_get_error_depth(x509ctx);
-        state.phaState = PHAState.COMPLETE;
-        if (state.certificateVerifyMode == -1 /*SSL_CVERIFY_UNSET*/ || state.certificateVerifyMode == SSL_VERIFY_NONE()) {
-            return 1;
-        }
-        /*SSL_VERIFY_ERROR_IS_OPTIONAL(errnum) -> ((errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT)
+            MemorySegment ssl = X509_STORE_CTX_get_ex_data(x509ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
+            EngineState state = getState(ssl);
+            if (state == null) {
+                log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.address())));
+                return 0;
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Verification in engine with mode [" + state.certificateVerifyMode + "] for " + state.ssl);
+            }
+            int ok = preverify_ok;
+            int errnum = X509_STORE_CTX_get_error(x509ctx);
+            int errdepth = X509_STORE_CTX_get_error_depth(x509ctx);
+            state.phaState = PHAState.COMPLETE;
+            if (state.certificateVerifyMode == -1 /*SSL_CVERIFY_UNSET*/ || state.certificateVerifyMode == SSL_VERIFY_NONE()) {
+                return 1;
+            }
+            /*SSL_VERIFY_ERROR_IS_OPTIONAL(errnum) -> ((errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT)
                 || (errnum == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN)
                 || (errnum == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY)
                 || (errnum == X509_V_ERR_CERT_UNTRUSTED)
                 || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE))*/
-        boolean verifyErrorIsOptional = (errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT())
-                || (errnum == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN())
-                || (errnum == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY())
-                || (errnum == X509_V_ERR_CERT_UNTRUSTED())
-                || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE());
-        if (verifyErrorIsOptional && (state.certificateVerifyMode == OPTIONAL_NO_CA)) {
-            ok = 1;
-            SSL_set_verify_result(state.ssl, X509_V_OK());
-        }
-        /*
-         * Expired certificates vs. "expired" CRLs: by default, OpenSSL
-         * turns X509_V_ERR_CRL_HAS_EXPIRED into a "certificate_expired(45)"
-         * SSL alert, but that's not really the message we should convey to the
-         * peer (at the very least, it's confusing, and in many cases, it's also
-         * inaccurate, as the certificate itself may very well not have expired
-         * yet). We set the X509_STORE_CTX error to something which OpenSSL's
-         * s3_both.c:ssl_verify_alarm_type() maps to SSL_AD_CERTIFICATE_UNKNOWN,
-         * i.e. the peer will receive a "certificate_unknown(46)" alert.
-         * We do not touch errnum, though, so that later on we will still log
-         * the "real" error, as returned by OpenSSL.
-         */
-        if (ok == 0 && errnum == X509_V_ERR_CRL_HAS_EXPIRED()) {
-            X509_STORE_CTX_set_error(x509ctx, -1);
-        }
-
-        // OCSP
-        if (!state.noOcspCheck && (ok > 0)) {
-            /* If there was an optional verification error, it's not
-             * possible to perform OCSP validation since the issuer may be
-             * missing/untrusted.  Fail in that case.
+            boolean verifyErrorIsOptional = (errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT())
+                    || (errnum == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN())
+                    || (errnum == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY())
+                    || (errnum == X509_V_ERR_CERT_UNTRUSTED())
+                    || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE());
+            if (verifyErrorIsOptional && (state.certificateVerifyMode == OpenSSLContext.OPTIONAL_NO_CA)) {
+                ok = 1;
+                SSL_set_verify_result(state.ssl, X509_V_OK());
+            }
+            /*
+             * Expired certificates vs. "expired" CRLs: by default, OpenSSL
+             * turns X509_V_ERR_CRL_HAS_EXPIRED into a "certificate_expired(45)"
+             * SSL alert, but that's not really the message we should convey to the
+             * peer (at the very least, it's confusing, and in many cases, it's also
+             * inaccurate, as the certificate itself may very well not have expired
+             * yet). We set the X509_STORE_CTX error to something which OpenSSL's
+             * s3_both.c:ssl_verify_alarm_type() maps to SSL_AD_CERTIFICATE_UNKNOWN,
+             * i.e. the peer will receive a "certificate_unknown(46)" alert.
+             * We do not touch errnum, though, so that later on we will still log
+             * the "real" error, as returned by OpenSSL.
              */
-            if (verifyErrorIsOptional) {
-                if (state.certificateVerifyMode != OPTIONAL_NO_CA) {
-                    X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_APPLICATION_VERIFICATION());
-                    errnum = X509_V_ERR_APPLICATION_VERIFICATION();
-                    ok = 0;
-                }
-            } else {
-                int ocspResponse = processOCSP(x509ctx);
-                if (ocspResponse == V_OCSP_CERTSTATUS_REVOKED()) {
-                    ok = 0;
-                    errnum = X509_STORE_CTX_get_error(x509ctx);
-                } else if (ocspResponse == V_OCSP_CERTSTATUS_UNKNOWN()) {
-                    errnum = X509_STORE_CTX_get_error(x509ctx);
-                    if (errnum <= 0) {
+            if (ok == 0 && errnum == X509_V_ERR_CRL_HAS_EXPIRED()) {
+                X509_STORE_CTX_set_error(x509ctx, -1);
+            }
+
+            // OCSP
+            if (!state.noOcspCheck && (ok > 0)) {
+                /* If there was an optional verification error, it's not
+                 * possible to perform OCSP validation since the issuer may be
+                 * missing/untrusted.  Fail in that case.
+                 */
+                if (verifyErrorIsOptional) {
+                    if (state.certificateVerifyMode != OpenSSLContext.OPTIONAL_NO_CA) {
+                        X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_APPLICATION_VERIFICATION());
+                        errnum = X509_V_ERR_APPLICATION_VERIFICATION();
                         ok = 0;
+                    }
+                } else {
+                    int ocspResponse = processOCSP(x509ctx);
+                    if (ocspResponse == V_OCSP_CERTSTATUS_REVOKED()) {
+                        ok = 0;
+                        errnum = X509_STORE_CTX_get_error(x509ctx);
+                    } else if (ocspResponse == V_OCSP_CERTSTATUS_UNKNOWN()) {
+                        errnum = X509_STORE_CTX_get_error(x509ctx);
+                        if (errnum <= 0) {
+                            ok = 0;
+                        }
                     }
                 }
             }
-        }
 
-        if (errdepth > state.certificateVerificationDepth) {
-            // Certificate Verification: Certificate Chain too long
-            ok = 0;
+            if (errdepth > state.certificateVerificationDepth) {
+                // Certificate Verification: Certificate Chain too long
+                ok = 0;
+            }
+            return ok;
         }
-        return ok;
     }
 
-    static int processOCSP(MemorySegment /*X509_STORE_CTX*/ x509ctx) {
+    private static int processOCSP(MemorySegment /*X509_STORE_CTX*/ x509ctx) {
         int ocspResponse = V_OCSP_CERTSTATUS_UNKNOWN();
         // ocspResponse = ssl_verify_OCSP(x509_ctx);
         MemorySegment x509 = X509_STORE_CTX_get_current_cert(x509ctx);
