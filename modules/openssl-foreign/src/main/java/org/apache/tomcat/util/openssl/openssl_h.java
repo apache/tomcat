@@ -36,16 +36,16 @@ public class openssl_h  {
     Linker linker = Linker.nativeLinker();
     SYMBOL_LOOKUP = name -> loaderLookup.find(name).or(() -> linker.defaultLookup().find(name));
     }
-    public static final OfBoolean C_BOOL = JAVA_BOOLEAN;
-    public static final OfByte C_CHAR = JAVA_BYTE;
-    public static final OfShort C_SHORT = JAVA_SHORT;
-    public static final OfInt C_INT = JAVA_INT;
-    public static final OfLong C_LONG = JAVA_LONG;
-    public static final OfLong C_LONG_LONG = JAVA_LONG;
-    public static final OfFloat C_FLOAT = JAVA_FLOAT;
-    public static final OfDouble C_DOUBLE = JAVA_DOUBLE;
+    public static final ValueLayout.OfBoolean C_BOOL = ValueLayout.JAVA_BOOLEAN;
+    public static final ValueLayout.OfByte C_CHAR = ValueLayout.JAVA_BYTE;
+    public static final ValueLayout.OfShort C_SHORT = ValueLayout.JAVA_SHORT;
+    public static final ValueLayout.OfInt C_INT = ValueLayout.JAVA_INT;
+    public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG;
+    public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT;
+    public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE;
     public static final AddressLayout C_POINTER = ValueLayout.ADDRESS
             .withTargetLayout(MemoryLayout.sequenceLayout(java.lang.Long.MAX_VALUE, JAVA_BYTE));
+    public static final ValueLayout.OfLong C_LONG = ValueLayout.JAVA_LONG;
     private static final int BIO_CLOSE = (int)1L;
     
     /**
@@ -798,13 +798,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int OPENSSL_sk_num(const OPENSSL_STACK*);
+     * int OPENSSL_sk_num(OPENSSL_STACK*);
      * }
      */
     public static MethodHandle OPENSSL_sk_num$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -825,7 +825,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * void* OPENSSL_sk_value(const OPENSSL_STACK*, int);
+     * void* OPENSSL_sk_value(OPENSSL_STACK*, int);
      * }
      */
     public static MethodHandle OPENSSL_sk_value$MH() {
@@ -833,7 +833,7 @@ public class openssl_h  {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -859,7 +859,7 @@ public class openssl_h  {
     public static MethodHandle OpenSSL_version_num$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_LONG        );
+                openssl_h.C_LONG        );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
                     openssl_h.findOrThrow("OpenSSL_version_num"),
@@ -885,7 +885,7 @@ public class openssl_h  {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -913,7 +913,7 @@ public class openssl_h  {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -933,13 +933,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * size_t BIO_ctrl_pending(BIO* b);
+     * unsigned long BIO_ctrl_pending(BIO* b);
      * }
      */
     public static MethodHandle BIO_ctrl_pending$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_LONG,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER
             );
     
@@ -960,7 +960,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * const BIO_METHOD* BIO_s_file();
+     * BIO_METHOD* BIO_s_file();
      * }
      */
     public static MethodHandle BIO_s_file$MH() {
@@ -1013,7 +1013,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * BIO* BIO_new(const BIO_METHOD* type);
+     * BIO* BIO_new(BIO_METHOD* type);
      * }
      */
     public static MethodHandle BIO_new$MH() {
@@ -1046,7 +1046,7 @@ public class openssl_h  {
     public static MethodHandle BIO_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -1073,10 +1073,10 @@ public class openssl_h  {
     public static MethodHandle BIO_read$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -1102,10 +1102,10 @@ public class openssl_h  {
     public static MethodHandle BIO_write$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -1131,10 +1131,10 @@ public class openssl_h  {
     public static MethodHandle BIO_ctrl$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_LONG,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER,
-                JAVA_INT,
-                JAVA_LONG,
+                openssl_h.C_INT,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER
             );
     
@@ -1155,7 +1155,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * const BIO_METHOD* BIO_s_mem();
+     * BIO_METHOD* BIO_s_mem();
      * }
      */
     public static MethodHandle BIO_s_mem$MH() {
@@ -1180,7 +1180,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * const BIO_METHOD* BIO_s_bio();
+     * BIO_METHOD* BIO_s_bio();
      * }
      */
     public static MethodHandle BIO_s_bio$MH() {
@@ -1205,17 +1205,17 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int BIO_new_bio_pair(BIO** bio1, size_t writebuf1, BIO** bio2, size_t writebuf2);
+     * int BIO_new_bio_pair(BIO** bio1, unsigned long writebuf1, BIO** bio2, unsigned long writebuf2);
      * }
      */
     public static MethodHandle BIO_new_bio_pair$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
-                JAVA_LONG,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER,
-                JAVA_LONG
+                openssl_h.C_LONG
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -1266,9 +1266,9 @@ public class openssl_h  {
     public static MethodHandle BN_set_word$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
-                JAVA_LONG
+                openssl_h.C_LONG
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -1504,13 +1504,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int ASN1_STRING_length(const ASN1_STRING* x);
+     * int ASN1_STRING_length(ASN1_STRING* x);
      * }
      */
     public static MethodHandle ASN1_STRING_length$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -1531,7 +1531,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * unsigned char* ASN1_STRING_get0_data(const ASN1_STRING* x);
+     * unsigned char* ASN1_STRING_get0_data(ASN1_STRING* x);
      * }
      */
     public static MethodHandle ASN1_STRING_get0_data$MH() {
@@ -1558,7 +1558,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * const OSSL_PROVIDER* EVP_MD_get0_provider(const EVP_MD* md);
+     * OSSL_PROVIDER* EVP_MD_get0_provider(EVP_MD* md);
      * }
      */
     public static MethodHandle EVP_MD_get0_provider$MH() {
@@ -1640,13 +1640,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int EVP_PKEY_get_base_id(const EVP_PKEY* pkey);
+     * int EVP_PKEY_get_base_id(EVP_PKEY* pkey);
      * }
      */
     public static MethodHandle EVP_PKEY_get_base_id$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -1667,13 +1667,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int EVP_PKEY_get_bits(const EVP_PKEY* pkey);
+     * int EVP_PKEY_get_bits(EVP_PKEY* pkey);
      * }
      */
     public static MethodHandle EVP_PKEY_get_bits$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -1746,13 +1746,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int EC_GROUP_get_curve_name(const EC_GROUP* group);
+     * int EC_GROUP_get_curve_name(EC_GROUP* group);
      * }
      */
     public static MethodHandle EC_GROUP_get_curve_name$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -1782,7 +1782,7 @@ public class openssl_h  {
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
-                JAVA_LONG
+                openssl_h.C_LONG
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -1809,7 +1809,7 @@ public class openssl_h  {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -1912,7 +1912,7 @@ public class openssl_h  {
     public static MethodHandle DH_set0_pqg$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
@@ -1942,9 +1942,9 @@ public class openssl_h  {
     public static MethodHandle X509_STORE_set_flags$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
-                JAVA_LONG
+                openssl_h.C_LONG
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -1964,7 +1964,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * struct stack_st_X509* X509_STORE_CTX_get0_untrusted(const X509_STORE_CTX* ctx);
+     * struct stack_st_X509* X509_STORE_CTX_get0_untrusted(X509_STORE_CTX* ctx);
      * }
      */
     public static MethodHandle X509_STORE_CTX_get0_untrusted$MH() {
@@ -2075,11 +2075,11 @@ public class openssl_h  {
     public static MethodHandle X509_LOOKUP_ctrl$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
-                JAVA_LONG,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER
             );
     
@@ -2100,7 +2100,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * void* X509_STORE_CTX_get_ex_data(const X509_STORE_CTX* ctx, int idx);
+     * void* X509_STORE_CTX_get_ex_data(X509_STORE_CTX* ctx, int idx);
      * }
      */
     public static MethodHandle X509_STORE_CTX_get_ex_data$MH() {
@@ -2108,7 +2108,7 @@ public class openssl_h  {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -2128,13 +2128,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int X509_STORE_CTX_get_error(const X509_STORE_CTX* ctx);
+     * int X509_STORE_CTX_get_error(X509_STORE_CTX* ctx);
      * }
      */
     public static MethodHandle X509_STORE_CTX_get_error$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -2162,7 +2162,7 @@ public class openssl_h  {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -2182,13 +2182,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int X509_STORE_CTX_get_error_depth(const X509_STORE_CTX* ctx);
+     * int X509_STORE_CTX_get_error_depth(X509_STORE_CTX* ctx);
      * }
      */
     public static MethodHandle X509_STORE_CTX_get_error_depth$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -2209,7 +2209,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * X509* X509_STORE_CTX_get_current_cert(const X509_STORE_CTX* ctx);
+     * X509* X509_STORE_CTX_get_current_cert(X509_STORE_CTX* ctx);
      * }
      */
     public static MethodHandle X509_STORE_CTX_get_current_cert$MH() {
@@ -2236,7 +2236,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * X509* X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX* ctx);
+     * X509* X509_STORE_CTX_get0_current_issuer(X509_STORE_CTX* ctx);
      * }
      */
     public static MethodHandle X509_STORE_CTX_get0_current_issuer$MH() {
@@ -2291,16 +2291,99 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int X509_get_ext_by_NID(const X509* x, int nid, int lastpos);
+     * void X509_free(X509* a);
+     * }
+     */
+    public static MethodHandle X509_free$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+                openssl_h.C_POINTER
+            );
+    
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("X509_free"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+    
+    public static void X509_free(MemorySegment a) {
+        var mh$ = X509_free$MH();
+        try {
+            mh$.invokeExact(a);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    /**
+     * {@snippet lang=c :
+     * X509* d2i_X509(X509* a, unsigned char** in, long len);
+     * }
+     */
+    public static MethodHandle d2i_X509$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_LONG
+            );
+    
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("d2i_X509"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+    
+    public static MemorySegment d2i_X509(MemorySegment a, MemorySegment in, long len) {
+        var mh$ = d2i_X509$MH();
+        try {
+            return (MemorySegment) mh$.invokeExact(a, in, len);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    /**
+     * {@snippet lang=c :
+     * int i2d_X509(X509* a, unsigned char** out);
+     * }
+     */
+    public static MethodHandle i2d_X509$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_INT,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER
+            );
+    
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("i2d_X509"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+    
+    public static int i2d_X509(MemorySegment a, MemorySegment out) {
+        var mh$ = i2d_X509$MH();
+        try {
+            return (int) mh$.invokeExact(a, out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    /**
+     * {@snippet lang=c :
+     * int X509_get_ext_by_NID(X509* x, int nid, int lastpos);
      * }
      */
     public static MethodHandle X509_get_ext_by_NID$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
-                JAVA_INT,
-                JAVA_INT
+                openssl_h.C_INT,
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -2320,7 +2403,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * X509_EXTENSION* X509_get_ext(const X509* x, int loc);
+     * X509_EXTENSION* X509_get_ext(X509* x, int loc);
      * }
      */
     public static MethodHandle X509_get_ext$MH() {
@@ -2328,7 +2411,7 @@ public class openssl_h  {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -2407,6 +2490,126 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
+     * X509* PEM_read_bio_X509_AUX(BIO* out, X509** x, pem_password_cb* cb, void* u);
+     * }
+     */
+    public static MethodHandle PEM_read_bio_X509_AUX$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER
+            );
+    
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("PEM_read_bio_X509_AUX"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+    
+    public static MemorySegment PEM_read_bio_X509_AUX(MemorySegment out, MemorySegment x, MemorySegment cb, MemorySegment u) {
+        var mh$ = PEM_read_bio_X509_AUX$MH();
+        try {
+            return (MemorySegment) mh$.invokeExact(out, x, cb, u);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    /**
+     * {@snippet lang=c :
+     * EC_GROUP* PEM_read_bio_ECPKParameters(BIO* out, EC_GROUP** x, pem_password_cb* cb, void* u);
+     * }
+     */
+    public static MethodHandle PEM_read_bio_ECPKParameters$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER
+            );
+    
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("PEM_read_bio_ECPKParameters"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+    
+    public static MemorySegment PEM_read_bio_ECPKParameters(MemorySegment out, MemorySegment x, MemorySegment cb, MemorySegment u) {
+        var mh$ = PEM_read_bio_ECPKParameters$MH();
+        try {
+            return (MemorySegment) mh$.invokeExact(out, x, cb, u);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    /**
+     * {@snippet lang=c :
+     * DH* PEM_read_bio_DHparams(BIO* out, DH** x, pem_password_cb* cb, void* u);
+     * }
+     */
+    public static MethodHandle PEM_read_bio_DHparams$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER
+            );
+    
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("PEM_read_bio_DHparams"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+    
+    public static MemorySegment PEM_read_bio_DHparams(MemorySegment out, MemorySegment x, MemorySegment cb, MemorySegment u) {
+        var mh$ = PEM_read_bio_DHparams$MH();
+        try {
+            return (MemorySegment) mh$.invokeExact(out, x, cb, u);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    /**
+     * {@snippet lang=c :
+     * EVP_PKEY* PEM_read_bio_PrivateKey(BIO* out, EVP_PKEY** x, pem_password_cb* cb, void* u);
+     * }
+     */
+    public static MethodHandle PEM_read_bio_PrivateKey$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER
+            );
+    
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("PEM_read_bio_PrivateKey"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+    
+    public static MemorySegment PEM_read_bio_PrivateKey(MemorySegment out, MemorySegment x, MemorySegment cb, MemorySegment u) {
+        var mh$ = PEM_read_bio_PrivateKey$MH();
+        try {
+            return (MemorySegment) mh$.invokeExact(out, x, cb, u);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    /**
+     * {@snippet lang=c :
      * EVP_PKEY* PEM_read_bio_Parameters(BIO* bp, EVP_PKEY** x);
      * }
      */
@@ -2435,13 +2638,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * uint64_t SSL_CTX_get_options(const SSL_CTX* ctx);
+     * unsigned long SSL_CTX_get_options(SSL_CTX* ctx);
      * }
      */
     public static MethodHandle SSL_CTX_get_options$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_LONG,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER
             );
     
@@ -2462,13 +2665,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * uint64_t SSL_get_options(const SSL* s);
+     * unsigned long SSL_get_options(SSL* s);
      * }
      */
     public static MethodHandle SSL_get_options$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_LONG,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER
             );
     
@@ -2489,15 +2692,15 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * uint64_t SSL_CTX_clear_options(SSL_CTX* ctx, uint64_t op);
+     * unsigned long SSL_CTX_clear_options(SSL_CTX* ctx, unsigned long op);
      * }
      */
     public static MethodHandle SSL_CTX_clear_options$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_LONG,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER,
-                JAVA_LONG
+                openssl_h.C_LONG
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -2517,15 +2720,15 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * uint64_t SSL_CTX_set_options(SSL_CTX* ctx, uint64_t op);
+     * unsigned long SSL_CTX_set_options(SSL_CTX* ctx, unsigned long op);
      * }
      */
     public static MethodHandle SSL_CTX_set_options$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_LONG,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER,
-                JAVA_LONG
+                openssl_h.C_LONG
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -2545,15 +2748,15 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * uint64_t SSL_set_options(SSL* s, uint64_t op);
+     * unsigned long SSL_set_options(SSL* s, unsigned long op);
      * }
      */
     public static MethodHandle SSL_set_options$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_LONG,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER,
-                JAVA_LONG
+                openssl_h.C_LONG
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -2573,7 +2776,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * void SSL_CTX_set_alpn_select_cb(SSL_CTX* ctx, SSL_CTX_alpn_select_cb_func cb, void* arg);
+     * void SSL_CTX_set_alpn_select_cb(SSL_CTX* ctx, int (*cb)(struct ssl_st*,unsigned char**,unsigned char*,unsigned char*,unsigned int,void*), void* arg);
      * }
      */
     public static MethodHandle SSL_CTX_set_alpn_select_cb$MH() {
@@ -2601,7 +2804,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * void SSL_get0_alpn_selected(const SSL* ssl, unsigned char** data, unsigned int* len);
+     * void SSL_get0_alpn_selected(SSL* ssl, unsigned char** data, unsigned int* len);
      * }
      */
     public static MethodHandle SSL_get0_alpn_selected$MH() {
@@ -2629,13 +2832,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int SSL_in_init(const SSL* s);
+     * int SSL_in_init(SSL* s);
      * }
      */
     public static MethodHandle SSL_in_init$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -2662,7 +2865,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set0_tmp_dh_pkey$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER
             );
@@ -2690,7 +2893,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_cipher_list$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER
             );
@@ -2712,7 +2915,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * SSL_CTX* SSL_CTX_new(const SSL_METHOD* meth);
+     * SSL_CTX* SSL_CTX_new(SSL_METHOD* meth);
      * }
      */
     public static MethodHandle SSL_CTX_new$MH() {
@@ -2771,9 +2974,9 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_timeout$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_LONG,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER,
-                JAVA_LONG
+                openssl_h.C_LONG
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -2793,13 +2996,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * long SSL_CTX_get_timeout(const SSL_CTX* ctx);
+     * long SSL_CTX_get_timeout(SSL_CTX* ctx);
      * }
      */
     public static MethodHandle SSL_CTX_get_timeout$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_LONG,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER
             );
     
@@ -2820,7 +3023,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * X509_STORE* SSL_CTX_get_cert_store(const SSL_CTX*);
+     * X509_STORE* SSL_CTX_get_cert_store(SSL_CTX*);
      * }
      */
     public static MethodHandle SSL_CTX_get_cert_store$MH() {
@@ -2847,7 +3050,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * const SSL_CIPHER* SSL_get_current_cipher(const SSL* s);
+     * SSL_CIPHER* SSL_get_current_cipher(SSL* s);
      * }
      */
     public static MethodHandle SSL_get_current_cipher$MH() {
@@ -2874,7 +3077,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * char* SSL_CIPHER_get_name(const SSL_CIPHER* c);
+     * char* SSL_CIPHER_get_name(SSL_CIPHER* c);
      * }
      */
     public static MethodHandle SSL_CIPHER_get_name$MH() {
@@ -2901,13 +3104,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int SSL_CIPHER_get_kx_nid(const SSL_CIPHER* c);
+     * int SSL_CIPHER_get_kx_nid(SSL_CIPHER* c);
      * }
      */
     public static MethodHandle SSL_CIPHER_get_kx_nid$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -2928,13 +3131,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int SSL_CIPHER_get_auth_nid(const SSL_CIPHER* c);
+     * int SSL_CIPHER_get_auth_nid(SSL_CIPHER* c);
      * }
      */
     public static MethodHandle SSL_CIPHER_get_auth_nid$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -2955,13 +3158,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int SSL_pending(const SSL* s);
+     * int SSL_pending(SSL* s);
      * }
      */
     public static MethodHandle SSL_pending$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -3016,7 +3219,7 @@ public class openssl_h  {
     public static MethodHandle SSL_set_cipher_list$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER
             );
@@ -3044,7 +3247,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_ciphersuites$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER
             );
@@ -3066,14 +3269,14 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * void SSL_set_verify(SSL* s, int mode, SSL_verify_cb callback);
+     * void SSL_set_verify(SSL* s, int mode, int (*callback)(int,struct x509_store_ctx_st*));
      * }
      */
     public static MethodHandle SSL_set_verify$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -3100,7 +3303,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_use_certificate_chain_file$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER
             );
@@ -3155,7 +3358,7 @@ public class openssl_h  {
     public static MethodHandle SSL_add_file_cert_subjects_to_stack$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER
             );
@@ -3177,13 +3380,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * long SSL_SESSION_get_time(const SSL_SESSION* s);
+     * long SSL_SESSION_get_time(SSL_SESSION* s);
      * }
      */
     public static MethodHandle SSL_SESSION_get_time$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_LONG,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER
             );
     
@@ -3204,7 +3407,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * unsigned char* SSL_SESSION_get_id(const SSL_SESSION* s, unsigned int* len);
+     * unsigned char* SSL_SESSION_get_id(SSL_SESSION* s, unsigned int* len);
      * }
      */
     public static MethodHandle SSL_SESSION_get_id$MH() {
@@ -3232,7 +3435,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * X509* SSL_get1_peer_certificate(const SSL* s);
+     * X509* SSL_get1_peer_certificate(SSL* s);
      * }
      */
     public static MethodHandle SSL_get1_peer_certificate$MH() {
@@ -3259,7 +3462,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * struct stack_st_X509* SSL_get_peer_cert_chain(const SSL* s);
+     * struct stack_st_X509* SSL_get_peer_cert_chain(SSL* s);
      * }
      */
     public static MethodHandle SSL_get_peer_cert_chain$MH() {
@@ -3286,14 +3489,14 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * void SSL_CTX_set_verify(SSL_CTX* ctx, int mode, SSL_verify_cb callback);
+     * void SSL_CTX_set_verify(SSL_CTX* ctx, int mode, int (*callback)(int,struct x509_store_ctx_st*));
      * }
      */
     public static MethodHandle SSL_CTX_set_verify$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -3348,7 +3551,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_use_PrivateKey$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER
             );
@@ -3376,7 +3579,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_use_certificate$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER
             );
@@ -3425,13 +3628,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int SSL_CTX_check_private_key(const SSL_CTX* ctx);
+     * int SSL_CTX_check_private_key(SSL_CTX* ctx);
      * }
      */
     public static MethodHandle SSL_CTX_check_private_key$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -3458,10 +3661,10 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_session_id_context$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -3540,10 +3743,10 @@ public class openssl_h  {
     public static MethodHandle SSL_read$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -3569,10 +3772,10 @@ public class openssl_h  {
     public static MethodHandle SSL_write$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -3598,10 +3801,10 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_ctrl$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_LONG,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER,
-                JAVA_INT,
-                JAVA_LONG,
+                openssl_h.C_INT,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER
             );
     
@@ -3622,7 +3825,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * char* SSL_get_version(const SSL* s);
+     * char* SSL_get_version(SSL* s);
      * }
      */
     public static MethodHandle SSL_get_version$MH() {
@@ -3649,7 +3852,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * const SSL_METHOD* TLS_server_method();
+     * SSL_METHOD* TLS_server_method();
      * }
      */
     public static MethodHandle TLS_server_method$MH() {
@@ -3674,7 +3877,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * struct stack_st_SSL_CIPHER* SSL_get_ciphers(const SSL* s);
+     * struct stack_st_SSL_CIPHER* SSL_get_ciphers(SSL* s);
      * }
      */
     public static MethodHandle SSL_get_ciphers$MH() {
@@ -3701,7 +3904,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * struct stack_st_SSL_CIPHER* SSL_CTX_get_ciphers(const SSL_CTX* ctx);
+     * struct stack_st_SSL_CIPHER* SSL_CTX_get_ciphers(SSL_CTX* ctx);
      * }
      */
     public static MethodHandle SSL_CTX_get_ciphers$MH() {
@@ -3734,7 +3937,7 @@ public class openssl_h  {
     public static MethodHandle SSL_do_handshake$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -3761,7 +3964,7 @@ public class openssl_h  {
     public static MethodHandle SSL_renegotiate$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -3782,13 +3985,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int SSL_renegotiate_pending(const SSL* s);
+     * int SSL_renegotiate_pending(SSL* s);
      * }
      */
     public static MethodHandle SSL_renegotiate_pending$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -3815,7 +4018,7 @@ public class openssl_h  {
     public static MethodHandle SSL_shutdown$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -3842,7 +4045,7 @@ public class openssl_h  {
     public static MethodHandle SSL_verify_client_post_handshake$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -3890,7 +4093,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * struct stack_st_X509_NAME* SSL_CTX_get_client_CA_list(const SSL_CTX* s);
+     * struct stack_st_X509_NAME* SSL_CTX_get_client_CA_list(SSL_CTX* s);
      * }
      */
     public static MethodHandle SSL_CTX_get_client_CA_list$MH() {
@@ -3923,7 +4126,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_add_client_CA$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER
             );
@@ -3997,7 +4200,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * struct evp_pkey_st* SSL_get_privatekey(const SSL* ssl);
+     * struct evp_pkey_st* SSL_get_privatekey(SSL* ssl);
      * }
      */
     public static MethodHandle SSL_get_privatekey$MH() {
@@ -4024,13 +4227,13 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int SSL_get_shutdown(const SSL* ssl);
+     * int SSL_get_shutdown(SSL* ssl);
      * }
      */
     public static MethodHandle SSL_get_shutdown$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -4057,7 +4260,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_default_verify_paths$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -4084,7 +4287,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_load_verify_locations$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER
@@ -4107,7 +4310,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * SSL_SESSION* SSL_get_session(const SSL* ssl);
+     * SSL_SESSION* SSL_get_session(SSL* ssl);
      * }
      */
     public static MethodHandle SSL_get_session$MH() {
@@ -4134,7 +4337,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * void SSL_set_info_callback(SSL* ssl, void (*cb)(const SSL*,int,int));
+     * void SSL_set_info_callback(SSL* ssl, void (*cb)(SSL*,int,int));
      * }
      */
     public static MethodHandle SSL_set_info_callback$MH() {
@@ -4168,7 +4371,7 @@ public class openssl_h  {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
-                JAVA_LONG
+                openssl_h.C_LONG
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -4194,7 +4397,7 @@ public class openssl_h  {
     public static MethodHandle SSL_get_ex_data_X509_STORE_CTX_idx$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT        );
+                openssl_h.C_INT        );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
                     openssl_h.findOrThrow("SSL_get_ex_data_X509_STORE_CTX_idx"),
@@ -4271,7 +4474,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CONF_CTX_finish$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -4324,9 +4527,9 @@ public class openssl_h  {
     public static MethodHandle SSL_CONF_CTX_set_flags$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -4379,7 +4582,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CONF_cmd$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER
@@ -4408,7 +4611,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CONF_cmd_value_type$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER
             );
@@ -4430,14 +4633,14 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * int OPENSSL_init_ssl(uint64_t opts, const OPENSSL_INIT_SETTINGS* settings);
+     * int OPENSSL_init_ssl(unsigned long opts, OPENSSL_INIT_SETTINGS* settings);
      * }
      */
     public static MethodHandle OPENSSL_init_ssl$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
-                JAVA_LONG,
+                openssl_h.C_INT,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER
             );
     
@@ -4464,7 +4667,7 @@ public class openssl_h  {
     public static MethodHandle ERR_get_error$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_LONG        );
+                openssl_h.C_LONG        );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
                     openssl_h.findOrThrow("ERR_get_error"),
@@ -4489,7 +4692,7 @@ public class openssl_h  {
     public static MethodHandle ERR_peek_last_error$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_LONG        );
+                openssl_h.C_LONG        );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
                     openssl_h.findOrThrow("ERR_peek_last_error"),
@@ -4539,7 +4742,7 @@ public class openssl_h  {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
-                JAVA_LONG,
+                openssl_h.C_LONG,
                 openssl_h.C_POINTER
             );
     
@@ -4566,10 +4769,10 @@ public class openssl_h  {
     public static MethodHandle PKCS12_verify_mac$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -4589,13 +4792,39 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
+     * void PKCS12_free(PKCS12* a);
+     * }
+     */
+    public static MethodHandle PKCS12_free$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+                openssl_h.C_POINTER
+            );
+    
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("PKCS12_free"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+    
+    public static void PKCS12_free(MemorySegment a) {
+        var mh$ = PKCS12_free$MH();
+        try {
+            mh$.invokeExact(a);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    /**
+     * {@snippet lang=c :
      * int PKCS12_parse(PKCS12* p12, char* pass, EVP_PKEY** pkey, X509** cert, struct stack_st_X509** ca);
      * }
      */
     public static MethodHandle PKCS12_parse$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
@@ -4655,7 +4884,7 @@ public class openssl_h  {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -4681,9 +4910,9 @@ public class openssl_h  {
     public static MethodHandle RAND_load_file$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
-                JAVA_LONG
+                openssl_h.C_LONG
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -4709,7 +4938,7 @@ public class openssl_h  {
     public static MethodHandle X509_check_issued$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER
             );
@@ -4764,7 +4993,7 @@ public class openssl_h  {
     public static MethodHandle ENGINE_register_all_complete$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT        );
+                openssl_h.C_INT        );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
                     openssl_h.findOrThrow("ENGINE_register_all_complete"),
@@ -4789,11 +5018,11 @@ public class openssl_h  {
     public static MethodHandle ENGINE_ctrl_cmd_string$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -4819,7 +5048,7 @@ public class openssl_h  {
     public static MethodHandle ENGINE_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -4876,9 +5105,9 @@ public class openssl_h  {
     public static MethodHandle ENGINE_set_default$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -4898,7 +5127,7 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * OCSP_CERTID* OCSP_cert_to_id(const EVP_MD* dgst, const X509* subject, const X509* issuer);
+     * OCSP_CERTID* OCSP_cert_to_id(EVP_MD* dgst, X509* subject, X509* issuer);
      * }
      */
     public static MethodHandle OCSP_cert_to_id$MH() {
@@ -4961,7 +5190,7 @@ public class openssl_h  {
     public static MethodHandle OCSP_response_status$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER
             );
     
@@ -5017,7 +5246,7 @@ public class openssl_h  {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -5043,10 +5272,10 @@ public class openssl_h  {
     public static MethodHandle OCSP_resp_find$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
-                JAVA_INT
+                openssl_h.C_INT
             );
     
             static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
@@ -5072,7 +5301,7 @@ public class openssl_h  {
     public static MethodHandle OCSP_single_get0_status$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                JAVA_INT,
+                openssl_h.C_INT,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
                 openssl_h.C_POINTER,
@@ -5097,7 +5326,193 @@ public class openssl_h  {
     }
     /**
      * {@snippet lang=c :
-     * char* OSSL_PROVIDER_get0_name(const OSSL_PROVIDER* prov);
+     * void OCSP_BASICRESP_free(OCSP_BASICRESP* a);
+     * }
+     */
+    public static MethodHandle OCSP_BASICRESP_free$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+                openssl_h.C_POINTER
+            );
+    
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("OCSP_BASICRESP_free"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+    
+    public static void OCSP_BASICRESP_free(MemorySegment a) {
+        var mh$ = OCSP_BASICRESP_free$MH();
+        try {
+            mh$.invokeExact(a);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    /**
+     * {@snippet lang=c :
+     * void OCSP_RESPONSE_free(OCSP_RESPONSE* a);
+     * }
+     */
+    public static MethodHandle OCSP_RESPONSE_free$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+                openssl_h.C_POINTER
+            );
+    
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("OCSP_RESPONSE_free"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+    
+    public static void OCSP_RESPONSE_free(MemorySegment a) {
+        var mh$ = OCSP_RESPONSE_free$MH();
+        try {
+            mh$.invokeExact(a);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    /**
+     * {@snippet lang=c :
+     * OCSP_RESPONSE* d2i_OCSP_RESPONSE(OCSP_RESPONSE* a, unsigned char** in, long len);
+     * }
+     */
+    public static MethodHandle d2i_OCSP_RESPONSE$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_LONG
+            );
+    
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("d2i_OCSP_RESPONSE"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+    
+    public static MemorySegment d2i_OCSP_RESPONSE(MemorySegment a, MemorySegment in, long len) {
+        var mh$ = d2i_OCSP_RESPONSE$MH();
+        try {
+            return (MemorySegment) mh$.invokeExact(a, in, len);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    /**
+     * {@snippet lang=c :
+     * void OCSP_CERTID_free(OCSP_CERTID* a);
+     * }
+     */
+    public static MethodHandle OCSP_CERTID_free$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+                openssl_h.C_POINTER
+            );
+    
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("OCSP_CERTID_free"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+    
+    public static void OCSP_CERTID_free(MemorySegment a) {
+        var mh$ = OCSP_CERTID_free$MH();
+        try {
+            mh$.invokeExact(a);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    /**
+     * {@snippet lang=c :
+     * OCSP_REQUEST* OCSP_REQUEST_new();
+     * }
+     */
+    public static MethodHandle OCSP_REQUEST_new$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_POINTER        );
+    
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("OCSP_REQUEST_new"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+    
+    public static MemorySegment OCSP_REQUEST_new() {
+        var mh$ = OCSP_REQUEST_new$MH();
+        try {
+            return (MemorySegment) mh$.invokeExact();
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    /**
+     * {@snippet lang=c :
+     * void OCSP_REQUEST_free(OCSP_REQUEST* a);
+     * }
+     */
+    public static MethodHandle OCSP_REQUEST_free$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+                openssl_h.C_POINTER
+            );
+    
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("OCSP_REQUEST_free"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+    
+    public static void OCSP_REQUEST_free(MemorySegment a) {
+        var mh$ = OCSP_REQUEST_free$MH();
+        try {
+            mh$.invokeExact(a);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    /**
+     * {@snippet lang=c :
+     * int i2d_OCSP_REQUEST(OCSP_REQUEST* a, unsigned char** out);
+     * }
+     */
+    public static MethodHandle i2d_OCSP_REQUEST$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_INT,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER
+            );
+    
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("i2d_OCSP_REQUEST"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+    
+    public static int i2d_OCSP_REQUEST(MemorySegment a, MemorySegment out) {
+        var mh$ = i2d_OCSP_REQUEST$MH();
+        try {
+            return (int) mh$.invokeExact(a, out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    /**
+     * {@snippet lang=c :
+     * char* OSSL_PROVIDER_get0_name(OSSL_PROVIDER* prov);
      * }
      */
     public static MethodHandle OSSL_PROVIDER_get0_name$MH() {
@@ -5122,11 +5537,11 @@ public class openssl_h  {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    private static final MemorySegment OPENSSL_FILE = Arena.ofAuto().allocateFrom("/tmp/jextract$17086606898854816972.h");
+    private static final MemorySegment OPENSSL_FILE = Arena.ofAuto().allocateFrom("/tmp/jextract$7266064093665146871.h");;
     
     /**
      * {@snippet lang=c :
-     * #define OPENSSL_FILE "/tmp/jextract$17086606898854816972.h"
+     * #define OPENSSL_FILE "/tmp/jextract$7266064093665146871.h"
      * }
      */
     public static MemorySegment OPENSSL_FILE() {
@@ -5182,7 +5597,7 @@ public class openssl_h  {
     public static int EVP_PKEY_DSA() {
         return EVP_PKEY_DSA;
     }
-    private static final MemorySegment PEM_STRING_ECPARAMETERS = Arena.ofAuto().allocateFrom("EC PARAMETERS");
+    private static final MemorySegment PEM_STRING_ECPARAMETERS = Arena.ofAuto().allocateFrom("EC PARAMETERS");;
     
     /**
      * {@snippet lang=c :
