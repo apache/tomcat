@@ -100,7 +100,6 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-
         ServletResponse wResponse = null;
 
         if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
@@ -110,6 +109,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
             HttpSession session = req.getSession(false);
 
+            String requestedPath = getRequestedPath(req);
             boolean skipNonceCheck = skipNonceCheck(req);
             NonceCache<String> nonceCache = null;
 
@@ -117,38 +117,62 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                 String previousNonce = req.getParameter(nonceRequestParameterName);
 
                 if (previousNonce == null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Rejecting request for " + getRequestedPath(req) + ", session " +
-                                (null == session ? "(none)" : session.getId()) +
-                                " with no CSRF nonce found in request");
+                    if(enforce(req, requestedPath)) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Rejecting request for " + getRequestedPath(req) + ", session " +
+                                    (null == session ? "(none)" : session.getId()) +
+                                    " with no CSRF nonce found in request");
+                        }
+
+                        res.sendError(getDenyStatus());
+                        return;
+                    } else {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Would have rejected request for " + getRequestedPath(req) + ", session " +
+                                    (null == session ? "(none)" : session.getId()) +
+                                    " with no CSRF nonce found in request");
+                        }
                     }
+                } else {
+                    nonceCache = getNonceCache(req, session);
+                    if (nonceCache == null) {
+                        if(enforce(req, requestedPath)) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Rejecting request for " + getRequestedPath(req) + ", session " +
+                                        (null == session ? "(none)" : session.getId()) + " due to empty / missing nonce cache");
+                            }
 
-                    res.sendError(getDenyStatus());
-                    return;
-                }
+                            res.sendError(getDenyStatus());
+                            return;
+                        } else {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Would have rejecting request for " + getRequestedPath(req) + ", session " +
+                                        (null == session ? "(none)" : session.getId()) + " due to empty / missing nonce cache");
+                            }
+                        }
+                    } else if (!nonceCache.contains(previousNonce)) {
+                        if(enforce(req, requestedPath)) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Rejecting request for " + getRequestedPath(req) + ", session " +
+                                        (null == session ? "(none)" : session.getId()) + " due to invalid nonce " +
+                                        previousNonce);
+                            }
 
-                nonceCache = getNonceCache(req, session);
-                if (nonceCache == null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Rejecting request for " + getRequestedPath(req) + ", session " +
-                                (null == session ? "(none)" : session.getId()) + " due to empty / missing nonce cache");
+                            res.sendError(getDenyStatus());
+                            return;
+                        } else {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Would have rejecting request for " + getRequestedPath(req) + ", session " +
+                                        (null == session ? "(none)" : session.getId()) + " due to invalid nonce " +
+                                        previousNonce);
+                            }
+                        }
+                    } else {
+                        if (log.isTraceEnabled()) {
+                            log.trace(
+                                    "Allowing request to " + getRequestedPath(req) + " with valid CSRF nonce " + previousNonce);
+                        }
                     }
-
-                    res.sendError(getDenyStatus());
-                    return;
-                } else if (!nonceCache.contains(previousNonce)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Rejecting request for " + getRequestedPath(req) + ", session " +
-                                (null == session ? "(none)" : session.getId()) + " due to invalid nonce " +
-                                previousNonce);
-                    }
-
-                    res.sendError(getDenyStatus());
-                    return;
-                }
-                if (log.isTraceEnabled()) {
-                    log.trace(
-                            "Allowing request to " + getRequestedPath(req) + " with valid CSRF nonce " + previousNonce);
                 }
             }
 
@@ -190,6 +214,28 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         chain.doFilter(request, wResponse == null ? response : wResponse);
     }
 
+    /**
+     * Check to see if the request and path should be enforced or only
+     * observed and reported.
+     *
+     * This implementation always returns true. Subclasses are invited
+     * to override this method to provide whatever implementation they
+     * choose.
+     *
+     * Note that the <code>requestedPath</code> parameter is purely
+     * a performance optimization to avoid calling
+     * {@link #getRequestedPath(HttpServletRequest)} multiple times.
+     *
+     * @param req The request.
+     * @param requestedPath The path of the request being evaluated.
+     *
+     * @return <code>true</code> if the CSRF prevention should be enforced,
+     *         <code>false</code> if the CSRF prevention should only be
+     *         logged in DEBUG mode.
+     */
+    protected boolean enforce(HttpServletRequest req, String requestedPath) {
+        return true;
+    }
 
     protected boolean skipNonceCheck(HttpServletRequest request) {
         if (!Constants.METHOD_GET.equals(request.getMethod())) {
