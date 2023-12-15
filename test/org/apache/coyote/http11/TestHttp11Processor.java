@@ -1344,6 +1344,41 @@ public class TestHttp11Processor extends TomcatBaseTest {
     }
 
     /*
+     * Request line host is case insensitive match for Host header (no port, no user info)
+     */
+    @Test
+    public void testConsistentHostHeader04() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // This setting means the connection will be closed at the end of the
+        // request
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        // Add servlet
+        Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
+        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+
+        tomcat.start();
+
+        String request = "GET http://a/foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: A" +
+                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] { request });
+
+        client.connect();
+        client.processRequest();
+
+        // Expected response is a 200 response.
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("request.getServerName() is [A] and request.getServerPort() is 80",
+                client.getResponseBody());
+    }
+
+    /*
      * Host header exists but its value is an empty string. This is valid if the request line does not include a
      * hostname/port. Added for bug 62739.
      */
