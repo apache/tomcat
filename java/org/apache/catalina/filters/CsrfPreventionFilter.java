@@ -376,6 +376,16 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             return false;
         }
 
+        if (null != noNoncePatterns && noNoncePatterns.isEmpty()) {
+            if (null != noNoncePatterns) {
+                for (Predicate<String> p : noNoncePatterns) {
+                    if (p.test(requestedPath)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
         if (log.isTraceEnabled()) {
             log.trace("Skipping CSRF nonce-check for GET request to entry point " + requestedPath);
         }
