@@ -678,6 +678,28 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
+    public boolean equalsIgnoreCase(byte b2[], int off2, int len2) {
+        byte b1[] = buff;
+        if (b1 == null && b2 == null) {
+            return true;
+        }
+
+        int len = end - start;
+        if (len != len2 || b1 == null || b2 == null) {
+            return false;
+        }
+
+        int off1 = start;
+
+        while (len-- > 0) {
+            if (Ascii.toLower(b1[off1++]) != Ascii.toLower(b2[off2++])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
     public boolean equals(CharChunk cc) {
         return equals(cc.getChars(), cc.getStart(), cc.getLength());
     }
