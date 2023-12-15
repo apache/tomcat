@@ -71,10 +71,10 @@ cd $JAVA_HOME/bin
 
   <p>
     Download the Tomcat Stuffed module from
-    https://github.com/apache/tomcat/tree/main/modules/stuffed and place
-    all the files in a folder <code>stuffed</code> in this documentation.
+    <code>https://github.com/apache/tomcat/tree/main/modules/stuffed</code>.
+    For convinience, an env property can be set:
     <source>export TOMCAT_STUFFED=/absolute...path...to/stuffed</source>
-    The build process now requires both Ant and Maven.
+    The build process now requires both Apache Ant and Maven.
   </p>
 
   </section>
@@ -82,9 +82,10 @@ cd $JAVA_HOME/bin
   <section name="Packaging and Building">
 
   <p>
-    Inside the tomcat-stuffed folder, the directory structure is the same as for
-    regular Tomcat. The main configuration files are placed in the conf folder,
-    and if using the default server.xml the webapps are placed in the webapps
+    Inside the <code>$TOMCAT_STUFFED</code> folder, the directory structure
+    is the same as for regular Tomcat. The main configuration files
+    are placed in the <code>conf</code> folder, and if using the default
+    <code>server.xml</code> the webapps are placed in the <code>webapps</code>
     folder.
   </p>
 
@@ -94,8 +95,9 @@ cd $JAVA_HOME/bin
     <source>cd $TOMCAT_STUFFED
 mvn package
 ant -Dwebapp.name=somewebapp -f webapp-jspc.ant.xml</source>
-    Dependencies for the webapp should now be added to the main pom.xml,
-    following with building the complete fat JAR.
+    Dependencies for the webapp should now be added to the main
+    <code>$TOMCAT_STUFFED/pom.xml</code>,
+    following by building the complete fat JAR.
     <source>mvn package</source>
   </p>
 
