@@ -291,6 +291,13 @@
         request. The default value is <code>403</code>.</p>
       </attribute>
 
+      <attribute name="enforce" required="false">
+        <p>A flag to enable or disable enforcement. When enforcement is
+        disabled, the CsrfPreventionFilter will <i>allow all requests</i> and
+        log CSRF failures as DEBUG messages. The default is <b>true</b>,
+        enabling the enforcement of CSRF protections.</p>
+      </attribute>
+
       <attribute name="entryPoints" required="false">
         <p>A comma separated list of URLs that will not be tested for the
         presence of a valid nonce. They are used to provide a way to navigate

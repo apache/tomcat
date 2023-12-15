@@ -53,6 +53,8 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
     private String nonceRequestParameterName = Constants.CSRF_NONCE_REQUEST_PARAM;
 
+    private boolean enforce = true;
+
     /**
      * Entry points are URLs that will not be tested for the presence of a valid nonce. They are used to provide a way
      * to navigate back to a protected application after navigating away from it. Entry points will be limited to HTTP
@@ -85,6 +87,30 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      */
     public void setNonceRequestParameterName(String parameterName) {
         this.nonceRequestParameterName = parameterName;
+    }
+
+    /**
+     * Sets the flag to enforce CSRF protection or just log failures as DEBUG
+     * messages.
+     *
+     * @param enforce <code>true</code> to enforce CSRF protections or
+     *                <code>false</code> to log DEBUG messages and allow
+     *                all requests.
+     */
+    public void setEnforce(boolean enforce) {
+        this.enforce = enforce;
+    }
+
+    /**
+     * Gets the flag to enforce CSRF protection or just log failures as DEBUG
+     * messages.
+     *
+     * @return <code>true</code> if CSRF protections will be enforced or
+     *         <code>false</code> if all requests will be allowed and
+     *         failures will be logged as DEBUG messages.
+     */
+    public boolean getEnforce() {
+        return this.enforce;
     }
 
     @Override
@@ -218,10 +244,6 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      * Check to see if the request and path should be enforced or only
      * observed and reported.
      *
-     * This implementation always returns true. Subclasses are invited
-     * to override this method to provide whatever implementation they
-     * choose.
-     *
      * Note that the <code>requestedPath</code> parameter is purely
      * a performance optimization to avoid calling
      * {@link #getRequestedPath(HttpServletRequest)} multiple times.
@@ -234,7 +256,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      *         logged in DEBUG mode.
      */
     protected boolean enforce(HttpServletRequest req, String requestedPath) {
-        return true;
+        return getEnforce();
     }
 
     protected boolean skipNonceCheck(HttpServletRequest request) {
