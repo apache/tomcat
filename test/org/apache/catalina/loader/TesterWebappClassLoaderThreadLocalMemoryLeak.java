@@ -22,7 +22,6 @@ import java.util.concurrent.Executor;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -49,8 +48,7 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
  * most systems (just not all and particularly some of the ASF's CI systems) and
  * still may be useful if a bug is reported in this area in the future.
  */
-@Ignore
-public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
+public class TesterWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
 
     @Test
     public void testThreadLocalLeak1() throws Exception {

@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -892,27 +891,6 @@ public class TestRequest extends TomcatBaseTest {
         Locale expected = Locale.forLanguageTag("en-gb");
 
         Assert.assertEquals(expected, actual);
-    }
-
-
-    @Test
-    @Ignore("Used to check performance of different parsing approaches")
-    public void localeParsePerformance() throws Exception {
-        TesterRequest req = new TesterRequest();
-        req.addHeader("accept-encoding", "en-gb,en");
-
-        long start = System.nanoTime();
-
-        // Takes about 0.3s on a quad core 2.7Ghz 2013 MacBook
-        for (int i = 0; i < 10000000; i++) {
-            req.parseLocales();
-            req.localesParsed = false;
-            req.locales.clear();
-        }
-
-        long time = System.nanoTime() - start;
-
-        System.out.println(time);
     }
 
 
