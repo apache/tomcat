@@ -72,6 +72,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         defaultNoNonceURLPatterns.add(new SuffixPredicate(".gif"));
         defaultNoNonceURLPatterns.add(new SuffixPredicate(".png"));
         defaultNoNonceURLPatterns.add(new SuffixPredicate(".jpg"));
+        defaultNoNonceURLPatterns.add(new SuffixPredicate(".svg"));
 
         DEFAULT_NO_NONCE_URL_PATTERNS = Collections.unmodifiableList(defaultNoNonceURLPatterns);
     }
