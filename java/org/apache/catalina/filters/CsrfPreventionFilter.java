@@ -248,7 +248,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                 String previousNonce = req.getParameter(nonceRequestParameterName);
 
                 if (previousNonce == null) {
-                    if(enforce(req, requestedPath)) {
+                    if (enforce(req, requestedPath)) {
                         if (log.isDebugEnabled()) {
                             log.debug("Rejecting request for " + getRequestedPath(req) + ", session " +
                                     (null == session ? "(none)" : session.getId()) +
@@ -267,7 +267,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                 } else {
                     nonceCache = getNonceCache(req, session);
                     if (nonceCache == null) {
-                        if(enforce(req, requestedPath)) {
+                        if (enforce(req, requestedPath)) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Rejecting request for " + getRequestedPath(req) + ", session " +
                                         (null == session ? "(none)" : session.getId()) + " due to empty / missing nonce cache");
@@ -282,7 +282,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                             }
                         }
                     } else if (!nonceCache.contains(previousNonce)) {
-                        if(enforce(req, requestedPath)) {
+                        if (enforce(req, requestedPath)) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Rejecting request for " + getRequestedPath(req) + ", session " +
                                         (null == session ? "(none)" : session.getId()) + " due to invalid nonce " +
