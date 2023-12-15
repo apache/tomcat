@@ -123,6 +123,11 @@
         fixing a regression caused by the introduction of a second
         <code>addSslHostConfig</code> method. (remm)
       </fix>
+      <fix>
+        Relax the check that the HTTP Host header is consistent with the host
+        used in the request line, if any, to make the check case insensitive
+        since host names are case insensitive. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web Applications">
