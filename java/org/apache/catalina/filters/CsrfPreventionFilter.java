@@ -18,10 +18,15 @@ package org.apache.catalina.filters;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -54,6 +59,22 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     private String nonceRequestParameterName = Constants.CSRF_NONCE_REQUEST_PARAM;
 
     private boolean enforce = true;
+
+    private Collection<Predicate<String>> noNoncePatterns = DEFAULT_NO_NONCE_URL_PATTERNS;
+
+    private static final Collection<Predicate<String>> DEFAULT_NO_NONCE_URL_PATTERNS;
+
+    static {
+        ArrayList<Predicate<String>> defaultNoNonceURLPatterns = new ArrayList<>();
+
+        defaultNoNonceURLPatterns.add(new SuffixPredicate(".css"));
+        defaultNoNonceURLPatterns.add(new SuffixPredicate(".js"));
+        defaultNoNonceURLPatterns.add(new SuffixPredicate(".gif"));
+        defaultNoNonceURLPatterns.add(new SuffixPredicate(".png"));
+        defaultNoNonceURLPatterns.add(new SuffixPredicate(".jpg"));
+
+        DEFAULT_NO_NONCE_URL_PATTERNS = Collections.unmodifiableList(defaultNoNonceURLPatterns);
+    }
 
     /**
      * Entry points are URLs that will not be tested for the presence of a valid nonce. They are used to provide a way
@@ -111,6 +132,90 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      */
     public boolean getEnforce() {
         return this.enforce;
+    }
+
+    /**
+     * Sets the list of URL patterns to suppress nonce-addition for.
+     *
+     * Some URLs do not need nonces added to them such as static resources.
+     * By <i>not</i> adding nonces to those URLs, HTTP caches can be more
+     * effective because the CSRF prevention filter won't generate what
+     * look like unique URLs for those commonly-reused resources.
+     *
+     * @param patterns A comma-separated list of URL patterns that will not
+     *        have nonces added to them. Patterns may begin or end with a
+     *        <code>*</code> character to denote a suffix-match or
+     *        prefix-match. Any matched URL will not have a CSRF nonce
+     *        added to it when passed through
+     *        {@link HttpServletResponse#encodeURL(String)}.
+     */
+    public void setNoNonceURLPatterns(String patterns) {
+        String values[] = patterns.split(",");
+        if (null == this.noNoncePatterns) {
+            this.noNoncePatterns = new ArrayList<>();
+        } else {
+            this.noNoncePatterns.clear();
+        }
+
+        for (String value : values) {
+            Predicate<String> p = createNoNoncePredicate(value.trim());
+
+            if (null != p) {
+                this.noNoncePatterns.add(p);
+            }
+        }
+    }
+
+    protected Predicate<String> createNoNoncePredicate(String pattern) {
+        if (null == pattern || 0 == pattern.trim().length()) {
+            return null;
+        }
+        if (pattern.startsWith("*")) {
+            return new SuffixPredicate(pattern.substring(1));
+        } else if (pattern.endsWith("*")) {
+            return new PrefixPredicate(pattern.substring(0, pattern.length() - 1));
+        } else if (pattern.startsWith("/") && pattern.endsWith("/")) {
+            return new PatternPredicate(pattern.substring(1, pattern.length() - 1));
+        } else {
+            throw new IllegalArgumentException("Unsupported pattern: " + pattern);
+        }
+    }
+
+    protected static class PrefixPredicate implements Predicate<String> {
+        private final String prefix;
+        public PrefixPredicate(String prefix) {
+            this.prefix = prefix;
+        }
+
+        @Override
+        public boolean test(String t) {
+            return t.endsWith(this.prefix);
+        }
+    }
+
+    protected static class SuffixPredicate implements Predicate<String> {
+        private final String suffix;
+        public SuffixPredicate(String suffix) {
+            this.suffix = suffix;
+        }
+
+        @Override
+        public boolean test(String t) {
+            return t.endsWith(this.suffix);
+        }
+    }
+
+    protected static class PatternPredicate implements Predicate<String> {
+        private final Pattern pattern;
+
+        public PatternPredicate(String regex) {
+            this.pattern = Pattern.compile(regex);
+        }
+
+        @Override
+        public boolean test(String t) {
+            return pattern.matcher(t).matches();
+        }
     }
 
     @Override
@@ -233,7 +338,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                 // requiring the use of response.encodeURL.
                 request.setAttribute(Constants.CSRF_NONCE_REQUEST_ATTR_NAME, newNonce);
 
-                wResponse = new CsrfResponseWrapper(res, nonceRequestParameterName, newNonce);
+                wResponse = new CsrfResponseWrapper(res, nonceRequestParameterName, newNonce, noNoncePatterns);
             }
         }
 
@@ -335,21 +440,48 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         private final String nonceRequestParameterName;
         private final String nonce;
+        private final Collection<Predicate<String>> noNoncePatterns;
 
-        public CsrfResponseWrapper(HttpServletResponse response, String nonceRequestParameterName, String nonce) {
+        public CsrfResponseWrapper(HttpServletResponse response, String nonceRequestParameterName,
+                String nonce, Collection<Predicate<String>> noNoncePatterns) {
             super(response);
             this.nonceRequestParameterName = nonceRequestParameterName;
             this.nonce = nonce;
+            this.noNoncePatterns = noNoncePatterns;
         }
 
         @Override
         public String encodeRedirectURL(String url) {
-            return addNonce(super.encodeRedirectURL(url));
+            if (shouldAddNonce(url)) {
+                return addNonce(super.encodeRedirectURL(url));
+            } else {
+                return url;
+            }
         }
 
         @Override
         public String encodeURL(String url) {
-            return addNonce(super.encodeURL(url));
+            if (shouldAddNonce(url)) {
+                return addNonce(super.encodeURL(url));
+            } else {
+                return url;
+            }
+        }
+
+        private boolean shouldAddNonce(String url) {
+            if (null == noNoncePatterns || noNoncePatterns.isEmpty()) {
+                return true;
+            }
+
+            if (null != noNoncePatterns) {
+                for (Predicate<String> p : noNoncePatterns) {
+                    if (p.test(url)) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         /*

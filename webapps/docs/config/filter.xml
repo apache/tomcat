@@ -326,6 +326,29 @@
         of <code>java.security.SecureRandom</code> will be used.</p>
       </attribute>
 
+      <attribute name="setNoNonceURLPatterns" required="false">
+        <p>A list of URL patterns that will <i>not</i> have CSRF nonces added
+        to them. You may not want to add nonces to certain URLs to avoid
+        creating unique URLs which may defeat resource caching, etc.</p>
+
+        <p>There are 3 types of patterns supported:</p>
+
+        <ul>
+          <li>Prefix matches using a pattern that ends with a <code>*</code>.
+          For example, <code>/images/*</code>.</li>
+
+          <li>Suffix matches using a pattern that begins with a <code>*</code>.
+          For example, <code>*.css</code>.</li>
+
+          <li>Complete regular expression patterns which begin and end with a
+          <code>/</code>. The <code>/</code> characters will be removed from
+          from the pattern before being compiled. Note that patterns cannot
+          contain a comma (<code>,</code>) because the entire configuration
+          attribute is comma-separated.</li>
+        </ul>
+
+        <p>The default is <code>*.css, *.js, *.gif, *.png, *.jpg</code>.</p>
+      </attribute>
     </attributes>
 
   </subsection>
