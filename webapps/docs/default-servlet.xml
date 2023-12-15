@@ -211,6 +211,10 @@ Tomcat.</p>
         valid for GET requests, RFC 9110 (which obsoletes RFC 7233) now allows
         partial puts. [true]
   </property>
+  <property name="directoryRedirectStatusCode">
+        When a directory redirect (trailing slash missing) is made, use this as
+        the the HTTP response code. [302]
+  </property>
 </properties>
 </section>
 

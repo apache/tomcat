@@ -116,6 +116,11 @@
   <!--                       headers only valid for GET requests, RFC 9110  -->
   <!--                       (which obsoletes RFC 7233) now allows partial  -->
   <!--                       puts. [true]                                   -->
+  <!--                                                                      -->
+  <!--   directoryRedirectStatusCode                                        -->
+  <!--                       Status code to use for directory redirects.    -->
+  <!--                       Possible values: 301, 302, 307, 308            -->
+  <!--                       [302]                                          -->
 
     <servlet>
         <servlet-name>default</servlet-name>

@@ -173,6 +173,11 @@ public class DefaultServlet extends HttpServlet {
     protected boolean listings = false;
 
     /**
+     * Status code to use for directory redirects.
+     */
+    protected int directoryRedirectStatusCode = HttpServletResponse.SC_FOUND;
+
+    /**
      * Read only flag. By default, it's set to true.
      */
     protected boolean readOnly = true;
@@ -285,6 +290,21 @@ public class DefaultServlet extends HttpServlet {
         }
 
         listings = Boolean.parseBoolean(getServletConfig().getInitParameter("listings"));
+
+        if (getServletConfig().getInitParameter("directoryRedirectStatusCode") != null) {
+            String statusCodeString = getServletConfig().getInitParameter("directoryRedirectStatusCode");
+            int statusCode = Integer.parseInt(statusCodeString);
+            switch (statusCode) {
+                case HttpServletResponse.SC_MOVED_PERMANENTLY:
+                case HttpServletResponse.SC_FOUND:
+                case HttpServletResponse.SC_TEMPORARY_REDIRECT:
+                case HttpServletResponse.SC_PERMANENT_REDIRECT:
+                    directoryRedirectStatusCode = statusCode;
+                    break;
+                default:
+                    log("Invalid redirectStatusCode of " + statusCode);
+            }
+        }
 
         if (getServletConfig().getInitParameter("readonly") != null) {
             readOnly = Boolean.parseBoolean(getServletConfig().getInitParameter("readonly"));
@@ -1376,7 +1396,7 @@ public class DefaultServlet extends HttpServlet {
         while (location.length() > 1 && location.charAt(1) == '/') {
             location.deleteCharAt(0);
         }
-        response.sendRedirect(response.encodeRedirectURL(location.toString()));
+        response.sendRedirect(response.encodeRedirectURL(location.toString()), directoryRedirectStatusCode);
     }
 
     /**
