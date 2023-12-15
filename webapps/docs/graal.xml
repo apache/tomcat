@@ -46,10 +46,10 @@
 
   <p>
     The native image tool is much easier to use with single JARs, as a result
-    the process will use the Maven shade plugin JAR packaging (fat JAR). The
+    the process will use the Maven shade plugin JAR packaging. The
     idea is to produce a single JAR that contains all necessary classes from
     Tomcat, the webapps and all additional dependencies. Although Tomcat has
-    received compatibility fixes to support native images, any library
+    received compatibility fixes to support native images, other libraries
     may not be compatible and may require replacement code (the GraalVM
     documentation has more details about this).
   </p>
@@ -64,8 +64,8 @@
 cd $JAVA_HOME/bin
 ./gu install native-image</source>
    Mandrel already includes the Native Image tool ready to use, so this
-   step can be skipped. Only JAVA_HOME must be set to the folder which
-   contains the bin folder with the JVM binaries, such as:
+   step can be skipped. Only <code>JAVA_HOME</code> must be set to the folder
+   which contains the bin folder with the JVM binaries, such as:
    <source>export JAVA_HOME=/absolute...path...to/mandrel-javaXX-platform-x.x.x.x/mandrelJDK</source>
   </p>
 
@@ -90,14 +90,15 @@ cd $JAVA_HOME/bin
   </p>
 
   <p>
-    The first step is to build the fat Tomcat JAR with all dependencies.
-    Any JSP in the webapp must all be precompiled and packaged.
+    The first step is to build the shaded Tomcat JAR with all dependencies.
+    Any JSP in the webapp must all be precompiled and packaged (assuming
+    that the <code>webapps</code> contains a <code>$WEBAPPNAME</code> webapp):
     <source>cd $TOMCAT_STUFFED
 mvn package
-ant -Dwebapp.name=somewebapp -f webapp-jspc.ant.xml</source>
+ant -Dwebapp.name=$WEBAPPNAME -f webapp-jspc.ant.xml</source>
     Dependencies for the webapp should now be added to the main
     <code>$TOMCAT_STUFFED/pom.xml</code>,
-    following by building the complete fat JAR.
+    following by building the shaded JAR:
     <source>mvn package</source>
   </p>
 
@@ -108,8 +109,10 @@ ant -Dwebapp.name=somewebapp -f webapp-jspc.ant.xml</source>
     context.xml files used to configure the contexts.
     <source>$JAVA_HOME/bin/java\
         -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties\
-        -jar target/tomcat-stuffed-1.0.jar --catalina -generateCode src/main/java
-mvn package</source>
+        -jar target/tomcat-stuffed-1.0.jar --catalina -generateCode src/main/java</source>
+    Then stop Tomcat and use the following command to include the generated
+    embedded code:
+    <source>mvn package</source>
     The rest of the process described here will assume this step was done and
     the <code>--catalina -useGeneratedCode</code> arguments are added to the
     command lines. If this was not the case, they should be removed.
