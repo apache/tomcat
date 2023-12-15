@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.management.ObjectName;
@@ -195,11 +194,11 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
      * @param attNames The attribute name (complete)
      * @param getAttMap The readable attributes map
      * @param setAttMap The settable attributes map
-     * @param invokeAttMap The invokable attributes map
+     * @param invokeAttList The invokable attributes list
      */
     private void initMethods(Class<?> realClass, Set<String> attNames,
             Map<String,Method> getAttMap, Map<String,Method> setAttMap,
-            Map<String,Method> invokeAttMap) {
+            List<Method> invokeAttList) {
 
         Method[] methods = realClass.getMethods();
         for (Method method : methods) {
@@ -256,10 +255,10 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 attNames.add(name);
             } else {
                 if (params.length == 0) {
-                    if (specialMethods.get(method.getName()) != null) {
+                    if (specialMethods.get(name) != null) {
                         continue;
                     }
-                    invokeAttMap.put(name, method);
+                    invokeAttList.add(method);
                 } else {
                     boolean supported = true;
                     for (Class<?> param : params) {
@@ -269,7 +268,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                         }
                     }
                     if (supported) {
-                        invokeAttMap.put(name, method);
+                        invokeAttList.add(method);
                     }
                 }
             }
@@ -301,9 +300,9 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
         // key: attribute val: setter method
         Map<String, Method> setAttMap = new HashMap<>();
         // key: operation val: invoke method
-        Map<String, Method> invokeAttMap = new HashMap<>();
+        List<Method> invokeAttList = new ArrayList<>();
 
-        initMethods(realClass, attrNames, getAttMap, setAttMap, invokeAttMap);
+        initMethods(realClass, attrNames, getAttMap, setAttMap, invokeAttList);
 
         try {
             for (String name : attrNames) {
@@ -340,18 +339,13 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 }
             }
 
-            // This map is populated by iterating the methods (which end up as
-            // values in the Map) and obtaining the key from the value. It is
-            // impossible for a key to be associated with a null value.
-            for (Entry<String, Method> entry : invokeAttMap.entrySet()) {
-                String name = entry.getKey();
-                Method m = entry.getValue();
-
+            for (Method method : invokeAttList) {
+                String name = method.getName();
                 OperationInfo op = new OperationInfo();
                 op.setName(name);
-                op.setReturnType(m.getReturnType().getName());
+                op.setReturnType(method.getReturnType().getName());
                 op.setDescription("Introspected operation " + name);
-                Class<?>[] params = m.getParameterTypes();
+                Class<?>[] params = method.getParameterTypes();
                 for (int i = 0; i < params.length; i++) {
                     ParameterInfo pi = new ParameterInfo();
                     pi.setType(params[i].getName());
