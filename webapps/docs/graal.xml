@@ -127,7 +127,7 @@ mvn package</source>
   </p>
 
   <p>
-    Run the GraalVM substrate VM using the trace agent:
+    Run Tomcat using the GraalVM substrate VM and its trace agent:
     <source>$JAVA_HOME/bin/java\
         -agentlib:native-image-agent=config-output-dir=$TOMCAT_STUFFED/target/\
         -Dorg.graalvm.nativeimage.imagecode=agent\
@@ -140,7 +140,7 @@ mvn package</source>
     (ex: Servlet access, websockets, etc) need to be accessed using a script
     that will exercise the webapp. Servlets may be loaded on startup
     instead of needing an actual access. Listeners may also be used to load
-    additional classes on startup.
+    additional classes on startup. When that is done, Tomcat can be stopped.
   </p>
 
   <p>
