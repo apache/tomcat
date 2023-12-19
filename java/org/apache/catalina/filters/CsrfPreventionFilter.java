@@ -50,20 +50,8 @@ import org.apache.juli.logging.LogFactory;
  * </ul>
  */
 public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
-    private static final Collection<Predicate<String>> DEFAULT_NO_NONCE_URL_PATTERNS;
-
-    static {
-        ArrayList<Predicate<String>> defaultNoNonceURLPatterns = new ArrayList<>();
-
-        defaultNoNonceURLPatterns.add(new SuffixPredicate(".css"));
-        defaultNoNonceURLPatterns.add(new SuffixPredicate(".js"));
-        defaultNoNonceURLPatterns.add(new SuffixPredicate(".gif"));
-        defaultNoNonceURLPatterns.add(new SuffixPredicate(".png"));
-        defaultNoNonceURLPatterns.add(new SuffixPredicate(".jpg"));
-        defaultNoNonceURLPatterns.add(new SuffixPredicate(".svg"));
-
-        DEFAULT_NO_NONCE_URL_PATTERNS = Collections.unmodifiableList(defaultNoNonceURLPatterns);
-    }
+    private static final Collection<Predicate<String>> DEFAULT_NO_NONCE_URL_PATTERNS
+        = createNoNoncePredicates("*.css, *.js, *.gif, *.png, *.jpg, *.svg");
 
     private final Log log = LogFactory.getLog(CsrfPreventionFilter.class);
 
