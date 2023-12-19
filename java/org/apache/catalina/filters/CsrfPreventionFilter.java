@@ -50,18 +50,6 @@ import org.apache.juli.logging.LogFactory;
  * </ul>
  */
 public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
-    private final Log log = LogFactory.getLog(CsrfPreventionFilter.class);
-
-    private final Set<String> entryPoints = new HashSet<>();
-
-    private int nonceCacheSize = 5;
-
-    private String nonceRequestParameterName = Constants.CSRF_NONCE_REQUEST_PARAM;
-
-    private boolean enforce = true;
-
-    private Collection<Predicate<String>> noNoncePatterns = DEFAULT_NO_NONCE_URL_PATTERNS;
-
     private static final Collection<Predicate<String>> DEFAULT_NO_NONCE_URL_PATTERNS;
 
     static {
@@ -76,6 +64,18 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         DEFAULT_NO_NONCE_URL_PATTERNS = Collections.unmodifiableList(defaultNoNonceURLPatterns);
     }
+
+    private final Log log = LogFactory.getLog(CsrfPreventionFilter.class);
+
+    private final Set<String> entryPoints = new HashSet<>();
+
+    private int nonceCacheSize = 5;
+
+    private String nonceRequestParameterName = Constants.CSRF_NONCE_REQUEST_PARAM;
+
+    private boolean enforce = true;
+
+    private Collection<Predicate<String>> noNoncePatterns = DEFAULT_NO_NONCE_URL_PATTERNS;
 
     /**
      * Entry points are URLs that will not be tested for the presence of a valid nonce. They are used to provide a way
@@ -151,23 +151,47 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      *        {@link HttpServletResponse#encodeURL(String)}.
      */
     public void setNoNonceURLPatterns(String patterns) {
-        String values[] = patterns.split(",");
-        if (null == this.noNoncePatterns) {
-            this.noNoncePatterns = new ArrayList<>();
-        } else {
-            this.noNoncePatterns.clear();
+        this.noNoncePatterns = createNoNoncePredicates(patterns);
+    }
+
+    /**
+     * Creates a collection of matchers from a comma-separated string of patterns.
+     *
+     * @param patterns A comma-separated string of URL matching patterns.
+     *
+     * @return A collection of predicates representing the URL patterns.
+     */
+    protected static Collection<Predicate<String>> createNoNoncePredicates(String patterns) {
+        if (null == patterns || 0 == patterns.trim().length()) {
+            return null;
         }
 
+        String values[] = patterns.split(",");
+
+        ArrayList<Predicate<String>> matchers = new ArrayList<>(values.length);
         for (String value : values) {
             Predicate<String> p = createNoNoncePredicate(value.trim());
 
             if (null != p) {
-                this.noNoncePatterns.add(p);
+                matchers.add(p);
             }
         }
+
+        matchers.trimToSize();
+
+        return matchers;
     }
 
-    protected Predicate<String> createNoNoncePredicate(String pattern) {
+    /**
+     * Creates a predicate that can match the specified type of pattern.
+     *
+     * @param pattern The pattern to match e.g. <code>*.foo</code> or
+     *                <code>/bar/*</code>.
+     *
+     * @return A Predicate which can match the specified pattern, or
+     *         <code>>null</code> if the pattern is null or blank.
+     */
+    protected static Predicate<String> createNoNoncePredicate(String pattern) {
         if (null == pattern || 0 == pattern.trim().length()) {
             return null;
         }
