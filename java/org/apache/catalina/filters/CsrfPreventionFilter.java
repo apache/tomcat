@@ -416,8 +416,12 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         String requestedPath = getRequestedPath(request);
 
-        if (!entryPoints.contains(requestedPath)) {
-            return false;
+        if (entryPoints.contains(requestedPath)) {
+            if (log.isTraceEnabled()) {
+                log.trace("Skipping CSRF nonce-check for GET request to entry point " + requestedPath);
+            }
+
+            return true;
         }
 
         if (null != noNoncePatterns && noNoncePatterns.isEmpty()) {
@@ -430,11 +434,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             }
         }
 
-        if (log.isTraceEnabled()) {
-            log.trace("Skipping CSRF nonce-check for GET request to entry point " + requestedPath);
-        }
-
-        return true;
+        return false;
     }
 
 

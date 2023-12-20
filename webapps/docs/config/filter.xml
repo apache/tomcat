@@ -326,7 +326,7 @@
         of <code>java.security.SecureRandom</code> will be used.</p>
       </attribute>
 
-      <attribute name="setNoNonceURLPatterns" required="false">
+      <attribute name="noNonceURLPatterns" required="false">
         <p>A list of URL patterns that will <i>not</i> have CSRF nonces added
         to them. You may not want to add nonces to certain URLs to avoid
         creating unique URLs which may defeat resource caching, etc.</p>
