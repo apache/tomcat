@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -50,8 +51,10 @@ import org.apache.juli.logging.LogFactory;
  * </ul>
  */
 public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
-    private static final Collection<Predicate<String>> DEFAULT_NO_NONCE_URL_PATTERNS
-        = createNoNoncePredicates("*.css, *.js, *.gif, *.png, *.jpg, *.svg, *.ico, *.jpeg");
+    private static final String DEFAULT_NO_NONCE_URL_PATTERNS
+        = "*.css, *.js, *.gif, *.png, *.jpg, *.svg, *.ico, *.jpeg";
+
+    private ServletContext context;
 
     private final Log log = LogFactory.getLog(CsrfPreventionFilter.class);
 
@@ -63,7 +66,9 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
     private boolean enforce = true;
 
-    private Collection<Predicate<String>> noNoncePatterns = DEFAULT_NO_NONCE_URL_PATTERNS;
+    private String noNoncePatterns = DEFAULT_NO_NONCE_URL_PATTERNS;
+
+    private Collection<Predicate<String>> noNoncePredicates;
 
     /**
      * Entry points are URLs that will not be tested for the presence of a valid nonce. They are used to provide a way
@@ -139,7 +144,11 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      *        {@link HttpServletResponse#encodeURL(String)}.
      */
     public void setNoNonceURLPatterns(String patterns) {
-        this.noNoncePatterns = createNoNoncePredicates(patterns);
+        this.noNoncePatterns = patterns;
+
+        if (null != context) {
+            this.noNoncePredicates = createNoNoncePredicates(context, this.noNoncePatterns);
+        }
     }
 
     /**
@@ -149,7 +158,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      *
      * @return A collection of predicates representing the URL patterns.
      */
-    protected static Collection<Predicate<String>> createNoNoncePredicates(String patterns) {
+    protected static Collection<Predicate<String>> createNoNoncePredicates(ServletContext context, String patterns) {
         if (null == patterns || 0 == patterns.trim().length()) {
             return null;
         }
@@ -158,7 +167,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         ArrayList<Predicate<String>> matchers = new ArrayList<>(values.length);
         for (String value : values) {
-            Predicate<String> p = createNoNoncePredicate(value.trim());
+            Predicate<String> p = createNoNoncePredicate(context, value.trim());
 
             if (null != p) {
                 matchers.add(p);
@@ -179,7 +188,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      * @return A Predicate which can match the specified pattern, or
      *         <code>>null</code> if the pattern is null or blank.
      */
-    protected static Predicate<String> createNoNoncePredicate(String pattern) {
+    protected static Predicate<String> createNoNoncePredicate(ServletContext context, String pattern) {
         if (null == pattern || 0 == pattern.trim().length()) {
             return null;
         }
@@ -191,6 +200,18 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             return new PatternPredicate(pattern.substring(1, pattern.length() - 1));
         } else {
             throw new IllegalArgumentException("Unsupported pattern: " + pattern);
+        }
+    }
+
+    protected static class PredicateBase {
+        private final ServletContext context;
+
+        public PredicateBase(ServletContext context) {
+            this.context = context;
+        }
+
+        protected ServletContext getServletContext() {
+            return context;
         }
     }
 
@@ -235,6 +256,10 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     public void init(FilterConfig filterConfig) throws ServletException {
         // Set the parameters
         super.init(filterConfig);
+
+        this.context = filterConfig.getServletContext();
+
+        this.noNoncePredicates = createNoNoncePredicates(context, this.noNoncePatterns);
 
         // Put the expected request parameter name into the application scope
         filterConfig.getServletContext().setAttribute(Constants.CSRF_NONCE_REQUEST_PARAM_NAME_KEY,
@@ -351,7 +376,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                 // requiring the use of response.encodeURL.
                 request.setAttribute(Constants.CSRF_NONCE_REQUEST_ATTR_NAME, newNonce);
 
-                wResponse = new CsrfResponseWrapper(res, nonceRequestParameterName, newNonce, noNoncePatterns);
+                wResponse = new CsrfResponseWrapper(res, nonceRequestParameterName, newNonce, noNoncePredicates);
             }
         }
 
@@ -390,7 +415,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         if (null != noNoncePatterns && noNoncePatterns.isEmpty()) {
             if (null != noNoncePatterns) {
-                for (Predicate<String> p : noNoncePatterns) {
+                for (Predicate<String> p : noNoncePredicates) {
                     if (p.test(requestedPath)) {
                         return true;
                     }
