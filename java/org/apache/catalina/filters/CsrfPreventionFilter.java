@@ -424,12 +424,14 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             return true;
         }
 
-        if (null != noNoncePatterns && noNoncePatterns.isEmpty()) {
-            if (null != noNoncePatterns) {
-                for (Predicate<String> p : noNoncePredicates) {
-                    if (p.test(requestedPath)) {
-                        return true;
+        if (null != noNoncePredicates && !noNoncePredicates.isEmpty()) {
+            for (Predicate<String> p : noNoncePredicates) {
+                if (p.test(requestedPath)) {
+                    if (log.isTraceEnabled()) {
+                        log.trace("Skipping CSRF nonce-check for GET request to no-nonce path " + requestedPath);
                     }
+
+                    return true;
                 }
             }
         }
