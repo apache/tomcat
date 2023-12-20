@@ -945,7 +945,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private void checkLastError() throws SSLException {
-        String sslError = getLastError();
+        String sslError = OpenSSLContext.getLastError();
         if (sslError != null) {
             // Many errors can occur during handshake and need to be reported
             if (!handshakeFinished) {
@@ -961,38 +961,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Clear out any errors, but log a warning.
      */
     private static void clearLastError() {
-        getLastError();
-    }
-
-    /**
-     * Many calls to SSL methods do not check the last error. Those that do
-     * check the last error need to ensure that any previously ignored error is
-     * cleared prior to the method call else errors may be falsely reported.
-     * Ideally, before any SSL_read, SSL_write, clearLastError should always
-     * be called, and getLastError should be called after on any negative or
-     * zero result.
-     * @return the first error in the stack
-     */
-    private static String getLastError() {
-        String sslError = null;
-        long error = ERR_get_error();
-        if (error != SSL_ERROR_NONE()) {
-            try (var localArena = Arena.ofConfined()) {
-                do {
-                    // Loop until getLastErrorNumber() returns SSL_ERROR_NONE
-                    var buf = localArena.allocate(ValueLayout.JAVA_BYTE, 128);
-                    ERR_error_string(error, buf);
-                    String err = buf.getString(0);
-                    if (sslError == null) {
-                        sslError = err;
-                    }
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("engine.openSSLError", Long.toString(error), err));
-                    }
-                } while ((error = ERR_get_error()) != SSL_ERROR_NONE());
-            }
-        }
-        return sslError;
+        OpenSSLContext.getLastError();
     }
 
     private SSLEngineResult.Status getEngineStatus() {
