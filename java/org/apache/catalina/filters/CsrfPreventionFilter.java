@@ -52,7 +52,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     private static final String DEFAULT_NO_NONCE_URL_PATTERNS
-        = "*.css, *.js, *.gif, *.png, *.jpg, *.svg, *.ico, *.jpeg";
+        = "*.css, *.js, *.gif, *.png, *.jpg, *.svg, *.ico, *.jpeg, *.mjs";
 
     private ServletContext context;
 

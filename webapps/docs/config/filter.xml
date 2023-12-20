@@ -352,7 +352,7 @@
           <code>ServletContext.getMimeType</code>.</li>
         </ul>
 
-        <p>The default is <code>*.css, *.js, *.gif, *.png, *.jpg</code>.</p>
+        <p>The default is <code>*.css, *.js, *.gif, *.png, *.jpg, *.svg, *.ico, *.jpeg, *.mjs</code>.</p>
       </attribute>
     </attributes>
 
