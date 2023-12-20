@@ -345,6 +345,11 @@
           from the pattern before being compiled. Note that patterns cannot
           contain a comma (<code>,</code>) because the entire configuration
           attribute is comma-separated.</li>
+
+          <li>Mime-type matches which begin with <code>mime:</code> and specify
+          one of the above matches which will be checked against the MIME type
+          of the URL filename. Note that the MIME-type will be determined using
+          <code>ServletContext.getMimeType</code>.</li>
         </ul>
 
         <p>The default is <code>*.css, *.js, *.gif, *.png, *.jpg</code>.</p>

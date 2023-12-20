@@ -192,7 +192,9 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         if (null == pattern || 0 == pattern.trim().length()) {
             return null;
         }
-        if (pattern.startsWith("*")) {
+        if (pattern.startsWith("mime:")) {
+            return new MimePredicate(context, createNoNoncePredicate(context, pattern.substring(5)));
+        } else if (pattern.startsWith("*")) {
             return new SuffixPredicate(pattern.substring(1));
         } else if (pattern.endsWith("*")) {
             return new PrefixPredicate(pattern.substring(0, pattern.length() - 1));
@@ -203,15 +205,20 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         }
     }
 
-    protected static class PredicateBase {
+    protected static class MimePredicate implements Predicate<String> {
         private final ServletContext context;
+        private final Predicate<String> predicate;
 
-        public PredicateBase(ServletContext context) {
+        public MimePredicate(ServletContext context, Predicate<String> predicate) {
             this.context = context;
+            this.predicate = predicate;
         }
 
-        protected ServletContext getServletContext() {
-            return context;
+        @Override
+        public boolean test(String t) {
+            String mimeType = context.getMimeType(t);
+
+            return predicate.test(mimeType);
         }
     }
 
