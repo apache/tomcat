@@ -59,17 +59,6 @@
   </p>
 
   <p>
-   If using GraalVM, the first step is then to add the Native Image tool.
-   <source>export JAVA_HOME=/absolute...path...to/graalvm-ce-javaX-x.y.z
-cd $JAVA_HOME/bin
-./gu install native-image</source>
-   Mandrel already includes the Native Image tool ready to use, so this
-   step can be skipped. Only <code>JAVA_HOME</code> must be set to the folder
-   which contains the bin folder with the JVM binaries, such as:
-   <source>export JAVA_HOME=/absolute...path...to/mandrel-javaXX-platform-x.x.x.x/mandrelJDK</source>
-  </p>
-
-  <p>
     Download the Tomcat Stuffed module from
     <code>https://github.com/apache/tomcat/tree/10.1.x/modules/stuffed</code>.
     For convinience, an env property can be set:
@@ -169,11 +158,11 @@ ant -Dwebapp.name=$WEBAPPNAME -f webapp-jspc.ant.xml</source>
   <p>
     If everything has been done properly, the native image can now be built
     using the native-image tool.
-    <source>$JAVA_HOME/bin/native-image --no-server\
-        --allow-incomplete-classpath --enable-https\
+    <source>$JAVA_HOME/bin/native-image --report-unsupported-elements-at-runtime\
+        --enable-http --enable-https --enable-url-protocols=http,https,jar,jrt\
         --initialize-at-build-time=org.eclipse.jdt,org.apache.el.parser.SimpleNode,javax.servlet.jsp.JspFactory,org.apache.jasper.servlet.JasperInitializer,org.apache.jasper.runtime.JspFactoryImpl\
-        -H:+JNI -H:+ReportUnsupportedElementsAtRuntime\
-        -H:+ReportExceptionStackTraces -H:EnableURLProtocols=http,https,jar,jrt\
+        -H:+UnlockExperimentalVMOptions\
+        -H:+JNI -H:+ReportExceptionStackTraces\
         -H:ConfigurationFileDirectories=$TOMCAT_STUFFED/target/\
         -H:ReflectionConfigurationFiles=$TOMCAT_STUFFED/tomcat-reflection.json\
         -H:ResourceConfigurationFiles=$TOMCAT_STUFFED/tomcat-resource.json\
