@@ -331,7 +331,7 @@
         to them. You may not want to add nonces to certain URLs to avoid
         creating unique URLs which may defeat resource caching, etc.</p>
 
-        <p>There are 3 types of patterns supported:</p>
+        <p>There are several types of patterns supported:</p>
 
         <ul>
           <li>Prefix matches using a pattern that ends with a <code>*</code>.
@@ -341,14 +341,18 @@
           For example, <code>*.css</code>.</li>
 
           <li>Complete regular expression patterns which begin and end with a
-          <code>/</code>. The <code>/</code> characters will be removed from
+          <code>/</code>. For example <code>//images/.*|/scripts/.*/</code>.
+          The leading and trailing <code>/</code> characters will be removed
           from the pattern before being compiled. Note that patterns cannot
           contain a comma (<code>,</code>) because the entire configuration
-          attribute is comma-separated.</li>
+          attribute is comma-separated. The regular expression will be matched
+          against the entire URL, and the regex dialect is Java
+          (<code>java.util.regex.Pattern</code>).</li>
 
           <li>Mime-type matches which begin with <code>mime:</code> and specify
           one of the above matches which will be checked against the MIME type
-          of the URL filename. Note that the MIME-type will be determined using
+          of the URL filename. For example, <code>mime:image/*</code>.
+          Note that the MIME-type will be determined using
           <code>ServletContext.getMimeType</code>.</li>
         </ul>
 
