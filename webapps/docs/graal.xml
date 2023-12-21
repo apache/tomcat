@@ -79,6 +79,18 @@
   </p>
 
   <p>
+    All the webapp classes need to be made available to the Maven shade plugin
+    as well as the compiler during the JSP precompilation step.
+    Any JARs that are present in <code>/WEB-INF/lib</code>
+    need to be made available as Maven dependencies.
+    The <code>webapp-jspc.ant.xml</code> script will copy classes from the
+    <code>/WEB-INF/classes</code> folder of the webapp
+    to the <code>target/classes</code> path that Maven uses as the compilation
+    target, but if any of the JSP sources use them, then they need to be
+    packaged as JARs instead. 
+  </p>
+
+  <p>
     The first step is to build the shaded Tomcat JAR with all dependencies.
     Any JSP in the webapp must all be precompiled and packaged (assuming
     that the <code>webapps</code> contains a <code>$WEBAPPNAME</code> webapp):
