@@ -87,7 +87,7 @@
     <code>/WEB-INF/classes</code> folder of the webapp
     to the <code>target/classes</code> path that Maven uses as the compilation
     target, but if any of the JSP sources use them, then they need to be
-    packaged as JARs instead. 
+    packaged as JARs instead.
   </p>
 
   <p>
