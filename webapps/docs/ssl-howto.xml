@@ -282,7 +282,8 @@ loaded or not, use one of the following:</p>
            port="8443" .../>]]></source>
 
 <p>The OpenSSL JSSE implementation can also be configured explicitly if needed.
-If the Tomcat Native library or Java 22 is installed, using the sslImplementationName
+If the Tomcat Native library or Java 22 is installed, using the
+<code>sslImplementationName</code>
 attribute allows enabling it. When using the OpenSSL JSSE implementation, the
 configuration can use either the JSSE attributes or the OpenSSL attributes, but
 must not mix attributes from both types in the same SSLHostConfig or Connector
@@ -298,22 +299,18 @@ element.</p>
            sslImplementationName="org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"
            .../>]]></source>
 
-<p>If you are using JSSE OpenSSL, you have the option of configuring an alternative engine to OpenSSL.</p>
+<p>Alternately a listener can be added to the <code>Server</code> to enable
+OpenSSL on all connectors without having to add the
+<code>sslImplementationName</code> attribute on each.</p>
 <p>With Tomcat Native:</p>
-<source><![CDATA[<Listener className="org.apache.catalina.core.AprLifecycleListener"
-          SSLEngine="someengine" SSLRandomSeed="somedevice" />]]></source>
+<source><![CDATA[<Listener className="org.apache.catalina.core.AprLifecycleListener"/>]]></source>
 <p>With Java 22 FFM API:</p>
-<source><![CDATA[<Listener className="org.apache.catalina.core.OpenSSLLifecycleListener"
-          SSLEngine="someengine" SSLRandomSeed="somedevice" />]]></source>
+<source><![CDATA[<Listener className="org.apache.catalina.core.OpenSSLLifecycleListener"/>]]></source>
 <p>
-So to enable OpenSSL, make sure the SSLEngine attribute is set to something other than <code>off</code>.
-The default value is <code>on</code> and if you specify another value,
-it has to be a valid OpenSSL engine name.
-</p>
-
-<p>
-SSLRandomSeed allows to specify a source of entropy. Productive system needs a reliable source of entropy
-but entropy may need a lot of time to be collected therefore test systems could use no blocking entropy
+The <code>SSLRandomSeed</code> attribute of the listeners allows specifying a
+source of entropy.
+Productive system needs a reliable source of entropy but entropy may need a lot
+of time to be collected therefore test systems could use no blocking entropy
 sources like "/dev/urandom" that will allow quicker starts of Tomcat.
 </p>
 
@@ -340,10 +337,7 @@ so it looks something like this:</p>
     </SSLHostConfig>
 </Connector>]]></source>
 <p>
-  Note: If tomcat-native is installed, the configuration will use JSSE with
-  an OpenSSL implementation.</p>
-<p>
-  The APR configuration style uses different attributes for many SSL settings,
+  The OpenSSL configuration style uses different attributes for many SSL settings,
   particularly keys and certificates. An example of an APR configuration style
   is:</p>
 <source><![CDATA[<!-- Define an SSL Coyote HTTP/1.1 Connector on port 8443 -->
