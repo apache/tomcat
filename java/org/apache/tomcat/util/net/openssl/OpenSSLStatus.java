@@ -23,6 +23,7 @@ public class OpenSSLStatus {
     private static volatile boolean libraryInitialized = false;
     private static volatile boolean initialized = false;
     private static volatile boolean available = false;
+    private static volatile boolean useOpenSSL = true;
     private static volatile boolean instanceCreated = false;
 
 
@@ -36,6 +37,10 @@ public class OpenSSLStatus {
 
     public static boolean isAvailable() {
         return available;
+    }
+
+    public static boolean getUseOpenSSL() {
+        return useOpenSSL;
     }
 
     public static boolean isInstanceCreated() {
@@ -52,6 +57,10 @@ public class OpenSSLStatus {
 
     public static void setAvailable(boolean available) {
         OpenSSLStatus.available = available;
+    }
+
+    public static void setUseOpenSSL(boolean useOpenSSL) {
+        OpenSSLStatus.useOpenSSL = useOpenSSL;
     }
 
     public static void setInstanceCreated(boolean instanceCreated) {

@@ -220,4 +220,14 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
         return false;
     }
 
+    public void setUseOpenSSL(boolean useOpenSSL) {
+        if (useOpenSSL != OpenSSLStatus.getUseOpenSSL()) {
+            OpenSSLStatus.setUseOpenSSL(useOpenSSL);
+        }
+    }
+
+    public static boolean getUseOpenSSL() {
+        return OpenSSLStatus.getUseOpenSSL();
+    }
+
 }
