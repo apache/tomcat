@@ -3470,7 +3470,7 @@
       <fix>
         Ensure that the <code>ReadListener</code>'s <code>onError()</code> event
         is triggered if the client closes the connection before sending the
-        entire request body and the server is ready the request body using
+        entire request body and the server is reading the request body using
         non-blocking I/O. (markt)
       </fix>
       <fix>
