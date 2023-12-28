@@ -242,7 +242,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         @Override
         public boolean test(String t) {
-            return t.endsWith(this.suffix);
+            return t.startsWith(this.suffix);
         }
     }
 
