@@ -30,7 +30,6 @@
     <menu name="Links">
         <item name="Docs Home"             href="index.html"/>
         <item name="FAQ"                   href="https://cwiki.apache.org/confluence/display/TOMCAT/FAQ" />
-        <item name="User Comments"         href="#comments_section"/>
     </menu>
 
     <menu name="User Guide">
