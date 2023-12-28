@@ -124,7 +124,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      *         <code>false</code> if all requests will be allowed and
      *         failures will be logged as DEBUG messages.
      */
-    public boolean getEnforce() {
+    public boolean isEnforce() {
         return this.enforce;
     }
 
@@ -406,7 +406,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      *         logged in DEBUG mode.
      */
     protected boolean enforce(HttpServletRequest req, String requestedPath) {
-        return getEnforce();
+        return isEnforce();
     }
 
     protected boolean skipNonceCheck(HttpServletRequest request) {
