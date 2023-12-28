@@ -108,7 +108,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      * Sets the flag to enforce CSRF protection or just log failures as DEBUG
      * messages.
      *
-     * @param enforce <code>true</code> to enforce CSRF protections or
+     * @param enforce <code>true</code> to enforce CSRF protection or
      *                <code>false</code> to log DEBUG messages and allow
      *                all requests.
      */
@@ -120,7 +120,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      * Gets the flag to enforce CSRF protection or just log failures as DEBUG
      * messages.
      *
-     * @return <code>true</code> if CSRF protections will be enforced or
+     * @return <code>true</code> if CSRF protection will be enforced or
      *         <code>false</code> if all requests will be allowed and
      *         failures will be logged as DEBUG messages.
      */
