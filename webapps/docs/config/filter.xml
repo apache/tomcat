@@ -295,7 +295,7 @@
         <p>A flag to enable or disable enforcement. When enforcement is
         disabled, the CsrfPreventionFilter will <i>allow all requests</i> and
         log CSRF failures as DEBUG messages. The default is <b>true</b>,
-        enabling the enforcement of CSRF protections.</p>
+        enabling the enforcement of CSRF protection.</p>
       </attribute>
 
       <attribute name="entryPoints" required="false">
