@@ -151,6 +151,10 @@
   <footer>
     <div id="footer">
     Copyright © 1999-<xsl:value-of select="$year"/>, The Apache Software Foundation
+    <br/>
+    Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo
+    are either registered trademarks or trademarks of the Apache Software
+    Foundation.
     </div>
   </footer>
   </div>
