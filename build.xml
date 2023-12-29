@@ -2213,7 +2213,7 @@
       header="&lt;b&gt;Common Annotations ${annotation.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
               &lt;br/&gt;
-              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks 
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
@@ -2238,7 +2238,7 @@
       header="&lt;b&gt;Servlet ${servlet.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
               &lt;br/&gt;
-              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks 
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
@@ -2262,7 +2262,7 @@
       header="&lt;b&gt;JSP ${jsp.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
               &lt;br/&gt;
-              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks 
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
@@ -2286,7 +2286,7 @@
       header="&lt;b&gt;EL ${el.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
               &lt;br/&gt;
-              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks 
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
@@ -2310,7 +2310,7 @@
       header="&lt;b&gt;WebSocket ${websocket.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
               &lt;br/&gt;
-              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks 
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
@@ -2334,7 +2334,7 @@
       header="&lt;b&gt;JASPIC ${jaspic.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
               &lt;br/&gt;
-              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks 
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
@@ -2356,7 +2356,7 @@
       header="&lt;b&gt;Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
               &lt;br/&gt;
-              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks 
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
