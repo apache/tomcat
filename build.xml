@@ -2188,9 +2188,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       destdir="${tomcat.dist}/webapps/docs/annotationapi"
       version="true"
       windowtitle="Common Annotations ${annotation.spec.version} API Documentation - Apache Tomcat ${version}"
-      doctitle="Common Annotations ${annotation.spec.version} API - Apache Tomcat ${version}"
-      header="&lt;b&gt;Common Annotations ${annotation.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
-      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      doctitle="Common Annotations ${annotation.spec.version} API - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}"
+      header="&lt;b&gt;Common Annotations ${annotation.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
+              &lt;br/&gt;
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks 
+              or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2210,9 +2213,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       destdir="${tomcat.dist}/webapps/docs/servletapi"
       version="true"
       windowtitle="Servlet ${servlet.spec.version} API Documentation - Apache Tomcat ${version}"
-      doctitle="Servlet ${servlet.spec.version} API - Apache Tomcat ${version}"
-      header="&lt;b&gt;Servlet ${servlet.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
-      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      doctitle="Servlet ${servlet.spec.version} API - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}"
+      header="&lt;b&gt;Servlet ${servlet.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
+              &lt;br/&gt;
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks 
+              or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2231,9 +2237,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       destdir="${tomcat.dist}/webapps/docs/jspapi"
       version="true"
       windowtitle="JSP ${jsp.spec.version} API Documentation - Apache Tomcat ${version}"
-      doctitle="JSP ${jsp.spec.version} API - Apache Tomcat ${version}"
-      header="&lt;b&gt;JSP ${jsp.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
-      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      doctitle="JSP ${jsp.spec.version} API - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}"
+      header="&lt;b&gt;JSP ${jsp.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
+              &lt;br/&gt;
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks 
+              or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2252,9 +2261,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       destdir="${tomcat.dist}/webapps/docs/elapi"
       version="true"
       windowtitle="EL ${el.spec.version} API Documentation - Apache Tomcat ${version}"
-      doctitle="EL ${el.spec.version} API - Apache Tomcat ${version}"
-      header="&lt;b&gt;EL ${el.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
-      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      doctitle="EL ${el.spec.version} API - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}"
+      header="&lt;b&gt;EL ${el.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
+              &lt;br/&gt;
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks 
+              or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2273,9 +2285,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       destdir="${tomcat.dist}/webapps/docs/websocketapi"
       version="true"
       windowtitle="WebSocket ${websocket.spec.version} API Documentation - Apache Tomcat ${version}"
-      doctitle="WebSocket ${websocket.spec.version} API - Apache Tomcat ${version}"
-      header="&lt;b&gt;WebSocket ${websocket.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
-      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      doctitle="WebSocket ${websocket.spec.version} API - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}"
+      header="&lt;b&gt;WebSocket ${websocket.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
+              &lt;br/&gt;
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks 
+              or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2294,9 +2309,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       destdir="${tomcat.dist}/webapps/docs/jaspicapi"
       version="true"
       windowtitle="JASPIC ${jaspic.spec.version} API Documentation - Apache Tomcat ${version}"
-      doctitle="JASPIC ${jaspic.spec.version} API - Apache Tomcat ${version}"
-      header="&lt;b&gt;JASPIC ${jaspic.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
-      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      doctitle="JASPIC ${jaspic.spec.version} API - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}"
+      header="&lt;b&gt;JASPIC ${jaspic.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
+              &lt;br/&gt;
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks 
+              or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2313,9 +2331,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       destdir="${tomcat.dist}/webapps/docs/api"
       version="true"
       windowtitle="Apache Tomcat ${version} API Documentation"
-      doctitle="Apache Tomcat ${version} API"
-      header="&lt;b&gt;Apache Tomcat ${version}&lt;/b&gt;"
-      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      doctitle="Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version} API"
+      header="&lt;b&gt;Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
+              &lt;br/&gt;
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks 
+              or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
