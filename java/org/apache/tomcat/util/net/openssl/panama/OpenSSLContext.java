@@ -66,6 +66,8 @@ import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.net.openssl.OpenSSLUtil;
+import org.apache.tomcat.util.openssl.PEM_read_bio_PrivateKey$cb;
+import org.apache.tomcat.util.openssl.PEM_read_bio_X509_AUX$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_alpn_select_cb$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_cert_verify_callback$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_default_passwd_cb$cb;
@@ -132,9 +134,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private boolean initialized = false;
 
     private boolean noOcspCheck = false;
-
-    // Password callback
-    private final MemorySegment openSSLCallbackPassword;
 
     private static final ConcurrentHashMap<Long, ContextState> states = new ConcurrentHashMap<>();
     private static ContextState getState(MemorySegment ctx) {
@@ -279,8 +278,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // Probably not needed
 
             // Set int pem_password_cb(char *buf, int size, int rwflag, void *u) callback
-            openSSLCallbackPassword = SSL_CTX_set_default_passwd_cb$cb.allocate(new PasswordCallback(), contextArena);
-            SSL_CTX_set_default_passwd_cb(sslCtx, openSSLCallbackPassword);
+            SSL_CTX_set_default_passwd_cb(sslCtx,
+                    SSL_CTX_set_default_passwd_cb$cb.allocate(new PasswordCallback(null), contextArena));
 
             if (negotiableProtocols != null && negotiableProtocols.size() > 0) {
                 alpn = true;
@@ -891,15 +890,16 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
-    private static ThreadLocal<String> callbackPasswordTheadLocal = new ThreadLocal<>();
-
-    private static class PasswordCallback implements SSL_CTX_set_default_passwd_cb$cb {
+    private static class PasswordCallback implements SSL_CTX_set_default_passwd_cb$cb, PEM_read_bio_X509_AUX$cb, PEM_read_bio_PrivateKey$cb {
+        private final String callbackPassword;
+        PasswordCallback(String callbackPassword) {
+            this.callbackPassword = callbackPassword;
+        }
         @Override
         public int apply(MemorySegment /* char **/ buf, int bufsiz, int verify, MemorySegment /* void **/ cb) {
             if (log.isDebugEnabled()) {
                 log.debug("Return password for certificate");
             }
-            String callbackPassword = callbackPasswordTheadLocal.get();
             if (callbackPassword != null && callbackPassword.length() > 0) {
                 try (var localArena = Arena.ofConfined()) {
                     MemorySegment callbackPasswordNative = localArena.allocateFrom(callbackPassword);
@@ -1020,12 +1020,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         }
                         key = MemorySegment.NULL;
                         for (int i = 0; i < 3; i++) {
-                            try {
-                                callbackPasswordTheadLocal.set(keyPassToUse);
-                                key = PEM_read_bio_PrivateKey(keyBIO, MemorySegment.NULL, openSSLCallbackPassword, MemorySegment.NULL);
-                            } finally {
-                                callbackPasswordTheadLocal.set(null);
-                            }
+                            key = PEM_read_bio_PrivateKey(keyBIO, MemorySegment.NULL,
+                                    PEM_read_bio_PrivateKey$cb.allocate(new PasswordCallback(keyPassToUse), contextArena),
+                                    MemorySegment.NULL);
                             if (!MemorySegment.NULL.equals(key)) {
                                 break;
                             }
@@ -1048,12 +1045,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         return false;
                     }
                     // Load certificate
-                    try {
-                        callbackPasswordTheadLocal.set(keyPassToUse);
-                        cert = PEM_read_bio_X509_AUX(certificateBIO, MemorySegment.NULL, openSSLCallbackPassword, MemorySegment.NULL);
-                    } finally {
-                        callbackPasswordTheadLocal.set(null);
-                    }
+                    cert = PEM_read_bio_X509_AUX(certificateBIO, MemorySegment.NULL,
+                            PEM_read_bio_X509_AUX$cb.allocate(new PasswordCallback(keyPassToUse), contextArena),
+                            MemorySegment.NULL);
                     if (MemorySegment.NULL.equals(cert) &&
                             // Missing ERR_GET_REASON(ERR_peek_last_error())
                             /*int ERR_GET_REASON(unsigned long errcode) {
