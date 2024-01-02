@@ -105,6 +105,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.85 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        <bug>68378</bug>: Align extension to MIME type mappings in the global
+        web.xml with those in httpd by adding
+        <code>application/vnd.geogebra.slides</code> for <code>ggs</code>,
+        <code>text/javascript</code> for <code>mjs</code> and
+        <code>audio/ogg</code> for opus. (markt)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
