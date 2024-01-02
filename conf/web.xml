@@ -1751,6 +1751,10 @@
         <mime-type>application/vnd.geogebra.file</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>ggs</extension>
+        <mime-type>application/vnd.geogebra.slides</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>ggt</extension>
         <mime-type>application/vnd.geogebra.tool</mime-type>
     </mime-mapping>
@@ -2455,6 +2459,10 @@
         <mime-type>video/mj2</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>mjs</extension>
+        <mime-type>text/javascript</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>mk3d</extension>
         <mime-type>video/x-matroska</mime-type>
     </mime-mapping>
@@ -2891,6 +2899,10 @@
     <mime-mapping>
         <extension>oprc</extension>
         <mime-type>application/vnd.palm</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>opus</extension>
+        <mime-type>audio/ogg</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>org</extension>
