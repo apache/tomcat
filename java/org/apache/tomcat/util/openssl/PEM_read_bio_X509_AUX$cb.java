@@ -19,29 +19,22 @@
 
 package org.apache.tomcat.util.openssl;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker;
+import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
-import java.lang.foreign.*;
-import static java.lang.foreign.ValueLayout.*;
 
 /**
- * {@snippet lang=c :
- * int (*PEM_read_bio_X509_AUX$cb)(char* buf,int size,int rwflag,void* userdata);
+ * {@snippet lang = c : * int (*PEM_read_bio_X509_AUX$cb)(char* buf,int size,int rwflag,void* userdata);
  * }
  */
 public interface PEM_read_bio_X509_AUX$cb {
 
     int apply(MemorySegment buf, int size, int rwflag, MemorySegment userdata);
 
-    FunctionDescriptor $DESC = FunctionDescriptor.of(
-        openssl_h.C_INT,
-        openssl_h.C_POINTER,
-        openssl_h.C_INT,
-        openssl_h.C_INT,
-        openssl_h.C_POINTER
-    );
+    FunctionDescriptor $DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_INT,
+            openssl_h.C_INT, openssl_h.C_POINTER);
 
     MethodHandle UP$MH = openssl_h.upcallHandle(PEM_read_bio_X509_AUX$cb.class, "apply", $DESC);
 
