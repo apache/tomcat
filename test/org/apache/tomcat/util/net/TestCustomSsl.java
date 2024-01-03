@@ -19,7 +19,6 @@ package org.apache.tomcat.util.net;
 import java.io.File;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -46,8 +45,10 @@ public class TestCustomSsl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Connector connector = tomcat.getConnector();
 
-        Assume.assumeFalse("This test is only for JSSE based SSL connectors",
-                connector.getProtocolHandlerClassName().contains("Apr"));
+        // This test is only for JSSE based SSL connectors
+        if (connector.getProtocolHandlerClassName().contains("Apr")) {
+            return;
+        }
 
         SSLHostConfig sslHostConfig = new SSLHostConfig();
         SSLHostConfigCertificate certificate = new SSLHostConfigCertificate(sslHostConfig, Type.UNDEFINED);
