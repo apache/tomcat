@@ -265,15 +265,13 @@ public class TestSsl extends TomcatBaseTest {
     }
 
     @Test
-    public void testRenegotiateWorks() throws Exception {
+    public void testClientInitiatedRenegotiation() throws Exception {
+
         Tomcat tomcat = getTomcatInstance();
-
         TesterSupport.initSsl(tomcat);
-
         TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
 
-        Assume.assumeTrue("SSL renegotiation has to be supported for this test",
-                TesterSupport.isClientRenegotiationSupported(getTomcatInstance()));
+        boolean renegotiationSupported = TesterSupport.isClientRenegotiationSupported(getTomcatInstance());
 
         if (needApr) {
             AprLifecycleListener listener = new AprLifecycleListener();
@@ -283,11 +281,9 @@ public class TestSsl extends TomcatBaseTest {
         }
 
         Context root = tomcat.addContext("", TEMP_DIR);
-        Wrapper w =
-            Tomcat.addServlet(root, "tester", new TesterServlet());
+        Wrapper w = Tomcat.addServlet(root, "tester", new TesterServlet());
         w.setAsyncSupported(true);
         root.addServletMappingDecoded("/", "tester");
-
 
         tomcat.start();
 
@@ -299,8 +295,7 @@ public class TestSsl extends TomcatBaseTest {
 
         sslCtx.init(null, TesterSupport.getTrustManagers(), null);
         SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
-        SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost",
-                getPort());
+        SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost", getPort());
 
         OutputStream os = socket.getOutputStream();
         InputStream is = socket.getInputStream();
@@ -315,7 +310,17 @@ public class TestSsl extends TomcatBaseTest {
 
         socket.startHandshake();
 
-        doRequest(os, r);
+        try {
+            doRequest(os, r);
+            if (!renegotiationSupported) {
+                Assert.fail("Renegotiation started when it should have failed");
+            }
+        } catch (IOException e) {
+            if (renegotiationSupported) {
+                Assert.fail("Renegotiation failed when it should be supported");
+            }
+            return;
+        }
         // Handshake complete appears to be called asynchronously
         int wait = 0;
         while (wait < 5000 && !listener.isComplete()) {
