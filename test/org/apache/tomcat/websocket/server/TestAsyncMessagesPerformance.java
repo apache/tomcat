@@ -27,7 +27,6 @@ import jakarta.websocket.Session;
 import jakarta.websocket.WebSocketContainer;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -37,8 +36,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.TesterAsyncTiming;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
-@Ignore // Test passes but GC delays can introduce false failures.
-public class TestAsyncMessages extends TomcatBaseTest {
+public class TestAsyncMessagesPerformance extends TomcatBaseTest {
 
     @Test
     public void testAsyncTiming() throws Exception {
