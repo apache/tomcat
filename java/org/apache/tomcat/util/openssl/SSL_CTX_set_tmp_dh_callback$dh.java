@@ -29,6 +29,7 @@ import java.lang.invoke.MethodHandle;
  * {@snippet lang = c : * DH* (*SSL_CTX_set_tmp_dh_callback$dh)(SSL*,int,int);
  * }
  */
+@SuppressWarnings("javadoc")
 public interface SSL_CTX_set_tmp_dh_callback$dh {
 
     FunctionDescriptor $DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT,

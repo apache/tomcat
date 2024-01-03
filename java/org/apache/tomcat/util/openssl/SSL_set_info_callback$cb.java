@@ -29,6 +29,7 @@ import java.lang.invoke.MethodHandle;
  * {@snippet lang = c : * void (*SSL_set_info_callback$cb)(SSL*,int,int);
  * }
  */
+@SuppressWarnings("javadoc")
 public interface SSL_set_info_callback$cb {
 
     FunctionDescriptor $DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_INT, openssl_h.C_INT);

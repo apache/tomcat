@@ -29,6 +29,7 @@ import java.lang.invoke.MethodHandle;
  * {@snippet lang = c : * int (*PEM_read_bio_PrivateKey$cb)(char* buf,int size,int rwflag,void* userdata);
  * }
  */
+@SuppressWarnings("javadoc")
 public interface PEM_read_bio_PrivateKey$cb {
 
     int apply(MemorySegment buf, int size, int rwflag, MemorySegment userdata);

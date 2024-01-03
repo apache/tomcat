@@ -24,6 +24,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 
+@SuppressWarnings("javadoc")
 public class openssl_h {
 
     static final SymbolLookup SYMBOL_LOOKUP
@@ -5586,7 +5587,7 @@ public class openssl_h {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    private static final MemorySegment OPENSSL_FILE = Arena.ofAuto().allocateFrom("/tmp/jextract$12868569411196900360.h");;
+    private static final MemorySegment OPENSSL_FILE = Arena.ofAuto().allocateFrom("/tmp/jextract$12868569411196900360.h");
 
     /**
      * {@snippet lang=c :
@@ -5646,7 +5647,7 @@ public class openssl_h {
     public static int EVP_PKEY_DSA() {
         return EVP_PKEY_DSA;
     }
-    private static final MemorySegment PEM_STRING_ECPARAMETERS = Arena.ofAuto().allocateFrom("EC PARAMETERS");;
+    private static final MemorySegment PEM_STRING_ECPARAMETERS = Arena.ofAuto().allocateFrom("EC PARAMETERS");
 
     /**
      * {@snippet lang=c :
