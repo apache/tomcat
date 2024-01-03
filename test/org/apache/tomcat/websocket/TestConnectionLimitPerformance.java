@@ -25,7 +25,6 @@ import javax.websocket.DeploymentException;
 import javax.websocket.WebSocketContainer;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -34,8 +33,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
-@Ignore // Not for use in normal unit test runs
-public class TestConnectionLimit extends TomcatBaseTest {
+public class TestConnectionLimitPerformance extends TomcatBaseTest {
 
     /*
      * Simple test to see how many outgoing connections can be created on a single machine.
