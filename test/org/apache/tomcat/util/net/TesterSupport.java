@@ -29,7 +29,6 @@ import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Locale;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -227,20 +226,6 @@ public final class TesterSupport {
             ks.load(is, JKS_PASS.toCharArray());
         }
         return ks;
-    }
-
-    protected static boolean isMacOs() {
-        return System.getProperty("os.name").toLowerCase(Locale.ENGLISH).startsWith("mac os x");
-    }
-
-    public static boolean isRenegotiationSupported(Tomcat tomcat) {
-        String protocol = tomcat.getConnector().getProtocolHandlerClassName();
-        if (protocol.contains("Apr")) {
-            // Disabled by default in 1.1.20 windows binary (2010-07-27)
-            return false;
-        }
-
-        return true;
     }
 
     protected static boolean isClientRenegotiationSupported(Tomcat tomcat) {

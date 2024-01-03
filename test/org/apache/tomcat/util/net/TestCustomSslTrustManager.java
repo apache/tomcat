@@ -21,7 +21,6 @@ import java.net.SocketException;
 import javax.net.ssl.SSLException;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.connector.Connector;
@@ -64,12 +63,14 @@ public class TestCustomSslTrustManager extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Assume.assumeTrue("SSL renegotiation has to be supported for this test",
-                TesterSupport.isRenegotiationSupported(tomcat));
-
         TesterSupport.configureClientCertContext(tomcat);
 
         Connector connector = tomcat.getConnector();
+
+        // This test is only for JSSE based SSL connectors
+        if (connector.getProtocolHandlerClassName().contains("Apr")) {
+            return;
+        }
 
         // Override the defaults
         ProtocolHandler handler = connector.getProtocolHandler();

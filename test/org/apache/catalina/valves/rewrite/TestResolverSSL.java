@@ -22,7 +22,6 @@ import java.io.PrintWriter;
 import javax.servlet.ServletException;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Container;
@@ -39,9 +38,6 @@ public class TestResolverSSL extends TomcatBaseTest {
 
     @Test
     public void testSslEnv() throws Exception {
-        Assume.assumeTrue("SSL renegotiation has to be supported for this test",
-                TesterSupport.isRenegotiationSupported(getTomcatInstance()));
-
         Tomcat tomcat = getTomcatInstance();
         Container root = tomcat.getHost().findChild("");
         root.getPipeline().addValve(new ResolverTestValve());
