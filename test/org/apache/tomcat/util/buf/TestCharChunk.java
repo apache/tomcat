@@ -16,13 +16,8 @@
  */
 package org.apache.tomcat.util.buf;
 
-import java.io.IOException;
-
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
-
-import org.apache.tomcat.util.buf.CharChunk.CharOutputChannel;
 
 /**
  * Test cases for {@link CharChunk}.
@@ -69,28 +64,16 @@ public class TestCharChunk {
     }
 
 
-    @Ignore // Requires an 11GB heap (on markt's desktop - YMMV)
     @Test
-    public void testAppend() throws Exception {
+    public void testToString() {
         CharChunk cc = new CharChunk();
-        cc.setCharOutputChannel(new Sink());
-        // Defaults to no limit
-
-        char data[] = new char[32 * 1024 * 1024];
-
-        for (int i = 0; i < 100; i++) {
-            cc.append(data, 0, data.length);
-        }
-
-        Assert.assertEquals(AbstractChunk.ARRAY_MAX_SIZE, cc.getBuffer().length);
-    }
-
-
-    public class Sink implements CharOutputChannel {
-
-        @Override
-        public void realWriteChars(char[] cbuf, int off, int len) throws IOException {
-            // NO-OP
-        }
+        Assert.assertNull(cc.toString());
+        char[] data = new char[8];
+        cc.setChars(data, 0, data.length);
+        Assert.assertNotNull(cc.toString());
+        cc.recycle();
+        // toString() should behave consistently for new ByteChunk and
+        // immediately after a call to recycle().
+        Assert.assertNull(cc.toString());
     }
 }
