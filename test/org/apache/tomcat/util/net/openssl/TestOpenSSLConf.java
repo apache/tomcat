@@ -24,7 +24,6 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
@@ -62,8 +61,9 @@ public class TestOpenSSLConf extends TomcatBaseTest {
         if (!protocol.contains("Apr")) {
             String sslImplementation = String.valueOf(
                     tomcat.getConnector().getProperty("sslImplementationName"));
-            Assume.assumeTrue("This test is only for OpenSSL based SSL connectors",
-                    sslImplementation.contains("openssl"));
+            if (!sslImplementation.contains("openssl")) {
+                return null;
+            }
         }
 
         OpenSSLConf conf = new OpenSSLConf();
@@ -102,6 +102,9 @@ public class TestOpenSSLConf extends TomcatBaseTest {
         } else {
             sslHostConfig = initOpenSSLConfCmd("CipherString", ENABLED_CIPHER);
         }
+        if (sslHostConfig == null) {
+            return;
+        }
         String[] ciphers = sslHostConfig.getEnabledCiphers();
         MatcherAssert.assertThat("Wrong HostConfig ciphers", ciphers,
                 CoreMatchers.is(EXPECTED_CIPHERS));
@@ -134,6 +137,9 @@ public class TestOpenSSLConf extends TomcatBaseTest {
             sb.append(',').append(protocol);
         }
         SSLHostConfig sslHostConfig = initOpenSSLConfCmd("Protocol", sb.substring(1));
+        if (sslHostConfig == null) {
+            return;
+        }
         String[] protocols = sslHostConfig.getEnabledProtocols();
         for (String protocol : protocols) {
             Assert.assertFalse("Protocol " + protocol + " is not allowed",
