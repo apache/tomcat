@@ -24,7 +24,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.connector.Connector;
@@ -89,9 +88,12 @@ public class TestXxxEndpoint extends TomcatBaseTest {
     public void testUnixDomainSocket() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         Connector c = tomcat.getConnector();
-        Assume.assumeTrue("NIO Unix domain sockets have to be supported for this test",
-                c.getProtocolHandlerClassName().contains("NioProtocol")
-                && JreCompat.isJre16Available());
+
+        if (!c.getProtocolHandlerClassName().contains("NioProtocol") || !JreCompat.isJre16Available()) {
+            // Only the NIO connector supports UnixDomainSockets
+            // and only when running on Java 16+
+            return;
+        }
 
         File tempPath = File.createTempFile("uds-tomcat-test-", ".sock");
         String unixDomainSocketPath = tempPath.getAbsolutePath();
