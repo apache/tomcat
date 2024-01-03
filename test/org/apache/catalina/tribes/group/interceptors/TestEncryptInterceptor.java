@@ -243,21 +243,6 @@ public class TestEncryptInterceptor {
     }
 
     @Test
-    @Ignore("ECB mode isn't implemented because it's insecure")
-    public void testECB() throws Exception {
-        src.setEncryptionAlgorithm("AES/ECB/PKCS5Padding");
-        src.start(Channel.SND_TX_SEQ);
-        dest.setEncryptionAlgorithm("AES/ECB/PKCS5Padding");
-        dest.start(Channel.SND_TX_SEQ);
-
-        String testInput = "The quick brown fox jumps over the lazy dog.";
-
-        Assert.assertEquals("Failed in ECB mode",
-                     testInput,
-                     roundTrip(testInput, src, dest));
-    }
-
-    @Test
     public void testOFB() throws Exception {
         src.setEncryptionAlgorithm("AES/OFB/PKCS5Padding");
         src.start(Channel.SND_TX_SEQ);
@@ -307,8 +292,11 @@ public class TestEncryptInterceptor {
                      roundTrip(testInput, src, dest));
     }
 
+    /*
+     * ECB mode isn't supported because it's insecure.
+     */
     @Test
-    public void testIllegalECB() throws Exception {
+    public void testECB() throws Exception {
         try {
             src.setEncryptionAlgorithm("AES/ECB/PKCS5Padding");
             src.start(Channel.SND_TX_SEQ);
