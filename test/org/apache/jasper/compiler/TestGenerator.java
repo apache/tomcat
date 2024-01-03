@@ -40,7 +40,6 @@ import javax.servlet.jsp.tagext.TryCatchFinally;
 import javax.servlet.jsp.tagext.VariableInfo;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -50,6 +49,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.jasper.servlet.JasperInitializer;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestGenerator extends TomcatBaseTest {
 
@@ -776,13 +776,17 @@ public class TestGenerator extends TomcatBaseTest {
         doTestJsp("usebean-04.jsp", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
-    @Ignore // Requires specific Java settings
     @Test
     public void testUseBean05() throws Exception {
         // Whether this test passes or fails depends on the Java version used
         // and the JRE settings.
-        // For the test to pass use Java 9+ with --illegal-access=deny
-        doTestJsp("usebean-05.jsp", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        // For the test to pass it requires --illegal-access=deny
+        // This is the default setting on Java 16 upwards
+        if (JreCompat.isJre16Available()) {
+            doTestJsp("usebean-05.jsp", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } else {
+            doTestJsp("usebean-05.jsp", HttpServletResponse.SC_OK);
+        }
     }
 
     @Test
