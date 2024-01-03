@@ -19,10 +19,11 @@ package org.apache.tomcat.websocket;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 
-@Ignore // Additional infrastructure is required to run this test
-public class TestWsWebSocketContainerWithProxy extends TestWsWebSocketContainer {
+/*
+ * Additional infrastructure (a reverse proxy) is required to run this test.
+ */
+public class TesterWsWebSocketContainerWithProxy extends TestWsWebSocketContainer {
 
     @BeforeClass
     public static void init() {
