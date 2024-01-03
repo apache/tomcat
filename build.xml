@@ -2027,6 +2027,8 @@
               <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
               <!-- Exclude tests that Gump can't compile -->
               <exclude name="org/apache/tomcat/buildutil/**" />
+              <!-- Exclude tests that require large heaps -->
+              <exclude name="**/*LargeHeap.java" unless="${test.includeLargeHeap}" />
               <!--
                 Avoid running tests which require the SecurityManager with other
                 tests. See below for more details.
