@@ -34,7 +34,7 @@ import javax.net.SocketFactory;
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -285,7 +285,7 @@ public class TestSsl extends TomcatBaseTest {
             if (!renegotiationSupported) {
                 Assert.fail("Renegotiation started when it should have failed");
             }
-        } catch (SSLHandshakeException e) {
+        } catch (SSLException e) {
             if (renegotiationSupported) {
                 Assert.fail("Renegotiation failed when it should be supported");
             }
