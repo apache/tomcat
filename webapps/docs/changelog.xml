@@ -163,6 +163,9 @@
       <update>
         Update SpotBugs to 4.8.3. (markt)
       </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
