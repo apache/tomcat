@@ -139,6 +139,10 @@
         used in the request line, if any, to make the check case insensitive
         since host names are case insensitive. (markt)
       </fix>
+      <add>
+        <bug>68348</bug>: Add support for the partitioned attribute for cookies
+        including session cookies. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
