@@ -160,6 +160,9 @@
       <update>
         Update Checkstyle to 10.12.7. (markt)
       </update>
+      <update>
+        Update SpotBugs to 4.8.3. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
