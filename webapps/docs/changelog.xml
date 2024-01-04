@@ -188,7 +188,7 @@
     <changelog>
       <fix>
         Background processes should not be run concurrently with lifecycle
-        oprations of a container. (remm)
+        operations of a container. (remm)
       </fix>
       <add>
         Add support for the <code>jakarta.servlet.request.secure_protocol</code>
