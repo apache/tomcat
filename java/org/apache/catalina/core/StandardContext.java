@@ -638,6 +638,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     private boolean useHttpOnly = true;
 
+    private boolean usePartitioned = false;
+
 
     /**
      * The domain to use for session cookies. <code>null</code> indicates that the domain is controlled by the
@@ -1565,6 +1567,20 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         boolean oldUseHttpOnly = this.useHttpOnly;
         this.useHttpOnly = useHttpOnly;
         support.firePropertyChange("useHttpOnly", oldUseHttpOnly, this.useHttpOnly);
+    }
+
+
+    @Override
+    public boolean getUsePartitioned() {
+        return usePartitioned;
+    }
+
+
+    @Override
+    public void setUsePartitioned(boolean usePartitioned) {
+        boolean oldUsePartitioned = this.usePartitioned;
+        this.usePartitioned = usePartitioned;
+        support.firePropertyChange("usePartitioned", oldUsePartitioned, this.usePartitioned);
     }
 
 

@@ -416,6 +416,16 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public boolean getUsePartitioned() {
+        return false;
+    }
+
+    @Override
+    public void setUsePartitioned(boolean usePartitioned) {
+        // NO-OP
+    }
+
+    @Override
     public String getSessionCookieDomain() {
         return null;
     }

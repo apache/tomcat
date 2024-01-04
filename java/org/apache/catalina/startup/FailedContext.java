@@ -346,6 +346,11 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void setUseHttpOnly(boolean useHttpOnly) { /* NO-OP */ }
 
     @Override
+    public boolean getUsePartitioned() { return false; }
+    @Override
+    public void setUsePartitioned(boolean usePartitioned) { /* NO-OP */ }
+
+    @Override
     public String getSessionCookieDomain() { return null; }
     @Override
     public void setSessionCookieDomain(String sessionCookieDomain) { /* NO-OP */ }
