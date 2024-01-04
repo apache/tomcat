@@ -1078,12 +1078,15 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 cookie.setDomain(ssoDomain);
             }
 
-            // Configure httpOnly on SSO cookie using same rules as session
-            // cookies
+            // Configure httpOnly on SSO cookie using same rules as session cookies
             if (request.getServletContext().getSessionCookieConfig().isHttpOnly() ||
                     request.getContext().getUseHttpOnly()) {
                 cookie.setHttpOnly(true);
             }
+
+            // Configure Partitioned on SSO cookie using same rules as session cookies
+            cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR,
+                    Boolean.toString(request.getContext().getUsePartitioned()));
 
             response.addCookie(cookie);
 
