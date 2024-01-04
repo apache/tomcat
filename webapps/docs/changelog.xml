@@ -171,7 +171,7 @@
     <changelog>
       <fix>
         Background processes should not be run concurrently with lifecycle
-        oprations of a container. (remm)
+        operations of a container. (remm)
       </fix>
       <fix>
         Correct unintended escaping of XML in some WebDAV responses. The XML
