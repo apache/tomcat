@@ -99,6 +99,13 @@
 
     <attributes>
 
+      <attribute name="partitioned" required="false">
+       <p>Should the Partitioned flag be set on cookies? Defaults to <code>false</code>.</p>
+       <p>Note: The name of the attribute used to indicate a partitioned cookie as part of
+       <a href="https://developers.google.com/privacy-sandbox/3pcd#partitioned">CHIPS</a> is not defined by an RFC and
+       may change in a non-backwards compatible way once equivalent functionality is included in an RFC.</p>
+      </attribute>
+
       <attribute name="sameSiteCookies" required="false">
         <p>Enables setting same-site cookie attribute.</p>
 

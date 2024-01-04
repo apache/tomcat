@@ -173,6 +173,10 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
             header.append(sameSiteCookiesValue.getValue());
         }
 
+        if (getPartitioned()) {
+            header.append("; Partitioned");
+        }
+
         return header.toString();
     }
 

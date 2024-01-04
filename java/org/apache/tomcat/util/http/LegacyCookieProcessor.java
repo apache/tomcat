@@ -330,6 +330,10 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
             buf.append(sameSiteCookiesValue.getValue());
         }
 
+        if (getPartitioned()) {
+            buf.append("; Partitioned");
+        }
+
         return buf.toString();
     }
 
