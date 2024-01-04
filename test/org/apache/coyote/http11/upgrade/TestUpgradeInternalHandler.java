@@ -39,7 +39,6 @@ import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
@@ -59,10 +58,6 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
 
     @Test
     public void testUpgradeInternal() throws Exception {
-        Assume.assumeTrue(
-                "Only supported on NIO 2",
-                getTomcatInstance().getConnector().getProtocolHandlerClassName().contains("Nio2"));
-
         UpgradeConnection uc = doUpgrade(EchoAsync.class);
         PrintWriter pw = new PrintWriter(uc.getWriter());
         BufferedReader reader = uc.getReader();
@@ -87,6 +82,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
             Class<? extends HttpUpgradeHandler> upgradeHandlerClass) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
+        Assert.assertTrue(tomcat.getConnector().setProperty("useAsyncIO", "true"));
 
         // No file system docBase required
         Context ctx = getProgrammaticRootContext();
