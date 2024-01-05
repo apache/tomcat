@@ -304,7 +304,8 @@ public class StatusTransformer {
                 appendJSonValue(writer, "usageUsed", Long.toString(usage.getUsed()));
                 writer.append('}');
             }
-            writer.append(']').println();
+            writer.println();
+            indent(writer, 2).append(']').println();
 
             indent(writer, 1).append('}');
         }
@@ -503,11 +504,15 @@ public class StatusTransformer {
 
             writer.write("</connector>");
         } else if (mode == 2) {
-            indent(writer, 1).append('{').println();
+            indent(writer, 2).append('{').println();
 
-            indent(writer, 2);
-            appendJSonValue(writer, "name", JSONFilter.escape(name)).append(',').println();
-            indent(writer, 2).append('"').append("threadInfo").append('"').append(':').append('{');
+            indent(writer, 3);
+            String jsonName = JSONFilter.escape(name);
+            if (jsonName.length() > 4 && jsonName.startsWith("\\\"") && jsonName.endsWith("\\\"")) {
+                jsonName = jsonName.substring(2, jsonName.length() - 2);
+            }
+            appendJSonValue(writer, "name", jsonName).append(',').println();
+            indent(writer, 3).append('"').append("threadInfo").append('"').append(':').append('{');
             appendJSonValue(writer, "maxThreads", mBeanServer.getAttribute(tpName, "maxThreads").toString()).append(',');
             appendJSonValue(writer, "currentThreadCount", mBeanServer.getAttribute(tpName, "currentThreadCount").toString()).append(',');
             appendJSonValue(writer, "currentThreadsBusy", mBeanServer.getAttribute(tpName, "currentThreadsBusy").toString());
@@ -523,7 +528,7 @@ public class StatusTransformer {
 
             if (grpName != null) {
                 writer.append(',').println();
-                indent(writer, 2).append('"').append("requestInfo").append('"').append(':').append('{');
+                indent(writer, 3).append('"').append("requestInfo").append('"').append(':').append('{');
                 appendJSonValue(writer, "maxTime", mBeanServer.getAttribute(grpName, "maxTime").toString()).append(',');
                 appendJSonValue(writer, "processingTime", mBeanServer.getAttribute(grpName, "processingTime").toString()).append(',');
                 appendJSonValue(writer, "requestCount", mBeanServer.getAttribute(grpName, "requestCount").toString()).append(',');
@@ -534,7 +539,7 @@ public class StatusTransformer {
                 // Note: No detailed per processor info
             }
 
-            indent(writer, 1).append('}');
+            indent(writer, 2).append('}');
         }
     }
 

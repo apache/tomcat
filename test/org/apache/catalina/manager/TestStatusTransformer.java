@@ -72,10 +72,9 @@ public class TestStatusTransformer extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         String json = client.getResponseBody();
-
+        System.out.println(json);
         JSONParser parser = new JSONParser(json);
         String result = parser.parse().toString();
-        System.out.println(result);
         Assert.assertTrue(result.contains("name=localhost/"));
     }
 
