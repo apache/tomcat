@@ -1177,7 +1177,7 @@
 
   <subsection name="HTTP/2 Support">
 
-  <p>HTTP/2 is support is provided for TLS (h2), non-TLS via HTTP upgrade (h2c)
+  <p>HTTP/2 support is provided for TLS (h2), non-TLS via HTTP upgrade (h2c)
      and direct HTTP/2 (h2c) connections. To enable HTTP/2 support for an HTTP
      connector the following <strong>UpgradeProtocol</strong> element must be
      nested within the <strong>Connector</strong> with a
