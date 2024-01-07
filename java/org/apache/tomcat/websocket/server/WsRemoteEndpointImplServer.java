@@ -103,12 +103,12 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     protected boolean acquireMessagePartInProgressSemaphore(byte opCode, long timeoutExpiry)
             throws InterruptedException {
 
-        // Only close requires special handling.
-        if (opCode != Constants.OPCODE_CLOSE) {
+        // Only close message in response requires special handling.
+        int socketWrapperLockCount = socketWrapper.getLock().getHoldCount();
+        if (opCode != Constants.OPCODE_CLOSE || socketWrapperLockCount <= 0) {
             return super.acquireMessagePartInProgressSemaphore(opCode, timeoutExpiry);
         }
 
-        int socketWrapperLockCount = socketWrapper.getLock().getHoldCount();
         while (!messagePartInProgress.tryAcquire()) {
             if (timeoutExpiry < System.currentTimeMillis()) {
                 return false;
