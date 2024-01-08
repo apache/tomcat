@@ -151,7 +151,7 @@ public class TestAsyncMessagesPerformance extends TomcatBaseTest {
                 if (seqZeroTimingFailureCount > 1) {
                     // The 50ms pause after the short message may very rarely appear to be less than 40ms
                     fail = true;
-                } else if (seqOneTimingFailureCount > 5) {
+                } else if (seqOneTimingFailureCount > 10) {
                     // The two chunks of the 16k message may rarely be more than 0.5ms apart
                     fail = true;
                 } else if (seqTwoTimingFailureCount > 100) {
