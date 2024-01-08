@@ -409,7 +409,11 @@ public class Cookie implements Cloneable, Serializable {
             }
         }
 
-        attributes.put(name, value);
+        if (value == null) {
+            attributes.remove(name);
+        } else {
+            attributes.put(name, value);
+        }
     }
 
 
