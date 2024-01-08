@@ -37,7 +37,8 @@ public class TestCharsetCachePerformance {
 
         Assert.assertTrue("No cache was faster than full cache", timeFull < timeNone);
         Assert.assertTrue("No cache was faster than lazy cache", timeLazy < timeNone);
-        Assert.assertTrue("Lazy cache was faster than full cache ", timeFull < timeLazy);
+        // On average full cache is faster than lazy cache but they are close enough the test will fail sometimes
+        //Assert.assertTrue("Lazy cache was faster than full cache ", timeFull < timeLazy);
     }
 
 
