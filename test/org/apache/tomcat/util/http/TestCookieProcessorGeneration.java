@@ -96,6 +96,14 @@ public class TestCookieProcessorGeneration {
     }
 
     @Test
+    public void valueNull() {
+        Cookie cookie = new Cookie("foo", "bar");
+        cookie.setAttribute("other", "anything");
+        cookie.setAttribute("other", null);
+        doTest(cookie, "foo=bar");
+    }
+
+    @Test
     public void testMaxAgePositive() {
         doTestMaxAge(100, "foo=bar; Max-Age=100");
     }
