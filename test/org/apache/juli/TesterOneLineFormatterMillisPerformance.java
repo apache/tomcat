@@ -25,8 +25,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+/*
+ * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
+ * excluded due to the name starting Tester...
+ */
 @RunWith(Parameterized.class)
-public class TestOneLineFormatterMillisPerformance {
+public class TesterOneLineFormatterMillisPerformance {
 
     @Parameterized.Parameters(name = "{index}: format[{0}]")
     public static Collection<Object[]> parameters() {

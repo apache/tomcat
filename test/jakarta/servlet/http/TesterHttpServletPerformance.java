@@ -27,10 +27,10 @@ import org.apache.catalina.filters.TesterHttpServletResponse;
 
 
 /*
- * Note: Class name chosen so it matches *Performance.java and can be excluded
- *       from test runs along with other performance tests.
+ * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
+ * excluded due to the name starting Tester...
  */
-public class TestHttpServletPerformance {
+public class TesterHttpServletPerformance {
 
     @Test
     public void testDoOptions() throws IOException, ServletException{
