@@ -20,10 +20,14 @@ import java.io.StringReader;
 
 import jakarta.el.ELBaseTest;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.tomcat.util.collections.SynchronizedStack;
 
+/*
+ * This is a relative performance test so it remains part of the standard test run.
+ */
 public class TestELParserPerformance extends ELBaseTest {
 
     /*
@@ -48,6 +52,8 @@ public class TestELParserPerformance extends ELBaseTest {
         final int runs = 20;
         final int parseIterations = 10000;
 
+        long reinitTotalTime = 0;
+        long newTotalTime = 0;
 
         for (int j = 0; j < runs; j ++) {
             long start = System.nanoTime();
@@ -64,6 +70,7 @@ public class TestELParserPerformance extends ELBaseTest {
                 stack.push(parser);
             }
             long end = System.nanoTime();
+            reinitTotalTime +=  (end - start);
 
             System.out.println(parseIterations +
                     " iterations using ELParser.ReInit(...) took " + (end - start) + "ns");
@@ -76,9 +83,12 @@ public class TestELParserPerformance extends ELBaseTest {
                 parser.CompositeExpression();
             }
             long end = System.nanoTime();
+            newTotalTime +=  (end - start);
 
             System.out.println(parseIterations +
                     " iterations using    new ELParser(...) took " + (end - start) + "ns");
         }
+
+        Assert.assertTrue("Using new ElParser() was faster then using ELParser.ReInit", reinitTotalTime < newTotalTime);
     }
 }
