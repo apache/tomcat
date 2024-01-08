@@ -20,7 +20,11 @@ import java.util.regex.Pattern;
 
 import org.junit.Test;
 
-public class TestAbstractFileResourceSetPerformance {
+/*
+ * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
+ * excluded due to the name starting Tester...
+ */
+public class TesterAbstractFileResourceSetPerformance {
 
     private static final Pattern UNSAFE_WINDOWS_FILENAME_PATTERN = Pattern.compile(" $|[\"<>]");
 

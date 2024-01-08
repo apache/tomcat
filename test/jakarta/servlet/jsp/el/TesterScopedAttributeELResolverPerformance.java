@@ -25,7 +25,11 @@ import jakarta.servlet.jsp.TesterPageContext;
 
 import org.junit.Test;
 
-public class TestScopedAttributeELResolverPerformance {
+/*
+ * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
+ * excluded due to the name starting Tester...
+ */
+public class TesterScopedAttributeELResolverPerformance {
 
     /*
      * With the caching of NotFound responses this test takes ~20ms. Without the

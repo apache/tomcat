@@ -20,7 +20,11 @@ import org.junit.Test;
 
 import org.apache.tomcat.unittest.TesterRequest;
 
-public class TestRequestPerformance {
+/*
+ * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
+ * excluded due to the name starting Tester...
+ */
+public class TesterRequestPerformance {
 
     @Test
     public void localeParsePerformance() throws Exception {
