@@ -31,6 +31,12 @@ import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.bcel.classfile.ClassParser;
 import org.apache.tomcat.util.scan.JarFactory;
 
+/*
+ * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
+ * excluded due to the name starting Tester...
+ *
+ * The test also requires that the Jira lib directory has been extracted from a Jira install and copied to /tmp.
+ */
 public class TesterPerformance {
 
     private static final String JAR_LOCATION = "/tmp/jira-libs";
