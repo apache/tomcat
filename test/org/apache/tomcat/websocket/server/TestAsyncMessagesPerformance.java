@@ -36,6 +36,11 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.TesterAsyncTiming;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
+/*
+ * This test is very timing sensitive. Any failures need to be checked to see if the thresholds just need adjusting to
+ * support a wider range of platforms and/or Java versions or if the failure is an indication of a performance drop in
+ * the WebSocket implementation.
+ */
 public class TestAsyncMessagesPerformance extends TomcatBaseTest {
 
     @Test
@@ -69,11 +74,20 @@ public class TestAsyncMessagesPerformance extends TomcatBaseTest {
         private long lastMessage = 0;
         private int sequence = 0;
         private int count = 0;
+        private long seqZeroTimingFailureCount = 0;
+        private long seqOneTimingFailureCount = 0;
+        private long seqTwoTimingFailureCount = 0;
+
         private CountDownLatch latch = new CountDownLatch(1);
         private volatile boolean fail = false;
 
         @Override
         public void onMessage(ByteBuffer message, boolean last) {
+            // Expected received data is:
+            // 1 * 16k message in 2 * 8k chunks
+            // 1 * 4k message in 1 * 4k chunk
+            // 50 ms pause
+            // loop
             if (lastMessage == 0) {
                 // First message. Don't check
                 sequence++;
@@ -87,34 +101,36 @@ public class TestAsyncMessagesPerformance extends TomcatBaseTest {
                     sequence++;
                     if (message.capacity() != 8192) {
                         System.out.println(
-                                "Expected size 8192 but was [" + message.capacity() + "], count [" + count + "]");
+                                "SEQ0: Expected size 8192 but was [" + message.capacity() + "], count [" + count + "]");
                         fail = true;
                     }
                     if (diff < 40000000) {
-                        System.out.println("Expected diff > 40ms but was [" + diff + "], count [" + count + "]");
-                        fail = true;
+                        System.out.println("SEQ0: Expected diff > 40ms but was [" + diff + "], count [" + count + "]");
+                        seqZeroTimingFailureCount++;
                     }
                 } else if (sequence == 1) {
                     sequence++;
                     if (message.capacity() != 8192) {
                         System.out.println(
-                                "Expected size 8192 but was [" + message.capacity() + "], count [" + count + "]");
+                                "SEQ1: Expected size 8192 but was [" + message.capacity() + "], count [" + count + "]");
                         fail = true;
                     }
+                    // Gap between 2* 8k chunks of 16k message expected to be less than 0.5ms
                     if (diff > 500000) {
-                        System.out.println("Expected diff < 500,000 but was [" + diff + "], count [" + count + "]");
-                        fail = true;
+                        System.out.println("SEQ1: Expected diff < 500,000 but was [" + diff + "], count [" + count + "]");
+                        seqOneTimingFailureCount++;
                     }
                 } else if (sequence == 2) {
                     sequence = 0;
                     if (message.capacity() != 4096) {
                         System.out.println(
-                                "Expected size 4096 but was [" + message.capacity() + "], count [" + count + "]");
+                                "SEQ2: Expected size 4096 but was [" + message.capacity() + "], count [" + count + "]");
                         fail = true;
                     }
+                    // Gap between 16k message and 4k message expected to be less than 0.5ms
                     if (diff > 500000) {
-                        System.out.println("Expected diff < 500,000 but was [" + diff + "], count [" + count + "]");
-                        fail = true;
+                        System.out.println("SEQ2: Expected diff < 500,000 but was [" + diff + "], count [" + count + "]");
+                        seqTwoTimingFailureCount++;
                     }
                 }
             }
@@ -130,6 +146,19 @@ public class TestAsyncMessagesPerformance extends TomcatBaseTest {
         }
 
         public boolean hasFailed() {
+            // Total iterations are 1500
+            if (!fail) {
+                if (seqZeroTimingFailureCount > 1) {
+                    // The 50ms pause after the short message may very rarely appear to be less than 40ms
+                    fail = true;
+                } else if (seqOneTimingFailureCount > 5) {
+                    // The two chunks of the 16k message may rarely be more than 0.5ms apart
+                    fail = true;
+                } else if (seqTwoTimingFailureCount > 100) {
+                    // The short message may often be more than 0.5ms after the long message
+                    fail = true;
+                }
+            }
             return fail;
         }
     }
