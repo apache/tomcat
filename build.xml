@@ -275,6 +275,7 @@
     <filter token="BND_JAR" value="${bnd.jar}"/>
     <filter token="UNBOUNDID_JAR" value="${unboundid.jar}"/>
     <filter token="JUNIT_JAR" value="${junit.jar}"/>
+    <filter token="OUTPUT_DIR" value="${tomcat.output}"/>
   </filterset>
 
   <!-- Version info filter set -->
@@ -3474,7 +3475,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
   <!-- ============================ IntelliJ IDEA=========================== -->
 
   <target name="ide-intellij"
-          depends="download-compile, extras-webservices-prepare, download-test-compile"
+          depends="download-compile, extras-webservices-prepare, download-test-compile, deploy"
           description="Creates project directory .idea for IntelliJ IDEA">
 
     <copy todir="${tomcat.home}/.idea">
@@ -3483,7 +3484,11 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
       <filterset refid="version.filters"/>
     </copy>
 
-    <echo>IntelliJ IDEA project directory created.</echo>
+    <mkdir dir="${tomcat.home}/lib"/>
+
+    <echo>IntelliJ IDEA project directory created.
+The SDK was set to &quot;${build.java.version}&quot; so make sure that your IDE has an SDK with that name,
+or update the Project Settings accordingly.</echo>
   </target>
 
   <!-- ============================ NetBeans =============================== -->
