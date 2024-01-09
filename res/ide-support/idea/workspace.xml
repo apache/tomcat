@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="RunManager">
+    <configuration name="Tomcat" type="Application" factoryName="Application">
+      <option name="ALTERNATIVE_JRE_PATH" value="@BUILD_JAVA_VERSION@" />
+      <option name="MAIN_CLASS_NAME" value="org.apache.catalina.startup.Bootstrap" />
+      <module name="tomcat" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="@OUTPUT_DIR@/build" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+</project>
