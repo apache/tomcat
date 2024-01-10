@@ -105,6 +105,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0-M17 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Implement <code>HttpSession.getAccessor()</code> which provides a
+        mechanism for applications to interact with an <code>HttpSession</code>
+        outside the standard Servlet processing of an HTTP request. This is
+        expected to be especially useful with applications using the Jakarta
+        WebSocket API. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
