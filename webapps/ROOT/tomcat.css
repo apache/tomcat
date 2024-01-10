@@ -155,8 +155,8 @@ a img {
 }
 
 #asf-box h1 {
-    padding: 0;
     margin: 0;
+    line-height: 1.5;
 }
 
 #upper {
