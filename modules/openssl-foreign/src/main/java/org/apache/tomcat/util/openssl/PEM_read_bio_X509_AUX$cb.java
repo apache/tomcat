@@ -26,29 +26,30 @@ import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
 
 /**
- * {@snippet lang = c : * void (*SSL_set_info_callback$cb)(SSL*,int,int);
+ * {@snippet lang = c : * int (*PEM_read_bio_X509_AUX$cb)(char* buf,int size,int rwflag,void* userdata);
  * }
  */
 @SuppressWarnings("javadoc")
-public interface SSL_set_info_callback$cb {
+public interface PEM_read_bio_X509_AUX$cb {
 
-    FunctionDescriptor $DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_INT, openssl_h.C_INT);
+    int apply(MemorySegment buf, int size, int rwflag, MemorySegment userdata);
 
-    void apply(MemorySegment _x0, int _x1, int _x2);
+    FunctionDescriptor $DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_INT,
+            openssl_h.C_INT, openssl_h.C_POINTER);
 
-    MethodHandle UP$MH = openssl_h.upcallHandle(SSL_set_info_callback$cb.class, "apply", $DESC);
+    MethodHandle UP$MH = openssl_h.upcallHandle(PEM_read_bio_X509_AUX$cb.class, "apply", $DESC);
 
-    static MemorySegment allocate(SSL_set_info_callback$cb fi, Arena scope) {
+    static MemorySegment allocate(PEM_read_bio_X509_AUX$cb fi, Arena scope) {
         return Linker.nativeLinker().upcallStub(UP$MH.bindTo(fi), $DESC, scope);
     }
 
     MethodHandle DOWN$MH = Linker.nativeLinker().downcallHandle($DESC);
 
-    static SSL_set_info_callback$cb ofAddress(MemorySegment addr, Arena arena) {
+    static PEM_read_bio_X509_AUX$cb ofAddress(MemorySegment addr, Arena arena) {
         MemorySegment symbol = addr.reinterpret(arena, null);
-        return (MemorySegment __x0, int __x1, int __x2) -> {
+        return (MemorySegment _buf, int _size, int _rwflag, MemorySegment _userdata) -> {
             try {
-                DOWN$MH.invokeExact(symbol, __x0, __x1, __x2);
+                return (int) DOWN$MH.invokeExact(symbol, _buf, _size, _rwflag, _userdata);
             } catch (Throwable ex$) {
                 throw new AssertionError("should not reach here", ex$);
             }
