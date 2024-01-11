@@ -34,7 +34,7 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
     private static final String RESULT_NONCE = Constants.CSRF_NONCE_SESSION_ATTR_NAME + "=TESTNONCE";
 
     private final HttpServletResponse wrapper = new CsrfPreventionFilter.CsrfResponseWrapper(new NonEncodingResponse(),
-            Constants.CSRF_NONCE_SESSION_ATTR_NAME, "TESTNONCE");
+            Constants.CSRF_NONCE_SESSION_ATTR_NAME, "TESTNONCE", null);
 
     @Test
     public void testAddNonceNoQueryNoAnchor() throws Exception {
