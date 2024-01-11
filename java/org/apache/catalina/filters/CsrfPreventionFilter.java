@@ -202,11 +202,19 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             return new SuffixPredicate(pattern.substring(1));
         } else if (pattern.endsWith("*")) {
             return new PrefixPredicate(pattern.substring(0, pattern.length() - 1));
+        } else if (pattern.startsWith("/") && pattern.endsWith("/")) {
+            return new PatternPredicate(pattern.substring(1, pattern.length() - 1));
         } else {
             throw new IllegalArgumentException("Unsupported pattern: " + pattern);
         }
     }
 
+    /**
+     * A no-nonce Predicate that evaluates a MIME type instead of a URL.
+     *
+     * It can be used with any other Predicate for matching
+     * the actual value of the MIME type.
+     */
     protected static class MimePredicate implements Predicate<String> {
         private final ServletContext context;
         private final Predicate<String> predicate;
@@ -224,6 +232,9 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         }
     }
 
+    /**
+     * A no-nonce Predicate that matches a prefix.
+     */
     protected static class PrefixPredicate implements Predicate<String> {
         private final String prefix;
         public PrefixPredicate(String prefix) {
@@ -232,10 +243,13 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         @Override
         public boolean test(String t) {
-            return t.endsWith(this.prefix);
+            return t.startsWith(this.prefix);
         }
     }
 
+    /**
+     * A no-nonce Predicate that matches a suffix.
+     */
     protected static class SuffixPredicate implements Predicate<String> {
         private final String suffix;
         public SuffixPredicate(String suffix) {
@@ -244,10 +258,13 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         @Override
         public boolean test(String t) {
-            return t.startsWith(this.suffix);
+            return t.endsWith(this.suffix);
         }
     }
 
+    /**
+     * A no-nonce Predicate that matches a regular expression.
+     */
     protected static class PatternPredicate implements Predicate<String> {
         private final Pattern pattern;
 
