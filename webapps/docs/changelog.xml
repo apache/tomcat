@@ -122,6 +122,10 @@
         Setting a <code>null</code> value for a cookie attribute should remove
         the attribute. (markt)
       </fix>
+      <fix>
+        Optimize state handling for OpenSSL context callbacks with the FFM API.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>

@@ -36,7 +36,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import javax.net.ssl.KeyManager;
@@ -128,17 +127,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private final boolean alpn;
     private final int minTlsVersion;
     private final int maxTlsVersion;
+    private final List<byte[]> negotiableProtocols;
 
     private OpenSSLSessionContext sessionContext;
     private String enabledProtocol;
     private boolean initialized = false;
 
     private boolean noOcspCheck = false;
-
-    private static final ConcurrentHashMap<Long, ContextState> states = new ConcurrentHashMap<>();
-    private static ContextState getState(MemorySegment ctx) {
-        return states.get(Long.valueOf(ctx.address()));
-    }
+    private X509TrustManager x509TrustManager;
 
     private final ContextState state;
     private final Arena contextArena;
@@ -292,7 +288,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         } catch(Exception e) {
             throw new SSLException(sm.getString("openssl.errorSSLCtxInit"), e);
         } finally {
-            state = new ContextState(sslCtx, confCtx, negotiableProtocolsBytes);
+            this.negotiableProtocols = negotiableProtocolsBytes;
+            state = new ContextState(sslCtx, confCtx);
             /*
              * When an SSLHostConfig is replaced at runtime, it is not possible to
              * call destroy() on the associated OpenSSLContext since it is likely
@@ -546,15 +543,15 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // Trust and certificate verification
             if (tms != null) {
                 // Client certificate verification based on custom trust managers
-                state.x509TrustManager = chooseTrustManager(tms);
+                x509TrustManager = chooseTrustManager(tms);
                 SSL_CTX_set_cert_verify_callback(state.sslCtx,
-                        SSL_CTX_set_cert_verify_callback$cb.allocate(new CertVerifyCallback(), contextArena), state.sslCtx);
+                        SSL_CTX_set_cert_verify_callback$cb.allocate(new CertVerifyCallback(x509TrustManager), contextArena), state.sslCtx);
 
                 // Pass along the DER encoded certificates of the accepted client
                 // certificate issuers, so that their subjects can be presented
                 // by the server during the handshake to allow the client choosing
                 // an acceptable certificate
-                for (X509Certificate caCert : state.x509TrustManager.getAcceptedIssuers()) {
+                for (X509Certificate caCert : x509TrustManager.getAcceptedIssuers()) {
                     var rawCACertificate = localArena.allocateFrom(ValueLayout.JAVA_BYTE, caCert.getEncoded());
                     var rawCACertificatePointer = localArena.allocateFrom(ValueLayout.ADDRESS, rawCACertificate);
                     var x509CACert = d2i_X509(MemorySegment.NULL, rawCACertificatePointer, rawCACertificate.byteSize());
@@ -596,9 +593,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
             }
 
-            if (state.negotiableProtocols != null && state.negotiableProtocols.size() > 0) {
+            if (negotiableProtocols != null && negotiableProtocols.size() > 0) {
                 SSL_CTX_set_alpn_select_cb(state.sslCtx,
-                        SSL_CTX_set_alpn_select_cb$cb.allocate(new ALPNSelectCallback(), contextArena), state.sslCtx);
+                        SSL_CTX_set_alpn_select_cb$cb.allocate(new ALPNSelectCallback(negotiableProtocols), contextArena), state.sslCtx);
             }
 
             // Apply OpenSSLConfCmd if used
@@ -710,18 +707,17 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     // int SSL_callback_alpn_select_proto(SSL* ssl, const unsigned char **out, unsigned char *outlen,
     //        const unsigned char *in, unsigned int inlen, void *arg)
     private static class ALPNSelectCallback implements SSL_CTX_set_alpn_select_cb$cb {
+        private final List<byte[]> negotiableProtocols;
+        ALPNSelectCallback(List<byte[]> negotiableProtocols) {
+            this.negotiableProtocols = negotiableProtocols;
+        }
         @Override
         public int apply(MemorySegment ssl, MemorySegment out,
                 MemorySegment outlen, MemorySegment in, int inlen, MemorySegment arg) {
-            ContextState state = getState(arg);
-            if (state == null) {
-                log.warn(sm.getString("context.noSSL", Long.valueOf(arg.address())));
-                return SSL_TLSEXT_ERR_NOACK();
-            }
             try (var localArena = Arena.ofConfined()) {
                 MemorySegment inSeg = in.reinterpret(inlen, localArena, null);
                 byte[] advertisedBytes = inSeg.toArray(ValueLayout.JAVA_BYTE);
-                for (byte[] negotiableProtocolBytes : state.negotiableProtocols) {
+                for (byte[] negotiableProtocolBytes : negotiableProtocols) {
                     for (int i = 0; i <= advertisedBytes.length - negotiableProtocolBytes.length; i++) {
                         if (advertisedBytes[i] == negotiableProtocolBytes[0]) {
                             for (int j = 0; j < negotiableProtocolBytes.length; j++) {
@@ -748,17 +744,16 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
 
     private static class CertVerifyCallback implements SSL_CTX_set_cert_verify_callback$cb {
+        private final X509TrustManager x509TrustManager;
+        CertVerifyCallback(X509TrustManager x509TrustManager) {
+            this.x509TrustManager = x509TrustManager;
+        }
         @Override
         public int apply(MemorySegment /*X509_STORE_CTX*/ x509_ctx, MemorySegment param) {
             if (log.isDebugEnabled()) {
                 log.debug("Certificate verification");
             }
             if (MemorySegment.NULL.equals(param)) {
-                return 0;
-            }
-            ContextState state = getState(param);
-            if (state == null) {
-                log.warn(sm.getString("context.noSSL", Long.valueOf(param.address())));
                 return 0;
             }
             MemorySegment ssl = X509_STORE_CTX_get_ex_data(x509_ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
@@ -783,7 +778,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         : getCipherAuthenticationMethod(SSL_CIPHER_get_auth_nid(cipher), SSL_CIPHER_get_kx_nid(cipher));
                 X509Certificate[] peerCerts = certificates(certificateChain);
                 try {
-                    state.x509TrustManager.checkClientTrusted(peerCerts, authMethod);
+                    x509TrustManager.checkClientTrusted(peerCerts, authMethod);
                     return 1;
                 } catch (Exception e) {
                     log.debug(sm.getString("openssl.certificateVerificationFailed"), e);
@@ -1411,8 +1406,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     @Override
     public X509Certificate[] getAcceptedIssuers() {
         X509Certificate[] acceptedCerts = null;
-        if (state.x509TrustManager != null) {
-            acceptedCerts = state.x509TrustManager.getAcceptedIssuers();
+        if (x509TrustManager != null) {
+            acceptedCerts = x509TrustManager.getAcceptedIssuers();
         }
         return acceptedCerts;
     }
@@ -1423,13 +1418,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         private final Arena stateArena = Arena.ofShared();
         private final MemorySegment sslCtx;
         private final MemorySegment confCtx;
-        private final List<byte[]> negotiableProtocols;
 
-        private X509TrustManager x509TrustManager = null;
-
-        private ContextState(MemorySegment sslCtx, MemorySegment confCtx, List<byte[]> negotiableProtocols) {
-            states.put(Long.valueOf(sslCtx.address()), this);
-            this.negotiableProtocols = negotiableProtocols;
+        private ContextState(MemorySegment sslCtx, MemorySegment confCtx) {
             // Use another arena to avoid keeping a reference through segments
             // This also allows making further accesses to the main pointers safer
             this.sslCtx = sslCtx.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena,
@@ -1452,7 +1442,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
         @Override
         public void run() {
-            states.remove(Long.valueOf(sslCtx.address()));
             stateArena.close();
         }
     }
