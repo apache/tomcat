@@ -29,6 +29,7 @@ import java.lang.invoke.MethodHandle;
  * {@snippet lang = c : * int (*SSL_CTX_set_default_passwd_cb$cb)(char* buf,int size,int rwflag,void* userdata);
  * }
  */
+@SuppressWarnings("javadoc")
 public interface SSL_CTX_set_default_passwd_cb$cb {
 
     FunctionDescriptor $DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_INT,
