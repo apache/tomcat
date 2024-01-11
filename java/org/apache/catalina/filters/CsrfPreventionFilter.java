@@ -163,6 +163,10 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             return null;
         }
 
+        if (patterns.startsWith("/") && patterns.endsWith("/")) {
+            return Collections.singleton(new PatternPredicate(patterns.substring(1, patterns.length() - 1)));
+        }
+
         String values[] = patterns.split(",");
 
         ArrayList<Predicate<String>> matchers = new ArrayList<>(values.length);
@@ -198,8 +202,6 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             return new SuffixPredicate(pattern.substring(1));
         } else if (pattern.endsWith("*")) {
             return new PrefixPredicate(pattern.substring(0, pattern.length() - 1));
-        } else if (pattern.startsWith("/") && pattern.endsWith("/")) {
-            return new PatternPredicate(pattern.substring(1, pattern.length() - 1));
         } else {
             throw new IllegalArgumentException("Unsupported pattern: " + pattern);
         }
