@@ -230,6 +230,10 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
             return predicate.test(mimeType);
         }
+
+        public Predicate<String> getPredicate() {
+            return predicate;
+        }
     }
 
     /**
