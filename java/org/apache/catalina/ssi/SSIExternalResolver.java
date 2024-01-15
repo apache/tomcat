@@ -20,9 +20,9 @@ package org.apache.catalina.ssi;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+
 /**
- * Interface used by SSIMediator to talk to the 'outside world' ( usually a
- * servlet )
+ * Interface used by SSIMediator to talk to the 'outside world' ( usually a servlet )
  *
  * @author Dan Sandberg
  */
@@ -30,8 +30,7 @@ public interface SSIExternalResolver {
     /**
      * Adds any external variables to the variableNames collection.
      *
-     * @param variableNames
-     *            the collection to add to
+     * @param variableNames the collection to add to
      */
     void addVariableNames(Collection<String> variableNames);
 
@@ -40,22 +39,18 @@ public interface SSIExternalResolver {
 
 
     /**
-     * Set the named variable to the specified value. If value is null, then
-     * the variable will be removed ( ie. a call to getVariableValue will
-     * return null )
+     * Set the named variable to the specified value. If value is null, then the variable will be removed ( ie. a call
+     * to getVariableValue will return null )
      *
-     * @param name
-     *            of the variable
-     * @param value
-     *            of the variable
+     * @param name  of the variable
+     * @param value of the variable
      */
     void setVariableValue(String name, String value);
 
 
     /**
-     * Returns the current date. This is useful for putting the SSI stuff in a
-     * regression test. Since you can make the current date a constant, it
-     * makes testing easier since the output won't change.
+     * Returns the current date. This is useful for putting the SSI stuff in a regression test. Since you can make the
+     * current date a constant, it makes testing easier since the output won't change.
      *
      * @return the data
      */
@@ -65,8 +60,7 @@ public interface SSIExternalResolver {
     long getFileSize(String path, boolean virtual) throws IOException;
 
 
-    long getFileLastModified(String path, boolean virtual)
-            throws IOException;
+    long getFileLastModified(String path, boolean virtual) throws IOException;
 
 
     String getFileText(String path, boolean virtual) throws IOException;
