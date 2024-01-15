@@ -36,11 +36,12 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 /**
- * Filter to process SSI requests within a webpage. Mapped to a content types
- * from within web.xml.
+ * Filter to process SSI requests within a webpage. Mapped to a content types from within web.xml.
  *
  * @author David Becker
+ *
  * @see org.apache.catalina.ssi.SSIServlet
  */
 public class SSIFilter implements Filter {
@@ -54,8 +55,7 @@ public class SSIFilter implements Filter {
     /** regex pattern to match when evaluating content types */
     protected Pattern contentTypeRegEx = null;
     /** default pattern for ssi filter content type matching */
-    protected final Pattern shtmlRegEx =
-        Pattern.compile("text/x-server-parsed-html(;.*)?");
+    protected final Pattern shtmlRegEx = Pattern.compile("text/x-server-parsed-html(;.*)?");
     /** Allow exec (normally blocked for security) */
     protected boolean allowExec = false;
 
@@ -74,8 +74,7 @@ public class SSIFilter implements Filter {
             contentTypeRegEx = shtmlRegEx;
         }
 
-        isVirtualWebappRelative =
-            Boolean.parseBoolean(config.getInitParameter("isVirtualWebappRelative"));
+        isVirtualWebappRelative = Boolean.parseBoolean(config.getInitParameter("isVirtualWebappRelative"));
 
         if (config.getInitParameter("expires") != null) {
             expires = Long.valueOf(config.getInitParameter("expires"));
@@ -84,17 +83,16 @@ public class SSIFilter implements Filter {
         allowExec = Boolean.parseBoolean(config.getInitParameter("allowExec"));
 
         if (debug > 0) {
-            config.getServletContext().log(
-                    "SSIFilter.init() SSI invoker started with 'debug'=" + debug);
+            config.getServletContext().log("SSIFilter.init() SSI invoker started with 'debug'=" + debug);
         }
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-            FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
         // cast once
-        HttpServletRequest req = (HttpServletRequest)request;
-        HttpServletResponse res = (HttpServletResponse)response;
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
 
         // setup to capture output
         ByteArrayServletOutputStream basos = new ByteArrayServletOutputStream();
@@ -115,22 +113,17 @@ public class SSIFilter implements Filter {
             String encoding = res.getCharacterEncoding();
 
             // set up SSI processing
-            SSIExternalResolver ssiExternalResolver =
-                new SSIServletExternalResolver(config.getServletContext(), req,
-                        res, isVirtualWebappRelative, debug, encoding);
-            SSIProcessor ssiProcessor = new SSIProcessor(ssiExternalResolver,
-                    debug, allowExec);
+            SSIExternalResolver ssiExternalResolver = new SSIServletExternalResolver(config.getServletContext(), req,
+                    res, isVirtualWebappRelative, debug, encoding);
+            SSIProcessor ssiProcessor = new SSIProcessor(ssiExternalResolver, debug, allowExec);
 
             // prepare readers/writers
-            Reader reader =
-                new InputStreamReader(new ByteArrayInputStream(bytes), encoding);
+            Reader reader = new InputStreamReader(new ByteArrayInputStream(bytes), encoding);
             ByteArrayOutputStream ssiout = new ByteArrayOutputStream();
-            PrintWriter writer =
-                new PrintWriter(new OutputStreamWriter(ssiout, encoding));
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(ssiout, encoding));
 
             // do SSI processing
-            long lastModified = ssiProcessor.process(reader,
-                    responseIncludeWrapper.getLastModified(), writer);
+            long lastModified = ssiProcessor.process(reader, responseIncludeWrapper.getLastModified(), writer);
 
             // set output bytes
             writer.flush();
@@ -138,16 +131,14 @@ public class SSIFilter implements Filter {
 
             // override headers
             if (expires != null) {
-                res.setDateHeader("expires", (new java.util.Date()).getTime()
-                        + expires.longValue() * 1000);
+                res.setDateHeader("expires", (new java.util.Date()).getTime() + expires.longValue() * 1000);
             }
             if (lastModified > 0) {
                 res.setDateHeader("last-modified", lastModified);
             }
             res.setContentLength(bytes.length);
 
-            Matcher shtmlMatcher =
-                shtmlRegEx.matcher(responseIncludeWrapper.getContentType());
+            Matcher shtmlMatcher = shtmlRegEx.matcher(responseIncludeWrapper.getContentType());
             if (shtmlMatcher.matches()) {
                 // Convert shtml mime type to ordinary html mime type but preserve
                 // encoding, if any.

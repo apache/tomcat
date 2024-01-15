@@ -16,13 +16,13 @@
  */
 package org.apache.catalina.ssi;
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 import org.apache.catalina.util.IOTools;
+
 /**
  * Implements the Server-side #exec command
  *
@@ -41,17 +41,16 @@ public class SSIExec implements SSICommand {
      * @see SSICommand
      */
     @Override
-    public long process(SSIMediator ssiMediator, String commandName,
-            String[] paramNames, String[] paramValues, PrintWriter writer) {
+    public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
+            PrintWriter writer) {
         long lastModified = 0;
         String configErrMsg = ssiMediator.getConfigErrMsg();
         String paramName = paramNames[0];
         String paramValue = paramValues[0];
         String substitutedValue = ssiMediator.substituteVariables(paramValue);
         if (paramName.equalsIgnoreCase("cgi")) {
-            lastModified = ssiInclude.process(ssiMediator, "include",
-                    new String[]{"virtual"}, new String[]{substitutedValue},
-                    writer);
+            lastModified = ssiInclude.process(ssiMediator, "include", new String[] { "virtual" },
+                    new String[] { substitutedValue }, writer);
         } else if (paramName.equalsIgnoreCase("cmd")) {
             boolean foundProgram = false;
             try {
@@ -60,7 +59,8 @@ public class SSIExec implements SSICommand {
                 foundProgram = true;
                 char[] buf = new char[BUFFER_SIZE];
                 try (BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-                        BufferedReader stdErrReader = new BufferedReader(new InputStreamReader(proc.getErrorStream()));) {
+                        BufferedReader stdErrReader =
+                                new BufferedReader(new InputStreamReader(proc.getErrorStream()));) {
                     IOTools.flow(stdErrReader, writer, buf);
                     IOTools.flow(stdOutReader, writer, buf);
                 }
@@ -71,7 +71,7 @@ public class SSIExec implements SSICommand {
                 writer.write(configErrMsg);
             } catch (IOException e) {
                 if (!foundProgram) {
-                    //apache doesn't output an error message if it can't find
+                    // apache doesn't output an error message if it can't find
                     // a program
                 }
                 ssiMediator.log("Couldn't exec file: " + substitutedValue, e);
