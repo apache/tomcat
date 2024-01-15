@@ -26,10 +26,10 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 
 import org.apache.catalina.util.IOTools;
+
 /**
- * The entry point to SSI processing. This class does the actual parsing,
- * delegating to the SSIMediator, SSICommand, and SSIExternalResolver as
- * necessary[
+ * The entry point to SSI processing. This class does the actual parsing, delegating to the SSIMediator, SSICommand, and
+ * SSIExternalResolver as necessary.
  *
  * @author Dan Sandberg
  * @author David Becker
@@ -45,8 +45,7 @@ public class SSIProcessor {
     protected final boolean allowExec;
 
 
-    public SSIProcessor(SSIExternalResolver ssiExternalResolver, int debug,
-            boolean allowExec) {
+    public SSIProcessor(SSIExternalResolver ssiExternalResolver, int debug, boolean allowExec) {
         this.ssiExternalResolver = ssiExternalResolver;
         this.debug = debug;
         this.allowExec = allowExec;
@@ -79,24 +78,20 @@ public class SSIProcessor {
 
 
     /**
-     * Process a file with server-side commands, reading from reader and
-     * writing the processed version to writer. NOTE: We really should be doing
-     * this in a streaming way rather than converting it to an array first.
+     * Process a file with server-side commands, reading from reader and writing the processed version to writer. NOTE:
+     * We really should be doing this in a streaming way rather than converting it to an array first.
      *
-     * @param reader
-     *            the reader to read the file containing SSIs from
+     * @param reader           the reader to read the file containing SSIs from
      * @param lastModifiedDate resource last modification date
-     * @param writer
-     *            the writer to write the file with the SSIs processed.
+     * @param writer           the writer to write the file with the SSIs processed.
+     *
      * @return the most current modified date resulting from any SSI commands
-     * @throws IOException
-     *             when things go horribly awry. Should be unlikely since the
-     *             SSICommand usually catches 'normal' IOExceptions.
+     *
+     * @throws IOException when things go horribly awry. Should be unlikely since the SSICommand usually catches
+     *                         'normal' IOExceptions.
      */
-    public long process(Reader reader, long lastModifiedDate,
-            PrintWriter writer) throws IOException {
-        SSIMediator ssiMediator = new SSIMediator(ssiExternalResolver,
-                lastModifiedDate);
+    public long process(Reader reader, long lastModifiedDate, PrintWriter writer) throws IOException {
+        SSIMediator ssiMediator = new SSIMediator(ssiExternalResolver, lastModifiedDate);
         StringWriter stringWriter = new StringWriter();
         IOTools.flow(reader, stringWriter);
         String fileContents = stringWriter.toString();
@@ -108,11 +103,10 @@ public class SSIProcessor {
             while (index < fileContents.length()) {
                 char c = fileContents.charAt(index);
                 if (!inside) {
-                    if (c == COMMAND_START.charAt(0)
-                            && charCmp(fileContents, index, COMMAND_START)) {
+                    if (c == COMMAND_START.charAt(0) && charCmp(fileContents, index, COMMAND_START)) {
                         inside = true;
                         index += COMMAND_START.length();
-                        command.setLength(0); //clear the command string
+                        command.setLength(0); // clear the command string
                     } else {
                         if (!ssiMediator.getConditionalState().processConditionalCommandsOnly) {
                             writer.write(c);
@@ -120,43 +114,34 @@ public class SSIProcessor {
                         index++;
                     }
                 } else {
-                    if (c == COMMAND_END.charAt(0)
-                            && charCmp(fileContents, index, COMMAND_END)) {
+                    if (c == COMMAND_END.charAt(0) && charCmp(fileContents, index, COMMAND_END)) {
                         inside = false;
                         index += COMMAND_END.length();
                         String strCmd = parseCmd(command);
                         if (debug > 0) {
-                            ssiExternalResolver.log(
-                                    "SSIProcessor.process -- processing command: "
-                                            + strCmd, null);
+                            ssiExternalResolver.log("SSIProcessor.process -- processing command: " + strCmd, null);
                         }
-                        String[] paramNames = parseParamNames(command, strCmd
-                                .length());
-                        String[] paramValues = parseParamValues(command,
-                                strCmd.length(), paramNames.length);
-                        //We need to fetch this value each time, since it may
-                        // change
-                        // during the loop
+                        String[] paramNames = parseParamNames(command, strCmd.length());
+                        String[] paramValues = parseParamValues(command, strCmd.length(), paramNames.length);
+                        // We need to fetch this value each time, since it may change during the loop
                         String configErrMsg = ssiMediator.getConfigErrMsg();
-                        SSICommand ssiCommand =
-                            commands.get(strCmd.toLowerCase(Locale.ENGLISH));
+                        SSICommand ssiCommand = commands.get(strCmd.toLowerCase(Locale.ENGLISH));
                         String errorMessage = null;
                         if (ssiCommand == null) {
                             errorMessage = "Unknown command: " + strCmd;
                         } else if (paramValues == null) {
                             errorMessage = "Error parsing directive parameters.";
                         } else if (paramNames.length != paramValues.length) {
-                            errorMessage = "Parameter names count does not match parameter values count on command: "
-                                    + strCmd;
+                            errorMessage =
+                                    "Parameter names count does not match parameter values count on command: " + strCmd;
                         } else {
-                            // don't process the command if we are processing
-                            // conditional
-                            // commands only and the
-                            // command is not conditional
-                            if (!ssiMediator.getConditionalState().processConditionalCommandsOnly
-                                    || ssiCommand instanceof SSIConditional) {
-                                long lmd = ssiCommand.process(ssiMediator, strCmd,
-                                               paramNames, paramValues, writer);
+                            /*
+                             * Don't process the command if we are processing conditional commands only and the command
+                             * is not conditional
+                             */
+                            if (!ssiMediator.getConditionalState().processConditionalCommandsOnly ||
+                                    ssiCommand instanceof SSIConditional) {
+                                long lmd = ssiCommand.process(ssiMediator, strCmd, paramNames, paramValues, writer);
                                 if (lmd > lastModifiedDate) {
                                     lastModifiedDate = lmd;
                                 }
@@ -173,20 +158,18 @@ public class SSIProcessor {
                 }
             }
         } catch (SSIStopProcessingException e) {
-            //If we are here, then we have already stopped processing, so all
-            // is good
+            // If we are here, then we have already stopped processing, so all is good
         }
         return lastModifiedDate;
     }
 
 
     /**
-     * Parse a StringBuilder and take out the param type token. Called from
-     * <code>requestHandler</code>
+     * Parse a StringBuilder and take out the param type token. Called from <code>requestHandler</code>
      *
-     * @param cmd
-     *            a value of type 'StringBuilder'
+     * @param cmd   a value of type 'StringBuilder'
      * @param start index on which parsing will start
+     *
      * @return an array with the parameter names
      */
     protected String[] parseParamNames(StringBuilder cmd, int start) {
@@ -237,13 +220,12 @@ public class SSIProcessor {
 
 
     /**
-     * Parse a StringBuilder and take out the param token. Called from
-     * <code>requestHandler</code>
+     * Parse a StringBuilder and take out the param token. Called from <code>requestHandler</code>
      *
-     * @param cmd
-     *            a value of type 'StringBuilder'
+     * @param cmd   a value of type 'StringBuilder'
      * @param start index on which parsing will start
      * @param count number of values which should be parsed
+     *
      * @return an array with the parameter values
      */
     protected String[] parseParamValues(StringBuilder cmd, int start, int count) {
@@ -275,17 +257,17 @@ public class SSIProcessor {
                     if (c == endQuote && !escaped) {
                         break;
                     }
-                    // Since parsing of attributes and var
-                    // substitution is done in separate places,
-                    // we need to leave escape in the string
+                    /*
+                     * Since parsing of attributes and var substitution is done in separate places, we need to leave
+                     * escape in the string
+                     */
                     if (c == '$' && escaped) {
                         sb.append('\\');
                     }
                     escaped = false;
                     sb.append(c);
                 }
-                // If we hit the end without seeing a quote
-                // the signal an error
+                // If we hit the end without seeing a quote the signal an error
                 if (bIdx == cmd.length()) {
                     return null;
                 }
@@ -299,11 +281,10 @@ public class SSIProcessor {
 
 
     /**
-     * Parse a StringBuilder and take out the command token. Called from
-     * <code>requestHandler</code>
+     * Parse a StringBuilder and take out the command token. Called from <code>requestHandler</code>
      *
-     * @param cmd
-     *            a value of type 'StringBuilder'
+     * @param cmd a value of type 'StringBuilder'
+     *
      * @return a value of type 'String', or null if there is none
      */
     private String parseCmd(StringBuilder cmd) {
