@@ -50,6 +50,12 @@ public class ArrayELResolver extends ELResolver {
 
         if (base != null && base.getClass().isArray()) {
             context.setPropertyResolved(base, property);
+
+            if (LENGTH_PROPERTY_NAME.equals(property)) {
+                // Always read-only
+                return null;
+            }
+
             try {
                 int idx = coerce(property);
                 checkBounds(base, idx);
@@ -95,6 +101,11 @@ public class ArrayELResolver extends ELResolver {
         if (base != null && base.getClass().isArray()) {
             context.setPropertyResolved(base, property);
 
+            if (LENGTH_PROPERTY_NAME.equals(property)) {
+                throw new PropertyNotWritableException(
+                        Util.message(context, "propertyNotWritable", base.getClass().getName(), property));
+            }
+
             if (this.readOnly) {
                 throw new PropertyNotWritableException(
                         Util.message(context, "resolverNotWritable", base.getClass().getName()));
@@ -116,6 +127,10 @@ public class ArrayELResolver extends ELResolver {
 
         if (base != null && base.getClass().isArray()) {
             context.setPropertyResolved(base, property);
+            if (LENGTH_PROPERTY_NAME.equals(property)) {
+                // Always read-only
+                return true;
+            }
             try {
                 int idx = coerce(property);
                 checkBounds(base, idx);
