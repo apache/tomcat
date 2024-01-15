@@ -48,16 +48,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class SSIServletExternalResolver implements SSIExternalResolver {
     private static final StringManager sm = StringManager.getManager(SSIServletExternalResolver.class);
-    protected final String VARIABLE_NAMES[] = {"AUTH_TYPE", "CONTENT_LENGTH",
-            "CONTENT_TYPE", "DOCUMENT_NAME", "DOCUMENT_URI",
-            "GATEWAY_INTERFACE", "HTTP_ACCEPT", "HTTP_ACCEPT_ENCODING",
-            "HTTP_ACCEPT_LANGUAGE", "HTTP_CONNECTION", "HTTP_HOST",
-            "HTTP_REFERER", "HTTP_USER_AGENT", "PATH_INFO", "PATH_TRANSLATED",
-            "QUERY_STRING", "QUERY_STRING_UNESCAPED", "REMOTE_ADDR",
-            "REMOTE_HOST", "REMOTE_PORT", "REMOTE_USER", "REQUEST_METHOD",
-            "REQUEST_URI", "SCRIPT_FILENAME", "SCRIPT_NAME", "SERVER_ADDR",
-            "SERVER_NAME", "SERVER_PORT", "SERVER_PROTOCOL", "SERVER_SOFTWARE",
-            "UNIQUE_ID"};
+    protected final String VARIABLE_NAMES[] = { "AUTH_TYPE", "CONTENT_LENGTH", "CONTENT_TYPE", "DOCUMENT_NAME",
+            "DOCUMENT_URI", "GATEWAY_INTERFACE", "HTTP_ACCEPT", "HTTP_ACCEPT_ENCODING", "HTTP_ACCEPT_LANGUAGE",
+            "HTTP_CONNECTION", "HTTP_HOST", "HTTP_REFERER", "HTTP_USER_AGENT", "PATH_INFO", "PATH_TRANSLATED",
+            "QUERY_STRING", "QUERY_STRING_UNESCAPED", "REMOTE_ADDR", "REMOTE_HOST", "REMOTE_PORT", "REMOTE_USER",
+            "REQUEST_METHOD", "REQUEST_URI", "SCRIPT_FILENAME", "SCRIPT_NAME", "SERVER_ADDR", "SERVER_NAME",
+            "SERVER_PORT", "SERVER_PROTOCOL", "SERVER_SOFTWARE", "UNIQUE_ID" };
     protected final ServletContext context;
     protected final HttpServletRequest req;
     protected final HttpServletResponse res;
@@ -65,8 +61,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     protected final int debug;
     protected final String inputEncoding;
 
-    public SSIServletExternalResolver(ServletContext context,
-            HttpServletRequest req, HttpServletResponse res,
+    public SSIServletExternalResolver(ServletContext context, HttpServletRequest req, HttpServletResponse res,
             boolean isVirtualWebappRelative, int debug, String inputEncoding) {
         this.context = context;
         this.req = req;
@@ -79,9 +74,10 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
 
     @Override
     public void log(String message, Throwable throwable) {
-        //We can't assume that Servlet.log( message, null )
-        //is the same as Servlet.log( message ), since API
-        //doesn't seem to say so.
+        /*
+         * We can't assume that Servlet.log(message, null) is the same as Servlet.log( message ), since API doesn't seem
+         * to say so.
+         */
         if (throwable != null) {
             context.log(message, throwable);
         } else {
@@ -116,8 +112,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                 Enumeration<String> e = req.getAttributeNames();
                 while (e.hasMoreElements()) {
                     String name = e.nextElement();
-                    if (targetName.equalsIgnoreCase(name)
-                            && !isNameReserved(name)) {
+                    if (targetName.equalsIgnoreCase(name) && !isNameReserved(name)) {
                         object = req.getAttribute(name);
                         if (object != null) {
                             break;
@@ -131,8 +126,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
 
 
     protected boolean isNameReserved(String name) {
-        return name.startsWith("java.") || name.startsWith("javax.")
-                || name.startsWith("sun.");
+        return name.startsWith("java.") || name.startsWith("javax.") || name.startsWith("sun.");
     }
 
 
@@ -165,12 +159,11 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
             if (nameParts[0].equals("PATH")) {
                 requiredParts = 1;
             }
-        }
-        else if (nameParts[0].equals("AUTH")) {
+        } else if (nameParts[0].equals("AUTH")) {
             if (nameParts[1].equals("TYPE")) {
                 retVal = req.getAuthType();
             }
-        } else if(nameParts[0].equals("CONTENT")) {
+        } else if (nameParts[0].equals("CONTENT")) {
             if (nameParts[1].equals("LENGTH")) {
                 long contentLength = req.getContentLengthLong();
                 if (contentLength >= 0) {
@@ -204,27 +197,22 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                     Enumeration<String> acceptHeaders = req.getHeaders(accept);
                     if (acceptHeaders != null) {
                         if (acceptHeaders.hasMoreElements()) {
-                            StringBuilder rv = new StringBuilder(
-                                    acceptHeaders.nextElement());
+                            StringBuilder rv = new StringBuilder(acceptHeaders.nextElement());
                             while (acceptHeaders.hasMoreElements()) {
                                 rv.append(", ");
                                 rv.append(acceptHeaders.nextElement());
                             }
-                        retVal = rv.toString();
-                    }
+                            retVal = rv.toString();
+                        }
                     }
                 }
-            }
-            else if (nameParts[1].equals("CONNECTION")) {
+            } else if (nameParts[1].equals("CONNECTION")) {
                 retVal = req.getHeader("Connection");
-            }
-            else if (nameParts[1].equals("HOST")) {
+            } else if (nameParts[1].equals("HOST")) {
                 retVal = req.getHeader("Host");
-            }
-            else if (nameParts[1].equals("REFERER")) {
+            } else if (nameParts[1].equals("REFERER")) {
                 retVal = req.getHeader("Referer");
-            }
-            else if (nameParts[1].equals("USER")) {
+            } else if (nameParts[1].equals("USER")) {
                 if (nameParts.length == 3) {
                     if (nameParts[2].equals("AGENT")) {
                         requiredParts = 3;
@@ -243,7 +231,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
             if (nameParts[1].equals("STRING")) {
                 String queryString = req.getQueryString();
                 if (nameParts.length == 2) {
-                    //apache displays this as an empty string rather than (none)
+                    // apache displays this as an empty string rather than (none)
                     retVal = nullToEmptyString(queryString);
                 } else if (nameParts[2].equals("UNESCAPED")) {
                     requiredParts = 3;
@@ -252,11 +240,10 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                         Charset requestCharset = null;
                         boolean useBodyEncodingForURI = false;
 
-                        // Get encoding settings from request / connector if
-                        // possible
+                        // Get encoding settings from request / connector if possible
                         if (req instanceof Request) {
-                            requestCharset = ((Request)req).getCoyoteRequest().getCharsetHolder().getCharset();
-                            Connector connector =  ((Request)req).getConnector();
+                            requestCharset = ((Request) req).getCoyoteRequest().getCharsetHolder().getCharset();
+                            Connector connector = ((Request) req).getConnector();
                             uriCharset = connector.getURICharset();
                             useBodyEncodingForURI = connector.getUseBodyEncodingForURI();
                         }
@@ -277,7 +264,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                     }
                 }
             }
-        } else if(nameParts[0].equals("REMOTE")) {
+        } else if (nameParts[0].equals("REMOTE")) {
             if (nameParts[1].equals("ADDR")) {
                 retVal = req.getRemoteAddr();
             } else if (nameParts[1].equals("HOST")) {
@@ -285,28 +272,25 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
             } else if (nameParts[1].equals("IDENT")) {
                 // Not implemented
             } else if (nameParts[1].equals("PORT")) {
-                retVal = Integer.toString( req.getRemotePort());
+                retVal = Integer.toString(req.getRemotePort());
             } else if (nameParts[1].equals("USER")) {
                 retVal = req.getRemoteUser();
             }
-        } else if(nameParts[0].equals("REQUEST")) {
+        } else if (nameParts[0].equals("REQUEST")) {
             if (nameParts[1].equals("METHOD")) {
                 retVal = req.getMethod();
-            }
-            else if (nameParts[1].equals("URI")) {
+            } else if (nameParts[1].equals("URI")) {
                 // If this is an error page, get the original URI
-                retVal = (String) req.getAttribute(
-                        RequestDispatcher.FORWARD_REQUEST_URI);
+                retVal = (String) req.getAttribute(RequestDispatcher.FORWARD_REQUEST_URI);
                 if (retVal == null) {
-                    retVal=req.getRequestURI();
+                    retVal = req.getRequestURI();
                 }
             }
         } else if (nameParts[0].equals("SCRIPT")) {
             String scriptName = req.getServletPath();
             if (nameParts[1].equals("FILENAME")) {
                 retVal = context.getRealPath(scriptName);
-            }
-            else if (nameParts[1].equals("NAME")) {
+            } else if (nameParts[1].equals("NAME")) {
                 retVal = scriptName;
             }
         } else if (nameParts[0].equals("SERVER")) {
@@ -335,7 +319,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
         if (requiredParts != nameParts.length) {
             return null;
         }
-            return retVal;
+        return retVal;
     }
 
     @Override
@@ -357,15 +341,14 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
         String retVal = null;
         int lastSlash = servletPath.lastIndexOf('/');
         if (lastSlash >= 0) {
-            //cut off file name
+            // cut off file name
             retVal = servletPath.substring(0, lastSlash + 1);
         }
         return retVal;
     }
 
 
-    protected String getPathWithoutContext(final String contextPath,
-            final String servletPath) {
+    protected String getPathWithoutContext(final String contextPath, final String servletPath) {
         if (servletPath.startsWith(contextPath)) {
             return servletPath.substring(contextPath.length());
         }
@@ -388,27 +371,25 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     }
 
 
-    protected ServletContextAndPath getServletContextAndPathFromNonVirtualPath(
-            String nonVirtualPath) throws IOException {
+    protected ServletContextAndPath getServletContextAndPathFromNonVirtualPath(String nonVirtualPath)
+            throws IOException {
         if (nonVirtualPath.startsWith("/") || nonVirtualPath.startsWith("\\")) {
             throw new IOException(sm.getString("ssiServletExternalResolver.absoluteNonVirtualPath", nonVirtualPath));
         }
         if (nonVirtualPath.contains("../")) {
-            throw new IOException(sm.getString("ssiServletExternalResolver.pathTraversalNonVirtualPath", nonVirtualPath));
+            throw new IOException(
+                    sm.getString("ssiServletExternalResolver.pathTraversalNonVirtualPath", nonVirtualPath));
         }
         String path = getAbsolutePath(nonVirtualPath);
-        ServletContextAndPath csAndP = new ServletContextAndPath(
-                context, path);
+        ServletContextAndPath csAndP = new ServletContextAndPath(context, path);
         return csAndP;
     }
 
 
-    protected ServletContextAndPath getServletContextAndPathFromVirtualPath(
-            String virtualPath) throws IOException {
+    protected ServletContextAndPath getServletContextAndPathFromVirtualPath(String virtualPath) throws IOException {
 
         if (!virtualPath.startsWith("/") && !virtualPath.startsWith("\\")) {
-            return new ServletContextAndPath(context,
-                    getAbsolutePath(virtualPath));
+            return new ServletContextAndPath(context, getAbsolutePath(virtualPath));
         }
 
         String normalized = RequestUtil.normalize(virtualPath);
@@ -420,10 +401,8 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
         if (normContext == null) {
             throw new IOException(sm.getString("ssiServletExternalResolver.noContext", normalized));
         }
-        //If it's the root context, then there is no context element
-        // to remove,
-        // ie:
-        // '/file1.shtml' vs '/appName1/file1.shtml'
+        // If it's the root context, then there is no context element to remove.
+        // ie: '/file1.shtml' vs '/appName1/file1.shtml'
         if (!isRootContext(normContext)) {
             String noContext = getPathWithoutContext(normContext.getContextPath(), normalized);
             return new ServletContextAndPath(normContext, noContext);
@@ -433,25 +412,19 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     }
 
 
-    //Assumes servletContext is not-null
-    //Assumes that identity comparison will be true for the same context
-    //Assuming the above, getContext("/") will be non-null as long as the root
-    // context is
-    // accessible.
-    //If it isn't, then servletContext can't be the root context anyway, hence
-    // they will
-    // not match.
+    // Assumes servletContext is not-null
+    // Assumes that identity comparison will be true for the same context
+    // Assuming the above, getContext("/") will be non-null as long as the root context is accessible.
+    // If it isn't, then servletContext can't be the root context anyway, hence they will not match.
     protected boolean isRootContext(ServletContext servletContext) {
         return servletContext == servletContext.getContext("/");
     }
 
 
-    protected ServletContextAndPath getServletContextAndPath(
-            String originalPath, boolean virtual) throws IOException {
+    protected ServletContextAndPath getServletContextAndPath(String originalPath, boolean virtual) throws IOException {
         ServletContextAndPath csAndP = null;
         if (debug > 0) {
-            log("SSIServletExternalResolver.getServletContextAndPath( "
-                    + originalPath + ", " + virtual + ")", null);
+            log("SSIServletExternalResolver.getServletContextAndPath( " + originalPath + ", " + virtual + ")", null);
         }
         if (virtual) {
             csAndP = getServletContextAndPathFromVirtualPath(originalPath);
@@ -462,10 +435,8 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     }
 
 
-    protected URLConnection getURLConnection(String originalPath,
-            boolean virtual) throws IOException {
-        ServletContextAndPath csAndP = getServletContextAndPath(originalPath,
-                virtual);
+    protected URLConnection getURLConnection(String originalPath, boolean virtual) throws IOException {
+        ServletContextAndPath csAndP = getServletContextAndPath(originalPath, virtual);
         ServletContext context = csAndP.getServletContext();
         String path = csAndP.getPath();
         URL url = context.getResource(path);
@@ -478,8 +449,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
 
 
     @Override
-    public long getFileLastModified(String path, boolean virtual)
-            throws IOException {
+    public long getFileLastModified(String path, boolean virtual) throws IOException {
         long lastModified = 0;
         try {
             URLConnection urlConnection = getURLConnection(path, virtual);
@@ -504,15 +474,14 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     }
 
 
-    //We are making lots of unnecessary copies of the included data here. If
-    //someone ever complains that this is slow, we should connect the included
-    // stream to the print writer that SSICommand uses.
+    /*
+     * We are making lots of unnecessary copies of the included data here. If someone ever complains that this is slow,
+     * we should connect the included stream to the print writer that SSICommand uses.
+     */
     @Override
-    public String getFileText(String originalPath, boolean virtual)
-            throws IOException {
+    public String getFileText(String originalPath, boolean virtual) throws IOException {
         try {
-            ServletContextAndPath csAndP = getServletContextAndPath(
-                    originalPath, virtual);
+            ServletContextAndPath csAndP = getServletContextAndPath(originalPath, virtual);
             ServletContext context = csAndP.getServletContext();
             String path = csAndP.getPath();
             RequestDispatcher rd = context.getRequestDispatcher(path);
@@ -522,23 +491,22 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
             ByteArrayServletOutputStream basos = new ByteArrayServletOutputStream();
             ResponseIncludeWrapper responseIncludeWrapper = new ResponseIncludeWrapper(res, basos);
             rd.include(req, responseIncludeWrapper);
-            //We can't assume the included servlet flushed its output
+            // We can't assume the included servlet flushed its output
             responseIncludeWrapper.flushOutputStreamOrWriter();
             byte[] bytes = basos.toByteArray();
 
-            //Assume platform default encoding unless otherwise specified
+            // Assume platform default encoding unless otherwise specified
             String retVal;
             if (inputEncoding == null) {
-                retVal = new String( bytes );
+                retVal = new String(bytes);
             } else {
-                retVal = new String (bytes,
-                        B2CConverter.getCharset(inputEncoding));
+                retVal = new String(bytes, B2CConverter.getCharset(inputEncoding));
             }
 
-            //make an assumption that an empty response is a failure. This is
-            // a problem
-            // if a truly empty file
-            //were included, but not sure how else to tell.
+            /*
+             * Make an assumption that an empty response is a failure. This is a problem if a truly empty file were
+             * included, but not sure how else to tell.
+             */
             if (retVal.equals("") && !req.getMethod().equalsIgnoreCase("HEAD")) {
                 throw new IOException(sm.getString("ssiServletExternalResolver.noFile", path));
             }
@@ -553,8 +521,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
         protected final String path;
 
 
-        public ServletContextAndPath(ServletContext servletContext,
-                                     String path) {
+        public ServletContextAndPath(ServletContext servletContext, String path) {
             this.servletContext = servletContext;
             this.path = path;
         }
