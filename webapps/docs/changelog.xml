@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.99 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix ServiceBindingPropertySource so that trailing <code>\r\n</code>
+        sequences are correctly removed from files containing property values
+        when configured to do so. Bug identified by Coverity Scan. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.98 (schultz)" rtext="2024-01-09">
   <subsection name="Catalina">
