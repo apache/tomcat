@@ -505,6 +505,9 @@ public class PEMFile {
 
 
         private byte[] deriveKeyPBKDF1(int keyLength, String password, byte[] salt) throws NoSuchAlgorithmException {
+            if (password == null) {
+                throw new IllegalArgumentException(sm.getString("pemFile.noPassword"));
+            }
             // PBKDF1-MD5 as specified by PKCS#5
             byte[] key = new byte[keyLength];
 
@@ -529,6 +532,9 @@ public class PEMFile {
 
         private byte[] deriveKeyPBKDF2(String algorithm, String password, byte[] salt, int iterations, int keyLength)
                 throws GeneralSecurityException {
+            if (password == null) {
+                throw new IllegalArgumentException(sm.getString("pemFile.noPassword"));
+            }
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorithm);
             KeySpec keySpec;
             keySpec = new PBEKeySpec(password.toCharArray(), salt, iterations, keyLength);
