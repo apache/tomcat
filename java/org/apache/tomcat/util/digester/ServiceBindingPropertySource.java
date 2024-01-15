@@ -139,7 +139,7 @@ public class ServiceBindingPropertySource implements IntrospectionUtils.SecurePr
             int length = bytes.length;
 
             if (chomp) {
-                if(length > 1 && bytes[length - 2] == '\r' && bytes[length - 2] == '\n') {
+                if(length > 1 && bytes[length - 2] == '\r' && bytes[length - 1] == '\n') {
                     length -= 2;
                 } else if (length > 0) {
                     byte c = bytes[length - 1];

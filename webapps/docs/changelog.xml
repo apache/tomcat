@@ -113,6 +113,11 @@
         that is no longer included in the JAR. Based on pull request
         <pr>684</pr> by Jendrik Johannes. (markt)
       </fix>
+      <fix>
+        Fix ServiceBindingPropertySource so that trailing <code>\r\n</code>
+        sequences are correctly removed from files containing property values
+        when configured to do so. Bug identified by Coverity Scan. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
