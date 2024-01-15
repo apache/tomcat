@@ -404,7 +404,7 @@ public class ExpressionParseTree {
                         return -1;
                     }
                 } catch (PatternSyntaxException pse) {
-                    ssiMediator.log("Invalid expression: " + expr, pse);
+                    ssiMediator.log(sm.getString("expressionParseTree.invalidExpression", expr), pse);
                     return 0;
                 }
             }

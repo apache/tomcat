@@ -410,9 +410,6 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
         // ie: '/file1.shtml' vs '/appName1/file1.shtml'
         if (!isRootContext(normContext)) {
             String noContext = getPathWithoutContext(normContext.getContextPath(), normalized);
-            if (noContext == null) {
-                throw new IOException("Couldn't remove context from path: " + normalized);
-            }
             return new ServletContextAndPath(normContext, noContext);
         }
 
