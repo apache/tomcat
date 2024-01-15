@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Represents a parsed expression.
@@ -31,6 +32,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * @author Paul Speed
  */
 public class ExpressionParseTree {
+    private static final StringManager sm = StringManager.getManager(ExpressionParseTree.class);
     /**
      * Contains the current set of completed nodes. This is a workspace for the parser. Needs to be LinkedList since it
      * can contain {@code null}s.
@@ -214,13 +216,13 @@ public class ExpressionParseTree {
         // Finish off the rest of the opps
         resolveGroup();
         if (nodeStack.size() == 0) {
-            throw new ParseException("No nodes created.", et.getIndex());
+            throw new ParseException(sm.getString("expressionParseTree.noNodes"), et.getIndex());
         }
         if (nodeStack.size() > 1) {
-            throw new ParseException("Extra nodes created.", et.getIndex());
+            throw new ParseException(sm.getString("expressionParseTree.extraNodes"), et.getIndex());
         }
         if (oppStack.size() != 0) {
-            throw new ParseException("Unused opp nodes exist.", et.getIndex());
+            throw new ParseException(sm.getString("expressionParseTree.unusedOpCodes"), et.getIndex());
         }
         root = nodeStack.get(0);
     }

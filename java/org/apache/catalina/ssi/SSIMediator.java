@@ -28,6 +28,7 @@ import java.util.TimeZone;
 
 import org.apache.catalina.util.Strftime;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 
 /**
@@ -40,6 +41,8 @@ import org.apache.tomcat.util.security.Escape;
  * @author David Becker
  */
 public class SSIMediator {
+    private static final StringManager sm = StringManager.getManager(SSIMediator.class);
+
     protected static final String ENCODING_NONE = "none";
     protected static final String ENCODING_ENTITY = "entity";
     protected static final String ENCODING_URL = "url";
@@ -166,9 +169,7 @@ public class SSIMediator {
         String lowerCaseVariableName = variableName.toLowerCase(Locale.ENGLISH);
         String variableValue = null;
         if (!isNameReserved(lowerCaseVariableName)) {
-            // Try getting it externally first, if it fails, try getting the
-            // 'built-in'
-            // value
+            // Try getting it externally first, if it fails, try getting the 'built-in' value
             variableValue = ssiExternalResolver.getVariableValue(variableName);
             if (variableValue == null) {
                 variableName = variableName.toUpperCase(Locale.ENGLISH);
@@ -190,8 +191,7 @@ public class SSIMediator {
      * @return the value after variable substitution
      */
     public String substituteVariables(String val) {
-        // If it has no references or HTML entities then no work
-        // need to be done
+        // If it has no references or HTML entities then no work need to be done
         if (val.indexOf('$') < 0 && val.indexOf('&') < 0) {
             return val;
         }
@@ -262,8 +262,7 @@ public class SSIMediator {
             }
             // Replace the var name with its value
             sb.replace(start, end, value);
-            // Start searching for the next $ after the value
-            // that was just substituted.
+            // Start searching for the next $ after the value that was just substituted.
             i = start + value.length();
         }
         return sb.toString();
@@ -273,9 +272,7 @@ public class SSIMediator {
     protected String formatDate(Date date, TimeZone timeZone) {
         String retVal;
         if (timeZone != null) {
-            // we temporarily change strftime. Since SSIMediator is inherently
-            // single-threaded, this
-            // isn't a problem
+            // we temporarily change strftime. Since SSIMediator is inherently single-threaded, this isn't a problem
             TimeZone oldTimeZone = strftime.getTimeZone();
             strftime.setTimeZone(timeZone);
             retVal = strftime.format(date);
@@ -297,7 +294,7 @@ public class SSIMediator {
             retVal = Escape.htmlElementContent(value);
         } else {
             // This shouldn't be possible
-            throw new IllegalArgumentException("Unknown encoding: " + encoding);
+            throw new IllegalArgumentException(sm.getString("ssiMediator.unknownEncoding", encoding));
         }
         return retVal;
     }

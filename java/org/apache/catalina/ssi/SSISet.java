@@ -19,6 +19,8 @@ package org.apache.catalina.ssi;
 
 import java.io.PrintWriter;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Implements the Server-side #set command
  *
@@ -27,6 +29,8 @@ import java.io.PrintWriter;
  * @author David Becker
  */
 public class SSISet implements SSICommand {
+    private static final StringManager sm = StringManager.getManager(SSISet.class);
+
     /**
      * @see SSICommand
      */
@@ -47,12 +51,12 @@ public class SSISet implements SSICommand {
                     ssiMediator.setVariableValue(variableName, substitutedValue);
                     lastModified = System.currentTimeMillis();
                 } else {
-                    ssiMediator.log("#set--no variable specified");
+                    ssiMediator.log(sm.getString("ssiSet.noVariable"));
                     writer.write(errorMessage);
                     throw new SSIStopProcessingException();
                 }
             } else {
-                ssiMediator.log("#set--Invalid attribute: " + paramName);
+                ssiMediator.log(sm.getString("ssiCommand.invalidAttribute", paramName));
                 writer.write(errorMessage);
                 throw new SSIStopProcessingException();
             }
