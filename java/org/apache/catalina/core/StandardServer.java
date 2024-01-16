@@ -709,18 +709,22 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     @Override
     public Service[] findServices() {
-        return services;
+        synchronized (servicesLock) {
+            return services.clone();
+        }
     }
 
     /**
      * @return the JMX service names.
      */
     public ObjectName[] getServiceNames() {
-        ObjectName[] onames = new ObjectName[services.length];
-        for (int i = 0; i < services.length; i++) {
-            onames[i] = ((StandardService) services[i]).getObjectName();
+        synchronized (servicesLock) {
+            ObjectName[] onames = new ObjectName[services.length];
+            for (int i = 0; i < services.length; i++) {
+                onames[i] = ((StandardService) services[i]).getObjectName();
+            }
+            return onames;
         }
-        return onames;
     }
 
 
@@ -969,8 +973,10 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         fireLifecycleEvent(CONFIGURE_STOP_EVENT, null);
 
         // Stop our defined Services
-        for (Service service : services) {
-            service.stop();
+        synchronized (servicesLock) {
+            for (Service service : services) {
+                service.stop();
+            }
         }
 
         synchronized (utilityExecutorLock) {
@@ -1035,16 +1041,20 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             }
         }
         // Initialize our defined Services
-        for (Service service : services) {
-            service.init();
+        synchronized (servicesLock) {
+            for (Service service : services) {
+                service.init();
+            }
         }
     }
 
     @Override
     protected void destroyInternal() throws LifecycleException {
         // Destroy our defined Services
-        for (Service service : services) {
-            service.destroy();
+        synchronized (servicesLock) {
+            for (Service service : services) {
+                service.destroy();
+            }
         }
 
         globalNamingResources.destroy();
