@@ -385,7 +385,7 @@ public class Tomcat {
         // will do class for name and set init params
         Wrapper sw = ctx.createWrapper();
         if (sw == null) {
-            return null;
+            throw new IllegalStateException(sm.getString("tomcat.noWrapper"));
         }
         sw.setServletClass(servletClass);
         sw.setName(servletName);
