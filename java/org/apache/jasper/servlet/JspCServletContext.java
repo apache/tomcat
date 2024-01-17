@@ -349,7 +349,11 @@ public class JspCServletContext implements ServletContext {
             return null;
         }
         try {
-            File f = new File(getResource(path).toURI());
+            URL url = getResource(path);
+            if (url == null) {
+                return null;
+            }
+            File f = new File(url.toURI());
             return f.getAbsolutePath();
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -426,7 +430,11 @@ public class JspCServletContext implements ServletContext {
     @Override
     public InputStream getResourceAsStream(String path) {
         try {
-            return getResource(path).openStream();
+            URL url = getResource(path);
+            if (url == null) {
+                return null;
+            }
+            return url.openStream();
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             return null;
