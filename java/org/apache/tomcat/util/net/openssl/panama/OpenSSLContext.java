@@ -463,7 +463,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
      * @param sr Is not used for this implementation.
      */
     @Override
-    public synchronized void init(KeyManager[] kms, TrustManager[] tms, SecureRandom sr) {
+    public void init(KeyManager[] kms, TrustManager[] tms, SecureRandom sr) {
         if (initialized) {
             log.warn(sm.getString("openssl.doubleInit"));
             return;
@@ -1367,7 +1367,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     @Override
-    public synchronized SSLEngine createSSLEngine() {
+    public SSLEngine createSSLEngine() {
         return new OpenSSLEngine(cleaner, state.sslCtx, defaultProtocol, false, sessionContext,
                 alpn, initialized,
                 sslHostConfig.getCertificateVerificationDepth(),
