@@ -198,7 +198,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
 
     @Override
-    public synchronized void destroy() {
+    public void destroy() {
         cleanable.clean();
     }
 
@@ -297,7 +297,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
      * @param sr Is not used for this implementation.
      */
     @Override
-    public synchronized void init(KeyManager[] kms, TrustManager[] tms, SecureRandom sr) {
+    public void init(KeyManager[] kms, TrustManager[] tms, SecureRandom sr) {
         if (initialized) {
             log.warn(sm.getString("openssl.doubleInit"));
             return;
