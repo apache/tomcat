@@ -45,11 +45,11 @@ import org.apache.tomcat.websocket.server.TesterEndpointConfig;
 public class TestWsSessionSuspendResume extends WebSocketBaseTest {
 
     @Test
-    public void test() throws Exception {
+    public void testSuspendResume() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         Context ctx = getProgrammaticRootContext();
-        ctx.addApplicationListener(Config.class.getName());
+        ctx.addApplicationListener(SuspendResumeConfig.class.getName());
 
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
@@ -60,7 +60,7 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
 
         ClientEndpointConfig clientEndpointConfig = ClientEndpointConfig.Builder.create().build();
         Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class, clientEndpointConfig,
-                new URI("ws://localhost:" + getPort() + Config.PATH));
+                new URI("ws://localhost:" + getPort() + SuspendResumeConfig.PATH));
 
         final CountDownLatch latch = new CountDownLatch(2);
         wsSession.addMessageHandler(new MessageHandler.Whole<String>() {
@@ -82,7 +82,7 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
     }
 
 
-    public static final class Config extends TesterEndpointConfig {
+    public static final class SuspendResumeConfig extends TesterEndpointConfig {
         private static final String PATH = "/echo";
 
         @Override
@@ -101,7 +101,7 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
 
         @Override
         public void onOpen(Session session, EndpointConfig epc) {
-            final MessageProcessor processor = new MessageProcessor(session, 3);
+            final SuspendResumeMessageProcessor processor = new SuspendResumeMessageProcessor(session, 3);
             session.addMessageHandler(new MessageHandler.Whole<String>() {
 
                 @Override
@@ -127,12 +127,12 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
     }
 
 
-    private static final class MessageProcessor {
+    private static final class SuspendResumeMessageProcessor {
         private final Session session;
         private final int count;
         private final List<String> messages = new ArrayList<>();
 
-        MessageProcessor(Session session, int count) {
+        SuspendResumeMessageProcessor(Session session, int count) {
             this.session = session;
             this.count = count;
         }
