@@ -35,7 +35,7 @@ import org.apache.tomcat.websocket.TestWsWebSocketContainer.EndpointA;
  * significantly extends the length of a test run when using multiple test
  * threads.
  */
-public class TestWsWebSocketContainerSessionExpiryContainer extends WsWebSocketContainerBaseTest {
+public class TestWsWebSocketContainerSessionExpiryContainerClient extends WsWebSocketContainerBaseTest {
 
     @Test
     public void testSessionExpiryContainer() throws Exception {
@@ -67,9 +67,9 @@ public class TestWsWebSocketContainerSessionExpiryContainer extends WsWebSocketC
 
         int count = 0;
         boolean isOpen = true;
-        while (isOpen && count < 8) {
+        while (isOpen && count < 100) {
             count++;
-            Thread.sleep(1000);
+            Thread.sleep(100);
             isOpen = false;
             for (Session session : setA) {
                 if (session.isOpen()) {
