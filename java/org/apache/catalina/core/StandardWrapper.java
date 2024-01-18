@@ -1280,7 +1280,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         // Send j2ee.state.starting notification
         if (this.getObjectName() != null) {
@@ -1310,7 +1310,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         setAvailable(Long.MAX_VALUE);
 

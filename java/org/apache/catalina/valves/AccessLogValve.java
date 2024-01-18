@@ -650,7 +650,7 @@ public class AccessLogValve extends AbstractAccessLogValve {
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         // Initialize the Date formatters
         String format = getFileDateFormat();
@@ -674,7 +674,7 @@ public class AccessLogValve extends AbstractAccessLogValve {
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         super.stopInternal();
         close(false);

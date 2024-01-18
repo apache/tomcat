@@ -633,7 +633,7 @@ public class DeltaManager extends ClusterManagerBase {
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         super.startInternal();
 
@@ -808,7 +808,7 @@ public class DeltaManager extends ClusterManagerBase {
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("deltaManager.stopped", getName()));
