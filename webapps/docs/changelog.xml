@@ -128,6 +128,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Correct a regression in the fix for <bug>66508</bug> that could cause an
+        <code>UpgradeProcessor</code> leak in some circumstances. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.18 (schultz)" rtext="2024-01-09">
   <subsection name="Catalina">
