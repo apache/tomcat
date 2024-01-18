@@ -604,7 +604,12 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         synchronized (endPointSessionMapLock) {
             Set<WsSession> sessions = endpointSessionMap.get(key);
             if (sessions != null) {
-                result.addAll(sessions);
+                // Some sessions may be in the process of closing
+                for (WsSession session : sessions) {
+                    if (session.isOpen()) {
+                        result.add(session);
+                    }
+                }
             }
         }
         return result;
@@ -1019,8 +1024,10 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         if (backgroundProcessCount >= processPeriod) {
             backgroundProcessCount = 0;
 
+            // Check all registered sessions.
             for (WsSession wsSession : sessions.keySet()) {
                 wsSession.checkExpiration();
+                wsSession.checkCloseTimeout();
             }
         }
 
