@@ -818,7 +818,7 @@ public class StandardHost extends ContainerBase implements Host {
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         // Set error report valve
         String errorValve = getErrorReportValveClass();

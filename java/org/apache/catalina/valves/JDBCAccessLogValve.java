@@ -622,7 +622,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         try {
             open();
         } catch (SQLException e) {
@@ -640,7 +640,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
         super.stopInternal();
         close();
     }
