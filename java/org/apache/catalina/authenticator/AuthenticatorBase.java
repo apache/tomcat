@@ -1196,7 +1196,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         ServletContext servletContext = context.getServletContext();
         jaspicAppContextID = servletContext.getVirtualServerName() + " " + servletContext.getContextPath();
 
@@ -1233,7 +1233,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
 
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
         super.stopInternal();
         sso = null;
     }

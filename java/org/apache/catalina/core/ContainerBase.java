@@ -843,7 +843,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         reconfigureStartStopExecutor(getStartStopThreads());
 
@@ -908,7 +908,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         // Stop our thread
         if (monitorFuture != null) {

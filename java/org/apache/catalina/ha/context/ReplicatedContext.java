@@ -52,7 +52,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         super.startInternal();
         try {
             CatalinaCluster catclust = (CatalinaCluster) this.getCluster();
@@ -76,7 +76,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         Map<String,Object> map = ((ReplApplContext) this.context).getAttributeMap();
 

@@ -237,7 +237,7 @@ public class StandardEngine extends ContainerBase implements Engine {
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         // Log our server identification information
         if (log.isInfoEnabled()) {

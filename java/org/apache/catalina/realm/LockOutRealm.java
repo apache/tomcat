@@ -73,7 +73,7 @@ public class LockOutRealm extends CombinedRealm {
 
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         /*
          * Configure the list of failed users to delete the oldest entry once it exceeds the specified size. This is an
          * LRU cache so if the cache size is exceeded the users who most recently failed authentication will be
