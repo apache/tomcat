@@ -19,6 +19,7 @@ package org.apache.tomcat.websocket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import jakarta.websocket.ClientEndpointConfig;
 import jakarta.websocket.Extension;
@@ -116,6 +117,11 @@ public class Constants {
     public static final String BLOCKING_SEND_TIMEOUT_PROPERTY = "org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT";
     // Milliseconds so this is 20 seconds
     public static final long DEFAULT_BLOCKING_SEND_TIMEOUT = 20 * 1000;
+
+    // Configuration for session close timeout
+    public static final String SESSION_CLOSE_TIMEOUT_PROPERTY = "org.apache.tomcat.websocket.SESSION_CLOSE_TIMEOUT";
+    // Default is 30 seconds - setting is in milliseconds
+    public static final long DEFAULT_SESSION_CLOSE_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
 
     // Configuration for read idle timeout on WebSocket session
     public static final String READ_IDLE_TIMEOUT_MS = "org.apache.tomcat.websocket.READ_IDLE_TIMEOUT_MS";

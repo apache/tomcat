@@ -205,6 +205,11 @@
         Review usage of debug logging and downgrade trace or data dumping
         operations from debug level to trace. (remm)
       </fix>
+      <fix>
+        Ensure that WebSocket connection closure completes if the connection is
+        closed when the server side has used the proprietary suspend/resume
+        feature to suspend the connection. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
