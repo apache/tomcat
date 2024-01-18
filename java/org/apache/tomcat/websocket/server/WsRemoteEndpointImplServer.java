@@ -107,42 +107,43 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
          * Special handling is required only when all of the following are true:
          * - A close message is being sent
          * - This thread currently holds the socketWrapper lock (i.e. the thread is current processing a socket event)
+         *
+         * Special handling is only possible if the socketWrapper lock is a ReentrantLock (it will be by default)
          */
-        if (!(opCode == Constants.OPCODE_CLOSE && socketWrapper.getLock().isHeldByCurrentThread())) {
-            // Skip special handling
-            return super.acquireMessagePartInProgressSemaphore(opCode, timeoutExpiry);
-        }
-
-        int socketWrapperLockCount;
         if (socketWrapper.getLock() instanceof ReentrantLock) {
-            socketWrapperLockCount = ((ReentrantLock) socketWrapper.getLock()).getHoldCount();
-        } else {
-            socketWrapperLockCount = 1;
-        }
-        while (!messagePartInProgress.tryAcquire()) {
-            if (timeoutExpiry < System.currentTimeMillis()) {
-                return false;
-            }
-            try {
-                // Release control of the processor
-                socketWrapper.setCurrentProcessor(connection);
-                // Release the per socket lock(s)
-                for (int i = 0; i < socketWrapperLockCount; i++) {
-                    socketWrapper.getLock().unlock();
+            ReentrantLock reentrantLock = (ReentrantLock) socketWrapper.getLock();
+            if (opCode == Constants.OPCODE_CLOSE && reentrantLock.isHeldByCurrentThread()) {
+                int socketWrapperLockCount = reentrantLock.getHoldCount();
+
+                while (!messagePartInProgress.tryAcquire()) {
+                    if (timeoutExpiry < System.currentTimeMillis()) {
+                        return false;
+                    }
+                    try {
+                        // Release control of the processor
+                        socketWrapper.setCurrentProcessor(connection);
+                        // Release the per socket lock(s)
+                        for (int i = 0; i < socketWrapperLockCount; i++) {
+                            socketWrapper.getLock().unlock();
+                        }
+                        // Provide opportunity for another thread to obtain the socketWrapper lock
+                        Thread.yield();
+                    } finally {
+                        // Re-obtain the per socket lock(s)
+                        for (int i = 0; i < socketWrapperLockCount; i++) {
+                            socketWrapper.getLock().lock();
+                        }
+                        // Re-take control of the processor
+                        socketWrapper.takeCurrentProcessor();
+                    }
                 }
-                // Provide opportunity for another thread to obtain the socketWrapper lock
-                Thread.yield();
-            } finally {
-                // Re-obtain the per socket lock(s)
-                for (int i = 0; i < socketWrapperLockCount; i++) {
-                    socketWrapper.getLock().lock();
-                }
-                // Re-take control of the processor
-                socketWrapper.takeCurrentProcessor();
+
+                return true;
             }
         }
 
-        return true;
+        // Skip special handling
+        return super.acquireMessagePartInProgressSemaphore(opCode, timeoutExpiry);
     }
 
 
