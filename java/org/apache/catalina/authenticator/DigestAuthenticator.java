@@ -443,7 +443,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
     // ------------------------------------------------------- Lifecycle Methods
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         super.startInternal();
 
         // Generate a random secret key

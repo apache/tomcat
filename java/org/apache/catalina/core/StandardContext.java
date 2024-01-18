@@ -4650,7 +4650,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         if (log.isDebugEnabled()) {
             log.debug("Starting " + getBaseName());
@@ -5074,7 +5074,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         // Send j2ee.state.stopping notification
         if (this.getObjectName() != null) {

@@ -158,7 +158,7 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         // Start the Valves in our pipeline (including the basic), if any
         Valve current = first;
@@ -183,7 +183,7 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         setState(LifecycleState.STOPPING);
 

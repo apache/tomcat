@@ -863,7 +863,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         // Start our subordinate components, if any
         logger = null;
@@ -923,7 +923,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         // Stop our thread
         threadStop();

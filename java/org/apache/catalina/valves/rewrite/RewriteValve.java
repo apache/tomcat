@@ -135,7 +135,7 @@ public class RewriteValve extends ValveBase {
 
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         super.startInternal();
 
@@ -285,7 +285,7 @@ public class RewriteValve extends ValveBase {
     }
 
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
         super.stopInternal();
         for (RewriteMap map : maps.values()) {
             if (map instanceof Lifecycle) {

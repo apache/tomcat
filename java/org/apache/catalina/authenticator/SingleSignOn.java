@@ -567,7 +567,7 @@ public class SingleSignOn extends ValveBase {
 
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         Container c = getContainer();
         while (c != null && !(c instanceof Engine)) {
             c = c.getParent();
@@ -580,7 +580,7 @@ public class SingleSignOn extends ValveBase {
 
 
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
         super.stopInternal();
         engine = null;
     }

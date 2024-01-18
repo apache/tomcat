@@ -121,7 +121,7 @@ public class SemaphoreValve extends ValveBase {
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         semaphore = new Semaphore(concurrency, fairness);
         super.startInternal();
     }
@@ -135,7 +135,7 @@ public class SemaphoreValve extends ValveBase {
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
         super.stopInternal();
         semaphore = null;
     }
