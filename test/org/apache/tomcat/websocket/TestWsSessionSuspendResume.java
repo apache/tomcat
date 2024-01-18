@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.CloseReason;
 import javax.websocket.ContainerProvider;
@@ -40,7 +42,9 @@ import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
+import org.apache.tomcat.websocket.server.Constants;
 import org.apache.tomcat.websocket.server.TesterEndpointConfig;
+import org.apache.tomcat.websocket.server.WsServerContainer;
 
 public class TestWsSessionSuspendResume extends WebSocketBaseTest {
 
@@ -150,6 +154,109 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
             } else {
                 messages.add(message);
             }
+        }
+    }
+
+
+    @Test
+    public void testSuspendThenClose() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctx = getProgrammaticRootContext();
+        ctx.addApplicationListener(SuspendCloseConfig.class.getName());
+        ctx.addApplicationListener(WebSocketFastServerTimeout.class.getName());
+
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMappingDecoded("/", "default");
+
+        tomcat.start();
+
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
+
+        ClientEndpointConfig clientEndpointConfig = ClientEndpointConfig.Builder.create().build();
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class, clientEndpointConfig,
+                new URI("ws://localhost:" + getPort() + SuspendResumeConfig.PATH));
+
+        wsSession.getBasicRemote().sendText("start test");
+
+        // Wait for the client response to be received by the server
+        int count = 0;
+        while (count < 50 && !SuspendCloseEndpoint.isServerSessionFullyClosed()) {
+            Thread.sleep(100);
+            count ++;
+        }
+        Assert.assertTrue(SuspendCloseEndpoint.isServerSessionFullyClosed());
+    }
+
+
+    public static final class SuspendCloseConfig extends TesterEndpointConfig {
+        private static final String PATH = "/echo";
+
+        @Override
+        protected Class<?> getEndpointClass() {
+            return SuspendCloseEndpoint.class;
+        }
+
+        @Override
+        protected ServerEndpointConfig getServerEndpointConfig() {
+            return ServerEndpointConfig.Builder.create(getEndpointClass(), PATH).build();
+        }
+    }
+
+
+    public static final class SuspendCloseEndpoint extends Endpoint {
+
+        // Yes, a static variable is a hack.
+        private static WsSession serverSession;
+
+        @Override
+        public void onOpen(Session session, EndpointConfig epc) {
+            serverSession = (WsSession) session;
+            // Set a short session close timeout (milliseconds)
+            serverSession.getUserProperties().put(
+                    org.apache.tomcat.websocket.Constants.SESSION_CLOSE_TIMEOUT_PROPERTY, Long.valueOf(2000));
+            // Any message will trigger the suspend then close
+            serverSession.addMessageHandler(String.class, new MessageHandler.Whole<String>() {
+                @Override
+                public void onMessage(String message) {
+                    try {
+                        serverSession.getBasicRemote().sendText("server session open");
+                        serverSession.getBasicRemote().sendText("suspending server session");
+                        serverSession.suspend();
+                        serverSession.getBasicRemote().sendText("closing server session");
+                        serverSession.close();
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                        // Attempt to make the failure more obvious
+                        throw new RuntimeException(ioe);
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void onError(Session session, Throwable t) {
+            t.printStackTrace();
+        }
+
+        public static boolean isServerSessionFullyClosed() {
+            return serverSession.isClosed();
+        }
+    }
+
+
+    public static class WebSocketFastServerTimeout implements ServletContextListener {
+
+        @Override
+        public void contextInitialized(ServletContextEvent sce) {
+            WsServerContainer container = (WsServerContainer) sce.getServletContext().getAttribute(
+                    Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
+            container.setProcessPeriod(0);
+        }
+
+        @Override
+        public void contextDestroyed(ServletContextEvent sce) {
+            // NO-OP
         }
     }
 }
