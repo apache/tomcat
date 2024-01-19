@@ -738,12 +738,12 @@ public final class Request {
 
     public void setRequestThread() {
         Thread t = Thread.currentThread();
-        threadId = t.threadId();
+        threadId = t.getId();
         getRequestProcessor().setWorkerThreadName(t.getName());
     }
 
     public boolean isRequestThread() {
-        return Thread.currentThread().threadId() == threadId;
+        return Thread.currentThread().getId() == threadId;
     }
 
     // -------------------- Per-Request "notes" --------------------

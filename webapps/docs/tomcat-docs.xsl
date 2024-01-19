@@ -37,8 +37,8 @@
   <xsl:param    name="version"             select="'11.0.x'"/>
   <xsl:param    name="majorversion"        select="'11'"/>
   <xsl:param    name="majorminorversion"   select="'11.0'"/>
-  <xsl:param    name="minjavaversion"      select="'21'"/>
-  <xsl:param    name="buildjavaversion"    select="'21'"/>
+  <xsl:param    name="minjavaversion"      select="'17'"/>
+  <xsl:param    name="buildjavaversion"    select="'22'"/>
   <xsl:param    name="antversionrequired"  select="'1.10.2'"/>
   <xsl:param    name="build-date"          select="'MMM d yyyy'"/>
   <xsl:param    name="build-date-iso-8601" select="'yyyy-MM-dd'"/>

@@ -104,11 +104,11 @@
   <!-- build output directory for generated reflectionless code -->
   <property name="tomcat.xreflect"       value="${tomcat.output}/xreflect"/>
 
-  <!-- Jakarta EE 11 platform requires Java 21+ -->
+  <!-- Jakarta EE 11 platform requires Java 17+ -->
   <!-- Keep in sync with webapps/docs/tomcat-docs.xsl -->
-  <property name="compile.release" value="21"/>
-  <property name="min.java.version" value="21"/>
-  <property name="build.java.version" value="21"/>
+  <property name="compile.release" value="17"/>
+  <property name="min.java.version" value="17"/>
+  <property name="build.java.version" value="17"/>
   <property name="release.java.version" value="22"/>
 
   <!-- Check Java Build Version -->

@@ -487,7 +487,6 @@ public class Diagnostics {
      * @param requestedSm the StringManager to use
      * @return the formatted JVM information text
      */
-    @SuppressWarnings("deprecation")
     public static String getVMInfo(StringManager requestedSm) {
         StringBuilder sb = new StringBuilder();
 

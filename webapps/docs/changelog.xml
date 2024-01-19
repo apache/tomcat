@@ -105,6 +105,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0-M18 (markt)" rtext="in development">
+  <subsection name="General">
+    <changelog>
+      <update>
+        Reduce the minimum supported Java version to Java 17. (markt)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <add>
@@ -114,6 +121,11 @@
         for the Jakarta EL 6.0 API. The property support has also been refined
         for greater consistency. (markt)
       </add>
+      <update>
+        The defaults for <code>compilerSourceVM</code> and
+        <code>compilerTargetVM</code> have been updated to 17 to align with Java
+        17 being the minimum Java version required for Tomcat 11. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

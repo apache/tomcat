@@ -341,9 +341,6 @@ public class CachedResource implements WebResource {
         try {
             CachedResourceURLStreamHandler handler = new CachedResourceURLStreamHandler(resourceURL, root, webAppPath,
                     usesClassLoaderResources);
-            // Need the custom handler for all protocols. URL.of(...) does not allow file to use a custom handler.
-            // Ignore the deprecation for now.
-            @SuppressWarnings("deprecation")
             URL result = new URL(null, resourceURL.toExternalForm(), handler);
             handler.setCacheURL(result);
             return result;

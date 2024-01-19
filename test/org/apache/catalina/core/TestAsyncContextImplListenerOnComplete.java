@@ -38,6 +38,7 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
@@ -79,11 +80,9 @@ public class TestAsyncContextImplListenerOnComplete extends TomcatBaseTest {
             socket.connect(new InetSocketAddress("localhost", port));
 
             try (var writer = new OutputStreamWriter(socket.getOutputStream())) {
-                writer.write("""
-                    GET /repro
-                    Accept: text/event-stream
-
-                    """);
+                writer.write("GET /repro" + SimpleHttpClient.CRLF +
+                        "Accept: text/event-stream" + SimpleHttpClient.CRLF +
+                        SimpleHttpClient.CRLF);
                 writer.flush();
             }
             Thread.sleep(1_000);
@@ -146,18 +145,18 @@ public class TestAsyncContextImplListenerOnComplete extends TomcatBaseTest {
         private final Set<AsyncContext> contexts = new HashSet<>();
 
         private EventSource() {
-            Thread.ofVirtual()
-                .name(getClass().getSimpleName())
-                .start(() -> {
-                    while (true) {
-                        try {
-                            Thread.sleep(2000);
-                            send("PING");
-                        } catch (InterruptedException e) {
-                            System.out.println("Failed to sleep: " + e);
-                        }
+            Runnable r = () -> {
+                while (true) {
+                    try {
+                        Thread.sleep(2000);
+                        send("PING");
+                    } catch (InterruptedException e) {
+                        System.out.println("Failed to sleep: " + e);
                     }
-                });
+                }
+            };
+            Thread t = new Thread(r);
+            t.start();
         }
 
         public void send(String message) {

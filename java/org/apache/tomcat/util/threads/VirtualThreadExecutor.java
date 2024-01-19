@@ -23,6 +23,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -34,10 +35,12 @@ public class VirtualThreadExecutor extends AbstractExecutorService {
 
     private CountDownLatch shutdown = new CountDownLatch(1);
 
-    private Thread.Builder threadBuilder;
+    private final JreCompat jreCompat = JreCompat.getInstance();
+
+    private Object threadBuilder;
 
     public VirtualThreadExecutor(String namePrefix) {
-        threadBuilder = Thread.ofVirtual().name(namePrefix, 0);
+        threadBuilder = jreCompat.createVirtualThreadBuilder(namePrefix);
     }
 
     @Override
@@ -46,7 +49,7 @@ public class VirtualThreadExecutor extends AbstractExecutorService {
             throw new RejectedExecutionException(
                     sm.getString("virtualThreadExecutor.taskRejected", command.toString(), this.toString()));
         }
-        threadBuilder.start(command);
+        jreCompat.threadBuilderStart(threadBuilder, command);
     }
 
     @Override
