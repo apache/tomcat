@@ -321,8 +321,9 @@ public class PerMessageDeflate implements Transformation {
                 continue;
             }
 
-            boolean emptyPart = uncompressedPart.getPayload().limit() == 0;
-            emptyMessage = emptyMessage && emptyPart;
+            if (uncompressedPart.getPayload().limit() != 0) {
+                emptyMessage = false;
+            }
             if (emptyMessage && uncompressedPart.isFin()) {
                 // Zero length messages can't be compressed so pass the
                 // final (empty) part straight through.
