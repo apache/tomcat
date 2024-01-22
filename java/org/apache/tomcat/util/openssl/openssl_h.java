@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"javadoc", "boxing"})
 public class openssl_h {
 
     static final SymbolLookup SYMBOL_LOOKUP
