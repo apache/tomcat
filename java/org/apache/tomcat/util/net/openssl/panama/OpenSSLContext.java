@@ -674,7 +674,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     // DH *(*tmp_dh_callback)(SSL *ssl, int is_export, int keylength)
-    private static class TmpDHCallback implements SSL_CTX_set_tmp_dh_callback$dh {
+    private static class TmpDHCallback implements SSL_CTX_set_tmp_dh_callback$dh.Function {
         @Override
         public MemorySegment apply(MemorySegment ssl, int isExport, int keylength) {
             var pkey = SSL_get_privatekey(ssl);
@@ -706,7 +706,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     // int SSL_callback_alpn_select_proto(SSL* ssl, const unsigned char **out, unsigned char *outlen,
     //        const unsigned char *in, unsigned int inlen, void *arg)
-    private static class ALPNSelectCallback implements SSL_CTX_set_alpn_select_cb$cb {
+    private static class ALPNSelectCallback implements SSL_CTX_set_alpn_select_cb$cb.Function {
         private final List<byte[]> negotiableProtocols;
         ALPNSelectCallback(List<byte[]> negotiableProtocols) {
             this.negotiableProtocols = negotiableProtocols;
@@ -743,7 +743,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
 
-    private static class CertVerifyCallback implements SSL_CTX_set_cert_verify_callback$cb {
+    private static class CertVerifyCallback implements SSL_CTX_set_cert_verify_callback$cb.Function {
         private final X509TrustManager x509TrustManager;
         CertVerifyCallback(X509TrustManager x509TrustManager) {
             this.x509TrustManager = x509TrustManager;
@@ -871,7 +871,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
-    private static class PasswordCallback implements SSL_CTX_set_default_passwd_cb$cb, PEM_read_bio_X509_AUX$cb, PEM_read_bio_PrivateKey$cb {
+    private static class PasswordCallback implements SSL_CTX_set_default_passwd_cb$cb.Function,
+        PEM_read_bio_X509_AUX$cb.Function, PEM_read_bio_PrivateKey$cb.Function {
         private final String callbackPassword;
         PasswordCallback(String callbackPassword) {
             this.callbackPassword = callbackPassword;

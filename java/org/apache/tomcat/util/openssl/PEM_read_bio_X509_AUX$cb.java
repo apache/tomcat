@@ -26,34 +26,43 @@ import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
 
 /**
- * {@snippet lang = c : * int (*PEM_read_bio_X509_AUX$cb)(char* buf,int size,int rwflag,void* userdata);
+ * {@snippet lang=c :
+ * pem_password_cb *cb
  * }
  */
 @SuppressWarnings("javadoc")
-public interface PEM_read_bio_X509_AUX$cb {
+public class PEM_read_bio_X509_AUX$cb {
 
-    int apply(MemorySegment buf, int size, int rwflag, MemorySegment userdata);
+    public interface Function {
+        int apply(MemorySegment buf, int size, int rwflag, MemorySegment userdata);
+    }
 
-    FunctionDescriptor $DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_INT,
-            openssl_h.C_INT, openssl_h.C_POINTER);
+    private static final FunctionDescriptor $DESC = FunctionDescriptor.of(
+        openssl_h.C_INT,
+        openssl_h.C_POINTER,
+        openssl_h.C_INT,
+        openssl_h.C_INT,
+        openssl_h.C_POINTER
+    );
 
-    MethodHandle UP$MH = openssl_h.upcallHandle(PEM_read_bio_X509_AUX$cb.class, "apply", $DESC);
+    public static FunctionDescriptor descriptor() {
+        return $DESC;
+    }
 
-    static MemorySegment allocate(PEM_read_bio_X509_AUX$cb fi, Arena scope) {
+    private static final MethodHandle UP$MH = openssl_h.upcallHandle(PEM_read_bio_X509_AUX$cb.Function.class, "apply", $DESC);
+
+    public static MemorySegment allocate(PEM_read_bio_X509_AUX$cb.Function fi, Arena scope) {
         return Linker.nativeLinker().upcallStub(UP$MH.bindTo(fi), $DESC, scope);
     }
 
-    MethodHandle DOWN$MH = Linker.nativeLinker().downcallHandle($DESC);
+    private static final MethodHandle DOWN$MH = Linker.nativeLinker().downcallHandle($DESC);
 
-    static PEM_read_bio_X509_AUX$cb ofAddress(MemorySegment addr, Arena arena) {
-        MemorySegment symbol = addr.reinterpret(arena, null);
-        return (MemorySegment _buf, int _size, int _rwflag, MemorySegment _userdata) -> {
-            try {
-                return (int) DOWN$MH.invokeExact(symbol, _buf, _size, _rwflag, _userdata);
-            } catch (Throwable ex$) {
-                throw new AssertionError("should not reach here", ex$);
-            }
-        };
+    public static int invoke(MemorySegment funcPtr,MemorySegment buf, int size, int rwflag, MemorySegment userdata) {
+        try {
+            return (int) DOWN$MH.invokeExact(funcPtr, buf, size, rwflag, userdata);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
     }
 }
 

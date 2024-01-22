@@ -26,33 +26,41 @@ import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
 
 /**
- * {@snippet lang = c : * int (*SSL_CTX_set_cert_verify_callback$cb)(X509_STORE_CTX*,void*);
+ * {@snippet lang=c :
+ * int (*cb)(X509_STORE_CTX *, void *)
  * }
  */
 @SuppressWarnings("javadoc")
-public interface SSL_CTX_set_cert_verify_callback$cb {
+public class SSL_CTX_set_cert_verify_callback$cb {
 
-    FunctionDescriptor $DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
+    public interface Function {
+        int apply(MemorySegment _x0, MemorySegment _x1);
+    }
 
-    int apply(MemorySegment _x0, MemorySegment _x1);
+    private static final FunctionDescriptor $DESC = FunctionDescriptor.of(
+        openssl_h.C_INT,
+        openssl_h.C_POINTER,
+        openssl_h.C_POINTER
+    );
 
-    MethodHandle UP$MH = openssl_h.upcallHandle(SSL_CTX_set_cert_verify_callback$cb.class, "apply", $DESC);
+    public static FunctionDescriptor descriptor() {
+        return $DESC;
+    }
 
-    static MemorySegment allocate(SSL_CTX_set_cert_verify_callback$cb fi, Arena scope) {
+    private static final MethodHandle UP$MH = openssl_h.upcallHandle(SSL_CTX_set_cert_verify_callback$cb.Function.class, "apply", $DESC);
+
+    public static MemorySegment allocate(SSL_CTX_set_cert_verify_callback$cb.Function fi, Arena scope) {
         return Linker.nativeLinker().upcallStub(UP$MH.bindTo(fi), $DESC, scope);
     }
 
-    MethodHandle DOWN$MH = Linker.nativeLinker().downcallHandle($DESC);
+    private static final MethodHandle DOWN$MH = Linker.nativeLinker().downcallHandle($DESC);
 
-    static SSL_CTX_set_cert_verify_callback$cb ofAddress(MemorySegment addr, Arena arena) {
-        MemorySegment symbol = addr.reinterpret(arena, null);
-        return (MemorySegment __x0, MemorySegment __x1) -> {
-            try {
-                return (int) DOWN$MH.invokeExact(symbol, __x0, __x1);
-            } catch (Throwable ex$) {
-                throw new AssertionError("should not reach here", ex$);
-            }
-        };
+    public static int invoke(MemorySegment funcPtr,MemorySegment _x0, MemorySegment _x1) {
+        try {
+            return (int) DOWN$MH.invokeExact(funcPtr, _x0, _x1);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
     }
 }
 

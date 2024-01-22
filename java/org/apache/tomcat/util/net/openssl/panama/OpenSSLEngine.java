@@ -1109,7 +1109,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
     }
 
-    private static class InfoCallback implements SSL_set_info_callback$cb {
+    private static class InfoCallback implements SSL_set_info_callback$cb.Function {
         @Override
         public void apply(MemorySegment ssl, int where, int ret) {
             EngineState state = getState(ssl);
@@ -1123,7 +1123,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
     }
 
-    static class VerifyCallback implements SSL_set_verify$callback, SSL_CTX_set_verify$callback {
+    static class VerifyCallback implements SSL_set_verify$callback.Function, SSL_CTX_set_verify$callback.Function {
         @Override
         public int apply(int preverify_ok, MemorySegment /*X509_STORE_CTX*/ x509ctx) {
             MemorySegment ssl = X509_STORE_CTX_get_ex_data(x509ctx, SSL_get_ex_data_X509_STORE_CTX_idx());

@@ -21,6 +21,8 @@ package org.apache.tomcat.util.openssl;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 
@@ -49,6 +51,15 @@ public class openssl_h {
     public static final AddressLayout C_POINTER = ValueLayout.ADDRESS
             .withTargetLayout(MemoryLayout.sequenceLayout(java.lang.Long.MAX_VALUE, JAVA_BYTE));
     public static final ValueLayout.OfLong C_LONG = ValueLayout.JAVA_LONG;
+
+    static final boolean TRACE_DOWNCALLS = Boolean.getBoolean("jextract.trace.downcalls");
+
+    static void traceDowncall(String name, Object... args) {
+         String traceArgs = Arrays.stream(args)
+                       .map(Object::toString)
+                       .collect(Collectors.joining(", "));
+         System.out.printf("%s(%s)\n", name, traceArgs);
+    }
 
     static MemorySegment findOrThrow(String symbol) {
         return SYMBOL_LOOKUP.find(symbol)
@@ -846,11 +857,7 @@ public class openssl_h {
     public static int V_OCSP_CERTSTATUS_UNKNOWN() {
         return V_OCSP_CERTSTATUS_UNKNOWN;
     }
-    /**
-     * {@snippet lang=c :
-     * int OPENSSL_sk_num(OPENSSL_STACK*);
-     * }
-     */
+
     public static MethodHandle OPENSSL_sk_num$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -865,19 +872,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int OPENSSL_sk_num(const OPENSSL_STACK *)
+     * }
+     */
     public static int OPENSSL_sk_num(MemorySegment x0) {
         var mh$ = OPENSSL_sk_num$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OPENSSL_sk_num", x0);
+            }
             return (int) mh$.invokeExact(x0);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void* OPENSSL_sk_value(OPENSSL_STACK*, int);
-     * }
-     */
+
     public static MethodHandle OPENSSL_sk_value$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -893,19 +904,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void *OPENSSL_sk_value(const OPENSSL_STACK *, int)
+     * }
+     */
     public static MemorySegment OPENSSL_sk_value(MemorySegment x0, int x1) {
         var mh$ = OPENSSL_sk_value$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OPENSSL_sk_value", x0, x1);
+            }
             return (MemorySegment) mh$.invokeExact(x0, x1);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * unsigned long OpenSSL_version_num();
-     * }
-     */
+
     public static MethodHandle OpenSSL_version_num$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -918,19 +933,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * unsigned long OpenSSL_version_num(void)
+     * }
+     */
     public static long OpenSSL_version_num() {
         var mh$ = OpenSSL_version_num$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OpenSSL_version_num");
+            }
             return (long) mh$.invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * char* OpenSSL_version(int type);
-     * }
-     */
+
     public static MethodHandle OpenSSL_version$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -945,19 +964,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * const char *OpenSSL_version(int type)
+     * }
+     */
     public static MemorySegment OpenSSL_version(int type) {
         var mh$ = OpenSSL_version$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OpenSSL_version", type);
+            }
             return (MemorySegment) mh$.invokeExact(type);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void CRYPTO_free(void* ptr, char* file, int line);
-     * }
-     */
+
     public static MethodHandle CRYPTO_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -973,19 +996,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void CRYPTO_free(void *ptr, const char *file, int line)
+     * }
+     */
     public static void CRYPTO_free(MemorySegment ptr, MemorySegment file, int line) {
         var mh$ = CRYPTO_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("CRYPTO_free", ptr, file, line);
+            }
             mh$.invokeExact(ptr, file, line);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * unsigned long BIO_ctrl_pending(BIO* b);
-     * }
-     */
+
     public static MethodHandle BIO_ctrl_pending$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1000,19 +1027,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * size_t BIO_ctrl_pending(BIO *b)
+     * }
+     */
     public static long BIO_ctrl_pending(MemorySegment b) {
         var mh$ = BIO_ctrl_pending$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BIO_ctrl_pending", b);
+            }
             return (long) mh$.invokeExact(b);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * BIO_METHOD* BIO_s_file();
-     * }
-     */
+
     public static MethodHandle BIO_s_file$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1025,19 +1056,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * const BIO_METHOD *BIO_s_file(void)
+     * }
+     */
     public static MemorySegment BIO_s_file() {
         var mh$ = BIO_s_file$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BIO_s_file");
+            }
             return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * BIO* BIO_new_file(char* filename, char* mode);
-     * }
-     */
+
     public static MethodHandle BIO_new_file$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1053,19 +1088,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * BIO *BIO_new_file(const char *filename, const char *mode)
+     * }
+     */
     public static MemorySegment BIO_new_file(MemorySegment filename, MemorySegment mode) {
         var mh$ = BIO_new_file$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BIO_new_file", filename, mode);
+            }
             return (MemorySegment) mh$.invokeExact(filename, mode);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * BIO* BIO_new(BIO_METHOD* type);
-     * }
-     */
+
     public static MethodHandle BIO_new$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1080,19 +1119,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * BIO *BIO_new(const BIO_METHOD *type)
+     * }
+     */
     public static MemorySegment BIO_new(MemorySegment type) {
         var mh$ = BIO_new$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BIO_new", type);
+            }
             return (MemorySegment) mh$.invokeExact(type);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int BIO_free(BIO* a);
-     * }
-     */
+
     public static MethodHandle BIO_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1107,19 +1150,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int BIO_free(BIO *a)
+     * }
+     */
     public static int BIO_free(MemorySegment a) {
         var mh$ = BIO_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BIO_free", a);
+            }
             return (int) mh$.invokeExact(a);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int BIO_read(BIO* b, void* data, int dlen);
-     * }
-     */
+
     public static MethodHandle BIO_read$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1136,19 +1183,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int BIO_read(BIO *b, void *data, int dlen)
+     * }
+     */
     public static int BIO_read(MemorySegment b, MemorySegment data, int dlen) {
         var mh$ = BIO_read$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BIO_read", b, data, dlen);
+            }
             return (int) mh$.invokeExact(b, data, dlen);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int BIO_write(BIO* b, void* data, int dlen);
-     * }
-     */
+
     public static MethodHandle BIO_write$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1165,19 +1216,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int BIO_write(BIO *b, const void *data, int dlen)
+     * }
+     */
     public static int BIO_write(MemorySegment b, MemorySegment data, int dlen) {
         var mh$ = BIO_write$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BIO_write", b, data, dlen);
+            }
             return (int) mh$.invokeExact(b, data, dlen);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * long BIO_ctrl(BIO* bp, int cmd, long larg, void* parg);
-     * }
-     */
+
     public static MethodHandle BIO_ctrl$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1195,19 +1250,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * long BIO_ctrl(BIO *bp, int cmd, long larg, void *parg)
+     * }
+     */
     public static long BIO_ctrl(MemorySegment bp, int cmd, long larg, MemorySegment parg) {
         var mh$ = BIO_ctrl$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BIO_ctrl", bp, cmd, larg, parg);
+            }
             return (long) mh$.invokeExact(bp, cmd, larg, parg);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * BIO_METHOD* BIO_s_mem();
-     * }
-     */
+
     public static MethodHandle BIO_s_mem$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1220,19 +1279,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * const BIO_METHOD *BIO_s_mem(void)
+     * }
+     */
     public static MemorySegment BIO_s_mem() {
         var mh$ = BIO_s_mem$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BIO_s_mem");
+            }
             return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * BIO_METHOD* BIO_s_bio();
-     * }
-     */
+
     public static MethodHandle BIO_s_bio$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1245,19 +1308,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * const BIO_METHOD *BIO_s_bio(void)
+     * }
+     */
     public static MemorySegment BIO_s_bio() {
         var mh$ = BIO_s_bio$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BIO_s_bio");
+            }
             return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int BIO_new_bio_pair(BIO** bio1, unsigned long writebuf1, BIO** bio2, unsigned long writebuf2);
-     * }
-     */
+
     public static MethodHandle BIO_new_bio_pair$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1275,19 +1342,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int BIO_new_bio_pair(BIO **bio1, size_t writebuf1, BIO **bio2, size_t writebuf2)
+     * }
+     */
     public static int BIO_new_bio_pair(MemorySegment bio1, long writebuf1, MemorySegment bio2, long writebuf2) {
         var mh$ = BIO_new_bio_pair$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BIO_new_bio_pair", bio1, writebuf1, bio2, writebuf2);
+            }
             return (int) mh$.invokeExact(bio1, writebuf1, bio2, writebuf2);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * BIGNUM* BN_new();
-     * }
-     */
+
     public static MethodHandle BN_new$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1300,19 +1371,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * BIGNUM *BN_new(void)
+     * }
+     */
     public static MemorySegment BN_new() {
         var mh$ = BN_new$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BN_new");
+            }
             return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int BN_set_word(BIGNUM* a, unsigned long w);
-     * }
-     */
+
     public static MethodHandle BN_set_word$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1328,19 +1403,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int BN_set_word(BIGNUM *a, unsigned long w)
+     * }
+     */
     public static int BN_set_word(MemorySegment a, long w) {
         var mh$ = BN_set_word$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BN_set_word", a, w);
+            }
             return (int) mh$.invokeExact(a, w);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * BIGNUM* BN_get_rfc2409_prime_768(BIGNUM* bn);
-     * }
-     */
+
     public static MethodHandle BN_get_rfc2409_prime_768$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1355,19 +1434,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * BIGNUM *BN_get_rfc2409_prime_768(BIGNUM *bn)
+     * }
+     */
     public static MemorySegment BN_get_rfc2409_prime_768(MemorySegment bn) {
         var mh$ = BN_get_rfc2409_prime_768$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BN_get_rfc2409_prime_768", bn);
+            }
             return (MemorySegment) mh$.invokeExact(bn);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * BIGNUM* BN_get_rfc2409_prime_1024(BIGNUM* bn);
-     * }
-     */
+
     public static MethodHandle BN_get_rfc2409_prime_1024$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1382,19 +1465,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * BIGNUM *BN_get_rfc2409_prime_1024(BIGNUM *bn)
+     * }
+     */
     public static MemorySegment BN_get_rfc2409_prime_1024(MemorySegment bn) {
         var mh$ = BN_get_rfc2409_prime_1024$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BN_get_rfc2409_prime_1024", bn);
+            }
             return (MemorySegment) mh$.invokeExact(bn);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * BIGNUM* BN_get_rfc3526_prime_1536(BIGNUM* bn);
-     * }
-     */
+
     public static MethodHandle BN_get_rfc3526_prime_1536$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1409,19 +1496,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * BIGNUM *BN_get_rfc3526_prime_1536(BIGNUM *bn)
+     * }
+     */
     public static MemorySegment BN_get_rfc3526_prime_1536(MemorySegment bn) {
         var mh$ = BN_get_rfc3526_prime_1536$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BN_get_rfc3526_prime_1536", bn);
+            }
             return (MemorySegment) mh$.invokeExact(bn);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * BIGNUM* BN_get_rfc3526_prime_2048(BIGNUM* bn);
-     * }
-     */
+
     public static MethodHandle BN_get_rfc3526_prime_2048$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1436,19 +1527,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * BIGNUM *BN_get_rfc3526_prime_2048(BIGNUM *bn)
+     * }
+     */
     public static MemorySegment BN_get_rfc3526_prime_2048(MemorySegment bn) {
         var mh$ = BN_get_rfc3526_prime_2048$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BN_get_rfc3526_prime_2048", bn);
+            }
             return (MemorySegment) mh$.invokeExact(bn);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * BIGNUM* BN_get_rfc3526_prime_3072(BIGNUM* bn);
-     * }
-     */
+
     public static MethodHandle BN_get_rfc3526_prime_3072$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1463,19 +1558,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * BIGNUM *BN_get_rfc3526_prime_3072(BIGNUM *bn)
+     * }
+     */
     public static MemorySegment BN_get_rfc3526_prime_3072(MemorySegment bn) {
         var mh$ = BN_get_rfc3526_prime_3072$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BN_get_rfc3526_prime_3072", bn);
+            }
             return (MemorySegment) mh$.invokeExact(bn);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * BIGNUM* BN_get_rfc3526_prime_4096(BIGNUM* bn);
-     * }
-     */
+
     public static MethodHandle BN_get_rfc3526_prime_4096$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1490,19 +1589,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * BIGNUM *BN_get_rfc3526_prime_4096(BIGNUM *bn)
+     * }
+     */
     public static MemorySegment BN_get_rfc3526_prime_4096(MemorySegment bn) {
         var mh$ = BN_get_rfc3526_prime_4096$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BN_get_rfc3526_prime_4096", bn);
+            }
             return (MemorySegment) mh$.invokeExact(bn);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * BIGNUM* BN_get_rfc3526_prime_6144(BIGNUM* bn);
-     * }
-     */
+
     public static MethodHandle BN_get_rfc3526_prime_6144$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1517,19 +1620,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * BIGNUM *BN_get_rfc3526_prime_6144(BIGNUM *bn)
+     * }
+     */
     public static MemorySegment BN_get_rfc3526_prime_6144(MemorySegment bn) {
         var mh$ = BN_get_rfc3526_prime_6144$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BN_get_rfc3526_prime_6144", bn);
+            }
             return (MemorySegment) mh$.invokeExact(bn);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * BIGNUM* BN_get_rfc3526_prime_8192(BIGNUM* bn);
-     * }
-     */
+
     public static MethodHandle BN_get_rfc3526_prime_8192$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1544,19 +1651,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * BIGNUM *BN_get_rfc3526_prime_8192(BIGNUM *bn)
+     * }
+     */
     public static MemorySegment BN_get_rfc3526_prime_8192(MemorySegment bn) {
         var mh$ = BN_get_rfc3526_prime_8192$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BN_get_rfc3526_prime_8192", bn);
+            }
             return (MemorySegment) mh$.invokeExact(bn);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int ASN1_STRING_length(ASN1_STRING* x);
-     * }
-     */
+
     public static MethodHandle ASN1_STRING_length$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1571,19 +1682,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int ASN1_STRING_length(const ASN1_STRING *x)
+     * }
+     */
     public static int ASN1_STRING_length(MemorySegment x) {
         var mh$ = ASN1_STRING_length$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("ASN1_STRING_length", x);
+            }
             return (int) mh$.invokeExact(x);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * unsigned char* ASN1_STRING_get0_data(ASN1_STRING* x);
-     * }
-     */
+
     public static MethodHandle ASN1_STRING_get0_data$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1598,19 +1713,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * const unsigned char *ASN1_STRING_get0_data(const ASN1_STRING *x)
+     * }
+     */
     public static MemorySegment ASN1_STRING_get0_data(MemorySegment x) {
         var mh$ = ASN1_STRING_get0_data$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("ASN1_STRING_get0_data", x);
+            }
             return (MemorySegment) mh$.invokeExact(x);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * OSSL_PROVIDER* EVP_MD_get0_provider(EVP_MD* md);
-     * }
-     */
+
     public static MethodHandle EVP_MD_get0_provider$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1625,19 +1744,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * const OSSL_PROVIDER *EVP_MD_get0_provider(const EVP_MD *md)
+     * }
+     */
     public static MemorySegment EVP_MD_get0_provider(MemorySegment md) {
         var mh$ = EVP_MD_get0_provider$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("EVP_MD_get0_provider", md);
+            }
             return (MemorySegment) mh$.invokeExact(md);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * EVP_MD* EVP_MD_fetch(OSSL_LIB_CTX* ctx, char* algorithm, char* properties);
-     * }
-     */
+
     public static MethodHandle EVP_MD_fetch$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1654,19 +1777,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * EVP_MD *EVP_MD_fetch(OSSL_LIB_CTX *ctx, const char *algorithm, const char *properties)
+     * }
+     */
     public static MemorySegment EVP_MD_fetch(MemorySegment ctx, MemorySegment algorithm, MemorySegment properties) {
         var mh$ = EVP_MD_fetch$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("EVP_MD_fetch", ctx, algorithm, properties);
+            }
             return (MemorySegment) mh$.invokeExact(ctx, algorithm, properties);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void EVP_MD_free(EVP_MD* md);
-     * }
-     */
+
     public static MethodHandle EVP_MD_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -1680,19 +1807,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void EVP_MD_free(EVP_MD *md)
+     * }
+     */
     public static void EVP_MD_free(MemorySegment md) {
         var mh$ = EVP_MD_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("EVP_MD_free", md);
+            }
             mh$.invokeExact(md);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int EVP_PKEY_get_base_id(EVP_PKEY* pkey);
-     * }
-     */
+
     public static MethodHandle EVP_PKEY_get_base_id$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1707,19 +1838,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int EVP_PKEY_get_base_id(const EVP_PKEY *pkey)
+     * }
+     */
     public static int EVP_PKEY_get_base_id(MemorySegment pkey) {
         var mh$ = EVP_PKEY_get_base_id$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("EVP_PKEY_get_base_id", pkey);
+            }
             return (int) mh$.invokeExact(pkey);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int EVP_PKEY_get_bits(EVP_PKEY* pkey);
-     * }
-     */
+
     public static MethodHandle EVP_PKEY_get_bits$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1734,19 +1869,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int EVP_PKEY_get_bits(const EVP_PKEY *pkey)
+     * }
+     */
     public static int EVP_PKEY_get_bits(MemorySegment pkey) {
         var mh$ = EVP_PKEY_get_bits$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("EVP_PKEY_get_bits", pkey);
+            }
             return (int) mh$.invokeExact(pkey);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void EVP_PKEY_free(EVP_PKEY* pkey);
-     * }
-     */
+
     public static MethodHandle EVP_PKEY_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -1760,19 +1899,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void EVP_PKEY_free(EVP_PKEY *pkey)
+     * }
+     */
     public static void EVP_PKEY_free(MemorySegment pkey) {
         var mh$ = EVP_PKEY_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("EVP_PKEY_free", pkey);
+            }
             mh$.invokeExact(pkey);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void EC_GROUP_free(EC_GROUP* group);
-     * }
-     */
+
     public static MethodHandle EC_GROUP_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -1786,19 +1929,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void EC_GROUP_free(EC_GROUP *group)
+     * }
+     */
     public static void EC_GROUP_free(MemorySegment group) {
         var mh$ = EC_GROUP_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("EC_GROUP_free", group);
+            }
             mh$.invokeExact(group);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int EC_GROUP_get_curve_name(EC_GROUP* group);
-     * }
-     */
+
     public static MethodHandle EC_GROUP_get_curve_name$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1813,19 +1960,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int EC_GROUP_get_curve_name(const EC_GROUP *group)
+     * }
+     */
     public static int EC_GROUP_get_curve_name(MemorySegment group) {
         var mh$ = EC_GROUP_get_curve_name$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("EC_GROUP_get_curve_name", group);
+            }
             return (int) mh$.invokeExact(group);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * EC_GROUP* d2i_ECPKParameters(EC_GROUP**, unsigned char** in, long len);
-     * }
-     */
+
     public static MethodHandle d2i_ECPKParameters$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1842,19 +1993,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * EC_GROUP *d2i_ECPKParameters(EC_GROUP **, const unsigned char **in, long len)
+     * }
+     */
     public static MemorySegment d2i_ECPKParameters(MemorySegment x0, MemorySegment in, long len) {
         var mh$ = d2i_ECPKParameters$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("d2i_ECPKParameters", x0, in, len);
+            }
             return (MemorySegment) mh$.invokeExact(x0, in, len);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * EC_KEY* EC_KEY_new_by_curve_name(int nid);
-     * }
-     */
+
     public static MethodHandle EC_KEY_new_by_curve_name$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1869,19 +2024,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * EC_KEY *EC_KEY_new_by_curve_name(int nid)
+     * }
+     */
     public static MemorySegment EC_KEY_new_by_curve_name(int nid) {
         var mh$ = EC_KEY_new_by_curve_name$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("EC_KEY_new_by_curve_name", nid);
+            }
             return (MemorySegment) mh$.invokeExact(nid);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void EC_KEY_free(EC_KEY* key);
-     * }
-     */
+
     public static MethodHandle EC_KEY_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -1895,19 +2054,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void EC_KEY_free(EC_KEY *key)
+     * }
+     */
     public static void EC_KEY_free(MemorySegment key) {
         var mh$ = EC_KEY_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("EC_KEY_free", key);
+            }
             mh$.invokeExact(key);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * DH* DH_new();
-     * }
-     */
+
     public static MethodHandle DH_new$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1920,19 +2083,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * DH *DH_new(void)
+     * }
+     */
     public static MemorySegment DH_new() {
         var mh$ = DH_new$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("DH_new");
+            }
             return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void DH_free(DH* dh);
-     * }
-     */
+
     public static MethodHandle DH_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -1946,19 +2113,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void DH_free(DH *dh)
+     * }
+     */
     public static void DH_free(MemorySegment dh) {
         var mh$ = DH_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("DH_free", dh);
+            }
             mh$.invokeExact(dh);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int DH_set0_pqg(DH* dh, BIGNUM* p, BIGNUM* q, BIGNUM* g);
-     * }
-     */
+
     public static MethodHandle DH_set0_pqg$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -1976,19 +2147,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g)
+     * }
+     */
     public static int DH_set0_pqg(MemorySegment dh, MemorySegment p, MemorySegment q, MemorySegment g) {
         var mh$ = DH_set0_pqg$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("DH_set0_pqg", dh, p, q, g);
+            }
             return (int) mh$.invokeExact(dh, p, q, g);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int X509_STORE_set_flags(X509_STORE* ctx, unsigned long flags);
-     * }
-     */
+
     public static MethodHandle X509_STORE_set_flags$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2004,19 +2179,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int X509_STORE_set_flags(X509_STORE *ctx, unsigned long flags)
+     * }
+     */
     public static int X509_STORE_set_flags(MemorySegment ctx, long flags) {
         var mh$ = X509_STORE_set_flags$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_STORE_set_flags", ctx, flags);
+            }
             return (int) mh$.invokeExact(ctx, flags);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * struct stack_st_X509* X509_STORE_CTX_get0_untrusted(X509_STORE_CTX* ctx);
-     * }
-     */
+
     public static MethodHandle X509_STORE_CTX_get0_untrusted$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2031,19 +2210,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * struct stack_st_X509 *X509_STORE_CTX_get0_untrusted(const X509_STORE_CTX *ctx)
+     * }
+     */
     public static MemorySegment X509_STORE_CTX_get0_untrusted(MemorySegment ctx) {
         var mh$ = X509_STORE_CTX_get0_untrusted$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_STORE_CTX_get0_untrusted", ctx);
+            }
             return (MemorySegment) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * X509_LOOKUP* X509_STORE_add_lookup(X509_STORE* v, X509_LOOKUP_METHOD* m);
-     * }
-     */
+
     public static MethodHandle X509_STORE_add_lookup$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2059,19 +2242,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * X509_LOOKUP *X509_STORE_add_lookup(X509_STORE *v, X509_LOOKUP_METHOD *m)
+     * }
+     */
     public static MemorySegment X509_STORE_add_lookup(MemorySegment v, MemorySegment m) {
         var mh$ = X509_STORE_add_lookup$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_STORE_add_lookup", v, m);
+            }
             return (MemorySegment) mh$.invokeExact(v, m);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * X509_LOOKUP_METHOD* X509_LOOKUP_hash_dir();
-     * }
-     */
+
     public static MethodHandle X509_LOOKUP_hash_dir$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2084,19 +2271,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * X509_LOOKUP_METHOD *X509_LOOKUP_hash_dir(void)
+     * }
+     */
     public static MemorySegment X509_LOOKUP_hash_dir() {
         var mh$ = X509_LOOKUP_hash_dir$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_LOOKUP_hash_dir");
+            }
             return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * X509_LOOKUP_METHOD* X509_LOOKUP_file();
-     * }
-     */
+
     public static MethodHandle X509_LOOKUP_file$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2109,19 +2300,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * X509_LOOKUP_METHOD *X509_LOOKUP_file(void)
+     * }
+     */
     public static MemorySegment X509_LOOKUP_file() {
         var mh$ = X509_LOOKUP_file$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_LOOKUP_file");
+            }
             return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int X509_LOOKUP_ctrl(X509_LOOKUP* ctx, int cmd, char* argc, long argl, char** ret);
-     * }
-     */
+
     public static MethodHandle X509_LOOKUP_ctrl$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2140,19 +2335,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int X509_LOOKUP_ctrl(X509_LOOKUP *ctx, int cmd, const char *argc, long argl, char **ret)
+     * }
+     */
     public static int X509_LOOKUP_ctrl(MemorySegment ctx, int cmd, MemorySegment argc, long argl, MemorySegment ret) {
         var mh$ = X509_LOOKUP_ctrl$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_LOOKUP_ctrl", ctx, cmd, argc, argl, ret);
+            }
             return (int) mh$.invokeExact(ctx, cmd, argc, argl, ret);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void* X509_STORE_CTX_get_ex_data(X509_STORE_CTX* ctx, int idx);
-     * }
-     */
+
     public static MethodHandle X509_STORE_CTX_get_ex_data$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2168,19 +2367,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void *X509_STORE_CTX_get_ex_data(const X509_STORE_CTX *ctx, int idx)
+     * }
+     */
     public static MemorySegment X509_STORE_CTX_get_ex_data(MemorySegment ctx, int idx) {
         var mh$ = X509_STORE_CTX_get_ex_data$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_STORE_CTX_get_ex_data", ctx, idx);
+            }
             return (MemorySegment) mh$.invokeExact(ctx, idx);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int X509_STORE_CTX_get_error(X509_STORE_CTX* ctx);
-     * }
-     */
+
     public static MethodHandle X509_STORE_CTX_get_error$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2195,19 +2398,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int X509_STORE_CTX_get_error(const X509_STORE_CTX *ctx)
+     * }
+     */
     public static int X509_STORE_CTX_get_error(MemorySegment ctx) {
         var mh$ = X509_STORE_CTX_get_error$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_STORE_CTX_get_error", ctx);
+            }
             return (int) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void X509_STORE_CTX_set_error(X509_STORE_CTX* ctx, int s);
-     * }
-     */
+
     public static MethodHandle X509_STORE_CTX_set_error$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -2222,19 +2429,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void X509_STORE_CTX_set_error(X509_STORE_CTX *ctx, int s)
+     * }
+     */
     public static void X509_STORE_CTX_set_error(MemorySegment ctx, int s) {
         var mh$ = X509_STORE_CTX_set_error$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_STORE_CTX_set_error", ctx, s);
+            }
             mh$.invokeExact(ctx, s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int X509_STORE_CTX_get_error_depth(X509_STORE_CTX* ctx);
-     * }
-     */
+
     public static MethodHandle X509_STORE_CTX_get_error_depth$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2249,19 +2460,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int X509_STORE_CTX_get_error_depth(const X509_STORE_CTX *ctx)
+     * }
+     */
     public static int X509_STORE_CTX_get_error_depth(MemorySegment ctx) {
         var mh$ = X509_STORE_CTX_get_error_depth$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_STORE_CTX_get_error_depth", ctx);
+            }
             return (int) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * X509* X509_STORE_CTX_get_current_cert(X509_STORE_CTX* ctx);
-     * }
-     */
+
     public static MethodHandle X509_STORE_CTX_get_current_cert$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2276,19 +2491,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * X509 *X509_STORE_CTX_get_current_cert(const X509_STORE_CTX *ctx)
+     * }
+     */
     public static MemorySegment X509_STORE_CTX_get_current_cert(MemorySegment ctx) {
         var mh$ = X509_STORE_CTX_get_current_cert$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_STORE_CTX_get_current_cert", ctx);
+            }
             return (MemorySegment) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * X509* X509_STORE_CTX_get0_current_issuer(X509_STORE_CTX* ctx);
-     * }
-     */
+
     public static MethodHandle X509_STORE_CTX_get0_current_issuer$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2303,19 +2522,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
+     * }
+     */
     public static MemorySegment X509_STORE_CTX_get0_current_issuer(MemorySegment ctx) {
         var mh$ = X509_STORE_CTX_get0_current_issuer$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_STORE_CTX_get0_current_issuer", ctx);
+            }
             return (MemorySegment) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * X509* d2i_X509_bio(BIO* bp, X509** x509);
-     * }
-     */
+
     public static MethodHandle d2i_X509_bio$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2331,19 +2554,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * X509 *d2i_X509_bio(BIO *bp, X509 **x509)
+     * }
+     */
     public static MemorySegment d2i_X509_bio(MemorySegment bp, MemorySegment x509) {
         var mh$ = d2i_X509_bio$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("d2i_X509_bio", bp, x509);
+            }
             return (MemorySegment) mh$.invokeExact(bp, x509);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void X509_free(X509* a);
-     * }
-     */
+
     public static MethodHandle X509_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -2357,19 +2584,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * extern void X509_free(X509 *a)
+     * }
+     */
     public static void X509_free(MemorySegment a) {
         var mh$ = X509_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_free", a);
+            }
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * X509* d2i_X509(X509** a, unsigned char** in, long len);
-     * }
-     */
+
     public static MethodHandle d2i_X509$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2386,19 +2617,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * extern X509 *d2i_X509(X509 **a, const unsigned char **in, long len)
+     * }
+     */
     public static MemorySegment d2i_X509(MemorySegment a, MemorySegment in, long len) {
         var mh$ = d2i_X509$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("d2i_X509", a, in, len);
+            }
             return (MemorySegment) mh$.invokeExact(a, in, len);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int i2d_X509(X509* a, unsigned char** out);
-     * }
-     */
+
     public static MethodHandle i2d_X509$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2414,19 +2649,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * extern int i2d_X509(const X509 *a, unsigned char **out)
+     * }
+     */
     public static int i2d_X509(MemorySegment a, MemorySegment out) {
         var mh$ = i2d_X509$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("i2d_X509", a, out);
+            }
             return (int) mh$.invokeExact(a, out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int X509_get_ext_by_NID(X509* x, int nid, int lastpos);
-     * }
-     */
+
     public static MethodHandle X509_get_ext_by_NID$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2443,19 +2682,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int X509_get_ext_by_NID(const X509 *x, int nid, int lastpos)
+     * }
+     */
     public static int X509_get_ext_by_NID(MemorySegment x, int nid, int lastpos) {
         var mh$ = X509_get_ext_by_NID$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_get_ext_by_NID", x, nid, lastpos);
+            }
             return (int) mh$.invokeExact(x, nid, lastpos);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * X509_EXTENSION* X509_get_ext(X509* x, int loc);
-     * }
-     */
+
     public static MethodHandle X509_get_ext$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2471,19 +2714,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * X509_EXTENSION *X509_get_ext(const X509 *x, int loc)
+     * }
+     */
     public static MemorySegment X509_get_ext(MemorySegment x, int loc) {
         var mh$ = X509_get_ext$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_get_ext", x, loc);
+            }
             return (MemorySegment) mh$.invokeExact(x, loc);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * ASN1_OCTET_STRING* X509_EXTENSION_get_data(X509_EXTENSION* ne);
-     * }
-     */
+
     public static MethodHandle X509_EXTENSION_get_data$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2498,19 +2745,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * ASN1_OCTET_STRING *X509_EXTENSION_get_data(X509_EXTENSION *ne)
+     * }
+     */
     public static MemorySegment X509_EXTENSION_get_data(MemorySegment ne) {
         var mh$ = X509_EXTENSION_get_data$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_EXTENSION_get_data", ne);
+            }
             return (MemorySegment) mh$.invokeExact(ne);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void* PEM_ASN1_read_bio(d2i_of_void* d2i, char* name, BIO* bp, void** x, pem_password_cb* cb, void* u);
-     * }
-     */
+
     public static MethodHandle PEM_ASN1_read_bio$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2530,19 +2781,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void *PEM_ASN1_read_bio(d2i_of_void *d2i, const char *name, BIO *bp, void **x, pem_password_cb *cb, void *u)
+     * }
+     */
     public static MemorySegment PEM_ASN1_read_bio(MemorySegment d2i, MemorySegment name, MemorySegment bp, MemorySegment x, MemorySegment cb, MemorySegment u) {
         var mh$ = PEM_ASN1_read_bio$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("PEM_ASN1_read_bio", d2i, name, bp, x, cb, u);
+            }
             return (MemorySegment) mh$.invokeExact(d2i, name, bp, x, cb, u);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * X509* PEM_read_bio_X509_AUX(BIO* out, X509** x, pem_password_cb* cb, void* u);
-     * }
-     */
+
     public static MethodHandle PEM_read_bio_X509_AUX$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2560,19 +2815,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * extern X509 *PEM_read_bio_X509_AUX(BIO *out, X509 **x, pem_password_cb *cb, void *u)
+     * }
+     */
     public static MemorySegment PEM_read_bio_X509_AUX(MemorySegment out, MemorySegment x, MemorySegment cb, MemorySegment u) {
         var mh$ = PEM_read_bio_X509_AUX$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("PEM_read_bio_X509_AUX", out, x, cb, u);
+            }
             return (MemorySegment) mh$.invokeExact(out, x, cb, u);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * EC_GROUP* PEM_read_bio_ECPKParameters(BIO* out, EC_GROUP** x, pem_password_cb* cb, void* u);
-     * }
-     */
+
     public static MethodHandle PEM_read_bio_ECPKParameters$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2590,19 +2849,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * EC_GROUP *PEM_read_bio_ECPKParameters(BIO *out, EC_GROUP **x, pem_password_cb *cb, void *u)
+     * }
+     */
     public static MemorySegment PEM_read_bio_ECPKParameters(MemorySegment out, MemorySegment x, MemorySegment cb, MemorySegment u) {
         var mh$ = PEM_read_bio_ECPKParameters$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("PEM_read_bio_ECPKParameters", out, x, cb, u);
+            }
             return (MemorySegment) mh$.invokeExact(out, x, cb, u);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * DH* PEM_read_bio_DHparams(BIO* out, DH** x, pem_password_cb* cb, void* u);
-     * }
-     */
+
     public static MethodHandle PEM_read_bio_DHparams$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2620,19 +2883,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * DH *PEM_read_bio_DHparams(BIO *out, DH **x, pem_password_cb *cb, void *u)
+     * }
+     */
     public static MemorySegment PEM_read_bio_DHparams(MemorySegment out, MemorySegment x, MemorySegment cb, MemorySegment u) {
         var mh$ = PEM_read_bio_DHparams$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("PEM_read_bio_DHparams", out, x, cb, u);
+            }
             return (MemorySegment) mh$.invokeExact(out, x, cb, u);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * EVP_PKEY* PEM_read_bio_PrivateKey(BIO* out, EVP_PKEY** x, pem_password_cb* cb, void* u);
-     * }
-     */
+
     public static MethodHandle PEM_read_bio_PrivateKey$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2650,19 +2917,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * extern EVP_PKEY *PEM_read_bio_PrivateKey(BIO *out, EVP_PKEY **x, pem_password_cb *cb, void *u)
+     * }
+     */
     public static MemorySegment PEM_read_bio_PrivateKey(MemorySegment out, MemorySegment x, MemorySegment cb, MemorySegment u) {
         var mh$ = PEM_read_bio_PrivateKey$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("PEM_read_bio_PrivateKey", out, x, cb, u);
+            }
             return (MemorySegment) mh$.invokeExact(out, x, cb, u);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * EVP_PKEY* PEM_read_bio_Parameters(BIO* bp, EVP_PKEY** x);
-     * }
-     */
+
     public static MethodHandle PEM_read_bio_Parameters$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2678,19 +2949,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * EVP_PKEY *PEM_read_bio_Parameters(BIO *bp, EVP_PKEY **x)
+     * }
+     */
     public static MemorySegment PEM_read_bio_Parameters(MemorySegment bp, MemorySegment x) {
         var mh$ = PEM_read_bio_Parameters$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("PEM_read_bio_Parameters", bp, x);
+            }
             return (MemorySegment) mh$.invokeExact(bp, x);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * unsigned long SSL_CTX_get_options(SSL_CTX* ctx);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_get_options$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2705,19 +2980,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * uint64_t SSL_CTX_get_options(const SSL_CTX *ctx)
+     * }
+     */
     public static long SSL_CTX_get_options(MemorySegment ctx) {
         var mh$ = SSL_CTX_get_options$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_get_options", ctx);
+            }
             return (long) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * unsigned long SSL_get_options(SSL* s);
-     * }
-     */
+
     public static MethodHandle SSL_get_options$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2732,19 +3011,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * uint64_t SSL_get_options(const SSL *s)
+     * }
+     */
     public static long SSL_get_options(MemorySegment s) {
         var mh$ = SSL_get_options$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_get_options", s);
+            }
             return (long) mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * unsigned long SSL_CTX_clear_options(SSL_CTX* ctx, unsigned long op);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_clear_options$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2760,19 +3043,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * uint64_t SSL_CTX_clear_options(SSL_CTX *ctx, uint64_t op)
+     * }
+     */
     public static long SSL_CTX_clear_options(MemorySegment ctx, long op) {
         var mh$ = SSL_CTX_clear_options$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_clear_options", ctx, op);
+            }
             return (long) mh$.invokeExact(ctx, op);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * unsigned long SSL_CTX_set_options(SSL_CTX* ctx, unsigned long op);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_set_options$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2788,19 +3075,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * uint64_t SSL_CTX_set_options(SSL_CTX *ctx, uint64_t op)
+     * }
+     */
     public static long SSL_CTX_set_options(MemorySegment ctx, long op) {
         var mh$ = SSL_CTX_set_options$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_set_options", ctx, op);
+            }
             return (long) mh$.invokeExact(ctx, op);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * unsigned long SSL_set_options(SSL* s, unsigned long op);
-     * }
-     */
+
     public static MethodHandle SSL_set_options$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2816,19 +3107,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * uint64_t SSL_set_options(SSL *s, uint64_t op)
+     * }
+     */
     public static long SSL_set_options(MemorySegment s, long op) {
         var mh$ = SSL_set_options$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_set_options", s, op);
+            }
             return (long) mh$.invokeExact(s, op);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_CTX_set_alpn_select_cb(SSL_CTX* ctx, int (*cb)(struct ssl_st*,unsigned char**,unsigned char*,unsigned char*,unsigned int,void*), void* arg);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_set_alpn_select_cb$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -2844,19 +3139,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_CTX_set_alpn_select_cb(SSL_CTX *ctx, SSL_CTX_alpn_select_cb_func cb, void *arg)
+     * }
+     */
     public static void SSL_CTX_set_alpn_select_cb(MemorySegment ctx, MemorySegment cb, MemorySegment arg) {
         var mh$ = SSL_CTX_set_alpn_select_cb$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_set_alpn_select_cb", ctx, cb, arg);
+            }
             mh$.invokeExact(ctx, cb, arg);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_get0_alpn_selected(SSL* ssl, unsigned char** data, unsigned int* len);
-     * }
-     */
+
     public static MethodHandle SSL_get0_alpn_selected$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -2872,19 +3171,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_get0_alpn_selected(const SSL *ssl, const unsigned char **data, unsigned int *len)
+     * }
+     */
     public static void SSL_get0_alpn_selected(MemorySegment ssl, MemorySegment data, MemorySegment len) {
         var mh$ = SSL_get0_alpn_selected$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_get0_alpn_selected", ssl, data, len);
+            }
             mh$.invokeExact(ssl, data, len);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_in_init(SSL* s);
-     * }
-     */
+
     public static MethodHandle SSL_in_init$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2899,19 +3202,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_in_init(const SSL *s)
+     * }
+     */
     public static int SSL_in_init(MemorySegment s) {
         var mh$ = SSL_in_init$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_in_init", s);
+            }
             return (int) mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_CTX_set0_tmp_dh_pkey(SSL_CTX* ctx, EVP_PKEY* dhpkey);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_set0_tmp_dh_pkey$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2927,19 +3234,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_CTX_set0_tmp_dh_pkey(SSL_CTX *ctx, EVP_PKEY *dhpkey)
+     * }
+     */
     public static int SSL_CTX_set0_tmp_dh_pkey(MemorySegment ctx, MemorySegment dhpkey) {
         var mh$ = SSL_CTX_set0_tmp_dh_pkey$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_set0_tmp_dh_pkey", ctx, dhpkey);
+            }
             return (int) mh$.invokeExact(ctx, dhpkey);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_CTX_set_cipher_list(SSL_CTX*, char* str);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_set_cipher_list$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2955,19 +3266,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_CTX_set_cipher_list(SSL_CTX *, const char *str)
+     * }
+     */
     public static int SSL_CTX_set_cipher_list(MemorySegment x0, MemorySegment str) {
         var mh$ = SSL_CTX_set_cipher_list$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_set_cipher_list", x0, str);
+            }
             return (int) mh$.invokeExact(x0, str);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * SSL_CTX* SSL_CTX_new(SSL_METHOD* meth);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_new$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -2982,19 +3297,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
+     * }
+     */
     public static MemorySegment SSL_CTX_new(MemorySegment meth) {
         var mh$ = SSL_CTX_new$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_new", meth);
+            }
             return (MemorySegment) mh$.invokeExact(meth);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_CTX_free(SSL_CTX*);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -3008,19 +3327,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_CTX_free(SSL_CTX *)
+     * }
+     */
     public static void SSL_CTX_free(MemorySegment x0) {
         var mh$ = SSL_CTX_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_free", x0);
+            }
             mh$.invokeExact(x0);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * long SSL_CTX_set_timeout(SSL_CTX* ctx, long t);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_set_timeout$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3036,19 +3359,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * long SSL_CTX_set_timeout(SSL_CTX *ctx, long t)
+     * }
+     */
     public static long SSL_CTX_set_timeout(MemorySegment ctx, long t) {
         var mh$ = SSL_CTX_set_timeout$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_set_timeout", ctx, t);
+            }
             return (long) mh$.invokeExact(ctx, t);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * long SSL_CTX_get_timeout(SSL_CTX* ctx);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_get_timeout$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3063,19 +3390,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * long SSL_CTX_get_timeout(const SSL_CTX *ctx)
+     * }
+     */
     public static long SSL_CTX_get_timeout(MemorySegment ctx) {
         var mh$ = SSL_CTX_get_timeout$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_get_timeout", ctx);
+            }
             return (long) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * X509_STORE* SSL_CTX_get_cert_store(SSL_CTX*);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_get_cert_store$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3090,19 +3421,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * X509_STORE *SSL_CTX_get_cert_store(const SSL_CTX *)
+     * }
+     */
     public static MemorySegment SSL_CTX_get_cert_store(MemorySegment x0) {
         var mh$ = SSL_CTX_get_cert_store$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_get_cert_store", x0);
+            }
             return (MemorySegment) mh$.invokeExact(x0);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * SSL_CIPHER* SSL_get_current_cipher(SSL* s);
-     * }
-     */
+
     public static MethodHandle SSL_get_current_cipher$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3117,19 +3452,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * const SSL_CIPHER *SSL_get_current_cipher(const SSL *s)
+     * }
+     */
     public static MemorySegment SSL_get_current_cipher(MemorySegment s) {
         var mh$ = SSL_get_current_cipher$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_get_current_cipher", s);
+            }
             return (MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * char* SSL_CIPHER_get_name(SSL_CIPHER* c);
-     * }
-     */
+
     public static MethodHandle SSL_CIPHER_get_name$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3144,19 +3483,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * const char *SSL_CIPHER_get_name(const SSL_CIPHER *c)
+     * }
+     */
     public static MemorySegment SSL_CIPHER_get_name(MemorySegment c) {
         var mh$ = SSL_CIPHER_get_name$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CIPHER_get_name", c);
+            }
             return (MemorySegment) mh$.invokeExact(c);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_CIPHER_get_kx_nid(SSL_CIPHER* c);
-     * }
-     */
+
     public static MethodHandle SSL_CIPHER_get_kx_nid$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3171,19 +3514,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_CIPHER_get_kx_nid(const SSL_CIPHER *c)
+     * }
+     */
     public static int SSL_CIPHER_get_kx_nid(MemorySegment c) {
         var mh$ = SSL_CIPHER_get_kx_nid$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CIPHER_get_kx_nid", c);
+            }
             return (int) mh$.invokeExact(c);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_CIPHER_get_auth_nid(SSL_CIPHER* c);
-     * }
-     */
+
     public static MethodHandle SSL_CIPHER_get_auth_nid$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3198,19 +3545,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_CIPHER_get_auth_nid(const SSL_CIPHER *c)
+     * }
+     */
     public static int SSL_CIPHER_get_auth_nid(MemorySegment c) {
         var mh$ = SSL_CIPHER_get_auth_nid$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CIPHER_get_auth_nid", c);
+            }
             return (int) mh$.invokeExact(c);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_pending(SSL* s);
-     * }
-     */
+
     public static MethodHandle SSL_pending$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3225,19 +3576,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_pending(const SSL *s)
+     * }
+     */
     public static int SSL_pending(MemorySegment s) {
         var mh$ = SSL_pending$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_pending", s);
+            }
             return (int) mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_set_bio(SSL* s, BIO* rbio, BIO* wbio);
-     * }
-     */
+
     public static MethodHandle SSL_set_bio$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -3253,19 +3608,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_set_bio(SSL *s, BIO *rbio, BIO *wbio)
+     * }
+     */
     public static void SSL_set_bio(MemorySegment s, MemorySegment rbio, MemorySegment wbio) {
         var mh$ = SSL_set_bio$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_set_bio", s, rbio, wbio);
+            }
             mh$.invokeExact(s, rbio, wbio);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_set_cipher_list(SSL* s, char* str);
-     * }
-     */
+
     public static MethodHandle SSL_set_cipher_list$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3281,19 +3640,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_set_cipher_list(SSL *s, const char *str)
+     * }
+     */
     public static int SSL_set_cipher_list(MemorySegment s, MemorySegment str) {
         var mh$ = SSL_set_cipher_list$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_set_cipher_list", s, str);
+            }
             return (int) mh$.invokeExact(s, str);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_CTX_set_ciphersuites(SSL_CTX* ctx, char* str);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_set_ciphersuites$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3309,19 +3672,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str)
+     * }
+     */
     public static int SSL_CTX_set_ciphersuites(MemorySegment ctx, MemorySegment str) {
         var mh$ = SSL_CTX_set_ciphersuites$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_set_ciphersuites", ctx, str);
+            }
             return (int) mh$.invokeExact(ctx, str);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_set_verify(SSL* s, int mode, int (*callback)(int,struct x509_store_ctx_st*));
-     * }
-     */
+
     public static MethodHandle SSL_set_verify$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -3337,19 +3704,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_set_verify(SSL *s, int mode, SSL_verify_cb callback)
+     * }
+     */
     public static void SSL_set_verify(MemorySegment s, int mode, MemorySegment callback) {
         var mh$ = SSL_set_verify$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_set_verify", s, mode, callback);
+            }
             mh$.invokeExact(s, mode, callback);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_CTX_use_certificate_chain_file(SSL_CTX* ctx, char* file);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_use_certificate_chain_file$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3365,19 +3736,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_CTX_use_certificate_chain_file(SSL_CTX *ctx, const char *file)
+     * }
+     */
     public static int SSL_CTX_use_certificate_chain_file(MemorySegment ctx, MemorySegment file) {
         var mh$ = SSL_CTX_use_certificate_chain_file$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_use_certificate_chain_file", ctx, file);
+            }
             return (int) mh$.invokeExact(ctx, file);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * struct stack_st_X509_NAME* SSL_load_client_CA_file(char* file);
-     * }
-     */
+
     public static MethodHandle SSL_load_client_CA_file$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3392,19 +3767,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * struct stack_st_X509_NAME *SSL_load_client_CA_file(const char *file)
+     * }
+     */
     public static MemorySegment SSL_load_client_CA_file(MemorySegment file) {
         var mh$ = SSL_load_client_CA_file$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_load_client_CA_file", file);
+            }
             return (MemorySegment) mh$.invokeExact(file);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_add_file_cert_subjects_to_stack(struct stack_st_X509_NAME* stackCAs, char* file);
-     * }
-     */
+
     public static MethodHandle SSL_add_file_cert_subjects_to_stack$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3420,19 +3799,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_add_file_cert_subjects_to_stack(struct stack_st_X509_NAME *stackCAs, const char *file)
+     * }
+     */
     public static int SSL_add_file_cert_subjects_to_stack(MemorySegment stackCAs, MemorySegment file) {
         var mh$ = SSL_add_file_cert_subjects_to_stack$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_add_file_cert_subjects_to_stack", stackCAs, file);
+            }
             return (int) mh$.invokeExact(stackCAs, file);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * long SSL_SESSION_get_time(SSL_SESSION* s);
-     * }
-     */
+
     public static MethodHandle SSL_SESSION_get_time$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3447,19 +3830,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * long SSL_SESSION_get_time(const SSL_SESSION *s)
+     * }
+     */
     public static long SSL_SESSION_get_time(MemorySegment s) {
         var mh$ = SSL_SESSION_get_time$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_SESSION_get_time", s);
+            }
             return (long) mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * unsigned char* SSL_SESSION_get_id(SSL_SESSION* s, unsigned int* len);
-     * }
-     */
+
     public static MethodHandle SSL_SESSION_get_id$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3475,19 +3862,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * const unsigned char *SSL_SESSION_get_id(const SSL_SESSION *s, unsigned int *len)
+     * }
+     */
     public static MemorySegment SSL_SESSION_get_id(MemorySegment s, MemorySegment len) {
         var mh$ = SSL_SESSION_get_id$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_SESSION_get_id", s, len);
+            }
             return (MemorySegment) mh$.invokeExact(s, len);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * X509* SSL_get1_peer_certificate(SSL* s);
-     * }
-     */
+
     public static MethodHandle SSL_get1_peer_certificate$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3502,19 +3893,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * X509 *SSL_get1_peer_certificate(const SSL *s)
+     * }
+     */
     public static MemorySegment SSL_get1_peer_certificate(MemorySegment s) {
         var mh$ = SSL_get1_peer_certificate$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_get1_peer_certificate", s);
+            }
             return (MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * struct stack_st_X509* SSL_get_peer_cert_chain(SSL* s);
-     * }
-     */
+
     public static MethodHandle SSL_get_peer_cert_chain$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3529,19 +3924,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * struct stack_st_X509 *SSL_get_peer_cert_chain(const SSL *s)
+     * }
+     */
     public static MemorySegment SSL_get_peer_cert_chain(MemorySegment s) {
         var mh$ = SSL_get_peer_cert_chain$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_get_peer_cert_chain", s);
+            }
             return (MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_CTX_set_verify(SSL_CTX* ctx, int mode, int (*callback)(int,struct x509_store_ctx_st*));
-     * }
-     */
+
     public static MethodHandle SSL_CTX_set_verify$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -3557,19 +3956,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, SSL_verify_cb callback)
+     * }
+     */
     public static void SSL_CTX_set_verify(MemorySegment ctx, int mode, MemorySegment callback) {
         var mh$ = SSL_CTX_set_verify$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_set_verify", ctx, mode, callback);
+            }
             mh$.invokeExact(ctx, mode, callback);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_CTX_set_cert_verify_callback(SSL_CTX* ctx, int (*cb)(X509_STORE_CTX*,void*), void* arg);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_set_cert_verify_callback$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -3585,19 +3988,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_CTX_set_cert_verify_callback(SSL_CTX *ctx, int (*cb)(X509_STORE_CTX *, void *), void *arg)
+     * }
+     */
     public static void SSL_CTX_set_cert_verify_callback(MemorySegment ctx, MemorySegment cb, MemorySegment arg) {
         var mh$ = SSL_CTX_set_cert_verify_callback$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_set_cert_verify_callback", ctx, cb, arg);
+            }
             mh$.invokeExact(ctx, cb, arg);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_CTX_use_PrivateKey(SSL_CTX* ctx, EVP_PKEY* pkey);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_use_PrivateKey$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3613,19 +4020,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_CTX_use_PrivateKey(SSL_CTX *ctx, EVP_PKEY *pkey)
+     * }
+     */
     public static int SSL_CTX_use_PrivateKey(MemorySegment ctx, MemorySegment pkey) {
         var mh$ = SSL_CTX_use_PrivateKey$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_use_PrivateKey", ctx, pkey);
+            }
             return (int) mh$.invokeExact(ctx, pkey);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_CTX_use_certificate(SSL_CTX* ctx, X509* x);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_use_certificate$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3641,19 +4052,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_CTX_use_certificate(SSL_CTX *ctx, X509 *x)
+     * }
+     */
     public static int SSL_CTX_use_certificate(MemorySegment ctx, MemorySegment x) {
         var mh$ = SSL_CTX_use_certificate$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_use_certificate", ctx, x);
+            }
             return (int) mh$.invokeExact(ctx, x);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_CTX_set_default_passwd_cb(SSL_CTX* ctx, pem_password_cb* cb);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_set_default_passwd_cb$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -3668,19 +4083,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_CTX_set_default_passwd_cb(SSL_CTX *ctx, pem_password_cb *cb)
+     * }
+     */
     public static void SSL_CTX_set_default_passwd_cb(MemorySegment ctx, MemorySegment cb) {
         var mh$ = SSL_CTX_set_default_passwd_cb$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_set_default_passwd_cb", ctx, cb);
+            }
             mh$.invokeExact(ctx, cb);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_CTX_check_private_key(SSL_CTX* ctx);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_check_private_key$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3695,19 +4114,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_CTX_check_private_key(const SSL_CTX *ctx)
+     * }
+     */
     public static int SSL_CTX_check_private_key(MemorySegment ctx) {
         var mh$ = SSL_CTX_check_private_key$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_check_private_key", ctx);
+            }
             return (int) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_CTX_set_session_id_context(SSL_CTX* ctx, unsigned char* sid_ctx, unsigned int sid_ctx_len);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_set_session_id_context$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3724,19 +4147,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_CTX_set_session_id_context(SSL_CTX *ctx, const unsigned char *sid_ctx, unsigned int sid_ctx_len)
+     * }
+     */
     public static int SSL_CTX_set_session_id_context(MemorySegment ctx, MemorySegment sid_ctx, int sid_ctx_len) {
         var mh$ = SSL_CTX_set_session_id_context$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_set_session_id_context", ctx, sid_ctx, sid_ctx_len);
+            }
             return (int) mh$.invokeExact(ctx, sid_ctx, sid_ctx_len);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * SSL* SSL_new(SSL_CTX* ctx);
-     * }
-     */
+
     public static MethodHandle SSL_new$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3751,19 +4178,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * SSL *SSL_new(SSL_CTX *ctx)
+     * }
+     */
     public static MemorySegment SSL_new(MemorySegment ctx) {
         var mh$ = SSL_new$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_new", ctx);
+            }
             return (MemorySegment) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_free(SSL* ssl);
-     * }
-     */
+
     public static MethodHandle SSL_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -3777,19 +4208,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_free(SSL *ssl)
+     * }
+     */
     public static void SSL_free(MemorySegment ssl) {
         var mh$ = SSL_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_free", ssl);
+            }
             mh$.invokeExact(ssl);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_read(SSL* ssl, void* buf, int num);
-     * }
-     */
+
     public static MethodHandle SSL_read$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3806,19 +4241,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_read(SSL *ssl, void *buf, int num)
+     * }
+     */
     public static int SSL_read(MemorySegment ssl, MemorySegment buf, int num) {
         var mh$ = SSL_read$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_read", ssl, buf, num);
+            }
             return (int) mh$.invokeExact(ssl, buf, num);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_write(SSL* ssl, void* buf, int num);
-     * }
-     */
+
     public static MethodHandle SSL_write$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3835,19 +4274,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_write(SSL *ssl, const void *buf, int num)
+     * }
+     */
     public static int SSL_write(MemorySegment ssl, MemorySegment buf, int num) {
         var mh$ = SSL_write$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_write", ssl, buf, num);
+            }
             return (int) mh$.invokeExact(ssl, buf, num);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * long SSL_CTX_ctrl(SSL_CTX* ctx, int cmd, long larg, void* parg);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_ctrl$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3865,19 +4308,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * long SSL_CTX_ctrl(SSL_CTX *ctx, int cmd, long larg, void *parg)
+     * }
+     */
     public static long SSL_CTX_ctrl(MemorySegment ctx, int cmd, long larg, MemorySegment parg) {
         var mh$ = SSL_CTX_ctrl$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_ctrl", ctx, cmd, larg, parg);
+            }
             return (long) mh$.invokeExact(ctx, cmd, larg, parg);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * char* SSL_get_version(SSL* s);
-     * }
-     */
+
     public static MethodHandle SSL_get_version$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3892,19 +4339,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * const char *SSL_get_version(const SSL *s)
+     * }
+     */
     public static MemorySegment SSL_get_version(MemorySegment s) {
         var mh$ = SSL_get_version$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_get_version", s);
+            }
             return (MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * SSL_METHOD* TLS_server_method();
-     * }
-     */
+
     public static MethodHandle TLS_server_method$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3917,19 +4368,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * const SSL_METHOD *TLS_server_method(void)
+     * }
+     */
     public static MemorySegment TLS_server_method() {
         var mh$ = TLS_server_method$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("TLS_server_method");
+            }
             return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * struct stack_st_SSL_CIPHER* SSL_get_ciphers(SSL* s);
-     * }
-     */
+
     public static MethodHandle SSL_get_ciphers$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3944,19 +4399,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * struct stack_st_SSL_CIPHER *SSL_get_ciphers(const SSL *s)
+     * }
+     */
     public static MemorySegment SSL_get_ciphers(MemorySegment s) {
         var mh$ = SSL_get_ciphers$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_get_ciphers", s);
+            }
             return (MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * struct stack_st_SSL_CIPHER* SSL_CTX_get_ciphers(SSL_CTX* ctx);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_get_ciphers$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3971,19 +4430,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * struct stack_st_SSL_CIPHER *SSL_CTX_get_ciphers(const SSL_CTX *ctx)
+     * }
+     */
     public static MemorySegment SSL_CTX_get_ciphers(MemorySegment ctx) {
         var mh$ = SSL_CTX_get_ciphers$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_get_ciphers", ctx);
+            }
             return (MemorySegment) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_do_handshake(SSL* s);
-     * }
-     */
+
     public static MethodHandle SSL_do_handshake$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -3998,19 +4461,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_do_handshake(SSL *s)
+     * }
+     */
     public static int SSL_do_handshake(MemorySegment s) {
         var mh$ = SSL_do_handshake$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_do_handshake", s);
+            }
             return (int) mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_renegotiate(SSL* s);
-     * }
-     */
+
     public static MethodHandle SSL_renegotiate$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4025,19 +4492,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_renegotiate(SSL *s)
+     * }
+     */
     public static int SSL_renegotiate(MemorySegment s) {
         var mh$ = SSL_renegotiate$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_renegotiate", s);
+            }
             return (int) mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_renegotiate_pending(SSL* s);
-     * }
-     */
+
     public static MethodHandle SSL_renegotiate_pending$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4052,19 +4523,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_renegotiate_pending(const SSL *s)
+     * }
+     */
     public static int SSL_renegotiate_pending(MemorySegment s) {
         var mh$ = SSL_renegotiate_pending$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_renegotiate_pending", s);
+            }
             return (int) mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_shutdown(SSL* s);
-     * }
-     */
+
     public static MethodHandle SSL_shutdown$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4079,19 +4554,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_shutdown(SSL *s)
+     * }
+     */
     public static int SSL_shutdown(MemorySegment s) {
         var mh$ = SSL_shutdown$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_shutdown", s);
+            }
             return (int) mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_verify_client_post_handshake(SSL* s);
-     * }
-     */
+
     public static MethodHandle SSL_verify_client_post_handshake$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4106,19 +4585,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_verify_client_post_handshake(SSL *s)
+     * }
+     */
     public static int SSL_verify_client_post_handshake(MemorySegment s) {
         var mh$ = SSL_verify_client_post_handshake$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_verify_client_post_handshake", s);
+            }
             return (int) mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_CTX_set_client_CA_list(SSL_CTX* ctx, struct stack_st_X509_NAME* name_list);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_set_client_CA_list$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -4133,19 +4616,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_CTX_set_client_CA_list(SSL_CTX *ctx, struct stack_st_X509_NAME *name_list)
+     * }
+     */
     public static void SSL_CTX_set_client_CA_list(MemorySegment ctx, MemorySegment name_list) {
         var mh$ = SSL_CTX_set_client_CA_list$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_set_client_CA_list", ctx, name_list);
+            }
             mh$.invokeExact(ctx, name_list);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * struct stack_st_X509_NAME* SSL_CTX_get_client_CA_list(SSL_CTX* s);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_get_client_CA_list$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4160,19 +4647,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * struct stack_st_X509_NAME *SSL_CTX_get_client_CA_list(const SSL_CTX *s)
+     * }
+     */
     public static MemorySegment SSL_CTX_get_client_CA_list(MemorySegment s) {
         var mh$ = SSL_CTX_get_client_CA_list$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_get_client_CA_list", s);
+            }
             return (MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_CTX_add_client_CA(SSL_CTX* ctx, X509* x);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_add_client_CA$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4188,19 +4679,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_CTX_add_client_CA(SSL_CTX *ctx, X509 *x)
+     * }
+     */
     public static int SSL_CTX_add_client_CA(MemorySegment ctx, MemorySegment x) {
         var mh$ = SSL_CTX_add_client_CA$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_add_client_CA", ctx, x);
+            }
             return (int) mh$.invokeExact(ctx, x);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_set_connect_state(SSL* s);
-     * }
-     */
+
     public static MethodHandle SSL_set_connect_state$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -4214,19 +4709,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_set_connect_state(SSL *s)
+     * }
+     */
     public static void SSL_set_connect_state(MemorySegment s) {
         var mh$ = SSL_set_connect_state$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_set_connect_state", s);
+            }
             mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_set_accept_state(SSL* s);
-     * }
-     */
+
     public static MethodHandle SSL_set_accept_state$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -4240,19 +4739,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_set_accept_state(SSL *s)
+     * }
+     */
     public static void SSL_set_accept_state(MemorySegment s) {
         var mh$ = SSL_set_accept_state$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_set_accept_state", s);
+            }
             mh$.invokeExact(s);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * struct evp_pkey_st* SSL_get_privatekey(SSL* ssl);
-     * }
-     */
+
     public static MethodHandle SSL_get_privatekey$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4267,19 +4770,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * struct evp_pkey_st *SSL_get_privatekey(const SSL *ssl)
+     * }
+     */
     public static MemorySegment SSL_get_privatekey(MemorySegment ssl) {
         var mh$ = SSL_get_privatekey$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_get_privatekey", ssl);
+            }
             return (MemorySegment) mh$.invokeExact(ssl);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_get_shutdown(SSL* ssl);
-     * }
-     */
+
     public static MethodHandle SSL_get_shutdown$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4294,19 +4801,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_get_shutdown(const SSL *ssl)
+     * }
+     */
     public static int SSL_get_shutdown(MemorySegment ssl) {
         var mh$ = SSL_get_shutdown$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_get_shutdown", ssl);
+            }
             return (int) mh$.invokeExact(ssl);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_CTX_set_default_verify_paths(SSL_CTX* ctx);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_set_default_verify_paths$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4321,19 +4832,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_CTX_set_default_verify_paths(SSL_CTX *ctx)
+     * }
+     */
     public static int SSL_CTX_set_default_verify_paths(MemorySegment ctx) {
         var mh$ = SSL_CTX_set_default_verify_paths$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_set_default_verify_paths", ctx);
+            }
             return (int) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_CTX_load_verify_locations(SSL_CTX* ctx, char* CAfile, char* CApath);
-     * }
-     */
+
     public static MethodHandle SSL_CTX_load_verify_locations$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4350,19 +4865,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath)
+     * }
+     */
     public static int SSL_CTX_load_verify_locations(MemorySegment ctx, MemorySegment CAfile, MemorySegment CApath) {
         var mh$ = SSL_CTX_load_verify_locations$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_load_verify_locations", ctx, CAfile, CApath);
+            }
             return (int) mh$.invokeExact(ctx, CAfile, CApath);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * SSL_SESSION* SSL_get_session(SSL* ssl);
-     * }
-     */
+
     public static MethodHandle SSL_get_session$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4377,19 +4896,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * SSL_SESSION *SSL_get_session(const SSL *ssl)
+     * }
+     */
     public static MemorySegment SSL_get_session(MemorySegment ssl) {
         var mh$ = SSL_get_session$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_get_session", ssl);
+            }
             return (MemorySegment) mh$.invokeExact(ssl);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_set_info_callback(SSL* ssl, void (*cb)(SSL*,int,int));
-     * }
-     */
+
     public static MethodHandle SSL_set_info_callback$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -4404,19 +4927,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_set_info_callback(SSL *ssl, void (*cb)(const SSL *, int, int))
+     * }
+     */
     public static void SSL_set_info_callback(MemorySegment ssl, MemorySegment cb) {
         var mh$ = SSL_set_info_callback$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_set_info_callback", ssl, cb);
+            }
             mh$.invokeExact(ssl, cb);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_set_verify_result(SSL* ssl, long v);
-     * }
-     */
+
     public static MethodHandle SSL_set_verify_result$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -4431,19 +4958,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_set_verify_result(SSL *ssl, long v)
+     * }
+     */
     public static void SSL_set_verify_result(MemorySegment ssl, long v) {
         var mh$ = SSL_set_verify_result$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_set_verify_result", ssl, v);
+            }
             mh$.invokeExact(ssl, v);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_get_ex_data_X509_STORE_CTX_idx();
-     * }
-     */
+
     public static MethodHandle SSL_get_ex_data_X509_STORE_CTX_idx$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4456,19 +4987,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_get_ex_data_X509_STORE_CTX_idx(void)
+     * }
+     */
     public static int SSL_get_ex_data_X509_STORE_CTX_idx() {
         var mh$ = SSL_get_ex_data_X509_STORE_CTX_idx$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_get_ex_data_X509_STORE_CTX_idx");
+            }
             return (int) mh$.invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_CTX_set_tmp_dh_callback(SSL_CTX* ctx, DH* (*dh)(SSL*,int,int));
-     * }
-     */
+
     public static MethodHandle SSL_CTX_set_tmp_dh_callback$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -4483,19 +5018,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_CTX_set_tmp_dh_callback(SSL_CTX *ctx, DH *(*dh)(SSL *, int, int))
+     * }
+     */
     public static void SSL_CTX_set_tmp_dh_callback(MemorySegment ctx, MemorySegment dh) {
         var mh$ = SSL_CTX_set_tmp_dh_callback$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CTX_set_tmp_dh_callback", ctx, dh);
+            }
             mh$.invokeExact(ctx, dh);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * SSL_CONF_CTX* SSL_CONF_CTX_new();
-     * }
-     */
+
     public static MethodHandle SSL_CONF_CTX_new$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4508,19 +5047,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * SSL_CONF_CTX *SSL_CONF_CTX_new(void)
+     * }
+     */
     public static MemorySegment SSL_CONF_CTX_new() {
         var mh$ = SSL_CONF_CTX_new$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CONF_CTX_new");
+            }
             return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_CONF_CTX_finish(SSL_CONF_CTX* cctx);
-     * }
-     */
+
     public static MethodHandle SSL_CONF_CTX_finish$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4535,19 +5078,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_CONF_CTX_finish(SSL_CONF_CTX *cctx)
+     * }
+     */
     public static int SSL_CONF_CTX_finish(MemorySegment cctx) {
         var mh$ = SSL_CONF_CTX_finish$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CONF_CTX_finish", cctx);
+            }
             return (int) mh$.invokeExact(cctx);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_CONF_CTX_free(SSL_CONF_CTX* cctx);
-     * }
-     */
+
     public static MethodHandle SSL_CONF_CTX_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -4561,19 +5108,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_CONF_CTX_free(SSL_CONF_CTX *cctx)
+     * }
+     */
     public static void SSL_CONF_CTX_free(MemorySegment cctx) {
         var mh$ = SSL_CONF_CTX_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CONF_CTX_free", cctx);
+            }
             mh$.invokeExact(cctx);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * unsigned int SSL_CONF_CTX_set_flags(SSL_CONF_CTX* cctx, unsigned int flags);
-     * }
-     */
+
     public static MethodHandle SSL_CONF_CTX_set_flags$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4589,19 +5140,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * unsigned int SSL_CONF_CTX_set_flags(SSL_CONF_CTX *cctx, unsigned int flags)
+     * }
+     */
     public static int SSL_CONF_CTX_set_flags(MemorySegment cctx, int flags) {
         var mh$ = SSL_CONF_CTX_set_flags$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CONF_CTX_set_flags", cctx, flags);
+            }
             return (int) mh$.invokeExact(cctx, flags);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void SSL_CONF_CTX_set_ssl_ctx(SSL_CONF_CTX* cctx, SSL_CTX* ctx);
-     * }
-     */
+
     public static MethodHandle SSL_CONF_CTX_set_ssl_ctx$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -4616,19 +5171,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void SSL_CONF_CTX_set_ssl_ctx(SSL_CONF_CTX *cctx, SSL_CTX *ctx)
+     * }
+     */
     public static void SSL_CONF_CTX_set_ssl_ctx(MemorySegment cctx, MemorySegment ctx) {
         var mh$ = SSL_CONF_CTX_set_ssl_ctx$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CONF_CTX_set_ssl_ctx", cctx, ctx);
+            }
             mh$.invokeExact(cctx, ctx);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_CONF_cmd(SSL_CONF_CTX* cctx, char* cmd, char* value);
-     * }
-     */
+
     public static MethodHandle SSL_CONF_cmd$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4645,19 +5204,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_CONF_cmd(SSL_CONF_CTX *cctx, const char *cmd, const char *value)
+     * }
+     */
     public static int SSL_CONF_cmd(MemorySegment cctx, MemorySegment cmd, MemorySegment value) {
         var mh$ = SSL_CONF_cmd$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CONF_cmd", cctx, cmd, value);
+            }
             return (int) mh$.invokeExact(cctx, cmd, value);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int SSL_CONF_cmd_value_type(SSL_CONF_CTX* cctx, char* cmd);
-     * }
-     */
+
     public static MethodHandle SSL_CONF_cmd_value_type$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4673,19 +5236,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int SSL_CONF_cmd_value_type(SSL_CONF_CTX *cctx, const char *cmd)
+     * }
+     */
     public static int SSL_CONF_cmd_value_type(MemorySegment cctx, MemorySegment cmd) {
         var mh$ = SSL_CONF_cmd_value_type$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_CONF_cmd_value_type", cctx, cmd);
+            }
             return (int) mh$.invokeExact(cctx, cmd);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int OPENSSL_init_ssl(unsigned long opts, OPENSSL_INIT_SETTINGS* settings);
-     * }
-     */
+
     public static MethodHandle OPENSSL_init_ssl$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4701,19 +5268,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int OPENSSL_init_ssl(uint64_t opts, const OPENSSL_INIT_SETTINGS *settings)
+     * }
+     */
     public static int OPENSSL_init_ssl(long opts, MemorySegment settings) {
         var mh$ = OPENSSL_init_ssl$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OPENSSL_init_ssl", opts, settings);
+            }
             return (int) mh$.invokeExact(opts, settings);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * unsigned long ERR_get_error();
-     * }
-     */
+
     public static MethodHandle ERR_get_error$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4726,19 +5297,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * unsigned long ERR_get_error(void)
+     * }
+     */
     public static long ERR_get_error() {
         var mh$ = ERR_get_error$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("ERR_get_error");
+            }
             return (long) mh$.invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * unsigned long ERR_peek_last_error();
-     * }
-     */
+
     public static MethodHandle ERR_peek_last_error$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4751,19 +5326,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * unsigned long ERR_peek_last_error(void)
+     * }
+     */
     public static long ERR_peek_last_error() {
         var mh$ = ERR_peek_last_error$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("ERR_peek_last_error");
+            }
             return (long) mh$.invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void ERR_clear_error();
-     * }
-     */
+
     public static MethodHandle ERR_clear_error$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(        );
@@ -4775,19 +5354,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void ERR_clear_error(void)
+     * }
+     */
     public static void ERR_clear_error() {
         var mh$ = ERR_clear_error$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("ERR_clear_error");
+            }
             mh$.invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * char* ERR_error_string(unsigned long e, char* buf);
-     * }
-     */
+
     public static MethodHandle ERR_error_string$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4803,19 +5386,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * char *ERR_error_string(unsigned long e, char *buf)
+     * }
+     */
     public static MemorySegment ERR_error_string(long e, MemorySegment buf) {
         var mh$ = ERR_error_string$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("ERR_error_string", e, buf);
+            }
             return (MemorySegment) mh$.invokeExact(e, buf);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int PKCS12_verify_mac(PKCS12* p12, char* pass, int passlen);
-     * }
-     */
+
     public static MethodHandle PKCS12_verify_mac$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4832,19 +5419,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int PKCS12_verify_mac(PKCS12 *p12, const char *pass, int passlen)
+     * }
+     */
     public static int PKCS12_verify_mac(MemorySegment p12, MemorySegment pass, int passlen) {
         var mh$ = PKCS12_verify_mac$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("PKCS12_verify_mac", p12, pass, passlen);
+            }
             return (int) mh$.invokeExact(p12, pass, passlen);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void PKCS12_free(PKCS12* a);
-     * }
-     */
+
     public static MethodHandle PKCS12_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -4858,19 +5449,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * extern void PKCS12_free(PKCS12 *a)
+     * }
+     */
     public static void PKCS12_free(MemorySegment a) {
         var mh$ = PKCS12_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("PKCS12_free", a);
+            }
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int PKCS12_parse(PKCS12* p12, char* pass, EVP_PKEY** pkey, X509** cert, struct stack_st_X509** ca);
-     * }
-     */
+
     public static MethodHandle PKCS12_parse$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4889,19 +5484,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int PKCS12_parse(PKCS12 *p12, const char *pass, EVP_PKEY **pkey, X509 **cert, struct stack_st_X509 **ca)
+     * }
+     */
     public static int PKCS12_parse(MemorySegment p12, MemorySegment pass, MemorySegment pkey, MemorySegment cert, MemorySegment ca) {
         var mh$ = PKCS12_parse$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("PKCS12_parse", p12, pass, pkey, cert, ca);
+            }
             return (int) mh$.invokeExact(p12, pass, pkey, cert, ca);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * PKCS12* d2i_PKCS12_bio(BIO* bp, PKCS12** p12);
-     * }
-     */
+
     public static MethodHandle d2i_PKCS12_bio$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4917,19 +5516,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * PKCS12 *d2i_PKCS12_bio(BIO *bp, PKCS12 **p12)
+     * }
+     */
     public static MemorySegment d2i_PKCS12_bio(MemorySegment bp, MemorySegment p12) {
         var mh$ = d2i_PKCS12_bio$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("d2i_PKCS12_bio", bp, p12);
+            }
             return (MemorySegment) mh$.invokeExact(bp, p12);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void RAND_seed(void* buf, int num);
-     * }
-     */
+
     public static MethodHandle RAND_seed$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -4944,19 +5547,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * void RAND_seed(const void *buf, int num)
+     * }
+     */
     public static void RAND_seed(MemorySegment buf, int num) {
         var mh$ = RAND_seed$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("RAND_seed", buf, num);
+            }
             mh$.invokeExact(buf, num);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int RAND_load_file(char* file, long max_bytes);
-     * }
-     */
+
     public static MethodHandle RAND_load_file$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -4972,19 +5579,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int RAND_load_file(const char *file, long max_bytes)
+     * }
+     */
     public static int RAND_load_file(MemorySegment file, long max_bytes) {
         var mh$ = RAND_load_file$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("RAND_load_file", file, max_bytes);
+            }
             return (int) mh$.invokeExact(file, max_bytes);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int X509_check_issued(X509* issuer, X509* subject);
-     * }
-     */
+
     public static MethodHandle X509_check_issued$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5000,19 +5611,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int X509_check_issued(X509 *issuer, X509 *subject)
+     * }
+     */
     public static int X509_check_issued(MemorySegment issuer, MemorySegment subject) {
         var mh$ = X509_check_issued$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("X509_check_issued", issuer, subject);
+            }
             return (int) mh$.invokeExact(issuer, subject);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * ENGINE* ENGINE_by_id(char* id);
-     * }
-     */
+
     public static MethodHandle ENGINE_by_id$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5027,19 +5642,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * ENGINE *ENGINE_by_id(const char *id)
+     * }
+     */
     public static MemorySegment ENGINE_by_id(MemorySegment id) {
         var mh$ = ENGINE_by_id$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("ENGINE_by_id", id);
+            }
             return (MemorySegment) mh$.invokeExact(id);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int ENGINE_register_all_complete();
-     * }
-     */
+
     public static MethodHandle ENGINE_register_all_complete$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5052,19 +5671,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int ENGINE_register_all_complete(void)
+     * }
+     */
     public static int ENGINE_register_all_complete() {
         var mh$ = ENGINE_register_all_complete$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("ENGINE_register_all_complete");
+            }
             return (int) mh$.invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int ENGINE_ctrl_cmd_string(ENGINE* e, char* cmd_name, char* arg, int cmd_optional);
-     * }
-     */
+
     public static MethodHandle ENGINE_ctrl_cmd_string$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5082,19 +5705,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int ENGINE_ctrl_cmd_string(ENGINE *e, const char *cmd_name, const char *arg, int cmd_optional)
+     * }
+     */
     public static int ENGINE_ctrl_cmd_string(MemorySegment e, MemorySegment cmd_name, MemorySegment arg, int cmd_optional) {
         var mh$ = ENGINE_ctrl_cmd_string$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("ENGINE_ctrl_cmd_string", e, cmd_name, arg, cmd_optional);
+            }
             return (int) mh$.invokeExact(e, cmd_name, arg, cmd_optional);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int ENGINE_free(ENGINE* e);
-     * }
-     */
+
     public static MethodHandle ENGINE_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5109,19 +5736,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int ENGINE_free(ENGINE *e)
+     * }
+     */
     public static int ENGINE_free(MemorySegment e) {
         var mh$ = ENGINE_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("ENGINE_free", e);
+            }
             return (int) mh$.invokeExact(e);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * EVP_PKEY* ENGINE_load_private_key(ENGINE* e, char* key_id, UI_METHOD* ui_method, void* callback_data);
-     * }
-     */
+
     public static MethodHandle ENGINE_load_private_key$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5139,19 +5770,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * EVP_PKEY *ENGINE_load_private_key(ENGINE *e, const char *key_id, UI_METHOD *ui_method, void *callback_data)
+     * }
+     */
     public static MemorySegment ENGINE_load_private_key(MemorySegment e, MemorySegment key_id, MemorySegment ui_method, MemorySegment callback_data) {
         var mh$ = ENGINE_load_private_key$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("ENGINE_load_private_key", e, key_id, ui_method, callback_data);
+            }
             return (MemorySegment) mh$.invokeExact(e, key_id, ui_method, callback_data);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int ENGINE_set_default(ENGINE* e, unsigned int flags);
-     * }
-     */
+
     public static MethodHandle ENGINE_set_default$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5167,19 +5802,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int ENGINE_set_default(ENGINE *e, unsigned int flags)
+     * }
+     */
     public static int ENGINE_set_default(MemorySegment e, int flags) {
         var mh$ = ENGINE_set_default$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("ENGINE_set_default", e, flags);
+            }
             return (int) mh$.invokeExact(e, flags);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * OCSP_CERTID* OCSP_cert_to_id(EVP_MD* dgst, X509* subject, X509* issuer);
-     * }
-     */
+
     public static MethodHandle OCSP_cert_to_id$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5196,19 +5835,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * OCSP_CERTID *OCSP_cert_to_id(const EVP_MD *dgst, const X509 *subject, const X509 *issuer)
+     * }
+     */
     public static MemorySegment OCSP_cert_to_id(MemorySegment dgst, MemorySegment subject, MemorySegment issuer) {
         var mh$ = OCSP_cert_to_id$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_cert_to_id", dgst, subject, issuer);
+            }
             return (MemorySegment) mh$.invokeExact(dgst, subject, issuer);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * OCSP_ONEREQ* OCSP_request_add0_id(OCSP_REQUEST* req, OCSP_CERTID* cid);
-     * }
-     */
+
     public static MethodHandle OCSP_request_add0_id$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5224,19 +5867,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * OCSP_ONEREQ *OCSP_request_add0_id(OCSP_REQUEST *req, OCSP_CERTID *cid)
+     * }
+     */
     public static MemorySegment OCSP_request_add0_id(MemorySegment req, MemorySegment cid) {
         var mh$ = OCSP_request_add0_id$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_request_add0_id", req, cid);
+            }
             return (MemorySegment) mh$.invokeExact(req, cid);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int OCSP_response_status(OCSP_RESPONSE* resp);
-     * }
-     */
+
     public static MethodHandle OCSP_response_status$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5251,19 +5898,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int OCSP_response_status(OCSP_RESPONSE *resp)
+     * }
+     */
     public static int OCSP_response_status(MemorySegment resp) {
         var mh$ = OCSP_response_status$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_response_status", resp);
+            }
             return (int) mh$.invokeExact(resp);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * OCSP_BASICRESP* OCSP_response_get1_basic(OCSP_RESPONSE* resp);
-     * }
-     */
+
     public static MethodHandle OCSP_response_get1_basic$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5278,19 +5929,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * OCSP_BASICRESP *OCSP_response_get1_basic(OCSP_RESPONSE *resp)
+     * }
+     */
     public static MemorySegment OCSP_response_get1_basic(MemorySegment resp) {
         var mh$ = OCSP_response_get1_basic$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_response_get1_basic", resp);
+            }
             return (MemorySegment) mh$.invokeExact(resp);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * OCSP_SINGLERESP* OCSP_resp_get0(OCSP_BASICRESP* bs, int idx);
-     * }
-     */
+
     public static MethodHandle OCSP_resp_get0$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5306,19 +5961,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * OCSP_SINGLERESP *OCSP_resp_get0(OCSP_BASICRESP *bs, int idx)
+     * }
+     */
     public static MemorySegment OCSP_resp_get0(MemorySegment bs, int idx) {
         var mh$ = OCSP_resp_get0$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_resp_get0", bs, idx);
+            }
             return (MemorySegment) mh$.invokeExact(bs, idx);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int OCSP_resp_find(OCSP_BASICRESP* bs, OCSP_CERTID* id, int last);
-     * }
-     */
+
     public static MethodHandle OCSP_resp_find$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5335,19 +5994,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int OCSP_resp_find(OCSP_BASICRESP *bs, OCSP_CERTID *id, int last)
+     * }
+     */
     public static int OCSP_resp_find(MemorySegment bs, MemorySegment id, int last) {
         var mh$ = OCSP_resp_find$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_resp_find", bs, id, last);
+            }
             return (int) mh$.invokeExact(bs, id, last);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int OCSP_single_get0_status(OCSP_SINGLERESP* single, int* reason, ASN1_GENERALIZEDTIME** revtime, ASN1_GENERALIZEDTIME** thisupd, ASN1_GENERALIZEDTIME** nextupd);
-     * }
-     */
+
     public static MethodHandle OCSP_single_get0_status$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5366,19 +6029,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * int OCSP_single_get0_status(OCSP_SINGLERESP *single, int *reason, ASN1_GENERALIZEDTIME **revtime, ASN1_GENERALIZEDTIME **thisupd, ASN1_GENERALIZEDTIME **nextupd)
+     * }
+     */
     public static int OCSP_single_get0_status(MemorySegment single, MemorySegment reason, MemorySegment revtime, MemorySegment thisupd, MemorySegment nextupd) {
         var mh$ = OCSP_single_get0_status$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_single_get0_status", single, reason, revtime, thisupd, nextupd);
+            }
             return (int) mh$.invokeExact(single, reason, revtime, thisupd, nextupd);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void OCSP_BASICRESP_free(OCSP_BASICRESP* a);
-     * }
-     */
+
     public static MethodHandle OCSP_BASICRESP_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -5392,19 +6059,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * extern void OCSP_BASICRESP_free(OCSP_BASICRESP *a)
+     * }
+     */
     public static void OCSP_BASICRESP_free(MemorySegment a) {
         var mh$ = OCSP_BASICRESP_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_BASICRESP_free", a);
+            }
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void OCSP_RESPONSE_free(OCSP_RESPONSE* a);
-     * }
-     */
+
     public static MethodHandle OCSP_RESPONSE_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -5418,19 +6089,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * extern void OCSP_RESPONSE_free(OCSP_RESPONSE *a)
+     * }
+     */
     public static void OCSP_RESPONSE_free(MemorySegment a) {
         var mh$ = OCSP_RESPONSE_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_RESPONSE_free", a);
+            }
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * OCSP_RESPONSE* d2i_OCSP_RESPONSE(OCSP_RESPONSE** a, unsigned char** in, long len);
-     * }
-     */
+
     public static MethodHandle d2i_OCSP_RESPONSE$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5447,19 +6122,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * extern OCSP_RESPONSE *d2i_OCSP_RESPONSE(OCSP_RESPONSE **a, const unsigned char **in, long len)
+     * }
+     */
     public static MemorySegment d2i_OCSP_RESPONSE(MemorySegment a, MemorySegment in, long len) {
         var mh$ = d2i_OCSP_RESPONSE$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("d2i_OCSP_RESPONSE", a, in, len);
+            }
             return (MemorySegment) mh$.invokeExact(a, in, len);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void OCSP_CERTID_free(OCSP_CERTID* a);
-     * }
-     */
+
     public static MethodHandle OCSP_CERTID_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -5473,19 +6152,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * extern void OCSP_CERTID_free(OCSP_CERTID *a)
+     * }
+     */
     public static void OCSP_CERTID_free(MemorySegment a) {
         var mh$ = OCSP_CERTID_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_CERTID_free", a);
+            }
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * OCSP_REQUEST* OCSP_REQUEST_new();
-     * }
-     */
+
     public static MethodHandle OCSP_REQUEST_new$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5498,19 +6181,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * extern OCSP_REQUEST *OCSP_REQUEST_new(void)
+     * }
+     */
     public static MemorySegment OCSP_REQUEST_new() {
         var mh$ = OCSP_REQUEST_new$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_REQUEST_new");
+            }
             return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * void OCSP_REQUEST_free(OCSP_REQUEST* a);
-     * }
-     */
+
     public static MethodHandle OCSP_REQUEST_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
@@ -5524,19 +6211,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * extern void OCSP_REQUEST_free(OCSP_REQUEST *a)
+     * }
+     */
     public static void OCSP_REQUEST_free(MemorySegment a) {
         var mh$ = OCSP_REQUEST_free$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OCSP_REQUEST_free", a);
+            }
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * int i2d_OCSP_REQUEST(OCSP_REQUEST* a, unsigned char** out);
-     * }
-     */
+
     public static MethodHandle i2d_OCSP_REQUEST$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5552,19 +6243,23 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * extern int i2d_OCSP_REQUEST(const OCSP_REQUEST *a, unsigned char **out)
+     * }
+     */
     public static int i2d_OCSP_REQUEST(MemorySegment a, MemorySegment out) {
         var mh$ = i2d_OCSP_REQUEST$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("i2d_OCSP_REQUEST", a, out);
+            }
             return (int) mh$.invokeExact(a, out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    /**
-     * {@snippet lang=c :
-     * char* OSSL_PROVIDER_get0_name(OSSL_PROVIDER* prov);
-     * }
-     */
+
     public static MethodHandle OSSL_PROVIDER_get0_name$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -5579,19 +6274,27 @@ public class openssl_h {
         return Holder.MH;
     }
 
+    /**
+     * {@snippet lang=c :
+     * const char *OSSL_PROVIDER_get0_name(const OSSL_PROVIDER *prov)
+     * }
+     */
     public static MemorySegment OSSL_PROVIDER_get0_name(MemorySegment prov) {
         var mh$ = OSSL_PROVIDER_get0_name$MH();
         try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("OSSL_PROVIDER_get0_name", prov);
+            }
             return (MemorySegment) mh$.invokeExact(prov);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    private static final MemorySegment OPENSSL_FILE = Arena.ofAuto().allocateFrom("/tmp/jextract$12868569411196900360.h");
+    private static final MemorySegment OPENSSL_FILE = Arena.ofAuto().allocateFrom("/tmp/jextract$5497034726522862260.h");
 
     /**
      * {@snippet lang=c :
-     * #define OPENSSL_FILE "/tmp/jextract$12868569411196900360.h"
+     * #define OPENSSL_FILE "/tmp/jextract$5497034726522862260.h"
      * }
      */
     public static MemorySegment OPENSSL_FILE() {
