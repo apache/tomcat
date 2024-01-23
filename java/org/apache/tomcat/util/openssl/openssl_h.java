@@ -52,6 +52,7 @@ public class openssl_h {
             .withTargetLayout(MemoryLayout.sequenceLayout(java.lang.Long.MAX_VALUE, JAVA_BYTE));
     public static final ValueLayout.OfLong C_LONG = ValueLayout.JAVA_LONG;
 
+    static final Arena LIBRARY_ARENA = Arena.ofAuto();
     static final boolean TRACE_DOWNCALLS = Boolean.getBoolean("jextract.trace.downcalls");
 
     static void traceDowncall(String name, Object... args) {
@@ -108,7 +109,6 @@ public class openssl_h {
         throw new IllegalArgumentException("Invalid type for ABI: " + c.getTypeName());
     }
     private static final int BIO_CLOSE = (int)1L;
-
     /**
      * {@snippet lang=c :
      * #define BIO_CLOSE 1
@@ -118,7 +118,6 @@ public class openssl_h {
         return BIO_CLOSE;
     }
     private static final int BIO_CTRL_RESET = (int)1L;
-
     /**
      * {@snippet lang=c :
      * #define BIO_CTRL_RESET 1
@@ -128,7 +127,6 @@ public class openssl_h {
         return BIO_CTRL_RESET;
     }
     private static final int BIO_FP_READ = (int)2L;
-
     /**
      * {@snippet lang=c :
      * #define BIO_FP_READ 2
@@ -138,7 +136,6 @@ public class openssl_h {
         return BIO_FP_READ;
     }
     private static final int BIO_C_SET_FILENAME = (int)108L;
-
     /**
      * {@snippet lang=c :
      * #define BIO_C_SET_FILENAME 108
@@ -148,7 +145,6 @@ public class openssl_h {
         return BIO_C_SET_FILENAME;
     }
     private static final int NID_info_access = (int)177L;
-
     /**
      * {@snippet lang=c :
      * #define NID_info_access 177
@@ -158,7 +154,6 @@ public class openssl_h {
         return NID_info_access;
     }
     private static final int X509_FILETYPE_PEM = (int)1L;
-
     /**
      * {@snippet lang=c :
      * #define X509_FILETYPE_PEM 1
@@ -168,7 +163,6 @@ public class openssl_h {
         return X509_FILETYPE_PEM;
     }
     private static final int X509_L_FILE_LOAD = (int)1L;
-
     /**
      * {@snippet lang=c :
      * #define X509_L_FILE_LOAD 1
@@ -178,7 +172,6 @@ public class openssl_h {
         return X509_L_FILE_LOAD;
     }
     private static final int X509_L_ADD_DIR = (int)2L;
-
     /**
      * {@snippet lang=c :
      * #define X509_L_ADD_DIR 2
@@ -188,7 +181,6 @@ public class openssl_h {
         return X509_L_ADD_DIR;
     }
     private static final int X509_V_OK = (int)0L;
-
     /**
      * {@snippet lang=c :
      * #define X509_V_OK 0
@@ -198,7 +190,6 @@ public class openssl_h {
         return X509_V_OK;
     }
     private static final int X509_V_ERR_CRL_HAS_EXPIRED = (int)12L;
-
     /**
      * {@snippet lang=c :
      * #define X509_V_ERR_CRL_HAS_EXPIRED 12
@@ -208,7 +199,6 @@ public class openssl_h {
         return X509_V_ERR_CRL_HAS_EXPIRED;
     }
     private static final int X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT = (int)18L;
-
     /**
      * {@snippet lang=c :
      * #define X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT 18
@@ -218,7 +208,6 @@ public class openssl_h {
         return X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT;
     }
     private static final int X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN = (int)19L;
-
     /**
      * {@snippet lang=c :
      * #define X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN 19
@@ -228,7 +217,6 @@ public class openssl_h {
         return X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN;
     }
     private static final int X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY = (int)20L;
-
     /**
      * {@snippet lang=c :
      * #define X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY 20
@@ -238,7 +226,6 @@ public class openssl_h {
         return X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY;
     }
     private static final int X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE = (int)21L;
-
     /**
      * {@snippet lang=c :
      * #define X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE 21
@@ -248,7 +235,6 @@ public class openssl_h {
         return X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE;
     }
     private static final int X509_V_ERR_CERT_UNTRUSTED = (int)27L;
-
     /**
      * {@snippet lang=c :
      * #define X509_V_ERR_CERT_UNTRUSTED 27
@@ -258,7 +244,6 @@ public class openssl_h {
         return X509_V_ERR_CERT_UNTRUSTED;
     }
     private static final int X509_V_ERR_APPLICATION_VERIFICATION = (int)50L;
-
     /**
      * {@snippet lang=c :
      * #define X509_V_ERR_APPLICATION_VERIFICATION 50
@@ -268,7 +253,6 @@ public class openssl_h {
         return X509_V_ERR_APPLICATION_VERIFICATION;
     }
     private static final int X509_V_FLAG_CRL_CHECK = (int)4L;
-
     /**
      * {@snippet lang=c :
      * #define X509_V_FLAG_CRL_CHECK 4
@@ -278,7 +262,6 @@ public class openssl_h {
         return X509_V_FLAG_CRL_CHECK;
     }
     private static final int X509_V_FLAG_CRL_CHECK_ALL = (int)8L;
-
     /**
      * {@snippet lang=c :
      * #define X509_V_FLAG_CRL_CHECK_ALL 8
@@ -288,7 +271,6 @@ public class openssl_h {
         return X509_V_FLAG_CRL_CHECK_ALL;
     }
     private static final int PEM_R_NO_START_LINE = (int)108L;
-
     /**
      * {@snippet lang=c :
      * #define PEM_R_NO_START_LINE 108
@@ -298,7 +280,6 @@ public class openssl_h {
         return PEM_R_NO_START_LINE;
     }
     private static final int SSL3_VERSION = (int)768L;
-
     /**
      * {@snippet lang=c :
      * #define SSL3_VERSION 768
@@ -308,7 +289,6 @@ public class openssl_h {
         return SSL3_VERSION;
     }
     private static final int TLS1_VERSION = (int)769L;
-
     /**
      * {@snippet lang=c :
      * #define TLS1_VERSION 769
@@ -318,7 +298,6 @@ public class openssl_h {
         return TLS1_VERSION;
     }
     private static final int TLS1_1_VERSION = (int)770L;
-
     /**
      * {@snippet lang=c :
      * #define TLS1_1_VERSION 770
@@ -328,7 +307,6 @@ public class openssl_h {
         return TLS1_1_VERSION;
     }
     private static final int TLS1_2_VERSION = (int)771L;
-
     /**
      * {@snippet lang=c :
      * #define TLS1_2_VERSION 771
@@ -338,7 +316,6 @@ public class openssl_h {
         return TLS1_2_VERSION;
     }
     private static final int TLS1_3_VERSION = (int)772L;
-
     /**
      * {@snippet lang=c :
      * #define TLS1_3_VERSION 772
@@ -348,7 +325,6 @@ public class openssl_h {
         return TLS1_3_VERSION;
     }
     private static final int SSL_SENT_SHUTDOWN = (int)1L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_SENT_SHUTDOWN 1
@@ -358,7 +334,6 @@ public class openssl_h {
         return SSL_SENT_SHUTDOWN;
     }
     private static final int SSL_RECEIVED_SHUTDOWN = (int)2L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_RECEIVED_SHUTDOWN 2
@@ -368,7 +343,6 @@ public class openssl_h {
         return SSL_RECEIVED_SHUTDOWN;
     }
     private static final int SSL_OP_SINGLE_ECDH_USE = (int)0L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_OP_SINGLE_ECDH_USE 0
@@ -378,7 +352,6 @@ public class openssl_h {
         return SSL_OP_SINGLE_ECDH_USE;
     }
     private static final int SSL_OP_SINGLE_DH_USE = (int)0L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_OP_SINGLE_DH_USE 0
@@ -388,7 +361,6 @@ public class openssl_h {
         return SSL_OP_SINGLE_DH_USE;
     }
     private static final int SSL_OP_NO_SSLv2 = (int)0L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_OP_NO_SSLv2 0
@@ -398,7 +370,6 @@ public class openssl_h {
         return SSL_OP_NO_SSLv2;
     }
     private static final int SSL_CONF_FLAG_FILE = (int)2L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CONF_FLAG_FILE 2
@@ -408,7 +379,6 @@ public class openssl_h {
         return SSL_CONF_FLAG_FILE;
     }
     private static final int SSL_CONF_FLAG_SERVER = (int)8L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CONF_FLAG_SERVER 8
@@ -418,7 +388,6 @@ public class openssl_h {
         return SSL_CONF_FLAG_SERVER;
     }
     private static final int SSL_CONF_FLAG_SHOW_ERRORS = (int)16L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CONF_FLAG_SHOW_ERRORS 16
@@ -428,7 +397,6 @@ public class openssl_h {
         return SSL_CONF_FLAG_SHOW_ERRORS;
     }
     private static final int SSL_CONF_FLAG_CERTIFICATE = (int)32L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CONF_FLAG_CERTIFICATE 32
@@ -438,7 +406,6 @@ public class openssl_h {
         return SSL_CONF_FLAG_CERTIFICATE;
     }
     private static final int SSL_CONF_TYPE_UNKNOWN = (int)0L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CONF_TYPE_UNKNOWN 0
@@ -448,7 +415,6 @@ public class openssl_h {
         return SSL_CONF_TYPE_UNKNOWN;
     }
     private static final int SSL_CONF_TYPE_FILE = (int)2L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CONF_TYPE_FILE 2
@@ -458,7 +424,6 @@ public class openssl_h {
         return SSL_CONF_TYPE_FILE;
     }
     private static final int SSL_CONF_TYPE_DIR = (int)3L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CONF_TYPE_DIR 3
@@ -468,7 +433,6 @@ public class openssl_h {
         return SSL_CONF_TYPE_DIR;
     }
     private static final int SSL_SESS_CACHE_OFF = (int)0L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_SESS_CACHE_OFF 0
@@ -478,7 +442,6 @@ public class openssl_h {
         return SSL_SESS_CACHE_OFF;
     }
     private static final int SSL_SESS_CACHE_SERVER = (int)2L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_SESS_CACHE_SERVER 2
@@ -488,7 +451,6 @@ public class openssl_h {
         return SSL_SESS_CACHE_SERVER;
     }
     private static final int SSL2_VERSION = (int)2L;
-
     /**
      * {@snippet lang=c :
      * #define SSL2_VERSION 2
@@ -498,7 +460,6 @@ public class openssl_h {
         return SSL2_VERSION;
     }
     private static final int SSL_TLSEXT_ERR_OK = (int)0L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_TLSEXT_ERR_OK 0
@@ -508,7 +469,6 @@ public class openssl_h {
         return SSL_TLSEXT_ERR_OK;
     }
     private static final int SSL_TLSEXT_ERR_NOACK = (int)3L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_TLSEXT_ERR_NOACK 3
@@ -518,7 +478,6 @@ public class openssl_h {
         return SSL_TLSEXT_ERR_NOACK;
     }
     private static final int SSL_CB_HANDSHAKE_DONE = (int)32L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CB_HANDSHAKE_DONE 32
@@ -528,7 +487,6 @@ public class openssl_h {
         return SSL_CB_HANDSHAKE_DONE;
     }
     private static final int SSL_VERIFY_NONE = (int)0L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_VERIFY_NONE 0
@@ -538,7 +496,6 @@ public class openssl_h {
         return SSL_VERIFY_NONE;
     }
     private static final int SSL_VERIFY_PEER = (int)1L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_VERIFY_PEER 1
@@ -548,7 +505,6 @@ public class openssl_h {
         return SSL_VERIFY_PEER;
     }
     private static final int SSL_VERIFY_FAIL_IF_NO_PEER_CERT = (int)2L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_VERIFY_FAIL_IF_NO_PEER_CERT 2
@@ -558,7 +514,6 @@ public class openssl_h {
         return SSL_VERIFY_FAIL_IF_NO_PEER_CERT;
     }
     private static final int SSL_ERROR_NONE = (int)0L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_ERROR_NONE 0
@@ -568,7 +523,6 @@ public class openssl_h {
         return SSL_ERROR_NONE;
     }
     private static final int SSL_CTRL_SET_TMP_DH = (int)3L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SET_TMP_DH 3
@@ -578,7 +532,6 @@ public class openssl_h {
         return SSL_CTRL_SET_TMP_DH;
     }
     private static final int SSL_CTRL_SET_TMP_ECDH = (int)4L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SET_TMP_ECDH 4
@@ -588,7 +541,6 @@ public class openssl_h {
         return SSL_CTRL_SET_TMP_ECDH;
     }
     private static final int SSL_CTRL_SESS_NUMBER = (int)20L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SESS_NUMBER 20
@@ -598,7 +550,6 @@ public class openssl_h {
         return SSL_CTRL_SESS_NUMBER;
     }
     private static final int SSL_CTRL_SESS_CONNECT = (int)21L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SESS_CONNECT 21
@@ -608,7 +559,6 @@ public class openssl_h {
         return SSL_CTRL_SESS_CONNECT;
     }
     private static final int SSL_CTRL_SESS_CONNECT_GOOD = (int)22L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SESS_CONNECT_GOOD 22
@@ -618,7 +568,6 @@ public class openssl_h {
         return SSL_CTRL_SESS_CONNECT_GOOD;
     }
     private static final int SSL_CTRL_SESS_CONNECT_RENEGOTIATE = (int)23L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SESS_CONNECT_RENEGOTIATE 23
@@ -628,7 +577,6 @@ public class openssl_h {
         return SSL_CTRL_SESS_CONNECT_RENEGOTIATE;
     }
     private static final int SSL_CTRL_SESS_ACCEPT = (int)24L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SESS_ACCEPT 24
@@ -638,7 +586,6 @@ public class openssl_h {
         return SSL_CTRL_SESS_ACCEPT;
     }
     private static final int SSL_CTRL_SESS_ACCEPT_GOOD = (int)25L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SESS_ACCEPT_GOOD 25
@@ -648,7 +595,6 @@ public class openssl_h {
         return SSL_CTRL_SESS_ACCEPT_GOOD;
     }
     private static final int SSL_CTRL_SESS_ACCEPT_RENEGOTIATE = (int)26L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SESS_ACCEPT_RENEGOTIATE 26
@@ -658,7 +604,6 @@ public class openssl_h {
         return SSL_CTRL_SESS_ACCEPT_RENEGOTIATE;
     }
     private static final int SSL_CTRL_SESS_HIT = (int)27L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SESS_HIT 27
@@ -668,7 +613,6 @@ public class openssl_h {
         return SSL_CTRL_SESS_HIT;
     }
     private static final int SSL_CTRL_SESS_CB_HIT = (int)28L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SESS_CB_HIT 28
@@ -678,7 +622,6 @@ public class openssl_h {
         return SSL_CTRL_SESS_CB_HIT;
     }
     private static final int SSL_CTRL_SESS_MISSES = (int)29L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SESS_MISSES 29
@@ -688,7 +631,6 @@ public class openssl_h {
         return SSL_CTRL_SESS_MISSES;
     }
     private static final int SSL_CTRL_SESS_TIMEOUTS = (int)30L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SESS_TIMEOUTS 30
@@ -698,7 +640,6 @@ public class openssl_h {
         return SSL_CTRL_SESS_TIMEOUTS;
     }
     private static final int SSL_CTRL_SESS_CACHE_FULL = (int)31L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SESS_CACHE_FULL 31
@@ -708,7 +649,6 @@ public class openssl_h {
         return SSL_CTRL_SESS_CACHE_FULL;
     }
     private static final int SSL_CTRL_SET_SESS_CACHE_SIZE = (int)42L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SET_SESS_CACHE_SIZE 42
@@ -718,7 +658,6 @@ public class openssl_h {
         return SSL_CTRL_SET_SESS_CACHE_SIZE;
     }
     private static final int SSL_CTRL_GET_SESS_CACHE_SIZE = (int)43L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_GET_SESS_CACHE_SIZE 43
@@ -728,7 +667,6 @@ public class openssl_h {
         return SSL_CTRL_GET_SESS_CACHE_SIZE;
     }
     private static final int SSL_CTRL_SET_SESS_CACHE_MODE = (int)44L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SET_SESS_CACHE_MODE 44
@@ -738,7 +676,6 @@ public class openssl_h {
         return SSL_CTRL_SET_SESS_CACHE_MODE;
     }
     private static final int SSL_CTRL_GET_SESS_CACHE_MODE = (int)45L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_GET_SESS_CACHE_MODE 45
@@ -748,7 +685,6 @@ public class openssl_h {
         return SSL_CTRL_GET_SESS_CACHE_MODE;
     }
     private static final int SSL_CTRL_SET_TLSEXT_TICKET_KEYS = (int)59L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SET_TLSEXT_TICKET_KEYS 59
@@ -758,7 +694,6 @@ public class openssl_h {
         return SSL_CTRL_SET_TLSEXT_TICKET_KEYS;
     }
     private static final int SSL_CTRL_CHAIN_CERT = (int)89L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_CHAIN_CERT 89
@@ -768,7 +703,6 @@ public class openssl_h {
         return SSL_CTRL_CHAIN_CERT;
     }
     private static final int SSL_CTRL_SET_GROUPS = (int)91L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SET_GROUPS 91
@@ -778,7 +712,6 @@ public class openssl_h {
         return SSL_CTRL_SET_GROUPS;
     }
     private static final int SSL_CTRL_SET_DH_AUTO = (int)118L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SET_DH_AUTO 118
@@ -788,7 +721,6 @@ public class openssl_h {
         return SSL_CTRL_SET_DH_AUTO;
     }
     private static final int SSL_CTRL_SET_MIN_PROTO_VERSION = (int)123L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SET_MIN_PROTO_VERSION 123
@@ -798,7 +730,6 @@ public class openssl_h {
         return SSL_CTRL_SET_MIN_PROTO_VERSION;
     }
     private static final int SSL_CTRL_SET_MAX_PROTO_VERSION = (int)124L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_CTRL_SET_MAX_PROTO_VERSION 124
@@ -808,7 +739,6 @@ public class openssl_h {
         return SSL_CTRL_SET_MAX_PROTO_VERSION;
     }
     private static final int ERR_REASON_MASK = (int)8388607L;
-
     /**
      * {@snippet lang=c :
      * #define ERR_REASON_MASK 8388607
@@ -818,7 +748,6 @@ public class openssl_h {
         return ERR_REASON_MASK;
     }
     private static final int OCSP_RESPONSE_STATUS_SUCCESSFUL = (int)0L;
-
     /**
      * {@snippet lang=c :
      * #define OCSP_RESPONSE_STATUS_SUCCESSFUL 0
@@ -828,7 +757,6 @@ public class openssl_h {
         return OCSP_RESPONSE_STATUS_SUCCESSFUL;
     }
     private static final int V_OCSP_CERTSTATUS_GOOD = (int)0L;
-
     /**
      * {@snippet lang=c :
      * #define V_OCSP_CERTSTATUS_GOOD 0
@@ -838,7 +766,6 @@ public class openssl_h {
         return V_OCSP_CERTSTATUS_GOOD;
     }
     private static final int V_OCSP_CERTSTATUS_REVOKED = (int)1L;
-
     /**
      * {@snippet lang=c :
      * #define V_OCSP_CERTSTATUS_REVOKED 1
@@ -848,7 +775,6 @@ public class openssl_h {
         return V_OCSP_CERTSTATUS_REVOKED;
     }
     private static final int V_OCSP_CERTSTATUS_UNKNOWN = (int)2L;
-
     /**
      * {@snippet lang=c :
      * #define V_OCSP_CERTSTATUS_UNKNOWN 2
@@ -858,7 +784,7 @@ public class openssl_h {
         return V_OCSP_CERTSTATUS_UNKNOWN;
     }
 
-    public static MethodHandle OPENSSL_sk_num$MH() {
+    private static MethodHandle OPENSSL_sk_num$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -889,7 +815,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OPENSSL_sk_value$MH() {
+    private static MethodHandle OPENSSL_sk_value$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -921,7 +847,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OpenSSL_version_num$MH() {
+    private static MethodHandle OpenSSL_version_num$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_LONG        );
@@ -950,7 +876,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OpenSSL_version$MH() {
+    private static MethodHandle OpenSSL_version$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -981,7 +907,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle CRYPTO_free$MH() {
+    private static MethodHandle CRYPTO_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
@@ -1013,7 +939,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BIO_ctrl_pending$MH() {
+    private static MethodHandle BIO_ctrl_pending$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_LONG,
@@ -1044,7 +970,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BIO_s_file$MH() {
+    private static MethodHandle BIO_s_file$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER        );
@@ -1073,7 +999,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BIO_new_file$MH() {
+    private static MethodHandle BIO_new_file$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -1105,7 +1031,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BIO_new$MH() {
+    private static MethodHandle BIO_new$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -1136,7 +1062,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BIO_free$MH() {
+    private static MethodHandle BIO_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -1167,7 +1093,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BIO_read$MH() {
+    private static MethodHandle BIO_read$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -1200,7 +1126,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BIO_write$MH() {
+    private static MethodHandle BIO_write$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -1233,7 +1159,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BIO_ctrl$MH() {
+    private static MethodHandle BIO_ctrl$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_LONG,
@@ -1267,7 +1193,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BIO_s_mem$MH() {
+    private static MethodHandle BIO_s_mem$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER        );
@@ -1296,7 +1222,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BIO_s_bio$MH() {
+    private static MethodHandle BIO_s_bio$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER        );
@@ -1325,7 +1251,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BIO_new_bio_pair$MH() {
+    private static MethodHandle BIO_new_bio_pair$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -1359,7 +1285,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BN_new$MH() {
+    private static MethodHandle BN_new$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER        );
@@ -1388,7 +1314,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BN_set_word$MH() {
+    private static MethodHandle BN_set_word$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -1420,7 +1346,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BN_get_rfc2409_prime_768$MH() {
+    private static MethodHandle BN_get_rfc2409_prime_768$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -1451,7 +1377,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BN_get_rfc2409_prime_1024$MH() {
+    private static MethodHandle BN_get_rfc2409_prime_1024$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -1482,7 +1408,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BN_get_rfc3526_prime_1536$MH() {
+    private static MethodHandle BN_get_rfc3526_prime_1536$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -1513,7 +1439,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BN_get_rfc3526_prime_2048$MH() {
+    private static MethodHandle BN_get_rfc3526_prime_2048$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -1544,7 +1470,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BN_get_rfc3526_prime_3072$MH() {
+    private static MethodHandle BN_get_rfc3526_prime_3072$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -1575,7 +1501,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BN_get_rfc3526_prime_4096$MH() {
+    private static MethodHandle BN_get_rfc3526_prime_4096$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -1606,7 +1532,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BN_get_rfc3526_prime_6144$MH() {
+    private static MethodHandle BN_get_rfc3526_prime_6144$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -1637,7 +1563,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle BN_get_rfc3526_prime_8192$MH() {
+    private static MethodHandle BN_get_rfc3526_prime_8192$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -1668,7 +1594,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle ASN1_STRING_length$MH() {
+    private static MethodHandle ASN1_STRING_length$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -1699,7 +1625,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle ASN1_STRING_get0_data$MH() {
+    private static MethodHandle ASN1_STRING_get0_data$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -1730,7 +1656,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle EVP_MD_get0_provider$MH() {
+    private static MethodHandle EVP_MD_get0_provider$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -1761,7 +1687,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle EVP_MD_fetch$MH() {
+    private static MethodHandle EVP_MD_fetch$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -1794,7 +1720,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle EVP_MD_free$MH() {
+    private static MethodHandle EVP_MD_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER
@@ -1824,7 +1750,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle EVP_PKEY_get_base_id$MH() {
+    private static MethodHandle EVP_PKEY_get_base_id$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -1855,7 +1781,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle EVP_PKEY_get_bits$MH() {
+    private static MethodHandle EVP_PKEY_get_bits$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -1886,7 +1812,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle EVP_PKEY_free$MH() {
+    private static MethodHandle EVP_PKEY_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER
@@ -1916,7 +1842,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle EC_GROUP_free$MH() {
+    private static MethodHandle EC_GROUP_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER
@@ -1946,7 +1872,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle EC_GROUP_get_curve_name$MH() {
+    private static MethodHandle EC_GROUP_get_curve_name$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -1977,7 +1903,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle d2i_ECPKParameters$MH() {
+    private static MethodHandle d2i_ECPKParameters$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2010,7 +1936,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle EC_KEY_new_by_curve_name$MH() {
+    private static MethodHandle EC_KEY_new_by_curve_name$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2041,7 +1967,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle EC_KEY_free$MH() {
+    private static MethodHandle EC_KEY_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER
@@ -2071,7 +1997,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle DH_new$MH() {
+    private static MethodHandle DH_new$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER        );
@@ -2100,7 +2026,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle DH_free$MH() {
+    private static MethodHandle DH_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER
@@ -2130,7 +2056,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle DH_set0_pqg$MH() {
+    private static MethodHandle DH_set0_pqg$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -2164,7 +2090,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_STORE_set_flags$MH() {
+    private static MethodHandle X509_STORE_set_flags$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -2196,7 +2122,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_STORE_CTX_get0_untrusted$MH() {
+    private static MethodHandle X509_STORE_CTX_get0_untrusted$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2227,7 +2153,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_STORE_add_lookup$MH() {
+    private static MethodHandle X509_STORE_add_lookup$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2259,7 +2185,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_LOOKUP_hash_dir$MH() {
+    private static MethodHandle X509_LOOKUP_hash_dir$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER        );
@@ -2288,7 +2214,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_LOOKUP_file$MH() {
+    private static MethodHandle X509_LOOKUP_file$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER        );
@@ -2317,7 +2243,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_LOOKUP_ctrl$MH() {
+    private static MethodHandle X509_LOOKUP_ctrl$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -2352,7 +2278,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_STORE_CTX_get_ex_data$MH() {
+    private static MethodHandle X509_STORE_CTX_get_ex_data$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2384,7 +2310,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_STORE_CTX_get_error$MH() {
+    private static MethodHandle X509_STORE_CTX_get_error$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -2415,7 +2341,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_STORE_CTX_set_error$MH() {
+    private static MethodHandle X509_STORE_CTX_set_error$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
@@ -2446,7 +2372,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_STORE_CTX_get_error_depth$MH() {
+    private static MethodHandle X509_STORE_CTX_get_error_depth$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -2477,7 +2403,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_STORE_CTX_get_current_cert$MH() {
+    private static MethodHandle X509_STORE_CTX_get_current_cert$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2508,7 +2434,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_STORE_CTX_get0_current_issuer$MH() {
+    private static MethodHandle X509_STORE_CTX_get0_current_issuer$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2539,7 +2465,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle d2i_X509_bio$MH() {
+    private static MethodHandle d2i_X509_bio$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2571,7 +2497,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_free$MH() {
+    private static MethodHandle X509_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER
@@ -2601,7 +2527,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle d2i_X509$MH() {
+    private static MethodHandle d2i_X509$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2634,7 +2560,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle i2d_X509$MH() {
+    private static MethodHandle i2d_X509$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -2666,7 +2592,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_get_ext_by_NID$MH() {
+    private static MethodHandle X509_get_ext_by_NID$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -2699,7 +2625,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_get_ext$MH() {
+    private static MethodHandle X509_get_ext$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2731,7 +2657,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_EXTENSION_get_data$MH() {
+    private static MethodHandle X509_EXTENSION_get_data$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2762,7 +2688,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle PEM_ASN1_read_bio$MH() {
+    private static MethodHandle PEM_ASN1_read_bio$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2798,7 +2724,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle PEM_read_bio_X509_AUX$MH() {
+    private static MethodHandle PEM_read_bio_X509_AUX$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2832,7 +2758,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle PEM_read_bio_ECPKParameters$MH() {
+    private static MethodHandle PEM_read_bio_ECPKParameters$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2866,7 +2792,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle PEM_read_bio_DHparams$MH() {
+    private static MethodHandle PEM_read_bio_DHparams$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2900,7 +2826,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle PEM_read_bio_PrivateKey$MH() {
+    private static MethodHandle PEM_read_bio_PrivateKey$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2934,7 +2860,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle PEM_read_bio_Parameters$MH() {
+    private static MethodHandle PEM_read_bio_Parameters$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -2966,7 +2892,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_get_options$MH() {
+    private static MethodHandle SSL_CTX_get_options$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_LONG,
@@ -2997,7 +2923,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_get_options$MH() {
+    private static MethodHandle SSL_get_options$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_LONG,
@@ -3028,7 +2954,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_clear_options$MH() {
+    private static MethodHandle SSL_CTX_clear_options$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_LONG,
@@ -3060,7 +2986,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_set_options$MH() {
+    private static MethodHandle SSL_CTX_set_options$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_LONG,
@@ -3092,7 +3018,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_set_options$MH() {
+    private static MethodHandle SSL_set_options$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_LONG,
@@ -3124,7 +3050,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_set_alpn_select_cb$MH() {
+    private static MethodHandle SSL_CTX_set_alpn_select_cb$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
@@ -3156,7 +3082,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_get0_alpn_selected$MH() {
+    private static MethodHandle SSL_get0_alpn_selected$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
@@ -3188,7 +3114,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_in_init$MH() {
+    private static MethodHandle SSL_in_init$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -3219,7 +3145,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_set0_tmp_dh_pkey$MH() {
+    private static MethodHandle SSL_CTX_set0_tmp_dh_pkey$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -3251,7 +3177,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_set_cipher_list$MH() {
+    private static MethodHandle SSL_CTX_set_cipher_list$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -3283,7 +3209,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_new$MH() {
+    private static MethodHandle SSL_CTX_new$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -3314,7 +3240,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_free$MH() {
+    private static MethodHandle SSL_CTX_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER
@@ -3344,7 +3270,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_set_timeout$MH() {
+    private static MethodHandle SSL_CTX_set_timeout$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_LONG,
@@ -3376,7 +3302,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_get_timeout$MH() {
+    private static MethodHandle SSL_CTX_get_timeout$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_LONG,
@@ -3407,7 +3333,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_get_cert_store$MH() {
+    private static MethodHandle SSL_CTX_get_cert_store$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -3438,7 +3364,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_get_current_cipher$MH() {
+    private static MethodHandle SSL_get_current_cipher$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -3469,7 +3395,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CIPHER_get_name$MH() {
+    private static MethodHandle SSL_CIPHER_get_name$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -3500,7 +3426,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CIPHER_get_kx_nid$MH() {
+    private static MethodHandle SSL_CIPHER_get_kx_nid$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -3531,7 +3457,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CIPHER_get_auth_nid$MH() {
+    private static MethodHandle SSL_CIPHER_get_auth_nid$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -3562,7 +3488,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_pending$MH() {
+    private static MethodHandle SSL_pending$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -3593,7 +3519,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_set_bio$MH() {
+    private static MethodHandle SSL_set_bio$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
@@ -3625,7 +3551,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_set_cipher_list$MH() {
+    private static MethodHandle SSL_set_cipher_list$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -3657,7 +3583,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_set_ciphersuites$MH() {
+    private static MethodHandle SSL_CTX_set_ciphersuites$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -3689,7 +3615,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_set_verify$MH() {
+    private static MethodHandle SSL_set_verify$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
@@ -3721,7 +3647,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_use_certificate_chain_file$MH() {
+    private static MethodHandle SSL_CTX_use_certificate_chain_file$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -3753,7 +3679,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_load_client_CA_file$MH() {
+    private static MethodHandle SSL_load_client_CA_file$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -3784,7 +3710,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_add_file_cert_subjects_to_stack$MH() {
+    private static MethodHandle SSL_add_file_cert_subjects_to_stack$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -3816,7 +3742,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_SESSION_get_time$MH() {
+    private static MethodHandle SSL_SESSION_get_time$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_LONG,
@@ -3847,7 +3773,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_SESSION_get_id$MH() {
+    private static MethodHandle SSL_SESSION_get_id$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -3879,7 +3805,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_get1_peer_certificate$MH() {
+    private static MethodHandle SSL_get1_peer_certificate$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -3910,7 +3836,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_get_peer_cert_chain$MH() {
+    private static MethodHandle SSL_get_peer_cert_chain$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -3941,7 +3867,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_set_verify$MH() {
+    private static MethodHandle SSL_CTX_set_verify$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
@@ -3973,7 +3899,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_set_cert_verify_callback$MH() {
+    private static MethodHandle SSL_CTX_set_cert_verify_callback$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
@@ -4005,7 +3931,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_use_PrivateKey$MH() {
+    private static MethodHandle SSL_CTX_use_PrivateKey$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -4037,7 +3963,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_use_certificate$MH() {
+    private static MethodHandle SSL_CTX_use_certificate$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -4069,7 +3995,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_set_default_passwd_cb$MH() {
+    private static MethodHandle SSL_CTX_set_default_passwd_cb$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
@@ -4100,7 +4026,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_check_private_key$MH() {
+    private static MethodHandle SSL_CTX_check_private_key$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -4131,7 +4057,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_set_session_id_context$MH() {
+    private static MethodHandle SSL_CTX_set_session_id_context$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -4164,7 +4090,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_new$MH() {
+    private static MethodHandle SSL_new$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -4195,7 +4121,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_free$MH() {
+    private static MethodHandle SSL_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER
@@ -4225,7 +4151,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_read$MH() {
+    private static MethodHandle SSL_read$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -4258,7 +4184,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_write$MH() {
+    private static MethodHandle SSL_write$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -4291,7 +4217,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_ctrl$MH() {
+    private static MethodHandle SSL_CTX_ctrl$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_LONG,
@@ -4325,7 +4251,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_get_version$MH() {
+    private static MethodHandle SSL_get_version$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -4356,7 +4282,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle TLS_server_method$MH() {
+    private static MethodHandle TLS_server_method$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER        );
@@ -4385,7 +4311,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_get_ciphers$MH() {
+    private static MethodHandle SSL_get_ciphers$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -4416,7 +4342,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_get_ciphers$MH() {
+    private static MethodHandle SSL_CTX_get_ciphers$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -4447,7 +4373,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_do_handshake$MH() {
+    private static MethodHandle SSL_do_handshake$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -4478,7 +4404,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_renegotiate$MH() {
+    private static MethodHandle SSL_renegotiate$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -4509,7 +4435,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_renegotiate_pending$MH() {
+    private static MethodHandle SSL_renegotiate_pending$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -4540,7 +4466,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_shutdown$MH() {
+    private static MethodHandle SSL_shutdown$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -4571,7 +4497,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_verify_client_post_handshake$MH() {
+    private static MethodHandle SSL_verify_client_post_handshake$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -4602,7 +4528,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_set_client_CA_list$MH() {
+    private static MethodHandle SSL_CTX_set_client_CA_list$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
@@ -4633,7 +4559,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_get_client_CA_list$MH() {
+    private static MethodHandle SSL_CTX_get_client_CA_list$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -4664,7 +4590,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_add_client_CA$MH() {
+    private static MethodHandle SSL_CTX_add_client_CA$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -4696,7 +4622,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_set_connect_state$MH() {
+    private static MethodHandle SSL_set_connect_state$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER
@@ -4726,7 +4652,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_set_accept_state$MH() {
+    private static MethodHandle SSL_set_accept_state$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER
@@ -4756,7 +4682,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_get_privatekey$MH() {
+    private static MethodHandle SSL_get_privatekey$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -4787,7 +4713,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_get_shutdown$MH() {
+    private static MethodHandle SSL_get_shutdown$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -4818,7 +4744,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_set_default_verify_paths$MH() {
+    private static MethodHandle SSL_CTX_set_default_verify_paths$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -4849,7 +4775,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_load_verify_locations$MH() {
+    private static MethodHandle SSL_CTX_load_verify_locations$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -4882,7 +4808,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_get_session$MH() {
+    private static MethodHandle SSL_get_session$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -4913,7 +4839,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_set_info_callback$MH() {
+    private static MethodHandle SSL_set_info_callback$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
@@ -4944,7 +4870,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_set_verify_result$MH() {
+    private static MethodHandle SSL_set_verify_result$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
@@ -4975,7 +4901,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_get_ex_data_X509_STORE_CTX_idx$MH() {
+    private static MethodHandle SSL_get_ex_data_X509_STORE_CTX_idx$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT        );
@@ -5004,7 +4930,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CTX_set_tmp_dh_callback$MH() {
+    private static MethodHandle SSL_CTX_set_tmp_dh_callback$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
@@ -5035,7 +4961,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CONF_CTX_new$MH() {
+    private static MethodHandle SSL_CONF_CTX_new$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER        );
@@ -5064,7 +4990,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CONF_CTX_finish$MH() {
+    private static MethodHandle SSL_CONF_CTX_finish$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -5095,7 +5021,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CONF_CTX_free$MH() {
+    private static MethodHandle SSL_CONF_CTX_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER
@@ -5125,7 +5051,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CONF_CTX_set_flags$MH() {
+    private static MethodHandle SSL_CONF_CTX_set_flags$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -5157,7 +5083,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CONF_CTX_set_ssl_ctx$MH() {
+    private static MethodHandle SSL_CONF_CTX_set_ssl_ctx$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
@@ -5188,7 +5114,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CONF_cmd$MH() {
+    private static MethodHandle SSL_CONF_cmd$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -5221,7 +5147,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle SSL_CONF_cmd_value_type$MH() {
+    private static MethodHandle SSL_CONF_cmd_value_type$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -5253,7 +5179,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OPENSSL_init_ssl$MH() {
+    private static MethodHandle OPENSSL_init_ssl$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -5285,7 +5211,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle ERR_get_error$MH() {
+    private static MethodHandle ERR_get_error$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_LONG        );
@@ -5314,7 +5240,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle ERR_peek_last_error$MH() {
+    private static MethodHandle ERR_peek_last_error$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_LONG        );
@@ -5343,7 +5269,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle ERR_clear_error$MH() {
+    private static MethodHandle ERR_clear_error$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(        );
 
@@ -5371,7 +5297,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle ERR_error_string$MH() {
+    private static MethodHandle ERR_error_string$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -5403,7 +5329,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle PKCS12_verify_mac$MH() {
+    private static MethodHandle PKCS12_verify_mac$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -5436,7 +5362,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle PKCS12_free$MH() {
+    private static MethodHandle PKCS12_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER
@@ -5466,7 +5392,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle PKCS12_parse$MH() {
+    private static MethodHandle PKCS12_parse$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -5501,7 +5427,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle d2i_PKCS12_bio$MH() {
+    private static MethodHandle d2i_PKCS12_bio$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -5533,7 +5459,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle RAND_seed$MH() {
+    private static MethodHandle RAND_seed$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER,
@@ -5564,7 +5490,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle RAND_load_file$MH() {
+    private static MethodHandle RAND_load_file$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -5596,7 +5522,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle X509_check_issued$MH() {
+    private static MethodHandle X509_check_issued$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -5628,7 +5554,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle ENGINE_by_id$MH() {
+    private static MethodHandle ENGINE_by_id$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -5659,7 +5585,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle ENGINE_register_all_complete$MH() {
+    private static MethodHandle ENGINE_register_all_complete$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT        );
@@ -5688,7 +5614,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle ENGINE_ctrl_cmd_string$MH() {
+    private static MethodHandle ENGINE_ctrl_cmd_string$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -5722,7 +5648,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle ENGINE_free$MH() {
+    private static MethodHandle ENGINE_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -5753,7 +5679,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle ENGINE_load_private_key$MH() {
+    private static MethodHandle ENGINE_load_private_key$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -5787,7 +5713,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle ENGINE_set_default$MH() {
+    private static MethodHandle ENGINE_set_default$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -5819,7 +5745,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OCSP_cert_to_id$MH() {
+    private static MethodHandle OCSP_cert_to_id$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -5852,7 +5778,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OCSP_request_add0_id$MH() {
+    private static MethodHandle OCSP_request_add0_id$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -5884,7 +5810,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OCSP_response_status$MH() {
+    private static MethodHandle OCSP_response_status$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -5915,7 +5841,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OCSP_response_get1_basic$MH() {
+    private static MethodHandle OCSP_response_get1_basic$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -5946,7 +5872,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OCSP_resp_get0$MH() {
+    private static MethodHandle OCSP_resp_get0$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -5978,7 +5904,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OCSP_resp_find$MH() {
+    private static MethodHandle OCSP_resp_find$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -6011,7 +5937,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OCSP_single_get0_status$MH() {
+    private static MethodHandle OCSP_single_get0_status$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -6046,7 +5972,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OCSP_BASICRESP_free$MH() {
+    private static MethodHandle OCSP_BASICRESP_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER
@@ -6076,7 +6002,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OCSP_RESPONSE_free$MH() {
+    private static MethodHandle OCSP_RESPONSE_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER
@@ -6106,7 +6032,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle d2i_OCSP_RESPONSE$MH() {
+    private static MethodHandle d2i_OCSP_RESPONSE$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -6139,7 +6065,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OCSP_CERTID_free$MH() {
+    private static MethodHandle OCSP_CERTID_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER
@@ -6169,7 +6095,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OCSP_REQUEST_new$MH() {
+    private static MethodHandle OCSP_REQUEST_new$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER        );
@@ -6198,7 +6124,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OCSP_REQUEST_free$MH() {
+    private static MethodHandle OCSP_REQUEST_free$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
                 openssl_h.C_POINTER
@@ -6228,7 +6154,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle i2d_OCSP_REQUEST$MH() {
+    private static MethodHandle i2d_OCSP_REQUEST$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_INT,
@@ -6260,7 +6186,7 @@ public class openssl_h {
         }
     }
 
-    public static MethodHandle OSSL_PROVIDER_get0_name$MH() {
+    private static MethodHandle OSSL_PROVIDER_get0_name$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(
                 openssl_h.C_POINTER,
@@ -6290,18 +6216,19 @@ public class openssl_h {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-    private static final MemorySegment OPENSSL_FILE = Arena.ofAuto().allocateFrom("/tmp/jextract$5497034726522862260.h");
-
     /**
      * {@snippet lang=c :
-     * #define OPENSSL_FILE "/tmp/jextract$5497034726522862260.h"
+     * #define OPENSSL_FILE "/tmp/jextract$7967504926277577155.h"
      * }
      */
     public static MemorySegment OPENSSL_FILE() {
-        return OPENSSL_FILE;
+        class Holder {
+            static final MemorySegment OPENSSL_FILE
+                = openssl_h.LIBRARY_ARENA.allocateFrom("/tmp/jextract$7967504926277577155.h");
+        }
+        return Holder.OPENSSL_FILE;
     }
     private static final int OPENSSL_LINE = (int)50L;
-
     /**
      * {@snippet lang=c :
      * #define OPENSSL_LINE 50
@@ -6311,7 +6238,6 @@ public class openssl_h {
         return OPENSSL_LINE;
     }
     private static final long OPENSSL_INIT_ENGINE_ALL_BUILTIN = 30208L;
-
     /**
      * {@snippet lang=c :
      * #define OPENSSL_INIT_ENGINE_ALL_BUILTIN 30208
@@ -6321,7 +6247,6 @@ public class openssl_h {
         return OPENSSL_INIT_ENGINE_ALL_BUILTIN;
     }
     private static final int EVP_PKEY_NONE = (int)0L;
-
     /**
      * {@snippet lang=c :
      * #define EVP_PKEY_NONE 0
@@ -6331,7 +6256,6 @@ public class openssl_h {
         return EVP_PKEY_NONE;
     }
     private static final int EVP_PKEY_RSA = (int)6L;
-
     /**
      * {@snippet lang=c :
      * #define EVP_PKEY_RSA 6
@@ -6341,7 +6265,6 @@ public class openssl_h {
         return EVP_PKEY_RSA;
     }
     private static final int EVP_PKEY_DSA = (int)116L;
-
     /**
      * {@snippet lang=c :
      * #define EVP_PKEY_DSA 116
@@ -6350,18 +6273,19 @@ public class openssl_h {
     public static int EVP_PKEY_DSA() {
         return EVP_PKEY_DSA;
     }
-    private static final MemorySegment PEM_STRING_ECPARAMETERS = Arena.ofAuto().allocateFrom("EC PARAMETERS");
-
     /**
      * {@snippet lang=c :
      * #define PEM_STRING_ECPARAMETERS "EC PARAMETERS"
      * }
      */
     public static MemorySegment PEM_STRING_ECPARAMETERS() {
-        return PEM_STRING_ECPARAMETERS;
+        class Holder {
+            static final MemorySegment PEM_STRING_ECPARAMETERS
+                = openssl_h.LIBRARY_ARENA.allocateFrom("EC PARAMETERS");
+        }
+        return Holder.PEM_STRING_ECPARAMETERS;
     }
     private static final long SSL_OP_NO_TICKET = 16384L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_OP_NO_TICKET 16384
@@ -6371,7 +6295,6 @@ public class openssl_h {
         return SSL_OP_NO_TICKET;
     }
     private static final long SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION = 65536L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION 65536
@@ -6381,7 +6304,6 @@ public class openssl_h {
         return SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION;
     }
     private static final long SSL_OP_NO_COMPRESSION = 131072L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_OP_NO_COMPRESSION 131072
@@ -6391,7 +6313,6 @@ public class openssl_h {
         return SSL_OP_NO_COMPRESSION;
     }
     private static final long SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION = 262144L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION 262144
@@ -6401,7 +6322,6 @@ public class openssl_h {
         return SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION;
     }
     private static final long SSL_OP_CIPHER_SERVER_PREFERENCE = 4194304L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_OP_CIPHER_SERVER_PREFERENCE 4194304
@@ -6411,7 +6331,6 @@ public class openssl_h {
         return SSL_OP_CIPHER_SERVER_PREFERENCE;
     }
     private static final long SSL_OP_NO_SSLv3 = 33554432L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_OP_NO_SSLv3 33554432
@@ -6421,7 +6340,6 @@ public class openssl_h {
         return SSL_OP_NO_SSLv3;
     }
     private static final long SSL_OP_NO_TLSv1 = 67108864L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_OP_NO_TLSv1 67108864
@@ -6431,7 +6349,6 @@ public class openssl_h {
         return SSL_OP_NO_TLSv1;
     }
     private static final long SSL_OP_NO_TLSv1_2 = 134217728L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_OP_NO_TLSv1_2 134217728
@@ -6441,7 +6358,6 @@ public class openssl_h {
         return SSL_OP_NO_TLSv1_2;
     }
     private static final long SSL_OP_NO_TLSv1_1 = 268435456L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_OP_NO_TLSv1_1 268435456
@@ -6451,7 +6367,6 @@ public class openssl_h {
         return SSL_OP_NO_TLSv1_1;
     }
     private static final long SSL_OP_NO_TLSv1_3 = 536870912L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_OP_NO_TLSv1_3 536870912
@@ -6461,7 +6376,6 @@ public class openssl_h {
         return SSL_OP_NO_TLSv1_3;
     }
     private static final long SSL_OP_ALL = 2147485776L;
-
     /**
      * {@snippet lang=c :
      * #define SSL_OP_ALL 2147485776
@@ -6471,7 +6385,6 @@ public class openssl_h {
         return SSL_OP_ALL;
     }
     private static final int ENGINE_METHOD_ALL = (int)65535L;
-
     /**
      * {@snippet lang=c :
      * #define ENGINE_METHOD_ALL 65535
