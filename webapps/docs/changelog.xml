@@ -114,7 +114,16 @@
       </fix>
     </changelog>
   </subsection>
- <subsection name="WebSocket">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Make asynchronous error handling more robust. Ensure that once a
+        connection is marked to be closed, further asynchronous processing
+        cannot change that. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="WebSocket">
     <changelog>
       <fix>
         Correct a regression in the fix for <bug>66508</bug> that could cause an

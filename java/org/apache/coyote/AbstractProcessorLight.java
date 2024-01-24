@@ -74,7 +74,12 @@ public abstract class AbstractProcessorLight implements Processor {
                         "Socket: [" + socketWrapper + "], Status in: [" + status + "], State out: [" + state + "]");
             }
 
-            if (isAsync()) {
+            /*
+             * If state is already CLOSED don't call asyncPostProcess() as that will likely change the the state to some
+             * other value causing processing to continue when it should cease. The AsyncStateMachine will be recycled
+             * as part of the Processor clean-up on CLOSED so it doesn't matter what state it is left in at this point.
+             */
+            if (isAsync() && state != SocketState.CLOSED) {
                 state = asyncPostProcess();
                 if (getLog().isDebugEnabled()) {
                     getLog().debug(
