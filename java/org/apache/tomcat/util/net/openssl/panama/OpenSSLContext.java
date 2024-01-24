@@ -55,7 +55,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.file.ConfigurationSource.Resource;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
@@ -77,8 +76,6 @@ import org.apache.tomcat.util.res.StringManager;
 public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static final Log log = LogFactory.getLog(OpenSSLContext.class);
-
-    private static final StringManager netSm = StringManager.getManager(AbstractEndpoint.class);
     private static final StringManager sm = StringManager.getManager(OpenSSLContext.class);
 
     private static final Cleaner cleaner = Cleaner.create();
@@ -216,8 +213,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 } else {
                     // Should not happen since filtering to build
                     // enabled protocols removes invalid values.
-                    throw new Exception(netSm.getString(
-                            "endpoint.apr.invalidSslProtocol", enabledProtocol));
+                    throw new Exception(sm.getString("openssl.invalidSslProtocol", enabledProtocol));
                 }
             }
             // Set maximum and minimum protocol versions
