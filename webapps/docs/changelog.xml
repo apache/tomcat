@@ -137,6 +137,11 @@
         Optimize state handling for OpenSSL context callbacks with the FFM API.
         (remm)
       </fix>
+      <fix>
+        Make asynchronous error handling more robust. Ensure that once a
+        connection is marked to be closed, further asynchronous processing
+        cannot change that. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
