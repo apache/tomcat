@@ -131,6 +131,13 @@
         connection is marked to be closed, further asynchronous processing
         cannot change that. (markt)
       </fix>
+      <fix>
+        Make asynchronous error handling more robust. Ensure that once the call
+        to <code>AsyncListener.onError()</code> has returned to the container,
+        only container threads can access the <code>AsyncContext</code>. This
+        protects against various race conditions that woudl otherwise occur if
+        application threads continued to access the <code>AsyncContext</code>.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
