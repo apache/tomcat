@@ -126,6 +126,11 @@
         Setting a <code>null</code> value for a cookie attribute should remove
         the attribute. (markt)
       </fix>
+      <fix>
+        Make asynchronous error handling more robust. Ensure that once a
+        connection is marked to be closed, further asynchronous processing
+        cannot change that. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
