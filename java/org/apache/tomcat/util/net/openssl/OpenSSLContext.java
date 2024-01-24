@@ -50,7 +50,6 @@ import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLConf;
 import org.apache.tomcat.jni.SSLContext;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
@@ -62,9 +61,6 @@ import org.apache.tomcat.util.res.StringManager;
 public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static final Log log = LogFactory.getLog(OpenSSLContext.class);
-
-    // Note: this uses the main "net" package strings as many are common with APR
-    private static final StringManager netSm = StringManager.getManager(AbstractEndpoint.class);
     private static final StringManager sm = StringManager.getManager(OpenSSLContext.class);
 
     private static final String defaultProtocol = "TLS";
@@ -144,8 +140,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 } else {
                     // Should not happen since filtering to build
                     // enabled protocols removes invalid values.
-                    throw new Exception(netSm.getString(
-                            "endpoint.apr.invalidSslProtocol", protocol));
+                    throw new Exception(sm.getString("openssl.invalidSslProtocol", protocol));
                 }
             }
 
@@ -156,8 +151,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 // If the sslEngine is disabled on the AprLifecycleListener
                 // there will be an Exception here but there is no way to check
                 // the AprLifecycleListener settings from here
-                throw new Exception(
-                        netSm.getString("endpoint.apr.failSslContextMake"), e);
+                throw new Exception(sm.getString("openssl.failSslContextMake"), e);
             }
 
             this.negotiableProtocols = negotiableProtocols;
