@@ -73,7 +73,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     private long timeout = -1;
     private AsyncEvent event = null;
     private volatile Request request;
-    AtomicBoolean hasProcessedError = new AtomicBoolean(false);
+    private final AtomicBoolean hasProcessedError = new AtomicBoolean(false);
 
     public AsyncContextImpl(Request request) {
         if (log.isDebugEnabled()) {
