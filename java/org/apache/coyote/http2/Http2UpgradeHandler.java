@@ -88,7 +88,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     private static final String HTTP2_SETTINGS_HEADER = "HTTP2-Settings";
 
-    private static final HeaderSink HEADER_SINK = new HeaderSink();
+    protected static final HeaderSink HEADER_SINK = new HeaderSink();
 
     protected final String connectionId;
 
