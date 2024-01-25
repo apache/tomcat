@@ -176,6 +176,11 @@
         by reporting problems at the end of the frame where the error was
         detected rather than at the end of the headers. (markt)
       </fix>
+      <fix>
+       Remove the remaining reference to a stream once the stream has been
+       recycled. This makes the stream eligible for garbage collection earlier
+       and thereby improves scalability. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
