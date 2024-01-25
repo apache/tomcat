@@ -2092,7 +2092,7 @@
       <class location="${tomcat.classes}" />
       <class location="${test.classes}" />
       <auxClasspath>
-        <fileset file="${jdt.jar}" />
+        <path refid="tomcat.test.classpath"/>
         <fileset file="${ant.core.lib}" />
       </auxClasspath>
     </spotbugs>
