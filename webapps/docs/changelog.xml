@@ -167,6 +167,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Correct the remaining OSGi contract references in the manifest files to
+        refer to the Jakarta EE contract names rather than the Java EE contract
+        names. Based on pull request <pr>685</pr> provided by Paul A. Nicolucci.
+        (markt)
+      </fix>
+
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M16 (markt)" rtext="2024-01-09">
   <subsection name="Catalina">
