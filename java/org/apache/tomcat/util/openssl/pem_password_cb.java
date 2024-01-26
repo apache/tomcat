@@ -27,36 +27,49 @@ import java.lang.invoke.MethodHandle;
 
 /**
  * {@snippet lang=c :
- * pem_password_cb *cb
+ * typedef int (pem_password_cb)(char *, int, int, void *)
  * }
  */
 @SuppressWarnings("javadoc")
-public class PEM_read_bio_PrivateKey$cb {
+public class pem_password_cb {
 
+    /**
+     * The function pointer signature, expressed as a functional interface
+     */
     public interface Function {
         int apply(MemorySegment buf, int size, int rwflag, MemorySegment userdata);
     }
 
     private static final FunctionDescriptor $DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT,
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        openssl_h.C_INT,
+        openssl_h.C_POINTER,
+        openssl_h.C_INT,
+        openssl_h.C_INT,
+        openssl_h.C_POINTER
+    );
 
+    /**
+     * The descriptor of this function pointer
+     */
     public static FunctionDescriptor descriptor() {
         return $DESC;
     }
 
-    private static final MethodHandle UP$MH = openssl_h.upcallHandle(PEM_read_bio_PrivateKey$cb.Function.class, "apply", $DESC);
+    private static final MethodHandle UP$MH = openssl_h.upcallHandle(pem_password_cb.Function.class, "apply", $DESC);
 
-    public static MemorySegment allocate(PEM_read_bio_PrivateKey$cb.Function fi, Arena scope) {
-        return Linker.nativeLinker().upcallStub(UP$MH.bindTo(fi), $DESC, scope);
+    /**
+     * Allocates a new upcall stub, whose implementation is defined by {@code fi}.
+     * The lifetime of the returned segment is managed by {@code arena}
+     */
+    public static MemorySegment allocate(pem_password_cb.Function fi, Arena arena) {
+        return Linker.nativeLinker().upcallStub(UP$MH.bindTo(fi), $DESC, arena);
     }
 
     private static final MethodHandle DOWN$MH = Linker.nativeLinker().downcallHandle($DESC);
 
+    /**
+     * Invoke the upcall stub {@code funcPtr}, with given parameters
+     */
     public static int invoke(MemorySegment funcPtr,MemorySegment buf, int size, int rwflag, MemorySegment userdata) {
         try {
             return (int) DOWN$MH.invokeExact(funcPtr, buf, size, rwflag, userdata);
