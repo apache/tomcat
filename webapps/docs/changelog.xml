@@ -157,6 +157,10 @@
         Additional fixes to correctly support <code>length</code> as a read-only
         property of an array via the <code>ArrayELResolver</code>. (markt)
       </fix>
+      <fix>
+        <bug>68546</bug>: Generate optimal size and types for JSP imports maps,
+        as suggested by John Engebretson. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
