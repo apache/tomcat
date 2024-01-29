@@ -624,7 +624,9 @@ class Generator {
         out.pushIndent();
         // Packages is never empty because o.a.j.Constants.STANDARD_IMPORTS
         // contains 3 packages and is always added to the imports.
-        out.printin("_jspx_imports_packages = new java.util.HashSet<>();");
+        out.printin("_jspx_imports_packages = new java.util.LinkedHashSet<>(");
+        out.print(Integer.valueOf(packages.size()));
+        out.print(");");
         out.println();
         for (String packageName : packages) {
             out.printin("_jspx_imports_packages.add(\"");
@@ -636,7 +638,9 @@ class Generator {
             out.printin("_jspx_imports_classes = null;");
             out.println();
         } else {
-            out.printin("_jspx_imports_classes = new java.util.HashSet<>();");
+            out.printin("_jspx_imports_classes = new java.util.LinkedHashSet<>(");
+            out.print(Integer.valueOf(classes.size()));
+            out.print(");");
             out.println();
             for (String className : classes) {
                 out.printin("_jspx_imports_classes.add(\"");
