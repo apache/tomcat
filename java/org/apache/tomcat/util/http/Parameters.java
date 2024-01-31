@@ -144,7 +144,11 @@ public final class Parameters {
      */
     public void handleQueryParameters() {
         if (didQueryParameters) {
-            return;
+            if (!queryMB.isNull() && decodedQuery.isNull()) {
+                log.debug("This class is not thread safe but handled by multiple threads now. This is just a fallback to avoid severely error.");
+            } else {
+                return;
+            }
         }
 
         didQueryParameters = true;
