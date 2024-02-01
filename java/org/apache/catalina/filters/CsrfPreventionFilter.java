@@ -33,7 +33,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
-import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -188,6 +187,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     /**
      * Creates a collection of matchers from a comma-separated string of patterns.
      *
+     * @param context the Servlet context
      * @param patterns A comma-separated string of URL matching patterns.
      *
      * @return A collection of predicates representing the URL patterns.
@@ -220,6 +220,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     /**
      * Creates a predicate that can match the specified type of pattern.
      *
+     * @param context the Servlet context
      * @param pattern The pattern to match e.g. <code>*.foo</code> or
      *                <code>/bar/*</code>.
      *
