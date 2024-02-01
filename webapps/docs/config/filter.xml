@@ -291,6 +291,13 @@
         request. The default value is <code>403</code>.</p>
       </attribute>
 
+      <attribute name="enforce" required="false">
+        <p>A flag to enable or disable enforcement. When enforcement is
+        disabled, the CsrfPreventionFilter will <i>allow all requests</i> and
+        log CSRF failures as DEBUG messages. The default is <b>true</b>,
+        enabling the enforcement of CSRF protection.</p>
+      </attribute>
+
       <attribute name="entryPoints" required="false">
         <p>A comma separated list of URLs that will not be tested for the
         presence of a valid nonce. They are used to provide a way to navigate
@@ -319,6 +326,41 @@
         of <code>java.security.SecureRandom</code> will be used.</p>
       </attribute>
 
+      <attribute name="noNonceURLPatterns" required="false">
+        <p>A list of URL patterns that will <i>not</i> have CSRF nonces added
+        to them. You may not want to add nonces to certain URLs to avoid
+        creating unique URLs which may defeat resource caching, etc.</p>
+
+        <p>There are several types of patterns supported:</p>
+
+        <ul>
+          <li>Prefix matches using a pattern that ends with a <code>*</code>.
+          For example, <code>/images/*</code>.</li>
+
+          <li>Suffix matches using a pattern that begins with a <code>*</code>.
+          For example, <code>*.css</code>.</li>
+
+          <li>Mime-type matches which begin with <code>mime:</code> and specify
+          one of the above matches which will be checked against the MIME type
+          of the URL filename. For example, <code>mime:image/*</code>.
+          Note that the MIME-type will be determined using
+          <code>ServletContext.getMimeType</code>.</li>
+
+          <li>A single complete regular expression pattern which begins and
+          ends with <code>/</code> (slash / solidus) symbols. For example
+          <code>//images/.*|/scripts/.*/</code>. The leading and trailing
+          <code>/</code> characters will be removed from the pattern before
+          being compiled. Note that there can be only a single pattern,
+          but that pattern can of course have as many alternatives as desired
+          by using the regular expression <code>|</code> (<code>OR</code>)
+          operator. The regular expression will be matched against the entire
+          URL (i.e. <i>match</i> not <i>find</i> semantics), and the regex
+          dialect is Java (<code>java.util.regex.Pattern</code>).
+          </li>
+        </ul>
+
+        <p>The default is <code>*.css, *.js, *.gif, *.png, *.jpg, *.svg, *.ico, *.jpeg, *.mjs</code>.</p>
+      </attribute>
     </attributes>
 
   </subsection>
