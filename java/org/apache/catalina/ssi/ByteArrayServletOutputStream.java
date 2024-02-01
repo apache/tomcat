@@ -23,10 +23,10 @@ import jakarta.servlet.WriteListener;
 
 
 /**
- * Class that extends ServletOutputStream, used as a wrapper from within
- * <code>SsiInclude</code>
+ * Class that extends ServletOutputStream, used as a wrapper from within <code>SsiInclude</code>
  *
  * @author Bip Thelin
+ *
  * @see ServletOutputStream and ByteArrayOutputStream
  */
 public class ByteArrayServletOutputStream extends ServletOutputStream {

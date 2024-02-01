@@ -104,7 +104,86 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 11.0.0-M16 (markt)" rtext="in development">
+<section name="Tomcat 11.0.0-M17 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Implement <code>HttpSession.getAccessor()</code> which provides a
+        mechanism for applications to interact with an <code>HttpSession</code>
+        outside the standard Servlet processing of an HTTP request. This is
+        expected to be especially useful with applications using the Jakarta
+        WebSocket API. (markt)
+      </add>
+      <fix>
+        Correct JPMS and OSGi meta-data for <code>tomcat-enbed-core.jar</code>
+        by removing reference to <code>org.apache.catalina.ssi</code> package
+        that is no longer included in the JAR. Based on pull request
+        <pr>684</pr> by Jendrik Johannes. (markt)
+      </fix>
+      <fix>
+        Fix ServiceBindingPropertySource so that trailing <code>\r\n</code>
+        sequences are correctly removed from files containing property values
+        when configured to do so. Bug identified by Coverity Scan. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Setting a <code>null</code> value for a cookie attribute should remove
+        the attribute. (markt)
+      </fix>
+      <fix>
+        Optimize state handling for OpenSSL context callbacks with the FFM API.
+        (remm)
+      </fix>
+      <fix>
+        Make asynchronous error handling more robust. Ensure that once a
+        connection is marked to be closed, further asynchronous processing
+        cannot change that. (markt)
+      </fix>
+      <fix>
+        Make asynchronous error handling more robust. Ensure that once the call
+        to <code>AsyncListener.onError()</code> has returned to the container,
+        only container threads can access the <code>AsyncContext</code>. This
+        protects against various race conditions that woudl otherwise occur if
+        application threads continued to access the <code>AsyncContext</code>.
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Additional fixes to correctly support <code>length</code> as a read-only
+        property of an array via the <code>ArrayELResolver</code>. (markt)
+      </fix>
+      <fix>
+        <bug>68546</bug>: Generate optimal size and types for JSP imports maps,
+        as suggested by John Engebretson. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Correct a regression in the fix for <bug>66508</bug> that could cause an
+        <code>UpgradeProcessor</code> leak in some circumstances. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Correct the remaining OSGi contract references in the manifest files to
+        refer to the Jakarta EE contract names rather than the Java EE contract
+        names. Based on pull request <pr>685</pr> provided by Paul A. Nicolucci.
+        (markt)
+      </fix>
+
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 11.0.0-M16 (markt)" rtext="2024-01-09">
   <subsection name="Catalina">
     <changelog>
       <add>
@@ -112,6 +191,13 @@
         the default servlet via the init param
         <code>directoryRedirectStatusCode</code>. (funkman/markt)
       </add>
+      <update>
+        <bug>68378</bug>: Align extension to MIME type mappings in the global
+        web.xml with those in httpd by adding
+        <code>application/vnd.geogebra.slides</code> for <code>ggs</code>,
+        <code>text/javascript</code> for <code>mjs</code> and
+        <code>audio/ogg</code> for opus. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -137,6 +223,19 @@
         used in the request line, if any, to make the check case insensitive
         since host names are case insensitive. (markt)
       </fix>
+      <add>
+        <bug>68348</bug>: Add support for the partitioned attribute for cookies
+        including session cookies. (markt)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        The defaults for <code>compilerSourceVM</code> and
+        <code>compilerTargetVM</code> have been updated to 21 to align with Java
+        21 being the minimum Java version required for Tomcat 11. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Web Applications">
@@ -149,13 +248,32 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update to the Eclipse JDT compiler 4.30. (markt)
+      </update>
+      <update>
+        Update Checkstyle to 10.12.7. (markt)
+      </update>
+      <update>
+        Update SpotBugs to 4.8.3. (markt)
+      </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations by tak7iji. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M15 (markt)" rtext="2023-12-12">
   <subsection name="Catalina">
     <changelog>
       <fix>
         Background processes should not be run concurrently with lifecycle
-        oprations of a container. (remm)
+        operations of a container. (remm)
       </fix>
       <add>
         Add support for the <code>jakarta.servlet.request.secure_protocol</code>
@@ -1194,7 +1312,7 @@
       <add>
         Align the EL implementation with the latest changes to the Jakarta EL
         specification and add support for the length attribute to the
-        <code>ArrayElResolver</code>. (markt)
+        <code>ArrayELResolver</code>. (markt)
       </add>
     </changelog>
   </subsection>

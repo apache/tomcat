@@ -1096,7 +1096,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 case REQUIRE -> SSL_VERIFY_FAIL_IF_NO_PEER_CERT();
                 case OPTIONAL -> certificateVerificationOptionalNoCA ? OpenSSLContext.OPTIONAL_NO_CA : SSL_VERIFY_PEER();
             };
-            // SSL.setVerify(state.ssl, value, certificateVerificationDepth);
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
             int value = switch (mode) {
                 case NONE -> SSL_VERIFY_NONE();
@@ -1110,7 +1109,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
     }
 
-    private static class InfoCallback implements SSL_set_info_callback$cb {
+    private static class InfoCallback implements SSL_set_info_callback$cb.Function {
         @Override
         public void apply(MemorySegment ssl, int where, int ret) {
             EngineState state = getState(ssl);
@@ -1124,7 +1123,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
     }
 
-    static class VerifyCallback implements SSL_set_verify$callback, SSL_CTX_set_verify$callback {
+    static class VerifyCallback implements SSL_set_verify$callback.Function, SSL_CTX_set_verify$callback.Function {
         @Override
         public int apply(int preverify_ok, MemorySegment /*X509_STORE_CTX*/ x509ctx) {
             MemorySegment ssl = X509_STORE_CTX_get_ex_data(x509ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
@@ -1209,7 +1208,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static int processOCSP(MemorySegment /*X509_STORE_CTX*/ x509ctx) {
         int ocspResponse = V_OCSP_CERTSTATUS_UNKNOWN();
-        // ocspResponse = ssl_verify_OCSP(x509_ctx);
         MemorySegment x509 = X509_STORE_CTX_get_current_cert(x509ctx);
         if (!MemorySegment.NULL.equals(x509)) {
             // No need to check cert->valid, because ssl_verify_OCSP() only
@@ -1322,7 +1320,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return V_OCSP_CERTSTATUS_UNKNOWN();
             }
             MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
-            // HTTP request with the following header
+            // HTTP request with the following header:
             // POST urlPath HTTP/1.1
             // Host: urlHost:urlPort
             // Content-Type: application/ocsp-request
@@ -1534,7 +1532,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     if (!clientMode) {
                         // if used on the server side SSL_get_peer_cert_chain(...) will not include the remote peer certificate.
                         // We use SSL_get_peer_certificate to get it in this case and add it to our array later.
-                        //
                         // See https://www.openssl.org/docs/ssl/SSL_get_peer_cert_chain.html
                         clientCert = getPeerCertificate();
                     } else {

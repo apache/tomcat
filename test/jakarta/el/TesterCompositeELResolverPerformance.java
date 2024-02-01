@@ -18,7 +18,11 @@ package jakarta.el;
 
 import org.junit.Test;
 
-public class TestCompositeELResolverPerformance {
+/*
+ * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
+ * excluded due to the name starting Tester...
+ */
+public class TesterCompositeELResolverPerformance {
 
     /*
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=68119

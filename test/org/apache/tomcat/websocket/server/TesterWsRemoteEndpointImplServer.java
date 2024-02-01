@@ -36,7 +36,6 @@ import jakarta.websocket.Session;
 import jakarta.websocket.WebSocketContainer;
 import jakarta.websocket.server.ServerEndpointConfig;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -45,8 +44,10 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.websocket.WebSocketBaseTest;
 import org.apache.tomcat.websocket.pojo.TesterUtil.SimpleClient;
 
-@Ignore // This test requires manual intervention to create breakpoints etc.
-public class TestWsRemoteEndpointImplServer extends WebSocketBaseTest {
+/*
+ * This test requires manual intervention to create breakpoints etc.
+ */
+public class TesterWsRemoteEndpointImplServer extends WebSocketBaseTest {
 
     /*
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=58624

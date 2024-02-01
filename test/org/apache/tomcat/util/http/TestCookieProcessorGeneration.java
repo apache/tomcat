@@ -96,6 +96,14 @@ public class TestCookieProcessorGeneration {
     }
 
     @Test
+    public void valueNull() {
+        Cookie cookie = new Cookie("foo", "bar");
+        cookie.setAttribute("other", "anything");
+        cookie.setAttribute("other", null);
+        doTest(cookie, "foo=bar");
+    }
+
+    @Test
     public void testMaxAgePositive() {
         doTestMaxAge(100, "foo=bar; Max-Age=100");
     }
@@ -208,6 +216,36 @@ public class TestCookieProcessorGeneration {
 
         Assert.assertEquals("foo=bar; Secure; HttpOnly; SameSite=Strict", rfc6265.generateHeader(cookie, null));
     }
+
+
+    @Test
+    public void testPartitionedCookies() {
+        Rfc6265CookieProcessor rfc6265 = new Rfc6265CookieProcessor();
+
+        Cookie cookie = new Cookie("foo", "bar");
+
+        Assert.assertEquals("foo=bar", rfc6265.generateHeader(cookie, null));
+
+        rfc6265.setPartitioned(false);
+
+        Assert.assertEquals("foo=bar", rfc6265.generateHeader(cookie, null));
+
+        rfc6265.setPartitioned(true);
+
+        Assert.assertEquals("foo=bar; Partitioned", rfc6265.generateHeader(cookie, null));
+
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+
+        rfc6265.setPartitioned(false);
+
+        Assert.assertEquals("foo=bar; Secure; HttpOnly", rfc6265.generateHeader(cookie, null));
+
+        rfc6265.setPartitioned(true);
+
+        Assert.assertEquals("foo=bar; Secure; HttpOnly; Partitioned", rfc6265.generateHeader(cookie, null));
+    }
+
 
     private void doTest(Cookie cookie, String expectedRfc6265) {
         CookieProcessor rfc6265 = new Rfc6265CookieProcessor();

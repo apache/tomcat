@@ -241,7 +241,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         setState(LifecycleState.STARTING);
     }
@@ -254,7 +254,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         setState(LifecycleState.STOPPING);
     }

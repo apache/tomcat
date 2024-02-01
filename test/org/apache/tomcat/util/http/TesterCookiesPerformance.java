@@ -21,6 +21,10 @@ import org.junit.Test;
 
 import org.apache.tomcat.util.buf.MessageBytes;
 
+/*
+ * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
+ * excluded due to the name starting Tester...
+ */
 public class TesterCookiesPerformance {
 
     @Test

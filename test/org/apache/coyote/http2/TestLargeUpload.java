@@ -45,7 +45,7 @@ import org.apache.tomcat.util.net.TesterSupport;
 @RunWith(Parameterized.class)
 public class TestLargeUpload extends Http2TestBase {
 
-    @Parameters(name = "{0}: {1}]")
+    @Parameters(name = "{0}: {1} {2}]")
     public static Collection<Object[]> parameters() {
         Collection<Object[]> baseData = data();
 

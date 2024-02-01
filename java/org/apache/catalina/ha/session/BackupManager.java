@@ -132,7 +132,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         super.startInternal();
 
@@ -170,7 +170,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("backupManager.stopped", getName()));

@@ -73,7 +73,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     private long timeout = -1;
     private AsyncEvent event = null;
     private volatile Request request;
-    AtomicBoolean hasProcessedError = new AtomicBoolean(false);
+    private final AtomicBoolean hasErrorProcessingStarted = new AtomicBoolean(false);
+    private final AtomicBoolean hasOnErrorReturned = new AtomicBoolean(false);
 
     public AsyncContextImpl(Request request) {
         if (log.isDebugEnabled()) {
@@ -280,7 +281,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         request = null;
         clearServletRequestResponse();
         timeout = -1;
-        hasProcessedError.set(false);
+        hasErrorProcessingStarted.set(false);
+        hasOnErrorReturned.set(false);
     }
 
     private void clearServletRequestResponse() {
@@ -379,7 +381,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
 
     public void setErrorState(Throwable t, boolean fireOnError) {
-        if (!hasProcessedError.compareAndSet(false, true)) {
+        if (!hasErrorProcessingStarted.compareAndSet(false, true)) {
             // Skip duplicate error processing
             return;
         }
@@ -401,6 +403,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 } catch (Throwable t2) {
                     ExceptionUtils.handleThrowable(t2);
                     log.warn(sm.getString("asyncContextImpl.onErrorError", listener.getClass().getName()), t2);
+                } finally {
+                    hasOnErrorReturned.set(true);
                 }
             }
         }
@@ -500,9 +504,18 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
     private void check() {
+        Request request = this.request;
         if (request == null) {
             // AsyncContext has been recycled and should not be being used
             throw new IllegalStateException(sm.getString("asyncContextImpl.requestEnded"));
+        }
+        if (hasOnErrorReturned.get() && !request.getCoyoteRequest().isRequestThread()) {
+            /*
+             * Non-container thread is trying to use the AsyncContext after an error has occurred and the call to
+             * AsyncListener.onError() has returned. At this point, the non-container thread should not be trying to use
+             * the AsyncContext due to possible race conditions.
+             */
+            throw new IllegalStateException(sm.getString("asyncContextImpl.afterOnError"));
         }
     }
 

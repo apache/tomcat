@@ -320,10 +320,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             } else if (opt.equals("20")) {
                 settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_20);
             } else if (opt.equals("21")) {
-                // Constant not available in latest ECJ version shipped with
-                // Tomcat. May be supported in a snapshot build.
-                // This is checked against the actual version below.
-                settings.put(CompilerOptions.OPTION_Source, "21");
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_21);
             } else if (opt.equals("22")) {
                 // Constant not available in latest ECJ version shipped with
                 // Tomcat. May be supported in a snapshot build.
@@ -331,11 +328,11 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 settings.put(CompilerOptions.OPTION_Source, "22");
             } else {
                 log.warn(Localizer.getMessage("jsp.warning.unknown.sourceVM", opt));
-                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_11);
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_21);
             }
         } else {
-            // Default to 11
-            settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_11);
+            // Default to 21
+            settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_21);
         }
 
         // Target JVM
@@ -400,11 +397,8 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_20);
                 settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_20);
             } else if (opt.equals("21")) {
-                // Constant not available in latest ECJ version shipped with
-                // Tomcat. May be supported in a snapshot build.
-                // This is checked against the actual version below.
-                settings.put(CompilerOptions.OPTION_TargetPlatform, "21");
-                settings.put(CompilerOptions.OPTION_Compliance, "21");
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_21);
+                settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_21);
             } else if (opt.equals("22")) {
                 // Constant not available in latest ECJ version shipped with
                 // Tomcat. May be supported in a snapshot build.
@@ -413,12 +407,12 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 settings.put(CompilerOptions.OPTION_Compliance, "22");
             } else {
                 log.warn(Localizer.getMessage("jsp.warning.unknown.targetVM", opt));
-                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_11);
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_21);
             }
         } else {
-            // Default to 11
-            settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_11);
-            settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_11);
+            // Default to 21
+            settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_21);
+            settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_21);
         }
 
         final IProblemFactory problemFactory = new DefaultProblemFactory(Locale.getDefault());

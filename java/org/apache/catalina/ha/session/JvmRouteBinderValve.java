@@ -355,7 +355,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         if (cluster == null) {
             Cluster containerCluster = getContainer().getCluster();
@@ -383,7 +383,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         super.stopInternal();
 

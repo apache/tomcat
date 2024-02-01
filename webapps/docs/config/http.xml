@@ -1066,7 +1066,7 @@
 
   <subsection name="HTTP/2 Support">
 
-  <p>HTTP/2 is support is provided for TLS (h2), non-TLS via HTTP upgrade (h2c)
+  <p>HTTP/2 support is provided for TLS (h2), non-TLS via HTTP upgrade (h2c)
      and direct HTTP/2 (h2c) connections. To enable HTTP/2 support for an HTTP
      connector the following <strong>UpgradeProtocol</strong> element must be
      nested within the <strong>Connector</strong> with a
@@ -1565,6 +1565,10 @@
   implementation depending on the processor being used,
   and can be complemented with many commercial accelerator components.</p>
 
+  <p>When OpenSSL FFM support is enabled, the connectors will default to using
+  OpenSSL through JSSE, which is equivalent but uses the Java FFM API from
+  Java 22 to access OpenSSL.</p>
+
   <p>The following NIO and NIO2 SSL configuration attributes are not specific to
   a virtual host and, therefore, must be configured on the connector.</p>
 
@@ -1594,6 +1598,9 @@
       will automatically enable it and the default value of this attribute
       becomes
       <code>org.apache.tomcat.util.net.openssl.OpenSSLImplementation</code>.
+      The FFM API from Java 22 may also be used to enable OpenSSL support, in
+      which case the default value of the attribute becomes
+      <code>org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation</code>.
       In that case, the attributes from either JSSE and OpenSSL
       configuration styles can be used, as long as the two types are not mixed
       (for example, it is not allowed to define use of a Java keystore and

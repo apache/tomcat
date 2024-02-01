@@ -40,7 +40,6 @@ import jakarta.servlet.jsp.tagext.TryCatchFinally;
 import jakarta.servlet.jsp.tagext.VariableInfo;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -786,12 +785,12 @@ public class TestGenerator extends TomcatBaseTest {
         doTestJsp("usebean-04.jsp", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
-    @Ignore // Requires specific Java settings
     @Test
     public void testUseBean05() throws Exception {
         // Whether this test passes or fails depends on the Java version used
         // and the JRE settings.
         // For the test to pass use --illegal-access=deny
+        // This is the default setting for Java 16 onwards
         doTestJsp("usebean-05.jsp", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 

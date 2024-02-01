@@ -273,14 +273,17 @@ public class SingleSignOn extends ValveBase {
             if (domain != null) {
                 cookie.setDomain(domain);
             }
-            // This is going to trigger a Set-Cookie header. While the value is
-            // not security sensitive, ensure that expectations for secure and
-            // httpOnly are met
+            /*
+             * This is going to trigger a Set-Cookie header. While the value is not security sensitive, ensure that
+             * expectations for secure, httpOnly and Partitioned are met.
+             */
             cookie.setSecure(request.isSecure());
             if (request.getServletContext().getSessionCookieConfig().isHttpOnly() ||
                     request.getContext().getUseHttpOnly()) {
                 cookie.setHttpOnly(true);
             }
+            cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR,
+                    Boolean.toString(request.getContext().getUsePartitioned()));
 
             response.addCookie(cookie);
         }
@@ -567,7 +570,7 @@ public class SingleSignOn extends ValveBase {
 
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         Container c = getContainer();
         while (c != null && !(c instanceof Engine)) {
             c = c.getParent();
@@ -580,7 +583,7 @@ public class SingleSignOn extends ValveBase {
 
 
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
         super.stopInternal();
         engine = null;
     }

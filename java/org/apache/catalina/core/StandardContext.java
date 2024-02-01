@@ -640,6 +640,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     private boolean useHttpOnly = true;
 
+    private boolean usePartitioned = false;
+
 
     /**
      * The domain to use for session cookies. <code>null</code> indicates that the domain is controlled by the
@@ -1543,6 +1545,20 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         boolean oldUseHttpOnly = this.useHttpOnly;
         this.useHttpOnly = useHttpOnly;
         support.firePropertyChange("useHttpOnly", oldUseHttpOnly, this.useHttpOnly);
+    }
+
+
+    @Override
+    public boolean getUsePartitioned() {
+        return usePartitioned;
+    }
+
+
+    @Override
+    public void setUsePartitioned(boolean usePartitioned) {
+        boolean oldUsePartitioned = this.usePartitioned;
+        this.usePartitioned = usePartitioned;
+        support.firePropertyChange("usePartitioned", oldUsePartitioned, this.usePartitioned);
     }
 
 
@@ -4597,7 +4613,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         if (log.isDebugEnabled()) {
             log.debug("Starting " + getBaseName());
@@ -5008,7 +5024,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         // Send j2ee.state.stopping notification
         if (this.getObjectName() != null) {

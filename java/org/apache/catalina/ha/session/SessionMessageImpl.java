@@ -112,14 +112,13 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
 
     /**
      * set message send time but only the first setting works (one shot)
+     * @param time the timestamp
      */
     @Override
     public void setTimestamp(long time) {
-        synchronized (this) {
-            if (!timestampSet) {
-                serializationTimestamp = time;
-                timestampSet = true;
-            }
+        if (!timestampSet) {
+            serializationTimestamp = time;
+            timestampSet = true;
         }
     }
 

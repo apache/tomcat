@@ -28,11 +28,12 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.InstanceManager;
 
-public class TestDefaultInstanceManagerPerformance extends TomcatBaseTest {
+/*
+ * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
+ * excluded due to the name starting Tester...
+ */
+public class TesterDefaultInstanceManagerPerformance extends TomcatBaseTest {
 
-    /*
-     * Performance test. Comment out @Ignore to run the test.
-     */
     @Test
     public void testConcurrency() throws Exception {
         // Create a populated InstanceManager

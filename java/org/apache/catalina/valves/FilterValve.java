@@ -180,7 +180,7 @@ public class FilterValve extends ValveBase implements FilterConfig {
     }
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         super.startInternal();
 
         if (null == getFilterClassName()) {
@@ -220,7 +220,7 @@ public class FilterValve extends ValveBase implements FilterConfig {
     }
 
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
         super.stopInternal();
 
         if (null != filter) {

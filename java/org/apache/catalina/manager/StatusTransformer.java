@@ -211,24 +211,25 @@ public class StatusTransformer {
 
             writer.write("</jvm>");
         } else if (mode == 2) {
-            writer.append('"').append("jvm").append('"').append(':').append('{').println();
+            indent(writer, 1).append('"').append("jvm").append('"').append(':').append('{').println();
 
-            writer.append('"').append("memory").append('"').append(':').append('{');
+            indent(writer, 2).append('"').append("memory").append('"').append(':').append('{');
             appendJSonValue(writer, "free", Long.toString(Runtime.getRuntime().freeMemory())).append(',');
             appendJSonValue(writer, "total", Long.toString(Runtime.getRuntime().totalMemory())).append(',');
             appendJSonValue(writer, "max", Long.toString(Runtime.getRuntime().maxMemory()));
             writer.append('}').append(',').println();
 
-            writer.append('"').append("memorypool").append('"').append(':').append('[');
+            indent(writer, 2).append('"').append("memorypool").append('"').append(':').append('[');
             boolean first = true;
             for (MemoryPoolMXBean memoryPoolMBean : memoryPoolMBeans.values()) {
                 MemoryUsage usage = memoryPoolMBean.getUsage();
                 if (first) {
                     first = false;
+                    writer.println();
                 } else {
                     writer.append(',').println();
                 }
-                writer.append('{');
+                indent(writer, 3).append('{');
                 appendJSonValue(writer, "name", JSONFilter.escape(memoryPoolMBean.getName())).append(',');
                 appendJSonValue(writer, "type", memoryPoolMBean.getType().toString()).append(',');
                 appendJSonValue(writer, "usageInit", Long.toString(usage.getInit())).append(',');
@@ -237,9 +238,10 @@ public class StatusTransformer {
                 appendJSonValue(writer, "usageUsed", Long.toString(usage.getUsed()));
                 writer.append('}');
             }
-            writer.append(']').println();
+            writer.println();
+            indent(writer, 2).append(']').println();
 
-            writer.append('}');
+            indent(writer, 1).append('}');
         }
 
     }
@@ -247,6 +249,14 @@ public class StatusTransformer {
 
     private static PrintWriter appendJSonValue(PrintWriter writer, String name, String value) {
         return writer.append('"').append(name).append('"').append(':').append('"').append(value).append('"');
+    }
+
+
+    private static PrintWriter indent(PrintWriter writer, int count) {
+        for (int i = 0; i < count; i++) {
+            writer.append(' ').append(' ');
+        }
+        return writer;
     }
 
 
@@ -269,7 +279,7 @@ public class StatusTransformer {
             throws Exception {
         if (mode == 2) {
             writer.append(',').println();
-            writer.append('"').append("connector").append('"').append(':').append('[').println();
+            indent(writer, 1).append('"').append("connector").append('"').append(':').append('[').println();
         }
         boolean first = true;
         for (ObjectName objectName : threadPools) {
@@ -286,7 +296,7 @@ public class StatusTransformer {
                     writer, objectName, name, mBeanServer, globalRequestProcessors, requestProcessors, mode, args);
         }
         if (mode == 2) {
-            writer.append(']').println();
+            writer.append(']');
         }
     }
 
@@ -428,10 +438,15 @@ public class StatusTransformer {
 
             writer.write("</connector>");
         } else if (mode == 2) {
-            writer.append('{').println();
+            indent(writer, 2).append('{').println();
 
-            appendJSonValue(writer, "name", JSONFilter.escape(name)).append(',').println();
-            writer.append('"').append("threadInfo").append('"').append(':').append('{');
+            indent(writer, 3);
+            String jsonName = JSONFilter.escape(name);
+            if (jsonName.length() > 4 && jsonName.startsWith("\\\"") && jsonName.endsWith("\\\"")) {
+                jsonName = jsonName.substring(2, jsonName.length() - 2);
+            }
+            appendJSonValue(writer, "name", jsonName).append(',').println();
+            indent(writer, 3).append('"').append("threadInfo").append('"').append(':').append('{');
             appendJSonValue(writer, "maxThreads", mBeanServer.getAttribute(tpName, "maxThreads").toString()).append(',');
             appendJSonValue(writer, "currentThreadCount", mBeanServer.getAttribute(tpName, "currentThreadCount").toString()).append(',');
             appendJSonValue(writer, "currentThreadsBusy", mBeanServer.getAttribute(tpName, "currentThreadsBusy").toString());
@@ -447,7 +462,7 @@ public class StatusTransformer {
 
             if (grpName != null) {
                 writer.append(',').println();
-                writer.append('"').append("requestInfo").append('"').append(':').append('{');
+                indent(writer, 3).append('"').append("requestInfo").append('"').append(':').append('{');
                 appendJSonValue(writer, "maxTime", mBeanServer.getAttribute(grpName, "maxTime").toString()).append(',');
                 appendJSonValue(writer, "processingTime", mBeanServer.getAttribute(grpName, "processingTime").toString()).append(',');
                 appendJSonValue(writer, "requestCount", mBeanServer.getAttribute(grpName, "requestCount").toString()).append(',');
@@ -458,7 +473,7 @@ public class StatusTransformer {
                 // Note: No detailed per processor info
             }
 
-            writer.append('}');
+            indent(writer, 2).append('}');
         }
     }
 
@@ -692,7 +707,7 @@ public class StatusTransformer {
             // for now we don't write out the Detailed state in XML
         } else if (mode == 2) {
             writer.append(',').println();
-            writer.append('"').append("context").append('"').append(':').append('[');
+            indent(writer, 1).append('"').append("context").append('"').append(':').append('[').println();
             Iterator<ObjectName> iterator = hostsON.iterator();
             boolean first = true;
             while (iterator.hasNext()) {
@@ -704,7 +719,8 @@ public class StatusTransformer {
                 ObjectName contextON = iterator.next();
                 writeContext(writer, contextON, mBeanServer, mode);
             }
-            writer.append(']').println();
+            writer.println();
+            indent(writer, 1).append(']').println();
         }
 
     }
@@ -791,8 +807,8 @@ public class StatusTransformer {
         } else if (mode == 1) {
             // for now we don't write out the context in XML
         } else if (mode == 2) {
-            writer.append('{');
-            appendJSonValue(writer, "name", JSONFilter.escape(JSONFilter.escape(name))).append(',');
+            indent(writer, 2).append('{').println();
+            appendJSonValue(indent(writer, 3), "name", JSONFilter.escape(JSONFilter.escape(name))).append(',');
             appendJSonValue(writer, "startTime",
                     new Date(((Long) mBeanServer.getAttribute(objectName, "startTime")).longValue()).toString()).append(',');
             appendJSonValue(writer, "startupTime", mBeanServer.getAttribute(objectName, "startupTime").toString()).append(',');
@@ -804,7 +820,7 @@ public class StatusTransformer {
                 writeJspMonitor(writer, jspMonitorONs, mBeanServer, mode);
             }
             writer.append(',').println();
-            writer.append('"').append("wrapper").append('"').append(':').append('[');
+            indent(writer, 3).append('"').append("wrapper").append('"').append(':').append('[').println();
             String onStr = objectName.getDomain() + ":j2eeType=Servlet,WebModule=" + webModuleName + ",*";
             ObjectName servletObjectName = new ObjectName(onStr);
             Set<ObjectInstance> set = mBeanServer.queryMBeans(servletObjectName, null);
@@ -817,8 +833,9 @@ public class StatusTransformer {
                 }
                 writeWrapper(writer, oi.getObjectName(), mBeanServer, mode);
             }
-            writer.append(']').println();
-            writer.append('}');
+            writer.println();
+            indent(writer, 3).append(']').println();
+            indent(writer, 2).append('}');
         }
 
     }
@@ -859,7 +876,7 @@ public class StatusTransformer {
             // for now we don't write out the wrapper details
         } else if (mode == 2) {
             writer.append(',').println();
-            writer.append('"').append("manager").append('"').append(':').append('{');
+            indent(writer, 3).append('"').append("manager").append('"').append(':').append('{');
             appendJSonValue(writer, "activeSessions", mBeanServer.getAttribute(objectName, "activeSessions").toString()).append(',');
             appendJSonValue(writer, "sessionCounter", mBeanServer.getAttribute(objectName, "sessionCounter").toString()).append(',');
             appendJSonValue(writer, "maxActive", mBeanServer.getAttribute(objectName, "maxActive").toString()).append(',');
@@ -907,7 +924,7 @@ public class StatusTransformer {
             // for now we don't write out anything
         } else if (mode == 2) {
             writer.append(',').println();
-            writer.append('"').append("jsp").append('"').append(':').append('{');
+            indent(writer, 3).append('"').append("jsp").append('"').append(':').append('{');
             appendJSonValue(writer, "jspCount", Integer.toString(jspCount)).append(',');
             appendJSonValue(writer, "jspReloadCount", Integer.toString(jspReloadCount));
             writer.append('}');
@@ -964,7 +981,7 @@ public class StatusTransformer {
         } else if (mode == 1) {
             // for now we don't write out the wrapper details
         } else if (mode == 2) {
-            writer.append('{');
+            indent(writer, 4).append('{');
             appendJSonValue(writer, "servletName", JSONFilter.escape(servletName)).append(',');
             appendJSonValue(writer, "processingTime", mBeanServer.getAttribute(objectName, "processingTime").toString()).append(',');
             appendJSonValue(writer, "maxTime", mBeanServer.getAttribute(objectName, "maxTime").toString()).append(',');

@@ -26,25 +26,26 @@ import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
 
 /**
- * {@snippet lang = c : * int (*SSL_CTX_set_default_passwd_cb$cb)(char* buf,int size,int rwflag,void* userdata);
+ * {@snippet lang = c : * int (*PEM_read_bio_X509_AUX$cb)(char* buf,int size,int rwflag,void* userdata);
  * }
  */
-public interface SSL_CTX_set_default_passwd_cb$cb {
+@SuppressWarnings("javadoc")
+public interface PEM_read_bio_X509_AUX$cb {
+
+    int apply(MemorySegment buf, int size, int rwflag, MemorySegment userdata);
 
     FunctionDescriptor $DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_INT,
             openssl_h.C_INT, openssl_h.C_POINTER);
 
-    int apply(MemorySegment buf, int size, int rwflag, MemorySegment userdata);
+    MethodHandle UP$MH = openssl_h.upcallHandle(PEM_read_bio_X509_AUX$cb.class, "apply", $DESC);
 
-    MethodHandle UP$MH = openssl_h.upcallHandle(SSL_CTX_set_default_passwd_cb$cb.class, "apply", $DESC);
-
-    static MemorySegment allocate(SSL_CTX_set_default_passwd_cb$cb fi, Arena scope) {
+    static MemorySegment allocate(PEM_read_bio_X509_AUX$cb fi, Arena scope) {
         return Linker.nativeLinker().upcallStub(UP$MH.bindTo(fi), $DESC, scope);
     }
 
     MethodHandle DOWN$MH = Linker.nativeLinker().downcallHandle($DESC);
 
-    static SSL_CTX_set_default_passwd_cb$cb ofAddress(MemorySegment addr, Arena arena) {
+    static PEM_read_bio_X509_AUX$cb ofAddress(MemorySegment addr, Arena arena) {
         MemorySegment symbol = addr.reinterpret(arena, null);
         return (MemorySegment _buf, int _size, int _rwflag, MemorySegment _userdata) -> {
             try {

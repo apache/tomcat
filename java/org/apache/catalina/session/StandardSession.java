@@ -621,6 +621,16 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
+    @Override
+    public Accessor getAccessor() {
+        if (!isValidInternal()) {
+            throw new IllegalStateException(sm.getString("standardSession.getAccessor.ise"));
+        }
+
+        return new StandardSessionAccessor(getManager(), getId());
+    }
+
+
     // ------------------------------------------------- Session Public Methods
 
 

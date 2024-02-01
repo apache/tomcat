@@ -264,6 +264,33 @@ public interface Context extends Container, ContextBind {
 
 
     /**
+     * Should the {@code Partitioned} attribute be added to session cookies created for this web application.
+     * <p>
+     * The name of the attribute used to indicate a partitioned cookie as part of
+     * <a href="https://developers.google.com/privacy-sandbox/3pcd#partitioned">CHIPS</a> is not defined by an RFC and
+     * may change in a non-backwards compatible way once equivalent functionality is included in an RFC.
+     *
+     * @return {@code true} if the {@code Partitioned} attribute should be added to session cookies created for this web
+     *             application, otherwise {@code false}
+     */
+    boolean getUsePartitioned();
+
+
+    /**
+     * Configure whether the {@code Partitioned} attribute should be added to session cookies created for this web
+     * application.
+     * <p>
+     * The name of the attribute used to indicate a partitioned cookie as part of
+     * <a href="https://developers.google.com/privacy-sandbox/3pcd#partitioned">CHIPS</a> is not defined by an RFC and
+     * may change in a non-backwards compatible way once equivalent functionality is included in an RFC.
+     *
+     * @param usePartitioned {@code true} if the {@code Partitioned} attribute should be added to session cookies
+     *                           created for this web application, otherwise {@code false}
+     */
+    void setUsePartitioned(boolean usePartitioned);
+
+
+    /**
      * Gets the domain to use for session cookies. Overrides any setting that
      * may be specified by the application.
      *

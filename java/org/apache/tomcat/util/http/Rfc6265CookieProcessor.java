@@ -177,6 +177,18 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
             header.append(cookieSameSite);
         }
 
+        String cookiePartitioned = cookie.getAttribute(Constants.COOKIE_PARTITIONED_ATTR);
+        if (cookiePartitioned == null) {
+            if (getPartitioned()) {
+                header.append("; Partitioned");
+            }
+        } else {
+            if (Boolean.parseBoolean(cookiePartitioned)) {
+                header.append("; Partitioned");
+            }
+        }
+
+
         // Add the remaining attributes
         for (Map.Entry<String,String> entry : cookie.getAttributes().entrySet()) {
             switch (entry.getKey()) {
@@ -187,6 +199,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
                 case Constants.COOKIE_SECURE_ATTR:
                 case Constants.COOKIE_HTTP_ONLY_ATTR:
                 case Constants.COOKIE_SAME_SITE_ATTR:
+                case Constants.COOKIE_PARTITIONED_ATTR:
                     // Handled above so NO-OP
                     break;
                 default: {

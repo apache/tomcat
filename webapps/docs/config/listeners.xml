@@ -83,8 +83,8 @@
   <subsection name="APR Lifecycle Listener - org.apache.catalina.core.AprLifecycleListener">
 
     <p>The <strong>APR Lifecycle Listener</strong> checks for the presence of
-    the APR/native library and loads the library if it is present. For more
-    information see the <a href="../apr.html">APR/native guide</a>.</p>
+    the Apache Tomcat Native library and loads the library if it is present.
+    For more information see the <a href="../apr.html">APR/native guide</a>.</p>
 
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements.</p>
@@ -299,14 +299,15 @@
 
     <p>The <strong>OpenSSL Lifecycle Listener</strong> checks for the presence
     of the OpenSSL library and loads the library if it is present. This
-    uses the FFM API and requires Java 22 or newer. When enabled and
-    successfully loaded, NIO and NIO2 connector will then make use of OpenSSL
-    for TLS functionality.</p>
+    uses the FFM API from Java 22 instead of additional native code. When
+    enabled and successfully loaded, NIO and NIO2 connector will then make use
+    of OpenSSL for TLS functionality. This is a functional replacement to the
+    <strong>APR Lifecycle Listener</strong> described above.</p>
 
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements.</p>
 
-    <p>The following additional attributes are supported by the <strong>APR
+    <p>The following additional attributes are supported by the <strong>OpenSSL
     Lifecycle Listener</strong>:</p>
 
     <attributes>
@@ -343,6 +344,12 @@
         If this attribute is set to anything other than <code>off</code>, the
         <b>SSLEngine</b> must be enabled as well.</p>
         <p>The default value is <code>off</code>.</p>
+      </attribute>
+
+      <attribute name="useOpenSSL" required="false">
+        <p>This attribute controls the auto-selection of the OpenSSL JSSE
+        implementation. The default is <code>true</code> which will use OpenSSL
+        if the FFM API is available.</p>
       </attribute>
 
     </attributes>

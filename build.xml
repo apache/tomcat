@@ -264,6 +264,7 @@
     <filter token="MIGRATION_JAR" value="${migration-lib.jar}"/>
     <filter token="UNBOUNDID_JAR" value="${unboundid.jar}"/>
     <filter token="JUNIT_JAR" value="${junit.jar}"/>
+    <filter token="OUTPUT_DIR" value="${tomcat.output}"/>
   </filterset>
 
   <!-- Version info filter set -->
@@ -2070,6 +2071,8 @@
               <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
               <!-- Exclude tests that Gump can't compile -->
               <exclude name="org/apache/tomcat/buildutil/**" />
+              <!-- Exclude tests that require large heaps -->
+              <exclude name="**/*LargeHeap.java" unless="${test.includeLargeHeap}" />
             </fileset>
           </batchtest>
         </junit>
@@ -2119,7 +2122,7 @@
       <class location="${tomcat.classes}" />
       <class location="${test.classes}" />
       <auxClasspath>
-        <fileset file="${jdt.jar}" />
+        <path refid="tomcat.test.classpath"/>
         <fileset file="${ant.core.lib}" />
       </auxClasspath>
     </spotbugs>
@@ -2209,9 +2212,12 @@
       destdir="${tomcat.dist}/webapps/docs/annotationapi"
       version="true"
       windowtitle="Common Annotations ${annotation.spec.version} API Documentation - Apache Tomcat ${version}"
-      doctitle="Common Annotations ${annotation.spec.version} API - Apache Tomcat ${version}"
-      header="&lt;b&gt;Common Annotations ${annotation.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
-      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      doctitle="Common Annotations ${annotation.spec.version} API - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}"
+      header="&lt;b&gt;Common Annotations ${annotation.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
+              &lt;br/&gt;
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
+              or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2231,9 +2237,12 @@
       destdir="${tomcat.dist}/webapps/docs/servletapi"
       version="true"
       windowtitle="Servlet ${servlet.spec.version} API Documentation - Apache Tomcat ${version}"
-      doctitle="Servlet ${servlet.spec.version} API - Apache Tomcat ${version}"
-      header="&lt;b&gt;Servlet ${servlet.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
-      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      doctitle="Servlet ${servlet.spec.version} API - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}"
+      header="&lt;b&gt;Servlet ${servlet.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
+              &lt;br/&gt;
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
+              or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2252,9 +2261,12 @@
       destdir="${tomcat.dist}/webapps/docs/jspapi"
       version="true"
       windowtitle="JSP ${jsp.spec.version} API Documentation - Apache Tomcat ${version}"
-      doctitle="JSP ${jsp.spec.version} API - Apache Tomcat ${version}"
-      header="&lt;b&gt;JSP ${jsp.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
-      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      doctitle="JSP ${jsp.spec.version} API - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}"
+      header="&lt;b&gt;JSP ${jsp.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
+              &lt;br/&gt;
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
+              or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2273,9 +2285,12 @@
       destdir="${tomcat.dist}/webapps/docs/elapi"
       version="true"
       windowtitle="EL ${el.spec.version} API Documentation - Apache Tomcat ${version}"
-      doctitle="EL ${el.spec.version} API - Apache Tomcat ${version}"
-      header="&lt;b&gt;EL ${el.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
-      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      doctitle="EL ${el.spec.version} API - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}"
+      header="&lt;b&gt;EL ${el.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
+              &lt;br/&gt;
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
+              or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2294,9 +2309,12 @@
       destdir="${tomcat.dist}/webapps/docs/websocketapi"
       version="true"
       windowtitle="WebSocket ${websocket.spec.version} API Documentation - Apache Tomcat ${version}"
-      doctitle="WebSocket ${websocket.spec.version} API - Apache Tomcat ${version}"
-      header="&lt;b&gt;WebSocket ${websocket.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
-      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      doctitle="WebSocket ${websocket.spec.version} API - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}"
+      header="&lt;b&gt;WebSocket ${websocket.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
+              &lt;br/&gt;
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
+              or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2315,9 +2333,12 @@
       destdir="${tomcat.dist}/webapps/docs/jaspicapi"
       version="true"
       windowtitle="JASPIC ${jaspic.spec.version} API Documentation - Apache Tomcat ${version}"
-      doctitle="JASPIC ${jaspic.spec.version} API - Apache Tomcat ${version}"
-      header="&lt;b&gt;JASPIC ${jaspic.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
-      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      doctitle="JASPIC ${jaspic.spec.version} API - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}"
+      header="&lt;b&gt;JASPIC ${jaspic.spec.version} - Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
+              &lt;br/&gt;
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
+              or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2334,9 +2355,12 @@
       destdir="${tomcat.dist}/webapps/docs/api"
       version="true"
       windowtitle="Apache Tomcat ${version} API Documentation"
-      doctitle="Apache Tomcat ${version} API"
-      header="&lt;b&gt;Apache Tomcat ${version}&lt;/b&gt;"
-      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      doctitle="Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version} API"
+      header="&lt;b&gt;Apache Tomcat&lt;sup&gt;&#174;&lt;/sup&gt; ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.
+              &lt;br/&gt;
+              Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
+              or trademarks of the Apache Software Foundation."
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -3795,7 +3819,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
   <!-- ============================ IntelliJ IDEA=========================== -->
 
   <target name="ide-intellij"
-          depends="download-compile, download-test-compile"
+          depends="download-compile, download-test-compile, deploy"
           description="Creates project directory .idea for IntelliJ IDEA">
 
     <copy todir="${tomcat.home}/.idea" overwrite="true">
@@ -3804,7 +3828,11 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
       <filterset refid="version.filters"/>
     </copy>
 
-    <echo>IntelliJ IDEA project directory created.</echo>
+    <mkdir dir="${tomcat.home}/lib"/>
+
+    <echo>IntelliJ IDEA project directory created.
+The SDK was set to &quot;${build.java.version}&quot; so make sure that your IDE has an SDK with that name,
+or update the Project Settings accordingly.</echo>
   </target>
 
   <!-- ============================ NetBeans =============================== -->

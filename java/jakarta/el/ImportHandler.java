@@ -87,13 +87,14 @@ public class ImportHandler {
         servletClassNames.add("UnavailableException");
         standardPackages.put("jakarta.servlet", servletClassNames);
 
-        // Servlet 6.0
+        // Servlet 6.1
         Set<String> servletHttpClassNames = new HashSet<>();
         // Interfaces
         servletHttpClassNames.add("HttpServletMapping");
         servletHttpClassNames.add("HttpServletRequest");
         servletHttpClassNames.add("HttpServletResponse");
         servletHttpClassNames.add("HttpSession");
+        servletHttpClassNames.add("HttpSession.Accessor");
         servletHttpClassNames.add("HttpSessionActivationListener");
         servletHttpClassNames.add("HttpSessionAttributeListener");
         servletHttpClassNames.add("HttpSessionBindingListener");

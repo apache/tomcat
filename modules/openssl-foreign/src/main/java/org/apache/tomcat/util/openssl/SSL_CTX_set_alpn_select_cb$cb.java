@@ -30,6 +30,7 @@ import java.lang.invoke.MethodHandle;
  * : * int (*SSL_CTX_set_alpn_select_cb$cb)(struct ssl_st*,unsigned char**,unsigned char*,unsigned char*,unsigned int,void*);
  * }
  */
+@SuppressWarnings("javadoc")
 public interface SSL_CTX_set_alpn_select_cb$cb {
 
     FunctionDescriptor $DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER,

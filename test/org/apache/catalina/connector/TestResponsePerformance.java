@@ -24,6 +24,10 @@ import org.junit.Test;
 import org.apache.catalina.startup.LoggingBaseTest;
 import org.apache.tomcat.unittest.TesterRequest;
 
+/*
+ * This is a relative performance test so it remains part of the standard test run. If the test fails then we need to
+ * looking at why and possibly disable/remove the homebrew approach for some OS/Java combinations.
+ */
 public class TestResponsePerformance extends LoggingBaseTest {
 
     private static final int ITERATIONS = 1000000;
@@ -38,8 +42,8 @@ public class TestResponsePerformance extends LoggingBaseTest {
         doHomebrew(resp);
         doUri();
 
-        // Note: With Java 11 the 'homebrew' approach is consistently 3 to 4
-        //       times faster on both MacOS and Linux
+        // Note: With Java 11 the 'homebrew' approach is consistently 3-4 times faster on both MacOS (Intel) and Linux
+        //       With Java 22 EA the 'homebrew' approach is consistently a little over 2x faster on MacOS (M1)
 
         // To allow for timing differences between runs, a "best of n" approach
         // is taken for this test

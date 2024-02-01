@@ -72,7 +72,7 @@ public class HealthCheckValve extends ValveBase {
     }
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         super.startInternal();
         context = (getContainer() instanceof Context);
     }

@@ -145,7 +145,7 @@ public class SSLAuthenticator extends AuthenticatorBase {
 
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         super.startInternal();
 

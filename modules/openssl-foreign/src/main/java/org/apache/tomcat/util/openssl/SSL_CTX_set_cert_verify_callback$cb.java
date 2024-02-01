@@ -29,6 +29,7 @@ import java.lang.invoke.MethodHandle;
  * {@snippet lang = c : * int (*SSL_CTX_set_cert_verify_callback$cb)(X509_STORE_CTX*,void*);
  * }
  */
+@SuppressWarnings("javadoc")
 public interface SSL_CTX_set_cert_verify_callback$cb {
 
     FunctionDescriptor $DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
