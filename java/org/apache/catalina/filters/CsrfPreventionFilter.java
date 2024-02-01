@@ -100,7 +100,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      */
     private String noNoncePatterns = DEFAULT_NO_NONCE_URL_PATTERNS;
 
-    private interface Predicate<T> {
+    public interface Predicate<T> {
         boolean test(T t);
     }
 

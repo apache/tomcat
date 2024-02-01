@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.function.Predicate;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,6 +31,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.filters.CsrfPreventionFilter.LruCache;
+import org.apache.catalina.filters.CsrfPreventionFilter.Predicate;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.unittest.TesterServletContext;
 
