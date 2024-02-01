@@ -118,6 +118,10 @@
         sequences are correctly removed from files containing property values
         when configured to do so. Bug identified by Coverity Scan. (markt)
       </fix>
+      <add>
+        Add improvements to the CSRF prevention filter including the ability
+        to skip adding nonces for resource name and subtree URL patterns. (schultz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
