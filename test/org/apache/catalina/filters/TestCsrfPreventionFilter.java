@@ -187,7 +187,6 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         Assert.assertEquals("/foo", response.encodeURL("/foo"));
         Assert.assertEquals("/foo/home.png", response.encodeURL("/foo/home.png"));
         Assert.assertEquals("/foo/images/home.jpg", response.encodeURL("/foo/images/home.jpg"));
-
     }
 
     private static class MimeTypeServletContext extends TesterServletContext {

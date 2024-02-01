@@ -49,11 +49,36 @@ import org.apache.juli.logging.LogFactory;
  * <li>{@link HttpServletResponse#encodeRedirectURL(String)} and {@link HttpServletResponse#encodeURL(String)} are used
  * to encode all URLs returned to the client
  * </ul>
+ *
+ * <p>
+ *   CSRF protection is enabled by generating random nonce values which are
+ *   stored in the client's HTTP session. Each URL encoded using
+ *   {@link HttpServletResponse#encodeURL(String)} has a URL parameter added
+ *   which, when sent to the server in a future request, will be checked
+ *   against this stored set of nonces for validity.
+ * </p>
+ *
+ * <p>
+ *   Some URLs should be accessible even without a valid nonce parameter value.
+ *   These URLs are known as "entry points" because clients should be able to
+ *   "enter" the application without first establishing any valid tokens. These
+ *   are configured with the <code>entryPoints</code> filter
+ *   <code>init-param</code>.
+ * </p>
+ *
+ * <p>
+ *   Some URLs should not have nonce parameters added to them at all
  */
 public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
+    /**
+     * The default set of URL patterns for which nonces will not be appended.
+     */
     private static final String DEFAULT_NO_NONCE_URL_PATTERNS
         = "*.css, *.js, *.gif, *.png, *.jpg, *.svg, *.ico, *.jpeg, *.mjs";
 
+    /**
+     * The servlet context in which this Filter is operating.
+     */
     private ServletContext context;
 
     private final Log log = LogFactory.getLog(CsrfPreventionFilter.class);
@@ -64,8 +89,16 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
     private String nonceRequestParameterName = Constants.CSRF_NONCE_REQUEST_PARAM;
 
+    /**
+     * Flag which determines whether this Filter is in "enforcement" mode
+     * (the default) or in "reporting" mode.
+     */
     private boolean enforce = true;
 
+    /**
+     * A set of comma-separated URL patterns which will have no nonce
+     * parameters added to them.
+     */
     private String noNoncePatterns = DEFAULT_NO_NONCE_URL_PATTERNS;
 
     private Collection<Predicate<String>> noNoncePredicates;
