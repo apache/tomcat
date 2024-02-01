@@ -750,8 +750,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
      */
     private boolean fill(boolean block) throws IOException {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Before fill(): parsingHeader: [" + parsingHeader + "], parsingRequestLine: [" +
+        if (log.isTraceEnabled()) {
+            log.trace("Before fill(): parsingHeader: [" + parsingHeader + "], parsingRequestLine: [" +
                     parsingRequestLine + "], parsingRequestLinePhase: [" + parsingRequestLinePhase +
                     "], parsingRequestLineStart: [" + parsingRequestLineStart + "], byteBuffer.position(): [" +
                     byteBuffer.position() + "], byteBuffer.limit(): [" + byteBuffer.limit() + "], end: [" + end + "]");
@@ -802,8 +802,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             }
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Received [" + new String(byteBuffer.array(), byteBuffer.position(), byteBuffer.remaining(),
+        if (log.isTraceEnabled()) {
+            log.trace("Received [" + new String(byteBuffer.array(), byteBuffer.position(), byteBuffer.remaining(),
                     StandardCharsets.ISO_8859_1) + "]");
         }
 
