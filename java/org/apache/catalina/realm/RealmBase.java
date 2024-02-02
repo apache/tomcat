@@ -409,8 +409,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         String serverDigest = HexUtils.toHexString(ConcurrentMessageDigest.digest(algorithm, valueBytes));
 
-        if (log.isDebugEnabled()) {
-            log.debug("Digest : " + clientDigest + " Username:" + username + " ClientDigest:" + clientDigest +
+        if (log.isTraceEnabled()) {
+            log.trace("Digest : " + clientDigest + " Username:" + username + " ClientDigest:" + clientDigest +
                     " nonce:" + nonce + " nc:" + nc + " cnonce:" + cnonce + " qop:" + qop + " realm:" + realm +
                     "digestA2:" + digestA2 + " Server digest:" + serverDigest);
         }
@@ -431,13 +431,13 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         }
 
         // Check the validity of each certificate in the chain
-        if (log.isDebugEnabled()) {
-            log.debug("Authenticating client certificate chain");
+        if (log.isTraceEnabled()) {
+            log.trace("Authenticating client certificate chain");
         }
         if (validate) {
             for (X509Certificate cert : certs) {
-                if (log.isDebugEnabled()) {
-                    log.debug(" Checking validity for '" + cert.getSubjectX500Principal().toString() + "'");
+                if (log.isTraceEnabled()) {
+                    log.trace(" Checking validity for '" + cert.getSubjectX500Principal().toString() + "'");
                 }
                 try {
                     cert.checkValidity();
@@ -475,8 +475,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                             log.warn(sm.getString("realmBase.delegatedCredentialFail", gssName), e);
                         }
                     } else {
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("realmBase.credentialNotDelegated", gssName));
+                        if (log.isTraceEnabled()) {
+                            log.trace(sm.getString("realmBase.credentialNotDelegated", gssName));
                         }
                     }
                 }
@@ -520,8 +520,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         // Are there any defined security constraints?
         SecurityConstraint constraints[] = context.findConstraints();
         if (constraints == null || constraints.length == 0) {
-            if (log.isDebugEnabled()) {
-                log.debug("  No applicable constraints defined");
+            if (log.isTraceEnabled()) {
+                log.trace("  No applicable constraints defined");
             }
             return null;
         }
@@ -546,8 +546,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 continue;
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug("  Checking constraint '" + constraints[i] + "' against " + method + " " + uri + " --> " +
+            if (log.isTraceEnabled()) {
+                log.trace("  Checking constraint '" + constraints[i] + "' against " + method + " " + uri + " --> " +
                         constraints[i].included(uri, method));
             }
 
@@ -590,8 +590,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 continue;
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug("  Checking constraint '" + constraints[i] + "' against " + method + " " + uri + " --> " +
+            if (log.isTraceEnabled()) {
+                log.trace("  Checking constraint '" + constraints[i] + "' against " + method + " " + uri + " --> " +
                         constraints[i].included(uri, method));
             }
 
@@ -652,8 +652,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 continue;
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug("  Checking constraint '" + constraints[i] + "' against " + method + " " + uri + " --> " +
+            if (log.isTraceEnabled()) {
+                log.trace("  Checking constraint '" + constraints[i] + "' against " + method + " " + uri + " --> " +
                         constraints[i].included(uri, method));
             }
 
@@ -707,8 +707,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 continue;
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug("  Checking constraint '" + constraints[i] + "' against " + method + " " + uri + " --> " +
+            if (log.isTraceEnabled()) {
+                log.trace("  Checking constraint '" + constraints[i] + "' against " + method + " " + uri + " --> " +
                         constraints[i].included(uri, method));
             }
 
@@ -739,8 +739,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         if (results == null) {
             // No applicable security constraint was found
-            if (log.isDebugEnabled()) {
-                log.debug("  No applicable constraint located");
+            if (log.isTraceEnabled()) {
+                log.trace("  No applicable constraint located");
             }
         }
         return resultsToArray(results);
@@ -782,50 +782,50 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 roles = new String[0];
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug("  Checking roles " + principal);
+            if (log.isTraceEnabled()) {
+                log.trace("  Checking roles " + principal);
             }
 
             if (constraint.getAuthenticatedUsers() && principal != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Passing all authenticated users");
+                if (log.isTraceEnabled()) {
+                    log.trace("Passing all authenticated users");
                 }
                 status = true;
             } else if (roles.length == 0 && !constraint.getAllRoles() && !constraint.getAuthenticatedUsers()) {
                 if (constraint.getAuthConstraint()) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("No roles");
+                    if (log.isTraceEnabled()) {
+                        log.trace("No roles");
                     }
                     status = false; // No listed roles means no access at all
                     denyfromall = true;
                     break;
                 }
 
-                if (log.isDebugEnabled()) {
-                    log.debug("Passing all access");
+                if (log.isTraceEnabled()) {
+                    log.trace("Passing all access");
                 }
                 status = true;
             } else if (principal == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("  No user authenticated, cannot grant access");
+                if (log.isTraceEnabled()) {
+                    log.trace("  No user authenticated, cannot grant access");
                 }
             } else {
                 for (String role : roles) {
                     if (hasRole(request.getWrapper(), principal, role)) {
                         status = true;
-                        if (log.isDebugEnabled()) {
-                            log.debug("Role found:  " + role);
+                        if (log.isTraceEnabled()) {
+                            log.trace("Role found:  " + role);
                         }
-                    } else if (log.isDebugEnabled()) {
-                        log.debug("No role found:  " + role);
+                    } else if (log.isTraceEnabled()) {
+                        log.trace("No role found:  " + role);
                     }
                 }
             }
         }
 
         if (!denyfromall && allRolesMode != AllRolesMode.STRICT_MODE && !status && principal != null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Checking for all roles mode: " + allRolesMode);
+            if (log.isTraceEnabled()) {
+                log.trace("Checking for all roles mode: " + allRolesMode);
             }
             // Check for an all roles(role-name="*")
             for (SecurityConstraint constraint : constraints) {
@@ -833,8 +833,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 // If the all roles mode exists, sets
                 if (constraint.getAllRoles()) {
                     if (allRolesMode == AllRolesMode.AUTH_ONLY_MODE) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Granting access for role-name=*, auth-only");
+                        if (log.isTraceEnabled()) {
+                            log.trace("Granting access for role-name=*, auth-only");
                         }
                         status = true;
                         break;
@@ -846,8 +846,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                         roles = new String[0];
                     }
                     if (roles.length == 0 && allRolesMode == AllRolesMode.STRICT_AUTH_ONLY_MODE) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Granting access for role-name=*, strict auth-only");
+                        if (log.isTraceEnabled()) {
+                            log.trace("Granting access for role-name=*, strict auth-only");
                         }
                         status = true;
                         break;
@@ -889,12 +889,12 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         boolean result = hasRoleInternal(principal, role);
 
-        if (log.isDebugEnabled()) {
+        if (log.isTraceEnabled()) {
             String name = principal.getName();
             if (result) {
-                log.debug(sm.getString("realmBase.hasRoleSuccess", name, role));
+                log.trace(sm.getString("realmBase.hasRoleSuccess", name, role));
             } else {
-                log.debug(sm.getString("realmBase.hasRoleFailure", name, role));
+                log.trace(sm.getString("realmBase.hasRoleFailure", name, role));
             }
         }
 
@@ -964,22 +964,22 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         // Is there a relevant user data constraint?
         if (constraints == null || constraints.length == 0) {
-            if (log.isDebugEnabled()) {
-                log.debug("  No applicable security constraint defined");
+            if (log.isTraceEnabled()) {
+                log.trace("  No applicable security constraint defined");
             }
             return true;
         }
         for (SecurityConstraint constraint : constraints) {
             String userConstraint = constraint.getUserConstraint();
             if (userConstraint == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("  No applicable user data constraint defined");
+                if (log.isTraceEnabled()) {
+                    log.trace("  No applicable user data constraint defined");
                 }
                 return true;
             }
             if (userConstraint.equals(TransportGuarantee.NONE.name())) {
-                if (log.isDebugEnabled()) {
-                    log.debug("  User data constraint has no restrictions");
+                if (log.isTraceEnabled()) {
+                    log.trace("  User data constraint has no restrictions");
                 }
                 return true;
             }
@@ -987,8 +987,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         }
         // Validate the request against the user data constraint
         if (request.getRequest().isSecure()) {
-            if (log.isDebugEnabled()) {
-                log.debug("  User data constraint already satisfied");
+            if (log.isTraceEnabled()) {
+                log.trace("  User data constraint already satisfied");
             }
             return true;
         }
@@ -997,8 +997,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         // Is redirecting disabled?
         if (redirectPort <= 0) {
-            if (log.isDebugEnabled()) {
-                log.debug("  SSL redirect is disabled");
+            if (log.isTraceEnabled()) {
+                log.trace("  SSL redirect is disabled");
             }
             response.sendError(HttpServletResponse.SC_FORBIDDEN, request.getRequestURI());
             return false;
@@ -1028,8 +1028,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             file.append('?');
             file.append(queryString);
         }
-        if (log.isDebugEnabled()) {
-            log.debug("  Redirecting to " + file.toString());
+        if (log.isTraceEnabled()) {
+            log.trace("  Redirecting to " + file.toString());
         }
         response.sendRedirect(file.toString(), transportGuaranteeRedirectStatus);
         return false;
@@ -1180,8 +1180,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     protected Principal getPrincipal(X509Certificate usercert) {
         String username = x509UsernameRetriever.getUsername(usercert);
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("realmBase.gotX509Username", username));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("realmBase.gotX509Username", username));
         }
 
         return getPrincipal(username);
