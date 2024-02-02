@@ -499,8 +499,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
         if (constraints != null) {
             // Enforce any user data constraint for this security constraint
-            if (log.isDebugEnabled()) {
-                log.debug("Calling hasUserDataPermission()");
+            if (log.isTraceEnabled()) {
+                log.trace("Calling hasUserDataPermission()");
             }
             if (!realm.hasUserDataPermission(request, response, constraints)) {
                 if (log.isDebugEnabled()) {
@@ -550,8 +550,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         }
 
         if (authRequired) {
-            if (log.isDebugEnabled()) {
-                log.debug("Calling authenticate()");
+            if (log.isTraceEnabled()) {
+                log.trace("Calling authenticate()");
             }
 
             if (jaspicProvider != null) {
@@ -576,8 +576,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         }
 
         if (constraints != null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Calling accessControl()");
+            if (log.isTraceEnabled()) {
+                log.trace("Calling accessControl()");
             }
             if (!realm.hasResourcePermission(request, response, constraints, this.context)) {
                 if (log.isDebugEnabled()) {
@@ -592,8 +592,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         }
 
         // Any and all specified constraints have been satisfied
-        if (log.isDebugEnabled()) {
-            log.debug("Successfully passed all security constraints");
+        if (log.isTraceEnabled()) {
+            log.trace("Successfully passed all security constraints");
         }
         getNext().invoke(request, response);
 

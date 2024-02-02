@@ -208,8 +208,8 @@ public class SingleSignOn extends ValveBase {
         request.removeNote(Constants.REQ_SSOID_NOTE);
 
         // Has a valid user already been authenticated?
-        if (containerLog.isDebugEnabled()) {
-            containerLog.debug(sm.getString("singleSignOn.debug.invoke", request.getRequestURI()));
+        if (containerLog.isTraceEnabled()) {
+            containerLog.trace(sm.getString("singleSignOn.debug.invoke", request.getRequestURI()));
         }
         if (request.getUserPrincipal() != null) {
             if (containerLog.isDebugEnabled()) {
@@ -221,8 +221,8 @@ public class SingleSignOn extends ValveBase {
         }
 
         // Check for the single sign on cookie
-        if (containerLog.isDebugEnabled()) {
-            containerLog.debug(sm.getString("singleSignOn.debug.cookieCheck"));
+        if (containerLog.isTraceEnabled()) {
+            containerLog.trace(sm.getString("singleSignOn.debug.cookieCheck"));
         }
         Cookie cookie = null;
         Cookie cookies[] = request.getCookies();
@@ -243,8 +243,8 @@ public class SingleSignOn extends ValveBase {
         }
 
         // Look up the cached Principal associated with this cookie value
-        if (containerLog.isDebugEnabled()) {
-            containerLog.debug(sm.getString("singleSignOn.debug.principalCheck", cookie.getValue()));
+        if (containerLog.isTraceEnabled()) {
+            containerLog.trace(sm.getString("singleSignOn.debug.principalCheck", cookie.getValue()));
         }
         SingleSignOnEntry entry = cache.get(cookie.getValue());
         if (entry != null) {
