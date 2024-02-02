@@ -78,7 +78,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     private final AtomicBoolean hasOnErrorReturned = new AtomicBoolean(false);
 
     public AsyncContextImpl(Request request) {
-        if (log.isDebugEnabled()) {
+        if (log.isTraceEnabled()) {
             logDebug("Constructor");
         }
         this.request = request;
@@ -86,7 +86,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public void complete() {
-        if (log.isDebugEnabled()) {
+        if (log.isTraceEnabled()) {
             logDebug("complete   ");
         }
         check();
@@ -95,8 +95,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public void fireOnComplete() {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("asyncContextImpl.fireOnComplete"));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("asyncContextImpl.fireOnComplete"));
         }
         List<AsyncListenerWrapper> listenersCopy = new ArrayList<>(listeners);
 
@@ -125,8 +125,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         Context context = this.context;
 
         if (result.get()) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("asyncContextImpl.fireOnTimeout"));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("asyncContextImpl.fireOnTimeout"));
             }
             ClassLoader oldCL = context.bind(false, null);
             try {
@@ -179,7 +179,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     @Override
     public void dispatch(ServletContext servletContext, String path) {
         synchronized (asyncContextLock) {
-            if (log.isDebugEnabled()) {
+            if (log.isTraceEnabled()) {
                 logDebug("dispatch   ");
             }
             check();
@@ -226,7 +226,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public void start(final Runnable run) {
-        if (log.isDebugEnabled()) {
+        if (log.isTraceEnabled()) {
             logDebug("start      ");
         }
         check();
@@ -271,7 +271,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
     public void recycle() {
-        if (log.isDebugEnabled()) {
+        if (log.isTraceEnabled()) {
             logDebug("recycle    ");
         }
         context = null;
@@ -312,8 +312,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
             List<AsyncListenerWrapper> listenersCopy = new ArrayList<>(listeners);
             listeners.clear();
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("asyncContextImpl.fireOnStartAsync"));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("asyncContextImpl.fireOnStartAsync"));
             }
             for (AsyncListenerWrapper listener : listenersCopy) {
                 try {
@@ -333,7 +333,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
     protected void doInternalDispatch() throws ServletException, IOException {
-        if (log.isDebugEnabled()) {
+        if (log.isTraceEnabled()) {
             logDebug("intDispatch");
         }
         try {
@@ -392,8 +392,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         request.getCoyoteRequest().action(ActionCode.ASYNC_ERROR, null);
 
         if (fireOnError) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("asyncContextImpl.fireOnError"));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("asyncContextImpl.fireOnError"));
             }
             AsyncEvent errorEvent =
                     new AsyncEvent(event.getAsyncContext(), event.getSuppliedRequest(), event.getSuppliedResponse(), t);

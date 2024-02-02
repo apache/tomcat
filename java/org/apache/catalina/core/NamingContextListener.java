@@ -496,8 +496,8 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
 
         int i;
 
-        if (log.isDebugEnabled()) {
-            log.debug("Creating JNDI naming context");
+        if (log.isTraceEnabled()) {
+            log.trace("Creating JNDI naming context");
         }
 
         if (namingResources == null) {
