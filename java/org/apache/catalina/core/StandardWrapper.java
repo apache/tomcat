@@ -738,8 +738,8 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
                 synchronized (this) {
                     if (instance == null) {
                         try {
-                            if (log.isDebugEnabled()) {
-                                log.debug("Allocating non-STM instance");
+                            if (log.isTraceEnabled()) {
+                                log.trace("Allocating non-STM instance");
                             }
 
                             // Note: We don't know if the Servlet implements
