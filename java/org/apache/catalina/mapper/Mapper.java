@@ -507,8 +507,8 @@ public final class Mapper {
 
     protected void removeWrapper(ContextVersion context, String path) {
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("mapper.removeWrapper", context.name, path));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("mapper.removeWrapper", context.name, path));
         }
 
         synchronized (context) {

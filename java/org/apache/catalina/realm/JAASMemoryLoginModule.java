@@ -121,8 +121,8 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     // --------------------------------------------------------- Public Methods
 
     public JAASMemoryLoginModule() {
-        if (log.isDebugEnabled()) {
-            log.debug("MEMORY LOGIN MODULE");
+        if (log.isTraceEnabled()) {
+            log.trace("MEMORY LOGIN MODULE");
         }
     }
 
@@ -142,8 +142,8 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             committed = false;
             principal = null;
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Abort");
+        if (log.isTraceEnabled()) {
+            log.trace("Abort");
         }
         return true;
     }
@@ -151,8 +151,8 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
 
     @Override
     public boolean commit() throws LoginException {
-        if (log.isDebugEnabled()) {
-            log.debug("commit " + principal);
+        if (log.isTraceEnabled()) {
+            log.trace("commit " + principal);
         }
 
         // If authentication was not successful, just return false
@@ -182,8 +182,8 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     @Override
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String,?> sharedState,
             Map<String,?> options) {
-        if (log.isDebugEnabled()) {
-            log.debug("Init");
+        if (log.isTraceEnabled()) {
+            log.trace("Init");
         }
 
         // Save configuration values

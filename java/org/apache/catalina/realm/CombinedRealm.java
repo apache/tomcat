@@ -68,7 +68,7 @@ public class CombinedRealm extends RealmBase {
         realms.add(theRealm);
 
         if (log.isDebugEnabled()) {
-            sm.getString("combinedRealm.addRealm", theRealm.getClass().getName(), Integer.toString(realms.size()));
+            log.debug(sm.getString("combinedRealm.addRealm", theRealm.getClass().getName(), Integer.toString(realms.size())));
         }
     }
 
@@ -101,20 +101,20 @@ public class CombinedRealm extends RealmBase {
         Principal authenticatedUser = null;
 
         for (Realm realm : realms) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("combinedRealm.authStart", username, realm.getClass().getName()));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("combinedRealm.authStart", username, realm.getClass().getName()));
             }
 
             authenticatedUser =
                     realm.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realmName, digestA2, algorithm);
 
             if (authenticatedUser == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authFail", username, realm.getClass().getName()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("combinedRealm.authFail", username, realm.getClass().getName()));
                 }
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSuccess", username, realm.getClass().getName()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("combinedRealm.authSuccess", username, realm.getClass().getName()));
                 }
                 break;
             }
@@ -128,19 +128,19 @@ public class CombinedRealm extends RealmBase {
         Principal authenticatedUser = null;
 
         for (Realm realm : realms) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("combinedRealm.authStart", username, realm.getClass().getName()));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("combinedRealm.authStart", username, realm.getClass().getName()));
             }
 
             authenticatedUser = realm.authenticate(username);
 
             if (authenticatedUser == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authFail", username, realm.getClass().getName()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("combinedRealm.authFail", username, realm.getClass().getName()));
                 }
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSuccess", username, realm.getClass().getName()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("combinedRealm.authSuccess", username, realm.getClass().getName()));
                 }
                 break;
             }
@@ -154,19 +154,19 @@ public class CombinedRealm extends RealmBase {
         Principal authenticatedUser = null;
 
         for (Realm realm : realms) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("combinedRealm.authStart", username, realm.getClass().getName()));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("combinedRealm.authStart", username, realm.getClass().getName()));
             }
 
             authenticatedUser = realm.authenticate(username, credentials);
 
             if (authenticatedUser == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authFail", username, realm.getClass().getName()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("combinedRealm.authFail", username, realm.getClass().getName()));
                 }
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSuccess", username, realm.getClass().getName()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("combinedRealm.authSuccess", username, realm.getClass().getName()));
                 }
                 break;
             }
@@ -265,19 +265,19 @@ public class CombinedRealm extends RealmBase {
         }
 
         for (Realm realm : realms) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("combinedRealm.authStart", username, realm.getClass().getName()));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("combinedRealm.authStart", username, realm.getClass().getName()));
             }
 
             authenticatedUser = realm.authenticate(certs);
 
             if (authenticatedUser == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authFail", username, realm.getClass().getName()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("combinedRealm.authFail", username, realm.getClass().getName()));
                 }
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSuccess", username, realm.getClass().getName()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("combinedRealm.authSuccess", username, realm.getClass().getName()));
                 }
                 break;
             }
@@ -299,19 +299,19 @@ public class CombinedRealm extends RealmBase {
             }
 
             for (Realm realm : realms) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authStart", gssName, realm.getClass().getName()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("combinedRealm.authStart", gssName, realm.getClass().getName()));
                 }
 
                 authenticatedUser = realm.authenticate(gssContext, storeCred);
 
                 if (authenticatedUser == null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("combinedRealm.authFail", gssName, realm.getClass().getName()));
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("combinedRealm.authFail", gssName, realm.getClass().getName()));
                     }
                 } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("combinedRealm.authSuccess", gssName, realm.getClass().getName()));
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("combinedRealm.authSuccess", gssName, realm.getClass().getName()));
                     }
                     break;
                 }
@@ -329,8 +329,8 @@ public class CombinedRealm extends RealmBase {
         Principal authenticatedUser = null;
 
         for (Realm realm : realms) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("combinedRealm.authStart", gssName, realm.getClass().getName()));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("combinedRealm.authStart", gssName, realm.getClass().getName()));
             }
 
             if (!(realm instanceof org.apache.catalina.GSSRealm)) {
@@ -344,12 +344,12 @@ public class CombinedRealm extends RealmBase {
             authenticatedUser = ((org.apache.catalina.GSSRealm) realm).authenticate(gssName, gssCredential);
 
             if (authenticatedUser == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authFail", gssName, realm.getClass().getName()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("combinedRealm.authFail", gssName, realm.getClass().getName()));
                 }
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("combinedRealm.authSuccess", gssName, realm.getClass().getName()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("combinedRealm.authSuccess", gssName, realm.getClass().getName()));
                 }
                 break;
             }

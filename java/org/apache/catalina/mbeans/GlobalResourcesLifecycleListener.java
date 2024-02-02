@@ -137,8 +137,8 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
                 Binding binding = bindings.next();
                 String name = prefix + binding.getName();
                 Object value = context.lookup(binding.getName());
-                if (log.isDebugEnabled()) {
-                    log.debug("Checking resource " + name);
+                if (log.isTraceEnabled()) {
+                    log.trace("Checking resource " + name);
                 }
                 if (value instanceof Context) {
                     createMBeans(name + "/", (Context) value);
@@ -169,9 +169,9 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
     protected void createMBeans(String name, UserDatabase database) throws Exception {
 
         // Create the MBean for the UserDatabase itself
-        if (log.isDebugEnabled()) {
-            log.debug("Creating UserDatabase MBeans for resource " + name);
-            log.debug("Database=" + database);
+        if (log.isTraceEnabled()) {
+            log.trace("Creating UserDatabase MBeans for resource " + name);
+            log.trace("Database=" + database);
         }
         try {
             MBeanUtils.createMBean(database);
@@ -183,8 +183,8 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
         Iterator<Role> roles = database.getRoles();
         while (roles.hasNext()) {
             Role role = roles.next();
-            if (log.isDebugEnabled()) {
-                log.debug("  Creating Role MBean for role " + role);
+            if (log.isTraceEnabled()) {
+                log.trace("  Creating Role MBean for role " + role);
             }
             try {
                 MBeanUtils.createMBean(role);
@@ -198,8 +198,8 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
         Iterator<Group> groups = database.getGroups();
         while (groups.hasNext()) {
             Group group = groups.next();
-            if (log.isDebugEnabled()) {
-                log.debug("  Creating Group MBean for group " + group);
+            if (log.isTraceEnabled()) {
+                log.trace("  Creating Group MBean for group " + group);
             }
             try {
                 MBeanUtils.createMBean(group);
@@ -213,8 +213,8 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
         Iterator<User> users = database.getUsers();
         while (users.hasNext()) {
             User user = users.next();
-            if (log.isDebugEnabled()) {
-                log.debug("  Creating User MBean for user " + user);
+            if (log.isTraceEnabled()) {
+                log.trace("  Creating User MBean for user " + user);
             }
             try {
                 MBeanUtils.createMBean(user);
@@ -230,8 +230,8 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
      * Destroy the MBeans for the interesting global JNDI resources.
      */
     protected void destroyMBeans() {
-        if (log.isDebugEnabled()) {
-            log.debug("Destroying MBeans for Global JNDI Resources");
+        if (log.isTraceEnabled()) {
+            log.trace("Destroying MBeans for Global JNDI Resources");
         }
     }
 }

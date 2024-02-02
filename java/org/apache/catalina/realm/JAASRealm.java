@@ -349,8 +349,8 @@ public class JAASRealm extends RealmBase {
                 appName = "Tomcat";
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("jaasRealm.beginLogin", username, appName));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("jaasRealm.beginLogin", username, appName));
             }
 
             // What if the LoginModule is in the container class loader ?
@@ -379,8 +379,8 @@ public class JAASRealm extends RealmBase {
                 }
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug("Login context created " + username);
+            if (log.isTraceEnabled()) {
+                log.trace("Login context created " + username);
             }
 
             // Negotiate a login via this LoginContext
@@ -438,23 +438,25 @@ public class JAASRealm extends RealmBase {
                 return null;
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("jaasRealm.loginContextCreated", username));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("jaasRealm.loginContextCreated", username));
             }
 
             // Return the appropriate Principal for this authenticated Subject
             Principal principal = createPrincipal(username, subject, loginContext);
             if (principal == null) {
-                log.debug(sm.getString("jaasRealm.authenticateFailure", username));
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("jaasRealm.authenticateFailure", username));
+                }
                 return null;
             }
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("jaasRealm.authenticateSuccess", username, principal));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("jaasRealm.authenticateSuccess", username, principal));
             }
 
             return principal;
         } catch (Throwable t) {
-            log.error("error ", t);
+            log.error(sm.getString("jaasRealm.unexpectedError"), t);
             // JAAS throws exception different than LoginException so mark the realm as unavailable
             invocationSuccess = false;
             return null;
@@ -515,21 +517,21 @@ public class JAASRealm extends RealmBase {
         for (Principal principal : subject.getPrincipals()) {
             String principalClass = principal.getClass().getName();
 
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("jaasRealm.checkPrincipal", principal, principalClass));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("jaasRealm.checkPrincipal", principal, principalClass));
             }
 
             if (userPrincipal == null && userClasses.contains(principalClass)) {
                 userPrincipal = principal;
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("jaasRealm.userPrincipalSuccess", principal.getName()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("jaasRealm.userPrincipalSuccess", principal.getName()));
                 }
             }
 
             if (roleClasses.contains(principalClass)) {
                 roles.add(principal.getName());
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("jaasRealm.rolePrincipalAdd", principal.getName()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("jaasRealm.rolePrincipalAdd", principal.getName()));
                 }
             }
         }
