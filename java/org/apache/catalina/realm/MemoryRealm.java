@@ -223,8 +223,8 @@ public class MemoryRealm extends RealmBase {
         String pathName = getPathname();
         try (InputStream is = ConfigFileLoader.getSource().getResource(pathName).getInputStream()) {
             // Load the contents of the database file
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("memoryRealm.loadPath", pathName));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("memoryRealm.loadPath", pathName));
             }
 
             synchronized (digesterLock) {
