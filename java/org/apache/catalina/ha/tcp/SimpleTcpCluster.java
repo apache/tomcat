@@ -596,8 +596,8 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         if (container != null) {
             for (Valve v : valves) {
                 ClusterValve valve = (ClusterValve) v;
-                if (log.isDebugEnabled()) {
-                    log.debug("Invoking addValve on " + getContainer() + " with class=" + valve.getClass().getName());
+                if (log.isTraceEnabled()) {
+                    log.trace("Invoking addValve on " + getContainer() + " with class=" + valve.getClass().getName());
                 }
                 if (valve != null) {
                     container.getPipeline().addValve(valve);
@@ -613,8 +613,8 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     protected void unregisterClusterValve() {
         for (Valve v : valves) {
             ClusterValve valve = (ClusterValve) v;
-            if (log.isDebugEnabled()) {
-                log.debug("Invoking removeValve on " + getContainer() + " with class=" + valve.getClass().getName());
+            if (log.isTraceEnabled()) {
+                log.trace("Invoking removeValve on " + getContainer() + " with class=" + valve.getClass().getName());
             }
             if (valve != null) {
                 container.getPipeline().removeValve(valve);
@@ -796,8 +796,8 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     public void messageReceived(ClusterMessage message) {
 
-        if (log.isDebugEnabled() && message != null) {
-            log.debug("Assuming clocks are synched: Replication for " + message.getUniqueId() + " took=" +
+        if (log.isTraceEnabled() && message != null) {
+            log.trace("Assuming clocks are synched: Replication for " + message.getUniqueId() + " took=" +
                     (System.currentTimeMillis() - (message).getTimestamp()) + " ms.");
         }
 

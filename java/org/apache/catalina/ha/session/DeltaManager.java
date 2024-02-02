@@ -427,8 +427,8 @@ public class DeltaManager extends ClusterManagerBase {
         if (cluster.getMembers().length > 0) {
             SessionMessage msg = new SessionMessageImpl(getName(), SessionMessage.EVT_SESSION_CREATED, null, sessionId,
                     sessionId + "-" + System.currentTimeMillis());
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("deltaManager.sendMessage.newSession", name, sessionId));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("deltaManager.sendMessage.newSession", name, sessionId));
             }
             msg.setTimestamp(session.getCreationTime());
             counterSend_EVT_SESSION_CREATED++;
@@ -744,8 +744,8 @@ public class DeltaManager extends ClusterManagerBase {
         if (mbr == null && log.isWarnEnabled()) {
             log.warn(sm.getString("deltaManager.noMasterMember", getName(), ""));
         }
-        if (mbr != null && log.isDebugEnabled()) {
-            log.debug(sm.getString("deltaManager.foundMasterMember", getName(), mbr));
+        if (mbr != null && log.isTraceEnabled()) {
+            log.trace(sm.getString("deltaManager.foundMasterMember", getName(), mbr));
         }
         return mbr;
     }
@@ -1021,13 +1021,14 @@ public class DeltaManager extends ClusterManagerBase {
      * Expire all find sessions.
      */
     public void expireAllLocalSessions() {
-        long timeNow = System.currentTimeMillis();
         Session sessions[] = findSessions();
         int expireDirect = 0;
         int expireIndirect = 0;
 
-        if (log.isDebugEnabled()) {
-            log.debug("Start expire all sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
+        long timeNow = 0;
+        if (log.isTraceEnabled()) {
+            timeNow = System.currentTimeMillis();
+            log.trace("Start expire all sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
         }
         for (Session value : sessions) {
             if (value instanceof DeltaSession) {
@@ -1042,9 +1043,9 @@ public class DeltaManager extends ClusterManagerBase {
                 } // end if
             } // end if
         } // for
-        long timeEnd = System.currentTimeMillis();
-        if (log.isDebugEnabled()) {
-            log.debug("End expire sessions " + getName() + " expire processingTime " + (timeEnd - timeNow) +
+        if (log.isTraceEnabled()) {
+            long timeEnd = System.currentTimeMillis();
+            log.trace("End expire sessions " + getName() + " expire processingTime " + (timeEnd - timeNow) +
                     " expired direct sessions: " + expireDirect + " expired direct sessions: " + expireIndirect);
         }
     }
@@ -1071,8 +1072,8 @@ public class DeltaManager extends ClusterManagerBase {
 
             ClassLoader[] loaders = getClassLoaders();
             currentThread.setContextClassLoader(loaders[0]);
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("deltaManager.receiveMessage.eventType", getName(), msg.getEventTypeString(),
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("deltaManager.receiveMessage.eventType", getName(), msg.getEventTypeString(),
                         sender));
             }
 

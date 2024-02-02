@@ -906,8 +906,8 @@ public class RemoteIpFilter extends GenericFilter {
             }
             request.setAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE, Boolean.TRUE);
 
-            if (log.isDebugEnabled()) {
-                log.debug("Incoming request " + request.getRequestURI() + " with originalRemoteAddr [" +
+            if (log.isTraceEnabled()) {
+                log.trace("Incoming request " + request.getRequestURI() + " with originalRemoteAddr [" +
                         request.getRemoteAddr() + "], originalRemoteHost=[" + request.getRemoteHost() +
                         "], originalSecure=[" + request.isSecure() + "], originalScheme=[" + request.getScheme() +
                         "], originalServerName=[" + request.getServerName() + "], originalServerPort=[" +
@@ -926,8 +926,8 @@ public class RemoteIpFilter extends GenericFilter {
             }
             chain.doFilter(xRequest, response);
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("Skip RemoteIpFilter for request " + request.getRequestURI() + " with originalRemoteAddr '" +
+            if (log.isTraceEnabled()) {
+                log.trace("Skip RemoteIpFilter for request " + request.getRequestURI() + " with originalRemoteAddr '" +
                         request.getRemoteAddr() + "'");
             }
             chain.doFilter(request, response);
@@ -962,8 +962,7 @@ public class RemoteIpFilter extends GenericFilter {
                 try {
                     port = Integer.parseInt(portHeaderValue);
                 } catch (NumberFormatException nfe) {
-                    log.debug("Invalid port value [" + portHeaderValue + "] provided in header [" + getPortHeader() +
-                            "]");
+                    log.debug(sm.getString("remoteIpFilter.invalidPort", portHeaderValue, getPortHeader()));
                 }
             }
         }
