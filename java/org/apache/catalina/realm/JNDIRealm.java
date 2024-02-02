@@ -965,7 +965,9 @@ public class JNDIRealm extends RealmBase {
             this.cipherSuitesArray = null;
         } else {
             this.cipherSuitesArray = cipherSuites.trim().split("\\s*,\\s*");
-            containerLog.debug(sm.getString("jndiRealm.cipherSuites", Arrays.toString(this.cipherSuitesArray)));
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace(sm.getString("jndiRealm.cipherSuites", Arrays.toString(this.cipherSuitesArray)));
+            }
         }
         return this.cipherSuitesArray;
     }
@@ -1254,8 +1256,8 @@ public class JNDIRealm extends RealmBase {
                             if (checkCredentials(connection.context, user, credentials)) {
                                 // Search for additional roles
                                 List<String> roles = getRoles(connection, user);
-                                if (containerLog.isDebugEnabled()) {
-                                    containerLog.debug("Found roles: " + ((roles == null) ? "" : roles.toString()));
+                                if (containerLog.isTraceEnabled()) {
+                                    containerLog.trace("Found roles: " + ((roles == null) ? "" : roles.toString()));
                                 }
                                 return new GenericPrincipal(username, credentials, roles);
                             }
@@ -1284,8 +1286,8 @@ public class JNDIRealm extends RealmBase {
 
                 // Search for additional roles
                 List<String> roles = getRoles(connection, user);
-                if (containerLog.isDebugEnabled()) {
-                    containerLog.debug("Found roles: " + ((roles == null) ? "" : roles.toString()));
+                if (containerLog.isTraceEnabled()) {
+                    containerLog.trace("Found roles: " + ((roles == null) ? "" : roles.toString()));
                 }
 
                 // Create and return a suitable Principal for this user
@@ -1496,8 +1498,8 @@ public class JNDIRealm extends RealmBase {
         // Use pattern or search for user entry
         if (userPatternArray != null && curUserPattern >= 0) {
             user = getUserByPattern(connection, username, credentials, attrIds, curUserPattern);
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("Found user by pattern [" + user + "]");
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace("Found user by pattern [" + user + "]");
             }
         } else {
             boolean thisUserSearchAsUser = isUserSearchAsUser();
@@ -1511,8 +1513,8 @@ public class JNDIRealm extends RealmBase {
                     userCredentialsRemove(connection.context);
                 }
             }
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("Found user by search [" + user + "]");
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace("Found user by search [" + user + "]");
             }
         }
         if (userPassword == null && credentials != null && user != null) {
@@ -2217,8 +2219,8 @@ public class JNDIRealm extends RealmBase {
         }
         // Close our opened connection
         try {
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("Closing directory context");
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace("Closing directory context");
             }
             connection.context.close();
         } catch (NamingException e) {
@@ -2676,10 +2678,10 @@ public class JNDIRealm extends RealmBase {
         Hashtable<String,String> env = new Hashtable<>();
 
         // Configure our directory context environment.
-        if (containerLog.isDebugEnabled() && connectionAttempt == 0) {
-            containerLog.debug("Connecting to URL " + connectionURL);
-        } else if (containerLog.isDebugEnabled() && connectionAttempt > 0) {
-            containerLog.debug("Connecting to URL " + alternateURL);
+        if (containerLog.isTraceEnabled() && connectionAttempt == 0) {
+            containerLog.trace("Connecting to URL " + connectionURL);
+        } else if (containerLog.isTraceEnabled() && connectionAttempt > 0) {
+            containerLog.trace("Connecting to URL " + alternateURL);
         }
         env.put(Context.INITIAL_CONTEXT_FACTORY, contextFactory);
         if (connectionName != null) {
