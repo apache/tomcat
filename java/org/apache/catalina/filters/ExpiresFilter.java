@@ -1404,7 +1404,9 @@ public class ExpiresFilter extends FilterBase {
             }
         }
 
-        log.debug(sm.getString("expiresFilter.filterInitialized", this.toString()));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("expiresFilter.filterInitialized", this.toString()));
+        }
     }
 
     /**

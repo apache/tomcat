@@ -184,10 +184,10 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
                 return;
             }
             handleJvmRoute(request, sessionID, jvmRoute);
-            if (log.isDebugEnabled()) {
+            if (log.isTraceEnabled()) {
                 long t2 = System.currentTimeMillis();
                 long time = t2 - t1;
-                log.debug(sm.getString("jvmRoute.turnoverInfo", Long.valueOf(time)));
+                log.trace(sm.getString("jvmRoute.turnoverInfo", Long.valueOf(time)));
             }
         }
     }
@@ -218,7 +218,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
         Manager manager = request.getContext().getManager();
         if (log.isDebugEnabled()) {
             if (manager != null) {
-                log.debug(sm.getString("jvmRoute.foundManager", manager, request.getContext().getName()));
+                log.trace(sm.getString("jvmRoute.foundManager", manager, request.getContext().getName()));
             } else {
                 log.debug(sm.getString("jvmRoute.notFoundManager", request.getContext().getName()));
             }

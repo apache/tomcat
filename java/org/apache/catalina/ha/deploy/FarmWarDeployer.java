@@ -207,8 +207,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         try {
             if (msg instanceof FileMessage) {
                 FileMessage fmsg = (FileMessage) msg;
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("farmWarDeployer.msgRxDeploy", fmsg.getContextName(), fmsg.getFileName()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("farmWarDeployer.msgRxDeploy", fmsg.getContextName(), fmsg.getFileName()));
                 }
                 FileMessageFactory factory = getFactory(fmsg);
                 // TODO correct second try after app is in service!
@@ -232,8 +232,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                                 removeServiced(contextName);
                             }
                             check(contextName);
-                            if (log.isDebugEnabled()) {
-                                log.debug(sm.getString("farmWarDeployer.deployEnd", contextName));
+                            if (log.isTraceEnabled()) {
+                                log.trace(sm.getString("farmWarDeployer.deployEnd", contextName));
                             }
                         } else {
                             log.error(sm.getString("farmWarDeployer.servicingDeploy", contextName, name));
@@ -248,8 +248,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                 try {
                     UndeployMessage umsg = (UndeployMessage) msg;
                     String contextName = umsg.getContextName();
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("farmWarDeployer.msgRxUndeploy", contextName));
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("farmWarDeployer.msgRxUndeploy", contextName));
                     }
                     if (tryAddServiced(contextName)) {
                         try {
@@ -257,8 +257,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                         } finally {
                             removeServiced(contextName);
                         }
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("farmWarDeployer.undeployEnd", contextName));
+                        if (log.isTraceEnabled()) {
+                            log.trace(sm.getString("farmWarDeployer.undeployEnd", contextName));
                         }
                     } else {
                         log.error(sm.getString("farmWarDeployer.servicingUndeploy", contextName));
@@ -340,21 +340,21 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         Member localMember = getCluster().getLocalMember();
         FileMessageFactory factory = FileMessageFactory.getInstance(webapp, false);
         FileMessage msg = new FileMessage(localMember, webapp.getName(), contextName);
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("farmWarDeployer.sendStart", contextName, webapp));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("farmWarDeployer.sendStart", contextName, webapp));
         }
         msg = factory.readMessage(msg);
         while (msg != null) {
             for (Member member : members) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("farmWarDeployer.sendFragment", contextName, webapp, member));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("farmWarDeployer.sendFragment", contextName, webapp, member));
                 }
                 getCluster().send(msg, member);
             }
             msg = factory.readMessage(msg);
         }
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("farmWarDeployer.sendEnd", contextName, webapp));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("farmWarDeployer.sendEnd", contextName, webapp));
         }
     }
 
@@ -381,8 +381,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
             Member localMember = getCluster().getLocalMember();
             UndeployMessage msg = new UndeployMessage(localMember, System.currentTimeMillis(),
                     "Undeploy:" + contextName + ":" + System.currentTimeMillis(), contextName);
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("farmWarDeployer.removeTxMsg", contextName));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("farmWarDeployer.removeTxMsg", contextName));
             }
             cluster.send(msg);
         }
