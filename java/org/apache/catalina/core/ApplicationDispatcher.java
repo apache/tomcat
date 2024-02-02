@@ -367,8 +367,8 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         }
 
         // This is not a real close in order to support error processing
-        if (wrapper.getLogger().isDebugEnabled()) {
-            wrapper.getLogger().debug(" Disabling the response for further output");
+        if (wrapper.getLogger().isTraceEnabled()) {
+            wrapper.getLogger().trace(" Disabling the response for further output");
         }
 
         if (response instanceof ResponseFacade) {
@@ -376,9 +376,9 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         } else {
             // Servlet SRV.6.2.2. The Request/Response may have been wrapped
             // and may no longer be instance of RequestFacade
-            if (wrapper.getLogger().isDebugEnabled()) {
+            if (wrapper.getLogger().isTraceEnabled()) {
                 wrapper.getLogger()
-                        .debug(" The Response is vehiculed using a wrapper: " + response.getClass().getName());
+                        .trace(" The Response is vehiculed using a wrapper: " + response.getClass().getName());
             }
 
             // Close anyway

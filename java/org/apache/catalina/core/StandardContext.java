@@ -2030,8 +2030,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     @Override
     public void setPublicId(String publicId) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Setting deployment descriptor public ID to '" + publicId + "'");
+        if (log.isTraceEnabled()) {
+            log.trace("Setting deployment descriptor public ID to '" + publicId + "'");
         }
 
         String oldPublicId = this.publicId;
@@ -4274,8 +4274,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     public boolean filterStart() {
 
-        if (getLogger().isDebugEnabled()) {
-            getLogger().debug("Starting filters");
+        if (getLogger().isTraceEnabled()) {
+            getLogger().trace("Starting filters");
         }
         // Instantiate and record a FilterConfig for each defined filter
         boolean ok = true;
@@ -4283,8 +4283,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             filterConfigs.clear();
             for (Entry<String,FilterDef> entry : filterDefs.entrySet()) {
                 String name = entry.getKey();
-                if (getLogger().isDebugEnabled()) {
-                    getLogger().debug(" Starting filter '" + name + "'");
+                if (getLogger().isTraceEnabled()) {
+                    getLogger().trace(" Starting filter '" + name + "'");
                 }
                 try {
                     ApplicationFilterConfig filterConfig = new ApplicationFilterConfig(this, entry.getValue());
@@ -4309,15 +4309,15 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     public boolean filterStop() {
 
-        if (getLogger().isDebugEnabled()) {
-            getLogger().debug("Stopping filters");
+        if (getLogger().isTraceEnabled()) {
+            getLogger().trace("Stopping filters");
         }
 
         // Release all Filter and FilterConfig instances
         synchronized (filterDefs) {
             for (Entry<String,ApplicationFilterConfig> entry : filterConfigs.entrySet()) {
-                if (getLogger().isDebugEnabled()) {
-                    getLogger().debug(" Stopping filter '" + entry.getKey() + "'");
+                if (getLogger().isTraceEnabled()) {
+                    getLogger().trace(" Stopping filter '" + entry.getKey() + "'");
                 }
                 ApplicationFilterConfig filterConfig = entry.getValue();
                 filterConfig.release();
@@ -4351,8 +4351,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     public boolean listenerStart() {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Configuring application event listeners");
+        if (log.isTraceEnabled()) {
+            log.trace("Configuring application event listeners");
         }
 
         // Instantiate the required listeners
@@ -4360,8 +4360,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         Object results[] = new Object[listeners.length];
         boolean ok = true;
         for (int i = 0; i < results.length; i++) {
-            if (getLogger().isDebugEnabled()) {
-                getLogger().debug(" Configuring event listener class '" + listeners[i] + "'");
+            if (getLogger().isTraceEnabled()) {
+                getLogger().trace(" Configuring event listener class '" + listeners[i] + "'");
             }
             try {
                 String listener = listeners[i];
@@ -4409,8 +4409,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Send application start events
 
-        if (getLogger().isDebugEnabled()) {
-            getLogger().debug("Sending application start events");
+        if (getLogger().isTraceEnabled()) {
+            getLogger().trace("Sending application start events");
         }
 
         // Ensure context is not null
@@ -4460,8 +4460,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     public boolean listenerStop() {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Sending application stop events");
+        if (log.isTraceEnabled()) {
+            log.trace("Sending application stop events");
         }
 
         boolean ok = true;
@@ -4652,8 +4652,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     @Override
     protected void startInternal() throws LifecycleException {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Starting " + getBaseName());
+        if (log.isTraceEnabled()) {
+            log.trace("Starting " + getBaseName());
         }
 
         // Send j2ee.state.starting notification
@@ -4677,8 +4677,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Add missing components as necessary
         if (getResources() == null) { // (1) Required by Loader
-            if (log.isDebugEnabled()) {
-                log.debug("Configuring default Resources");
+            if (log.isTraceEnabled()) {
+                log.trace("Configuring default Resources");
             }
 
             try {
@@ -4737,8 +4737,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         // Standard container startup
-        if (log.isDebugEnabled()) {
-            log.debug("Processing standard container startup");
+        if (log.isTraceEnabled()) {
+            log.trace("Processing standard container startup");
         }
 
 
@@ -4945,8 +4945,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Set available status depending upon startup success
         if (ok) {
-            if (log.isDebugEnabled()) {
-                log.debug("Starting completed");
+            if (log.isTraceEnabled()) {
+                log.trace("Starting completed");
             }
         } else {
             log.error(sm.getString("standardContext.startFailed", getName()));
@@ -5130,8 +5130,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             setCharsetMapper(null);
 
             // Normal container shutdown processing
-            if (log.isDebugEnabled()) {
-                log.debug("Processing standard container shutdown");
+            if (log.isTraceEnabled()) {
+                log.trace("Processing standard container shutdown");
             }
 
             // JNDI resources are unbound in CONFIGURE_STOP_EVENT so stop
@@ -5197,8 +5197,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         // reset the instance manager
         setInstanceManager(null);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Stopping complete");
+        if (log.isTraceEnabled()) {
+            log.trace("Stopping complete");
         }
 
     }
@@ -5315,8 +5315,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         postConstructMethods.clear();
         preDestroyMethods.clear();
 
-        if (log.isDebugEnabled()) {
-            log.debug("resetContext " + getObjectName());
+        if (log.isTraceEnabled()) {
+            log.trace("resetContext " + getObjectName());
         }
     }
 

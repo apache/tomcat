@@ -131,7 +131,7 @@ final class StandardHostValve extends ValveBase {
                 }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                container.getLogger().error("Exception Processing " + request.getRequestURI(), t);
+                container.getLogger().error(sm.getString("standardHostValve.exception", request.getRequestURI()), t);
                 // If a new error occurred while trying to report a previous
                 // error allow the original error to be reported.
                 if (!response.isErrorReportRequired()) {
@@ -241,7 +241,7 @@ final class StandardHostValve extends ValveBase {
                 } catch (ClientAbortException e) {
                     // Ignore
                 } catch (IOException e) {
-                    container.getLogger().warn("Exception Processing " + errorPage, e);
+                    container.getLogger().warn(sm.getString("standardHostValve.exception", errorPage), e);
                 }
             }
         }
@@ -303,7 +303,7 @@ final class StandardHostValve extends ValveBase {
                     try {
                         response.finishResponse();
                     } catch (IOException e) {
-                        container.getLogger().warn("Exception Processing " + errorPage, e);
+                        container.getLogger().warn(sm.getString("standardHostValve.exception", errorPage), e);
                     }
                 }
             }
@@ -336,8 +336,8 @@ final class StandardHostValve extends ValveBase {
      */
     private boolean custom(Request request, Response response, ErrorPage errorPage) {
 
-        if (container.getLogger().isDebugEnabled()) {
-            container.getLogger().debug("Processing " + errorPage);
+        if (container.getLogger().isTraceEnabled()) {
+            container.getLogger().trace("Processing " + errorPage);
         }
 
         try {
@@ -347,7 +347,7 @@ final class StandardHostValve extends ValveBase {
 
             if (rd == null) {
                 container.getLogger()
-                        .error(sm.getString("standardHostValue.customStatusFailed", errorPage.getLocation()));
+                        .error(sm.getString("standardHostValve.customStatusFailed", errorPage.getLocation()));
                 return false;
             }
 
@@ -385,7 +385,7 @@ final class StandardHostValve extends ValveBase {
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             // Report our failure to process this custom page
-            container.getLogger().error("Exception Processing " + errorPage, t);
+            container.getLogger().error(sm.getString("standardHostValve.exception", errorPage), t);
             return false;
         }
     }
