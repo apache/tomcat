@@ -153,8 +153,8 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
      * @param filter The filter to set.
      */
     public void setFilter(String filter) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("ReplicationValve.filter.loading", filter));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("ReplicationValve.filter.loading", filter));
         }
 
         if (filter == null || filter.length() == 0) {
@@ -277,8 +277,8 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
         List<DeltaSession> sessions = crossContextSessions.get();
         if (sessions != null) {
             if (!sessions.contains(session)) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("ReplicationValve.crossContext.registerSession", session.getIdInternal(),
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("ReplicationValve.crossContext.registerSession", session.getIdInternal(),
                             session.getManager().getContext().getName()));
                 }
                 sessions.add(session);
@@ -311,8 +311,8 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
         boolean isCrossContext = context != null && context instanceof StandardContext && context.getCrossContext();
         try {
             if (isCrossContext) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("ReplicationValve.crossContext.add"));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("ReplicationValve.crossContext.add"));
                 }
                 // FIXME add Pool of Arraylists
                 crossContextSessions.set(new ArrayList<DeltaSession>());
@@ -336,8 +336,8 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
             // Array must be remove: Current master request send endAccess at recycle.
             // Don't register this request session again!
             if (isCrossContext) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("ReplicationValve.crossContext.remove"));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("ReplicationValve.crossContext.remove"));
                 }
                 crossContextSessions.remove();
             }
@@ -465,8 +465,8 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
      * @param session HttpSession from current request or cross context session
      */
     protected void resetDeltaRequest(Session session) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("ReplicationValve.resetDeltaRequest", session.getManager().getContext().getName()));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("ReplicationValve.resetDeltaRequest", session.getManager().getContext().getName()));
         }
         ((DeltaSession) session).resetDeltaRequest();
     }
