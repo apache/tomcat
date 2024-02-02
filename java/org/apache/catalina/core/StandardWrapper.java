@@ -636,8 +636,8 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
             synchronized (this) {
                 if (instance == null) {
                     try {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Allocating instance");
+                        if (log.isTraceEnabled()) {
+                            log.trace("Allocating instance");
                         }
                         instance = loadServlet();
                         newInstance = true;
