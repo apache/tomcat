@@ -905,10 +905,10 @@ public class CoyoteAdapter implements Adapter {
         // encoding that doesn't give the expected result so be explicit
         Charset charset = connector.getURICharset();
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("coyoteAdapter.debug", "uriBC", uriBC.toString()));
-            log.debug(sm.getString("coyoteAdapter.debug", "semicolon", String.valueOf(semicolon)));
-            log.debug(sm.getString("coyoteAdapter.debug", "enc", charset.name()));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("coyoteAdapter.debug", "uriBC", uriBC.toString()));
+            log.trace(sm.getString("coyoteAdapter.debug", "semicolon", String.valueOf(semicolon)));
+            log.trace(sm.getString("coyoteAdapter.debug", "enc", charset.name()));
         }
 
         while (semicolon > -1) {
@@ -939,10 +939,10 @@ public class CoyoteAdapter implements Adapter {
                 uriBC.setEnd(start + semicolon);
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("coyoteAdapter.debug", "pathParamStart", String.valueOf(pathParamStart)));
-                log.debug(sm.getString("coyoteAdapter.debug", "pathParamEnd", String.valueOf(pathParamEnd)));
-                log.debug(sm.getString("coyoteAdapter.debug", "pv", pv));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("coyoteAdapter.debug", "pathParamStart", String.valueOf(pathParamStart)));
+                log.trace(sm.getString("coyoteAdapter.debug", "pathParamEnd", String.valueOf(pathParamEnd)));
+                log.trace(sm.getString("coyoteAdapter.debug", "pv", pv));
             }
 
             if (pv != null) {
@@ -951,10 +951,10 @@ public class CoyoteAdapter implements Adapter {
                     String name = pv.substring(0, equals);
                     String value = pv.substring(equals + 1);
                     request.addPathParameter(name, value);
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("coyoteAdapter.debug", "equals", String.valueOf(equals)));
-                        log.debug(sm.getString("coyoteAdapter.debug", "name", name));
-                        log.debug(sm.getString("coyoteAdapter.debug", "value", value));
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("coyoteAdapter.debug", "equals", String.valueOf(equals)));
+                        log.trace(sm.getString("coyoteAdapter.debug", "name", name));
+                        log.trace(sm.getString("coyoteAdapter.debug", "value", value));
                     }
                 }
             }
