@@ -54,11 +54,11 @@ public abstract class ClusterListener implements ChannelListener {
     }
 
     public void setCluster(CatalinaCluster cluster) {
-        if (log.isDebugEnabled()) {
+        if (log.isTraceEnabled()) {
             if (cluster != null) {
-                log.debug("add ClusterListener " + this.toString() + " to cluster" + cluster);
+                log.trace("add ClusterListener " + this.toString() + " to cluster" + cluster);
             } else {
-                log.debug("remove ClusterListener " + this.toString() + " from cluster");
+                log.trace("remove ClusterListener " + this.toString() + " from cluster");
             }
         }
         this.cluster = cluster;

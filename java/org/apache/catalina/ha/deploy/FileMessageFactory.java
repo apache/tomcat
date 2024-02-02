@@ -134,8 +134,8 @@ public class FileMessageFactory {
     private FileMessageFactory(File f, boolean openForWrite) throws FileNotFoundException, IOException {
         this.file = f;
         this.openForWrite = openForWrite;
-        if (log.isDebugEnabled()) {
-            log.debug("open file " + f + " write " + openForWrite);
+        if (log.isTraceEnabled()) {
+            log.trace("FileMessageFactory open file " + f + " write " + openForWrite);
         }
         if (openForWrite) {
             if (!file.exists()) {
@@ -211,8 +211,8 @@ public class FileMessageFactory {
         if (!openForWrite) {
             throw new IllegalArgumentException(sm.getString("fileMessageFactory.cannotWrite"));
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Message " + msg + " data " + HexUtils.toHexString(msg.getData()) + " data length " +
+        if (log.isTraceEnabled()) {
+            log.trace("Message " + msg + " data " + HexUtils.toHexString(msg.getData()) + " data length " +
                     msg.getDataLength() + " out " + out);
         }
 
