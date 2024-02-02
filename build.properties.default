@@ -45,7 +45,7 @@ compile.debug=true
 compile.deprecation=false
 
 # ----- Documentation properties -----
-git.branch=main
+git.branch=10.1.x
 
 # ----- Code quality tools
 # Note enabling validation uses Checkstyle which is LGPL licensed
