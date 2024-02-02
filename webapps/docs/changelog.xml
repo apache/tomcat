@@ -1231,7 +1231,7 @@
       </fix>
       <fix>
         <bug>66524</bug> Correct eviction ordering in WebResource cache to
-        by LRU as intended. (schultz)
+        be LRU as intended. (schultz)
       </fix>
       <update>
         Add support code for custom user attributes in <code>RealmBase</code>.
