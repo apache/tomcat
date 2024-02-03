@@ -54,7 +54,7 @@ public class openssl_h_Compatibility {
         var mh$ = Holder.MH;
         try {
             if (openssl_h.TRACE_DOWNCALLS) {
-                openssl_h.traceDowncall(Holder.NAME, r);
+                openssl_h.traceDowncall(Holder.NAME, Integer.valueOf(r));
             }
             return (int) mh$.invokeExact(r);
         } catch (Throwable ex$) {
