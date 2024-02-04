@@ -20,8 +20,8 @@ import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
 
 /**
- * <p><strong>RuleSet</strong> for processing the contents of a
- * Context definition element.</p>
+ * <strong>RuleSet</strong> for processing the contents of a
+ * Context definition element.
  *
  * @author Craig R. McClanahan
  */
