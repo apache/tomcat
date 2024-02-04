@@ -20,10 +20,10 @@ import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
 
 /**
- * <p><strong>RuleSet</strong> for processing the contents of a
+ * <strong>RuleSet</strong> for processing the contents of a
  * Engine definition element.  This <code>RuleSet</code> does NOT include
  * any rules for nested Host elements, which should be added via instances of
- * <code>HostRuleSet</code>.</p>
+ * <code>HostRuleSet</code>.
  *
  * @author Craig R. McClanahan
  */

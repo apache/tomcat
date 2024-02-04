@@ -20,8 +20,8 @@ import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
 
 /**
- * <p><strong>RuleSet</strong> for processing the JNDI Enterprise Naming
- * Context resource declaration elements.</p>
+ * <strong>RuleSet</strong> for processing the JNDI Enterprise Naming
+ * Context resource declaration elements.
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
