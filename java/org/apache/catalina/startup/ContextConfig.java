@@ -835,16 +835,6 @@ public class ContextConfig implements LifecycleListener {
             context.removeChild(children[i]);
         }
 
-        // Removing application parameters
-        /*
-        ApplicationParameter[] applicationParameters =
-            context.findApplicationParameters();
-        for (i = 0; i < applicationParameters.length; i++) {
-            context.removeApplicationParameter
-                (applicationParameters[i].getName());
-        }
-        */
-
         // Removing security constraints
         SecurityConstraint[] securityConstraints = context.findConstraints();
         for (i = 0; i < securityConstraints.length; i++) {
