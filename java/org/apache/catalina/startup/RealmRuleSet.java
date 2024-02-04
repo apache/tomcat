@@ -22,9 +22,9 @@ import org.apache.tomcat.util.digester.RuleSetBase;
 
 
 /**
- * <p><strong>RuleSet</strong> for processing the contents of a Realm definition
+ * <strong>RuleSet</strong> for processing the contents of a Realm definition
  * element.  This <code>RuleSet</code> supports Realms such as the
- * <code>CombinedRealm</code> that used nested Realms.</p>
+ * <code>CombinedRealm</code> that used nested Realms.
  */
 @SuppressWarnings("deprecation")
 public class RealmRuleSet extends RuleSetBase {

@@ -26,18 +26,18 @@ import org.apache.juli.logging.LogFactory;
 
 
 /**
- * <p>General purpose wrapper for command line tools that should execute in an
+ * General purpose wrapper for command line tools that should execute in an
  * environment with the common class loader environment set up by Catalina.
  * This should be executed from a command line script that conforms to
- * the following requirements:</p>
+ * the following requirements:
  * <ul>
  * <li>Passes the <code>catalina.home</code> system property configured with
  *     the pathname of the Tomcat installation directory.</li>
  * <li>Sets the system classpath to include <code>bootstrap.jar</code> and
  *     <code>$JAVA_HOME/lib/tools.jar</code>.</li>
  * </ul>
- *
- * <p>The command line to execute the tool looks like:</p>
+ * <p>
+ * The command line to execute the tool looks like:
  * <pre>
  *   java -classpath $CLASSPATH org.apache.catalina.startup.Tool \
  *     ${options} ${classname} ${arguments}

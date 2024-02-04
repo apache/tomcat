@@ -23,14 +23,13 @@ import org.apache.tomcat.util.digester.Rule;
 
 
 /**
- * <p>Rule implementation that calls a method on the (top-1) (parent)
+ * Rule implementation that calls a method on the (top-1) (parent)
  * object, passing the top object (child) as an argument.  It is
- * commonly used to establish parent-child relationships.</p>
- *
- * <p>This rule now supports more flexible method matching by default.
+ * commonly used to establish parent-child relationships.
+ * <p>
+ * This rule now supports more flexible method matching by default.
  * It is possible that this may break (some) code
  * written against release 1.1.1 or earlier.
- * </p>
  */
 
 public class SetNextNamingRule extends Rule {

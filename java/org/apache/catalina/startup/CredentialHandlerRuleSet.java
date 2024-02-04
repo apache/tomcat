@@ -20,10 +20,10 @@ import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSetBase;
 
 /**
- * <p><strong>RuleSet</strong> for processing the contents of a
+ * <strong>RuleSet</strong> for processing the contents of a
  * CredentialHandler definition element.  This <code>RuleSet</code> supports
  * CredentialHandler such as the <code>NestedCredentialHandler</code> that used
- * nested CredentialHandlers.</p>
+ * nested CredentialHandlers.
  */
 @SuppressWarnings("deprecation")
 public class CredentialHandlerRuleSet extends RuleSetBase {

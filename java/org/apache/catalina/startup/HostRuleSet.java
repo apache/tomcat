@@ -22,10 +22,10 @@ import org.apache.tomcat.util.digester.RuleSetBase;
 
 
 /**
- * <p><strong>RuleSet</strong> for processing the contents of a
+ * <strong>RuleSet</strong> for processing the contents of a
  * Host definition element.  This <code>RuleSet</code> does NOT include
  * any rules for nested Context which should be added via instances of
- * <code>ContextRuleSet</code>.</p>
+ * <code>ContextRuleSet</code>.
  *
  * @author Craig R. McClanahan
  */

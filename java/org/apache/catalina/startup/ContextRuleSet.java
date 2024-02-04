@@ -22,8 +22,8 @@ import org.apache.tomcat.util.digester.RuleSetBase;
 
 
 /**
- * <p><strong>RuleSet</strong> for processing the contents of a
- * Context definition element.</p>
+ * <strong>RuleSet</strong> for processing the contents of a
+ * Context definition element.
  *
  * @author Craig R. McClanahan
  */
