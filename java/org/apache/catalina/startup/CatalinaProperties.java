@@ -47,6 +47,7 @@ public class CatalinaProperties {
 
     /**
      * @param name The property name
+     *
      * @return specified property value
      */
     public static String getProperty(String name) {
@@ -89,8 +90,7 @@ public class CatalinaProperties {
 
         if (is == null) {
             try {
-                is = CatalinaProperties.class.getResourceAsStream
-                    ("/org/apache/catalina/startup/catalina.properties");
+                is = CatalinaProperties.class.getResourceAsStream("/org/apache/catalina/startup/catalina.properties");
             } catch (Throwable t) {
                 handleThrowable(t);
             }

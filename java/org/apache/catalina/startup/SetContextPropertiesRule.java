@@ -19,10 +19,10 @@ package org.apache.catalina.startup;
 import org.apache.tomcat.util.digester.SetPropertiesRule;
 
 /**
- * Rule that uses the introspection utils to set properties of a context
- * (everything except "path").
+ * Rule that uses the introspection utils to set properties of a context (everything except "path").
  *
  * @author Remy Maucherat
+ *
  * @deprecated This will be removed in Tomcat 10
  */
 @Deprecated
@@ -32,7 +32,7 @@ public class SetContextPropertiesRule extends SetPropertiesRule {
     // ----------------------------------------------------------- Constructors
 
     public SetContextPropertiesRule() {
-        super(new String[]{"path", "docBase"});
+        super(new String[] { "path", "docBase" });
     }
 
     // ----------------------------------------------------- Instance Variables
