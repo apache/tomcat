@@ -16,12 +16,12 @@
  */
 package org.apache.catalina.startup;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -65,6 +65,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.security.DeployXmlPermission;
 import org.apache.catalina.util.ContextName;
+import org.apache.catalina.util.IOTools;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -231,7 +232,7 @@ public class HostConfig implements LifecycleListener {
                     }
                 } catch (MalformedURLException e) {
                     // Should never happen
-                    log.warn("hostConfig.docBaseUrlInvalid", e);
+                    log.warn(sm.getString("hostConfig.docBaseUrlInvalid"), e);
                 }
             }
         }
@@ -631,6 +632,11 @@ public class HostConfig implements LifecycleListener {
                 }
             }
 
+            if (context.getPath() != null) {
+                log.warn(sm.getString("hostConfig.deployDescriptor.path", context.getPath(),
+                        contextXml.getAbsolutePath()));
+            }
+
             Class<?> clazz = Class.forName(host.getConfigClass());
             LifecycleListener listener = (LifecycleListener) clazz.getConstructor().newInstance();
             context.addLifecycleListener(listener);
@@ -653,6 +659,17 @@ public class HostConfig implements LifecycleListener {
                     deployedApp.redeployResources.put(docBase.getAbsolutePath(), Long.valueOf(docBase.lastModified()));
                     if (docBase.getAbsolutePath().toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                         isExternalWar = true;
+                    }
+                    // Check that a WAR or DIR in the appBase is not 'hidden'
+                    File war = new File(host.getAppBaseFile(), cn.getBaseName() + ".war");
+                    if (war.exists()) {
+                        log.warn(sm.getString("hostConfig.deployDescriptor.hiddenWar", contextXml.getAbsolutePath(),
+                                war.getAbsolutePath()));
+                    }
+                    File dir = new File(host.getAppBaseFile(), cn.getBaseName());
+                    if (dir.exists()) {
+                        log.warn(sm.getString("hostConfig.deployDescriptor.hiddenDir", contextXml.getAbsolutePath(),
+                                dir.getAbsolutePath()));
                     }
                 } else {
                     log.warn(sm.getString("hostConfig.deployDescriptor.localDocBaseSpecified", docBase));
@@ -955,17 +972,8 @@ public class HostConfig implements LifecycleListener {
                 try (JarFile jar = new JarFile(war)) {
                     JarEntry entry = jar.getJarEntry(Constants.ApplicationContextXml);
                     try (InputStream istream = jar.getInputStream(entry);
-                            FileOutputStream fos = new FileOutputStream(xml);
-                            BufferedOutputStream ostream = new BufferedOutputStream(fos, 1024)) {
-                        byte buffer[] = new byte[1024];
-                        while (true) {
-                            int n = istream.read(buffer);
-                            if (n < 0) {
-                                break;
-                            }
-                            ostream.write(buffer, 0, n);
-                        }
-                        ostream.flush();
+                            OutputStream ostream = new FileOutputStream(xml)) {
+                        IOTools.flow(istream, ostream);
                     }
                 } catch (IOException e) {
                     /* Ignore */
@@ -1345,10 +1353,12 @@ public class HostConfig implements LifecycleListener {
             } else {
                 // There is a chance the the resource was only missing
                 // temporarily eg renamed during a text editor save
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e1) {
-                    // Ignore
+                if (resource.exists() || !resource.getName().toLowerCase(Locale.ENGLISH).endsWith(".war")) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e1) {
+                        // Ignore
+                    }
                 }
                 // Recheck the resource to see if it was really deleted
                 if (resource.exists()) {

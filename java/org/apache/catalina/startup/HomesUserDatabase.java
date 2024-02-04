@@ -31,14 +31,6 @@ import java.util.Map;
 public final class HomesUserDatabase implements UserDatabase {
 
     /**
-     * Initialize a new instance of this user database component.
-     */
-    public HomesUserDatabase() {
-        super();
-    }
-
-
-    /**
      * The set of home directories for all defined users, keyed by username.
      */
     private final Map<String,String> homes = new HashMap<>();
