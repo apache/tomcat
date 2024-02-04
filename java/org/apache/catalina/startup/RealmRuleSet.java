@@ -16,26 +16,21 @@
  */
 package org.apache.catalina.startup;
 
-
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSetBase;
 
-
 /**
- * <strong>RuleSet</strong> for processing the contents of a Realm definition
- * element.  This <code>RuleSet</code> supports Realms such as the
- * <code>CombinedRealm</code> that used nested Realms.
+ * <strong>RuleSet</strong> for processing the contents of a Realm definition element. This <code>RuleSet</code>
+ * supports Realms such as the <code>CombinedRealm</code> that used nested Realms.
  */
 @SuppressWarnings("deprecation")
 public class RealmRuleSet extends RuleSetBase {
 
+    private static final int MAX_NESTED_REALM_LEVELS =
+            Integer.getInteger("org.apache.catalina.startup.RealmRuleSet.MAX_NESTED_REALM_LEVELS", 3).intValue();
 
-    private static final int MAX_NESTED_REALM_LEVELS = Integer.getInteger(
-            "org.apache.catalina.startup.RealmRuleSet.MAX_NESTED_REALM_LEVELS",
-            3).intValue();
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * The matching pattern prefix to use for recognizing our elements.
@@ -45,10 +40,8 @@ public class RealmRuleSet extends RuleSetBase {
 
     // ------------------------------------------------------------ Constructor
 
-
     /**
-     * Construct an instance of this <code>RuleSet</code> with the default
-     * matching pattern prefix.
+     * Construct an instance of this <code>RuleSet</code> with the default matching pattern prefix.
      */
     public RealmRuleSet() {
         this("");
@@ -56,11 +49,9 @@ public class RealmRuleSet extends RuleSetBase {
 
 
     /**
-     * Construct an instance of this <code>RuleSet</code> with the specified
-     * matching pattern prefix.
+     * Construct an instance of this <code>RuleSet</code> with the specified matching pattern prefix.
      *
-     * @param prefix Prefix for matching pattern rules (including the
-     *  trailing slash character)
+     * @param prefix Prefix for matching pattern rules (including the trailing slash character)
      */
     public RealmRuleSet(String prefix) {
         this.prefix = prefix;
@@ -69,15 +60,11 @@ public class RealmRuleSet extends RuleSetBase {
 
     // --------------------------------------------------------- Public Methods
 
-
     /**
-     * <p>Add the set of Rule instances defined in this RuleSet to the
-     * specified <code>Digester</code> instance, associating them with
-     * our namespace URI (if any).  This method should only be called
-     * by a Digester instance.</p>
+     * Add the set of Rule instances defined in this RuleSet to the specified <code>Digester</code> instance,
+     * associating them with our namespace URI (if any). This method should only be called by a Digester instance.
      *
-     * @param digester Digester instance to which the new Rule instances
-     *  should be added.
+     * @param digester Digester instance to which the new Rule instances should be added.
      */
     @Override
     public void addRuleInstances(Digester digester) {
@@ -92,8 +79,7 @@ public class RealmRuleSet extends RuleSetBase {
     }
 
     private void addRuleInstances(Digester digester, String pattern, String methodName) {
-        digester.addObjectCreate(pattern, null /* MUST be specified in the element */,
-                "className");
+        digester.addObjectCreate(pattern, null /* MUST be specified in the element */, "className");
         digester.addSetProperties(pattern);
         digester.addSetNext(pattern, methodName, "org.apache.catalina.Realm");
         digester.addRuleSet(new CredentialHandlerRuleSet(pattern + "/"));
