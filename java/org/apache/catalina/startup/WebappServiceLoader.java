@@ -40,18 +40,14 @@ import org.apache.catalina.Context;
 import org.apache.tomcat.util.scan.JarFactory;
 
 /**
- * A variation of Java's JAR ServiceLoader that respects exclusion rules for
- * web applications.
+ * A variation of Java's JAR ServiceLoader that respects exclusion rules for web applications.
  * <p>
- * Primarily intended for use loading ServletContainerInitializers as defined
- * by Servlet 8.2.4. This implementation does not attempt lazy loading as the
- * container is required to introspect all implementations discovered.
+ * Primarily intended for use loading ServletContainerInitializers as defined by Servlet 8.2.4. This implementation does
+ * not attempt lazy loading as the container is required to introspect all implementations discovered.
  * <p>
- * If the ServletContext defines ORDERED_LIBS, then only JARs in WEB-INF/lib
- * that are named in that set will be included in the search for
- * provider configuration files; if ORDERED_LIBS is not defined then
- * all JARs will be searched for provider configuration files. Providers
- * defined by resources in the parent ClassLoader will always be returned.
+ * If the ServletContext defines ORDERED_LIBS, then only JARs in WEB-INF/lib that are named in that set will be included
+ * in the search for provider configuration files; if ORDERED_LIBS is not defined then all JARs will be searched for
+ * provider configuration files. Providers defined by resources in the parent ClassLoader will always be returned.
  * <p>
  * Provider classes will be loaded using the context's ClassLoader.
  *
@@ -88,15 +84,15 @@ public class WebappServiceLoader<T> {
 
 
     /**
-     * Load the providers for a service type. Container defined services will be
-     * loaded before application defined services in case the application
-     * depends on a Container provided service. Note that services are always
-     * loaded via the Context (web application) class loader so it is possible
-     * for an application to provide an alternative implementation of what would
-     * normally be a Container provided service.
+     * Load the providers for a service type. Container defined services will be loaded before application defined
+     * services in case the application depends on a Container provided service. Note that services are always loaded
+     * via the Context (web application) class loader so it is possible for an application to provide an alternative
+     * implementation of what would normally be a Container provided service.
      *
      * @param serviceType the type of service to load
+     *
      * @return an unmodifiable collection of service providers
+     *
      * @throws IOException if there was a problem loading any service
      */
     public List<T> load(Class<T> serviceType) throws IOException {
@@ -131,13 +127,13 @@ public class WebappServiceLoader<T> {
         // Obtaining the application provided configuration files is a little
         // more difficult for two reasons:
         // - The web application may employ a custom class loader. Ideally, we
-        //   would use ClassLoader.findResources() but that method is protected.
-        //   We could force custom class loaders to override that method and
-        //   make it public but that would be a new requirement and break
-        //   backwards compatibility for what is an often customised component.
+        // would use ClassLoader.findResources() but that method is protected.
+        // We could force custom class loaders to override that method and
+        // make it public but that would be a new requirement and break
+        // backwards compatibility for what is an often customised component.
         // - If the application web.xml file has defined an order for fragments
-        //   then only those JAR files represented by fragments in that order
-        //   (and arguably WEB-INF/classes) should be scanned for services.
+        // then only those JAR files represented by fragments in that order
+        // (and arguably WEB-INF/classes) should be scanned for services.
         LinkedHashSet<String> applicationServiceClassNames = new LinkedHashSet<>();
 
         // Check to see if the ServletContext has ORDERED_LIBS defined
@@ -209,8 +205,8 @@ public class WebappServiceLoader<T> {
 
     void parseConfigFile(LinkedHashSet<String> servicesFound, URL url) throws IOException {
         try (InputStream is = url.openStream();
-            InputStreamReader in = new InputStreamReader(is, StandardCharsets.UTF_8);
-            BufferedReader reader = new BufferedReader(in)) {
+                InputStreamReader in = new InputStreamReader(is, StandardCharsets.UTF_8);
+                BufferedReader reader = new BufferedReader(in)) {
             String line;
             while ((line = reader.readLine()) != null) {
                 int i = line.indexOf('#');
