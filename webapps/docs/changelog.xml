@@ -185,6 +185,9 @@
         names. Based on pull request <pr>685</pr> provided by Paul A. Nicolucci.
         (markt)
       </fix>
+      <update>
+        Update Checkstyle to 10.13.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
