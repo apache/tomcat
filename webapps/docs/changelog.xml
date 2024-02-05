@@ -188,6 +188,9 @@
       <update>
         Update Checkstyle to 10.13.0. (markt)
       </update>
+      <update>
+        Update JSign to 6.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
