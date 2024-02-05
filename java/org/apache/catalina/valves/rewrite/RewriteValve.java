@@ -221,8 +221,8 @@ public class RewriteValve extends ValveBase {
                 Object result = parse(line);
                 if (result instanceof RewriteRule) {
                     RewriteRule rule = (RewriteRule) result;
-                    if (containerLog.isDebugEnabled()) {
-                        containerLog.debug("Add rule with pattern " + rule.getPatternString()
+                    if (containerLog.isTraceEnabled()) {
+                        containerLog.trace("Add rule with pattern " + rule.getPatternString()
                                 + " and substitution " + rule.getSubstitutionString());
                     }
                     for (int i = (conditions.size() - 1); i > 0; i--) {
@@ -231,9 +231,9 @@ public class RewriteValve extends ValveBase {
                         }
                     }
                     for (RewriteCond condition : conditions) {
-                        if (containerLog.isDebugEnabled()) {
+                        if (containerLog.isTraceEnabled()) {
                             RewriteCond cond = condition;
-                            containerLog.debug("Add condition " + cond.getCondPattern()
+                            containerLog.trace("Add condition " + cond.getCondPattern()
                                     + " test " + cond.getTestString() + " to rule with pattern "
                                     + rule.getPatternString() + " and substitution "
                                     + rule.getSubstitutionString() + (cond.isOrnext() ? " [OR]" : "")
@@ -323,8 +323,8 @@ public class RewriteValve extends ValveBase {
                 CharSequence test = (rule.isHost()) ? host : urlDecoded;
                 CharSequence newtest = rule.evaluate(test, resolver);
                 if (newtest != null && !test.equals(newtest.toString())) {
-                    if (containerLog.isDebugEnabled()) {
-                        containerLog.debug("Rewrote " + test + " as " + newtest
+                    if (containerLog.isTraceEnabled()) {
+                        containerLog.trace("Rewrote " + test + " as " + newtest
                                 + " with rule pattern " + rule.getPatternString());
                     }
                     if (rule.isHost()) {

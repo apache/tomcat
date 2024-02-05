@@ -106,12 +106,12 @@ public abstract class AbstractStreamProvider implements StreamProvider {
         URLConnection connection = openConnection(url, headers, connectTimeout, readTimeout);
         if (connection instanceof HttpsURLConnection) {
             ((HttpsURLConnection) connection).setSSLSocketFactory(getSocketFactory());
-            if (log.isDebugEnabled()) {
-                log.debug(String.format("Using HttpsURLConnection with SSLSocketFactory [%s] for url [%s].", getSocketFactory(), url));
+            if (log.isTraceEnabled()) {
+                log.trace(String.format("Using HttpsURLConnection with SSLSocketFactory [%s] for url [%s].", getSocketFactory(), url));
             }
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug(String.format("Using URLConnection for url [%s].", url));
+            if (log.isTraceEnabled()) {
+                log.trace(String.format("Using URLConnection for url [%s].", url));
             }
         }
         return connection.getInputStream();
