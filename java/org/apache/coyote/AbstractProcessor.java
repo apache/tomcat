@@ -265,8 +265,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             state = dispatchEndRequest();
         }
 
-        if (getLog().isDebugEnabled()) {
-            getLog().debug("Socket: [" + socketWrapper + "], Status in: [" + status + "], State out: [" + state + "]");
+        if (getLog().isTraceEnabled()) {
+            getLog().trace("Socket: [" + socketWrapper + "], Status in: [" + status + "], State out: [" + state + "]");
         }
 
         return state;

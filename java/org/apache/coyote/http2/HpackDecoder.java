@@ -263,8 +263,8 @@ public class HpackDecoder {
             addStaticTableEntry(index);
         } else {
             int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("hpackdecoder.useDynamic", Integer.valueOf(adjustedIndex)));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("hpackdecoder.useDynamic", Integer.valueOf(adjustedIndex)));
             }
             Hpack.HeaderField headerField = headerTable[adjustedIndex];
             emitHeader(headerField.name, headerField.value);
@@ -295,8 +295,8 @@ public class HpackDecoder {
 
     private void addStaticTableEntry(int index) throws HpackException {
         // adds an entry from the static table.
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("hpackdecoder.useStatic", Integer.valueOf(index)));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("hpackdecoder.useStatic", Integer.valueOf(index)));
         }
         Hpack.HeaderField entry = Hpack.STATIC_TABLE[index];
         emitHeader(entry.name, (entry.value == null) ? "" : entry.value);
@@ -304,8 +304,8 @@ public class HpackDecoder {
 
     private void addEntryToHeaderTable(Hpack.HeaderField entry) {
         if (entry.size > maxMemorySizeSoft) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("hpackdecoder.clearDynamic"));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("hpackdecoder.clearDynamic"));
             }
             // it is to big to fit, so we just completely clear the table.
             while (filledTableSlots > 0) {
@@ -323,8 +323,8 @@ public class HpackDecoder {
         int newTableSlots = filledTableSlots + 1;
         int tableLength = headerTable.length;
         int index = (firstSlotPosition + filledTableSlots) % tableLength;
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("hpackdecoder.addDynamic", Integer.valueOf(index), entry.name, entry.value));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("hpackdecoder.addDynamic", Integer.valueOf(index), entry.name, entry.value));
         }
         headerTable[index] = entry;
         int newSize = currentMemorySize + entry.size;
@@ -433,8 +433,8 @@ public class HpackDecoder {
         int inc = 3 + name.length() + value.length();
         headerSize += inc;
         if (!isHeaderCountExceeded() && !isHeaderSizeExceeded(0)) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("hpackdecoder.emitHeader", name, value));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("hpackdecoder.emitHeader", name, value));
             }
             headerEmitter.emitHeader(name, value);
         }

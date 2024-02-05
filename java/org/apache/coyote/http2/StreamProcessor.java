@@ -527,8 +527,8 @@ class StreamProcessor extends AbstractProcessor {
 
     @Override
     protected final boolean flushBufferedWrite() throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("streamProcessor.flushBufferedWrite.entry", stream.getConnectionId(),
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("streamProcessor.flushBufferedWrite.entry", stream.getConnectionId(),
                     stream.getIdAsString()));
         }
         if (stream.flush(false)) {

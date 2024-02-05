@@ -200,8 +200,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     final void receiveReset(long errorCode) {
-        if (log.isDebugEnabled()) {
-            log.debug(
+        if (log.isTraceEnabled()) {
+            log.trace(
                     sm.getString("stream.reset.receive", getConnectionId(), getIdAsString(), Long.toString(errorCode)));
         }
         // Set the new state first since read and write both check this
@@ -310,8 +310,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     @Override
     public final void emitHeader(String name, String value) throws HpackException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.header.debug", getConnectionId(), getIdAsString(), name, value));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("stream.header.debug", getConnectionId(), getIdAsString(), name, value));
         }
 
         // Header names must be lower case
@@ -742,8 +742,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         if (http2Exception instanceof StreamException) {
             try {
                 StreamException se = (StreamException) http2Exception;
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("stream.reset.send", getConnectionId(), getIdAsString(), se.getError()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("stream.reset.send", getConnectionId(), getIdAsString(), se.getError()));
                 }
 
                 // Need to update state atomically with the sending of the RST
@@ -779,8 +779,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
      * period after the Stream closes.
      */
     final void recycle() {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.recycle", getConnectionId(), getIdAsString()));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("stream.recycle", getConnectionId(), getIdAsString()));
         }
         int remaining;
         // May be null if stream was closed before any DATA frames were processed.
@@ -1021,8 +1021,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         private boolean flush(boolean writeInProgress, boolean block) throws IOException {
             writeLock.lock();
             try {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("stream.outputBuffer.flush.debug", getConnectionId(), getIdAsString(),
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("stream.outputBuffer.flush.debug", getConnectionId(), getIdAsString(),
                             Integer.toString(buffer.position()), Boolean.toString(writeInProgress),
                             Boolean.toString(closed)));
                 }
@@ -1216,8 +1216,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 while (inBuffer.position() == 0 && (canRead = isActive() && !isInputFinished())) {
                     // Need to block until some data is written
                     try {
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("stream.inputBuffer.empty"));
+                        if (log.isTraceEnabled()) {
+                            log.trace(sm.getString("stream.inputBuffer.empty"));
                         }
 
                         long readTimeout = handler.getProtocol().getStreamReadTimeout();
@@ -1252,8 +1252,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     // outBuffer.
                     inBuffer.flip();
                     written = inBuffer.remaining();
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("stream.inputBuffer.copy", Integer.toString(written)));
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("stream.inputBuffer.copy", Integer.toString(written)));
                     }
                     inBuffer.get(outBuffer, 0, written);
                     inBuffer.clear();
@@ -1330,8 +1330,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 if (closed) {
                     swallowUnread();
                 } else if (readInterest) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("stream.inputBuffer.dispatch"));
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("stream.inputBuffer.dispatch"));
                     }
                     readInterest = false;
                     coyoteRequest.action(ActionCode.DISPATCH_READ, null);
@@ -1340,8 +1340,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     // own.
                     coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
                 } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("stream.inputBuffer.signal"));
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("stream.inputBuffer.signal"));
                     }
                     synchronized (inBuffer) {
                         inBuffer.notifyAll();
@@ -1421,8 +1421,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 int unreadByteCount = 0;
                 synchronized (inBuffer) {
                     unreadByteCount = inBuffer.position();
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("stream.inputBuffer.swallowUnread", Integer.valueOf(unreadByteCount)));
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("stream.inputBuffer.swallowUnread", Integer.valueOf(unreadByteCount)));
                     }
                     if (unreadByteCount > 0) {
                         inBuffer.position(0);

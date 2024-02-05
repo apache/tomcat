@@ -100,8 +100,8 @@ abstract class AbstractStream {
             // goes beyond 2^31-1 an error is triggered.
             windowSize += increment;
 
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("abstractStream.windowSizeInc", getConnectionId(), getIdAsString(),
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("abstractStream.windowSizeInc", getConnectionId(), getIdAsString(),
                         Integer.toString(increment), Long.toString(windowSize)));
             }
 
@@ -127,8 +127,8 @@ abstract class AbstractStream {
             // the Integer.MAX_VALUE and once windowSize goes negative no further
             // decrements are permitted
             windowSize -= decrement;
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("abstractStream.windowSizeDec", getConnectionId(), getIdAsString(),
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("abstractStream.windowSizeDec", getConnectionId(), getIdAsString(),
                         Integer.toString(decrement), Long.toString(windowSize)));
             }
         } finally {
@@ -143,7 +143,7 @@ abstract class AbstractStream {
 
 
     final void setConnectionAllocationRequested(int connectionAllocationRequested) {
-        log.debug(sm.getString("abstractStream.setConnectionAllocationRequested", getConnectionId(), getIdAsString(),
+        log.trace(sm.getString("abstractStream.setConnectionAllocationRequested", getConnectionId(), getIdAsString(),
                 Integer.toString(this.connectionAllocationRequested), Integer.toString(connectionAllocationRequested)));
         this.connectionAllocationRequested = connectionAllocationRequested;
     }
@@ -155,7 +155,7 @@ abstract class AbstractStream {
 
 
     final void setConnectionAllocationMade(int connectionAllocationMade) {
-        log.debug(sm.getString("abstractStream.setConnectionAllocationMade", getConnectionId(), getIdAsString(),
+        log.trace(sm.getString("abstractStream.setConnectionAllocationMade", getConnectionId(), getIdAsString(),
                 Integer.toString(this.connectionAllocationMade), Integer.toString(connectionAllocationMade)));
         this.connectionAllocationMade = connectionAllocationMade;
     }
