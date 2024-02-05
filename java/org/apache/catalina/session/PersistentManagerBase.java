@@ -316,8 +316,8 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
         long timeNow = System.currentTimeMillis();
         Session sessions[] = findSessions();
         int expireHere = 0;
-        if (log.isDebugEnabled()) {
-            log.debug("Start expire sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
+        if (log.isTraceEnabled()) {
+            log.trace("Start expire sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
         }
         for (Session session : sessions) {
             if (!session.isValid()) {
@@ -331,8 +331,8 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
         }
 
         long timeEnd = System.currentTimeMillis();
-        if (log.isDebugEnabled()) {
-            log.debug("End expire sessions " + getName() + " processingTime " + (timeEnd - timeNow) +
+        if (log.isTraceEnabled()) {
+            log.trace("End expire sessions " + getName() + " processingTime " + (timeEnd - timeNow) +
                     " expired sessions: " + expireHere);
         }
         processingTime += (timeEnd - timeNow);
@@ -609,8 +609,8 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
     }
 
     private void reactivateLoadedSession(String id, Session session) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("persistentManager.swapIn", id));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("persistentManager.swapIn", id));
         }
 
         session.setManager(this);
@@ -714,8 +714,8 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
     @Override
     protected void stopInternal() throws LifecycleException {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Stopping");
+        if (log.isTraceEnabled()) {
+            log.trace("Stopping");
         }
 
         setState(LifecycleState.STOPPING);
@@ -771,8 +771,8 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
                             // Session is currently being accessed - skip it
                             continue;
                         }
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("persistentManager.swapMaxIdle", session.getIdInternal(),
+                        if (log.isTraceEnabled()) {
+                            log.trace(sm.getString("persistentManager.swapMaxIdle", session.getIdInternal(),
                                     Integer.valueOf(timeIdle)));
                         }
                         try {
@@ -821,8 +821,8 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
                         // Session is currently being accessed - skip it
                         continue;
                     }
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("persistentManager.swapTooManyActive", session.getIdInternal(),
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("persistentManager.swapTooManyActive", session.getIdInternal(),
                                 Integer.valueOf(timeIdle)));
                     }
                     try {
@@ -865,8 +865,8 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
                     }
                     int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
                     if (timeIdle >= maxIdleBackup) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("persistentManager.backupMaxIdle", session.getIdInternal(),
+                        if (log.isTraceEnabled()) {
+                            log.trace(sm.getString("persistentManager.backupMaxIdle", session.getIdInternal(),
                                     Integer.valueOf(timeIdle)));
                         }
 

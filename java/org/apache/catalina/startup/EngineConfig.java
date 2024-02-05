@@ -89,8 +89,8 @@ public class EngineConfig implements LifecycleListener {
      */
     protected void start() {
 
-        if (engine.getLogger().isDebugEnabled()) {
-            engine.getLogger().debug(sm.getString("engineConfig.start"));
+        if (engine.getLogger().isTraceEnabled()) {
+            engine.getLogger().trace(sm.getString("engineConfig.start"));
         }
 
     }
@@ -101,8 +101,8 @@ public class EngineConfig implements LifecycleListener {
      */
     protected void stop() {
 
-        if (engine.getLogger().isDebugEnabled()) {
-            engine.getLogger().debug(sm.getString("engineConfig.stop"));
+        if (engine.getLogger().isTraceEnabled()) {
+            engine.getLogger().trace(sm.getString("engineConfig.stop"));
         }
 
     }
