@@ -127,8 +127,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
     @Override
     void sendStreamReset(StreamStateMachine state, StreamException se) throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.rst.debug", connectionId, Integer.toString(se.getStreamId()),
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("upgradeHandler.rst.debug", connectionId, Integer.toString(se.getStreamId()),
                     se.getError(), se.getMessage()));
         }
         // Write a RST frame
@@ -223,8 +223,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
     @Override
     void writeBody(Stream stream, ByteBuffer data, int len, boolean finished) throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.writeBody", connectionId, stream.getIdAsString(),
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("upgradeHandler.writeBody", connectionId, stream.getIdAsString(),
                     Integer.toString(len), Boolean.valueOf(finished)));
         }
 
@@ -254,8 +254,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     @Override
     void writeWindowUpdate(AbstractNonZeroStream stream, int increment, boolean applicationInitiated)
             throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.windowUpdateConnection", getConnectionId(),
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("upgradeHandler.windowUpdateConnection", getConnectionId(),
                     Integer.valueOf(increment)));
         }
         // Build window update frame for stream 0
@@ -268,8 +268,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         if (stream instanceof Stream && ((Stream) stream).canWrite()) {
             int streamIncrement = ((Stream) stream).getWindowUpdateSizeToWrite(increment);
             if (streamIncrement > 0) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("upgradeHandler.windowUpdateStream", getConnectionId(), getIdAsString(),
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("upgradeHandler.windowUpdateStream", getConnectionId(), getIdAsString(),
                             Integer.valueOf(streamIncrement)));
                 }
                 byte[] frame2 = new byte[13];
@@ -338,8 +338,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 return SendfileState.ERROR;
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("upgradeHandler.sendfile.reservation", connectionId,
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("upgradeHandler.sendfile.reservation", connectionId,
                         sendfile.stream.getIdAsString(), Integer.valueOf(sendfile.connectionReservation),
                         Integer.valueOf(sendfile.streamReservation)));
             }
@@ -360,8 +360,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 sentEndOfStream(sendfile.stream);
             }
             if (writable) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("upgradeHandler.writeBody", connectionId, sendfile.stream.getIdAsString(),
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("upgradeHandler.writeBody", connectionId, sendfile.stream.getIdAsString(),
                             Integer.toString(frameSize), Boolean.valueOf(finished)));
                 }
                 ByteUtil.set31Bits(header, 5, sendfile.stream.getIdAsInt());
@@ -419,8 +419,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                     return;
                 }
 
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("upgradeHandler.sendfile.reservation", connectionId,
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("upgradeHandler.sendfile.reservation", connectionId,
                             sendfile.stream.getIdAsString(), Integer.valueOf(sendfile.connectionReservation),
                             Integer.valueOf(sendfile.streamReservation)));
                 }
@@ -441,8 +441,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                     sentEndOfStream(sendfile.stream);
                 }
                 if (writable) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(
+                    if (log.isTraceEnabled()) {
+                        log.trace(
                                 sm.getString("upgradeHandler.writeBody", connectionId, sendfile.stream.getIdAsString(),
                                         Integer.toString(frameSize), Boolean.valueOf(finished)));
                     }
