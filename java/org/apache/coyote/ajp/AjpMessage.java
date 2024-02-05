@@ -333,21 +333,21 @@ public class AjpMessage {
         // Verify message signature
         if ((toContainer && mark != 0x1234) || (!toContainer && mark != 0x4142)) {
             log.error(sm.getString("ajpmessage.invalid", "" + mark));
-            if (log.isDebugEnabled()) {
+            if (log.isTraceEnabled()) {
                 dump("In");
             }
             return -1;
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Received " + len + " " + buf[0]);
+        if (log.isTraceEnabled()) {
+            log.trace("Received " + len + " " + buf[0]);
         }
         return len;
     }
 
 
     private void dump(String prefix) {
-        if (log.isDebugEnabled()) {
-            log.debug(prefix + ": " + HexUtils.toHexString(buf) + " " + pos + "/" + (len + 4));
+        if (log.isTraceEnabled()) {
+            log.trace(prefix + ": " + HexUtils.toHexString(buf) + " " + pos + "/" + (len + 4));
         }
         int max = pos;
         if (len + 4 > pos) {
@@ -356,9 +356,9 @@ public class AjpMessage {
         if (max > 1000) {
             max = 1000;
         }
-        if (log.isDebugEnabled()) {
+        if (log.isTraceEnabled()) {
             for (int j = 0; j < max; j += 16) {
-                log.debug(hexLine(buf, j, len));
+                log.trace(hexLine(buf, j, len));
             }
         }
     }

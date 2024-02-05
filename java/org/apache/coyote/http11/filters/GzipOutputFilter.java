@@ -109,8 +109,8 @@ public class GzipOutputFilter implements OutputFilter {
     public void flush() throws IOException {
         if (compressionStream != null) {
             try {
-                if (log.isDebugEnabled()) {
-                    log.debug("Flushing the compression stream!");
+                if (log.isTraceEnabled()) {
+                    log.trace("Flushing the compression stream!");
                 }
                 compressionStream.flush();
             } catch (IOException e) {

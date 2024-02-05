@@ -66,8 +66,8 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
 
 
     final void set(Setting setting, long value) throws T {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("connectionSettings.debug", connectionId, getEndpointName(), setting,
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("connectionSettings.debug", connectionId, getEndpointName(), setting,
                     Long.toString(value)));
         }
 

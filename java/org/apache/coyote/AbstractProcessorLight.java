@@ -44,8 +44,8 @@ public abstract class AbstractProcessorLight implements Processor {
         do {
             if (dispatches != null) {
                 DispatchType nextDispatch = dispatches.next();
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug("Processing dispatch type: [" + nextDispatch + "]");
+                if (getLog().isTraceEnabled()) {
+                    getLog().trace("Processing dispatch type: [" + nextDispatch + "]");
                 }
                 state = dispatch(nextDispatch.getSocketStatus());
                 if (!dispatches.hasNext()) {
@@ -69,8 +69,8 @@ public abstract class AbstractProcessorLight implements Processor {
                 state = SocketState.CLOSED;
             }
 
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(
+            if (getLog().isTraceEnabled()) {
+                getLog().trace(
                         "Socket: [" + socketWrapper + "], Status in: [" + status + "], State out: [" + state + "]");
             }
 
@@ -81,8 +81,8 @@ public abstract class AbstractProcessorLight implements Processor {
              */
             if (isAsync() && state != SocketState.CLOSED) {
                 state = asyncPostProcess();
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug(
+                if (getLog().isTraceEnabled()) {
+                    getLog().trace(
                             "Socket: [" + socketWrapper + "], State after async post processing: [" + state + "]");
                 }
             }

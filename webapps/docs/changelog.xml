@@ -136,6 +136,11 @@
         protects against various race conditions that woudl otherwise occur if
         application threads continued to access the <code>AsyncContext</code>.
       </fix>
+      <fix>
+        Review usage of debug logging and downgrade trace or data dumping
+        operations from debug level to trace. In particular, most of the
+        HTTP/2 debug logging has been changed to trace level. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
