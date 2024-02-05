@@ -167,6 +167,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update Checkstyle to 10.13.0. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.98 (schultz)" rtext="2024-01-09">
   <subsection name="Catalina">
