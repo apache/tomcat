@@ -229,7 +229,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      *                <code>/bar/*</code>.
      *
      * @return A Predicate which can match the specified pattern, or
-     *         <code>>null</code> if the pattern is null or blank.
+     *         <code>null</code> if the pattern is null or blank.
      */
     protected static Predicate<String> createNoNoncePredicate(ServletContext context, String pattern) {
         if (null == pattern || 0 == pattern.trim().length()) {
