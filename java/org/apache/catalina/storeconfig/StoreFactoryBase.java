@@ -115,8 +115,8 @@ public class StoreFactoryBase implements IStoreFactory {
                 aElement.getClass());
 
         if (elementDesc != null) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("factory.storeTag",
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("factory.storeTag",
                         elementDesc.getTag(), aElement));
             }
             getStoreAppender().printIndent(aWriter, indent + 2);

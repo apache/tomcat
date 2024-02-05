@@ -1457,8 +1457,8 @@ public class StandardSession implements HttpSession, Session, Serializable {
         principal = null; // Transient (may be set later)
         // setId((String) stream.readObject());
         id = (String) stream.readObject();
-        if (manager.getContext().getLogger().isDebugEnabled()) {
-            manager.getContext().getLogger().debug("readObject() loading session " + id);
+        if (manager.getContext().getLogger().isTraceEnabled()) {
+            manager.getContext().getLogger().trace("readObject() loading session " + id);
         }
 
         if (notes == null) {
@@ -1531,8 +1531,8 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 }
                 throw wae;
             }
-            if (manager.getContext().getLogger().isDebugEnabled()) {
-                manager.getContext().getLogger().debug("  loading attribute '" + name + "' with value '" + value + "'");
+            if (manager.getContext().getLogger().isTraceEnabled()) {
+                manager.getContext().getLogger().trace("  loading attribute '" + name + "' with value '" + value + "'");
             }
             // Handle the case where the filter configuration was changed while
             // the web application was stopped.
@@ -1577,8 +1577,8 @@ public class StandardSession implements HttpSession, Session, Serializable {
         stream.writeObject(Boolean.valueOf(isValid));
         stream.writeObject(Long.valueOf(thisAccessedTime));
         stream.writeObject(id);
-        if (manager.getContext().getLogger().isDebugEnabled()) {
-            manager.getContext().getLogger().debug("writeObject() storing session " + id);
+        if (manager.getContext().getLogger().isTraceEnabled()) {
+            manager.getContext().getLogger().trace("writeObject() storing session " + id);
         }
 
         // Gather authentication information (if configured)
@@ -1635,8 +1635,8 @@ public class StandardSession implements HttpSession, Session, Serializable {
             stream.writeObject(saveNames.get(i));
             try {
                 stream.writeObject(saveValues.get(i));
-                if (manager.getContext().getLogger().isDebugEnabled()) {
-                    manager.getContext().getLogger().debug(
+                if (manager.getContext().getLogger().isTraceEnabled()) {
+                    manager.getContext().getLogger().trace(
                             "  storing attribute '" + saveNames.get(i) + "' with value '" + saveValues.get(i) + "'");
                 }
             } catch (NotSerializableException e) {

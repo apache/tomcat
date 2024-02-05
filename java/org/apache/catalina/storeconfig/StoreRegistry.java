@@ -107,8 +107,8 @@ public class StoreRegistry {
      * @return The description
      */
     public StoreDescription findDescription(String id) {
-        if (log.isDebugEnabled()) {
-            log.debug("search descriptor " + id);
+        if (log.isTraceEnabled()) {
+            log.trace("search descriptor " + id);
         }
         StoreDescription desc = descriptors.get(id);
         if (desc == null) {
@@ -130,7 +130,7 @@ public class StoreRegistry {
         }
         if (log.isDebugEnabled()) {
             if (desc != null) {
-                log.debug("find descriptor " + id + "#" + desc.getTag() + "#"
+                log.trace("find descriptor " + id + "#" + desc.getTag() + "#"
                         + desc.getStoreFactoryClass());
             } else {
                 log.debug(("Can't find descriptor for key " + id));
@@ -186,8 +186,8 @@ public class StoreRegistry {
             key = desc.getTagClass();
         }
         descriptors.put(key, desc);
-        if (log.isDebugEnabled()) {
-            log.debug("register store descriptor " + key + "#" + desc.getTag()
+        if (log.isTraceEnabled()) {
+            log.trace("register store descriptor " + key + "#" + desc.getTag()
                     + "#" + desc.getTagClass());
         }
     }

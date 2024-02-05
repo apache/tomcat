@@ -820,22 +820,22 @@ public final class CGIServlet extends HttpServlet {
                 webAppRootDir = webAppRootDir + File.separator + cgiPathPrefix;
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("cgiServlet.find.path", pathInfo, webAppRootDir));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("cgiServlet.find.path", pathInfo, webAppRootDir));
             }
 
             File currentLocation = new File(webAppRootDir);
             StringTokenizer dirWalker = new StringTokenizer(pathInfo, "/");
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("cgiServlet.find.location", currentLocation.getAbsolutePath()));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("cgiServlet.find.location", currentLocation.getAbsolutePath()));
             }
             StringBuilder cginameBuilder = new StringBuilder();
             while (!currentLocation.isFile() && dirWalker.hasMoreElements()) {
                 String nextElement = (String) dirWalker.nextElement();
                 currentLocation = new File(currentLocation, nextElement);
                 cginameBuilder.append('/').append(nextElement);
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("cgiServlet.find.location", currentLocation.getAbsolutePath()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("cgiServlet.find.location", currentLocation.getAbsolutePath()));
                 }
             }
             String cginame = cginameBuilder.toString();
@@ -852,8 +852,8 @@ public final class CGIServlet extends HttpServlet {
                 scriptname = contextPath + servletPath + cginame;
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("cgiServlet.find.found", name, path, scriptname, cginame));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("cgiServlet.find.found", name, path, scriptname, cginame));
             }
             return new String[] { path, scriptname, cginame, name };
         }
@@ -1437,8 +1437,8 @@ public final class CGIServlet extends HttpServlet {
                 throw new IOException(this.getClass().getName() + ": not ready to run.");
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug("envp: [" + env + "], command: [" + command + "]");
+            if (log.isTraceEnabled()) {
+                log.trace("envp: [" + env + "], command: [" + command + "]");
             }
 
             if ((command.contains(File.separator + "." + File.separator)) ||

@@ -190,8 +190,8 @@ public class DataSourceStore extends JDBCStore {
                 try (ResultSet rst = preparedLoadSql.executeQuery()) {
                     if (rst.next()) {
                         try (ObjectInputStream ois = getObjectInputStream(rst.getBinaryStream(2))) {
-                            if (contextLog.isDebugEnabled()) {
-                                contextLog.debug(sm.getString(getStoreName() + ".loading", id, sessionTable));
+                            if (contextLog.isTraceEnabled()) {
+                                contextLog.trace(sm.getString(getStoreName() + ".loading", id, sessionTable));
                             }
 
                             _session = (StandardSession) manager.createEmptySession();
@@ -246,8 +246,8 @@ public class DataSourceStore extends JDBCStore {
             numberOfTries--;
         }
 
-        if (manager.getContext().getLogger().isDebugEnabled()) {
-            manager.getContext().getLogger().debug(sm.getString(getStoreName() + ".removing", id, sessionTable));
+        if (manager.getContext().getLogger().isTraceEnabled()) {
+            manager.getContext().getLogger().trace(sm.getString(getStoreName() + ".removing", id, sessionTable));
         }
     }
 
@@ -358,9 +358,9 @@ public class DataSourceStore extends JDBCStore {
             }
         }
 
-        if (manager.getContext().getLogger().isDebugEnabled()) {
+        if (manager.getContext().getLogger().isTraceEnabled()) {
             manager.getContext().getLogger()
-                    .debug(sm.getString(getStoreName() + ".saving", session.getIdInternal(), sessionTable));
+                    .trace(sm.getString(getStoreName() + ".saving", session.getIdInternal(), sessionTable));
         }
     }
 

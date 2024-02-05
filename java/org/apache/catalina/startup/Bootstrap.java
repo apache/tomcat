@@ -255,15 +255,15 @@ public final class Bootstrap {
         SecurityClassLoad.securityClassLoad(catalinaLoader);
 
         // Load our startup class and call its process() method
-        if (log.isDebugEnabled()) {
-            log.debug("Loading startup class");
+        if (log.isTraceEnabled()) {
+            log.trace("Loading startup class");
         }
         Class<?> startupClass = catalinaLoader.loadClass("org.apache.catalina.startup.Catalina");
         Object startupInstance = startupClass.getConstructor().newInstance();
 
         // Set the shared extensions class loader
-        if (log.isDebugEnabled()) {
-            log.debug("Setting startup class properties");
+        if (log.isTraceEnabled()) {
+            log.trace("Setting startup class properties");
         }
         String methodName = "setParentClassLoader";
         Class<?> paramTypes[] = new Class[1];
@@ -296,8 +296,8 @@ public final class Bootstrap {
             param[0] = arguments;
         }
         Method method = catalinaDaemon.getClass().getMethod(methodName, paramTypes);
-        if (log.isDebugEnabled()) {
-            log.debug("Calling startup class " + method);
+        if (log.isTraceEnabled()) {
+            log.trace("Calling startup class " + method);
         }
         method.invoke(catalinaDaemon, param);
     }
