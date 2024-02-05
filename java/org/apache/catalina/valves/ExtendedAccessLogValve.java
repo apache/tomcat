@@ -509,8 +509,8 @@ public class ExtendedAccessLogValve extends AccessLogValve {
 
             String token = tokenizer.getToken();
             while (token != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("token = " + token);
+                if (log.isTraceEnabled()) {
+                    log.trace("token = " + token);
                 }
                 AccessLogElement element = getLogElement(token, tokenizer);
                 if (element == null) {
@@ -526,8 +526,8 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 }
                 token = tokenizer.getToken();
             }
-            if (log.isDebugEnabled()) {
-                log.debug("finished decoding with element size of: " + list.size());
+            if (log.isTraceEnabled()) {
+                log.trace("finished decoding with element size of: " + list.size());
             }
             return list.toArray(new AccessLogElement[0]);
         } catch (IOException e) {

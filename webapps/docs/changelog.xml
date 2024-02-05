@@ -116,6 +116,10 @@
         Add improvements to the CSRF prevention filter including the ability
         to skip adding nonces for resource name and subtree URL patterns. (schultz)
       </add>
+      <fix>
+        Review usage of debug logging and downgrade trace or data dumping
+        operations from debug level to trace. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
