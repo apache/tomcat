@@ -707,8 +707,8 @@ public class RemoteIpValve extends ValveBase {
 
             request.setAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE, Boolean.TRUE);
 
-            if (log.isDebugEnabled()) {
-                log.debug("Incoming request " + request.getRequestURI() + " with originalRemoteAddr [" +
+            if (log.isTraceEnabled()) {
+                log.trace("Incoming request " + request.getRequestURI() + " with originalRemoteAddr [" +
                         originalRemoteAddr + "], originalRemoteHost=[" + originalRemoteHost + "], originalSecure=[" +
                         originalSecure + "], originalScheme=[" + originalScheme + "], originalServerName=[" +
                         originalServerName + "], originalServerPort=[" + originalServerPort +
@@ -718,8 +718,8 @@ public class RemoteIpValve extends ValveBase {
                         request.getServerPort() + "]");
             }
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("Skip RemoteIpValve for request " + request.getRequestURI() + " with originalRemoteAddr '" +
+            if (log.isTraceEnabled()) {
+                log.trace("Skip RemoteIpValve for request " + request.getRequestURI() + " with originalRemoteAddr '" +
                         request.getRemoteAddr() + "'");
             }
         }

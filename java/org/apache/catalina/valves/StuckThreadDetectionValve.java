@@ -128,8 +128,8 @@ public class StuckThreadDetectionValve extends ValveBase {
     protected void initInternal() throws LifecycleException {
         super.initInternal();
 
-        if (log.isDebugEnabled()) {
-            log.debug("Monitoring stuck threads with threshold = " + threshold + " sec");
+        if (log.isTraceEnabled()) {
+            log.trace("Monitoring stuck threads with threshold = " + threshold + " sec");
         }
     }
 

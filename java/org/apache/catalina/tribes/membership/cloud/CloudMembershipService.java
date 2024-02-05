@@ -139,8 +139,8 @@ public class CloudMembershipService extends MembershipServiceBase
             } else if (DNS.equals(provider)) {
                 provider = DNS_PROVIDER_CLASS;
             }
-            if (log.isDebugEnabled()) {
-                log.debug("Using membershipProvider: " + provider);
+            if (log.isTraceEnabled()) {
+                log.trace("Using membershipProvider: " + provider);
             }
             membershipProvider =
                     (MembershipProvider) Class.forName(provider).getConstructor().newInstance();
@@ -182,8 +182,8 @@ public class CloudMembershipService extends MembershipServiceBase
 
     @Override
     public void setLocalMemberProperties(String listenHost, int listenPort, int securePort, int udpPort) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("setLocalMemberProperties(%s, %d, %d, %d)", listenHost,
+        if (log.isTraceEnabled()) {
+            log.trace(String.format("setLocalMemberProperties(%s, %d, %d, %d)", listenHost,
                     Integer.valueOf(listenPort), Integer.valueOf(securePort), Integer.valueOf(udpPort)));
         }
         properties.setProperty("tcpListenHost", listenHost);
