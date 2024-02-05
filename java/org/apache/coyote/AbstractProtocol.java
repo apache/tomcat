@@ -428,16 +428,16 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
 
     public void addWaitingProcessor(Processor processor) {
-        if (getLog().isDebugEnabled()) {
-            getLog().debug(sm.getString("abstractProtocol.waitingProcessor.add", processor));
+        if (getLog().isTraceEnabled()) {
+            getLog().trace(sm.getString("abstractProtocol.waitingProcessor.add", processor));
         }
         waitingProcessors.add(processor);
     }
 
 
     public void removeWaitingProcessor(Processor processor) {
-        if (getLog().isDebugEnabled()) {
-            getLog().debug(sm.getString("abstractProtocol.waitingProcessor.remove", processor));
+        if (getLog().isTraceEnabled()) {
+            getLog().trace(sm.getString("abstractProtocol.waitingProcessor.remove", processor));
         }
         waitingProcessors.remove(processor);
     }
@@ -801,8 +801,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
         @Override
         public SocketState process(SocketWrapperBase<S> wrapper, SocketEvent status) {
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("abstractConnectionHandler.process", wrapper.getSocket(), status));
+            if (getLog().isTraceEnabled()) {
+                getLog().trace(sm.getString("abstractConnectionHandler.process", wrapper.getSocket(), status));
             }
             if (wrapper == null) {
                 // Nothing to do. Socket has been closed.
@@ -816,8 +816,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
             // held by this variable will be associated with the SocketWrapper before this
             // method returns.
             Processor processor = (Processor) wrapper.takeCurrentProcessor();
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("abstractConnectionHandler.connectionsGet", processor, socket));
+            if (getLog().isTraceEnabled()) {
+                getLog().trace(sm.getString("abstractConnectionHandler.connectionsGet", processor, socket));
             }
 
             // Timeouts are calculated on a dedicated thread and then
@@ -848,8 +848,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                         UpgradeProtocol upgradeProtocol = getProtocol().getNegotiatedProtocol(negotiatedProtocol);
                         if (upgradeProtocol != null) {
                             processor = upgradeProtocol.getProcessor(wrapper, getProtocol().getAdapter());
-                            if (getLog().isDebugEnabled()) {
-                                getLog().debug(sm.getString("abstractConnectionHandler.processorCreate", processor));
+                            if (getLog().isTraceEnabled()) {
+                                getLog().trace(sm.getString("abstractConnectionHandler.processorCreate", processor));
                             }
                         } else if (negotiatedProtocol.equals("http/1.1")) {
                             // Explicitly negotiated the default protocol.
@@ -877,15 +877,15 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                 }
                 if (processor == null) {
                     processor = recycledProcessors.pop();
-                    if (getLog().isDebugEnabled()) {
-                        getLog().debug(sm.getString("abstractConnectionHandler.processorPop", processor));
+                    if (getLog().isTraceEnabled()) {
+                        getLog().trace(sm.getString("abstractConnectionHandler.processorPop", processor));
                     }
                 }
                 if (processor == null) {
                     processor = getProtocol().createProcessor();
                     register(processor);
-                    if (getLog().isDebugEnabled()) {
-                        getLog().debug(sm.getString("abstractConnectionHandler.processorCreate", processor));
+                    if (getLog().isTraceEnabled()) {
+                        getLog().trace(sm.getString("abstractConnectionHandler.processorCreate", processor));
                     }
                 }
 
@@ -924,8 +924,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                             release(processor);
                             // Create the upgrade processor
                             processor = getProtocol().createUpgradeProcessor(wrapper, upgradeToken);
-                            if (getLog().isDebugEnabled()) {
-                                getLog().debug(
+                            if (getLog().isTraceEnabled()) {
+                                getLog().trace(
                                         sm.getString("abstractConnectionHandler.upgradeCreate", processor, wrapper));
                             }
                             // Initialise the upgrade handler (which may trigger
@@ -1099,8 +1099,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                     // recycledProcessors since that pool is only for AJP or
                     // HTTP processors
                     recycledProcessors.push(processor);
-                    if (getLog().isDebugEnabled()) {
-                        getLog().debug("Pushed Processor [" + processor + "]");
+                    if (getLog().isTraceEnabled()) {
+                        getLog().trace("Pushed Processor [" + processor + "]");
                     }
                 }
             }
@@ -1127,8 +1127,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                         ObjectName rpName = new ObjectName(
                                 getProtocol().getDomain() + ":type=RequestProcessor,worker=" + getProtocol().getName() +
                                         ",name=" + getProtocol().getProtocolName() + "Request" + count);
-                        if (getLog().isDebugEnabled()) {
-                            getLog().debug("Register [" + processor + "] as [" + rpName + "]");
+                        if (getLog().isTraceEnabled()) {
+                            getLog().trace("Register [" + processor + "] as [" + rpName + "]");
                         }
                         Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
                         rp.setRpName(rpName);
@@ -1151,8 +1151,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                         RequestInfo rp = r.getRequestProcessor();
                         rp.setGlobalProcessor(null);
                         ObjectName rpName = rp.getRpName();
-                        if (getLog().isDebugEnabled()) {
-                            getLog().debug("Unregister [" + rpName + "]");
+                        if (getLog().isTraceEnabled()) {
+                            getLog().trace("Unregister [" + rpName + "]");
                         }
                         Registry.getRegistry(null, null).unregisterComponent(rpName);
                         rp.setRpName(null);

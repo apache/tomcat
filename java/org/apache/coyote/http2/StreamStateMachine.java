@@ -101,8 +101,8 @@ class StreamStateMachine {
     private void stateChange(State oldState, State newState) {
         if (state == oldState) {
             state = newState;
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("streamStateMachine.debug.change", connectionId, streamId, oldState, newState));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("streamStateMachine.debug.change", connectionId, streamId, oldState, newState));
             }
         }
     }

@@ -424,8 +424,8 @@ class AsyncStateMachine {
         Request request = processor.getRequest();
         boolean containerThread = (request != null && request.isRequestThread());
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("asyncStateMachine.asyncError.start"));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("asyncStateMachine.asyncError.start"));
         }
 
         clearNonBlockingListeners();
@@ -433,8 +433,8 @@ class AsyncStateMachine {
             updateState(AsyncState.MUST_ERROR);
         } else {
             if (hasProcessedError) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("asyncStateMachine.asyncError.skip"));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("asyncStateMachine.asyncError.skip"));
                 }
                 return false;
             }
@@ -507,8 +507,8 @@ class AsyncStateMachine {
 
 
     private synchronized void updateState(AsyncState newState) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("asyncStateMachine.stateChange", state, newState));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("asyncStateMachine.stateChange", state, newState));
         }
         state = newState;
     }

@@ -151,8 +151,8 @@ class HpackEncoder {
             if (!skip) {
                 String val = headers.getValue(it).toString();
 
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("hpackEncoder.encodeHeader", headerName, val));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("hpackEncoder.encodeHeader", headerName, val));
                 }
                 TableEntry tableEntry = findInTable(headerName, val);
 
