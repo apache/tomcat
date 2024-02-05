@@ -989,8 +989,8 @@ public class Catalina {
         @Override
         public void begin(String namespace, String name, Attributes attributes) throws Exception {
 
-            if (digester.getLogger().isDebugEnabled()) {
-                digester.getLogger().debug("Setting parent class loader");
+            if (digester.getLogger().isTraceEnabled()) {
+                digester.getLogger().trace("Setting parent class loader");
             }
 
             Container top = (Container) digester.peek();

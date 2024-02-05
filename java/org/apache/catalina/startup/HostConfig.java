@@ -1252,14 +1252,14 @@ public class HostConfig implements LifecycleListener {
                 if (docBase != null) {
                     resource = new File(docBaseFile, watchedResource);
                 } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Ignoring non-existent WatchedResource '" + resource.getAbsolutePath() + "'");
+                    if (log.isTraceEnabled()) {
+                        log.trace("Ignoring non-existent WatchedResource '" + resource.getAbsolutePath() + "'");
                     }
                     continue;
                 }
             }
-            if (log.isDebugEnabled()) {
-                log.debug("Watching WatchedResource '" + resource.getAbsolutePath() + "'");
+            if (log.isTraceEnabled()) {
+                log.trace("Watching WatchedResource '" + resource.getAbsolutePath() + "'");
             }
             app.reloadResources.put(resource.getAbsolutePath(), Long.valueOf(resource.lastModified()));
         }
@@ -1296,8 +1296,8 @@ public class HostConfig implements LifecycleListener {
         long currentTimeWithResolutionOffset = System.currentTimeMillis() - FILE_MODIFICATION_RESOLUTION_MS;
         for (int i = 0; i < resources.length; i++) {
             File resource = new File(resources[i]);
-            if (log.isDebugEnabled()) {
-                log.debug("Checking context[" + app.name + "] redeploy resource " + resource);
+            if (log.isTraceEnabled()) {
+                log.trace("Checking context[" + app.name + "] redeploy resource " + resource);
             }
             long lastModified = app.redeployResources.get(resources[i]).longValue();
             if (resource.exists() || lastModified == 0) {
@@ -1373,8 +1373,8 @@ public class HostConfig implements LifecycleListener {
         boolean update = false;
         for (String s : resources) {
             File resource = new File(s);
-            if (log.isDebugEnabled()) {
-                log.debug("Checking context[" + app.name + "] reload resource " + resource);
+            if (log.isTraceEnabled()) {
+                log.trace("Checking context[" + app.name + "] reload resource " + resource);
             }
             long lastModified = app.reloadResources.get(s).longValue();
             // File.lastModified() has a resolution of 1s (1000ms). The last
@@ -1562,8 +1562,8 @@ public class HostConfig implements LifecycleListener {
      */
     public void start() {
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("hostConfig.start"));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("hostConfig.start"));
         }
 
         try {
@@ -1591,8 +1591,8 @@ public class HostConfig implements LifecycleListener {
      */
     public void stop() {
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("hostConfig.stop"));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("hostConfig.stop"));
         }
 
         if (oname != null) {

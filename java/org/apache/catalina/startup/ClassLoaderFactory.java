@@ -218,9 +218,9 @@ public final class ClassLoaderFactory {
 
         // Construct the class loader itself
         final URL[] array = set.toArray(new URL[0]);
-        if (log.isDebugEnabled()) {
+        if (log.isTraceEnabled()) {
             for (int i = 0; i < array.length; i++) {
-                log.debug("  location " + i + " is " + array[i]);
+                log.trace("  location " + i + " is " + array[i]);
             }
         }
 

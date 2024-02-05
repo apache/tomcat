@@ -722,8 +722,8 @@ public class ContextConfig implements LifecycleListener {
                 errorHandler.logFindings(log, contextXml.toString());
                 ok = false;
             }
-            if (log.isDebugEnabled()) {
-                log.debug("Successfully processed context [" + context.getName() + "] configuration file [" +
+            if (log.isTraceEnabled()) {
+                log.trace("Successfully processed context [" + context.getName() + "] configuration file [" +
                         contextXml + "]");
             }
         } catch (SAXParseException e) {
@@ -919,8 +919,8 @@ public class ContextConfig implements LifecycleListener {
             contextDigester.getParser();
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("contextConfig.init"));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("contextConfig.init"));
         }
         context.setConfigured(false);
         ok = true;
@@ -950,12 +950,12 @@ public class ContextConfig implements LifecycleListener {
     protected synchronized void configureStart() {
         // Called from StandardContext.start()
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("contextConfig.start"));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("contextConfig.start"));
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("contextConfig.xmlSettings", context.getName(),
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("contextConfig.xmlSettings", context.getName(),
                     Boolean.valueOf(context.getXmlValidation()), Boolean.valueOf(context.getXmlNamespaceAware())));
         }
 
@@ -974,8 +974,8 @@ public class ContextConfig implements LifecycleListener {
         }
 
         // Dump the contents of this pipeline if requested
-        if (log.isDebugEnabled()) {
-            log.debug("Pipeline Configuration:");
+        if (log.isTraceEnabled()) {
+            log.trace("Pipeline Configuration:");
             Pipeline pipeline = context.getPipeline();
             Valve valves[] = null;
             if (pipeline != null) {
@@ -983,10 +983,10 @@ public class ContextConfig implements LifecycleListener {
             }
             if (valves != null) {
                 for (Valve valve : valves) {
-                    log.debug("  " + valve.getClass().getName());
+                    log.trace("  " + valve.getClass().getName());
                 }
             }
-            log.debug("======================");
+            log.trace("======================");
         }
 
         // Make our application available if no problems were encountered
@@ -1005,8 +1005,8 @@ public class ContextConfig implements LifecycleListener {
      */
     protected synchronized void configureStop() {
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("contextConfig.stop"));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("contextConfig.stop"));
         }
 
         int i;
@@ -1103,8 +1103,8 @@ public class ContextConfig implements LifecycleListener {
      */
     protected synchronized void destroy() {
         // Called from StandardContext.destroy()
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("contextConfig.destroy"));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("contextConfig.destroy"));
         }
 
         // Skip clearing the work directory if Tomcat is being shutdown
@@ -2140,8 +2140,8 @@ public class ContextConfig implements LifecycleListener {
         if (webResource.isDirectory()) {
             WebResource[] webResources = webResource.getWebResourceRoot().listResources(webResource.getWebappPath());
             if (webResources.length > 0) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("contextConfig.processAnnotationsWebDir.debug", webResource.getURL()));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("contextConfig.processAnnotationsWebDir.debug", webResource.getURL()));
                 }
                 for (WebResource r : webResources) {
                     processAnnotationsWebResource(r, fragment, handlesTypesOnly, javaClassCache);
@@ -2181,8 +2181,8 @@ public class ContextConfig implements LifecycleListener {
             Map<String,JavaClassCacheEntry> javaClassCache) {
 
         try (Jar jar = JarFactory.newInstance(url)) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("contextConfig.processAnnotationsJar.debug", url));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("contextConfig.processAnnotationsJar.debug", url));
             }
 
             jar.nextEntry();
@@ -2211,8 +2211,8 @@ public class ContextConfig implements LifecycleListener {
             // Returns null if directory is not readable
             String[] dirs = file.list();
             if (dirs != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("contextConfig.processAnnotationsDir.debug", file));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("contextConfig.processAnnotationsDir.debug", file));
                 }
                 for (String dir : dirs) {
                     processAnnotationsFile(new File(file, dir), fragment, handlesTypesOnly, javaClassCache);

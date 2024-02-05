@@ -194,8 +194,8 @@ public final class Tool {
         String params[] = new String[args.length - index];
         System.arraycopy(args, index, params, 0, params.length);
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Identifying main() method");
+            if (log.isTraceEnabled()) {
+                log.trace("Identifying main() method");
             }
             String methodName = "main";
             Class<?> paramTypes[] = new Class[1];
@@ -209,8 +209,8 @@ public final class Tool {
 
         // Invoke the main method of the application class
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Calling main() method");
+            if (log.isTraceEnabled()) {
+                log.trace("Calling main() method");
             }
             Object paramValues[] = new Object[1];
             paramValues[0] = params;
