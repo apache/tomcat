@@ -45,8 +45,8 @@ public class ManagerSF extends StoreFactoryBase {
             if (aElement instanceof StandardManager) {
                 StandardManager manager = (StandardManager) aElement;
                 if (!isDefaultManager(manager)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("factory.storeTag", elementDesc
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("factory.storeTag", elementDesc
                                 .getTag(), aElement));
                     }
                     super.store(aWriter, indent, aElement);

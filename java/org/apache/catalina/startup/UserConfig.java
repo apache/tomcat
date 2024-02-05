@@ -282,8 +282,8 @@ public final class UserConfig implements LifecycleListener {
      */
     private void deploy() {
 
-        if (host.getLogger().isDebugEnabled()) {
-            host.getLogger().debug(sm.getString("userConfig.deploying"));
+        if (host.getLogger().isTraceEnabled()) {
+            host.getLogger().trace(sm.getString("userConfig.deploying"));
         }
 
         // Load the user database object for this host

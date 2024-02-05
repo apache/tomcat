@@ -144,9 +144,9 @@ public abstract class StoreBase extends LifecycleBase implements Store {
             manager.getContext().getLogger().error("Error getting keys", e);
             return;
         }
-        if (manager.getContext().getLogger().isDebugEnabled()) {
+        if (manager.getContext().getLogger().isTraceEnabled()) {
             manager.getContext().getLogger()
-                    .debug(getStoreName() + ": processExpires check number of " + keys.length + " sessions");
+                    .trace(getStoreName() + ": processExpires check number of " + keys.length + " sessions");
         }
 
         long timeNow = System.currentTimeMillis();
@@ -161,9 +161,9 @@ public abstract class StoreBase extends LifecycleBase implements Store {
                 if (timeIdle < session.getMaxInactiveInterval()) {
                     continue;
                 }
-                if (manager.getContext().getLogger().isDebugEnabled()) {
+                if (manager.getContext().getLogger().isTraceEnabled()) {
                     manager.getContext().getLogger()
-                            .debug(getStoreName() + ": processExpires expire store session " + key);
+                            .trace(getStoreName() + ": processExpires expire store session " + key);
                 }
                 boolean isLoaded = false;
                 if (manager instanceof PersistentManagerBase) {

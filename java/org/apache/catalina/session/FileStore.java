@@ -218,8 +218,8 @@ public final class FileStore extends StoreBase {
         Context context = getManager().getContext();
         Log contextLog = context.getLogger();
 
-        if (contextLog.isDebugEnabled()) {
-            contextLog.debug(sm.getString(getStoreName() + ".loading", id, file.getAbsolutePath()));
+        if (contextLog.isTraceEnabled()) {
+            contextLog.trace(sm.getString(getStoreName() + ".loading", id, file.getAbsolutePath()));
         }
 
         ClassLoader oldThreadContextCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
@@ -256,9 +256,9 @@ public final class FileStore extends StoreBase {
         if (file == null) {
             return;
         }
-        if (manager.getContext().getLogger().isDebugEnabled()) {
+        if (manager.getContext().getLogger().isTraceEnabled()) {
             manager.getContext().getLogger()
-                    .debug(sm.getString(getStoreName() + ".removing", id, file.getAbsolutePath()));
+                    .trace(sm.getString(getStoreName() + ".removing", id, file.getAbsolutePath()));
         }
 
         if (file.exists() && !file.delete()) {
@@ -282,9 +282,9 @@ public final class FileStore extends StoreBase {
         if (file == null) {
             return;
         }
-        if (manager.getContext().getLogger().isDebugEnabled()) {
+        if (manager.getContext().getLogger().isTraceEnabled()) {
             manager.getContext().getLogger()
-                    .debug(sm.getString(getStoreName() + ".saving", session.getIdInternal(), file.getAbsolutePath()));
+                    .trace(sm.getString(getStoreName() + ".saving", session.getIdInternal(), file.getAbsolutePath()));
         }
 
         try (FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());

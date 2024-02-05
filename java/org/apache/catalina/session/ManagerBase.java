@@ -587,8 +587,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         Session sessions[] = findSessions();
         int expireHere = 0;
 
-        if (log.isDebugEnabled()) {
-            log.debug("Start expire sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
+        if (log.isTraceEnabled()) {
+            log.trace("Start expire sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
         }
         for (Session session : sessions) {
             if (session != null && !session.isValid()) {
@@ -596,8 +596,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
             }
         }
         long timeEnd = System.currentTimeMillis();
-        if (log.isDebugEnabled()) {
-            log.debug("End expire sessions " + getName() + " processingTime " + (timeEnd - timeNow) +
+        if (log.isTraceEnabled()) {
+            log.trace("End expire sessions " + getName() + " processingTime " + (timeEnd - timeNow) +
                     " expired sessions: " + expireHere);
         }
         processingTime += (timeEnd - timeNow);
