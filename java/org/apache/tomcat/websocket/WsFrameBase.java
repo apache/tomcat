@@ -207,8 +207,8 @@ public abstract class WsFrameBase {
         }
         payloadLength = b & 0x7F;
         state = State.PARTIAL_HEADER;
-        if (getLog().isDebugEnabled()) {
-            getLog().debug(sm.getString("wsFrame.partialHeaderComplete", Boolean.toString(fin), Integer.toString(rsv),
+        if (getLog().isTraceEnabled()) {
+            getLog().trace(sm.getString("wsFrame.partialHeaderComplete", Boolean.toString(fin), Integer.toString(rsv),
                     Integer.toString(opCode), Long.toString(payloadLength)));
         }
         return true;

@@ -178,8 +178,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             ClientEndpointConfig clientEndpointConfiguration, URI path, Set<URI> redirectSet)
             throws DeploymentException {
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("wsWebSocketContainer.connect.entry", clientEndpointHolder.getClassName(), path));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("wsWebSocketContainer.connect.entry", clientEndpointHolder.getClassName(), path));
         }
 
         boolean secure = false;
@@ -314,14 +314,14 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             Future<Void> fHandshake = channel.handshake();
             fHandshake.get(timeout, TimeUnit.MILLISECONDS);
 
-            if (log.isDebugEnabled()) {
+            if (log.isTraceEnabled()) {
                 SocketAddress localAddress = null;
                 try {
                     localAddress = channel.getLocalAddress();
                 } catch (IOException ioe) {
                     // Ignore
                 }
-                log.debug(sm.getString("wsWebSocketContainer.connect.write", Integer.valueOf(request.position()),
+                log.trace(sm.getString("wsWebSocketContainer.connect.write", Integer.valueOf(request.position()),
                         Integer.valueOf(request.limit()), localAddress));
             }
             writeRequest(channel, request, timeout);

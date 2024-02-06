@@ -169,8 +169,8 @@ public class WsSession implements Session {
 
         this.localEndpoint = clientEndpointHolder.getInstance(getInstanceManager());
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("wsSession.created", id));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("wsSession.created", id));
         }
     }
 
@@ -268,8 +268,8 @@ public class WsSession implements Session {
             this.localEndpoint = new PojoEndpointServer(pathParameters, endpointInstance);
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("wsSession.created", id));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("wsSession.created", id));
         }
     }
 
@@ -570,8 +570,8 @@ public class WsSession implements Session {
             return;
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("wsSession.doClose", id));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("wsSession.doClose", id));
         }
 
         // Flush any batched messages not yet sent.

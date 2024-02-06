@@ -259,8 +259,8 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                     fnmapvar);
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Expression [" + expression + "], type [" + expectedType.getName() + "], returns [" + result + "]");
+        if (log.isTraceEnabled()) {
+            log.trace("Expression [" + expression + "], type [" + expectedType.getName() + "], returns [" + result + "]");
         }
 
         return result;
