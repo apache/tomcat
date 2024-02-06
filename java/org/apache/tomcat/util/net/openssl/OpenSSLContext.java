@@ -104,8 +104,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
             if (openSslConf != null) {
                 try {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("openssl.makeConf"));
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("openssl.makeConf"));
                     }
                     cctx = SSLConf.make(aprPool,
                                         SSL.SSL_CONF_FLAG_FILE |
@@ -212,8 +212,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 result = false;
                 continue;
             }
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("opensslconf.checkCommand", name, value));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("opensslconf.checkCommand", name, value));
             }
             try {
                 rc = SSLConf.check(cctx, name, value);
@@ -225,8 +225,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 log.error(sm.getString("opensslconf.failedCommand", name, value,
                         Integer.toString(rc)));
                 result = false;
-            } else if (log.isDebugEnabled()) {
-                log.debug(sm.getString("opensslconf.resultCommand", name, value,
+            } else if (log.isTraceEnabled()) {
+                log.trace(sm.getString("opensslconf.resultCommand", name, value,
                         Integer.toString(rc)));
             }
         }
@@ -252,8 +252,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 result = false;
                 continue;
             }
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("opensslconf.applyCommand", name, value));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("opensslconf.applyCommand", name, value));
             }
             try {
                 rc = SSLConf.apply(cctx, name, value);
@@ -265,8 +265,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 log.error(sm.getString("opensslconf.failedCommand", name, value,
                         Integer.toString(rc)));
                 result = false;
-            } else if (log.isDebugEnabled()) {
-                log.debug(sm.getString("opensslconf.resultCommand", name, value,
+            } else if (log.isTraceEnabled()) {
+                log.trace(sm.getString("opensslconf.resultCommand", name, value,
                         Integer.toString(rc)));
             }
         }
@@ -397,8 +397,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
             if (openSslConf != null && state.cctx != 0) {
                 // Check OpenSSLConfCmd if used
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("openssl.checkConf"));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("openssl.checkConf"));
                 }
                 try {
                     if (!checkConf(openSslConf, state.cctx)) {
@@ -408,8 +408,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 } catch (Exception e) {
                     throw new Exception(sm.getString("openssl.errCheckConf"), e);
                 }
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("openssl.applyConf"));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("openssl.applyConf"));
                 }
                 try {
                     if (!applyConf(openSslConf, state.cctx, state.ctx)) {

@@ -608,8 +608,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             this.readCompletionHandler = new CompletionHandler<>() {
                 @Override
                 public void completed(Integer nBytes, ByteBuffer attachment) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Socket: [" + Nio2SocketWrapper.this + "], Interest: [" + readInterest + "]");
+                    if (log.isTraceEnabled()) {
+                        log.trace("Socket: [" + Nio2SocketWrapper.this + "], Interest: [" + readInterest + "]");
                     }
                     boolean notify = false;
                     synchronized (readCompletionHandler) {
@@ -821,8 +821,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         public int read(boolean block, byte[] b, int off, int len) throws IOException {
             checkError();
 
-            if (log.isDebugEnabled()) {
-                log.debug("Socket: [" + this + "], block: [" + block + "], length: [" + len + "]");
+            if (log.isTraceEnabled()) {
+                log.trace("Socket: [" + this + "], block: [" + block + "], length: [" + len + "]");
             }
 
             if (socketBufferHandler == null) {
@@ -843,8 +843,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     }
                 } else {
                     if (!readPending.tryAcquire()) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Socket: [" + this + "], Read in progress. Returning [0]");
+                        if (log.isTraceEnabled()) {
+                            log.trace("Socket: [" + this + "], Read in progress. Returning [0]");
                         }
                         return 0;
                     }
@@ -877,8 +877,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 } else if (nRead == 0 && !block) {
                     readInterest = true;
                 }
-                if (log.isDebugEnabled()) {
-                    log.debug("Socket: [" + this + "], Read: [" + nRead + "]");
+                if (log.isTraceEnabled()) {
+                    log.trace("Socket: [" + this + "], Read: [" + nRead + "]");
                 }
                 return nRead;
             }
@@ -907,8 +907,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     }
                 } else {
                     if (!readPending.tryAcquire()) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Socket: [" + this + "], Read in progress. Returning [0]");
+                        if (log.isTraceEnabled()) {
+                            log.trace("Socket: [" + this + "], Read in progress. Returning [0]");
                         }
                         return 0;
                     }
@@ -935,14 +935,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 if (block && to.remaining() >= limit) {
                     to.limit(to.position() + limit);
                     nRead = fillReadBuffer(block, to);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Socket: [" + this + "], Read direct from socket: [" + nRead + "]");
+                    if (log.isTraceEnabled()) {
+                        log.trace("Socket: [" + this + "], Read direct from socket: [" + nRead + "]");
                     }
                 } else {
                     // Fill the read buffer as best we can.
                     nRead = fillReadBuffer(block);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Socket: [" + this + "], Read into buffer: [" + nRead + "]");
+                    if (log.isTraceEnabled()) {
+                        log.trace("Socket: [" + this + "], Read into buffer: [" + nRead + "]");
                     }
                     // Fill as much of the remaining byte array as possible with the
                     // data that was just read
@@ -959,8 +959,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
         @Override
         protected void doClose() {
-            if (log.isDebugEnabled()) {
-                log.debug("Calling [" + getEndpoint() + "].closeSocket([" + this + "])");
+            if (log.isTraceEnabled()) {
+                log.trace("Calling [" + getEndpoint() + "].closeSocket([" + this + "])");
             }
             try {
                 getEndpoint().connections.remove(getSocket().getIOChannel());
@@ -1383,8 +1383,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 if (readNotify) {
                     return;
                 }
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("endpoint.debug.registerRead", this));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("endpoint.debug.registerRead", this));
                 }
                 readInterest = true;
                 if (readPending.tryAcquire()) {
@@ -1413,8 +1413,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 if (writeNotify) {
                     return;
                 }
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("endpoint.debug.registerWrite", this));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("endpoint.debug.registerWrite", this));
                 }
                 writeInterest = true;
                 if (writePending.availablePermits() == 1) {

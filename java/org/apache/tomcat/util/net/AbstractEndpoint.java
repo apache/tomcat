@@ -1117,8 +1117,8 @@ public abstract class AbstractEndpoint<S,U> {
                 // That causes delays when running the unit tests. Explicitly enableing linger but with a timeout of
                 // zero seconds seems to fix the issue.
                 s.setSoLinger(true, 0);
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug("About to unlock socket for:" + unlockAddress);
+                if (getLog().isTraceEnabled()) {
+                    getLog().trace("About to unlock socket for:" + unlockAddress);
                 }
                 s.connect(unlockAddress,utmo);
                 if (getDeferAccept()) {
@@ -1134,8 +1134,8 @@ public abstract class AbstractEndpoint<S,U> {
                             "User-Agent: Tomcat wakeup connection\r\n\r\n");
                     sw.flush();
                 }
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug("Socket unlock completed for:" + unlockAddress);
+                if (getLog().isTraceEnabled()) {
+                    getLog().trace("Socket unlock completed for:" + unlockAddress);
                 }
             }
             // Wait for up to 1000ms acceptor threads to unlock. Particularly
