@@ -5173,7 +5173,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         try {
             resetContext();
         } catch (Exception ex) {
-            log.error("Error resetting context " + this + " " + ex, ex);
+            log.error(sm.getString("standardContext.resetContextFail", getName()), ex);
         }
 
         // reset the instance manager
