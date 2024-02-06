@@ -368,8 +368,8 @@ public abstract class SocketWrapperBase<E> {
             remaining = Math.min(remaining, len);
             readBuffer.get(b, off, remaining);
 
-            if (log.isDebugEnabled()) {
-                log.debug("Socket: [" + this + "], Read from buffer: [" + remaining + "]");
+            if (log.isTraceEnabled()) {
+                log.trace("Socket: [" + this + "], Read from buffer: [" + remaining + "]");
             }
         }
         return remaining;
@@ -382,8 +382,8 @@ public abstract class SocketWrapperBase<E> {
         socketBufferHandler.configureReadBufferForRead();
         int nRead = transfer(socketBufferHandler.getReadBuffer(), to);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Socket: [" + this + "], Read from buffer: [" + nRead + "]");
+        if (log.isTraceEnabled()) {
+            log.trace("Socket: [" + this + "], Read from buffer: [" + nRead + "]");
         }
         return nRead;
     }

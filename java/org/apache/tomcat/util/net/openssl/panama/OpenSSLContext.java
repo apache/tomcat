@@ -174,8 +174,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // Create OpenSSLConfCmd context if used
             OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
             if (openSslConf != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("openssl.makeConf"));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("openssl.makeConf"));
                 }
                 confCtx = SSL_CONF_CTX_new();
                 if (MemorySegment.NULL.equals(confCtx)) {
@@ -335,8 +335,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 result = false;
                 continue;
             }
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("opensslconf.checkCommand", name, value));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("opensslconf.checkCommand", name, value));
             }
             try (var localArena = Arena.ofConfined()) {
                 if (name.equals("NO_OCSP_CHECK")) {
@@ -378,8 +378,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 log.error(sm.getString("opensslconf.failedCommand", name, value,
                         Integer.toString(rc)));
                 result = false;
-            } else if (log.isDebugEnabled()) {
-                log.debug(sm.getString("opensslconf.resultCommand", name, value,
+            } else if (log.isTraceEnabled()) {
+                log.trace(sm.getString("opensslconf.resultCommand", name, value,
                         Integer.toString(rc)));
             }
         }
@@ -406,8 +406,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 result = false;
                 continue;
             }
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("opensslconf.applyCommand", name, value));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("opensslconf.applyCommand", name, value));
             }
             try (var localArena = Arena.ofConfined()) {
                 if (name.equals("NO_OCSP_CHECK")) {
@@ -430,8 +430,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 log.error(sm.getString("opensslconf.failedCommand", name, value,
                         Integer.toString(rc)));
                 result = false;
-            } else if (log.isDebugEnabled()) {
-                log.debug(sm.getString("opensslconf.resultCommand", name, value,
+            } else if (log.isTraceEnabled()) {
+                log.trace(sm.getString("opensslconf.resultCommand", name, value,
                         Integer.toString(rc)));
             }
         }
@@ -596,8 +596,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
             if (openSslConf != null && !MemorySegment.NULL.equals(state.confCtx)) {
                 // Check OpenSSLConfCmd if used
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("openssl.checkConf"));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("openssl.checkConf"));
                 }
                 try {
                     if (!checkConf(openSslConf)) {
@@ -606,8 +606,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 } catch (Exception e) {
                     log.error(sm.getString("openssl.errCheckConf"), e);
                 }
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("openssl.applyConf"));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("openssl.applyConf"));
                 }
                 try {
                     if (!applyConf(openSslConf)) {
@@ -744,8 +744,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
         @Override
         public int apply(MemorySegment /*X509_STORE_CTX*/ x509_ctx, MemorySegment param) {
-            if (log.isDebugEnabled()) {
-                log.debug("Certificate verification");
+            if (log.isTraceEnabled()) {
+                log.trace("Certificate verification");
             }
             if (MemorySegment.NULL.equals(param)) {
                 return 0;
@@ -872,8 +872,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
         @Override
         public int apply(MemorySegment /* char **/ buf, int bufsiz, int verify, MemorySegment /* void **/ cb) {
-            if (log.isDebugEnabled()) {
-                log.debug("Return password for certificate");
+            if (log.isTraceEnabled()) {
+                log.trace("Return password for certificate");
             }
             if (callbackPassword != null && callbackPassword.length() > 0) {
                 try (var localArena = Arena.ofConfined()) {

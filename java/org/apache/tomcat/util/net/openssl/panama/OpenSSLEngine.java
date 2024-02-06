@@ -891,8 +891,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
             MemorySegment protocolAddress = protocolPointer.get(ValueLayout.ADDRESS, 0);
             byte[] name = protocolAddress.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
-            if (log.isDebugEnabled()) {
-                log.debug("Protocol negotiated [" + new String(name) + "]");
+            if (log.isTraceEnabled()) {
+                log.trace("Protocol negotiated [" + new String(name) + "]");
             }
             return new String(name);
         }
@@ -921,8 +921,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private void renegotiate() throws SSLException {
-        if (log.isDebugEnabled()) {
-            log.debug("Start renegotiate");
+        if (log.isTraceEnabled()) {
+            log.trace("Start renegotiate");
         }
         clearLastError();
         int code;
@@ -1132,8 +1132,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.address())));
                 return 0;
             }
-            if (log.isDebugEnabled()) {
-                log.debug("Verification in engine with mode [" + state.certificateVerifyMode + "] for " + state.ssl);
+            if (log.isTraceEnabled()) {
+                log.trace("Verification in engine with mode [" + state.certificateVerifyMode + "] for " + state.ssl);
             }
             int ok = preverify_ok;
             int errnum = X509_STORE_CTX_get_error(x509ctx);
