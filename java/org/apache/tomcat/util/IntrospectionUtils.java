@@ -308,7 +308,7 @@ public final class IntrospectionUtils {
             return value;
         }
         if (iterationCount >=20) {
-            log.warn("System property failed to update and remains [" + value + "]");
+            log.warn(sm.getString("introspectionUtils.tooManyIterations", value));
             return value;
         }
         StringBuilder sb = new StringBuilder();
