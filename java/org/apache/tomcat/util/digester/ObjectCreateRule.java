@@ -144,8 +144,8 @@ public class ObjectCreateRule extends Rule {
     public void end(String namespace, String name) throws Exception {
 
         Object top = digester.pop();
-        if (digester.log.isDebugEnabled()) {
-            digester.log.debug("[ObjectCreateRule]{" + digester.match +
+        if (digester.log.isTraceEnabled()) {
+            digester.log.trace("[ObjectCreateRule]{" + digester.match +
                     "} Pop " + top.getClass().getName());
         }
 

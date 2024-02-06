@@ -477,8 +477,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         // Search for a descriptor in the same package
         if (managed == null) {
             // check package and parent packages
-            if (log.isDebugEnabled()) {
-                log.debug("Looking for descriptor ");
+            if (log.isTraceEnabled()) {
+                log.trace("Looking for descriptor ");
             }
             findDescriptor(beanClass, type);
 
@@ -487,8 +487,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
         // Still not found - use introspection
         if (managed == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Introspecting ");
+            if (log.isTraceEnabled()) {
+                log.trace("Introspecting ");
             }
 
             // introspection
@@ -603,8 +603,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * @throws Exception Error registering component
      */
     public void registerComponent(Object bean, ObjectName oname, String type) throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("Managed= " + oname);
+        if (log.isTraceEnabled()) {
+            log.trace("Managed= " + oname);
         }
 
         if (bean == null) {
@@ -662,7 +662,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             return;
         }
 
-        log.debug("Found " + dURL);
+        if (log.isTraceEnabled()) {
+            log.trace("Found " + dURL);
+        }
         searchedPaths.put(packageName, dURL);
         try {
             load("MbeansDescriptorsDigesterSource", dURL, null);
