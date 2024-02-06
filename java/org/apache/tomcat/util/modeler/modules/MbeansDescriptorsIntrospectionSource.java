@@ -208,8 +208,8 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 continue;
             }
             if (!Modifier.isPublic(method.getModifiers())) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Not public " + method);
+                if (log.isTraceEnabled()) {
+                    log.trace("Not public " + method);
                 }
                 continue;
             }
@@ -221,8 +221,8 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
             if (name.startsWith("get") && params.length == 0) {
                 Class<?> ret = method.getReturnType();
                 if (!supportedType(ret)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Unsupported type " + method);
+                    if (log.isTraceEnabled()) {
+                        log.trace("Unsupported type " + method);
                     }
                     continue;
                 }
@@ -233,8 +233,8 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
             } else if (name.startsWith("is") && params.length == 0) {
                 Class<?> ret = method.getReturnType();
                 if (Boolean.TYPE != ret) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Unsupported type " + method + " " + ret);
+                    if (log.isTraceEnabled()) {
+                        log.trace("Unsupported type " + method + " " + ret);
                     }
                     continue;
                 }
@@ -245,8 +245,8 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
             } else if (name.startsWith("set") && params.length == 1) {
                 if (!supportedType(params[0])) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Unsupported type " + method + " " + params[0]);
+                    if (log.isTraceEnabled()) {
+                        log.trace("Unsupported type " + method + " " + params[0]);
                     }
                     continue;
                 }
@@ -325,8 +325,8 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                     ai.setSetMethod(sm.getName());
                 }
                 ai.setDescription("Introspected attribute " + name);
-                if (log.isDebugEnabled()) {
-                    log.debug("Introspected attribute " + name + " " + gm + " " + sm);
+                if (log.isTraceEnabled()) {
+                    log.trace("Introspected attribute " + name + " " + gm + " " + sm);
                 }
                 if (gm == null) {
                     ai.setReadable(false);
@@ -356,8 +356,8 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 mbean.addOperation(op);
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug("Setting name: " + type);
+            if (log.isTraceEnabled()) {
+                log.trace("Setting name: " + type);
             }
             mbean.setName(type);
 

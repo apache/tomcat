@@ -387,7 +387,7 @@ public class CallMethodRule extends Rule {
         }
 
         // Invoke the required method on the top object
-        if (digester.log.isDebugEnabled()) {
+        if (digester.log.isTraceEnabled()) {
             StringBuilder sb = new StringBuilder("[CallMethodRule]{");
             sb.append(digester.match);
             sb.append("} Call ");
@@ -412,7 +412,7 @@ public class CallMethodRule extends Rule {
                 }
             }
             sb.append(')');
-            digester.log.debug(sb.toString());
+            digester.log.trace(sb.toString());
         }
         Object result = IntrospectionUtils.callMethodN(target, methodName,
                 paramValues, paramTypes);

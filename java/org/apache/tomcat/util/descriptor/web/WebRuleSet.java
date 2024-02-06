@@ -794,9 +794,9 @@ final class SetAuthConstraintRule extends Rule {
         SecurityConstraint securityConstraint =
             (SecurityConstraint) digester.peek();
         securityConstraint.setAuthConstraint(true);
-        if (digester.getLogger().isDebugEnabled()) {
+        if (digester.getLogger().isTraceEnabled()) {
             digester.getLogger()
-               .debug("Calling SecurityConstraint.setAuthConstraint(true)");
+               .trace("Calling SecurityConstraint.setAuthConstraint(true)");
         }
     }
 
@@ -818,8 +818,8 @@ final class SetDistributableRule extends Rule {
         throws Exception {
         WebXml webXml = (WebXml) digester.peek();
         webXml.setDistributable(true);
-        if (digester.getLogger().isDebugEnabled()) {
-            digester.getLogger().debug
+        if (digester.getLogger().isTraceEnabled()) {
+            digester.getLogger().trace
                (webXml.getClass().getName() + ".setDistributable(true)");
         }
     }
@@ -841,8 +841,8 @@ final class SetDenyUncoveredHttpMethodsRule extends Rule {
         throws Exception {
         WebXml webXml = (WebXml) digester.peek();
         webXml.setDenyUncoveredHttpMethods(true);
-        if (digester.getLogger().isDebugEnabled()) {
-            digester.getLogger().debug(webXml.getClass().getName() +
+        if (digester.getLogger().isTraceEnabled()) {
+            digester.getLogger().trace(webXml.getClass().getName() +
                     ".setDenyUncoveredHttpMethods(true)");
         }
     }
@@ -882,8 +882,8 @@ final class SetPublicIdRule extends Rule {
         }
 
         m.invoke(top, (Object [])paramValues);
-        if (digester.getLogger().isDebugEnabled()) {
-            digester.getLogger().debug("" + top.getClass().getName() + "."
+        if (digester.getLogger().isTraceEnabled()) {
+            digester.getLogger().trace("" + top.getClass().getName() + "."
                                        + method + "(" + paramValues[0] + ")");
         }
 
@@ -908,8 +908,8 @@ final class ServletDefCreateRule extends Rule {
         throws Exception {
         ServletDef servletDef = new ServletDef();
         digester.push(servletDef);
-        if (digester.getLogger().isDebugEnabled()) {
-            digester.getLogger().debug("new " + servletDef.getClass().getName());
+        if (digester.getLogger().isTraceEnabled()) {
+            digester.getLogger().trace("new " + servletDef.getClass().getName());
         }
     }
 
@@ -917,8 +917,8 @@ final class ServletDefCreateRule extends Rule {
     public void end(String namespace, String name)
         throws Exception {
         ServletDef servletDef = (ServletDef) digester.pop();
-        if (digester.getLogger().isDebugEnabled()) {
-            digester.getLogger().debug("pop " + servletDef.getClass().getName());
+        if (digester.getLogger().isTraceEnabled()) {
+            digester.getLogger().trace("pop " + servletDef.getClass().getName());
         }
     }
 
@@ -1074,8 +1074,8 @@ final class IgnoreAnnotationsRule extends Rule {
         } else if ("false".equals(value)) {
             webxml.setMetadataComplete(false);
         }
-        if (digester.getLogger().isDebugEnabled()) {
-            digester.getLogger().debug
+        if (digester.getLogger().isTraceEnabled()) {
+            digester.getLogger().trace
                 (webxml.getClass().getName() + ".setMetadataComplete( " +
                         webxml.isMetadataComplete() + ")");
         }
@@ -1100,8 +1100,8 @@ final class VersionRule extends Rule {
         WebXml webxml = (WebXml) digester.peek(digester.getCount() - 1);
         webxml.setVersion(attributes.getValue("version"));
 
-        if (digester.getLogger().isDebugEnabled()) {
-            digester.getLogger().debug
+        if (digester.getLogger().isTraceEnabled()) {
+            digester.getLogger().trace
                 (webxml.getClass().getName() + ".setVersion( " +
                         webxml.getVersion() + ")");
         }
@@ -1167,8 +1167,8 @@ final class AbsoluteOrderingRule extends Rule {
             isAbsoluteOrderingSet = true;
             WebXml webXml = (WebXml) digester.peek();
             webXml.createAbsoluteOrdering();
-            if (digester.getLogger().isDebugEnabled()) {
-                digester.getLogger().debug(
+            if (digester.getLogger().isTraceEnabled()) {
+                digester.getLogger().trace(
                         webXml.getClass().getName() + ".setAbsoluteOrdering()");
             }
         }
@@ -1374,8 +1374,8 @@ final class SetOverrideRule extends Rule {
     public void begin(String namespace, String name, Attributes attributes) throws Exception {
         ContextEnvironment envEntry = (ContextEnvironment) digester.peek();
         envEntry.setOverride(false);
-        if (digester.getLogger().isDebugEnabled()) {
-            digester.getLogger().debug(envEntry.getClass().getName() + ".setOverride(false)");
+        if (digester.getLogger().isTraceEnabled()) {
+            digester.getLogger().trace(envEntry.getClass().getName() + ".setOverride(false)");
         }
     }
 }

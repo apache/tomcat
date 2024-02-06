@@ -89,8 +89,8 @@ public class FactoryCreateRule extends Rule {
             try {
                 Object instance = creationFactory.createObject(attributes);
 
-                if (digester.log.isDebugEnabled()) {
-                    digester.log.debug("[FactoryCreateRule]{" + digester.match +
+                if (digester.log.isTraceEnabled()) {
+                    digester.log.trace("[FactoryCreateRule]{" + digester.match +
                             "} New " + instance.getClass().getName());
                 }
                 digester.push(instance);
@@ -111,8 +111,8 @@ public class FactoryCreateRule extends Rule {
         } else {
             Object instance = creationFactory.createObject(attributes);
 
-            if (digester.log.isDebugEnabled()) {
-                digester.log.debug("[FactoryCreateRule]{" + digester.match +
+            if (digester.log.isTraceEnabled()) {
+                digester.log.trace("[FactoryCreateRule]{" + digester.match +
                         "} New " + instance.getClass().getName());
             }
             digester.push(instance);
@@ -144,8 +144,8 @@ public class FactoryCreateRule extends Rule {
         }
 
         Object top = digester.pop();
-        if (digester.log.isDebugEnabled()) {
-            digester.log.debug("[FactoryCreateRule]{" + digester.match +
+        if (digester.log.isTraceEnabled()) {
+            digester.log.trace("[FactoryCreateRule]{" + digester.match +
                     "} Pop " + top.getClass().getName());
         }
 

@@ -51,8 +51,8 @@ public final class IntrospectionUtils {
     @SuppressWarnings("null") // setPropertyMethodVoid is not null when used
     public static boolean setProperty(Object o, String name, String value,
             boolean invokeSetProperty) {
-        if (log.isDebugEnabled()) {
-            log.debug("IntrospectionUtils: setProperty(" +
+        if (log.isTraceEnabled()) {
+            log.trace("IntrospectionUtils: setProperty(" +
                     o.getClass() + " " + name + "=" + value + ")");
         }
 
@@ -120,8 +120,8 @@ public final class IntrospectionUtils {
 
                         // Unknown type
                     } else {
-                        if (log.isDebugEnabled()) {
-                            log.debug("IntrospectionUtils: Unknown type " +
+                        if (log.isTraceEnabled()) {
+                            log.trace("IntrospectionUtils: Unknown type " +
                                     paramType.getName());
                         }
                     }
@@ -412,8 +412,8 @@ public final class IntrospectionUtils {
                     "IntrospectionUtils: Assert: Illegal params " +
                     target + " " + param1);
         }
-        if (log.isDebugEnabled()) {
-            log.debug("IntrospectionUtils: callMethod1 " +
+        if (log.isTraceEnabled()) {
+            log.trace("IntrospectionUtils: callMethod1 " +
                     target.getClass().getName() + " " +
                     param1.getClass().getName() + " " + typeParam1);
         }
@@ -451,8 +451,7 @@ public final class IntrospectionUtils {
         try {
             Object o = m.invoke(target, params);
 
-            if (log.isDebugEnabled()) {
-                // debug
+            if (log.isTraceEnabled()) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(target.getClass().getName()).append('.').append(methodN).append('(');
                 for (int i = 0; i < params.length; i++) {
@@ -462,7 +461,7 @@ public final class IntrospectionUtils {
                     sb.append(params[i]);
                 }
                 sb.append(')');
-                log.debug("IntrospectionUtils:" + sb.toString());
+                log.trace("IntrospectionUtils:" + sb.toString());
             }
             return o;
         } catch (InvocationTargetException ie) {
@@ -500,8 +499,8 @@ public final class IntrospectionUtils {
 
             // Unknown type
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("IntrospectionUtils: Unknown type " +
+            if (log.isTraceEnabled()) {
+                log.trace("IntrospectionUtils: Unknown type " +
                         paramType.getName());
             }
         }
