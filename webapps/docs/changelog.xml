@@ -206,6 +206,10 @@
       <update>
         Update JSign to 6.0. (markt)
       </update>
+      <update>
+        Update the packaged version of the Tomcat Migration Tool for Jakarta EE
+        to 1.0.7. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
