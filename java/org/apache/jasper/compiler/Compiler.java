@@ -263,9 +263,9 @@ public abstract class Compiler {
             // to be GC'd and save memory.
             ctxt.setWriter(null);
 
-            if (log.isDebugEnabled()) {
+            if (log.isTraceEnabled()) {
                 t4 = System.currentTimeMillis();
-                log.debug("Generated " + javaFileName + " total=" + (t4 - t1)
+                log.trace("Generated " + javaFileName + " total=" + (t4 - t1)
                         + " generate=" + (t4 - t3) + " validate=" + (t2 - t1));
             }
 
@@ -490,8 +490,8 @@ public abstract class Compiler {
         }
 
         if (targetLastModified != jspRealLastModified.longValue()) {
-            if (log.isDebugEnabled()) {
-                log.debug("Compiler: outdated: " + targetFile + " "
+            if (log.isTraceEnabled()) {
+                log.trace("Compiler: outdated: " + targetFile + " "
                         + targetLastModified);
             }
             return true;
@@ -581,8 +581,8 @@ public abstract class Compiler {
 
         try {
             File javaFile = new File(ctxt.getServletJavaFileName());
-            if (log.isDebugEnabled()) {
-                log.debug("Deleting " + javaFile);
+            if (log.isTraceEnabled()) {
+                log.trace("Deleting " + javaFile);
             }
             if (javaFile.exists()) {
                 if (!javaFile.delete()) {
@@ -601,8 +601,8 @@ public abstract class Compiler {
     public void removeGeneratedClassFiles() {
         try {
             File classFile = new File(ctxt.getClassFileName());
-            if (log.isDebugEnabled()) {
-                log.debug("Deleting " + classFile);
+            if (log.isTraceEnabled()) {
+                log.trace("Deleting " + classFile);
             }
             if (classFile.exists()) {
                 if (!classFile.delete()) {

@@ -81,8 +81,8 @@ public class AntCompiler extends Compiler {
         }
 
         if( options.getCompiler() != null ) {
-            if( log.isDebugEnabled() ) {
-                log.debug("Compiler " + options.getCompiler() );
+            if( log.isTraceEnabled() ) {
+                log.trace("Compiler " + options.getCompiler() );
             }
             project.setProperty("build.compiler", options.getCompiler() );
         }
@@ -157,8 +157,8 @@ public class AntCompiler extends Compiler {
             info.append("    cp=" + repository + "\n");
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug( "Using classpath: " + System.getProperty("java.class.path") +
+        if (log.isTraceEnabled()) {
+            log.trace( "Using classpath: " + System.getProperty("java.class.path") +
                     File.pathSeparator + classpath);
         }
 
