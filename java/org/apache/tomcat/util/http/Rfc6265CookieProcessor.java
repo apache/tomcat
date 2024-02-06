@@ -86,8 +86,8 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
                     }
                     cookieValue.toBytes();
                 }
-                if (log.isDebugEnabled()) {
-                    log.debug("Cookies: Parsing b[]: " + cookieValue.toString());
+                if (log.isTraceEnabled()) {
+                    log.trace("Cookies: Parsing b[]: " + cookieValue.toString());
                 }
                 ByteChunk bc = cookieValue.getByteChunk();
 

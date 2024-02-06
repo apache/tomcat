@@ -65,8 +65,8 @@ public class SetPropertiesRule extends Rule {
 
         // Populate the corresponding properties of the top object
         Object top = digester.peek();
-        if (digester.log.isDebugEnabled()) {
-            digester.log.debug("[SetPropertiesRule]{" + digester.match +
+        if (digester.log.isTraceEnabled()) {
+            digester.log.trace("[SetPropertiesRule]{" + digester.match +
                     "} Set " + top.getClass().getName() +
                     " properties");
         }
@@ -83,8 +83,8 @@ public class SetPropertiesRule extends Rule {
             }
             String value = attributes.getValue(i);
 
-            if (digester.log.isDebugEnabled()) {
-                digester.log.debug("[SetPropertiesRule]{" + digester.match +
+            if (digester.log.isTraceEnabled()) {
+                digester.log.trace("[SetPropertiesRule]{" + digester.match +
                         "} Setting property '" + name + "' to '" +
                         value + "'");
             }
