@@ -830,7 +830,7 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
         super.startInternal();
 
         if (store == null) {
-            log.error("No Store configured, persistence disabled");
+            log.error(sm.getString("persistentManager.noStore"));
         } else if (store instanceof Lifecycle) {
             ((Lifecycle) store).start();
         }

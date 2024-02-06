@@ -141,7 +141,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
         try {
             keys = expiredKeys();
         } catch (IOException e) {
-            manager.getContext().getLogger().error("Error getting keys", e);
+            manager.getContext().getLogger().error(sm.getString("store.keysFail"), e);
             return;
         }
         if (manager.getContext().getLogger().isTraceEnabled()) {
@@ -186,11 +186,11 @@ public abstract class StoreBase extends LifecycleBase implements Store {
                 }
                 remove(key);
             } catch (Exception e) {
-                manager.getContext().getLogger().error("Session: " + key + "; ", e);
+                manager.getContext().getLogger().error(sm.getString("store.expireFail", key), e);
                 try {
                     remove(key);
                 } catch (IOException e2) {
-                    manager.getContext().getLogger().error("Error removing key", e2);
+                    manager.getContext().getLogger().error(sm.getString("store.removeFail", key), e2);
                 }
             }
         }
