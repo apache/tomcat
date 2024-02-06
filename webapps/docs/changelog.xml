@@ -149,6 +149,10 @@
         <bug>68546</bug>: Generate optimal size and types for JSP imports maps,
         as suggested by John Engebretson. (remm)
       </fix>
+      <fix>
+        Review usage of debug logging and downgrade trace or data dumping
+        operations from debug level to trace. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -156,6 +160,10 @@
       <fix>
         Correct a regression in the fix for <bug>66508</bug> that could cause an
         <code>UpgradeProcessor</code> leak in some circumstances. (markt)
+      </fix>
+      <fix>
+        Review usage of debug logging and downgrade trace or data dumping
+        operations from debug level to trace. (remm)
       </fix>
     </changelog>
   </subsection>
