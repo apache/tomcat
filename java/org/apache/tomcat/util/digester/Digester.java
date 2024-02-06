@@ -919,8 +919,8 @@ public class Digester extends DefaultHandler2 {
     @Override
     public void characters(char buffer[], int start, int length) throws SAXException {
 
-        if (saxLog.isDebugEnabled()) {
-            saxLog.debug("characters(" + new String(buffer, start, length) + ")");
+        if (saxLog.isTraceEnabled()) {
+            saxLog.trace("characters(" + new String(buffer, start, length) + ")");
         }
 
         bodyText.append(buffer, start, length);
@@ -936,11 +936,11 @@ public class Digester extends DefaultHandler2 {
     @Override
     public void endDocument() throws SAXException {
 
-        if (saxLog.isDebugEnabled()) {
+        if (saxLog.isTraceEnabled()) {
             if (getCount() > 1) {
-                saxLog.debug("endDocument():  " + getCount() + " elements left");
+                saxLog.trace("endDocument():  " + getCount() + " elements left");
             } else {
-                saxLog.debug("endDocument()");
+                saxLog.trace("endDocument()");
             }
         }
 
@@ -983,14 +983,14 @@ public class Digester extends DefaultHandler2 {
     public void endElement(String namespaceURI, String localName, String qName)
             throws SAXException {
 
-        boolean debug = log.isDebugEnabled();
+        boolean debug = log.isTraceEnabled();
 
         if (debug) {
             if (saxLog.isDebugEnabled()) {
-                saxLog.debug("endElement(" + namespaceURI + "," + localName + "," + qName + ")");
+                saxLog.trace("endElement(" + namespaceURI + "," + localName + "," + qName + ")");
             }
-            log.debug("  match='" + match + "'");
-            log.debug("  bodyText='" + bodyText + "'");
+            log.trace("  match='" + match + "'");
+            log.trace("  bodyText='" + bodyText + "'");
         }
 
         // Parse system properties
@@ -1011,7 +1011,7 @@ public class Digester extends DefaultHandler2 {
                 try {
                     Rule rule = value;
                     if (debug) {
-                        log.debug("  Fire body() for " + rule);
+                        log.trace("  Fire body() for " + rule);
                     }
                     rule.body(namespaceURI, name, bodyText);
                 } catch (Exception e) {
@@ -1024,7 +1024,7 @@ public class Digester extends DefaultHandler2 {
             }
         } else {
             if (debug) {
-                log.debug(sm.getString("digester.noRulesFound", match));
+                log.trace(sm.getString("digester.noRulesFound", match));
             }
             if (rulesValidation) {
                 log.warn(sm.getString("digester.noRulesFound", match));
@@ -1041,7 +1041,7 @@ public class Digester extends DefaultHandler2 {
                 try {
                     Rule rule = rules.get(j);
                     if (debug) {
-                        log.debug("  Fire end() for " + rule);
+                        log.trace("  Fire end() for " + rule);
                     }
                     rule.end(namespaceURI, name);
                 } catch (Exception e) {
@@ -1075,8 +1075,8 @@ public class Digester extends DefaultHandler2 {
     @Override
     public void endPrefixMapping(String prefix) throws SAXException {
 
-        if (saxLog.isDebugEnabled()) {
-            saxLog.debug("endPrefixMapping(" + prefix + ")");
+        if (saxLog.isTraceEnabled()) {
+            saxLog.trace("endPrefixMapping(" + prefix + ")");
         }
 
         // Deregister this prefix mapping
@@ -1109,8 +1109,8 @@ public class Digester extends DefaultHandler2 {
     @Override
     public void ignorableWhitespace(char buffer[], int start, int len) throws SAXException {
 
-        if (saxLog.isDebugEnabled()) {
-            saxLog.debug("ignorableWhitespace(" + new String(buffer, start, len) + ")");
+        if (saxLog.isTraceEnabled()) {
+            saxLog.trace("ignorableWhitespace(" + new String(buffer, start, len) + ")");
         }
 
         // No processing required
@@ -1129,8 +1129,8 @@ public class Digester extends DefaultHandler2 {
     @Override
     public void processingInstruction(String target, String data) throws SAXException {
 
-        if (saxLog.isDebugEnabled()) {
-            saxLog.debug("processingInstruction('" + target + "','" + data + "')");
+        if (saxLog.isTraceEnabled()) {
+            saxLog.trace("processingInstruction('" + target + "','" + data + "')");
         }
 
         // No processing is required
@@ -1157,8 +1157,8 @@ public class Digester extends DefaultHandler2 {
     @Override
     public void setDocumentLocator(Locator locator) {
 
-        if (saxLog.isDebugEnabled()) {
-            saxLog.debug("setDocumentLocator(" + locator + ")");
+        if (saxLog.isTraceEnabled()) {
+            saxLog.trace("setDocumentLocator(" + locator + ")");
         }
 
         this.locator = locator;
@@ -1176,8 +1176,8 @@ public class Digester extends DefaultHandler2 {
     @Override
     public void skippedEntity(String name) throws SAXException {
 
-        if (saxLog.isDebugEnabled()) {
-            saxLog.debug("skippedEntity(" + name + ")");
+        if (saxLog.isTraceEnabled()) {
+            saxLog.trace("skippedEntity(" + name + ")");
         }
 
         // No processing required
@@ -1193,8 +1193,8 @@ public class Digester extends DefaultHandler2 {
     @Override
     public void startDocument() throws SAXException {
 
-        if (saxLog.isDebugEnabled()) {
-            saxLog.debug("startDocument()");
+        if (saxLog.isTraceEnabled()) {
+            saxLog.trace("startDocument()");
         }
 
         if (locator instanceof Locator2) {
@@ -1233,10 +1233,10 @@ public class Digester extends DefaultHandler2 {
     @Override
     public void startElement(String namespaceURI, String localName, String qName, Attributes list)
             throws SAXException {
-        boolean debug = log.isDebugEnabled();
+        boolean debug = log.isTraceEnabled();
 
-        if (saxLog.isDebugEnabled()) {
-            saxLog.debug("startElement(" + namespaceURI + "," + localName + "," + qName + ")");
+        if (saxLog.isTraceEnabled()) {
+            saxLog.trace("startElement(" + namespaceURI + "," + localName + "," + qName + ")");
         }
 
         // Parse system properties
@@ -1261,7 +1261,7 @@ public class Digester extends DefaultHandler2 {
         sb.append(name);
         match = sb.toString();
         if (debug) {
-            log.debug("  New match='" + match + "'");
+            log.trace("  New match='" + match + "'");
         }
 
         // Fire "begin" events for all relevant rules
@@ -1272,7 +1272,7 @@ public class Digester extends DefaultHandler2 {
                 try {
                     Rule rule = value;
                     if (debug) {
-                        log.debug("  Fire begin() for " + rule);
+                        log.trace("  Fire begin() for " + rule);
                     }
                     rule.begin(namespaceURI, name, list);
                 } catch (Exception e) {
@@ -1285,7 +1285,7 @@ public class Digester extends DefaultHandler2 {
             }
         } else {
             if (debug) {
-                log.debug(sm.getString("digester.noRulesFound", match));
+                log.trace(sm.getString("digester.noRulesFound", match));
             }
         }
 
@@ -1303,8 +1303,8 @@ public class Digester extends DefaultHandler2 {
     @Override
     public void startPrefixMapping(String prefix, String namespaceURI) throws SAXException {
 
-        if (saxLog.isDebugEnabled()) {
-            saxLog.debug("startPrefixMapping(" + prefix + "," + namespaceURI + ")");
+        if (saxLog.isTraceEnabled()) {
+            saxLog.trace("startPrefixMapping(" + prefix + "," + namespaceURI + ")");
         }
 
         // Register this prefix mapping
@@ -1331,8 +1331,8 @@ public class Digester extends DefaultHandler2 {
     @Override
     public void notationDecl(String name, String publicId, String systemId) {
 
-        if (saxLog.isDebugEnabled()) {
-            saxLog.debug("notationDecl(" + name + "," + publicId + "," + systemId + ")");
+        if (saxLog.isTraceEnabled()) {
+            saxLog.trace("notationDecl(" + name + "," + publicId + "," + systemId + ")");
         }
 
     }
@@ -1349,8 +1349,8 @@ public class Digester extends DefaultHandler2 {
     @Override
     public void unparsedEntityDecl(String name, String publicId, String systemId, String notation) {
 
-        if (saxLog.isDebugEnabled()) {
-            saxLog.debug("unparsedEntityDecl(" + name + "," + publicId + "," + systemId + ","
+        if (saxLog.isTraceEnabled()) {
+            saxLog.trace("unparsedEntityDecl(" + name + "," + publicId + "," + systemId + ","
                     + notation + ")");
         }
 
@@ -1382,8 +1382,8 @@ public class Digester extends DefaultHandler2 {
     public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId)
             throws SAXException, IOException {
 
-        if (saxLog.isDebugEnabled()) {
-            saxLog.debug(
+        if (saxLog.isTraceEnabled()) {
+            saxLog.trace(
                     "resolveEntity('" + publicId + "', '" + systemId + "', '" + baseURI + "')");
         }
 
@@ -1396,15 +1396,15 @@ public class Digester extends DefaultHandler2 {
         if (entityURL == null) {
             if (systemId == null) {
                 // cannot resolve
-                if (log.isDebugEnabled()) {
-                    log.debug(" Cannot resolve entity: '" + publicId + "'");
+                if (log.isTraceEnabled()) {
+                    log.trace(" Cannot resolve entity: '" + publicId + "'");
                 }
                 return null;
 
             } else {
                 // try to resolve using system ID
-                if (log.isDebugEnabled()) {
-                    log.debug(" Trying to resolve using system ID '" + systemId + "'");
+                if (log.isTraceEnabled()) {
+                    log.trace(" Trying to resolve using system ID '" + systemId + "'");
                 }
                 entityURL = systemId;
                 // resolve systemId against baseURI if it is not absolute
@@ -1424,8 +1424,8 @@ public class Digester extends DefaultHandler2 {
         }
 
         // Return an input source to our alternative URL
-        if (log.isDebugEnabled()) {
-            log.debug(" Resolving to alternate DTD '" + entityURL + "'");
+        if (log.isTraceEnabled()) {
+            log.trace(" Resolving to alternate DTD '" + entityURL + "'");
         }
 
         try {
@@ -1577,8 +1577,8 @@ public class Digester extends DefaultHandler2 {
      */
     public void register(String publicId, String entityURL) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("register('" + publicId + "', '" + entityURL + "'");
+        if (log.isTraceEnabled()) {
+            log.trace("register('" + publicId + "', '" + entityURL + "'");
         }
         entityValidator.put(publicId, entityURL);
 
