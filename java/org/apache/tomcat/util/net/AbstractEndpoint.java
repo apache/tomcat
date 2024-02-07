@@ -472,7 +472,8 @@ public abstract class AbstractEndpoint<S,U> {
     protected void releaseSSLContext(SSLHostConfig sslHostConfig) {
         for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
             if (certificate.getSslContext() != null) {
-                SSLContext sslContext = certificate.getSslContext();
+                // Only release the SSLContext if we generated it.
+                SSLContext sslContext = certificate.getSslContextGenerated();
                 if (sslContext != null) {
                     sslContext.destroy();
                 }
@@ -1317,6 +1318,7 @@ public abstract class AbstractEndpoint<S,U> {
 
     public abstract void bind() throws Exception;
     public abstract void unbind() throws Exception;
+
     public abstract void startInternal() throws Exception;
     public abstract void stopInternal() throws Exception;
 

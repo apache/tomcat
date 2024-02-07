@@ -141,6 +141,11 @@
         operations from debug level to trace. In particular, most of the
         HTTP/2 debug logging has been changed to trace level. (remm)
       </fix>
+      <fix>
+        Add support for user provided <code>SSLContext</code> instances
+        configured on <code>SSLHostConfigCertificate</code> instances. Based on
+        pull request <pr>673</pr> provided by Hakan Altındağ. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
