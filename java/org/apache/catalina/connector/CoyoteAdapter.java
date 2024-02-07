@@ -583,6 +583,7 @@ public class CoyoteAdapter implements Adapter {
         }
 
         MessageBytes undecodedURI = req.requestURI();
+        undecodedURI.setCharset(connector.getURICharset());
 
         // Check for ping OPTIONS * request
         if (undecodedURI.equals("*")) {
@@ -619,9 +620,6 @@ public class CoyoteAdapter implements Adapter {
                 // Copy the raw URI to the decodedURI
                 decodedURI.duplicate(undecodedURI);
 
-                // Parse (and strip out) the path parameters
-                parsePathParameters(req, request);
-
                 // URI decoding
                 // %xx decoding of the URL
                 try {
@@ -640,6 +638,9 @@ public class CoyoteAdapter implements Adapter {
                 } else {
                     response.sendError(400, sm.getString("coyoteAdapter.invalidURI"));
                 }
+
+                // Parse (and strip out) the path parameters after decoding and normalizing the URI
+                parsePathParameters(req, request);
             } else {
                 /*
                  * The URI is chars or String, and has been sent using an in-memory protocol handler. The following

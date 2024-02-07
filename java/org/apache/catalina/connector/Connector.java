@@ -271,7 +271,7 @@ public class Connector extends LifecycleMBeanBase {
     /**
      * The behavior when an encoded solidus (slash) is submitted.
      */
-    private EncodedSolidusHandling encodedSolidusHandling = EncodedSolidusHandling.REJECT;
+    private EncodedSolidusHandling encodedSolidusHandling = EncodedSolidusHandling.DECODE;
 
 
     /**

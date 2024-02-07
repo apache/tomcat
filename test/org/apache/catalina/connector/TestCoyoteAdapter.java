@@ -226,6 +226,35 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         // Invalid UTF-8
         doTestUriDecoding("/foo%ed%a0%80", "UTF-8", null);
     }
+    @Test
+    public void testPathTraversal1() throws Exception {
+        doTestUriDecoding("/foo/..", "UTF-8", "/");
+    }
+
+    @Test
+    public void testPathTraversal2() throws Exception {
+        doTestUriDecoding("/foo%2F..", "UTF-8", "/");
+    }
+
+    @Test
+    public void testPathTraversal3() throws Exception {
+        doTestUriDecoding("/foo%2F..%2F..", "UTF-8", null);
+    }
+
+    @Test
+    public void testSemicolonPathTraversal1() throws Exception {
+        doTestUriDecoding("/foo;a=b/..", "UTF-8", "/");
+    }
+
+    @Test
+    public void testSemicolonPathTraversal2() throws Exception {
+        doTestUriDecoding("/foo;a=b%2F..", "UTF-8", "/");
+    }
+
+    @Test
+    public void testSemicolonPathTraversal3() throws Exception {
+        doTestUriDecoding("/foo;a=b%2F..%2F..", "UTF-8", null);
+    }
 
     private void doTestUriDecoding(String path, String encoding,
             String expectedPathInfo) throws Exception{

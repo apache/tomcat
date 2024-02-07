@@ -29,6 +29,7 @@ import java.util.Map;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.buf.UDecoder;
@@ -364,7 +365,7 @@ public final class Parameters {
         if (urlDec == null) {
             urlDec = new UDecoder();
         }
-        urlDec.convert(bc, true);
+        urlDec.convert(bc, true, EncodedSolidusHandling.DECODE);
     }
 
     public void processParameters(MessageBytes data, Charset charset) {

@@ -61,24 +61,6 @@ public final class UDecoder {
 
     /**
      * URLDecode, will modify the source. Assumes source bytes are encoded using a superset of US-ASCII as per RFC 7230.
-     * "%2f" will be rejected unless the input is a query string.
-     *
-     * @param mb    The URL encoded bytes
-     * @param query {@code true} if this is a query string. For a query string '+' will be decoded to ' '
-     *
-     * @throws IOException Invalid %xx URL encoding
-     */
-    public void convert(ByteChunk mb, boolean query) throws IOException {
-        if (query) {
-            convert(mb, true, EncodedSolidusHandling.DECODE);
-        } else {
-            convert(mb, false, EncodedSolidusHandling.REJECT);
-        }
-    }
-
-
-    /**
-     * URLDecode, will modify the source. Assumes source bytes are encoded using a superset of US-ASCII as per RFC 7230.
      *
      * @param mb                     The URL encoded bytes
      * @param encodedSolidusHandling How should the %2f sequence handled by the decoder? For query strings this
@@ -91,7 +73,18 @@ public final class UDecoder {
     }
 
 
-    private void convert(ByteChunk mb, boolean query, EncodedSolidusHandling encodedSolidusHandling)
+    /**
+     * URLDecode, will modify the source. Assumes source bytes are encoded using a superset of US-ASCII as per RFC 7230.
+     *
+     * @param mb                     The URL encoded bytes
+     * @param query                  {@code true} if this is a query string. For a query string '+' will be decoded
+     *                                   to ' '
+     * @param encodedSolidusHandling How should the %2f sequence handled by the decoder? For query strings this
+     *                                   parameter will be ignored and the %2f sequence will be decoded
+     *
+     * @throws IOException Invalid %xx URL encoding
+     */
+    public void convert(ByteChunk mb, boolean query, EncodedSolidusHandling encodedSolidusHandling)
             throws IOException {
 
         int start = mb.getOffset();
