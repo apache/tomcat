@@ -50,10 +50,14 @@ public class SSLHostConfigCertificate implements Serializable {
     // Internal
     private ObjectName oname;
 
-    // OpenSSL can handle multiple certs in a single config so the reference to
-    // the context is at the virtual host level. JSSE can't so the reference is
-    // held here on the certificate.
-    private transient volatile SSLContext sslContext;
+    /*
+     *  OpenSSL can handle multiple certs in a single config so the reference to the context is at the virtual host
+     *  level. JSSE can't so the reference is held here on the certificate. Typically, the SSLContext is generated from
+     *  the configuration but, particularly in embedded scenarios, it can be provided directly.
+     */
+    private transient volatile SSLContext sslContextProvided;
+    private transient volatile SSLContext sslContextGenerated;
+
 
     // Common
     private final SSLHostConfig sslHostConfig;
@@ -90,12 +94,25 @@ public class SSLHostConfigCertificate implements Serializable {
 
 
     public SSLContext getSslContext() {
-        return sslContext;
+        if (sslContextProvided != null) {
+            return sslContextProvided;
+        }
+        return sslContextGenerated;
     }
 
 
     public void setSslContext(SSLContext sslContext) {
-        this.sslContext = sslContext;
+        this.sslContextProvided = sslContext;
+    }
+
+
+    public SSLContext getSslContextGenerated() {
+        return sslContextGenerated;
+    }
+
+
+    void setSslContextGenerated(SSLContext sslContext) {
+        this.sslContextGenerated = sslContext;
     }
 
 

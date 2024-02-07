@@ -99,14 +99,18 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
                 sslHostConfig.setEnabledCiphers(sslUtil.getEnabledCiphers());
             }
 
-            SSLContext sslContext;
-            try {
-                sslContext = sslUtil.createSSLContext(negotiableProtocols);
-            } catch (Exception e) {
-                throw new IllegalArgumentException(e.getMessage(), e);
+            SSLContext sslContext = certificate.getSslContext();
+            // Generate the SSLContext from configuration unless (e.g. embedded) an SSLContext has been provided.
+            if (sslContext == null) {
+                try {
+                    sslContext = sslUtil.createSSLContext(negotiableProtocols);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(e.getMessage(), e);
+                }
+
+                certificate.setSslContextGenerated(sslContext);
             }
 
-            certificate.setSslContext(sslContext);
             logCertificate(certificate);
         }
     }
@@ -202,7 +206,11 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
     public void unbind() throws Exception {
         for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
             for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates()) {
-                certificate.setSslContext(null);
+                /*
+                 * Only remove any generated SSLContext. If the SSLContext was provided it is left in place in case the
+                 * endpoint is re-started.
+                 */
+                certificate.setSslContextGenerated(null);
             }
         }
     }
