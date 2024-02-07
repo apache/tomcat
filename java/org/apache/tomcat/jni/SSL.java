@@ -241,7 +241,7 @@ public final class SSL {
     public static final int SSL_SELECTOR_FAILURE_NO_ADVERTISE = 0;
     public static final int SSL_SELECTOR_FAILURE_CHOOSE_MY_LAST_PROTOCOL = 1;
 
-    /* Return OpenSSL version number (compile time version, if version < 1.1.0) */
+    /* Return OpenSSL version number (run time version) */
     public static native int version();
 
     /* Return OpenSSL version string (run time version) */
