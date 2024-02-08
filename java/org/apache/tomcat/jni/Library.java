@@ -30,7 +30,7 @@ public final class Library {
      */
     private static Library _instance = null;
 
-    private static boolean initialized = false;
+    private static volatile boolean initialized = false;
 
     private Library() throws Exception {
         boolean loaded = false;
