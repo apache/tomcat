@@ -101,6 +101,7 @@ public final class TesterSupport {
             Library.initialize(null);
             available = true;
             version = SSL.version();
+            Library.terminatePrepare();
             Library.terminate();
         } catch (Exception | LibraryNotFoundError ex) {
             // Ignore

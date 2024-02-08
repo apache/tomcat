@@ -175,6 +175,7 @@ public class AprLifecycleListener implements LifecycleListener {
     }
 
     private static void terminateAPR() {
+        Library.terminatePrepare();
         Library.terminate();
         aprAvailable = false;
         aprInitialized = false;
