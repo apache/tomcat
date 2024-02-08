@@ -133,6 +133,10 @@
         Review usage of debug logging and downgrade trace or data dumping
         operations from debug level to trace. (remm)
       </fix>
+      <fix>
+        <bug>68559</bug>: Allow asynchronous error handling to write to the
+        response after an error during asynchronous processing. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
