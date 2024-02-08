@@ -70,6 +70,7 @@ import org.apache.juli.logging.LogFactory;
  *   Some URLs should not have nonce parameters added to them at all
  */
 public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
+
     /**
      * The default set of URL patterns for which nonces will not be appended.
      */
@@ -240,7 +241,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         } else if (pattern.startsWith("/") && pattern.endsWith("/")) {
             return new PatternPredicate(pattern.substring(1, pattern.length() - 1));
         } else {
-            throw new IllegalArgumentException("Unsupported pattern: " + pattern);
+            throw new IllegalArgumentException(sm.getString("csrfPrevention.unsupportedPattern", pattern));
         }
     }
 
