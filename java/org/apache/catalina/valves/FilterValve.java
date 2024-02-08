@@ -141,8 +141,7 @@ public class FilterValve extends ValveBase implements FilterConfig {
     @Override
     public ServletContext getServletContext() {
         if (null == application) {
-            throw new IllegalStateException("Filter " + filter +
-                    " has called getServletContext from FilterValve, but this FilterValve is not ");
+            throw new IllegalStateException(sm.getString("filterValve.noContext", getFilterClassName()));
         } else {
             return application;
         }
@@ -184,7 +183,7 @@ public class FilterValve extends ValveBase implements FilterConfig {
         super.startInternal();
 
         if (null == getFilterClassName()) {
-            throw new LifecycleException("No filterClass specified for FilterValve: a filterClass is required");
+            throw new LifecycleException(sm.getString("filterValve.nullFilterClassName"));
         }
         Container parent = super.getContainer();
         if (parent instanceof Context) {
@@ -202,8 +201,7 @@ public class FilterValve extends ValveBase implements FilterConfig {
                                     ScheduledThreadPoolExecutor.class.getName().equals(args[0])) {
                                 return executor;
                             } else {
-                                throw new UnsupportedOperationException(
-                                        "This ServletContext is not really meant to be used.");
+                                throw new UnsupportedOperationException(sm.getString("filterValve.proxyServletContext"));
                             }
                         }
                     });
@@ -215,7 +213,7 @@ public class FilterValve extends ValveBase implements FilterConfig {
             filter.init(this);
         } catch (ServletException | InstantiationException | IllegalAccessException | IllegalArgumentException |
                 InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException se) {
-            throw new LifecycleException("Failed to start FilterValve for filter " + filter, se);
+            throw new LifecycleException(sm.getString("filterValve.initError", getFilterClassName()), se);
         }
     }
 
@@ -245,11 +243,11 @@ public class FilterValve extends ValveBase implements FilterConfig {
 
         if (!filterCallInfo.stop) {
             if (request != filterCallInfo.request) {
-                throw new IllegalStateException("Filter " + filter + " has illegally changed or wrapped the request");
+                throw new IllegalStateException(sm.getString("filterValve.illegalWrapping", getFilterClassName()));
             }
 
             if (response != filterCallInfo.response) {
-                throw new IllegalStateException("Filter " + filter + " has illegally changed or wrapped the response");
+                throw new IllegalStateException(sm.getString("filterValve.illegalWrapping", getFilterClassName()));
             }
 
             getNext().invoke(request, response);
