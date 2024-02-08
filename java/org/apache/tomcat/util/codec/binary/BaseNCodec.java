@@ -172,7 +172,7 @@ public abstract class BaseNCodec {
     private static int createPositiveCapacity(final int minCapacity) {
         if (minCapacity < 0) {
             // overflow
-            throw new OutOfMemoryError("Unable to allocate array size: " + (minCapacity & 0xffffffffL));
+            throw new OutOfMemoryError(sm.getString("base64.outOfMemory", Long.valueOf(minCapacity & 0xffffffffL)));
         }
         // This is called when we require buffer expansion to a very big array.
         // Use the conservative maximum buffer size if possible, otherwise the biggest required.
