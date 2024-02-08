@@ -29,6 +29,8 @@ public final class Library {
      */
     private static Library _instance = null;
 
+    private static boolean initialized = false;
+
     private Library() throws Exception {
         boolean loaded = false;
         StringBuilder err = new StringBuilder();
@@ -97,12 +99,26 @@ public final class Library {
         System.loadLibrary(libraryName);
     }
 
-    /* create global TCN's APR pool
-     * This has to be the first call to TCN library.
+    /**
+     * Create Tomcat Native's global APR pool. This has to be the first call to TCN library.
      */
     private static native boolean initialize();
-    /* destroy global TCN's APR pool
-     * This has to be the last call to TCN library.
+    /**
+     * Signal that Tomcat Native is about to be shutdown.
+     * <p>
+     * The main purpose of this flag is to allow instances that manage their own APR root pools to determine if those
+     * pools need to be explicitly cleaned up or if they will be / have been cleaned up by the call to
+     * {@link #terminate()}. The code needs to avoid multiple attempts to clean up these pools else the Native code may
+     * crash.
+     */
+    public static void terminatePrepare() {
+        initialized = false;
+    }
+    /**
+     * Destroys Tomcat Native's global APR pool. This has to be the last call to TCN library. This will destroy any APR
+     * root pools that have not been explicitly destroyed.
+     * <p>
+     * Callers of this method should call {@link #terminatePrepare()} before calling this method.
      */
     public static native void terminate();
     /* Internal function for loading APR Features */
@@ -161,6 +177,12 @@ public final class Library {
                                                aprVersionString() + ")");
             }
         }
-        return initialize();
+        initialized = initialize();
+        return initialized;
+    }
+
+
+    public static boolean isInitialized() {
+        return initialized;
     }
 }
