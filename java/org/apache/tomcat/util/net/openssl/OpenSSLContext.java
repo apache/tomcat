@@ -45,6 +45,7 @@ import javax.net.ssl.X509TrustManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.CertificateVerifier;
+import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLConf;
@@ -187,7 +188,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     @Override
     public synchronized void destroy() {
         // Guard against multiple destroyPools() calls triggered by construction exception and finalize() later
-        if (aprPoolDestroyed.compareAndSet(0, 1)) {
+        if (aprPoolDestroyed.compareAndSet(0, 1) && Library.isInitialized()) {
             if (ctx != 0) {
                 SSLContext.free(ctx);
             }
