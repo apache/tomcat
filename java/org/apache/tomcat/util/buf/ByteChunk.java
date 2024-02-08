@@ -541,24 +541,6 @@ public final class ByteChunk extends AbstractChunk {
     /**
      * Converts the current content of the byte buffer to a String using the configured character set.
      *
-     * @return The result of converting the bytes to a String
-     *
-     * @deprecated Unused. This method will be removed in Tomcat 11 onwards.
-     */
-    @Deprecated
-    public String toStringInternal() {
-        try {
-            return toStringInternal(CodingErrorAction.REPLACE, CodingErrorAction.REPLACE);
-        } catch (CharacterCodingException e) {
-            // Unreachable code. Use of REPLACE above means the exception will never be thrown.
-            throw new IllegalStateException(e);
-        }
-    }
-
-
-    /**
-     * Converts the current content of the byte buffer to a String using the configured character set.
-     *
      * @param malformedInputAction      Action to take if the input is malformed
      * @param unmappableCharacterAction Action to take if a byte sequence can't be mapped to a character
      *

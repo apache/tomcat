@@ -124,11 +124,6 @@ public class MimeHeaders {
         count = 0;
     }
 
-    @Deprecated
-    public void clear() {
-        recycle();
-    }
-
     @Override
     public String toString() {
         StringWriter sw = new StringWriter();

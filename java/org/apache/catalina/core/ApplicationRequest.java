@@ -41,23 +41,13 @@ import jakarta.servlet.ServletRequestWrapper;
  */
 class ApplicationRequest extends ServletRequestWrapper {
 
-    /**
-     * The set of attribute names that are special for request dispatchers.
-     *
-     * @deprecated Will be removed without replacement in Tomcat 11 onwards.
-     */
-    @Deprecated
-    protected static final String specials[] =
-            { RequestDispatcher.INCLUDE_REQUEST_URI, RequestDispatcher.INCLUDE_CONTEXT_PATH,
+    private static final Set<String> specialsSet =
+            new HashSet<>(Arrays.asList(RequestDispatcher.INCLUDE_REQUEST_URI, RequestDispatcher.INCLUDE_CONTEXT_PATH,
                     RequestDispatcher.INCLUDE_SERVLET_PATH, RequestDispatcher.INCLUDE_PATH_INFO,
                     RequestDispatcher.INCLUDE_QUERY_STRING, RequestDispatcher.INCLUDE_MAPPING,
                     RequestDispatcher.FORWARD_REQUEST_URI, RequestDispatcher.FORWARD_CONTEXT_PATH,
                     RequestDispatcher.FORWARD_SERVLET_PATH, RequestDispatcher.FORWARD_PATH_INFO,
-                    RequestDispatcher.FORWARD_QUERY_STRING, RequestDispatcher.FORWARD_MAPPING };
-    /*
-     * This duplicates specials but has been added to improve the performance of isSpecial().
-     */
-    private static final Set<String> specialsSet = new HashSet<>(Arrays.asList(specials));
+                    RequestDispatcher.FORWARD_QUERY_STRING, RequestDispatcher.FORWARD_MAPPING));
 
 
     /**
@@ -111,7 +101,7 @@ class ApplicationRequest extends ServletRequestWrapper {
     public void removeAttribute(String name) {
         synchronized (attributes) {
             attributes.remove(name);
-            if (!isSpecial(name)) {
+            if (!specialsSet.contains(name)) {
                 getRequest().removeAttribute(name);
             }
         }
@@ -128,7 +118,7 @@ class ApplicationRequest extends ServletRequestWrapper {
     public void setAttribute(String name, Object value) {
         synchronized (attributes) {
             attributes.put(name, value);
-            if (!isSpecial(name)) {
+            if (!specialsSet.contains(name)) {
                 getRequest().setAttribute(name, value);
             }
         }
@@ -156,20 +146,5 @@ class ApplicationRequest extends ServletRequestWrapper {
                 attributes.put(name, value);
             }
         }
-    }
-
-
-    // ------------------------------------------------------ Protected Methods
-
-    /**
-     * Is this attribute name one of the special ones that is added only for included servlets?
-     *
-     * @param name Attribute name to be tested
-     *
-     * @deprecated Will be removed without replacement in Tomcat 11 onwards.
-     */
-    @Deprecated
-    protected boolean isSpecial(String name) {
-        return specialsSet.contains(name);
     }
 }

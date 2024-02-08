@@ -475,22 +475,6 @@ public class StringCache {
     /**
      * Find an entry given its name in the cache and return the associated String.
      *
-     * @param name The name to find
-     *
-     * @return the corresponding value
-     *
-     * @deprecated Unused. Will be removed in Tomcat 11.
-     *             Use {@link #find(ByteChunk, CodingErrorAction, CodingErrorAction)}
-     */
-    @Deprecated
-    protected static final String find(ByteChunk name) {
-        return find(name, CodingErrorAction.REPLACE, CodingErrorAction.REPLACE);
-    }
-
-
-    /**
-     * Find an entry given its name in the cache and return the associated String.
-     *
      * @param name                      The name to find
      * @param malformedInputAction      Action to take if an malformed input is encountered
      * @param unmappableCharacterAction Action to take if an unmappable character is encountered
