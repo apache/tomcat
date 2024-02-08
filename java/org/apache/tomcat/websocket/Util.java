@@ -523,7 +523,7 @@ public class Util {
                 }
                 if (value != null && (value.indexOf(',') > -1 || value.indexOf(';') > -1 || value.indexOf('\"') > -1 ||
                         value.indexOf('=') > -1)) {
-                    throw new IllegalArgumentException(sm.getString("", value));
+                    throw new IllegalArgumentException(sm.getString("util.invalidValue", value));
                 }
                 extension.addParameter(new WsExtensionParameter(name, value));
             }
