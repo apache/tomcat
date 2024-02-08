@@ -29,13 +29,6 @@ import static java.lang.foreign.ValueLayout.*;
 @SuppressWarnings({"javadoc", "boxing"})
 public class openssl_h {
 
-    static final SymbolLookup SYMBOL_LOOKUP
-            = SymbolLookup.loaderLookup().or(Linker.nativeLinker().defaultLookup());
-
-    static {
-        System.loadLibrary("ssl");
-    }
-
     openssl_h() {
         // Suppresses public default constructor, ensuring non-instantiability,
         // but allows generated subclasses in same package.
@@ -54,6 +47,9 @@ public class openssl_h {
 
     static final Arena LIBRARY_ARENA = Arena.ofAuto();
     static final boolean TRACE_DOWNCALLS = Boolean.getBoolean("jextract.trace.downcalls");
+    static final SymbolLookup SYMBOL_LOOKUP = SymbolLookup.libraryLookup(System.mapLibraryName("ssl"), LIBRARY_ARENA)
+            .or(SymbolLookup.loaderLookup())
+            .or(Linker.nativeLinker().defaultLookup());
 
     static void traceDowncall(String name, Object... args) {
          String traceArgs = Arrays.stream(args)
