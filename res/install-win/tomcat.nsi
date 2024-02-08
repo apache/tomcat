@@ -265,9 +265,9 @@ Section "Native" SecTomcatNative
   SetOutPath $INSTDIR\bin
 
   ${If} $Arch == "x86"
-    File bin\tcnative-1.dll
+    File bin\tcnative-2.dll
   ${ElseIf} $Arch == "x64"
-    File /oname=tcnative-1.dll bin\x64\tcnative-1.dll
+    File /oname=tcnative-2.dll bin\x64\tcnative-2.dll
   ${EndIf}
 
   ClearErrors

@@ -422,8 +422,8 @@ To deactivate Apache Tomcat Native library:
 
 The binary file of Apache Tomcat Native library is usually named
 
-  - "tcnative-1.dll" on Windows
-  - "libtcnative-1.so" on *nix systems
+  - "tcnative-2.dll" on Windows
+  - "libtcnative-2.so" on *nix systems
 
 
 Apache Commons Daemon

@@ -374,7 +374,7 @@ By default the "test.apr.loc" property specifies the following location:
     output/build/bin/
 
 If you are on Windows and want to test the OpenSSL TLS implementation you can
-put the tcnative-1.dll file into ${tomcat.source}/bin/ and it will be
+put the tcnative-2.dll file into ${tomcat.source}/bin/ and it will be
 copied into the above directory when the build runs.
 
 The unit tests include tests of the clustering functionality which require
