@@ -62,11 +62,11 @@
     <subsection name="Windows">
 
     <p>
-      Windows binaries are provided for tcnative-1, which is a statically compiled .dll which includes
+      Windows binaries are provided for tcnative-2, which is a statically compiled .dll which includes
       OpenSSL and APR. It can be downloaded from <a href="https://tomcat.apache.org/download-native.cgi">here</a>
       as 32bit or AMD x86-64 binaries.
       In security conscious production environments, it is recommended to use separate shared dlls
-      for OpenSSL, APR, and libtcnative-1, and update them as needed according to security bulletins.
+      for OpenSSL, APR, and libtcnative-2, and update them as needed according to security bulletins.
       Windows OpenSSL binaries are linked from the <a href="https://www.openssl.org">Official OpenSSL
       website</a> (see related/binaries).
     </p>
@@ -84,8 +84,8 @@
       Requirements:
     </p>
     <ul>
-      <li>APR 1.2+ development headers (libapr1-dev package)</li>
-      <li>OpenSSL 1.0.2+ development headers (libssl-dev package)</li>
+      <li>APR 1.6.3+ development headers (libapr1-dev package)</li>
+      <li>OpenSSL 1.1.1+ development headers (libssl-dev package)</li>
       <li>JNI headers from Java compatible JDK 1.4+</li>
       <li>GNU development environment (gcc, make)</li>
     </ul>

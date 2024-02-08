@@ -257,7 +257,7 @@ Section "Native" SecTomcatNative
 
   SetOutPath $INSTDIR\bin
 
-  File bin\tcnative-1.dll
+  File bin\tcnative-2.dll
 
   ClearErrors
 
