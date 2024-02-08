@@ -160,14 +160,14 @@ jdt.loc.1=http://archive.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj
 jdt.loc.2=http://download.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj-${jdt.version}.jar
 
 # ----- Tomcat native library -----
-tomcat-native.version=2.0.6
-tomcat-native-openssl.version=3.0.11
+tomcat-native.version=2.0.7
+tomcat-native-openssl.version=3.0.13
 tomcat-native.src.checksum.enabled=true
 tomcat-native.src.checksum.algorithm=SHA-512
-tomcat-native.src.checksum.value=d714fb96f880d0d565c58d25bb803fa9a144a6d87e825ad8d00aeac833b40a5512f888b94b3109853f8ee28b176b24fde95fb2d2a70ce65181a51ca7fc60cdab
+tomcat-native.src.checksum.value=625b334271494f7c86c06d6a8c6d13c06d9d6094f65cccbdc8d3df13ee2aae4cb42ad326e20bcbf8a8f141240111778991882f9bf87793b09a2920433d6c8c85
 tomcat-native.win.checksum.enabled=true
 tomcat-native.win.checksum.algorithm=SHA-512
-tomcat-native.win.checksum.value=f45083d2148d6f17549eba395f6ac4f25f4ffc5cdd45a99d25bef89aee9395d1f913c3fcc27689648c13c298a86083ad7df49311fc3178cbadfa3c2d97b0dc38
+tomcat-native.win.checksum.value=7486ac1587bbd2871eb84a4a393fc5f1e72918612a35272b4375cc8b92ccab5adf4506cd16eb0165e654152f979f45ca1de5a72dc57531c57ffd0f859694c36b
 tomcat-native.home=${base.path}/tomcat-native-${tomcat-native.version}
 tomcat-native.tar.gz=${tomcat-native.home}/tomcat-native.tar.gz
 tomcat-native.loc.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/source/tomcat-native-${tomcat-native.version}-src.tar.gz
