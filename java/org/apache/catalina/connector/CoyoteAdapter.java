@@ -177,6 +177,8 @@ public class CoyoteAdapter implements Adapter {
                         }
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
+                        // Allow the error handling to write to the response
+                        response.setSuspended(false);
                         // Need to trigger the call to AbstractProcessor.setErrorState()
                         // before the listener is called so the listener can call complete
                         // Therefore no need to set success=false as that would trigger a
@@ -210,6 +212,8 @@ public class CoyoteAdapter implements Adapter {
                         }
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
+                        // Allow the error handling to write to the response
+                        response.setSuspended(false);
                         // Need to trigger the call to AbstractProcessor.setErrorState()
                         // before the listener is called so the listener can call complete
                         // Therefore no need to set success=false as that would trigger a
