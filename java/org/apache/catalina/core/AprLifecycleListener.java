@@ -170,6 +170,8 @@ public class AprLifecycleListener implements LifecycleListener {
 
     private static void terminateAPR() {
         Library.terminatePrepare();
+        // Need to force GC here as some components do APR clean-up in finalize()
+        System.gc();
         AprStatus.setAprInitialized(false);
         AprStatus.setAprAvailable(false);
         fipsModeActive = false;
