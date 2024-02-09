@@ -169,11 +169,10 @@ public class AprLifecycleListener implements LifecycleListener {
     }
 
     private static void terminateAPR() {
-        Library.terminatePrepare();
         AprStatus.setAprInitialized(false);
         AprStatus.setAprAvailable(false);
         fipsModeActive = false;
-        sslInitialized = false; // Well we cleaned the pool in terminate.
+        sslInitialized = false; // terminate() will clean the pool
         Library.terminate();
     }
 

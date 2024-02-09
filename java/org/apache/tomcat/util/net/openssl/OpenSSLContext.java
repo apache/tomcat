@@ -46,7 +46,6 @@ import javax.net.ssl.X509TrustManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.CertificateVerifier;
-import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLConf;
@@ -649,16 +648,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
         @Override
         public void run() {
-            if (Library.isInitialized()) {
-                if (ctx != 0) {
-                    SSLContext.free(ctx);
-                }
-                if (cctx != 0) {
-                    SSLConf.free(cctx);
-                }
-                if (aprPool != 0) {
-                    Pool.destroy(aprPool);
-                }
+            if (ctx != 0) {
+                SSLContext.free(ctx);
+            }
+            if (cctx != 0) {
+                SSLConf.free(cctx);
+            }
+            if (aprPool != 0) {
+                Pool.destroy(aprPool);
             }
         }
     }

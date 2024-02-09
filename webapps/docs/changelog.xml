@@ -171,10 +171,6 @@
         configured on <code>SSLHostConfigCertificate</code> instances. Based on
         pull request <pr>673</pr> provided by Hakan Altındağ. (markt)
       </fix>
-      <fix>
-        Improve the Tomcat Native shutdown process to reduce the likelihood of a
-        JVM crash during Tomcat shutdown. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
