@@ -87,6 +87,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private final SSLHostConfigCertificate certificate;
     private final List<String> negotiableProtocols;
     private final long aprPool;
+    private final long aprGeneration;
     private final AtomicInteger aprPoolDestroyed = new AtomicInteger(0);
     // OpenSSLConfCmd context
     protected final long cctx;
@@ -104,6 +105,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         this.sslHostConfig = certificate.getSSLHostConfig();
         this.certificate = certificate;
         aprPool = Pool.create(0);
+        aprGeneration = Library.getGeneration();
         boolean success = false;
         try {
             // Create OpenSSLConfCmd context if used
@@ -190,15 +192,21 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     @Override
     public synchronized void destroy() {
         // Guard against multiple destroyPools() calls triggered by construction exception and finalize() later
-        if (aprPoolDestroyed.compareAndSet(0, 1) && Library.isInitialized()) {
-            if (ctx != 0) {
-                SSLContext.free(ctx);
-            }
-            if (cctx != 0) {
-                SSLConf.free(cctx);
-            }
-            if (aprPool != 0) {
-                Pool.destroy(aprPool);
+        if (aprPoolDestroyed.compareAndSet(0, 1)) {
+            if (Library.tryCleanUpLock(aprGeneration)) {
+                try {
+                    if (ctx != 0) {
+                        SSLContext.free(ctx);
+                    }
+                    if (cctx != 0) {
+                        SSLConf.free(cctx);
+                    }
+                    if (aprPool != 0) {
+                        Pool.destroy(aprPool);
+                    }
+                } finally {
+                    Library.returnCleanUpLock();
+                }
             }
         }
     }

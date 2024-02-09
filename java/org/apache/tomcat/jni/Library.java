@@ -17,6 +17,10 @@
 package org.apache.tomcat.jni;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public final class Library {
 
@@ -30,7 +34,8 @@ public final class Library {
      */
     private static Library _instance = null;
 
-    private static volatile boolean initialized = false;
+    private static final AtomicLong generation = new AtomicLong(0);
+    private static final ReadWriteLock cleanUpLock = new ReentrantReadWriteLock();
 
     private Library() throws Exception {
         boolean loaded = false;
@@ -81,21 +86,25 @@ public final class Library {
      */
     private static native boolean initialize();
     /**
-     * Signal that Tomcat Native is about to be shutdown.
-     * <p>
-     * The main purpose of this flag is to allow instances that manage their own APR root pools to determine if those
-     * pools need to be explicitly cleaned up or if they will be / have been cleaned up by the call to
-     * {@link #terminate()}. The code needs to avoid multiple attempts to clean up these pools else the Native code may
-     * crash.
+     * Allows for thread safe termination when other threads may be attempting clean-up concurrently with the current
+     * thread. Waits for any threads currently holding the clean-up lock to release the lock and then calls
+     * {@link #terminate()}.
      */
-    public static void terminatePrepare() {
-        initialized = false;
+    public static void threadSafeTerminate() {
+        cleanUpLock.writeLock().lock();
+        try {
+            terminate();
+        } finally {
+            generation.incrementAndGet();
+            cleanUpLock.writeLock().unlock();
+        }
     }
     /**
      * Destroys Tomcat Native's global APR pool. This has to be the last call to TCN library. This will destroy any APR
      * root pools that have not been explicitly destroyed.
      * <p>
-     * Callers of this method should call {@link #terminatePrepare()} before calling this method.
+     * This method should only be used if the caller is certain that all other threads have finished using the native
+     * library.
      */
     public static native void terminate();
     /* Internal function for loading APR Features */
@@ -263,13 +272,29 @@ public final class Library {
                 throw new UnsatisfiedLinkError("Missing threading support from APR");
             }
         }
-        initialized = initialize();
-        return initialized;
+        return initialize();
     }
 
 
-    public static boolean isInitialized() {
-        return initialized;
+    public static boolean tryCleanUpLock(long cleanupGeneration) {
+        try {
+            boolean result = cleanUpLock.readLock().tryLock(0, TimeUnit.SECONDS);
+            if (result &&  generation.get() == cleanupGeneration) {
+                return true;
+            }
+            cleanUpLock.readLock().unlock();
+        } catch (InterruptedException e) {
+            // Treated the same way as not getting the lock
+        }
+        return false;
+    }
+
+    public static long getGeneration() {
+        return generation.get();
+    }
+
+    public static void returnCleanUpLock() {
+        cleanUpLock.readLock().unlock();
     }
 
     /**
