@@ -293,7 +293,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("login " + username + " " + principal);
+            log.debug(sm.getString("jaasMemoryLoginModule.login", username, principal));
         }
 
         // Report results based on success or failure

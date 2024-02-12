@@ -758,7 +758,7 @@ public class Catalina {
             try {
                 getServer().destroy();
             } catch (LifecycleException e1) {
-                log.debug("destroy() failed for failed Server ", e1);
+                log.debug(sm.getString("catalina.destroyFail"), e1);
             }
             return;
         }
@@ -878,14 +878,14 @@ public class Catalina {
             }
             System.setProperty(javax.naming.Context.URL_PKG_PREFIXES, value);
             if (log.isDebugEnabled()) {
-                log.debug("Setting naming prefix=" + value);
+                log.debug(sm.getString("catalina.namingPrefix", value));
             }
             value = System.getProperty(javax.naming.Context.INITIAL_CONTEXT_FACTORY);
             if (value == null) {
                 System.setProperty(javax.naming.Context.INITIAL_CONTEXT_FACTORY,
                         "org.apache.naming.java.javaURLContextFactory");
             } else {
-                log.debug("INITIAL_CONTEXT_FACTORY already set " + value);
+                log.debug(sm.getString("catalina.initialContextFactory", value));
             }
         }
     }
@@ -911,7 +911,7 @@ public class Catalina {
             writer.write(code.toString());
         } catch (IOException e) {
             // Should not happen
-            log.debug("Error writing code loader", e);
+            log.debug(sm.getString("catalina.loaderWriteFail"), e);
         }
     }
 

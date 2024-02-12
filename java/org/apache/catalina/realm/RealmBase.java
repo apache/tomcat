@@ -443,7 +443,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     cert.checkValidity();
                 } catch (Exception e) {
                     if (log.isDebugEnabled()) {
-                        log.debug("  Validity exception", e);
+                        log.debug(sm.getString("realmBase.validity"), e);
                     }
                     return null;
                 }

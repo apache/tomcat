@@ -183,7 +183,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                     host = InetAddress.getLocalHost().getHostAddress();
                 }
                 if (log.isDebugEnabled()) {
-                    log.debug("Starting replication listener on address:"+ host);
+                    log.debug(sm.getString("receiverBase.start", host));
                 }
                 bind = InetAddress.getByName(host);
             } catch (IOException ioe) {

@@ -1403,7 +1403,7 @@ public class Digester extends DefaultHandler2 {
                         }
                     } catch (URISyntaxException e) {
                         if (log.isDebugEnabled()) {
-                            log.debug("Invalid URI '" + baseURI + "' or '" + systemId + "'");
+                            log.debug(sm.getString("digester.invalidURI", baseURI, systemId));
                         }
                     }
                 }

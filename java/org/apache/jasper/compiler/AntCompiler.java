@@ -255,8 +255,7 @@ public class AntCompiler extends Compiler {
 
         if( log.isDebugEnabled() ) {
             long t2 = System.currentTimeMillis();
-            log.debug("Compiled " + ctxt.getServletJavaFileName() + " "
-                      + (t2-t1) + "ms");
+            log.debug(Localizer.getMessage("jsp.compiled", ctxt.getServletJavaFileName(), Long.valueOf(t2 - t1)));
         }
 
         logger = null;

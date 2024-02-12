@@ -168,7 +168,7 @@ public class StandardManager extends ManagerBase {
             }
         } catch (FileNotFoundException e) {
             if (log.isDebugEnabled()) {
-                log.debug("No persisted data file found");
+                log.debug(sm.getString("standardManager.noFile", file.getAbsolutePath()));
             }
             return;
         }
@@ -223,7 +223,7 @@ public class StandardManager extends ManagerBase {
 
         // Expire all the sessions we just wrote
         if (log.isDebugEnabled()) {
-            log.debug("Expiring " + list.size() + " persisted sessions");
+            log.debug(sm.getString("standardManager.expiringSessions", list.size()));
         }
         for (StandardSession session : list) {
             try {

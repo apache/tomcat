@@ -689,7 +689,7 @@ public class ContextConfig implements LifecycleListener {
     protected void processContextConfig(Digester digester, URL contextXml, InputStream stream) {
 
         if (log.isDebugEnabled()) {
-            log.debug("Processing context [" + context.getName() + "] configuration file [" + contextXml + "]");
+            log.debug(sm.getString("contextConfig.processContext", context.getName(), contextXml));
         }
 
         InputSource source = null;
@@ -894,8 +894,7 @@ public class ContextConfig implements LifecycleListener {
             antiLockingDocBase = antiLockingDocBase.getAbsoluteFile();
 
             if (log.isDebugEnabled()) {
-                log.debug("Anti locking context[" + context.getName() + "] setting docBase to " +
-                        antiLockingDocBase.getPath());
+                log.debug(sm.getString("contextConfig.antiLocking", context.getName(), antiLockingDocBase.getPath()));
             }
 
             // Cleanup just in case an old deployment is lying around
@@ -1541,7 +1540,7 @@ public class ContextConfig implements LifecycleListener {
             } else {
                 if (log.isDebugEnabled()) {
                     for (String urlPattern : jspPropertyGroup.getUrlPatterns()) {
-                        log.debug("Skipping " + urlPattern + " , no servlet " + jspServletName);
+                        log.debug(sm.getString("contextConfig.noJsp", urlPattern, jspServletName));
                     }
                 }
             }

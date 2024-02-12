@@ -629,7 +629,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     @Override
     public void addChild(Container child) {
         if (log.isDebugEnabled()) {
-            log.debug("Add child " + child + " " + this);
+            log.debug(sm.getString("containerBase.child.add", child, this));
         }
 
         synchronized (children) {
