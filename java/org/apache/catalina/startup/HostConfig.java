@@ -1459,7 +1459,7 @@ public class HostConfig implements LifecycleListener {
             // host's configBase
             if (isDeletableResource(app, current)) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Delete " + current);
+                    log.debug(sm.getString("hostConfig.delete", current));
                 }
                 ExpandWar.delete(current);
             }
@@ -1478,7 +1478,7 @@ public class HostConfig implements LifecycleListener {
                 // configBase
                 if (isDeletableResource(app, current)) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Delete " + current);
+                        log.debug(sm.getString("hostConfig.delete", current));
                     }
                     ExpandWar.delete(current);
                 }

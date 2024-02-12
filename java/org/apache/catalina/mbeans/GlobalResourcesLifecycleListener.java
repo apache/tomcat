@@ -128,7 +128,7 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
     protected void createMBeans(String prefix, Context context) throws NamingException {
 
         if (log.isDebugEnabled()) {
-            log.debug("Creating MBeans for Global JNDI Resources in Context '" + prefix + "'");
+            log.debug(sm.getString("globalResources.create", prefix));
         }
 
         try {

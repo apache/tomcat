@@ -144,13 +144,14 @@ public class RewriteValve extends ValveBase {
         // Process configuration file for this valve
         if (getContainer() instanceof Context) {
             context = true;
+            String webInfResourcePath = "/WEB-INF/" + resourcePath;
             is = ((Context) getContainer()).getServletContext()
-                .getResourceAsStream("/WEB-INF/" + resourcePath);
+                .getResourceAsStream(webInfResourcePath);
             if (containerLog.isDebugEnabled()) {
                 if (is == null) {
-                    containerLog.debug("No configuration resource found: /WEB-INF/" + resourcePath);
+                    containerLog.debug(sm.getString("rewriteValve.noConfiguration", webInfResourcePath));
                 } else {
-                    containerLog.debug("Read configuration from: /WEB-INF/" + resourcePath);
+                    containerLog.debug(sm.getString("rewriteValve.readConfiguration", webInfResourcePath));
                 }
             }
         } else if (getContainer() instanceof Host) {

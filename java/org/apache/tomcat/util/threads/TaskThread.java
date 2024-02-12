@@ -18,6 +18,7 @@ package org.apache.tomcat.util.threads;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * A Thread implementation that records the time at which it was created.
@@ -26,6 +27,7 @@ import org.apache.juli.logging.LogFactory;
 public class TaskThread extends Thread {
 
     private static final Log log = LogFactory.getLog(TaskThread.class);
+    private static final StringManager sm = StringManager.getManager(TaskThread.class);
     private final long creationTime;
 
     public TaskThread(ThreadGroup group, Runnable target, String name) {
@@ -62,7 +64,7 @@ public class TaskThread extends Thread {
             } catch(StopPooledThreadException exc) {
                 //expected : we just swallow the exception to avoid disturbing
                 //debuggers like eclipse's
-                log.debug("Thread exiting on purpose", exc);
+                log.debug(sm.getString("taskThread.exiting"), exc);
             }
         }
 

@@ -396,8 +396,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     @Override
     public synchronized Manager createManager(String name) {
         if (log.isDebugEnabled()) {
-            log.debug("Creating ClusterManager for context " + name + " using class " +
-                    getManagerTemplate().getClass().getName());
+            log.debug(sm.getString("simpleTcpCluster.createManager", name, getManagerTemplate().getClass().getName()));
         }
         ClusterManager manager = null;
         try {
@@ -697,7 +696,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
                 if (destmembers.length > 0) {
                     channel.send(destmembers, msg, sendOptions);
                 } else if (log.isDebugEnabled()) {
-                    log.debug("No members in cluster, ignoring message:" + msg);
+                    log.debug(sm.getString("simpleTcpCluster.noMembers", msg));
                 }
             }
         } catch (Exception x) {
@@ -796,8 +795,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
                 // Notify our interested LifecycleListeners
                 fireLifecycleEvent(RECEIVE_MESSAGE_FAILURE_EVENT, new SendMessageData(message, dest, null));
                 if (log.isDebugEnabled()) {
-                    log.debug("Message " + message.toString() + " from type " + message.getClass().getName() +
-                            " transferred but no listener registered");
+                    log.debug(sm.getString("simpleTcpCluster.noListener", message, message.getClass().getName()));
                 }
             }
         }

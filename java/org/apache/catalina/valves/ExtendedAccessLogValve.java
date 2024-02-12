@@ -491,8 +491,8 @@ public class ExtendedAccessLogValve extends AccessLogValve {
 
     @Override
     protected AccessLogElement[] createLogElements() {
-        if (log.isDebugEnabled()) {
-            log.debug("decodePattern, pattern =" + pattern);
+        if (log.isTraceEnabled()) {
+            log.trace("decodePattern, pattern =" + pattern);
         }
         List<AccessLogElement> list = new ArrayList<>();
 

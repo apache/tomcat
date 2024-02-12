@@ -33,9 +33,11 @@ import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.collections.SynchronizedStack;
+import org.apache.tomcat.util.res.StringManager;
 
 public abstract class ClusterManagerBase extends ManagerBase implements ClusterManager {
 
+    protected static final StringManager sm = StringManager.getManager(ClusterManagerBase.class);
     private final Log log = LogFactory.getLog(ClusterManagerBase.class); // must not be static
 
     /**
@@ -191,7 +193,7 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
                     } // for
 
                     if (replicationValve == null && log.isDebugEnabled()) {
-                        log.debug("no ReplicationValve found for CrossContext Support");
+                        log.debug(sm.getString("clusterManager.noValve"));
                     } // endif
                 } // end if
             } // endif

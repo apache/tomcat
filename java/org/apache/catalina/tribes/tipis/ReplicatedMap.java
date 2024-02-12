@@ -191,7 +191,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
             removed = (mapMembers.remove(member) != null );
             if (!removed) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Member["+member+"] disappeared, but was not present in the map.");
+                    log.debug(sm.getString("replicatedMap.member.disappeared.unknown", member));
                 }
                 return; //the member was not part of our map.
             }

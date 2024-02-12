@@ -191,16 +191,16 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         key.attach(null);
         if (key.channel() instanceof SocketChannel) {
             try { ((SocketChannel)key.channel()).socket().close(); } catch (IOException e) { if (log.isDebugEnabled()) {
-                log.debug("", e);
+                log.debug(sm.getString("nioReceiver.closeError"), e);
             } }
         }
         if (key.channel() instanceof DatagramChannel) {
             try { ((DatagramChannel)key.channel()).socket().close(); } catch (Exception e) { if (log.isDebugEnabled()) {
-                log.debug("", e);
+                log.debug(sm.getString("nioReceiver.closeError"), e);
             } }
         }
         try { key.channel().close(); } catch (IOException e) { if (log.isDebugEnabled()) {
-            log.debug("", e);
+            log.debug(sm.getString("nioReceiver.closeError"), e);
         } }
 
     }
@@ -347,7 +347,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 datagramChannel.close();
             }catch (Exception iox) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to close datagram channel.",iox);
+                    log.debug(sm.getString("nioReceiver.closeError"), iox);
                 }
             }
             datagramChannel=null;
@@ -474,7 +474,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             // thread becomes available, the thread pool itself has a waiting mechanism
             // so we will not wait here.
             if (log.isDebugEnabled()) {
-                log.debug("No TcpReplicationThread available");
+                log.debug(sm.getString("nioReceiver.noThread"));
             }
         } else {
             // invoking this wakes up the worker thread then returns

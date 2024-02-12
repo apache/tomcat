@@ -27,6 +27,7 @@ import java.util.TreeMap;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This class implements a String cache for ByteChunk and CharChunk.
@@ -37,6 +38,7 @@ public class StringCache {
 
 
     private static final Log log = LogFactory.getLog(StringCache.class);
+    private static final StringManager sm = StringManager.getManager(StringCache.class);
 
 
     // ------------------------------------------------------- Static Variables
@@ -289,7 +291,7 @@ public class StringCache {
                         bcCache = tempbcCache;
                         if (log.isDebugEnabled()) {
                             long t2 = System.currentTimeMillis();
-                            log.debug("ByteCache generation time: " + (t2 - t1) + "ms");
+                            log.debug(sm.getString("stringCache.byteTime", Long.valueOf(t2 - t1)));
                         }
                     } else {
                         bcCount++;
@@ -402,7 +404,7 @@ public class StringCache {
                         ccCache = tempccCache;
                         if (log.isDebugEnabled()) {
                             long t2 = System.currentTimeMillis();
-                            log.debug("CharCache generation time: " + (t2 - t1) + "ms");
+                            log.debug(sm.getString("stringCache.charTime", Long.valueOf(t2 - t1)));
                         }
                     } else {
                         ccCount++;
