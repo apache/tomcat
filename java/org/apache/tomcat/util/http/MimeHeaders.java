@@ -488,7 +488,7 @@ class ValuesEnumerator implements Enumeration<String> {
     public String nextElement() {
         MessageBytes current = next;
         findNext();
-        return current.toString();
+        return current.toStringType();
     }
 }
 
