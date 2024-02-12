@@ -1021,8 +1021,8 @@ public class CoyoteAdapter implements Adapter {
                     request.setRequestedSessionId(scookie.getValue().toString());
                     request.setRequestedSessionCookie(true);
                     request.setRequestedSessionURL(false);
-                    if (log.isDebugEnabled()) {
-                        log.debug(" Requested cookie session id is " + request.getRequestedSessionId());
+                    if (log.isTraceEnabled()) {
+                        log.trace(" Requested cookie session id is " + request.getRequestedSessionId());
                     }
                 } else {
                     if (!request.isRequestedSessionIdValid()) {

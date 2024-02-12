@@ -432,16 +432,15 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         if (server == null) {
             synchronized (serverLock) {
                 if (server == null) {
-                    long t1 = System.currentTimeMillis();
                     if (MBeanServerFactory.findMBeanServer(null).size() > 0) {
                         server = MBeanServerFactory.findMBeanServer(null).get(0);
                         if (log.isDebugEnabled()) {
-                            log.debug("Using existing MBeanServer " + (System.currentTimeMillis() - t1));
+                            log.debug(sm.getString("registry.existingServer"));
                         }
                     } else {
                         server = ManagementFactory.getPlatformMBeanServer();
                         if (log.isDebugEnabled()) {
-                            log.debug("Created MBeanServer" + (System.currentTimeMillis() - t1));
+                            log.debug(sm.getString("registry.createdServer"));
                         }
                     }
                 }
@@ -624,7 +623,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
             if (getMBeanServer().isRegistered(oname)) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Unregistering existing component " + oname);
+                    log.debug(sm.getString("registry.unregisterExisting", oname));
                 }
                 getMBeanServer().unregisterMBean(oname);
             }

@@ -1199,8 +1199,8 @@ public class JNDIRealm extends RealmBase {
             closePooledConnections();
 
             // Return "not authenticated" for this request
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("Returning null principal.");
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace("Returning null principal.");
             }
             return null;
         } finally {
@@ -1227,8 +1227,8 @@ public class JNDIRealm extends RealmBase {
             throws NamingException {
 
         if (username == null || username.equals("") || credentials == null || credentials.equals("")) {
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("username null or empty: returning null principal.");
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace("username null or empty: returning null principal.");
             }
             return null;
         }

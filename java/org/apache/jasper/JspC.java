@@ -1102,8 +1102,7 @@ public class JspC extends Task implements Options {
         throws IOException
     {
         if (log.isDebugEnabled()) {
-            log.debug("Generating web mapping for file " + file
-                      + " using compilation context " + clctxt);
+            log.debug(Localizer.getMessage("jspc.generatingMapping", file, clctxt));
         }
 
         String className = clctxt.getServletClassName();
@@ -1267,7 +1266,7 @@ public class JspC extends Task implements Options {
     protected void processFile(String file) throws JasperException {
 
         if (log.isDebugEnabled()) {
-            log.debug("Processing file: " + file);
+            log.debug(Localizer.getMessage("jspc.processing", file));
         }
 
         ClassLoader originalClassLoader = null;
@@ -1310,7 +1309,7 @@ public class JspC extends Task implements Options {
             // the .java file
             if( clc.isOutDated(compile) ) {
                 if (log.isDebugEnabled()) {
-                    log.debug(jspUri + " is out dated, compiling...");
+                    log.debug(Localizer.getMessage("jspc.outdated", jspUri));
                 }
 
                 clc.compile(compile, true);
@@ -1319,7 +1318,7 @@ public class JspC extends Task implements Options {
             // Generate mapping
             generateWebMapping( file, clctxt );
             if ( showSuccess ) {
-                log.info( "Built File: " + file );
+                log.info(Localizer.getMessage("jspc.built", file));
             }
 
         } catch (JasperException je) {
@@ -1399,7 +1398,7 @@ public class JspC extends Task implements Options {
     @Override
     public void execute() {
         if(log.isDebugEnabled()) {
-            log.debug("execute() starting for " + pages.size() + " pages.");
+            log.debug(Localizer.getMessage("jspc.start", pages.size()));
         }
 
         try {

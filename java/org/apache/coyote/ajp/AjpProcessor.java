@@ -369,7 +369,7 @@ public class AjpProcessor extends AbstractProcessor {
                         socketWrapper.flush(true);
                     } catch (IOException e) {
                         if (getLog().isDebugEnabled()) {
-                            getLog().debug("Pong message failed", e);
+                            getLog().debug(sm.getString("ajpprocessor.pongFail"), e);
                         }
                         setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                     }
@@ -379,7 +379,7 @@ public class AjpProcessor extends AbstractProcessor {
                     // Unexpected packet type. Unread body packets should have
                     // been swallowed in finish().
                     if (getLog().isDebugEnabled()) {
-                        getLog().debug("Unexpected message: " + type);
+                        getLog().debug(sm.getString("ajpprocessor.unexpectedMessage", type));
                     }
                     setErrorState(ErrorState.CLOSE_CONNECTION_NOW, null);
                     break;

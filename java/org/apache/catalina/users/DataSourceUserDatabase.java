@@ -934,10 +934,8 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
         if (log.isDebugEnabled()) {
             // As there are lots of parameters to configure, log some debug to help out
-            log.debug("DataSource UserDatabase features: User<->Role ["
-                    + Boolean.toString(userRoleTable != null && roleNameCol != null)
-                    + "], Roles [" + Boolean.toString(isRoleStoreDefined())
-                    + "], Groups [" + Boolean.toString(isRoleStoreDefined()) + "]");
+            log.debug(sm.getString("dataSourceUserDatabase.features", Boolean.toString(userRoleTable != null && roleNameCol != null),
+                    Boolean.toString(isRoleStoreDefined()), Boolean.toString(isGroupStoreDefined())));
         }
 
         dbWriteLock.lock();
