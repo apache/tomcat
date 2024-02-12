@@ -59,8 +59,16 @@ class ApplicationRequest extends ServletRequestWrapper {
      */
     private static final Set<String> specialsSet = new HashSet<>(Arrays.asList(specials));
 
-    private static final int shortestSpecialNameLength =
-            specialsSet.stream().mapToInt(s -> s.length()).min().getAsInt();
+    private static final int shortestSpecialNameLength;
+    static {
+        int minLength = Integer.MAX_VALUE;
+        for (String special : specialsSet) {
+            if (special.length() < minLength) {
+                minLength = special.length();
+            }
+        }
+        shortestSpecialNameLength = minLength;
+    }
 
 
     /**

@@ -83,14 +83,17 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * It may be possible to remove specials but that will require changes to AttributeNamesEnumerator.
      */
     private static final Map<String,Integer> specialsMap = new HashMap<>();
+    private static final int shortestSpecialNameLength;
     static {
+        int minLength = Integer.MAX_VALUE;
         for (int i = 0; i < specials.length; i++) {
             specialsMap.put(specials[i], Integer.valueOf(i));
+            if (specials[i].length() < minLength) {
+                minLength = specials[i].length();
+            }
         }
+        shortestSpecialNameLength = minLength;
     }
-
-    private static final int shortestSpecialNameLength =
-            specialsMap.keySet().stream().mapToInt(s -> s.length()).min().getAsInt();
 
 
     private static final int SPECIALS_FIRST_FORWARD_INDEX = 6;
