@@ -379,7 +379,7 @@ public class AjpProcessor extends AbstractProcessor {
                     // Unexpected packet type. Unread body packets should have
                     // been swallowed in finish().
                     if (getLog().isDebugEnabled()) {
-                        getLog().debug(sm.getString("ajpprocessor.unexpectedMessage", type));
+                        getLog().debug(sm.getString("ajpprocessor.unexpectedMessage", Integer.toString(type)));
                     }
                     setErrorState(ErrorState.CLOSE_CONNECTION_NOW, null);
                     break;

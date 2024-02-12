@@ -1398,7 +1398,7 @@ public class JspC extends Task implements Options {
     @Override
     public void execute() {
         if(log.isDebugEnabled()) {
-            log.debug(Localizer.getMessage("jspc.start", pages.size()));
+            log.debug(Localizer.getMessage("jspc.start", Integer.toString(pages.size())));
         }
 
         try {

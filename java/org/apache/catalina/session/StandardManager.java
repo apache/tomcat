@@ -311,7 +311,7 @@ public class StandardManager extends ManagerBase {
 
         // Expire all the sessions we just wrote
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("standardManager.expiringSessions", list.size()));
+            log.debug(sm.getString("standardManager.expiringSessions", Integer.toString(list.size())));
         }
         for (StandardSession session : list) {
             try {
