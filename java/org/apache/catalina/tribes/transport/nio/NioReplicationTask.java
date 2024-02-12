@@ -262,7 +262,7 @@ public class NioReplicationTask extends AbstractRxTask {
     private void remoteEof(SelectionKey key) {
         // close channel on EOF, invalidates the key
         if ( log.isDebugEnabled() ) {
-            log.debug("Channel closed on the remote end, disconnecting");
+            log.debug(sm.getString("nioReplicationTask.disconnect"));
         }
         cancelKey(key);
     }
