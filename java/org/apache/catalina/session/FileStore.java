@@ -233,7 +233,7 @@ public final class FileStore extends StoreBase {
             return session;
         } catch (FileNotFoundException e) {
             if (contextLog.isDebugEnabled()) {
-                contextLog.debug("No persisted data file found");
+                contextLog.debug(sm.getString("fileStore.noFile", id, file.getAbsolutePath()));
             }
             return null;
         } finally {

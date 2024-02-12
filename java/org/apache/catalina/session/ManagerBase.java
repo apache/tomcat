@@ -650,12 +650,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
             ((Lifecycle) sessionIdGenerator).start();
         } else {
             // Force initialization of the random number generator
-            if (log.isDebugEnabled()) {
-                log.debug("Force random number initialization starting");
+            if (log.isTraceEnabled()) {
+                log.trace("Force random number initialization starting");
             }
             sessionIdGenerator.generateSessionId();
-            if (log.isDebugEnabled()) {
-                log.debug("Force random number initialization completed");
+            if (log.isTraceEnabled()) {
+                log.trace("Force random number initialization completed");
             }
         }
     }

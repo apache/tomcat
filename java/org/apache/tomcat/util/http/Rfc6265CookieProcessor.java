@@ -82,7 +82,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
                     if (log.isDebugEnabled()) {
                         Exception e = new Exception();
                         // TODO: Review this in light of HTTP/2
-                        log.debug("Cookies: Parsing cookie as String. Expected bytes.", e);
+                        log.debug(sm.getString("rfc6265CookieProcessor.expectedBytes"), e);
                     }
                     cookieValue.toBytes();
                 }

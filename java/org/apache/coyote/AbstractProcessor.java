@@ -209,7 +209,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 }
             } catch (IOException ioe) {
                 if (getLog().isDebugEnabled()) {
-                    getLog().debug("Unable to write async data.", ioe);
+                    getLog().debug(sm.getString("abstractProcessor.asyncFail"), ioe);
                 }
                 status = SocketEvent.ERROR;
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);

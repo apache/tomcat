@@ -548,8 +548,7 @@ public abstract class Compiler {
                 }
             } catch (Exception e) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Problem accessing resource. Treat as outdated.",
-                            e);
+                    log.debug(Localizer.getMessage("jsp.error.compiler.missingResource"), e);
                 }
                 return true;
             }

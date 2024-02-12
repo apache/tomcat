@@ -110,7 +110,7 @@ public class NioReplicationTask extends AbstractRxTask {
             } else if ( e instanceof IOException ) {
                 //don't spew out stack traces for IO exceptions unless debug is enabled.
                 if (log.isDebugEnabled()) {
-                    log.debug ("IOException in replication worker, unable to drain channel. Probable cause: Keep alive socket closed["+e.getMessage()+"].", e);
+                    log.debug(sm.getString("nioReplicationTask.unable.drainChannel.ioe", e.getMessage()), e);
                 } else {
                     log.warn (sm.getString("nioReplicationTask.unable.drainChannel.ioe", e.getMessage()));
                 }

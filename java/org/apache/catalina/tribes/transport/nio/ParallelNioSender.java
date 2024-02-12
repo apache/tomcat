@@ -428,7 +428,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                 selector.close();
             } catch (Exception e) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Failed to close selector", e);
+                    log.debug(sm.getString("parallelNioSender.selectorCloseFail"), e);
                 }
             }
         }

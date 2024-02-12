@@ -212,7 +212,7 @@ public class ProxyErrorReportValve extends ErrorReportValve {
                 IOTools.flow(inputStream, outputStream);
             } catch (URISyntaxException | IOException | IllegalArgumentException e) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Proxy error to " + urlString, e);
+                    log.debug(sm.getString("proxyErrorReportValve.error", urlString), e);
                 }
                 // Ignore
             } finally {

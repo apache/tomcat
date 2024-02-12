@@ -441,8 +441,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Security checking request " + request.getMethod() + " " + request.getRequestURI());
+        if (log.isTraceEnabled()) {
+            log.trace("Security checking request " + request.getMethod() + " " + request.getRequestURI());
         }
 
         // Have we got a cached authenticated Principal to record?
@@ -453,8 +453,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 if (session != null) {
                     principal = session.getPrincipal();
                     if (principal != null) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("We have cached auth type " + session.getAuthType() + " for principal " +
+                        if (log.isTraceEnabled()) {
+                            log.trace("We have cached auth type " + session.getAuthType() + " for principal " +
                                     principal);
                         }
                         request.setAuthType(session.getAuthType());
@@ -476,8 +476,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         }
 
         if (constraints == null && !context.getPreemptiveAuthentication() && !authRequired) {
-            if (log.isDebugEnabled()) {
-                log.debug("Not subject to any constraint");
+            if (log.isTraceEnabled()) {
+                log.trace("Not subject to any constraint");
             }
             getNext().invoke(request, response);
             return;
@@ -503,7 +503,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             }
             if (!realm.hasUserDataPermission(request, response, constraints)) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Failed hasUserDataPermission() test");
+                    log.debug(sm.getString("authenticator.userDataPermissionFail"));
                 }
                 /*
                  * ASSERT: Authenticator already set the appropriate HTTP status code, so we do not have to do anything
@@ -542,7 +542,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
         if ((authRequired || constraints != null) && allowCorsPreflightBypass(request)) {
             if (log.isDebugEnabled()) {
-                log.debug("CORS Preflight request bypassing authentication");
+                log.debug(sm.getString("authenticator.corsBypass"));
             }
             getNext().invoke(request, response);
             return;
@@ -563,7 +563,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             if (jaspicProvider == null && !doAuthenticate(request, response) ||
                     jaspicProvider != null && !authenticateJaspic(request, response, jaspicState, false)) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Failed authenticate() test");
+                    log.debug(sm.getString("authenticator.authenticationFail"));
                 }
                 /*
                  * ASSERT: Authenticator already set the appropriate HTTP status code, so we do not have to do anything
@@ -580,7 +580,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             }
             if (!realm.hasResourcePermission(request, response, constraints, this.context)) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Failed accessControl() test");
+                    log.debug(sm.getString("authenticator.userPermissionFail", request.getUserPrincipal().getName()));
                 }
                 /*
                  * ASSERT: AccessControl method has already set the appropriate HTTP status code, so we do not have to
@@ -813,8 +813,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
         if (authStatus == AuthStatus.SUCCESS) {
             GenericPrincipal principal = getPrincipal(client);
-            if (log.isDebugEnabled()) {
-                log.debug("Authenticated user: " + principal);
+            if (log.isTraceEnabled()) {
+                log.trace("Authenticated user: " + principal);
             }
             if (principal == null) {
                 request.setUserPrincipal(null);
@@ -975,8 +975,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             associate(ssoId, request.getSessionInternal(true));
 
             if (log.isDebugEnabled()) {
-                log.debug("Reauthenticated cached principal '" + request.getUserPrincipal().getName() +
-                        "' with auth type '" + request.getAuthType() + "'");
+                log.debug(sm.getString("authenticator.reauthentication", request.getUserPrincipal().getName(), request.getAuthType()));
             }
         }
 
@@ -1018,7 +1017,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
         if (log.isDebugEnabled()) {
             String name = (principal == null) ? "none" : principal.getName();
-            log.debug("Authenticated '" + name + "' with type '" + authType + "'");
+            log.debug(sm.getString("authenticator.authentication", name, authType));
         }
 
         // Cache the authentication information in our request
@@ -1221,9 +1220,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         }
         if (log.isDebugEnabled()) {
             if (sso != null) {
-                log.debug("Found SingleSignOn Valve at " + sso);
+                log.debug(sm.getString("authenticator.sso", sso));
             } else {
-                log.debug("No SingleSignOn Valve is present");
+                log.trace("No SingleSignOn Valve is present");
             }
         }
 
