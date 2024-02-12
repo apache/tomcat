@@ -59,6 +59,9 @@ class ApplicationRequest extends ServletRequestWrapper {
      */
     private static final Set<String> specialsSet = new HashSet<>(Arrays.asList(specials));
 
+    private static final int shortestSpecialNameLength =
+            specialsSet.stream().mapToInt(s -> s.length()).min().getAsInt();
+
 
     /**
      * The request attributes for this request. This is initialized from the wrapped request, but updates are allowed.
@@ -135,6 +138,23 @@ class ApplicationRequest extends ServletRequestWrapper {
     }
 
 
+    /**
+     * Is this attribute name one of the special ones that is added only for included servlets?
+     *
+     * @param name Attribute name to be tested
+     *
+     * @deprecated Will be made private in Tomcat 11 onwards.
+     */
+    @Deprecated
+    protected boolean isSpecial(String name) {
+        // Performance - see BZ 68089
+        if (name.length() < shortestSpecialNameLength) {
+            return false;
+        }
+        return specialsSet.contains(name);
+    }
+
+
     // ------------------------------------------ ServletRequestWrapper Methods
 
     /**
@@ -156,20 +176,5 @@ class ApplicationRequest extends ServletRequestWrapper {
                 attributes.put(name, value);
             }
         }
-    }
-
-
-    // ------------------------------------------------------ Protected Methods
-
-    /**
-     * Is this attribute name one of the special ones that is added only for included servlets?
-     *
-     * @param name Attribute name to be tested
-     *
-     * @deprecated Will be removed without replacement in Tomcat 11 onwards.
-     */
-    @Deprecated
-    protected boolean isSpecial(String name) {
-        return specialsSet.contains(name);
     }
 }
