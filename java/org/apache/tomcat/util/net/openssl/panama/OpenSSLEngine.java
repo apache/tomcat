@@ -1245,7 +1245,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                                         URL url = (new URI(urlString)).toURL();
                                         ocspResponse = processOCSPRequest(url, issuer, x509, x509ctx, localArenal);
                                         if (log.isDebugEnabled()) {
-                                            log.debug(sm.getString("engine.ocspResponse", urlString, ocspResponse));
+                                            log.debug(sm.getString("engine.ocspResponse", urlString,
+                                                    Integer.toString(ocspResponse)));
                                         }
                                     } catch (MalformedURLException | URISyntaxException e) {
                                         log.warn(sm.getString("engine.invalidOCSPURL", urlString));
