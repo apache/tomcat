@@ -134,6 +134,11 @@
         operations from debug level to trace. (remm)
       </fix>
       <fix>
+        <bug>68089</bug>: Further improve the performance of request attribute
+        access for <code>ApplicationHttpRequest</code> and
+        <code>ApplicationRequest</code>. (markt)
+      </fix>
+      <fix>
         <bug>68559</bug>: Allow asynchronous error handling to write to the
         response after an error during asynchronous processing. (markt)
       </fix>

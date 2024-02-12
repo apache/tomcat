@@ -49,6 +49,9 @@ class ApplicationRequest extends ServletRequestWrapper {
                     RequestDispatcher.FORWARD_SERVLET_PATH, RequestDispatcher.FORWARD_PATH_INFO,
                     RequestDispatcher.FORWARD_QUERY_STRING, RequestDispatcher.FORWARD_MAPPING));
 
+    private static final int shortestSpecialNameLength =
+            specialsSet.stream().mapToInt(s -> s.length()).min().getAsInt();
+
 
     /**
      * The request attributes for this request. This is initialized from the wrapped request, but updates are allowed.
@@ -101,7 +104,7 @@ class ApplicationRequest extends ServletRequestWrapper {
     public void removeAttribute(String name) {
         synchronized (attributes) {
             attributes.remove(name);
-            if (!specialsSet.contains(name)) {
+            if (!isSpecial(name)) {
                 getRequest().removeAttribute(name);
             }
         }
@@ -118,12 +121,20 @@ class ApplicationRequest extends ServletRequestWrapper {
     public void setAttribute(String name, Object value) {
         synchronized (attributes) {
             attributes.put(name, value);
-            if (!specialsSet.contains(name)) {
+            if (!isSpecial(name)) {
                 getRequest().setAttribute(name, value);
             }
         }
     }
 
+
+    private boolean isSpecial(String name) {
+        // Performance - see BZ 68089
+        if (name.length() < shortestSpecialNameLength) {
+            return false;
+        }
+        return specialsSet.contains(name);
+    }
 
     // ------------------------------------------ ServletRequestWrapper Methods
 

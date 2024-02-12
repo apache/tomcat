@@ -88,6 +88,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         }
     }
 
+    private static final int shortestSpecialNameLength =
+            specialsMap.keySet().stream().mapToInt(s -> s.length()).min().getAsInt();
+
 
     private static final int SPECIALS_FIRST_FORWARD_INDEX = 6;
 
@@ -742,6 +745,10 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param name Attribute name to be tested
      */
     protected boolean isSpecial(String name) {
+        // Performance - see BZ 68089
+        if (name.length() < shortestSpecialNameLength) {
+            return false;
+        }
         return specialsMap.containsKey(name);
     }
 
@@ -752,6 +759,10 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @return the special attribute pos, or -1 if it is not a special attribute
      */
     protected int getSpecial(String name) {
+        // Performance - see BZ 68089
+        if (name.length() < shortestSpecialNameLength) {
+            return -1;
+        }
         Integer index = specialsMap.get(name);
         if (index == null) {
             return -1;
@@ -766,6 +777,10 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @return true if the attribute was a special attribute, false otherwise
      */
     protected boolean setSpecial(String name, Object value) {
+        // Performance - see BZ 68089
+        if (name.length() < shortestSpecialNameLength) {
+            return false;
+        }
         Integer index = specialsMap.get(name);
         if (index == null) {
             return false;
