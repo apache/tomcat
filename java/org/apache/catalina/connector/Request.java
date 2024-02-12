@@ -2372,7 +2372,7 @@ public class Request implements HttpServletRequest {
      */
     @Override
     public String getRequestURI() {
-        return coyoteRequest.requestURI().toString();
+        return coyoteRequest.requestURI().toStringType();
     }
 
 
