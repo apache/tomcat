@@ -633,7 +633,7 @@ public class McastServiceImpl extends MembershipProviderBase {
                     if (errorCounter==0) {
                         log.warn(sm.getString("mcastServiceImpl.send.failed"),x);
                     } else {
-                        log.debug("Unable to send mcast message.",x);
+                        log.debug(sm.getString("mcastServiceImpl.send.failed"),x);
                     }
                     if ( (++errorCounter)>=recoveryCounter ) {
                         errorCounter=0;
