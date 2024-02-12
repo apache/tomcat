@@ -479,7 +479,7 @@ public final class Request {
         if (contentTypeMB == null || contentTypeMB.isNull()) {
             return null;
         }
-        return contentTypeMB.toString();
+        return contentTypeMB.toStringType();
     }
 
 
