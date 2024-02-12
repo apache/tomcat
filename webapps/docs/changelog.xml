@@ -165,6 +165,12 @@
         Improve the Tomcat Native shutdown process to reduce the likelihood of a
         JVM crash during Tomcat shutdown. (markt)
       </fix>
+      <fix>
+        Partial fix for <bug>68558</bug>: Cache the result of converting to
+        <code>String</code> for request URI, HTTP header names and the request
+        <code>Content-Type</code> value to improve performance by reducing
+        repeated <code>byte[]</code> to <code>String</code> conversions. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
