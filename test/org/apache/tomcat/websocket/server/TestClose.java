@@ -34,7 +34,6 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -115,10 +114,6 @@ public class TestClose extends WebSocketBaseTest {
 
     @Test
     public void testTcpClose() throws Exception {
-        // TODO
-        Assume.assumeFalse("This test currently fails for APR",
-                getTomcatInstance().getConnector().getProtocolHandlerClassName().contains("Apr"));
-
         startServer(TestEndpointConfig.class);
 
         TesterWsClient client = new TesterWsClient("localhost", getPort());
@@ -178,10 +173,6 @@ public class TestClose extends WebSocketBaseTest {
 
     @Test
     public void testTcpCloseInOnMessage() throws Exception {
-        // TODO
-        Assume.assumeFalse("This test currently fails for APR",
-                getTomcatInstance().getConnector().getProtocolHandlerClassName().contains("Apr"));
-
         startServer(TestEndpointConfig.class);
 
         TesterWsClient client = new TesterWsClient("localhost", getPort());
