@@ -225,6 +225,9 @@
       <update>
         Add strings for debug level messages. (remm)
       </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
