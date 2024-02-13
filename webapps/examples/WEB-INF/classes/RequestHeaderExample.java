@@ -89,7 +89,7 @@ public class RequestHeaderExample extends HttpServlet {
 
     protected void renderHTML(HttpServletRequest request,
                               HttpServletResponse response)
-        throws IOException, ServletException
+        throws IOException
     {
         ResourceBundle rb = ResourceBundle.getBundle("LocalStrings",request.getLocale());
 
@@ -144,7 +144,7 @@ public class RequestHeaderExample extends HttpServlet {
     }
 
     protected void renderJSON(HttpServletRequest request, HttpServletResponse response)
-        throws IOException, ServletException
+        throws IOException
     {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
