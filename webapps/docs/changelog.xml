@@ -226,6 +226,9 @@
       <update>
         Add strings for debug level messages. (remm)
       </update>
+      <update>
+        Update Tomcat Native to 1.3.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
