@@ -196,7 +196,7 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
     public static final class SuspendCloseEndpoint extends Endpoint {
 
         // Yes, a static variable is a hack.
-        private static WsSession serverSession;
+        private static volatile WsSession serverSession;
 
         @Override
         public void onOpen(Session session, EndpointConfig epc) {
@@ -226,7 +226,7 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
         }
 
         public static boolean isServerSessionFullyClosed() {
-            return serverSession.isClosed();
+            return serverSession != null && serverSession.isClosed();
         }
     }
 
