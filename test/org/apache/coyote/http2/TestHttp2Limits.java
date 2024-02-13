@@ -281,9 +281,17 @@ public class TestHttp2Limits extends Http2TestBase {
             }
             case STREAM_RESET_THEN_CONNECTION_RESET: {
                 // Expect a stream reset
-                parser.readFrame();
-                Assert.assertEquals("3-RST-[11]\n", output.getTrace());
-                output.clearTrace();
+                // On some platform / Connector combinations the TCP connection close
+                // will be processed before the client gets a chance to read the
+                // connection close frame which will trigger an
+                // IOException when we try to read the frame.
+                try {
+                    parser.readFrame();
+                    Assert.assertEquals("3-RST-[11]\n", output.getTrace());
+                    output.clearTrace();
+                } catch (IOException ioe) {
+                    // Expected on some platforms
+                }
             }
                 //$FALL-THROUGH$
             case CONNECTION_RESET: {
