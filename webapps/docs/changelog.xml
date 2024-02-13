@@ -217,6 +217,9 @@
       <update>
         Update JSign to 6.0. (markt)
       </update>
+      <update>
+        Add strings for debug level messages. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
