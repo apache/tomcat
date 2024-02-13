@@ -115,7 +115,7 @@
         WebSocket API. (markt)
       </add>
       <fix>
-        Correct JPMS and OSGi meta-data for <code>tomcat-enbed-core.jar</code>
+        Correct JPMS and OSGi meta-data for <code>tomcat-embed-core.jar</code>
         by removing reference to <code>org.apache.catalina.ssi</code> package
         that is no longer included in the JAR. Based on pull request
         <pr>684</pr> by Jendrik Johannes. (markt)
