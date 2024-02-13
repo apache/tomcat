@@ -236,6 +236,9 @@
       <update>
         Update Tomcat Native to 2.0.7. (markt)
       </update>
+      <update>
+        Add strings for debug level messages. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
