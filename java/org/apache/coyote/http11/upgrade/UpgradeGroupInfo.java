@@ -61,7 +61,9 @@ public class UpgradeGroupInfo extends BaseModelMBean {
     }
     public void setBytesReceived(long bytesReceived) {
         deadBytesReceived.reset();
-        deadBytesReceived.add(bytesReceived);
+        if (bytesReceived != 0) {
+            deadBytesReceived.add(bytesReceived);
+        }
         for (UpgradeInfo ui : upgradeInfos) {
             ui.setBytesReceived(bytesReceived);
         }
@@ -77,7 +79,9 @@ public class UpgradeGroupInfo extends BaseModelMBean {
     }
     public void setBytesSent(long bytesSent) {
         deadBytesSent.reset();
-        deadBytesSent.add(bytesSent);
+        if (bytesSent != 0) {
+            deadBytesSent.add(bytesSent);
+        }
         for (UpgradeInfo ui : upgradeInfos) {
             ui.setBytesSent(bytesSent);
         }
@@ -93,7 +97,9 @@ public class UpgradeGroupInfo extends BaseModelMBean {
     }
     public void setMsgsReceived(long msgsReceived) {
         deadMsgsReceived.reset();
-        deadMsgsReceived.add(msgsReceived);
+        if (msgsReceived != 0) {
+            deadMsgsReceived.add(msgsReceived);
+        }
         for (UpgradeInfo ui : upgradeInfos) {
             ui.setMsgsReceived(msgsReceived);
         }
@@ -109,7 +115,9 @@ public class UpgradeGroupInfo extends BaseModelMBean {
     }
     public void setMsgsSent(long msgsSent) {
         deadMsgsSent.reset();
-        deadMsgsSent.add(msgsSent);
+        if (msgsSent != 0) {
+            deadMsgsSent.add(msgsSent);
+        }
         for (UpgradeInfo ui : upgradeInfos) {
             ui.setMsgsSent(msgsSent);
         }
