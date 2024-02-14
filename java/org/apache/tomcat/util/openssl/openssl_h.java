@@ -51,6 +51,7 @@ public class openssl_h {
     static final SymbolLookup SYMBOL_LOOKUP;
     static {
         String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+        // Note: Library loading is not portable for MacOS https://github.com/sergot/openssl/issues/81
         if (os.indexOf("mac") >= 0) {
             System.loadLibrary("ssl");
             SYMBOL_LOOKUP = SymbolLookup.loaderLookup().or(Linker.nativeLinker().defaultLookup());
