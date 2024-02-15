@@ -1,4 +1,6 @@
-## Welcome to Apache Tomcat!
+## Welcome to Beyond SUPER Tomcat!
+
+![LGTM](https://i.lgtm.fun/2pbk.png)
 
 ### What Is It?
 
