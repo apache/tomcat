@@ -3813,16 +3813,18 @@ differences that should not be considered troublesome.
         SSS SSS     S                S     SSS SSS
           SSSSSSSSSS                  SSSSSSSSS
 
-
-All (important) signatures are verified; the build appears to be reproducible.
 </echo>
+    <echo if:set="reproducible-3">
+All signatures are verified; the build appears to be 100% reproducible.
+</echo>
+    <echo unless:set="reproducible-3">
+All (important) signatures are verified; the build appears to be reproducible.
 
-    <echo unless:set="reprodicible-3">
 The fulldocs bundle appears to be different than that of the release.
 It is likely due to this JDK bug:
 
   https://bugs.openjdk.org/browse/JDK-8306980
-    </echo>
+</echo>
   </target>
 
   <target name="-check-release-toolchain-versions" if="release-java-version">
