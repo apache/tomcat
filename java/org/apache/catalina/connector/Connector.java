@@ -1010,6 +1010,7 @@ public class Connector extends LifecycleMBeanBase {
 
         if (JreCompat.isJre22Available() && OpenSSLStatus.getUseOpenSSL() && OpenSSLStatus.isAvailable()
                 && protocolHandler instanceof AbstractHttp11Protocol) {
+            // Use FFM and OpenSSL if available
             AbstractHttp11Protocol<?> jsseProtocolHandler = (AbstractHttp11Protocol<?>) protocolHandler;
             if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
                 // OpenSSL is compatible with the JSSE configuration, so use it if it is available
@@ -1018,12 +1019,14 @@ public class Connector extends LifecycleMBeanBase {
             }
         } else if (AprStatus.isAprAvailable() && AprStatus.getUseOpenSSL() &&
                 protocolHandler instanceof AbstractHttp11Protocol) {
+            // Use tomcat-native and OpenSSL otherwise, if available
             AbstractHttp11Protocol<?> jsseProtocolHandler = (AbstractHttp11Protocol<?>) protocolHandler;
             if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
                 // OpenSSL is compatible with the JSSE configuration, so use it if APR is available
                 jsseProtocolHandler.setSslImplementationName(OpenSSLImplementation.class.getName());
             }
         }
+        // Otherwise the default JSSE will be used
 
         try {
             protocolHandler.init();
