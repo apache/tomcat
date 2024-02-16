@@ -350,16 +350,7 @@ public class CorsFilter extends GenericFilter {
         response.resetBuffer();
 
         if (log.isDebugEnabled()) {
-            // Debug so no need for i18n
-            StringBuilder message = new StringBuilder("Invalid CORS request; Origin=");
-            message.append(origin);
-            message.append(";Method=");
-            message.append(method);
-            if (accessControlRequestHeaders != null) {
-                message.append(";Access-Control-Request-Headers=");
-                message.append(accessControlRequestHeaders);
-            }
-            log.debug(message.toString());
+            sm.getString("corsFilter.invalidRequest", origin, method, accessControlRequestHeaders);
         }
     }
 

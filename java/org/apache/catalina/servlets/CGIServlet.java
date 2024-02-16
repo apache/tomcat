@@ -1434,7 +1434,7 @@ public final class CGIServlet extends HttpServlet {
              */
 
             if (!isReady()) {
-                throw new IOException(this.getClass().getName() + ": not ready to run.");
+                throw new IOException(sm.getString("cgiServlet.notReady"));
             }
 
             if (log.isTraceEnabled()) {
@@ -1443,8 +1443,7 @@ public final class CGIServlet extends HttpServlet {
 
             if ((command.contains(File.separator + "." + File.separator)) ||
                     (command.contains(File.separator + "..")) || (command.contains(".." + File.separator))) {
-                throw new IOException(this.getClass().getName() + "Illegal Character in CGI command path " +
-                        "('.' or '..') detected.  Not running CGI [" + command + "].");
+                throw new IOException(sm.getString("cgiServlet.invalidCommand", command));
             }
 
             /*

@@ -132,7 +132,7 @@ public class StoreRegistry {
                 log.trace("find descriptor " + id + "#" + desc.getTag() + "#"
                         + desc.getStoreFactoryClass());
             } else {
-                log.debug(("Can't find descriptor for key " + id));
+                log.debug(sm.getString("registry.noDescriptor", id));
             }
         }
         return desc;

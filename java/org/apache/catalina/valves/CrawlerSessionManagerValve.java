@@ -245,13 +245,13 @@ public class CrawlerSessionManagerValve extends ValveBase {
                             new CrawlerHttpSessionBindingListener(clientIdSessionId, clientIdentifier));
                     s.setMaxInactiveInterval(sessionInactiveInterval);
 
-                    if (log.isDebugEnabled()) {
-                        log.debug(request.hashCode() + ": New bot session. SessionID=" + s.getId());
+                    if (log.isTraceEnabled()) {
+                        log.trace(request.hashCode() + ": New bot session. SessionID=" + s.getId());
                     }
                 }
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug(request.hashCode() + ": Bot session accessed. SessionID=" + sessionId);
+                if (log.isTraceEnabled()) {
+                    log.trace(request.hashCode() + ": Bot session accessed. SessionID=" + sessionId);
                 }
             }
         }

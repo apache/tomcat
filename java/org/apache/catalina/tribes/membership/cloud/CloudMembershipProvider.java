@@ -152,7 +152,8 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
             return;
         }
         if (log.isDebugEnabled()) {
-            String message = add ? "Member added: " + member : "Member disappeared: " + member;
+            String message = add ? sm.getString("cloudMembershipProvider.add", member)
+                    : sm.getString("cloudMembershipProvider.remove", member);
             log.debug(message);
         }
         Runnable r = () -> {
