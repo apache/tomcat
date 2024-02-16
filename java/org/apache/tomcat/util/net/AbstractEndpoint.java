@@ -414,7 +414,7 @@ public abstract class AbstractEndpoint<S,U> {
                 try {
                     sslContext = sslUtil.createSSLContext(negotiableProtocols);
                 } catch (Exception e) {
-                    throw new IllegalArgumentException(e.getMessage(), e);
+                    throw new IllegalArgumentException(sm.getString("endpoint.errorCreatingSSLContext"), e);
                 }
 
                 certificate.setSslContextGenerated(sslContext);

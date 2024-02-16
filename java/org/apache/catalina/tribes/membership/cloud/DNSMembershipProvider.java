@@ -126,7 +126,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug(String.format("Namespace [%s] set; clustering enabled", dnsServiceName));
+            log.debug(sm.getString("cloudMembershipProvider.start", dnsServiceName));
         }
         dnsServiceName = URLEncoder.encode(dnsServiceName, "UTF-8");
 

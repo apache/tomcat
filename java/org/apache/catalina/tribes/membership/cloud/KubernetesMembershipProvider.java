@@ -57,7 +57,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         String namespace = getNamespace();
 
         if (log.isDebugEnabled()) {
-            log.debug(String.format("Namespace [%s] set; clustering enabled", namespace));
+            log.debug(sm.getString("cloudMembershipProvider.start", namespace));
         }
 
         String protocol = getEnv(CUSTOM_ENV_PREFIX + "MASTER_PROTOCOL", "KUBERNETES_MASTER_PROTOCOL");
