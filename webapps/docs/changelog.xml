@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.100 (schultz)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations by tak7iji. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.99 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
@@ -227,12 +237,6 @@
       <update>
         Add strings for debug level messages. (remm)
       </update>
-      <add>
-        Improvements to French translations. (remm)
-      </add>
-      <add>
-        Improvements to Japanese translations by tak7iji. (markt)
-      </add>
     </changelog>
   </subsection>
 </section>
