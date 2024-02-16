@@ -246,7 +246,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             encoderBuffer.clear();
             CoderResult cr = encoder.encode(part, encoderBuffer, true);
             if (cr.isError()) {
-                throw new IllegalArgumentException(cr.toString());
+                throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.encoderError", cr));
             }
             isDone = !cr.isOverflow();
             encoderBuffer.flip();
