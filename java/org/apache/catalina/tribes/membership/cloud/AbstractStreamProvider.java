@@ -75,7 +75,7 @@ public abstract class AbstractStreamProvider implements StreamProvider {
      */
     public URLConnection openConnection(String url, Map<String, String> headers, int connectTimeout, int readTimeout) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(String.format("%s opening connection: url [%s], headers [%s], connectTimeout [%s], readTimeout [%s]",
+            log.debug(sm.getString("abstractStream.connection",
                     getClass().getSimpleName(), url, headers, Integer.toString(connectTimeout), Integer.toString(readTimeout)));
         }
         URLConnection connection;
@@ -91,9 +91,8 @@ public abstract class AbstractStreamProvider implements StreamProvider {
             }
         }
         if (connectTimeout < 0 || readTimeout < 0) {
-            throw new IllegalArgumentException(
-                String.format("Neither connectTimeout [%s] nor readTimeout [%s] can be less than 0 for URLConnection.",
-                        Integer.toString(connectTimeout), Integer.toString(readTimeout)));
+            throw new IllegalArgumentException(sm.getString("abstractStream.invalidTimeout",
+                    Integer.toString(connectTimeout), Integer.toString(readTimeout)));
         }
         connection.setConnectTimeout(connectTimeout);
         connection.setReadTimeout(readTimeout);
