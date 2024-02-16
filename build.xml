@@ -4213,6 +4213,20 @@ reproducible-10=${reproducible-10}
 
     <fail unless="reproducible">
 One or more signatures failed.
+
+Considering using a tool such as "diffoscope"[1] to inspect the differences
+between the official release and your local-build. There may be trivial
+differences that should not be considered troublesome.
+
+For example:
+$ wget https://dist.apache.org/repos/dist/release/tomcat/tomcat-${version.major}/v${version}/src/apache-tomcat-${version}-src.tar.gz
+  or, for a release candidate:
+$ wget https://dist.apache.org/repos/dist/dev/tomcat/tomcat-${version.major}/v${version}/src/apache-tomcat-${version}-src.tar.gz
+  then:
+$ diffoscope apache-tomcat-${version}-src.tar.gz output/release/v${version}/src/apache-tomcat-${version}-src.tar.gz
+
+
+[1] https://diffoscope.org/
 </fail>
     <echo>
 
