@@ -1020,17 +1020,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                             pem_password_cb.allocate(new PasswordCallback(keyPassToUse), contextArena),
                             MemorySegment.NULL);
                     if (MemorySegment.NULL.equals(cert) &&
-                            // Missing ERR_GET_REASON(ERR_peek_last_error())
-                            /*int ERR_GET_REASON(unsigned long errcode) {
-                             *    if (ERR_SYSTEM_ERROR(errcode))
-                             *        return errcode & ERR_SYSTEM_MASK;
-                             *    return errcode & ERR_REASON_MASK;
-                             *}
-                             *# define ERR_SYSTEM_ERROR(errcode)      (((errcode) & ERR_SYSTEM_FLAG) != 0)
-                             *# define ERR_SYSTEM_FLAG                ((unsigned int)INT_MAX + 1)
-                             *# define ERR_SYSTEM_MASK                ((unsigned int)INT_MAX)
-                             *# define ERR_REASON_MASK                0X7FFFFF
-                             */
+                            // EOF is accepted, then try again
                             ((ERR_peek_last_error() & ERR_REASON_MASK()) == PEM_R_NO_START_LINE())) {
                         ERR_clear_error();
                         BIO_reset(certificateBIO);
