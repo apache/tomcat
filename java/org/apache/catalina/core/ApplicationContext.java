@@ -680,7 +680,6 @@ public class ApplicationContext implements ServletContext {
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 context.fireContainerEvent("afterContextAttributeRemoved", listener);
-                // FIXME - should we do anything besides log these?
                 log(sm.getString("applicationContext.attributeEvent"), t);
             }
         }
@@ -743,7 +742,6 @@ public class ApplicationContext implements ServletContext {
                 } else {
                     context.fireContainerEvent("afterContextAttributeAdded", listener);
                 }
-                // FIXME - should we do anything besides log these?
                 log(sm.getString("applicationContext.attributeEvent"), t);
             }
         }

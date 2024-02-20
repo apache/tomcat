@@ -73,7 +73,6 @@ public class JsonAccessLogValve extends AccessLogValve {
 
     private static final Map<Character, String> PATTERNS;
     static {
-        // FIXME: finalize attribute names
         Map<Character, String> pattern2AttributeName = new HashMap<>();
         pattern2AttributeName.put(Character.valueOf('a'), "remoteAddr");
         pattern2AttributeName.put(Character.valueOf('A'), "localAddr");
@@ -102,7 +101,6 @@ public class JsonAccessLogValve extends AccessLogValve {
 
     private static final Map<Character, String> SUB_OBJECT_PATTERNS;
     static {
-        // FIXME: finalize attribute names
         Map<Character, String> pattern2AttributeName = new HashMap<>();
         pattern2AttributeName.put(Character.valueOf('c'), "cookies");
         pattern2AttributeName.put(Character.valueOf('i'), "requestHeaders");

@@ -654,10 +654,7 @@ public class MBeanFactory {
         if (container instanceof Context) {
             ((Context) container).setLoader(loader);
         }
-        // FIXME add Loader.getObjectName
-        // ObjectName oname = loader.getObjectName();
-        ObjectName oname = MBeanUtils.createObjectName(pname.getDomain(), loader);
-        return oname.toString();
+        return loader.getObjectName().toString();
 
     }
 

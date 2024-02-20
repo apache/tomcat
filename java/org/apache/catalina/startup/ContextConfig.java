@@ -2552,8 +2552,7 @@ public class ContextConfig implements LifecycleListener {
     }
 
     /**
-     * process filter annotation and merge with existing one! FIXME: refactoring method too long and has redundant
-     * subroutines with processAnnotationWebServlet!
+     * Process filter annotation and merge with existing one
      *
      * @param className The filter class name
      * @param ae        The filter annotation
