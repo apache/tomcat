@@ -27,7 +27,6 @@ import javax.management.ObjectName;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Group;
-import org.apache.catalina.Loader;
 import org.apache.catalina.Role;
 import org.apache.catalina.Server;
 import org.apache.catalina.User;
