@@ -45,7 +45,7 @@ public abstract class ELResolver {
     public abstract Object getValue(ELContext context, Object base, Object property);
 
     /**
-     * Invokes a method on the the given object. This default implementation always returns <code>null</code>.
+     * Invokes a method on the the given object.
      *
      * @param context    The EL context for this evaluation
      * @param base       The base object on which the method is to be found
@@ -53,7 +53,7 @@ public abstract class ELResolver {
      * @param paramTypes The types of the parameters of the method to invoke
      * @param params     The parameters with which to invoke the method
      *
-     * @return Always <code>null</code>
+     * @return This default implementation always returns <code>null</code>
      *
      * @since EL 2.2
      */
@@ -141,14 +141,14 @@ public abstract class ELResolver {
     public abstract Class<?> getCommonPropertyType(ELContext context, Object base);
 
     /**
-     * Converts the given object to the given type. This default implementation always returns <code>null</code>.
+     * Converts the given object to the given type.
      *
      * @param <T>     The type to which the object should be converted
      * @param context The EL context for this evaluation
      * @param obj     The object to convert
      * @param type    The type to which the object should be converted
      *
-     * @return Always <code>null</code>
+     * @return This default implementation always returns <code>null</code>
      *
      * @since EL 3.0
      */
