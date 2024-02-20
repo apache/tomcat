@@ -458,29 +458,6 @@ public class MBeanUtils {
 
 
     /**
-     * Create an <code>ObjectName</code> for this <code>Loader</code> object.
-     *
-     * @param domain Domain in which this name is to be created
-     * @param loader The Loader to be named
-     *
-     * @return a new object name
-     *
-     * @exception MalformedObjectNameException if a name cannot be created
-     */
-    static ObjectName createObjectName(String domain, Loader loader) throws MalformedObjectNameException {
-
-        ObjectName name = null;
-        Context context = loader.getContext();
-
-        ContextName cn = new ContextName(context.getName(), false);
-        Container host = context.getParent();
-        name = new ObjectName(domain + ":type=Loader,host=" + host.getName() + ",context=" + cn.getDisplayName());
-
-        return name;
-    }
-
-
-    /**
      * Create an <code>ObjectName</code> for this <code>Role</code> object.
      *
      * @param domain Domain in which this name is to be created
