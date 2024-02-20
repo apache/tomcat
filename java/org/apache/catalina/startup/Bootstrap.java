@@ -424,9 +424,6 @@ public final class Bootstrap {
      * Destroy the Catalina Daemon.
      */
     public void destroy() {
-
-        // FIXME
-
     }
 
 

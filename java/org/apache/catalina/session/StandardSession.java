@@ -729,7 +729,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
             expiring = true;
 
             // Notify interested application event listeners
-            // FIXME - Assumes we call listeners in reverse order
+            // Call listeners in reverse order
             Context context = manager.getContext();
 
             // The call to expire() may not have been triggered by the webapp.

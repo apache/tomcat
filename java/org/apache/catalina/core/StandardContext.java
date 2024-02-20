@@ -5920,7 +5920,6 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
-        // FIXME: we not send j2ee.attribute.changed
         if (notificationInfo == null) {
             notificationInfo = new MBeanNotificationInfo[] {
                     new MBeanNotificationInfo(new String[] { "j2ee.object.created" }, Notification.class.getName(),
