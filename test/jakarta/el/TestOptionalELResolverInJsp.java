@@ -53,18 +53,20 @@ public class TestOptionalELResolverInJsp extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
         String result = responseBody.toString();
-        assertEcho(result, "00-null");
-        assertEcho(result, "01-null");
-        assertEcho(result, "02-null");
+        assertEcho(result, "00-");
+        assertEcho(result, "01-");
+        assertEcho(result, "02-");
+        assertEcho(result, "03-");
         assertEcho(result, "10-This is an instance of TesterBeanB");
         assertEcho(result, "11-test");
-        assertEcho(result, "12-test");
-        assertEcho(result, "20-null");
-        assertEcho(result, "21-null");
-        assertEcho(result, "22-null");
+        assertEcho(result, "13-Returned from the doSomething() method");
+        assertEcho(result, "20-");
+        assertEcho(result, "21-");
+        assertEcho(result, "22-");
+        assertEcho(result, "23-");
         assertEcho(result, "30-This is an instance of TesterBeanB");
         assertEcho(result, "31-test");
-        assertEcho(result, "32-test");
+        assertEcho(result, "33-Returned from the doSomething() method");
     }
 
 

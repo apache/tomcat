@@ -32,4 +32,8 @@ public class TesterBeanB {
     public String toString() {
         return "This is an instance of TesterBeanB";
     }
+
+    public String doSomething() {
+        return "Returned from the doSomething() method";
+    }
 }

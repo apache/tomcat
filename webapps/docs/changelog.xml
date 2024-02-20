@@ -105,6 +105,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0-M18 (markt)" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        Add method invocation support for <code>java.util.Optional</code> via
+        the <code>jakarta.el.OptionalELResolver</code>  to Tomcat's
+        implementation of the Jakarta EL API to align with the latest proposals
+        for the Jakarta EL 6.0 API. The property support has also been refined
+        for greater consistency. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M17 (markt)" rtext="2024-02-19">
   <subsection name="Catalina">

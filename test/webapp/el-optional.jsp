@@ -34,15 +34,23 @@
     <tags:echo echo="00-${testBeanA1.beanBOpt}" />
     <tags:echo echo="01-${testBeanA1.beanBOpt.name}" />
     <tags:echo echo="02-${testBeanA1.beanBOpt.map(b -> b.name)}" />
+    <tags:echo echo="03-${testBeanA1.beanBOpt.doSomething()}" />
     <tags:echo echo="10-${testBeanA2.beanBOpt}" />
     <tags:echo echo="11-${testBeanA2.beanBOpt.name}" />
+    <%-- Triggers MethodNotFoundException
     <tags:echo echo="12-${testBeanA2.beanBOpt.map(b -> b.name)}" />
+    --%>
+    <tags:echo echo="13-${testBeanA2.beanBOpt.doSomething()}" />
 
     <tags:echo-deferred echo="20-#{testBeanA1.beanBOpt}" />
     <tags:echo-deferred echo="21-#{testBeanA1.beanBOpt.name}" />
     <tags:echo-deferred echo="22-#{testBeanA1.beanBOpt.map(b -> b.name)}" />
+    <tags:echo-deferred echo="23-#{testBeanA1.beanBOpt.doSomething()}" />
     <tags:echo-deferred echo="30-#{testBeanA2.beanBOpt}" />
     <tags:echo-deferred echo="31-#{testBeanA2.beanBOpt.name}" />
+    <%-- Triggers MethodNotFoundException
     <tags:echo-deferred echo="32-#{testBeanA2.beanBOpt.map(b -> b.name)}" />
+    --%>
+    <tags:echo-deferred echo="33-#{testBeanA2.beanBOpt.doSomething()}" />
   </body>
 </html>

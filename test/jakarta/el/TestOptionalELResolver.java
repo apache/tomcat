@@ -69,7 +69,7 @@ public class TestOptionalELResolver {
         ValueExpression ve = factory.createValueExpression(context, "${beanA.beanBOpt.name}", String.class);
         Object result = ve.getValue(context);
 
-        Assert.assertNull(result);
+        Assert.assertEquals("", result);
     }
 
 
@@ -185,11 +185,11 @@ public class TestOptionalELResolver {
         ValueExpression ve = factory.createValueExpression(context, "${beanA.beanBOpt.map(b -> b.name)}", String.class);
         Object result = ve.getValue(context);
 
-        Assert.assertNull(result);
+        Assert.assertEquals("", result);
     }
 
 
-    @Test
+    @Test(expected = MethodNotFoundException.class)
     public void testIssue176WithOptionalResolverOptionalPresentWithMap() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         StandardELContext context = new StandardELContext(factory);
@@ -203,8 +203,76 @@ public class TestOptionalELResolver {
         context.getVariableMapper().setVariable("beanA", varBeanA);
 
         ValueExpression ve = factory.createValueExpression(context, "${beanA.beanBOpt.map(b -> b.name)}", String.class);
+        ve.getValue(context);
+    }
+
+
+    @Test(expected = MethodNotFoundException.class)
+    public void testWithoutOptionalResolverInvokeOnEmpty() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        StandardELContext context = new StandardELContext(factory);
+
+        TesterBeanA beanA = new TesterBeanA();
+
+        ValueExpression varBeanA = factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("beanA", varBeanA);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanA.beanBOpt.doSomething()}", String.class);
+        ve.getValue(context);
+    }
+
+
+    @Test
+    public void testWithOptionalResolverInvokeOnEmpty() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        StandardELContext context = new StandardELContext(factory);
+        context.addELResolver(new OptionalELResolver());
+
+        TesterBeanA beanA = new TesterBeanA();
+
+        ValueExpression varBeanA = factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("beanA", varBeanA);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanA.beanBOpt.doSomething()}", String.class);
         Object result = ve.getValue(context);
 
-        Assert.assertEquals("test", result);
+        Assert.assertEquals("", result);
+    }
+
+
+    @Test(expected = MethodNotFoundException.class)
+    public void testWithoutOptionalResolverInvokeOnPresent() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        StandardELContext context = new StandardELContext(factory);
+
+        TesterBeanA beanA = new TesterBeanA();
+        TesterBeanB beanB = new TesterBeanB("test");
+        beanA.setBeanB(beanB);
+
+        ValueExpression varBeanA = factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("beanA", varBeanA);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanA.beanBOpt.doSomething()}", String.class);
+        ve.getValue(context);
+    }
+
+
+    @Test
+    public void testWithOptionalResolverInvokeOnPresent() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        StandardELContext context = new StandardELContext(factory);
+        context.addELResolver(new OptionalELResolver());
+
+        TesterBeanA beanA = new TesterBeanA();
+        TesterBeanB beanB = new TesterBeanB("test");
+        beanA.setBeanB(beanB);
+
+        ValueExpression varBeanA = factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("beanA", varBeanA);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanA.beanBOpt.doSomething()}", String.class);
+        Object result = ve.getValue(context);
+
+        Assert.assertEquals(beanB.doSomething(), result);
     }
 }
