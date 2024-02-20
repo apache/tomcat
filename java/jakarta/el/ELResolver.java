@@ -21,10 +21,6 @@ package jakarta.el;
  */
 public abstract class ELResolver {
 
-    public static final String TYPE = "type";
-
-    public static final String RESOLVABLE_AT_DESIGN_TIME = "resolvableAtDesignTime";
-
     /**
      * Obtain the value of the given property on the given object using the given context.
      *
