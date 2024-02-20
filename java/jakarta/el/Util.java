@@ -494,8 +494,8 @@ class Util {
      */
     private static boolean isCoercibleFrom(ELContext context, Object src, Class<?> target) {
         /*
-         *  TODO: This isn't pretty but it works. Significant refactoring would be required to avoid the exception. See
-         *        also OptionalELResolver.convertToType().
+         * TODO: This isn't pretty but it works. Significant refactoring would be required to avoid the exception. See
+         * also OptionalELResolver.convertToType().
          */
         try {
             context.convertToType(src, target);

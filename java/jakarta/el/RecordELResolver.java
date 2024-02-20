@@ -22,9 +22,9 @@ import java.util.Objects;
 /**
  * Defines property resolution behavior on instances of {@link Record}.
  * <p>
- * The resolver handles base objects of type {@link Record}. It accepts any non-{@code null} object as a property and coerces it to a
- * String using {@link Object#toString()}. The property string is used to find an accessor method for a field
- * with the same name.
+ * The resolver handles base objects of type {@link Record}. It accepts any non-{@code null} object as a property and
+ * coerces it to a String using {@link Object#toString()}. The property string is used to find an accessor method for a
+ * field with the same name.
  * <p>
  * This resolver is always read-only since {@link Record}s are always read-only.
  * <p>
@@ -67,8 +67,7 @@ public class RecordELResolver extends ELResolver {
                 method = base.getClass().getMethod(propertyName);
             } catch (NoSuchMethodException nsme) {
                 throw new PropertyNotFoundException(
-                        Util.message(context, "propertyNotFound", base.getClass().getName(), propertyName),
-                        nsme);
+                        Util.message(context, "propertyNotFound", base.getClass().getName(), propertyName), nsme);
             }
 
             try {
@@ -112,8 +111,7 @@ public class RecordELResolver extends ELResolver {
                 base.getClass().getMethod(propertyName);
             } catch (NoSuchMethodException nsme) {
                 throw new PropertyNotFoundException(
-                        Util.message(context, "propertyNotFound", base.getClass().getName(), propertyName),
-                        nsme);
+                        Util.message(context, "propertyNotFound", base.getClass().getName(), propertyName), nsme);
             }
         }
         return null;
@@ -150,8 +148,7 @@ public class RecordELResolver extends ELResolver {
                 base.getClass().getMethod(propertyName);
             } catch (NoSuchMethodException nsme) {
                 throw new PropertyNotFoundException(
-                        Util.message(context, "propertyNotFound", base.getClass().getName(), propertyName),
-                        nsme);
+                        Util.message(context, "propertyNotFound", base.getClass().getName(), propertyName), nsme);
             }
 
             throw new PropertyNotWritableException(
@@ -187,8 +184,7 @@ public class RecordELResolver extends ELResolver {
                 base.getClass().getMethod(propertyName);
             } catch (NoSuchMethodException nsme) {
                 throw new PropertyNotFoundException(
-                        Util.message(context, "propertyNotFound", base.getClass().getName(), propertyName),
-                        nsme);
+                        Util.message(context, "propertyNotFound", base.getClass().getName(), propertyName), nsme);
             }
 
             return true;
