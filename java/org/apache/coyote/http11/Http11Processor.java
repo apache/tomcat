@@ -955,7 +955,11 @@ public class Http11Processor extends AbstractProcessor {
             headers.addValue("Date").setString(FastHttpDateFormat.getCurrentDate());
         }
 
-        // FIXME: Add transfer encoding header
+        // Although using transfer-encoding for gzip would be doable and was
+        // the original intent (which means the compression would be from an
+        // endpoint to the next, so only for the current transmission), it
+        // has been found that using content-encoding (which is end to end
+        // compression) is more efficient and more reliable.
 
         if ((entityBody) && (!contentDelimitation) || connectionClosePresent) {
             // Disable keep-alive if:

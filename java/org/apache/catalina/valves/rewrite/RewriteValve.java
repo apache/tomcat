@@ -621,8 +621,8 @@ public class RewriteValve extends ValveBase {
                 } else if (rewriteMapClassName.startsWith("rnd:")) {
                     map = new RandomizedTextRewriteMap(rewriteMapClassName.substring("rnd:".length()), true);
                 } else if (rewriteMapClassName.startsWith("prg:")) {
-                    // FIXME: https://httpd.apache.org/docs/2.4/rewrite/rewritemap.html#prg
-                    // Likely not worth implementing further since this is a simpler CGI
+                    // https://httpd.apache.org/docs/2.4/rewrite/rewritemap.html#prg
+                    // Not worth implementing further since this is a simpler CGI
                     // piping stdin/stdout from an external native process
                     // Instead assume a class and use the RewriteMap interface
                     rewriteMapClassName = rewriteMapClassName.substring("prg:".length());
