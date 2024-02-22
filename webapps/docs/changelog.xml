@@ -105,6 +105,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.20 (schultz)" rtext="in development">
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Avoid updating request count stats on async. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.19 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
