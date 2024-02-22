@@ -326,7 +326,7 @@ public class CachedResource implements WebResource {
          *
          * One option to resolve this issue is to use a custom URL scheme for resource URLs. This would allow us, via
          * registration of a URLStreamHandlerFactory, to control how the resources are accessed and ensure that all
-         * access go via the cache We took this approach for war: URLs so we can use jar:war:file: URLs to reference
+         * access go via the cache. We took this approach for war: URLs so we can use jar:war:file: URLs to reference
          * resources in unpacked WAR files. However, because URL.setURLStreamHandlerFactory() may only be called once,
          * this can cause problems when using other libraries that also want to use a custom URL scheme.
          *
