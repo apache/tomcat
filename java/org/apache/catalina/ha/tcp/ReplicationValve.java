@@ -306,12 +306,12 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
         }
         Context context = request.getContext();
         boolean isCrossContext = context != null && context instanceof StandardContext && context.getCrossContext();
+        boolean isAsync = request.getAsyncContextInternal() != null;
         try {
             if (isCrossContext) {
                 if (log.isTraceEnabled()) {
                     log.trace(sm.getString("ReplicationValve.crossContext.add"));
                 }
-                // FIXME add Pool of Arraylists
                 crossContextSessions.set(new ArrayList<>());
             }
             getNext().invoke(request, response);
@@ -324,7 +324,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
                     return;
                 }
                 if (cluster.hasMembers()) {
-                    sendReplicationMessage(request, totalstart, isCrossContext, clusterManager);
+                    sendReplicationMessage(request, totalstart, isCrossContext, isAsync, clusterManager);
                 } else {
                     resetReplicationRequest(request, isCrossContext);
                 }
@@ -380,7 +380,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
 
     // --------------------------------------------------------- Protected Methods
 
-    protected void sendReplicationMessage(Request request, long totalstart, boolean isCrossContext,
+    protected void sendReplicationMessage(Request request, long totalstart, boolean isCrossContext, boolean isAsync,
             ClusterManager clusterManager) {
         // this happens after the request
         long start = 0;
@@ -389,10 +389,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
         }
         try {
             // send invalid sessions
-            // DeltaManager returns String[0]
-            if (!(clusterManager instanceof DeltaManager)) {
-                sendInvalidSessions(clusterManager);
-            }
+            sendInvalidSessions(clusterManager);
             // send replication
             sendSessionReplicationMessage(request, clusterManager);
             if (isCrossContext) {
@@ -403,7 +400,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
             log.error(sm.getString("ReplicationValve.send.failure"), x);
         } finally {
             if (doStatistics()) {
-                updateStats(totalstart, start);
+                updateStats(totalstart, start, isAsync);
             }
         }
     }
@@ -415,8 +412,8 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
         List<DeltaSession> sessions = crossContextSessions.get();
         if (sessions != null && sessions.size() > 0) {
             for (DeltaSession session : sessions) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("ReplicationValve.crossContext.sendDelta",
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("ReplicationValve.crossContext.sendDelta",
                             session.getManager().getContext().getName()));
                 }
                 sendMessage(session, (ClusterManager) session.getManager());
@@ -557,23 +554,24 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
      *
      * @param requestTime Request time
      * @param clusterTime Cluster time
+     * @param isAsync if the request was in async mode
      */
-    protected void updateStats(long requestTime, long clusterTime) {
-        // TODO: Async requests may trigger multiple replication requests. How,
-        // if at all, should the stats handle this?
+    protected void updateStats(long requestTime, long clusterTime, boolean isAsync) {
         long currentTime = System.currentTimeMillis();
         lastSendTime.set(currentTime);
         totalSendTime.add(currentTime - clusterTime);
         totalRequestTime.add(currentTime - requestTime);
-        nrOfRequests.increment();
-        if (log.isInfoEnabled()) {
-            if ((nrOfRequests.longValue() % 100) == 0) {
-                log.info(sm.getString("ReplicationValve.stats",
-                        new Object[] { Long.valueOf(totalRequestTime.longValue() / nrOfRequests.longValue()),
-                                Long.valueOf(totalSendTime.longValue() / nrOfRequests.longValue()), Long.valueOf(nrOfRequests.longValue()),
-                                Long.valueOf(nrOfSendRequests.longValue()), Long.valueOf(nrOfCrossContextSendRequests.longValue()),
-                                Long.valueOf(nrOfFilterRequests.longValue()), Long.valueOf(totalRequestTime.longValue()),
-                                Long.valueOf(totalSendTime.longValue()) }));
+        if (!isAsync) {
+            nrOfRequests.increment();
+            if (log.isDebugEnabled()) {
+                if ((nrOfRequests.longValue() % 100) == 0) {
+                    log.debug(sm.getString("ReplicationValve.stats",
+                            new Object[] { Long.valueOf(totalRequestTime.longValue() / nrOfRequests.longValue()),
+                                    Long.valueOf(totalSendTime.longValue() / nrOfRequests.longValue()), Long.valueOf(nrOfRequests.longValue()),
+                                    Long.valueOf(nrOfSendRequests.longValue()), Long.valueOf(nrOfCrossContextSendRequests.longValue()),
+                                    Long.valueOf(nrOfFilterRequests.longValue()), Long.valueOf(totalRequestTime.longValue()),
+                                    Long.valueOf(totalSendTime.longValue()) }));
+                }
             }
         }
     }

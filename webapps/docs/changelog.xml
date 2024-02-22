@@ -128,6 +128,13 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Avoid updating request count stats on async. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M17 (markt)" rtext="2024-02-19">
   <subsection name="Catalina">
