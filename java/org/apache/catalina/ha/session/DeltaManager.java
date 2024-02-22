@@ -62,6 +62,8 @@ public class DeltaManager extends ClusterManagerBase {
      */
     protected static final StringManager sm = StringManager.getManager(DeltaManager.class);
 
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
+
     // ----------------------------------------------------- Instance Variables
 
     protected String name = null;
@@ -1171,7 +1173,7 @@ public class DeltaManager extends ClusterManagerBase {
 
     @Override
     public String[] getInvalidatedSessions() {
-        return new String[0];
+        return EMPTY_STRING_ARRAY;
     }
 
     // -------------------------------------------------------- message receive

@@ -58,7 +58,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * A <b>Cluster </b> implementation using simple multicast. Responsible for setting up a cluster and provides callers
- * with a valid multicast receiver/sender. FIXME wrote testcases
+ * with a valid multicast receiver/sender.
  *
  * @author Remy Maucherat
  * @author Peter Rossbach
