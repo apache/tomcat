@@ -29,6 +29,16 @@ public class openssl_h_Macros {
 
 
     /**
+     * Publicly accessible find.
+     * @param symbol the symbol to find
+     * @return the symbol
+     */
+    public static MemorySegment findOrThrow(String symbol) {
+        return openssl_h.findOrThrow(symbol);
+    }
+
+
+    /**
      * Set maximum protocol version on the given context.
      * {@snippet lang = c : # define SSL_CTX_set_max_proto_version(sslCtx, version) \
      *    SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MAX_PROTO_VERSION, version, NULL)

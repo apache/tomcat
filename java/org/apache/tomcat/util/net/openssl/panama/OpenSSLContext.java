@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
 import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
@@ -68,6 +67,7 @@ import org.apache.tomcat.util.openssl.SSL_CTX_set_alpn_select_cb$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_cert_verify_callback$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_tmp_dh_callback$dh;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_verify$callback;
+import org.apache.tomcat.util.openssl.openssl_h_Macros;
 import org.apache.tomcat.util.openssl.pem_password_cb;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -1081,7 +1081,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     // Set callback for DH parameters
                     SSL_CTX_set_tmp_dh_callback(state.sslCtx, SSL_CTX_set_tmp_dh_callback$dh.allocate(new TmpDHCallback(), contextArena));
                 } else {
-                    var d2i_ECPKParameters = SymbolLookup.loaderLookup().find("d2i_ECPKParameters").get();
+                    var d2i_ECPKParameters = openssl_h_Macros.findOrThrow("d2i_ECPKParameters");
                     var ecparams = PEM_ASN1_read_bio(d2i_ECPKParameters,
                             PEM_STRING_ECPARAMETERS(), certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
                     if (!MemorySegment.NULL.equals(ecparams)) {

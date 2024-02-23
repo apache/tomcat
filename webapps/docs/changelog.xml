@@ -112,6 +112,13 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Fix bad symbol lookup use in the OpenSSL FFM code. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <add>
