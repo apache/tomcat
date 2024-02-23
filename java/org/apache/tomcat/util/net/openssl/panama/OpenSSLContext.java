@@ -1081,7 +1081,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     // Set callback for DH parameters
                     SSL_CTX_set_tmp_dh_callback(state.sslCtx, SSL_CTX_set_tmp_dh_callback$dh.allocate(new TmpDHCallback(), contextArena));
                 } else {
-                    var d2i_ECPKParameters = openssl_h_Macros.findOrThrow("d2i_ECPKParameters");
+                    var d2i_ECPKParameters = openssl_h_Macros.d2i_ECPKParameters$SYMBOL();
                     var ecparams = PEM_ASN1_read_bio(d2i_ECPKParameters,
                             PEM_STRING_ECPARAMETERS(), certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
                     if (!MemorySegment.NULL.equals(ecparams)) {
