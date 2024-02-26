@@ -25,10 +25,13 @@ public class Jre22Compat extends Jre21Compat {
     private static final Log log = LogFactory.getLog(Jre22Compat.class);
     private static final StringManager sm = StringManager.getManager(Jre22Compat.class);
 
-    private static final boolean hasPanama;
+    private static final boolean supported;
 
 
     static {
+        // Note: FFM is the main new feature from Java 22, but it was previously
+        // present as a preview. As a result, it is more accurate to test for another
+        // new class
         Class<?> c1 = null;
         try {
             c1 = Class.forName("java.text.ListFormat");
@@ -36,11 +39,11 @@ public class Jre22Compat extends Jre21Compat {
             // Must be pre-Java 22
             log.debug(sm.getString("jre22Compat.javaPre22"), e);
         }
-        hasPanama = (c1 != null);
+        supported = (c1 != null);
     }
 
     static boolean isSupported() {
-        return hasPanama;
+        return supported;
     }
 
 }
