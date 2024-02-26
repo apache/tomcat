@@ -65,17 +65,9 @@ import org.apache.tomcat.util.net.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
 
 /**
- * NIO tailored thread pool, providing the following services:
- * <ul>
- * <li>Socket acceptor thread</li>
- * <li>Socket poller thread</li>
- * <li>Worker threads pool</li>
- * </ul>
- *
- * TODO: Consider using the virtual machine's thread pool.
+ * NIO endpoint.
  *
  * @author Mladen Turk
- * @author Remy Maucherat
  */
 public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,SocketChannel> {
 
