@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import jakarta.servlet.WriteListener;
@@ -52,6 +53,7 @@ public final class Response {
 
     private static final StringManager sm = StringManager.getManager(Response.class);
     private static final Log log = LogFactory.getLog(Response.class);
+    private static final Log logConcurrency = LogFactory.getLog(Response.class.getName() + ".concurrency");
 
 
     // ----------------------------------------------------- Class Variables
@@ -88,6 +90,8 @@ public final class Response {
      * Associated output buffer.
      */
     OutputBuffer outputBuffer;
+
+    private final ReentrantLock writeLock = new ReentrantLock();
 
 
     /**
@@ -284,7 +288,9 @@ public final class Response {
      * @param ex The exception that occurred
      */
     public void setErrorException(Exception ex) {
-        errorException = ex;
+        if (errorException == null) {
+            errorException = ex;
+        }
     }
 
 
@@ -635,37 +641,75 @@ public final class Response {
      * @throws IOException If an I/O error occurs during the write
      */
     public void doWrite(ByteBuffer chunk) throws IOException {
-        int len = chunk.remaining();
-        outputBuffer.doWrite(chunk);
-        contentWritten += len - chunk.remaining();
+
+        /*
+         * Writing specification correct asynchronous code is hard. In particular, section 2.3.3.4 (Thread Safety) makes
+         * it an application responsibility to manage thread safety on non-container threads. This is particularly
+         * tricky during error handling as it is possible that an outside event (such as a client disconnect) will
+         * trigger the asynchronous error handling while the non-container thread is in the middle of a write.
+         *
+         * While the application should handle this - many don't. Therefore Tomcat attempts to protect against this here
+         * (the protection isn't perfect) and also attempts to log a warning if Tomcat detects an attempt to
+         * concurrently write to the response and recycle the response.
+         */
+        boolean obtainLock = writeLock.tryLock();
+        if (!obtainLock) {
+            // Concurrent access
+            logConcurrency.warn(sm.getString("response.illegalConcurrentAccess"));
+            writeLock.lock();
+        }
+        try {
+            int len = chunk.remaining();
+            outputBuffer.doWrite(chunk);
+            contentWritten += len - chunk.remaining();
+        } catch (IOException ioe) {
+            setErrorException(ioe);
+            throw ioe;
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     // --------------------
 
     public void recycle() {
 
-        contentType = null;
-        contentLanguage = null;
-        locale = DEFAULT_LOCALE;
-        charsetHolder = CharsetHolder.EMPTY;
-        contentLength = -1;
-        status = 200;
-        message = null;
-        committed = false;
-        commitTimeNanos = -1;
-        errorException = null;
-        errorState.set(0);
-        headers.recycle();
-        trailerFieldsSupplier = null;
-        // Servlet 3.1 non-blocking write listener
-        listener = null;
-        synchronized (nonBlockingStateLock) {
-            fireListener = false;
-            registeredForWrite = false;
-        }
+        /*
+         * See doWrite(ByteBuffer chunk) for an explanation of what this lock is aiming to achieve.
+         */
 
-        // update counters
-        contentWritten = 0;
+        boolean obtainLock = writeLock.tryLock();
+        if (!obtainLock) {
+            // Concurrent access
+            logConcurrency.warn(sm.getString("response.illegalConcurrentAccess"));
+            writeLock.lock();
+        }
+        try {
+            contentType = null;
+            contentLanguage = null;
+            locale = DEFAULT_LOCALE;
+            charsetHolder = CharsetHolder.EMPTY;
+            contentLength = -1;
+            status = 200;
+            message = null;
+            committed = false;
+            commitTimeNanos = -1;
+            errorException = null;
+            errorState.set(0);
+            headers.recycle();
+            trailerFieldsSupplier = null;
+            // Servlet 3.1 non-blocking write listener
+            listener = null;
+            synchronized (nonBlockingStateLock) {
+                fireListener = false;
+                registeredForWrite = false;
+            }
+
+            // update counters
+            contentWritten = 0;
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     /**

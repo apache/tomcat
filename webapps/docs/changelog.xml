@@ -112,6 +112,17 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        Attempt to protect against an application violating section 2.3.3.4
+        (Thread Safety) of the Servlet specification during asynchronous
+        processing and log a warning with a dedicated logger
+        (<code>org.apache.coyote.Response.concurrency</code>) if any such
+        violation is detected. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <add>
