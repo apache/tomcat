@@ -64,6 +64,7 @@ import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
+import org.apache.tomcat.util.net.jsse.JSSEImplementation;
 
 public final class TesterSupport {
 
@@ -236,7 +237,8 @@ public final class TesterSupport {
         }
 
         String sslImplementation = System.getProperty("tomcat.test.sslImplementation");
-        if (sslImplementation != null && !"${test.sslImplementation}".equals(sslImplementation)) {
+        if (sslImplementation != null && !"${test.sslImplementation}".equals(sslImplementation)
+                && !JSSEImplementation.class.getName().equals(sslImplementation)) {
             // Assume custom SSL is not supporting this
             return false;
         }
