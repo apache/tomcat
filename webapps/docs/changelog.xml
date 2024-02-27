@@ -105,6 +105,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.20 (schultz)" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        Add support for specifying Java 21 (with the value <code>21</code>) as
+        the compiler source and/or compiler target for JSP compilation. If used
+        with an Eclipse JDT compiler version that does not support these values,
+        a warning will be logged and the default will used.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>
