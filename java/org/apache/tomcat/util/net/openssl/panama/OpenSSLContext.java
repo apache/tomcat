@@ -35,7 +35,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLEngine;
@@ -67,7 +66,6 @@ import org.apache.tomcat.util.openssl.SSL_CTX_set_alpn_select_cb$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_cert_verify_callback$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_tmp_dh_callback$dh;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_verify$callback;
-import org.apache.tomcat.util.openssl.openssl_h_Macros;
 import org.apache.tomcat.util.openssl.pem_password_cb;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -1081,8 +1079,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     // Set callback for DH parameters
                     SSL_CTX_set_tmp_dh_callback(state.sslCtx, SSL_CTX_set_tmp_dh_callback$dh.allocate(new TmpDHCallback(), contextArena));
                 } else {
-                    var d2i_ECPKParameters = openssl_h_Macros.d2i_ECPKParameters$SYMBOL();
-                    var ecparams = PEM_ASN1_read_bio(d2i_ECPKParameters,
+                    var ecparams = PEM_ASN1_read_bio(d2i_ECPKParameters$SYMBOL(),
                             PEM_STRING_ECPARAMETERS(), certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
                     if (!MemorySegment.NULL.equals(ecparams)) {
                         int curveNid = EC_GROUP_get_curve_name(ecparams);
@@ -1407,18 +1404,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // Use another arena to avoid keeping a reference through segments
             // This also allows making further accesses to the main pointers safer
             this.sslCtx = sslCtx.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena,
-                    new Consumer<MemorySegment>() {
-                        @Override
-                        public void accept(MemorySegment t) {
-                            SSL_CTX_free(t);
-                        }});
+                    (MemorySegment t) -> SSL_CTX_free(t));
             if (!MemorySegment.NULL.equals(confCtx)) {
                 this.confCtx = confCtx.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena,
-                        new Consumer<MemorySegment>() {
-                            @Override
-                            public void accept(MemorySegment t) {
-                                SSL_CONF_CTX_free(t);
-                            }});
+                        (MemorySegment t) -> SSL_CONF_CTX_free(t));
             } else {
                 this.confCtx = null;
             }

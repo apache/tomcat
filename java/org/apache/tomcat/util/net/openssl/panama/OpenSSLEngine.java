@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
@@ -1684,17 +1683,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // Use another arena to avoid keeping a reference through segments
             // This also allows making further accesses to the main pointers safer
             this.ssl = ssl.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena,
-                    new Consumer<MemorySegment>() {
-                @Override
-                public void accept(MemorySegment t) {
-                    SSL_free(t);
-                }});
+                    (MemorySegment t) -> SSL_free(t));
             this.networkBIO = networkBIO.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena,
-                    new Consumer<MemorySegment>() {
-                @Override
-                public void accept(MemorySegment t) {
-                    BIO_free(t);
-                }});
+                    (MemorySegment t) -> BIO_free(t));
         }
 
         @Override
