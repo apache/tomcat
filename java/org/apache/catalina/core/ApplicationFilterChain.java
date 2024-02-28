@@ -17,6 +17,8 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.servlet.Filter;
@@ -56,6 +58,8 @@ public final class ApplicationFilterChain implements FilterChain {
      * Filters.
      */
     private ApplicationFilterConfig[] filters = new ApplicationFilterConfig[0];
+
+    private final Set<ApplicationFilterConfig> addedFilters = new HashSet<>();
 
 
     /**
@@ -113,7 +117,7 @@ public final class ApplicationFilterChain implements FilterChain {
                 Filter filter = filterConfig.getFilter();
 
                 if (request.isAsyncSupported() &&
-                        "false".equalsIgnoreCase(filterConfig.getFilterDef().getAsyncSupported())) {
+                    Boolean.FALSE.toString().equalsIgnoreCase(filterConfig.getFilterDef().getAsyncSupported())) {
                     request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, Boolean.FALSE);
                 }
                 filter.doFilter(request, response, this);
@@ -180,20 +184,17 @@ public final class ApplicationFilterChain implements FilterChain {
      * @param filterConfig The FilterConfig for the servlet to be executed
      */
     void addFilter(ApplicationFilterConfig filterConfig) {
-
         // Prevent the same filter being added multiple times
-        for (ApplicationFilterConfig filter : filters) {
-            if (filter == filterConfig) {
-                return;
-            }
+        if (addedFilters.contains(filterConfig)) {
+            return;
         }
 
         if (n == filters.length) {
-            ApplicationFilterConfig[] newFilters = new ApplicationFilterConfig[n + INCREMENT];
-            System.arraycopy(filters, 0, newFilters, 0, n);
-            filters = newFilters;
+            int newSize = n + INCREMENT;
+            filters = Arrays.copyOf(filters, newSize);
         }
         filters[n++] = filterConfig;
+        addedFilters.add(filterConfig);
 
     }
 
@@ -250,7 +251,7 @@ public final class ApplicationFilterChain implements FilterChain {
     public void findNonAsyncFilters(Set<String> result) {
         for (int i = 0; i < n; i++) {
             ApplicationFilterConfig filter = filters[i];
-            if ("false".equalsIgnoreCase(filter.getFilterDef().getAsyncSupported())) {
+            if (Boolean.FALSE.toString().equalsIgnoreCase(filter.getFilterDef().getAsyncSupported())) {
                 result.add(filter.getFilterClass());
             }
         }
