@@ -17,6 +17,7 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Set;
 
 import jakarta.servlet.Filter;
@@ -113,7 +114,7 @@ public final class ApplicationFilterChain implements FilterChain {
                 Filter filter = filterConfig.getFilter();
 
                 if (request.isAsyncSupported() &&
-                        "false".equalsIgnoreCase(filterConfig.getFilterDef().getAsyncSupported())) {
+                        !(filterConfig.getFilterDef().getAsyncSupportedBoolean())) {
                     request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, Boolean.FALSE);
                 }
                 filter.doFilter(request, response, this);
@@ -182,16 +183,14 @@ public final class ApplicationFilterChain implements FilterChain {
     void addFilter(ApplicationFilterConfig filterConfig) {
 
         // Prevent the same filter being added multiple times
-        for (ApplicationFilterConfig filter : filters) {
-            if (filter == filterConfig) {
+        for (int i = 0; i < n; i++) {
+            if (filters[i] == filterConfig) {
                 return;
             }
         }
 
         if (n == filters.length) {
-            ApplicationFilterConfig[] newFilters = new ApplicationFilterConfig[n + INCREMENT];
-            System.arraycopy(filters, 0, newFilters, 0, n);
-            filters = newFilters;
+            filters = Arrays.copyOf(filters, n + INCREMENT);
         }
         filters[n++] = filterConfig;
 
@@ -250,7 +249,7 @@ public final class ApplicationFilterChain implements FilterChain {
     public void findNonAsyncFilters(Set<String> result) {
         for (int i = 0; i < n; i++) {
             ApplicationFilterConfig filter = filters[i];
-            if ("false".equalsIgnoreCase(filter.getFilterDef().getAsyncSupported())) {
+            if (!(filter.getFilterDef().getAsyncSupportedBoolean())) {
                 result.add(filter.getFilterClass());
             }
         }

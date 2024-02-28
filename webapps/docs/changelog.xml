@@ -112,6 +112,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Minor performance improvement for building filter chains. Based on
+        ideas from <pr>702</pr> by Luke Miao. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
