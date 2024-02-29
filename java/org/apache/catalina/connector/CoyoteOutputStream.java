@@ -78,7 +78,12 @@ public class CoyoteOutputStream extends ServletOutputStream {
     @Override
     public void write(int i) throws IOException {
         boolean nonBlocking = checkNonBlockingWrite();
-        ob.writeByte(i);
+        try {
+            ob.writeByte(i);
+        } catch (IOException ioe) {
+            ob.setErrorException(ioe);
+            throw ioe;
+        }
         if (nonBlocking) {
             checkRegisterForWrite();
         }
@@ -94,7 +99,12 @@ public class CoyoteOutputStream extends ServletOutputStream {
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         boolean nonBlocking = checkNonBlockingWrite();
-        ob.write(b, off, len);
+        try {
+            ob.write(b, off, len);
+        } catch (IOException ioe) {
+            ob.setErrorException(ioe);
+            throw ioe;
+        }
         if (nonBlocking) {
             checkRegisterForWrite();
         }
@@ -108,7 +118,12 @@ public class CoyoteOutputStream extends ServletOutputStream {
         if (from.remaining() == 0) {
             return;
         }
-        ob.write(from);
+        try {
+            ob.write(from);
+        } catch (IOException ioe) {
+            ob.setErrorException(ioe);
+            throw ioe;
+        }
         if (nonBlocking) {
             checkRegisterForWrite();
         }
@@ -121,7 +136,12 @@ public class CoyoteOutputStream extends ServletOutputStream {
     @Override
     public void flush() throws IOException {
         boolean nonBlocking = checkNonBlockingWrite();
-        ob.flush();
+        try {
+            ob.flush();
+        } catch (IOException ioe) {
+            ob.setErrorException(ioe);
+            throw ioe;
+        }
         if (nonBlocking) {
             checkRegisterForWrite();
         }
@@ -156,7 +176,12 @@ public class CoyoteOutputStream extends ServletOutputStream {
 
     @Override
     public void close() throws IOException {
-        ob.close();
+        try {
+            ob.close();
+        } catch (IOException ioe) {
+            ob.setErrorException(ioe);
+            throw ioe;
+        }
     }
 
     @Override
