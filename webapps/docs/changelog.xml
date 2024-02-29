@@ -111,6 +111,13 @@
         Minor performance improvement for building filter chains. Based on
         ideas from <pr>702</pr> by Luke Miao. (remm)
       </fix>
+      <fix>
+        Align error handling for <code>Writer</code> and
+        <code>OutputStream</code>. Ensure use of either once the response has
+        been recycled triggers a <code>NullPointerException</code> provided that
+        <code>discardFacades</code> is configured with the default value of
+        <code>true</code>.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
