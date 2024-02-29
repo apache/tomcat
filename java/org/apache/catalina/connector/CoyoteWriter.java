@@ -92,7 +92,7 @@ public class CoyoteWriter extends PrintWriter {
         try {
             ob.flush();
         } catch (IOException e) {
-            error = true;
+            setErrorException(e);
         }
 
     }
@@ -130,7 +130,7 @@ public class CoyoteWriter extends PrintWriter {
         try {
             ob.write(c);
         } catch (IOException e) {
-            error = true;
+            setErrorException(e);
         }
 
     }
@@ -146,7 +146,7 @@ public class CoyoteWriter extends PrintWriter {
         try {
             ob.write(buf, off, len);
         } catch (IOException e) {
-            error = true;
+            setErrorException(e);
         }
 
     }
@@ -168,7 +168,7 @@ public class CoyoteWriter extends PrintWriter {
         try {
             ob.write(s, off, len);
         } catch (IOException e) {
-            error = true;
+            setErrorException(e);
         }
 
     }
@@ -313,4 +313,8 @@ public class CoyoteWriter extends PrintWriter {
     }
 
 
+    private void setErrorException(Exception e) {
+        error = true;
+        ob.setErrorException(e);
+    }
 }

@@ -105,6 +105,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.100 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Align error handling for <code>Writer</code> and
+        <code>OutputStream</code>. Ensure use of either once the response has
+        been recycled triggers a <code>NullPointerException</code> provided that
+        <code>discardFacades</code> is configured with the default value of
+        <code>true</code>.
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <add>

@@ -362,7 +362,6 @@ public class OutputBuffer extends Writer {
                 // An IOException on a write is almost always due to
                 // the remote client aborting the request. Wrap this
                 // so that it can be handled better by the error dispatcher.
-                coyoteResponse.setErrorException(e);
                 throw new ClientAbortException(e);
             }
         }
@@ -798,6 +797,12 @@ public class OutputBuffer extends Writer {
             }
         }
     }
+
+
+    public void setErrorException(Exception e) {
+        coyoteResponse.setErrorException(e);
+    }
+
 
     private void appendByteArray(byte src[], int off, int len) throws IOException {
         if (len == 0) {
