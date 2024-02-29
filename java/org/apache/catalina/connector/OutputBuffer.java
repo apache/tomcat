@@ -239,9 +239,7 @@ public class OutputBuffer extends Writer {
             // request since in that case no body should have been written and
             // setting a value of zero here will result in an explicit content
             // length of zero being set on the response.
-            if (!coyoteResponse.isCommitted()) {
-                coyoteResponse.setContentLength(bb.remaining());
-            }
+            coyoteResponse.setContentLength(bb.remaining());
         }
 
         if (coyoteResponse.getStatus() == HttpServletResponse.SC_SWITCHING_PROTOCOLS) {
