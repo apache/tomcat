@@ -235,9 +235,7 @@ public class OutputBuffer extends Writer {
         if ((!coyoteResponse.isCommitted()) && (coyoteResponse.getContentLengthLong() == -1)) {
             // If this didn't cause a commit of the response, the final content
             // length can be calculated.
-            if (!coyoteResponse.isCommitted()) {
-                coyoteResponse.setContentLength(bb.remaining());
-            }
+            coyoteResponse.setContentLength(bb.remaining());
         }
 
         if (coyoteResponse.getStatus() == HttpServletResponse.SC_SWITCHING_PROTOCOLS) {
