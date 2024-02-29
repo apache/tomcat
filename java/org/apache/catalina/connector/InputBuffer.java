@@ -201,7 +201,9 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
         int available = availableInThisBuffer();
         if (available == 0) {
             coyoteRequest.action(ActionCode.AVAILABLE, Boolean.valueOf(coyoteRequest.getReadListener() != null));
-            available = (coyoteRequest.getAvailable() > 0) ? 1 : 0;
+            if (coyoteRequest.getAvailable() > 0) {
+                available = 1;
+            }
         }
         return available;
     }
