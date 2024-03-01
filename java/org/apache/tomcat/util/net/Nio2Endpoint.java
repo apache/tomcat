@@ -119,6 +119,8 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
         }
         if (getExecutor() instanceof ExecutorService) {
             threadGroup = AsynchronousChannelGroup.withThreadPool((ExecutorService) getExecutor());
+        } else {
+            log.info(sm.getString("endpoint.nio2.executorService"));
         }
         // AsynchronousChannelGroup needs exclusive access to its executor service
         if (!internalExecutor) {

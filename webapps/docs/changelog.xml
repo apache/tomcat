@@ -123,7 +123,12 @@
         <code>OutputStream</code>. Ensure use of either once the response has
         been recycled triggers a <code>NullPointerException</code> provided that
         <code>discardFacades</code> is configured with the default value of
-        <code>true</code>.
+        <code>true</code>. (markt)
+      </fix>
+      <fix>
+        <bug>68692</bug>: The standard thread pool implementations that are
+        configured using the <code>Executor</code> element now implement
+        <code>ExecutorService</code> for better support NIO2. (remm)
       </fix>
     </changelog>
   </subsection>
