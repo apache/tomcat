@@ -128,7 +128,9 @@
       <fix>
         <bug>68692</bug>: The standard thread pool implementations that are
         configured using the <code>Executor</code> element now implement
-        <code>ExecutorService</code> for better support NIO2. (remm)
+        <code>ExecutorService</code> for better support NIO2. The
+        <code>org.apache.catalina.Executor</code> interface now extends
+        <code>ExecutorService</code>. (remm)
       </fix>
     </changelog>
   </subsection>
