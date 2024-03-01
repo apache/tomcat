@@ -16,7 +16,15 @@
  */
 package org.apache.catalina.core;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.catalina.Executor;
 import org.apache.catalina.LifecycleException;
@@ -28,7 +36,7 @@ import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
-public class StandardThreadExecutor extends LifecycleMBeanBase implements Executor, ResizableExecutor {
+public class StandardThreadExecutor extends LifecycleMBeanBase implements Executor, ExecutorService, ResizableExecutor {
 
     protected static final StringManager sm = StringManager.getManager(StandardThreadExecutor.class);
 
@@ -303,5 +311,116 @@ public class StandardThreadExecutor extends LifecycleMBeanBase implements Execut
     @Override
     protected String getObjectNameKeyProperties() {
         return "type=Executor,name=" + getName();
+    }
+
+
+    @Override
+    public void shutdown() {
+        // Controlled by Lifecycle instead
+    }
+
+
+    @Override
+    public List<Runnable> shutdownNow() {
+        // Controlled by Lifecycle instead
+        return Collections.emptyList();
+    }
+
+
+    @Override
+    public boolean isShutdown() {
+        if (executor != null) {
+            return executor.isShutdown();
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
+    }
+
+
+    @Override
+    public boolean isTerminated() {
+        if (executor != null) {
+            return executor.isTerminated();
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
+    }
+
+
+    @Override
+    public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+        return false;
+    }
+
+
+    @Override
+    public <T> Future<T> submit(Callable<T> task) {
+        if (executor != null) {
+            return executor.submit(task);
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
+    }
+
+
+    @Override
+    public <T> Future<T> submit(Runnable task, T result) {
+        if (executor != null) {
+            return executor.submit(task, result);
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
+    }
+
+
+    @Override
+    public Future<?> submit(Runnable task) {
+        if (executor != null) {
+            return executor.submit(task);
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
+    }
+
+
+    @Override
+    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
+        if (executor != null) {
+            return executor.invokeAll(tasks);
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
+    }
+
+
+    @Override
+    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+            throws InterruptedException {
+        if (executor != null) {
+            return executor.invokeAll(tasks, timeout, unit);
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
+    }
+
+
+    @Override
+    public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
+        if (executor != null) {
+            return executor.invokeAny(tasks);
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
+    }
+
+
+    @Override
+    public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+            throws InterruptedException, ExecutionException, TimeoutException {
+        if (executor != null) {
+            return executor.invokeAny(tasks, timeout, unit);
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
     }
 }
