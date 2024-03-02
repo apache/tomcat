@@ -638,9 +638,9 @@ public class FormAuthenticator extends AuthenticatorBase {
         // it would in a normal request would require some invasive API changes.
         // Therefore force the conversion to String now so the correct values
         // are presented if the application requests them.
-        request.getRequestURI();
-        request.getQueryString();
-        request.getProtocol();
+        request.getCoyoteRequest().requestURI().toStringType();
+        request.getCoyoteRequest().queryString().toStringType();
+        request.getCoyoteRequest().protocol().toStringType();
 
         if (saved.getOriginalMaxInactiveInterval() > 0) {
             session.setMaxInactiveInterval(saved.getOriginalMaxInactiveInterval());
