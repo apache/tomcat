@@ -114,6 +114,11 @@
         <code>discardFacades</code> is configured with the default value of
         <code>true</code>.
       </fix>
+      <fix>
+        <bug>68495</bug>: When restoring a saved POST request after a successful
+        FORM authentication, ensure that neither the URI, the query string nor
+        the protocol are corrupted when restoring the request body. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
