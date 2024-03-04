@@ -137,6 +137,10 @@
         FORM authentication, ensure that neither the URI, the query string nor
         the protocol are corrupted when restoring the request body. (markt)
       </fix>
+      <fix>
+        After forwarding a request, attempt to unwrap the response in order to
+        suspend it, instead of simply closing it if it was wrapped. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
