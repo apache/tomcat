@@ -295,16 +295,26 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
             wrapper.getLogger().trace(" Disabling the response for further output");
         }
 
+        boolean finished = false;
         if (response instanceof ResponseFacade) {
+            finished = true;
             ((ResponseFacade) response).finish();
-        } else {
+        } else if (response instanceof ServletResponseWrapper) {
+            ServletResponse baseResponse = response;
+            do {
+                baseResponse = ((ServletResponseWrapper) baseResponse).getResponse();
+            } while (baseResponse instanceof ServletResponseWrapper);
+            if (baseResponse instanceof ResponseFacade) {
+                finished = true;
+                ((ResponseFacade) baseResponse).finish();
+            }
+        }
+        if (!finished) {
             // Servlet SRV.6.2.2. The Request/Response may have been wrapped
             // and may no longer be instance of RequestFacade
-            if (wrapper.getLogger().isTraceEnabled()) {
-                wrapper.getLogger()
-                        .trace(" The Response is vehiculed using a wrapper: " + response.getClass().getName());
+            if (wrapper.getLogger().isDebugEnabled()) {
+                wrapper.getLogger().debug(sm.getString("applicationDispatcher.customResponse", response.getClass()));
             }
-
             // Close anyway
             try {
                 PrintWriter writer = response.getWriter();
