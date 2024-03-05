@@ -173,6 +173,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M17 (markt)" rtext="2024-02-19">
   <subsection name="Catalina">
