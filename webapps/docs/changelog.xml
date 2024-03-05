@@ -148,7 +148,13 @@
       </fix>
     </changelog>
   </subsection>
-</section>
+</section>  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+    </changelog>
+  </subsection>
 <section name="Tomcat 10.1.19 (schultz)" rtext="2024-02-19">
   <subsection name="Catalina">
     <changelog>
