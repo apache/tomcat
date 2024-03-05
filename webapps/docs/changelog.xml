@@ -155,7 +155,7 @@
       </fix>
     </changelog>
   </subsection>
-</section>  <subsection name="Other">
+  <subsection name="Other">
     <changelog>
       <add>
         Improvements to French translations. (remm)
@@ -165,6 +165,7 @@
       </add>
     </changelog>
   </subsection>
+</section>
 <section name="Tomcat 10.1.19 (schultz)" rtext="2024-02-19">
   <subsection name="Catalina">
     <changelog>
