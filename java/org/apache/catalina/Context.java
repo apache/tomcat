@@ -1995,6 +1995,23 @@ public interface Context extends Container, ContextBind {
 
 
     /**
+     * If this is <code>true</code>, then following a forward the response will
+     * be unwrapped to suspend the Catalina response instead of simply closing
+     * the top level response. The default value is <code>true</code>.
+     * @return the flag value
+     */
+    boolean getSuspendWrappedResponseAfterForward();
+
+
+    /**
+     * Allows unwrapping the response object to suspend the response following
+     * a forward.
+     * @param suspendWrappedResponseAfterForward the new flag value
+     */
+    void setSuspendWrappedResponseAfterForward(boolean suspendWrappedResponseAfterForward);
+
+
+    /**
      * Find configuration file with the specified path, first looking into the
      * webapp resources, then delegating to
      * <code>ConfigFileLoader.getSource().getResource</code>. The

@@ -1425,4 +1425,13 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void setUseBloomFilterForArchives(boolean useBloomFilterForArchives) {
     }
 
+    @Override
+    public boolean getSuspendWrappedResponseAfterForward() {
+        return false;
+    }
+
+    @Override
+    public void setSuspendWrappedResponseAfterForward(boolean suspendWrappedResponseAfterForward) {
+    }
+
 }

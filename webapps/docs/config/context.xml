@@ -596,6 +596,13 @@
         attribute is <code>false</code>.</p>
       </attribute>
 
+      <attribute name="suspendWrappedResponseAfterForward" required="false">
+        <p>If the value of this flag is <code>true</code>, Catalina will
+        suspend wrapped responses after a forward, instead of closing them.
+        If not specified, the default value of the flag is
+        <code>false</code>.</p>
+      </attribute>
+
       <attribute name="swallowAbortedUploads" required="false">
         <p>Set to <code>false</code> if Tomcat should <b>not</b> read any
         additional request body data for aborted uploads and instead abort the
