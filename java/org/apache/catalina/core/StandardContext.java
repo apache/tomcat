@@ -794,6 +794,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     private boolean dispatcherWrapsSameObject = Globals.STRICT_SERVLET_COMPLIANCE;
 
+    private boolean suspendWrappedResponseAfterForward = true;
+
     private boolean parallelAnnotationScanning = false;
 
 
@@ -873,6 +875,18 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     @Override
     public void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject) {
         this.dispatcherWrapsSameObject = dispatcherWrapsSameObject;
+    }
+
+
+    @Override
+    public boolean getSuspendWrappedResponseAfterForward() {
+        return suspendWrappedResponseAfterForward;
+    }
+
+
+    @Override
+    public void setSuspendWrappedResponseAfterForward(boolean suspendWrappedResponseAfterForward) {
+        this.suspendWrappedResponseAfterForward = suspendWrappedResponseAfterForward;
     }
 
 

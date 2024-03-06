@@ -1436,4 +1436,13 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {
     }
 
+    @Override
+    public boolean getSuspendWrappedResponseAfterForward() {
+        return false;
+    }
+
+    @Override
+    public void setSuspendWrappedResponseAfterForward(boolean suspendWrappedResponseAfterForward) {
+    }
+
 }

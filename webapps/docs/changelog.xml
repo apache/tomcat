@@ -139,7 +139,10 @@
       </fix>
       <fix>
         After forwarding a request, attempt to unwrap the response in order to
-        suspend it, instead of simply closing it if it was wrapped. (remm)
+        suspend it, instead of simply closing it if it was wrapped. Add a new
+        <code>suspendWrappedResponseAfterForward</code> boolean attribute on
+        <code>Context</code> to control the bahavior, defaulting to
+        <code>true</code>. (remm)
       </fix>
     </changelog>
   </subsection>
