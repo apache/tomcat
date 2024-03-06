@@ -1997,7 +1997,7 @@ public interface Context extends Container, ContextBind {
     /**
      * If this is <code>true</code>, then following a forward the response will
      * be unwrapped to suspend the Catalina response instead of simply closing
-     * the top level response. The default value is <code>true</code>.
+     * the top level response. The default value is <code>false</code>.
      * @return the flag value
      */
     boolean getSuspendWrappedResponseAfterForward();
