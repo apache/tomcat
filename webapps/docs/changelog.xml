@@ -120,6 +120,16 @@
         the protocol are corrupted when restoring the request body. (markt)
       </fix>
       <fix>
+        <bug>68721</bug>: Workaround a possible cause of duplicate class
+        definitions when using <code>ClassFileTransformer</code>s and the
+        transformation of a class also triggers the loading of the same class.
+        (markt) 
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
         Improve the HTTP/2 stream prioritisation process. If a stream uses all
         of the connection windows and still has content to write, it will now be
         added to the backlog immediately rather than waiting until the write
