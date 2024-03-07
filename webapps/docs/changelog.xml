@@ -151,6 +151,12 @@
       <fix>
         Fix bad symbol lookup use in the OpenSSL FFM code. (remm)
       </fix>
+      <fix>
+        Improve the HTTP/2 stream prioritisation process. If a stream uses all
+        of the connection windows and still has content to write, it will now be
+        added to the backlog immediately rather than waiting until the write
+        attempt for the remaining content. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
