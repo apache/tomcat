@@ -924,9 +924,14 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
+    /*
+     * Requesting an allocation from the connection window for the specified stream.
+     */
     int reserveWindowSize(Stream stream, int reservation, boolean block) throws IOException {
-        // Need to be holding the stream lock so releaseBacklog() can't notify
-        // this thread until after this thread enters wait()
+        /*
+         * Need to be holding the stream lock so releaseBacklog() can't notify this thread until after this thread
+         * enters wait().
+         */
         int allocation = 0;
         stream.windowAllocationLock.lock();
         try {
@@ -940,19 +945,35 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 }
                 long windowSize = getWindowSize();
                 if (stream.getConnectionAllocationMade() > 0) {
+                    // The stream is/was in the backlog and has been granted an allocation - use it.
                     allocation = stream.getConnectionAllocationMade();
                     stream.setConnectionAllocationMade(0);
                 } else if (windowSize < 1) {
-                    // Has this stream been granted an allocation
-                    if (stream.getConnectionAllocationMade() == 0) {
+                    /*
+                     * The connection window has no capacity. If the stream has not been granted an allocation, and the
+                     * stream was not already added to the backlog due to an partial reservation (see next else if
+                     * block) add it to the backlog so it can obtain an allocation when capacity is available.
+                     */
+                    if (stream.getConnectionAllocationMade() == 0 && stream.getConnectionAllocationRequested() == 0) {
                         stream.setConnectionAllocationRequested(reservation);
                         backLogSize += reservation;
                         backLogStreams.add(stream);
                     }
                 } else if (windowSize < reservation) {
+                    /*
+                     * The connection window has some capacity but not enough to fill this reservation. Allocate what
+                     * capacity is available and add the stream to the backlog so it can obtain a further allocation
+                     * when capacity is available.
+                     */
                     allocation = (int) windowSize;
                     decrementWindowSize(allocation);
+                    int reservationRemaining = reservation - allocation;
+                    stream.setConnectionAllocationRequested(reservationRemaining);
+                    backLogSize += reservationRemaining;
+                    backLogStreams.add(stream);
+
                 } else {
+                     // The connection window has sufficient capacity for this reservation. Allocate the full amount.
                     allocation = reservation;
                     decrementWindowSize(allocation);
                 }
