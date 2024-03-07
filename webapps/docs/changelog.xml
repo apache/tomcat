@@ -144,6 +144,12 @@
         <code>Context</code> to control the bahavior, defaulting to
         <code>true</code>. (remm)
       </fix>
+      <fix>
+        <bug>68721</bug>: Workaround a possible cause of duplicate class
+        definitions when using <code>ClassFileTransformer</code>s and the
+        transformation of a class also triggers the loading of the same class.
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

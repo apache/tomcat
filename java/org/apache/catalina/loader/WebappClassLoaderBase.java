@@ -2163,6 +2163,17 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             } catch (UnsupportedClassVersionError ucve) {
                 throw new UnsupportedClassVersionError(
                         ucve.getLocalizedMessage() + " " + sm.getString("webappClassLoader.wrongVersion", name));
+            } catch (LinkageError e) {
+                // May be caused by the transformation also triggering loading of the class - BZ 68721
+                try {
+                    // Try and load the already defined class
+                    clazz = findLoadedClass0(name);
+                } catch (Throwable t) {
+                    // Not BZ 68721
+                    ExceptionUtils.handleThrowable(t);
+                    // Re-throw the original exception
+                    throw e;
+                }
             }
             entry.loadedClass = clazz;
         }
