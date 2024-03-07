@@ -119,6 +119,12 @@
         FORM authentication, ensure that neither the URI, the query string nor
         the protocol are corrupted when restoring the request body. (markt)
       </fix>
+      <fix>
+        Improve the HTTP/2 stream prioritisation process. If a stream uses all
+        of the connection windows and still has content to write, it will now be
+        added to the backlog immediately rather than waiting until the write
+        attempt for the remaining content. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
