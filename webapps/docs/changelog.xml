@@ -139,7 +139,7 @@
         <bug>68721</bug>: Workaround a possible cause of duplicate class
         definitions when using <code>ClassFileTransformer</code>s and the
         transformation of a class also triggers the loading of the same class.
-        (markt) 
+        (markt)
       </fix>
     </changelog>
   </subsection>
