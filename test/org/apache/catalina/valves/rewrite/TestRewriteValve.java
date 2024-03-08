@@ -72,6 +72,11 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
     @Test
+    public void testNoopValveSkipRewrite() throws Exception {
+        doTestRewrite("RewriteRule ^(.*) $1 [VS]", "/a/%255A", "/a/%255A", null, null, true);
+    }
+
+    @Test
     public void testPathRewrite() throws Exception {
         doTestRewrite("RewriteRule ^/b(.*) /a$1", "/b/%255A", "/a/%255A");
     }
@@ -725,6 +730,11 @@ public class TestRewriteValve extends TomcatBaseTest {
 
     private void doTestRewrite(String config, String request, String expectedURI, String expectedQueryString,
             String expectedAttributeValue) throws Exception {
+        doTestRewrite(config, request, expectedURI, expectedQueryString, expectedAttributeValue, false);
+    }
+
+    private void doTestRewrite(String config, String request, String expectedURI, String expectedQueryString,
+            String expectedAttributeValue, boolean valveSkip) throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
 
@@ -733,6 +743,14 @@ public class TestRewriteValve extends TomcatBaseTest {
 
         RewriteValve rewriteValve = new RewriteValve();
         ctx.getPipeline().addValve(rewriteValve);
+        if (valveSkip) {
+            ctx.getPipeline().addValve(new ValveBase() {
+                @Override
+                public void invoke(Request request, Response response) throws IOException, ServletException {
+                    throw new IllegalStateException();
+                }
+            });
+        }
 
         rewriteValve.setConfiguration(config);
 

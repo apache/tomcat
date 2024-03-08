@@ -42,6 +42,7 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Pipeline;
+import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -335,11 +336,12 @@ public class RewriteValve extends ValveBase {
             boolean done = false;
             boolean qsa = false;
             boolean qsd = false;
+            boolean valveSkip = false;
             for (int i = 0; i < rules.length; i++) {
                 RewriteRule rule = rules[i];
                 CharSequence test = (rule.isHost()) ? host : urlDecoded;
                 CharSequence newtest = rule.evaluate(test, resolver);
-                if (newtest != null && !test.equals(newtest.toString())) {
+                if (newtest != null && !test.toString().equals(newtest.toString())) {
                     if (containerLog.isTraceEnabled()) {
                         containerLog.trace("Rewrote " + test + " as " + newtest
                                 + " with rule pattern " + rule.getPatternString());
@@ -359,6 +361,10 @@ public class RewriteValve extends ValveBase {
 
                 if (!qsd && newtest != null && rule.isQsdiscard()) {
                     qsd = true;
+                }
+
+                if (!valveSkip && newtest != null && rule.isValveSkip()) {
+                    valveSkip = true;
                 }
 
                 // Final reply
@@ -559,7 +565,15 @@ public class RewriteValve extends ValveBase {
                     pipeline.getFirst().invoke(request, response);
                 }
             } else {
-                getNext().invoke(request, response);
+                Valve next = getNext();
+                if (valveSkip) {
+                    next = next.getNext();
+                    if (next == null) {
+                        // Ignore and invoke the next valve normally
+                        next = getNext();
+                    }
+                }
+                next.invoke(request, response);
             }
 
         } finally {
@@ -851,6 +865,8 @@ public class RewriteValve extends ValveBase {
             }
             rule.setType(true);
             rule.setTypeValue(flag);
+        } else if (flag.startsWith("valveSkip") || flag.startsWith("VS")) {
+            rule.setValveSkip(true);
         } else {
             throw new IllegalArgumentException(sm.getString("rewriteValve.invalidFlags", line, flag));
         }

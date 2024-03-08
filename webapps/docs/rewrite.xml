@@ -750,6 +750,17 @@ cannot use <code>$N</code> in the substitution string!
         the <code>.phps</code> extension:
         <source>RewriteRule ^(.+\.php)s$ $1 [T=application/x-httpd-php-source]</source>
         </li>
+
+        <li>'<strong><code>valveSkip|VS</code></strong>'
+        (skip valve)<br />
+        This flag can be used to setup conditional execution of valves.
+        When the flag is set and the rule matches, the rewrite valve will skip
+        the next valve in the Catalina pipeline. If the rewrite valve is the
+        last of the pipeline, then the flag will be ignored and the container
+        basic valve will be invoked. If rewrite occurred, then the flag will
+        not have any effect.
+        </li>
+
       </ul>
 
   </subsection>
