@@ -335,6 +335,11 @@ public class RewriteRule {
     protected boolean type = false;
     protected String typeValue = null;
 
+    /**
+     * Allows skipping the next valve in the Catalina pipeline.
+     */
+    protected boolean valveSkip = false;
+
     public boolean isEscapeBackReferences() {
         return escapeBackReferences;
     }
@@ -560,4 +565,13 @@ public class RewriteRule {
     public void setCookieHttpOnly(boolean cookieHttpOnly) {
         this.cookieHttpOnly = cookieHttpOnly;
     }
+
+    public boolean isValveSkip() {
+        return this.valveSkip;
+    }
+
+    public void setValveSkip(boolean valveSkip) {
+        this.valveSkip = valveSkip;
+    }
+
 }
