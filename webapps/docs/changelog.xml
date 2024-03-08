@@ -141,6 +141,15 @@
         transformation of a class also triggers the loading of the same class.
         (markt)
       </fix>
+      <fix>
+        The rewrite valve should not do a rewrite if the output is identical
+        to the input. (remm)
+      </fix>
+      <update>
+        Add a new <code>valveSkip</code> (or <code>VS</code>) rule flag to the
+        rewrite valve to allow skipping over the next valve in the Catalina
+        pipeline. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
