@@ -287,6 +287,7 @@
     <filter token="VERSION_MAJOR" value="${version.major}"/>
     <filter token="VERSION_MAJOR_MINOR" value="${version.major.minor}"/>
     <filter token="VERSION_BUILT" value="${today} ${tstamp} UTC"/>
+    <filter token="VERSION_BUILT_ISO" value="${today-iso-8601}"/>
     <filter token="JDT_VERSION" value="${jdt.version}"/>
     <filter token="GIT_BRANCH" value="${git.branch}"/>
     <filter token="MIN_JAVA_VERSION" value="${min.java.version}"/>
