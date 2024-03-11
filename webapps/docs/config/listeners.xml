@@ -436,6 +436,11 @@
         is not performed on Windows platforms.</p>
       </attribute>
 
+      <attribute name="buildDateWarningAgeDays" required="false">
+        <p>The maximim number of days between the build-date of this instance
+        of Tomcat and its startup date can be before warnings will be logged.
+        If not specified, the default value of <b>180</b> is used.</p>
+      </attribute>
     </attributes>
 
   </subsection>
