@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.88 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Add <code>highConcurrencyStatus</code> attribute to the
+        <code>SemaphoreValve</code> to optionally allow the valve to return an
+        error status code to the client when a permit cannot be acquired from
+        the semaphore. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.87 (remm)" rtext="release in progress">
   <subsection name="Catalina">
