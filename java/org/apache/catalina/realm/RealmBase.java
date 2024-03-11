@@ -29,6 +29,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.InputStreamReader;
 
 import jakarta.servlet.annotation.ServletSecurity.TransportGuarantee;
 import jakarta.servlet.http.HttpServletResponse;
@@ -1295,6 +1299,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * specified, the default for the CredentialHandler will be used.</li>
      * <li><b>-h</b> - The fully qualified class name of the CredentialHandler to use. If not specified, the built-in
      * handlers will be tested in turn and the first one to accept the specified algorithm will be used.</li>
+     * <li><b>-f</b> - The name of the file that contains passwords to encode. Each
+     *                 line in the file should contain only one password. Using this
+     *                 option ignores other password input.</li>
      * </ul>
      * <p>
      * This generation process currently supports the following CredentialHandlers, the correct one being selected based
@@ -1307,7 +1314,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *
      * @param args The parameters passed on the command line
      */
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException {
 
         // Use negative values since null is not an option to indicate 'not set'
         int saltLength = -1;
@@ -1319,6 +1326,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         // the command line
         String algorithm = null;
         String handlerClassName = null;
+        // File name to read password(s) from
+        String passwordFile = null;
 
         if (args.length == 0) {
             usage();
@@ -1326,8 +1335,12 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         }
 
         int argIndex = 0;
+        // Boolean to check and see if we've reached the -- option
+        boolean endOfList = false;
 
-        while (args.length > argIndex + 2 && args[argIndex].length() == 2 && args[argIndex].charAt(0) == '-') {
+        // Note: Reducing args.length requirement to argIndex+1 so that -f works and ignores
+        // trailing words
+        while (args.length > argIndex + 1 && args[argIndex].length() == 2 && args[argIndex].charAt(0) == '-' && !endOfList) {
             switch (args[argIndex].charAt(1)) {
                 case 'a': {
                     algorithm = args[argIndex + 1];
@@ -1351,6 +1364,18 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 }
                 case 'h': {
                     handlerClassName = args[argIndex + 1];
+                    break;
+                }
+                case 'f': {
+                    passwordFile = args[argIndex + 1];
+                    break;
+                }
+                case '-': {
+                    // When encountering --  option don't parse anything else as an option
+                    endOfList = true;
+                    // The -- opt doesn't take an argument, decrement the argIndex so that it parses
+                    // all remaining args
+                    argIndex--;
                     break;
                 }
                 default: {
@@ -1412,18 +1437,52 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         if (keyLength > 0) {
             IntrospectionUtils.setProperty(handler, "keyLength", Integer.toString(keyLength));
         }
+        if (passwordFile != null) {
+            // If the file name is used, then don't parse the trailing arguments
+            argIndex = args.length;
 
+            try {
+                BufferedReader br;
+                // Special case, allow for - filename to refer to stdin
+                if (passwordFile.equals("-")) {
+                    br = new BufferedReader(new InputStreamReader(System.in));
+                } else {
+                    br = new BufferedReader(new FileReader(passwordFile));
+                }
+
+                String line;
+                while ((line = br.readLine()) != null) {
+                    // Mutate each line in the file, or stdin
+                    mutateCredential(line, handler);
+                }
+            } catch (Exception e) {
+                // A FileNotFound is the likely exception here and self-explanatory. Softly
+                // reporting it and exit 1 so that you can tell it failed from the command line.
+                if (e instanceof java.io.FileNotFoundException) {
+                    System.err.println("cannot stat '" + passwordFile +
+                            "': No such file or directory");
+                    // Not sure if using an exit here is OK, but I wanted to return a code that
+                    // showed failure.
+                    System.exit(1);
+                } else {
+                    throw e;
+                }
+            }
+        }
         for (; argIndex < args.length; argIndex++) {
-            String credential = args[argIndex];
-            System.out.print(credential + ":");
-            System.out.println(handler.mutate(credential));
+            mutateCredential(args[argIndex], handler);
         }
     }
 
+    private static void mutateCredential(String credential, CredentialHandler handler) {
+        System.out.print(credential + ":");
+        System.out.println(handler.mutate(credential));
+    }
 
     private static void usage() {
-        System.out.println("Usage: RealmBase [-a <algorithm>] [-e <encoding>] " +
-                "[-i <iterations>] [-s <salt-length>] [-k <key-length>] " + "[-h <handler-class-name>] <credentials>");
+        System.out.println("Usage: RealmBase [-a <algorithm>] [-e <encoding>]"
+              + " [-i <iterations>] [-s <salt-length>] [-k <key-length>]"
+              + " [-h <handler-class-name>] | <XX credentials>");
     }
 
 
