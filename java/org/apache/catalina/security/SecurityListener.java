@@ -16,6 +16,10 @@
  */
 package org.apache.catalina.security;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -24,6 +28,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Server;
+import org.apache.catalina.util.ServerInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringUtils;
@@ -42,10 +47,17 @@ public class SecurityListener implements LifecycleListener {
 
     private static final String UMASK_FORMAT = "%04o";
 
+    private static final int DEFAULT_BUILD_DATE_WARNING_AGE_DAYS = 180;
+
     /**
      * The list of operating system users not permitted to run Tomcat.
      */
     private final Set<String> checkedOsUsers = new HashSet<>();
+
+    /**
+     * The number of days this Tomcat build can go without warning upon startup.
+     */
+    private int buildDateWarningAgeDays = DEFAULT_BUILD_DATE_WARNING_AGE_DAYS;
 
     /**
      * The minimum umask that must be configured for the operating system user running Tomcat. The umask is handled as
@@ -126,6 +138,33 @@ public class SecurityListener implements LifecycleListener {
         return String.format(UMASK_FORMAT, minimumUmask);
     }
 
+    /**
+     * Sets the number of days that may pass between the build-date of this
+     * Tomcat instance before warnings are printed.
+     *
+     * @param ageDays The number of days a Tomcat build is allowed to age
+     *                before logging warnings.
+     */
+    public void setBuildDateWarningAgeDays(String ageDays) {
+        try {
+            buildDateWarningAgeDays = Integer.parseInt(ageDays);
+        } catch (NumberFormatException nfe) {
+            // Just use the default and warn the user
+            log.warn(sm.getString("SecurityListener.buildDateAgeUnreadable",
+                    ageDays, DEFAULT_BUILD_DATE_WARNING_AGE_DAYS));
+        }
+    }
+
+    /**
+     * Gets the number of days that may pass between the build-date of this
+     * Tomcat instance before warnings are printed.
+     *
+     * @return The number of days a Tomcat build is allowed to age
+     *         before logging warnings.
+     */
+    public int getBuildDateWarningAgeDays() {
+        return buildDateWarningAgeDays;
+    }
 
     /**
      * Execute the security checks. Each check should be in a separate method.
@@ -133,6 +172,7 @@ public class SecurityListener implements LifecycleListener {
     protected void doChecks() {
         checkOsUser();
         checkUmask();
+        checkServerBuildAge();
     }
 
 
@@ -177,6 +217,29 @@ public class SecurityListener implements LifecycleListener {
         if ((umask.intValue() & minimumUmask.intValue()) != minimumUmask.intValue()) {
             throw new Error(sm.getString("SecurityListener.checkUmaskFail", String.format(UMASK_FORMAT, umask),
                     getMinimumUmask()));
+        }
+    }
+
+    protected void checkServerBuildAge() {
+        String buildDateString = ServerInfo.getServerBuiltISO();
+
+        if (null == buildDateString || buildDateString.length() < 1 || !Character.isDigit(buildDateString.charAt(0))) {
+            log.warn(sm.getString("SecurityListener.buildDateUnreadable", buildDateString));
+        } else {
+            try {
+                Date buildDate = new SimpleDateFormat("yyyy-MM-dd").parse(buildDateString);
+
+                int allowedAgeDays = getBuildDateWarningAgeDays();
+
+                Calendar old = Calendar.getInstance();
+                old.add(Calendar.DATE, -allowedAgeDays); // Subtract X days from today
+
+                if(buildDate.before(old.getTime())) {
+                    log.warn(sm.getString("SecurityListener.buildDateIsOld", allowedAgeDays));
+                }
+            } catch (ParseException pe) {
+                log.warn(sm.getString("SecurityListener.buildDateUnreadable", buildDateString));
+            }
         }
     }
 }

@@ -46,6 +46,11 @@ public class ServerInfo {
     private static final String serverBuilt;
 
     /**
+     * The server built String, in ISO-8604 date format.
+     */
+    private static final String serverBuiltIso;
+
+    /**
      * The server's version number String.
      */
     private static final String serverNumber;
@@ -54,6 +59,7 @@ public class ServerInfo {
 
         String info = null;
         String built = null;
+        String builtIso = null;
         String number = null;
 
         Properties props = new Properties();
@@ -62,6 +68,7 @@ public class ServerInfo {
             props.load(is);
             info = props.getProperty("server.info");
             built = props.getProperty("server.built");
+            builtIso = props.getProperty("server.built.iso");
             number = props.getProperty("server.number");
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -75,9 +82,13 @@ public class ServerInfo {
         if (number == null) {
             number = "8.5.x";
         }
+        if (builtIso == null || builtIso.equals("@VERSION_BUILT_ISO@")) {
+            builtIso = "unknown";
+        }
 
         serverInfo = info;
         serverBuilt = built;
+        serverBuiltIso = builtIso;
         serverNumber = number;
     }
 
@@ -97,6 +108,13 @@ public class ServerInfo {
      */
     public static String getServerBuilt() {
         return serverBuilt;
+    }
+
+    /**
+     * @return the server built date for this version of Tomcat in ISO-8601 date format.
+     */
+    public static String getServerBuiltISO() {
+        return serverBuiltIso;
     }
 
     /**
