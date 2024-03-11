@@ -224,7 +224,7 @@ simplified to <code>{digest}</code>.</p>
 <p>The full syntax of <code>CATALINA_HOME/bin/digest.[bat|sh]</code> is:</p>
 <source>CATALINA_HOME/bin/digest.[bat|sh] [-a &lt;algorithm&gt;] [-e &lt;encoding&gt;]
         [-i &lt;iterations&gt;] [-s &lt;salt-length&gt;] [-k &lt;key-length&gt;]
-        [-h &lt;handler-class-name&gt;] &lt;credentials&gt;
+        [-h &lt;handler-class-name&gt;] [-f &lt;password-file&gt; | &lt;credentials&gt;]
 </source>
 <ul>
 <li><b>-a</b> - The algorithm to use to generate the stored
@@ -249,6 +249,9 @@ simplified to <code>{digest}</code>.</p>
                 tested in turn (MessageDigestCredentialHandler then
                 SecretKeyCredentialHandler) and the first one to accept the
                 specified algorithm will be used.</li>
+<li><b>-f</b> - The name of the file that contains passwords to encode. Each
+                line in the file should contain only one password. Using this
+                option ignores other password input.</li>
 </ul>
 </subsection>
 
