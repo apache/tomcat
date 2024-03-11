@@ -234,7 +234,7 @@ public class SecurityListener implements LifecycleListener {
                 Calendar old = Calendar.getInstance();
                 old.add(Calendar.DATE, -allowedAgeDays); // Subtract X days from today
 
-                if(buildDate.before(old.getTime())) {
+                if (buildDate.before(old.getTime())) {
                     log.warn(sm.getString("SecurityListener.buildDateIsOld", allowedAgeDays));
                 }
             } catch (ParseException pe) {
