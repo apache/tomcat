@@ -156,6 +156,11 @@
         error status code to the client when a permit cannot be acquired from
         the semaphore. (remm)
       </update>
+      <add>
+        Add checking of the "age" of the running Tomcat instance since its
+        build-date to the SecurityListener, and log a warning if the server
+        is old. (schultz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
