@@ -150,6 +150,12 @@
         rewrite valve to allow skipping over the next valve in the Catalina
         pipeline. (remm)
       </update>
+      <update>
+        Add <code>highConcurrencyStatus</code> attribute to the
+        <code>SemaphoreValve</code> to optionally allow the valve to return an
+        error status code to the client when a permit cannot be acquired from
+        the semaphore. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

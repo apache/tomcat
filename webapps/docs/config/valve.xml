@@ -2555,6 +2555,13 @@
         <strong>false</strong>.</p>
       </attribute>
 
+      <attribute name="highConcurrencyStatus" required="false">
+        <p>The error status code which will be returned to the client, if the
+        value is positive, when a permit cannot be acquired from the
+        sepmaphore. The default value is <strong>-1</strong>, which will mean
+        no error status will be sent back.</p>
+      </attribute>
+
       <attribute name="interruptible" required="false">
         <p>Flag to determine if a thread may be interrupted until a permit is
         available. The default value is <strong>false</strong>.</p>
