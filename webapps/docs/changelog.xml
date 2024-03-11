@@ -193,6 +193,10 @@
       <add>
         Improvements to Japanese translations by tak7iji. (markt)
       </add>
+      <fix>
+        <bug>57130</bug>: Allow digest.(sh|bat) to accept password from a file
+        or stdin. (csutherl/schultz)
+      </fix>
     </changelog>
   </subsection>
 </section>
