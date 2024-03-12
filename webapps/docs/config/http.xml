@@ -707,6 +707,19 @@
       <code>-1</code> to make clear that it is not used.</p>
     </attribute>
 
+    <attribute name="threadsMaxIdleTime" required="false">
+      <p>The amount of time in milliseconds that threads will be kept alive by
+      the thread pool, if there are more than <code>minSpareThreads</code>
+      threads in the executor. If not specified, the default of
+      <code>60000</code> milliseconds is used. If an executor is associated
+      with this connector, this attribute
+      is ignored as the connector will execute tasks using the executor rather
+      than an internal thread pool. Note that if an executor is configured any
+      value set for this attribute will be recorded correctly but it will be
+      reported (e.g. via JMX) as <code>-1</code> to make clear that it is not
+      used.</p>
+    </attribute>
+
     <attribute name="throwOnFailure" required="false">
       <p>If the Connector experiences an Exception during a Lifecycle transition
       should the Exception be rethrown or logged? If not specified, the default
