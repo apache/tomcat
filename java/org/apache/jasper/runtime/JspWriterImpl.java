@@ -17,6 +17,7 @@
 package org.apache.jasper.runtime;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Writer;
 
 import jakarta.servlet.ServletResponse;
@@ -115,7 +116,16 @@ public class JspWriterImpl extends JspWriter {
 
     private void initOut() throws IOException {
         if (out == null) {
-            out = response.getWriter();
+            try {
+                out = response.getWriter();
+            } catch (IllegalStateException e) {
+                /*
+                 * At some point in the processing something (most likely the default servlet as the target of a
+                 * <jsp:forward ... /> action) wrote directly to the OutputStream rather than the Writer. Wrap the
+                 * OutputStream in a Writer so the JSp engine can use the Writer it is expecting to use.
+                 */
+                out = new PrintWriter(response.getOutputStream());
+            }
         }
     }
 

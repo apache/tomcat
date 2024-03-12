@@ -120,6 +120,17 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Handle the case where the JSP engine forwards a request/response to a
+        Servlet that uses an <code>OutputStream</code> rather than a
+        <code>Writer</code>. This was triggering an
+        <code>IllegalStateException</code> on code paths where there was a
+        subsequent attempt to obtain a <code>Writer</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M18 (markt)" rtext="release in progress">
   <subsection name="General">
