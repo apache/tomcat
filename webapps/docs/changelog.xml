@@ -181,6 +181,9 @@
         <bug>57130</bug>: Allow digest.(sh|bat) to accept password from a file
         or stdin. (csutherl/schultz)
       </fix>
+      <update>
+        Update Checkstyle to 10.14.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
