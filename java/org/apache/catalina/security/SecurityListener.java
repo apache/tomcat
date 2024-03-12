@@ -151,7 +151,7 @@ public class SecurityListener implements LifecycleListener {
         } catch (NumberFormatException nfe) {
             // Just use the default and warn the user
             log.warn(sm.getString("SecurityListener.buildDateAgeUnreadable",
-                    ageDays, DEFAULT_BUILD_DATE_WARNING_AGE_DAYS));
+                    ageDays, String.valueOf(DEFAULT_BUILD_DATE_WARNING_AGE_DAYS)));
         }
     }
 
@@ -235,7 +235,7 @@ public class SecurityListener implements LifecycleListener {
                 old.add(Calendar.DATE, -allowedAgeDays); // Subtract X days from today
 
                 if (buildDate.before(old.getTime())) {
-                    log.warn(sm.getString("SecurityListener.buildDateIsOld", allowedAgeDays));
+                    log.warn(sm.getString("SecurityListener.buildDateIsOld", String.valueOf(allowedAgeDays)));
                 }
             } catch (ParseException pe) {
                 log.warn(sm.getString("SecurityListener.buildDateUnreadable", buildDateString));
