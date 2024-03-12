@@ -120,4 +120,21 @@ public class TestPageContextImpl extends TomcatBaseTest {
         }
 
     }
+
+
+    @Test
+    public void testIncludeThenForward() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/jsp/includeThenForward.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String body = res.toString();
+        Assert.assertTrue(body.contains("OK"));
+        Assert.assertFalse(body.contains("FAIL"));
+    }
 }
