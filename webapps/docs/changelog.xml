@@ -182,6 +182,13 @@
         a warning will be logged and the default will used.
         (markt)
       </add>
+      <fix>
+        Handle the case where the JSP engine forwards a request/response to a
+        Servlet that uses an <code>OutputStream</code> rather than a
+        <code>Writer</code>. This was triggering an
+        <code>IllegalStateException</code> on code paths where there was a
+        subsequent attempt to obtain a <code>Writer</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
