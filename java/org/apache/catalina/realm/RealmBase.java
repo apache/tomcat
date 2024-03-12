@@ -1385,6 +1385,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
      * </ul>
      *
      * @param args The parameters passed on the command line
+     *
+     * @throws IOException If an error occurs reading the password file
      */
     public static void main(String args[]) throws IOException {
 
