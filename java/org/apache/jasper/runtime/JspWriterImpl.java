@@ -122,7 +122,7 @@ public class JspWriterImpl extends JspWriter {
                 /*
                  * At some point in the processing something (most likely the default servlet as the target of a
                  * <jsp:forward ... /> action) wrote directly to the OutputStream rather than the Writer. Wrap the
-                 * OutputStream in a Writer so the JSp engine can use the Writer it is expecting to use.
+                 * OutputStream in a Writer so the JSP engine can use the Writer it is expecting to use.
                  */
                 out = new PrintWriter(response.getOutputStream());
             }
