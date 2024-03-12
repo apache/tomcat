@@ -976,6 +976,30 @@ public abstract class AbstractEndpoint<S,U> {
 
 
     /**
+     * Amount of time in milliseconds before the internal thread pool stops any idle threads
+     * if the amount of thread is greater than the minimum amount of spare threads.
+     */
+    private int threadsMaxIdleTime = 60000;
+    public void setThreadsMaxIdleTime(int threadsMaxIdleTime) {
+        this.threadsMaxIdleTime = threadsMaxIdleTime;
+        Executor executor = this.executor;
+        if (internalExecutor && executor instanceof ThreadPoolExecutor) {
+            // The internal executor should always be an instance of
+            // org.apache.tomcat.util.threads.ThreadPoolExecutor but it may be
+            // null if the endpoint is not running.
+            // This check also avoids various threading issues.
+            ((ThreadPoolExecutor) executor).setKeepAliveTime(threadsMaxIdleTime, TimeUnit.MILLISECONDS);
+        }
+    }
+    public int getThreadsMaxIdleTime() {
+        if (internalExecutor) {
+            return threadsMaxIdleTime;
+        } else {
+            return -1;
+        }
+    }
+
+    /**
      * Priority of the worker threads.
      */
     protected int threadPriority = Thread.NORM_PRIORITY;
