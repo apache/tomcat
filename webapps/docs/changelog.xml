@@ -120,6 +120,16 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Add <code>threadsMaxIdleTime</code> attribute to the endpoint,
+        to allow configuring the amount of time before an internal executor
+        will scale back to the configured <code>minSpareThreads</code> size.
+        (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
