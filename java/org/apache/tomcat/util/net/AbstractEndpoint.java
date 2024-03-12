@@ -1222,8 +1222,9 @@ public abstract class AbstractEndpoint<S,U> {
         } else {
             TaskQueue taskqueue = new TaskQueue();
             TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-", daemon, getThreadPriority());
-            executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS,taskqueue, tf);
-            taskqueue.setParent( (ThreadPoolExecutor) executor);
+            executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), getThreadsMaxIdleTime(),
+                    TimeUnit.MILLISECONDS, taskqueue, tf);
+            taskqueue.setParent((ThreadPoolExecutor) executor);
         }
     }
 
