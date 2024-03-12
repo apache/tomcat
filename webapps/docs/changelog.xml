@@ -131,6 +131,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update Checkstyle to 10.14.1. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M18 (markt)" rtext="release in progress">
   <subsection name="General">
