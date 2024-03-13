@@ -167,6 +167,11 @@
         <code>IllegalStateException</code> on code paths where there was a
         subsequent attempt to obtain a <code>Writer</code>. (markt)
       </fix>
+      <fix>
+        Correctly handle the case where a tag library is packaged in a JAR file
+        and the web application is deployed as a WAR file rather than an
+        unpacked directory. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

@@ -45,6 +45,7 @@ import javax.servlet.jsp.tagext.ValidationMessage;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.tomcat.Jar;
+import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.descriptor.tld.TagFileXml;
 import org.apache.tomcat.util.descriptor.tld.TagXml;
 import org.apache.tomcat.util.descriptor.tld.TaglibXml;
@@ -268,6 +269,13 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         URL url = null;
         try {
             url = ctxt.getResource(uri);
+            /*
+             *  When the TLD cache is built for a TLD contained within a JAR within a WAR, the jar form of the URL is
+             *  used for any nested JAR.
+             */
+            if (url.getProtocol().equals("war") && uri.endsWith(".jar")) {
+                url = UriUtil.warToJar(url);
+            }
         } catch (Exception ex) {
             err.jspError("jsp.error.tld.unable_to_get_jar", uri, ex.toString());
         }
