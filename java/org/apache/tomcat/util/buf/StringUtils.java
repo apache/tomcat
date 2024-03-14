@@ -19,7 +19,6 @@ package org.apache.tomcat.util.buf;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 
 /**
  * Utility methods to build a separated list from a given set (not java.util.Set) of inputs and return that list as a
@@ -97,11 +96,6 @@ public final class StringUtils {
     }
 
     /**
-     * {@link Pattern} for a comma delimited string that support whitespace characters
-     */
-    private static final Pattern commaSeparatedValuesPattern = Pattern.compile("\\s*,\\s*");
-
-    /**
      * Splits a comma-separated string into an array of String values.
      *
      * Whitespace around the commas is removed.
@@ -113,8 +107,15 @@ public final class StringUtils {
      * @return An array of String values.
      */
     public static String[] splitCommaSeparated(String s) {
-        return (s == null || s.length() == 0) ? new String[0] :
-            commaSeparatedValuesPattern.split(s);
+        if (s == null || s.length() == 0) {
+            return new String[0];
+        }
 
+        String[] splits = s.split(",");
+        for (int i=0; i<splits.length; ++i) {
+            splits[i] = splits[i].trim();
+        }
+
+        return splits;
     }
 }
