@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.tomcat.util.buf.StringUtils;
+
 
 /**
  * This class maintains a Set of NetMask objects and allows to check if a given IP address is matched by any of the
@@ -124,7 +126,7 @@ public class NetMaskSet {
 
         List<String> errMessages = new ArrayList<>();
 
-        for (String s : input.split("\\s*,\\s*")) {
+        for (String s : StringUtils.splitCommaSeparated(input)) {
             try {
                 this.add(s);
             } catch (IllegalArgumentException e) {

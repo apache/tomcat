@@ -64,6 +64,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
@@ -966,7 +967,7 @@ public class JNDIRealm extends RealmBase {
             containerLog.warn(sm.getString("jndiRealm.emptyCipherSuites"));
             this.cipherSuitesArray = null;
         } else {
-            this.cipherSuitesArray = cipherSuites.trim().split("\\s*,\\s*");
+            this.cipherSuitesArray = StringUtils.splitCommaSeparated(cipherSuites.trim());
             if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("jndiRealm.cipherSuites", Arrays.toString(this.cipherSuitesArray)));
             }
