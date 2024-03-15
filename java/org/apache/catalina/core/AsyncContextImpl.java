@@ -293,6 +293,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     public boolean isStarted() {
         AtomicBoolean result = new AtomicBoolean(false);
+        Request request = this.request;
+        check();
         request.getCoyoteRequest().action(ActionCode.ASYNC_IS_STARTED, result);
         return result.get();
     }
