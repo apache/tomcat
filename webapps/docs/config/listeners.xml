@@ -358,7 +358,8 @@
       <attribute name="buildDateWarningAgeDays" required="false">
         <p>The maximim number of days between the build-date of this instance
         of Tomcat and its startup date can be before warnings will be logged.
-        If not specified, the default value of <b>180</b> is used.</p>
+        Set to anything less than 0 (e.g. -1) to disable this check.
+        If not specified, the default value of <b>-1</b> is used.</p>
       </attribute>
     </attributes>
 
