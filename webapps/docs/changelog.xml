@@ -139,6 +139,12 @@
         build-date to the SecurityListener, and log a warning if the server
         is old. (schultz)
       </add>
+      <fix>
+        When using the <code>AsyncContext</code>, throw an
+        <code>IllegalStateException</code>, rather than allowing an
+        <code>NullPointerException</code>, if an attempt is made to use the
+        <code>AsyncContext</code> after it has been recycled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
