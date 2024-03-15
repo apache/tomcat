@@ -47,7 +47,7 @@ public class SecurityListener implements LifecycleListener {
 
     private static final String UMASK_FORMAT = "%04o";
 
-    private static final int DEFAULT_BUILD_DATE_WARNING_AGE_DAYS = 180;
+    private static final int DEFAULT_BUILD_DATE_WARNING_AGE_DAYS = -1;
 
     /**
      * The list of operating system users not permitted to run Tomcat.
@@ -221,24 +221,26 @@ public class SecurityListener implements LifecycleListener {
     }
 
     protected void checkServerBuildAge() {
-        String buildDateString = ServerInfo.getServerBuiltISO();
+        int allowedAgeDays = getBuildDateWarningAgeDays();
 
-        if (null == buildDateString || buildDateString.length() < 1 || !Character.isDigit(buildDateString.charAt(0))) {
-            log.warn(sm.getString("SecurityListener.buildDateUnreadable", buildDateString));
-        } else {
-            try {
-                Date buildDate = new SimpleDateFormat("yyyy-MM-dd").parse(buildDateString);
+        if (allowedAgeDays >= 0) {
+            String buildDateString = ServerInfo.getServerBuiltISO();
 
-                int allowedAgeDays = getBuildDateWarningAgeDays();
-
-                Calendar old = Calendar.getInstance();
-                old.add(Calendar.DATE, -allowedAgeDays); // Subtract X days from today
-
-                if (buildDate.before(old.getTime())) {
-                    log.warn(sm.getString("SecurityListener.buildDateIsOld", String.valueOf(allowedAgeDays)));
-                }
-            } catch (ParseException pe) {
+            if (null == buildDateString || buildDateString.length() < 1 || !Character.isDigit(buildDateString.charAt(0))) {
                 log.warn(sm.getString("SecurityListener.buildDateUnreadable", buildDateString));
+            } else {
+                try {
+                    Date buildDate = new SimpleDateFormat("yyyy-MM-dd").parse(buildDateString);
+
+                    Calendar old = Calendar.getInstance();
+                    old.add(Calendar.DATE, -allowedAgeDays); // Subtract X days from today
+
+                    if (buildDate.before(old.getTime())) {
+                        log.warn(sm.getString("SecurityListener.buildDateIsOld", String.valueOf(allowedAgeDays)));
+                    }
+                } catch (ParseException pe) {
+                    log.warn(sm.getString("SecurityListener.buildDateUnreadable", buildDateString));
+                }
             }
         }
     }
