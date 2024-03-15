@@ -141,6 +141,12 @@
         consistency with the recent changes to <code>Set-Cookie</code> header
         generation. (markt)
       </scode>
+      <fix>
+        Do not generate the <code>Max-Age</code> attribute for
+        <code>Set-Cookie</code> headers associated with cookies that have been
+        configured with a <code>Max-Age</code> value of zero as RFC 6265 does
+        not permit a value of zero in this case. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

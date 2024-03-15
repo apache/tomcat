@@ -121,27 +121,27 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
             header.append(value);
         }
 
-        // RFC 6265 prefers Max-Age to Expires but... (see below)
+        /*
+         *  RFC 6265 prefers Max-Age to Expires but some browsers including Microsoft IE and Microsoft Edge don't
+         *  understand Max-Age so send expires as well. Without this, persistent cookies fail with those browsers.
+         */
         int maxAge = cookie.getMaxAge();
+
+        // Negative Max-Age is equivalent to no Max-Age
         if (maxAge > -1) {
-            // Negative Max-Age is equivalent to no Max-Age
-            header.append("; Max-Age=");
-            header.append(maxAge);
-
-            // Microsoft IE and Microsoft Edge don't understand Max-Age so send
-            // expires as well. Without this, persistent cookies fail with those
-            // browsers. See http://tomcat.markmail.org/thread/g6sipbofsjossacn
-
-            // Wdy, DD-Mon-YY HH:MM:SS GMT ( Expires Netscape format )
             header.append("; Expires=");
-            // To expire immediately we need to set the time in past
             if (maxAge == 0) {
+                // To expire immediately we need to set the time in past
                 header.append(ANCIENT_DATE);
             } else {
-                COOKIE_DATE_FORMAT.get().format(new Date(System.currentTimeMillis() + maxAge * 1000L), header,
-                        new FieldPosition(0));
+                COOKIE_DATE_FORMAT.get().format(
+                        new Date(System.currentTimeMillis() + maxAge * 1000L), header, new FieldPosition(0));
+
+                header.append("; Max-Age=");
+                header.append(maxAge);
             }
         }
+
 
         String domain = cookie.getDomain();
         if (domain != null && domain.length() > 0) {
