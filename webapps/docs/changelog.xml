@@ -135,6 +135,12 @@
         equals sign or value. This will simplify future support for similar new
         attributes by removing the need for special handling. (markt)
       </update>
+      <scode>
+        Refactor the internal representation of the <code>HttpOnly</code> and
+        <code>Secure</code> attributes to use the empty string as the value for
+        consistency with the recent changes to <code>Set-Cookie</code> header
+        generation. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
