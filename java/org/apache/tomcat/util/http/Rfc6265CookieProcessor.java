@@ -41,6 +41,8 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
     private static final StringManager sm =
             StringManager.getManager(Rfc6265CookieProcessor.class.getPackage().getName());
 
+    private static final String EMPTY_STRING = "";
+
     private static final BitSet domainValid = new BitSet(128);
 
     static {
@@ -183,7 +185,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
                 header.append("; Partitioned");
             }
         } else {
-            if (Boolean.parseBoolean(cookiePartitioned)) {
+            if (EMPTY_STRING.equals(cookiePartitioned)) {
                 header.append("; Partitioned");
             }
         }
@@ -206,8 +208,10 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
                     validateAttribute(entry.getKey(), entry.getValue());
                     header.append("; ");
                     header.append(entry.getKey());
-                    header.append('=');
-                    header.append(entry.getValue());
+                    if (!EMPTY_STRING.equals(entry.getValue())) {
+                        header.append('=');
+                        header.append(entry.getValue());
+                    }
                 }
             }
         }
