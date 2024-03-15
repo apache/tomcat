@@ -47,7 +47,7 @@ public class SecurityListener implements LifecycleListener {
 
     private static final String UMASK_FORMAT = "%04o";
 
-    private static final int DEFAULT_BUILD_DATE_WARNING_AGE_DAYS = -1;
+    private static final int DEFAULT_BUILD_DATE_WARNING_AGE_DAYS = 180;
 
     /**
      * The list of operating system users not permitted to run Tomcat.
