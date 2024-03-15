@@ -120,7 +120,7 @@
       </add>
     </changelog>
   </subsection>
-  <subsection name="Catalina">
+  <subsection name="Coyote">
     <changelog>
       <fix>
         Add <code>threadsMaxIdleTime</code> attribute to the endpoint,
