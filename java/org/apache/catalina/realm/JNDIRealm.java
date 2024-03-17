@@ -963,11 +963,12 @@ public class JNDIRealm extends RealmBase {
         if (cipherSuites == null || cipherSuitesArray != null) {
             return cipherSuitesArray;
         }
-        if (this.cipherSuites.trim().isEmpty()) {
+        this.cipherSuites = this.cipherSuites.trim();
+        if (this.cipherSuites.isEmpty()) {
             containerLog.warn(sm.getString("jndiRealm.emptyCipherSuites"));
             this.cipherSuitesArray = null;
         } else {
-            this.cipherSuitesArray = StringUtils.splitCommaSeparated(cipherSuites.trim());
+            this.cipherSuitesArray = StringUtils.splitCommaSeparated(cipherSuites);
             if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("jndiRealm.cipherSuites", Arrays.toString(this.cipherSuitesArray)));
             }
