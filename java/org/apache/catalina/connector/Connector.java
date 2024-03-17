@@ -44,6 +44,7 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.CharsetUtil;
 import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.apache.tomcat.util.buf.UDecoder;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 import org.apache.tomcat.util.res.StringManager;
@@ -510,7 +511,7 @@ public class Connector extends LifecycleMBeanBase {
         HashSet<String> methodSet = new HashSet<>();
 
         if (null != methods) {
-            methodSet.addAll(Arrays.asList(methods.split("\\s*,\\s*")));
+            methodSet.addAll(Arrays.asList(StringUtils.splitCommaSeparated(methods)));
         }
 
         if (methodSet.contains("TRACE")) {

@@ -30,6 +30,7 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.NetMask;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.StringUtils;
 
 public final class RemoteCIDRValve extends RequestFilterValve {
 
@@ -236,7 +237,7 @@ public final class RemoteCIDRValve extends RequestFilterValve {
         final List<String> messages = new ArrayList<>();
         NetMask nm;
 
-        for (final String s : input.split("\\s*,\\s*")) {
+        for (final String s : StringUtils.splitCommaSeparated(input)) {
             try {
                 nm = new NetMask(s);
                 target.add(nm);

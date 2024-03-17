@@ -28,7 +28,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
-import java.util.regex.Pattern;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -44,6 +43,7 @@ import javax.servlet.http.MappingMatch;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.StringUtils;
 
 /**
  * <p>
@@ -1010,11 +1010,6 @@ public class ExpiresFilter extends FilterBase {
 
     }
 
-    /**
-     * {@link Pattern} for a comma delimited string that support whitespace characters
-     */
-    private static final Pattern commaSeparatedValuesPattern = Pattern.compile("\\s*,\\s*");
-
     private static final String HEADER_CACHE_CONTROL = "Cache-Control";
 
     private static final String HEADER_EXPIRES = "Expires";
@@ -1039,7 +1034,7 @@ public class ExpiresFilter extends FilterBase {
      * @return never {@code null} array
      */
     protected static int[] commaDelimitedListToIntArray(String commaDelimitedInts) {
-        String[] intsAsStrings = commaDelimitedListToStringArray(commaDelimitedInts);
+        String[] intsAsStrings = StringUtils.splitCommaSeparated(commaDelimitedInts);
         int[] ints = new int[intsAsStrings.length];
         for (int i = 0; i < intsAsStrings.length; i++) {
             String intAsString = intsAsStrings[i];
@@ -1059,10 +1054,12 @@ public class ExpiresFilter extends FilterBase {
      * @param commaDelimitedStrings the string to be split
      *
      * @return array of patterns (non {@code null})
+     *
+     * @deprecated Unused. Will be removed in Tomcat 11.
      */
+    @Deprecated
     protected static String[] commaDelimitedListToStringArray(String commaDelimitedStrings) {
-        return (commaDelimitedStrings == null || commaDelimitedStrings.length() == 0) ? new String[0] :
-                commaSeparatedValuesPattern.split(commaDelimitedStrings);
+        return StringUtils.splitCommaSeparated(commaDelimitedStrings);
     }
 
     /**
