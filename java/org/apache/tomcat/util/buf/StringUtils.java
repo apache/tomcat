@@ -112,7 +112,7 @@ public final class StringUtils {
         }
 
         String[] splits = s.split(",");
-        for (int i=0; i<splits.length; ++i) {
+        for (int i = 0; i < splits.length; ++i) {
             splits[i] = splits[i].trim();
         }
 
