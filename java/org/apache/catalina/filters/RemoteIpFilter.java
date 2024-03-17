@@ -640,11 +640,6 @@ public class RemoteIpFilter extends GenericFilter {
     }
 
 
-    /**
-     * {@link Pattern} for a comma delimited string that support whitespace characters
-     */
-    private static final Pattern commaSeparatedValuesPattern = Pattern.compile("\\s*,\\s*");
-
     protected static final String HTTP_SERVER_PORT_PARAMETER = "httpServerPort";
 
     protected static final String HTTPS_SERVER_PORT_PARAMETER = "httpsServerPort";
@@ -675,18 +670,6 @@ public class RemoteIpFilter extends GenericFilter {
     protected static final String TRUSTED_PROXIES_PARAMETER = "trustedProxies";
 
     protected static final String ENABLE_LOOKUPS_PARAMETER = "enableLookups";
-
-    /**
-     * Convert a given comma delimited list of regular expressions into an array of String
-     *
-     * @param commaDelimitedStrings The string to split
-     *
-     * @return array of patterns (non <code>null</code>)
-     */
-    protected static String[] commaDelimitedListToStringArray(String commaDelimitedStrings) {
-        return (commaDelimitedStrings == null || commaDelimitedStrings.length() == 0) ? new String[0] :
-                commaSeparatedValuesPattern.split(commaDelimitedStrings);
-    }
 
     /**
      * @see #setHttpServerPort(int)
@@ -764,7 +747,7 @@ public class RemoteIpFilter extends GenericFilter {
                 concatRemoteIpHeaderValue.append(e.nextElement());
             }
 
-            String[] remoteIpHeaderValue = commaDelimitedListToStringArray(concatRemoteIpHeaderValue.toString());
+            String[] remoteIpHeaderValue = StringUtils.splitCommaSeparated(concatRemoteIpHeaderValue.toString());
             int idx;
             if (!isInternal) {
                 proxiesHeaderValue.addFirst(request.getRemoteAddr());
@@ -898,7 +881,7 @@ public class RemoteIpFilter extends GenericFilter {
         if (!protocolHeaderValue.contains(",")) {
             return protocolHeaderHttpsValue.equalsIgnoreCase(protocolHeaderValue);
         }
-        String[] forwardedProtocols = commaDelimitedListToStringArray(protocolHeaderValue);
+        String[] forwardedProtocols = StringUtils.splitCommaSeparated(protocolHeaderValue);
         if (forwardedProtocols.length == 0) {
             return false;
         }
