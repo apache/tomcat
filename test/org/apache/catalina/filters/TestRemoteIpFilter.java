@@ -639,7 +639,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
     @Test
     public void testListToCommaDelimitedString() {
-        String[] actual = RemoteIpFilter.commaDelimitedListToStringArray("element1, element2, element3");
+        String[] actual = StringUtils.splitCommaSeparated("element1, element2, element3");
         String[] expected = new String[] { "element1", "element2", "element3" };
         Assert.assertEquals(expected.length, actual.length);
         for (int i = 0; i < actual.length; i++) {
@@ -649,7 +649,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
     @Test
     public void testListToCommaDelimitedStringMixedSpaceChars() {
-        String[] actual = RemoteIpFilter.commaDelimitedListToStringArray("element1  , element2,\t element3");
+        String[] actual = StringUtils.splitCommaSeparated("element1  , element2,\t element3");
         String[] expected = new String[] { "element1", "element2", "element3" };
         Assert.assertEquals(expected.length, actual.length);
         for (int i = 0; i < actual.length; i++) {

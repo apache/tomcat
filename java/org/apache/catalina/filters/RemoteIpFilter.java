@@ -657,11 +657,6 @@ public class RemoteIpFilter extends GenericFilter {
     }
 
 
-    /**
-     * {@link Pattern} for a comma delimited string that support whitespace characters
-     */
-    private static final Pattern commaSeparatedValuesPattern = Pattern.compile("\\s*,\\s*");
-
     protected static final String HTTP_SERVER_PORT_PARAMETER = "httpServerPort";
 
     protected static final String HTTPS_SERVER_PORT_PARAMETER = "httpsServerPort";
@@ -699,10 +694,12 @@ public class RemoteIpFilter extends GenericFilter {
      * @param commaDelimitedStrings The string to split
      *
      * @return array of patterns (non <code>null</code>)
+     *
+     * @deprecated Unused. Will be removed in Tomcat 11 onwards.
      */
+    @Deprecated
     protected static String[] commaDelimitedListToStringArray(String commaDelimitedStrings) {
-        return (commaDelimitedStrings == null || commaDelimitedStrings.length() == 0) ? new String[0] :
-                commaSeparatedValuesPattern.split(commaDelimitedStrings);
+        return StringUtils.splitCommaSeparated(commaDelimitedStrings);
     }
 
     /**
@@ -808,7 +805,7 @@ public class RemoteIpFilter extends GenericFilter {
                 concatRemoteIpHeaderValue.append(e.nextElement());
             }
 
-            String[] remoteIpHeaderValue = commaDelimitedListToStringArray(concatRemoteIpHeaderValue.toString());
+            String[] remoteIpHeaderValue = StringUtils.splitCommaSeparated(concatRemoteIpHeaderValue.toString());
             int idx;
             if (!isInternal) {
                 proxiesHeaderValue.addFirst(request.getRemoteAddr());
@@ -942,7 +939,7 @@ public class RemoteIpFilter extends GenericFilter {
         if (!protocolHeaderValue.contains(",")) {
             return protocolHeaderHttpsValue.equalsIgnoreCase(protocolHeaderValue);
         }
-        String[] forwardedProtocols = commaDelimitedListToStringArray(protocolHeaderValue);
+        String[] forwardedProtocols = StringUtils.splitCommaSeparated(protocolHeaderValue);
         if (forwardedProtocols.length == 0) {
             return false;
         }
