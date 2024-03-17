@@ -103,4 +103,28 @@ public final class StringUtils {
     public interface Function<T> {
         String apply(T t);
     }
+
+    /**
+     * Splits a comma-separated string into an array of String values.
+     *
+     * Whitespace around the commas is removed.
+     *
+     * Null or empty values will return a zero-element array.
+     *
+     * @param s The string to split by commas.
+     *
+     * @return An array of String values.
+     */
+    public static String[] splitCommaSeparated(String s) {
+        if (s == null || s.length() == 0) {
+            return new String[0];
+        }
+
+        String[] splits = s.split(",");
+        for (int i = 0; i < splits.length; ++i) {
+            splits[i] = splits[i].trim();
+        }
+
+        return splits;
+    }
 }
