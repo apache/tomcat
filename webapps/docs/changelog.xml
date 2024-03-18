@@ -153,6 +153,13 @@
         configured with a <code>Max-Age</code> value of zero as RFC 6265 does
         not permit a value of zero in this case. (markt)
       </fix>
+      <fix>
+        Correct a regression in the support for user provided
+        <code>SSLContext</code> instances that broke the
+        <code>org.apache.catalina.security.TLSCertificateReloadListener</code>.
+        (markt)
+      </fix>
+      
     </changelog>
   </subsection>
   <subsection name="Jasper">
