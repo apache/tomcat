@@ -101,8 +101,14 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
             }
 
             SSLContext sslContext = certificate.getSslContext();
+            SSLContext sslContextGenerated = certificate.getSslContextGenerated();
             // Generate the SSLContext from configuration unless (e.g. embedded) an SSLContext has been provided.
-            if (sslContext == null) {
+            // Need to handle both initial configuration and reload.
+            // Initial, SSLContext provided     - sslContext will be non-null and sslContextGenerated will be null
+            // Initial, SSLContext not provided - sslContext null and sslContextGenerated will be null
+            // Reload,  SSLContext provided     - sslContext will be non-null and sslContextGenerated will be null
+            // Reload,  SSLContext not provided - sslContext non-null and equal to sslContextGenerated
+            if (sslContext == null || sslContext == sslContextGenerated) {
                 try {
                     sslContext = sslUtil.createSSLContext(negotiableProtocols);
                 } catch (Exception e) {
