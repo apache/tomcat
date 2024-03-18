@@ -155,6 +155,12 @@
         added to the backlog immediately rather than waiting until the write
         attempt for the remaining content. (markt)
       </fix>
+      <fix>
+        Correct a regression in the support for user provided
+        <code>SSLContext</code> instances that broke the
+        <code>org.apache.catalina.security.TLSCertificateReloadListener</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
