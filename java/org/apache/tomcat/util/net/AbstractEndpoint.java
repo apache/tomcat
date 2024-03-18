@@ -523,7 +523,6 @@ public abstract class AbstractEndpoint<S,U> {
             // Only try to negotiate if both client and server have at least
             // one protocol in common
             // Note: Tomcat does not explicitly negotiate http/1.1
-            // TODO: Is this correct? Should it change?
             List<String> commonProtocols = new ArrayList<>(negotiableProtocols);
             commonProtocols.retainAll(clientRequestedApplicationProtocols);
             if (commonProtocols.size() > 0) {
@@ -1235,6 +1234,7 @@ public abstract class AbstractEndpoint<S,U> {
             this.executor = null;
             if (executor instanceof ThreadPoolExecutor) {
                 //this is our internal one, so we need to shut it down
+                @SuppressWarnings("resource")
                 ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
                 tpe.shutdownNow();
                 long timeout = getExecutorTerminationTimeoutMillis();
