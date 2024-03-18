@@ -183,6 +183,12 @@
         will scale back to the configured <code>minSpareThreads</code> size.
         (remm)
       </fix>
+      <fix>
+        Correct a regression in the support for user provided
+        <code>SSLContext</code> instances that broke the
+        <code>org.apache.catalina.security.TLSCertificateReloadListener</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
