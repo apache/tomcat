@@ -159,7 +159,6 @@
         <code>org.apache.catalina.security.TLSCertificateReloadListener</code>.
         (markt)
       </fix>
-      
     </changelog>
   </subsection>
   <subsection name="Jasper">
