@@ -128,7 +128,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                 }
             }
         }
-        return result.toArray(new String[0]);
+        return Arrays.sort(result.toArray(new String[0]));
     }
 
 
