@@ -29,12 +29,11 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.connector.Connector;
-import org.apache.catalina.core.AprLifecycleListener;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 
 /**
  * The keys and certificates used in this file are all available in svn and were
@@ -56,7 +55,7 @@ public class TestClientCertTls13 extends TomcatBaseTest {
         parameterSets.add(new Object[] {
                 "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
         parameterSets.add(new Object[] {
-                "OpenSSL-FFM", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+                "OpenSSL-FFM", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
 
         return parameterSets;
     }
@@ -108,15 +107,13 @@ public class TestClientCertTls13 extends TomcatBaseTest {
         TesterSupport.configureClientSsl();
 
         Connector connector = tomcat.getConnector();
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
 
         if (needApr) {
-            AprLifecycleListener listener = new AprLifecycleListener();
-            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
-            // Need at least OpenSSL 1.1.1 for TLSv1.3 support
-            Assume.assumeTrue(SSL.version() >= 0x1010100f);
-            StandardServer server = (StandardServer) tomcat.getServer();
-            server.addLifecycleListener(listener);
+            if (OpenSSLImplementation.class.getName().equals(sslImplementationName)) {
+                // Need at least OpenSSL 1.1.1 for TLSv1.3 support
+                Assume.assumeTrue(SSL.version() >= 0x1010100f);
+            }
         }
 
         // Tests default to TLSv1.2 when client cert auth is used

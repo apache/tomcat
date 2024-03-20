@@ -52,9 +52,11 @@ import org.junit.Assert;
 import org.junit.Assume;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.authenticator.SSLAuthenticator;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.core.OpenSSLLifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
@@ -66,6 +68,7 @@ import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.jsse.JSSEImplementation;
+import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 
 public final class TesterSupport {
 
@@ -237,11 +240,18 @@ public final class TesterSupport {
         return true;
     }
 
-    public static void configureSSLImplementation(Tomcat tomcat, String sslImplementationName) {
-        try {
-            Class.forName(sslImplementationName);
-        } catch (Exception e) {
-            Assume.assumeNoException(e);
+    public static void configureSSLImplementation(Tomcat tomcat, String sslImplementationName, boolean openSSL) {
+        if (openSSL) {
+            LifecycleListener listener = null;
+            if (OpenSSLImplementation.class.getName().equals(sslImplementationName)) {
+                listener = new AprLifecycleListener();
+                Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
+            } else {
+                listener = new OpenSSLLifecycleListener();
+                Assume.assumeTrue(OpenSSLLifecycleListener.isAvailable());
+            }
+            StandardServer server = (StandardServer) tomcat.getServer();
+            server.addLifecycleListener(listener);
         }
         Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
     }

@@ -321,18 +321,6 @@ migration-lib.home=${base.path}/migration-${migration-lib.version}
 migration-lib.jar=${migration-lib.home}/jakartaee-migration-${migration-lib.version}-shaded.jar
 migration-lib.loc=${base-maven.loc}/org/apache/tomcat/jakartaee-migration/${migration-lib.version}/jakartaee-migration-${migration-lib.version}-shaded.jar
 
-# ----- Tomcat OpenSSL -----
-openssl-lib.version=0.1
-
-# checksums for tomcat-coyote-openssl-java17-0.1.jar
-openssl-lib.checksum.enabled=true
-openssl-lib.checksum.algorithm=MD5|SHA-1
-openssl-lib.checksum.value=xxx|xxx
-
-openssl-lib.home=${base.path}/tomcat-coyote-openssl-java17-${openssl-lib.version}
-openssl-lib.jar=${openssl-lib.home}/tomcat-coyote-openssl-java17-${openssl-lib.version}.jar
-openssl-lib.loc=${base-maven.loc}/org/apache/tomcat/tomcat-coyote-openssl-java17/${openssl-lib.version}/tomcat-coyote-openssl-java17-${openssl-lib.version}.jar
-
 # ----- JSign, version 4.1 or later -----
 jsign.version=6.0
 jsign.checksum.enabled=true

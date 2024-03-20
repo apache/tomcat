@@ -105,6 +105,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.21 (schultz)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        Add OpenSSL integration using the FFM API rather than Tomcat Native.
+        OpenSSL support may be enabled by adding the
+        <code>org.apache.catalina.core.OpenSSLLifecycleListener</code>
+        listener on the <code>Server</code> element when using Java 22
+        or later. (remm)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.20 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
