@@ -434,6 +434,12 @@
   <xsl:template match="min-java-version">
     <xsl:value-of select="$minjavaversion"/>
   </xsl:template>
+  <xsl:template match="build-java-version">
+    <xsl:value-of select="$buildjavaversion"/>
+  </xsl:template>
+  <xsl:template match="ant-version-required">
+    <xsl:value-of select="$antversionrequired"/>
+  </xsl:template>
 
   <!-- Process everything else by just passing it through -->
   <xsl:template match="*|@*">
