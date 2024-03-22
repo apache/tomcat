@@ -225,6 +225,11 @@
         and the web application is deployed as a WAR file rather than an
         unpacked directory. (markt)
       </fix>
+      <fix>
+        Prevent the web application's ClassLoader from being pinned by the JSP
+        compiler if an application uses a custom XMLInputFactory. Based upon a
+        suggestion from Simon Niederberger. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
