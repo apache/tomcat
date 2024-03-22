@@ -1240,6 +1240,7 @@ public abstract class AbstractEndpoint<S,U> {
             this.executor = null;
             if (executor instanceof ThreadPoolExecutor) {
                 //this is our internal one, so we need to shut it down
+                @SuppressWarnings("resource")
                 ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
                 tpe.shutdownNow();
                 long timeout = getExecutorTerminationTimeoutMillis();
