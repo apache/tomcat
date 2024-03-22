@@ -462,14 +462,14 @@ public class TLSClientHelloExtractor {
      * Allows the HTTP response to be changed.
      * <pre>
      * {@code
-     * new ResponseCustomizer() {
+     * TLSClientHelloExtractor.RESPONSE_CUSTOMIZER = new ResponseCustomizer() {
      *     @Override
      *     public byte[] customize(ByteBuffer netInBuffer) {
      *         return ("HTTP/1.1 302 \r\n" +
      *             "Location: https://www.example.org/index.html\r\n" +
      *             "\r\n").getBytes(StandardCharsets.UTF_8);
      *     }
-     * }
+     * };
      * }
      * </pre>
      */
