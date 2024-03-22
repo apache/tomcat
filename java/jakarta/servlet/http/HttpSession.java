@@ -229,5 +229,7 @@ public interface HttpSession {
      *
      * @throws IllegalStateException if this method is called on an invalid session
      */
-    Accessor getAccessor();
+    default Accessor getAccessor() {
+        return null;
+    }
 }

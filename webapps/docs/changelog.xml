@@ -124,6 +124,10 @@
         <code>NullPointerException</code>, if an attempt is made to use the
         <code>AsyncContext</code> after it has been recycled. (markt)
       </fix>
+      <add>
+        Add a default implementation for <code>HttpSession.getAccessor()</code>
+        to align with the Servlet 6.1 API. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
