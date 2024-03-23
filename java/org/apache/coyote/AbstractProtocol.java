@@ -458,7 +458,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     }
 
 
-    protected Handler<S> getHandler() {
+    public Handler<S> getHandler() {
         return handler;
     }
 
