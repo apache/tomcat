@@ -10,19 +10,19 @@
     <xsd:documentation>
 
       Copyright (c) 2009, 2021 Oracle and/or its affiliates. All rights reserved.
-      
+
       This program and the accompanying materials are made available under the
       terms of the Eclipse Public License v. 2.0, which is available at
       http://www.eclipse.org/legal/epl-2.0.
-      
+
       This Source Code may also be made available under the following Secondary
       Licenses when the conditions for such availability set forth in the
       Eclipse Public License v. 2.0 are satisfied: GNU General Public License,
       version 2 with the GNU Classpath Exception, which is available at
       https://www.gnu.org/software/classpath/license.html.
-      
+
       SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
-      
+
     </xsd:documentation>
   </xsd:annotation>
 
@@ -32,11 +32,11 @@
       This is the XML Schema for the JSP 4.0 deployment descriptor
       types.  The JSP 4.0 schema contains all the special
       structures and datatypes that are necessary to use JSP files
-      from a web application. 
-      
-      The contents of this schema is used by the web-common_6_1.xsd 
-      file to define JSP specific content. 
-      
+      from a web application.
+
+      The contents of this schema is used by the web-common_6_1.xsd
+      file to define JSP specific content.
+
     </xsd:documentation>
   </xsd:annotation>
 
@@ -45,7 +45,7 @@
 
       The following conventions apply to all Jakarta EE
       deployment descriptor elements unless indicated otherwise.
-      
+
       - In elements that specify a pathname to a file within the
       same JAR file, relative filenames (i.e., those not
       starting with "/") are considered relative to the root of
@@ -54,7 +54,7 @@
       JAR file's namespace.  In general, relative names are
       preferred.  The exception is .war files where absolute
       names are preferred for consistency with the Servlet API.
-      
+
     </xsd:documentation>
   </xsd:annotation>
 
@@ -70,7 +70,7 @@
         The jsp-configType is used to provide global configuration
         information for the JSP files in a web application. It has
         two subelements, taglib and jsp-property-group.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -96,7 +96,7 @@
 
         The jsp-file element contains the full path to a JSP file
         within the web application beginning with a `/'.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -115,7 +115,7 @@
         files so they can be given global property information.
         All files so described are deemed to be JSP files.  The
         following additional properties can be described:
-        
+
         - Control whether EL is ignored.
         - Control whether scripting elements are invalid.
         - Indicate pageEncoding information.
@@ -129,7 +129,7 @@
         - Indicate the default buffering model for JspWriter
         - Control whether error should be raised for the use of
         undeclared namespaces in a JSP page.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -148,7 +148,7 @@
             EL evaluation is enabled for Web Applications using
             a Servlet 2.4 or greater web.xml, and disabled
             otherwise.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -161,7 +161,7 @@
             Can be used to easily set the errorOnELNotFound
             property of a group of JSP pages. By default, this
             property is false.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -182,7 +182,7 @@
             in a JSP configuration element matching the document.
             It is legal to name the same encoding through
             mulitple mechanisms.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -195,7 +195,7 @@
             Can be used to easily disable scripting in a
             group of JSP pages.  By default, scripting is
             enabled.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -211,7 +211,7 @@
             If false, the resources are assumed to not
             be JSP documents, unless there is another
             property group that indicates otherwise.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -228,7 +228,7 @@
             the given path will be automatically included (as
             in an include directive) at the beginning of each
             JSP page in this jsp-property-group.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -245,7 +245,7 @@
             the given path will be automatically included (as
             in an include directive) at the end of each
             JSP page in this jsp-property-group.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -260,7 +260,7 @@
             character sequence is used as a String literal, unless
             this element is enabled (true). Disabled (false) by
             default.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -274,7 +274,7 @@
             must be removed from the response output. It has no
             effect on JSP documents (XML syntax). Disabled (false)
             by default.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -288,7 +288,7 @@
             contentType page directive.  It specifies the default
             response contentType if the page directive does not include
             a contentType attribute.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -302,7 +302,7 @@
             buffer page directive.  It specifies if buffering should be
             used for the output to response, and if so, the size of the
             buffer to use.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -317,7 +317,7 @@
             set to true, then an error must be raised during the translation
             time when an undeclared tag is used in a JSP page.  Disabled
             (false) by default.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -338,7 +338,7 @@
         available to the application.  This can be done
         to override implicit map entries from TLD files and
         from the container.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -353,7 +353,7 @@
             absolute URI specification, or a relative URI.
             There should be no entries in web.xml with the
             same taglib-uri value.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -366,7 +366,7 @@
             (as a resource relative to the root of the web
             application) where to find the Tag Library
             Description file for the tag library.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>

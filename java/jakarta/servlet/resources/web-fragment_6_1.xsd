@@ -10,19 +10,19 @@
     <xsd:documentation>
 
       Copyright (c) 2009, 2021 Oracle and/or its affiliates. All rights reserved.
-      
+
       This program and the accompanying materials are made available under the
       terms of the Eclipse Public License v. 2.0, which is available at
       http://www.eclipse.org/legal/epl-2.0.
-      
+
       This Source Code may also be made available under the following Secondary
       Licenses when the conditions for such availability set forth in the
       Eclipse Public License v. 2.0 are satisfied: GNU General Public License,
       version 2 with the GNU Classpath Exception, which is available at
       https://www.gnu.org/software/classpath/license.html.
-      
+
       SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
-      
+
     </xsd:documentation>
   </xsd:annotation>
 
@@ -34,25 +34,25 @@
       in the web fragment's jar file.  All Servlet deployment descriptors
       must indicate the web application schema by using the Jakarta EE
       namespace:
-      
+
       https://jakarta.ee/xml/ns/jakartaee
-      
+
       and by indicating the version of the schema by
       using the version element as shown below:
-      
+
       <web-fragment xmlns="https://jakarta.ee/xml/ns/jakartaee"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="..."
       version="6.1">
       ...
       </web-fragment>
-      
+
       The instance documents may indicate the published version of
       the schema using the xsi:schemaLocation attribute for Jakarta EE
       namespace with the following location:
-      
+
       https://jakarta.ee/xml/ns/jakartaee/web-fragment_6_1.xsd
-      
+
       ]]>
     </xsd:documentation>
   </xsd:annotation>
@@ -62,7 +62,7 @@
 
       The following conventions apply to all Jakarta EE
       deployment descriptor elements unless indicated otherwise.
-      
+
       - In elements that specify a pathname to a file within the
       same JAR file, relative filenames (i.e., those not
       starting with "/") are considered relative to the root of
@@ -71,7 +71,7 @@
       JAR file's namespace.  In general, relative names are
       preferred.  The exception is .war files where absolute
       names are preferred for consistency with the Servlet API.
-      
+
     </xsd:documentation>
   </xsd:annotation>
 
@@ -99,7 +99,7 @@
         of the element distributable is redundant and the container
         treats that case exactly in the same way when there is only
         one distributable.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:unique name="web-common-servlet-name-uniqueness">
@@ -108,7 +108,7 @@
 
           The servlet element contains the name of a servlet.
           The name must be unique within the web application.
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="jakartaee:servlet"/>
@@ -120,7 +120,7 @@
 
           The filter element contains the name of a filter.
           The name must be unique within the web application.
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="jakartaee:filter"/>
@@ -130,14 +130,14 @@
       <xsd:annotation>
         <xsd:documentation>
 
-          The ejb-local-ref-name element contains the name of an 
+          The ejb-local-ref-name element contains the name of an
           enterprise bean reference. The enterprise bean reference
           is an entry in the web application's environment and is relative
           to the java:comp/env context.  The name must be unique within
           the web application.
-          
+
           It is recommended that name is prefixed with "ejb/".
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="jakartaee:ejb-local-ref"/>
@@ -147,14 +147,14 @@
       <xsd:annotation>
         <xsd:documentation>
 
-          The ejb-ref-name element contains the name of an  
-          enterprise bean reference. The enterprise bean reference 
-          is an entry in the web application's environment and is relative 
+          The ejb-ref-name element contains the name of an
+          enterprise bean reference. The enterprise bean reference
+          is an entry in the web application's environment and is relative
           to the java:comp/env context.  The name must be unique within
           the web application.
-          
+
           It is recommended that name is prefixed with "ejb/".
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="jakartaee:ejb-ref"/>
@@ -169,7 +169,7 @@
           environment entry name used in the web application code.
           The name is a JNDI name relative to the java:comp/env
           context and must be unique within a web application.
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="jakartaee:resource-env-ref"/>
@@ -184,7 +184,7 @@
           environment entry name used in the web application code.
           The name is a JNDI name relative to the java:comp/env
           context and must be unique within a web application.
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="jakartaee:message-destination-ref"/>
@@ -198,7 +198,7 @@
           resource manager connection factory reference.  The name
           is a JNDI name relative to the java:comp/env context.
           The name must be unique within a web application.
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="jakartaee:resource-ref"/>
@@ -212,7 +212,7 @@
           application's environment entry.  The name is a JNDI
           name relative to the java:comp/env context.  The name
           must be unique within a web application.
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="jakartaee:env-entry"/>
@@ -224,7 +224,7 @@
 
           A role-name-key is specified to allow the references
           from the security-role-refs.
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="jakartaee:security-role"/>
@@ -237,7 +237,7 @@
 
           The keyref indicates the references from
           security-role-ref to a specified role-name.
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="jakartaee:servlet/jakartaee:security-role-ref"/>
@@ -268,7 +268,7 @@
       <xsd:documentation>
 
         Please see section 8.2.2 of the specification for details.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -298,7 +298,7 @@
         comes
         before or after other documents within the application.
         See section 8.2.2 of the specification for details.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
