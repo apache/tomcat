@@ -566,18 +566,24 @@ COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 For the following Jakarta EE Schemas:
 - jakartaee_9.xsd
 - jakartaee_10.xsd
+- jakartaee_11.xsd
 - jakarta_web-services_2_0.xsd
 - jakarta_web-services_client_2_0.xsd
 - jsp_3_0.xsd
 - jsp_3_1.xsd
+- jsp_4_0.xsd
 - web-app_5_0.xsd
 - web-app_6_0.xsd
+- web-app_6_1.xsd
 - web-commonn_5_0.xsd
 - web-commonn_6_0.xsd
+- web-commonn_6_1.xsd
 - web-fragment_5_0.xsd
 - web-fragment_6_0.xsd
+- web-fragment_6_1.xsd
 - web-jsptaglibrary_3_0.xsd
 - web-jsptaglibrary_3_1.xsd
+- web-jsptaglibrary_4_0.xsd
 
 Eclipse Public License - v 2.0
 
