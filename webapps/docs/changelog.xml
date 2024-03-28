@@ -128,6 +128,10 @@
         Add a default implementation for <code>HttpSession.getAccessor()</code>
         to align with the Servlet 6.1 API. (markt)
       </add>
+      <add>
+        Add the Jakarta EE 11 XML schemas and update Tomcat and included web
+        applications to use them. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
