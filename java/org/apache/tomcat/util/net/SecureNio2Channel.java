@@ -423,7 +423,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             break;
         case NON_SECURE:
             netOutBuffer.clear();
-            netOutBuffer.put(TLSClientHelloExtractor.USE_TLS_RESPONSE);
+            netOutBuffer.put(extractor.getUseTlsResponse());
             netOutBuffer.flip();
             flush();
             throw new IOException(sm.getString("channel.nio.ssl.foundHttp"));
