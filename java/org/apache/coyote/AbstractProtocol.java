@@ -458,7 +458,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     }
 
 
-    protected Handler<S> getHandler() {
+    public Handler<S> getHandler() {
         return handler;
     }
 
@@ -769,7 +769,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
     // ------------------------------------------- Connection handler base class
 
-    protected static class ConnectionHandler<S> implements AbstractEndpoint.Handler<S> {
+    public static class ConnectionHandler<S> implements AbstractEndpoint.Handler<S> {
 
         private final AbstractProtocol<S> proto;
         private final RequestGroupInfo global = new RequestGroupInfo();
