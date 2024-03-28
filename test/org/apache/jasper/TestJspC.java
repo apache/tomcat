@@ -119,6 +119,14 @@ public class TestJspC {
         verify(webappOut);
     }
 
+    @Test
+    public void precompileWebapp_6_1() throws IOException {
+        File appDir = new File("test/webapp-6.1");
+        File webappOut = new File(outputDir, appDir.getName());
+        precompile(appDir, webappOut);
+        verify(webappOut);
+    }
+
     private void verify(File webappOut) {
         // for now, just check some expected files exist
         Assert.assertTrue(new File(webappOut, "generated_web.xml").exists());
