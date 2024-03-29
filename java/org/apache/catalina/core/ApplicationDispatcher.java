@@ -267,16 +267,6 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Forward this request and response to another resource for processing. Any runtime exception, IOException, or
-     * ServletException thrown by the called servlet will be propagated to the caller.
-     *
-     * @param request  The servlet request to be forwarded
-     * @param response The servlet response to be forwarded
-     *
-     * @exception IOException      if an input/output error occurs
-     * @exception ServletException if a servlet exception occurs
-     */
     @Override
     public void forward(ServletRequest request, ServletResponse response) throws ServletException, IOException {
         if (Globals.IS_SECURITY_ENABLED) {
@@ -452,16 +442,6 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
     }
 
 
-    /**
-     * Include the response from another resource in the current response. Any runtime exception, IOException, or
-     * ServletException thrown by the called servlet will be propagated to the caller.
-     *
-     * @param request  The servlet request that is including this one
-     * @param response The servlet response to be appended to
-     *
-     * @exception IOException      if an input/output error occurs
-     * @exception ServletException if a servlet exception occurs
-     */
     @Override
     public void include(ServletRequest request, ServletResponse response) throws ServletException, IOException {
         if (Globals.IS_SECURITY_ENABLED) {

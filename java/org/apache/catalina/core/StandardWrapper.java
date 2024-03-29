@@ -1340,21 +1340,12 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     // -------------------------------------------------- ServletConfig Methods
 
 
-    /**
-     * @return the initialization parameter value for the specified name, if any; otherwise return <code>null</code>.
-     *
-     * @param name Name of the initialization parameter to retrieve
-     */
     @Override
     public String getInitParameter(String name) {
         return findInitParameter(name);
     }
 
 
-    /**
-     * @return the set of initialization parameter names defined for this servlet. If none are defined, an empty
-     *             Enumeration is returned.
-     */
     @Override
     public Enumeration<String> getInitParameterNames() {
 
@@ -1368,9 +1359,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * @return the servlet context with which this servlet is associated.
-     */
     @Override
     public ServletContext getServletContext() {
         if (parent == null) {
@@ -1383,9 +1371,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * @return the name of this servlet.
-     */
     @Override
     public String getServletName() {
         return getName();

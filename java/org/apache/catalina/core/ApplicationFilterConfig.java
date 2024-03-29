@@ -131,9 +131,6 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     // --------------------------------------------------- FilterConfig Methods
 
 
-    /**
-     * Return the name of the filter we are configuring.
-     */
     @Override
     public String getFilterName() {
         return filterDef.getFilterName();
@@ -146,12 +143,6 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         return filterDef.getFilterClass();
     }
 
-    /**
-     * Return a <code>String</code> containing the value of the named initialization parameter, or <code>null</code> if
-     * the parameter does not exist.
-     *
-     * @param name Name of the requested initialization parameter
-     */
     @Override
     public String getInitParameter(String name) {
 
@@ -165,9 +156,6 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     }
 
 
-    /**
-     * Return an <code>Enumeration</code> of the names of the initialization parameters for this Filter.
-     */
     @Override
     public Enumeration<String> getInitParameterNames() {
         Map<String,String> map = filterDef.getParameterMap();
@@ -180,9 +168,6 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     }
 
 
-    /**
-     * Return the ServletContext of our associated web application.
-     */
     @Override
     public ServletContext getServletContext() {
 
@@ -191,9 +176,6 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     }
 
 
-    /**
-     * Return a String representation of this object.
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("ApplicationFilterConfig[");
