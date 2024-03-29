@@ -392,10 +392,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * @return the content type that was set or calculated for this response, or <code>null</code> if no content type
-     *             was set.
-     */
     @Override
     public String getContentType() {
         return getCoyoteResponse().getContentType();
@@ -428,29 +424,18 @@ public class Response implements HttpServletResponse {
     // ------------------------------------------------ ServletResponse Methods
 
 
-    /**
-     * Flush the buffer and commit this response.
-     *
-     * @exception IOException if an input/output error occurs
-     */
     @Override
     public void flushBuffer() throws IOException {
         outputBuffer.flush();
     }
 
 
-    /**
-     * @return the actual buffer size used for this Response.
-     */
     @Override
     public int getBufferSize() {
         return outputBuffer.getBufferSize();
     }
 
 
-    /**
-     * @return the character encoding used for this Response.
-     */
     @Override
     public String getCharacterEncoding() {
         String charset = getCoyoteResponse().getCharsetHolder().getName();
@@ -469,12 +454,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * @return the servlet output stream associated with this Response.
-     *
-     * @exception IllegalStateException if <code>getWriter</code> has already been called for this response
-     * @exception IOException           if an input/output error occurs
-     */
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
 
@@ -491,21 +470,12 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * @return the Locale assigned to this response.
-     */
     @Override
     public Locale getLocale() {
         return getCoyoteResponse().getLocale();
     }
 
 
-    /**
-     * @return the writer associated with this Response.
-     *
-     * @exception IllegalStateException if <code>getOutputStream</code> has already been called for this response
-     * @exception IOException           if an input/output error occurs
-     */
     @Override
     public PrintWriter getWriter() throws IOException {
 
@@ -534,22 +504,12 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Has the output of this response already been committed?
-     *
-     * @return <code>true</code> if the response has been committed
-     */
     @Override
     public boolean isCommitted() {
         return getCoyoteResponse().isCommitted();
     }
 
 
-    /**
-     * Clear any content written to the buffer.
-     *
-     * @exception IllegalStateException if this response has already been committed
-     */
     @Override
     public void reset() {
         // Ignore any call from an included servlet
@@ -565,11 +525,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Reset the data buffer but not any status or header information.
-     *
-     * @exception IllegalStateException if the response has already been committed
-     */
     @Override
     public void resetBuffer() {
         resetBuffer(false);
@@ -602,13 +557,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Set the buffer size to be used for this Response.
-     *
-     * @param size The new buffer size
-     *
-     * @exception IllegalStateException if this method is called after output has been committed for this response
-     */
     @Override
     public void setBufferSize(int size) {
 
@@ -621,11 +569,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Set the content length (in bytes) for this Response.
-     *
-     * @param length The new content length
-     */
     @Override
     public void setContentLength(int length) {
 
@@ -648,11 +591,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Set the content type for this Response.
-     *
-     * @param type The new content type
-     */
     @Override
     public void setContentType(String type) {
 
@@ -706,12 +644,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Overrides the name of the character encoding used in the body of the request. This method must be called prior to
-     * reading request parameters or reading input using getReader().
-     *
-     * @param encoding String containing the name of the character encoding.
-     */
     @Override
     public void setCharacterEncoding(String encoding) {
 
@@ -772,11 +704,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Set the Locale that is appropriate for this response, including setting the appropriate character encoding.
-     *
-     * @param locale The new locale
-     */
     @Override
     public void setLocale(Locale locale) {
 
@@ -928,12 +855,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Add the specified date header to the specified value.
-     *
-     * @param name  Name of the header to set
-     * @param value Date value to be set
-     */
     @Override
     public void addDateHeader(String name, long value) {
 
@@ -954,12 +875,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Add the specified header to the specified value.
-     *
-     * @param name  Name of the header to set
-     * @param value Value to be set
-     */
     @Override
     public void addHeader(String name, String value) {
         addHeader(name, value, null);
@@ -1008,12 +923,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Add the specified integer header to the specified value.
-     *
-     * @param name  Name of the header to set
-     * @param value Integer value to be set
-     */
     @Override
     public void addIntHeader(String name, int value) {
 
@@ -1035,13 +944,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Has the specified header been set already in this response?
-     *
-     * @param name Name of the header to check
-     *
-     * @return <code>true</code> if the header has been set
-     */
     @Override
     public boolean containsHeader(String name) {
         // Need special handling for Content-Type and Content-Length due to
@@ -1074,13 +976,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Encode the session identifier associated with this response into the specified redirect URL, if necessary.
-     *
-     * @param url URL to be encoded
-     *
-     * @return <code>true</code> if the URL was encoded
-     */
     @Override
     public String encodeRedirectURL(String url) {
         if (isEncodeable(toAbsolute(url))) {
@@ -1091,13 +986,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Encode the session identifier associated with this response into the specified URL, if necessary.
-     *
-     * @param url URL to be encoded
-     *
-     * @return <code>true</code> if the URL was encoded
-     */
     @Override
     public String encodeURL(String url) {
 
@@ -1147,29 +1035,12 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Send an error response with the specified status and a default message.
-     *
-     * @param status HTTP status code to send
-     *
-     * @exception IllegalStateException if this response has already been committed
-     * @exception IOException           if an input/output error occurs
-     */
     @Override
     public void sendError(int status) throws IOException {
         sendError(status, null);
     }
 
 
-    /**
-     * Send an error response with the specified status and message.
-     *
-     * @param status  HTTP status code to send
-     * @param message Corresponding message to send
-     *
-     * @exception IllegalStateException if this response has already been committed
-     * @exception IOException           if an input/output error occurs
-     */
     @Override
     public void sendError(int status, String message) throws IOException {
 
@@ -1242,12 +1113,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Set the specified date header to the specified value.
-     *
-     * @param name  Name of the header to set
-     * @param value Date value to be set
-     */
     @Override
     public void setDateHeader(String name, long value) {
 
@@ -1268,12 +1133,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Set the specified header to the specified value.
-     *
-     * @param name  Name of the header to set
-     * @param value Value to be set
-     */
     @Override
     public void setHeader(String name, String value) {
 
@@ -1301,12 +1160,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Set the specified integer header to the specified value.
-     *
-     * @param name  Name of the header to set
-     * @param value Integer value to be set
-     */
     @Override
     public void setIntHeader(String name, int value) {
 
@@ -1328,11 +1181,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Set the HTTP status to be returned with this response.
-     *
-     * @param status The new HTTP status
-     */
     @Override
     public void setStatus(int status) {
 
