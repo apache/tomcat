@@ -247,20 +247,12 @@ public class StandardSession implements HttpSession, Session, Serializable {
     // ----------------------------------------------------- Session Properties
 
 
-    /**
-     * Return the authentication type used to authenticate our cached Principal, if any.
-     */
     @Override
     public String getAuthType() {
         return this.authType;
     }
 
 
-    /**
-     * Set the authentication type used to authenticate our cached Principal, if any.
-     *
-     * @param authType The new cached authentication type
-     */
     @Override
     public void setAuthType(String authType) {
         String oldAuthType = this.authType;
@@ -269,12 +261,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Set the creation time for this session. This method is called by the Manager when an existing Session instance is
-     * reused.
-     *
-     * @param time The new creation time
-     */
     @Override
     public void setCreationTime(long time) {
 
@@ -285,29 +271,18 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Return the session identifier for this session.
-     */
     @Override
     public String getId() {
         return this.id;
     }
 
 
-    /**
-     * Return the session identifier for this session.
-     */
     @Override
     public String getIdInternal() {
         return this.id;
     }
 
 
-    /**
-     * Set the session identifier for this session.
-     *
-     * @param id The new session identifier
-     */
     @Override
     public void setId(String id) {
         setId(id, true);
@@ -369,16 +344,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
     }
 
-    /**
-     * Inform the listeners about the change session ID.
-     *
-     * @param newId                    new session ID
-     * @param oldId                    old session ID
-     * @param notifySessionListeners   Should any associated sessionListeners be notified that session ID has been
-     *                                     changed?
-     * @param notifyContainerListeners Should any associated ContainerListeners be notified that session ID has been
-     *                                     changed?
-     */
     @Override
     public void tellChangedSessionId(String newId, String oldId, boolean notifySessionListeners,
             boolean notifyContainerListeners) {
@@ -411,11 +376,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Return the last time the client sent a request associated with this session, as the number of milliseconds since
-     * midnight, January 1, 1970 GMT. Actions that your application takes, such as getting or setting a value associated
-     * with the session, do not affect the access time. This one gets updated whenever a request starts.
-     */
     @Override
     public long getThisAccessedTime() {
 
@@ -426,21 +386,11 @@ public class StandardSession implements HttpSession, Session, Serializable {
         return this.thisAccessedTime;
     }
 
-    /**
-     * Return the last client access time without invalidation check
-     *
-     * @see #getThisAccessedTime()
-     */
     @Override
     public long getThisAccessedTimeInternal() {
         return this.thisAccessedTime;
     }
 
-    /**
-     * Return the last time the client sent a request associated with this session, as the number of milliseconds since
-     * midnight, January 1, 1970 GMT. Actions that your application takes, such as getting or setting a value associated
-     * with the session, do not affect the access time. This one gets updated whenever a request finishes.
-     */
     @Override
     public long getLastAccessedTime() {
 
@@ -451,19 +401,11 @@ public class StandardSession implements HttpSession, Session, Serializable {
         return this.lastAccessedTime;
     }
 
-    /**
-     * Return the last client access time without invalidation check
-     *
-     * @see #getLastAccessedTime()
-     */
     @Override
     public long getLastAccessedTimeInternal() {
         return this.lastAccessedTime;
     }
 
-    /**
-     * Return the idle time (in milliseconds) from last client access time.
-     */
     @Override
     public long getIdleTime() {
 
@@ -474,11 +416,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
         return getIdleTimeInternal();
     }
 
-    /**
-     * Return the idle time from last client access time without invalidation check
-     *
-     * @see #getIdleTime()
-     */
     @Override
     public long getIdleTimeInternal() {
         long timeNow = System.currentTimeMillis();
@@ -491,78 +428,42 @@ public class StandardSession implements HttpSession, Session, Serializable {
         return timeIdle;
     }
 
-    /**
-     * Return the Manager within which this Session is valid.
-     */
     @Override
     public Manager getManager() {
         return this.manager;
     }
 
 
-    /**
-     * Set the Manager within which this Session is valid.
-     *
-     * @param manager The new Manager
-     */
     @Override
     public void setManager(Manager manager) {
         this.manager = manager;
     }
 
 
-    /**
-     * Return the maximum time interval, in seconds, between client requests before the servlet container will
-     * invalidate the session. A negative time indicates that the session should never time out.
-     */
     @Override
     public int getMaxInactiveInterval() {
         return this.maxInactiveInterval;
     }
 
 
-    /**
-     * Set the maximum time interval, in seconds, between client requests before the servlet container will invalidate
-     * the session. A zero or negative time indicates that the session should never time out.
-     *
-     * @param interval The new maximum interval
-     */
     @Override
     public void setMaxInactiveInterval(int interval) {
         this.maxInactiveInterval = interval;
     }
 
 
-    /**
-     * Set the <code>isNew</code> flag for this session.
-     *
-     * @param isNew The new value for the <code>isNew</code> flag
-     */
     @Override
     public void setNew(boolean isNew) {
         this.isNew = isNew;
     }
 
 
-    /**
-     * Return the authenticated Principal that is associated with this Session. This provides an
-     * <code>Authenticator</code> with a means to cache a previously authenticated Principal, and avoid potentially
-     * expensive <code>Realm.authenticate()</code> calls on every request. If there is no current associated Principal,
-     * return <code>null</code>.
-     */
     @Override
     public Principal getPrincipal() {
         return this.principal;
     }
 
 
-    /**
-     * Set the authenticated Principal that is associated with this Session. This provides an <code>Authenticator</code>
-     * with a means to cache a previously authenticated Principal, and avoid potentially expensive
-     * <code>Realm.authenticate()</code> calls on every request.
-     *
-     * @param principal The new Principal, or <code>null</code> if none
-     */
     @Override
     public void setPrincipal(Principal principal) {
 
@@ -573,9 +474,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Return the <code>HttpSession</code> for which this object is the facade.
-     */
     @Override
     public HttpSession getSession() {
         if (facade == null) {
@@ -589,9 +487,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Return the <code>isValid</code> flag for this session.
-     */
     @Override
     public boolean isValid() {
 
@@ -618,11 +513,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Set the <code>isValid</code> flag for this session.
-     *
-     * @param isValid The new value for the <code>isValid</code> flag
-     */
     @Override
     public void setValid(boolean isValid) {
         this.isValid = isValid;
@@ -632,10 +522,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     // ------------------------------------------------- Session Public Methods
 
 
-    /**
-     * Update the accessed time information for this session. This method should be called by the context when a request
-     * comes in for a particular session, even if the application does not reference it.
-     */
     @Override
     public void access() {
 
@@ -648,9 +534,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * End the access.
-     */
     @Override
     public void endAccess() {
 
@@ -674,9 +557,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Add a session event listener to this component.
-     */
     @Override
     public void addSessionListener(SessionListener listener) {
 
@@ -685,10 +565,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Perform the internal processing required to invalidate this session, without triggering an exception if the
-     * session has already expired.
-     */
     @Override
     public void expire() {
 
@@ -872,30 +748,18 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Return the object bound with the specified name to the internal notes for this session, or <code>null</code> if
-     * no such binding exists.
-     *
-     * @param name Name of the note to be returned
-     */
     @Override
     public Object getNote(String name) {
         return notes.get(name);
     }
 
 
-    /**
-     * Return an Iterator containing the String names of all notes bindings that exist for this session.
-     */
     @Override
     public Iterator<String> getNoteNames() {
         return notes.keySet().iterator();
     }
 
 
-    /**
-     * Release all object references, and initialize instance variables, in preparation for reuse of this object.
-     */
     @Override
     public void recycle() {
 
@@ -916,11 +780,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Remove any object bound to the specified name in the internal notes for this session.
-     *
-     * @param name Name of the note to be removed
-     */
     @Override
     public void removeNote(String name) {
 
@@ -929,9 +788,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Remove a session event listener from this component.
-     */
     @Override
     public void removeSessionListener(SessionListener listener) {
 
@@ -940,13 +796,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Bind an object to a specified name in the internal notes associated with this session, replacing any existing
-     * binding for this name.
-     *
-     * @param name  Name to which the object should be bound
-     * @param value Object to be bound to the specified name
-     */
     @Override
     public void setNote(String name, Object value) {
 
@@ -1005,11 +854,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     // ------------------------------------------------- HttpSession Properties
 
 
-    /**
-     * Return the time when this session was created, in milliseconds since midnight, January 1, 1970 GMT.
-     *
-     * @exception IllegalStateException if this method is called on an invalidated session
-     */
     @Override
     public long getCreationTime() {
         if (!isValidInternal()) {
@@ -1020,19 +864,12 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Return the time when this session was created, in milliseconds since midnight, January 1, 1970 GMT, bypassing the
-     * session validation checks.
-     */
     @Override
     public long getCreationTimeInternal() {
         return this.creationTime;
     }
 
 
-    /**
-     * Return the ServletContext to which this session belongs.
-     */
     @Override
     public ServletContext getServletContext() {
         if (manager == null) {
@@ -1045,14 +882,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
     // ----------------------------------------------HttpSession Public Methods
 
-    /**
-     * Return the object bound with the specified name in this session, or <code>null</code> if no object is bound with
-     * that name.
-     *
-     * @param name Name of the attribute to be returned
-     *
-     * @exception IllegalStateException if this method is called on an invalidated session
-     */
     @Override
     public Object getAttribute(String name) {
         if (!isValidInternal()) {
@@ -1067,12 +896,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Return an <code>Enumeration</code> of <code>String</code> objects containing the names of the objects bound to
-     * this session.
-     *
-     * @exception IllegalStateException if this method is called on an invalidated session
-     */
     @Override
     public Enumeration<String> getAttributeNames() {
 
@@ -1085,11 +908,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Invalidates this session and unbinds any objects bound to it.
-     *
-     * @exception IllegalStateException if this method is called on an invalidated session
-     */
     @Override
     public void invalidate() {
 
@@ -1103,13 +921,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Return <code>true</code> if the client does not yet know about the session, or if the client chooses not to join
-     * the session. For example, if the server used only cookie-based sessions, and the client has disabled the use of
-     * cookies, then a session would be new on each request.
-     *
-     * @exception IllegalStateException if this method is called on an invalidated session
-     */
     @Override
     public boolean isNew() {
         if (!isValidInternal()) {
@@ -1120,17 +931,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Remove the object bound with the specified name from this session. If the session does not have an object bound
-     * with this name, this method does nothing.
-     * <p>
-     * After this method executes, and if the object implements <code>HttpSessionBindingListener</code>, the container
-     * calls <code>valueUnbound()</code> on the object.
-     *
-     * @param name Name of the object to remove from this session.
-     *
-     * @exception IllegalStateException if this method is called on an invalidated session
-     */
     @Override
     public void removeAttribute(String name) {
 
@@ -1163,20 +963,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Bind an object to this session, using the specified name. If an object of the same name is already bound to this
-     * session, the object is replaced.
-     * <p>
-     * After this method executes, and if the object implements <code>HttpSessionBindingListener</code>, the container
-     * calls <code>valueBound()</code> on the object.
-     *
-     * @param name  Name to which the object is bound, cannot be null
-     * @param value Object to be bound, cannot be null
-     *
-     * @exception IllegalArgumentException if an attempt is made to add a non-serializable object in an environment
-     *                                         marked distributable.
-     * @exception IllegalStateException    if this method is called on an invalidated session
-     */
     @Override
     public void setAttribute(String name, Object value) {
         setAttribute(name, value, true);
