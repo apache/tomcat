@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.21 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Change the thread-safety mechanism for protecting StandardServer.services
+        from a simple synchronized lock to a ReentrantReadWriteLock to allow
+        multiple readers to operate simultaneously. Based upon a suggestion by
+        Markus Wolfe (schultz).
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <add>
