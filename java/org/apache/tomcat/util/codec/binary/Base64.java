@@ -53,7 +53,7 @@ import java.util.Objects;
 public class Base64 extends BaseNCodec {
 
     /**
-     * BASE32 characters are 6 bits in length.
+     * BASE64 characters are 6 bits in length.
      * They are formed by taking a block of 3 octets to form a 24-bit string,
      * which is converted into 4 BASE64 characters.
      */
@@ -64,9 +64,10 @@ public class Base64 extends BaseNCodec {
     /**
      * This array is a lookup table that translates 6-bit positive integer index values into their "Base64 Alphabet"
      * equivalents as specified in Table 1 of RFC 2045.
-     *
+     * <p>
      * Thanks to "commons" project in ws.apache.org for this code.
      * https://svn.apache.org/repos/asf/webservices/commons/trunk/modules/util/
+     * </p>
      */
     private static final byte[] STANDARD_ENCODE_TABLE = {
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
@@ -93,12 +94,14 @@ public class Base64 extends BaseNCodec {
      * This array is a lookup table that translates Unicode characters drawn from the "Base64 Alphabet" (as specified
      * in Table 1 of RFC 2045) into their 6-bit positive integer equivalents. Characters that are not in the Base64
      * alphabet but fall within the bounds of the array are translated to -1.
-     *
+     * <p>
      * Note: '+' and '-' both decode to 62. '/' and '_' both decode to 63. This means decoder seamlessly handles both
      * URL_SAFE and STANDARD base64. (The encoder, on the other hand, needs to know ahead of time what to emit).
-     *
+     * </p>
+     * <p>
      * Thanks to "commons" project in ws.apache.org for this code.
      * https://svn.apache.org/repos/asf/webservices/commons/trunk/modules/util/
+     * </p>
      */
     private static final byte[] STANDARD_DECODE_TABLE = {
         //   0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
@@ -415,9 +418,10 @@ public class Base64 extends BaseNCodec {
     /**
      * Validates whether decoding the final trailing character is possible in the context
      * of the set of possible base 64 values.
-     *
-     * <p>The character is valid if the lower bits within the provided mask are zero. This
+     * <p>
+     * The character is valid if the lower bits within the provided mask are zero. This
      * is used to test the final trailing base-64 digit is zero in the bits that will be discarded.
+     * </p>
      *
      * @param emptyBitsMask The mask of the lower bits that should be empty
      * @param context the context to be used
@@ -450,7 +454,7 @@ public class Base64 extends BaseNCodec {
      */
     private final byte[] encodeTable;
 
-    // Only one decode table currently; keep for consistency with Base32 code
+    /** Only one decode table currently; keep for consistency with Base32 code. */
     private final byte[] decodeTable;
 
     /**
@@ -657,8 +661,8 @@ public class Base64 extends BaseNCodec {
                     context.modulus = (context.modulus+1) % BYTES_PER_ENCODED_BLOCK;
                     context.ibitWorkArea = (context.ibitWorkArea << BITS_PER_ENCODED_BYTE) + result;
                     if (context.modulus == 0) {
-                        buffer[context.pos++] = (byte) ((context.ibitWorkArea >> 16) & MASK_8BITS);
-                        buffer[context.pos++] = (byte) ((context.ibitWorkArea >> 8) & MASK_8BITS);
+                        buffer[context.pos++] = (byte) (context.ibitWorkArea >> 16 & MASK_8BITS);
+                        buffer[context.pos++] = (byte) (context.ibitWorkArea >> 8 & MASK_8BITS);
                         buffer[context.pos++] = (byte) (context.ibitWorkArea & MASK_8BITS);
                     }
                 }
@@ -679,13 +683,13 @@ public class Base64 extends BaseNCodec {
                 case 2 : // 12 bits = 8 + 4
                     validateCharacter(MASK_4BITS, context);
                     context.ibitWorkArea = context.ibitWorkArea >> 4; // dump the extra 4 bits
-                    buffer[context.pos++] = (byte) ((context.ibitWorkArea) & MASK_8BITS);
+                    buffer[context.pos++] = (byte) (context.ibitWorkArea & MASK_8BITS);
                     break;
                 case 3 : // 18 bits = 8 + 8 + 2
                     validateCharacter(MASK_2BITS, context);
                     context.ibitWorkArea = context.ibitWorkArea >> 2; // dump 2 bits
-                    buffer[context.pos++] = (byte) ((context.ibitWorkArea >> 8) & MASK_8BITS);
-                    buffer[context.pos++] = (byte) ((context.ibitWorkArea) & MASK_8BITS);
+                    buffer[context.pos++] = (byte) (context.ibitWorkArea >> 8 & MASK_8BITS);
+                    buffer[context.pos++] = (byte) (context.ibitWorkArea & MASK_8BITS);
                     break;
                 default:
                     throw new IllegalStateException(sm.getString(
@@ -734,9 +738,9 @@ public class Base64 extends BaseNCodec {
                     break;
                 case 1 : // 8 bits = 6 + 2
                     // top 6 bits:
-                    buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 2) & MASK_6BITS];
+                    buffer[context.pos++] = encodeTable[context.ibitWorkArea >> 2 & MASK_6BITS];
                     // remaining 2:
-                    buffer[context.pos++] = encodeTable[(context.ibitWorkArea << 4) & MASK_6BITS];
+                    buffer[context.pos++] = encodeTable[context.ibitWorkArea << 4 & MASK_6BITS];
                     // URL-SAFE skips the padding to further reduce size.
                     if (encodeTable == STANDARD_ENCODE_TABLE) {
                         buffer[context.pos++] = pad;
@@ -745,9 +749,9 @@ public class Base64 extends BaseNCodec {
                     break;
 
                 case 2 : // 16 bits = 6 + 6 + 4
-                    buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 10) & MASK_6BITS];
-                    buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 4) & MASK_6BITS];
-                    buffer[context.pos++] = encodeTable[(context.ibitWorkArea << 2) & MASK_6BITS];
+                    buffer[context.pos++] = encodeTable[context.ibitWorkArea >> 10 & MASK_6BITS];
+                    buffer[context.pos++] = encodeTable[context.ibitWorkArea >> 4 & MASK_6BITS];
+                    buffer[context.pos++] = encodeTable[context.ibitWorkArea << 2 & MASK_6BITS];
                     // URL-SAFE skips the padding to further reduce size.
                     if (encodeTable == STANDARD_ENCODE_TABLE) {
                         buffer[context.pos++] = pad;
@@ -773,9 +777,9 @@ public class Base64 extends BaseNCodec {
                 }
                 context.ibitWorkArea = (context.ibitWorkArea << 8) + b; //  BITS_PER_BYTE
                 if (0 == context.modulus) { // 3 bytes = 24 bits = 4 * 6 bits to extract
-                    buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 18) & MASK_6BITS];
-                    buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 12) & MASK_6BITS];
-                    buffer[context.pos++] = encodeTable[(context.ibitWorkArea >> 6) & MASK_6BITS];
+                    buffer[context.pos++] = encodeTable[context.ibitWorkArea >> 18 & MASK_6BITS];
+                    buffer[context.pos++] = encodeTable[context.ibitWorkArea >> 12 & MASK_6BITS];
+                    buffer[context.pos++] = encodeTable[context.ibitWorkArea >> 6 & MASK_6BITS];
                     buffer[context.pos++] = encodeTable[context.ibitWorkArea & MASK_6BITS];
                     context.currentLinePos += BYTES_PER_ENCODED_BLOCK;
                     if (lineLength > 0 && lineLength <= context.currentLinePos) {

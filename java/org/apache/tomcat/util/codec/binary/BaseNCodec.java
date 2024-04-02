@@ -136,7 +136,7 @@ public abstract class BaseNCodec {
     /**
      * The maximum size buffer to allocate.
      *
-     * <p>This is set to the same size used in the JDK {@code java.util.ArrayList}:</p>
+     * <p>This is set to the same size used in the JDK {@link java.util.ArrayList}:</p>
      * <blockquote>
      * Some VMs reserve some header words in an array.
      * Attempts to allocate larger arrays may result in
@@ -262,6 +262,7 @@ public abstract class BaseNCodec {
     /**
      * Note {@code lineLength} is rounded down to the nearest multiple of the encoded block size.
      * If {@code chunkSeparatorLength} is zero, then chunking is disabled.
+     *
      * @param unencodedBlockSize the size of an unencoded block (e.g. Base64 = 3)
      * @param encodedBlockSize the size of an encoded block (e.g. Base64 = 4)
      * @param lineLength if &gt; 0, use chunking with a length {@code lineLength}
@@ -275,6 +276,7 @@ public abstract class BaseNCodec {
     /**
      * Note {@code lineLength} is rounded down to the nearest multiple of the encoded block size.
      * If {@code chunkSeparatorLength} is zero, then chunking is disabled.
+     *
      * @param unencodedBlockSize the size of an unencoded block (e.g. Base64 = 3)
      * @param encodedBlockSize the size of an encoded block (e.g. Base64 = 4)
      * @param lineLength if &gt; 0, use chunking with a length {@code lineLength}
@@ -286,7 +288,7 @@ public abstract class BaseNCodec {
         this.unencodedBlockSize = unencodedBlockSize;
         this.encodedBlockSize = encodedBlockSize;
         final boolean useChunking = lineLength > 0 && chunkSeparatorLength > 0;
-        this.lineLength = useChunking ? (lineLength / encodedBlockSize) * encodedBlockSize : 0;
+        this.lineLength = useChunking ? lineLength / encodedBlockSize * encodedBlockSize : 0;
         this.chunkSeparatorLength = chunkSeparatorLength;
         this.pad = pad;
     }
@@ -448,7 +450,7 @@ public abstract class BaseNCodec {
     }
 
     /**
-     * Get the default buffer size. Can be overridden.
+     * Gets the default buffer size. Can be overridden.
      *
      * @return the default buffer size.
      */
@@ -467,10 +469,10 @@ public abstract class BaseNCodec {
     public long getEncodedLength(final byte[] pArray) {
         // Calculate non-chunked size - rounded up to allow for padding
         // cast to long is needed to avoid possibility of overflow
-        long len = ((pArray.length + unencodedBlockSize-1)  / unencodedBlockSize) * (long) encodedBlockSize;
+        long len = (pArray.length + unencodedBlockSize-1)  / unencodedBlockSize * (long) encodedBlockSize;
         if (lineLength > 0) { // We're using chunking
             // Round up to nearest multiple
-            len += ((len + lineLength-1) / lineLength) * chunkSeparatorLength;
+            len += (len + lineLength-1) / lineLength * chunkSeparatorLength;
         }
         return len;
     }
@@ -532,7 +534,8 @@ public abstract class BaseNCodec {
      * Extracts buffered data into the provided byte[] array, starting at position bPos, up to a maximum of bAvail
      * bytes. Returns how many bytes were actually extracted.
      * <p>
-     * Package protected for access from I/O streams.
+     * Package private for access from I/O streams.
+     * </p>
      *
      * @param b
      *            byte[] array to extract the buffered data into.
