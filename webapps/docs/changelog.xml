@@ -126,6 +126,13 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the internal fork of Apache Commons BCEL to 6.8.2. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.20 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
