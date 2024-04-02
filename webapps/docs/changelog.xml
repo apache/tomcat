@@ -124,6 +124,12 @@
         <code>NullPointerException</code>, if an attempt is made to use the
         <code>AsyncContext</code> after it has been recycled. (markt)
       </fix>
+      <fix>
+        Change the thread-safety mechanism for protecting StandardServer.services
+        from a simple synchronized lock to a ReentrantReadWriteLock to allow
+        multiple readers to operate simultaneously. Based upon a suggestion by
+        Markus Wolfe (schultz).
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
