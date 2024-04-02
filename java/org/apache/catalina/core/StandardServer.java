@@ -35,6 +35,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -140,7 +141,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      * The set of Services associated with this Server.
      */
     private Service[] services = new Service[0];
-    private final Object servicesLock = new Object();
+    private final ReentrantReadWriteLock servicesLock = new ReentrantReadWriteLock();
 
 
     /**
@@ -506,7 +507,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
         service.setServer(this);
 
-        synchronized (servicesLock) {
+        try {
+            servicesLock.writeLock().lock();
             Service results[] = new Service[services.length + 1];
             System.arraycopy(services, 0, results, 0, services.length);
             results[services.length] = service;
@@ -522,6 +524,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
             // Report this property change to interested listeners
             support.firePropertyChange("service", null, service);
+        } finally {
+            servicesLock.writeLock().unlock();
         }
 
     }
@@ -693,12 +697,15 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         if (name == null) {
             return null;
         }
-        synchronized (servicesLock) {
+        try {
+            servicesLock.readLock().lock();
             for (Service service : services) {
                 if (name.equals(service.getName())) {
                     return service;
                 }
             }
+        } finally {
+            servicesLock.readLock().unlock();
         }
         return null;
     }
@@ -709,8 +716,11 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     @Override
     public Service[] findServices() {
-        synchronized (servicesLock) {
+        try {
+            servicesLock.readLock().lock();
             return services.clone();
+        } finally {
+            servicesLock.readLock().unlock();
         }
     }
 
@@ -718,12 +728,15 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      * @return the JMX service names.
      */
     public ObjectName[] getServiceNames() {
-        synchronized (servicesLock) {
+        try {
+            servicesLock.readLock().lock();
             ObjectName[] onames = new ObjectName[services.length];
             for (int i = 0; i < services.length; i++) {
                 onames[i] = ((StandardService) services[i]).getObjectName();
             }
             return onames;
+        } finally {
+            servicesLock.readLock().unlock();
         }
     }
 
@@ -736,7 +749,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     @Override
     public void removeService(Service service) {
 
-        synchronized (servicesLock) {
+        try {
+            servicesLock.writeLock().lock();
             int j = -1;
             for (int i = 0; i < services.length; i++) {
                 if (service == services[i]) {
@@ -763,6 +777,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
             // Report this property change to interested listeners
             support.firePropertyChange("service", service, null);
+        } finally {
+            servicesLock.writeLock().unlock();
         }
 
     }
@@ -920,10 +936,13 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         globalNamingResources.start();
 
         // Start our defined Services
-        synchronized (servicesLock) {
+        try {
+            servicesLock.readLock().lock();
             for (Service service : services) {
                 service.start();
             }
+        } finally {
+            servicesLock.readLock().unlock();
         }
 
         if (periodicEventDelay > 0) {
@@ -973,10 +992,13 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         fireLifecycleEvent(CONFIGURE_STOP_EVENT, null);
 
         // Stop our defined Services
-        synchronized (servicesLock) {
+        try {
+            servicesLock.readLock().lock();
             for (Service service : services) {
                 service.stop();
             }
+        } finally {
+            servicesLock.readLock().unlock();
         }
 
         synchronized (utilityExecutorLock) {
@@ -1041,20 +1063,26 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             }
         }
         // Initialize our defined Services
-        synchronized (servicesLock) {
+        try {
+            servicesLock.readLock().lock();
             for (Service service : services) {
                 service.init();
             }
+        } finally {
+            servicesLock.readLock().unlock();
         }
     }
 
     @Override
     protected void destroyInternal() throws LifecycleException {
         // Destroy our defined Services
-        synchronized (servicesLock) {
+        try {
+            servicesLock.writeLock().lock();
             for (Service service : services) {
                 service.destroy();
             }
+        } finally {
+            servicesLock.writeLock().unlock();
         }
 
         globalNamingResources.destroy();
