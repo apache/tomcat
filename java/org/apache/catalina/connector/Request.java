@@ -896,8 +896,9 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the names of all request attributes for this Request, or an empty <code>Enumeration</code> if there are
-     * none. Note that the attribute names returned will only be those for the attributes set via
+     * {@inheritDoc}
+     * <p>
+     * The attribute names returned will only be those for the attributes set via
      * {@link #setAttribute(String, Object)}. Tomcat internal attributes will not be included although they are
      * accessible via {@link #getAttribute(String)}. The Tomcat internal attributes include:
      * <ul>
@@ -918,8 +919,6 @@ public class Request implements HttpServletRequest {
      * </ul>
      * Connector implementations may return some, all or none of these attributes and may also support additional
      * attributes.
-     *
-     * @return the attribute names enumeration
      */
     @Override
     public Enumeration<String> getAttributeNames() {
