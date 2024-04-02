@@ -132,6 +132,12 @@
         Add the Jakarta EE 11 XML schemas and update Tomcat and included web
         applications to use them. (markt)
       </add>
+      <fix>
+        Change the thread-safety mechanism for protecting StandardServer.services
+        from a simple synchronized lock to a ReentrantReadWriteLock to allow
+        multiple readers to operate simultaneously. Based upon a suggestion by
+        Markus Wolfe (schultz).
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
