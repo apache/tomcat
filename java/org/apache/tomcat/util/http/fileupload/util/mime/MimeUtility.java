@@ -29,7 +29,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
 /**
  * Utility class to decode MIME texts.
  *
- * @since 1.3
+ * @since FileUpload 1.3
  */
 public final class MimeUtility {
 
