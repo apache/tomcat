@@ -53,7 +53,7 @@ public class InvalidContentTypeException
      * @param msg The detail message.
      * @param cause the original cause
      *
-     * @since 1.3.1
+     * @since FileUpload 1.3.1
      */
     public InvalidContentTypeException(final String msg, final Throwable cause) {
         super(msg, cause);
