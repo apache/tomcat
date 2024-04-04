@@ -129,6 +129,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      * The child Containers belonging to this Container, keyed by name.
      */
     protected final HashMap<String,Container> children = new HashMap<>();
+    private final ReadWriteLock childrenLock = new ReentrantReadWriteLock();
 
 
     /**
@@ -632,26 +633,30 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
             log.debug(sm.getString("containerBase.child.add", child, this));
         }
 
-        synchronized (children) {
+        childrenLock.writeLock().lock();
+        try {
             if (children.get(child.getName()) != null) {
                 throw new IllegalArgumentException(sm.getString("containerBase.child.notUnique", child.getName()));
             }
             child.setParent(this); // May throw IAE
             children.put(child.getName(), child);
-        }
 
-        fireContainerEvent(ADD_CHILD_EVENT, child);
+            fireContainerEvent(ADD_CHILD_EVENT, child);
 
-        // Start child
-        // Don't do this inside sync block - start can be a slow process and
-        // locking the children object can cause problems elsewhere
-        try {
-            if ((getState().isAvailable() || LifecycleState.STARTING_PREP.equals(getState())) && startChildren) {
-                child.start();
+            // Start child
+            // Don't do this inside sync block - start can be a slow process and
+            // locking the children object can cause problems elsewhere
+            try {
+                if ((getState().isAvailable() || LifecycleState.STARTING_PREP.equals(getState())) && startChildren) {
+                    child.start();
+                }
+            } catch (LifecycleException e) {
+                throw new IllegalStateException(sm.getString("containerBase.child.start"), e);
             }
-        } catch (LifecycleException e) {
-            throw new IllegalStateException(sm.getString("containerBase.child.start"), e);
+        } finally {
+            childrenLock.writeLock().unlock();
         }
+
     }
 
 
@@ -688,8 +693,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         if (name == null) {
             return null;
         }
-        synchronized (children) {
+        childrenLock.readLock().lock();
+        try {
             return children.get(name);
+        } finally {
+            childrenLock.readLock().unlock();
         }
     }
 
@@ -700,8 +708,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      */
     @Override
     public Container[] findChildren() {
-        synchronized (children) {
+        childrenLock.readLock().lock();
+        try {
             return children.values().toArray(new Container[0]);
+        } finally {
+            childrenLock.readLock().unlock();
         }
     }
 
@@ -728,36 +739,40 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
             return;
         }
 
+        childrenLock.writeLock().lock();
         try {
-            if (child.getState().isAvailable()) {
-                child.stop();
+            try {
+                if (child.getState().isAvailable()) {
+                    child.stop();
+                }
+            } catch (LifecycleException e) {
+                log.error(sm.getString("containerBase.child.stop"), e);
             }
-        } catch (LifecycleException e) {
-            log.error(sm.getString("containerBase.child.stop"), e);
-        }
 
-        boolean destroy = false;
-        try {
-            // child.destroy() may have already been called which would have
-            // triggered this call. If that is the case, no need to destroy the
-            // child again.
-            if (!LifecycleState.DESTROYING.equals(child.getState())) {
-                child.destroy();
-                destroy = true;
+            boolean destroy = false;
+            try {
+                // child.destroy() may have already been called which would have
+                // triggered this call. If that is the case, no need to destroy the
+                // child again.
+                if (!LifecycleState.DESTROYING.equals(child.getState())) {
+                    child.destroy();
+                    destroy = true;
+                }
+            } catch (LifecycleException e) {
+                log.error(sm.getString("containerBase.child.destroy"), e);
             }
-        } catch (LifecycleException e) {
-            log.error(sm.getString("containerBase.child.destroy"), e);
-        }
 
-        if (!destroy) {
-            fireContainerEvent(REMOVE_CHILD_EVENT, child);
-        }
+            if (!destroy) {
+                fireContainerEvent(REMOVE_CHILD_EVENT, child);
+            }
 
-        synchronized (children) {
             if (children.get(child.getName()) == null) {
                 return;
             }
             children.remove(child.getName());
+        } finally {
+            childrenLock.writeLock().unlock();
+
         }
 
     }
@@ -1166,13 +1181,16 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
     public ObjectName[] getChildren() {
         List<ObjectName> names;
-        synchronized (children) {
+        childrenLock.readLock().lock();
+        try {
             names = new ArrayList<>(children.size());
             for (Container next : children.values()) {
                 if (next instanceof ContainerBase) {
                     names.add(next.getObjectName());
                 }
             }
+        } finally {
+            childrenLock.readLock().unlock();
         }
         return names.toArray(new ObjectName[0]);
     }

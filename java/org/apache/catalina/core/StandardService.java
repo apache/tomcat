@@ -230,20 +230,20 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             System.arraycopy(connectors, 0, results, 0, connectors.length);
             results[connectors.length] = connector;
             connectors = results;
+            try {
+                if (getState().isAvailable()) {
+                    connector.start();
+                }
+            } catch (LifecycleException e) {
+                throw new IllegalArgumentException(sm.getString("standardService.connector.startFailed", connector), e);
+            }
         } finally {
             writeLock.unlock();
         }
 
-        try {
-            if (getState().isAvailable()) {
-                connector.start();
-            }
-        } catch (LifecycleException e) {
-            throw new IllegalArgumentException(sm.getString("standardService.connector.startFailed", connector), e);
-        }
-
         // Report this property change to interested listeners
         support.firePropertyChange("connector", null, connector);
+
     }
 
 
@@ -326,12 +326,12 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                 }
             }
             connectors = results;
-
-            // Report this property change to interested listeners
-            support.firePropertyChange("connector", connector, null);
         } finally {
             writeLock.unlock();
         }
+
+        // Report this property change to interested listeners
+        support.firePropertyChange("connector", connector, null);
 
     }
 
