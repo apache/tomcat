@@ -51,10 +51,11 @@ Note: Only classes required for Base64 encoding/decoding. The rest are removed.
 FileUpload
 ----------
 Unused code is removed
+Branch: 1.x
 Sub-tree:
 src/main/java/org/apache/commons/fileupload2
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
-34eb241c051b02eca3b0b1b04f67b3b4e6c3a24d (2023-01-03)
+7a8c3241cfa8d036452cd4fc3f92d57cff189bca (2023-09-16)
 
 Note: Tomcat's copy of fileupload also includes classes copied manually from
       Commons IO.
