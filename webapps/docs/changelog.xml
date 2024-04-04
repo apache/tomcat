@@ -112,10 +112,11 @@
         from a simple synchronized lock to a ReentrantReadWriteLock to allow
         multiple readers to operate simultaneously. Based upon a suggestion by
         Markus Wolfe. (schultz)
-      <fix>
-        Improve Service connectors access sync using a ReentrantReadWriteLock.
-        (remm)
       </fix>
+      <fix>
+        Improve Service connectors and Container children access sync using a
+        ReentrantReadWriteLock. Harmonize locking for their lifecycle
+        operations after add and remove. (remm)
       </fix>
     </changelog>
   </subsection>
