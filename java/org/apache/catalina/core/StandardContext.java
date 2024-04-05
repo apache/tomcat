@@ -1790,29 +1790,29 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 return;
             }
             this.loader = loader;
-
-            // Stop the old component if necessary
-            if (getState().isAvailable() && (oldLoader != null) && (oldLoader instanceof Lifecycle)) {
-                try {
-                    ((Lifecycle) oldLoader).stop();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString("standardContext.setLoader.stop"), e);
-                }
-            }
-
             // Start the new component if necessary
             if (loader != null) {
                 loader.setContext(this);
             }
-            if (getState().isAvailable() && (loader != null) && (loader instanceof Lifecycle)) {
-                try {
-                    ((Lifecycle) loader).start();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString("standardContext.setLoader.start"), e);
-                }
-            }
         } finally {
             writeLock.unlock();
+        }
+
+        // Stop the old component if necessary
+        if (getState().isAvailable() && oldLoader instanceof Lifecycle) {
+            try {
+                ((Lifecycle) oldLoader).stop();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("standardContext.setLoader.stop"), e);
+            }
+        }
+
+        if (getState().isAvailable() && loader instanceof Lifecycle) {
+            try {
+                ((Lifecycle) loader).start();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("standardContext.setLoader.start"), e);
+            }
         }
 
         // Report this property change to interested listeners
@@ -1845,30 +1845,30 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 return;
             }
             this.manager = manager;
-
-            // Stop the old component if necessary
-            if (oldManager instanceof Lifecycle) {
-                try {
-                    ((Lifecycle) oldManager).stop();
-                    ((Lifecycle) oldManager).destroy();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString("standardContext.setManager.stop"), e);
-                }
-            }
-
             // Start the new component if necessary
             if (manager != null) {
                 manager.setContext(this);
             }
-            if (getState().isAvailable() && manager instanceof Lifecycle) {
-                try {
-                    ((Lifecycle) manager).start();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString("standardContext.setManager.start"), e);
-                }
-            }
         } finally {
             writeLock.unlock();
+        }
+
+        // Stop the old component if necessary
+        if (oldManager instanceof Lifecycle) {
+            try {
+                ((Lifecycle) oldManager).stop();
+                ((Lifecycle) oldManager).destroy();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("standardContext.setManager.stop"), e);
+            }
+        }
+
+        if (getState().isAvailable() && manager instanceof Lifecycle) {
+            try {
+                ((Lifecycle) manager).start();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("standardContext.setManager.start"), e);
+            }
         }
 
         // Report this property change to interested listeners
@@ -2408,11 +2408,12 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             if (resources != null) {
                 resources.setContext(this);
             }
-
-            support.firePropertyChange("resources", oldResources, resources);
         } finally {
             writeLock.unlock();
         }
+
+        support.firePropertyChange("resources", oldResources, resources);
+
     }
 
 
@@ -4594,8 +4595,6 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         boolean ok = true;
 
-        Lock writeLock = resourcesLock.writeLock();
-        writeLock.lock();
         try {
             if (resources != null) {
                 resources.stop();
@@ -4604,8 +4603,6 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("standardContext.resourcesStop"), t);
             ok = false;
-        } finally {
-            writeLock.unlock();
         }
 
         return ok;

@@ -131,8 +131,8 @@
         Markus Wolfe. (schultz)
       </fix>
       <fix>
-        Improve Service connectors access sync using a ReentrantReadWriteLock.
-        (remm)
+        Improve Service connectors, Container children and Service executors
+        access sync using a ReentrantReadWriteLock. (remm)
       </fix>
     </changelog>
   </subsection>
