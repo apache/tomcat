@@ -85,6 +85,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      * The list of executors held by the service.
      */
     protected final ArrayList<Executor> executors = new ArrayList<>();
+    private final ReadWriteLock executorsLock = new ReentrantReadWriteLock();
 
     private Engine engine = null;
 
@@ -310,14 +311,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             if (j < 0) {
                 return;
             }
-            if (connectors[j].getState().isAvailable()) {
-                try {
-                    connectors[j].stop();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString("standardService.connector.stopFailed", connectors[j]), e);
-                }
-            }
-            connector.setService(null);
             int k = 0;
             Connector results[] = new Connector[connectors.length - 1];
             for (int i = 0; i < connectors.length; i++) {
@@ -327,12 +320,21 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             }
             connectors = results;
 
-            // Report this property change to interested listeners
-            support.firePropertyChange("connector", connector, null);
         } finally {
             writeLock.unlock();
         }
 
+        if (connector.getState().isAvailable()) {
+            try {
+                connector.stop();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("standardService.connector.stopFailed", connector), e);
+            }
+        }
+        connector.setService(null);
+
+        // Report this property change to interested listeners
+        support.firePropertyChange("connector", connector, null);
     }
 
 
@@ -365,16 +367,21 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     @Override
     public void addExecutor(Executor ex) {
-        synchronized (executors) {
+        boolean added = false;
+        executorsLock.writeLock().lock();
+        try {
             if (!executors.contains(ex)) {
+                added = true;
                 executors.add(ex);
-                if (getState().isAvailable()) {
-                    try {
-                        ex.start();
-                    } catch (LifecycleException x) {
-                        log.error(sm.getString("standardService.executor.start"), x);
-                    }
-                }
+            }
+        } finally {
+            executorsLock.writeLock().unlock();
+        }
+        if (added && getState().isAvailable()) {
+            try {
+                ex.start();
+            } catch (LifecycleException x) {
+                log.error(sm.getString("standardService.executor.start"), x);
             }
         }
     }
@@ -387,8 +394,11 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     @Override
     public Executor[] findExecutors() {
-        synchronized (executors) {
+        executorsLock.readLock().lock();
+        try {
             return executors.toArray(new Executor[0]);
+        } finally {
+            executorsLock.readLock().unlock();
         }
     }
 
@@ -402,12 +412,15 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     @Override
     public Executor getExecutor(String executorName) {
-        synchronized (executors) {
+        executorsLock.readLock().lock();
+        try {
             for (Executor executor : executors) {
                 if (executorName.equals(executor.getName())) {
                     return executor;
                 }
             }
+        } finally {
+            executorsLock.readLock().unlock();
         }
         return null;
     }
@@ -420,13 +433,18 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     @Override
     public void removeExecutor(Executor ex) {
-        synchronized (executors) {
-            if (executors.remove(ex) && getState().isAvailable()) {
-                try {
-                    ex.stop();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString("standardService.executor.stop"), e);
-                }
+        boolean removed = false;
+        executorsLock.writeLock().lock();
+        try {
+            removed = executors.remove(ex);
+        } finally {
+            executorsLock.writeLock().unlock();
+        }
+        if (removed && getState().isAvailable()) {
+            try {
+                ex.stop();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("standardService.executor.stop"), e);
             }
         }
     }
@@ -449,15 +467,11 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
         // Start our defined Container first
         if (engine != null) {
-            synchronized (engine) {
-                engine.start();
-            }
+            engine.start();
         }
 
-        synchronized (executors) {
-            for (Executor executor : executors) {
-                executor.start();
-            }
+        for (Executor executor : findExecutors()) {
+            executor.start();
         }
 
         mapperListener.start();
@@ -509,9 +523,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
         // Stop our defined Container once the Connectors are all paused
         if (engine != null) {
-            synchronized (engine) {
-                engine.stop();
-            }
+            engine.stop();
         }
 
         // Now stop the connectors
