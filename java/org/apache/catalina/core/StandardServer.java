@@ -511,26 +511,25 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         service.setServer(this);
 
         servicesWriteLock.lock();
-
         try {
             Service results[] = new Service[services.length + 1];
             System.arraycopy(services, 0, results, 0, services.length);
             results[services.length] = service;
             services = results;
-
-            if (getState().isAvailable()) {
-                try {
-                    service.start();
-                } catch (LifecycleException e) {
-                    // Ignore
-                }
-            }
-
-            // Report this property change to interested listeners
-            support.firePropertyChange("service", null, service);
         } finally {
             servicesWriteLock.unlock();
         }
+
+        if (getState().isAvailable()) {
+            try {
+                service.start();
+            } catch (LifecycleException e) {
+                // Ignore
+            }
+        }
+
+        // Report this property change to interested listeners
+        support.firePropertyChange("service", null, service);
     }
 
     public void stopAwait() {
@@ -769,11 +768,6 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             if (j < 0) {
                 return;
             }
-            try {
-                services[j].stop();
-            } catch (LifecycleException e) {
-                // Ignore
-            }
             int k = 0;
             Service[] results = new Service[services.length - 1];
             for (int i = 0; i < services.length; i++) {
@@ -782,12 +776,18 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                 }
             }
             services = results;
-
-            // Report this property change to interested listeners
-            support.firePropertyChange("service", service, null);
         } finally {
             servicesWriteLock.unlock();
         }
+
+        try {
+            service.stop();
+        } catch (LifecycleException e) {
+            // Ignore
+        }
+
+        // Report this property change to interested listeners
+        support.firePropertyChange("service", service, null);
     }
 
 
@@ -943,14 +943,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         globalNamingResources.start();
 
         // Start our defined Services
-        servicesReadLock.lock();
-
-        try {
-            for (Service service : services) {
-                service.start();
-            }
-        } finally {
-            servicesReadLock.unlock();
+        for (Service service : findServices()) {
+            service.start();
         }
 
         if (periodicEventDelay > 0) {
@@ -1000,14 +994,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         fireLifecycleEvent(CONFIGURE_STOP_EVENT, null);
 
         // Stop our defined Services
-        servicesReadLock.lock();
-
-        try {
-            for (Service service : services) {
-                service.stop();
-            }
-        } finally {
-            servicesReadLock.unlock();
+        for (Service service : findServices()) {
+            service.stop();
         }
 
         synchronized (utilityExecutorLock) {
@@ -1047,28 +1035,16 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         globalNamingResources.init();
 
         // Initialize our defined Services
-        servicesReadLock.lock();
-
-        try {
-            for (Service service : services) {
-                service.init();
-            }
-        } finally {
-            servicesReadLock.unlock();
+        for (Service service : findServices()) {
+            service.init();
         }
     }
 
     @Override
     protected void destroyInternal() throws LifecycleException {
         // Destroy our defined Services
-        servicesReadLock.lock();
-
-        try {
-            for (Service service : services) {
-                service.destroy();
-            }
-        } finally {
-            servicesReadLock.unlock();
+        for (Service service : findServices()) {
+            service.destroy();
         }
 
         globalNamingResources.destroy();
