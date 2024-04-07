@@ -128,7 +128,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     protected Map<String,Session> sessions = new ConcurrentHashMap<>();
 
     // Number of sessions created by this manager
-    protected long sessionCounter = 0;
+    protected AtomicLong sessionCounter = new AtomicLong(0);
 
     protected volatile int maxActive = 0;
 
@@ -695,7 +695,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
             id = generateSessionId();
         }
         session.setId(id);
-        sessionCounter++;
+        sessionCounter.incrementAndGet();
 
         SessionTiming timing = new SessionTiming(session.getCreationTime(), 0);
         synchronized (sessionCreationTiming) {
@@ -902,13 +902,13 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
     @Override
     public void setSessionCounter(long sessionCounter) {
-        this.sessionCounter = sessionCounter;
+        this.sessionCounter.set(sessionCounter);
     }
 
 
     @Override
     public long getSessionCounter() {
-        return sessionCounter;
+        return sessionCounter.get();
     }
 
 
