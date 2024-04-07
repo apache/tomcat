@@ -284,7 +284,9 @@ public final class Response {
      * @param ex The exception that occurred
      */
     public void setErrorException(Exception ex) {
-        errorException = ex;
+        if (errorException == null) {
+            errorException = ex;
+        }
     }
 
 
@@ -304,12 +306,10 @@ public final class Response {
 
 
     /**
-     * Set the error flag.
-     *
-     * @return <code>false</code> if the error flag was already set
+     * Set the error flag if not already set.
      */
-    public boolean setError() {
-        return errorState.compareAndSet(0, 1);
+    public void setError() {
+        errorState.compareAndSet(0, 1);
     }
 
 
@@ -495,7 +495,7 @@ public final class Response {
      *
      * @throws UnsupportedEncodingException If the specified name is not recognised
      *
-     * @deprecated Unused. Will be removed in Tomcat 11.
+     * @deprecated Unused. Will be removed in Tomcat 12.
      */
     @Deprecated
     public void setCharacterEncoding(String characterEncoding) throws UnsupportedEncodingException {
@@ -513,7 +513,7 @@ public final class Response {
      *
      * @return The current character set
      *
-     * @deprecated Unused. Will be removed in Tomcat 11.
+     * @deprecated Unused. Will be removed in Tomcat 12.
      */
     @Deprecated
     public Charset getCharset() {
@@ -526,7 +526,7 @@ public final class Response {
      *
      * @return The name of the current encoding
      *
-     * @deprecated Unused. Will be removed in Tomcat 11.
+     * @deprecated Unused. Will be removed in Tomcat 12.
      */
     @Deprecated
     public String getCharacterEncoding() {
@@ -657,7 +657,7 @@ public final class Response {
         commitTimeNanos = -1;
         errorException = null;
         errorState.set(0);
-        headers.clear();
+        headers.recycle();
         trailerFieldsSupplier = null;
         // Servlet 3.1 non-blocking write listener
         listener = null;

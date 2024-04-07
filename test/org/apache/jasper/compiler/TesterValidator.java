@@ -26,9 +26,7 @@ import org.apache.tomcat.util.security.Escape;
  */
 public class TesterValidator {
 
-    private static String[] bug53867TestData = new String[] {
-            "Hello World!",
-            "<meta http-equiv=\"Content-Language\">",
+    private static String[] bug53867TestData = new String[] { "Hello World!", "<meta http-equiv=\"Content-Language\">",
             "This connection has limited network connectivity.",
             "Please use this web page & to access file server resources." };
 
@@ -43,8 +41,7 @@ public class TesterValidator {
         int count = 100000;
 
         for (String testDatum : bug53867TestData) {
-            Assert.assertEquals(doTestBug53867OldVersion(testDatum),
-                    Escape.xml(testDatum));
+            Assert.assertEquals(doTestBug53867OldVersion(testDatum), Escape.xml(testDatum));
         }
 
         for (int i = 0; i < 100; i++) {
@@ -64,8 +61,7 @@ public class TesterValidator {
                 doTestBug53867OldVersion(bug53867TestDatum);
             }
         }
-        System.out.println(
-                "Old escape:" + (System.currentTimeMillis() - start));
+        System.out.println("Old escape:" + (System.currentTimeMillis() - start));
 
         start = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
@@ -73,13 +69,12 @@ public class TesterValidator {
                 Escape.xml(bug53867TestDatum);
             }
         }
-        System.out.println(
-                "New escape:" + (System.currentTimeMillis() - start));
+        System.out.println("New escape:" + (System.currentTimeMillis() - start));
     }
 
     private static String doTestBug53867OldVersion(String s) {
         if (s == null) {
-          return null;
+            return null;
         }
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {

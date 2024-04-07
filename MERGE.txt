@@ -37,7 +37,7 @@ Unused code is removed
 Sub-tree:
 src/main/java/org/apache/bcel
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
-2ee2bff580c7138545377628074173412c27290c (2023-01-03)
+rel/commons-bcel-6.8.2 (2024-02-25)
 
 Codec
 -----
@@ -45,16 +45,17 @@ Unused code is removed
 Sub-tree:
 src/main/java/org/apache/commons/codec
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
-f03cbd3ba741758ead9f59bc07e6688a739a4813 (2023-01-03)
+rel/commons-codec-1.16.1 (2024-02-09)
 Note: Only classes required for Base64 encoding/decoding. The rest are removed.
 
 FileUpload
 ----------
 Unused code is removed
+Branch: 1.x
 Sub-tree:
 src/main/java/org/apache/commons/fileupload2
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
-34eb241c051b02eca3b0b1b04f67b3b4e6c3a24d (2023-01-03)
+7a8c3241cfa8d036452cd4fc3f92d57cff189bca (2023-09-16)
 
 Note: Tomcat's copy of fileupload also includes classes copied manually from
       Commons IO.
@@ -66,10 +67,7 @@ Unused classes removed
 Sub-tree
 src/main/java/org/apache/commons/pool2
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
-rel/commons-pool-2.11.1 (2021-08-17)
-
-Note: Changes beyond 2.11.1 require matching changes in DBCP that are not yet
-      (as of 2022-11-29) implemented
+rel/commons-pool-2.12.0 (2023-09-30)
 
 DBCP2
 No unused code removed
@@ -77,4 +75,4 @@ Sub-tree
 src/main/java/org/apache/commons/dbcp2
 src/main/resources/org/apache/commons/dbcp2
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
-f13128604536e78bb1b45b44f74128e93cfbb7cc (2023-01-03)
+b1e0c86d101aa43029625eb191aaee4306911702 (2023-03-08)

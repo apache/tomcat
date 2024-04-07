@@ -201,7 +201,8 @@ public class TesterHttpServletResponse implements HttpServletResponse {
     }
 
     public void recycle() {
-        /* NOOP */}
+        /* NOOP */
+    }
 
     /**
      * @param b Unused
@@ -349,7 +350,7 @@ public class TesterHttpServletResponse implements HttpServletResponse {
     }
 
     @Override
-    public void sendRedirect(String location) throws IOException {
+    public void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException {
         /* NOOP */}
 
     @Override

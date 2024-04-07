@@ -66,7 +66,7 @@ resources:</p>
     will operate.</li>
 <li><code><strong>&lt;resource-ref&gt;</strong></code> - Resource reference,
     which is typically to an object factory for resources such as a JDBC
-    <code>DataSource</code>, a JavaMail <code>Session</code>, or custom
+    <code>DataSource</code>, a Jakarta Mail <code>Session</code>, or custom
     object factories configured into Tomcat.</li>
 <li><code><strong>&lt;resource-env-ref&gt;</strong></code> - Resource
     environment reference, a new variation of <code>resource-ref</code>
@@ -619,13 +619,13 @@ create table user_roles (
 
   </subsection>
 
-  <subsection name="JavaMail Sessions">
+  <subsection name="Jakarta Mail Sessions">
 
     <h5>0.  Introduction</h5>
 
     <p>In many web applications, sending electronic mail messages is a
     required part of the system's functionality.  The
-    <a href="http://www.oracle.com/technetwork/java/javamail/index.html">Java Mail</a> API
+    <a href="https://jakartaee.github.io/mail-api/">Jakarta Mail</a> API
     makes this process relatively straightforward, but requires many
     configuration details that the client application must be aware of
     (including the name of the SMTP host to be used for message sending).</p>
@@ -717,7 +717,7 @@ Transport.send(message);]]></source>
     and values and passed to
     <code>jakarta.mail.Session.getInstance(java.util.Properties)</code> as part of
     the <code>java.util.Properties</code> collection. In addition to the
-    properties defined in Annex A of the JavaMail specification, individual
+    properties defined in Appendix A of the Jakarta Mail specification, individual
     providers may also support additional properties.
     </p>
 
@@ -726,19 +726,30 @@ Transport.send(message);]]></source>
     then Tomcat&apos;s resource factory will configure and add a
     <code>jakarta.mail.Authenticator</code> to the mail session.</p>
 
-    <h5>4.  Install the JavaMail libraries</h5>
+    <h5>4.  Install the Jakarta Mail API</h5>
 
-    <p><a href="http://javamail.java.net/">
-    Download the JavaMail API</a>.</p>
+    <p><a href="https://search.maven.org/artifact/jakarta.mail/jakarta.mail-api/2.1.0/jar">
+    Download the Jakarta Mail API</a>.</p>
 
-    <p>Unpackage the distribution and place mail.jar  into $CATALINA_HOME/lib so
-    that it is available to Tomcat during the initialization of the mail Session
-    Resource. <strong>Note:</strong> placing this jar in both $CATALINA_HOME/lib
-    and a  web application's lib folder will cause an error, so ensure you have
-    it in the $CATALINA_HOME/lib location only.
+    <p>Unpackage the distribution and place jakarta.mail-api-2.1.0.jar into
+    $CATALINA_HOME/lib so that it is available to Tomcat during the
+    initialization of the mail Session Resource.
+    <strong>Note:</strong> placing this jar in both $CATALINA_HOME/lib and a web
+    application's lib folder will cause an error, so ensure you have it in the
+    $CATALINA_HOME/lib location only.
     </p>
 
-    <h5>5.  Restart Tomcat</h5>
+    <h5>5.  Install a compatible implementaion</h5>
+
+    <p>Select and <a href="https://jakarta.ee/specifications/mail/2.1/">
+    download a compatible implementation</a>.</p>
+
+    <p>Unpackage the implementation and place the jar file(s) into
+    $CATALINA_HOME/lib.</p>
+
+    <p>Note: Other implementations may be available</p>
+
+    <h5>6.  Restart Tomcat</h5>
 
     <p>For the additional JAR to be visible to Tomcat, it is necessary for the
     Tomcat instance to be restarted.</p>

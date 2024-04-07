@@ -26,9 +26,8 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * The <b>WarWatcher </b> watches the deployDir for changes made to the
- * directory (adding new WAR files-&gt;deploy or remove WAR files-&gt;undeploy)
- * and notifies a listener of the changes made.
+ * The <b>WarWatcher </b> watches the deployDir for changes made to the directory (adding new WAR files-&gt;deploy or
+ * remove WAR files-&gt;undeploy) and notifies a listener of the changes made.
  *
  * @author Peter Rossbach
  */
@@ -52,7 +51,7 @@ public class WarWatcher {
     /**
      * Currently deployed files
      */
-    protected final Map<String, WarInfo> currentStatus = new HashMap<>();
+    protected final Map<String,WarInfo> currentStatus = new HashMap<>();
 
     /*--Constructor---------------------------------------------*/
 
@@ -72,42 +71,36 @@ public class WarWatcher {
         }
         File[] list = watchDir.listFiles(new WarFilter());
         if (list == null) {
-            log.warn(sm.getString("warWatcher.cantListWatchDir",
-                                  watchDir));
+            log.warn(sm.getString("warWatcher.cantListWatchDir", watchDir));
 
             list = new File[0];
         }
-        //first make sure all the files are listed in our current status
+        // first make sure all the files are listed in our current status
         for (File file : list) {
             if (!file.exists()) {
-                log.warn(sm.getString("warWatcher.listedFileDoesNotExist",
-                        file, watchDir));
+                log.warn(sm.getString("warWatcher.listedFileDoesNotExist", file, watchDir));
             }
 
             addWarInfo(file);
         }
 
         // Check all the status codes and update the FarmDeployer
-        for (Iterator<Map.Entry<String,WarInfo>> i =
-                currentStatus.entrySet().iterator(); i.hasNext();) {
+        for (Iterator<Map.Entry<String,WarInfo>> i = currentStatus.entrySet().iterator(); i.hasNext();) {
             Map.Entry<String,WarInfo> entry = i.next();
             WarInfo info = entry.getValue();
-            if(log.isTraceEnabled()) {
-                log.trace(sm.getString("warWatcher.checkingWar",
-                                       info.getWar()));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("warWatcher.checkingWar", info.getWar()));
             }
             int check = info.check();
             if (check == 1) {
                 listener.fileModified(info.getWar());
             } else if (check == -1) {
                 listener.fileRemoved(info.getWar());
-                //no need to keep in memory
+                // no need to keep in memory
                 i.remove();
             }
-            if(log.isTraceEnabled()) {
-                log.trace(sm.getString("warWatcher.checkWarResult",
-                                       Integer.valueOf(check),
-                                       info.getWar()));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("warWatcher.checkWarResult", Integer.valueOf(check), info.getWar()));
             }
         }
 
@@ -115,13 +108,14 @@ public class WarWatcher {
 
     /**
      * add cluster war to the watcher state
+     *
      * @param warfile The WAR to add
      */
     protected void addWarInfo(File warfile) {
         WarInfo info = currentStatus.get(warfile.getAbsolutePath());
         if (info == null) {
             info = new WarInfo(warfile);
-            info.setLastState(-1); //assume file is non existent
+            info.setLastState(-1); // assume file is non existent
             currentStatus.put(warfile.getAbsolutePath(), info);
         }
     }
@@ -176,25 +170,24 @@ public class WarWatcher {
         }
 
         /**
-         * Returns 1 if the file has been added/modified, 0 if the file is
-         * unchanged and -1 if the file has been removed
+         * Returns 1 if the file has been added/modified, 0 if the file is unchanged and -1 if the file has been removed
          *
          * @return int 1=file added; 0=unchanged; -1=file removed
          */
         public int check() {
-            //file unchanged by default
+            // file unchanged by default
             int result = 0;
 
             if (modified()) {
-                //file has changed - timestamp
+                // file has changed - timestamp
                 result = 1;
                 lastState = result;
             } else if ((!exists()) && (!(lastState == -1))) {
-                //file was removed
+                // file was removed
                 result = -1;
                 lastState = result;
             } else if ((lastState == -1) && exists()) {
-                //file was added
+                // file was added
                 result = 1;
                 lastState = result;
             }

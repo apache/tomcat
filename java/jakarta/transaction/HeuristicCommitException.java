@@ -16,7 +16,7 @@
  */
 package jakarta.transaction;
 
-public class HeuristicCommitException extends java.lang.Exception {
+public class HeuristicCommitException extends Exception {
 
     private static final long serialVersionUID = -3977609782149921760L;
 

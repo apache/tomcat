@@ -36,13 +36,12 @@ public abstract class Authenticator {
     /**
      * Generate the authorization header value that will be sent to the server.
      *
-     * @param requestUri            The request URI
-     * @param authenticateHeader    The server authentication header received
-     * @param userName              The user name
-     * @param userPassword          The user password
-     * @param userRealm             The realm for which the provided user name
-     *                                  and password are valid. {@code null} to
-     *                                  indicate all realms.
+     * @param requestUri         The request URI
+     * @param authenticateHeader The server authentication header received
+     * @param userName           The user name
+     * @param userPassword       The user password
+     * @param userRealm          The realm for which the provided user name and password are valid. {@code null} to
+     *                               indicate all realms.
      *
      * @return The generated authorization header value
      *
@@ -110,9 +109,8 @@ public abstract class Authenticator {
         }
 
         /*
-         * User has configured a realm. Only allow authentication to proceed if
-         * the realm in the authentication challenge matches (both BASIC and
-         * DIGEST are required to include a realm).
+         * User has configured a realm. Only allow authentication to proceed if the realm in the authentication
+         * challenge matches (both BASIC and DIGEST are required to include a realm).
          */
         if (serverRealm != null) {
             serverRealm = serverRealm.trim();

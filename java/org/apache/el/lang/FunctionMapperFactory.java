@@ -39,7 +39,7 @@ public class FunctionMapperFactory extends FunctionMapper {
 
 
     /* (non-Javadoc)
-     * @see jakarta.el.FunctionMapper#resolveFunction(java.lang.String, java.lang.String)
+     * @see jakarta.el.FunctionMapper#resolveFunction(String, String)
      */
     @Override
     public Method resolveFunction(String prefix, String localName) {

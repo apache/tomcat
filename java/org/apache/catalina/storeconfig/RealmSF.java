@@ -39,8 +39,8 @@ public class RealmSF extends StoreFactoryBase {
                     aElement.getClass());
 
             if (elementDesc != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("factory.storeTag",
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("factory.storeTag",
                             elementDesc.getTag(), aElement));
                 }
                 getStoreAppender().printIndent(aWriter, indent + 2);
@@ -85,7 +85,8 @@ public class RealmSF extends StoreFactoryBase {
         }
         // Store nested <CredentialHandler> element
         CredentialHandler credentialHandler = ((Realm) aRealm).getCredentialHandler();
-        if (credentialHandler != null) {
+        if (credentialHandler != null
+                && !(credentialHandler.getClass().getName().equals("org.apache.catalina.realm.CombinedRealm$CombinedRealmCredentialHandler"))) {
             storeElement(aWriter, indent, credentialHandler);
         }
     }

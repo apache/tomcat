@@ -190,8 +190,8 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
             return false;
         }
 
-        String inputHexEncoded = mutate(inputCredentials, salt, iterations,
-                HexUtils.fromHexString(storedHexEncoded).length * Byte.SIZE);
+        String inputHexEncoded =
+                mutate(inputCredentials, salt, iterations, HexUtils.fromHexString(storedHexEncoded).length * Byte.SIZE);
         if (inputHexEncoded == null) {
             // Failed to mutate user credentials. Automatic fail.
             // Root cause should be logged by mutate()

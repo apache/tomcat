@@ -288,17 +288,17 @@
       <tr>
         <td>--JvmMs</td>
         <td></td>
-        <td>Initial memory pool size in MB. (Not used in <b>exe</b> mode.)</td>
+        <td>Initial memory pool size in MiB. (Not used in <b>exe</b> mode.)</td>
       </tr>
       <tr>
         <td>--JvmMx</td>
         <td></td>
-        <td>Maximum memory pool size in MB. (Not used in <b>exe</b> mode.)</td>
+        <td>Maximum memory pool size in MiB. (Not used in <b>exe</b> mode.)</td>
       </tr>
       <tr>
         <td>--JvmSs</td>
         <td></td>
-        <td>Thread stack size in KB. (Not used in <b>exe</b> mode.)</td>
+        <td>Thread stack size in KiB. (Not used in <b>exe</b> mode.)</td>
       </tr>
       <tr>
         <td>--StartMode</td>

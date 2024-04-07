@@ -179,8 +179,8 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
         //ignore the message, it doesn't have the flag set
         if ( process ) {
             super.messageReceived(msg);
-        } else if ( log.isDebugEnabled() ) {
-            log.debug("Received a TCP ping packet:"+msg);
+        } else if ( log.isTraceEnabled() ) {
+            log.trace("Received a TCP ping packet:" + msg);
         }
     }//messageReceived
 

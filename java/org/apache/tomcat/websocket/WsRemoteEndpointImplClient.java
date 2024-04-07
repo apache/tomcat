@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.ReentrantLock;
 
 import jakarta.websocket.SendHandler;
 import jakarta.websocket.SendResult;
@@ -28,6 +29,7 @@ import jakarta.websocket.SendResult;
 public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
 
     private final AsyncChannelWrapper channel;
+    private final ReentrantLock lock = new ReentrantLock();
 
     public WsRemoteEndpointImplClient(AsyncChannelWrapper channel) {
         this.channel = channel;
@@ -41,8 +43,7 @@ public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
 
 
     @Override
-    protected void doWrite(SendHandler handler, long blockingWriteTimeoutExpiry,
-            ByteBuffer... data) {
+    protected void doWrite(SendHandler handler, long blockingWriteTimeoutExpiry, ByteBuffer... data) {
         long timeout;
         for (ByteBuffer byteBuffer : data) {
             if (blockingWriteTimeoutExpiry == -1) {
@@ -53,7 +54,8 @@ public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
             } else {
                 timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
                 if (timeout < 0) {
-                    SendResult sr = new SendResult(new IOException(sm.getString("wsRemoteEndpoint.writeTimeout")));
+                    SendResult sr = new SendResult(getSession(),
+                            new IOException(sm.getString("wsRemoteEndpoint.writeTimeout")));
                     handler.onResult(sr);
                 }
             }
@@ -61,15 +63,22 @@ public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
             try {
                 channel.write(byteBuffer).get(timeout, TimeUnit.MILLISECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                handler.onResult(new SendResult(e));
+                handler.onResult(new SendResult(getSession(), e));
                 return;
             }
         }
-        handler.onResult(SENDRESULT_OK);
+        handler.onResult(new SendResult(getSession()));
     }
+
 
     @Override
     protected void doClose() {
         channel.close();
+    }
+
+
+    @Override
+    protected ReentrantLock getLock() {
+        return lock;
     }
 }

@@ -50,8 +50,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     private static final StringManager sm = StringManager.getManager(Http11InputBuffer.class);
 
 
-    private static final byte[] CLIENT_PREFACE_START = "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n"
-            .getBytes(StandardCharsets.ISO_8859_1);
+    private static final byte[] CLIENT_PREFACE_START =
+            "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n".getBytes(StandardCharsets.ISO_8859_1);
 
     /**
      * Associated Coyote request.
@@ -64,8 +64,6 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
      */
     private final MimeHeaders headers;
 
-
-    private final boolean rejectIllegalHeader;
 
     /**
      * State.
@@ -148,14 +146,12 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
     // ----------------------------------------------------------- Constructors
 
-    public Http11InputBuffer(Request request, int headerBufferSize, boolean rejectIllegalHeader,
-            HttpParser httpParser) {
+    public Http11InputBuffer(Request request, int headerBufferSize, HttpParser httpParser) {
 
         this.request = request;
         headers = request.getMimeHeaders();
 
         this.headerBufferSize = headerBufferSize;
-        this.rejectIllegalHeader = rejectIllegalHeader;
         this.httpParser = httpParser;
 
         filterLibrary = new InputFilter[0];
@@ -373,7 +369,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     request.setStartTimeNanos(System.nanoTime());
                 }
                 chr = byteBuffer.get();
-            } while ((chr == Constants.CR) || (chr == Constants.LF));
+            } while (chr == Constants.CR || chr == Constants.LF);
             byteBuffer.position(byteBuffer.position() - 1);
 
             parsingRequestLineStart = byteBuffer.position();
@@ -420,7 +416,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     }
                 }
                 chr = byteBuffer.get();
-                if (!(chr == Constants.SP || chr == Constants.HT)) {
+                if (chr != Constants.SP && chr != Constants.HT) {
                     space = false;
                     byteBuffer.position(byteBuffer.position() - 1);
                 }
@@ -516,7 +512,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     }
                 }
                 byte chr = byteBuffer.get();
-                if (!(chr == Constants.SP || chr == Constants.HT)) {
+                if (chr != Constants.SP && chr != Constants.HT) {
                     space = false;
                     byteBuffer.position(byteBuffer.position() - 1);
                 }
@@ -559,7 +555,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 }
             }
 
-            if ((end - parsingRequestLineStart) > 0) {
+            if (end - parsingRequestLineStart > 0) {
                 request.protocol().setBytes(byteBuffer.array(), parsingRequestLineStart, end - parsingRequestLineStart);
                 parsingRequestLinePhase = 7;
             }
@@ -754,8 +750,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
      */
     private boolean fill(boolean block) throws IOException {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Before fill(): parsingHeader: [" + parsingHeader + "], parsingRequestLine: [" +
+        if (log.isTraceEnabled()) {
+            log.trace("Before fill(): parsingHeader: [" + parsingHeader + "], parsingRequestLine: [" +
                     parsingRequestLine + "], parsingRequestLinePhase: [" + parsingRequestLinePhase +
                     "], parsingRequestLineStart: [" + parsingRequestLineStart + "], byteBuffer.position(): [" +
                     byteBuffer.position() + "], byteBuffer.limit(): [" + byteBuffer.limit() + "], end: [" + end + "]");
@@ -806,8 +802,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             }
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Received [" + new String(byteBuffer.array(), byteBuffer.position(), byteBuffer.remaining(),
+        if (log.isTraceEnabled()) {
+            log.trace("Received [" + new String(byteBuffer.array(), byteBuffer.position(), byteBuffer.remaining(),
                     StandardCharsets.ISO_8859_1) + "]");
         }
 
@@ -830,6 +826,12 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
      */
     private HeaderParseStatus parseHeader() throws IOException {
 
+        /*
+         * Implementation note: Any changes to this method probably need to be echoed in
+         * ChunkedInputFilter.parseHeader(). Why not use a common implementation? In short, this code uses non-blocking
+         * reads whereas ChunkedInputFilter using blocking reads. The code is just different enough that a common
+         * implementation wasn't viewed as practical.
+         */
         while (headerParsePos == HeaderParsePosition.HEADER_START) {
 
             // Read new bytes if needed
@@ -883,6 +885,11 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             int pos = byteBuffer.position();
             chr = byteBuffer.get();
             if (chr == Constants.COLON) {
+                if (headerData.start == pos) {
+                    // Zero length header name - not valid.
+                    // skipLine() will handle the error
+                    return skipLine();
+                }
                 headerParsePos = HeaderParsePosition.HEADER_VALUE_START;
                 headerData.headerValue = headers.addValue(byteBuffer.array(), headerData.start, pos - headerData.start);
                 pos = byteBuffer.position();
@@ -897,18 +904,18 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 headerData.lastSignificantChar = pos;
                 byteBuffer.position(byteBuffer.position() - 1);
                 // skipLine() will handle the error
-                return skipLine(false);
+                return skipLine();
             }
 
             // chr is next byte of header name. Convert to lowercase.
-            if ((chr >= Constants.A) && (chr <= Constants.Z)) {
+            if (chr >= Constants.A && chr <= Constants.Z) {
                 byteBuffer.put(pos, (byte) (chr - Constants.LC_OFFSET));
             }
         }
 
         // Skip the line and ignore the header
         if (headerParsePos == HeaderParsePosition.HEADER_SKIPLINE) {
-            return skipLine(false);
+            return skipLine();
         }
 
         //
@@ -931,7 +938,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     }
 
                     chr = byteBuffer.get();
-                    if (!(chr == Constants.SP || chr == Constants.HT)) {
+                    if (chr != Constants.SP && chr != Constants.HT) {
                         headerParsePos = HeaderParsePosition.HEADER_VALUE;
                         byteBuffer.position(byteBuffer.position() - 1);
                         // Avoids prevChr = chr at start of header value
@@ -966,10 +973,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                         eol = true;
                     } else if (prevChr == Constants.CR) {
                         // Invalid value - also need to delete header
-                        return skipLine(true);
-                    } else if (chr != Constants.HT && HttpParser.isControl(chr)) {
+                        return skipLine();
+                    } else if (HttpParser.isControl(chr) && chr != Constants.HT) {
                         // Invalid value - also need to delete header
-                        return skipLine(true);
+                        return skipLine();
                     } else if (chr == Constants.SP || chr == Constants.HT) {
                         byteBuffer.put(headerData.realPos, chr);
                         headerData.realPos++;
@@ -997,7 +1004,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
             byte peek = byteBuffer.get(byteBuffer.position());
             if (headerParsePos == HeaderParsePosition.HEADER_MULTI_LINE) {
-                if ((peek != Constants.SP) && (peek != Constants.HT)) {
+                if (peek != Constants.SP && peek != Constants.HT) {
                     headerParsePos = HeaderParsePosition.HEADER_START;
                     break;
                 } else {
@@ -1017,25 +1024,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     }
 
 
-    private HeaderParseStatus skipLine(boolean deleteHeader) throws IOException {
-        boolean rejectThisHeader = rejectIllegalHeader;
-        // Check if rejectIllegalHeader is disabled and needs to be overridden
-        // for this header. The header name is required to determine if this
-        // override is required. The header name is only available once the
-        // header has been created. If the header has been created then
-        // deleteHeader will be true.
-        if (!rejectThisHeader && deleteHeader) {
-            if (headers.getName(headers.size() - 1).equalsIgnoreCase("content-length")) {
-                // Malformed content-length headers must always be rejected
-                // RFC 9112, section 6.3, bullet 5.
-                rejectThisHeader = true;
-            } else {
-                // Only need to delete the header if the request isn't going to
-                // be rejected (it will be the most recent one)
-                headers.removeHeader(headers.size() - 1);
-            }
-        }
-
+    private HeaderParseStatus skipLine() throws IOException {
         // Parse the rest of the invalid header so we can construct a useful
         // exception and/or debug message.
         headerParsePos = HeaderParsePosition.HEADER_SKIPLINE;
@@ -1063,17 +1052,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 headerData.lastSignificantChar = pos;
             }
         }
-        if (rejectThisHeader || log.isDebugEnabled()) {
-            String message = sm.getString("iib.invalidheader", HeaderUtil.toPrintableString(byteBuffer.array(),
-                    headerData.lineStart, headerData.lastSignificantChar - headerData.lineStart + 1));
-            if (rejectThisHeader) {
-                throw new IllegalArgumentException(message);
-            }
-            log.debug(message);
-        }
 
-        headerParsePos = HeaderParsePosition.HEADER_START;
-        return HeaderParseStatus.HAVE_MORE_HEADERS;
+        throw new IllegalArgumentException(
+                sm.getString("iib.invalidheader.reject", HeaderUtil.toPrintableString(byteBuffer.array(),
+                        headerData.lineStart, headerData.lastSignificantChar - headerData.lineStart + 1)));
     }
 
 

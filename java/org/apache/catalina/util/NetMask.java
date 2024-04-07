@@ -18,6 +18,7 @@ package org.apache.catalina.util;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -25,28 +26,19 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * A class representing a CIDR netmask.
- *
  * <p>
- * The constructor takes a string as an argument which represents a netmask, as
- * per the CIDR notation -- whether this netmask be IPv4 or IPv6. It then
- * extracts the network address (before the /) and the CIDR prefix (after the
- * /), and tells through the #matches() method whether a candidate
- * {@link InetAddress} object fits in the recorded range.
+ * The constructor takes a string as an argument which represents a netmask, as per the CIDR notation -- whether this
+ * netmask be IPv4 or IPv6. It then extracts the network address (before the /) and the CIDR prefix (after the /), and
+ * tells through the #matches() method whether a candidate {@link InetAddress} object fits in the recorded range.
  * </p>
- *
  * <p>
- * As byte arrays as returned by <code>InetAddress.getByName()</code> are always
- * in network byte order, finding a match is therefore as simple as testing
- * whether the n first bits (where n is the CIDR) are the same in both byte
- * arrays (the one of the network address and the one of the candidate address).
- * We do that by first doing byte comparisons, then testing the last bits if any
- * (that is, if the remainder of the integer division of the CIDR by 8 is not
- * 0).
+ * As byte arrays as returned by <code>InetAddress.getByName()</code> are always in network byte order, finding a match
+ * is therefore as simple as testing whether the n first bits (where n is the CIDR) are the same in both byte arrays
+ * (the one of the network address and the one of the candidate address). We do that by first doing byte comparisons,
+ * then testing the last bits if any (that is, if the remainder of the integer division of the CIDR by 8 is not 0).
  * </p>
- *
  * <p>
- * As a bonus, if no '/' is found in the input, it is assumed that an exact
- * address match is required.
+ * As a bonus, if no '/' is found in the input, it is assumed that an exact address match is required.
  * </p>
  */
 public final class NetMask {
@@ -69,8 +61,7 @@ public final class NetMask {
     private final int nrBytes;
 
     /**
-     * The right shift to apply to the last byte if CIDR % 8 is not 0; if it is
-     * 0, this variable is set to 0
+     * The right shift to apply to the last byte if CIDR % 8 is not 0; if it is 0, this variable is set to 0
      */
     private final int lastByteShift;
 
@@ -89,8 +80,9 @@ public final class NetMask {
      * Constructor
      *
      * @param input the CIDR netmask
-     * @throws IllegalArgumentException if the netmask is not correct (invalid
-     *             address specification, malformed CIDR prefix, etc)
+     *
+     * @throws IllegalArgumentException if the netmask is not correct (invalid address specification, malformed CIDR
+     *                                      prefix, etc)
      */
     public NetMask(final String input) {
 
@@ -133,8 +125,7 @@ public final class NetMask {
         }
 
         /*
-         * OK, we do have a netmask specified, so let's extract both the address
-         * and the CIDR.
+         * OK, we do have a netmask specified, so let's extract both the address and the CIDR.
          */
 
         final String addressPart = nonPortPart.substring(0, idx), cidrPart = nonPortPart.substring(idx + 1);
@@ -161,15 +152,14 @@ public final class NetMask {
         }
 
         /*
-         * We don't want a negative CIDR, nor do we want a CIDR which is greater
-         * than the address length (consider 0.0.0.0/33, or ::/129)
+         * We don't want a negative CIDR, nor do we want a CIDR which is greater than the address length (consider
+         * 0.0.0.0/33, or ::/129)
          */
         if (cidr < 0) {
             throw new IllegalArgumentException(sm.getString("netmask.cidrNegative", cidrPart));
         }
         if (cidr > addrlen) {
-            throw new IllegalArgumentException(
-                    sm.getString("netmask.cidrTooBig", cidrPart, Integer.valueOf(addrlen)));
+            throw new IllegalArgumentException(sm.getString("netmask.cidrTooBig", cidrPart, Integer.valueOf(addrlen)));
         }
 
         nrBytes = cidr / 8;
@@ -179,8 +169,8 @@ public final class NetMask {
          *
          * lastByteShift = (8 - (cidr % 8)) & 7;
          *
-         * But... It's not worth it. In fact, explaining why it could work would
-         * be too long to be worth the trouble, so let's do it the simple way...
+         * But... It's not worth it. In fact, explaining why it could work would be too long to be worth the trouble, so
+         * let's do it the simple way...
          */
 
         final int remainder = cidr % 8;
@@ -194,6 +184,7 @@ public final class NetMask {
      *
      * @param addr The {@link java.net.InetAddress} to test
      * @param port The port to test
+     *
      * @return true on match, false otherwise
      */
     public boolean matches(final InetAddress addr, int port) {
@@ -212,6 +203,7 @@ public final class NetMask {
      * Test if a given address matches this netmask.
      *
      * @param addr The {@link java.net.InetAddress} to test
+     *
      * @return true on match, false otherwise
      */
     public boolean matches(final InetAddress addr) {
@@ -222,8 +214,9 @@ public final class NetMask {
     /**
      * Test if a given address matches this netmask.
      *
-     * @param addr The {@link java.net.InetAddress} to test
+     * @param addr        The {@link java.net.InetAddress} to test
      * @param checkedPort Indicates, whether we already checked the port
+     *
      * @return true on match, false otherwise
      */
     public boolean matches(final InetAddress addr, boolean checkedPort) {
@@ -233,22 +226,17 @@ public final class NetMask {
         final byte[] candidate = addr.getAddress();
 
         /*
-         * OK, remember that a CIDR prefix tells the number of BITS which should
-         * be equal between this NetMask's recorded address (netaddr) and the
-         * candidate address. One byte is 8 bits, no matter what, and IP
-         * addresses, whether they be IPv4 or IPv6, are big endian, aka MSB,
-         * Most Significant Byte (first).
+         * OK, remember that a CIDR prefix tells the number of BITS which should be equal between this NetMask's
+         * recorded address (netaddr) and the candidate address. One byte is 8 bits, no matter what, and IP addresses,
+         * whether they be IPv4 or IPv6, are big endian, aka MSB, Most Significant Byte (first).
          *
-         * We therefore need to get the byte array of the candidate address,
-         * compare as many bytes of the candidate address with the recorded
-         * address as the CIDR prefix tells us to (that is, CIDR / 8), and then
-         * deal with the remaining bits -- if any.
+         * We therefore need to get the byte array of the candidate address, compare as many bytes of the candidate
+         * address with the recorded address as the CIDR prefix tells us to (that is, CIDR / 8), and then deal with the
+         * remaining bits -- if any.
          *
-         * But prior to that, a simple test can be done: we deal with IP
-         * addresses here, which means IPv4 and IPv6. IPv4 addresses are encoded
-         * on 4 bytes, IPv6 addresses are encoded on 16 bytes. If the candidate
-         * address length is different than this NetMask's address, we don't
-         * have a match.
+         * But prior to that, a simple test can be done: we deal with IP addresses here, which means IPv4 and IPv6. IPv4
+         * addresses are encoded on 4 bytes, IPv6 addresses are encoded on 16 bytes. If the candidate address length is
+         * different than this NetMask's address, we don't have a match.
          */
         if (candidate.length != netaddr.length) {
             return false;
@@ -256,13 +244,11 @@ public final class NetMask {
 
 
         /*
-         * Now do the byte-compare. The constructor has recorded the number of
-         * bytes to compare in nrBytes, use that. If any of the byte we have to
-         * compare is different than what we expect, we don't have a match.
+         * Now do the byte-compare. The constructor has recorded the number of bytes to compare in nrBytes, use that. If
+         * any of the byte we have to compare is different than what we expect, we don't have a match.
          *
-         * If, on the opposite, after this loop, all bytes have been deemed
-         * equal, then the loop variable i will point to the byte right after
-         * that -- which we will need...
+         * If, on the opposite, after this loop, all bytes have been deemed equal, then the loop variable i will point
+         * to the byte right after that -- which we will need...
          */
         int i = 0;
         for (; i < nrBytes; i++) {
@@ -272,24 +258,20 @@ public final class NetMask {
         }
 
         /*
-         * ... if there are bits left to test. There aren't any if lastByteShift
-         * is set to 0.
+         * ... if there are bits left to test. There aren't any if lastByteShift is set to 0.
          */
         if (lastByteShift == 0) {
             return true;
         }
 
         /*
-         * If it is not 0, however, we must test for the relevant bits in the
-         * next byte (whatever is in the bytes after that doesn't matter). We do
-         * it this way (remember that lastByteShift contains the amount of bits
-         * we should _right_ shift the last byte):
+         * If it is not 0, however, we must test for the relevant bits in the next byte (whatever is in the bytes after
+         * that doesn't matter). We do it this way (remember that lastByteShift contains the amount of bits we should
+         * _right_ shift the last byte):
          *
-         * - grab both bytes at index i, both from the netmask address and the
-         * candidate address; - xor them both.
+         * - grab both bytes at index i, both from the netmask address and the candidate address; - xor them both.
          *
-         * After the xor, it means that all the remaining bits of the CIDR
-         * should be set to 0...
+         * After the xor, it means that all the remaining bits of the CIDR should be set to 0...
          */
         final int lastByte = netaddr[i] ^ candidate[i];
 
@@ -304,4 +286,24 @@ public final class NetMask {
     public String toString() {
         return expression;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        NetMask other = (NetMask) o;
+        return nrBytes == other.nrBytes && lastByteShift == other.lastByteShift &&
+                Arrays.equals(netaddr, other.netaddr);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 31 * Arrays.hashCode(netaddr) + lastByteShift;
+        return result;
+    }
+
 }

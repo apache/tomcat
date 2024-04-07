@@ -45,7 +45,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpUpgradeHandler;
 import jakarta.servlet.http.Part;
-import jakarta.servlet.http.PushBuilder;
 
 public class TesterHttpServletRequest implements HttpServletRequest {
 
@@ -428,11 +427,6 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass)
             throws IOException, ServletException {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public PushBuilder newPushBuilder() {
         throw new RuntimeException("Not implemented");
     }
 

@@ -82,7 +82,7 @@ public class CompressionServletResponseWrapper
     /**
      * The compression buffer size
      */
-    protected int compressionBuffer = 8192;  // 8KB default
+    protected int compressionBuffer = 8192;  // 8 KiB default
 
     /**
      * The mime types to compress

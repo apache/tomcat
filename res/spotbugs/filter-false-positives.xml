@@ -141,6 +141,12 @@
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
   </Match>
   <Match>
+  </Match>
+    <!-- NPE is expected if Connector definition is invalid -->
+    <Class name="org.apache.catalina.connector.Connector"/>
+    <Method name="startInternal"/>
+    <Bug pattern="NP_NULL_ON_SOME_PATH"/>
+  <Match>
     <!-- req.getRemoteUser(), req.getAuthType(), request.getQueryString() can
     return null because o.a.t.util.buf.MessageBytes.toString() can return NULL
     -->
@@ -185,6 +191,12 @@
     <Class name="org.apache.catalina.core.AsyncContextImpl"/>
     <Method name="logDebug"/>
     <Bug code="RCN"/>
+  </Match>
+  <Match>
+    <!-- Sync isn't guarding this object -->
+    <Class name="org.apache.catalina.core.ContainerBase"/>
+    <Method name="setStartStopThreads"/>
+    <Bug pattern="IS2_INCONSISTENT_SYNC"/>
   </Match>
   <Match>
     <!-- Exception caught deliberately -->
@@ -885,6 +897,15 @@
       <Field name="cachedContent"/>
     </Or>
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
+  </Match>
+  <Match>
+    <!-- Delegation to URL methods is deliberate -->
+    <Class name="org.apache.catalina.webresources.CachedResource$CachedResourceURLStreamHandler"/>
+    <Or>
+      <Method name="equals"/>
+      <Method name="hashCode"/>
+    </Or>
+    <Bug pattern="DMI_BLOCKING_METHODS_ON_URL"/>
   </Match>
   <Match>
     <!-- Class lock is not an instance lock -->
@@ -1765,6 +1786,15 @@
     <Field name="buffers" />
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
   </Match>
+  <Match>
+    <!-- Locks are released then re-obtained which is the opposite order to normal. -->
+    <Class name="org.apache.tomcat.websocket.server.WsRemoteEndpointImplServer" />
+    <Method name="acquireMessagePartInProgressSemaphore" />
+    <Or>
+      <Bug pattern="UL_UNRELEASED_LOCK" />
+      <Bug pattern="UL_UNRELEASED_LOCK_EXCEPTION_PATH" />
+    </Or>
+  </Match>
 
   <!-- Example code -->
   <Match>
@@ -2558,6 +2588,30 @@
     </Or>
   </Match>
   <Match>
+    <!-- Array contents is not mutated -->
+    <Class name="org.apache.tomcat.websocket.pojo.TestEncodingDecoding$MsgByte"/>
+    <Field name="data"/>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestClose" />
+    <Method name="setUp" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestWsRemoteEndpointImplServerDeadlock" />
+    <Method name="testTemporaryDeadlockOnClientClose" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestWsRemoteEndpointImplServerDeadlock$Bug66508Endpoint" />
+    <Method name="onOpen" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
     <!-- Return value of latch is intentionally ignored -->
     <Or>
       <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClient"/>
@@ -2583,18 +2637,6 @@
       <Field name="running" />
       <Field name="timeout" />
     </Or>
-    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
-  </Match>
-  <Match>
-    <!-- Array contents is not mutated -->
-    <Class name="org.apache.tomcat.websocket.pojo.TestEncodingDecoding$MsgByte"/>
-    <Field name="data"/>
-    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
-  </Match>
-  <Match>
-    <!-- Statics are used deliberately as they are simpler -->
-    <Class name="org.apache.tomcat.websocket.server.TestClose" />
-    <Method name="setUp" />
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
   </Match>
   <Match>

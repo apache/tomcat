@@ -19,13 +19,8 @@ package org.apache.tomcat.util.net.openssl.panama;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.lang.foreign.Arena;
-import java.lang.foreign.FunctionDescriptor;
-import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
 import java.net.HttpURLConnection;
@@ -47,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
@@ -58,14 +54,17 @@ import javax.net.ssl.SSLSessionBindingListener;
 import javax.net.ssl.SSLSessionContext;
 
 import static org.apache.tomcat.util.openssl.openssl_h.*;
-import static org.apache.tomcat.util.openssl.openssl_compat_h.*;
-
+import static org.apache.tomcat.util.openssl.openssl_h_Compatibility.*;
+import static org.apache.tomcat.util.openssl.openssl_h_Macros.*;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.Asn1Parser;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLUtil;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
+import org.apache.tomcat.util.openssl.SSL_CTX_set_verify$callback;
+import org.apache.tomcat.util.openssl.SSL_set_info_callback$cb;
+import org.apache.tomcat.util.openssl.SSL_set_verify$callback;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -84,54 +83,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     public static final Set<String> IMPLEMENTED_PROTOCOLS_SET;
 
-    private static final MethodHandle openSSLCallbackInfoHandle;
-    private static final MethodHandle openSSLCallbackVerifyHandle;
-
-    private static final FunctionDescriptor openSSLCallbackInfoFunctionDescriptor =
-            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT);
-    private static final FunctionDescriptor openSSLCallbackVerifyFunctionDescriptor =
-            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.ADDRESS);
-
     static {
-        MethodHandles.Lookup lookup = MethodHandles.lookup();
-        try {
-            openSSLCallbackInfoHandle = lookup.findStatic(OpenSSLEngine.class, "openSSLCallbackInfo",
-                    MethodType.methodType(void.class, MemorySegment.class, int.class, int.class));
-            openSSLCallbackVerifyHandle = lookup.findStatic(OpenSSLEngine.class, "openSSLCallbackVerify",
-                    MethodType.methodType(int.class, int.class, MemorySegment.class));
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-
-        OpenSSLLifecycleListener.initLibrary();
-
         final Set<String> availableCipherSuites = new LinkedHashSet<>(128);
-        try (var localArena = Arena.ofConfined()) {
-            var sslCtx = SSL_CTX_new(TLS_server_method());
-            try {
-                SSL_CTX_set_options(sslCtx, SSL_OP_ALL());
-                SSL_CTX_set_cipher_list(sslCtx, localArena.allocateUtf8String("ALL"));
-                var ssl = SSL_new(sslCtx);
-                SSL_set_accept_state(ssl);
-                try {
-                    for (String c : getCiphers(ssl)) {
-                        // Filter out bad input.
-                        if (c == null || c.length() == 0 || availableCipherSuites.contains(c)) {
-                            continue;
-                        }
-                        availableCipherSuites.add(OpenSSLCipherConfigurationParser.openSSLToJsse(c));
-                    }
-                } finally {
-                    SSL_free(ssl);
-                }
-            } finally {
-                SSL_CTX_free(sslCtx);
-            }
-        } catch (Exception e) {
-            log.warn(sm.getString("engine.ciphersFailure"), e);
-        }
+        availableCipherSuites.addAll(OpenSSLLibrary.findCiphers("ALL"));
         AVAILABLE_CIPHER_SUITES = Collections.unmodifiableSet(availableCipherSuites);
-
         HashSet<String> protocols = new HashSet<>();
         protocols.add(Constants.SSL_PROTO_SSLv2Hello);
         protocols.add(Constants.SSL_PROTO_SSLv2);
@@ -143,34 +98,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         IMPLEMENTED_PROTOCOLS_SET = Collections.unmodifiableSet(protocols);
     }
 
-    private static String[] getCiphers(MemorySegment ssl) {
-        MemorySegment sk = SSL_get_ciphers(ssl);
-        int len = OPENSSL_sk_num(sk);
-        if (len <= 0) {
-            return null;
-        }
-        ArrayList<String> ciphers = new ArrayList<>(len);
-        for (int i = 0; i < len; i++) {
-            MemorySegment cipher = OPENSSL_sk_value(sk, i);
-            MemorySegment cipherName = SSL_CIPHER_get_name(cipher);
-            ciphers.add(cipherName.getUtf8String(0));
-        }
-        return ciphers.toArray(new String[0]);
-    }
-
     private static final int MAX_PLAINTEXT_LENGTH = 16 * 1024; // 2^14
     private static final int MAX_COMPRESSED_LENGTH = MAX_PLAINTEXT_LENGTH + 1024;
     private static final int MAX_CIPHERTEXT_LENGTH = MAX_COMPRESSED_LENGTH + 1024;
 
-    // Protocols
-    static final int VERIFY_DEPTH = 10;
-
     // Header (5) + Data (2^14) + Compression (1024) + Encryption (1024) + MAC (20) + Padding (256)
-    static final int MAX_ENCRYPTED_PACKET_LENGTH = MAX_CIPHERTEXT_LENGTH + 5 + 20 + 256;
+    private static final int MAX_ENCRYPTED_PACKET_LENGTH = MAX_CIPHERTEXT_LENGTH + 5 + 20 + 256;
 
-    static final int MAX_ENCRYPTION_OVERHEAD_LENGTH = MAX_ENCRYPTED_PACKET_LENGTH - MAX_PLAINTEXT_LENGTH;
-
-    enum ClientAuthMode {
+    private enum ClientAuthMode {
         NONE,
         OPTIONAL,
         REQUIRE,
@@ -203,8 +138,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private volatile String applicationProtocol;
 
     private volatile Certificate[] peerCerts;
-    @Deprecated
-    private volatile javax.security.cert.X509Certificate[] x509PeerCerts;
     private volatile ClientAuthMode clientAuth = ClientAuthMode.NONE;
 
     // SSL Engine status variables
@@ -253,9 +186,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         session = new OpenSSLSession();
         var ssl = SSL_new(sslCtx);
         // Set ssl_info_callback
-        var openSSLCallbackInfo = Linker.nativeLinker().upcallStub(openSSLCallbackInfoHandle,
-                openSSLCallbackInfoFunctionDescriptor, engineArena);
-        SSL_set_info_callback(ssl, openSSLCallbackInfo);
+        SSL_set_info_callback(ssl, SSL_set_info_callback$cb.allocate(new InfoCallback(), engineArena));
         if (clientMode) {
             SSL_set_connect_state(ssl);
         } else {
@@ -721,7 +652,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (destroyed) {
             return new String[0];
         }
-        String[] enabled = getCiphers(state.ssl);
+        String[] enabled = OpenSSLLibrary.getCiphers(state.ssl);
         if (enabled == null) {
             return new String[0];
         } else {
@@ -770,7 +701,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         final String cipherSuiteSpec = buf.toString();
         try (var localArena = Arena.ofConfined()) {
-            SSL_set_cipher_list(state.ssl, localArena.allocateUtf8String(cipherSuiteSpec));
+            SSL_set_cipher_list(state.ssl, localArena.allocateFrom(cipherSuiteSpec));
         } catch (Exception e) {
             throw new IllegalStateException(sm.getString("engine.failedCipherSuite", cipherSuiteSpec), e);
         }
@@ -908,15 +839,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private byte[] getPeerCertificate() {
         try (var localArena = Arena.ofConfined()) {
             MemorySegment/*(X509*)*/ x509 = (OpenSSLContext.OPENSSL_3 ? SSL_get1_peer_certificate(state.ssl) : SSL_get_peer_certificate(state.ssl));
-            MemorySegment bufPointer = localArena.allocate(ValueLayout.ADDRESS, MemorySegment.NULL);
+            MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
             int length = i2d_X509(x509, bufPointer);
             if (length <= 0) {
                 return null;
             }
             MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
-            byte[] certificate = buf.reinterpret(length, localArena.scope(), null).toArray(ValueLayout.JAVA_BYTE);
+            byte[] certificate = buf.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
             X509_free(x509);
-            CRYPTO_free(buf, MemorySegment.NULL, 0); // OPENSSL_free macro
+            OPENSSL_free(buf);
             return certificate;
         }
     }
@@ -931,16 +862,16 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         try (var localArena = Arena.ofConfined()) {
             for (int i = 0; i < len; i++) {
                 MemorySegment/*(X509*)*/ x509 = OPENSSL_sk_value(sk, i);
-                MemorySegment bufPointer = localArena.allocate(ValueLayout.ADDRESS, MemorySegment.NULL);
+                MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
                 int length = i2d_X509(x509, bufPointer);
                 if (length < 0) {
                     certificateChain[i] = new byte[0];
                     continue;
                 }
                 MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
-                byte[] certificate = buf.reinterpret(length, localArena.scope(), null).toArray(ValueLayout.JAVA_BYTE);
+                byte[] certificate = buf.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
                 certificateChain[i] = certificate;
-                CRYPTO_free(buf, MemorySegment.NULL, 0); // OPENSSL_free macro
+                OPENSSL_free(buf);
             }
             return certificateChain;
         }
@@ -948,8 +879,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private String getProtocolNegotiated() {
         try (var localArena = Arena.ofConfined()) {
-            MemorySegment lenAddress = localArena.allocate(ValueLayout.JAVA_INT, 0);
-            MemorySegment protocolPointer = localArena.allocate(ValueLayout.ADDRESS, MemorySegment.NULL);
+            MemorySegment lenAddress = localArena.allocate(ValueLayout.JAVA_INT);
+            MemorySegment protocolPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
             SSL_get0_alpn_selected(state.ssl, protocolPointer, lenAddress);
             if (MemorySegment.NULL.equals(protocolPointer)) {
                 return null;
@@ -959,7 +890,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return null;
             }
             MemorySegment protocolAddress = protocolPointer.get(ValueLayout.ADDRESS, 0);
-            byte[] name = protocolAddress.reinterpret(length, localArena.scope(), null).toArray(ValueLayout.JAVA_BYTE);
+            byte[] name = protocolAddress.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
             if (log.isDebugEnabled()) {
                 log.debug("Protocol negotiated [" + new String(name) + "]");
             }
@@ -989,13 +920,13 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
     }
 
-    private synchronized void renegotiate() throws SSLException {
+    private void renegotiate() throws SSLException {
         if (log.isDebugEnabled()) {
             log.debug("Start renegotiate");
         }
         clearLastError();
         int code;
-        if (SSL_get_version(state.ssl).getUtf8String(0).equals(Constants.SSL_PROTO_TLSv1_3)) {
+        if (SSL_get_version(state.ssl).getString(0).equals(Constants.SSL_PROTO_TLSv1_3)) {
             state.phaState = PHAState.START;
             code = SSL_verify_client_post_handshake(state.ssl);
         } else {
@@ -1006,7 +937,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
         handshakeFinished = false;
         peerCerts = null;
-        x509PeerCerts = null;
         currentHandshake = state.handshakeCount;
         int code2 = SSL_do_handshake(state.ssl);
         if (code2 <= 0) {
@@ -1015,7 +945,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private void checkLastError() throws SSLException {
-        String sslError = getLastError();
+        String sslError = OpenSSLContext.getLastError();
         if (sslError != null) {
             // Many errors can occur during handshake and need to be reported
             if (!handshakeFinished) {
@@ -1030,39 +960,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     /**
      * Clear out any errors, but log a warning.
      */
-    private void clearLastError() {
-        getLastError();
-    }
-
-    /**
-     * Many calls to SSL methods do not check the last error. Those that do
-     * check the last error need to ensure that any previously ignored error is
-     * cleared prior to the method call else errors may be falsely reported.
-     * Ideally, before any SSL_read, SSL_write, clearLastError should always
-     * be called, and getLastError should be called after on any negative or
-     * zero result.
-     * @return the first error in the stack
-     */
-    private String getLastError() {
-        String sslError = null;
-        long error = ERR_get_error();
-        if (error != SSL_ERROR_NONE()) {
-            try (var localArena = Arena.ofConfined()) {
-                do {
-                    // Loop until getLastErrorNumber() returns SSL_ERROR_NONE
-                    var buf = localArena.allocateArray(ValueLayout.JAVA_BYTE, new byte[128]);
-                    ERR_error_string(error, buf);
-                    String err = buf.getUtf8String(0);
-                    if (sslError == null) {
-                        sslError = err;
-                    }
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("engine.openSSLError", Long.toString(error), err));
-                    }
-                } while ((error = ERR_get_error()) != SSL_ERROR_NONE());
-            }
-        }
-        return sslError;
+    private static void clearLastError() {
+        OpenSSLContext.getLastError();
     }
 
     private SSLEngineResult.Status getEngineStatus() {
@@ -1127,7 +1026,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     selectedProtocol = getProtocolNegotiated();
                 }
                 session.lastAccessedTime = System.currentTimeMillis();
-                version = SSL_get_version(state.ssl).getUtf8String(0);
+                version = SSL_get_version(state.ssl).getString(0);
                 handshakeFinished = true;
                 return SSLEngineResult.HandshakeStatus.FINISHED;
             }
@@ -1184,8 +1083,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         return clientAuth == ClientAuthMode.OPTIONAL;
     }
 
-    private static final int OPTIONAL_NO_CA = 3;
-
     private void setClientAuth(ClientAuthMode mode) {
         if (clientMode) {
             return;
@@ -1197,117 +1094,120 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             state.certificateVerifyMode = switch (mode) {
                 case NONE -> SSL_VERIFY_NONE();
                 case REQUIRE -> SSL_VERIFY_FAIL_IF_NO_PEER_CERT();
-                case OPTIONAL -> certificateVerificationOptionalNoCA ? OPTIONAL_NO_CA : SSL_VERIFY_PEER();
+                case OPTIONAL -> certificateVerificationOptionalNoCA ? OpenSSLContext.OPTIONAL_NO_CA : SSL_VERIFY_PEER();
             };
-            // SSL.setVerify(state.ssl, value, certificateVerificationDepth);
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
-            var openSSLCallbackVerify =
-                    Linker.nativeLinker().upcallStub(openSSLCallbackVerifyHandle,
-                    openSSLCallbackVerifyFunctionDescriptor, engineArena);
             int value = switch (mode) {
                 case NONE -> SSL_VERIFY_NONE();
                 case REQUIRE -> SSL_VERIFY_PEER() | SSL_VERIFY_FAIL_IF_NO_PEER_CERT();
                 case OPTIONAL -> SSL_VERIFY_PEER();
             };
-            SSL_set_verify(state.ssl, value, openSSLCallbackVerify);
+            // Note: Since a callback is always set by the context, the callback here could in theory
+            // be set to NULL (at the time of creation of the SSL, the SSL_CTX will have a non null callback)
+            SSL_set_verify(state.ssl, value, SSL_set_verify$callback.allocate(new VerifyCallback(), engineArena));
             clientAuth = mode;
         }
     }
 
-    public static void openSSLCallbackInfo(MemorySegment ssl, int where, int ret) {
-        EngineState state = getState(ssl);
-        if (state == null) {
-            log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.address())));
-            return;
-        }
-        if (0 != (where & SSL_CB_HANDSHAKE_DONE())) {
-            state.handshakeCount++;
+    private static class InfoCallback implements SSL_set_info_callback$cb {
+        @Override
+        public void apply(MemorySegment ssl, int where, int ret) {
+            EngineState state = getState(ssl);
+            if (state == null) {
+                log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.address())));
+                return;
+            }
+            if (0 != (where & SSL_CB_HANDSHAKE_DONE())) {
+                state.handshakeCount++;
+            }
         }
     }
 
-    public static int openSSLCallbackVerify(int preverify_ok, MemorySegment /*X509_STORE_CTX*/ x509ctx) {
-        MemorySegment ssl = X509_STORE_CTX_get_ex_data(x509ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
-        EngineState state = getState(ssl);
-        if (state == null) {
-            log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.address())));
-            return 0;
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("Verification in engine with mode [" + state.certificateVerifyMode + "] for " + state.ssl);
-        }
-        int ok = preverify_ok;
-        int errnum = X509_STORE_CTX_get_error(x509ctx);
-        int errdepth = X509_STORE_CTX_get_error_depth(x509ctx);
-        state.phaState = PHAState.COMPLETE;
-        if (state.certificateVerifyMode == -1 /*SSL_CVERIFY_UNSET*/ || state.certificateVerifyMode == SSL_VERIFY_NONE()) {
-            return 1;
-        }
-        /*SSL_VERIFY_ERROR_IS_OPTIONAL(errnum) -> ((errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT)
+    static class VerifyCallback implements SSL_set_verify$callback, SSL_CTX_set_verify$callback {
+        @Override
+        public int apply(int preverify_ok, MemorySegment /*X509_STORE_CTX*/ x509ctx) {
+            MemorySegment ssl = X509_STORE_CTX_get_ex_data(x509ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
+            EngineState state = getState(ssl);
+            if (state == null) {
+                log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.address())));
+                return 0;
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Verification in engine with mode [" + state.certificateVerifyMode + "] for " + state.ssl);
+            }
+            int ok = preverify_ok;
+            int errnum = X509_STORE_CTX_get_error(x509ctx);
+            int errdepth = X509_STORE_CTX_get_error_depth(x509ctx);
+            state.phaState = PHAState.COMPLETE;
+            if (state.certificateVerifyMode == -1 /*SSL_CVERIFY_UNSET*/ || state.certificateVerifyMode == SSL_VERIFY_NONE()) {
+                return 1;
+            }
+            /*SSL_VERIFY_ERROR_IS_OPTIONAL(errnum) -> ((errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT)
                 || (errnum == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN)
                 || (errnum == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY)
                 || (errnum == X509_V_ERR_CERT_UNTRUSTED)
                 || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE))*/
-        boolean verifyErrorIsOptional = (errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT())
-                || (errnum == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN())
-                || (errnum == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY())
-                || (errnum == X509_V_ERR_CERT_UNTRUSTED())
-                || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE());
-        if (verifyErrorIsOptional && (state.certificateVerifyMode == OPTIONAL_NO_CA)) {
-            ok = 1;
-            SSL_set_verify_result(state.ssl, X509_V_OK());
-        }
-        /*
-         * Expired certificates vs. "expired" CRLs: by default, OpenSSL
-         * turns X509_V_ERR_CRL_HAS_EXPIRED into a "certificate_expired(45)"
-         * SSL alert, but that's not really the message we should convey to the
-         * peer (at the very least, it's confusing, and in many cases, it's also
-         * inaccurate, as the certificate itself may very well not have expired
-         * yet). We set the X509_STORE_CTX error to something which OpenSSL's
-         * s3_both.c:ssl_verify_alarm_type() maps to SSL_AD_CERTIFICATE_UNKNOWN,
-         * i.e. the peer will receive a "certificate_unknown(46)" alert.
-         * We do not touch errnum, though, so that later on we will still log
-         * the "real" error, as returned by OpenSSL.
-         */
-        if (ok == 0 && errnum == X509_V_ERR_CRL_HAS_EXPIRED()) {
-            X509_STORE_CTX_set_error(x509ctx, -1);
-        }
-
-        // OCSP
-        if (!state.noOcspCheck && (ok > 0)) {
-            /* If there was an optional verification error, it's not
-             * possible to perform OCSP validation since the issuer may be
-             * missing/untrusted.  Fail in that case.
+            boolean verifyErrorIsOptional = (errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT())
+                    || (errnum == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN())
+                    || (errnum == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY())
+                    || (errnum == X509_V_ERR_CERT_UNTRUSTED())
+                    || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE());
+            if (verifyErrorIsOptional && (state.certificateVerifyMode == OpenSSLContext.OPTIONAL_NO_CA)) {
+                ok = 1;
+                SSL_set_verify_result(state.ssl, X509_V_OK());
+            }
+            /*
+             * Expired certificates vs. "expired" CRLs: by default, OpenSSL
+             * turns X509_V_ERR_CRL_HAS_EXPIRED into a "certificate_expired(45)"
+             * SSL alert, but that's not really the message we should convey to the
+             * peer (at the very least, it's confusing, and in many cases, it's also
+             * inaccurate, as the certificate itself may very well not have expired
+             * yet). We set the X509_STORE_CTX error to something which OpenSSL's
+             * s3_both.c:ssl_verify_alarm_type() maps to SSL_AD_CERTIFICATE_UNKNOWN,
+             * i.e. the peer will receive a "certificate_unknown(46)" alert.
+             * We do not touch errnum, though, so that later on we will still log
+             * the "real" error, as returned by OpenSSL.
              */
-            if (verifyErrorIsOptional) {
-                if (state.certificateVerifyMode != OPTIONAL_NO_CA) {
-                    X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_APPLICATION_VERIFICATION());
-                    errnum = X509_V_ERR_APPLICATION_VERIFICATION();
-                    ok = 0;
-                }
-            } else {
-                int ocspResponse = processOCSP(x509ctx);
-                if (ocspResponse == V_OCSP_CERTSTATUS_REVOKED()) {
-                    ok = 0;
-                    errnum = X509_STORE_CTX_get_error(x509ctx);
-                } else if (ocspResponse == V_OCSP_CERTSTATUS_UNKNOWN()) {
-                    errnum = X509_STORE_CTX_get_error(x509ctx);
-                    if (errnum <= 0) {
+            if (ok == 0 && errnum == X509_V_ERR_CRL_HAS_EXPIRED()) {
+                X509_STORE_CTX_set_error(x509ctx, -1);
+            }
+
+            // OCSP
+            if (!state.noOcspCheck && (ok > 0)) {
+                /* If there was an optional verification error, it's not
+                 * possible to perform OCSP validation since the issuer may be
+                 * missing/untrusted.  Fail in that case.
+                 */
+                if (verifyErrorIsOptional) {
+                    if (state.certificateVerifyMode != OpenSSLContext.OPTIONAL_NO_CA) {
+                        X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_APPLICATION_VERIFICATION());
+                        errnum = X509_V_ERR_APPLICATION_VERIFICATION();
                         ok = 0;
+                    }
+                } else {
+                    int ocspResponse = processOCSP(x509ctx);
+                    if (ocspResponse == V_OCSP_CERTSTATUS_REVOKED()) {
+                        ok = 0;
+                        errnum = X509_STORE_CTX_get_error(x509ctx);
+                    } else if (ocspResponse == V_OCSP_CERTSTATUS_UNKNOWN()) {
+                        errnum = X509_STORE_CTX_get_error(x509ctx);
+                        if (errnum <= 0) {
+                            ok = 0;
+                        }
                     }
                 }
             }
-        }
 
-        if (errdepth > state.certificateVerificationDepth) {
-            // Certificate Verification: Certificate Chain too long
-            ok = 0;
+            if (errdepth > state.certificateVerificationDepth) {
+                // Certificate Verification: Certificate Chain too long
+                ok = 0;
+            }
+            return ok;
         }
-        return ok;
     }
 
-    static int processOCSP(MemorySegment /*X509_STORE_CTX*/ x509ctx) {
+    private static int processOCSP(MemorySegment /*X509_STORE_CTX*/ x509ctx) {
         int ocspResponse = V_OCSP_CERTSTATUS_UNKNOWN();
-        // ocspResponse = ssl_verify_OCSP(x509_ctx);
         MemorySegment x509 = X509_STORE_CTX_get_current_cert(x509ctx);
         if (!MemorySegment.NULL.equals(x509)) {
             // No need to check cert->valid, because ssl_verify_OCSP() only
@@ -1329,7 +1229,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                             int length = ASN1_STRING_length(os);
                             MemorySegment data = ASN1_STRING_get0_data(os);
                             // ocsp_urls = decode_OCSP_url(os);
-                            byte[] asn1String = data.reinterpret(length, localArenal.scope(), null).toArray(ValueLayout.JAVA_BYTE);
+                            byte[] asn1String = data.reinterpret(length, localArenal, null).toArray(ValueLayout.JAVA_BYTE);
                             Asn1Parser parser = new Asn1Parser(asn1String);
                             // Parse the byte sequence
                             ArrayList<String> urls = new ArrayList<>();
@@ -1414,18 +1314,18 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             if (MemorySegment.NULL.equals(ocspOneReq)) {
                 return V_OCSP_CERTSTATUS_UNKNOWN();
             }
-            MemorySegment bufPointer = localArena.allocate(ValueLayout.ADDRESS, MemorySegment.NULL);
+            MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
             int requestLength = i2d_OCSP_REQUEST(ocspRequest, bufPointer);
             if (requestLength <= 0) {
                 return V_OCSP_CERTSTATUS_UNKNOWN();
             }
             MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
-            // HTTP request with the following header
+            // HTTP request with the following header:
             // POST urlPath HTTP/1.1
             // Host: urlHost:urlPort
             // Content-Type: application/ocsp-request
             // Content-Length: ocspRequestData.length
-            byte[] ocspRequestData = buf.reinterpret(requestLength, localArena.scope(), null).toArray(ValueLayout.JAVA_BYTE);
+            byte[] ocspRequestData = buf.reinterpret(requestLength, localArena, null).toArray(ValueLayout.JAVA_BYTE);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setDoInput(true);
@@ -1445,8 +1345,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 baos.write(responseBuf, 0, read);
             }
             byte[] responseData = baos.toByteArray();
-            var nativeResponseData = localArena.allocateArray(ValueLayout.JAVA_BYTE, responseData);
-            var nativeResponseDataPointer = localArena.allocate(ValueLayout.ADDRESS, nativeResponseData);
+            var nativeResponseData = localArena.allocateFrom(ValueLayout.JAVA_BYTE, responseData);
+            var nativeResponseDataPointer = localArena.allocateFrom(ValueLayout.ADDRESS, nativeResponseData);
             ocspResponse = d2i_OCSP_RESPONSE(MemorySegment.NULL, nativeResponseDataPointer, responseData.length);
             if (!MemorySegment.NULL.equals(ocspResponse)) {
                 if (OCSP_response_status(ocspResponse) == OCSP_RESPONSE_STATUS_SUCCESSFUL()) {
@@ -1507,7 +1407,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             synchronized (OpenSSLEngine.this) {
                 if (!destroyed) {
                     try (var localArena = Arena.ofConfined()) {
-                        MemorySegment lenPointer = localArena.allocate(ValueLayout.ADDRESS);
+                        MemorySegment lenPointer = localArena.allocate(ValueLayout.JAVA_INT);
                         var session = SSL_get_session(state.ssl);
                         if (MemorySegment.NULL.equals(session)) {
                             return new byte[0];
@@ -1515,7 +1415,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                         MemorySegment sessionId = SSL_SESSION_get_id(session, lenPointer);
                         int len = lenPointer.get(ValueLayout.JAVA_INT, 0);
                         id = (len == 0) ? new byte[0]
-                                : sessionId.reinterpret(len, localArena.scope(), null).toArray(ValueLayout.JAVA_BYTE);
+                                : sessionId.reinterpret(len, localArena, null).toArray(ValueLayout.JAVA_BYTE);
                     }
                 }
             }
@@ -1632,7 +1532,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     if (!clientMode) {
                         // if used on the server side SSL_get_peer_cert_chain(...) will not include the remote peer certificate.
                         // We use SSL_get_peer_certificate to get it in this case and add it to our array later.
-                        //
                         // See https://www.openssl.org/docs/ssl/SSL_get_peer_cert_chain.html
                         clientCert = getPeerCertificate();
                     } else {
@@ -1673,37 +1572,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             return EMPTY_CERTIFICATES;
         }
 
-        @Deprecated
-        @Override
-        public javax.security.cert.X509Certificate[] getPeerCertificateChain()
-                throws SSLPeerUnverifiedException {
-            // these are lazy created to reduce memory overhead
-            javax.security.cert.X509Certificate[] c = x509PeerCerts;
-            if (c == null) {
-                byte[][] chain;
-                synchronized (OpenSSLEngine.this) {
-                    if (destroyed || SSL_in_init(state.ssl) != 0) {
-                        throw new SSLPeerUnverifiedException(sm.getString("engine.unverifiedPeer"));
-                    }
-                    chain = getPeerCertChain();
-                }
-                if (chain == null) {
-                    throw new SSLPeerUnverifiedException(sm.getString("engine.unverifiedPeer"));
-                }
-                javax.security.cert.X509Certificate[] peerCerts =
-                        new javax.security.cert.X509Certificate[chain.length];
-                for (int i = 0; i < peerCerts.length; i++) {
-                    try {
-                        peerCerts[i] = javax.security.cert.X509Certificate.getInstance(chain[i]);
-                    } catch (javax.security.cert.CertificateException e) {
-                        throw new IllegalStateException(e);
-                    }
-                }
-                c = x509PeerCerts = peerCerts;
-            }
-            return c;
-        }
-
         @Override
         public Principal getPeerPrincipal() throws SSLPeerUnverifiedException {
             Certificate[] peer = getPeerCertificates();
@@ -1737,7 +1605,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     if (destroyed) {
                         return INVALID_CIPHER;
                     }
-                    ciphers = SSL_CIPHER_get_name(SSL_get_current_cipher(state.ssl)).getUtf8String(0);
+                    ciphers = SSL_CIPHER_get_name(SSL_get_current_cipher(state.ssl)).getString(0);
                 }
                 String c = OpenSSLCipherConfigurationParser.openSSLToJsse(ciphers);
                 if (c != null) {
@@ -1761,7 +1629,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             String version = null;
             synchronized (OpenSSLEngine.this) {
                 if (!destroyed) {
-                    version = SSL_get_version(state.ssl).getUtf8String(0);
+                    version = SSL_get_version(state.ssl).getString(0);
                 }
             }
             if (applicationProtocol.isEmpty()) {
@@ -1814,19 +1682,24 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             this.noOcspCheck = noOcspCheck;
             // Use another arena to avoid keeping a reference through segments
             // This also allows making further accesses to the main pointers safer
-            this.ssl = ssl.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena.scope(), null);
-            this.networkBIO = networkBIO.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena.scope(), null);
+            this.ssl = ssl.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena,
+                    new Consumer<MemorySegment>() {
+                @Override
+                public void accept(MemorySegment t) {
+                    SSL_free(t);
+                }});
+            this.networkBIO = networkBIO.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena,
+                    new Consumer<MemorySegment>() {
+                @Override
+                public void accept(MemorySegment t) {
+                    BIO_free(t);
+                }});
         }
 
         @Override
         public void run() {
-            try {
-                states.remove(Long.valueOf(ssl.address()));
-                BIO_free(networkBIO);
-                SSL_free(ssl);
-            } finally {
-                stateArena.close();
-            }
+            states.remove(Long.valueOf(ssl.address()));
+            stateArena.close();
         }
     }
 }

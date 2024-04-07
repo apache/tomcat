@@ -404,7 +404,7 @@ public class TestStandardContext extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Setup realm
         TesterMapRealm realm = new TesterMapRealm();
@@ -473,7 +473,7 @@ public class TestStandardContext extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         ctx.setDenyUncoveredHttpMethods(enableDeny);
 
@@ -554,7 +554,7 @@ public class TestStandardContext extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add ServletContainerInitializer
         Bug51376SCI sci = new Bug51376SCI(loadOnStartUp);
@@ -704,7 +704,7 @@ public class TestStandardContext extends TomcatBaseTest {
 
             PrintWriter out = resp.getWriter();
 
-            out.println("parts=" + (null == req.getParts()
+            out.print("parts=" + (null == req.getParts()
                                     ? "null"
                                     : Integer.valueOf(req.getParts().size())));
         }

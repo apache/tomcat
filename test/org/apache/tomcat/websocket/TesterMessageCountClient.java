@@ -39,8 +39,7 @@ public class TesterMessageCountClient {
         void setLatch(CountDownLatch latch);
     }
 
-    public static class TesterProgrammaticEndpoint
-            extends Endpoint implements TesterEndpoint {
+    public static class TesterProgrammaticEndpoint extends Endpoint implements TesterEndpoint {
 
         private CountDownLatch latch = null;
 
@@ -108,8 +107,7 @@ public class TesterMessageCountClient {
     }
 
 
-    public abstract static class BasicHandler<T>
-            implements MessageHandler.Whole<T> {
+    public abstract static class BasicHandler<T> implements MessageHandler.Whole<T> {
 
         private final CountDownLatch latch;
 
@@ -162,9 +160,7 @@ public class TesterMessageCountClient {
                 getMessages().add(message);
             } else {
                 if (!expected.equals(message)) {
-                    throw new IllegalStateException(
-                            "Expected: [" + expected + "]\r\n" +
-                            "Was:      [" + message + "]");
+                    throw new IllegalStateException("Expected: [" + expected + "]\r\n" + "Was:      [" + message + "]");
                 }
             }
             if (getLatch() != null) {
@@ -191,8 +187,7 @@ public class TesterMessageCountClient {
         }
     }
 
-    public abstract static class AsyncHandler<T>
-            implements MessageHandler.Partial<T> {
+    public abstract static class AsyncHandler<T> implements MessageHandler.Partial<T> {
 
         private final CountDownLatch latch;
 

@@ -1036,6 +1036,11 @@ http://localhost:8080/manager/status/all?XML=true</source>
 
 <p>Displays server status information in XML format.</p>
 
+<source>http://localhost:8080/manager/status?JSON=true
+http://localhost:8080/manager/status/all?JSON=true</source>
+
+<p>Displays server status information in JSON format.</p>
+
 <p>First, you have the server and JVM version number, JVM provider, OS name
 and number followed by the architecture type.</p>
 

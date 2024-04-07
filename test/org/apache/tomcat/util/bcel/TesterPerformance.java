@@ -19,6 +19,7 @@ package org.apache.tomcat.util.bcel;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Locale;
@@ -31,6 +32,12 @@ import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.bcel.classfile.ClassParser;
 import org.apache.tomcat.util.scan.JarFactory;
 
+/*
+ * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
+ * excluded due to the name starting Tester...
+ *
+ * The test also requires that the Jira lib directory has been extracted from a Jira install and copied to /tmp.
+ */
 public class TesterPerformance {
 
     private static final String JAR_LOCATION = "/tmp/jira-libs";
@@ -48,7 +55,7 @@ public class TesterPerformance {
             if (!lib.toLowerCase(Locale.ENGLISH).endsWith(".jar")) {
                 continue;
             }
-            jarURLs.add(new URL("jar:" + new File (libDir, lib).toURI().toURL().toExternalForm() + "!/"));
+            jarURLs.add(URI.create("jar:" + new File (libDir, lib).toURI().toURL().toExternalForm() + "!/").toURL());
         }
 
         long duration = 0;

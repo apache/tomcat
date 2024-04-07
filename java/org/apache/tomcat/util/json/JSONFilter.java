@@ -29,7 +29,7 @@ public class JSONFilter {
      * @return a char array with the escaped sequence
      */
     public static char[] escape(char c) {
-        if (c < 0x20 || c == 0x22 || c == 0x5c) {
+        if (c < 0x20 || c == 0x22 || c == 0x5c || Character.isHighSurrogate(c) || Character.isLowSurrogate(c)) {
             char popular = getPopularChar(c);
             if (popular > 0) {
                 return new char[] { '\\', popular };
@@ -81,7 +81,7 @@ public class JSONFilter {
         int lastUnescapedStart = off;
         for (int i = off; i < length; i++) {
             char c = input.charAt(i);
-            if (c < 0x20 || c == 0x22 || c == 0x5c) {
+            if (c < 0x20 || c == 0x22 || c == 0x5c || Character.isHighSurrogate(c) || Character.isLowSurrogate(c)) {
                 if (escaped == null) {
                     escaped = new StringBuilder(length + 20);
                 }

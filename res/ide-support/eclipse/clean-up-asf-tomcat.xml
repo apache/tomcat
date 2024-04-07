@@ -29,7 +29,7 @@
         <setting id="cleanup.qualify_static_member_accesses_through_subtypes_with_declaring_class" value="true"/>
         <setting id="cleanup.useless_continue" value="false"/>
         <setting id="cleanup.remove_redundant_type_arguments" value="false"/>
-        <setting id="cleanup.remove_unused_imports" value="false"/>
+        <setting id="cleanup.remove_unused_imports" value="true"/>
         <setting id="cleanup.break_loop" value="false"/>
         <setting id="cleanup.pull_up_assignment" value="false"/>
         <setting id="cleanup.stringbuilder" value="false"/>

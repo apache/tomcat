@@ -35,8 +35,8 @@ import java.util.TreeMap;
  * sparingly to improve the interoperability of your servlets.
  * <p>
  * The servlet sends cookies to the browser by using the {@link HttpServletResponse#addCookie} method, which adds fields
- * to HTTP response headers to send cookies to the browser, one at a time. The browser is expected to support 20 cookies
- * for each Web server, 300 cookies total, and may limit cookie size to 4 KB each.
+ * to HTTP response headers to send cookies to the browser, one at a time. The browser is expected to support 50 cookies
+ * for each domain, 3000 cookies total, and may limit cookie size to 4 KiB each.
  * <p>
  * The browser returns cookies to the servlet by adding fields to HTTP request headers. Cookies can be retrieved from a
  * request by using the {@link HttpServletRequest#getCookies} method. Several cookies might have the same name but
@@ -54,6 +54,8 @@ public class Cookie implements Cloneable, Serializable {
 
     private static final CookieNameValidator validation = new RFC6265Validator();
 
+    private static final String EMPTY_STRING = "";
+
     private static final long serialVersionUID = 2L;
 
     /**
@@ -69,7 +71,7 @@ public class Cookie implements Cloneable, Serializable {
     /**
      * Attributes encoded in the header's cookie fields.
      */
-    private volatile Map<String, String> attributes;
+    private volatile Map<String,String> attributes;
 
     private static final String DOMAIN = "Domain";
     private static final String MAX_AGE = "Max-Age";
@@ -238,7 +240,7 @@ public class Cookie implements Cloneable, Serializable {
      * @see #getSecure
      */
     public void setSecure(boolean flag) {
-        setAttributeInternal(SECURE, Boolean.toString(flag));
+        setAttributeInternal(SECURE, EMPTY_STRING);
     }
 
 
@@ -251,7 +253,7 @@ public class Cookie implements Cloneable, Serializable {
      * @see #setSecure
      */
     public boolean getSecure() {
-        return Boolean.parseBoolean(getAttribute(SECURE));
+        return EMPTY_STRING.equals(getAttribute(SECURE));
     }
 
 
@@ -347,7 +349,7 @@ public class Cookie implements Cloneable, Serializable {
      * @since Servlet 3.0
      */
     public void setHttpOnly(boolean httpOnly) {
-        setAttributeInternal(HTTP_ONLY, Boolean.toString(httpOnly));
+        setAttributeInternal(HTTP_ONLY, EMPTY_STRING);
     }
 
 
@@ -359,7 +361,7 @@ public class Cookie implements Cloneable, Serializable {
      * @since Servlet 3.0
      */
     public boolean isHttpOnly() {
-        return Boolean.parseBoolean(getAttribute(HTTP_ONLY));
+        return EMPTY_STRING.equals(getAttribute(HTTP_ONLY));
     }
 
 
@@ -409,7 +411,11 @@ public class Cookie implements Cloneable, Serializable {
             }
         }
 
-        attributes.put(name, value);
+        if (value == null) {
+            attributes.remove(name);
+        } else {
+            attributes.put(name, value);
+        }
     }
 
 
@@ -439,7 +445,7 @@ public class Cookie implements Cloneable, Serializable {
      *
      * @since Servlet 6.0
      */
-    public Map<String, String> getAttributes() {
+    public Map<String,String> getAttributes() {
         if (attributes == null) {
             return Collections.emptyMap();
         } else {

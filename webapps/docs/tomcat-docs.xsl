@@ -28,8 +28,6 @@
               doctype-system="about:legacy-compat"/>
 
   <!-- Defined parameters (overridable) -->
-  <xsl:param    name="home-name"           select="'The Tomcat Project'"/>
-  <xsl:param    name="home-href"           select="'https://tomcat.apache.org/'"/>
   <xsl:param    name="home-logo"           select="'/images/tomcat.png'"/>
   <xsl:param    name="home-stylesheet"     select="'/images/docs-stylesheet.css'"/>
   <xsl:param    name="apache-logo"         select="'/images/asf-logo.svg'"/>
@@ -39,8 +37,8 @@
   <xsl:param    name="version"             select="'11.0.x'"/>
   <xsl:param    name="majorversion"        select="'11'"/>
   <xsl:param    name="majorminorversion"   select="'11.0'"/>
-  <xsl:param    name="minjavaversion"      select="'11'"/>
-  <xsl:param    name="buildjavaversion"    select="'11'"/>
+  <xsl:param    name="minjavaversion"      select="'17'"/>
+  <xsl:param    name="buildjavaversion"    select="'22'"/>
   <xsl:param    name="antversionrequired"  select="'1.10.2'"/>
   <xsl:param    name="build-date"          select="'MMM d yyyy'"/>
   <xsl:param    name="build-date-iso-8601" select="'yyyy-MM-dd'"/>
@@ -151,6 +149,10 @@
   <footer>
     <div id="footer">
     Copyright © 1999-<xsl:value-of select="$year"/>, The Apache Software Foundation
+    <br/>
+    Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo
+    are either registered trademarks or trademarks of the Apache Software
+    Foundation.
     </div>
   </footer>
   </div>

@@ -31,7 +31,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.connector.Response;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ContinueResponseTiming;
 import org.apache.juli.logging.Log;
@@ -67,6 +66,13 @@ public class FormAuthenticator extends AuthenticatorBase {
      * If not set, error responses will be sent instead.
      */
     protected String landingPage = null;
+
+    /**
+     * If the authentication process creates a session, this is the maximum session timeout (in seconds) during the
+     * authentication process. Once authentication is complete, the default session timeout will apply. Sessions that
+     * exist before the authentication process starts will retain their original session timeout throughout.
+     */
+    protected int authenticationSessionTimeout = 120;
 
 
     // ------------------------------------------------------------- Properties
@@ -111,8 +117,31 @@ public class FormAuthenticator extends AuthenticatorBase {
     }
 
 
-    // ------------------------------------------------------ Protected Methods
+    /**
+     * Returns the maximum session timeout to be used during authentication if the authentication process creates a
+     * session.
+     *
+     * @return the maximum session timeout to be used during authentication if the authentication process creates a
+     *             session
+     */
+    public int getAuthenticationSessionTimeout() {
+        return authenticationSessionTimeout;
+    }
 
+
+    /**
+     * Configures the maximum session timeout to be used during authentication if the authentication process creates a
+     * session.
+     *
+     * @param authenticationSessionTimeout The maximum session timeout to use duriing authentication if the
+     *                                         authentication process creates a session
+     */
+    public void setAuthenticationSessionTimeout(int authenticationSessionTimeout) {
+        this.authenticationSessionTimeout = authenticationSessionTimeout;
+    }
+
+
+    // ------------------------------------------------------ Protected Methods
 
     /**
      * Authenticate the user making this request, based on the specified login configuration. Return <code>true</code>
@@ -134,14 +163,14 @@ public class FormAuthenticator extends AuthenticatorBase {
         // Have we authenticated this user before but have caching disabled?
         if (!cache) {
             session = request.getSessionInternal(true);
-            if (log.isDebugEnabled()) {
-                log.debug("Checking for reauthenticate in session " + session);
+            if (log.isTraceEnabled()) {
+                log.trace("Checking for reauthenticate in session " + session);
             }
             String username = (String) session.getNote(Constants.SESS_USERNAME_NOTE);
             String password = (String) session.getNote(Constants.SESS_PASSWORD_NOTE);
             if (username != null && password != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Reauthenticating username '" + username + "'");
+                if (log.isTraceEnabled()) {
+                    log.trace("Reauthenticating username '" + username + "'");
                 }
                 principal = context.getRealm().authenticate(username, password);
                 if (principal != null) {
@@ -151,7 +180,7 @@ public class FormAuthenticator extends AuthenticatorBase {
                     }
                 }
                 if (log.isDebugEnabled()) {
-                    log.debug("Reauthentication failed, proceed normally");
+                    log.debug(sm.getString("formAuthenticator.reauthFailed"));
                 }
             }
         }
@@ -160,17 +189,17 @@ public class FormAuthenticator extends AuthenticatorBase {
         // authentication? If so, forward the *original* request instead.
         if (matchRequest(request)) {
             session = request.getSessionInternal(true);
-            if (log.isDebugEnabled()) {
-                log.debug("Restore request from session '" + session.getIdInternal() + "'");
+            if (log.isTraceEnabled()) {
+                log.trace("Restore request from session '" + session.getIdInternal() + "'");
             }
             if (restoreRequest(request, session)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Proceed to restored request");
+                if (log.isTraceEnabled()) {
+                    log.trace("Proceed to restored request");
                 }
                 return true;
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("Restore of original request failed");
+                    log.debug(sm.getString("formAuthenticator.restoreFailed"));
                 }
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return false;
@@ -209,13 +238,13 @@ public class FormAuthenticator extends AuthenticatorBase {
             }
 
             session = request.getSessionInternal(true);
-            if (log.isDebugEnabled()) {
-                log.debug("Save request in session '" + session.getIdInternal() + "'");
+            if (log.isTraceEnabled()) {
+                log.trace("Save request in session '" + session.getIdInternal() + "'");
             }
             try {
                 saveRequest(request, session);
             } catch (IOException ioe) {
-                log.debug("Request body too big to save during authentication");
+                log.debug(sm.getString("authenticator.requestBodyTooBig"));
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, sm.getString("authenticator.requestBodyTooBig"));
                 return false;
             }
@@ -232,8 +261,8 @@ public class FormAuthenticator extends AuthenticatorBase {
         }
         String username = request.getParameter(Constants.FORM_USERNAME);
         String password = request.getParameter(Constants.FORM_PASSWORD);
-        if (log.isDebugEnabled()) {
-            log.debug("Authenticating username '" + username + "'");
+        if (log.isTraceEnabled()) {
+            log.trace("Authenticating username '" + username + "'");
         }
         principal = realm.authenticate(username, password);
         if (principal == null) {
@@ -241,8 +270,8 @@ public class FormAuthenticator extends AuthenticatorBase {
             return false;
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Authentication of '" + username + "' was successful");
+        if (log.isTraceEnabled()) {
+            log.trace("Authentication of '" + username + "' was successful");
         }
 
         if (session == null) {
@@ -261,7 +290,7 @@ public class FormAuthenticator extends AuthenticatorBase {
         }
         if (session == null) {
             if (containerLog.isDebugEnabled()) {
-                containerLog.debug("User took so long to log on the session expired");
+                containerLog.debug(sm.getString("formAuthenticator.sessionExpired"));
             }
             if (landingPage == null) {
                 response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT,
@@ -285,8 +314,8 @@ public class FormAuthenticator extends AuthenticatorBase {
         // Redirect the user to the original request URI (which will cause
         // the original request to be restored)
         requestURI = savedRequestURL(session);
-        if (log.isDebugEnabled()) {
-            log.debug("Redirecting to original '" + requestURI + "'");
+        if (log.isTraceEnabled()) {
+            log.trace("Redirecting to original '" + requestURI + "'");
         }
         if (requestURI == null) {
             if (landingPage == null) {
@@ -303,14 +332,11 @@ public class FormAuthenticator extends AuthenticatorBase {
                 response.sendRedirect(response.encodeRedirectURL(uri));
             }
         } else {
-            // Until the Servlet API allows specifying the type of redirect to
-            // use.
-            Response internalResponse = request.getResponse();
             String location = response.encodeRedirectURL(requestURI);
             if ("HTTP/1.1".equals(request.getProtocol())) {
-                internalResponse.sendRedirect(location, HttpServletResponse.SC_SEE_OTHER);
+                response.sendRedirect(location, HttpServletResponse.SC_SEE_OTHER);
             } else {
-                internalResponse.sendRedirect(location, HttpServletResponse.SC_FOUND);
+                response.sendRedirect(location, HttpServletResponse.SC_FOUND);
             }
         }
         return false;
@@ -612,9 +638,13 @@ public class FormAuthenticator extends AuthenticatorBase {
         // it would in a normal request would require some invasive API changes.
         // Therefore force the conversion to String now so the correct values
         // are presented if the application requests them.
-        request.getRequestURI();
-        request.getQueryString();
-        request.getProtocol();
+        request.getCoyoteRequest().requestURI().toStringType();
+        request.getCoyoteRequest().queryString().toStringType();
+        request.getCoyoteRequest().protocol().toStringType();
+
+        if (saved.getOriginalMaxInactiveInterval() > 0) {
+            session.setMaxInactiveInterval(saved.getOriginalMaxInactiveInterval());
+        }
 
         return true;
     }
@@ -681,6 +711,22 @@ public class FormAuthenticator extends AuthenticatorBase {
         saved.setRequestURI(request.getRequestURI());
         saved.setDecodedRequestURI(request.getDecodedRequestURI());
 
+        SavedRequest previousSavedRequest = (SavedRequest) session.getNote(Constants.FORM_REQUEST_NOTE);
+        if (session.isNew()) {
+            int originalMaxInactiveInterval = session.getMaxInactiveInterval();
+            if (originalMaxInactiveInterval > getAuthenticationSessionTimeout()) {
+                saved.setOriginalMaxInactiveInterval(originalMaxInactiveInterval);
+                session.setMaxInactiveInterval(getAuthenticationSessionTimeout());
+            }
+        } else if (previousSavedRequest != null && previousSavedRequest.getOriginalMaxInactiveInterval() > 0) {
+            /*
+             * The user may have refreshed the browser page during authentication. Transfer the original max inactive
+             * interval from previous saved request to current one else, once authentication is completed, the session
+             * will retain the the shorter authentication session timeout
+             */
+            saved.setOriginalMaxInactiveInterval(previousSavedRequest.getOriginalMaxInactiveInterval());
+        }
+
         // Stash the SavedRequest in our session for later use
         session.setNote(Constants.FORM_REQUEST_NOTE, saved);
     }
@@ -704,6 +750,12 @@ public class FormAuthenticator extends AuthenticatorBase {
             sb.append('?');
             sb.append(saved.getQueryString());
         }
+
+        // Avoid protocol relative redirects
+        while (sb.length() > 1 && sb.charAt(1) == '/') {
+            sb.deleteCharAt(0);
+        }
+
         return sb.toString();
     }
 }

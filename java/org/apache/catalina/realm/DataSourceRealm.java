@@ -28,6 +28,7 @@ import javax.naming.Context;
 import javax.sql.DataSource;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Server;
 import org.apache.naming.ContextBindings;
 
 /**
@@ -224,15 +225,11 @@ public class DataSourceRealm extends RealmBase {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Return the Principal associated with the specified username and credentials, if there is one; otherwise return
-     * <code>null</code>. If there are any errors with the JDBC connection, executing the query or anything we return
-     * null (don't authenticate). This event is also logged, and the connection will be closed so that a subsequent
-     * request will automatically re-open it.
-     *
-     * @param username    Username of the Principal to look up
-     * @param credentials Password or other credentials to use in authenticating this username
-     *
-     * @return the associated principal, or <code>null</code> if there is none.
+     * {@inheritDoc}
+     * <p>
+     * If there are any errors with the JDBC connection, executing the query or anything this method returns null
+     * (doesn't authenticate). This event is also logged, and the connection will be closed so that a subsequent request
+     * will automatically re-open it.
      */
     @Override
     public Principal authenticate(String username, String credentials) {
@@ -370,7 +367,13 @@ public class DataSourceRealm extends RealmBase {
                 context = ContextBindings.getClassLoader();
                 context = (Context) context.lookup("comp/env");
             } else {
-                context = getServer().getGlobalNamingContext();
+                Server server = getServer();
+                if (server == null) {
+                    connectionSuccess = false;
+                    containerLog.error(sm.getString("dataSourceRealm.noNamingContext"));
+                    return null;
+                }
+                context = server.getGlobalNamingContext();
             }
             DataSource dataSource = (DataSource) context.lookup(dataSourceName);
             Connection connection = dataSource.getConnection();
@@ -529,13 +532,6 @@ public class DataSourceRealm extends RealmBase {
 
     // ------------------------------------------------------ Lifecycle Methods
 
-    /**
-     * Prepare for the beginning of active use of the public methods of this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
     @Override
     protected void startInternal() throws LifecycleException {
 

@@ -58,8 +58,8 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
             Reference ref = (Reference) obj;
             RefAddr userAttr = ref.get("username");
             RefAddr passAttr = ref.get("password");
-            if (userAttr.getContent()!=null && passAttr.getContent()!=null) {
-                result = wrapDataSource(result,userAttr.getContent().toString(), passAttr.getContent().toString());
+            if (userAttr != null && passAttr != null && userAttr.getContent() != null && passAttr.getContent() != null) {
+                result = wrapDataSource(result, userAttr.getContent().toString(), passAttr.getContent().toString());
             }
         }
         return result;
@@ -74,9 +74,6 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
         }catch (Exception x) {
             if (x instanceof InvocationTargetException) {
                 Throwable cause = x.getCause();
-                if (cause instanceof ThreadDeath) {
-                    throw (ThreadDeath) cause;
-                }
                 if (cause instanceof VirtualMachineError) {
                     throw (VirtualMachineError) cause;
                 }

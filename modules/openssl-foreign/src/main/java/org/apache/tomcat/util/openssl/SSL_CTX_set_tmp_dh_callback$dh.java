@@ -19,32 +19,41 @@
 
 package org.apache.tomcat.util.openssl;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker;
+import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
-import java.lang.foreign.*;
-import static java.lang.foreign.ValueLayout.*;
+
 /**
- * {@snippet :
- * DH* (*SSL_CTX_set_tmp_dh_callback$dh)(SSL*,int,int);
+ * {@snippet lang = c : * DH* (*SSL_CTX_set_tmp_dh_callback$dh)(SSL*,int,int);
  * }
  */
+@SuppressWarnings("javadoc")
 public interface SSL_CTX_set_tmp_dh_callback$dh {
 
-    java.lang.foreign.MemorySegment apply(java.lang.foreign.MemorySegment _x0, int _x1, int _x2);
+    FunctionDescriptor $DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT,
+            openssl_h.C_INT);
+
+    MemorySegment apply(MemorySegment _x0, int _x1, int _x2);
+
+    MethodHandle UP$MH = openssl_h.upcallHandle(SSL_CTX_set_tmp_dh_callback$dh.class, "apply", $DESC);
+
     static MemorySegment allocate(SSL_CTX_set_tmp_dh_callback$dh fi, Arena scope) {
-        return RuntimeHelper.upcallStub(constants$21.SSL_CTX_set_tmp_dh_callback$dh_UP$MH, fi, constants$21.SSL_CTX_set_tmp_dh_callback$dh$FUNC, scope);
+        return Linker.nativeLinker().upcallStub(UP$MH.bindTo(fi), $DESC, scope);
     }
+
+    MethodHandle DOWN$MH = Linker.nativeLinker().downcallHandle($DESC);
+
     static SSL_CTX_set_tmp_dh_callback$dh ofAddress(MemorySegment addr, Arena arena) {
-        MemorySegment symbol = addr.reinterpret(arena.scope(), null);
-        return (java.lang.foreign.MemorySegment __x0, int __x1, int __x2) -> {
+        MemorySegment symbol = addr.reinterpret(arena, null);
+        return (MemorySegment __x0, int __x1, int __x2) -> {
             try {
-                return (java.lang.foreign.MemorySegment)constants$22.SSL_CTX_set_tmp_dh_callback$dh_DOWN$MH.invokeExact(symbol, __x0, __x1, __x2);
+                return (MemorySegment) DOWN$MH.invokeExact(symbol, __x0, __x1, __x2);
             } catch (Throwable ex$) {
                 throw new AssertionError("should not reach here", ex$);
             }
         };
     }
 }
-
 

@@ -20,8 +20,10 @@ import java.io.File;
 
 public final class Library {
 
-    /* Default library names */
+    /* Default library names - use 2.x in preference to 1.x if both are available */
     private static final String [] NAMES = {"tcnative-2", "libtcnative-2", "tcnative-1", "libtcnative-1"};
+    /* System property used to define CATALINA_HOME */
+    private static final String CATALINA_HOME_PROP = "catalina.home";
     /*
      * A handle to the unique Library singleton instance.
      */
@@ -30,13 +32,13 @@ public final class Library {
     private Library() throws Exception {
         boolean loaded = false;
         StringBuilder err = new StringBuilder();
-        File binLib = new File(System.getProperty("catalina.home"), "bin");
+        File binLib = new File(System.getProperty(CATALINA_HOME_PROP), "bin");
         for (int i = 0; i < NAMES.length; i++) {
             File library = new File(binLib, System.mapLibraryName(NAMES[i]));
             try {
                 System.load(library.getAbsolutePath());
                 loaded = true;
-            } catch (ThreadDeath | VirtualMachineError t) {
+            } catch (VirtualMachineError t) {
                 throw t;
             } catch (Throwable t) {
                 if (library.exists()) {
@@ -59,7 +61,7 @@ public final class Library {
                 try {
                     System.loadLibrary(value);
                     loaded = true;
-                } catch (ThreadDeath | VirtualMachineError t) {
+                } catch (VirtualMachineError t) {
                     throw t;
                 } catch (Throwable t) {
                     String name = System.mapLibraryName(value);
@@ -95,12 +97,13 @@ public final class Library {
         System.loadLibrary(libraryName);
     }
 
-    /* create global TCN's APR pool
-     * This has to be the first call to TCN library.
+    /**
+     * Create Tomcat Native's global APR pool. This has to be the first call to TCN library.
      */
     private static native boolean initialize();
-    /* destroy global TCN's APR pool
-     * This has to be the last call to TCN library.
+    /**
+     * Destroys Tomcat Native's global APR pool. This has to be the last call to TCN library. This will destroy any APR
+     * root pools that have not been explicitly destroyed.
      */
     public static native void terminate();
     /* Internal function for loading APR Features */

@@ -52,7 +52,6 @@ ${Using:StrFunc} StrLoc
 Var JavaHome
 Var JavaExe
 Var JvmDll
-Var Arch
 Var ResetInstDir
 Var TomcatPortShutdown
 Var TomcatPortHttp
@@ -211,13 +210,7 @@ Section "Core" SecTomcatCore
 
   SetOutPath $INSTDIR\bin
   File /oname=$TomcatServiceManagerFileName bin\tomcat@VERSION_MAJOR@w.exe
-
-  ; Get the current platform x86 / AMD64 / IA64
-  ${If} $Arch == "x86"
-    File /oname=$TomcatServiceFileName bin\tomcat@VERSION_MAJOR@.exe
-  ${ElseIf} $Arch == "x64"
-    File /oname=$TomcatServiceFileName bin\x64\tomcat@VERSION_MAJOR@.exe
-  ${EndIf}
+  File /oname=$TomcatServiceFileName bin\tomcat@VERSION_MAJOR@.exe
 
   FileOpen $ServiceInstallLog "$INSTDIR\logs\service-install.log" a
   FileSeek $ServiceInstallLog 0 END
@@ -264,11 +257,7 @@ Section "Native" SecTomcatNative
 
   SetOutPath $INSTDIR\bin
 
-  ${If} $Arch == "x86"
-    File bin\tcnative-1.dll
-  ${ElseIf} $Arch == "x64"
-    File /oname=tcnative-1.dll bin\x64\tcnative-1.dll
-  ${EndIf}
+  File bin\tcnative-2.dll
 
   ClearErrors
 
@@ -791,8 +780,6 @@ FunctionEnd
 ;
 ; Checks that a valid JVM has been specified or a suitable default is available
 ; Sets $JavaHome, $JavaExe and $JvmDll accordingly
-; Determines if the JVM is 32-bit or 64-bit and sets $Arch accordingly. For
-; 64-bit JVMs, also determines if it is x64 or ia64
 Function checkJava
 
   ${If} $JavaHome == ""
@@ -823,81 +810,13 @@ Function checkJava
 
   StrCpy "$JvmDll" $5
 
-  ; Read PE header of JvmDll to check for architecture
-  ; 1. Jump to 0x3c and read offset of PE header
-  ; 2. Jump to offset. Read PE header signature. It must be 'PE'\0\0 (50 45 00 00).
-  ; 3. The next word gives the machine type.
-  ; 0x014c: x86
-  ; 0x8664: x64
-  ; 0x0200: i64
-  ClearErrors
-  FileOpen $R1 "$JvmDll" r
-  IfErrors WrongPEHeader
-
-  FileSeek $R1 0x3c SET
-  FileReadByte $R1 $R2
-  FileReadByte $R1 $R3
-  IntOp $R3 $R3 << 8
-  IntOp $R2 $R2 + $R3
-
-  FileSeek $R1 $R2 SET
-  FileReadByte $R1 $R2
-  IntCmp $R2 0x50 +1 WrongPEHeader WrongPEHeader
-  FileReadByte $R1 $R2
-  IntCmp $R2 0x45 +1 WrongPEHeader WrongPEHeader
-  FileReadByte $R1 $R2
-  IntCmp $R2 0 +1 WrongPEHeader WrongPEHeader
-  FileReadByte $R1 $R2
-  IntCmp $R2 0 +1 WrongPEHeader WrongPEHeader
-
-  FileReadByte $R1 $R2
-  FileReadByte $R1 $R3
-  IntOp $R3 $R3 << 8
-  IntOp $R2 $R2 + $R3
-
-  IntCmp $R2 0x014c +1 +4 +4
-  StrCpy "$Arch" "x86"
-  SetRegView 32
-  Goto DonePEHeader
-
-  IntCmp $R2 0x8664 +1 +4 +4
-  StrCpy "$Arch" "x64"
-  SetRegView 64
-  Goto DonePEHeader
-
-  IntCmp $R2 0x0200 +1 +4 +4
-  StrCpy "$Arch" "i64"
-  SetRegView 64
-  Goto DonePEHeader
-
-WrongPEHeader:
-  IfSilent +2
-  MessageBox MB_OK|MB_ICONEXCLAMATION 'Cannot read PE header from "$JvmDll"$\r$\nWill assume that the architecture is x86.'
-  DetailPrint 'Cannot read PE header from "$JvmDll". Assuming the architecture is x86.'
-  SetRegView 32
-  StrCpy "$Arch" "x86"
-
-DonePEHeader:
-  FileClose $R1
-
-  DetailPrint 'Architecture: "$Arch"'
-
   StrCpy $INSTDIR "$ResetInstDir"
 
-  ; The default varies depending on 32-bit or 64-bit
   ${If} "$INSTDIR" == ""
-    ${If} $Arch == "x86"
-      ${If} $TomcatServiceName == $TomcatServiceDefaultName
-        StrCpy $INSTDIR "$PROGRAMFILES32\Apache Software Foundation\Tomcat @VERSION_MAJOR_MINOR@"
-      ${Else}
-        StrCpy $INSTDIR "$PROGRAMFILES32\Apache Software Foundation\Tomcat @VERSION_MAJOR_MINOR@_$TomcatServiceName"
-      ${EndIf}
+    ${If} $TomcatServiceName == $TomcatServiceDefaultName
+      StrCpy $INSTDIR "$PROGRAMFILES64\Apache Software Foundation\Tomcat @VERSION_MAJOR_MINOR@"
     ${Else}
-      ${If} $TomcatServiceName == $TomcatServiceDefaultName
-        StrCpy $INSTDIR "$PROGRAMFILES64\Apache Software Foundation\Tomcat @VERSION_MAJOR_MINOR@"
-      ${Else}
-        StrCpy $INSTDIR "$PROGRAMFILES64\Apache Software Foundation\Tomcat @VERSION_MAJOR_MINOR@_$TomcatServiceName"
-      ${EndIf}
+      StrCpy $INSTDIR "$PROGRAMFILES64\Apache Software Foundation\Tomcat @VERSION_MAJOR_MINOR@_$TomcatServiceName"
     ${EndIf}
   ${EndIf}
 
@@ -940,34 +859,7 @@ Function findJavaHome
     ${EndIf}
   ${EndIf}
 
-  ; If no 64-bit Java was found, look for 32-bit Java
-  ${If} $1 == ""
-    SetRegView 32
-    ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\JRE" "CurrentVersion"
-    ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\JRE\$2" "JavaHome"
-    ReadRegStr $3 HKLM "SOFTWARE\JavaSoft\JRE\$2" "RuntimeLib"
-
-    IfErrors 0 +2
-    StrCpy $1 ""
-    ClearErrors
-
-    ${If} $1 == ""
-      ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
-      ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$2" "JavaHome"
-      ReadRegStr $3 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$2" "RuntimeLib"
-
-      IfErrors 0 +2
-      StrCpy $1 ""
-      ClearErrors
-    ${EndIf}
-
-    ; If using 64-bit, go back to using 64-bit registry
-    ${If} $0 != "%PROGRAMW6432%"
-      SetRegView 64
-    ${EndIf}
-  ${EndIf}
-
-  ; If no 32-bit Java (JRE) found, look for 64-bit Java JDK
+  ; If no 64-bit Java (JRE) found, look for 64-bit Java JDK
   ${If} $1 == ""
   ${AndIf} $0 != "%PROGRAMW6432%"
     ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\JDK" "CurrentVersion"
@@ -1269,12 +1161,7 @@ FunctionEnd
     nsExec::ExecToLog '"$INSTDIR\bin\$TomcatServiceFileName" //DS//$TomcatServiceName --LogPath "$INSTDIR\logs"'
     ClearErrors
 
-    ; Don't know if 32-bit or 64-bit registry was used so, for now, remove both
-    SetRegView 32
-    DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName"
-    DeleteRegKey HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@\$TomcatServiceName"
-    DeleteRegValue HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@_$TomcatServiceName"
-    DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@_$TomcatServiceName"
+    ; Remove registry entries
     SetRegView 64
     DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName"
     DeleteRegKey HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@\$TomcatServiceName"

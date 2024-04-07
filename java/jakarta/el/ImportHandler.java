@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ImportHandler {
 
-    private static final Map<String, Set<String>> standardPackages = new HashMap<>();
+    private static final Map<String,Set<String>> standardPackages = new HashMap<>();
 
     static {
         // Servlet 6.0
@@ -87,13 +87,14 @@ public class ImportHandler {
         servletClassNames.add("UnavailableException");
         standardPackages.put("jakarta.servlet", servletClassNames);
 
-        // Servlet 6.0
+        // Servlet 6.1
         Set<String> servletHttpClassNames = new HashSet<>();
         // Interfaces
         servletHttpClassNames.add("HttpServletMapping");
         servletHttpClassNames.add("HttpServletRequest");
         servletHttpClassNames.add("HttpServletResponse");
         servletHttpClassNames.add("HttpSession");
+        servletHttpClassNames.add("HttpSession.Accessor");
         servletHttpClassNames.add("HttpSessionActivationListener");
         servletHttpClassNames.add("HttpSessionAttributeListener");
         servletHttpClassNames.add("HttpSessionBindingListener");
@@ -136,7 +137,7 @@ public class ImportHandler {
         standardPackages.put("jakarta.servlet.jsp", servletJspClassNames);
 
         Set<String> javaLangClassNames = new HashSet<>();
-        // Based on Java 19 EA26
+        // Based on Java 21 EA29
         // Interfaces
         javaLangClassNames.add("Appendable");
         javaLangClassNames.add("AutoCloseable");
@@ -185,6 +186,8 @@ public class ImportHandler {
         javaLangClassNames.add("Runtime");
         javaLangClassNames.add("Runtime.Version");
         javaLangClassNames.add("RuntimePermission");
+        javaLangClassNames.add("ScopedValue");
+        javaLangClassNames.add("ScopedValue.Carrier");
         javaLangClassNames.add("SecurityManager");
         javaLangClassNames.add("Short");
         javaLangClassNames.add("StackTraceElement");
@@ -193,6 +196,9 @@ public class ImportHandler {
         javaLangClassNames.add("String");
         javaLangClassNames.add("StringBuffer");
         javaLangClassNames.add("StringBuilder");
+        javaLangClassNames.add("StringTemplate");
+        javaLangClassNames.add("StringTemplate.Processor");
+        javaLangClassNames.add("StringTemplate.Processor.Linkage");
         javaLangClassNames.add("System");
         javaLangClassNames.add("System.LoggerFinder");
         javaLangClassNames.add("Thread");
@@ -272,10 +278,10 @@ public class ImportHandler {
 
     }
 
-    private Map<String, Set<String>> packageNames = new ConcurrentHashMap<>();
-    private Map<String, String> classNames = new ConcurrentHashMap<>();
-    private Map<String, Class<?>> clazzes = new ConcurrentHashMap<>();
-    private Map<String, Class<?>> statics = new ConcurrentHashMap<>();
+    private Map<String,Set<String>> packageNames = new ConcurrentHashMap<>();
+    private Map<String,String> classNames = new ConcurrentHashMap<>();
+    private Map<String,Class<?>> clazzes = new ConcurrentHashMap<>();
+    private Map<String,Class<?>> statics = new ConcurrentHashMap<>();
 
 
     public ImportHandler() {
@@ -283,7 +289,7 @@ public class ImportHandler {
     }
 
 
-    public void importStatic(String name) throws jakarta.el.ELException {
+    public void importStatic(String name) throws ELException {
         int lastPeriod = name.lastIndexOf('.');
 
         if (lastPeriod < 0) {
@@ -338,7 +344,7 @@ public class ImportHandler {
     }
 
 
-    public void importClass(String name) throws jakarta.el.ELException {
+    public void importClass(String name) throws ELException {
         int lastPeriodIndex = name.lastIndexOf('.');
 
         if (lastPeriodIndex < 0) {
@@ -370,7 +376,7 @@ public class ImportHandler {
     }
 
 
-    public java.lang.Class<?> resolveClass(String name) {
+    public Class<?> resolveClass(String name) {
         if (name == null || name.contains(".")) {
             return null;
         }
@@ -398,7 +404,7 @@ public class ImportHandler {
 
         // Search the package imports - note there may be multiple matches
         // (which correctly triggers an error)
-        for (Map.Entry<String, Set<String>> entry : packageNames.entrySet()) {
+        for (Map.Entry<String,Set<String>> entry : packageNames.entrySet()) {
             if (!entry.getValue().isEmpty()) {
                 // Standard package where we know all the class names
                 if (!entry.getValue().contains(name)) {
@@ -430,7 +436,7 @@ public class ImportHandler {
     }
 
 
-    public java.lang.Class<?> resolveStatic(String name) {
+    public Class<?> resolveStatic(String name) {
         return statics.get(name);
     }
 

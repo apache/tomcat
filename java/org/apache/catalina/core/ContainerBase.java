@@ -128,7 +128,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     /**
      * The child Containers belonging to this Container, keyed by name.
      */
-    protected final HashMap<String, Container> children = new HashMap<>();
+    protected final HashMap<String,Container> children = new HashMap<>();
+    private final ReadWriteLock childrenLock = new ReentrantReadWriteLock();
 
 
     /**
@@ -375,30 +376,29 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
                 return;
             }
             this.cluster = cluster;
-
-            // Stop the old component if necessary
-            if (getState().isAvailable() && (oldCluster != null) && (oldCluster instanceof Lifecycle)) {
-                try {
-                    ((Lifecycle) oldCluster).stop();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString("containerBase.cluster.stop"), e);
-                }
-            }
-
             // Start the new component if necessary
             if (cluster != null) {
                 cluster.setContainer(this);
             }
-
-            if (getState().isAvailable() && (cluster != null) && (cluster instanceof Lifecycle)) {
-                try {
-                    ((Lifecycle) cluster).start();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString("containerBase.cluster.start"), e);
-                }
-            }
         } finally {
             writeLock.unlock();
+        }
+
+        // Stop the old component if necessary
+        if (getState().isAvailable() && (oldCluster instanceof Lifecycle)) {
+            try {
+                ((Lifecycle) oldCluster).stop();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("containerBase.cluster.stop"), e);
+            }
+        }
+
+        if (getState().isAvailable() && (cluster instanceof Lifecycle)) {
+            try {
+                ((Lifecycle) cluster).start();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("containerBase.cluster.start"), e);
+            }
         }
 
         // Report this property change to interested listeners
@@ -569,43 +569,44 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     @Override
     public void setRealm(Realm realm) {
 
+        Realm oldRealm = null;
         Lock l = realmLock.writeLock();
         l.lock();
         try {
             // Change components if necessary
-            Realm oldRealm = this.realm;
+            oldRealm = this.realm;
             if (oldRealm == realm) {
                 return;
             }
             this.realm = realm;
 
-            // Stop the old component if necessary
-            if (getState().isAvailable() && (oldRealm != null) && (oldRealm instanceof Lifecycle)) {
-                try {
-                    ((Lifecycle) oldRealm).stop();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString("containerBase.realm.stop"), e);
-                }
-            }
-
             // Start the new component if necessary
             if (realm != null) {
                 realm.setContainer(this);
             }
-            if (getState().isAvailable() && (realm != null) && (realm instanceof Lifecycle)) {
-                try {
-                    ((Lifecycle) realm).start();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString("containerBase.realm.start"), e);
-                }
-            }
-
-            // Report this property change to interested listeners
-            support.firePropertyChange("realm", oldRealm, this.realm);
         } finally {
             l.unlock();
         }
 
+        // Stop the old component if necessary
+        if (getState().isAvailable() && oldRealm instanceof Lifecycle) {
+            try {
+                ((Lifecycle) oldRealm).stop();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("containerBase.realm.stop"), e);
+            }
+        }
+
+        if (getState().isAvailable() && realm instanceof Lifecycle) {
+            try {
+                ((Lifecycle) realm).start();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("containerBase.realm.start"), e);
+            }
+        }
+
+        // Report this property change to interested listeners
+        support.firePropertyChange("realm", oldRealm, this.realm);
     }
 
 
@@ -629,15 +630,18 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     @Override
     public void addChild(Container child) {
         if (log.isDebugEnabled()) {
-            log.debug("Add child " + child + " " + this);
+            log.debug(sm.getString("containerBase.child.add", child, this));
         }
 
-        synchronized (children) {
+        childrenLock.writeLock().lock();
+        try {
             if (children.get(child.getName()) != null) {
                 throw new IllegalArgumentException(sm.getString("containerBase.child.notUnique", child.getName()));
             }
             child.setParent(this); // May throw IAE
             children.put(child.getName(), child);
+        } finally {
+            childrenLock.writeLock().unlock();
         }
 
         fireContainerEvent(ADD_CHILD_EVENT, child);
@@ -688,8 +692,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         if (name == null) {
             return null;
         }
-        synchronized (children) {
+        childrenLock.readLock().lock();
+        try {
             return children.get(name);
+        } finally {
+            childrenLock.readLock().unlock();
         }
     }
 
@@ -700,8 +707,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      */
     @Override
     public Container[] findChildren() {
-        synchronized (children) {
+        childrenLock.readLock().lock();
+        try {
             return children.values().toArray(new Container[0]);
+        } finally {
+            childrenLock.readLock().unlock();
         }
     }
 
@@ -753,11 +763,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
             fireContainerEvent(REMOVE_CHILD_EVENT, child);
         }
 
-        synchronized (children) {
-            if (children.get(child.getName()) == null) {
-                return;
-            }
+        childrenLock.writeLock().lock();
+        try {
             children.remove(child.getName());
+        } finally {
+            childrenLock.writeLock().unlock();
         }
 
     }
@@ -787,13 +797,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     }
 
 
-    @Override
-    protected void initInternal() throws LifecycleException {
-        reconfigureStartStopExecutor(getStartStopThreads());
-        super.initInternal();
-    }
-
-
     private void reconfigureStartStopExecutor(int threads) {
         if (threads == 1) {
             // Use a fake executor
@@ -817,7 +820,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
+
+        reconfigureStartStopExecutor(getStartStopThreads());
 
         // Start our subordinate components, if any
         logger = null;
@@ -832,8 +837,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         }
 
         // Start our child containers, if any
-        Container children[] = findChildren();
-        List<Future<Void>> results = new ArrayList<>();
+        Container[] children = findChildren();
+        List<Future<Void>> results = new ArrayList<>(children.length);
         for (Container child : children) {
             results.add(startStopExecutor.submit(new StartChild(child)));
         }
@@ -880,7 +885,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         // Stop our thread
         if (monitorFuture != null) {
@@ -897,8 +902,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         }
 
         // Stop our child containers, if any
-        Container children[] = findChildren();
-        List<Future<Void>> results = new ArrayList<>();
+        Container[] children = findChildren();
+        List<Future<Void>> results = new ArrayList<>(children.length);
         for (Container child : children) {
             results.add(startStopExecutor.submit(new StopChild(child)));
         }
@@ -924,6 +929,12 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         Cluster cluster = getClusterInternal();
         if (cluster instanceof Lifecycle) {
             ((Lifecycle) cluster).stop();
+        }
+
+        // If init fails, this may be null
+        if (startStopExecutor != null) {
+            startStopExecutor.shutdownNow();
+            startStopExecutor = null;
         }
     }
 
@@ -952,11 +963,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         // Required if the child is destroyed directly.
         if (parent != null) {
             parent.removeChild(this);
-        }
-
-        // If init fails, this may be null
-        if (startStopExecutor != null) {
-            startStopExecutor.shutdownNow();
         }
 
         super.destroyInternal();
@@ -992,7 +998,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         }
 
         AccessLogAdapter adapter = null;
-        Valve valves[] = getPipeline().getValves();
+        Valve[] valves = getPipeline().getValves();
         for (Valve valve : valves) {
             if (valve instanceof AccessLog) {
                 if (adapter == null) {
@@ -1035,7 +1041,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      * this container. Unexpected throwables will be caught and logged.
      */
     @Override
-    public void backgroundProcess() {
+    public synchronized void backgroundProcess() {
 
         if (!getState().isAvailable()) {
             return;
@@ -1066,7 +1072,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
             }
             current = current.getNext();
         }
-        fireLifecycleEvent(Lifecycle.PERIODIC_EVENT, null);
+        fireLifecycleEvent(PERIODIC_EVENT, null);
     }
 
 
@@ -1167,12 +1173,19 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         return keyProperties.toString();
     }
 
+
     public ObjectName[] getChildren() {
-        List<ObjectName> names = new ArrayList<>(children.size());
-        for (Container next : children.values()) {
-            if (next instanceof ContainerBase) {
-                names.add(next.getObjectName());
+        List<ObjectName> names;
+        childrenLock.readLock().lock();
+        try {
+            names = new ArrayList<>(children.size());
+            for (Container next : children.values()) {
+                if (next instanceof ContainerBase) {
+                    names.add(next.getObjectName());
+                }
             }
+        } finally {
+            childrenLock.readLock().unlock();
         }
         return names.toArray(new ObjectName[0]);
     }

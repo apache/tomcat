@@ -22,21 +22,19 @@ import org.apache.tomcat.util.buf.MessageBytes;
 
 
 /**
- *  Server-side cookie representation.
- *  Allows recycling and uses MessageBytes as low-level
- *  representation ( and thus the byte -&gt; char conversion can be delayed
- *  until we know the charset ).
- *
- *  Tomcat.core uses this recyclable object to represent cookies,
- *  and the facade will convert it to the external representation.
+ * Server-side cookie representation. Allows recycling and uses MessageBytes as low-level representation ( and thus the
+ * byte -&gt; char conversion can be delayed until we know the charset ).
+ * <p>
+ * Tomcat.core uses this recyclable object to represent cookies, and the facade will convert it to the external
+ * representation.
  */
 public class ServerCookie implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     // RFC 6265
-    private final MessageBytes name=MessageBytes.newInstance();
-    private final MessageBytes value=MessageBytes.newInstance();
+    private final MessageBytes name = MessageBytes.newInstance();
+    private final MessageBytes value = MessageBytes.newInstance();
 
     public ServerCookie() {
         // NOOP

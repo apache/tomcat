@@ -115,7 +115,7 @@ by Daniel Colascione</a>.</li>
 are enabled (via <strong>enableCmdLineArguments</strong>) individual encoded
 command line argument must match this pattern else the request will be rejected.
 The default matches the allowed values defined by RFC3875 and is
-<code>[a-zA-Z0-9\Q%;/?:@&amp;,$-_.!~*'()\E]+</code></li>
+<code>[\w\Q%;/?:@&amp;,$-.!~*'()\E]+</code></li>
 <li><strong>enableCmdLineArguments</strong> - Are command line arguments
 generated from the query string as per section 4.4 of 3875 RFC? The default is
 <code>false</code>.</li>

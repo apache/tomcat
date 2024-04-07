@@ -113,13 +113,13 @@ public class ApplicationContext implements ServletContext {
     /**
      * The context attributes for this context.
      */
-    protected Map<String, Object> attributes = new ConcurrentHashMap<>();
+    protected Map<String,Object> attributes = new ConcurrentHashMap<>();
 
 
     /**
      * List of read only attributes for this context.
      */
-    private final Map<String, String> readOnlyAttributes = new ConcurrentHashMap<>();
+    private final Map<String,String> readOnlyAttributes = new ConcurrentHashMap<>();
 
 
     /**
@@ -143,7 +143,7 @@ public class ApplicationContext implements ServletContext {
     /**
      * The merged context initialization parameters for this Context.
      */
-    private final Map<String, String> parameters = new ConcurrentHashMap<>();
+    private final Map<String,String> parameters = new ConcurrentHashMap<>();
 
 
     /**
@@ -303,11 +303,6 @@ public class ApplicationContext implements ServletContext {
     }
 
 
-    /**
-     * Return the MIME type of the specified file, or <code>null</code> if the MIME type cannot be determined.
-     *
-     * @param file Filename for which to identify a MIME type
-     */
     @Override
     public String getMimeType(String file) {
 
@@ -327,11 +322,6 @@ public class ApplicationContext implements ServletContext {
     }
 
 
-    /**
-     * Return a <code>RequestDispatcher</code> object that acts as a wrapper for the named servlet.
-     *
-     * @param name Name of the servlet for which a dispatcher is requested
-     */
     @Override
     public RequestDispatcher getNamedDispatcher(String name) {
 
@@ -608,7 +598,7 @@ public class ApplicationContext implements ServletContext {
 
         // Notify interested application event listeners
         Object listeners[] = context.getApplicationEventListeners();
-        if ((listeners == null) || (listeners.length == 0)) {
+        if (listeners == null || listeners.length == 0) {
             return;
         }
         ServletContextAttributeEvent event = new ServletContextAttributeEvent(context.getServletContext(), name, value);
@@ -624,7 +614,6 @@ public class ApplicationContext implements ServletContext {
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 context.fireContainerEvent("afterContextAttributeRemoved", listener);
-                // FIXME - should we do anything besides log these?
                 log(sm.getString("applicationContext.attributeEvent"), t);
             }
         }
@@ -655,7 +644,7 @@ public class ApplicationContext implements ServletContext {
 
         // Notify interested application event listeners
         Object listeners[] = context.getApplicationEventListeners();
-        if ((listeners == null) || (listeners.length == 0)) {
+        if (listeners == null || listeners.length == 0) {
             return;
         }
         ServletContextAttributeEvent event = null;
@@ -687,7 +676,6 @@ public class ApplicationContext implements ServletContext {
                 } else {
                     context.fireContainerEvent("afterContextAttributeAdded", listener);
                 }
-                // FIXME - should we do anything besides log these?
                 log(sm.getString("applicationContext.attributeEvent"), t);
             }
         }
@@ -799,7 +787,7 @@ public class ApplicationContext implements ServletContext {
         }
 
         String jspServletClassName = null;
-        Map<String, String> jspFileInitParams = new HashMap<>();
+        Map<String,String> jspFileInitParams = new HashMap<>();
 
         Wrapper jspServlet = (Wrapper) context.findChild("jsp");
 
@@ -826,7 +814,7 @@ public class ApplicationContext implements ServletContext {
 
 
     private ServletRegistration.Dynamic addServlet(String servletName, String servletClass, Servlet servlet,
-            Map<String, String> initParams) throws IllegalStateException {
+            Map<String,String> initParams) throws IllegalStateException {
 
         if (servletName == null || servletName.equals("")) {
             throw new IllegalArgumentException(sm.getString("applicationContext.invalidServletName", servletName));
@@ -869,7 +857,7 @@ public class ApplicationContext implements ServletContext {
         }
 
         if (initParams != null) {
-            for (Map.Entry<String, String> initParam : initParams.entrySet()) {
+            for (Map.Entry<String,String> initParam : initParams.entrySet()) {
                 wrapper.addInitParameter(initParam.getKey(), initParam.getValue());
             }
         }
@@ -1121,8 +1109,8 @@ public class ApplicationContext implements ServletContext {
 
 
     @Override
-    public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
-        Map<String, ApplicationFilterRegistration> result = new HashMap<>();
+    public Map<String,? extends FilterRegistration> getFilterRegistrations() {
+        Map<String,ApplicationFilterRegistration> result = new HashMap<>();
 
         FilterDef[] filterDefs = context.findFilterDefs();
         for (FilterDef filterDef : filterDefs) {
@@ -1140,8 +1128,8 @@ public class ApplicationContext implements ServletContext {
 
 
     @Override
-    public Map<String, ? extends ServletRegistration> getServletRegistrations() {
-        Map<String, ApplicationServletRegistration> result = new HashMap<>();
+    public Map<String,? extends ServletRegistration> getServletRegistrations() {
+        Map<String,ApplicationServletRegistration> result = new HashMap<>();
 
         Container[] wrappers = context.findChildren();
         for (Container wrapper : wrappers) {

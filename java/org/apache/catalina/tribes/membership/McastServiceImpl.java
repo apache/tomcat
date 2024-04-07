@@ -403,7 +403,7 @@ public class McastServiceImpl extends MembershipProviderBase {
         Thread currentThread = Thread.currentThread();
         if (Arrays.equals(m.getCommand(), Member.SHUTDOWN_PAYLOAD)) {
             if (log.isDebugEnabled()) {
-                log.debug("Member has shutdown:" + m);
+                log.debug(sm.getString("mcastServiceImpl.memberShutdown", m));
             }
             membership.removeMember(m);
             t = () -> {
@@ -417,7 +417,7 @@ public class McastServiceImpl extends MembershipProviderBase {
             };
         } else if (membership.memberAlive(m)) {
             if (log.isDebugEnabled()) {
-                log.debug("Mcast add member " + m);
+                log.debug(sm.getString("mcastServiceImpl.memberAdd", m));
             }
             t = () -> {
                 String name = currentThread.getName();
@@ -445,8 +445,8 @@ public class McastServiceImpl extends MembershipProviderBase {
             for (int i=0; i<count; i++) {
                 try {
                     data[i] = buffer.extractPackage(true);
-                }catch (IllegalStateException ise) {
-                    log.debug("Unable to decode message.",ise);
+                } catch (IllegalStateException ise) {
+                    log.debug(sm.getString("mcastServiceImpl.messageError"), ise);
                 }
             }
             Runnable t = () -> {
@@ -460,9 +460,6 @@ public class McastServiceImpl extends MembershipProviderBase {
                                 msgservice.messageReceived(datum);
                             }
                         } catch (Throwable t1) {
-                            if (t1 instanceof ThreadDeath) {
-                                throw (ThreadDeath) t1;
-                            }
                             if (t1 instanceof VirtualMachineError) {
                                 throw (VirtualMachineError) t1;
                             }
@@ -483,7 +480,7 @@ public class McastServiceImpl extends MembershipProviderBase {
             Member[] expired = membership.expire(timeToExpiration);
             for (final Member member : expired) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Mcast expire  member " + member);
+                    log.debug(sm.getString("mcastServiceImpl.memberExpire", member));
                 }
                 try {
                     Runnable t = () -> {
@@ -584,16 +581,24 @@ public class McastServiceImpl extends MembershipProviderBase {
                     //we can ignore this, as it means we have an invalid package
                     //but we will log it to debug
                     if ( log.isDebugEnabled() ) {
-                        log.debug("Invalid member mcast package.",ax);
+                        log.debug(sm.getString("mcastServiceImpl.invalidMemberPackage"), ax);
                     }
                 } catch ( Exception x ) {
                     if (errorCounter==0 && doRunReceiver) {
                         log.warn(sm.getString("mcastServiceImpl.error.receiving"),x);
                     } else if (log.isDebugEnabled()) {
-                        log.debug("Error receiving mcast package"+(doRunReceiver?". Sleeping 500ms":"."),x);
+                        if (doRunReceiver) {
+                            log.debug(sm.getString("mcastServiceImpl.error.receiving"), x);
+                        } else {
+                            log.warn(sm.getString("mcastServiceImpl.error.receivingNoSleep"), x);
+                        }
                     }
                     if (doRunReceiver) {
-                        try { Thread.sleep(500); } catch ( Exception ignore ){}
+                        try {
+                            sleep(500);
+                        } catch (Exception ignore){
+                            // Ignore
+                        }
                         if ( (++errorCounter)>=recoveryCounter ) {
                             errorCounter=0;
                             RecoveryThread.recover(McastServiceImpl.this);
@@ -626,14 +631,18 @@ public class McastServiceImpl extends MembershipProviderBase {
                     if (errorCounter==0) {
                         log.warn(sm.getString("mcastServiceImpl.send.failed"),x);
                     } else {
-                        log.debug("Unable to send mcast message.",x);
+                        log.debug(sm.getString("mcastServiceImpl.send.failed"),x);
                     }
                     if ( (++errorCounter)>=recoveryCounter ) {
                         errorCounter=0;
                         RecoveryThread.recover(McastServiceImpl.this);
                     }
                 }
-                try { Thread.sleep(time); } catch ( Exception ignore ) {}
+                try {
+                    sleep(time);
+                } catch (Exception ignore) {
+                    // Ignore
+                }
             }
         }
     }//class SenderThread
@@ -709,7 +718,7 @@ public class McastServiceImpl extends MembershipProviderBase {
                                         Integer.toString(++attempt),
                                         Long.toString(parent.recoverySleepTime)));
                             }
-                            Thread.sleep(parent.recoverySleepTime);
+                            sleep(parent.recoverySleepTime);
                         }
                     }catch (InterruptedException ignore) {
                     }

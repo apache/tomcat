@@ -693,7 +693,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
 
 
         public byte[] getHeader() {
-            return NonBlockingCoordinator.COORD_HEADER;
+            return COORD_HEADER;
         }
 
         public Member getLeader() {

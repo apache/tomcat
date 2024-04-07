@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.tomcat.util.IntrospectionUtils;
@@ -242,7 +243,7 @@ public class ConnectorStoreAppender extends StoreAppender {
      * Print a value but replace certain attribute names.
      *
      * @see org.apache.catalina.storeconfig.StoreAppender#printValue(java.io.PrintWriter,
-     *      int, java.lang.String, java.lang.Object)
+     *      int, String, Object)
      */
     @Override
     public void printValue(PrintWriter writer, int indent, String name,
@@ -258,9 +259,8 @@ public class ConnectorStoreAppender extends StoreAppender {
      * Print Connector Values. <ul><li> Special handling to default jkHome.
      * </li><li> Don't save catalina.base path at server.xml</li><li></ul>
      *
-     * @see org.apache.catalina.storeconfig.StoreAppender#isPrintValue(java.lang.Object,
-     *      java.lang.Object, java.lang.String,
-     *      org.apache.catalina.storeconfig.StoreDescription)
+     * @see org.apache.catalina.storeconfig.StoreAppender#isPrintValue(Object,
+     *      Object, String, StoreDescription)
      */
     @Override
     public boolean isPrintValue(Object bean, Object bean2, String attrName,
@@ -281,7 +281,7 @@ public class ConnectorStoreAppender extends StoreAppender {
 
     protected File getCatalinaBase() {
 
-        File file = new File(System.getProperty("catalina.base"));
+        File file = new File(System.getProperty(Globals.CATALINA_BASE_PROP));
         try {
             file = file.getCanonicalFile();
         } catch (IOException e) {

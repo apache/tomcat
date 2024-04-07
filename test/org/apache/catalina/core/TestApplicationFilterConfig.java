@@ -38,7 +38,7 @@ public class TestApplicationFilterConfig extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "HelloWorld", new HelloWorldServlet());
         ctx.addServletMappingDecoded("/", "HelloWorld");

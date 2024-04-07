@@ -16,6 +16,8 @@
  */
 package jakarta.servlet.jsp.el;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,5 +37,19 @@ public class TestImportELResolver extends TomcatBaseTest {
 
         Assert.assertTrue(result.contains("EL  - Long min value is -9223372036854775808"));
         Assert.assertTrue(result.contains("JSP - Long min value is -9223372036854775808"));
+    }
+
+
+    // https://bz.apache.org/bugzilla/show_bug.cgi?id=66582
+    @Test
+    public void testImportStaticFieldFromInterface() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug6nnnn/bug66582.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        String result = res.toString();
+        Assert.assertFalse(result, result.contains("data"));
     }
 }

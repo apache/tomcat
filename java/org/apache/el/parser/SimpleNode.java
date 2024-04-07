@@ -33,9 +33,15 @@ import org.apache.el.util.MessageFactory;
  * @author Jacob Hookom [jacob@hookom.net]
  */
 public abstract class SimpleNode implements Node {
-    protected Node parent;
 
-    protected Node[] children;
+    /*
+     * Uses SimpleNode rather than Node for performance.
+     *
+     * See https://bz.apache.org/bugzilla/show_bug.cgi?id=68068
+     */
+    protected SimpleNode parent;
+
+    protected SimpleNode[] children;
 
     protected final int id;
 
@@ -57,7 +63,7 @@ public abstract class SimpleNode implements Node {
 
     @Override
     public void jjtSetParent(Node n) {
-        parent = n;
+        parent = (SimpleNode) n;
     }
 
     @Override
@@ -68,13 +74,13 @@ public abstract class SimpleNode implements Node {
     @Override
     public void jjtAddChild(Node n, int i) {
         if (children == null) {
-            children = new Node[i + 1];
+            children = new SimpleNode[i + 1];
         } else if (i >= children.length) {
-            Node c[] = new Node[i + 1];
+            SimpleNode c[] = new SimpleNode[i + 1];
             System.arraycopy(children, 0, c, 0, children.length);
             children = c;
         }
-        children[i] = n;
+        children[i] = (SimpleNode) n;
     }
 
     @Override

@@ -23,6 +23,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
 
+import org.apache.catalina.Globals;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -38,7 +39,7 @@ public class StoreFileMover {
 
     private String encoding = "UTF-8";
 
-    private String basename = System.getProperty("catalina.base");
+    private String basename = System.getProperty(Globals.CATALINA_BASE_PROP);
 
     private File configOld;
 

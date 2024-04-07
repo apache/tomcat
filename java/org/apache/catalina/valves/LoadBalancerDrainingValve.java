@@ -157,7 +157,7 @@ public class LoadBalancerDrainingValve extends ValveBase {
                 !request.isRequestedSessionIdValid()) {
 
             if (containerLog.isDebugEnabled()) {
-                containerLog.debug("Load-balancer is in DISABLED state; draining this node");
+                containerLog.debug(sm.getString("loadBalancerDrainingValve.draining"));
             }
 
             boolean ignoreRebalance = false;
@@ -187,8 +187,7 @@ public class LoadBalancerDrainingValve extends ValveBase {
 
             if (ignoreRebalance) {
                 if (containerLog.isDebugEnabled()) {
-                    containerLog.debug("Client is presenting a valid " + _ignoreCookieName +
-                            " cookie, re-balancing is being skipped");
+                    containerLog.debug(sm.getString("loadBalancerDrainingValve.skip", _ignoreCookieName));
                 }
 
                 getNext().invoke(request, response);

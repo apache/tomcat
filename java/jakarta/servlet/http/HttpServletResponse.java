@@ -112,22 +112,105 @@ public interface HttpServletResponse extends ServletResponse {
     void sendError(int sc) throws IOException;
 
     /**
-     * Sends a temporary redirect response to the client using the specified redirect location URL. This method can
-     * accept relative URLs; the servlet container must convert the relative URL to an absolute URL before sending the
-     * response to the client. If the location is relative without a leading '/' the container interprets it as relative
-     * to the current request URI. If the location is relative with a leading '/' the container interprets it as
-     * relative to the servlet container root.
+     * Sends a redirect response to the client using the specified redirect location URL with the status code
+     * {@link #SC_FOUND} 302 (Found), clears the response buffer and commits the response. The response buffer will be
+     * replaced with a short hypertext note as per RFC 9110.
+     * <p>
+     * This method has no effect if called from an include.
+     *
+     * @param location the redirect location URL (may be absolute or relative)
+     *
+     * @exception IOException              If an input or output exception occurs
+     * @exception IllegalArgumentException If a relative URL is given and cannot be converted into an absolute URL
+     * @exception IllegalStateException    If the response was already committed when this method was called
+     *
+     * @see #sendRedirect(String, int, boolean)
+     */
+    default void sendRedirect(String location) throws IOException {
+        sendRedirect(location, SC_FOUND, true);
+    }
+
+    /**
+     * Sends a redirect response to the client using the specified redirect location URL with the status code
+     * {@link #SC_FOUND} 302 (Found), optionally clears the response buffer and commits the response. If the response
+     * buffer is cleared, it will be replaced with a short hypertext note as per RFC 9110.
+     * <p>
+     * This method has no effect if called from an include.
+     *
+     * @param location    the redirect location URL (may be absolute or relative)
+     * @param clearBuffer if {@code true}, clear the buffer and replace it with the data set by this method otherwise
+     *                        retain the existing buffer
+     *
+     * @exception IOException              If an input or output exception occurs
+     * @exception IllegalArgumentException If a relative URL is given and cannot be converted into an absolute URL
+     * @exception IllegalStateException    If the response was already committed when this method was called
+     *
+     * @see #sendRedirect(String, int, boolean)
+     *
+     * @since Servlet 6.1
+     */
+    default void sendRedirect(String location, boolean clearBuffer) throws IOException {
+        sendRedirect(location, SC_FOUND, clearBuffer);
+    }
+
+    /**
+     * Sends a redirect response to the client using the specified redirect location URL and status code, clears the
+     * response buffer and commits the response. The response buffer will be replaced with a short hypertext note as per
+     * RFC 9110.
+     * <p>
+     * This method has no effect if called from an include.
+     *
+     * @param location the redirect location URL (may be absolute or relative)
+     * @param sc       the status code to use for the redirect
+     *
+     * @exception IOException              If an input or output exception occurs
+     * @exception IllegalArgumentException If a relative URL is given and cannot be converted into an absolute URL
+     * @exception IllegalStateException    If the response was already committed when this method was called
+     *
+     * @see #sendRedirect(String, int, boolean)
+     *
+     * @since Servlet 6.1
+     */
+    default void sendRedirect(String location, int sc) throws IOException {
+        sendRedirect(location, sc, true);
+    }
+
+    /**
+     * Sends a redirect response to the client using the specified redirect location URL and status code, optionally
+     * clears the response buffer and commits the response. If the response buffer is cleared, it will be replaced with
+     * a short hypertext note as per RFC 9110.
+     * <p>
+     * This method has no effect if called from an include.
+     * <p>
+     * This method accepts both relative and absolute URLs. Absolute URLs passed to this method are used as provided as
+     * the redirect location URL. Relative URLs are converted to absolute URLs unless a container specific
+     * feature/option is provided that controls whether relative URLs passed to this method are converted to absolute
+     * URLs or used as provided for the redirect location URL. If converting a relative URL to an absolute URL then:
+     * <ul>
+     * <li>If the location is relative without a leading '/' the container interprets it as relative to the current
+     * request URI.</li>
+     * <li>If the location is relative with a leading '/' the container interprets it as relative to the servlet
+     * container root.</li>
+     * <li>If the location is relative with two leading '/' the container interprets it as a network-path reference (see
+     * <a href="http://www.ietf.org/rfc/rfc3986.txt"> RFC 3986: Uniform Resource Identifier (URI): Generic Syntax</a>,
+     * section 4.2 &quot;Relative Reference&quot;).</li>
+     * </ul>
      * <p>
      * If the response has already been committed, this method throws an IllegalStateException. After using this method,
      * the response should be considered to be committed and should not be written to.
      *
-     * @param location the redirect location URL
+     * @param location    the redirect location URL (may be absolute or relative)
+     * @param sc          the status code to use for the redirect
+     * @param clearBuffer if {@code true}, clear the buffer and replace it with the data set by this method otherwise
+     *                        retain the existing buffer
      *
-     * @exception IOException           If an input or output exception occurs
-     * @exception IllegalStateException If the response was committed or if a partial URL is given and cannot be
-     *                                      converted into a valid URL
+     * @exception IOException              If an input or output exception occurs
+     * @exception IllegalArgumentException If a relative URL is given and cannot be converted into an absolute URL
+     * @exception IllegalStateException    If the response was already committed when this method was called
+     *
+     * @since Servlet 6.1
      */
-    void sendRedirect(String location) throws IOException;
+    void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException;
 
     /**
      * Sets a response header with the given name and date-value. The date is specified in terms of milliseconds since
@@ -273,7 +356,7 @@ public interface HttpServletResponse extends ServletResponse {
      *
      * @since Servlet 4.0
      */
-    default void setTrailerFields(Supplier<Map<String, String>> supplier) {
+    default void setTrailerFields(Supplier<Map<String,String>> supplier) {
         // NO-OP
     }
 
@@ -285,7 +368,7 @@ public interface HttpServletResponse extends ServletResponse {
      *
      * @since Servlet 4.0
      */
-    default Supplier<Map<String, String>> getTrailerFields() {
+    default Supplier<Map<String,String>> getTrailerFields() {
         return null;
     }
 
@@ -391,6 +474,8 @@ public interface HttpServletResponse extends ServletResponse {
     /**
      * Status code (308) indicating that the requested resource resides permanently under a different URI. The new URI
      * <em>SHOULD</em> be given by the <code><em>Location</em></code> field in the response.
+     *
+     * @since Servlet 6.1
      */
     int SC_PERMANENT_REDIRECT = 308;
 
@@ -497,12 +582,16 @@ public interface HttpServletResponse extends ServletResponse {
     /**
      * Status code (421) indicating that the server is unwilling or unable to produce an authoritative response for the
      * target URI.
+     *
+     * @since Servlet 6.1
      */
     int SC_MISDIRECTED_REQUEST = 421;
 
     /**
      * Status code (422) indicating that the server understands the content type of the request but is unable to process
      * the contained instructions.
+     *
+     * @since Servlet 6.1
      */
     int SC_UNPROCESSABLE_CONTENT = 422;
 
@@ -510,6 +599,8 @@ public interface HttpServletResponse extends ServletResponse {
      * Status code (426) indicating that the server refuses to perform the request using the current protocol but may be
      * willing to do so after the client upgrades to a different protocol. The server must include an appropriate
      * {@code Upgrade} header in the response.
+     *
+     * @since Servlet 6.1
      */
     int SC_UPGRADE_REQUIRED = 426;
 

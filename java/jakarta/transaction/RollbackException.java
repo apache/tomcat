@@ -16,7 +16,7 @@
  */
 package jakarta.transaction;
 
-public class RollbackException extends java.lang.Exception {
+public class RollbackException extends Exception {
 
     private static final long serialVersionUID = 4151607774785285395L;
 

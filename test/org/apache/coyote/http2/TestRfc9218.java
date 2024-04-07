@@ -16,6 +16,8 @@
  */
 package org.apache.coyote.http2;
 
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,6 +43,10 @@ public class TestRfc9218 extends Http2TestBase {
             readSimpleGetResponse();
         }
 
+        String trace = output.getTrace();
+        System.out.println(trace);
+        output.clearTrace();
+
         // At this point the connection window should be 1k
 
         // Process a request on stream 17. This should consume the connection window.
@@ -48,6 +54,8 @@ public class TestRfc9218 extends Http2TestBase {
         // 17-headers, 17-1k-body
         parser.readFrame();
         parser.readFrame();
+        trace = output.getTrace();
+        System.out.println(trace);
         output.clearTrace();
 
         // Send additional requests. Connection window is empty so only headers will be returned.
@@ -57,6 +65,8 @@ public class TestRfc9218 extends Http2TestBase {
         // 19-headers, 21-headers
         parser.readFrame();
         parser.readFrame();
+        trace = output.getTrace();
+        System.out.println(trace);
         output.clearTrace();
 
         // At this point 17, 19 and 21 are all blocked because the connection window is zero.
@@ -100,7 +110,7 @@ public class TestRfc9218 extends Http2TestBase {
         parser.readFrame();
         parser.readFrame();
 
-        String trace = output.getTrace();
+        trace = output.getTrace();
         Assert.assertTrue(trace.contains("17-Body-877\n"));
         trace = trace.replace("17-Body-877\n", "");
         Assert.assertTrue(trace.contains("19-Body-1170\n"));
@@ -144,9 +154,16 @@ public class TestRfc9218 extends Http2TestBase {
          * with the remainder split equally between 17 and 21.
          */
         sendWindowUpdate(0, 1024 * 8);
-        parser.readFrame();
-        parser.readFrame();
-        parser.readFrame();
+        // Use try/catch as third read has been failing on some tests runs
+        try {
+            parser.readFrame();
+            parser.readFrame();
+            parser.readFrame();
+        } catch (IOException ioe) {
+            // Dump for debugging purposes
+            ioe.printStackTrace();
+            // Continue - we'll get trace dumped to stdout below
+        }
 
         trace = output.getTrace();
         System.out.println(trace);

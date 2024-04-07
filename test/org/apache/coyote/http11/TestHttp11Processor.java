@@ -74,7 +74,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add protected servlet
         Tomcat.addServlet(ctx, "ChunkedResponseWithErrorServlet", new ResponseWithErrorServlet(true));
@@ -105,7 +105,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         // There should not be an end chunk
         Assert.assertFalse(client.getResponseBody().endsWith("0"));
         // The last portion of text should be there
-        Assert.assertTrue(client.getResponseBody().endsWith("line03"));
+        Assert.assertTrue(client.getResponseBody().endsWith("line03" + SimpleHttpClient.CRLF));
     }
 
     private static class ResponseWithErrorServlet extends HttpServlet {
@@ -270,7 +270,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add protected servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
@@ -325,7 +325,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add protected servlet
         Wrapper w = Tomcat.addServlet(ctx, "servlet", new Bug64974Servlet());
@@ -364,7 +364,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "NoContentLengthFlushingServlet", new NoContentLengthFlushingServlet());
         ctx.addServletMappingDecoded("/test", "NoContentLengthFlushingServlet");
@@ -387,7 +387,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "NoContentLengthConnectionCloseFlushingServlet",
                 new NoContentLengthConnectionCloseFlushingServlet());
@@ -423,7 +423,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "LargeHeaderServlet", new LargeHeaderServlet(flush));
         ctx.addServletMappingDecoded("/test", "LargeHeaderServlet");
@@ -456,7 +456,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxThreads", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "async", new Bug55772Servlet());
         ctx.addServletMappingDecoded("/*", "async");
@@ -519,7 +519,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "echo", new EchoBodyServlet());
         ctx.addServletMappingDecoded("/echo", "echo");
@@ -688,7 +688,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
     private void doTestBug57621(boolean delayAsyncThread) throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        Context root = tomcat.addContext("", null);
+        Context root = getProgrammaticRootContext();
         Wrapper w = Tomcat.addServlet(root, "Bug57621", new Bug57621Servlet(delayAsyncThread));
         w.setAsyncSupported(true);
         root.addServletMappingDecoded("/test", "Bug57621");
@@ -794,7 +794,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "Bug59310", new Bug59310Servlet());
         ctx.addServletMappingDecoded("/test", "Bug59310");
@@ -845,7 +845,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         DispatchingServlet servlet = new DispatchingServlet();
         Wrapper w = Tomcat.addServlet(ctx, "Test", servlet);
@@ -934,7 +934,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Bug61086Servlet servlet = new Bug61086Servlet();
         Tomcat.addServlet(ctx, "Test", servlet);
@@ -974,7 +974,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
@@ -1007,7 +1007,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
@@ -1037,7 +1037,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
@@ -1066,7 +1066,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
@@ -1096,7 +1096,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
@@ -1126,7 +1126,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
@@ -1159,7 +1159,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
@@ -1192,7 +1192,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
@@ -1225,7 +1225,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
@@ -1259,7 +1259,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
@@ -1294,7 +1294,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
@@ -1330,7 +1330,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
@@ -1354,6 +1354,41 @@ public class TestHttp11Processor extends TomcatBaseTest {
     }
 
     /*
+     * Request line host is case insensitive match for Host header (no port, no user info)
+     */
+    @Test
+    public void testConsistentHostHeader04() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // This setting means the connection will be closed at the end of the
+        // request
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        // Add servlet
+        Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
+        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+
+        tomcat.start();
+
+        String request = "GET http://a/foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: A" +
+                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] { request });
+
+        client.connect();
+        client.processRequest();
+
+        // Expected response is a 200 response.
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("request.getServerName() is [A] and request.getServerPort() is 80",
+                client.getResponseBody());
+    }
+
+    /*
      * Host header exists but its value is an empty string. This is valid if the request line does not include a
      * hostname/port. Added for bug 62739.
      */
@@ -1366,7 +1401,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
@@ -1402,7 +1437,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
@@ -1494,7 +1529,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         tomcat.getConnector().setProperty("maxKeepAliveRequests", Integer.toString(maxKeepAliveRequests));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet(explicitClose));
@@ -1611,7 +1646,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         }
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new SwallowBodyTesterServlet());
@@ -1766,7 +1801,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet(false));
@@ -1821,7 +1856,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         connector.setProperty("continueResponseTiming", "onRead");
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add servlet
         Tomcat.addServlet(ctx, "TestPostNoReadServlet", new TestPostNoReadServlet());

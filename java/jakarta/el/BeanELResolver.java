@@ -38,7 +38,7 @@ public class BeanELResolver extends ELResolver {
 
     private final boolean readOnly;
 
-    private final ConcurrentCache<String, BeanProperties> cache = new ConcurrentCache<>(CACHE_SIZE);
+    private final ConcurrentCache<String,BeanProperties> cache = new ConcurrentCache<>(CACHE_SIZE);
 
     /**
      * Creates a writable instance of the standard JavaBean resolver.
@@ -121,9 +121,6 @@ public class BeanELResolver extends ELResolver {
         }
     }
 
-    /**
-     * @since EL 2.2
-     */
     @Override
     public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
         Objects.requireNonNull(context);
@@ -138,8 +135,8 @@ public class BeanELResolver extends ELResolver {
         // Find the matching method
         Method matchingMethod = Util.findMethod(context, base.getClass(), base, methodName, paramTypes, params);
 
-        Object[] parameters = Util.buildParameters(context, matchingMethod.getParameterTypes(),
-                matchingMethod.isVarArgs(), params);
+        Object[] parameters =
+                Util.buildParameters(context, matchingMethod.getParameterTypes(), matchingMethod.isVarArgs(), params);
 
         Object result = null;
         try {
@@ -177,7 +174,7 @@ public class BeanELResolver extends ELResolver {
     }
 
     abstract static class BeanProperties {
-        protected final Map<String, BeanProperty> properties;
+        protected final Map<String,BeanProperty> properties;
         protected final Class<?> type;
 
         BeanProperties(Class<?> type) throws ELException {
@@ -265,8 +262,8 @@ public class BeanELResolver extends ELResolver {
     private static final class ConcurrentCache<K, V> {
 
         private final int size;
-        private final Map<K, V> eden;
-        private final Map<K, V> longterm;
+        private final Map<K,V> eden;
+        private final Map<K,V> longterm;
 
         ConcurrentCache(int size) {
             this.size = size;

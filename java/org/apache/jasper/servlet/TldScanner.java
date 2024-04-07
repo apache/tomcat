@@ -243,12 +243,12 @@ public class TldScanner {
             }
         }
         if (found) {
-            if (log.isDebugEnabled()) {
-                log.debug(Localizer.getMessage("jsp.tldCache.tldInResourcePath", startPath));
+            if (log.isTraceEnabled()) {
+                log.trace(Localizer.getMessage("jsp.tldCache.tldInResourcePath", startPath));
             }
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug(Localizer.getMessage("jsp.tldCache.noTldInResourcePath", startPath));
+            if (log.isTraceEnabled()) {
+                log.trace(Localizer.getMessage("jsp.tldCache.noTldInResourcePath", startPath));
             }
         }
     }
@@ -318,13 +318,13 @@ public class TldScanner {
                 }
             }
             if (found) {
-                if (log.isDebugEnabled()) {
-                    log.debug(Localizer.getMessage("jsp.tldCache.tldInJar", jarFileUrl.toString()));
+                if (log.isTraceEnabled()) {
+                    log.trace(Localizer.getMessage("jsp.tldCache.tldInJar", jarFileUrl.toString()));
                 }
             } else {
                 foundJarWithoutTld = true;
-                if (log.isDebugEnabled()) {
-                    log.debug(Localizer.getMessage(
+                if (log.isTraceEnabled()) {
+                    log.trace(Localizer.getMessage(
                             "jsp.tldCache.noTldInJar", jarFileUrl.toString()));
                 }
             }
@@ -374,13 +374,13 @@ public class TldScanner {
                 }
             });
             if (foundFileWithoutTld) {
-                if (log.isDebugEnabled()) {
-                    log.debug(Localizer.getMessage("jsp.tldCache.tldInDir",
+                if (log.isTraceEnabled()) {
+                    log.trace(Localizer.getMessage("jsp.tldCache.tldInDir",
                             file.getAbsolutePath()));
                 }
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug(Localizer.getMessage("jsp.tldCache.noTldInDir",
+                if (log.isTraceEnabled()) {
+                    log.trace(Localizer.getMessage("jsp.tldCache.noTldInDir",
                             file.getAbsolutePath()));
                 }
             }

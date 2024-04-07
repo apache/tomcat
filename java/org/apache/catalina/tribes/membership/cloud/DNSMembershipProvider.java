@@ -60,6 +60,8 @@ import org.apache.juli.logging.LogFactory;
  *  }
  *  </pre>
  *
+ * minimal example for the Service my-tomcat-app-membership, note the <strong>selector</strong><br>
+ *
  * {@code dns-membership-service.yml }
  *
  * <pre>
@@ -73,11 +75,29 @@ import org.apache.juli.logging.LogFactory;
  *   name: my-tomcat-app-membership
  * spec:
  *   clusterIP: None
- *   ports:
- *   - name: membership
- *     port: 8888
  *   selector:
  *     app: my-tomcat-app
+ * }
+ * </pre>
+ *
+ * First Tomcat pod minimal example, note the <strong>labels</strong> that must correspond to the <strong>selector</strong> in the service.<br>
+ *
+ * {@code tomcat1.yml }
+ *
+ * <pre>
+ * {@code
+ * apiVersion: v1
+ * kind: Pod
+ * metadata:
+ *   name: tomcat1
+ *   labels:
+ *     app: my-tomcat-app
+ * spec:
+ *   containers:
+ *   - name: tomcat
+ *     image: tomcat
+ *     ports:
+ *     - containerPort: 8080
  * }
  * </pre>
  *
@@ -106,7 +126,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug(String.format("Namespace [%s] set; clustering enabled", dnsServiceName));
+            log.debug(sm.getString("cloudMembershipProvider.start", dnsServiceName));
         }
         dnsServiceName = URLEncoder.encode(dnsServiceName, "UTF-8");
 

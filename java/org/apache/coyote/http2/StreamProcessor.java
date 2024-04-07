@@ -22,6 +22,8 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import jakarta.servlet.ServletConnection;
 import jakarta.servlet.http.HttpServletResponse;
@@ -55,6 +57,7 @@ class StreamProcessor extends AbstractProcessor {
 
     private static final Set<String> H2_PSEUDO_HEADERS_REQUEST = new HashSet<>();
 
+    private final Lock processLock = new ReentrantLock();
     private final Http2UpgradeHandler handler;
     private final Stream stream;
     private SendfileData sendfileData = null;
@@ -77,8 +80,9 @@ class StreamProcessor extends AbstractProcessor {
 
     final void process(SocketEvent event) {
         try {
-            // FIXME: the regular processor syncs on socketWrapper, but here this deadlocks
-            synchronized (this) {
+            // Note: The regular processor uses the socketWrapper lock, but using that here triggers a deadlock
+            processLock.lock();
+            try {
                 // HTTP/2 equivalent of AbstractConnectionHandler#process() without the
                 // socket <-> processor mapping
                 SocketState state = SocketState.CLOSED;
@@ -94,9 +98,9 @@ class StreamProcessor extends AbstractProcessor {
                             // fully read. This typically occurs when Tomcat rejects an upload
                             // of some form (e.g. PUT or POST). Need to tell the client not to
                             // send any more data on this stream (reset).
-                            StreamException se = new StreamException(sm.getString("streamProcessor.cancel",
-                                    stream.getConnectionId(), stream.getIdAsString()), Http2Error.NO_ERROR,
-                                    stream.getIdAsInt());
+                            StreamException se =
+                                    new StreamException(sm.getString("streamProcessor.cancel", stream.getConnectionId(),
+                                            stream.getIdAsString()), Http2Error.NO_ERROR, stream.getIdAsInt());
                             stream.close(se);
                         } else if (!getErrorState().isConnectionIoAllowed()) {
                             ConnectionException ce = new ConnectionException(
@@ -134,6 +138,8 @@ class StreamProcessor extends AbstractProcessor {
                         recycle();
                     }
                 }
+            } finally {
+                processLock.unlock();
             }
         } finally {
             handler.executeQueuedStream();
@@ -153,15 +159,16 @@ class StreamProcessor extends AbstractProcessor {
 
 
     private void prepareSendfile() {
-        String fileName = (String) stream.getCoyoteRequest()
-                .getAttribute(org.apache.coyote.Constants.SENDFILE_FILENAME_ATTR);
+        String fileName =
+                (String) stream.getCoyoteRequest().getAttribute(org.apache.coyote.Constants.SENDFILE_FILENAME_ATTR);
         if (fileName != null) {
             sendfileData = new SendfileData();
             sendfileData.path = new File(fileName).toPath();
             sendfileData.pos = ((Long) stream.getCoyoteRequest()
                     .getAttribute(org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR)).longValue();
-            sendfileData.end = ((Long) stream.getCoyoteRequest()
-                    .getAttribute(org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR)).longValue();
+            sendfileData.end =
+                    ((Long) stream.getCoyoteRequest().getAttribute(org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR))
+                            .longValue();
             sendfileData.left = sendfileData.end - sendfileData.pos;
             sendfileData.stream = stream;
         }
@@ -226,7 +233,7 @@ class StreamProcessor extends AbstractProcessor {
 
         // Exclude some HTTP header fields where the value is determined only
         // while generating the content as per section 9.3.2 of RFC 9110.
-        if (coyoteRequest != null && "HEAD".equals(coyoteRequest.method().toString())) {
+        if (coyoteRequest != null && coyoteRequest.method().equals("HEAD")) {
             headers.removeHeader("content-length");
             headers.removeHeader("content-range");
         }
@@ -350,23 +357,6 @@ class StreamProcessor extends AbstractProcessor {
              * Streams may progress concurrently.
              */
             processSocketEvent(dispatchType.getSocketStatus(), true);
-        }
-    }
-
-
-    @Override
-    protected final boolean isPushSupported() {
-        return stream.isPushSupported();
-    }
-
-
-    @Override
-    protected final void doPush(Request pushTarget) {
-        try {
-            stream.push(pushTarget);
-        } catch (IOException ioe) {
-            setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
-            response.setErrorException(ioe);
         }
     }
 
@@ -511,17 +501,12 @@ class StreamProcessor extends AbstractProcessor {
         }
 
         // HTTP header names must be tokens.
+        // Stream#emitHeader() checks that all the pseudo headers appear first.
         MimeHeaders headers = request.getMimeHeaders();
-        boolean previousHeaderWasPseudoHeader = true;
         Enumeration<String> names = headers.names();
         while (names.hasMoreElements()) {
             String name = names.nextElement();
-            if (H2_PSEUDO_HEADERS_REQUEST.contains(name)) {
-                if (!previousHeaderWasPseudoHeader) {
-                    return false;
-                }
-            } else if (!HttpParser.isToken(name)) {
-                previousHeaderWasPseudoHeader = false;
+            if (!H2_PSEUDO_HEADERS_REQUEST.contains(name) && !HttpParser.isToken(name)) {
                 return false;
             }
         }
@@ -532,8 +517,8 @@ class StreamProcessor extends AbstractProcessor {
 
     @Override
     protected final boolean flushBufferedWrite() throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("streamProcessor.flushBufferedWrite.entry", stream.getConnectionId(),
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("streamProcessor.flushBufferedWrite.entry", stream.getConnectionId(),
                     stream.getIdAsString()));
         }
         if (stream.flush(false)) {

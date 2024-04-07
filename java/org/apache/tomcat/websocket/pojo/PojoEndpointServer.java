@@ -23,13 +23,12 @@ import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpointConfig;
 
 /**
- * Wrapper class for instances of POJOs annotated with
- * {@link jakarta.websocket.server.ServerEndpoint} so they appear as standard
- * {@link jakarta.websocket.Endpoint} instances.
+ * Wrapper class for instances of POJOs annotated with {@link jakarta.websocket.server.ServerEndpoint} so they appear as
+ * standard {@link jakarta.websocket.Endpoint} instances.
  */
 public class PojoEndpointServer extends PojoEndpointBase {
 
-    public PojoEndpointServer(Map<String,String> pathParameters, Object pojo) {
+    public PojoEndpointServer(Map<String, String> pathParameters, Object pojo) {
         super(pathParameters);
         setPojo(pojo);
     }
@@ -40,9 +39,8 @@ public class PojoEndpointServer extends PojoEndpointBase {
 
         ServerEndpointConfig sec = (ServerEndpointConfig) endpointConfig;
 
-        PojoMethodMapping methodMapping =
-                (PojoMethodMapping) sec.getUserProperties().get(
-                        Constants.POJO_METHOD_MAPPING_KEY);
+        PojoMethodMapping methodMapping = (PojoMethodMapping) sec.getUserProperties()
+                .get(Constants.POJO_METHOD_MAPPING_KEY);
         setMethodMapping(methodMapping);
 
         doOnOpen(session, endpointConfig);

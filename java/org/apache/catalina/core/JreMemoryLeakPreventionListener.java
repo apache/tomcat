@@ -17,6 +17,7 @@
 package org.apache.catalina.core;
 
 import java.net.URLConnection;
+import java.security.SecureRandom;
 import java.sql.DriverManager;
 import java.util.StringTokenizer;
 
@@ -106,6 +107,20 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
         this.classesToInitialize = classesToInitialize;
     }
 
+    /**
+     * Initialize JVM seed generator. On some platforms, the JVM will create a thread for this task, which can get
+     * associated with a web application depending on the timing.
+     */
+    private boolean initSeedGenerator = false;
+
+    public boolean getInitSeedGenerator() {
+        return this.initSeedGenerator;
+    }
+
+    public void setInitSeedGenerator(boolean initSeedGenerator) {
+        this.initSeedGenerator = initSeedGenerator;
+    }
+
 
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
@@ -168,6 +183,14 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 // Set the default URL caching policy to not to cache
                 if (urlCacheProtection) {
                     URLConnection.setDefaultUseCaches("JAR", false);
+                }
+
+                /*
+                 * Initialize the SeedGenerator of the JVM, as some platforms use a thread which could end up being
+                 * associated with a webapp rather than the container.
+                 */
+                if (initSeedGenerator) {
+                    SecureRandom.getSeed(1);
                 }
 
                 if (classesToInitialize != null) {

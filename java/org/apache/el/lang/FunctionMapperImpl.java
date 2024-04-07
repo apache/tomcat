@@ -43,8 +43,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
     /*
      * (non-Javadoc)
      *
-     * @see jakarta.el.FunctionMapper#resolveFunction(java.lang.String,
-     *      java.lang.String)
+     * @see jakarta.el.FunctionMapper#resolveFunction(String, String)
      */
     @Override
     public Method resolveFunction(String prefix, String localName) {
@@ -159,7 +158,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
                     Class<?>[] p = ReflectionUtil.toTypeArray(this.types);
                     this.m = t.getMethod(this.name, p);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // Ignore: this results in ELException after further resolution
                 }
             }
             return this.m;

@@ -84,27 +84,18 @@ public abstract class LifecycleBase implements Lifecycle {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addLifecycleListener(LifecycleListener listener) {
         lifecycleListeners.add(listener);
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public LifecycleListener[] findLifecycleListeners() {
         return lifecycleListeners.toArray(new LifecycleListener[0]);
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void removeLifecycleListener(LifecycleListener listener) {
         lifecycleListeners.remove(listener);
@@ -128,7 +119,7 @@ public abstract class LifecycleBase implements Lifecycle {
     @Override
     public final synchronized void init() throws LifecycleException {
         if (!state.equals(LifecycleState.NEW)) {
-            invalidTransition(Lifecycle.BEFORE_INIT_EVENT);
+            invalidTransition(BEFORE_INIT_EVENT);
         }
 
         try {
@@ -150,9 +141,6 @@ public abstract class LifecycleBase implements Lifecycle {
     protected abstract void initInternal() throws LifecycleException;
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final synchronized void start() throws LifecycleException {
 
@@ -175,7 +163,7 @@ public abstract class LifecycleBase implements Lifecycle {
             stop();
         } else if (!state.equals(LifecycleState.INITIALIZED) &&
                 !state.equals(LifecycleState.STOPPED)) {
-            invalidTransition(Lifecycle.BEFORE_START_EVENT);
+            invalidTransition(BEFORE_START_EVENT);
         }
 
         try {
@@ -188,7 +176,7 @@ public abstract class LifecycleBase implements Lifecycle {
             } else if (!state.equals(LifecycleState.STARTING)) {
                 // Shouldn't be necessary but acts as a check that sub-classes are
                 // doing what they are supposed to.
-                invalidTransition(Lifecycle.AFTER_START_EVENT);
+                invalidTransition(AFTER_START_EVENT);
             } else {
                 setStateInternal(LifecycleState.STARTED, null, false);
             }
@@ -216,9 +204,6 @@ public abstract class LifecycleBase implements Lifecycle {
     protected abstract void startInternal() throws LifecycleException;
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final synchronized void stop() throws LifecycleException {
 
@@ -241,7 +226,7 @@ public abstract class LifecycleBase implements Lifecycle {
         }
 
         if (!state.equals(LifecycleState.STARTED) && !state.equals(LifecycleState.FAILED)) {
-            invalidTransition(Lifecycle.BEFORE_STOP_EVENT);
+            invalidTransition(BEFORE_STOP_EVENT);
         }
 
         try {
@@ -259,7 +244,7 @@ public abstract class LifecycleBase implements Lifecycle {
             // Shouldn't be necessary but acts as a check that sub-classes are
             // doing what they are supposed to.
             if (!state.equals(LifecycleState.STOPPING) && !state.equals(LifecycleState.FAILED)) {
-                invalidTransition(Lifecycle.AFTER_STOP_EVENT);
+                invalidTransition(AFTER_STOP_EVENT);
             }
 
             setStateInternal(LifecycleState.STOPPED, null, false);
@@ -313,7 +298,7 @@ public abstract class LifecycleBase implements Lifecycle {
 
         if (!state.equals(LifecycleState.STOPPED) && !state.equals(LifecycleState.FAILED) &&
                 !state.equals(LifecycleState.NEW) && !state.equals(LifecycleState.INITIALIZED)) {
-            invalidTransition(Lifecycle.BEFORE_DESTROY_EVENT);
+            invalidTransition(BEFORE_DESTROY_EVENT);
         }
 
         try {
@@ -335,18 +320,12 @@ public abstract class LifecycleBase implements Lifecycle {
     protected abstract void destroyInternal() throws LifecycleException;
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public LifecycleState getState() {
         return state;
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getStateName() {
         return getState().toString();

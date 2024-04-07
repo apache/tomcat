@@ -85,8 +85,8 @@ public class StaticFieldELResolver extends ELResolver {
             if ("<init>".equals(methodName)) {
                 Constructor<?> match = Util.findConstructor(context, clazz, paramTypes, params);
 
-                Object[] parameters = Util.buildParameters(context, match.getParameterTypes(), match.isVarArgs(),
-                        params);
+                Object[] parameters =
+                        Util.buildParameters(context, match.getParameterTypes(), match.isVarArgs(), params);
 
                 Object result = null;
 
@@ -110,8 +110,8 @@ public class StaticFieldELResolver extends ELResolver {
                             Util.message(context, "staticFieldELResolver.methodNotFound", methodName, clazz.getName()));
                 }
 
-                Object[] parameters = Util.buildParameters(context, match.getParameterTypes(), match.isVarArgs(),
-                        params);
+                Object[] parameters =
+                        Util.buildParameters(context, match.getParameterTypes(), match.isVarArgs(), params);
 
                 Object result = null;
                 try {
@@ -172,7 +172,7 @@ public class StaticFieldELResolver extends ELResolver {
 
 
     /**
-     * Always returns <code>String.class</code>.
+     * @return This resolver always returns <code>String.class</code>
      */
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {

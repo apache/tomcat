@@ -18,6 +18,7 @@ package org.apache.tomcat.util.buf;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 
 import org.junit.Assert;
@@ -86,12 +87,6 @@ public abstract class TesterUriUtilBase {
 
 
     @Test
-    public void testWarToJar01() throws IOException {
-        doTestWarToJar("^");
-    }
-
-
-    @Test
     public void testWarToJar02() throws IOException {
         doTestWarToJar("*");
     }
@@ -104,7 +99,7 @@ public abstract class TesterUriUtilBase {
 
 
     private void doTestWarToJar(String separator) throws IOException {
-        URL warUrl = new URL("war:file:/external/path" + separator + "/internal/path");
+        URL warUrl = URI.create("war:file:/external/path" + separator + "/internal/path").toURL();
         URL jarUrl = UriUtil.warToJar(warUrl);
         Assert.assertEquals("jar:file:/external/path!/internal/path", jarUrl.toString());
     }

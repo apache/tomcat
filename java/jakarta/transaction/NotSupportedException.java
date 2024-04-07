@@ -16,7 +16,7 @@
  */
 package jakarta.transaction;
 
-public class NotSupportedException extends java.lang.Exception {
+public class NotSupportedException extends Exception {
 
     private static final long serialVersionUID = 56870312332816390L;
 

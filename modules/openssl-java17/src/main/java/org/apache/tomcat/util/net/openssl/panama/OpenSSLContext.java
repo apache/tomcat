@@ -650,7 +650,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()), state.contextScope) : null;
                 MemorySegment caCertificatePathNative = sslHostConfig.getCaCertificatePath() != null
                         ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()), state.contextScope) : null;
-                if ((sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null) 
+                if ((sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null)
                         && SSL_CTX_load_verify_locations(state.sslCtx,
                                 caCertificateFileNative == null ? MemoryAddress.NULL : caCertificateFileNative,
                                 caCertificatePathNative == null ? MemoryAddress.NULL : caCertificatePathNative) <= 0) {
@@ -775,7 +775,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
          * callback).
          */
         int keylen = 0;
-        if ((type == EVP_PKEY_RSA()) || (type == EVP_PKEY_DSA())) {
+        if (type == EVP_PKEY_RSA() || type == EVP_PKEY_DSA()) {
             keylen = (OPENSSL_3 ? EVP_PKEY_get_bits(pkey) : EVP_PKEY_bits(pkey));
         }
         for (int i = 0; i < OpenSSLLifecycleListener.dhParameters.length; i++) {

@@ -27,9 +27,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Generally, just passes calls straight to the wrapped
- * {@link AsynchronousSocketChannel}. In some cases exceptions may be swallowed
- * to save them being swallowed by the calling code.
+ * Generally, just passes calls straight to the wrapped {@link AsynchronousSocketChannel}. In some cases exceptions may
+ * be swallowed to save them being swallowed by the calling code.
  */
 public class AsyncChannelWrapperNonSecure implements AsyncChannelWrapper {
 
@@ -37,8 +36,7 @@ public class AsyncChannelWrapperNonSecure implements AsyncChannelWrapper {
 
     private final AsynchronousSocketChannel socketChannel;
 
-    public AsyncChannelWrapperNonSecure(
-            AsynchronousSocketChannel socketChannel) {
+    public AsyncChannelWrapperNonSecure(AsynchronousSocketChannel socketChannel) {
         this.socketChannel = socketChannel;
     }
 
@@ -48,8 +46,7 @@ public class AsyncChannelWrapperNonSecure implements AsyncChannelWrapper {
     }
 
     @Override
-    public <B,A extends B> void read(ByteBuffer dst, A attachment,
-            CompletionHandler<Integer,B> handler) {
+    public <B, A extends B> void read(ByteBuffer dst, A attachment, CompletionHandler<Integer, B> handler) {
         socketChannel.read(dst, attachment, handler);
     }
 
@@ -59,11 +56,9 @@ public class AsyncChannelWrapperNonSecure implements AsyncChannelWrapper {
     }
 
     @Override
-    public <B,A extends B> void write(ByteBuffer[] srcs, int offset, int length,
-            long timeout, TimeUnit unit, A attachment,
-            CompletionHandler<Long,B> handler) {
-        socketChannel.write(
-                srcs, offset, length, timeout, unit, attachment, handler);
+    public <B, A extends B> void write(ByteBuffer[] srcs, int offset, int length, long timeout, TimeUnit unit,
+            A attachment, CompletionHandler<Long, B> handler) {
+        socketChannel.write(srcs, offset, length, timeout, unit, attachment, handler);
     }
 
     @Override
@@ -110,9 +105,7 @@ public class AsyncChannelWrapperNonSecure implements AsyncChannelWrapper {
         }
 
         @Override
-        public Void get(long timeout, TimeUnit unit)
-                throws InterruptedException, ExecutionException,
-                TimeoutException {
+        public Void get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
             return null;
         }
     }

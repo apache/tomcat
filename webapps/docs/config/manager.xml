@@ -196,7 +196,8 @@
 
       <attribute name="sessionAttributeNameFilter" required="false">
         <p>A regular expression used to filter which session attributes will be
-        distributed. An attribute will only be distributed if its name matches
+        serialized for clustering/replication, or storage to any persistent store.
+        An attribute will only be serialized if its name matches
         this pattern. If the pattern is zero length or <code>null</code>, all
         attributes are eligible for distribution. The pattern is anchored so the
         session attribute name must fully match the pattern. As an example, the
@@ -208,7 +209,8 @@
 
       <attribute name="sessionAttributeValueClassNameFilter" required="false">
         <p>A regular expression used to filter which session attributes will be
-        distributed. An attribute will only be distributed if the implementation
+        serialized for clustering/replication, or storage to any persistent store.
+        An attribute will only be serialized if the implementation
         class name of the value matches this pattern. If the pattern is zero
         length or <code>null</code>, all attributes are eligible for
         distribution. The pattern is anchored so the fully qualified class name
@@ -331,7 +333,8 @@
 
       <attribute name="sessionAttributeNameFilter" required="false">
         <p>A regular expression used to filter which session attributes will be
-        distributed. An attribute will only be distributed if its name matches
+        serialized for clustering/replication, or storage to any persistent store.
+        An attribute will only be serialized if its name matches
         this pattern. If the pattern is zero length or <code>null</code>, all
         attributes are eligible for distribution. The pattern is anchored so the
         session attribute name must fully match the pattern. As an example, the
@@ -343,7 +346,8 @@
 
       <attribute name="sessionAttributeValueClassNameFilter" required="false">
         <p>A regular expression used to filter which session attributes will be
-        distributed. An attribute will only be distributed if the implementation
+        serialized for clustering/replication, or storage to any persistent store.
+        An attribute will only be serialized if the implementation
         class name of the value matches this pattern. If the pattern is zero
         length or <code>null</code>, all attributes are eligible for
         distribution. The pattern is anchored so the fully qualified class name

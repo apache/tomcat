@@ -26,12 +26,15 @@ import org.apache.coyote.Request;
 import org.apache.coyote.http11.InputFilter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Input filter responsible for reading and buffering the request body, so that
  * it does not interfere with client SSL handshake messages.
  */
 public class BufferedInputFilter implements InputFilter, ApplicationBufferHandler {
+
+    private static final StringManager sm = StringManager.getManager(BufferedInputFilter.class);
 
     private static final String ENCODING_NAME = "buffered";
     private static final ByteChunk ENCODING = new ByteChunk();
@@ -91,7 +94,7 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
                     swallowed += read;
                     if (maxSwallowSize > -1 && swallowed > maxSwallowSize) {
                         // No need for i18n - this isn't going to get logged
-                        throw new IOException("Ignored body exceeded maxSwallowSize");
+                        throw new IOException(sm.getString("bufferedInputFilter.maxSwallowSize"));
                     }
                 }
             } else {
@@ -102,8 +105,7 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
             }
         } catch(IOException | BufferOverflowException ioe) {
             // No need for i18n - this isn't going to get logged anywhere
-            throw new IllegalStateException(
-                    "Request body too large for buffer");
+            throw new IllegalStateException(sm.getString("bufferedInputFilter.bodySize", ioe.getMessage()));
         }
     }
 

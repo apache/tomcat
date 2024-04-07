@@ -32,9 +32,11 @@ public class TLSUtil {
      * @return {@code true} if the attribute is used to pass TLS configuration
      *         information, otherwise {@code false}
      */
+    @SuppressWarnings("deprecation")
     public static boolean isTLSRequestAttribute(String name) {
         switch (name) {
             case Globals.CERTIFICATES_ATTR:
+            case Globals.SECURE_PROTOCOL_ATTR:
             case Globals.CIPHER_SUITE_ATTR:
             case Globals.KEY_SIZE_ATTR:
             case Globals.SSL_SESSION_ID_ATTR:

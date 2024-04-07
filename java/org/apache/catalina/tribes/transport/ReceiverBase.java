@@ -180,12 +180,12 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         if (bind == null) {
             try {
                 if ("auto".equals(host)) {
-                    host = java.net.InetAddress.getLocalHost().getHostAddress();
+                    host = InetAddress.getLocalHost().getHostAddress();
                 }
                 if (log.isDebugEnabled()) {
-                    log.debug("Starting replication listener on address:"+ host);
+                    log.debug(sm.getString("receiverBase.start", host));
                 }
-                bind = java.net.InetAddress.getByName(host);
+                bind = InetAddress.getByName(host);
             } catch (IOException ioe) {
                 log.error(sm.getString("receiverBase.bind.failed", host), ioe);
             }
@@ -285,7 +285,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     /**
      * @param bind The bind to set.
      */
-    public void setBind(java.net.InetAddress bind) {
+    public void setBind(InetAddress bind) {
         this.bind = bind;
     }
 

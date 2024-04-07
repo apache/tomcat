@@ -172,7 +172,7 @@ public class ELProcessor {
      * @throws NullPointerException  If any of the arguments are null
      * @throws NoSuchMethodException If the method is not static
      */
-    public void defineFunction(String prefix, String function, Method method) throws java.lang.NoSuchMethodException {
+    public void defineFunction(String prefix, String function, Method method) throws NoSuchMethodException {
 
         if (prefix == null || function == null || method == null) {
             throw new NullPointerException(Util.message(context, "elProcessor.defineFunctionNullParams"));

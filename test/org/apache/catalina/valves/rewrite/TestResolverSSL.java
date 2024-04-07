@@ -49,10 +49,9 @@ public class TestResolverSSL extends TomcatBaseTest {
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
-        parameterSets.add(new Object[] {
-                "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
-        parameterSets.add(new Object[] {
-                "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+        parameterSets.add(new Object[] { "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation" });
+        parameterSets.add(
+                new Object[] { "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation" });
 
         return parameterSets;
     }
@@ -84,6 +83,7 @@ public class TestResolverSSL extends TomcatBaseTest {
         Assert.assertTrue(res.toString().indexOf("OK") > 0);
     }
 
+    //@formatter:off
     // List from https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#envvars
     private static final String[] keys = {
             "HTTPS",
@@ -141,12 +141,12 @@ public class TestResolverSSL extends TomcatBaseTest {
             "SSL_SRP_USER",
             "SSL_SRP_USERINFO",
             "SSL_TLS_SNI" };
+    //@formatter:on
 
     public static class ResolverTestValve extends ValveBase {
 
         @Override
-        public void invoke(Request request, Response response)
-                throws IOException, ServletException {
+        public void invoke(Request request, Response response) throws IOException, ServletException {
             PrintWriter writer = response.getWriter();
             Resolver resolver = new ResolverImpl(request);
             for (String key : keys) {

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.apache.catalina.Container;
+import org.apache.catalina.Globals;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 
@@ -53,9 +54,8 @@ public class StoreContextAppender extends StoreAppender {
      * </li><li> Don't save path at external context.xml </li><li> Don't
      * generate docBase for host.appBase webapps <LI></ul>
      *
-     * @see org.apache.catalina.storeconfig.StoreAppender#isPrintValue(java.lang.Object,
-     *      java.lang.Object, java.lang.String,
-     *      org.apache.catalina.storeconfig.StoreDescription)
+     * @see org.apache.catalina.storeconfig.StoreAppender#isPrintValue(Object,
+     *      Object, String, StoreDescription)
      */
     @Override
     public boolean isPrintValue(Object bean, Object bean2, String attrName,
@@ -65,7 +65,9 @@ public class StoreContextAppender extends StoreAppender {
             StandardContext context = ((StandardContext) bean);
             if ("workDir".equals(attrName)) {
                 String defaultWorkDir = getDefaultWorkDir(context);
-                isPrint = !defaultWorkDir.equals(context.getWorkDir());
+                if (defaultWorkDir != null) {
+                    isPrint = !defaultWorkDir.equals(context.getWorkDir());
+                }
             } else if ("path".equals(attrName)) {
                 isPrint = desc.isStoreSeparate()
                             && desc.isExternalAllowed()
@@ -87,7 +89,7 @@ public class StoreContextAppender extends StoreAppender {
         File appBase;
         File file = new File(host.getAppBase());
         if (!file.isAbsolute()) {
-            file = new File(System.getProperty("catalina.base"), host
+            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), host
                     .getAppBase());
         }
         try {

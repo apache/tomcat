@@ -33,7 +33,7 @@ import org.apache.jasper.runtime.JspRuntimeLibrary;
 
 public class TestJasperELResolver {
 
-    private static final int STANDARD_RESOLVERS_COUNT = 11;
+    private static final int STANDARD_RESOLVERS_COUNT = 12;
 
     @Test
     public void testConstructorNone() throws Exception {

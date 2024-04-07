@@ -76,14 +76,14 @@ class HpackEncoder {
     private int newMaxHeaderSize = -1; // if the max header size has been changed
     private int minNewMaxHeaderSize = -1; // records the smallest value of newMaxHeaderSize, as per section 4.1
 
-    private static final Map<String, TableEntry[]> ENCODING_STATIC_TABLE;
+    private static final Map<String,TableEntry[]> ENCODING_STATIC_TABLE;
 
     private final Deque<TableEntry> evictionQueue = new ArrayDeque<>();
-    private final Map<String, List<TableEntry>> dynamicTable = new HashMap<>(); // TODO: use a custom data structure to
-                                                                                // reduce allocations
+    private final Map<String,List<TableEntry>> dynamicTable = new HashMap<>(); // TODO: use a custom data structure to
+                                                                               // reduce allocations
 
     static {
-        Map<String, TableEntry[]> map = new HashMap<>();
+        Map<String,TableEntry[]> map = new HashMap<>();
         for (int i = 1; i < Hpack.STATIC_TABLE.length; ++i) {
             Hpack.HeaderField m = Hpack.STATIC_TABLE[i];
             TableEntry[] existing = map.get(m.name);
@@ -151,8 +151,8 @@ class HpackEncoder {
             if (!skip) {
                 String val = headers.getValue(it).toString();
 
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("hpackEncoder.encodeHeader", headerName, val));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("hpackEncoder.encodeHeader", headerName, val));
                 }
                 TableEntry tableEntry = findInTable(headerName, val);
 

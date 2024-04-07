@@ -65,58 +65,89 @@ import org.apache.tomcat.util.http.CookieProcessor;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * An implementation of {@link Context} that is used as a place-holder for
- * deployed applications when their deployment fails and a Context instance
- * (usually {@link org.apache.catalina.core.StandardContext} but may be any
- * Context implementation) cannot be created.
+ * An implementation of {@link Context} that is used as a place-holder for deployed applications when their deployment
+ * fails and a Context instance (usually {@link org.apache.catalina.core.StandardContext} but may be any Context
+ * implementation) cannot be created.
  */
 public class FailedContext extends LifecycleMBeanBase implements Context {
 
-    protected static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
     // --------------------- Methods that need to work even for a failed context
 
     private URL configFile;
+
     @Override
-    public URL getConfigFile() { return configFile; }
+    public URL getConfigFile() {
+        return configFile;
+    }
+
     @Override
-    public void setConfigFile(URL configFile) { this.configFile = configFile; }
+    public void setConfigFile(URL configFile) {
+        this.configFile = configFile;
+    }
 
 
     private String docBase;
-    @Override
-    public String getDocBase() { return docBase; }
-    @Override
-    public void setDocBase(String docBase) { this.docBase = docBase; }
 
+    @Override
+    public String getDocBase() {
+        return docBase;
+    }
+
+    @Override
+    public void setDocBase(String docBase) {
+        this.docBase = docBase;
+    }
 
 
     private String name = null;
+
     @Override
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
+
     @Override
-    public void setName(String name) { this.name = name; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
 
     private Container parent;
+
     @Override
-    public Container getParent() { return parent; }
+    public Container getParent() {
+        return parent;
+    }
+
     @Override
-    public void setParent(Container parent) { this.parent = parent; }
+    public void setParent(Container parent) {
+        this.parent = parent;
+    }
 
 
     private String path = null;
+
     @Override
-    public String getPath() { return path; }
+    public String getPath() {
+        return path;
+    }
+
     @Override
-    public void setPath(String path) { this.path = path; }
+    public void setPath(String path) {
+        this.path = path;
+    }
 
 
     private String webappVersion = null;
+
     @Override
-    public String getWebappVersion() { return webappVersion; }
+    public String getWebappVersion() {
+        return webappVersion;
+    }
+
     @Override
     public void setWebappVersion(String webappVersion) {
         this.webappVersion = webappVersion;
@@ -172,8 +203,7 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     @Override
     protected String getObjectNameKeyProperties() {
 
-        StringBuilder keyProperties =
-            new StringBuilder("j2eeType=WebModule,name=//");
+        StringBuilder keyProperties = new StringBuilder("j2eeType=WebModule,name=//");
 
         String hostname = getParent().getName();
         if (hostname == null) {
@@ -196,8 +226,7 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
 
     @Override
     protected void startInternal() throws LifecycleException {
-        throw new LifecycleException(
-                sm.getString("failedContext.start", getName()));
+        throw new LifecycleException(sm.getString("failedContext.start", getName()));
     }
 
 
@@ -210,21 +239,40 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
 
     // Only need to read these
     @Override
-    public void addWatchedResource(String name) { /* NO-OP */ }
+    public void addWatchedResource(String name) {
+        // NO-OP
+    }
+
     @Override
-    public String[] findWatchedResources() { return new String[0]; }
+    public String[] findWatchedResources() {
+        return new String[0];
+    }
+
     @Override
-    public void removeWatchedResource(String name) { /* NO-OP */ }
+    public void removeWatchedResource(String name) {
+        // NO-OP
+    }
 
 
     @Override
-    public void addChild(Container child) { /* NO-OP */ }
+    public void addChild(Container child) {
+        // NO-OP
+    }
+
     @Override
-    public Container findChild(String name) { return null; }
+    public Container findChild(String name) {
+        return null;
+    }
+
     @Override
-    public Container[] findChildren() { return new Container[0]; }
+    public Container[] findChildren() {
+        return new Container[0];
+    }
+
     @Override
-    public void removeChild(Container child) { /* NO-OP */ }
+    public void removeChild(Container child) {
+        // NO-OP
+    }
 
     @Override
     public String toString() {
@@ -233,507 +281,985 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
 
     // -------------------------------------------- All NO-OPs beyond this point
     @Override
-    public Loader getLoader() { return null; }
-    @Override
-    public void setLoader(Loader loader) { /* NO-OP */ }
+    public Loader getLoader() {
+        return null;
+    }
 
     @Override
-    public Log getLogger() { return null; }
+    public void setLoader(Loader loader) {
+        // NO-OP
+    }
 
     @Override
-    public String getLogName() { return null; }
+    public Log getLogger() {
+        return null;
+    }
 
     @Override
-    public Manager getManager() { return null; }
-    @Override
-    public void setManager(Manager manager) { /* NO-OP */ }
+    public String getLogName() {
+        return null;
+    }
 
     @Override
-    public Pipeline getPipeline() { return null; }
+    public Manager getManager() {
+        return null;
+    }
 
     @Override
-    public Cluster getCluster() { return null; }
-    @Override
-    public void setCluster(Cluster cluster) { /* NO-OP */ }
+    public void setManager(Manager manager) {
+        // NO-OP
+    }
 
     @Override
-    public int getBackgroundProcessorDelay() { return -1; }
-    @Override
-    public void setBackgroundProcessorDelay(int delay) { /* NO-OP */ }
+    public Pipeline getPipeline() {
+        return null;
+    }
 
     @Override
-    public ClassLoader getParentClassLoader() { return null; }
-    @Override
-    public void setParentClassLoader(ClassLoader parent) { /* NO-OP */ }
+    public Cluster getCluster() {
+        return null;
+    }
 
     @Override
-    public Realm getRealm() { return null; }
-    @Override
-    public void setRealm(Realm realm) { /* NO-OP */ }
+    public void setCluster(Cluster cluster) {
+        // NO-OP
+    }
 
     @Override
-    public WebResourceRoot getResources() { return null; }
-    @Override
-    public void setResources(WebResourceRoot resources) { /* NO-OP */ }
+    public int getBackgroundProcessorDelay() {
+        return -1;
+    }
 
     @Override
-    public void backgroundProcess() { /* NO-OP */ }
+    public void setBackgroundProcessorDelay(int delay) {
+        // NO-OP
+    }
 
     @Override
-    public void addContainerListener(ContainerListener listener) { /* NO-OP */ }
-    @Override
-    public ContainerListener[] findContainerListeners() { return null; }
-    @Override
-    public void removeContainerListener(ContainerListener listener) { /* NO-OP */ }
+    public ClassLoader getParentClassLoader() {
+        return null;
+    }
 
     @Override
-    public void addPropertyChangeListener(PropertyChangeListener listener) { /* NO-OP */ }
-    @Override
-    public void removePropertyChangeListener(PropertyChangeListener listener) { /* NO-OP */ }
+    public void setParentClassLoader(ClassLoader parent) {
+        // NO-OP
+    }
 
     @Override
-    public void fireContainerEvent(String type, Object data) { /* NO-OP */ }
+    public Realm getRealm() {
+        return null;
+    }
 
     @Override
-    public void logAccess(Request request, Response response, long time,
-            boolean useDefault) { /* NO-OP */ }
+    public void setRealm(Realm realm) {
+        // NO-OP
+    }
 
     @Override
-    public AccessLog getAccessLog() { return null; }
+    public WebResourceRoot getResources() {
+        return null;
+    }
 
     @Override
-    public int getStartStopThreads() { return 0; }
-    @Override
-    public void setStartStopThreads(int startStopThreads) { /* NO-OP */ }
+    public void setResources(WebResourceRoot resources) {
+        // NO-OP
+    }
 
     @Override
-    public boolean getAllowCasualMultipartParsing() { return false; }
-    @Override
-    public void setAllowCasualMultipartParsing(
-            boolean allowCasualMultipartParsing) { /* NO-OP */ }
+    public void backgroundProcess() {
+        // NO-OP
+    }
 
     @Override
-    public Object[] getApplicationEventListeners() { return null; }
-    @Override
-    public void setApplicationEventListeners(Object[] listeners) { /* NO-OP */ }
+    public void addContainerListener(ContainerListener listener) {
+        // NO-OP
+    }
 
     @Override
-    public Object[] getApplicationLifecycleListeners() { return null; }
-    @Override
-    public void setApplicationLifecycleListeners(Object[] listeners) { /* NO-OP */ }
+    public ContainerListener[] findContainerListeners() {
+        return null;
+    }
 
     @Override
-    public String getCharset(Locale locale) { return null; }
+    public void removeContainerListener(ContainerListener listener) {
+        // NO-OP
+    }
 
     @Override
-    public boolean getConfigured() { return false; }
-    @Override
-    public void setConfigured(boolean configured) { /* NO-OP */ }
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        // NO-OP
+    }
 
     @Override
-    public boolean getCookies() { return false; }
-    @Override
-    public void setCookies(boolean cookies) { /* NO-OP */ }
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        // NO-OP
+    }
 
     @Override
-    public String getSessionCookieName() { return null; }
-    @Override
-    public void setSessionCookieName(String sessionCookieName) { /* NO-OP */ }
+    public void fireContainerEvent(String type, Object data) {
+        // NO-OP
+    }
 
     @Override
-    public boolean getUseHttpOnly() { return false; }
-    @Override
-    public void setUseHttpOnly(boolean useHttpOnly) { /* NO-OP */ }
+    public void logAccess(Request request, Response response, long time, boolean useDefault) {
+        // NO-OP
+    }
 
     @Override
-    public String getSessionCookieDomain() { return null; }
-    @Override
-    public void setSessionCookieDomain(String sessionCookieDomain) { /* NO-OP */ }
+    public AccessLog getAccessLog() {
+        return null;
+    }
 
     @Override
-    public String getSessionCookiePath() { return null; }
-    @Override
-    public void setSessionCookiePath(String sessionCookiePath) { /* NO-OP */ }
+    public int getStartStopThreads() {
+        return 0;
+    }
 
     @Override
-    public boolean getSessionCookiePathUsesTrailingSlash() { return false; }
-    @Override
-    public void setSessionCookiePathUsesTrailingSlash(
-            boolean sessionCookiePathUsesTrailingSlash) { /* NO-OP */ }
+    public void setStartStopThreads(int startStopThreads) {
+        // NO-OP
+    }
 
     @Override
-    public boolean getCrossContext() { return false; }
-    @Override
-    public void setCrossContext(boolean crossContext) { /* NO-OP */ }
+    public boolean getAllowCasualMultipartParsing() {
+        return false;
+    }
 
     @Override
-    public String getAltDDName() { return null; }
-    @Override
-    public void setAltDDName(String altDDName) { /* NO-OP */ }
+    public void setAllowCasualMultipartParsing(boolean allowCasualMultipartParsing) {
+        // NO-OP
+    }
 
     @Override
-    public boolean getDenyUncoveredHttpMethods() { return false; }
+    public Object[] getApplicationEventListeners() {
+        return null;
+    }
+
+    @Override
+    public void setApplicationEventListeners(Object[] listeners) {
+        // NO-OP
+    }
+
+    @Override
+    public Object[] getApplicationLifecycleListeners() {
+        return null;
+    }
+
+    @Override
+    public void setApplicationLifecycleListeners(Object[] listeners) {
+        // NO-OP
+    }
+
+    @Override
+    public String getCharset(Locale locale) {
+        return null;
+    }
+
+    @Override
+    public boolean getConfigured() {
+        return false;
+    }
+
+    @Override
+    public void setConfigured(boolean configured) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getCookies() {
+        return false;
+    }
+
+    @Override
+    public void setCookies(boolean cookies) {
+        // NO-OP
+    }
+
+    @Override
+    public String getSessionCookieName() {
+        return null;
+    }
+
+    @Override
+    public void setSessionCookieName(String sessionCookieName) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getUseHttpOnly() {
+        return false;
+    }
+
+    @Override
+    public void setUseHttpOnly(boolean useHttpOnly) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getUsePartitioned() {
+        return false;
+    }
+
+    @Override
+    public void setUsePartitioned(boolean usePartitioned) {
+        // NO-OP
+    }
+
+    @Override
+    public String getSessionCookieDomain() {
+        return null;
+    }
+
+    @Override
+    public void setSessionCookieDomain(String sessionCookieDomain) {
+        // NO-OP
+    }
+
+    @Override
+    public String getSessionCookiePath() {
+        return null;
+    }
+
+    @Override
+    public void setSessionCookiePath(String sessionCookiePath) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getSessionCookiePathUsesTrailingSlash() {
+        return false;
+    }
+
+    @Override
+    public void setSessionCookiePathUsesTrailingSlash(boolean sessionCookiePathUsesTrailingSlash) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getCrossContext() {
+        return false;
+    }
+
+    @Override
+    public void setCrossContext(boolean crossContext) {
+        // NO-OP
+    }
+
+    @Override
+    public String getAltDDName() {
+        return null;
+    }
+
+    @Override
+    public void setAltDDName(String altDDName) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getDenyUncoveredHttpMethods() {
+        return false;
+    }
+
     @Override
     public void setDenyUncoveredHttpMethods(boolean denyUncoveredHttpMethods) {
         // NO-OP
     }
 
     @Override
-    public String getDisplayName() { return null; }
-    @Override
-    public void setDisplayName(String displayName) { /* NO-OP */ }
+    public String getDisplayName() {
+        return null;
+    }
 
     @Override
-    public boolean getDistributable() { return false; }
-    @Override
-    public void setDistributable(boolean distributable) { /* NO-OP */ }
+    public void setDisplayName(String displayName) {
+        // NO-OP
+    }
 
     @Override
-    public String getEncodedPath() { return null; }
+    public boolean getDistributable() {
+        return false;
+    }
 
     @Override
-    public boolean getIgnoreAnnotations() { return false; }
-    @Override
-    public void setIgnoreAnnotations(boolean ignoreAnnotations) { /* NO-OP */ }
+    public void setDistributable(boolean distributable) {
+        // NO-OP
+    }
 
     @Override
-    public boolean getMetadataComplete() { return false; }
-    @Override
-    public void setMetadataComplete(boolean metadataComplete) { /* NO-OP */ }
+    public String getEncodedPath() {
+        return null;
+    }
 
     @Override
-    public LoginConfig getLoginConfig() { return null; }
-    @Override
-    public void setLoginConfig(LoginConfig config) { /* NO-OP */ }
+    public boolean getIgnoreAnnotations() {
+        return false;
+    }
 
     @Override
-    public NamingResourcesImpl getNamingResources() { return null; }
-    @Override
-    public void setNamingResources(NamingResourcesImpl namingResources) { /* NO-OP */ }
+    public void setIgnoreAnnotations(boolean ignoreAnnotations) {
+        // NO-OP
+    }
 
     @Override
-    public String getPublicId() { return null; }
-    @Override
-    public void setPublicId(String publicId) { /* NO-OP */ }
+    public boolean getMetadataComplete() {
+        return false;
+    }
 
     @Override
-    public boolean getReloadable() { return false; }
-    @Override
-    public void setReloadable(boolean reloadable) { /* NO-OP */ }
+    public void setMetadataComplete(boolean metadataComplete) {
+        // NO-OP
+    }
 
     @Override
-    public boolean getOverride() { return false; }
-    @Override
-    public void setOverride(boolean override) { /* NO-OP */ }
+    public LoginConfig getLoginConfig() {
+        return null;
+    }
 
     @Override
-    public boolean getPrivileged() { return false; }
-    @Override
-    public void setPrivileged(boolean privileged) { /* NO-OP */ }
+    public void setLoginConfig(LoginConfig config) {
+        // NO-OP
+    }
 
     @Override
-    public ServletContext getServletContext() { return null; }
+    public NamingResourcesImpl getNamingResources() {
+        return null;
+    }
 
     @Override
-    public int getSessionTimeout() { return 0; }
-    @Override
-    public void setSessionTimeout(int timeout) { /* NO-OP */ }
+    public void setNamingResources(NamingResourcesImpl namingResources) {
+        // NO-OP
+    }
 
     @Override
-    public boolean getSwallowAbortedUploads() { return false; }
-    @Override
-    public void setSwallowAbortedUploads(boolean swallowAbortedUploads) { /* NO-OP */ }
+    public String getPublicId() {
+        return null;
+    }
 
     @Override
-    public boolean getSwallowOutput() { return false; }
-    @Override
-    public void setSwallowOutput(boolean swallowOutput) { /* NO-OP */ }
+    public void setPublicId(String publicId) {
+        // NO-OP
+    }
 
     @Override
-    public String getWrapperClass() { return null; }
-    @Override
-    public void setWrapperClass(String wrapperClass) { /* NO-OP */ }
+    public boolean getReloadable() {
+        return false;
+    }
 
     @Override
-    public boolean getXmlNamespaceAware() { return false; }
-    @Override
-    public void setXmlNamespaceAware(boolean xmlNamespaceAware) { /* NO-OP */ }
+    public void setReloadable(boolean reloadable) {
+        // NO-OP
+    }
 
     @Override
-    public boolean getXmlValidation() { return false; }
-    @Override
-    public void setXmlValidation(boolean xmlValidation) { /* NO-OP */ }
+    public boolean getOverride() {
+        return false;
+    }
 
     @Override
-    public boolean getXmlBlockExternal() { return true; }
-    @Override
-    public void setXmlBlockExternal(boolean xmlBlockExternal) { /* NO-OP */ }
+    public void setOverride(boolean override) {
+        // NO-OP
+    }
 
     @Override
-    public boolean getTldValidation() { return false; }
-    @Override
-    public void setTldValidation(boolean tldValidation){ /* NO-OP */ }
+    public boolean getPrivileged() {
+        return false;
+    }
 
     @Override
-    public JarScanner getJarScanner() { return null; }
-    @Override
-    public void setJarScanner(JarScanner jarScanner) { /* NO-OP */ }
+    public void setPrivileged(boolean privileged) {
+        // NO-OP
+    }
 
     @Override
-    public Authenticator getAuthenticator() { return null; }
+    public ServletContext getServletContext() {
+        return null;
+    }
 
     @Override
-    public void setLogEffectiveWebXml(boolean logEffectiveWebXml) { /* NO-OP */ }
-    @Override
-    public boolean getLogEffectiveWebXml() { return false; }
+    public int getSessionTimeout() {
+        return 0;
+    }
 
     @Override
-    public void addApplicationListener(String listener) { /* NO-OP */ }
-    @Override
-    public String[] findApplicationListeners() { return null; }
-    @Override
-    public void removeApplicationListener(String listener) { /* NO-OP */ }
+    public void setSessionTimeout(int timeout) {
+        // NO-OP
+    }
 
     @Override
-    public void addApplicationParameter(ApplicationParameter parameter) { /* NO-OP */ }
-    @Override
-    public ApplicationParameter[] findApplicationParameters() { return null; }
-    @Override
-    public void removeApplicationParameter(String name) { /* NO-OP */ }
+    public boolean getSwallowAbortedUploads() {
+        return false;
+    }
 
     @Override
-    public void addConstraint(SecurityConstraint constraint) { /* NO-OP */ }
-    @Override
-    public SecurityConstraint[] findConstraints() { return null; }
-    @Override
-    public void removeConstraint(SecurityConstraint constraint) { /* NO-OP */ }
+    public void setSwallowAbortedUploads(boolean swallowAbortedUploads) {
+        // NO-OP
+    }
 
     @Override
-    public void addErrorPage(ErrorPage errorPage) { /* NO-OP */ }
-    @Override
-    public ErrorPage findErrorPage(int errorCode) { return null; }
-    @Override
-    public ErrorPage findErrorPage(Throwable throwable) { return null; }
-    @Override
-    public ErrorPage[] findErrorPages() { return null; }
-    @Override
-    public void removeErrorPage(ErrorPage errorPage) { /* NO-OP */ }
+    public boolean getSwallowOutput() {
+        return false;
+    }
 
     @Override
-    public void addFilterDef(FilterDef filterDef) { /* NO-OP */ }
-    @Override
-    public FilterDef findFilterDef(String filterName) { return null; }
-    @Override
-    public FilterDef[] findFilterDefs() { return null; }
-    @Override
-    public void removeFilterDef(FilterDef filterDef) { /* NO-OP */ }
+    public void setSwallowOutput(boolean swallowOutput) {
+        // NO-OP
+    }
 
     @Override
-    public void addFilterMap(FilterMap filterMap) { /* NO-OP */ }
-    @Override
-    public void addFilterMapBefore(FilterMap filterMap) { /* NO-OP */ }
-    @Override
-    public FilterMap[] findFilterMaps() { return null; }
-    @Override
-    public void removeFilterMap(FilterMap filterMap) { /* NO-OP */ }
+    public String getWrapperClass() {
+        return null;
+    }
 
     @Override
-    public void addLocaleEncodingMappingParameter(String locale, String encoding) { /* NO-OP */ }
+    public void setWrapperClass(String wrapperClass) {
+        // NO-OP
+    }
 
     @Override
-    public void addMimeMapping(String extension, String mimeType) { /* NO-OP */ }
-    @Override
-    public String findMimeMapping(String extension) { return null; }
-    @Override
-    public String[] findMimeMappings() { return null; }
-    @Override
-    public void removeMimeMapping(String extension) { /* NO-OP */ }
+    public boolean getXmlNamespaceAware() {
+        return false;
+    }
 
     @Override
-    public void addParameter(String name, String value) { /* NO-OP */ }
-    @Override
-    public String findParameter(String name) { return null; }
-    @Override
-    public String[] findParameters() { return null; }
-    @Override
-    public void removeParameter(String name) { /* NO-OP */ }
+    public void setXmlNamespaceAware(boolean xmlNamespaceAware) {
+        // NO-OP
+    }
 
     @Override
-    public void addRoleMapping(String role, String link) { /* NO-OP */ }
-    @Override
-    public String findRoleMapping(String role) { return null; }
-    @Override
-    public void removeRoleMapping(String role) { /* NO-OP */ }
+    public boolean getXmlValidation() {
+        return false;
+    }
 
     @Override
-    public void addSecurityRole(String role) { /* NO-OP */ }
-    @Override
-    public boolean findSecurityRole(String role) { return false; }
-    @Override
-    public String[] findSecurityRoles() { return null; }
-    @Override
-    public void removeSecurityRole(String role) { /* NO-OP */ }
+    public void setXmlValidation(boolean xmlValidation) {
+        // NO-OP
+    }
 
     @Override
-    public void addServletMappingDecoded(String pattern, String name,
-            boolean jspWildcard) { /* NO-OP */ }
-    @Override
-    public String findServletMapping(String pattern) { return null; }
-    @Override
-    public String[] findServletMappings() { return null; }
-    @Override
-    public void removeServletMapping(String pattern) { /* NO-OP */ }
+    public boolean getXmlBlockExternal() {
+        return true;
+    }
 
     @Override
-    public void addWelcomeFile(String name) { /* NO-OP */ }
-    @Override
-    public boolean findWelcomeFile(String name) { return false; }
-    @Override
-    public String[] findWelcomeFiles() { return null; }
-    @Override
-    public void removeWelcomeFile(String name) { /* NO-OP */ }
+    public void setXmlBlockExternal(boolean xmlBlockExternal) {
+        // NO-OP
+    }
 
     @Override
-    public void addWrapperLifecycle(String listener) { /* NO-OP */ }
-    @Override
-    public String[] findWrapperLifecycles() { return null; }
-    @Override
-    public void removeWrapperLifecycle(String listener) { /* NO-OP */ }
+    public boolean getTldValidation() {
+        return false;
+    }
 
     @Override
-    public void addWrapperListener(String listener) { /* NO-OP */ }
-    @Override
-    public String[] findWrapperListeners() { return null; }
-    @Override
-    public void removeWrapperListener(String listener) { /* NO-OP */ }
+    public void setTldValidation(boolean tldValidation) {
+        // NO-OP
+    }
 
     @Override
-    public InstanceManager createInstanceManager() { return null; }
+    public JarScanner getJarScanner() {
+        return null;
+    }
 
     @Override
-    public Wrapper createWrapper() { return null; }
+    public void setJarScanner(JarScanner jarScanner) {
+        // NO-OP
+    }
 
     @Override
-    public boolean fireRequestInitEvent(ServletRequest request) { return false; }
-    @Override
-    public boolean fireRequestDestroyEvent(ServletRequest request) { return false; }
+    public Authenticator getAuthenticator() {
+        return null;
+    }
 
     @Override
-    public void reload() { /* NO-OP */ }
+    public void setLogEffectiveWebXml(boolean logEffectiveWebXml) {
+        // NO-OP
+    }
 
     @Override
-    public String getRealPath(String path) { return null; }
+    public boolean getLogEffectiveWebXml() {
+        return false;
+    }
 
     @Override
-    public int getEffectiveMajorVersion() { return 0; }
-    @Override
-    public void setEffectiveMajorVersion(int major) { /* NO-OP */ }
+    public void addApplicationListener(String listener) {
+        // NO-OP
+    }
 
     @Override
-    public int getEffectiveMinorVersion() { return 0; }
-    @Override
-    public void setEffectiveMinorVersion(int minor) { /* NO-OP */ }
+    public String[] findApplicationListeners() {
+        return null;
+    }
 
     @Override
-    public JspConfigDescriptor getJspConfigDescriptor() { return null; }
+    public void removeApplicationListener(String listener) {
+        // NO-OP
+    }
 
     @Override
-    public void setJspConfigDescriptor(JspConfigDescriptor descriptor) { /* NO-OP */ }
+    public void addApplicationParameter(ApplicationParameter parameter) {
+        // NO-OP
+    }
 
     @Override
-    public void addServletContainerInitializer(ServletContainerInitializer sci,
-            Set<Class<?>> classes) { /* NO-OP */ }
+    public ApplicationParameter[] findApplicationParameters() {
+        return null;
+    }
 
     @Override
-    public boolean getPaused() { return false; }
+    public void removeApplicationParameter(String name) {
+        // NO-OP
+    }
 
     @Override
-    public boolean isServlet22() { return false; }
+    public void addConstraint(SecurityConstraint constraint) {
+        // NO-OP
+    }
 
     @Override
-    public Set<String> addServletSecurity(
-            ServletRegistration.Dynamic registration,
-            ServletSecurityElement servletSecurityElement) { return null; }
+    public SecurityConstraint[] findConstraints() {
+        return null;
+    }
 
     @Override
-    public void setResourceOnlyServlets(String resourceOnlyServlets) { /* NO-OP */ }
-    @Override
-    public String getResourceOnlyServlets() { return null; }
-    @Override
-    public boolean isResourceOnlyServlet(String servletName) { return false; }
+    public void removeConstraint(SecurityConstraint constraint) {
+        // NO-OP
+    }
 
     @Override
-    public String getBaseName() { return null; }
+    public void addErrorPage(ErrorPage errorPage) {
+        // NO-OP
+    }
 
     @Override
-    public void setFireRequestListenersOnForwards(boolean enable) { /* NO-OP */ }
-    @Override
-    public boolean getFireRequestListenersOnForwards() { return false; }
+    public ErrorPage findErrorPage(int errorCode) {
+        return null;
+    }
 
     @Override
-    public void setPreemptiveAuthentication(boolean enable) { /* NO-OP */ }
-    @Override
-    public boolean getPreemptiveAuthentication() { return false; }
+    public ErrorPage findErrorPage(Throwable throwable) {
+        return null;
+    }
 
     @Override
-    public void setSendRedirectBody(boolean enable) { /* NO-OP */ }
+    public ErrorPage[] findErrorPages() {
+        return null;
+    }
+
     @Override
-    public boolean getSendRedirectBody() { return false; }
+    public void removeErrorPage(ErrorPage errorPage) {
+        // NO-OP
+    }
+
+    @Override
+    public void addFilterDef(FilterDef filterDef) {
+        // NO-OP
+    }
+
+    @Override
+    public FilterDef findFilterDef(String filterName) {
+        return null;
+    }
+
+    @Override
+    public FilterDef[] findFilterDefs() {
+        return null;
+    }
+
+    @Override
+    public void removeFilterDef(FilterDef filterDef) {
+        // NO-OP
+    }
+
+    @Override
+    public void addFilterMap(FilterMap filterMap) {
+        // NO-OP
+    }
+
+    @Override
+    public void addFilterMapBefore(FilterMap filterMap) {
+        // NO-OP
+    }
+
+    @Override
+    public FilterMap[] findFilterMaps() {
+        return null;
+    }
+
+    @Override
+    public void removeFilterMap(FilterMap filterMap) {
+        // NO-OP
+    }
+
+    @Override
+    public void addLocaleEncodingMappingParameter(String locale, String encoding) {
+        // NO-OP
+    }
+
+    @Override
+    public void addMimeMapping(String extension, String mimeType) {
+        // NO-OP
+    }
+
+    @Override
+    public String findMimeMapping(String extension) {
+        return null;
+    }
+
+    @Override
+    public String[] findMimeMappings() {
+        return null;
+    }
+
+    @Override
+    public void removeMimeMapping(String extension) {
+        // NO-OP
+    }
+
+    @Override
+    public void addParameter(String name, String value) {
+        // NO-OP
+    }
+
+    @Override
+    public String findParameter(String name) {
+        return null;
+    }
+
+    @Override
+    public String[] findParameters() {
+        return null;
+    }
+
+    @Override
+    public void removeParameter(String name) {
+        // NO-OP
+    }
+
+    @Override
+    public void addRoleMapping(String role, String link) {
+        // NO-OP
+    }
+
+    @Override
+    public String findRoleMapping(String role) {
+        return null;
+    }
+
+    @Override
+    public void removeRoleMapping(String role) {
+        // NO-OP
+    }
+
+    @Override
+    public void addSecurityRole(String role) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean findSecurityRole(String role) {
+        return false;
+    }
+
+    @Override
+    public String[] findSecurityRoles() {
+        return null;
+    }
+
+    @Override
+    public void removeSecurityRole(String role) {
+        // NO-OP
+    }
+
+    @Override
+    public void addServletMappingDecoded(String pattern, String name, boolean jspWildcard) {
+        // NO-OP
+    }
+
+    @Override
+    public String findServletMapping(String pattern) {
+        return null;
+    }
+
+    @Override
+    public String[] findServletMappings() {
+        return null;
+    }
+
+    @Override
+    public void removeServletMapping(String pattern) {
+        // NO-OP
+    }
+
+    @Override
+    public void addWelcomeFile(String name) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean findWelcomeFile(String name) {
+        return false;
+    }
+
+    @Override
+    public String[] findWelcomeFiles() {
+        return null;
+    }
+
+    @Override
+    public void removeWelcomeFile(String name) {
+        // NO-OP
+    }
+
+    @Override
+    public void addWrapperLifecycle(String listener) {
+        // NO-OP
+    }
+
+    @Override
+    public String[] findWrapperLifecycles() {
+        return null;
+    }
+
+    @Override
+    public void removeWrapperLifecycle(String listener) {
+        // NO-OP
+    }
+
+    @Override
+    public void addWrapperListener(String listener) {
+        // NO-OP
+    }
+
+    @Override
+    public String[] findWrapperListeners() {
+        return null;
+    }
+
+    @Override
+    public void removeWrapperListener(String listener) {
+        // NO-OP
+    }
+
+    @Override
+    public InstanceManager createInstanceManager() {
+        return null;
+    }
+
+    @Override
+    public Wrapper createWrapper() {
+        return null;
+    }
+
+    @Override
+    public boolean fireRequestInitEvent(ServletRequest request) {
+        return false;
+    }
+
+    @Override
+    public boolean fireRequestDestroyEvent(ServletRequest request) {
+        return false;
+    }
+
+    @Override
+    public void reload() {
+        // NO-OP
+    }
+
+    @Override
+    public String getRealPath(String path) {
+        return null;
+    }
+
+    @Override
+    public int getEffectiveMajorVersion() {
+        return 0;
+    }
+
+    @Override
+    public void setEffectiveMajorVersion(int major) {
+        // NO-OP
+    }
+
+    @Override
+    public int getEffectiveMinorVersion() {
+        return 0;
+    }
+
+    @Override
+    public void setEffectiveMinorVersion(int minor) {
+        // NO-OP
+    }
+
+    @Override
+    public JspConfigDescriptor getJspConfigDescriptor() {
+        return null;
+    }
+
+    @Override
+    public void setJspConfigDescriptor(JspConfigDescriptor descriptor) {
+        // NO-OP
+    }
+
+    @Override
+    public void addServletContainerInitializer(ServletContainerInitializer sci, Set<Class<?>> classes) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getPaused() {
+        return false;
+    }
+
+    @Override
+    public boolean isServlet22() {
+        return false;
+    }
+
+    @Override
+    public Set<String> addServletSecurity(ServletRegistration.Dynamic registration,
+            ServletSecurityElement servletSecurityElement) {
+        return null;
+    }
+
+    @Override
+    public void setResourceOnlyServlets(String resourceOnlyServlets) {
+        // NO-OP
+    }
+
+    @Override
+    public String getResourceOnlyServlets() {
+        return null;
+    }
+
+    @Override
+    public boolean isResourceOnlyServlet(String servletName) {
+        return false;
+    }
+
+    @Override
+    public String getBaseName() {
+        return null;
+    }
+
+    @Override
+    public void setFireRequestListenersOnForwards(boolean enable) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getFireRequestListenersOnForwards() {
+        return false;
+    }
+
+    @Override
+    public void setPreemptiveAuthentication(boolean enable) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getPreemptiveAuthentication() {
+        return false;
+    }
+
+    @Override
+    public void setSendRedirectBody(boolean enable) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getSendRedirectBody() {
+        return false;
+    }
 
     @SuppressWarnings("unused")
-    public synchronized void addValve(Valve valve) { /* NO-OP */ }
+    public synchronized void addValve(Valve valve) {
+        // NO-OP
+    }
 
     @Override
-    public File getCatalinaBase() { return null; }
+    public File getCatalinaBase() {
+        return null;
+    }
 
     @Override
-    public File getCatalinaHome() { return null; }
+    public File getCatalinaHome() {
+        return null;
+    }
 
     @Override
     public void setAddWebinfClassesResources(boolean addWebinfClassesResources) {
         // NO-OP
     }
-    @Override
-    public boolean getAddWebinfClassesResources() { return false; }
 
     @Override
-    public void addPostConstructMethod(String clazz, String method) { /* NO-OP */ }
+    public boolean getAddWebinfClassesResources() {
+        return false;
+    }
 
     @Override
-    public void addPreDestroyMethod(String clazz, String method) { /* NO-OP */ }
+    public void addPostConstructMethod(String clazz, String method) {
+        // NO-OP
+    }
 
     @Override
-    public void removePostConstructMethod(String clazz) { /* NO-OP */ }
+    public void addPreDestroyMethod(String clazz, String method) {
+        // NO-OP
+    }
 
     @Override
-    public void removePreDestroyMethod(String clazz) { /* NO-OP */ }
+    public void removePostConstructMethod(String clazz) {
+        // NO-OP
+    }
 
     @Override
-    public String findPostConstructMethod(String clazz) { return null; }
+    public void removePreDestroyMethod(String clazz) {
+        // NO-OP
+    }
 
     @Override
-    public String findPreDestroyMethod(String clazz) { return null; }
+    public String findPostConstructMethod(String clazz) {
+        return null;
+    }
 
     @Override
-    public Map<String, String> findPostConstructMethods() { return null; }
+    public String findPreDestroyMethod(String clazz) {
+        return null;
+    }
 
     @Override
-    public Map<String, String> findPreDestroyMethods() { return null; }
+    public Map<String,String> findPostConstructMethods() {
+        return null;
+    }
 
     @Override
-    public InstanceManager getInstanceManager() { return null; }
+    public Map<String,String> findPreDestroyMethods() {
+        return null;
+    }
 
     @Override
-    public void setInstanceManager(InstanceManager instanceManager) { /* NO-OP */ }
+    public InstanceManager getInstanceManager() {
+        return null;
+    }
 
     @Override
-    public void setContainerSciFilter(String containerSciFilter) { /* NO-OP */ }
+    public void setInstanceManager(InstanceManager instanceManager) {
+        // NO-OP
+    }
 
     @Override
-    public String getContainerSciFilter() { return null; }
+    public void setContainerSciFilter(String containerSciFilter) {
+        // NO-OP
+    }
 
     @Override
-    public ThreadBindingListener getThreadBindingListener() { return null; }
+    public String getContainerSciFilter() {
+        return null;
+    }
+
+    @Override
+    public ThreadBindingListener getThreadBindingListener() {
+        return null;
+    }
 
     @Override
     public void setThreadBindingListener(ThreadBindingListener threadBindingListener) {
@@ -761,13 +1287,19 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     }
 
     @Override
-    public Object getNamingToken() { return null; }
+    public Object getNamingToken() {
+        return null;
+    }
 
     @Override
-    public void setCookieProcessor(CookieProcessor cookieProcessor) { /* NO-OP */ }
+    public void setCookieProcessor(CookieProcessor cookieProcessor) {
+        // NO-OP
+    }
 
     @Override
-    public CookieProcessor getCookieProcessor() { return null; }
+    public CookieProcessor getCookieProcessor() {
+        return null;
+    }
 
     @Override
     public void setValidateClientProvidedNewSessionId(boolean validateClientProvidedNewSessionId) {
@@ -775,7 +1307,9 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     }
 
     @Override
-    public boolean getValidateClientProvidedNewSessionId() { return false; }
+    public boolean getValidateClientProvidedNewSessionId() {
+        return false;
+    }
 
     @Override
     public void setMapperContextRootRedirectEnabled(boolean mapperContextRootRedirectEnabled) {
@@ -783,7 +1317,9 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     }
 
     @Override
-    public boolean getMapperContextRootRedirectEnabled() { return false; }
+    public boolean getMapperContextRootRedirectEnabled() {
+        return false;
+    }
 
     @Override
     public void setMapperDirectoryRedirectEnabled(boolean mapperDirectoryRedirectEnabled) {
@@ -791,63 +1327,122 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     }
 
     @Override
-    public boolean getMapperDirectoryRedirectEnabled() { return false; }
+    public boolean getMapperDirectoryRedirectEnabled() {
+        return false;
+    }
 
     @Override
-    public void setUseRelativeRedirects(boolean useRelativeRedirects) { /* NO-OP */ }
-    @Override
-    public boolean getUseRelativeRedirects() { return true; }
-
-    @Override
-    public void setDispatchersUseEncodedPaths(boolean dispatchersUseEncodedPaths) { /* NO-OP */ }
-    @Override
-    public boolean getDispatchersUseEncodedPaths() { return true; }
-
-    @Override
-    public void setRequestCharacterEncoding(String encoding) { /* NO-OP */ }
-    @Override
-    public String getRequestCharacterEncoding() { return null; }
-
-    @Override
-    public void setResponseCharacterEncoding(String encoding) { /* NO-OP */ }
-    @Override
-    public String getResponseCharacterEncoding() { return null; }
-
-    @Override
-    public void setAllowMultipleLeadingForwardSlashInPath(
-            boolean allowMultipleLeadingForwardSlashInPath) {
+    public void setUseRelativeRedirects(boolean useRelativeRedirects) {
         // NO-OP
     }
-    @Override
-    public boolean getAllowMultipleLeadingForwardSlashInPath() { return false; }
 
     @Override
-    public void incrementInProgressAsyncCount() { /* NO-OP */ }
-    @Override
-    public void decrementInProgressAsyncCount() { /* NO-OP */ }
+    public boolean getUseRelativeRedirects() {
+        return true;
+    }
 
     @Override
-    public void setCreateUploadTargets(boolean createUploadTargets) { /* NO-OP */}
-    @Override
-    public boolean getCreateUploadTargets() { return false; }
+    public void setDispatchersUseEncodedPaths(boolean dispatchersUseEncodedPaths) {
+        // NO-OP
+    }
 
     @Override
-    public boolean getAlwaysAccessSession() { return false; }
-    @Override
-    public void setAlwaysAccessSession(boolean alwaysAccessSession) {}
+    public boolean getDispatchersUseEncodedPaths() {
+        return true;
+    }
 
     @Override
-    public boolean getContextGetResourceRequiresSlash() { return false; }
-    @Override
-    public void setContextGetResourceRequiresSlash(boolean contextGetResourceRequiresSlash) {}
+    public void setRequestCharacterEncoding(String encoding) {
+        // NO-OP
+    }
 
     @Override
-    public boolean getDispatcherWrapsSameObject() { return false; }
-    @Override
-    public void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject) {}
+    public String getRequestCharacterEncoding() {
+        return null;
+    }
 
     @Override
-    public boolean getParallelAnnotationScanning() { return false; }
+    public void setResponseCharacterEncoding(String encoding) {
+        // NO-OP
+    }
+
     @Override
-    public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {}
+    public String getResponseCharacterEncoding() {
+        return null;
+    }
+
+    @Override
+    public void setAllowMultipleLeadingForwardSlashInPath(boolean allowMultipleLeadingForwardSlashInPath) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getAllowMultipleLeadingForwardSlashInPath() {
+        return false;
+    }
+
+    @Override
+    public void incrementInProgressAsyncCount() {
+        // NO-OP
+    }
+
+    @Override
+    public void decrementInProgressAsyncCount() {
+        // NO-OP
+    }
+
+    @Override
+    public void setCreateUploadTargets(boolean createUploadTargets) {
+        /* NO-OP */}
+
+    @Override
+    public boolean getCreateUploadTargets() {
+        return false;
+    }
+
+    @Override
+    public boolean getAlwaysAccessSession() {
+        return false;
+    }
+
+    @Override
+    public void setAlwaysAccessSession(boolean alwaysAccessSession) {
+    }
+
+    @Override
+    public boolean getContextGetResourceRequiresSlash() {
+        return false;
+    }
+
+    @Override
+    public void setContextGetResourceRequiresSlash(boolean contextGetResourceRequiresSlash) {
+    }
+
+    @Override
+    public boolean getDispatcherWrapsSameObject() {
+        return false;
+    }
+
+    @Override
+    public void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject) {
+    }
+
+    @Override
+    public boolean getParallelAnnotationScanning() {
+        return false;
+    }
+
+    @Override
+    public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {
+    }
+
+    @Override
+    public boolean getSuspendWrappedResponseAfterForward() {
+        return false;
+    }
+
+    @Override
+    public void setSuspendWrappedResponseAfterForward(boolean suspendWrappedResponseAfterForward) {
+    }
+
 }

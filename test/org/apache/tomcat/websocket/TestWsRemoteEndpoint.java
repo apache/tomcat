@@ -92,32 +92,27 @@ public class TestWsRemoteEndpoint extends WebSocketBaseTest {
     private void doTestWriter(Class<?> clazz, boolean useWriter, String testMessage) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
-        WebSocketContainer wsContainer =
-                ContainerProvider.getWebSocketContainer();
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
         tomcat.start();
 
         Session wsSession;
-        URI uri = new URI("ws://localhost:" + getPort() +
-                TesterEchoServer.Config.PATH_ASYNC);
+        URI uri = new URI("ws://localhost:" + getPort() + TesterEchoServer.Config.PATH_ASYNC);
         if (Endpoint.class.isAssignableFrom(clazz)) {
             @SuppressWarnings("unchecked")
-            Class<? extends Endpoint> endpointClazz =
-                    (Class<? extends Endpoint>) clazz;
-            wsSession = wsContainer.connectToServer(endpointClazz,
-                    Builder.create().build(), uri);
+            Class<? extends Endpoint> endpointClazz = (Class<? extends Endpoint>) clazz;
+            wsSession = wsContainer.connectToServer(endpointClazz, Builder.create().build(), uri);
         } else {
             wsSession = wsContainer.connectToServer(clazz, uri);
         }
 
         CountDownLatch latch = new CountDownLatch(1);
-        TesterEndpoint tep =
-                (TesterEndpoint) wsSession.getUserProperties().get("endpoint");
+        TesterEndpoint tep = (TesterEndpoint) wsSession.getUserProperties().get("endpoint");
         tep.setLatch(latch);
         AsyncHandler<?> handler;
         if (useWriter) {
@@ -175,8 +170,7 @@ public class TestWsRemoteEndpoint extends WebSocketBaseTest {
                 Assert.assertEquals(0, result.length());
             } else {
                 // First may be a fragment
-                Assert.assertEquals(SEQUENCE.substring(offset, S_LEN),
-                        result.substring(0, S_LEN - offset));
+                Assert.assertEquals(SEQUENCE.substring(offset, S_LEN), result.substring(0, S_LEN - offset));
                 i = S_LEN - offset;
                 while (i + S_LEN < result.length()) {
                     if (!SEQUENCE.equals(result.substring(i, i + S_LEN))) {
@@ -205,7 +199,7 @@ public class TestWsRemoteEndpoint extends WebSocketBaseTest {
     private void doTestWriterError(Class<?> clazz) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");

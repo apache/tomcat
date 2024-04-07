@@ -67,7 +67,7 @@ public class TestClose extends WebSocketBaseTest {
         // Parameter of an @OnError call
         public volatile Throwable onErrorThrowable = null;
 
-        //This is set to true for tests where the @OnMessage should send a message
+        // This is set to true for tests where the @OnMessage should send a message
         public volatile boolean onMessageSends = false;
     }
 

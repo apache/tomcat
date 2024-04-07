@@ -51,22 +51,6 @@ public final class Globals {
 
 
     /**
-     * The request attribute that is set to {@code Boolean.TRUE} if some request
-     * parameters have been ignored during request parameters parsing. It can
-     * happen, for example, if there is a limit on the total count of parseable
-     * parameters, or if parameter cannot be decoded, or any other error
-     * happened during parameter parsing.
-     */
-    public static final String PARAMETER_PARSE_FAILED_ATTR = "org.apache.catalina.parameter_parse_failed";
-
-
-    /**
-     * The reason that the parameter parsing failed.
-     */
-    public static final String PARAMETER_PARSE_FAILED_REASON_ATTR = "org.apache.catalina.parameter_parse_failed_reason";
-
-
-    /**
      * The request attribute set by the RemoteIpFilter, RemoteIpValve (and may
      * be set by other similar components) that identifies for the connector the
      * remote IP address claimed to be associated with this request when a
@@ -105,7 +89,7 @@ public final class Globals {
     /**
      * The request attribute that can be used by a servlet to pass
      * to the connector the name of the file that is to be served
-     * by sendfile. The value should be {@code java.lang.String}
+     * by sendfile. The value should be {@code String}
      * that is {@code File.getCanonicalPath()} of the file to be served.
      *
      * Duplicated here for neater code in the catalina packages.
@@ -117,7 +101,7 @@ public final class Globals {
      * The request attribute that can be used by a servlet to pass
      * to the connector the start offset of the part of a file
      * that is to be served by sendfile. The value should be
-     * {@code java.lang.Long}. To serve complete file
+     * {@code Long}. To serve complete file
      * the value should be {@code Long.valueOf(0)}.
      *
      * Duplicated here for neater code in the catalina packages.
@@ -146,23 +130,29 @@ public final class Globals {
 
 
     /**
+     * The request attribute under which we store the name of the security protocol (e.g. TLSv1.3) being used on a
+     * secured connection (as an object of type {@link String}).
+     */
+    public static final String SECURE_PROTOCOL_ATTR = "jakarta.servlet.request.secure_protocol";
+
+
+    /**
      * The request attribute under which we store the name of the cipher suite
-     * being used on an SSL connection (as an object of type
-     * java.lang.String).
+     * being used on an SSL connection (as an object of type {@link String}).
      */
     public static final String CIPHER_SUITE_ATTR = "jakarta.servlet.request.cipher_suite";
 
 
     /**
      * The request attribute under which we store the key size being used for
-     * this SSL connection (as an object of type java.lang.Integer).
+     * this SSL connection (as an object of type {@link Integer}).
      */
     public static final String KEY_SIZE_ATTR = "jakarta.servlet.request.key_size";
 
 
     /**
      * The request attribute under which we store the session id being used
-     * for this SSL connection (as an object of type java.lang.String).
+     * for this SSL connection (as an object of type {@link String}).
      */
     public static final String SSL_SESSION_ID_ATTR = "jakarta.servlet.request.ssl_session_id";
 

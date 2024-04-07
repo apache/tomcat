@@ -36,8 +36,7 @@ public class CloseReason {
 
     @Override
     public String toString() {
-        return "CloseReason: code [" + closeCode.getCode() +
-                "], reason [" + reasonPhrase + "]";
+        return "CloseReason: code [" + closeCode.getCode() + "], reason [" + reasonPhrase + "]";
     }
 
     public interface CloseCode {
@@ -79,38 +78,37 @@ public class CloseReason {
             }
             switch (code) {
                 case 1000:
-                    return CloseCodes.NORMAL_CLOSURE;
+                    return NORMAL_CLOSURE;
                 case 1001:
-                    return CloseCodes.GOING_AWAY;
+                    return GOING_AWAY;
                 case 1002:
-                    return CloseCodes.PROTOCOL_ERROR;
+                    return PROTOCOL_ERROR;
                 case 1003:
-                    return CloseCodes.CANNOT_ACCEPT;
+                    return CANNOT_ACCEPT;
                 case 1004:
-                    return CloseCodes.RESERVED;
+                    return RESERVED;
                 case 1005:
-                    return CloseCodes.NO_STATUS_CODE;
+                    return NO_STATUS_CODE;
                 case 1006:
-                    return CloseCodes.CLOSED_ABNORMALLY;
+                    return CLOSED_ABNORMALLY;
                 case 1007:
-                    return CloseCodes.NOT_CONSISTENT;
+                    return NOT_CONSISTENT;
                 case 1008:
-                    return CloseCodes.VIOLATED_POLICY;
+                    return VIOLATED_POLICY;
                 case 1009:
-                    return CloseCodes.TOO_BIG;
+                    return TOO_BIG;
                 case 1010:
-                    return CloseCodes.NO_EXTENSION;
+                    return NO_EXTENSION;
                 case 1011:
-                    return CloseCodes.UNEXPECTED_CONDITION;
+                    return UNEXPECTED_CONDITION;
                 case 1012:
-                    return CloseCodes.SERVICE_RESTART;
+                    return SERVICE_RESTART;
                 case 1013:
-                    return CloseCodes.TRY_AGAIN_LATER;
+                    return TRY_AGAIN_LATER;
                 case 1015:
-                    return CloseCodes.TLS_HANDSHAKE_FAILURE;
+                    return TLS_HANDSHAKE_FAILURE;
                 default:
-                    throw new IllegalArgumentException(
-                            "Invalid close code: [" + code + "]");
+                    throw new IllegalArgumentException("Invalid close code: [" + code + "]");
             }
         }
 

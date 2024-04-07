@@ -18,10 +18,6 @@ package org.apache.coyote.http2;
 
 public class Constants {
 
-    // Range 0 to 7 inclusive
-    public static final int URGENCY_RANGE = 8;
-
-
     // Parsing
     static final int DEFAULT_HEADER_READ_BUFFER_SIZE = 1024;
 

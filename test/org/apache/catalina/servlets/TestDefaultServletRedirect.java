@@ -31,7 +31,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -62,7 +61,6 @@ public class TestDefaultServletRedirect extends TomcatBaseTest {
     @Parameter(0)
     public int redirectStatus;
 
-    @Ignore // See PR #524
     @Test
     public void testRedirect() throws Exception {
         Tomcat tomcat = getTomcatInstance();
@@ -74,7 +72,7 @@ public class TestDefaultServletRedirect extends TomcatBaseTest {
         Wrapper defaultServlet = Tomcat.addServlet(ctx, "default", new DefaultServlet());
         defaultServlet.addMapping("/");
 
-        defaultServlet.addInitParameter("redirectStatusCode", Integer.toString(redirectStatus));
+        defaultServlet.addInitParameter("directoryRedirectStatusCode", Integer.toString(redirectStatus));
 
         tomcat.start();
 
@@ -99,7 +97,7 @@ public class TestDefaultServletRedirect extends TomcatBaseTest {
         Wrapper defaultServlet = Tomcat.addServlet(ctx, "default", new DefaultServlet());
         defaultServlet.addMapping("/");
 
-        defaultServlet.addInitParameter("redirectStatusCode", Integer.toString(redirectStatus));
+        defaultServlet.addInitParameter("directoryRedirectStatusCode", Integer.toString(redirectStatus));
 
         Wrapper includeServlet = Tomcat.addServlet(ctx, "include", new IncludeServlet());
         includeServlet.addMapping("/include");

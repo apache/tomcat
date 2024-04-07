@@ -24,8 +24,7 @@ import jakarta.servlet.jsp.JspContext;
 import jakarta.servlet.jsp.PageContext;
 
 /**
- * An ELResolver for working with JSP scoped attributes which may have page,
- * request, session or application scope.
+ * An ELResolver for working with JSP scoped attributes which may have page, request, session or application scope.
  *
  * @since JSP 2.1
  */

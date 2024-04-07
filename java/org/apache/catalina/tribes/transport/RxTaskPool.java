@@ -77,7 +77,7 @@ public class RxTaskPool {
                 } else {
                     try {
                         mutex.wait();
-                    } catch (java.lang.InterruptedException x) {
+                    } catch (InterruptedException x) {
                         Thread.currentThread().interrupt();
                     }
                 }
@@ -90,7 +90,9 @@ public class RxTaskPool {
     }
 
     public int available() {
-        return idle.size();
+        synchronized (mutex) {
+            return idle.size();
+        }
     }
 
     /**

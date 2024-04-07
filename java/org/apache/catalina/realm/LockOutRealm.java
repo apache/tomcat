@@ -69,18 +69,11 @@ public class LockOutRealm extends CombinedRealm {
      * Users whose last authentication attempt failed. Entries will be ordered in access order from least recent to most
      * recent.
      */
-    protected Map<String, LockRecord> failedUsers = null;
+    protected Map<String,LockRecord> failedUsers = null;
 
 
-    /**
-     * Prepare for the beginning of active use of the public methods of this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         /*
          * Configure the list of failed users to delete the oldest entry once it exceeds the specified size. This is an
          * LRU cache so if the cache size is exceeded the users who most recently failed authentication will be
@@ -90,7 +83,7 @@ public class LockOutRealm extends CombinedRealm {
             private static final long serialVersionUID = 1L;
 
             @Override
-            protected boolean removeEldestEntry(Map.Entry<String, LockRecord> eldest) {
+            protected boolean removeEldestEntry(Map.Entry<String,LockRecord> eldest) {
                 if (size() > cacheSize) {
                     // Check to see if this element has been removed too quickly
                     long timeInCache = (System.currentTimeMillis() - eldest.getValue().getLastFailureTime()) / 1000;
@@ -109,33 +102,16 @@ public class LockOutRealm extends CombinedRealm {
     }
 
 
-    /**
-     * Return the Principal associated with the specified username, which matches the digest calculated using the given
-     * parameters using the method described in RFC 2069; otherwise return <code>null</code>.
-     *
-     * @param username     Username of the Principal to look up
-     * @param clientDigest Digest which has been submitted by the client
-     * @param nonce        Unique (or supposedly unique) token which has been used for this request
-     * @param realmName    Realm name
-     * @param md5a2        Second MD5 digest used to calculate the digest : MD5(Method + ":" + uri)
-     */
     @Override
     public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
-            String qop, String realmName, String md5a2) {
+            String qop, String realmName, String digestA2, String algorithm) {
 
-        Principal authenticatedUser = super.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realmName,
-                md5a2);
+        Principal authenticatedUser =
+                super.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realmName, digestA2, algorithm);
         return filterLockedAccounts(username, authenticatedUser);
     }
 
 
-    /**
-     * Return the Principal associated with the specified username and credentials, if there is one; otherwise return
-     * <code>null</code>.
-     *
-     * @param username    Username of the Principal to look up
-     * @param credentials Password or other credentials to use in authenticating this username
-     */
     @Override
     public Principal authenticate(String username, String credentials) {
         Principal authenticatedUser = super.authenticate(username, credentials);
@@ -143,13 +119,6 @@ public class LockOutRealm extends CombinedRealm {
     }
 
 
-    /**
-     * Return the Principal associated with the specified chain of X509 client certificates. If there is none, return
-     * <code>null</code>.
-     *
-     * @param certs Array of client certificates, with the first one in the array being the certificate of the client
-     *                  itself.
-     */
     @Override
     public Principal authenticate(X509Certificate[] certs) {
         String username = null;
@@ -162,9 +131,6 @@ public class LockOutRealm extends CombinedRealm {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Principal authenticate(GSSContext gssContext, boolean storeCreds) {
         if (gssContext.isEstablished()) {
@@ -188,9 +154,7 @@ public class LockOutRealm extends CombinedRealm {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public Principal authenticate(GSSName gssName, GSSCredential gssCredential) {
         String username = gssName.toString();
@@ -234,6 +198,7 @@ public class LockOutRealm extends CombinedRealm {
         // Auth success clears the lock record so...
         registerAuthSuccess(username);
     }
+
 
     /*
      * Checks to see if the current user is locked. If this is associated with a login attempt, then the last access

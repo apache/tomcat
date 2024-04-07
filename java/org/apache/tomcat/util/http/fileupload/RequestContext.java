@@ -24,7 +24,7 @@ import java.io.InputStream;
  * interface should be implemented for each type of request that may be
  * handled by FileUpload, such as servlets and portlets.</p>
  *
- * @since 1.1
+ * @since FileUpload 1.1
  */
 public interface RequestContext {
 

@@ -115,8 +115,8 @@ public class StoreFactoryBase implements IStoreFactory {
                 aElement.getClass());
 
         if (elementDesc != null) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("factory.storeTag",
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("factory.storeTag",
                         elementDesc.getTag(), aElement));
             }
             getStoreAppender().printIndent(aWriter, indent + 2);
@@ -167,8 +167,13 @@ public class StoreFactoryBase implements IStoreFactory {
             if (elementFactory != null) {
                 StoreDescription desc = getRegistry().findDescription(
                         aTagElement.getClass());
-                if (!desc.isTransientChild(aTagElement.getClass().getName())) {
-                    elementFactory.store(aWriter, indent, aTagElement);
+                if (desc != null) {
+                    if (!desc.isTransientChild(aTagElement.getClass().getName())) {
+                        elementFactory.store(aWriter, indent, aTagElement);
+                    }
+                } else {
+                    log.warn(sm.getString("factory.storeNoDescriptor", aTagElement
+                            .getClass()));
                 }
             } else {
                 log.warn(sm.getString("factory.storeNoDescriptor", aTagElement

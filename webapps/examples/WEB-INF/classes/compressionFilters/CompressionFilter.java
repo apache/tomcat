@@ -50,7 +50,7 @@ public class CompressionFilter extends GenericFilter {
     /**
      * Minimal reasonable buffer.
      */
-    // 8KB is what tomcat would use by default anyway
+    // 8 KiB is what tomcat would use by default anyway
     private static final int MIN_BUFFER = 8192;
 
     /**

@@ -71,7 +71,7 @@ public class IOTools {
     /**
      * Read input from input stream and write it to output stream until there is
      * no more input from input stream using a new buffer of the default size
-     * (4kB).
+     * (4 KiB).
      *
      * @param is input stream the input stream to read from.
      * @param os output stream the output stream to write to.

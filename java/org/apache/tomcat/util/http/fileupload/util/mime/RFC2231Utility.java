@@ -20,13 +20,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 /**
  * Utility class to decode/encode character set on HTTP Header fields based on RFC 2231.
- * This implementation adheres to RFC 5987 in particular, which was defined for HTTP headers
- *
+ * This implementation adheres to RFC 5987 in particular, which was defined for HTTP headers.
+ * <p>
  * RFC 5987 builds on RFC 2231, but has lesser scope like
  * <a href="https://tools.ietf.org/html/rfc5987#section-3.2">mandatory charset definition</a>
  * and <a href="https://tools.ietf.org/html/rfc5987#section-4">no parameter continuation</a>
  *
- * <p>
  * @see <a href="https://tools.ietf.org/html/rfc2231">RFC 2231</a>
  * @see <a href="https://tools.ietf.org/html/rfc5987">RFC 5987</a>
  */
@@ -93,15 +92,15 @@ public final class RFC2231Utility {
 
     /**
      * Decode a string of text obtained from a HTTP header as per RFC 2231
-     *
+     * <p>
      * <b>Eg 1.</b> {@code us-ascii'en-us'This%20is%20%2A%2A%2Afun%2A%2A%2A}
      * will be decoded to {@code This is ***fun***}
-     *
+     * <p>
      * <b>Eg 2.</b> {@code iso-8859-1'en'%A3%20rate}
-     * will be decoded to {@code £ rate}.
-     *
+     * will be decoded to {@code £ rate}
+     * <p>
      * <b>Eg 3.</b> {@code UTF-8''%c2%a3%20and%20%e2%82%ac%20rates}
-     * will be decoded to {@code £ and € rates}.
+     * will be decoded to {@code £ and € rates}
      *
      * @param encodedText - Text to be decoded has a format of {@code <charset>'<language>'<encoded_value>}
      * and ASCII only

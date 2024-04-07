@@ -32,8 +32,8 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.codec.binary.Base64;
 
 /**
- * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP BASIC Authentication, as outlined in RFC 2617: "HTTP
- * Authentication: Basic and Digest Access Authentication."
+ * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP BASIC Authentication, as outlined in RFC 7617: "The
+ * 'Basic' HTTP Authentication Scheme"
  *
  * @author Craig R. McClanahan
  */
@@ -100,7 +100,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
                 }
             } catch (IllegalArgumentException iae) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Invalid Authorization" + iae.getMessage());
+                    log.debug(sm.getString("basicAuthenticator.invalidAuthorization", iae.getMessage()));
                 }
             }
         }
@@ -205,7 +205,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
                 base64blobLength = authorization.getLength() - METHOD.length();
             } else {
                 // is this possible, or permitted?
-                throw new IllegalArgumentException("Authorization header method is not \"Basic\"");
+                throw new IllegalArgumentException(sm.getString("basicAuthenticator.notBasic"));
             }
         }
 
@@ -219,7 +219,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
             // restore original offset
             authorization.setOffset(initialOffset);
             if (decoded == null) {
-                throw new IllegalArgumentException("Basic Authorization credentials are not Base64");
+                throw new IllegalArgumentException(sm.getString("basicAuthenticator.notBase64"));
             }
             return decoded;
         }

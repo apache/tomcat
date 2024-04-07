@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -135,6 +136,16 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         }
         return tomcat;
     }
+
+
+    public Context getProgrammaticRootContext() {
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+        // Disable class path scanning - it slows the tests down by almost an order of magnitude
+        ((StandardJarScanner) ctx.getJarScanner()).setScanClassPath(false);
+        return ctx;
+    }
+
 
     /*
      * Sub-classes need to know port so they can connect
@@ -659,7 +670,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                 Map<String, List<String>> reqHead, Map<String, List<String>> resHead, String method,
                 boolean followRedirects) throws IOException {
 
-        URL url = new URL(path);
+        URL url = URI.create(path).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setUseCaches(false);
         connection.setReadTimeout(readTimeout);
@@ -753,7 +764,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                 Map<String, List<String>> reqHead,
                 Map<String, List<String>> resHead) throws IOException {
 
-        URL url = new URL(path);
+        URL url = URI.create(path).toURL();
         HttpURLConnection connection =
             (HttpURLConnection) url.openConnection();
         connection.setDoOutput(true);

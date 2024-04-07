@@ -399,7 +399,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             // Read the mechTypes into an ordered set
             int mechTypesLen = lengthAsInt();
             int mechTypesStart = pos;
-            LinkedHashMap<String, int[]> mechTypeEntries = new LinkedHashMap<>();
+            LinkedHashMap<String,int[]> mechTypeEntries = new LinkedHashMap<>();
             while (pos < mechTypesStart + mechTypesLen) {
                 int[] value = new int[2];
                 value[0] = pos;

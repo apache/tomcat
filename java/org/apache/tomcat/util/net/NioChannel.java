@@ -185,7 +185,7 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
 
     @Override
     public String toString() {
-        return super.toString() + ":" + sc.toString();
+        return super.toString() + ":" + sc;
     }
 
     public int getOutboundRemaining() {

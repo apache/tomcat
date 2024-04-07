@@ -22,12 +22,15 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Map;
 
-import org.apache.tomcat.util.security.MD5Encoder;
+import org.apache.tomcat.util.buf.HexUtils;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Authenticator supporting the DIGEST authentication method.
  */
 public class DigestAuthenticator extends Authenticator {
+
+    private static final StringManager sm = StringManager.getManager(DigestAuthenticator.class);
 
     public static final String schemeName = "digest";
     private static final Object cnonceGeneratorLock = new Object();
@@ -56,7 +59,7 @@ public class DigestAuthenticator extends Authenticator {
 
         if (!messageQop.isEmpty()) {
             if (cnonceGenerator == null) {
-                synchronized(cnonceGeneratorLock) {
+                synchronized (cnonceGeneratorLock) {
                     if (cnonceGenerator == null) {
                         cnonceGenerator = new SecureRandom();
                     }
@@ -74,13 +77,13 @@ public class DigestAuthenticator extends Authenticator {
         challenge.append("uri=\"" + requestUri + "\",");
 
         try {
-            challenge.append("response=\"" + calculateRequestDigest(requestUri, userName, userPassword,
-                    realm, nonce, messageQop, algorithm) + "\",");
+            challenge.append("response=\"" +
+                    calculateRequestDigest(requestUri, userName, userPassword, realm, nonce, messageQop, algorithm) +
+                    "\",");
         }
 
         catch (NoSuchAlgorithmException e) {
-            throw new AuthenticationException(
-                    "Unable to generate request digest " + e.getMessage());
+            throw new AuthenticationException(sm.getString("digestAuthenticator.algorithm", e.getMessage()));
         }
 
         challenge.append("algorithm=" + algorithm + ",");
@@ -96,27 +99,31 @@ public class DigestAuthenticator extends Authenticator {
 
     }
 
-    private String calculateRequestDigest(String requestUri, String userName, String password,
-            String realm, String nonce, String qop, String algorithm)
-            throws NoSuchAlgorithmException {
+    private String calculateRequestDigest(String requestUri, String userName, String password, String realm,
+            String nonce, String qop, String algorithm) throws NoSuchAlgorithmException {
+
+        boolean session = false;
+        if (algorithm.endsWith("-sess")) {
+            algorithm = algorithm.substring(0, algorithm.length() - 5);
+            session = true;
+        }
 
         StringBuilder preDigest = new StringBuilder();
         String A1;
 
-        if (algorithm.equalsIgnoreCase("MD5")) {
-            A1 = userName + ":" + realm + ":" + password;
+        if (session) {
+            A1 = encode(algorithm, userName + ":" + realm + ":" + password) + ":" + nonce + ":" + cNonce;
         } else {
-            A1 = encodeMD5(userName + ":" + realm + ":" + password) + ":" + nonce + ":" + cNonce;
+            A1 = userName + ":" + realm + ":" + password;
         }
 
         /*
-         * If the "qop" value is "auth-int", then A2 is: A2 = Method ":"
-         * digest-uri-value ":" H(entity-body) since we do not have an entity-body, A2 =
-         * Method ":" digest-uri-value for auth and auth_int
+         * If the "qop" value is "auth-int", then A2 is: A2 = Method ":" digest-uri-value ":" H(entity-body) since we do
+         * not have an entity-body, A2 = Method ":" digest-uri-value for auth and auth_int
          */
         String A2 = "GET:" + requestUri;
 
-        preDigest.append(encodeMD5(A1));
+        preDigest.append(encode(algorithm, A1));
         preDigest.append(':');
         preDigest.append(nonce);
 
@@ -130,18 +137,17 @@ public class DigestAuthenticator extends Authenticator {
         }
 
         preDigest.append(':');
-        preDigest.append(encodeMD5(A2));
+        preDigest.append(encode(algorithm, A2));
 
-        return encodeMD5(preDigest.toString());
-
+        return encode(algorithm, preDigest.toString());
     }
 
-    private String encodeMD5(String value) throws NoSuchAlgorithmException {
+    private String encode(String algorithm, String value) throws NoSuchAlgorithmException {
         byte[] bytesOfMessage = value.getBytes(StandardCharsets.ISO_8859_1);
-        MessageDigest md = MessageDigest.getInstance("MD5");
+        MessageDigest md = MessageDigest.getInstance(algorithm);
         byte[] thedigest = md.digest(bytesOfMessage);
 
-        return MD5Encoder.encode(thedigest);
+        return HexUtils.toHexString(thedigest);
     }
 
     @Override

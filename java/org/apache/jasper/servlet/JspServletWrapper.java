@@ -311,7 +311,7 @@ public class JspServletWrapper {
      * Get a list of files that the current page has source dependency on.
      * @return the map of dependent resources
      */
-    public java.util.Map<String,Long> getDependants() {
+    public Map<String,Long> getDependants() {
         try {
             Object target;
             if (isTagFile) {

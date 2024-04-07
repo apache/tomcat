@@ -57,7 +57,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         String namespace = getNamespace();
 
         if (log.isDebugEnabled()) {
-            log.debug(String.format("Namespace [%s] set; clustering enabled", namespace));
+            log.debug(sm.getString("cloudMembershipProvider.start", namespace));
         }
 
         String protocol = getEnv(CUSTOM_ENV_PREFIX + "MASTER_PROTOCOL", "KUBERNETES_MASTER_PROTOCOL");
@@ -89,6 +89,10 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 protocol = "http";
             }
             String clientKeyFile = getEnv("KUBERNETES_CLIENT_KEY_FILE");
+            if (clientKeyFile == null) {
+                log.error(sm.getString("kubernetesMembershipProvider.noKey"));
+                return;
+            }
             String clientKeyPassword = getEnv("KUBERNETES_CLIENT_KEY_PASSWORD");
             String clientKeyAlgo = getEnv("KUBERNETES_CLIENT_KEY_ALGO");
             if (clientKeyAlgo == null) {
@@ -183,7 +187,6 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                     log.warn(sm.getString("kubernetesMembershipProvider.invalidPod", "uid"));
                     continue;
                 }
-                String creationTimestamp = creationTimestampObject.toString();
                 // "status" contains "phase" (which must be "Running") and "podIP"
                 Object statusObject = pod.get("status");
                 if (!(statusObject instanceof LinkedHashMap<?, ?>)) {
@@ -213,7 +216,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                     continue;
                 }
 
-                long aliveTime = Duration.between(Instant.parse(creationTimestamp), startTime).toMillis();
+                long aliveTime = Duration.between(Instant.parse(creationTimestampObject.toString()), startTime).toMillis();
 
                 MemberImpl member = null;
                 try {

@@ -171,25 +171,30 @@ public class ResolverImpl extends Resolver {
                 return sslSupport.getCipherSuite();
             } else if (key.equals("SSL_CIPHER_EXPORT")) {
                 String cipherSuite = sslSupport.getCipherSuite();
-                Set<Cipher> cipherList = OpenSSLCipherConfigurationParser.parse(cipherSuite);
-                if (cipherList.size() == 1) {
-                    Cipher cipher = cipherList.iterator().next();
-                    if (cipher.getLevel().equals(EncryptionLevel.EXP40)
-                            || cipher.getLevel().equals(EncryptionLevel.EXP56)) {
-                        return "true";
-                    } else {
-                        return "false";
+                if (cipherSuite != null) {
+                    Set<Cipher> cipherList = OpenSSLCipherConfigurationParser.parse(cipherSuite);
+                    if (cipherList.size() == 1) {
+                        Cipher cipher = cipherList.iterator().next();
+                        if (cipher.getLevel().equals(EncryptionLevel.EXP40)
+                                || cipher.getLevel().equals(EncryptionLevel.EXP56)) {
+                            return "true";
+                        } else {
+                            return "false";
+                        }
                     }
                 }
             } else if (key.equals("SSL_CIPHER_ALGKEYSIZE")) {
                 String cipherSuite = sslSupport.getCipherSuite();
-                Set<Cipher> cipherList = OpenSSLCipherConfigurationParser.parse(cipherSuite);
-                if (cipherList.size() == 1) {
-                    Cipher cipher = cipherList.iterator().next();
-                    return String.valueOf(cipher.getAlg_bits());
+                if (cipherSuite != null) {
+                    Set<Cipher> cipherList = OpenSSLCipherConfigurationParser.parse(cipherSuite);
+                    if (cipherList.size() == 1) {
+                        Cipher cipher = cipherList.iterator().next();
+                        return String.valueOf(cipher.getAlg_bits());
+                    }
                 }
             } else if (key.equals("SSL_CIPHER_USEKEYSIZE")) {
-                return sslSupport.getKeySize().toString();
+                Integer keySize = sslSupport.getKeySize();
+                return (keySize == null) ? null : sslSupport.getKeySize().toString();
             } else if (key.startsWith("SSL_CLIENT_")) {
                 X509Certificate[] certificates = sslSupport.getPeerCertificateChain();
                 if (certificates != null && certificates.length > 0) {
@@ -269,6 +274,7 @@ public class ResolverImpl extends Resolver {
             try {
                 return PEMFile.toPEM(certificates[0]);
             } catch (CertificateEncodingException e) {
+                // Ignore
             }
         } else if (key.startsWith("CERT_CHAIN_")) {
             key = key.substring("CERT_CHAIN_".length());

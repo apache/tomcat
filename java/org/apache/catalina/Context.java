@@ -16,6 +16,10 @@
  */
 package org.apache.catalina;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
@@ -38,6 +42,8 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.util.file.ConfigFileLoader;
+import org.apache.tomcat.util.file.ConfigurationSource.Resource;
 import org.apache.tomcat.util.http.CookieProcessor;
 
 /**
@@ -83,6 +89,11 @@ public interface Context extends Container, ContextBind {
      */
     String CHANGE_SESSION_ID_EVENT = "changeSessionId";
 
+
+    /**
+     * Prefix for resource lookup.
+     */
+    String WEBAPP_PROTOCOL = "webapp:";
 
     // ------------------------------------------------------------- Properties
 
@@ -250,6 +261,33 @@ public interface Context extends Container, ContextBind {
      *                          for session cookies
      */
     void setUseHttpOnly(boolean useHttpOnly);
+
+
+    /**
+     * Should the {@code Partitioned} attribute be added to session cookies created for this web application.
+     * <p>
+     * The name of the attribute used to indicate a partitioned cookie as part of
+     * <a href="https://developers.google.com/privacy-sandbox/3pcd#partitioned">CHIPS</a> is not defined by an RFC and
+     * may change in a non-backwards compatible way once equivalent functionality is included in an RFC.
+     *
+     * @return {@code true} if the {@code Partitioned} attribute should be added to session cookies created for this web
+     *             application, otherwise {@code false}
+     */
+    boolean getUsePartitioned();
+
+
+    /**
+     * Configure whether the {@code Partitioned} attribute should be added to session cookies created for this web
+     * application.
+     * <p>
+     * The name of the attribute used to indicate a partitioned cookie as part of
+     * <a href="https://developers.google.com/privacy-sandbox/3pcd#partitioned">CHIPS</a> is not defined by an RFC and
+     * may change in a non-backwards compatible way once equivalent functionality is included in an RFC.
+     *
+     * @param usePartitioned {@code true} if the {@code Partitioned} attribute should be added to session cookies
+     *                           created for this web application, otherwise {@code false}
+     */
+    void setUsePartitioned(boolean usePartitioned);
 
 
     /**
@@ -1963,4 +2001,50 @@ public interface Context extends Container, ContextBind {
      * @param dispatcherWrapsSameObject the new flag value
      */
     void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject);
+
+
+    /**
+     * If this is <code>true</code>, then following a forward the response will
+     * be unwrapped to suspend the Catalina response instead of simply closing
+     * the top level response. The default value is <code>true</code>.
+     * @return the flag value
+     */
+    boolean getSuspendWrappedResponseAfterForward();
+
+
+    /**
+     * Allows unwrapping the response object to suspend the response following
+     * a forward.
+     * @param suspendWrappedResponseAfterForward the new flag value
+     */
+    void setSuspendWrappedResponseAfterForward(boolean suspendWrappedResponseAfterForward);
+
+
+    /**
+     * Find configuration file with the specified path, first looking into the
+     * webapp resources, then delegating to
+     * <code>ConfigFileLoader.getSource().getResource</code>. The
+     * <code>WEBAPP_PROTOCOL</code> constant prefix is used to denote webapp
+     * resources.
+     * @param name The resource name
+     * @return the resource
+     * @throws IOException if an error occurs or if the resource does not exist
+     */
+    default Resource findConfigFileResource(String name) throws IOException {
+        if (name.startsWith(WEBAPP_PROTOCOL)) {
+            String path = name.substring(WEBAPP_PROTOCOL.length());
+            WebResource resource = getResources().getResource(path);
+            if (resource.canRead() && resource.isFile()) {
+                InputStream stream = resource.getInputStream();
+                try {
+                    return new Resource(stream, resource.getURL().toURI());
+                } catch (URISyntaxException e) {
+                    stream.close();
+                }
+            }
+            throw new FileNotFoundException(name);
+        }
+        return ConfigFileLoader.getSource().getResource(name);
+    }
+
 }

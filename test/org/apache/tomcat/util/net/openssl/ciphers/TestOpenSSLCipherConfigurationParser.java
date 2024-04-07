@@ -556,6 +556,21 @@ public class TestOpenSSLCipherConfigurationParser {
         testSpecification("EECDH+aRSA+SHA384:EECDH:EDH+aRSA:RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS");
     }
 
+
+    /*
+     * Cipher string extracted from https://bz.apache.org/bugzilla/show_bug.cgi?id=67628
+     */
+    @Test
+    public void testSpecification04() throws Exception {
+        if (TesterOpenSSL.VERSION < 30200) {
+            // OpenSSL 3.2.x moved the CCM8 ciphers from high to medium
+            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK:!DSS:!SHA1:!SHA256:!SHA384:!AESCCM8");
+        } else {
+            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK:!DSS:!SHA1:!SHA256:!SHA384:");
+        }
+    }
+
+
     private void testSpecification(String specification) throws Exception {
         // Filter out cipher suites that OpenSSL does not implement
         String openSSLCipherList = TesterOpenSSL.getOpenSSLCiphersAsExpression(specification);

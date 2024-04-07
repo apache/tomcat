@@ -5101,7 +5101,7 @@ public enum Cipher {
     private static final Map<Integer,Cipher> idMap = new HashMap<>();
 
     static {
-        for (Cipher cipher : Cipher.values()) {
+        for (Cipher cipher : values()) {
             int id = cipher.getId();
 
             if (id > 0 && id < 0xFFFF) {

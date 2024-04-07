@@ -229,7 +229,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * The number of milliseconds to sleep between runs of the idle object evictor thread. When non-positive, no idle
      * object evictor thread will be run.
      */
-    private Duration durationBetweenEvictionRuns = BaseObjectPoolConfig.DEFAULT_TIME_BETWEEN_EVICTION_RUNS;
+    private Duration durationBetweenEvictionRuns = BaseObjectPoolConfig.DEFAULT_DURATION_BETWEEN_EVICTION_RUNS;
 
     /**
      * The number of objects to examine during each run of the idle object evictor thread (if any).
@@ -465,8 +465,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
         gop.setTestOnBorrow(testOnBorrow);
         gop.setTestOnReturn(testOnReturn);
         gop.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
-        gop.setMinEvictableIdle(minEvictableIdleDuration);
-        gop.setSoftMinEvictableIdle(softMinEvictableIdleDuration);
+        gop.setMinEvictableIdleDuration(minEvictableIdleDuration);
+        gop.setSoftMinEvictableIdleDuration(softMinEvictableIdleDuration);
         gop.setTestWhileIdle(testWhileIdle);
         gop.setLifo(lifo);
         gop.setSwallowedExceptionListener(new SwallowedExceptionLogger(log, logExpiredConnections));
@@ -2216,7 +2216,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     public synchronized void setMinEvictableIdle(final Duration minEvictableIdleDuration) {
         this.minEvictableIdleDuration = minEvictableIdleDuration;
-        setConnectionPool(GenericObjectPool::setMinEvictableIdle, minEvictableIdleDuration);
+        setConnectionPool(GenericObjectPool::setMinEvictableIdleDuration, minEvictableIdleDuration);
     }
 
     /**
@@ -2357,7 +2357,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     public synchronized void setSoftMinEvictableIdle(final Duration softMinEvictableIdleTimeMillis) {
         this.softMinEvictableIdleDuration = softMinEvictableIdleTimeMillis;
-        setConnectionPool(GenericObjectPool::setSoftMinEvictableIdle, softMinEvictableIdleTimeMillis);
+        setConnectionPool(GenericObjectPool::setSoftMinEvictableIdleDuration, softMinEvictableIdleTimeMillis);
     }
 
     /**
@@ -2428,7 +2428,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     public synchronized void setDurationBetweenEvictionRuns(final Duration timeBetweenEvictionRunsMillis) {
         this.durationBetweenEvictionRuns = timeBetweenEvictionRunsMillis;
-        setConnectionPool(GenericObjectPool::setTimeBetweenEvictionRuns, timeBetweenEvictionRunsMillis);
+        setConnectionPool(GenericObjectPool::setDurationBetweenEvictionRuns, timeBetweenEvictionRunsMillis);
     }
 
     /**
@@ -2546,7 +2546,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     protected void startPoolMaintenance() {
         if (connectionPool != null && durationBetweenEvictionRuns.compareTo(Duration.ZERO) > 0) {
-            connectionPool.setTimeBetweenEvictionRuns(durationBetweenEvictionRuns);
+            connectionPool.setDurationBetweenEvictionRuns(durationBetweenEvictionRuns);
         }
     }
 

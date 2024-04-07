@@ -207,6 +207,15 @@ public interface Session {
 
 
     /**
+     * Returns whether the session was created during the current request.
+     *
+     * @return {@code true} if the session was created during the current
+     *         request.
+     */
+    boolean isNew();
+
+
+    /**
      * Set the <code>isNew</code> flag for this session.
      *
      * @param isNew The new value for the <code>isNew</code> flag

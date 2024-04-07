@@ -27,12 +27,9 @@ public class UndeployMessage implements ClusterMessage {
     private String uniqueId;
     private final String contextName;
 
-    public UndeployMessage(Member address,
-                           long timestamp,
-                           String uniqueId,
-                           String contextName) {
-        this.address  = address;
-        this.timestamp= timestamp;
+    public UndeployMessage(Member address, long timestamp, String uniqueId, String contextName) {
+        this.address = address;
+        this.timestamp = timestamp;
         this.uniqueId = uniqueId;
         this.contextName = contextName;
     }

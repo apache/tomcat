@@ -17,18 +17,19 @@
 package jakarta.servlet.jsp;
 
 /**
- * Contains information about an error, for error pages. The information
- * contained in this instance is meaningless if not used in the context of an
- * error page. To indicate a JSP is an error page, the page author must set the
+ * Contains information about an error, for error pages. The information contained in this instance is meaningless if
+ * not used in the context of an error page. To indicate a JSP is an error page, the page author must set the
  * isErrorPage attribute of the page directive to "true".
  *
  * @see PageContext#getErrorData
+ *
  * @since JSP 2.0
  */
 public final class ErrorData {
 
     private final Throwable throwable;
     private final int statusCode;
+    private final String method;
     private final String uri;
     private final String servletName;
     private final String queryString;
@@ -36,42 +37,35 @@ public final class ErrorData {
     /**
      * Creates a new ErrorData object.
      *
-     * @param throwable
-     *            The Throwable that is the cause of the error
-     * @param statusCode
-     *            The status code of the error
-     * @param uri
-     *            The request URI
-     * @param servletName
-     *            The name of the servlet invoked
+     * @param throwable   The Throwable that is the cause of the error
+     * @param statusCode  The status code of the error
+     * @param uri         The request URI
+     * @param servletName The name of the servlet invoked
      *
-     * @deprecated Use {#link {@link ErrorData#ErrorData(Throwable, int, String,
-     *             String, String)}
+     * @deprecated Use {#link {@link ErrorData#ErrorData(Throwable, int, String, String, String, String)}
      */
     @Deprecated(since = "4.0", forRemoval = true)
-    public ErrorData(Throwable throwable, int statusCode, String uri,
-            String servletName) {
-        this(throwable, statusCode, uri, servletName, null);
+    public ErrorData(Throwable throwable, int statusCode, String uri, String servletName) {
+        this(throwable, statusCode, null, uri, servletName, null);
     }
 
     /**
      * Creates a new ErrorData object.
      *
-     * @param throwable
-     *            The Throwable that is the cause of the error
-     * @param statusCode
-     *            The status code of the error
-     * @param uri
-     *            The request URI
-     * @param servletName
-     *            The name of the servlet invoked
-     * @param queryString
-     *            The request query string
+     * @param throwable   The Throwable that is the cause of the error
+     * @param statusCode  The status code of the error
+     * @param method      The request method
+     * @param uri         The request URI
+     * @param servletName The name of the servlet invoked
+     * @param queryString The request query string
+     *
+     * @since JSP 4.0
      */
-    public ErrorData(Throwable throwable, int statusCode, String uri,
-            String servletName, String queryString) {
+    public ErrorData(Throwable throwable, int statusCode, String method, String uri, String servletName,
+            String queryString) {
         this.throwable = throwable;
         this.statusCode = statusCode;
+        this.method = method;
         this.uri = uri;
         this.servletName = servletName;
         this.queryString = queryString;
@@ -96,6 +90,15 @@ public final class ErrorData {
     }
 
     /**
+     * Returns the request method.
+     *
+     * @return The request method
+     */
+    public String getMethod() {
+        return this.method;
+    }
+
+    /**
      * Returns the request URI.
      *
      * @return The request URI
@@ -114,10 +117,11 @@ public final class ErrorData {
     }
 
     /**
-     * Returns the request query string or {@code null} if the request had no
-     * query string.
+     * Returns the request query string or {@code null} if the request had no query string.
      *
      * @return The request query string
+     *
+     * @since JSP 4.0
      */
     public String getQueryString() {
         return this.queryString;

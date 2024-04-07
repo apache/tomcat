@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http11.filters;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
@@ -30,7 +31,6 @@ import org.apache.coyote.Response;
 import org.apache.coyote.http11.HttpOutputBuffer;
 import org.apache.coyote.http11.OutputFilter;
 import org.apache.tomcat.util.buf.HexUtils;
-import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 
 /**
  * Chunked output filter.

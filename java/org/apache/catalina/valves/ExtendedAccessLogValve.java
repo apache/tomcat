@@ -361,7 +361,13 @@ public class ExtendedAccessLogValve extends AccessLogValve {
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
-            buf.append(wrap(urlEncode(request.getParameter(parameter))));
+            String parameterValue;
+            try {
+                parameterValue = request.getParameter(parameter);
+            } catch (IllegalStateException ise) {
+                parameterValue = null;
+            }
+            buf.append(wrap(urlEncode(parameterValue)));
         }
     }
 
@@ -412,9 +418,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                         parameter = true;
                         return result;
                     case ')':
-                        result = buf.toString();
-                        buf.setLength(0);
-                        break;
+                        throw new IOException(sm.getString("patternTokenizer.unexpectedParenthesis"));
                     default:
                         buf.append((char) c);
                 }
@@ -485,8 +489,8 @@ public class ExtendedAccessLogValve extends AccessLogValve {
 
     @Override
     protected AccessLogElement[] createLogElements() {
-        if (log.isDebugEnabled()) {
-            log.debug("decodePattern, pattern =" + pattern);
+        if (log.isTraceEnabled()) {
+            log.trace("decodePattern, pattern =" + pattern);
         }
         List<AccessLogElement> list = new ArrayList<>();
 
@@ -503,8 +507,8 @@ public class ExtendedAccessLogValve extends AccessLogValve {
 
             String token = tokenizer.getToken();
             while (token != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("token = " + token);
+                if (log.isTraceEnabled()) {
+                    log.trace("token = " + token);
                 }
                 AccessLogElement element = getLogElement(token, tokenizer);
                 if (element == null) {
@@ -520,8 +524,8 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 }
                 token = tokenizer.getToken();
             }
-            if (log.isDebugEnabled()) {
-                log.debug("finished decoding with element size of: " + list.size());
+            if (log.isTraceEnabled()) {
+                log.trace("finished decoding with element size of: " + list.size());
             }
             return list.toArray(new AccessLogElement[0]);
         } catch (IOException e) {

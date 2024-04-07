@@ -34,7 +34,6 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.JmxEnabled;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
@@ -170,7 +169,7 @@ public class StandardHost extends ContainerBase implements Host {
     /**
      * Track the class loaders for the child web applications so memory leaks can be detected.
      */
-    private final Map<ClassLoader, String> childClassLoaders = new WeakHashMap<>();
+    private final Map<ClassLoader,String> childClassLoaders = new WeakHashMap<>();
 
 
     /**
@@ -721,7 +720,7 @@ public class StandardHost extends ContainerBase implements Host {
     private class MemoryLeakTrackingListener implements LifecycleListener {
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
-            if (event.getType().equals(Lifecycle.AFTER_START_EVENT)) {
+            if (event.getType().equals(AFTER_START_EVENT)) {
                 if (event.getSource() instanceof Context) {
                     Context context = ((Context) event.getSource());
                     childClassLoaders.put(context.getLoader().getClassLoader(),
@@ -745,7 +744,7 @@ public class StandardHost extends ContainerBase implements Host {
 
         List<String> result = new ArrayList<>();
 
-        for (Map.Entry<ClassLoader, String> entry : childClassLoaders.entrySet()) {
+        for (Map.Entry<ClassLoader,String> entry : childClassLoaders.entrySet()) {
             ClassLoader cl = entry.getKey();
             if (cl instanceof WebappClassLoaderBase) {
                 if (!((WebappClassLoaderBase) cl).getState().isAvailable()) {
@@ -818,7 +817,7 @@ public class StandardHost extends ContainerBase implements Host {
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         // Set error report valve
         String errorValve = getErrorReportValveClass();
@@ -833,8 +832,8 @@ public class StandardHost extends ContainerBase implements Host {
                     }
                 }
                 if (!found) {
-                    Valve valve = ErrorReportValve.class.getName().equals(errorValve) ? new ErrorReportValve()
-                            : (Valve) Class.forName(errorValve).getConstructor().newInstance();
+                    Valve valve = ErrorReportValve.class.getName().equals(errorValve) ? new ErrorReportValve() :
+                            (Valve) Class.forName(errorValve).getConstructor().newInstance();
                     getPipeline().addValve(valve);
                 }
             } catch (Throwable t) {

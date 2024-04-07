@@ -19,7 +19,7 @@ package org.apache.catalina.filters;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -120,8 +120,12 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
      */
     public static class MockHttpServletRequest extends Request {
         public MockHttpServletRequest() {
-            super(new Connector());
-            setCoyoteRequest(new org.apache.coyote.Request());
+            super(new Connector(), new org.apache.coyote.Request());
+        }
+
+        public MockHttpServletRequest(String ipAddress) {
+            this();
+            this.setRemoteAddr(ipAddress);
         }
 
         public void setHeader(String name, String value) {
@@ -634,7 +638,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
     @Test
     public void testListToCommaDelimitedString() {
-        String[] actual = RemoteIpFilter.commaDelimitedListToStringArray("element1, element2, element3");
+        String[] actual = StringUtils.splitCommaSeparated("element1, element2, element3");
         String[] expected = new String[] { "element1", "element2", "element3" };
         Assert.assertEquals(expected.length, actual.length);
         for (int i = 0; i < actual.length; i++) {
@@ -644,7 +648,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
     @Test
     public void testListToCommaDelimitedStringMixedSpaceChars() {
-        String[] actual = RemoteIpFilter.commaDelimitedListToStringArray("element1  , element2,\t element3");
+        String[] actual = StringUtils.splitCommaSeparated("element1  , element2,\t element3");
         String[] expected = new String[] { "element1", "element2", "element3" };
         Assert.assertEquals(expected.length, actual.length);
         for (int i = 0; i < actual.length; i++) {
@@ -761,8 +765,8 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         getTomcatInstance().start();
 
         // TEST
-        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(
-                "http://localhost:" + tomcat.getConnector().getLocalPort() + "/test").openConnection();
+        HttpURLConnection httpURLConnection = (HttpURLConnection) URI.create(
+                "http://localhost:" + tomcat.getConnector().getLocalPort() + "/test").toURL().openConnection();
         String expectedRemoteAddr = "my-remote-addr";
         httpURLConnection.addRequestProperty("x-forwarded-for", expectedRemoteAddr);
         httpURLConnection.addRequestProperty("x-forwarded-proto", "https");

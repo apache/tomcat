@@ -30,7 +30,10 @@ import java.util.Set;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.Constants;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -712,6 +715,32 @@ public class OpenSSLCipherConfigurationParser {
             init();
         }
         String[] elements = expression.split(SEPARATOR);
+        // Handle PROFILE= using OpenSSL (if present, otherwise warn), then replace elements with that
+        if (elements.length == 1 && elements[0].startsWith("PROFILE=")) {
+            // Only use with Java 22 and if OpenSSL has been successfully loaded before
+            if (JreCompat.isJre22Available()) {
+                if (OpenSSLStatus.isLibraryInitialized()) {
+                    try {
+                        Class<?> openSSLLibraryClass = Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
+                        @SuppressWarnings("unchecked")
+                        List<String> cipherList = (List<String>) openSSLLibraryClass.getMethod("findCiphers").invoke(null, elements[0]);
+                        // Replace the original list with the profile contents
+                        elements = cipherList.toArray(new String[0]);
+                    } catch (Throwable t) {
+                        t = ExceptionUtils.unwrapInvocationTargetException(t);
+                        ExceptionUtils.handleThrowable(t);
+                        log.error(sm.getString("opensslCipherConfigurationParser.unknownProfile", elements[0]), t);
+                    }
+                } else {
+                    // OpenSSL is not available
+                    log.error(sm.getString("opensslCipherConfigurationParser.unknownProfile", elements[0]));
+                }
+            } else {
+                // No way to resolve using OpenSSL, log an info about this
+                // but it might still work if using tomcat-native
+                log.info(sm.getString("opensslCipherConfigurationParser.unknownProfile", elements[0]));
+            }
+        }
         LinkedHashSet<Cipher> ciphers = new LinkedHashSet<>();
         Set<Cipher> removedCiphers = new HashSet<>();
         for (String element : elements) {

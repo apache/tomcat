@@ -197,7 +197,6 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
         }
 
         // Return the results of this method invocation
-        // FIXME - should we validate the return type?
         return result;
     }
 
@@ -279,8 +278,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
                         sm.getString("baseModelMBean.nullMethodName"));
         }
 
-        if( log.isDebugEnabled()) {
-            log.debug("Invoke " + name);
+        if( log.isTraceEnabled()) {
+            log.trace("Invoke " + name);
         }
 
         Method method= managedBean.getInvoke(name, params, signature, this, resource);
@@ -316,7 +315,6 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
         }
 
         // Return the results of this method invocation
-        // FIXME - should we validate the return type?
         return result;
 
     }
@@ -374,8 +372,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
         throws AttributeNotFoundException, MBeanException,
         ReflectionException
     {
-        if( log.isDebugEnabled() ) {
-            log.debug("Setting attribute " + this + " " + attribute );
+        if( log.isTraceEnabled() ) {
+            log.trace("Setting attribute " + this + " " + attribute );
         }
 
         if( (resource instanceof DynamicMBean) &&
@@ -599,8 +597,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
             attributeBroadcaster = new BaseNotificationBroadcaster();
         }
 
-        if( log.isDebugEnabled() ) {
-            log.debug("addAttributeNotificationListener " + listener);
+        if( log.isTraceEnabled() ) {
+            log.trace("addAttributeNotificationListener " + listener);
         }
 
         BaseAttributeFilter filter = new BaseAttributeFilter(name);
@@ -664,8 +662,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
          {
             return; // This means there are no registered listeners
         }
-        if( log.isDebugEnabled() ) {
-            log.debug( "AttributeChangeNotification " + notification );
+        if( log.isTraceEnabled() ) {
+            log.trace( "AttributeChangeNotification " + notification );
         }
         attributeBroadcaster.sendNotification(notification);
 
@@ -791,8 +789,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
             throw new IllegalArgumentException(sm.getString("baseModelMBean.nullListener"));
         }
 
-        if( log.isDebugEnabled() ) {
-            log.debug("addNotificationListener " + listener);
+        if( log.isTraceEnabled() ) {
+            log.trace("addNotificationListener " + listener);
         }
 
         if (generalBroadcaster == null) {
@@ -809,8 +807,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
             attributeBroadcaster = new BaseNotificationBroadcaster();
         }
 
-        if( log.isDebugEnabled() ) {
-            log.debug("addAttributeNotificationListener " + listener);
+        if( log.isTraceEnabled() ) {
+            log.trace("addAttributeNotificationListener " + listener);
         }
 
         attributeBroadcaster.addNotificationListener
@@ -921,8 +919,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
                                   ObjectName name)
             throws Exception
     {
-        if( log.isDebugEnabled()) {
-            log.debug("preRegister " + resource + " " + name );
+        if( log.isTraceEnabled()) {
+            log.trace("preRegister " + resource + " " + name );
         }
         oname=name;
         if( resource instanceof MBeanRegistration ) {

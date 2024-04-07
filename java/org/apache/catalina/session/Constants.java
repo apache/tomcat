@@ -24,8 +24,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.valves.CrawlerSessionManagerValve;
 
 /**
- * Manifest constants for the <code>org.apache.catalina.session</code>
- * package.
+ * Manifest constants for the <code>org.apache.catalina.session</code> package.
  *
  * @author Craig R. McClanahan
  */
@@ -33,9 +32,8 @@ import org.apache.catalina.valves.CrawlerSessionManagerValve;
 public class Constants {
 
     /**
-     * Set of session attribute names used internally by Tomcat that should
-     * always be removed from the session before it is persisted, replicated or
-     * equivalent.
+     * Set of session attribute names used internally by Tomcat that should always be removed from the session before it
+     * is persisted, replicated or equivalent.
      */
     public static final Set<String> excludedAttributeNames;
 

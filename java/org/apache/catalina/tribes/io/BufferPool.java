@@ -28,7 +28,7 @@ public class BufferPool {
     private static final Log log = LogFactory.getLog(BufferPool.class);
 
     public static final int DEFAULT_POOL_SIZE =
-            Integer.getInteger("org.apache.catalina.tribes.io.BufferPool.DEFAULT_POOL_SIZE", 100*1024*1024).intValue(); //100MB
+            Integer.getInteger("org.apache.catalina.tribes.io.BufferPool.DEFAULT_POOL_SIZE", 100*1024*1024).intValue(); //100 MiB
 
     protected static final StringManager sm = StringManager.getManager(BufferPool.class);
 

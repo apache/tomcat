@@ -297,7 +297,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
 
                 if (sender == null) {
                     sender = new NioSender();
-                    AbstractSender.transferProperties(this, sender);
+                    transferProperties(this, sender);
                     state.nioSenders.put(destination[i], sender);
                 }
                 sender.reset();
@@ -372,7 +372,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
     }
 
     @Override
-    public boolean keepalive() {
+    public synchronized boolean keepalive() {
         boolean result = false;
         for (Iterator<Entry<Member,NioSender>> i = state.nioSenders.entrySet().iterator(); i.hasNext();) {
             Map.Entry<Member, NioSender> entry = i.next();
@@ -428,7 +428,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                 selector.close();
             } catch (Exception e) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Failed to close selector", e);
+                    log.debug(sm.getString("parallelNioSender.selectorCloseFail"), e);
                 }
             }
         }

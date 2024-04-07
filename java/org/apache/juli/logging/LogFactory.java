@@ -63,7 +63,7 @@ import aQute.bnd.annotation.spi.ServiceConsumer;
  * @author Costin Manolache
  * @author Richard A. Sitze
  */
-@ServiceConsumer(value=org.apache.juli.logging.Log.class)
+@ServiceConsumer(value=Log.class)
 public class LogFactory {
 
     private static final LogFactory singleton = new LogFactory();

@@ -42,16 +42,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.modules.ModelerSource;
 import org.apache.tomcat.util.res.StringManager;
 
-/*
-   Issues:
-   - exceptions - too many "throws Exception"
-   - double check the interfaces
-   - start removing the use of the experimental methods in tomcat, then remove
-     the methods ( before 1.1 final )
-   - is the security enough to prevent Registry being used to avoid the
-     permission checks in the mbean server ?
- */
-
 /**
  * Registry for modeler MBeans.
  *
@@ -59,9 +49,6 @@ import org.apache.tomcat.util.res.StringManager;
  * manipulate model mbeans and simplify their use.
  *
  * This class is itself an mbean.
- *
- * IMPORTANT: public methods not marked with {@code @since x.x} are experimental
- * or internal. Should not be used.
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
@@ -445,16 +432,15 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         if (server == null) {
             synchronized (serverLock) {
                 if (server == null) {
-                    long t1 = System.currentTimeMillis();
                     if (MBeanServerFactory.findMBeanServer(null).size() > 0) {
                         server = MBeanServerFactory.findMBeanServer(null).get(0);
                         if (log.isDebugEnabled()) {
-                            log.debug("Using existing MBeanServer " + (System.currentTimeMillis() - t1));
+                            log.debug(sm.getString("registry.existingServer"));
                         }
                     } else {
                         server = ManagementFactory.getPlatformMBeanServer();
                         if (log.isDebugEnabled()) {
-                            log.debug("Created MBeanServer" + (System.currentTimeMillis() - t1));
+                            log.debug(sm.getString("registry.createdServer"));
                         }
                     }
                 }
@@ -490,8 +476,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         // Search for a descriptor in the same package
         if (managed == null) {
             // check package and parent packages
-            if (log.isDebugEnabled()) {
-                log.debug("Looking for descriptor ");
+            if (log.isTraceEnabled()) {
+                log.trace("Looking for descriptor ");
             }
             findDescriptor(beanClass, type);
 
@@ -500,8 +486,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
         // Still not found - use introspection
         if (managed == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Introspecting ");
+            if (log.isTraceEnabled()) {
+                log.trace("Introspecting ");
             }
 
             // introspection
@@ -520,7 +506,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     /**
-     * EXPERIMENTAL Convert a string to object, based on type. Used by several
+     * Convert a string to object, based on type. Used by several
      * components. We could provide some pluggability. It is here to keep things
      * consistent and avoid duplication in other tasks
      *
@@ -552,7 +538,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     /**
-     * Experimental. Load descriptors.
+     * Load descriptors.
      *
      * @param sourceType The source type
      * @param source The bean
@@ -593,6 +579,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             if (sourceType == null) {
                 sourceType = "MbeansDescriptorsIntrospectionSource";
             }
+        } else {
+            throw new IllegalArgumentException(sm.getString("registry.invalidSource"));
         }
 
         if (sourceType == null) {
@@ -614,8 +602,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * @throws Exception Error registering component
      */
     public void registerComponent(Object bean, ObjectName oname, String type) throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("Managed= " + oname);
+        if (log.isTraceEnabled()) {
+            log.trace("Managed= " + oname);
         }
 
         if (bean == null) {
@@ -635,7 +623,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
             if (getMBeanServer().isRegistered(oname)) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Unregistering existing component " + oname);
+                    log.debug(sm.getString("registry.unregisterExisting", oname));
                 }
                 getMBeanServer().unregisterMBean(oname);
             }
@@ -673,7 +661,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             return;
         }
 
-        log.debug("Found " + dURL);
+        if (log.isTraceEnabled()) {
+            log.trace("Found " + dURL);
+        }
         searchedPaths.put(packageName, dURL);
         try {
             load("MbeansDescriptorsDigesterSource", dURL, null);

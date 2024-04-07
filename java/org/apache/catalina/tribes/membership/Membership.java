@@ -230,7 +230,7 @@ public class Membership implements Cloneable {
                 if (entry.hasExpired(maxtime)) {
                     if (list == null) {
                         // Only need a list when members are expired (smaller gc)
-                        list = new java.util.ArrayList<>();
+                        list = new ArrayList<>();
                     }
                     list.add(entry.getMember());
                 }

@@ -182,6 +182,14 @@ class AsyncStateMachine {
      * ends badly: e.g. CVE-2018-8037.
      */
     private final AtomicLong generation = new AtomicLong(0);
+    /*
+     * Error processing should only be triggered once per async generation. This field tracks whether the async
+     * processing has entered the error state during this async cycle.
+     *
+     * Guarded by this
+     */
+    private boolean hasProcessedError = false;
+
     // Need this to fire listener on complete
     private AsyncContextCallback asyncCtxt = null;
     private final AbstractProcessor processor;
@@ -284,6 +292,7 @@ class AsyncStateMachine {
             if (processor.getErrorState().isIoAllowed() && processor.flushBufferedWrite()) {
                 return SocketState.LONG;
             }
+            asyncCtxt.fireOnComplete();
             updateState(AsyncState.DISPATCHED);
             asyncCtxt.decrementInProgressAsyncCount();
             return SocketState.ASYNC_END;
@@ -412,21 +421,37 @@ class AsyncStateMachine {
 
 
     synchronized boolean asyncError() {
+        Request request = processor.getRequest();
+        boolean containerThread = (request != null && request.isRequestThread());
+
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("asyncStateMachine.asyncError.start"));
+        }
+
         clearNonBlockingListeners();
         if (state == AsyncState.STARTING) {
             updateState(AsyncState.MUST_ERROR);
-        } else if (state == AsyncState.DISPATCHED) {
-            // Async error handling has moved processing back into an async
-            // state. Need to increment in progress count as it will decrement
-            // when the async state is exited again.
-            asyncCtxt.incrementInProgressAsyncCount();
-            updateState(AsyncState.ERROR);
         } else {
-            updateState(AsyncState.ERROR);
+            if (hasProcessedError) {
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("asyncStateMachine.asyncError.skip"));
+                }
+                return false;
+            }
+            hasProcessedError = true;
+            if (state == AsyncState.DISPATCHED) {
+                // Async error handling has moved processing back into an async
+                // state. Need to increment in progress count as it will decrement
+                // when the async state is exited again.
+                asyncCtxt.incrementInProgressAsyncCount();
+                updateState(AsyncState.ERROR);
+            } else {
+                updateState(AsyncState.ERROR);
+            }
         }
 
-        Request request = processor.getRequest();
-        return request == null || !request.isRequestThread();
+        // Return true for non-container threads to trigger a dispatch
+        return !containerThread;
     }
 
 
@@ -471,6 +496,7 @@ class AsyncStateMachine {
         asyncCtxt = null;
         state = AsyncState.DISPATCHED;
         lastAsyncStart = 0;
+        hasProcessedError = false;
     }
 
 
@@ -481,8 +507,8 @@ class AsyncStateMachine {
 
 
     private synchronized void updateState(AsyncState newState) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("asyncStateMachine.stateChange", state, newState));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("asyncStateMachine.stateChange", state, newState));
         }
         state = newState;
     }

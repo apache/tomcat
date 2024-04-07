@@ -155,8 +155,7 @@ public class Http11Processor extends AbstractProcessor {
 
         httpParser = new HttpParser(protocol.getRelaxedPathChars(), protocol.getRelaxedQueryChars());
 
-        inputBuffer = new Http11InputBuffer(request, protocol.getMaxHttpRequestHeaderSize(),
-                protocol.getRejectIllegalHeader(), httpParser);
+        inputBuffer = new Http11InputBuffer(request, protocol.getMaxHttpRequestHeaderSize(), httpParser);
         request.setInputBuffer(inputBuffer);
 
         outputBuffer = new Http11OutputBuffer(response, protocol.getMaxHttpResponseHeaderSize());
@@ -732,20 +731,11 @@ public class Http11Processor extends AbstractProcessor {
                     if (hostValueMB != null) {
                         // Any host in the request line must be consistent with
                         // the Host header
-                        if (!hostValueMB.getByteChunk().equals(uriB, uriBCStart + pos, slashPos - pos)) {
-                            if (protocol.getAllowHostHeaderMismatch()) {
-                                // The requirements of RFC 2616 are being
-                                // applied. If the host header and the request
-                                // line do not agree, the request line takes
-                                // precedence
-                                hostValueMB = headers.setValue("host");
-                                hostValueMB.setBytes(uriB, uriBCStart + pos, slashPos - pos);
-                            } else {
-                                // The requirements of RFC 7230 are being
-                                // applied. If the host header and the request
-                                // line do not agree, trigger a 400 response.
-                                badRequest("http11processor.request.inconsistentHosts");
-                            }
+                        if (!hostValueMB.getByteChunk().equalsIgnoreCase(uriB, uriBCStart + pos, slashPos - pos)) {
+                            // The requirements of RFC 7230 are being
+                            // applied. If the host header and the request
+                            // line do not agree, trigger a 400 response.
+                            badRequest("http11processor.request.inconsistentHosts");
                         }
                     }
                 } else {
@@ -901,8 +891,7 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
 
-        MessageBytes methodMB = request.method();
-        boolean head = methodMB.equals("HEAD");
+        boolean head = request.method().equals("HEAD");
         if (head) {
             // No entity body
             outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
@@ -966,7 +955,11 @@ public class Http11Processor extends AbstractProcessor {
             headers.addValue("Date").setString(FastHttpDateFormat.getCurrentDate());
         }
 
-        // FIXME: Add transfer encoding header
+        // Although using transfer-encoding for gzip would be doable and was
+        // the original intent (which means the compression would be from an
+        // endpoint to the next, so only for the current transmission), it
+        // has been found that using content-encoding (which is end to end
+        // compression) is more efficient and more reliable.
 
         if ((entityBody) && (!contentDelimitation) || connectionClosePresent) {
             // Disable keep-alive if:
@@ -978,8 +971,7 @@ public class Http11Processor extends AbstractProcessor {
             keepAlive = false;
         }
 
-        // This may disabled keep-alive to check before working out the
-        // Connection header.
+        // This may disable keep-alive so check before working out the Connection header
         checkExpectationAndResponseStatus();
 
         // This may disable keep-alive if there is more body to swallow

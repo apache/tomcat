@@ -31,11 +31,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [ 17, 19, 20-ea ]
-        os: [ ubuntu-latest ]
-        include:
-        - os: windows-latest
-          java: 17
+        isMain:
+          - ${{ contains(github.ref, 'main') }}
+        java: [ 17, 20, 21 ]
+        os: [ ubuntu-latest, windows-latest ]
+        exclude:
+          - isMain: true
+            java: 17
+          - isMain: true
+            java: 20
+          - os: windows-latest
+            java: 20
+          - os: windows-latest
+            java: 21
     name: JDK${{ matrix.java }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:

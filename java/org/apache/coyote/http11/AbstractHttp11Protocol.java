@@ -60,7 +60,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     private final CompressionConfig compressionConfig = new CompressionConfig();
 
 
-    public AbstractHttp11Protocol(AbstractEndpoint<S, ?> endpoint) {
+    public AbstractHttp11Protocol(AbstractEndpoint<S,?> endpoint) {
         super(endpoint);
         setConnectionTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
     }
@@ -116,7 +116,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * Over-ridden here to make the method visible to nested classes.
      */
     @Override
-    protected AbstractEndpoint<S, ?> getEndpoint() {
+    protected AbstractEndpoint<S,?> getEndpoint() {
         return super.getEndpoint();
     }
 
@@ -169,53 +169,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     public void setRelaxedQueryChars(String relaxedQueryChars) {
         this.relaxedQueryChars = relaxedQueryChars;
-    }
-
-
-    private boolean allowHostHeaderMismatch = false;
-
-    /**
-     * Will Tomcat accept an HTTP 1.1 request where the host header does not agree with the host specified (if any) in
-     * the request line?
-     *
-     * @return {@code true} if Tomcat will allow such requests, otherwise {@code false}
-     */
-    public boolean getAllowHostHeaderMismatch() {
-        return allowHostHeaderMismatch;
-    }
-
-    /**
-     * Will Tomcat accept an HTTP 1.1 request where the host header does not agree with the host specified (if any) in
-     * the request line?
-     *
-     * @param allowHostHeaderMismatch {@code true} to allow such requests, {@code false} to reject them with a 400
-     */
-    public void setAllowHostHeaderMismatch(boolean allowHostHeaderMismatch) {
-        this.allowHostHeaderMismatch = allowHostHeaderMismatch;
-    }
-
-
-    private boolean rejectIllegalHeader = true;
-
-    /**
-     * If an HTTP request is received that contains an illegal header name or value (e.g. the header name is not a
-     * token) will the request be rejected (with a 400 response) or will the illegal header be ignored?
-     *
-     * @return {@code true} if the request will be rejected or {@code false} if the header will be ignored
-     */
-    public boolean getRejectIllegalHeader() {
-        return rejectIllegalHeader;
-    }
-
-    /**
-     * If an HTTP request is received that contains an illegal header name or value (e.g. the header name is not a
-     * token) should the request be rejected (with a 400 response) or should the illegal header be ignored?
-     *
-     * @param rejectIllegalHeader {@code true} to reject requests with illegal header names or values, {@code false} to
-     *                                ignore the header
-     */
-    public void setRejectIllegalHeader(boolean rejectIllegalHeader) {
-        this.rejectIllegalHeader = rejectIllegalHeader;
     }
 
 
@@ -578,11 +531,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     /**
      * The protocols that are available via internal Tomcat support for access via HTTP upgrade.
      */
-    private final Map<String, UpgradeProtocol> httpUpgradeProtocols = new HashMap<>();
+    private final Map<String,UpgradeProtocol> httpUpgradeProtocols = new HashMap<>();
     /**
      * The protocols that are available via internal Tomcat support for access via ALPN negotiation.
      */
-    private final Map<String, UpgradeProtocol> negotiatedProtocols = new HashMap<>();
+    private final Map<String,UpgradeProtocol> negotiatedProtocols = new HashMap<>();
 
     private void configureUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
         // HTTP Upgrade
@@ -634,7 +587,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * To enable basic statistics to be made available for these protocols, a map of protocol name to
      * {@link UpgradeGroupInfo} instances is maintained here.
      */
-    private final Map<String, UpgradeGroupInfo> upgradeProtocolGroupInfos = new ConcurrentHashMap<>();
+    private final Map<String,UpgradeGroupInfo> upgradeProtocolGroupInfos = new ConcurrentHashMap<>();
 
     public UpgradeGroupInfo getUpgradeGroupInfo(String upgradeProtocol) {
         if (upgradeProtocol == null) {
@@ -745,6 +698,12 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
 
     @Override
+    public void addSslHostConfig(SSLHostConfig sslHostConfig, boolean replace) {
+        getEndpoint().addSslHostConfig(sslHostConfig, replace);
+    }
+
+
+    @Override
     public SSLHostConfig[] findSslHostConfigs() {
         return getEndpoint().findSslHostConfigs();
     }
@@ -766,7 +725,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         }
         if (getSslImplementationName() != null &&
                 getSslImplementationName().endsWith(".panama.OpenSSLImplementation")) {
-            return "opensslforeign";
+            return "opensslffm";
         }
         return "jsse";
     }

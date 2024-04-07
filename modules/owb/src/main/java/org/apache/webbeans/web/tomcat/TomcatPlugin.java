@@ -18,6 +18,8 @@
  */
 package org.apache.webbeans.web.tomcat;
 
+import java.util.EventListener;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.Servlet;
 import jakarta.servlet.ServletContextAttributeListener;
@@ -28,8 +30,6 @@ import jakarta.servlet.http.HttpSessionActivationListener;
 import jakarta.servlet.http.HttpSessionAttributeListener;
 import jakarta.servlet.http.HttpSessionBindingListener;
 import jakarta.servlet.http.HttpSessionListener;
-
-import java.util.EventListener;
 
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.webbeans.config.WebBeansContext;

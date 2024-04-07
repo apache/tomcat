@@ -83,8 +83,8 @@
   <subsection name="APR Lifecycle Listener - org.apache.catalina.core.AprLifecycleListener">
 
     <p>The <strong>APR Lifecycle Listener</strong> checks for the presence of
-    the APR/native library and loads the library if it is present. For more
-    information see the <a href="../apr.html">APR/native guide</a>.</p>
+    the Apache Tomcat Native library and loads the library if it is present.
+    For more information see the <a href="../apr.html">APR/native guide</a>.</p>
 
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements.</p>
@@ -141,6 +141,33 @@
         if the native library is available and a NIO or NIO2 connector is used.</p>
       </attribute>
 
+    </attributes>
+
+  </subsection>
+
+  <subsection name="Context Naming Info Listener - org.apache.catalina.core.ContextNamingInfoListener">
+
+    <p>The <strong>Context Naming Info Listener</strong> adds the following
+    environment entries (<code>java:comp/env</code> implied) from the
+    <a href="context.html">Context</a>: <code>context/path</code>,
+    <code>context/encodedPath</code>, <code>context/webappVersion</code>,
+    <code>context/name</code>, <code>context/baseName</code>,
+    <code>context/displayName</code>.</p>
+
+    <p>This listener must only be nested within
+    <a href="context.html">Context</a> elements.</p>
+
+    <p>The following additional attributes are supported by the
+    <strong>Context Naming Info Listener</strong>:</p>
+
+    <attributes>
+      <attribute name="emptyOnRoot" required="false">
+        <p>Whether for the root context <code>context/path</code> and
+        <code>context/encodedPath</code> will contain <code>"/"</code> and
+        <code>context/name</code> will contain <code>"ROOT"</code> with a version,
+        if any.</p>
+        <p>The default value is <code>true</code>.</p>
+      </attribute>
     </attributes>
 
   </subsection>
@@ -229,6 +256,16 @@
         side-effects. The default is <code>true</code>.</p>
       </attribute>
 
+      <attribute name="initSeedGenerator" required="false">
+        <p>The first use of <code>SeedGenerator</code>, an internal class of
+        the default security spi implementation, might create a thread on some
+        platforms. Depending on the timing of the first use of a secure random
+        this thread might become associated with a webapp classloader, causing
+        a memory leak. Setting this to <code>true</code> will initialize the
+        seed. The default is <code>false</code> to avoid consuming random if
+        not needed.</p>
+      </attribute>
+
       <attribute name="urlCacheProtection" required="false">
         <p>Enables protection so that reading resources from JAR files using
         <code>java.net.URLConnection</code>s does not result in the JAR file
@@ -255,6 +292,98 @@
       processing.</p>
 
     </subsection>
+
+  </subsection>
+
+  <subsection name="OpenSSL Lifecycle Listener - org.apache.catalina.core.OpenSSLLifecycleListener">
+
+    <p>The <strong>OpenSSL Lifecycle Listener</strong> checks for the presence
+    of the OpenSSL library and loads the library if it is present. This
+    uses the FFM API from Java 22 instead of additional native code. When
+    enabled and successfully loaded, NIO and NIO2 connector will then make use
+    of OpenSSL for TLS functionality. This is a functional replacement to the
+    <strong>APR Lifecycle Listener</strong> described above.</p>
+
+    <p>This listener must only be nested within <a href="server.html">Server</a>
+    elements.</p>
+
+    <p>The following additional attributes are supported by the <strong>OpenSSL
+    Lifecycle Listener</strong>:</p>
+
+    <attributes>
+
+      <attribute name="SSLEngine" required="false">
+        <p>Name of the SSLEngine to use, for OpenSSL 1.x.</p>
+        <p>See the <a href="http://www.openssl.org/">Official OpenSSL website</a>
+        for more details on supported SSL hardware engines and manufacturers.
+        </p>
+      </attribute>
+
+      <attribute name="SSLRandomSeed" required="false">
+        <p>Entropy source used to seed the SSLEngine's PRNG. The default value
+        is <code>builtin</code>. On development systems, you may want to set
+        this to <code>/dev/urandom</code> to allow quicker start times.</p>
+      </attribute>
+
+      <attribute name="FIPSMode" required="false">
+        <p>The behaviour of this attribute depends on whether Tomcat Native has
+        been compiled against OpenSSL 1.x or OpenSSL 3.x.</p>
+        <p>For OpenSSL 1.x: Set to <code>on</code> to request that OpenSSL be in
+        FIPS mode (if OpenSSL is already in FIPS mode, it will remain in FIPS
+        mode).
+        Set to <code>enter</code> to force OpenSSL to enter FIPS mode (an
+        error will occur if OpenSSL is already in FIPS mode).
+        Set to <code>require</code> to require that OpenSSL <i>already</i> be
+        in FIPS mode (an error will occur if OpenSSL is not already in FIPS
+        mode).</p>
+        <p>For OpenSSL 3.x: <code>on</code>, <code>enter</code> and
+        <code>require</code> all behave the same way. If the FIPS provider is
+        the default provider, it will be used. If the FIPS provider is not the
+        default provider, an error will occur.</p>
+        <p>FIPS mode <em>requires you to have a FIPS-capable OpenSSL library</em>.
+        If this attribute is set to anything other than <code>off</code>, the
+        <b>SSLEngine</b> must be enabled as well.</p>
+        <p>The default value is <code>off</code>.</p>
+      </attribute>
+
+      <attribute name="useOpenSSL" required="false">
+        <p>This attribute controls the auto-selection of the OpenSSL JSSE
+        implementation. The default is <code>true</code> which will use OpenSSL
+        if the FFM API is available.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+  <subsection name="Properties Role Mapping Listener - org.apache.catalina.core.PropertiesRoleMappingListener">
+
+    <p>The <strong>Properties Role Mapping Listener</strong> populates the context's role mapping
+    from a properties file. The keys represent application roles (e.g., admin, user, uservisor,
+    etc.) while the values represent technical roles (e.g., DNs, SIDs, UUIDs, etc.). A key can
+    also be prefixed if, e.g., the properties file contains generic application configuration
+    as well: <code>app-roles.</code>.</p>
+
+    <p>This listener must only be nested within
+    <a href="context.html">Context</a> elements.</p>
+
+    <p>The following additional attributes are supported by the
+    <strong>Properties Role Mapping Listener</strong>:</p>
+
+    <attributes>
+
+      <attribute name="roleMappingFile" required="false">
+        <p>The path to the role mapping properties file. You can use protocol <code>webapp:</code>
+        and whatever <code>ConfigFileLoader</code> supports.</p>
+        <p>The default value is <code>webapp:/WEB-INF/role-mapping.properties</code>.</p>
+      </attribute>
+
+      <attribute name="keyPrefix" required="false">
+        <p>The prefix to filter from property keys. All other keys will be ignored which do
+        not have the prefix.</p>
+      </attribute>
+
+    </attributes>
 
   </subsection>
 
@@ -287,6 +416,12 @@
         is not performed on Windows platforms.</p>
       </attribute>
 
+      <attribute name="buildDateWarningAgeDays" required="false">
+        <p>The maximim number of days between the build-date of this instance
+        of Tomcat and its startup date can be before warnings will be logged.
+        Set to anything less than 0 (e.g. -1) to disable this check.
+        If not specified, the default value of <b>-1</b> is used.</p>
+      </attribute>
     </attributes>
 
   </subsection>
@@ -340,6 +475,43 @@
 
     <p>No additional attributes are supported by the <strong>ThreadLocal Leak
     Prevention Listener</strong>.</p>
+
+  </subsection>
+
+  <subsection name="TLS configuration reload listener - org.apache.catalina.security.TLSCertificateReloadListener">
+
+    <p>This listener may be used to monitor the expiration dates of TLS
+    certificates and trigger automatic reloading of the TLS configuration a set
+    number of days before the TLS certificate expires.</p>
+
+    <p>This listener assumes there is some other process (certbot, cloud
+    infrastructure, etc) that renews the certificate on a regular basis and
+    replaces the current certificate with the new one.</p>
+
+    <p>This listener does <b>NOT</b> re-read the Tomcat configuration from
+    server.xml. If you make changes to server.xml you must restart the Tomcat
+    process to pick up those changes.</p>
+
+    <p>This listener must only be nested within <a href="server.html">Server</a>
+    elements.</p>
+
+    <attributes>
+
+      <attribute name="checkPeriod" required="false">
+        <p>The time, in seconds, between reloading checks. The periodic process
+        for <code>LifecycleListener</code> typically runs much more frequently
+        than this listener requires. This attribute controls the period between
+        checks. If not specified, a default of 86,400 seconds (24 hours) is
+        used.</p>
+      </attribute>
+
+      <attribute name="daysBefore" required="false">
+        <p>The number of days before the expiry of a TLS certificate that it is
+        expected that the new certificate will be in place and the reloading can
+        be triggered. If not specified, a default of 14 days is used.</p>
+      </attribute>
+
+    </attributes>
 
   </subsection>
 

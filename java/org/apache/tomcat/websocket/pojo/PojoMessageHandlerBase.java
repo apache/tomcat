@@ -31,10 +31,9 @@ import org.apache.tomcat.websocket.WrappedMessageHandler;
 /**
  * Common implementation code for the POJO message handlers.
  *
- * @param <T>   The type of message to handle
+ * @param <T> The type of message to handle
  */
-public abstract class PojoMessageHandlerBase<T>
-        implements WrappedMessageHandler {
+public abstract class PojoMessageHandlerBase<T> implements WrappedMessageHandler {
 
     protected final Object pojo;
     protected final Method method;
@@ -45,9 +44,8 @@ public abstract class PojoMessageHandlerBase<T>
     protected final int indexSession;
     protected final long maxMessageSize;
 
-    public PojoMessageHandlerBase(Object pojo, Method method,
-            Session session, Object[] params, int indexPayload, boolean convert,
-            int indexSession, long maxMessageSize) {
+    public PojoMessageHandlerBase(Object pojo, Method method, Session session, Object[] params, int indexPayload,
+            boolean convert, int indexSession, long maxMessageSize) {
         this.pojo = pojo;
         this.method = method;
         // TODO: The method should already be accessible here but the following
@@ -90,9 +88,8 @@ public abstract class PojoMessageHandlerBase<T>
 
 
     /**
-     * Expose the POJO if it is a message handler so the Session is able to
-     * match requests to remove handlers if the original handler has been
-     * wrapped.
+     * Expose the POJO if it is a message handler so the Session is able to match requests to remove handlers if the
+     * original handler has been wrapped.
      */
     @Override
     public final MessageHandler getWrappedHandler() {

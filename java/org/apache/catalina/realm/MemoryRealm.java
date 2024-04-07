@@ -65,13 +65,13 @@ public class MemoryRealm extends RealmBase {
     /**
      * The set of valid Principals for this Realm, keyed by user name.
      */
-    private final Map<String, GenericPrincipal> principals = new HashMap<>();
+    private final Map<String,GenericPrincipal> principals = new HashMap<>();
 
 
     /**
      * The set of credentials for this Realm, keyed by user name.
      */
-    private final Map<String, String> credentials = new HashMap<>();
+    private final Map<String,String> credentials = new HashMap<>();
 
 
     // ------------------------------------------------------------- Properties
@@ -101,16 +101,6 @@ public class MemoryRealm extends RealmBase {
 
     // --------------------------------------------------------- Public Methods
 
-
-    /**
-     * Return the Principal associated with the specified username and credentials, if there is one; otherwise return
-     * <code>null</code>.
-     *
-     * @param username    Username of the Principal to look up
-     * @param credentials Password or other credentials to use in authenticating this username
-     *
-     * @return the associated principal, or <code>null</code> if there is none.
-     */
     @Override
     public Principal authenticate(String username, String credentials) {
 
@@ -197,6 +187,7 @@ public class MemoryRealm extends RealmBase {
      *             necessary.
      */
     protected Digester getDigester() {
+        // Keep locking for subclass compatibility
         synchronized (digesterLock) {
             if (digester == null) {
                 digester = new Digester();
@@ -213,54 +204,39 @@ public class MemoryRealm extends RealmBase {
     }
 
 
-    /**
-     * @return the password associated with the given principal's user name.
-     */
     @Override
     protected String getPassword(String username) {
         return credentials.get(username);
     }
 
 
-    /**
-     * @return the Principal associated with the given user name.
-     */
     @Override
     protected Principal getPrincipal(String username) {
-
         return principals.get(username);
-
     }
 
 
     // ------------------------------------------------------ Lifecycle Methods
 
-    /**
-     * Prepare for the beginning of active use of the public methods of this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
     @Override
     protected void startInternal() throws LifecycleException {
         String pathName = getPathname();
         try (InputStream is = ConfigFileLoader.getSource().getResource(pathName).getInputStream()) {
             // Load the contents of the database file
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("memoryRealm.loadPath", pathName));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("memoryRealm.loadPath", pathName));
             }
 
-            Digester digester = getDigester();
-            try {
-                synchronized (digester) {
+            synchronized (digesterLock) {
+                Digester digester = getDigester();
+                try {
                     digester.push(this);
                     digester.parse(is);
+                } catch (Exception e) {
+                    throw new LifecycleException(sm.getString("memoryRealm.readXml"), e);
+                } finally {
+                    digester.reset();
                 }
-            } catch (Exception e) {
-                throw new LifecycleException(sm.getString("memoryRealm.readXml"), e);
-            } finally {
-                digester.reset();
             }
         } catch (IOException ioe) {
             throw new LifecycleException(sm.getString("memoryRealm.loadExist", pathName), ioe);

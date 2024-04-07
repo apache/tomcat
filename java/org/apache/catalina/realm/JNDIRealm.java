@@ -64,6 +64,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
@@ -514,7 +515,7 @@ public class JNDIRealm extends RealmBase {
     /**
      * @return the derefAliases setting to be used.
      */
-    public java.lang.String getDerefAliases() {
+    public String getDerefAliases() {
         return derefAliases;
     }
 
@@ -524,7 +525,7 @@ public class JNDIRealm extends RealmBase {
      *
      * @param derefAliases New value of property derefAliases.
      */
-    public void setDerefAliases(java.lang.String derefAliases) {
+    public void setDerefAliases(String derefAliases) {
         this.derefAliases = derefAliases;
     }
 
@@ -962,12 +963,15 @@ public class JNDIRealm extends RealmBase {
         if (cipherSuites == null || cipherSuitesArray != null) {
             return cipherSuitesArray;
         }
-        if (this.cipherSuites.trim().isEmpty()) {
+        this.cipherSuites = this.cipherSuites.trim();
+        if (this.cipherSuites.isEmpty()) {
             containerLog.warn(sm.getString("jndiRealm.emptyCipherSuites"));
             this.cipherSuitesArray = null;
         } else {
-            this.cipherSuitesArray = cipherSuites.trim().split("\\s*,\\s*");
-            containerLog.debug(sm.getString("jndiRealm.cipherSuites", Arrays.toString(this.cipherSuitesArray)));
+            this.cipherSuitesArray = StringUtils.splitCommaSeparated(cipherSuites);
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace(sm.getString("jndiRealm.cipherSuites", Arrays.toString(this.cipherSuitesArray)));
+            }
         }
         return this.cipherSuitesArray;
     }
@@ -1120,15 +1124,11 @@ public class JNDIRealm extends RealmBase {
     // ---------------------------------------------------------- Realm Methods
 
     /**
-     * Return the Principal associated with the specified username and credentials, if there is one; otherwise return
-     * <code>null</code>. If there are any errors with the JDBC connection, executing the query or anything we return
-     * null (don't authenticate). This event is also logged, and the connection will be closed so that a subsequent
-     * request will automatically re-open it.
-     *
-     * @param username    Username of the Principal to look up
-     * @param credentials Password or other credentials to use in authenticating this username
-     *
-     * @return the associated principal, or <code>null</code> if there is none.
+     * {@inheritDoc}
+     * <p>
+     * If there are any errors with the JNDI connection, executing the query or anything we return null (don't
+     * authenticate). This event is also logged, and the connection will be closed so that a subsequent request will
+     * automatically re-open it.
      */
     @Override
     public Principal authenticate(String username, String credentials) {
@@ -1203,8 +1203,8 @@ public class JNDIRealm extends RealmBase {
             closePooledConnections();
 
             // Return "not authenticated" for this request
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("Returning null principal.");
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace("Returning null principal.");
             }
             return null;
         } finally {
@@ -1231,14 +1231,14 @@ public class JNDIRealm extends RealmBase {
             throws NamingException {
 
         if (username == null || username.equals("") || credentials == null || credentials.equals("")) {
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("username null or empty: returning null principal.");
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace("username null or empty: returning null principal.");
             }
             return null;
         }
 
         ClassLoader ocl = null;
-        Thread currentThread= null;
+        Thread currentThread = null;
         try {
             // https://bz.apache.org/bugzilla/show_bug.cgi?id=65553
             // This can move back to open() once it is known that Tomcat must be
@@ -1260,8 +1260,8 @@ public class JNDIRealm extends RealmBase {
                             if (checkCredentials(connection.context, user, credentials)) {
                                 // Search for additional roles
                                 List<String> roles = getRoles(connection, user);
-                                if (containerLog.isDebugEnabled()) {
-                                    containerLog.debug("Found roles: " + roles.toString());
+                                if (containerLog.isTraceEnabled()) {
+                                    containerLog.trace("Found roles: " + ((roles == null) ? "" : roles.toString()));
                                 }
                                 return new GenericPrincipal(username, roles);
                             }
@@ -1290,8 +1290,8 @@ public class JNDIRealm extends RealmBase {
 
                 // Search for additional roles
                 List<String> roles = getRoles(connection, user);
-                if (containerLog.isDebugEnabled()) {
-                    containerLog.debug("Found roles: " + roles.toString());
+                if (containerLog.isTraceEnabled()) {
+                    containerLog.trace("Found roles: " + ((roles == null) ? "" : roles.toString()));
                 }
 
                 // Create and return a suitable Principal for this user
@@ -1336,7 +1336,7 @@ public class JNDIRealm extends RealmBase {
      */
     @Override
     public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
-            String qop, String realm, String md5a2) {
+            String qop, String realm, String digestA2, String algorithm) {
         ClassLoader ocl = null;
         Thread currentThread = null;
         try {
@@ -1345,7 +1345,7 @@ public class JNDIRealm extends RealmBase {
                 ocl = currentThread.getContextClassLoader();
                 currentThread.setContextClassLoader(this.getClass().getClassLoader());
             }
-            return super.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realm, md5a2);
+            return super.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realm, digestA2, algorithm);
         } finally {
             if (currentThread != null) {
                 currentThread.setContextClassLoader(ocl);
@@ -1502,8 +1502,8 @@ public class JNDIRealm extends RealmBase {
         // Use pattern or search for user entry
         if (userPatternArray != null && curUserPattern >= 0) {
             user = getUserByPattern(connection, username, credentials, attrIds, curUserPattern);
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("Found user by pattern [" + user + "]");
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace("Found user by pattern [" + user + "]");
             }
         } else {
             boolean thisUserSearchAsUser = isUserSearchAsUser();
@@ -1517,8 +1517,8 @@ public class JNDIRealm extends RealmBase {
                     userCredentialsRemove(connection.context);
                 }
             }
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("Found user by search [" + user + "]");
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace("Found user by search [" + user + "]");
             }
         }
         if (userPassword == null && credentials != null && user != null) {
@@ -1949,7 +1949,7 @@ public class JNDIRealm extends RealmBase {
         }
 
         // Are we configured to do role searches?
-        if ((connection.roleFormat == null) || (roleName == null)) {
+        if (connection.roleFormat == null || roleName == null) {
             return list;
         }
 
@@ -1983,14 +1983,14 @@ public class JNDIRealm extends RealmBase {
         }
 
         // Perform the configured search and process the results
-        NamingEnumeration<SearchResult> results = searchAsUser(connection.context, user, base, filter, controls,
-                isRoleSearchAsUser());
+        NamingEnumeration<SearchResult> results =
+                searchAsUser(connection.context, user, base, filter, controls, isRoleSearchAsUser());
 
         if (results == null) {
             return list; // Should never happen, but just in case ...
         }
 
-        Map<String, String> groupMap = new HashMap<>();
+        Map<String,String> groupMap = new HashMap<>();
         try {
             while (results.hasMore()) {
                 SearchResult result = results.next();
@@ -2013,9 +2013,9 @@ public class JNDIRealm extends RealmBase {
         }
 
         if (containerLog.isTraceEnabled()) {
-            Set<Entry<String, String>> entries = groupMap.entrySet();
+            Set<Entry<String,String>> entries = groupMap.entrySet();
             containerLog.trace("  Found " + entries.size() + " direct roles");
-            for (Entry<String, String> entry : entries) {
+            for (Entry<String,String> entry : entries) {
                 containerLog.trace("  Found direct role " + entry.getKey() + " -> " + entry.getValue());
             }
         }
@@ -2027,11 +2027,11 @@ public class JNDIRealm extends RealmBase {
             // Directory Groups". It avoids group slurping and handles cyclic group memberships as well.
             // See http://middleware.internet2.edu/dir/ for details
 
-            Map<String, String> newGroups = new HashMap<>(groupMap);
+            Map<String,String> newGroups = new HashMap<>(groupMap);
             while (!newGroups.isEmpty()) {
-                Map<String, String> newThisRound = new HashMap<>(); // Stores the groups we find in this iteration
+                Map<String,String> newThisRound = new HashMap<>(); // Stores the groups we find in this iteration
 
-                for (Entry<String, String> group : newGroups.entrySet()) {
+                for (Entry<String,String> group : newGroups.entrySet()) {
                     // Group key is already value escaped if required
                     // Group value is not value escaped
                     // Everything needs to be filter escaped
@@ -2223,8 +2223,8 @@ public class JNDIRealm extends RealmBase {
         }
         // Close our opened connection
         try {
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("Closing directory context");
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace("Closing directory context");
             }
             connection.context.close();
         } catch (NamingException e) {
@@ -2410,7 +2410,7 @@ public class JNDIRealm extends RealmBase {
 
         User user = null;
         List<String> roles = null;
-        Hashtable<?, ?> preservedEnvironment = null;
+        Hashtable<?,?> preservedEnvironment = null;
         DirContext context = connection.context;
 
         try {
@@ -2445,7 +2445,7 @@ public class JNDIRealm extends RealmBase {
 
 
     private void restoreEnvironmentParameter(DirContext context, String parameterName,
-            Hashtable<?, ?> preservedEnvironment) {
+            Hashtable<?,?> preservedEnvironment) {
         try {
             context.removeFromEnvironment(parameterName);
             if (preservedEnvironment != null && preservedEnvironment.containsKey(parameterName)) {
@@ -2551,7 +2551,7 @@ public class JNDIRealm extends RealmBase {
     }
 
 
-    private DirContext createDirContext(Hashtable<String, String> env) throws NamingException {
+    private DirContext createDirContext(Hashtable<String,String> env) throws NamingException {
         if (useStartTls) {
             return createTlsDirContext(env);
         } else {
@@ -2616,8 +2616,8 @@ public class JNDIRealm extends RealmBase {
      *
      * @throws NamingException when something goes wrong while negotiating the connection
      */
-    private DirContext createTlsDirContext(Hashtable<String, String> env) throws NamingException {
-        Map<String, Object> savedEnv = new HashMap<>();
+    private DirContext createTlsDirContext(Hashtable<String,String> env) throws NamingException {
+        Map<String,Object> savedEnv = new HashMap<>();
         for (String key : Arrays.asList(Context.SECURITY_AUTHENTICATION, Context.SECURITY_CREDENTIALS,
                 Context.SECURITY_PRINCIPAL, Context.SECURITY_PROTOCOL)) {
             Object entry = env.remove(key);
@@ -2643,7 +2643,7 @@ public class JNDIRealm extends RealmBase {
             }
         } finally {
             if (result != null) {
-                for (Map.Entry<String, Object> savedEntry : savedEnv.entrySet()) {
+                for (Map.Entry<String,Object> savedEntry : savedEnv.entrySet()) {
                     result.addToEnvironment(savedEntry.getKey(), savedEntry.getValue());
                 }
             }
@@ -2657,15 +2657,15 @@ public class JNDIRealm extends RealmBase {
      *
      * @return java.util.Hashtable the configuration for the directory context.
      */
-    protected Hashtable<String, String> getDirectoryContextEnvironment() {
+    protected Hashtable<String,String> getDirectoryContextEnvironment() {
 
-        Hashtable<String, String> env = new Hashtable<>();
+        Hashtable<String,String> env = new Hashtable<>();
 
         // Configure our directory context environment.
-        if (containerLog.isDebugEnabled() && connectionAttempt == 0) {
-            containerLog.debug("Connecting to URL " + connectionURL);
-        } else if (containerLog.isDebugEnabled() && connectionAttempt > 0) {
-            containerLog.debug("Connecting to URL " + alternateURL);
+        if (containerLog.isTraceEnabled() && connectionAttempt == 0) {
+            containerLog.trace("Connecting to URL " + connectionURL);
+        } else if (containerLog.isTraceEnabled() && connectionAttempt > 0) {
+            containerLog.trace("Connecting to URL " + alternateURL);
         }
         env.put(Context.INITIAL_CONTEXT_FACTORY, contextFactory);
         if (connectionName != null) {
@@ -2689,7 +2689,7 @@ public class JNDIRealm extends RealmBase {
             env.put(Context.REFERRAL, referrals);
         }
         if (derefAliases != null) {
-            env.put(JNDIRealm.DEREF_ALIASES, derefAliases);
+            env.put(DEREF_ALIASES, derefAliases);
         }
         if (connectionTimeout != null) {
             env.put("com.sun.jndi.ldap.connect.timeout", connectionTimeout);
@@ -2896,11 +2896,11 @@ public class JNDIRealm extends RealmBase {
                 String pathComponent = userNameUri.getPath();
                 // Should not ever have an empty path component, since that is /{DN}
                 if (pathComponent.length() < 1) {
-                    throw new InvalidNameException("Search returned unparseable absolute name: " + resultName);
+                    throw new InvalidNameException(sm.getString("jndiRealm.invalidName", resultName));
                 }
                 name = parser.parse(pathComponent.substring(1));
             } catch (URISyntaxException e) {
-                throw new InvalidNameException("Search returned unparseable absolute name: " + resultName);
+                throw new InvalidNameException(sm.getString("jndiRealm.invalidName", resultName));
             }
         }
 

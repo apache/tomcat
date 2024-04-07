@@ -262,10 +262,7 @@ Tomcat can use two different implementations of SSL:
 The exact configuration details depend on which implementation is being used.
 If you configured Connector by specifying generic
 <code>protocol="HTTP/1.1"</code> then the implementation used by Tomcat is
-chosen automatically. If the installation uses <a href="apr.html">APR</a>
-- i.e. you have installed the Tomcat native library -
-then it will use the JSSE OpenSSL implementation, otherwise it will use the Java
-JSSE implementation.
+chosen automatically.
 </p>
 
 <p>
@@ -285,31 +282,35 @@ loaded or not, use one of the following:</p>
            port="8443" .../>]]></source>
 
 <p>The OpenSSL JSSE implementation can also be configured explicitly if needed.
-If the APR library is installed, using the sslImplementationName attribute
-allows enabling it. When using the OpenSSL JSSE implementation, the
+If the Tomcat Native library or Java 22 is installed, using the
+<code>sslImplementationName</code>
+attribute allows enabling it. When using the OpenSSL JSSE implementation, the
 configuration can use either the JSSE attributes or the OpenSSL attributes, but
 must not mix attributes from both types in the same SSLHostConfig or Connector
 element.</p>
+<p>With Tomcat Native:</p>
 <source><![CDATA[<!-- Define an HTTP/1.1 Connector on port 8443, JSSE NIO implementation and OpenSSL -->
 <Connector protocol="org.apache.coyote.http11.Http11NioProtocol" port="8443"
            sslImplementationName="org.apache.tomcat.util.net.openssl.OpenSSLImplementation"
            .../>]]></source>
+<p>With Java 22 FFM API:</p>
+<source><![CDATA[<!-- Define an HTTP/1.1 Connector on port 8443, JSSE NIO implementation and OpenSSL -->
+<Connector protocol="org.apache.coyote.http11.Http11NioProtocol" port="8443"
+           sslImplementationName="org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"
+           .../>]]></source>
 
-<p>If you are using JSSE OpenSSL, you have the option of configuring an alternative engine to OpenSSL.</p>
-<source><![CDATA[<Listener className="org.apache.catalina.core.AprLifecycleListener"
-          SSLEngine="someengine" SSLRandomSeed="somedevice" />]]></source>
-<p>The default value is</p>
-<source><![CDATA[<Listener className="org.apache.catalina.core.AprLifecycleListener"
-          SSLEngine="on" SSLRandomSeed="builtin" />]]></source>
+<p>Alternately a listener can be added to the <code>Server</code> to enable
+OpenSSL on all connectors without having to add the
+<code>sslImplementationName</code> attribute on each.</p>
+<p>With Tomcat Native:</p>
+<source><![CDATA[<Listener className="org.apache.catalina.core.AprLifecycleListener"/>]]></source>
+<p>With Java 22 FFM API:</p>
+<source><![CDATA[<Listener className="org.apache.catalina.core.OpenSSLLifecycleListener"/>]]></source>
 <p>
-So to enable OpenSSL, make sure the SSLEngine attribute is set to something other than <code>off</code>.
-The default value is <code>on</code> and if you specify another value,
-it has to be a valid OpenSSL engine name.
-</p>
-
-<p>
-SSLRandomSeed allows to specify a source of entropy. Productive system needs a reliable source of entropy
-but entropy may need a lot of time to be collected therefore test systems could use no blocking entropy
+The <code>SSLRandomSeed</code> attribute of the listeners allows specifying a
+source of entropy.
+Productive system needs a reliable source of entropy but entropy may need a lot
+of time to be collected therefore test systems could use no blocking entropy
 sources like "/dev/urandom" that will allow quicker starts of Tomcat.
 </p>
 
@@ -336,10 +337,7 @@ so it looks something like this:</p>
     </SSLHostConfig>
 </Connector>]]></source>
 <p>
-  Note: If tomcat-native is installed, the configuration will use JSSE with
-  an OpenSSL implementation.</p>
-<p>
-  The APR configuration style uses different attributes for many SSL settings,
+  The OpenSSL configuration style uses different attributes for many SSL settings,
   particularly keys and certificates. An example of an APR configuration style
   is:</p>
 <source><![CDATA[<!-- Define an SSL Coyote HTTP/1.1 Connector on port 8443 -->
@@ -454,17 +452,17 @@ mailing list</a>.</p>
 </section>
 
 <section name="Using OCSP Certificates">
-<p>To use Online Certificate Status Protocol (OCSP) with Apache Tomcat, ensure
-  you have downloaded, installed, and configured the
-  <a href="https://tomcat.apache.org/download-native.cgi">
-    Tomcat Native Connector</a>.
-Furthermore, if you use the Windows platform, ensure you download the
-ocsp-enabled connector.</p>
+    <p>
+        Support of the Online Certificate Status Protocol (OCSP) in Apache Tomcat
+        uses OpenSSL. This can be used either through
+        <a href="https://tomcat.apache.org/download-native.cgi">Tomcat Native</a>
+        or the FFM API on Java 22 and newer.
+    </p>
 <p>To use OCSP, you require the following:</p>
 
 <ul>
   <li>OCSP-enabled certificates</li>
-  <li>Tomcat with SSL APR connector</li>
+  <li>Tomcat with an OpenSSL enabled connector</li>
   <li>Configured OCSP responder</li>
 </ul>
 

@@ -76,7 +76,7 @@ public class SingleSignOn extends ValveBase {
      * The cache of SingleSignOnEntry instances for authenticated Principals, keyed by the cookie value that is used to
      * select them.
      */
-    protected Map<String, SingleSignOnEntry> cache = new ConcurrentHashMap<>();
+    protected Map<String,SingleSignOnEntry> cache = new ConcurrentHashMap<>();
 
     /**
      * Indicates whether this valve should require a downstream Authenticator to reauthenticate each request, or if it
@@ -208,8 +208,8 @@ public class SingleSignOn extends ValveBase {
         request.removeNote(Constants.REQ_SSOID_NOTE);
 
         // Has a valid user already been authenticated?
-        if (containerLog.isDebugEnabled()) {
-            containerLog.debug(sm.getString("singleSignOn.debug.invoke", request.getRequestURI()));
+        if (containerLog.isTraceEnabled()) {
+            containerLog.trace(sm.getString("singleSignOn.debug.invoke", request.getRequestURI()));
         }
         if (request.getUserPrincipal() != null) {
             if (containerLog.isDebugEnabled()) {
@@ -221,8 +221,8 @@ public class SingleSignOn extends ValveBase {
         }
 
         // Check for the single sign on cookie
-        if (containerLog.isDebugEnabled()) {
-            containerLog.debug(sm.getString("singleSignOn.debug.cookieCheck"));
+        if (containerLog.isTraceEnabled()) {
+            containerLog.trace(sm.getString("singleSignOn.debug.cookieCheck"));
         }
         Cookie cookie = null;
         Cookie cookies[] = request.getCookies();
@@ -243,8 +243,8 @@ public class SingleSignOn extends ValveBase {
         }
 
         // Look up the cached Principal associated with this cookie value
-        if (containerLog.isDebugEnabled()) {
-            containerLog.debug(sm.getString("singleSignOn.debug.principalCheck", cookie.getValue()));
+        if (containerLog.isTraceEnabled()) {
+            containerLog.trace(sm.getString("singleSignOn.debug.principalCheck", cookie.getValue()));
         }
         SingleSignOnEntry entry = cache.get(cookie.getValue());
         if (entry != null) {
@@ -273,14 +273,17 @@ public class SingleSignOn extends ValveBase {
             if (domain != null) {
                 cookie.setDomain(domain);
             }
-            // This is going to trigger a Set-Cookie header. While the value is
-            // not security sensitive, ensure that expectations for secure and
-            // httpOnly are met
+            /*
+             * This is going to trigger a Set-Cookie header. While the value is not security sensitive, ensure that
+             * expectations for secure, httpOnly and Partitioned are met.
+             */
             cookie.setSecure(request.isSecure());
             if (request.getServletContext().getSessionCookieConfig().isHttpOnly() ||
                     request.getContext().getUseHttpOnly()) {
                 cookie.setHttpOnly(true);
             }
+            cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR,
+                    Boolean.toString(request.getContext().getUsePartitioned()));
 
             response.addCookie(cookie);
         }
@@ -567,7 +570,7 @@ public class SingleSignOn extends ValveBase {
 
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         Container c = getContainer();
         while (c != null && !(c instanceof Engine)) {
             c = c.getParent();
@@ -580,7 +583,7 @@ public class SingleSignOn extends ValveBase {
 
 
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
         super.stopInternal();
         engine = null;
     }

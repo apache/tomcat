@@ -791,7 +791,6 @@ public class NamingContext implements Context {
         throws NamingException {
         throw  new OperationNotSupportedException
             (sm.getString("namingContext.noAbsoluteName"));
-        //FIXME ?
     }
 
 
@@ -867,14 +866,17 @@ public class NamingContext implements Context {
                         // Use the configured object factory to resolve it directly if possible
                         // Note: This may need manual constructor reflection configuration
                         Reference reference = (Reference) entry.value;
-                        Class<?> factoryClass = getClass().getClassLoader().loadClass(reference.getFactoryClassName());
-                        ObjectFactory factory = (ObjectFactory) factoryClass.getDeclaredConstructor().newInstance();
-                        obj = factory.getObjectInstance(entry.value, name, this, env);
+                        String factoryClassName = reference.getFactoryClassName();
+                        if (factoryClassName != null) {
+                            Class<?> factoryClass = getClass().getClassLoader().loadClass(factoryClassName);
+                            ObjectFactory factory = (ObjectFactory) factoryClass.getDeclaredConstructor().newInstance();
+                            obj = factory.getObjectInstance(entry.value, name, this, env);
+                        }
                     }
                     if (entry.value instanceof ResourceRef) {
                         boolean singleton = Boolean.parseBoolean(
                                     (String) ((ResourceRef) entry.value).get(
-                                        "singleton").getContent());
+                                            ResourceRef.SINGLETON).getContent());
                         if (singleton) {
                             entry.type = NamingEntry.ENTRY;
                             entry.value = obj;
@@ -998,8 +1000,7 @@ public class NamingContext implements Context {
             return true;
         } else {
             if (exceptionOnFailedWrite) {
-                throw new javax.naming.OperationNotSupportedException(
-                        sm.getString("namingContext.readOnly"));
+                throw new OperationNotSupportedException(sm.getString("namingContext.readOnly"));
             }
         }
         return false;

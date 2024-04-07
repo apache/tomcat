@@ -29,7 +29,7 @@ Require-Capability: \
     osgi.ee;\
         filter:="(&(osgi.ee=JavaSE)(version=1.8))"
 
--namesection: jakarta/websocket/client*/;\
+-namesection: jakarta/websocket*/;\
     Specification-Title=Jakarta WebSocket Client;\
     Specification-Version=${websocket.spec.version}${websocket.revision};\
     Specification-Vendor=Eclipse Foundation;\

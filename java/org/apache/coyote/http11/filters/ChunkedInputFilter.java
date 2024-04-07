@@ -24,12 +24,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.coyote.BadRequestException;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.http11.Constants;
 import org.apache.coyote.http11.InputFilter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -41,8 +43,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler {
 
-    private static final StringManager sm = StringManager.getManager(
-            ChunkedInputFilter.class.getPackage().getName());
+    private static final StringManager sm = StringManager.getManager(ChunkedInputFilter.class);
 
 
     // -------------------------------------------------------------- Constants
@@ -162,7 +163,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
         if (remaining <= 0) {
             if (!parseChunkHeader()) {
-                throwIOException(sm.getString("chunkedInputFilter.invalidHeader"));
+                throwBadRequestException(sm.getString("chunkedInputFilter.invalidHeader"));
             }
             if (endChunk) {
                 parseEndChunk();
@@ -174,7 +175,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
         if (readChunk == null || readChunk.position() >= readChunk.limit()) {
             if (readBytes() < 0) {
-                throwIOException(sm.getString("chunkedInputFilter.eos"));
+                throwEOFException(sm.getString("chunkedInputFilter.eos"));
             }
         }
 
@@ -229,7 +230,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
         while ((read = doRead(this)) >= 0) {
             swallowed += read;
             if (maxSwallowSize > -1 && swallowed > maxSwallowSize) {
-                throwIOException(sm.getString("inputFilter.maxSwallow"));
+                throwBadRequestException(sm.getString("inputFilter.maxSwallow"));
             }
         }
 
@@ -367,7 +368,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                 // validated. Currently it is simply ignored.
                 extensionSize++;
                 if (maxExtensionSize > -1 && extensionSize > maxExtensionSize) {
-                    throwIOException(sm.getString("chunkedInputFilter.maxExtension"));
+                    throwBadRequestException(sm.getString("chunkedInputFilter.maxExtension"));
                 }
             }
 
@@ -406,23 +407,23 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
         while (!eol) {
             if (readChunk == null || readChunk.position() >= readChunk.limit()) {
                 if (readBytes() <= 0) {
-                    throwIOException(sm.getString("chunkedInputFilter.invalidCrlfNoData"));
+                    throwBadRequestException(sm.getString("chunkedInputFilter.invalidCrlfNoData"));
                 }
             }
 
             byte chr = readChunk.get(readChunk.position());
             if (chr == Constants.CR) {
                 if (crfound) {
-                    throwIOException(sm.getString("chunkedInputFilter.invalidCrlfCRCR"));
+                    throwBadRequestException(sm.getString("chunkedInputFilter.invalidCrlfCRCR"));
                 }
                 crfound = true;
             } else if (chr == Constants.LF) {
                 if (!tolerant && !crfound) {
-                    throwIOException(sm.getString("chunkedInputFilter.invalidCrlfNoCR"));
+                    throwBadRequestException(sm.getString("chunkedInputFilter.invalidCrlfNoCR"));
                 }
                 eol = true;
             } else {
-                throwIOException(sm.getString("chunkedInputFilter.invalidCrlf"));
+                throwBadRequestException(sm.getString("chunkedInputFilter.invalidCrlf"));
             }
 
             readChunk.position(readChunk.position() + 1);
@@ -443,6 +444,13 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
 
     private boolean parseHeader() throws IOException {
+
+        /*
+         * Implementation note: Any changes to this method probably need to be echoed in
+         * Http11InputBuffer.parseHeader(). Why not use a common implementation? In short, this code uses blocking
+         * reads whereas Http11InputBuffer using non-blocking reads. The code is just different enough that a common
+         * implementation wasn't viewed as practical.
+         */
 
         Map<String,String> headers = request.getTrailerFields();
 
@@ -484,12 +492,17 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
             // readBytes() above will set readChunk unless it returns a value < 0
             chr = readChunk.get(readChunk.position());
-            if ((chr >= Constants.A) && (chr <= Constants.Z)) {
+            if (chr >= Constants.A && chr <= Constants.Z) {
                 chr = (byte) (chr - Constants.LC_OFFSET);
             }
 
             if (chr == Constants.COLON) {
                 colon = true;
+            } else if (!HttpParser.isToken(chr)) {
+                // Non-token characters are illegal in header names
+                throwBadRequestException(sm.getString("chunkedInputFilter.invalidTrailerHeaderName"));
+            } else if (trailingHeaders.getEnd() >= trailingHeaders.getLimit()) {
+                throwBadRequestException(sm.getString("chunkedInputFilter.maxTrailer"));
             } else {
                 trailingHeaders.append(chr);
             }
@@ -522,13 +535,13 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                 }
 
                 chr = readChunk.get(readChunk.position());
-                if ((chr == Constants.SP) || (chr == Constants.HT)) {
+                if (chr == Constants.SP || chr == Constants.HT) {
                     readChunk.position(readChunk.position() + 1);
                     // If we swallow whitespace, make sure it counts towards the
                     // limit placed on trailing header size
                     int newlimit = trailingHeaders.getLimit() -1;
                     if (trailingHeaders.getEnd() > newlimit) {
-                        throwIOException(sm.getString("chunkedInputFilter.maxTrailer"));
+                        throwBadRequestException(sm.getString("chunkedInputFilter.maxTrailer"));
                     }
                     trailingHeaders.setLimit(newlimit);
                 } else {
@@ -551,7 +564,11 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                 if (chr == Constants.CR || chr == Constants.LF) {
                     parseCRLF(true);
                     eol = true;
-                } else if (chr == Constants.SP) {
+                } else if (HttpParser.isControl(chr) && chr != Constants.HT) {
+                    throw new IOException(sm.getString("chunkedInputFilter.invalidTrailerHeaderValue"));
+                } else if (trailingHeaders.getEnd() >= trailingHeaders.getLimit()) {
+                    throwBadRequestException(sm.getString("chunkedInputFilter.maxTrailer"));
+                } else if (chr == Constants.SP || chr == Constants.HT) {
                     trailingHeaders.append(chr);
                 } else {
                     trailingHeaders.append(chr);
@@ -574,8 +591,10 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
             }
 
             chr = readChunk.get(readChunk.position());
-            if ((chr != Constants.SP) && (chr != Constants.HT)) {
+            if (chr != Constants.SP && chr != Constants.HT) {
                 validLine = false;
+            } else if (trailingHeaders.getEnd() >= trailingHeaders.getLimit()) {
+                throwBadRequestException(sm.getString("chunkedInputFilter.maxTrailer"));
             } else {
                 eol = false;
                 // Copying one extra space in the buffer (since there must
@@ -602,9 +621,9 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
     }
 
 
-    private void throwIOException(String msg) throws IOException {
+    private void throwBadRequestException(String msg) throws IOException {
         error = true;
-        throw new IOException(msg);
+        throw new BadRequestException(msg);
     }
 
 

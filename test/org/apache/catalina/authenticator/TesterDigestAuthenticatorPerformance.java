@@ -37,10 +37,14 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardService;
 import org.apache.catalina.filters.TesterHttpServletResponse;
 import org.apache.catalina.startup.TesterMapRealm;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
-import org.apache.tomcat.util.security.MD5Encoder;
 
+/*
+ * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
+ * excluded due to the name starting Tester...
+ */
 public class TesterDigestAuthenticatorPerformance {
 
     private static String USER = "user";
@@ -160,9 +164,9 @@ public class TesterDigestAuthenticatorPerformance {
         private static final String A1 = USER + ":" + REALM + ":" + PWD;
         private static final String A2 = METHOD + ":" + CONTEXT_PATH + URI;
 
-        private static final String MD5A1 = MD5Encoder.encode(
+        private static final String DIGEST_A1 = HexUtils.toHexString(
                 ConcurrentMessageDigest.digest("MD5", A1.getBytes(StandardCharsets.UTF_8)));
-        private static final String MD5A2 = MD5Encoder.encode(
+        private static final String DIGEST_A2 = HexUtils.toHexString(
                 ConcurrentMessageDigest.digest("MD5", A2.getBytes(StandardCharsets.UTF_8)));
 
 
@@ -212,10 +216,10 @@ public class TesterDigestAuthenticatorPerformance {
                     Integer.valueOf(nonceCount.incrementAndGet()));
             String cnonce = "cnonce";
 
-            String response = MD5A1 + ":" + nonce + ":" + ncString + ":" +
-                    cnonce + ":" + QOP + ":" + MD5A2;
+            String response = DIGEST_A1 + ":" + nonce + ":" + ncString + ":" +
+                    cnonce + ":" + QOP + ":" + DIGEST_A2;
 
-            String md5response = MD5Encoder.encode(ConcurrentMessageDigest.digest(
+            String md5response = HexUtils.toHexString(ConcurrentMessageDigest.digest(
                     "MD5", response.getBytes(StandardCharsets.UTF_8)));
 
             StringBuilder auth = new StringBuilder();
@@ -250,7 +254,7 @@ public class TesterDigestAuthenticatorPerformance {
         private String authHeader = null;
 
         TesterDigestRequest() {
-            super(null);
+            super(null, null);
         }
 
         @Override

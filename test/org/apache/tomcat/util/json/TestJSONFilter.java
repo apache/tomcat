@@ -54,6 +54,7 @@ public class TestJSONFilter {
         // Start
         parameterSets.add(new String[] { "\naaa", "\\naaa" });
         parameterSets.add(new String[] { "\n\naaa", "\\n\\naaa" });
+        parameterSets.add(new String[] { "/aaa", "/aaa" });
 
         // Middle
         parameterSets.add(new String[] { "aaa\naaa", "aaa\\naaa" });

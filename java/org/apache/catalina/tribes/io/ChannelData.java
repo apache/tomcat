@@ -326,7 +326,7 @@ public class ChannelData implements ChannelMessage {
     @Override
     public Object deepclone() {
         byte[] d = this.getDataPackage();
-        return ChannelData.getDataFromPackage(d);
+        return getDataFromPackage(d);
     }
 
     /**

@@ -257,20 +257,27 @@
 
       <p>The <strong>maxPostSize</strong> attribute controls the maximum size
       of a POST request that will be parsed for parameters. The parameters are
-      cached for the duration of the request so this is limited to 2MB by
+      cached for the duration of the request so this is limited to 2 MiB by
       default to reduce exposure to a DOS attack.</p>
 
       <p>The <strong>maxSavePostSize</strong> attribute controls the saving of
       the request body during FORM and CLIENT-CERT authentication and HTTP/1.1
-      upgrade. For FORM authentication, the request body is cached for the
-      duration of the authentication (which may be many minutes) so this is
-      limited to 4KB by default to reduce exposure to a DOS attack.</p>
+      upgrade. For FORM authentication, the request body is cached in the HTTP
+      session for the duration of the authentication so the cached request body
+      is limited to 4 KiB by default to reduce exposure to a DOS attack. To
+      further reduce exposure to a DoS attack by limiting the permitted duration
+      of the FORM authentication, a reduced session timeout is used if the
+      session is created by the FORM authentication. This reduced timeout is
+      controlled by the <code>authenticationSessionTimeout</code> attribute of
+      the <a href="config/valve.html#Form_Authenticator_Valve">FORM
+      authenticator</a>.</p>
 
-      <p>The <strong>maxParameterCount</strong> attribute controls the
-      maximum number of parameter and value pairs (GET plus POST) that can
-      be parsed and stored in the request. Excessive parameters are ignored.
-      If you want to reject such requests, configure a
-      <a href="config/filter.html">FailedRequestFilter</a>.</p>
+      <p>The <strong>maxParameterCount</strong> attribute controls the maximum
+      total number of request parameters (including uploaded files) obtained
+      from the query string and, for POST requests, the request body if the
+      content type is <code>application/x-www-form-urlencoded</code> or
+      <code>multipart/form-data</code>. Requests with excessive parameters are
+      rejected.</p>
 
       <p>The <strong>xpoweredBy</strong> attribute controls whether or not the
       X-Powered-By HTTP header is sent with each request. If sent, the value of
@@ -365,6 +372,13 @@
       <code>/*</code>. It should also be noted the RFC6265 section 8.5 makes it
       clear that different paths should not be considered sufficient to isolate
       cookies from other applications.</p>
+
+      <p>When <strong>antiResourceLocking</strong> is enabled, Tomcat will copy
+      the unpacked web application to the directory defined by the
+      <code>java.io.tmpdir</code> system property
+      (<code>$CATALINA_BASE/temp</code> by default). This location should be
+      secured with appropriate file permissions - typically read/write for the
+      Tomcat user and no access for other users.</p>
     </subsection>
 
     <subsection name="Valves">
@@ -511,11 +525,6 @@
     information on the potential risks and mitigations may be found by
     following the links in the <a href="cgi-howto.html">CGI How To</a>.</p>
 
-    <p><a href="config/filter.html">FailedRequestFilter</a>
-    can be configured and used to reject requests that had errors during
-    request parameter parsing. Without the filter the default behaviour is
-    to ignore invalid or excessive parameters.</p>
-
     <p><a href="config/filter.html">HttpHeaderSecurityFilter</a> can be
     used to add headers to responses to improve security. If clients access
     Tomcat directly, then you probably want to enable this filter and all the
@@ -524,16 +533,39 @@
     to be co-ordinated with any headers that the reverse proxy sets.</p>
   </section>
 
+  <section name="Embedded Tomcat">
+    <p>When using embedded Tomcat, the typical defaults provided by the scripts,
+    server.xml and other configuration are not set. Users of embedded Tomcat may
+    wish to consider the following:</p>
+    <ul>
+      <li>The listeners normally configured in server.xml, including
+      <code>org.apache.catalina.security.SecurityListener</code>, will not be
+      configured by default. They must be explicitly enabled if required.</li>
+      <li>The <code>java.io.tmpdir</code> will not be set (it is normally set to
+      <code>$CATALINA_BASE/temp</code>). This directory is used for various
+      temporary files that may be security sensitive including file uploads and
+      a copy of the web application if anti-resource locking is enabled.
+      Consider setting the <code>java.io.tmpdir</code> system property to an
+      appropriately secured directory.</li>
+    </ul>
+  </section>
+
   <section name="General">
     <p>BASIC and FORM authentication pass user names and passwords in clear
     text. Web applications using these authentication mechanisms with clients
     connecting over untrusted networks should use SSL.</p>
 
-    <p>The session cookie for a session with an authenticated user are nearly
-    as useful as the user's password to an attacker and in nearly all
-    circumstances should be afforded the same level of protection as the
-    password itself. This usually means authenticating over SSL and continuing
-    to use SSL until the session ends.</p>
+    <p>The session cookie for a session with an authenticated user is nearly as
+    useful as the user's password to an attacker and should be afforded the same
+    level of protection as the password itself. This usually means
+    authenticating over SSL and continuing to use SSL until the session
+    ends.</p>
+
+    <p>Tomcat's implementation of the Servlet API's file upload support may use
+    the directory defined by the <code>java.io.tmpdir</code> system property
+    (<code>$CATALINA_BASE/temp</code> by default) to store temporary files. This
+    location should be secured with appropriate file permissions - typically
+    read/write for the Tomcat user and no access for other users.</p>
   </section>
 
 </body>

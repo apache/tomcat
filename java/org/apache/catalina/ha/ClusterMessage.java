@@ -22,8 +22,12 @@ import org.apache.catalina.tribes.Member;
 
 public interface ClusterMessage extends Serializable {
     Member getAddress();
+
     void setAddress(Member member);
+
     String getUniqueId();
+
     long getTimestamp();
+
     void setTimestamp(long timestamp);
 }

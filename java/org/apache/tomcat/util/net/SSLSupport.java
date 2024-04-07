@@ -26,6 +26,13 @@ public interface SSLSupport {
     /**
      * The Request attribute key for the cipher suite.
      */
+    String SECURE_PROTOCOL_KEY =
+            "jakarta.servlet.request.secure_protocol";
+
+
+    /**
+     * The Request attribute key for the cipher suite.
+     */
     String CIPHER_SUITE_KEY =
             "jakarta.servlet.request.cipher_suite";
 
@@ -57,7 +64,10 @@ public interface SSLSupport {
     /**
      * The request attribute key under which the String indicating the protocol
      * that created the SSL socket is recorded - e.g. TLSv1 or TLSv1.2 etc.
+     *
+     * @deprecated Replaced by {@link #SECURE_PROTOCOL_KEY}. This constant will be removed in Tomcat 12.
      */
+    @Deprecated
     String PROTOCOL_VERSION_KEY =
             "org.apache.tomcat.util.net.secure_protocol_version";
 

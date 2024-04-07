@@ -465,27 +465,26 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 groups.putAll(createdGroups);
                 groups.putAll(modifiedGroups);
 
-                Connection dbConnection = openConnection();
-                if (dbConnection != null && preparedAllGroups != null) {
-                    try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAllGroups)) {
-                        try (ResultSet rs = stmt.executeQuery()) {
-                            while (rs.next()) {
-                                String groupName = rs.getString(1);
-                                if (groupName != null) {
-                                    if (!groups.containsKey(groupName) && !removedGroups.containsKey(groupName)) {
-                                        Group group = findGroupInternal(dbConnection, groupName);
-                                        if (group != null) {
-                                            groups.put(groupName, group);
+                try (Connection dbConnection = openConnection()) {
+                    if (dbConnection != null && preparedAllGroups != null) {
+                        try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAllGroups)) {
+                            try (ResultSet rs = stmt.executeQuery()) {
+                                while (rs.next()) {
+                                    String groupName = rs.getString(1);
+                                    if (groupName != null) {
+                                        if (!groups.containsKey(groupName) && !removedGroups.containsKey(groupName)) {
+                                            Group group = findGroupInternal(dbConnection, groupName);
+                                            if (group != null) {
+                                                groups.put(groupName, group);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    } catch (SQLException e) {
-                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                    } finally {
-                        closeConnection(dbConnection);
                     }
+                } catch (SQLException e) {
+                    log.error(sm.getString("dataSourceUserDatabase.exception"), e);
                 }
                 return groups.values().iterator();
             } finally {
@@ -506,27 +505,26 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 roles.putAll(createdRoles);
                 roles.putAll(modifiedRoles);
 
-                Connection dbConnection = openConnection();
-                if (dbConnection != null && preparedAllRoles != null) {
-                    try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAllRoles)) {
-                        try (ResultSet rs = stmt.executeQuery()) {
-                            while (rs.next()) {
-                                String roleName = rs.getString(1);
-                                if (roleName != null) {
-                                    if (!roles.containsKey(roleName) && !removedRoles.containsKey(roleName)) {
-                                        Role role = findRoleInternal(dbConnection, roleName);
-                                        if (role != null) {
-                                            roles.put(roleName, role);
+                try (Connection dbConnection = openConnection()) {
+                    if (dbConnection != null && preparedAllRoles != null) {
+                        try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAllRoles)) {
+                            try (ResultSet rs = stmt.executeQuery()) {
+                                while (rs.next()) {
+                                    String roleName = rs.getString(1);
+                                    if (roleName != null) {
+                                        if (!roles.containsKey(roleName) && !removedRoles.containsKey(roleName)) {
+                                            Role role = findRoleInternal(dbConnection, roleName);
+                                            if (role != null) {
+                                                roles.put(roleName, role);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    } catch (SQLException e) {
-                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                    } finally {
-                        closeConnection(dbConnection);
                     }
+                } catch (SQLException e) {
+                    log.error(sm.getString("dataSourceUserDatabase.exception"), e);
                 }
                 return roles.values().iterator();
             } finally {
@@ -936,10 +934,8 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
         if (log.isDebugEnabled()) {
             // As there are lots of parameters to configure, log some debug to help out
-            log.debug("DataSource UserDatabase features: User<->Role ["
-                    + Boolean.toString(userRoleTable != null && roleNameCol != null)
-                    + "], Roles [" + Boolean.toString(isRoleStoreDefined())
-                    + "], Groups [" + Boolean.toString(isRoleStoreDefined()) + "]");
+            log.debug(sm.getString("dataSourceUserDatabase.features", Boolean.toString(userRoleTable != null && roleNameCol != null),
+                    Boolean.toString(isRoleStoreDefined()), Boolean.toString(isGroupStoreDefined())));
         }
 
         dbWriteLock.lock();

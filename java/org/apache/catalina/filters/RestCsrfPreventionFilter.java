@@ -77,12 +77,13 @@ import jakarta.servlet.http.HttpSession;
  */
 public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     private enum MethodType {
-        NON_MODIFYING_METHOD, MODIFYING_METHOD
+        NON_MODIFYING_METHOD,
+        MODIFYING_METHOD
     }
 
     private static final Pattern NON_MODIFYING_METHODS_PATTERN = Pattern.compile("GET|HEAD|OPTIONS");
-    private static final Predicate<String> nonModifyingMethods = m -> Objects.nonNull(m) &&
-            NON_MODIFYING_METHODS_PATTERN.matcher(m).matches();
+    private static final Predicate<String> nonModifyingMethods =
+            m -> Objects.nonNull(m) && NON_MODIFYING_METHODS_PATTERN.matcher(m).matches();
 
     private Set<String> pathsAcceptingParams = new HashSet<>();
 
@@ -126,10 +127,10 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
     private interface RestCsrfPreventionStrategy {
-        NonceSupplier<HttpServletRequest, String> nonceFromRequestHeader = HttpServletRequest::getHeader;
-        NonceSupplier<HttpServletRequest, String[]> nonceFromRequestParams = ServletRequest::getParameterValues;
-        NonceSupplier<HttpSession, String> nonceFromSession = (s, k) -> Objects.isNull(s) ? null
-                : (String) s.getAttribute(k);
+        NonceSupplier<HttpServletRequest,String> nonceFromRequestHeader = HttpServletRequest::getHeader;
+        NonceSupplier<HttpServletRequest,String[]> nonceFromRequestParams = ServletRequest::getParameterValues;
+        NonceSupplier<HttpSession,String> nonceFromSession =
+                (s, k) -> Objects.isNull(s) ? null : (String) s.getAttribute(k);
 
         NonceConsumer<HttpServletResponse> nonceToResponse = HttpServletResponse::setHeader;
         NonceConsumer<HttpSession> nonceToSession = HttpSession::setAttribute;

@@ -72,8 +72,7 @@ public interface ObjectPool<T> extends Closeable {
      * @throws UnsupportedOperationException
      *              when this pool cannot add new idle objects.
      */
-    void addObject() throws Exception, IllegalStateException,
-            UnsupportedOperationException;
+    void addObject() throws Exception;
 
     /**
      * Calls {@link ObjectPool#addObject()} {@code count}
@@ -81,8 +80,7 @@ public interface ObjectPool<T> extends Closeable {
      *
      * @param count
      *            the number of idle objects to add.
-     * @throws Exception
-     *             when {@link ObjectPool#addObject()} fails.
+     * @throws Exception See {@link ObjectPool#addObject()}.
      * @since 2.8.0
      */
     default void addObjects(final int count) throws Exception {
@@ -122,8 +120,7 @@ public interface ObjectPool<T> extends Closeable {
      *              when the pool is exhausted and cannot or will not return
      *              another instance.
      */
-    T borrowObject() throws Exception, NoSuchElementException,
-            IllegalStateException;
+    T borrowObject() throws Exception;
 
     /**
      * Clears any objects sitting idle in the pool, releasing any associated
@@ -135,7 +132,7 @@ public interface ObjectPool<T> extends Closeable {
      *
      * @throws Exception if the pool cannot be cleared
      */
-    void clear() throws Exception, UnsupportedOperationException;
+    void clear() throws Exception;
 
     /**
      * Closes this pool, and free any resources associated with it.
@@ -199,7 +196,6 @@ public interface ObjectPool<T> extends Closeable {
      *
      * @param obj a {@link #borrowObject borrowed} instance to be disposed.
      * @param destroyMode destroy activation context provided to the factory
-     *
      * @throws Exception if the instance cannot be invalidated
      * @since 2.9.0
      */

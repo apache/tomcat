@@ -40,9 +40,8 @@ public class WatchedResourceSF extends StoreFactoryBase {
             String[] resources = ((StandardContext) aElement)
                     .findWatchedResources();
             if (elementDesc != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("store " + elementDesc.getTag() + "( " + aElement
-                            + " )");
+                if (log.isTraceEnabled()) {
+                    log.trace("store " + elementDesc.getTag() + "( " + aElement + " )");
                 }
                 getStoreAppender().printTagArray(aWriter, "WatchedResource",
                         indent, resources);

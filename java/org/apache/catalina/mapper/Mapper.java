@@ -83,7 +83,7 @@ public final class Mapper {
     /**
      * Mapping from Context object to Context version to support RequestDispatcher mappings.
      */
-    private final Map<Context, ContextVersion> contextObjectToContextVersionMap = new ConcurrentHashMap<>();
+    private final Map<Context,ContextVersion> contextObjectToContextVersionMap = new ConcurrentHashMap<>();
 
 
     // --------------------------------------------------------- Public Methods
@@ -284,8 +284,8 @@ public final class Mapper {
         }
         int slashCount = slashCount(path);
         synchronized (mappedHost) {
-            ContextVersion newContextVersion = new ContextVersion(version, path, slashCount, context, resources,
-                    welcomeResources);
+            ContextVersion newContextVersion =
+                    new ContextVersion(version, path, slashCount, context, resources, welcomeResources);
             if (wrappers != null) {
                 addWrappers(newContextVersion, wrappers);
             }
@@ -520,8 +520,8 @@ public final class Mapper {
 
     protected void removeWrapper(ContextVersion context, String path) {
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("mapper.removeWrapper", context.name, path));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("mapper.removeWrapper", context.name, path));
         }
 
         synchronized (context) {
@@ -1332,21 +1332,24 @@ public final class Mapper {
     private static int compare(CharChunk name, int start, int end, String compareTo) {
         int result = 0;
         char[] c = name.getBuffer();
-        int len = compareTo.length();
+        int compareLen = compareTo.length();
+        int len = compareLen;
         if ((end - start) < len) {
             len = end - start;
         }
         for (int i = 0; (i < len) && (result == 0); i++) {
-            if (c[i + start] > compareTo.charAt(i)) {
+            char nameChar = c[i + start];
+            char compareToChar = compareTo.charAt(i);
+            if (nameChar > compareToChar) {
                 result = 1;
-            } else if (c[i + start] < compareTo.charAt(i)) {
+            } else if (nameChar < compareToChar) {
                 result = -1;
             }
         }
         if (result == 0) {
-            if (compareTo.length() > (end - start)) {
+            if (compareLen > (end - start)) {
                 result = -1;
-            } else if (compareTo.length() < (end - start)) {
+            } else if (compareLen < (end - start)) {
                 result = 1;
             }
         }
@@ -1361,21 +1364,24 @@ public final class Mapper {
     private static int compareIgnoreCase(CharChunk name, int start, int end, String compareTo) {
         int result = 0;
         char[] c = name.getBuffer();
-        int len = compareTo.length();
+        int compareLen = compareTo.length();
+        int len = compareLen;
         if ((end - start) < len) {
             len = end - start;
         }
         for (int i = 0; (i < len) && (result == 0); i++) {
-            if (Ascii.toLower(c[i + start]) > Ascii.toLower(compareTo.charAt(i))) {
+            int nameLower = Ascii.toLower(c[i + start]);
+            int compareLower = Ascii.toLower(compareTo.charAt(i));
+            if (nameLower > compareLower) {
                 result = 1;
-            } else if (Ascii.toLower(c[i + start]) < Ascii.toLower(compareTo.charAt(i))) {
+            } else if (nameLower < compareLower) {
                 result = -1;
             }
         }
         if (result == 0) {
-            if (compareTo.length() > (end - start)) {
+            if (compareLen > (end - start)) {
                 result = -1;
-            } else if (compareTo.length() < (end - start)) {
+            } else if (compareLen < (end - start)) {
                 result = 1;
             }
         }
@@ -1439,8 +1445,7 @@ public final class Mapper {
     /**
      * Insert into the right place in a sorted MapElement array, and prevent duplicates.
      */
-    private static <T> boolean insertMap(MapElement<T>[] oldMap, MapElement<T>[] newMap,
-            MapElement<T> newElement) {
+    private static <T> boolean insertMap(MapElement<T>[] oldMap, MapElement<T>[] newMap, MapElement<T> newElement) {
         int pos = find(oldMap, newElement.name);
         if ((pos != -1) && (newElement.name.equals(oldMap[pos].name))) {
             return false;

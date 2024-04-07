@@ -454,7 +454,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
             // Smarter than the typical client. Attempts to read the response
             // even if the request is not fully written.
             try {
-                // Write (or try to write) 16MB
+                // Write (or try to write) 16 MiB
                 for (int i = 0; i < 1024 * 1024; i++) {
                     writer.write("10\r\n");
                     writer.write("0123456789ABCDEF\r\n");

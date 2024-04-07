@@ -23,35 +23,23 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to declare the configuration of a
- * {@link jakarta.servlet.Servlet}. <br>
- *
- * If the name attribute is not defined, the fully qualified name of the class
- * is used.<br>
+ * This annotation is used to declare the configuration of a {@link jakarta.servlet.Servlet}. <br>
+ * If the name attribute is not defined, the fully qualified name of the class is used.<br>
  * <br>
- *
- * At least one URL pattern MUST be declared in either the {@code value} or
- * {@code urlPattern} attribute of the annotation, but not both.<br>
+ * At least one URL pattern MUST be declared in either the {@code value} or {@code urlPattern} attribute of the
+ * annotation, but not both.<br>
  * <br>
- *
- * The {@code value} attribute is recommended for use when the URL pattern is
- * the only attribute being set, otherwise the {@code urlPattern} attribute
- * should be used.<br>
+ * The {@code value} attribute is recommended for use when the URL pattern is the only attribute being set, otherwise
+ * the {@code urlPattern} attribute should be used.<br>
  * <br>
- *
- * The class on which this annotation is declared MUST extend
- * {@link jakarta.servlet.http.HttpServlet}. <br>
+ * The class on which this annotation is declared MUST extend {@link jakarta.servlet.http.HttpServlet}. <br>
  * <br>
- *
  * E.g. <code>@WebServlet("/path")}<br>
  * public class TestServlet extends HttpServlet ... {</code><br>
- *
- * E.g.
- * <code>@WebServlet(name="TestServlet", urlPatterns={"/path", "/alt"}) <br>
+ * E.g. <code>@WebServlet(name="TestServlet", urlPatterns={"/path", "/alt"}) <br>
  * public class TestServlet extends HttpServlet ... {</code><br>
  *
  * @since Servlet 3.0 (Section 8.1.1)
- *
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -67,6 +55,7 @@ public @interface WebServlet {
      * A convenience method, to allow extremely simple annotation of a class.
      *
      * @return array of URL patterns
+     *
      * @see #urlPatterns()
      */
     String[] value() default {};

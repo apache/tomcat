@@ -111,29 +111,24 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
-        checkFacade();
-        ServletOutputStream sos = response.getOutputStream();
         if (isFinished()) {
             response.setSuspended(true);
         }
-        return sos;
+        return response.getOutputStream();
     }
 
 
     @Override
     public PrintWriter getWriter() throws IOException {
-        checkFacade();
-        PrintWriter writer = response.getWriter();
         if (isFinished()) {
             response.setSuspended(true);
         }
-        return writer;
+        return response.getWriter();
     }
 
 
     @Override
     public void setContentLength(int len) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -143,7 +138,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void setContentLengthLong(long length) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -153,7 +147,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void setContentType(String type) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -177,7 +170,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void flushBuffer() throws IOException {
-        checkFacade();
         if (isFinished()) {
             return;
         }
@@ -209,7 +201,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void setLocale(Locale loc) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -226,7 +217,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void addCookie(Cookie cookie) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -272,16 +262,15 @@ public class ResponseFacade implements HttpServletResponse {
 
 
     @Override
-    public void sendRedirect(String location) throws IOException {
+    public void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException {
         checkCommitted("coyoteResponse.sendRedirect.ise");
         response.setAppCommitted(true);
-        response.sendRedirect(location);
+        response.sendRedirect(location, sc, clearBuffer);
     }
 
 
     @Override
     public void setDateHeader(String name, long date) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -291,7 +280,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void addDateHeader(String name, long date) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -301,7 +289,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void setHeader(String name, String value) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -311,7 +298,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void addHeader(String name, String value) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -321,7 +307,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void setIntHeader(String name, int value) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -331,7 +316,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void addIntHeader(String name, int value) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -341,7 +325,6 @@ public class ResponseFacade implements HttpServletResponse {
 
     @Override
     public void setStatus(int sc) {
-        checkFacade();
         if (isCommitted()) {
             return;
         }
@@ -394,14 +377,14 @@ public class ResponseFacade implements HttpServletResponse {
 
 
     @Override
-    public void setTrailerFields(Supplier<Map<String, String>> supplier) {
+    public void setTrailerFields(Supplier<Map<String,String>> supplier) {
         checkFacade();
         response.setTrailerFields(supplier);
     }
 
 
     @Override
-    public Supplier<Map<String, String>> getTrailerFields() {
+    public Supplier<Map<String,String>> getTrailerFields() {
         checkFacade();
         return response.getTrailerFields();
     }
@@ -415,7 +398,6 @@ public class ResponseFacade implements HttpServletResponse {
 
 
     private void checkCommitted(String messageKey) {
-        checkFacade();
         if (isCommitted()) {
             throw new IllegalStateException(sm.getString(messageKey));
         }

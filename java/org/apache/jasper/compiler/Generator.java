@@ -620,7 +620,9 @@ class Generator {
         out.pushIndent();
         // Packages is never empty because o.a.j.Constants.STANDARD_IMPORTS
         // contains 3 packages and is always added to the imports.
-        out.printin("_jspx_imports_packages = new java.util.HashSet<>();");
+        out.printin("_jspx_imports_packages = new java.util.LinkedHashSet<>(");
+        out.print(Integer.toString(packages.size()));
+        out.print(");");
         out.println();
         for (String packageName : packages) {
             out.printin("_jspx_imports_packages.add(\"");
@@ -632,7 +634,9 @@ class Generator {
             out.printin("_jspx_imports_classes = null;");
             out.println();
         } else {
-            out.printin("_jspx_imports_classes = new java.util.HashSet<>();");
+            out.printin("_jspx_imports_classes = new java.util.LinkedHashSet<>(");
+            out.print(Integer.toString(classes.size()));
+            out.print(");");
             out.println();
             for (String className : classes) {
                 out.printin("_jspx_imports_classes.add(\"");
@@ -1205,8 +1209,7 @@ class Generator {
                 // Bean is defined using useBean, introspect at compile time
                 Class<?> bean = beanInfo.getBeanType(name);
                 String beanName = bean.getCanonicalName();
-                java.lang.reflect.Method meth = JspRuntimeLibrary
-                        .getReadMethod(bean, property);
+                Method meth = JspRuntimeLibrary.getReadMethod(bean, property);
                 String methodName = meth.getName();
                 out.printil("out.write(org.apache.jasper.runtime.JspRuntimeLibrary.toString("
                         + "((("
@@ -1226,15 +1229,7 @@ class Generator {
                         + property
                         + "\")));");
             } else {
-                StringBuilder msg = new StringBuilder();
-                msg.append("file:");
-                msg.append(n.getStart());
-                msg.append(" jsp:getProperty for bean with name '");
-                msg.append(name);
-                msg.append(
-                        "'. Name was not previously introduced as per JSP.5.3");
-
-                throw new JasperException(msg.toString());
+                throw new JasperException(Localizer.getMessage("jsp.error.invalid.name", n.getStart(), name));
             }
 
             n.setEndJavaLine(out.getJavaLine());
@@ -1359,7 +1354,7 @@ class Generator {
                     if (!Modifier.isPublic(modifiers) ||
                             Modifier.isAbstract(modifiers) ||
                             !constructor.canAccess(null) ) {
-                        throw new Exception(Localizer.getMessage("jsp.error.invalid.bean",
+                        throw new JasperException(Localizer.getMessage("jsp.error.invalid.bean",
                                 Integer.valueOf(modifiers)));
                     }
                     // At compile time, we have determined that the bean class

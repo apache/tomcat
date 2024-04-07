@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.core;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +66,7 @@ public class AprLifecycleListener implements LifecycleListener {
     protected static final int TCN_REQUIRED_PATCH = 34;
     protected static final int TCN_RECOMMENDED_MAJOR = 2;
     protected static final int TCN_RECOMMENDED_MINOR = 0;
-    protected static final int TCN_RECOMMENDED_PV = 1;
+    protected static final int TCN_RECOMMENDED_PV = 5;
 
 
     // ---------------------------------------------- Properties
@@ -169,15 +168,12 @@ public class AprLifecycleListener implements LifecycleListener {
 
     }
 
-    private static void terminateAPR()
-            throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        String methodName = "terminate";
-        Method method = Class.forName("org.apache.tomcat.jni.Library").getMethod(methodName, (Class[]) null);
-        method.invoke(null, (Object[]) null);
-        AprStatus.setAprAvailable(false);
+    private static void terminateAPR() {
         AprStatus.setAprInitialized(false);
-        sslInitialized = false; // Well we cleaned the pool in terminate.
+        AprStatus.setAprAvailable(false);
         fipsModeActive = false;
+        sslInitialized = false; // terminate() will clean the pool
+        Library.terminate();
     }
 
     private static void init() {

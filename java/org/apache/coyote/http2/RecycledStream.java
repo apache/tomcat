@@ -40,7 +40,6 @@ class RecycledStream extends AbstractNonZeroStream {
     }
 
 
-    @SuppressWarnings("sync-override")
     @Override
     void incrementWindowSize(int increment) throws Http2Exception {
         // NO-OP

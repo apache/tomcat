@@ -80,7 +80,7 @@
       <attribute name="cacheMaxSize" required="false">
         <p>The maximum size of the static resource cache in kilobytes.
         If not specified, the default value is <code>10240</code>
-        (10 megabytes). This value may be changed while the web application is
+        (10 MiB). This value may be changed while the web application is
         running (e.g. via JMX). If the cache is using more memory than the new
         limit the cache will attempt to reduce in size over time to meet the
         new limit. If necessary, <strong>cacheObjectMaxSize</strong> will be

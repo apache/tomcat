@@ -187,6 +187,7 @@ public class CoyoteReader extends BufferedReader {
                 pos = 0;
             } else {
                 reset();
+                // No need to check return value. We know there are at least skip characters available.
                 skip(skip);
             }
         }

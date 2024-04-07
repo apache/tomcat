@@ -49,11 +49,6 @@ class StreamStateMachine {
     }
 
 
-    final synchronized void sentPushPromise() {
-        stateChange(State.IDLE, State.RESERVED_LOCAL);
-    }
-
-
     final synchronized void sentHeaders() {
         // No change if currently OPEN
         stateChange(State.RESERVED_LOCAL, State.HALF_CLOSED_REMOTE);
@@ -106,8 +101,8 @@ class StreamStateMachine {
     private void stateChange(State oldState, State newState) {
         if (state == oldState) {
             state = newState;
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("streamStateMachine.debug.change", connectionId, streamId, oldState, newState));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("streamStateMachine.debug.change", connectionId, streamId, oldState, newState));
             }
         }
     }

@@ -22,16 +22,14 @@ import java.io.StringReader;
 public class EntityTag {
 
     /**
-     * Parse the given input as (per RFC 7232) 1#entity-tag.
-     * Compare an ETag header with a resource ETag as described in RFC 7232
-     * section 2.3.2.
+     * Parse the given input as (per RFC 7232) 1#entity-tag. Compare an ETag header with a resource ETag as described in
+     * RFC 7232 section 2.3.2.
      *
      * @param input        The input to parse
      * @param compareWeak  Use weak comparison e.g. match "etag" with W/"etag"
      * @param resourceETag Resource's ETag
      *
-     * @return {@code true} if ETag matches, {@code false} if ETag doesn't match
-     *         or {@code null} if the input is invalid
+     * @return {@code true} if ETag matches, {@code false} if ETag doesn't match or {@code null} if the input is invalid
      *
      * @throws IOException If an I/O occurs during the parsing
      */
@@ -65,7 +63,7 @@ public class EntityTag {
             }
 
             // Note: RFC 2616 allowed quoted string
-            //       RFC 7232 does not allow " in the entity-tag
+            // RFC 7232 does not allow " in the entity-tag
             String value = HttpParser.readQuotedString(input, true);
             if (value == null) {
                 // Not a quoted string so the header is invalid

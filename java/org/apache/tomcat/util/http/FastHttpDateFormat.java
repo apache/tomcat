@@ -57,8 +57,8 @@ public final class FastHttpDateFormat {
         FORMAT_OBSOLETE_RFC850 = new ConcurrentDateFormat(DATE_OBSOLETE_RFC850, Locale.US, tz);
         FORMAT_OBSOLETE_ASCTIME = new ConcurrentDateFormat(DATE_OBSOLETE_ASCTIME, Locale.US, tz);
 
-        httpParseFormats = new ConcurrentDateFormat[] {
-                FORMAT_RFC5322, FORMAT_OBSOLETE_RFC850, FORMAT_OBSOLETE_ASCTIME };
+        httpParseFormats =
+                new ConcurrentDateFormat[] { FORMAT_RFC5322, FORMAT_OBSOLETE_RFC850, FORMAT_OBSOLETE_ASCTIME };
     }
 
     /**
@@ -76,13 +76,13 @@ public final class FastHttpDateFormat {
     /**
      * Formatter cache.
      */
-    private static final Map<Long, String> formatCache = new ConcurrentHashMap<>(CACHE_SIZE);
+    private static final Map<Long,String> formatCache = new ConcurrentHashMap<>(CACHE_SIZE);
 
 
     /**
      * Parser cache.
      */
-    private static final Map<String, Long> parseCache = new ConcurrentHashMap<>(CACHE_SIZE);
+    private static final Map<String,Long> parseCache = new ConcurrentHashMap<>(CACHE_SIZE);
 
 
     // --------------------------------------------------------- Public Methods
@@ -90,6 +90,7 @@ public final class FastHttpDateFormat {
 
     /**
      * Get the current date in HTTP format.
+     *
      * @return the HTTP date
      */
     public static String getCurrentDate() {
@@ -105,7 +106,9 @@ public final class FastHttpDateFormat {
 
     /**
      * Get the HTTP format of the specified date.
+     *
      * @param value The date
+     *
      * @return the HTTP date
      */
     public static String formatDate(long value) {
@@ -123,9 +126,10 @@ public final class FastHttpDateFormat {
 
     /**
      * Try to parse the given date as an HTTP date.
+     *
      * @param value The HTTP date
-     * @return the date as a long or <code>-1</code> if the value cannot be
-     *         parsed
+     *
+     * @return the date as a long or <code>-1</code> if the value cannot be parsed
      */
     public static long parseDate(String value) {
 

@@ -416,6 +416,16 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public boolean getUsePartitioned() {
+        return false;
+    }
+
+    @Override
+    public void setUsePartitioned(boolean usePartitioned) {
+        // NO-OP
+    }
+
+    @Override
     public String getSessionCookieDomain() {
         return null;
     }
@@ -1320,5 +1330,10 @@ public class TesterContext implements Context {
     public boolean getMetadataComplete() { return false; }
     @Override
     public void setMetadataComplete(boolean metadataComplete) { /* NO-OP */ }
+
+    @Override
+    public boolean getSuspendWrappedResponseAfterForward() { return true; }
+    @Override
+    public void setSuspendWrappedResponseAfterForward(boolean suspendWrappedResponseAfterForward) {}
 
 }

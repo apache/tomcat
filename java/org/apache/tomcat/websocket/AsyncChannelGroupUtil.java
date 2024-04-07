@@ -28,14 +28,12 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 /**
- * This is a utility class that enables multiple {@link WsWebSocketContainer}
- * instances to share a single {@link AsynchronousChannelGroup} while ensuring
- * that the group is destroyed when no longer required.
+ * This is a utility class that enables multiple {@link WsWebSocketContainer} instances to share a single
+ * {@link AsynchronousChannelGroup} while ensuring that the group is destroyed when no longer required.
  */
 public class AsyncChannelGroupUtil {
 
-    private static final StringManager sm =
-            StringManager.getManager(AsyncChannelGroupUtil.class);
+    private static final StringManager sm = StringManager.getManager(AsyncChannelGroupUtil.class);
 
     private static AsynchronousChannelGroup group = null;
     private static int usageCount = 0;
@@ -81,16 +79,11 @@ public class AsyncChannelGroupUtil {
             // These are the same settings as the default
             // AsynchronousChannelGroup
             int initialSize = Runtime.getRuntime().availableProcessors();
-            ExecutorService executorService = new ThreadPoolExecutor(
-                    0,
-                    Integer.MAX_VALUE,
-                    Long.MAX_VALUE, TimeUnit.MILLISECONDS,
-                    new SynchronousQueue<>(),
-                    new AsyncIOThreadFactory());
+            ExecutorService executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60,
+                    TimeUnit.SECONDS, new SynchronousQueue<>(), new AsyncIOThreadFactory());
 
             try {
-                return AsynchronousChannelGroup.withCachedThreadPool(
-                        executorService, initialSize);
+                return AsynchronousChannelGroup.withCachedThreadPool(executorService, initialSize);
             } catch (IOException e) {
                 // No good reason for this to happen.
                 throw new IllegalStateException(sm.getString("asyncChannelGroup.createFail"));

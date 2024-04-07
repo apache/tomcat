@@ -17,6 +17,7 @@
 package org.apache.coyote;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.http.ServerCookies;
+import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -388,7 +390,7 @@ public final class Request {
      * @return The value set via {@link #setCharset(Charset)} or if no call has been made to that method try to obtain
      *             if from the content type.
      *
-     * @deprecated Unused. This method will be removed in Tomcat 11.
+     * @deprecated Unused. This method will be removed in Tomcat 12.
      */
     @Deprecated
     public String getCharacterEncoding() {
@@ -408,7 +410,7 @@ public final class Request {
      *
      * @throws UnsupportedEncodingException If the user agent has specified an invalid character encoding
      *
-     * @deprecated Unused. This method will be removed in Tomcat 11.
+     * @deprecated Unused. This method will be removed in Tomcat 12.
      */
     @Deprecated
     public Charset getCharset() throws UnsupportedEncodingException {
@@ -426,7 +428,7 @@ public final class Request {
      *
      * @param charset The Charset to use for the request
      *
-     * @deprecated Unused. This method will be removed in Tomcat 11.
+     * @deprecated Unused. This method will be removed in Tomcat 12.
      */
     @Deprecated
     public void setCharset(Charset charset) {
@@ -474,10 +476,10 @@ public final class Request {
 
     public String getContentType() {
         contentType();
-        if ((contentTypeMB == null) || contentTypeMB.isNull()) {
+        if (contentTypeMB == null || contentTypeMB.isNull()) {
             return null;
         }
-        return contentTypeMB.toString();
+        return contentTypeMB.toStringType();
     }
 
 
@@ -843,7 +845,7 @@ public final class Request {
     }
 
     public boolean isProcessing() {
-        return reqProcessorMX.getStage() == org.apache.coyote.Constants.STAGE_SERVICE;
+        return reqProcessorMX.getStage() == Constants.STAGE_SERVICE;
     }
 
     /**
@@ -857,20 +859,17 @@ public final class Request {
         if (contentType == null) {
             return null;
         }
-        int start = contentType.indexOf("charset=");
-        if (start < 0) {
-            return null;
+
+        MediaType mediaType = null;
+        try {
+            mediaType = MediaType.parseMediaType(new StringReader(contentType));
+        } catch (IOException e) {
+            // Ignore - null test below handles this
         }
-        String encoding = contentType.substring(start + 8);
-        int end = encoding.indexOf(';');
-        if (end >= 0) {
-            encoding = encoding.substring(0, end);
-        }
-        encoding = encoding.trim();
-        if ((encoding.length() > 2) && (encoding.startsWith("\"")) && (encoding.endsWith("\""))) {
-            encoding = encoding.substring(1, encoding.length() - 1);
+        if (mediaType != null) {
+            return mediaType.getCharset();
         }
 
-        return encoding.trim();
+        return null;
     }
 }

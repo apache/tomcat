@@ -55,7 +55,7 @@ public class Upgrade {
     }
 
 
-    public static List<Upgrade> parse (Enumeration<String> headerValues) {
+    public static List<Upgrade> parse(Enumeration<String> headerValues) {
         try {
             List<Upgrade> result = new ArrayList<>();
 

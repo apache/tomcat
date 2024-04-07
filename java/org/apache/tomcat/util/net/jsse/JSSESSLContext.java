@@ -97,9 +97,7 @@ class JSSESSLContext implements SSLContext {
             for (TrustManager tm : tms) {
                 if (tm instanceof X509TrustManager) {
                     X509Certificate[] accepted = ((X509TrustManager) tm).getAcceptedIssuers();
-                    if (accepted != null) {
-                        certs.addAll(Arrays.asList(accepted));
-                    }
+                    certs.addAll(Arrays.asList(accepted));
                 }
             }
         }

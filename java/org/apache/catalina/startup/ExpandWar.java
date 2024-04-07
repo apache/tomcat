@@ -17,6 +17,7 @@
 package org.apache.catalina.startup;
 
 import java.io.BufferedOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -51,32 +52,26 @@ public class ExpandWar {
     /**
      * The string resources for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
     /**
-     * Expand the WAR file found at the specified URL into an unpacked
-     * directory structure.
+     * Expand the WAR file found at the specified URL into an unpacked directory structure.
      *
-     * @param host Host war is being installed for
-     * @param war URL of the web application archive to be expanded
-     *  (must start with "jar:")
+     * @param host     Host war is being installed for
+     * @param war      URL of the web application archive to be expanded (must start with "jar:")
      * @param pathname Context path name for web application
      *
-     * @exception IllegalArgumentException if this is not a "jar:" URL or if the
-     *            WAR file is invalid
-     * @exception IOException if an input/output error was encountered
-     *  during expansion
+     * @exception IllegalArgumentException if this is not a "jar:" URL or if the WAR file is invalid
+     * @exception IOException              if an input/output error was encountered during expansion
      *
      * @return The absolute path to the expanded directory for the given WAR
      */
-    public static String expand(Host host, URL war, String pathname)
-        throws IOException {
+    public static String expand(Host host, URL war, String pathname) throws IOException {
 
-        /* Obtaining the last modified time opens an InputStream and there is no
-         * explicit close method. We have to obtain and then close the
-         * InputStream to avoid a file leak and the associated locked file.
+        /*
+         * Obtaining the last modified time opens an InputStream and there is no explicit close method. We have to
+         * obtain and then close the InputStream to avoid a file leak and the associated locked file.
          */
         JarURLConnection juc = (JarURLConnection) war.openConnection();
         juc.setUseCaches(false);
@@ -112,7 +107,7 @@ public class ExpandWar {
         }
 
         // Create the new document base directory
-        if(!docBase.mkdir() && !docBase.isDirectory()) {
+        if (!docBase.mkdir() && !docBase.isDirectory()) {
             throw new IOException(sm.getString("expandWar.createFailed", docBase));
         }
 
@@ -135,18 +130,14 @@ public class ExpandWar {
                 if (!expandedFile.getCanonicalFile().toPath().startsWith(canonicalDocBasePath)) {
                     // Trying to expand outside the docBase
                     // Throw an exception to stop the deployment
-                    throw new IllegalArgumentException(
-                            sm.getString("expandWar.illegalPath",war, name,
-                                    expandedFile.getCanonicalPath(),
-                                    canonicalDocBasePath));
+                    throw new IllegalArgumentException(sm.getString("expandWar.illegalPath", war, name,
+                            expandedFile.getCanonicalPath(), canonicalDocBasePath));
                 }
                 int last = name.lastIndexOf('/');
                 if (last >= 0) {
-                    File parent = new File(docBase,
-                                           name.substring(0, last));
+                    File parent = new File(docBase, name.substring(0, last));
                     if (!parent.mkdirs() && !parent.isDirectory()) {
-                        throw new IOException(
-                                sm.getString("expandWar.createFailed", parent));
+                        throw new IOException(sm.getString("expandWar.createFailed", parent));
                     }
                 }
                 if (name.endsWith("/")) {
@@ -155,8 +146,7 @@ public class ExpandWar {
 
                 try (InputStream input = jarFile.getInputStream(jarEntry)) {
                     if (null == input) {
-                        throw new ZipException(sm.getString("expandWar.missingJarEntry",
-                                jarEntry.getName()));
+                        throw new ZipException(sm.getString("expandWar.missingJarEntry", jarEntry.getName()));
                     }
 
                     // Bugzilla 33636
@@ -164,8 +154,7 @@ public class ExpandWar {
                     long lastModified = jarEntry.getTime();
                     if ((lastModified != -1) && (lastModified != 0)) {
                         if (!expandedFile.setLastModified(lastModified)) {
-                            throw new IOException(
-                                    sm.getString("expandWar.lastModifiedFailed", expandedFile));
+                            throw new IOException(sm.getString("expandWar.lastModifiedFailed", expandedFile));
                         }
                     }
                 }
@@ -199,15 +188,12 @@ public class ExpandWar {
     /**
      * Validate the WAR file found at the specified URL.
      *
-     * @param host Host war is being installed for
-     * @param war URL of the web application archive to be validated
-     *  (must start with "jar:")
+     * @param host     Host war is being installed for
+     * @param war      URL of the web application archive to be validated (must start with "jar:")
      * @param pathname Context path name for web application
      *
-     * @exception IllegalArgumentException if this is not a "jar:" URL or if the
-     *            WAR file is invalid
-     * @exception IOException if an input/output error was encountered
-     *            during validation
+     * @exception IllegalArgumentException if this is not a "jar:" URL or if the WAR file is invalid
+     * @exception IOException              if an input/output error was encountered during validation
      */
     public static void validate(Host host, URL war, String pathname) throws IOException {
 
@@ -226,10 +212,8 @@ public class ExpandWar {
                 if (!expandedFile.getCanonicalFile().toPath().startsWith(canonicalDocBasePath)) {
                     // Entry located outside the docBase
                     // Throw an exception to stop the deployment
-                    throw new IllegalArgumentException(
-                            sm.getString("expandWar.illegalPath",war, name,
-                                    expandedFile.getCanonicalPath(),
-                                    canonicalDocBasePath));
+                    throw new IllegalArgumentException(sm.getString("expandWar.illegalPath", war, name,
+                            expandedFile.getCanonicalPath(), canonicalDocBasePath));
                 }
             }
         } catch (IOException e) {
@@ -241,8 +225,9 @@ public class ExpandWar {
     /**
      * Copy the specified file or directory to the destination.
      *
-     * @param src File object representing the source
+     * @param src  File object representing the source
      * @param dest File object representing the destination
+     *
      * @return <code>true</code> if the copy was successful
      */
     public static boolean copy(File src, File dest) {
@@ -268,7 +253,17 @@ public class ExpandWar {
             } else {
                 try (FileChannel ic = (new FileInputStream(fileSrc)).getChannel();
                         FileChannel oc = (new FileOutputStream(fileDest)).getChannel()) {
-                    ic.transferTo(0, ic.size(), oc);
+                    long size = ic.size();
+                    long position = 0;
+                    while (size > 0) {
+                        long count = ic.transferTo(position, size, oc);
+                        if (count > 0) {
+                            position += count;
+                            size -= count;
+                        } else {
+                            throw new EOFException();
+                        }
+                    }
                 } catch (IOException e) {
                     log.error(sm.getString("expandWar.copy", fileSrc, fileDest), e);
                     result = false;
@@ -280,10 +275,11 @@ public class ExpandWar {
 
 
     /**
-     * Delete the specified directory, including all of its contents and
-     * sub-directories recursively. Any failure will be logged.
+     * Delete the specified directory, including all of its contents and sub-directories recursively. Any failure will
+     * be logged.
      *
      * @param dir File object representing the directory to be deleted
+     *
      * @return <code>true</code> if the deletion was successful
      */
     public static boolean delete(File dir) {
@@ -293,12 +289,11 @@ public class ExpandWar {
 
 
     /**
-     * Delete the specified directory, including all of its contents and
-     * sub-directories recursively.
+     * Delete the specified directory, including all of its contents and sub-directories recursively.
      *
-     * @param dir File object representing the directory to be deleted
-     * @param logFailure <code>true</code> if failure to delete the resource
-     *                   should be logged
+     * @param dir        File object representing the directory to be deleted
+     * @param logFailure <code>true</code> if failure to delete the resource should be logged
+     *
      * @return <code>true</code> if the deletion was successful
      */
     public static boolean delete(File dir, boolean logFailure) {
@@ -313,18 +308,18 @@ public class ExpandWar {
             }
         }
         if (logFailure && !result) {
-            log.error(sm.getString(
-                    "expandWar.deleteFailed", dir.getAbsolutePath()));
+            log.error(sm.getString("expandWar.deleteFailed", dir.getAbsolutePath()));
         }
         return result;
     }
 
 
     /**
-     * Delete the specified directory, including all of its contents and
-     * sub-directories recursively. Any failure will be logged.
+     * Delete the specified directory, including all of its contents and sub-directories recursively. Any failure will
+     * be logged.
      *
      * @param dir File object representing the directory to be deleted
+     *
      * @return <code>true</code> if the deletion was successful
      */
     public static boolean deleteDir(File dir) {
@@ -333,12 +328,11 @@ public class ExpandWar {
 
 
     /**
-     * Delete the specified directory, including all of its contents and
-     * sub-directories recursively.
+     * Delete the specified directory, including all of its contents and sub-directories recursively.
      *
-     * @param dir File object representing the directory to be deleted
-     * @param logFailure <code>true</code> if failure to delete the resource
-     *                   should be logged
+     * @param dir        File object representing the directory to be deleted
+     * @param logFailure <code>true</code> if failure to delete the resource should be logged
+     *
      * @return <code>true</code> if the deletion was successful
      */
     public static boolean deleteDir(File dir, boolean logFailure) {
@@ -364,8 +358,7 @@ public class ExpandWar {
         }
 
         if (logFailure && !result) {
-            log.error(sm.getString(
-                    "expandWar.deleteFailed", dir.getAbsolutePath()));
+            log.error(sm.getString("expandWar.deleteFailed", dir.getAbsolutePath()));
         }
 
         return result;
@@ -376,13 +369,12 @@ public class ExpandWar {
      * Expand the specified input stream into the specified file.
      *
      * @param input InputStream to be copied
-     * @param file The file to be created
+     * @param file  The file to be created
      *
      * @exception IOException if an input/output error occurs
      */
     private static void expand(InputStream input, File file) throws IOException {
-        try (BufferedOutputStream output =
-                new BufferedOutputStream(new FileOutputStream(file))) {
+        try (BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(file))) {
             byte buffer[] = new byte[2048];
             while (true) {
                 int n = input.read(buffer);

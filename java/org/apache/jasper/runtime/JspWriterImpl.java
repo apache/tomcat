@@ -17,6 +17,7 @@
 package org.apache.jasper.runtime;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Writer;
 
 import jakarta.servlet.ServletResponse;
@@ -115,7 +116,16 @@ public class JspWriterImpl extends JspWriter {
 
     private void initOut() throws IOException {
         if (out == null) {
-            out = response.getWriter();
+            try {
+                out = response.getWriter();
+            } catch (IllegalStateException e) {
+                /*
+                 * At some point in the processing something (most likely the default servlet as the target of a
+                 * <jsp:forward ... /> action) wrote directly to the OutputStream rather than the Writer. Wrap the
+                 * OutputStream in a Writer so the JSP engine can use the Writer it is expecting to use.
+                 */
+                out = new PrintWriter(response.getOutputStream());
+            }
         }
     }
 
@@ -352,7 +362,7 @@ public class JspWriterImpl extends JspWriter {
 
     /**
      * Print a boolean value.  The string produced by <code>{@link
-     * java.lang.String#valueOf(boolean)}</code> is translated into bytes
+     * String#valueOf(boolean)}</code> is translated into bytes
      * according to the platform's default character encoding, and these bytes
      * are written in exactly the manner of the <code>{@link
      * #write(int)}</code> method.
@@ -379,7 +389,7 @@ public class JspWriterImpl extends JspWriter {
 
     /**
      * Print an integer.  The string produced by <code>{@link
-     * java.lang.String#valueOf(int)}</code> is translated into bytes according
+     * String#valueOf(int)}</code> is translated into bytes according
      * to the platform's default character encoding, and these bytes are
      * written in exactly the manner of the <code>{@link #write(int)}</code>
      * method.
@@ -393,7 +403,7 @@ public class JspWriterImpl extends JspWriter {
 
     /**
      * Print a long integer.  The string produced by <code>{@link
-     * java.lang.String#valueOf(long)}</code> is translated into bytes
+     * String#valueOf(long)}</code> is translated into bytes
      * according to the platform's default character encoding, and these bytes
      * are written in exactly the manner of the <code>{@link #write(int)}</code>
      * method.
@@ -407,7 +417,7 @@ public class JspWriterImpl extends JspWriter {
 
     /**
      * Print a floating-point number.  The string produced by <code>{@link
-     * java.lang.String#valueOf(float)}</code> is translated into bytes
+     * String#valueOf(float)}</code> is translated into bytes
      * according to the platform's default character encoding, and these bytes
      * are written in exactly the manner of the <code>{@link #write(int)}</code>
      * method.
@@ -421,7 +431,7 @@ public class JspWriterImpl extends JspWriter {
 
     /**
      * Print a double-precision floating-point number.  The string produced by
-     * <code>{@link java.lang.String#valueOf(double)}</code> is translated into
+     * <code>{@link String#valueOf(double)}</code> is translated into
      * bytes according to the platform's default character encoding, and these
      * bytes are written in exactly the manner of the <code>{@link
      * #write(int)}</code> method.
@@ -467,7 +477,7 @@ public class JspWriterImpl extends JspWriter {
 
     /**
      * Print an object.  The string produced by the <code>{@link
-     * java.lang.String#valueOf(Object)}</code> method is translated into bytes
+     * String#valueOf(Object)}</code> method is translated into bytes
      * according to the platform's default character encoding, and these bytes
      * are written in exactly the manner of the <code>{@link #write(int)}</code>
      * method.

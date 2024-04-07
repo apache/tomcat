@@ -236,8 +236,9 @@
     <p><b>LocalMember:</b> <br/>
     Static member that is the local member of the static cluster group.
     </p>
-    <p><strong>Note:</strong> The setting of local member is not required.
-    It is possible to set up a list of all cluster members including local member instead of setting this components.
+    <p><strong>Note:</strong> It is not necessary to explicitly configure the local member using the
+    <strong>&lt;LocalMember&gt;</strong> element. All cluster members, including the local member, may be defined using
+    the <strong>&lt;Member&gt;</strong> element and Tomcat work out which one is the local member.
     </p>
     <attributes>
       <attribute name="className" required="true">

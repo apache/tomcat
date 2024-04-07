@@ -22,7 +22,6 @@ import java.util.concurrent.Semaphore;
 import jakarta.servlet.ServletException;
 
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 
@@ -115,6 +114,21 @@ public class SemaphoreValve extends ValveBase {
 
 
     /**
+     * High concurrency status. This status code is returned as an
+     * error if concurrency is too high.
+     */
+    protected int highConcurrencyStatus = -1;
+
+    public int getHighConcurrencyStatus() {
+        return this.highConcurrencyStatus;
+    }
+
+    public void setHighConcurrencyStatus(int highConcurrencyStatus) {
+        this.highConcurrencyStatus = highConcurrencyStatus;
+    }
+
+
+    /**
      * Start this component and implement the requirements of
      * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
@@ -122,11 +136,9 @@ public class SemaphoreValve extends ValveBase {
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
-
+    protected void startInternal() throws LifecycleException {
         semaphore = new Semaphore(concurrency, fairness);
-
-        setState(LifecycleState.STARTING);
+        super.startInternal();
     }
 
 
@@ -138,10 +150,8 @@ public class SemaphoreValve extends ValveBase {
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
-
-        setState(LifecycleState.STOPPING);
-
+    protected void stopInternal() throws LifecycleException {
+        super.stopInternal();
         semaphore = null;
     }
 
@@ -218,7 +228,9 @@ public class SemaphoreValve extends ValveBase {
      * @throws ServletException Other error
      */
     public void permitDenied(Request request, Response response) throws IOException, ServletException {
-        // NO-OP by default
+        if (highConcurrencyStatus > 0) {
+            response.sendError(highConcurrencyStatus);
+        }
     }
 
 

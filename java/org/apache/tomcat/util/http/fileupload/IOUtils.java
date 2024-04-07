@@ -60,7 +60,7 @@ public class IOUtils {
 
     /**
      * Represents the end-of-file (or stream).
-     * @since 2.5 (made public)
+     * @since IO 2.5 (made public)
      */
     public static final int EOF = -1;
 
@@ -104,7 +104,7 @@ public class IOUtils {
      * </pre>
      *
      * @param closeable the objects to close, may be null or already closed
-     * @since 2.0
+     * @since IO 2.0
      */
     public static void closeQuietly(final Closeable closeable) {
         try {
@@ -135,7 +135,7 @@ public class IOUtils {
      * @return the number of bytes copied, or -1 if &gt; Integer.MAX_VALUE
      * @throws NullPointerException if the input or output is null
      * @throws IOException          if an I/O error occurs
-     * @since 1.1
+     * @since IO 1.1
      */
     public static int copy(final InputStream input, final OutputStream output) throws IOException {
         final long count = copyLarge(input, output);
@@ -159,7 +159,7 @@ public class IOUtils {
      * @return the number of bytes copied
      * @throws NullPointerException if the input or output is null
      * @throws IOException          if an I/O error occurs
-     * @since 1.3
+     * @since IO 1.3
      */
     public static long copyLarge(final InputStream input, final OutputStream output)
             throws IOException {
@@ -186,7 +186,7 @@ public class IOUtils {
      * @param length length to read, must be &gt;= 0
      * @return actual length read; may be less than requested if EOF was reached
      * @throws IOException if a read error occurs
-     * @since 2.2
+     * @since IO 2.2
      */
     public static int read(final InputStream input, final byte[] buffer, final int offset, final int length)
             throws IOException {
@@ -219,7 +219,7 @@ public class IOUtils {
      * @throws IOException              if there is a problem reading the file
      * @throws IllegalArgumentException if length is negative
      * @throws EOFException             if the number of bytes read was incorrect
-     * @since 2.2
+     * @since IO 2.2
      */
     public static void readFully(final InputStream input, final byte[] buffer, final int offset, final int length)
             throws IOException {
@@ -241,7 +241,7 @@ public class IOUtils {
      * @throws IOException              if there is a problem reading the file
      * @throws IllegalArgumentException if length is negative
      * @throws EOFException             if the number of bytes read was incorrect
-     * @since 2.2
+     * @since IO 2.2
      */
     public static void readFully(final InputStream input, final byte[] buffer) throws IOException {
         readFully(input, buffer, 0, buffer.length);

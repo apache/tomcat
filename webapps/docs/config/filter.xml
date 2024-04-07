@@ -291,6 +291,13 @@
         request. The default value is <code>403</code>.</p>
       </attribute>
 
+      <attribute name="enforce" required="false">
+        <p>A flag to enable or disable enforcement. When enforcement is
+        disabled, the CsrfPreventionFilter will <i>allow all requests</i> and
+        log CSRF failures as DEBUG messages. The default is <b>true</b>,
+        enabling the enforcement of CSRF protection.</p>
+      </attribute>
+
       <attribute name="entryPoints" required="false">
         <p>A comma separated list of URLs that will not be tested for the
         presence of a valid nonce. They are used to provide a way to navigate
@@ -319,6 +326,41 @@
         of <code>java.security.SecureRandom</code> will be used.</p>
       </attribute>
 
+      <attribute name="noNonceURLPatterns" required="false">
+        <p>A list of URL patterns that will <i>not</i> have CSRF nonces added
+        to them. You may not want to add nonces to certain URLs to avoid
+        creating unique URLs which may defeat resource caching, etc.</p>
+
+        <p>There are several types of patterns supported:</p>
+
+        <ul>
+          <li>Prefix matches using a pattern that ends with a <code>*</code>.
+          For example, <code>/images/*</code>.</li>
+
+          <li>Suffix matches using a pattern that begins with a <code>*</code>.
+          For example, <code>*.css</code>.</li>
+
+          <li>Mime-type matches which begin with <code>mime:</code> and specify
+          one of the above matches which will be checked against the MIME type
+          of the URL filename. For example, <code>mime:image/*</code>.
+          Note that the MIME-type will be determined using
+          <code>ServletContext.getMimeType</code>.</li>
+
+          <li>A single complete regular expression pattern which begins and
+          ends with <code>/</code> (slash / solidus) symbols. For example
+          <code>//images/.*|/scripts/.*/</code>. The leading and trailing
+          <code>/</code> characters will be removed from the pattern before
+          being compiled. Note that there can be only a single pattern,
+          but that pattern can of course have as many alternatives as desired
+          by using the regular expression <code>|</code> (<code>OR</code>)
+          operator. The regular expression will be matched against the entire
+          URL (i.e. <i>match</i> not <i>find</i> semantics), and the regex
+          dialect is Java (<code>java.util.regex.Pattern</code>).
+          </li>
+        </ul>
+
+        <p>The default is <code>*.css, *.js, *.gif, *.png, *.jpg, *.svg, *.ico, *.jpeg, *.mjs</code>.</p>
+      </attribute>
     </attributes>
 
   </subsection>
@@ -824,49 +866,6 @@ FINE: Request "/docs/config/manager.html" with response status "200"
 
 </section>
 
-<section name="Failed Request Filter">
-
-  <subsection name="Introduction">
-
-    <p>This filter triggers parameters parsing in a request and rejects the
-    request if some parameters were skipped during parameter parsing because
-    of parsing errors or request size limitations (such as
-    <code>maxParameterCount</code> attribute in a
-    <a href="http.html">Connector</a>).
-    This filter can be used to ensure that none parameter values submitted by
-    client are lost.</p>
-
-    <p>Note that parameter parsing may consume the body of an HTTP request, so
-    caution is needed if the servlet protected by this filter uses
-    <code>request.getInputStream()</code> or <code>request.getReader()</code>
-    calls. In general the risk of breaking a web application by adding this
-    filter is not so high, because parameter parsing does check content type
-    of the request before consuming the request body.</p>
-
-    <p>Note, that for the POST requests to be parsed correctly, a
-    <code>SetCharacterEncodingFilter</code> filter must be configured above
-    this one. See CharacterEncoding page in the FAQ for details.</p>
-
-    <p>The request is rejected with HTTP status code 400 (Bad Request).</p>
-
-  </subsection>
-
-  <subsection name="Filter Class Name">
-
-    <p>The filter class name for the Failed Request Filter is
-    <strong><code>org.apache.catalina.filters.FailedRequestFilter</code>
-    </strong>.</p>
-
-  </subsection>
-
-  <subsection name="Initialisation parameters">
-
-    <p>The Failed Request Filter does not support any initialization parameters.</p>
-
-  </subsection>
-
-</section>
-
 <section name="HTTP Header Security Filter">
 
   <subsection name="Introduction">
@@ -948,19 +947,137 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         default value of <code>true</code> will be used.</p>
       </attribute>
 
-      <attribute name="xssProtectionEnabled" required="false">
-        <p>Should the header that enables the browser's cross-site scripting
-        filter protection (<code>X-XSS-Protection: 1; mode=block</code>)
-        be set on every response. If already present, the header
-        will be replaced. If not specified, the default value of
-        <code>true</code> will be used.</p>
+    </attributes>
+
+  </subsection>
+
+</section>
+
+
+<section name="Rate Limit Filter">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Rate Limit Filter</strong> can help mitigate Denial of Service
+    (DoS) and Brute Force attacks by limiting the number of a requests that are
+    allowed from a single IP address within a time window (also referred
+    to as a time bucket), e.g. 300 Requests per 60 seconds.</p>
+
+    <p>The filter works by incrementing a counter in a time bucket for each IP
+    address, and if the counter exceeds the allowed limit then further requests
+    from that IP are dropped with a &quot;429 Too many requests&quot; response
+    until the bucket time ends and a new bucket starts.</p>
+
+    <p>The filter is optimized for efficiency and low overhead, so it converts
+    some configured values to more efficient values. For example, a configuration
+    of a 60 seconds time bucket is converted to 65.536 seconds. That allows
+    for very fast bucket calculation using bit shift arithmetic. In order to remain
+    true to the user intent, the configured number of requests is then multiplied
+    by the same ratio, so a configuration of 100 Requests per 60 seconds, has the
+    real values of 109 Requests per 65 seconds.</p>
+
+    <p>It is common to set up different restrictions for different URIs.
+    For example, a login page or authentication script is typically expected
+    to get far less requests than the rest of the application, so you can add
+    a filter definition that would allow only 5 requests per 15 seconds and map
+    those URIs to it.</p>
+
+    <p>You can set <code>enforce</code> to <code>false</code>
+    to disable the termination of requests that exceed the allowed limit. Then
+    your application code can inspect the Request Attribute
+    <code>org.apache.catalina.filters.RateLimitFilter.Count</code> and decide
+    how to handle the request based on other information that it has, e.g. allow
+    more requests to certain users based on roles, etc.</p>
+
+    <p><strong>WARNING:</strong> if Tomcat is behind a reverse proxy then you must
+    make sure that the Rate Limit Filter sees the client IP address, so if for
+    example you are using the <a href="#Remote_IP_Filter">Remote IP Filter</a>,
+    then the filter mapping for the Rate Limit Filter must come <em>after</em>
+    the mapping of the Remote IP Filter to ensure that each request has its IP
+    address resolved before the Rate Limit Filter is applied. Failure to do so
+    will count requests from different IPs in the same bucket and will result in
+    a self inflicted DoS attack.</p>
+
+  </subsection>
+
+  <subsection name="Filter Class Name">
+
+    <p>The filter class name for the Remote Address Filter is
+    <strong><code>org.apache.catalina.filters.RateLimitFilter</code>
+    </strong>.</p>
+
+  </subsection>
+
+  <subsection name="Initialisation parameters">
+
+    <p>The <strong>Rate Limit Filter</strong> supports the following
+    initialisation parameters:</p>
+
+    <attributes>
+
+      <attribute name="bucketDuration" required="false">
+        <p>The number of seconds in a time bucket. Default is <code>60</code>.</p>
+      </attribute>
+
+      <attribute name="bucketRequests" required="false">
+        <p>The number of requests that are allowed in a time bucket.
+        Default is <code>300</code>.</p>
+      </attribute>
+
+      <attribute name="enforce" required="false">
+        <p>Set to false to allow requests through even when they exceed
+        the maximum allowed per time window. Your application code can
+        still inspect the Request Attribute
+        org.apache.catalina.filters.RateLimitFilter.Count to retrieve
+        the number of Requests made from that IP within the time window.
+        Default is <code>true</code>.</p>
+      </attribute>
+
+      <attribute name="statusCode" required="false">
+        <p>The status code to return when a request is dropped.
+        Default is <code>429</code>.</p>
+      </attribute>
+
+      <attribute name="statusMessage" required="false">
+        <p>The status message to return when a request is dropped.
+        Default is &quot;Too many requests&quot;.</p>
       </attribute>
 
     </attributes>
 
   </subsection>
 
+  <subsection name="Example">
+    <p>Set the site rate limit to 300 Requests per minute (default):</p>
+<source><![CDATA[    <filter>
+        <filter-name>RateLimitFilter Global</filter-name>
+        <filter-class>org.apache.catalina.filters.RateLimitFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>RateLimitFilter Global</filter-name>
+        <url-pattern>*</url-pattern>
+    </filter-mapping>]]></source>
+
+    <p>Set the /auth/* scripts rate limit to 20 Requests per minute:</p>
+<source><![CDATA[    <filter>
+        <filter-name>RateLimitFilter Login</filter-name>
+        <filter-class>org.apache.catalina.filters.RateLimitFilter</filter-class>
+        <init-param>
+            <param-name>bucketRequests</param-name>
+            <param-value>20</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>RateLimitFilter Login</filter-name>
+        <url-pattern>/auth/*</url-pattern>
+    </filter-mapping>]]></source>
+
+  </subsection>
+
 </section>
+
 
 <section name="Remote Address Filter">
 
@@ -1199,21 +1316,20 @@ FINE: Request "/docs/config/manager.html" with response status "200"
   </subsection>
 
   <subsection name="Example">
-    <p>To allow access only for the clients connecting from localhost:</p>
-    <pre>
-      &lt;filter>
-      &lt;filter-name>Remote CIDR Filter&lt;/filter-name>
-      &lt;filter-class>org.apache.catalina.filters.RemoteCIDRFilter&lt;/filter-class>
-      &lt;init-param>
-      &lt;param-name>allow&lt;/param-name>
-      &lt;param-value>127.0.0.0/8, ::1&lt;/param-value>
-      &lt;/init-param>
-      &lt;/filter>
-      &lt;filter-mapping>
-      &lt;filter-name>Remote CIDR Filter&lt;/filter-name>
-      &lt;url-pattern>/*&lt;/url-pattern>
-      &lt;/filter-mapping>
-    </pre>
+    <p>To allow access only for the clients connecting from localhost and from local network 192.68.0.*:</p>
+    <source><![CDATA[      <filter>
+        <filter-name>Remote CIDR Filter</filter-name>
+        <filter-class>org.apache.catalina.filters.RemoteCIDRFilter</filter-class>
+        <init-param>
+          <param-name>allow</param-name>
+          <param-value>127.0.0.1, ::1, 192.68.0.0/24</param-value>
+        </init-param>
+      </filter>
+
+      <filter-mapping>
+        <filter-name>Remote CIDR Filter</filter-name>
+        <url-pattern>/*</url-pattern>
+      </filter-mapping>]]></source>
   </subsection>
 
 </section>

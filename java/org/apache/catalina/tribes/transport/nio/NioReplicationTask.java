@@ -110,7 +110,7 @@ public class NioReplicationTask extends AbstractRxTask {
             } else if ( e instanceof IOException ) {
                 //don't spew out stack traces for IO exceptions unless debug is enabled.
                 if (log.isDebugEnabled()) {
-                    log.debug ("IOException in replication worker, unable to drain channel. Probable cause: Keep alive socket closed["+e.getMessage()+"].", e);
+                    log.debug(sm.getString("nioReplicationTask.unable.drainChannel.ioe", e.getMessage()), e);
                 } else {
                     log.warn (sm.getString("nioReplicationTask.unable.drainChannel.ioe", e.getMessage()));
                 }
@@ -261,7 +261,7 @@ public class NioReplicationTask extends AbstractRxTask {
     private void remoteEof(SelectionKey key) {
         // close channel on EOF, invalidates the key
         if ( log.isDebugEnabled() ) {
-            log.debug("Channel closed on the remote end, disconnecting");
+            log.debug(sm.getString("nioReplicationTask.disconnect"));
         }
         cancelKey(key);
     }
@@ -347,7 +347,7 @@ public class NioReplicationTask extends AbstractRxTask {
                           ((SocketChannel)channel).socket().getInetAddress() :
                           ((DatagramChannel)channel).socket().getInetAddress()));
             }
-        } catch ( java.io.IOException x ) {
+        } catch (IOException x) {
             log.warn(sm.getString("nioReplicationTask.unable.ack", x.getMessage()));
         }
     }

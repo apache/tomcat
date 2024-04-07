@@ -18,18 +18,25 @@ package org.apache.catalina.servlets;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.parsers.SAXParserFactory;
 
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
+import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.websocket.server.WsContextListener;
+import org.xml.sax.InputSource;
 
 public class TestWebdavServlet extends TomcatBaseTest {
 
@@ -44,8 +51,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         File appDir = new File(getBuildDirectory(), "webapps" + contextPath);
         // app dir is relative to server home
-        org.apache.catalina.Context ctx =
-            tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        Context ctx = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctx, "webdav", new WebdavServlet());
         ctx.addServletMappingDecoded("/*", "webdav");
@@ -88,8 +94,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         File appDir = new File(getBuildDirectory(), "webapps" + contextPath);
         // app dir is relative to server home
-        org.apache.catalina.Context ctx =
-            tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        Context ctx = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctx, "webdav", new WebdavServlet());
         ctx.addServletMappingDecoded("/webdav/*", "webdav");
@@ -149,4 +154,45 @@ public class TestWebdavServlet extends TomcatBaseTest {
         return TomcatBaseTest.getUrl(path, out, resHead);
     }
 
+    /*
+     * Bug 66609
+     */
+    @Test
+    public void testDirectoryListing() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
+        defaultServlet.addInitParameter("listings", "true");
+
+        ctxt.addServletMappingDecoded("/*", "webdav");
+        ctxt.addMimeMapping("html", "text/html");
+
+        tomcat.start();
+
+        Client client = new Client();
+        client.setPort(getPort());
+        client.setRequest(new String[] { "PROPFIND /bug66609/ HTTP/1.1" + SimpleHttpClient.CRLF +
+                                         "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                                         SimpleHttpClient.CRLF});
+        client.connect();
+        client.sendRequest();
+
+        client.setUseContentLength(true);
+        client.readResponse(true);
+
+        // This will throw an exception if the XML is not valid
+        SAXParserFactory.newInstance().newSAXParser().getXMLReader().parse(new InputSource(new StringReader(client.getResponseBody())));
+    }
+
+
+    private static final class Client extends SimpleHttpClient {
+
+        @Override
+        public boolean isResponseBodyOK() {
+            return true;
+        }
+    }
 }

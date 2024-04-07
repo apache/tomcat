@@ -23,7 +23,10 @@ import jakarta.servlet.ServletRequest;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Factory for the creation and caching of Filters and creation of Filter Chains.
@@ -32,6 +35,9 @@ import org.apache.tomcat.util.descriptor.web.FilterMap;
  * @author Remy Maucherat
  */
 public final class ApplicationFilterFactory {
+
+    private static final Log log = LogFactory.getLog(ApplicationFilterFactory.class);
+    private static final StringManager sm = StringManager.getManager(ApplicationFilterFactory.class);
 
     private ApplicationFilterFactory() {
         // Prevent instance creation. This is a utility class.
@@ -77,7 +83,7 @@ public final class ApplicationFilterFactory {
         FilterMap filterMaps[] = context.findFilterMaps();
 
         // If there are no filter mappings, we are done
-        if ((filterMaps == null) || (filterMaps.length == 0)) {
+        if (filterMaps == null || filterMaps.length == 0) {
             return filterChain;
         }
 
@@ -100,10 +106,10 @@ public final class ApplicationFilterFactory {
             if (!matchFiltersURL(filterMap, requestPath)) {
                 continue;
             }
-            ApplicationFilterConfig filterConfig = (ApplicationFilterConfig) context
-                    .findFilterConfig(filterMap.getFilterName());
+            ApplicationFilterConfig filterConfig =
+                    (ApplicationFilterConfig) context.findFilterConfig(filterMap.getFilterName());
             if (filterConfig == null) {
-                // FIXME - log configuration problem
+                log.warn(sm.getString("applicationFilterFactory.noFilterConfig", filterMap.getFilterName()));
                 continue;
             }
             filterChain.addFilter(filterConfig);
@@ -117,10 +123,10 @@ public final class ApplicationFilterFactory {
             if (!matchFiltersServlet(filterMap, servletName)) {
                 continue;
             }
-            ApplicationFilterConfig filterConfig = (ApplicationFilterConfig) context
-                    .findFilterConfig(filterMap.getFilterName());
+            ApplicationFilterConfig filterConfig =
+                    (ApplicationFilterConfig) context.findFilterConfig(filterMap.getFilterName());
             if (filterConfig == null) {
-                // FIXME - log configuration problem
+                log.warn(sm.getString("applicationFilterFactory.noFilterConfig", filterMap.getFilterName()));
                 continue;
             }
             filterChain.addFilter(filterConfig);

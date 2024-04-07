@@ -130,9 +130,7 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
         }
         if (state == PooledObjectState.EVICTION_RETURN_TO_HEAD) {
             state = PooledObjectState.IDLE;
-            if (!idleQueue.offerFirst(this)) {
-                // TODO - Should never happen
-            }
+            idleQueue.offerFirst(this);
         }
 
         return false;

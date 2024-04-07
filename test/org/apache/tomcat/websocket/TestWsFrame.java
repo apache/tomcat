@@ -37,8 +37,7 @@ public class TestWsFrame {
                 WsFrameBase.byteArrayToLong(new byte[] { -1, -1, -1, -1, -1, -1, -1 }, 0, 7));
         Assert.assertEquals(0x7FFFFFFFFFFFFFFFL,
                 WsFrameBase.byteArrayToLong(new byte[] { 127, -1, -1, -1, -1, -1, -1, -1 }, 0, 8));
-        Assert.assertEquals(-1,
-                WsFrameBase.byteArrayToLong(new byte[] { -1, -1, -1, -1, -1, -1, -1, -1 }, 0, 8));
+        Assert.assertEquals(-1, WsFrameBase.byteArrayToLong(new byte[] { -1, -1, -1, -1, -1, -1, -1, -1 }, 0, 8));
     }
 
 
@@ -57,7 +56,6 @@ public class TestWsFrame {
                 WsFrameBase.byteArrayToLong(new byte[] { 20, -1, -1, -1, -1, -1, -1, -1 }, 1, 7));
         Assert.assertEquals(0x7FFFFFFFFFFFFFFFL,
                 WsFrameBase.byteArrayToLong(new byte[] { 20, 127, -1, -1, -1, -1, -1, -1, -1 }, 1, 8));
-        Assert.assertEquals(-1,
-                WsFrameBase.byteArrayToLong(new byte[] { 20, -1, -1, -1, -1, -1, -1, -1, -1 }, 1, 8));
+        Assert.assertEquals(-1, WsFrameBase.byteArrayToLong(new byte[] { 20, -1, -1, -1, -1, -1, -1, -1, -1 }, 1, 8));
     }
 }

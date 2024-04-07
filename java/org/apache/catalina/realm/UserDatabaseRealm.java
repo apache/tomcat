@@ -28,6 +28,7 @@ import javax.naming.Context;
 import org.apache.catalina.Group;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Role;
+import org.apache.catalina.Server;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.naming.ContextBindings;
@@ -132,6 +133,9 @@ public class UserDatabaseRealm extends RealmBase {
 
     // ------------------------------------------------------ Protected Methods
 
+    /**
+     * Calls {@link UserDatabase#backgroundProcess()}.
+     */
     @Override
     public void backgroundProcess() {
         UserDatabase database = getUserDatabase();
@@ -141,9 +145,6 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
-    /**
-     * Return the password associated with the given principal's user name.
-     */
     @Override
     protected String getPassword(String username) {
         UserDatabase database = getUserDatabase();
@@ -181,9 +182,6 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
-    /**
-     * Return the Principal associated with the given user name.
-     */
     @Override
     protected Principal getPrincipal(String username) {
         UserDatabase database = getUserDatabase();
@@ -217,6 +215,11 @@ public class UserDatabaseRealm extends RealmBase {
                             context = ContextBindings.getClassLoader();
                             context = (Context) context.lookup("comp/env");
                         } else {
+                            Server server = getServer();
+                            if (server == null) {
+                                containerLog.error(sm.getString("userDatabaseRealm.noNamingContext"));
+                                return null;
+                            }
                             context = getServer().getGlobalNamingContext();
                         }
                         database = (UserDatabase) context.lookup(resourceName);
@@ -252,12 +255,6 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
-    /**
-     * Gracefully terminate the active use of the public methods of this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that needs to be reported
-     */
     @Override
     protected void stopInternal() throws LifecycleException {
 

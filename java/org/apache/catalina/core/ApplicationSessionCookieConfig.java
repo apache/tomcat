@@ -40,7 +40,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     private static final boolean DEFAULT_HTTP_ONLY = false;
     private static final boolean DEFAULT_SECURE = false;
 
-    private final Map<String, String> attributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private final Map<String,String> attributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
     private String name;
     private StandardContext context;
@@ -175,7 +175,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
 
 
     @Override
-    public Map<String, String> getAttributes() {
+    public Map<String,String> getAttributes() {
         return Collections.unmodifiableMap(attributes);
     }
 
@@ -221,10 +221,13 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
             cookie.setHttpOnly(true);
         }
 
+        cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR,
+                Boolean.toString(context.getUsePartitioned()));
+
         cookie.setPath(SessionConfig.getSessionCookiePath(context));
 
         // Other attributes
-        for (Map.Entry<String, String> attribute : scc.getAttributes().entrySet()) {
+        for (Map.Entry<String,String> attribute : scc.getAttributes().entrySet()) {
             switch (attribute.getKey()) {
                 case Constants.COOKIE_COMMENT_ATTR:
                 case Constants.COOKIE_DOMAIN_ATTR:

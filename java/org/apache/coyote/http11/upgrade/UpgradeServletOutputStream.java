@@ -189,7 +189,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
             return;
         }
         closed = true;
-        flushInternal((listener == null), false);
+        flushInternal(listener == null, false);
     }
 
 

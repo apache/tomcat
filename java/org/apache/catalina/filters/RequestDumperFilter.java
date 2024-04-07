@@ -134,19 +134,23 @@ public class RequestDumperFilter extends GenericFilter {
             doLog("            method", hRequest.getMethod());
         }
 
-        Enumeration<String> pnames = request.getParameterNames();
-        while (pnames.hasMoreElements()) {
-            String pname = pnames.nextElement();
-            String pvalues[] = request.getParameterValues(pname);
-            StringBuilder result = new StringBuilder(pname);
-            result.append('=');
-            for (int i = 0; i < pvalues.length; i++) {
-                if (i > 0) {
-                    result.append(", ");
+        try {
+            Enumeration<String> pnames = request.getParameterNames();
+            while (pnames.hasMoreElements()) {
+                String pname = pnames.nextElement();
+                String pvalues[] = request.getParameterValues(pname);
+                StringBuilder result = new StringBuilder(pname);
+                result.append('=');
+                for (int i = 0; i < pvalues.length; i++) {
+                    if (i > 0) {
+                        result.append(", ");
+                    }
+                    result.append(pvalues[i]);
                 }
-                result.append(pvalues[i]);
+                doLog("         parameter", result.toString());
             }
-            doLog("         parameter", result.toString());
+        } catch (IllegalStateException ise) {
+            doLog("        parameters", "Invalid request parameters");
         }
 
         if (hRequest == null) {

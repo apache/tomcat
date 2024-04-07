@@ -151,8 +151,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private volatile String applicationProtocol;
 
     private volatile Certificate[] peerCerts;
-    @Deprecated
-    private volatile javax.security.cert.X509Certificate[] x509PeerCerts;
     private volatile ClientAuthMode clientAuth = ClientAuthMode.NONE;
 
     // SSL Engine status variables
@@ -947,7 +945,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
         handshakeFinished = false;
         peerCerts = null;
-        x509PeerCerts = null;
         currentHandshake = SSL.getHandshakeCount(state.ssl);
         int code2 = SSL.doHandshake(state.ssl);
         if (code2 <= 0) {
@@ -1325,37 +1322,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         public Certificate[] getLocalCertificates() {
             // FIXME (if possible): Not available in the OpenSSL API
             return EMPTY_CERTIFICATES;
-        }
-
-        @Deprecated
-        @Override
-        public javax.security.cert.X509Certificate[] getPeerCertificateChain()
-                throws SSLPeerUnverifiedException {
-            // these are lazy created to reduce memory overhead
-            javax.security.cert.X509Certificate[] c = x509PeerCerts;
-            if (c == null) {
-                byte[][] chain;
-                synchronized (OpenSSLEngine.this) {
-                    if (destroyed || SSL.isInInit(state.ssl) != 0) {
-                        throw new SSLPeerUnverifiedException(sm.getString("engine.unverifiedPeer"));
-                    }
-                    chain = SSL.getPeerCertChain(state.ssl);
-                }
-                if (chain == null) {
-                    throw new SSLPeerUnverifiedException(sm.getString("engine.unverifiedPeer"));
-                }
-                javax.security.cert.X509Certificate[] peerCerts =
-                        new javax.security.cert.X509Certificate[chain.length];
-                for (int i = 0; i < peerCerts.length; i++) {
-                    try {
-                        peerCerts[i] = javax.security.cert.X509Certificate.getInstance(chain[i]);
-                    } catch (javax.security.cert.CertificateException e) {
-                        throw new IllegalStateException(e);
-                    }
-                }
-                c = x509PeerCerts = peerCerts;
-            }
-            return c;
         }
 
         @Override

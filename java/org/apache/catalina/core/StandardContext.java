@@ -130,6 +130,7 @@ import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.http.CookieProcessor;
 import org.apache.tomcat.util.http.Rfc6265CookieProcessor;
 import org.apache.tomcat.util.scan.StandardJarScanner;
+import org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor;
 
 /**
  * Standard implementation of the <b>Context</b> interface. Each child container must be a Wrapper implementation to
@@ -196,12 +197,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     /**
-     * The set of application listener class names configured for this application, in the order they were encountered
-     * in the resulting merged web.xml file.
+     * The list of unique application listener class names configured for this application, in the order they were
+     * encountered in the resulting merged web.xml file.
      */
-    private String applicationListeners[] = new String[0];
-
-    private final Object applicationListenersLock = new Object();
+    private CopyOnWriteArrayList<String> applicationListeners = new CopyOnWriteArrayList<>();
 
     /**
      * The set of application listeners that are required to have limited access to ServletContext methods. See Servlet
@@ -226,7 +225,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The ordered set of ServletContainerInitializers for this web application.
      */
-    private Map<ServletContainerInitializer, Set<Class<?>>> initializers = new LinkedHashMap<>();
+    private Map<ServletContainerInitializer,Set<Class<?>>> initializers = new LinkedHashMap<>();
 
 
     /**
@@ -356,13 +355,13 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The set of filter configurations (and associated filter instances) we have initialized, keyed by filter name.
      */
-    private Map<String, ApplicationFilterConfig> filterConfigs = new HashMap<>();
+    private Map<String,ApplicationFilterConfig> filterConfigs = new HashMap<>(); // Guarded by filterDefs
 
 
     /**
      * The set of filter definitions for this application, keyed by filter name.
      */
-    private Map<String, FilterDef> filterDefs = new HashMap<>();
+    private Map<String,FilterDef> filterDefs = new HashMap<>();
 
 
     /**
@@ -418,19 +417,19 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The message destinations for this web application.
      */
-    private HashMap<String, MessageDestination> messageDestinations = new HashMap<>();
+    private HashMap<String,MessageDestination> messageDestinations = new HashMap<>();
 
 
     /**
      * The MIME mappings for this web application, keyed by extension.
      */
-    private Map<String, String> mimeMappings = new HashMap<>();
+    private Map<String,String> mimeMappings = new HashMap<>();
 
 
     /**
      * The context initialization parameters for this web application, keyed by name.
      */
-    private final Map<String, String> parameters = new ConcurrentHashMap<>();
+    private final Map<String,String> parameters = new ConcurrentHashMap<>();
 
 
     /**
@@ -493,7 +492,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The security role mappings for this application, keyed by role name (as used within the application).
      */
-    private Map<String, String> roleMappings = new HashMap<>();
+    private Map<String,String> roleMappings = new HashMap<>();
 
 
     /**
@@ -507,7 +506,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The servlet mappings for this web application, keyed by matching pattern.
      */
-    private Map<String, String> servletMappings = new HashMap<>();
+    private Map<String,String> servletMappings = new HashMap<>();
 
     private final Object servletMappingsLock = new Object();
 
@@ -641,6 +640,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     private boolean useHttpOnly = true;
 
+    private boolean usePartitioned = false;
+
 
     /**
      * The domain to use for session cookies. <code>null</code> indicates that the domain is controlled by the
@@ -705,12 +706,6 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     private boolean renewThreadsWhenStoppingContext = true;
 
     /**
-     * Should Tomcat attempt to clear references to classes loaded by the web application class loader from the
-     * ObjectStreamClass caches?
-     */
-    private boolean clearReferencesObjectStreamClassCaches = true;
-
-    /**
      * Should Tomcat attempt to clear references to classes loaded by this class loader from ThreadLocals?
      */
     private boolean clearReferencesThreadLocals = true;
@@ -751,8 +746,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     private boolean jndiExceptionOnFailedWrite = true;
 
-    private Map<String, String> postConstructMethods = new HashMap<>();
-    private Map<String, String> preDestroyMethods = new HashMap<>();
+    private Map<String,String> postConstructMethods = new HashMap<>();
+    private Map<String,String> preDestroyMethods = new HashMap<>();
 
     private String containerSciFilter;
 
@@ -798,6 +793,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     private boolean contextGetResourceRequiresSlash = Globals.STRICT_SERVLET_COMPLIANCE;
 
     private boolean dispatcherWrapsSameObject = Globals.STRICT_SERVLET_COMPLIANCE;
+
+    private boolean suspendWrappedResponseAfterForward = true;
 
     private boolean parallelAnnotationScanning = false;
 
@@ -878,6 +875,18 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     @Override
     public void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject) {
         this.dispatcherWrapsSameObject = dispatcherWrapsSameObject;
+    }
+
+
+    @Override
+    public boolean getSuspendWrappedResponseAfterForward() {
+        return suspendWrappedResponseAfterForward;
+    }
+
+
+    @Override
+    public void setSuspendWrappedResponseAfterForward(boolean suspendWrappedResponseAfterForward) {
+        this.suspendWrappedResponseAfterForward = suspendWrappedResponseAfterForward;
     }
 
 
@@ -1553,6 +1562,20 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     }
 
 
+    @Override
+    public boolean getUsePartitioned() {
+        return usePartitioned;
+    }
+
+
+    @Override
+    public void setUsePartitioned(boolean usePartitioned) {
+        boolean oldUsePartitioned = this.usePartitioned;
+        this.usePartitioned = usePartitioned;
+        support.firePropertyChange("usePartitioned", oldUsePartitioned, this.usePartitioned);
+    }
+
+
     /**
      * Gets the domain to use for session cookies. Overrides any setting that may be specified by the application.
      *
@@ -1815,29 +1838,29 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 return;
             }
             this.loader = loader;
-
-            // Stop the old component if necessary
-            if (getState().isAvailable() && (oldLoader != null) && (oldLoader instanceof Lifecycle)) {
-                try {
-                    ((Lifecycle) oldLoader).stop();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString("standardContext.setLoader.stop"), e);
-                }
-            }
-
             // Start the new component if necessary
             if (loader != null) {
                 loader.setContext(this);
             }
-            if (getState().isAvailable() && (loader != null) && (loader instanceof Lifecycle)) {
-                try {
-                    ((Lifecycle) loader).start();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString("standardContext.setLoader.start"), e);
-                }
-            }
         } finally {
             writeLock.unlock();
+        }
+
+        // Stop the old component if necessary
+        if (getState().isAvailable() && oldLoader instanceof Lifecycle) {
+            try {
+                ((Lifecycle) oldLoader).stop();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("standardContext.setLoader.stop"), e);
+            }
+        }
+
+        if (getState().isAvailable() && loader instanceof Lifecycle) {
+            try {
+                ((Lifecycle) loader).start();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("standardContext.setLoader.start"), e);
+            }
         }
 
         // Report this property change to interested listeners
@@ -1870,30 +1893,30 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 return;
             }
             this.manager = manager;
-
-            // Stop the old component if necessary
-            if (oldManager instanceof Lifecycle) {
-                try {
-                    ((Lifecycle) oldManager).stop();
-                    ((Lifecycle) oldManager).destroy();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString("standardContext.setManager.stop"), e);
-                }
-            }
-
             // Start the new component if necessary
             if (manager != null) {
                 manager.setContext(this);
             }
-            if (getState().isAvailable() && manager instanceof Lifecycle) {
-                try {
-                    ((Lifecycle) manager).start();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString("standardContext.setManager.start"), e);
-                }
-            }
         } finally {
             writeLock.unlock();
+        }
+
+        // Stop the old component if necessary
+        if (oldManager instanceof Lifecycle) {
+            try {
+                ((Lifecycle) oldManager).stop();
+                ((Lifecycle) oldManager).destroy();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("standardContext.setManager.stop"), e);
+            }
+        }
+
+        if (getState().isAvailable() && manager instanceof Lifecycle) {
+            try {
+                ((Lifecycle) manager).start();
+            } catch (LifecycleException e) {
+                log.error(sm.getString("standardContext.setManager.start"), e);
+            }
         }
 
         // Report this property change to interested listeners
@@ -2108,8 +2131,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     @Override
     public void setPublicId(String publicId) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Setting deployment descriptor public ID to '" + publicId + "'");
+        if (log.isTraceEnabled()) {
+            log.trace("Setting deployment descriptor public ID to '" + publicId + "'");
         }
 
         String oldPublicId = this.publicId;
@@ -2247,6 +2270,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     @Override
     public ServletContext getServletContext() {
+        /*
+         *  This method is called (multiple times) during context start which is single threaded so there is concurrency
+         *  issue here.
+         */
         if (context == null) {
             context = new ApplicationContext(this);
             if (altDDName != null) {
@@ -2443,11 +2470,12 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             if (resources != null) {
                 resources.setContext(this);
             }
-
-            support.firePropertyChange("resources", oldResources, resources);
         } finally {
             writeLock.unlock();
         }
+
+        support.firePropertyChange("resources", oldResources, resources);
+
     }
 
 
@@ -2647,19 +2675,6 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     }
 
 
-    public boolean getClearReferencesObjectStreamClassCaches() {
-        return clearReferencesObjectStreamClassCaches;
-    }
-
-
-    public void setClearReferencesObjectStreamClassCaches(boolean clearReferencesObjectStreamClassCaches) {
-        boolean oldClearReferencesObjectStreamClassCaches = this.clearReferencesObjectStreamClassCaches;
-        this.clearReferencesObjectStreamClassCaches = clearReferencesObjectStreamClassCaches;
-        support.firePropertyChange("clearReferencesObjectStreamClassCaches", oldClearReferencesObjectStreamClassCaches,
-                this.clearReferencesObjectStreamClassCaches);
-    }
-
-
     public boolean getClearReferencesThreadLocals() {
         return clearReferencesThreadLocals;
     }
@@ -2715,21 +2730,11 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     @Override
     public void addApplicationListener(String listener) {
-
-        synchronized (applicationListenersLock) {
-            String results[] = new String[applicationListeners.length + 1];
-            for (int i = 0; i < applicationListeners.length; i++) {
-                if (listener.equals(applicationListeners[i])) {
-                    log.info(sm.getString("standardContext.duplicateListener", listener));
-                    return;
-                }
-                results[i] = applicationListeners[i];
-            }
-            results[applicationListeners.length] = listener;
-            applicationListeners = results;
+        if (applicationListeners.addIfAbsent(listener)) {
+            fireContainerEvent("addApplicationListener", listener);
+        } else {
+            log.info(sm.getString("standardContext.duplicateListener", listener));
         }
-        fireContainerEvent("addApplicationListener", listener);
-
     }
 
 
@@ -2994,7 +2999,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     @Override
     public void addParameter(String name, String value) {
         // Validate the proposed context initialization parameter
-        if ((name == null) || (value == null)) {
+        if (name == null || value == null) {
             throw new IllegalArgumentException(sm.getString("standardContext.parameter.required"));
         }
 
@@ -3218,7 +3223,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     @Override
     public String[] findApplicationListeners() {
-        return applicationListeners;
+        return applicationListeners.toArray(new String[0]);
     }
 
 
@@ -3569,36 +3574,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     @Override
     public void removeApplicationListener(String listener) {
-
-        synchronized (applicationListenersLock) {
-
-            // Make sure this listener is currently present
-            int n = -1;
-            for (int i = 0; i < applicationListeners.length; i++) {
-                if (applicationListeners[i].equals(listener)) {
-                    n = i;
-                    break;
-                }
-            }
-            if (n < 0) {
-                return;
-            }
-
-            // Remove the specified listener
-            int j = 0;
-            String results[] = new String[applicationListeners.length - 1];
-            for (int i = 0; i < applicationListeners.length; i++) {
-                if (i != n) {
-                    results[j++] = applicationListeners[i];
-                }
-            }
-            applicationListeners = results;
-
+        if (applicationListeners.remove(listener)) {
+            // Inform interested listeners if the specified listener was present and has been removed
+            fireContainerEvent("removeApplicationListener", listener);
         }
-
-        // Inform interested listeners
-        fireContainerEvent("removeApplicationListener", listener);
-
     }
 
 
@@ -4278,17 +4257,17 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     public boolean filterStart() {
 
-        if (getLogger().isDebugEnabled()) {
-            getLogger().debug("Starting filters");
+        if (getLogger().isTraceEnabled()) {
+            getLogger().trace("Starting filters");
         }
         // Instantiate and record a FilterConfig for each defined filter
         boolean ok = true;
-        synchronized (filterConfigs) {
+        synchronized (filterDefs) {
             filterConfigs.clear();
-            for (Entry<String, FilterDef> entry : filterDefs.entrySet()) {
+            for (Entry<String,FilterDef> entry : filterDefs.entrySet()) {
                 String name = entry.getKey();
-                if (getLogger().isDebugEnabled()) {
-                    getLogger().debug(" Starting filter '" + name + "'");
+                if (getLogger().isTraceEnabled()) {
+                    getLogger().trace(" Starting filter '" + name + "'");
                 }
                 try {
                     ApplicationFilterConfig filterConfig = new ApplicationFilterConfig(this, entry.getValue());
@@ -4313,15 +4292,15 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     public boolean filterStop() {
 
-        if (getLogger().isDebugEnabled()) {
-            getLogger().debug("Stopping filters");
+        if (getLogger().isTraceEnabled()) {
+            getLogger().trace("Stopping filters");
         }
 
         // Release all Filter and FilterConfig instances
-        synchronized (filterConfigs) {
-            for (Entry<String, ApplicationFilterConfig> entry : filterConfigs.entrySet()) {
-                if (getLogger().isDebugEnabled()) {
-                    getLogger().debug(" Stopping filter '" + entry.getKey() + "'");
+        synchronized (filterDefs) {
+            for (Entry<String,ApplicationFilterConfig> entry : filterConfigs.entrySet()) {
+                if (getLogger().isTraceEnabled()) {
+                    getLogger().trace(" Stopping filter '" + entry.getKey() + "'");
                 }
                 ApplicationFilterConfig filterConfig = entry.getValue();
                 filterConfig.release();
@@ -4342,7 +4321,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * @return the filter config object
      */
     public FilterConfig findFilterConfig(String name) {
-        return filterConfigs.get(name);
+        synchronized (filterDefs) {
+            return filterConfigs.get(name);
+        }
     }
 
 
@@ -4353,8 +4334,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     public boolean listenerStart() {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Configuring application event listeners");
+        if (log.isTraceEnabled()) {
+            log.trace("Configuring application event listeners");
         }
 
         // Instantiate the required listeners
@@ -4362,8 +4343,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         Object results[] = new Object[listeners.length];
         boolean ok = true;
         for (int i = 0; i < results.length; i++) {
-            if (getLogger().isDebugEnabled()) {
-                getLogger().debug(" Configuring event listener class '" + listeners[i] + "'");
+            if (getLogger().isTraceEnabled()) {
+                getLogger().trace(" Configuring event listener class '" + listeners[i] + "'");
             }
             try {
                 String listener = listeners[i];
@@ -4411,8 +4392,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Send application start events
 
-        if (getLogger().isDebugEnabled()) {
-            getLogger().debug("Sending application start events");
+        if (getLogger().isTraceEnabled()) {
+            getLogger().trace("Sending application start events");
         }
 
         // Ensure context is not null
@@ -4462,8 +4443,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     public boolean listenerStop() {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Sending application stop events");
+        if (log.isTraceEnabled()) {
+            log.trace("Sending application stop events");
         }
 
         boolean ok = true;
@@ -4575,8 +4556,6 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         boolean ok = true;
 
-        Lock writeLock = resourcesLock.writeLock();
-        writeLock.lock();
         try {
             if (resources != null) {
                 resources.stop();
@@ -4585,8 +4564,6 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("standardContext.resourcesStop"), t);
             ok = false;
-        } finally {
-            writeLock.unlock();
         }
 
         return ok;
@@ -4604,7 +4581,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     public boolean loadOnStartup(Container children[]) {
 
         // Collect "load on startup" servlets that need to be initialized
-        TreeMap<Integer, ArrayList<Wrapper>> map = new TreeMap<>();
+        TreeMap<Integer,ArrayList<Wrapper>> map = new TreeMap<>();
         for (Container child : children) {
             Wrapper wrapper = (Wrapper) child;
             int loadOnStartup = wrapper.getLoadOnStartup();
@@ -4647,16 +4624,16 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Starting " + getBaseName());
+        if (log.isTraceEnabled()) {
+            log.trace("Starting " + getBaseName());
         }
 
         // Send j2ee.state.starting notification
         if (this.getObjectName() != null) {
-            Notification notification = new Notification("j2ee.state.starting", this.getObjectName(),
-                    sequenceNumber.getAndIncrement());
+            Notification notification =
+                    new Notification("j2ee.state.starting", this.getObjectName(), sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
 
@@ -4674,8 +4651,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Add missing components as necessary
         if (getResources() == null) { // (1) Required by Loader
-            if (log.isDebugEnabled()) {
-                log.debug("Configuring default Resources");
+            if (log.isTraceEnabled()) {
+                log.trace("Configuring default Resources");
             }
 
             try {
@@ -4720,8 +4697,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         // Standard container startup
-        if (log.isDebugEnabled()) {
-            log.debug("Processing standard container startup");
+        if (log.isTraceEnabled()) {
+            log.trace("Processing standard container startup");
         }
 
 
@@ -4744,7 +4721,6 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     cl.setClearReferencesStopThreads(getClearReferencesStopThreads());
                     cl.setClearReferencesStopTimerThreads(getClearReferencesStopTimerThreads());
                     cl.setClearReferencesHttpClientKeepAliveThread(getClearReferencesHttpClientKeepAliveThread());
-                    cl.setClearReferencesObjectStreamClassCaches(getClearReferencesObjectStreamClassCaches());
                     cl.setClearReferencesThreadLocals(getClearReferencesThreadLocals());
                     cl.setSkipMemoryLeakChecksOnJvmShutdown(getSkipMemoryLeakChecksOnJvmShutdown());
                 }
@@ -4784,7 +4760,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 }
 
                 // Notify our interested LifecycleListeners
-                fireLifecycleEvent(Lifecycle.CONFIGURE_START_EVENT, null);
+                fireLifecycleEvent(CONFIGURE_START_EVENT, null);
 
                 // Start our child containers, if not already started
                 for (Container child : findChildren()) {
@@ -4854,13 +4830,17 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
                 // Make the version info available
                 getServletContext().setAttribute(Globals.WEBAPP_VERSION, getWebappVersion());
+
+                // Make the utility executor available
+                getServletContext().setAttribute(ScheduledThreadPoolExecutor.class.getName(),
+                        Container.getService(this).getServer().getUtilityExecutor());
             }
 
             // Set up the context init params
             mergeParameters();
 
             // Call ServletContainerInitializers
-            for (Map.Entry<ServletContainerInitializer, Set<Class<?>>> entry : initializers.entrySet()) {
+            for (Map.Entry<ServletContainerInitializer,Set<Class<?>>> entry : initializers.entrySet()) {
                 try {
                     entry.getKey().onStartup(entry.getValue(), getServletContext());
                 } catch (ServletException e) {
@@ -4921,8 +4901,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Set available status depending upon startup success
         if (ok) {
-            if (log.isDebugEnabled()) {
-                log.debug("Starting completed");
+            if (log.isTraceEnabled()) {
+                log.trace("Starting completed");
             }
         } else {
             log.error(sm.getString("standardContext.startFailed", getName()));
@@ -4932,8 +4912,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Send j2ee.state.running notification
         if (ok && (this.getObjectName() != null)) {
-            Notification notification = new Notification("j2ee.state.running", this.getObjectName(),
-                    sequenceNumber.getAndIncrement());
+            Notification notification =
+                    new Notification("j2ee.state.running", this.getObjectName(), sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
 
@@ -4948,8 +4928,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             setState(LifecycleState.FAILED);
             // Send j2ee.object.failed notification
             if (this.getObjectName() != null) {
-                Notification notification = new Notification("j2ee.object.failed", this.getObjectName(),
-                        sequenceNumber.getAndIncrement());
+                Notification notification =
+                        new Notification("j2ee.object.failed", this.getObjectName(), sequenceNumber.getAndIncrement());
                 broadcaster.sendNotification(notification);
             }
         } else {
@@ -4959,8 +4939,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     private void checkConstraintsForUncoveredMethods(SecurityConstraint[] constraints) {
-        SecurityConstraint[] newConstraints = SecurityConstraint.findUncoveredHttpMethods(constraints,
-                getDenyUncoveredHttpMethods(), getLogger());
+        SecurityConstraint[] newConstraints =
+                SecurityConstraint.findUncoveredHttpMethods(constraints, getDenyUncoveredHttpMethods(), getLogger());
         for (SecurityConstraint constraint : newConstraints) {
             addConstraint(constraint);
         }
@@ -4973,13 +4953,13 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         if (isUseNaming() && getNamingContextListener() != null) {
             context = getNamingContextListener().getEnvContext();
         }
-        Map<String, Map<String, String>> injectionMap = buildInjectionMap(
-                getIgnoreAnnotations() ? new NamingResourcesImpl() : getNamingResources());
+        Map<String,Map<String,String>> injectionMap =
+                buildInjectionMap(getIgnoreAnnotations() ? new NamingResourcesImpl() : getNamingResources());
         return new DefaultInstanceManager(context, injectionMap, this, this.getClass().getClassLoader());
     }
 
-    private Map<String, Map<String, String>> buildInjectionMap(NamingResourcesImpl namingResources) {
-        Map<String, Map<String, String>> injectionMap = new HashMap<>();
+    private Map<String,Map<String,String>> buildInjectionMap(NamingResourcesImpl namingResources) {
+        Map<String,Map<String,String>> injectionMap = new HashMap<>();
         for (Injectable resource : namingResources.findLocalEjbs()) {
             addInjectionTarget(resource, injectionMap);
         }
@@ -5004,7 +4984,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         return injectionMap;
     }
 
-    private void addInjectionTarget(Injectable resource, Map<String, Map<String, String>> injectionMap) {
+    private void addInjectionTarget(Injectable resource, Map<String,Map<String,String>> injectionMap) {
         List<InjectionTarget> injectionTargets = resource.getInjectionTargets();
         if (injectionTargets != null && injectionTargets.size() > 0) {
             String jndiName = resource.getName();
@@ -5023,7 +5003,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * the application parameters appropriately.
      */
     private void mergeParameters() {
-        Map<String, String> mergedParams = new HashMap<>();
+        Map<String,String> mergedParams = new HashMap<>();
 
         String names[] = findParameters();
         for (String s : names) {
@@ -5040,7 +5020,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         ServletContext sc = getServletContext();
-        for (Map.Entry<String, String> entry : mergedParams.entrySet()) {
+        for (Map.Entry<String,String> entry : mergedParams.entrySet()) {
             sc.setInitParameter(entry.getKey(), entry.getValue());
         }
 
@@ -5055,12 +5035,12 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         // Send j2ee.state.stopping notification
         if (this.getObjectName() != null) {
-            Notification notification = new Notification("j2ee.state.stopping", this.getObjectName(),
-                    sequenceNumber.getAndIncrement());
+            Notification notification =
+                    new Notification("j2ee.state.stopping", this.getObjectName(), sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
 
@@ -5111,8 +5091,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             setCharsetMapper(null);
 
             // Normal container shutdown processing
-            if (log.isDebugEnabled()) {
-                log.debug("Processing standard container shutdown");
+            if (log.isTraceEnabled()) {
+                log.trace("Processing standard container shutdown");
             }
 
             // JNDI resources are unbound in CONFIGURE_STOP_EVENT so stop
@@ -5123,7 +5103,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 namingResources.stop();
             }
 
-            fireLifecycleEvent(Lifecycle.CONFIGURE_STOP_EVENT, null);
+            fireLifecycleEvent(CONFIGURE_STOP_EVENT, null);
 
             // Stop the Valves in our pipeline (including the basic), if any
             if (pipeline instanceof Lifecycle && ((Lifecycle) pipeline).getState().isAvailable()) {
@@ -5160,8 +5140,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Send j2ee.state.stopped notification
         if (this.getObjectName() != null) {
-            Notification notification = new Notification("j2ee.state.stopped", this.getObjectName(),
-                    sequenceNumber.getAndIncrement());
+            Notification notification =
+                    new Notification("j2ee.state.stopped", this.getObjectName(), sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
 
@@ -5172,14 +5152,14 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         try {
             resetContext();
         } catch (Exception ex) {
-            log.error("Error resetting context " + this + " " + ex, ex);
+            log.error(sm.getString("standardContext.resetContextFail", getName()), ex);
         }
 
         // reset the instance manager
         setInstanceManager(null);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Stopping complete");
+        if (log.isTraceEnabled()) {
+            log.trace("Stopping complete");
         }
 
     }
@@ -5197,8 +5177,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         // have been set so the notification can't be created
         if (getObjectName() != null) {
             // Send j2ee.object.deleted notification
-            Notification notification = new Notification("j2ee.object.deleted", this.getObjectName(),
-                    sequenceNumber.getAndIncrement());
+            Notification notification =
+                    new Notification("j2ee.object.deleted", this.getObjectName(), sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
 
@@ -5225,7 +5205,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     @Override
-    public void backgroundProcess() {
+    public synchronized void backgroundProcess() {
 
         if (!getState().isAvailable()) {
             return;
@@ -5284,7 +5264,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         // Bugzilla 32867
         distributable = false;
 
-        applicationListeners = new String[0];
+        applicationListeners.clear();
         applicationEventListenersList.clear();
         applicationLifecycleListenersObjects = new Object[0];
         jspConfigDescriptor = null;
@@ -5296,8 +5276,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         postConstructMethods.clear();
         preDestroyMethods.clear();
 
-        if (log.isDebugEnabled()) {
-            log.debug("resetContext " + getObjectName());
+        if (log.isTraceEnabled()) {
+            log.trace("resetContext " + getObjectName());
         }
     }
 
@@ -5400,8 +5380,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
             // If the pattern did not conflict, add the new constraint(s).
             if (!foundConflict) {
-                SecurityConstraint[] newSecurityConstraints = SecurityConstraint
-                        .createConstraints(servletSecurityElement, urlPattern);
+                SecurityConstraint[] newSecurityConstraints =
+                        SecurityConstraint.createConstraints(servletSecurityElement, urlPattern);
                 for (SecurityConstraint securityConstraint : newSecurityConstraints) {
                     addConstraint(securityConstraint);
                 }
@@ -5629,7 +5609,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     listener.requestDestroyed(event);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    getLogger().error(sm.getString("standardContext.requestListener.requestInit",
+                    getLogger().error(sm.getString("standardContext.requestListener.requestDestroyed",
                             instances[j].getClass().getName()), t);
                     request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
                     return false;
@@ -5695,13 +5675,13 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     @Override
-    public Map<String, String> findPostConstructMethods() {
+    public Map<String,String> findPostConstructMethods() {
         return postConstructMethods;
     }
 
 
     @Override
-    public Map<String, String> findPreDestroyMethods() {
+    public Map<String,String> findPreDestroyMethods() {
         return preDestroyMethods;
     }
 
@@ -5887,8 +5867,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
         // Send j2ee.object.created notification
         if (this.getObjectName() != null) {
-            Notification notification = new Notification("j2ee.object.created", this.getObjectName(),
-                    sequenceNumber.getAndIncrement());
+            Notification notification =
+                    new Notification("j2ee.object.created", this.getObjectName(), sequenceNumber.getAndIncrement());
             broadcaster.sendNotification(notification);
         }
     }
@@ -5915,7 +5895,6 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
-        // FIXME: we not send j2ee.attribute.changed
         if (notificationInfo == null) {
             notificationInfo = new MBeanNotificationInfo[] {
                     new MBeanNotificationInfo(new String[] { "j2ee.object.created" }, Notification.class.getName(),
@@ -6204,22 +6183,22 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         @Override
-        public Map<String, ? extends ServletRegistration> getServletRegistrations() {
+        public Map<String,? extends ServletRegistration> getServletRegistrations() {
             throw new UnsupportedOperationException(sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
-        public jakarta.servlet.FilterRegistration.Dynamic addFilter(String filterName, String className) {
+        public FilterRegistration.Dynamic addFilter(String filterName, String className) {
             throw new UnsupportedOperationException(sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
-        public jakarta.servlet.FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
+        public FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
             throw new UnsupportedOperationException(sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
         @Override
-        public jakarta.servlet.FilterRegistration.Dynamic addFilter(String filterName,
+        public FilterRegistration.Dynamic addFilter(String filterName,
                 Class<? extends Filter> filterClass) {
             throw new UnsupportedOperationException(sm.getString("noPluggabilityServletContext.notAllowed"));
         }
@@ -6235,7 +6214,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         @Override
-        public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
+        public Map<String,? extends FilterRegistration> getFilterRegistrations() {
             throw new UnsupportedOperationException(sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 

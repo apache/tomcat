@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -30,8 +29,6 @@ import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
-import org.apache.catalina.core.AprLifecycleListener;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -56,7 +53,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
             parameterSets.add(new Object[] {
                     "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation", storeType});
             parameterSets.add(new Object[] {
-                    "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation", storeType});
+                    "OpenSSL-FFM", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation", storeType});
         }
 
         return parameterSets;
@@ -73,8 +70,6 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
     @Parameter(3)
     public StoreType storeType;
-
-    private SSLHostConfig sslHostConfig = new SSLHostConfig();
 
 
     @Test
@@ -244,6 +239,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
 
     private void configureHostRSA() {
+        SSLHostConfig sslHostConfig = getSSLHostConfig();
         switch (storeType) {
         case KEYSTORE: {
             SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
@@ -263,6 +259,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
 
     private void configureHostEC() {
+        SSLHostConfig sslHostConfig = getSSLHostConfig();
         switch (storeType) {
         case KEYSTORE: {
             SSLHostConfigCertificate sslHostConfigCertificateEc = new SSLHostConfigCertificate(sslHostConfig, Type.EC);
@@ -312,22 +309,23 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         connector.setScheme("https");
         connector.setSecure(true);
         Assert.assertTrue(connector.setProperty("SSLEnabled", "true"));
+        SSLHostConfig sslHostConfig = new SSLHostConfig();
         sslHostConfig.setProtocols("TLSv1.2");
         connector.addSslHostConfig(sslHostConfig);
 
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
-
-        if (needApr) {
-            AprLifecycleListener listener = new AprLifecycleListener();
-            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
-            StandardServer server = (StandardServer) tomcat.getServer();
-            server.addLifecycleListener(listener);
-        }
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
 
         // Simple webapp
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "TesterServlet", new TesterServlet());
         ctxt.addServletMappingDecoded("/*", "TesterServlet");
+    }
+
+
+    private SSLHostConfig getSSLHostConfig() {
+        Tomcat tomcat = getTomcatInstance();
+        Connector connector = tomcat.getConnector();
+        return connector.findSslHostConfigs()[0];
     }
 
 

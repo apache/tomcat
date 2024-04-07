@@ -72,7 +72,7 @@ public class MediaType {
                     result.append(type);
                     result.append('/');
                     result.append(subtype);
-                    for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                    for (Map.Entry<String,String> entry : parameters.entrySet()) {
                         String value = entry.getValue();
                         if (value == null || value.length() == 0) {
                             continue;
@@ -98,7 +98,7 @@ public class MediaType {
                     result.append(type);
                     result.append('/');
                     result.append(subtype);
-                    for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                    for (Map.Entry<String,String> entry : parameters.entrySet()) {
                         if (entry.getKey().equalsIgnoreCase("charset")) {
                             continue;
                         }
@@ -119,7 +119,9 @@ public class MediaType {
      * Parses a MediaType value, either from an HTTP header or from an application.
      *
      * @param input a reader over the header text
+     *
      * @return a MediaType parsed from the input, or null if not valid
+     *
      * @throws IOException if there was a problem reading the input
      */
     public static MediaType parseMediaType(StringReader input) throws IOException {

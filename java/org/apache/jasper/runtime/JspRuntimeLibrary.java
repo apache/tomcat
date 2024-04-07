@@ -990,9 +990,13 @@ public class JspRuntimeLibrary {
 
         String resourcePath = getContextRelativePath(request, relativePath);
         RequestDispatcher rd = request.getRequestDispatcher(resourcePath);
-
-        rd.include(request,
-                   new ServletResponseWrapperInclude(response, out));
+        if (rd != null) {
+            rd.include(request,
+                    new ServletResponseWrapperInclude(response, out));
+        } else {
+            throw new JasperException(
+                    Localizer.getMessage("jsp.error.include.exception", resourcePath));
+        }
 
     }
 

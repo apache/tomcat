@@ -18,9 +18,11 @@ package org.apache.tomcat.util.compat;
 
 import java.lang.reflect.Field;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * This is the base implementation class for JRE compatibility and provides an
- * implementation based on Java 11. Sub-classes may extend this class and provide
+ * implementation based on Java 17. Sub-classes may extend this class and provide
  * alternative implementations for later JRE versions
  */
 public class JreCompat {
@@ -28,6 +30,9 @@ public class JreCompat {
     private static final JreCompat instance;
     private static final boolean graalAvailable;
     private static final boolean jre19Available;
+    private static final boolean jre21Available;
+    private static final boolean jre22Available;
+    private static final StringManager sm = StringManager.getManager(JreCompat.class);
 
     static {
         boolean result = false;
@@ -43,11 +48,25 @@ public class JreCompat {
 
         // This is Tomcat 11.0.x with a minimum Java version of Java 17.
         // Look for the highest supported JVM first
-        if (Jre19Compat.isSupported()) {
+        if (Jre22Compat.isSupported()) {
+            instance = new Jre22Compat();
+            jre22Available = true;
+            jre21Available = true;
+            jre19Available = true;
+        } else if (Jre21Compat.isSupported()) {
+            instance = new Jre21Compat();
+            jre22Available = false;
+            jre21Available = true;
+            jre19Available = true;
+        } else if (Jre19Compat.isSupported()) {
             instance = new Jre19Compat();
+            jre22Available = false;
+            jre21Available = false;
             jre19Available = true;
         } else {
             instance = new JreCompat();
+            jre22Available = false;
+            jre21Available = false;
             jre19Available = false;
         }
     }
@@ -65,6 +84,16 @@ public class JreCompat {
 
     public static boolean isJre19Available() {
         return jre19Available;
+    }
+
+
+    public static boolean isJre21Available() {
+        return jre21Available;
+    }
+
+
+    public static boolean isJre22Available() {
+        return jre22Available;
     }
 
 
@@ -124,5 +153,30 @@ public class JreCompat {
         }
 
         return result;
+    }
+
+
+    // Java 17 implementations of Java 21 methods
+
+    /**
+     * Create a thread builder for virtual threads using the given name to name the threads.
+     *
+     * @param name The base name for the threads
+     *
+     * @return The thread buidler for virtual threads
+     */
+    public Object createVirtualThreadBuilder(String name) {
+        throw new UnsupportedOperationException(sm.getString("jreCompat.noVirtualThreads"));
+    }
+
+
+    /**
+     * Create a thread with the given thread builder and use it to execute the given runnable.
+     *
+     * @param threadBuilder The thread builder to use to create a thread
+     * @param command       The command to run
+     */
+    public void threadBuilderStart(Object threadBuilder, Runnable command) {
+        throw new UnsupportedOperationException(sm.getString("jreCompat.noVirtualThreads"));
     }
 }

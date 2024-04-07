@@ -128,8 +128,8 @@ public class StuckThreadDetectionValve extends ValveBase {
     protected void initInternal() throws LifecycleException {
         super.initInternal();
 
-        if (log.isDebugEnabled()) {
-            log.debug("Monitoring stuck threads with threshold = " + threshold + " sec");
+        if (log.isTraceEnabled()) {
+            log.trace("Monitoring stuck threads with threshold = " + threshold + " sec");
         }
     }
 
@@ -157,9 +157,6 @@ public class StuckThreadDetectionValve extends ValveBase {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
 
@@ -324,7 +321,7 @@ public class StuckThreadDetectionValve extends ValveBase {
                     // going out from here, maybe already serving a new request
                     this.interruptionSemaphore.acquire();
                 } catch (InterruptedException e) {
-                    log.debug("thread interrupted after the request is finished, ignoring", e);
+                    log.debug(sm.getString("stuckThreadDetectionValve.interrupted"), e);
                 }
                 // no need to release the semaphore, it will be GCed
             }

@@ -37,8 +37,7 @@ public class TestSSLValve {
     public static class MockRequest extends Request {
 
         public MockRequest() {
-            super(EasyMock.createMock(Connector.class));
-            setCoyoteRequest(new org.apache.coyote.Request());
+            super(EasyMock.createMock(Connector.class), new org.apache.coyote.Request());
         }
 
         @Override
@@ -266,6 +265,17 @@ public class TestSSLValve {
 
         Assert.assertNull(mockRequest.getAttribute(Globals.CERTIFICATES_ATTR));
         Assert.assertEquals(1, f.getMessageCount());
+    }
+
+
+    @Test
+    public void testSslSecureProtocolHeaderPresent() throws Exception {
+        String protocol = "secured-with";
+        mockRequest.setHeader(valve.getSslSecureProtocolHeader(), protocol);
+
+        valve.invoke(mockRequest, null);
+
+        Assert.assertEquals(protocol, mockRequest.getAttribute(Globals.SECURE_PROTOCOL_ATTR));
     }
 
 

@@ -36,7 +36,7 @@ public class SocketProperties {
     /**
      * Enable/disable socket processor cache, this bounded cache stores
      * SocketProcessor objects to reduce GC
-     * Default is 500
+     * Default is 0
      * -1 is unlimited
      * 0 is disabled
      */
@@ -45,7 +45,7 @@ public class SocketProperties {
     /**
      * Enable/disable poller event cache, this bounded cache stores
      * PollerEvent objects to reduce GC for the poller
-     * Default is 500
+     * Default is 0
      * -1 is unlimited
      * 0 is disabled
      * &gt;0 the max number of objects to keep in cache.
@@ -78,13 +78,13 @@ public class SocketProperties {
 
     /**
      * The application read buffer size in bytes.
-     * Default value is rxBufSize
+     * Default value is 8192
      */
     protected int appReadBufSize = 8192;
 
     /**
      * The application write buffer size in bytes
-     * Default value is txBufSize
+     * Default value is 8192
      */
     protected int appWriteBufSize = 8192;
 

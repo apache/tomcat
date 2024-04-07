@@ -40,8 +40,6 @@ import jakarta.servlet.http.HttpSession;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.catalina.connector.Request;
@@ -514,9 +512,6 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean getRequestAttributesEnabled() {
         return requestAttributesEnabled;
@@ -560,7 +555,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             this.pattern = pattern;
         }
         logElements = createLogElements();
-        cachedElements = createCachedElements(logElements);
+        if (logElements != null) {
+            cachedElements = createCachedElements(logElements);
+        }
     }
 
     /**
@@ -754,33 +751,6 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         return fallback;
     }
 
-
-    /**
-     * Start this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
-    @Override
-    protected synchronized void startInternal() throws LifecycleException {
-
-        setState(LifecycleState.STARTING);
-    }
-
-
-    /**
-     * Stop this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
-    @Override
-    protected synchronized void stopInternal() throws LifecycleException {
-
-        setState(LifecycleState.STOPPING);
-    }
 
     /**
      * AccessLogElement writes the partial message into the buffer.
@@ -1036,6 +1006,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
         /* Our format description string, null if CLF */
         private final String format;
+        /* Does the format string contain characters we need to escape */
+        private final boolean needsEscaping;
         /* Whether to use begin of request or end of response as the timestamp */
         private final boolean usesBegin;
         /* The format type */
@@ -1072,8 +1044,18 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return result.toString();
         }
 
-        protected DateAndTimeElement(String header) {
-            String format = header;
+        protected DateAndTimeElement(String sdf) {
+            String format = sdf;
+            boolean needsEscaping = false;
+            if (sdf != null) {
+                CharArrayWriter writer = new CharArrayWriter();
+                escapeAndAppend(sdf, writer);
+                String escaped = writer.toString();
+                if (!escaped.equals(sdf)) {
+                    needsEscaping = true;
+                }
+            }
+            this.needsEscaping = needsEscaping;
             boolean usesBegin = false;
             FormatType type = FormatType.CLF;
 
@@ -1155,7 +1137,11 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                         temp = temp.replace(tripleMsecPattern, tripleMsec);
                         temp = temp.replace(msecPattern, Long.toString(frac));
                     }
-                    buf.append(temp);
+                    if (needsEscaping) {
+                        escapeAndAppend(temp, buf);
+                    } else {
+                        buf.append(temp);
+                    }
                     break;
             }
         }
@@ -1547,17 +1533,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * write an attribute in the ServletRequest - %{xxx}r
      */
     protected static class RequestAttributeElement implements AccessLogElement {
-        private final String header;
+        private final String attribute;
 
-        public RequestAttributeElement(String header) {
-            this.header = header;
+        public RequestAttributeElement(String attribute) {
+            this.attribute = attribute;
         }
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             Object value = null;
             if (request != null) {
-                value = request.getAttribute(header);
+                value = request.getAttribute(attribute);
             } else {
                 value = "??";
             }
@@ -1577,10 +1563,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * write an attribute in the HttpSession - %{xxx}s
      */
     protected static class SessionAttributeElement implements AccessLogElement {
-        private final String header;
+        private final String attribute;
 
-        public SessionAttributeElement(String header) {
-            this.header = header;
+        public SessionAttributeElement(String attribute) {
+            this.attribute = attribute;
         }
 
         @Override
@@ -1589,7 +1575,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             if (null != request) {
                 HttpSession sess = request.getSession(false);
                 if (null != sess) {
-                    value = sess.getAttribute(header);
+                    value = sess.getAttribute(attribute);
                 }
             } else {
                 value = "??";
@@ -1847,40 +1833,74 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return;
         }
 
-        for (char c : input.toCharArray()) {
-            switch (c) {
-                // " and \
-                case '\\':
-                    dest.append("\\\\");
-                    break;
-                case '\"':
-                    dest.append("\\\"");
-                    break;
-                // Standard C escapes for whitespace (not all standard C escapes)
-                case '\f':
-                    dest.append("\\f");
-                    break;
-                case '\n':
-                    dest.append("\\n");
-                    break;
-                case '\r':
-                    dest.append("\\r");
-                    break;
-                case '\t':
-                    dest.append("\\t");
-                    break;
-                case '\u000b':
-                    dest.append("\\v");
-                    break;
-                default:
-                    // Control, delete (127) or above 127
-                    if (c < 32 || c > 126) {
+        int len = input.length();
+        // As long as we don't encounter chars that need escaping,
+        // we only remember start and length of that string part.
+        // "next" is the start of the string part containing these chars,
+        // "current - 1" is its end. So writing from "next" with length
+        // "current - next" writes that part.
+        // We write that part whenever we find a character to escape and the
+        // unchanged and unwritten string part is not empty.
+        int next = 0;
+        char c;
+        for (int current = 0; current < len; current++) {
+            c = input.charAt(current);
+            // Fast path
+            if (c >= 32 && c < 127) {
+                // special case " and \
+                switch (c) {
+                    case '\\': // dec 92
+                        // Write unchanged string parts
+                        if (current > next) {
+                            dest.write(input, next, current - next);
+                        }
+                        next = current + 1;
+                        dest.append("\\\\");
+                        break;
+                    case '\"': // dec 34
+                        // Write unchanged string parts
+                        if (current > next) {
+                            dest.write(input, next, current - next);
+                        }
+                        next = current + 1;
+                        dest.append("\\\"");
+                        break;
+                    // Don't output individual unchanged chars,
+                    // write the sub string only when the first char to encode
+                    // is encountered plus at the end.
+                    default:
+                }
+            // Control (1-31), delete (127) or above 127
+            } else {
+                // Write unchanged string parts
+                if (current > next) {
+                    dest.write(input, next, current - next);
+                }
+                next = current + 1;
+                switch (c) {
+                    // Standard escapes for some control chars
+                    case '\f': // dec 12
+                        dest.append("\\f");
+                        break;
+                    case '\n': // dec 10
+                        dest.append("\\n");
+                        break;
+                    case '\r': // dec 13
+                        dest.append("\\r");
+                        break;
+                    case '\t': // dec 09
+                        dest.append("\\t");
+                        break;
+                    // Unicode escape \\uXXXX
+                    default:
                         dest.append("\\u");
                         dest.append(HexUtils.toHexString(c));
-                    } else {
-                        dest.append(c);
-                    }
+                }
             }
+        }
+        // Write remaining unchanged string parts
+        if (len > next) {
+            dest.write(input, next, len - next);
         }
     }
 }

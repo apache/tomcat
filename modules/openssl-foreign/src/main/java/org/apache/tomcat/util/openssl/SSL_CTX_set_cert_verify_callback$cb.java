@@ -19,32 +19,40 @@
 
 package org.apache.tomcat.util.openssl;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker;
+import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
-import java.lang.foreign.*;
-import static java.lang.foreign.ValueLayout.*;
+
 /**
- * {@snippet :
- * int (*SSL_CTX_set_cert_verify_callback$cb)(X509_STORE_CTX*,void*);
+ * {@snippet lang = c : * int (*SSL_CTX_set_cert_verify_callback$cb)(X509_STORE_CTX*,void*);
  * }
  */
+@SuppressWarnings("javadoc")
 public interface SSL_CTX_set_cert_verify_callback$cb {
 
-    int apply(java.lang.foreign.MemorySegment _x0, java.lang.foreign.MemorySegment _x1);
+    FunctionDescriptor $DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
+
+    int apply(MemorySegment _x0, MemorySegment _x1);
+
+    MethodHandle UP$MH = openssl_h.upcallHandle(SSL_CTX_set_cert_verify_callback$cb.class, "apply", $DESC);
+
     static MemorySegment allocate(SSL_CTX_set_cert_verify_callback$cb fi, Arena scope) {
-        return RuntimeHelper.upcallStub(constants$15.SSL_CTX_set_cert_verify_callback$cb_UP$MH, fi, constants$15.SSL_CTX_set_cert_verify_callback$cb$FUNC, scope);
+        return Linker.nativeLinker().upcallStub(UP$MH.bindTo(fi), $DESC, scope);
     }
+
+    MethodHandle DOWN$MH = Linker.nativeLinker().downcallHandle($DESC);
+
     static SSL_CTX_set_cert_verify_callback$cb ofAddress(MemorySegment addr, Arena arena) {
-        MemorySegment symbol = addr.reinterpret(arena.scope(), null);
-        return (java.lang.foreign.MemorySegment __x0, java.lang.foreign.MemorySegment __x1) -> {
+        MemorySegment symbol = addr.reinterpret(arena, null);
+        return (MemorySegment __x0, MemorySegment __x1) -> {
             try {
-                return (int)constants$15.SSL_CTX_set_cert_verify_callback$cb_DOWN$MH.invokeExact(symbol, __x0, __x1);
+                return (int) DOWN$MH.invokeExact(symbol, __x0, __x1);
             } catch (Throwable ex$) {
                 throw new AssertionError("should not reach here", ex$);
             }
         };
     }
 }
-
 

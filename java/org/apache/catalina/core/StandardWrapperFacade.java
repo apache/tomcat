@@ -73,6 +73,10 @@ public final class StandardWrapperFacade implements ServletConfig {
 
     @Override
     public ServletContext getServletContext() {
+        /*
+         * This method may be called concurrently but the same context object will always be returned. There is no
+         * concurrency issue here.
+         */
         if (context == null) {
             context = config.getServletContext();
             if (context instanceof ApplicationContext) {

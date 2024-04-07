@@ -28,6 +28,7 @@ import java.util.List;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Loader;
@@ -71,7 +72,7 @@ public class StandardContextSF extends StoreFactoryBase {
         if (aContext instanceof StandardContext) {
             StoreDescription desc = getRegistry().findDescription(
                     aContext.getClass());
-            if (desc.isStoreSeparate()) {
+            if (desc != null && desc.isStoreSeparate()) {
                 URL configFile = ((StandardContext) aContext)
                         .getConfigFile();
                 if (configFile != null) {
@@ -122,7 +123,7 @@ public class StandardContextSF extends StoreFactoryBase {
         if (configFile != null) {
             File config = new File(configFile.toURI());
             if (!config.isAbsolute()) {
-                config = new File(System.getProperty("catalina.base"),
+                config = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
                         config.getPath());
             }
             if( (!config.isFile()) || (!config.canWrite())) {
@@ -188,7 +189,7 @@ public class StandardContextSF extends StoreFactoryBase {
         if (configFile != null) {
             File config = new File(configFile.toURI());
             if (!config.isAbsolute()) {
-                config = new File(System.getProperty("catalina.base"),
+                config = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
                         config.getPath());
             }
             // Open an output writer for the new configuration file
@@ -294,7 +295,7 @@ public class StandardContextSF extends StoreFactoryBase {
      */
     protected File configBase(Context context) {
 
-        File file = new File(System.getProperty("catalina.base"), "conf");
+        File file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf");
         Container host = context.getParent();
 
         if (host instanceof Host) {
@@ -328,9 +329,9 @@ public class StandardContextSF extends StoreFactoryBase {
     protected String[] filterWatchedResources(StandardContext context,
             String[] wresources) throws Exception {
         File configBase = configBase(context);
-        String confContext = new File(System.getProperty("catalina.base"),
+        String confContext = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
                 "conf/context.xml").getCanonicalPath();
-        String confWeb = new File(System.getProperty("catalina.base"),
+        String confWeb = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
                 "conf/web.xml").getCanonicalPath();
         String confHostDefault = new File(configBase, "context.xml.default")
                 .getCanonicalPath();

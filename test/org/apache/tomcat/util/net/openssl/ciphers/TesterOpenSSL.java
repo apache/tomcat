@@ -49,8 +49,10 @@ public class TesterOpenSSL {
         } catch (IOException e) {
             versionString = "";
         }
-        if (versionString.startsWith("OpenSSL 3.2.")) {
-            // Note: Gump currently tests 11.x with OpenSSL 3.2.x
+        if (versionString.startsWith("OpenSSL 3.3.")) {
+            // Note: Gump currently tests 11.x with OpenSSL 3.3.x
+            VERSION = 30300;
+        } else if (versionString.startsWith("OpenSSL 3.2.")) {
             VERSION = 30200;
         } else if (versionString.startsWith("OpenSSL 3.1.")) {
             VERSION = 30100;
@@ -126,7 +128,6 @@ public class TesterOpenSSL {
         unimplemented.add(Cipher.TLS_DH_RSA_WITH_CAMELLIA_256_CBC_SHA);
         unimplemented.add(Cipher.TLS_DH_RSA_WITH_SEED_CBC_SHA);
         unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_NULL_SHA);
-        unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_RC4_128_SHA);
         unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_RC4_128_SHA);
         unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA);
         unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA);

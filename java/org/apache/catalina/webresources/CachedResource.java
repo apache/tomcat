@@ -32,7 +32,6 @@ import java.security.cert.Certificate;
 import java.text.Collator;
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -316,15 +315,19 @@ public class CachedResource implements WebResource {
         /*
          * We don't want applications using this URL to access the resource directly as that could lead to inconsistent
          * results when the resource is updated on the file system but the cache entry has not yet expired. We saw this,
-         * for example, in JSP compilation. - last modified time was obtained via
-         * ServletContext.getResource("path").openConnection().getLastModified() - JSP content was obtained via
-         * ServletContext.getResourceAsStream("path") The result was that the JSP modification was detected but the JSP
-         * content was read from the cache so the non-updated JSP page was used to generate the .java and .class file
+         * for example, in JSP compilation.
+         *
+         * - last modified time was obtained via ServletContext.getResource("path").openConnection().getLastModified()
+         *
+         * - JSP content was obtained via ServletContext.getResourceAsStream("path")
+         *
+         * The result was that the JSP modification was detected but the JSP content was read from the cache so the
+         * non-updated JSP page was used to generate the .java and .class file
          *
          * One option to resolve this issue is to use a custom URL scheme for resource URLs. This would allow us, via
          * registration of a URLStreamHandlerFactory, to control how the resources are accessed and ensure that all
-         * access go via the cache We took this approach for war: URLs so we can use jar:war:file: URLs to reference
-         * resources in unpacked WAR files. However, because URL.setURLStreamHandlerFactory() may only be caused once,
+         * access go via the cache. We took this approach for war: URLs so we can use jar:war:file: URLs to reference
+         * resources in unpacked WAR files. However, because URL.setURLStreamHandlerFactory() may only be called once,
          * this can cause problems when using other libraries that also want to use a custom URL scheme.
          *
          * The approach below allows us to insert a custom URLStreamHandler without registering a custom protocol. The
@@ -339,7 +342,7 @@ public class CachedResource implements WebResource {
             CachedResourceURLStreamHandler handler = new CachedResourceURLStreamHandler(resourceURL, root, webAppPath,
                     usesClassLoaderResources);
             URL result = new URL(null, resourceURL.toExternalForm(), handler);
-            handler.setAssociatedURL(result);
+            handler.setCacheURL(result);
             return result;
         } catch (MalformedURLException e) {
             log.error(sm.getString("cachedResource.invalidURL", resourceURL.toExternalForm()), e);
@@ -406,6 +409,15 @@ public class CachedResource implements WebResource {
     }
 
 
+    /**
+     * URLStreamHandler to handle a URL for a cached resource, delegating reads to the Cache.
+     * <ul>
+     * <li>delegates reads to the Cache, to ensure consistent invalidation behavior</li>
+     * <li>delegates hashCode()/ equals() behavior to the underlying Resource URL. (Equinox/ OSGi compatibility)</li>
+     * <li>detects the case where a new relative URL is created from the wrapped URL, inheriting its handler; in this
+     * case reverts to default behavior</li>
+     * </ul>
+     */
     private static class CachedResourceURLStreamHandler extends URLStreamHandler {
 
         private final URL resourceURL;
@@ -413,7 +425,7 @@ public class CachedResource implements WebResource {
         private final String webAppPath;
         private final boolean usesClassLoaderResources;
 
-        private URL associatedURL = null;
+        private URL cacheURL = null;
 
         CachedResourceURLStreamHandler(URL resourceURL, StandardRoot root, String webAppPath,
                 boolean usesClassLoaderResources) {
@@ -423,8 +435,8 @@ public class CachedResource implements WebResource {
             this.usesClassLoaderResources = usesClassLoaderResources;
         }
 
-        protected void setAssociatedURL(URL associatedURL) {
-            this.associatedURL = associatedURL;
+        protected void setCacheURL(URL cacheURL) {
+            this.cacheURL = cacheURL;
         }
 
         @Override
@@ -432,15 +444,15 @@ public class CachedResource implements WebResource {
             // This deliberately uses ==. If u isn't the URL object this
             // URLStreamHandler was constructed for we do not want to use this
             // URLStreamHandler to create a connection.
-            if (associatedURL != null && u == associatedURL) {
-                if ("jar".equals(associatedURL.getProtocol())) {
+            if (cacheURL != null && u == cacheURL) {
+                if ("jar".equals(cacheURL.getProtocol())) {
                     return new CachedResourceJarURLConnection(resourceURL, root, webAppPath, usesClassLoaderResources);
                 } else {
                     return new CachedResourceURLConnection(resourceURL, root, webAppPath, usesClassLoaderResources);
                 }
             } else {
-                // The stream handler has been inherited by a URL that was
-                // constructed from a cache URL. We need to break that link.
+                // This stream handler has been inherited by a URL that was constructed from a cache URL.
+                // We need to break that link.
                 URI constructedURI;
                 try {
                     constructedURI = new URI(u.toExternalForm());
@@ -451,6 +463,42 @@ public class CachedResource implements WebResource {
                 URL constructedURL = constructedURI.toURL();
                 return constructedURL.openConnection();
             }
+        }
+
+        /**
+         * {@inheritDoc}
+         * <p>
+         * We don't know what the requirements are for equals for the wrapped resourceURL so if u1 is the cacheURL,
+         * delegate to the resourceURL and it's handler. Otherwise, use the default implementation from
+         * URLStreamHandler.
+         */
+        @Override
+        protected boolean equals(URL u1, URL u2) {
+            // Deliberate use of ==
+            if (cacheURL == u1) {
+                return resourceURL.equals(u2);
+            }
+            // Not the cacheURL. This stream handler has been inherited by a URL that was constructed from a cache URL.
+            // Use the default implementation from URLStreamHandler.
+            return super.equals(u1, u2);
+        }
+
+        /**
+         * {@inheritDoc}
+         * <p>
+         * We don't know what the requirements are for hashcode for the wrapped resourceURL so if u1 is the cacheURL,
+         * delegate to the resourceURL and it's handler. Otherwise, use the default implementation from
+         * URLStreamHandler.
+         */
+        @Override
+        protected int hashCode(URL u) {
+            // Deliberate use of ==
+            if (cacheURL == u) {
+                return resourceURL.hashCode();
+            }
+            // Not the cacheURL. This stream handler has been inherited by a URL that was constructed from a cache URL.
+            // Use the default implementation from URLStreamHandler.
+            return super.hashCode(u);
         }
     }
 
@@ -570,13 +618,5 @@ public class CachedResource implements WebResource {
             return ((JarURLConnection) resourceURL.openConnection()).getJarFile();
         }
 
-        @Override
-        public JarEntry getJarEntry() throws IOException {
-            if (getEntryName() == null) {
-                return null;
-            } else {
-                return super.getJarEntry();
-            }
-        }
     }
 }

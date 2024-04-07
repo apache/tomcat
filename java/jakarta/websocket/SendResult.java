@@ -17,16 +17,53 @@
 package jakarta.websocket;
 
 public final class SendResult {
+    private final Session session;
     private final Throwable exception;
     private final boolean ok;
 
-    public SendResult(Throwable exception) {
+    /**
+     * Create an instance for an unsuccessful message.
+     *
+     * @param session   the WebSocket session in which the message was sent
+     * @param exception The exception describing the failure when trying to send the message.
+     */
+    public SendResult(Session session, Throwable exception) {
+        this.session = session;
         this.exception = exception;
         this.ok = (exception == null);
     }
 
+    /**
+     * Create an instance for a successful message.
+     *
+     * @param session the WebSocket session in which the message was sent
+     */
+    public SendResult(Session session) {
+        this(session, null);
+    }
+
+    /**
+     * Create an instance for an unsuccessful message.
+     *
+     * @param exception The exception describing the failure when trying to send the message.
+     *
+     * @deprecated Deprecated in WebSocket 2.2 and will be removed in a future version. Use
+     *                 {@link #SendResult(Session, Throwable)} as a replacement.
+     */
+    @Deprecated
+    public SendResult(Throwable exception) {
+        this(null, exception);
+    }
+
+    /**
+     * Create an instance for a successful message.
+     *
+     * @deprecated Deprecated in WebSocket 2.2 and will be removed in a future version. Use
+     *                 {@link #SendResult(Session, Throwable)} as a replacement.
+     */
+    @Deprecated
     public SendResult() {
-        this (null);
+        this(null, null);
     }
 
     public Throwable getException() {
@@ -35,5 +72,14 @@ public final class SendResult {
 
     public boolean isOK() {
         return ok;
+    }
+
+    /**
+     * The WebSocket session in which the session was sent.
+     *
+     * @return the WebSocket session in which the session was sent or {@code null} if not known.
+     */
+    public Session getSession() {
+        return session;
     }
 }

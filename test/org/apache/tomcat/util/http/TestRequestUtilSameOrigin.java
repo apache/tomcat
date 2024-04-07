@@ -84,7 +84,7 @@ public class TestRequestUtilSameOrigin {
         private final int port;
 
         TesterRequest(String scheme, String host, int port) {
-            super(new Request(null));
+            super(new Request(null, null));
             this.scheme = scheme;
             this.host = host;
             this.port = port;

@@ -48,7 +48,7 @@ public abstract class HttpFilter extends GenericFilter {
             throw new ServletException(request + " not HttpServletRequest");
         }
         if (!(response instanceof HttpServletResponse)) {
-            throw new ServletException(request + " not HttpServletResponse");
+            throw new ServletException(response + " not HttpServletResponse");
         }
         doFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
     }

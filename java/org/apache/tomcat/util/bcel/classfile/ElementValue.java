@@ -119,7 +119,7 @@ public abstract class ElementValue {
             final int numArrayVals = input.readUnsignedShort();
             final ElementValue[] evalues = new ElementValue[numArrayVals];
             for (int j = 0; j < numArrayVals; j++) {
-                evalues[j] = ElementValue.readElementValue(input, cpool, arrayNesting);
+                evalues[j] = readElementValue(input, cpool, arrayNesting);
             }
             return new ArrayElementValue(ARRAY, evalues, cpool);
 

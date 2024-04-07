@@ -47,7 +47,7 @@ public class TestCloseBug58624 extends WebSocketBaseTest {
     public void testOnErrorNotCalledWhenClosingConnection() throws Throwable {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(Bug58624ServerConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
@@ -67,7 +67,7 @@ public class TestCloseBug58624 extends WebSocketBaseTest {
             count++;
             Thread.sleep(100);
         }
-        Assert.assertNotEquals(0,  Bug58624ServerEndpoint.getOpenSessionCount());
+        Assert.assertNotEquals(0, Bug58624ServerEndpoint.getOpenSessionCount());
 
         // Now close the session
         session.close();
@@ -78,10 +78,10 @@ public class TestCloseBug58624 extends WebSocketBaseTest {
             count++;
             Thread.sleep(100);
         }
-        Assert.assertEquals(0,  Bug58624ServerEndpoint.getOpenSessionCount());
+        Assert.assertEquals(0, Bug58624ServerEndpoint.getOpenSessionCount());
 
         // Ensure no errors were reported on the server
-        Assert.assertEquals(0,  Bug58624ServerEndpoint.getErrorCount());
+        Assert.assertEquals(0, Bug58624ServerEndpoint.getErrorCount());
 
         if (client.getError() != null) {
             throw client.getError();
@@ -114,11 +114,10 @@ public class TestCloseBug58624 extends WebSocketBaseTest {
         public void contextInitialized(ServletContextEvent sce) {
             super.contextInitialized(sce);
 
-            ServerContainer sc = (ServerContainer) sce.getServletContext().getAttribute(
-                    Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
+            ServerContainer sc = (ServerContainer) sce.getServletContext()
+                    .getAttribute(Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
 
-            ServerEndpointConfig sec = ServerEndpointConfig.Builder.create(
-                    Bug58624ServerEndpoint.class, PATH).build();
+            ServerEndpointConfig sec = ServerEndpointConfig.Builder.create(Bug58624ServerEndpoint.class, PATH).build();
 
             try {
                 sc.addEndpoint(sec);

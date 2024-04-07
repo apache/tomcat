@@ -29,7 +29,6 @@ import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
@@ -230,7 +229,7 @@ public class StandardEngine extends ContainerBase implements Engine {
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         // Log our server identification information
         if (log.isInfoEnabled()) {
@@ -427,8 +426,7 @@ public class StandardEngine extends ContainerBase implements Engine {
             }
 
             String type = event.getType();
-            if (Lifecycle.AFTER_START_EVENT.equals(type) || Lifecycle.BEFORE_STOP_EVENT.equals(type) ||
-                    Lifecycle.BEFORE_DESTROY_EVENT.equals(type)) {
+            if (AFTER_START_EVENT.equals(type) || BEFORE_STOP_EVENT.equals(type) || BEFORE_DESTROY_EVENT.equals(type)) {
                 // Container is being started/stopped/removed
                 // Force re-calculation and disable listener since it won't
                 // be re-used
@@ -456,7 +454,7 @@ public class StandardEngine extends ContainerBase implements Engine {
             if (disabled) {
                 return;
             }
-            if (Container.ADD_CHILD_EVENT.equals(event.getType())) {
+            if (ADD_CHILD_EVENT.equals(event.getType())) {
                 Context context = (Context) event.getData();
                 if (context.getPath().isEmpty()) {
                     // Force re-calculation and disable listener since it won't

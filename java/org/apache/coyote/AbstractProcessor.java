@@ -105,7 +105,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         }
         // Use the return value to avoid processing more than one async error
         // in a single async cycle.
-        boolean setError = response.setError();
+        response.setError();
         boolean blockIo = this.errorState.isIoAllowed() && !errorState.isIoAllowed();
         this.errorState = this.errorState.getMostSevere(errorState);
         // Don't change the status code for IOException since that is almost
@@ -117,7 +117,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         if (t != null) {
             request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
         }
-        if (blockIo && isAsync() && setError) {
+        if (blockIo && isAsync()) {
             if (asyncStateMachine.asyncError()) {
                 processSocketEvent(SocketEvent.ERROR, true);
             }
@@ -208,7 +208,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 }
             } catch (IOException ioe) {
                 if (getLog().isDebugEnabled()) {
-                    getLog().debug("Unable to write async data.", ioe);
+                    getLog().debug(sm.getString("abstractProcessor.asyncFail"), ioe);
                 }
                 status = SocketEvent.ERROR;
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
@@ -238,7 +238,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
         RequestInfo rp = request.getRequestProcessor();
         try {
-            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
+            rp.setStage(Constants.STAGE_SERVICE);
             if (!getAdapter().asyncDispatch(request, response, status)) {
                 setErrorState(ErrorState.CLOSE_NOW, null);
             }
@@ -250,7 +250,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             getLog().error(sm.getString("http11processor.request.process"), t);
         }
 
-        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
+        rp.setStage(Constants.STAGE_ENDED);
 
         SocketState state;
 
@@ -264,8 +264,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             state = dispatchEndRequest();
         }
 
-        if (getLog().isDebugEnabled()) {
-            getLog().debug("Socket: [" + socketWrapper + "], Status in: [" + status + "], State out: [" + state + "]");
+        if (getLog().isTraceEnabled()) {
+            getLog().trace("Socket: [" + socketWrapper + "], Status in: [" + status + "], State out: [" + state + "]");
         }
 
         return state;
@@ -608,17 +608,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 break;
             }
 
-            // Servlet 4.0 Push requests
-            case IS_PUSH_SUPPORTED: {
-                AtomicBoolean result = (AtomicBoolean) param;
-                result.set(isPushSupported());
-                break;
-            }
-            case PUSH_REQUEST: {
-                doPush((Request) param);
-                break;
-            }
-
             // Servlet 4.0 Trailers
             case IS_TRAILER_FIELDS_READY: {
                 AtomicBoolean result = (AtomicBoolean) param;
@@ -775,10 +764,16 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
      * Populate the TLS related request attributes from the {@link SSLSupport} instance associated with this processor.
      * Protocols that populate TLS attributes from a different source (e.g. AJP) should override this method.
      */
+    @SuppressWarnings("deprecation")
     protected void populateSslRequestAttributes() {
         try {
             if (sslSupport != null) {
-                Object sslO = sslSupport.getCipherSuite();
+                Object sslO = sslSupport.getProtocol();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.SECURE_PROTOCOL_KEY, sslO);
+                    request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
+                }
+                sslO = sslSupport.getCipherSuite();
                 if (sslO != null) {
                     request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, sslO);
                 }
@@ -793,10 +788,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 sslO = sslSupport.getSessionId();
                 if (sslO != null) {
                     request.setAttribute(SSLSupport.SESSION_ID_KEY, sslO);
-                }
-                sslO = sslSupport.getProtocol();
-                if (sslO != null) {
-                    request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
                 }
                 sslO = sslSupport.getRequestedProtocols();
                 if (sslO != null) {
@@ -927,29 +918,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     @Override
     public boolean isUpgrade() {
         return false;
-    }
-
-
-    /**
-     * Protocols that support push should override this method and return {@code
-     * true}.
-     *
-     * @return {@code true} if push is supported by this processor, otherwise {@code false}.
-     */
-    protected boolean isPushSupported() {
-        return false;
-    }
-
-
-    /**
-     * Process a push. Processors that support push should override this method and process the provided token.
-     *
-     * @param pushTarget Contains all the information necessary for the Processor to process the push request
-     *
-     * @throws UnsupportedOperationException if the protocol does not support push
-     */
-    protected void doPush(Request pushTarget) {
-        throw new UnsupportedOperationException(sm.getString("abstractProcessor.pushrequest.notsupported"));
     }
 
 

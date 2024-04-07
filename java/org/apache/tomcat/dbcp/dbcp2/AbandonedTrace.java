@@ -37,6 +37,12 @@ import org.apache.tomcat.dbcp.pool2.TrackedUse;
  */
 public class AbandonedTrace implements TrackedUse, AutoCloseable {
 
+    static void add(AbandonedTrace receiver, AbandonedTrace trace) {
+        if (receiver != null) {
+            receiver.addTrace(trace);
+        }
+    }
+
     /** A list of objects created by children of this object. */
     private final List<WeakReference<AbandonedTrace>> traceList = new ArrayList<>();
 
@@ -152,9 +158,7 @@ public class AbandonedTrace implements TrackedUse, AutoCloseable {
      *            AbandonedTrace parent object.
      */
     private void init(final AbandonedTrace parent) {
-        if (parent != null) {
-            parent.addTrace(this);
-        }
+        AbandonedTrace.add(parent, this);
     }
 
     /**

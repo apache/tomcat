@@ -74,12 +74,14 @@ public class TestBeanSupport extends ELBaseTest {
         doTest(MismatchBean.class, "value", TypeA.class, TypeA.class, null);
     }
 
-    /*
-     * The first setter found "wins".
-     */
     @Test
-    public void testAmbiguousBean() {
-        doTest(AmbiguousBean.class, "value", TypeA.class, null, TypeA.class);
+    public void testAmbiguousBean01() {
+        doTest(AmbiguousBean01.class, "value", TypeA.class, null, TypeA.class);
+    }
+
+    @Test
+    public void testAmbiguousBean02() {
+        doTest(AmbiguousBean02.class, "value", TypeA.class, null, TypeA.class);
     }
 
 
@@ -222,11 +224,20 @@ public class TestBeanSupport extends ELBaseTest {
     }
 
 
-    public static class AmbiguousBean {
+    public static class AmbiguousBean01 {
         public void setValue(@SuppressWarnings("unused") TypeA value) {
         }
 
         public void setValue(@SuppressWarnings("unused") String value) {
+        }
+    }
+
+
+    public static class AmbiguousBean02 {
+        public void setValue(@SuppressWarnings("unused") String value) {
+        }
+
+        public void setValue(@SuppressWarnings("unused") TypeA value) {
         }
     }
 
