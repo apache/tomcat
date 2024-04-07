@@ -291,6 +291,7 @@ public class DiskFileItem
      * or {@code null} if the data cannot be read
      *
      * @throws UncheckedIOException if an I/O error occurs
+     * @throws ArithmeticException if the file {@code size} overflows an int
      */
     @Override
     public byte[] get() throws UncheckedIOException {
@@ -301,7 +302,7 @@ public class DiskFileItem
             return cachedContent != null ? cachedContent.clone() : new byte[0];
         }
 
-        final byte[] fileData = new byte[(int) getSize()];
+        final byte[] fileData = new byte[Math.toIntExact(getSize())];
 
         try (InputStream fis = Files.newInputStream(dfos.getFile().toPath())) {
             IOUtils.readFully(fis, fileData);
