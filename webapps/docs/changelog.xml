@@ -134,6 +134,11 @@
         Improve Service connectors, Container children and Service executors
         access sync using a ReentrantReadWriteLock. (remm)
       </fix>
+      <fix>
+        Improve handling of integer overflow if an attempt is made to upload a
+        file via the Servlet API and the file is larger than
+        <code>Integer.MAX_VALUE</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
