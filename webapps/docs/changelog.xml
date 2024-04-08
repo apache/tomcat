@@ -143,6 +143,15 @@
       <update>
         Update the internal fork of Apache Commons Codec to 1.16.1. (markt)
       </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations by tak7iji. (remm)
+      </add>
+      <add>
+        Improvements to Chinese translations by leeyazhou. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
