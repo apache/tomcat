@@ -122,6 +122,10 @@
         file via the Servlet API and the file is larger than
         <code>Integer.MAX_VALUE</code>. (markt)
       </fix>
+      <fix>
+        <bug>68862</bug>: Handle possible response commit when processing read
+        errors. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
