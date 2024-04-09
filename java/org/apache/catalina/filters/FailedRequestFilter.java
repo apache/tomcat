@@ -87,7 +87,11 @@ public class FailedRequestFilter extends FilterBase {
                     break;
             }
 
-            ((HttpServletResponse) response).sendError(status);
+            try {
+                ((HttpServletResponse) response).sendError(status);
+            } catch (IllegalStateException e) {
+                // Already committed, ignore
+            }
             return;
         }
         chain.doFilter(request, response);
