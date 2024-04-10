@@ -2699,11 +2699,16 @@ skip.installer property in build.properties" />
   </target>
 
   <target name="release-version-check">
+    <!--FIXME: add version check for release once Java 22 has reasonable availability
     <fail message="Java version ${release.java.version} or newer is required for release (${java.version} is installed)">
       <condition>
         <not><javaversion atleast="${release.java.version}" /></not>
       </condition>
-    </fail>
+    </fail>-->
+    <condition property="no-ffm">
+      <not><javaversion atleast="${release.java.version}" /></not>
+    </condition>
+    <echo level="error" if:set="no-ffm">JAVA VERSION 22 OR NEWER IS REQUIRED FOR RELEASE</echo>
   </target>
 
   <target name="-pre-release-lone-target-check">
