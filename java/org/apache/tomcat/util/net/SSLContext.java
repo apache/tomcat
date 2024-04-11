@@ -26,8 +26,6 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509KeyManager;
-import javax.net.ssl.X509TrustManager;
 
 /**
  * This interface is needed to override the default SSLContext class
@@ -52,9 +50,4 @@ public interface SSLContext {
     X509Certificate[] getCertificateChain(String alias);
 
     X509Certificate[] getAcceptedIssuers();
-
-    static SSLContext wrap(javax.net.ssl.SSLContext sslContext, X509KeyManager keyManager, X509TrustManager trustManager) {
-        return new SSLContextWrapper(sslContext, keyManager, trustManager);
-    }
-
 }
