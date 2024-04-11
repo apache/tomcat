@@ -104,7 +104,18 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 10.1.21 (schultz)" rtext="in development">
+<section name="Tomcat 10.1.23 (schultz)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Fix bnd jar descriptor to include the OpenSSL FFM support. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 10.1.22 (schultz)" rtext="release in progress">
+</section>
+<section name="Tomcat 10.1.21 (schultz)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
