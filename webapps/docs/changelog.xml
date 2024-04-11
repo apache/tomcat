@@ -105,6 +105,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0-M20 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Add OpenSSL FFM classes to <code>tomcat-embed-core.jar</code>. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M19 (markt)" rtext="release in progress">
   <subsection name="Catalina">
