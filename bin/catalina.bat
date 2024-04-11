@@ -223,7 +223,6 @@ set "JAVA_OPTS=%JAVA_OPTS% --add-opens=java.base/java.io=ALL-UNNAMED"
 set "JAVA_OPTS=%JAVA_OPTS% --add-opens=java.base/java.util=ALL-UNNAMED"
 set "JAVA_OPTS=%JAVA_OPTS% --add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
 set "JAVA_OPTS=%JAVA_OPTS% --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"
-set "JAVA_OPTS=%JAVA_OPTS% --enable-native-access=ALL-UNNAMED"
 
 rem ----- Execute The Requested Command ---------------------------------------
 
