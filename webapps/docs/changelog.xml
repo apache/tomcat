@@ -105,6 +105,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.23 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Deprecate and remove <code>sessionCounter</code> (replaced by the
+        addition of the active session count and the expired session count,
+        as a reasonable approximation) and <code>duplicates</code> (which
+        does not represent a possible event in current implementations)
+        statistics from the session manager. (remm)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
