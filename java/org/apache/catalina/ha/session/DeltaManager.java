@@ -691,10 +691,7 @@ public class DeltaManager extends ClusterManagerBase {
                 session.setAccessCount(0);
                 session.resetDeltaRequest();
                 // FIXME How inform other session id cache like SingleSignOn
-                // increment sessionCounter to correct stats report
-                if (findSession(session.getIdInternal()) == null) {
-                    sessionCounter++;
-                } else {
+                if (findSession(session.getIdInternal()) != null) {
                     sessionReplaceCounter++;
                     // FIXME better is to grap this sessions again !
                     if (log.isWarnEnabled()) {
@@ -1098,7 +1095,6 @@ public class DeltaManager extends ClusterManagerBase {
         sessionReplaceCounter = 0;
         counterNoStateTransferred = 0;
         setMaxActive(getActiveSessions());
-        sessionCounter = getActiveSessions();
         counterReceive_EVT_ALL_SESSION_DATA = 0;
         counterReceive_EVT_GET_ALL_SESSIONS = 0;
         counterReceive_EVT_SESSION_ACCESSED = 0;

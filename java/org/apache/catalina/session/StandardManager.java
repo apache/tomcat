@@ -217,7 +217,6 @@ public class StandardManager extends ManagerBase {
                             session.setValid(true);
                             session.expire();
                         }
-                        sessionCounter++;
                     }
                 } finally {
                     // Delete the persistent storage file
