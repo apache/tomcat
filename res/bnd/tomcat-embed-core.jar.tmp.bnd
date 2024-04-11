@@ -82,6 +82,8 @@ Export-Package: \
     org.apache.tomcat.util.net,\
     org.apache.tomcat.util.net.openssl,\
     org.apache.tomcat.util.net.openssl.ciphers,\
+    org.apache.tomcat.util.net.openssl.panama,\
+    org.apache.tomcat.util.openssl,\
     org.apache.tomcat.util.res,\
     org.apache.tomcat.util.scan,\
     org.apache.tomcat.util.security,\

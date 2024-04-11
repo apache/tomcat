@@ -110,6 +110,9 @@
       <fix>
         Fix bnd jar descriptor to include the OpenSSL FFM support. (remm)
       </fix>
+      <fix>
+        Add OpenSSL FFM classes to <code>tomcat-embed-core.jar</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
