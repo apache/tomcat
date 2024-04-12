@@ -32,7 +32,6 @@ links for browsing the download directories and archives:
 - [Tomcat 11](https://tomcat.apache.org/download-11.cgi)
 - [Tomcat 10](https://tomcat.apache.org/download-10.cgi)
 - [Tomcat 9](https://tomcat.apache.org/download-90.cgi)
-- [Tomcat 8](https://tomcat.apache.org/download-80.cgi)
 
 To facilitate choosing the right major Tomcat version one, we have provided a
 [version overview page](https://tomcat.apache.org/whichversion.html).
@@ -43,10 +42,9 @@ The documentation available as of the date of this release is
 included in the docs webapp which ships with tomcat. You can access that webapp
 by starting tomcat and visiting <http://localhost:8080/docs/> in your browser.
 The most up-to-date documentation for each version can be found at:
-- [Tomcat 11.0](https://tomcat.apache.org/tomcat-11.0-doc/)
+- [Tomcat 11](https://tomcat.apache.org/tomcat-11.0-doc/)
 - [Tomcat 10](https://tomcat.apache.org/tomcat-10.1-doc/)
 - [Tomcat 9](https://tomcat.apache.org/tomcat-9.0-doc/)
-- [Tomcat 8](https://tomcat.apache.org/tomcat-8.5-doc/)
 
 ### Installation
 
