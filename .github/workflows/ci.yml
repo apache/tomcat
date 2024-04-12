@@ -18,7 +18,6 @@ on:
       - main
       - 10.1.x
       - 9.0.x
-      - 8.5.x
   pull_request:
     branches:
       - main
@@ -33,17 +32,13 @@ jobs:
       matrix:
         isMain:
           - ${{ contains(github.ref, 'main') }}
-        java: [ 17, 20, 21 ]
+        java: [ 17, 21, 22 ]
         os: [ ubuntu-latest, windows-latest ]
         exclude:
           - isMain: true
             java: 17
-          - isMain: true
-            java: 20
           - os: windows-latest
-            java: 20
-          - os: windows-latest
-            java: 21
+            java: 22
     name: JDK${{ matrix.java }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
