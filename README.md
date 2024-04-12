@@ -2,11 +2,11 @@
 
 ### What Is It?
 
-The Apache Tomcat® software is an open source implementation of the Java
-Servlet, JavaServer Pages, Java Expression Language and Java WebSocket
-technologies. The Java Servlet, JavaServer Pages, Java Expression Language and
-Java WebSocket specifications are developed under the
-[Java Community Process](https://jcp.org/en/introduction/overview).
+The Apache Tomcat® software is an open source implementation of the Jakarta
+Servlet, Jakarta Pages, Jakarta Expression Language and Jakarta WebSocket
+technologies. The Jakarta Servlet, Jakarta Pages, Jakarta Expression Language and
+Jakarta WebSocket specifications are developed as part of the 
+[Jakarta EE Platform](https://jakarta.ee/specifications/).
 
 The Apache Tomcat software is developed in an open and participatory
 environment and released under the
