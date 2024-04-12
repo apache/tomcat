@@ -19,7 +19,9 @@ package org.apache.catalina.valves;
 
 import java.io.CharArrayWriter;
 import java.io.IOException;
+import java.math.RoundingMode;
 import java.net.InetAddress;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1311,6 +1313,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     protected static class ElapsedTimeElement implements AccessLogElement {
         private final boolean micros;
         private final boolean millis;
+        private final DecimalFormat df;
 
         /**
          * @param micros <code>true</code>, write time in microseconds - %D
@@ -1320,6 +1323,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         public ElapsedTimeElement(boolean micros, boolean millis) {
             this.micros = micros;
             this.millis = millis;
+            df = new DecimalFormat("#.###");
+            df.setRoundingMode(RoundingMode.CEILING);
         }
 
         @Override
@@ -1330,7 +1335,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 buf.append(Long.toString(TimeUnit.NANOSECONDS.toMillis(time)));
             } else {
                 // second
-                buf.append(Long.toString(TimeUnit.NANOSECONDS.toSeconds(time)));
+                buf.append(df.format(time / 1000000000.00));
             }
         }
     }
