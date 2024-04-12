@@ -501,8 +501,7 @@ public class WsServerContainer extends WsWebSocketContainer
      */
     @Override
     protected void unregisterSession(Object key, WsSession wsSession) {
-        if (wsSession.getUserPrincipal() != null &&
-                wsSession.getHttpSessionId() != null) {
+        if (wsSession.getUserPrincipalInternal() != null && wsSession.getHttpSessionId() != null) {
             unregisterAuthenticatedSession(wsSession,
                     wsSession.getHttpSessionId());
         }

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.websocket.CloseReason;
@@ -104,6 +105,7 @@ public class WsSession implements Session {
     private volatile long lastActiveWrite = System.currentTimeMillis();
     private Map<FutureToSendHandler,FutureToSendHandler> futures =
             new ConcurrentHashMap<FutureToSendHandler,FutureToSendHandler>();
+    private volatile Long sessionCloseTimeoutExpiry;
 
     /**
      * Creates a new WebSocket session for communication between the two
@@ -484,6 +486,14 @@ public class WsSession implements Session {
             sendCloseMessage(closeReasonMessage);
             if (closeSocket) {
                 wsRemoteEndpoint.close();
+                closeConnection();
+            }else {
+                /*
+                 * Set close timeout. If the client fails to send a close message response within the timeout, the session
+                 * and the connection will be closed when the timeout expires.
+                 */
+                sessionCloseTimeoutExpiry =
+                        Long.valueOf(System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(getSessionCloseTimeout()));
             }
             fireEndpointOnClose(closeReasonLocal);
         }
@@ -519,7 +529,48 @@ public class WsSession implements Session {
                 state = State.CLOSED;
 
                 // Close the socket
-                wsRemoteEndpoint.close();
+                closeConnection();
+            }
+        }
+    }
+    private void closeConnection() {
+        /*
+         * Close the network connection.
+         */
+        wsRemoteEndpoint.close();
+        /*
+         * Don't unregister the session until the connection is fully closed since webSocketContainer is responsible for
+         * tracking the session close timeout.
+         */
+        webSocketContainer.unregisterSession(getSessionMapKey(), this);
+    }
+
+
+    /*
+     * Returns the session close timeout in milliseconds
+     */
+    protected long getSessionCloseTimeout() {
+        long result = 0;
+        Object obj = userProperties.get(Constants.SESSION_CLOSE_TIMEOUT_PROPERTY);
+        if (obj instanceof Long) {
+            result = ((Long) obj).intValue();
+        }
+        if (result <= 0) {
+            result = Constants.DEFAULT_SESSION_CLOSE_TIMEOUT;
+        }
+        return result;
+    }
+
+
+    protected void checkCloseTimeout() {
+        // Skip the check if no session close timeout has been set.
+        if (sessionCloseTimeoutExpiry != null) {
+            // Check if the timeout has expired.
+            if (System.nanoTime() - sessionCloseTimeoutExpiry.longValue() > 0) {
+                // Check if the session has been closed in another thread while the timeout was being processed.
+                if (state.compareAndSet(State.OUTPUT_CLOSED, State.CLOSED)) {
+                    closeConnection();
+                }
             }
         }
     }
@@ -744,6 +795,9 @@ public class WsSession implements Session {
     @Override
     public Principal getUserPrincipal() {
         checkState();
+        return getUserPrincipalInternal();
+    }
+    public Principal getUserPrincipalInternal() {
         return userPrincipal;
     }
 
