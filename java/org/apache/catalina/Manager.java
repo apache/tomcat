@@ -86,16 +86,6 @@ public interface Manager {
 
 
     /**
-     * Sets the total number of sessions created by this manager.
-     *
-     * @param sessionCounter Total number of sessions created by this manager.
-     * @deprecated This will be removed in Tomcat 11
-     */
-    @Deprecated
-    void setSessionCounter(long sessionCounter);
-
-
-    /**
      * Gets the maximum number of sessions that have been active at the same
      * time.
      *
