@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<%@page session="false" contentType="text/html; charset=ISO-8859-1" %>
+<%@page session="false" contentType="text/html; charset=UTF-8" %>
 <%@page import="java.util.Enumeration" %>
 <%@page import="jakarta.servlet.http.HttpSession" %>
 <%@page import="org.apache.catalina.Session" %>
