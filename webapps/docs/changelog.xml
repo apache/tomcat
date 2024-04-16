@@ -136,7 +136,8 @@
     <changelog>
       <update>
         Switch to using the Base64 encoder and decoder provided by the JRE
-        rather than the version provided by Commons Codec. (markt)
+        rather than the version provided by Commons Codec. This removes the
+        internal fork of Commons Codec. (markt)
       </update>
     </changelog>
   </subsection>
