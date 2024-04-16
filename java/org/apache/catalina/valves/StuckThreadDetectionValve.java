@@ -135,6 +135,7 @@ public class StuckThreadDetectionValve extends ValveBase {
 
     private void notifyStuckThreadDetected(MonitoredThread monitoredThread, long activeTime, int numStuckThreads) {
         if (log.isWarnEnabled()) {
+            @SuppressWarnings("deprecation")
             String msg = sm.getString("stuckThreadDetectionValve.notifyStuckThreadDetected",
                     monitoredThread.getThread().getName(), Long.valueOf(activeTime), monitoredThread.getStartTime(),
                     Integer.valueOf(numStuckThreads), monitoredThread.getRequestUri(), Integer.valueOf(threshold),
@@ -171,6 +172,7 @@ public class StuckThreadDetectionValve extends ValveBase {
         // GC'ing, as the reference is removed from the Map in the finally clause
 
         Thread currentThread = Thread.currentThread();
+        @SuppressWarnings("deprecation")
         Long key = Long.valueOf(currentThread.getId());
         StringBuffer requestUrl = request.getRequestURL();
         if (request.getQueryString() != null) {
@@ -227,6 +229,7 @@ public class StuckThreadDetectionValve extends ValveBase {
         return stuckCount.get();
     }
 
+    @SuppressWarnings("deprecation")
     public long[] getStuckThreadIds() {
         List<Long> idList = new ArrayList<>();
         for (MonitoredThread monitoredThread : activeThreads.values()) {
@@ -342,6 +345,7 @@ public class StuckThreadDetectionValve extends ValveBase {
             }
             try {
                 if (log.isWarnEnabled()) {
+                    @SuppressWarnings("deprecation")
                     String msg = sm.getString("stuckThreadDetectionValve.notifyStuckThreadInterrupted",
                             this.getThread().getName(), Long.valueOf(getActiveTimeInMillis()), this.getStartTime(),
                             this.getRequestUri(), Long.valueOf(interruptThreadThreshold),
@@ -369,6 +373,7 @@ public class StuckThreadDetectionValve extends ValveBase {
         private final long threadId;
         private final long totalActiveTime;
 
+        @SuppressWarnings("deprecation")
         CompletedStuckThread(Thread thread, long totalActiveTime) {
             this.threadName = thread.getName();
             this.threadId = thread.getId();

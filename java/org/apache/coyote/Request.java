@@ -736,12 +736,14 @@ public final class Request {
         threadId = 0;
     }
 
+    @SuppressWarnings("deprecation")
     public void setRequestThread() {
         Thread t = Thread.currentThread();
         threadId = t.getId();
         getRequestProcessor().setWorkerThreadName(t.getName());
     }
 
+    @SuppressWarnings("deprecation")
     public boolean isRequestThread() {
         return Thread.currentThread().getId() == threadId;
     }

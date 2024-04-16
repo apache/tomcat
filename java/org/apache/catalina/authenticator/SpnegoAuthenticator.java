@@ -134,6 +134,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     }
 
 
+    @SuppressWarnings("removal")
     @Override
     protected boolean doAuthenticate(Request request, HttpServletResponse response) throws IOException {
 
