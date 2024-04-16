@@ -141,7 +141,9 @@
     <changelog>
       <update>
         Switch to using the Base64 encoder and decoder provided by the JRE
-        rather than the version provided by Commons Codec. (markt)
+        rather than the version provided by Commons Codec. The internal fork of
+        Commons Codec has been deprecated and will be removed in Tomcat 11.
+        (markt)
       </update>
     </changelog>
   </subsection>
