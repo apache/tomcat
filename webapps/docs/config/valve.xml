@@ -1559,12 +1559,6 @@
         If not specified, the default value is <code>false</code>.</p>
       </attribute>
 
-      <attribute name="trimCredentials" required="false">
-        <p>Controls whether leading and/or trailing whitespace is removed from
-        the parsed credentials. If not specified, the default value is
-        <code>true</code>.</p>
-      </attribute>
-
     </attributes>
 
   </subsection>
