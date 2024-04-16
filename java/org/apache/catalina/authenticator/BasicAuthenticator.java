@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.util.Base64;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,7 +30,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.codec.binary.Base64;
 
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP BASIC Authentication, as outlined in RFC 7617: "The
@@ -43,7 +43,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
     private Charset charset = StandardCharsets.ISO_8859_1;
     private String charsetString = null;
-    private boolean trimCredentials = true;
+    private boolean trimCredentials = false;
 
 
     public String getCharset() {
@@ -64,11 +64,27 @@ public class BasicAuthenticator extends AuthenticatorBase {
     }
 
 
+    /**
+     * Obtain the current setting for the removal of whitespace around the decoded user name and password.
+     *
+     * @return {@code true} if white space will be removed around the decoded user name and password
+     *
+     * @deprecated Will be removed in Tomcat 11 onwards.
+     */
+    @Deprecated
     public boolean getTrimCredentials() {
         return trimCredentials;
     }
 
 
+    /**
+     * Configures trimming of whitespace around the decoded user name and password.
+     *
+     * @param trimCredentials {@code true} to remove white space around the decoded user name and password
+     *
+     * @deprecated Will be removed in Tomcat 11 onwards.
+     */
+    @Deprecated
     public void setTrimCredentials(boolean trimCredentials) {
         this.trimCredentials = trimCredentials;
     }
@@ -155,15 +171,29 @@ public class BasicAuthenticator extends AuthenticatorBase {
         private String password = null;
 
         /**
-         * Parse the HTTP Authorization header for BASIC authentication as per RFC 2617 section 2, and the Base64
-         * encoded credentials as per RFC 2045 section 6.8.
+         * Parse the HTTP Authorization header for BASIC authentication as per RFC 7617.
+         *
+         * @param input   The header value to parse in-place
+         * @param charset The character set to use to convert the bytes to a string
+         *
+         * @throws IllegalArgumentException If the header does not conform to RFC 7617
+         */
+        public BasicCredentials(ByteChunk input, Charset charset) throws IllegalArgumentException {
+            this(input, charset, false);
+        }
+
+        /**
+         * Parse the HTTP Authorization header for BASIC authentication as per RFC 7617.
          *
          * @param input           The header value to parse in-place
          * @param charset         The character set to use to convert the bytes to a string
          * @param trimCredentials Should leading and trailing whitespace be removed from the parsed credentials
          *
-         * @throws IllegalArgumentException If the header does not conform to RFC 2617
+         * @throws IllegalArgumentException If the header does not conform to RFC 7617
+         *
+         * @deprecated Will be removed in Tomcat 11 onwards
          */
+        @Deprecated
         public BasicCredentials(ByteChunk input, Charset charset, boolean trimCredentials)
                 throws IllegalArgumentException {
             authorization = input;
@@ -196,7 +226,8 @@ public class BasicAuthenticator extends AuthenticatorBase {
         }
 
         /*
-         * The authorization method string is case-insensitive and must hae at least one space character as a delimiter.
+         * The authorization method string is case-insensitive and must have at exactly one space character as a
+         * delimiter.
          */
         private void parseMethod() throws IllegalArgumentException {
             if (authorization.startsWithIgnoreCase(METHOD, 0)) {
@@ -215,7 +246,9 @@ public class BasicAuthenticator extends AuthenticatorBase {
          * surrounding white space.
          */
         private byte[] parseBase64() throws IllegalArgumentException {
-            byte[] decoded = Base64.decodeBase64(authorization.getBuffer(), base64blobOffset, base64blobLength);
+            byte[] encoded = new byte[base64blobLength];
+            System.arraycopy(authorization.getBuffer(), base64blobOffset, encoded, 0, base64blobLength);
+            byte[] decoded = Base64.getDecoder().decode(encoded);
             // restore original offset
             authorization.setOffset(initialOffset);
             if (decoded == null) {
