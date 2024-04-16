@@ -324,6 +324,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     }
 
 
+    @SuppressWarnings("deprecation")
     private void handleReadException(Exception e) throws IOException {
         // Set flag used by asynchronous processing to detect errors on non-container threads
         coyoteRequest.setErrorException(e);
