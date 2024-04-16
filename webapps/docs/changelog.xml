@@ -160,6 +160,13 @@
         <bug>68862</bug>: Handle possible response commit when processing read
         errors. (remm)
       </fix>
+      <fix>
+        Update Basic authentication to implement the requirements of RFC 7617
+        including the changing of the <code>trimCredentials</code> setting which
+        is now defaults to <code>false</code>. Note that the
+        <code>trimCredentials</code> setting will be removed in Tomcat 11.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
