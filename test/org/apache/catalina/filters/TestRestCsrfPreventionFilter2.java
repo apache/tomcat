@@ -19,6 +19,7 @@ package org.apache.catalina.filters;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,6 @@ import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
@@ -313,7 +313,7 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
             password = aPassword;
             String userCredentials = username + ":" + password;
             byte[] credentialsBytes = userCredentials.getBytes(StandardCharsets.ISO_8859_1);
-            String base64auth = Base64.encodeBase64String(credentialsBytes);
+            String base64auth = Base64.getEncoder().encodeToString(credentialsBytes);
             credentials = method + " " + base64auth;
         }
 

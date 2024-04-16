@@ -20,6 +20,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,7 +47,6 @@ import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.Priority;
 import org.apache.tomcat.util.log.UserDataHelper;
@@ -218,7 +218,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 // Process the initial settings frame
                 stream = getStream(1, true);
                 String base64Settings = stream.getCoyoteRequest().getHeader(HTTP2_SETTINGS_HEADER);
-                byte[] settings = Base64.decodeBase64URLSafe(base64Settings);
+                byte[] settings = Base64.getUrlDecoder().decode(base64Settings);
 
                 // Settings are only valid on stream 0
                 FrameType.SETTINGS.check(0, settings.length);

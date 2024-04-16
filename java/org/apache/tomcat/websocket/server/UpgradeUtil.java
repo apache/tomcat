@@ -19,6 +19,7 @@ package org.apache.tomcat.websocket.server;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
@@ -37,7 +38,6 @@ import javax.websocket.Extension;
 import javax.websocket.HandshakeResponse;
 import javax.websocket.server.ServerEndpointConfig;
 
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 import org.apache.tomcat.websocket.Constants;
@@ -226,16 +226,7 @@ public class UpgradeUtil {
 
     /*
      * Validate the key. It should be the base64 encoding of a random 16-byte value. 16-bytes are encoded in 24 base64
-     * characters, the last two of which must be ==.
-     *
-     * The validation isn't perfect:
-     *
-     * - it doesn't check the final non-'=' character is valid in the context of the number of bits it is meant to be
-     * encoding.
-     *
-     * - it doesn't check that the value is random and changes for each connection.
-     *
-     * Given that this header is for the benefit of the client, not the server, this should be good enough.
+     * characters.
      */
     private static boolean validateKey(String key) {
         if (key == null) {
@@ -246,17 +237,14 @@ public class UpgradeUtil {
             return false;
         }
 
-        char[] keyChars = key.toCharArray();
-        if (keyChars[22] != '=' || keyChars[23] != '=') {
-            return false;
-        }
-
-        for (int i = 0; i < 22; i++) {
-            if (!Base64.isInAlphabet(keyChars[i])) {
+        try {
+            byte[] decoded = Base64.getDecoder().decode(key);
+            if (decoded.length != 16) {
                 return false;
             }
+        } catch (IllegalArgumentException iae) {
+            return false;
         }
-
         return true;
     }
 
@@ -340,6 +328,6 @@ public class UpgradeUtil {
 
     private static String getWebSocketAccept(String key) {
         byte[] digest = ConcurrentMessageDigest.digestSHA1(key.getBytes(StandardCharsets.ISO_8859_1), WS_ACCEPT);
-        return Base64.encodeBase64String(digest);
+        return Base64.getEncoder().encodeToString(digest);
     }
 }
