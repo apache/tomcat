@@ -226,8 +226,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
         }
 
         /*
-         * The authorization method string is case-insensitive and must have at exactly one space character as a
-         * delimiter.
+         * The authorization method string is case-insensitive and must have exactly one space character as a delimiter.
          */
         private void parseMethod() throws IllegalArgumentException {
             if (authorization.startsWithIgnoreCase(METHOD, 0)) {
