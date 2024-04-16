@@ -27,7 +27,10 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * This class is thread-safe.
  * </p>
+ *
+ * @deprecated Unused. This class will be removed in Tomcat 11 onwards.
  */
+@Deprecated
 public abstract class BaseNCodec {
 
     protected static final StringManager sm = StringManager.getManager(BaseNCodec.class);

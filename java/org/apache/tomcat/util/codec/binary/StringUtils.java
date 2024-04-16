@@ -29,7 +29,10 @@ import java.nio.charset.StandardCharsets;
  * @see Charset
  * @see StandardCharsets
  * @since 1.4
+ *
+ * @deprecated Unused. This class will be removed in Tomcat 11 onwards.
  */
+@Deprecated
 public class StringUtils {
 
     /**

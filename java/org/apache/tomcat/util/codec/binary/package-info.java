@@ -17,5 +17,7 @@
 
 /**
  * Base64 String encoding and decoding.
+ *
+ * Unused. This package will be removed in Tomcat 11 onwards.
  */
 package org.apache.tomcat.util.codec.binary;
