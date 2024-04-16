@@ -137,6 +137,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Switch to using the Base64 encoder and decoder provided by the JRE
+        rather than the version provided by Commons Codec. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.22 (schultz)" rtext="not released">
   <subsection name="Other">

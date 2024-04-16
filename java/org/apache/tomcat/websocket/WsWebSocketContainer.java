@@ -34,6 +34,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -71,7 +72,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.InstanceManagerBindings;
 import org.apache.tomcat.util.buf.StringUtils;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.KeyStoreUtil;
@@ -703,7 +703,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     private static String generateWsKeyValue() {
         byte[] keyBytes = new byte[16];
         RANDOM.nextBytes(keyBytes);
-        return Base64.encodeBase64String(keyBytes);
+        return Base64.getEncoder().encodeToString(keyBytes);
     }
 
 
