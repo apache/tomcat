@@ -138,7 +138,14 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 10.1.22 (schultz)" rtext="release in progress">
+<section name="Tomcat 10.1.22 (schultz)" rtext="not released">
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Release re-built using correct JDK version.
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.21 (schultz)" rtext="not released">
   <subsection name="Catalina">
