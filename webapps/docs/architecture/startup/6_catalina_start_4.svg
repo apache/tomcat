@@ -629,7 +629,7 @@
     ><g font-size="11px" transform="translate(110,620)" fill-opacity="1" fill="white" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="white" stroke-opacity="1"
     ><rect x="0" width="452" height="14" y="0" clip-path="url(#clipPath58)" stroke="none"
       /><text fill="black" x="4" xml:space="preserve" y="11" clip-path="url(#clipPath58)" stroke="none"
-      >createWarpper() // Invoked by a WebWrapperRule (not Directly by the Digester)</text
+      >createWrapper() // Invoked by a WebWrapperRule (not Directly by the Digester)</text
     ></g
     ><g font-size="11px" transform="translate(60,544)" fill-opacity="1" fill="white" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="white" stroke-opacity="1"
     ><rect x="0" width="164" height="14" y="0" clip-path="url(#clipPath59)" stroke="none"
