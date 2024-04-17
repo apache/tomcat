@@ -133,6 +133,10 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
     @Override
     public int write(ByteBuffer src) throws IOException {
         checkInterruptStatus();
+        if (!src.hasRemaining()) {
+            // Nothing left to write
+            return 0;
+        }
         return sc.write(src);
     }
 
