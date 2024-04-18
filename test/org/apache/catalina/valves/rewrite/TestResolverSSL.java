@@ -35,6 +35,7 @@ import org.apache.catalina.Container;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.core.OpenSSLLifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -42,6 +43,7 @@ import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.TesterSupport;
+import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 
 @RunWith(Parameterized.class)
 public class TestResolverSSL extends TomcatBaseTest {
@@ -52,6 +54,8 @@ public class TestResolverSSL extends TomcatBaseTest {
         parameterSets.add(new Object[] { "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation" });
         parameterSets.add(
                 new Object[] { "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation" });
+        parameterSets.add(
+                new Object[] { "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" });
 
         return parameterSets;
     }
@@ -173,10 +177,17 @@ public class TestResolverSSL extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
 
         if (useOpenSSL) {
-            AprLifecycleListener listener = new AprLifecycleListener();
-            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
-            StandardServer server = (StandardServer) tomcat.getServer();
-            server.addLifecycleListener(listener);
+            if (OpenSSLImplementation.class.getName().equals(sslImplementationName)) {
+                AprLifecycleListener listener = new AprLifecycleListener();
+                Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
+                StandardServer server = (StandardServer) tomcat.getServer();
+                server.addLifecycleListener(listener);
+            } else if ("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation".equals(sslImplementationName)) {
+                OpenSSLLifecycleListener listener = new OpenSSLLifecycleListener();
+                Assume.assumeTrue(OpenSSLLifecycleListener.isAvailable());
+                StandardServer server = (StandardServer) tomcat.getServer();
+                server.addLifecycleListener(listener);
+            }
         }
     }
 }
