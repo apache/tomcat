@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.AsyncEvent;
 import jakarta.servlet.AsyncListener;
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -106,9 +107,15 @@ public class TestAsyncContextImplListenerOnComplete extends TomcatBaseTest {
             resp.setContentType("text/event-stream");
             resp.setCharacterEncoding("UTF-8");
             resp.setStatus(200);
-            AsyncContext context = req.startAsync();
-            context.addListener(new ReproAsyncListener());
-            eventSource.add(context);
+            /*
+             * AsyncListener dispatches back to this servlet in onError(). We do not want to restart async processing in
+             * this case or we will enter a loop.
+             */
+            if (req.getDispatcherType() == DispatcherType.REQUEST) {
+                AsyncContext context = req.startAsync();
+                context.addListener(new ReproAsyncListener());
+                eventSource.add(context);
+            }
         }
 
         private class ReproAsyncListener implements AsyncListener {
