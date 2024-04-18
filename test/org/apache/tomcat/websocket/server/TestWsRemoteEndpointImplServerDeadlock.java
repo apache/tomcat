@@ -124,6 +124,9 @@ public class TestWsRemoteEndpointImplServerDeadlock extends WebSocketBaseTest {
         // Server buffers are full. Server cannot send any more messages.
         // Server is now blocked waiting for the client to read the messages.
 
+        // Set a short session close timeout (milliseconds)
+        session.getUserProperties().put(
+            org.apache.tomcat.websocket.Constants.SESSION_CLOSE_TIMEOUT_PROPERTY, Long.valueOf(2000));
         // Close the session from the client
         session.close();
 
