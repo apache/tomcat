@@ -135,6 +135,10 @@
         dispatch is now performed rather than completing the request using the
         error page mechanism. (markt)
       </fix>
+      <add>
+        Re-factor ElapsedTimeElement in AbstractAccessLogValve to use a customizable
+        style. (schultz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
