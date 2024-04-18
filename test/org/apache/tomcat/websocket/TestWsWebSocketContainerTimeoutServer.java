@@ -100,6 +100,9 @@ public class TestWsWebSocketContainerTimeoutServer extends WsWebSocketContainerB
             loops++;
         }
 
+        // Set a short session close timeout (milliseconds)
+        wsSession.getUserProperties().put(
+            org.apache.tomcat.websocket.Constants.SESSION_CLOSE_TIMEOUT_PROPERTY, Long.valueOf(2000));
         // Close the client session, primarily to allow the
         // BackgroundProcessManager to shut down.
         wsSession.close();
