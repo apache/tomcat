@@ -60,7 +60,7 @@ public class TestResolverSSL extends TomcatBaseTest {
     public String connectorName;
 
     @Parameter(1)
-    public boolean needApr;
+    public boolean useOpenSSL;
 
     @Parameter(2)
     public String sslImplementationName;
@@ -172,7 +172,7 @@ public class TestResolverSSL extends TomcatBaseTest {
 
         Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
 
-        if (needApr) {
+        if (useOpenSSL) {
             AprLifecycleListener listener = new AprLifecycleListener();
             Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
             StandardServer server = (StandardServer) tomcat.getServer();
