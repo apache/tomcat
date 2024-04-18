@@ -465,7 +465,7 @@
     <li><b>s-ip</b> - Local IP address</li>
     <li><b>sc-status</b> - HTTP status code of the response</li>
     <li><b>time</b> - Time the request was served in HH:mm:ss format for GMT</li>
-    <li><b>time-taken</b> - Time (in seconds as floating point) taken to serve the request</li>
+    <li><b>time-taken</b> - Time (in seconds) taken to serve the request</li>
     <li><b>x-threadname</b> - Current request thread name (can compare later with stacktraces)</li>
     </ul>
 
