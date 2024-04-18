@@ -333,6 +333,11 @@ public final class Response {
     }
 
 
+    public void resetError() {
+        errorState.set(0);
+    }
+
+
     // -------------------- Methods --------------------
 
     public void reset() throws IllegalStateException {
@@ -656,7 +661,7 @@ public final class Response {
         committed = false;
         commitTimeNanos = -1;
         errorException = null;
-        errorState.set(0);
+        resetError();
         headers.recycle();
         trailerFieldsSupplier = null;
         // Servlet 3.1 non-blocking write listener

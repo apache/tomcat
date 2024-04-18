@@ -127,6 +127,12 @@
         Small performance optimization when logging cookies with no values.
         (schultz)
       </add>
+      <fix>
+        Correct error handling for asynchronous requests. If the application
+        performs an dispatch during <code>AsyncListener.onError()</code> the
+        dispatch is now performed rather than completing the request using the
+        error page mechanism. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
