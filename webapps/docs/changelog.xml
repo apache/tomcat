@@ -123,6 +123,10 @@
         including the removal of the <code>trimCredentials</code> setting which
         is now hard-coded to <code>false</code>. (markt)
       </fix>
+      <add>
+        Small performance optimization when logging cookies with no values.
+        (schultz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
