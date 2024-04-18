@@ -438,6 +438,12 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 // complete() or dispatch(). Complete the async processing.
                 complete();
             }
+        } else if (request.isAsyncDispatching()) {
+            /*
+             * AsyncListener.onError() called dispatch. Clear the error state on the response else the dispatch will
+             * trigger error page handling.
+             */
+            request.getResponse().resetError();
         }
     }
 
