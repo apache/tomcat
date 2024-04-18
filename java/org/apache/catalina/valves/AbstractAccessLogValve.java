@@ -1307,8 +1307,44 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * write time taken to process the request - %D, %T
      */
     protected static class ElapsedTimeElement implements AccessLogElement {
-        private final boolean micros;
-        private final boolean millis;
+        enum Style {
+            SECONDS {
+                @Override
+                public void append(CharArrayWriter buf, long time) {
+                    buf.append(Long.toString(TimeUnit.NANOSECONDS.toSeconds(time)));
+                }
+            },
+            MILLISECONDS {
+                @Override
+                public void append(CharArrayWriter buf, long time) {
+                    buf.append(Long.toString(TimeUnit.NANOSECONDS.toMillis(time)));
+                }
+            },
+            MICROSECONDS {
+                @Override
+                public void append(CharArrayWriter buf, long time) {
+                    buf.append(Long.toString(TimeUnit.NANOSECONDS.toMicros(time)));
+                }
+            };
+
+            /**
+             * Append the time to the buffer in the appropriate format.
+             *
+             * @param buf The buffer to append to.
+             * @param time The time to log in nanoseconds.
+             */
+            public abstract void append(CharArrayWriter buf, long time);
+        }
+        private final Style style;
+
+        /**
+         * Create a new ElapsedTimeElement that will log the time in the specified style.
+         *
+         * @param style The elapsed-time style to use.
+         */
+        public ElapsedTimeElement(Style style) {
+            this.style = style;
+        }
 
         /**
          * @param micros <code>true</code>, write time in microseconds - %D
@@ -1316,20 +1352,12 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
          *                   time in seconds - %T
          */
         public ElapsedTimeElement(boolean micros, boolean millis) {
-            this.micros = micros;
-            this.millis = millis;
+            this(micros ? Style.MICROSECONDS : millis ? Style.MILLISECONDS : Style.SECONDS);
         }
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
-            if (micros) {
-                buf.append(Long.toString(TimeUnit.NANOSECONDS.toMicros(time)));
-            } else if (millis) {
-                buf.append(Long.toString(TimeUnit.NANOSECONDS.toMillis(time)));
-            } else {
-                // second
-                buf.append(Long.toString(TimeUnit.NANOSECONDS.toSeconds(time)));
-            }
+            style.append(buf, time);
         }
     }
 
