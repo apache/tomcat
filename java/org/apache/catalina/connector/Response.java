@@ -429,6 +429,11 @@ public class Response implements HttpServletResponse {
     }
 
 
+    public void resetError() {
+        getCoyoteResponse().resetError();
+    }
+
+
     /**
      * Perform whatever actions are required to flush and close the output stream or writer, in a single operation.
      *
