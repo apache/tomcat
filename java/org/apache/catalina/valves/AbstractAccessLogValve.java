@@ -1479,7 +1479,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
-            StringBuilder value = new StringBuilder();
+            StringBuilder value = null;
             boolean first = true;
             Cookie[] cookies = request.getCookies();
             if (cookies != null) {
@@ -1490,6 +1490,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                         } else {
                             value.append(',');
                         }
+                        value = new StringBuilder();
                         value.append(cookie.getValue());
                     }
                 }
