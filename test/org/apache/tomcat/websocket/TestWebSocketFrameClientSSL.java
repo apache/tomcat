@@ -142,6 +142,9 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
 
         Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class, clientEndpointConfig,
                 new URI("wss://localhost:" + getPort() + TesterFirehoseServer.PATH));
+        // Set a short session close timeout (milliseconds)
+        wsSession.getUserProperties().put(
+            org.apache.tomcat.websocket.Constants.SESSION_CLOSE_TIMEOUT_PROPERTY, Long.valueOf(2000));
         CountDownLatch latch = new CountDownLatch(TesterFirehoseServer.MESSAGE_COUNT);
         BasicText handler = new BasicText(latch);
         wsSession.addMessageHandler(handler);
@@ -282,6 +285,9 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
             Assert.fail("There are [" + openConnectionCount + "] connections still open");
         }
 
+        // Set a short session close timeout (milliseconds)
+        wsSession.getUserProperties().put(
+            org.apache.tomcat.websocket.Constants.SESSION_CLOSE_TIMEOUT_PROPERTY, Long.valueOf(2000));
         // Close the client session.
         wsSession.close();
     }

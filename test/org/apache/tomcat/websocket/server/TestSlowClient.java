@@ -70,6 +70,9 @@ public class TestSlowClient extends WebSocketBaseTest {
             count++;
         }
         Assert.assertTrue(wsSession.isOpen());
+        // Set a short session close timeout (milliseconds)
+        wsSession.getUserProperties().put(
+            org.apache.tomcat.websocket.Constants.SESSION_CLOSE_TIMEOUT_PROPERTY, Long.valueOf(2000));
         wsSession.close();
 
         // BZ 64848 (non-container thread variant)
