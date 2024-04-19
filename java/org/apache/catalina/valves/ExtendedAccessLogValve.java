@@ -541,7 +541,19 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             if (tokenizer.hasSubToken()) {
                 String nextToken = tokenizer.getToken();
                 if ("taken".equals(nextToken)) {
-                    return new ElapsedTimeElement(false, false);
+                    nextToken = tokenizer.getToken();
+
+                    if ("ns".equals(nextToken)) {
+                        return new ElapsedTimeElement(ElapsedTimeElement.Style.NANOSECONDS);
+                    } else if("us".equals(nextToken)) {
+                        return new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
+                    } else if ("ms".equals(nextToken)) {
+                        return new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
+                    } else if ("fs".equals(nextToken)) {
+                        return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS_FRACTIONAL);
+                    } else {
+                        return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS);
+                    }
                 }
             } else {
                 return new TimeElement();

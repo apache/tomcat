@@ -137,6 +137,10 @@
         Re-factor ElapsedTimeElement in AbstractAccessLogValve to use a customizable
         style. (schultz)
       </add>
+      <add>
+        Add more timescale options to AccessLogValve and ExtendedAccessLogValve.
+        (schultz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
