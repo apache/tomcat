@@ -1777,7 +1777,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             case 'T':
                 // ms for milliseconds, us for microseconds, and s for seconds
                 if ("ns".equals(name)) {
-                    return new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
+                    return new ElapsedTimeElement(ElapsedTimeElement.Style.NANOSECONDS);
                 } else if ("us".equals(name)) {
                     return new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
                 } else if ("ms".equals(name)) {
