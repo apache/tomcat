@@ -1129,15 +1129,12 @@ public abstract class AbstractEndpoint<S,U> {
             unlockAddress = getUnlockAddress(localAddress);
 
             try (java.net.Socket s = new java.net.Socket()) {
-                int stmo = 2 * 1000;
                 int utmo = 2 * 1000;
-                if (getSocketProperties().getSoTimeout() > stmo) {
-                    stmo = getSocketProperties().getSoTimeout();
-                }
                 if (getSocketProperties().getUnlockTimeout() > utmo) {
                     utmo = getSocketProperties().getUnlockTimeout();
                 }
-                s.setSoTimeout(stmo);
+                // Never going to read from this socket so the timeout doesn't matter. Use the unlock timeout.
+                s.setSoTimeout(utmo);
                 // Newer MacOS versions (e.g. Ventura 13.2) appear to linger for ~1s on close when linger is disabled.
                 // That causes delays when running the unit tests. Explicitly enabling linger but with a timeout of
                 // zero seconds seems to fix the issue.
