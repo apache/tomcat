@@ -1295,7 +1295,7 @@ public abstract class AbstractEndpoint<S,U> {
                 }
                 s.setSoTimeout(stmo);
                 // Newer MacOS versions (e.g. Ventura 13.2) appear to linger for ~1s on close when linger is disabled.
-                // That causes delays when running the unit tests. Explicitly enableing linger but with a timeout of
+                // That causes delays when running the unit tests. Explicitly enabling linger but with a timeout of
                 // zero seconds seems to fix the issue.
                 s.setSoLinger(true, 0);
                 if (getLog().isTraceEnabled()) {
@@ -1306,7 +1306,7 @@ public abstract class AbstractEndpoint<S,U> {
                     getLog().trace("Socket unlock completed for:" + unlockAddress);
                 }
             }
-            // Wait for up to 1000ms acceptor threads to unlock. Particularly
+            // Wait for up to 1000ms for acceptor thread to unlock. Particularly
             // for the unit tests, we want to exit this loop as quickly as
             // possible. However, we also don't want to trigger excessive CPU
             // usage if the unlock takes longer than expected. Therefore, we
