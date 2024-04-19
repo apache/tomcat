@@ -296,7 +296,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         }
         if (running) {
             running = false;
-            acceptor.stopMillis(10000);
+            /*
+             * Need to wait for the acceptor to unlock but not too long. 100ms plus twice the unlock timeout should be
+             * plenty of time for the acceptor to unlock without being an excessively long wait if the unlock fails.
+             */
+            int acceptorWaitMilliSeconds = 100 + 2 * getSocketProperties().getUnlockTimeout();
+            acceptor.stopMillis(acceptorWaitMilliSeconds);
             if (poller != null) {
                 poller.destroy();
                 poller = null;

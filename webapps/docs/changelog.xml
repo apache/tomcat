@@ -158,6 +158,12 @@
         negative or zero value is configured, the default of <code>250ms</code>
         will be used. (mark)
       </fix>
+      <fix>
+        Reduce the time spent waiting for the connector to unlock. The previous
+        default of 10s was noticeably too long for cases where the unlock has
+        failed. The wait time is now 100ms plus twice
+        <code>socket.unlockTimeout</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
