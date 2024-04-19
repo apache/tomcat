@@ -1183,12 +1183,8 @@ public abstract class AbstractEndpoint<S,U> {
 
             try (java.net.Socket s = new java.net.Socket()) {
                 int stmo = 2 * 1000;
-                int utmo = 2 * 1000;
                 if (getSocketProperties().getSoTimeout() > stmo) {
                     stmo = getSocketProperties().getSoTimeout();
-                }
-                if (getSocketProperties().getUnlockTimeout() > utmo) {
-                    utmo = getSocketProperties().getUnlockTimeout();
                 }
                 s.setSoTimeout(stmo);
                 // Newer MacOS versions (e.g. Ventura 13.2) appear to linger for ~1s on close when linger is disabled.
@@ -1198,7 +1194,7 @@ public abstract class AbstractEndpoint<S,U> {
                 if (getLog().isTraceEnabled()) {
                     getLog().trace("About to unlock socket for:" + unlockAddress);
                 }
-                s.connect(unlockAddress,utmo);
+                s.connect(unlockAddress, getSocketProperties().getUnlockTimeout());
                 if (getDeferAccept()) {
                     /*
                      * In the case of a deferred accept / accept filters we need to
