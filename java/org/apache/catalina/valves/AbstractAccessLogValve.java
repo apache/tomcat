@@ -1489,17 +1489,19 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             if (cookies != null) {
                 for (Cookie cookie : cookies) {
                     if (cookieNameToLog.equals(cookie.getName())) {
+                        if (value == null) {
+                            value = new StringBuilder();
+                        }
                         if (first) {
                             first = false;
                         } else {
                             value.append(',');
                         }
-                        value = new StringBuilder();
                         value.append(cookie.getValue());
                     }
                 }
             }
-            if (value.length() == 0) {
+            if (value == null) {
                 buf.append('-');
             } else {
                 escapeAndAppend(value.toString(), buf);
