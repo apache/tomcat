@@ -139,6 +139,7 @@
       </add>
       <add>
         Add more timescale options to AccessLogValve and ExtendedAccessLogValve.
+        Allow timescales to apply to "time-taken" token in ExtendedAccessLogValve.
         (schultz)
       </add>
     </changelog>
