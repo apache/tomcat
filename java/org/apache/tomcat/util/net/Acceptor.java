@@ -164,22 +164,6 @@ public class Acceptor<U> implements Runnable {
     }
 
 
-    /**
-     * Signals the Acceptor to stop, optionally waiting for that stop process
-     * to complete before returning. If a wait is requested and the stop does
-     * not complete in that time a warning will be logged.
-     *
-     * @param waitSeconds The time to wait in seconds. Use a value less than
-     *                    zero for no wait.
-     *
-     * @deprecated Unused. Will be remove in Tomcat 11 onwards.
-     */
-    @Deprecated
-    public void stop(int waitSeconds) {
-        stopMillis(waitSeconds * 1000);
-    }
-
-
     public void stopMillis(int waitMilliseconds) {
         stopCalled = true;
         if (waitMilliseconds > 0) {
