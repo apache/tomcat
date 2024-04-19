@@ -200,12 +200,20 @@ public class Acceptor<U> implements Runnable {
      *
      * @param waitSeconds The time to wait in seconds. Use a value less than
      *                    zero for no wait.
+     *
+     * @deprecated Unused. Will be remove in Tomcat 11 onwards.
      */
+    @Deprecated
     public void stop(int waitSeconds) {
+        stopMillis(waitSeconds * 1000);
+    }
+
+
+    public void stopMillis(int waitMilliseconds) {
         stopCalled = true;
-        if (waitSeconds > 0) {
+        if (waitMilliseconds > 0) {
             try {
-                if (!stopLatch.await(waitSeconds, TimeUnit.SECONDS)) {
+                if (!stopLatch.await(waitMilliseconds, TimeUnit.MILLISECONDS)) {
                    log.warn(sm.getString("acceptor.stop.fail", getThreadName()));
                 }
             } catch (InterruptedException e) {
