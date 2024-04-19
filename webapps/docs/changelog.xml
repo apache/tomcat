@@ -105,8 +105,62 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0-M20 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Deprecate and remove <code>sessionCounter</code> (replaced by the
+        addition of the active session count and the expired session count,
+        as a reasonable approximation) and <code>duplicates</code> (which
+        does not represent a possible event in current implementations)
+        statistics from the session manager. (remm)
+      </update>
+      <fix>
+        <bug>68890</bug> Align output encoding of JSPs in the Manager webapp
+        with the XML declarations in those same files. (schultz)
+      </fix>
+      <fix>
+        Update Basic authentication to implement the requirements of RFC 7617
+        including the removal of the <code>trimCredentials</code> setting which
+        is now hard-coded to <code>false</code>. (markt)
+      </fix>
+      <add>
+        Small performance optimization when logging cookies with no values.
+        (schultz)
+      </add>
+      <fix>
+        Correct error handling for asynchronous requests. If the application
+        performs an dispatch during <code>AsyncListener.onError()</code> the
+        dispatch is now performed rather than completing the request using the
+        error page mechanism. (markt)
+      </fix>
+      <add>
+        Re-factor ElapsedTimeElement in AbstractAccessLogValve to use a customizable
+        style. (schultz)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Add OpenSSL FFM classes to <code>tomcat-embed-core.jar</code>. (remm)
+      </fix>
+      <fix>
+        Align non-secure and secure writes with NIO and skip the write attempt
+        when there are no bytes to be written. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Switch to using the Base64 encoder and decoder provided by the JRE
+        rather than the version provided by Commons Codec. This removes the
+        internal fork of Commons Codec. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
-<section name="Tomcat 11.0.0-M19 (markt)" rtext="release in progress">
+<section name="Tomcat 11.0.0-M19 (remm)" rtext="release in progress">
   <subsection name="Catalina">
     <changelog>
       <update>

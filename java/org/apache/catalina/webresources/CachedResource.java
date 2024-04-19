@@ -341,6 +341,7 @@ public class CachedResource implements WebResource {
         try {
             CachedResourceURLStreamHandler handler = new CachedResourceURLStreamHandler(resourceURL, root, webAppPath,
                     usesClassLoaderResources);
+            @SuppressWarnings("deprecation")
             URL result = new URL(null, resourceURL.toExternalForm(), handler);
             handler.setCacheURL(result);
             return result;

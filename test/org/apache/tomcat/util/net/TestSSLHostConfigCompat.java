@@ -63,7 +63,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
     public String connectorName;
 
     @Parameter(1)
-    public boolean needApr;
+    public boolean useOpenSSL;
 
     @Parameter(2)
     public String sslImplementationName;
@@ -313,7 +313,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         sslHostConfig.setProtocols("TLSv1.2");
         connector.addSslHostConfig(sslHostConfig);
 
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
         // Simple webapp
         Context ctxt = getProgrammaticRootContext();

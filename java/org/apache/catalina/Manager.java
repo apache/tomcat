@@ -76,19 +76,13 @@ public interface Manager {
 
 
     /**
-     * Returns the total number of sessions created by this manager.
+     * Returns the total number of sessions created by this manager, which is
+     * approximated as the number of active sessions plus the number of
+     * expired sessions.
      *
      * @return Total number of sessions created by this manager.
      */
     long getSessionCounter();
-
-
-    /**
-     * Sets the total number of sessions created by this manager.
-     *
-     * @param sessionCounter Total number of sessions created by this manager.
-     */
-    void setSessionCounter(long sessionCounter);
 
 
     /**

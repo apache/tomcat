@@ -240,8 +240,8 @@ public final class TesterSupport {
         return true;
     }
 
-    public static void configureSSLImplementation(Tomcat tomcat, String sslImplementationName, boolean openSSL) {
-        if (openSSL) {
+    public static void configureSSLImplementation(Tomcat tomcat, String sslImplementationName, boolean useOpenSSL) {
+        if (useOpenSSL) {
             LifecycleListener listener = null;
             if (OpenSSLImplementation.class.getName().equals(sslImplementationName)) {
                 listener = new AprLifecycleListener();

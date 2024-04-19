@@ -465,7 +465,7 @@
     <li><b>s-ip</b> - Local IP address</li>
     <li><b>sc-status</b> - HTTP status code of the response</li>
     <li><b>time</b> - Time the request was served in HH:mm:ss format for GMT</li>
-    <li><b>time-taken</b> - Time (in seconds as floating point) taken to serve the request</li>
+    <li><b>time-taken</b> - Time (in seconds) taken to serve the request</li>
     <li><b>x-threadname</b> - Current request thread name (can compare later with stacktraces)</li>
     </ul>
 
@@ -1557,12 +1557,6 @@
         <code>remote-user</code> and <code>auth-type</code> to a reverse proxy.
         This is useful, e.g., for access log consistency or other decisions to make.
         If not specified, the default value is <code>false</code>.</p>
-      </attribute>
-
-      <attribute name="trimCredentials" required="false">
-        <p>Controls whether leading and/or trailing whitespace is removed from
-        the parsed credentials. If not specified, the default value is
-        <code>true</code>.</p>
       </attribute>
 
     </attributes>
