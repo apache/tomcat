@@ -199,7 +199,7 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
         }
         if (running) {
             running = false;
-            acceptor.stop(10);
+            acceptor.stopMillis(10);
             // Use the executor to avoid binding the main thread if something bad
             // occurs and unbind will also wait for a bit for it to complete
             getExecutor().execute(() -> {
@@ -440,11 +440,11 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
         /**
          * Signals the Acceptor to stop.
          *
-         * @param waitSeconds Ignored for NIO2.
+         * @param waitMilliseconds Ignored for NIO2.
          *
          */
         @Override
-        public void stop(int waitSeconds) {
+        public void stopMillis(int waitMilliseconds) {
             acceptor.state = AcceptorState.ENDED;
         }
 

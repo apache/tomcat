@@ -297,7 +297,7 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
         }
         if (running) {
             running = false;
-            acceptor.stop(10);
+            acceptor.stopMillis(10000);
             if (poller != null) {
                 poller.destroy();
                 poller = null;

@@ -1661,7 +1661,7 @@ public abstract class AbstractEndpoint<S,U> {
     public final void closeServerSocketGraceful() {
         if (bindState == BindState.BOUND_ON_START) {
             // Stop accepting new connections
-            acceptor.stop(-1);
+            acceptor.stopMillis(-1);
             // Release locks that may be preventing the acceptor from stopping
             releaseConnectionLatch();
             unlockAccept();
