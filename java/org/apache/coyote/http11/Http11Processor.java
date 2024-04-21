@@ -148,6 +148,11 @@ public class Http11Processor extends AbstractProcessor {
      */
     private SendfileDataBase sendfileData = null;
 
+    /**
+     * Indicates if a bad request was received (if true, the connection will be closed at the end of the request)
+     */
+    private boolean badRequest = false;
+
 
     public Http11Processor(AbstractHttp11Protocol<?> protocol, Adapter adapter) {
         super(adapter);
@@ -190,7 +195,7 @@ public class Http11Processor extends AbstractProcessor {
      * Determine if we must drop the connection because of the HTTP status code. Use the same list of codes as
      * Apache/httpd.
      */
-    private static boolean statusDropsConnection(int status) {
+    protected boolean statusDropsConnection(int status) {
         return status == 400 /* SC_BAD_REQUEST */ || status == 408 /* SC_REQUEST_TIMEOUT */ ||
                 status == 411 /* SC_LENGTH_REQUIRED */ || status == 413 /* SC_REQUEST_ENTITY_TOO_LARGE */ ||
                 status == 414 /* SC_REQUEST_URI_TOO_LONG */ || status == 500 /* SC_INTERNAL_SERVER_ERROR */ ||
@@ -251,6 +256,7 @@ public class Http11Processor extends AbstractProcessor {
         keepAlive = true;
         openSocket = false;
         readComplete = true;
+        badRequest = false;
         boolean keptAlive = false;
         SendfileState sendfileState = SendfileState.DONE;
 
@@ -851,6 +857,7 @@ public class Http11Processor extends AbstractProcessor {
 
     private void badRequest(String errorKey) {
         response.setStatus(400);
+        badRequest = true;
         setErrorState(ErrorState.CLOSE_CLEAN, null);
         if (log.isDebugEnabled()) {
             log.debug(sm.getString(errorKey));
@@ -980,7 +987,7 @@ public class Http11Processor extends AbstractProcessor {
 
         // If we know that the request is bad this early, add the
         // Connection: close header.
-        if (keepAlive && statusDropsConnection(statusCode)) {
+        if (keepAlive && (badRequest || statusDropsConnection(statusCode))) {
             keepAlive = false;
         }
         if (!keepAlive) {
