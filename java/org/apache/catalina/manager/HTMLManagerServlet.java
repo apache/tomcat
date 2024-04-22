@@ -321,6 +321,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
         Object[] args = new Object[2];
         args[0] = getServletContext().getContextPath();
         args[1] = smClient.getString("htmlManagerServlet.title");
+        String HTMLSubtitle = getServletContext().getInitParameter("HTMLSubtitle");
+        if (HTMLSubtitle != null) {
+            args[1] += "</font><br/><font size=\"+1\">" + HTMLSubtitle;
+        }
 
         // HTML Header Section
         writer.print(MessageFormat.format(Constants.HTML_HEADER_SECTION, args));
