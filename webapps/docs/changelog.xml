@@ -104,27 +104,9 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 10.1.23 (schultz)" rtext="in development">
+<section name="Tomcat 10.1.24 (schultz)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
-      <update>
-        Deprecate and remove <code>sessionCounter</code> (replaced by the
-        addition of the active session count and the expired session count,
-        as a reasonable approximation) and <code>duplicates</code> (which
-        does not represent a possible event in current implementations)
-        statistics from the session manager. (remm)
-      </update>
-      <fix>
-        <bug>68890</bug> Align output encoding of JSPs in the Manager webapp
-        with the XML declarations in those same files. (schultz)
-      </fix>
-      <fix>
-        Update Basic authentication to implement the requirements of RFC 7617
-        including the changing of the <code>trimCredentials</code> setting which
-        is now defaults to <code>false</code>. Note that the
-        <code>trimCredentials</code> setting will be removed in Tomcat 11.
-        (markt)
-      </fix>
       <add>
         Small performance optimization when logging cookies with no values.
         (schultz)
@@ -143,12 +125,6 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
-      <fix>
-        Fix bnd jar descriptor to include the OpenSSL FFM support. (remm)
-      </fix>
-      <fix>
-        Add OpenSSL FFM classes to <code>tomcat-embed-core.jar</code>. (remm)
-      </fix>
       <fix>
         Align non-secure and secure writes with NIO and skip the write attempt
         when there are no bytes to be written. (markt)
@@ -183,6 +159,40 @@
         Commons Codec has been deprecated and will be removed in Tomcat 11.
         (markt)
       </update>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 10.1.23 (schultz)" rtext="release in progress">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Deprecate and remove <code>sessionCounter</code> (replaced by the
+        addition of the active session count and the expired session count,
+        as a reasonable approximation) and <code>duplicates</code> (which
+        does not represent a possible event in current implementations)
+        statistics from the session manager. (remm)
+      </update>
+      <fix>
+        <bug>68890</bug> Align output encoding of JSPs in the Manager webapp
+        with the XML declarations in those same files. (schultz)
+      </fix>
+      <fix>
+        Update Basic authentication to implement the requirements of RFC 7617
+        including the changing of the <code>trimCredentials</code> setting which
+        is now defaults to <code>false</code>. Note that the
+        <code>trimCredentials</code> setting will be removed in Tomcat 11.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Fix bnd jar descriptor to include the OpenSSL FFM support. (remm)
+      </fix>
+      <fix>
+        Add OpenSSL FFM classes to <code>tomcat-embed-core.jar</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
