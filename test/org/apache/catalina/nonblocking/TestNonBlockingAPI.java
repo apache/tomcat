@@ -155,6 +155,51 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
 
     @Test
+    public void testNonBlockingReadChunked() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        NBReadServlet servlet = new NBReadServlet(false, true);
+        String servletName = NBReadServlet.class.getName();
+        Tomcat.addServlet(ctx, servletName, servlet);
+        ctx.addServletMappingDecoded("/", servletName);
+
+        tomcat.start();
+
+        Client client = new Client();
+        client.setPort(getPort());
+        client.setRequest(new String[] { "GET / HTTP/1.1" + SimpleHttpClient.CRLF +
+                                         "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                                         "Transfer-Encoding: chunked" + SimpleHttpClient.CRLF +
+                                         SimpleHttpClient.CRLF +
+                                         "14" + SimpleHttpClient.CRLF +
+                                         "01234567890123456789" + SimpleHttpClient.CRLF +
+                                         "14" + SimpleHttpClient.CRLF +
+                                         "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                                         "0" + SimpleHttpClient.CRLF +
+                                         SimpleHttpClient.CRLF});
+        client.connect();
+        client.sendRequest();
+
+        client.setUseContentLength(true);
+        client.readResponse(true);
+
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    private static class Client extends SimpleHttpClient {
+        @Override
+        public boolean isResponseBodyOK() {
+            return "OK".equals(getResponseBody());
+        }
+    }
+
+
+    @Test
     public void testNonBlockingWrite() throws Exception {
         testNonBlockingWriteInternal(false);
     }
