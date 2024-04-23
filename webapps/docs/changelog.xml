@@ -169,6 +169,10 @@
         request body uses chunked encoding and is read using non-blocking IO.
         (markt)
       </fix>
+      <fix>
+        <bug>68934</bug>: Add debug logging in the latch object when exceeding
+        <code>maxConnections</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
