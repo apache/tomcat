@@ -210,8 +210,7 @@ public class Http11Processor extends AbstractProcessor {
             response.setStatus(400);
             setErrorState(ErrorState.CLOSE_CLEAN, null);
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("http11processor.request.prepare") +
-                        " Transfer encoding lists chunked before [" + encodingName + "]");
+                log.debug(sm.getString("http11processor.request.alreadyChunked", encodingName));
             }
             return;
         }
@@ -232,8 +231,7 @@ public class Http11Processor extends AbstractProcessor {
             response.setStatus(501);
             setErrorState(ErrorState.CLOSE_CLEAN, null);
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("http11processor.request.prepare") + " Unsupported transfer encoding [" +
-                        encodingName + "]");
+                log.debug(sm.getString("http11processor.request.unsupportedEncoding", encodingName));
             }
         }
     }
@@ -611,8 +609,7 @@ public class Http11Processor extends AbstractProcessor {
             response.setStatus(505);
             setErrorState(ErrorState.CLOSE_CLEAN, null);
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("http11processor.request.prepare") + " Unsupported HTTP version \"" +
-                        protocolMB + "\"");
+                log.debug(sm.getString("http11processor.request.unsupportedVersion", protocolMB));
             }
         }
     }
