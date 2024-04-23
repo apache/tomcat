@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.coyote.ActionCode;
 import org.apache.coyote.BadRequestException;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
@@ -167,6 +168,20 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
             }
             if (endChunk) {
                 parseEndChunk();
+                if (!request.isRequestThread()) {
+                    /*
+                     * Perform the dispatch back to the container for the onAllDataRead() event. For non-chunked input
+                     * this would be performed when isReady() is next called.
+                     *
+                     * Chunked input returns one chunk at a time for non-blocking reads. A consequence of this is that
+                     * reading the final chunk returns -1 which signals the end of stream. The application code reading
+                     * the request body probably won't call isReady() after receiving the -1 return value since it
+                     * already knows it is at end of stream. Therefore we trigger the dispatch back to the container
+                     * here which in turn ensures the onAllDataRead() event is fired.
+                     */
+                    request.action(ActionCode.DISPATCH_READ, null);
+                    request.action(ActionCode.DISPATCH_EXECUTE, null);
+                }
                 return -1;
             }
         }

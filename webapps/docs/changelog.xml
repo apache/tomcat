@@ -154,6 +154,11 @@
         failed. The wait time is now 100ms plus twice
         <code>socket.unlockTimeout</code>. (markt)
       </fix>
+      <fix>
+        Ensure that the <code>onAllDataRead()</code> event is triggered when the
+        request body uses chunked encoding and is read using non-blocking IO.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
