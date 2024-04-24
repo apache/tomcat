@@ -549,7 +549,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                         return new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
                     } else if ("ms".equals(nextToken)) {
                         return new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
-                    } else if ("fs".equals(nextToken)) {
+                    } else if ("fracsec".equals(nextToken)) {
                         return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS_FRACTIONAL);
                     } else {
                         return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS);

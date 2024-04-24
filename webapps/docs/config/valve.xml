@@ -339,7 +339,7 @@
         enhanced SimpleDateFormat pattern <code>xxx</code></li>
     <li><b><code>%{xxx}T</code></b> write time taken to process the request using unit <code>xxx</code>
         where valid units are <code>ns</code> for nanoseconds, <code>us</code> for microseconds,
-        <code>ms</code> for milliseconds, <code>fs</code> for fractional seconds, or <code>s</code> for whole seconds.
+        <code>ms</code> for milliseconds, <code>fracsec</code> for fractional seconds, or <code>s</code> for whole seconds.
         <code>%{s}T</code> is equivalent to <code>%T</code> as well
         as <code>%{us}T</code> is equivalent to <code>%D</code>.</li>
     </ul>
@@ -468,7 +468,7 @@
     <li><b>time</b> - Time the request was served in HH:mm:ss format for GMT</li>
     <li><b>time-taken</b> - Time (in seconds) taken to serve the request. Can also use the
       suffixes <code>-ns</code> for nanoseconds, <code>-us</code> for microseconds,
-      <code>-ms</code> for milliseconds, <code>-fs</code> for fractional seconds.</li>
+      <code>-ms</code> for milliseconds, <code>-fracsec</code> for fractional seconds.</li>
     <li><b>x-threadname</b> - Current request thread name (can compare later with stacktraces)</li>
     </ul>
 

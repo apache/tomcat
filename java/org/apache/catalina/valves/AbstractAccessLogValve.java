@@ -1782,7 +1782,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     return new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
                 } else if ("ms".equals(name)) {
                     return new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
-                } else if ("fs".equals(name)) {
+                } else if ("fracsec".equals(name)) {
                     return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS_FRACTIONAL);
                 } else {
                     return new ElapsedTimeElement(false, false);
