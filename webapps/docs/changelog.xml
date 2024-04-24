@@ -149,6 +149,14 @@
         <bug>68934</bug>: Add debug logging in the latch object when exceeding
         <code>maxConnections</code>. (remm)
       </fix>
+      <fix>
+        Refactor trailer field handling to use a <code>MimeHeaders</code>
+        instance to store trailer fields. (markt)
+      </fix>
+      <fix>
+        Ensure that multiple instances of the same trailer field are handled
+        correctly. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

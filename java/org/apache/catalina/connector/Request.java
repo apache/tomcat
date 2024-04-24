@@ -1839,8 +1839,8 @@ public class Request implements HttpServletRequest {
         if (!isTrailerFieldsReady()) {
             throw new IllegalStateException(sm.getString("coyoteRequest.trailersNotReady"));
         }
-        Map<String,String> result = new HashMap<>(coyoteRequest.getTrailerFields());
-        return result;
+        // No need for a defensive copy since a new Map is returned for every call.
+        return coyoteRequest.getTrailerFields();
     }
 
 

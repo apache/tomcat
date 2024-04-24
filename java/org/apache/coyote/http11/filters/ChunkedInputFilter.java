@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.coyote.ActionCode;
@@ -32,6 +31,7 @@ import org.apache.coyote.http11.Constants;
 import org.apache.coyote.http11.InputFilter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
+import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
@@ -467,7 +467,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
          * implementation wasn't viewed as practical.
          */
 
-        Map<String,String> headers = request.getTrailerFields();
+        MimeHeaders headers = request.getMimeTrailerFields();
 
         byte chr = 0;
 
@@ -629,7 +629,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
             String value = new String(trailingHeaders.getBytes(), colonPos,
                     lastSignificantChar - colonPos, StandardCharsets.ISO_8859_1);
 
-            headers.put(headerName, value);
+            headers.addValue(headerName).setString(value);
         }
 
         return true;

@@ -462,7 +462,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
                 if (headerState == HEADER_STATE_TRAILER) {
                     // HTTP/2 headers are already always lower case
-                    coyoteRequest.getTrailerFields().put(name, value);
+                    coyoteRequest.getMimeTrailerFields().addValue(name).setString(value);
                 } else {
                     coyoteRequest.getMimeHeaders().addValue(name).setString(value);
                 }
