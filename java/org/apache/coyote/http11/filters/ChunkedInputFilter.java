@@ -299,10 +299,6 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
     }
 
 
-    /**
-     * Return the name of the associated encoding; Here, the value is
-     * "identity".
-     */
     @Override
     public ByteChunk getEncodingName() {
         return ENCODING;
