@@ -37,6 +37,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
@@ -52,6 +53,7 @@ import org.apache.catalina.WebResource;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.DOMWriter;
 import org.apache.catalina.util.XMLWriter;
+import org.apache.tomcat.PeriodicEventListener;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.http.ConcurrentDateFormat;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
@@ -128,11 +130,9 @@ import org.xml.sax.SAXException;
  * access will be able to edit content available via http://host:port/context/content using
  * http://host:port/context/webdavedit/content
  *
- * @author Remy Maucherat
- *
  * @see <a href="https://tools.ietf.org/html/rfc4918">RFC 4918</a>
  */
-public class WebdavServlet extends DefaultServlet {
+public class WebdavServlet extends DefaultServlet implements PeriodicEventListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -268,6 +268,26 @@ public class WebdavServlet extends DefaultServlet {
 
         if (getServletConfig().getInitParameter("allowSpecialPaths") != null) {
             allowSpecialPaths = Boolean.parseBoolean(getServletConfig().getInitParameter("allowSpecialPaths"));
+        }
+    }
+
+
+    @Override
+    public void periodicEvent() {
+        // Check expiration of all locks
+        for (LockInfo currentLock : resourceLocks.values()) {
+            if (currentLock.hasExpired()) {
+                resourceLocks.remove(currentLock.path);
+                removeLockNull(currentLock.path);
+            }
+        }
+        Iterator<LockInfo> collectionLocksIterator = collectionLocks.iterator();
+        while (collectionLocksIterator.hasNext()) {
+            LockInfo currentLock = collectionLocksIterator.next();
+            if (currentLock.hasExpired()) {
+                collectionLocksIterator.remove();
+                removeLockNull(currentLock.path);
+            }
         }
     }
 
@@ -726,7 +746,7 @@ public class WebdavServlet extends DefaultServlet {
         if (resources.mkdir(path)) {
             resp.setStatus(WebdavStatus.SC_CREATED);
             // Removing any lock-null resource which would be present
-            lockNullResources.remove(path);
+            removeLockNull(path);
         } else {
             resp.sendError(WebdavStatus.SC_CONFLICT);
         }
@@ -786,7 +806,7 @@ public class WebdavServlet extends DefaultServlet {
         super.doPut(req, resp);
 
         // Removing any lock-null resource which would be present
-        lockNullResources.remove(path);
+        removeLockNull(path);
     }
 
 
@@ -1176,7 +1196,7 @@ public class WebdavServlet extends DefaultServlet {
                         int slash = lock.path.lastIndexOf('/');
                         String parentPath = lock.path.substring(0, slash);
 
-                        lockNullResources.computeIfAbsent(parentPath, k -> new ArrayList<>()).add(lock.path);
+                        lockNullResources.computeIfAbsent(parentPath, k -> new CopyOnWriteArrayList<>()).add(lock.path);
                     }
 
                     // Add the Lock-Token header as by RFC 2518 8.10.1
@@ -1286,7 +1306,7 @@ public class WebdavServlet extends DefaultServlet {
             if (lock.tokens.isEmpty()) {
                 resourceLocks.remove(path);
                 // Removing any lock-null resource which would be present
-                lockNullResources.remove(path);
+                removeLockNull(path);
             }
 
         }
@@ -1307,7 +1327,7 @@ public class WebdavServlet extends DefaultServlet {
                 if (lock.tokens.isEmpty()) {
                     collectionLocksList.remove();
                     // Removing any lock-null resource which would be present
-                    lockNullResources.remove(path);
+                    removeLockNull(path);
                 }
             }
         }
@@ -1551,7 +1571,7 @@ public class WebdavServlet extends DefaultServlet {
 
         // Removing any lock-null resource which would be present at
         // the destination path
-        lockNullResources.remove(destinationPath);
+        removeLockNull(destinationPath);
 
         return true;
     }
@@ -2192,6 +2212,21 @@ public class WebdavServlet extends DefaultServlet {
         }
 
         return methodsAllowed.toString();
+    }
+
+
+    private void removeLockNull(String path) {
+        int slash = path.lastIndexOf('/');
+        if (slash >= 0) {
+            String parentPath = path.substring(0, slash);
+            List<String> paths = lockNullResources.get(parentPath);
+            if (paths != null) {
+                paths.remove(path);
+            }
+            if (paths.isEmpty()) {
+                lockNullResources.remove(parentPath);
+            }
+        }
     }
 
 

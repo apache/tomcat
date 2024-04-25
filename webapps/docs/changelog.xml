@@ -135,6 +135,13 @@
         dispatch is now performed rather than completing the request using the
         error page mechanism. (markt)
       </fix>
+      <fix>
+        Fix WebDAV lock null (locks for non existing resources) thread safety
+        and removal. (remm)
+      </fix>
+      <fix>
+        Add periodic checking for WebDAV locks expiration. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
