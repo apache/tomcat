@@ -2222,9 +2222,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             List<String> paths = lockNullResources.get(parentPath);
             if (paths != null) {
                 paths.remove(path);
-            }
-            if (paths.isEmpty()) {
-                lockNullResources.remove(parentPath);
+                if (paths.isEmpty()) {
+                    lockNullResources.remove(parentPath);
+                }
             }
         }
     }
