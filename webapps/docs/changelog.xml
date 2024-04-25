@@ -137,6 +137,13 @@
         Re-factor ElapsedTimeElement in AbstractAccessLogValve to use a customizable
         style. (schultz)
       </add>
+      <fix>
+        Fix WebDAV lock null (locks for non existing resources) thread safety
+        and removal. (remm)
+      </fix>
+      <fix>
+        Add periodic checking for WebDAV locks expiration. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
