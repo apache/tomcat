@@ -737,7 +737,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
                 public void run() {
                     if (delayAsyncThread) {
                         // Makes the difference between calling complete before
-                        // the request body is received of after.
+                        // the request body is received or after.
                         try {
                             Thread.sleep(1500);
                         } catch (InterruptedException e) {
