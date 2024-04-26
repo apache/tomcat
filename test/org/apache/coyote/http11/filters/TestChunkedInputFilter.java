@@ -697,7 +697,11 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         client.setRequest(request);
         client.connect();
-        client.processRequest();
+        try {
+            client.processRequest();
+        } catch (IOException ioe) {
+            // Ignore - Triggered by connection being dropped after error
+        }
         // NIO2 may (will?) return null here
         String responseLine = client.getResponseLine();
         if (responseLine == null) {
