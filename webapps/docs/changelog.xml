@@ -164,6 +164,9 @@
         Ensure that multiple instances of the same trailer field are handled
         correctly. (markt)
       </fix>
+      <fix>
+        Fix non-blocking reads of chunked request bodies. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
