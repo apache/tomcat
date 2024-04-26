@@ -1316,6 +1316,19 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     buf.append(Long.toString(TimeUnit.NANOSECONDS.toSeconds(time)));
                 }
             },
+            SECONDS_FRACTIONAL {
+                @Override
+                public void append(CharArrayWriter buf, long time) {
+                    time = time / 1000000; // Convert to millis
+                    buf.append(Long.toString(time / 1000));
+                    buf.append('.');
+                    int remains = (int) (time % 1000);
+                    buf.append(Long.toString(remains / 100));
+                    remains = remains % 100;
+                    buf.append(Long.toString(remains / 10));
+                    buf.append(Long.toString(remains % 10));
+                }
+            },
             MILLISECONDS {
                 @Override
                 public void append(CharArrayWriter buf, long time) {
@@ -1327,6 +1340,12 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 public void append(CharArrayWriter buf, long time) {
                     buf.append(Long.toString(TimeUnit.NANOSECONDS.toMicros(time)));
                 }
+            },
+            NANOSECONDS {
+                @Override
+                public void append(CharArrayWriter buf, long time) {
+                    buf.append(Long.toString(time));
+                }
             };
 
             /**
@@ -1337,10 +1356,11 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
              */
             public abstract void append(CharArrayWriter buf, long time);
         }
+
         private final Style style;
 
         /**
-         * Create a new ElapsedTimeElement that will log the time in the specified style.
+         * Creates a new ElapsedTimeElement that will log the time in the specified style.
          *
          * @param style The elapsed-time style to use.
          */
@@ -1760,10 +1780,14 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 return new DateAndTimeElement(name);
             case 'T':
                 // ms for milliseconds, us for microseconds, and s for seconds
-                if ("ms".equals(name)) {
-                    return new ElapsedTimeElement(false, true);
+                if ("ns".equals(name)) {
+                    return new ElapsedTimeElement(ElapsedTimeElement.Style.NANOSECONDS);
                 } else if ("us".equals(name)) {
-                    return new ElapsedTimeElement(true, false);
+                    return new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
+                } else if ("ms".equals(name)) {
+                    return new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
+                } else if ("fracsec".equals(name)) {
+                    return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS_FRACTIONAL);
                 } else {
                     return new ElapsedTimeElement(false, false);
                 }
