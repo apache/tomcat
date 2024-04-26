@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.StringUtils;
@@ -164,6 +165,21 @@ public class MimeHeaders {
             result.merge(name, value, StringUtils::join);
         }
         return result;
+    }
+
+
+    public void filter(Set<String> allowedHeaders) {
+        int j = -1;
+        for (int i = 0; i < count; i++) {
+            String name = headers[i].getName().toStringType();
+            if (allowedHeaders.contains(name)) {
+                ++j;
+                if (j != i) {
+                    headers[j] = headers[i];
+                }
+            }
+        }
+        count = ++j;
     }
 
 
