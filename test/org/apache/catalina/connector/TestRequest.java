@@ -868,7 +868,7 @@ public class TestRequest extends TomcatBaseTest {
 
 
     @Test
-    public void testGetReaderInvalidEbcoding() throws Exception {
+    public void testGetReaderInvalidEncoding() throws Exception {
         doTestGetReader("X-Invalid", false);
     }
 

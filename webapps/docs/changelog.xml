@@ -142,6 +142,13 @@
         Allow timescales to apply to "time-taken" token in ExtendedAccessLogValve.
         (schultz)
       </add>
+      <fix>
+        Fix WebDAV lock null (locks for non existing resources) thread safety
+        and removal. (remm)
+      </fix>
+      <fix>
+        Add periodic checking for WebDAV locks expiration. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -153,6 +160,40 @@
         Align non-secure and secure writes with NIO and skip the write attempt
         when there are no bytes to be written. (markt)
       </fix>
+      <fix>
+        Allow any positive value for <code>socket.unlockTimeout</code>. If a
+        negative or zero value is configured, the default of <code>250ms</code>
+        will be used. (mark)
+      </fix>
+      <fix>
+        Reduce the time spent waiting for the connector to unlock. The previous
+        default of 10s was noticeably too long for cases where the unlock has
+        failed. The wait time is now 100ms plus twice
+        <code>socket.unlockTimeout</code>. (markt)
+      </fix>
+      <fix>
+        Ensure that the <code>onAllDataRead()</code> event is triggered when the
+        request body uses chunked encoding and is read using non-blocking IO.
+        (markt)
+      </fix>
+      <fix>
+        <bug>68934</bug>: Add debug logging in the latch object when exceeding
+        <code>maxConnections</code>. (remm)
+      </fix>
+      <fix>
+        Refactor trailer field handling to use a <code>MimeHeaders</code>
+        instance to store trailer fields. (markt)
+      </fix>
+      <fix>
+        Ensure that multiple instances of the same trailer field are handled
+        correctly. (markt)
+      </fix>
+      <fix>
+        Fix non-blocking reads of chunked request bodies. (markt)
+      </fix>
+      <scode>
+        Refactor HTTP header parsing to use common parsing code. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -165,7 +206,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 11.0.0-M19 (remm)" rtext="release in progress">
+<section name="Tomcat 11.0.0-M19 (remm)" rtext="2024-04-16">
   <subsection name="Catalina">
     <changelog>
       <update>

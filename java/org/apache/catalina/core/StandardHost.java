@@ -291,18 +291,12 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
 
-    /**
-     * ({@inheritDoc}
-     */
     @Override
     public String getXmlBase() {
         return this.xmlBase;
     }
 
 
-    /**
-     * ({@inheritDoc}
-     */
     @Override
     public void setXmlBase(String xmlBase) {
         String oldXmlBase = this.xmlBase;
@@ -311,9 +305,6 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
 
-    /**
-     * ({@inheritDoc}
-     */
     @Override
     public File getConfigBaseFile() {
         if (hostConfigBase != null) {
@@ -347,27 +338,24 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * @return <code>true</code> if the Host will attempt to create directories for appBase and xmlBase unless they
-     *             already exist.
+     * {@inheritDoc}
+     * <p>
+     * The default value for this implementation is {@code true}.
      */
     @Override
     public boolean getCreateDirs() {
         return createDirs;
     }
 
-    /**
-     * Set to <code>true</code> if the Host should attempt to create directories for xmlBase and appBase upon startup
-     *
-     * @param createDirs the new flag value
-     */
     @Override
     public void setCreateDirs(boolean createDirs) {
         this.createDirs = createDirs;
     }
 
     /**
-     * @return the value of the auto deploy flag. If true, it indicates that this host's child webapps will be
-     *             dynamically deployed.
+     * {@inheritDoc}
+     * <p>
+     * The default value for this implementation is {@code true}.
      */
     @Override
     public boolean getAutoDeploy() {
@@ -375,11 +363,6 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
 
-    /**
-     * Set the auto deploy flag value for this host.
-     *
-     * @param autoDeploy The new auto deploy flag
-     */
     @Override
     public void setAutoDeploy(boolean autoDeploy) {
 
@@ -390,20 +373,12 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
 
-    /**
-     * @return the Java class name of the context configuration class for new web applications.
-     */
     @Override
     public String getConfigClass() {
         return this.configClass;
     }
 
 
-    /**
-     * Set the Java class name of the context configuration class for new web applications.
-     *
-     * @param configClass The new context configuration class
-     */
     @Override
     public void setConfigClass(String configClass) {
 
@@ -437,8 +412,9 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * @return the value of the deploy on startup flag. If <code>true</code>, it indicates that this host's child
-     *             webapps should be discovered and automatically deployed at startup time.
+     * {@inheritDoc}
+     * <p>
+     * The default value for this implementation is {@code true}.
      */
     @Override
     public boolean getDeployOnStartup() {
@@ -446,11 +422,6 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
 
-    /**
-     * Set the deploy on startup flag value for this host.
-     *
-     * @param deployOnStartup The new deploy on startup flag
-     */
     @Override
     public void setDeployOnStartup(boolean deployOnStartup) {
 
@@ -519,22 +490,12 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
 
-    /**
-     * @return the canonical, fully qualified, name of the virtual host this Container represents.
-     */
     @Override
     public String getName() {
         return name;
     }
 
 
-    /**
-     * Set the canonical, fully qualified, name of the virtual host this Container represents.
-     *
-     * @param name Virtual host name
-     *
-     * @exception IllegalArgumentException if name is null
-     */
     @Override
     public void setName(String name) {
 
@@ -587,10 +548,6 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
 
-    /**
-     * @return the regular expression that defines the files and directories in the host's {@link #getAppBase} that will
-     *             be ignored by the automatic deployment process.
-     */
     @Override
     public String getDeployIgnore() {
         if (deployIgnore == null) {
@@ -600,22 +557,12 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
 
-    /**
-     * @return the compiled regular expression that defines the files and directories in the host's {@link #getAppBase}
-     *             that will be ignored by the automatic deployment process.
-     */
     @Override
     public Pattern getDeployIgnorePattern() {
         return this.deployIgnore;
     }
 
 
-    /**
-     * Set the regular expression that defines the files and directories in the host's {@link #getAppBase} that will be
-     * ignored by the automatic deployment process.
-     *
-     * @param deployIgnore the regexp
-     */
     @Override
     public void setDeployIgnore(String deployIgnore) {
         String oldDeployIgnore;
@@ -658,11 +605,6 @@ public class StandardHost extends ContainerBase implements Host {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Add an alias name that should be mapped to this same Host.
-     *
-     * @param alias The alias to be added
-     */
     @Override
     public void addAlias(String alias) {
 
@@ -687,9 +629,9 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Add a child Container, only if the proposed child is an implementation of Context.
-     *
-     * @param child Child container to be added
+     * {@inheritDoc}
+     * <p>
+     * The child must be an implementation of <code>Context</code>.
      */
     @Override
     public void addChild(Container child) {
@@ -756,9 +698,6 @@ public class StandardHost extends ContainerBase implements Host {
         return result.toArray(new String[0]);
     }
 
-    /**
-     * @return the set of alias names for this Host. If none are defined, a zero length array is returned.
-     */
     @Override
     public String[] findAliases() {
         synchronized (aliasesLock) {
@@ -767,11 +706,6 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
 
-    /**
-     * Remove the specified alias name from the aliases for this Host.
-     *
-     * @param alias Alias name to be removed
-     */
     @Override
     public void removeAlias(String alias) {
 
@@ -809,13 +743,6 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
 
-    /**
-     * Start this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
     @Override
     protected void startInternal() throws LifecycleException {
 

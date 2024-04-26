@@ -798,8 +798,11 @@
         be used for all three.</p>
       </attribute>
       <attribute name="socket.unlockTimeout" required="false">
-        <p>(int) The timeout for a socket unlock. When a connector is stopped, it will try to release the acceptor thread by opening a connector to itself.
-           The default value is <code>250</code> and the value is in milliseconds</p>
+        <p>(int) The timeout for a socket unlock. When a connector is stopped,
+        it will try to release the acceptor thread by opening a connector to
+        itself. The default value is <code>250</code> and the value is in
+        milliseconds. This vaoue must be positive. Negative or zero values will
+        be ignored.</p>
       </attribute>
     </attributes>
   </subsection>

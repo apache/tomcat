@@ -34,6 +34,11 @@ public final class StringUtils {
     }
 
 
+    public static String join(String a, String b) {
+        return join(new String[] { a, b });
+    }
+
+
     public static String join(String[] array) {
         if (array == null) {
             return EMPTY_STRING;

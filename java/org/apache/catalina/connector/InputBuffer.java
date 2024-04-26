@@ -243,7 +243,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("inputBuffer.requiresNonBlocking"));
             }
-            return false;
+            return true;
         }
         if (isFinished()) {
             // If this is a non-container thread, need to trigger a read

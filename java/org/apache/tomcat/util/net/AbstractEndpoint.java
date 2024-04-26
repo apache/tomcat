@@ -1285,28 +1285,21 @@ public abstract class AbstractEndpoint<S,U> {
             unlockAddress = getUnlockAddress(localAddress);
 
             try (java.net.Socket s = new java.net.Socket()) {
-                int stmo = 2 * 1000;
-                int utmo = 2 * 1000;
-                if (getSocketProperties().getSoTimeout() > stmo) {
-                    stmo = getSocketProperties().getSoTimeout();
-                }
-                if (getSocketProperties().getUnlockTimeout() > utmo) {
-                    utmo = getSocketProperties().getUnlockTimeout();
-                }
-                s.setSoTimeout(stmo);
+                // Never going to read from this socket so the timeout doesn't matter. Use the unlock timeout.
+                s.setSoTimeout(getSocketProperties().getUnlockTimeout());
                 // Newer MacOS versions (e.g. Ventura 13.2) appear to linger for ~1s on close when linger is disabled.
-                // That causes delays when running the unit tests. Explicitly enableing linger but with a timeout of
+                // That causes delays when running the unit tests. Explicitly enabling linger but with a timeout of
                 // zero seconds seems to fix the issue.
                 s.setSoLinger(true, 0);
                 if (getLog().isTraceEnabled()) {
                     getLog().trace("About to unlock socket for:" + unlockAddress);
                 }
-                s.connect(unlockAddress,utmo);
+                s.connect(unlockAddress, getSocketProperties().getUnlockTimeout());
                 if (getLog().isTraceEnabled()) {
                     getLog().trace("Socket unlock completed for:" + unlockAddress);
                 }
             }
-            // Wait for up to 1000ms acceptor threads to unlock. Particularly
+            // Wait for up to 1000ms for acceptor thread to unlock. Particularly
             // for the unit tests, we want to exit this loop as quickly as
             // possible. However, we also don't want to trigger excessive CPU
             // usage if the unlock takes longer than expected. Therefore, we
@@ -1668,7 +1661,7 @@ public abstract class AbstractEndpoint<S,U> {
     public final void closeServerSocketGraceful() {
         if (bindState == BindState.BOUND_ON_START) {
             // Stop accepting new connections
-            acceptor.stop(-1);
+            acceptor.stopMillis(-1);
             // Release locks that may be preventing the acceptor from stopping
             releaseConnectionLatch();
             unlockAccept();
