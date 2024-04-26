@@ -137,6 +137,11 @@
         Re-factor ElapsedTimeElement in AbstractAccessLogValve to use a customizable
         style. (schultz)
       </add>
+      <add>
+        Add more timescale options to AccessLogValve and ExtendedAccessLogValve.
+        Allow timescales to apply to "time-taken" token in ExtendedAccessLogValve.
+        (schultz)
+      </add>
       <fix>
         Fix WebDAV lock null (locks for non existing resources) thread safety
         and removal. (remm)
