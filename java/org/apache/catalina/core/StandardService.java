@@ -173,40 +173,24 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     }
 
 
-    /**
-     * Return the name of this Service.
-     */
     @Override
     public String getName() {
         return name;
     }
 
 
-    /**
-     * Set the name of this Service.
-     *
-     * @param name The new service name
-     */
     @Override
     public void setName(String name) {
         this.name = name;
     }
 
 
-    /**
-     * Return the <code>Server</code> with which we are associated (if any).
-     */
     @Override
     public Server getServer() {
         return this.server;
     }
 
 
-    /**
-     * Set the <code>Server</code> with which we are associated (if any).
-     *
-     * @param server The server that owns this Service
-     */
     @Override
     public void setServer(Server server) {
         this.server = server;
@@ -215,11 +199,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Add a new Connector to the set of defined Connectors, and associate it with this Service's Container.
-     *
-     * @param connector The Connector to be added
-     */
     @Override
     public void addConnector(Connector connector) {
 
@@ -273,9 +252,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     }
 
 
-    /**
-     * Find and return the set of Connectors associated with this Service.
-     */
     @Override
     public Connector[] findConnectors() {
         Lock readLock = connectorsLock.readLock();
@@ -289,12 +265,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     }
 
 
-    /**
-     * Remove the specified Connector from the set associated from this Service. The removed Connector will also be
-     * disassociated from our Container.
-     *
-     * @param connector The Connector to be removed
-     */
     @Override
     public void removeConnector(Connector connector) {
 
@@ -348,9 +318,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     }
 
 
-    /**
-     * Return a String representation of this component.
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("StandardService[");
@@ -360,11 +327,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     }
 
 
-    /**
-     * Adds a named executor to the service
-     *
-     * @param ex Executor
-     */
     @Override
     public void addExecutor(Executor ex) {
         boolean added = false;
@@ -387,11 +349,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     }
 
 
-    /**
-     * Retrieves all executors
-     *
-     * @return Executor[]
-     */
     @Override
     public Executor[] findExecutors() {
         executorsLock.readLock().lock();
@@ -403,13 +360,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     }
 
 
-    /**
-     * Retrieves executor by name, null if not found
-     *
-     * @param executorName String
-     *
-     * @return Executor
-     */
     @Override
     public Executor getExecutor(String executorName) {
         executorsLock.readLock().lock();
@@ -426,11 +376,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     }
 
 
-    /**
-     * Removes an executor from the service
-     *
-     * @param ex Executor
-     */
     @Override
     public void removeExecutor(Executor ex) {
         boolean removed = false;
@@ -552,6 +497,8 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     /**
      * Invoke a pre-startup initialization. This is used to allow connectors to bind to restricted ports under Unix
      * operating environments.
+     *
+     * @exception LifecycleException if this component detects a fatal error that needs to be reported
      */
     @Override
     protected void initInternal() throws LifecycleException {
@@ -602,9 +549,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     }
 
 
-    /**
-     * Return the parent class loader for this component.
-     */
     @Override
     public ClassLoader getParentClassLoader() {
         if (parentClassLoader != null) {
@@ -617,11 +561,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     }
 
 
-    /**
-     * Set the parent class loader for this server.
-     *
-     * @param parent The new parent class loader
-     */
     @Override
     public void setParentClassLoader(ClassLoader parent) {
         ClassLoader oldParentClassLoader = this.parentClassLoader;
