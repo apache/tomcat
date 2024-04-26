@@ -186,6 +186,9 @@
       <fix>
         Fix non-blocking reads of chunked request bodies. (markt)
       </fix>
+      <scode>
+        Refactor HTTP header parsing to use common parsing code. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Other">
