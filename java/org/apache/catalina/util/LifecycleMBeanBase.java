@@ -42,11 +42,6 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
     @Deprecated
     protected MBeanServer mserver = null;
 
-    /**
-     * Sub-classes wishing to perform additional initialization should override
-     * this method, ensuring that super.initInternal() is the first call in the
-     * overriding method.
-     */
     @Override
     protected void initInternal() throws LifecycleException {
         // If oname is not null then registration has already happened via
@@ -59,32 +54,18 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
     }
 
 
-    /**
-     * Sub-classes wishing to perform additional clean-up should override this
-     * method, ensuring that super.destroyInternal() is the last call in the
-     * overriding method.
-     */
     @Override
     protected void destroyInternal() throws LifecycleException {
         unregister(oname);
     }
 
 
-    /**
-     * Specify the domain under which this component should be registered. Used
-     * with components that cannot (easily) navigate the component hierarchy to
-     * determine the correct domain to use.
-     */
     @Override
     public final void setDomain(String domain) {
         this.domain = domain;
     }
 
 
-    /**
-     * Obtain the domain under which this component will be / has been
-     * registered.
-     */
     @Override
     public final String getDomain() {
         if (domain == null) {
@@ -108,9 +89,6 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
     protected abstract String getDomainInternal();
 
 
-    /**
-     * Obtain the name under which this component has been registered with JMX.
-     */
     @Override
     public final ObjectName getObjectName() {
         return oname;
@@ -223,10 +201,6 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
     }
 
 
-    /**
-     * Allows the object to be registered with an alternative
-     * {@link MBeanServer} and/or {@link ObjectName}.
-     */
     @Override
     public final ObjectName preRegister(MBeanServer server, ObjectName name)
             throws Exception {

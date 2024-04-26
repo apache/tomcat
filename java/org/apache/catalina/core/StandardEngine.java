@@ -98,11 +98,6 @@ public class StandardEngine extends ContainerBase implements Engine {
 
     // ------------------------------------------------------------- Properties
 
-    /**
-     * Obtain the configured Realm and provide a default Realm implementation when no explicit configuration is set.
-     *
-     * @return configured realm, or a {@link NullRealm} by default
-     */
     @Override
     public Realm getRealm() {
         Realm configured = super.getRealm();
@@ -116,20 +111,12 @@ public class StandardEngine extends ContainerBase implements Engine {
     }
 
 
-    /**
-     * Return the default host.
-     */
     @Override
     public String getDefaultHost() {
         return defaultHost;
     }
 
 
-    /**
-     * Set the default host.
-     *
-     * @param host The new default host
-     */
     @Override
     public void setDefaultHost(String host) {
 
@@ -147,41 +134,24 @@ public class StandardEngine extends ContainerBase implements Engine {
     }
 
 
-    /**
-     * Set the cluster-wide unique identifier for this Engine. This value is only useful in a load-balancing scenario.
-     * <p>
-     * This property should not be changed once it is set.
-     */
     @Override
     public void setJvmRoute(String routeId) {
         jvmRouteId = routeId;
     }
 
 
-    /**
-     * Retrieve the cluster-wide unique identifier for this Engine. This value is only useful in a load-balancing
-     * scenario.
-     */
     @Override
     public String getJvmRoute() {
         return jvmRouteId;
     }
 
 
-    /**
-     * Return the <code>Service</code> with which we are associated (if any).
-     */
     @Override
     public Service getService() {
         return this.service;
     }
 
 
-    /**
-     * Set the <code>Service</code> with which we are associated (if any).
-     *
-     * @param service The service that owns this Engine
-     */
     @Override
     public void setService(Service service) {
         this.service = service;
@@ -191,9 +161,9 @@ public class StandardEngine extends ContainerBase implements Engine {
 
 
     /**
-     * Add a child Container, only if the proposed child is an implementation of Host.
-     *
-     * @param child Child container to be added
+     * {@inheritDoc}
+     * <p>
+     * The child must be an implementation of <code>Host</code>.
      */
     @Override
     public void addChild(Container child) {
@@ -229,13 +199,6 @@ public class StandardEngine extends ContainerBase implements Engine {
     }
 
 
-    /**
-     * Start this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
     @Override
     protected void startInternal() throws LifecycleException {
 
@@ -250,6 +213,8 @@ public class StandardEngine extends ContainerBase implements Engine {
 
 
     /**
+     * {@inheritDoc}
+     * <p>
      * Override the default implementation. If no access log is defined for the Engine, look for one in the Engine's
      * default host and then the default host's ROOT context. If still none is found, return the default NoOp access
      * log.
@@ -308,9 +273,6 @@ public class StandardEngine extends ContainerBase implements Engine {
     }
 
 
-    /**
-     * Return the parent class loader for this component.
-     */
     @Override
     public ClassLoader getParentClassLoader() {
         if (parentClassLoader != null) {
