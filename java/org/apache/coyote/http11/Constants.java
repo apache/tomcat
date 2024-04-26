@@ -71,45 +71,9 @@ public final class Constants {
 
 
     /**
-     * 'A'.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 11.
-     */
-    @Deprecated
-    public static final byte A = (byte) 'A';
-
-
-    /**
-     * 'a'.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 11.
-     */
-    @Deprecated
-    public static final byte a = (byte) 'a';
-
-
-    /**
-     * 'Z'.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 11.
-     */
-    @Deprecated
-    public static final byte Z = (byte) 'Z';
-
-
-    /**
      * '?'.
      */
     public static final byte QUESTION = (byte) '?';
-
-
-    /**
-     * Lower case offset.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 11.
-     */
-    @Deprecated
-    public static final byte LC_OFFSET = A - a;
 
 
     /* Various constant "strings" */
