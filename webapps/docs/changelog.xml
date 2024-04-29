@@ -214,6 +214,9 @@
       <update>
         Update JaCoCo to 0.8.12. (markt)
       </update>
+      <update>
+        Update SpotBugs to 4.8.4. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
