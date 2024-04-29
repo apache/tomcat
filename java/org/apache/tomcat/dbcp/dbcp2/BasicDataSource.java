@@ -727,8 +727,9 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Gets the underlying connection pool.
      *
      * @return the underlying connection pool.
+     * @since DBCP 2.10.0
      */
-    protected GenericObjectPool<PoolableConnection> getConnectionPool() {
+    public GenericObjectPool<PoolableConnection> getConnectionPool() {
         return connectionPool;
     }
 
