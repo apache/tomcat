@@ -226,6 +226,9 @@
       <update>
         Update Checkstyle to 10.16.0. (markt)
       </update>
+      <update>
+        Update JaCoCo to 0.8.12. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
