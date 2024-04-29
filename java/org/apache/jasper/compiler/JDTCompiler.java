@@ -423,8 +423,8 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 settings.put(CompilerOptions.OPTION_TargetPlatform, "22");
                 settings.put(CompilerOptions.OPTION_Compliance, "22");
             } else if (opt.equals("23")) {
-                // Constant not available in latest ECJ version shipped with
-                // Tomcat. May be supported in a snapshot build.
+                // Constant not available in latest ECJ version that runs on
+                // Java 11.
                 // This is checked against the actual version below.
                 settings.put(CompilerOptions.OPTION_TargetPlatform, "23");
                 settings.put(CompilerOptions.OPTION_Compliance, "23");
