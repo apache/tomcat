@@ -218,7 +218,10 @@
         Update to the Eclipse JDT compiler 4.31. (markt)
       </update>
       <update>
-        Update NSIS to 3.10. (markt)
+        Update NSIS to 3.10. (mark0t)
+      </update>
+      <update>
+        Update UnboundID to 7.0.0. (markt)
       </update>
     </changelog>
   </subsection>
