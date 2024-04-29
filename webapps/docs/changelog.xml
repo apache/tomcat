@@ -203,6 +203,9 @@
         rather than the version provided by Commons Codec. This removes the
         internal fork of Commons Codec. (markt)
       </update>
+      <update>
+        Update to the Eclipse JDT compiler 4.31. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
