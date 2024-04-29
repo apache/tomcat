@@ -217,6 +217,9 @@
       <update>
         Update SpotBugs to 4.8.4. (markt)
       </update>
+      <update>
+        Update the internal fork of Apache Commons BCEL to 6.9.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
