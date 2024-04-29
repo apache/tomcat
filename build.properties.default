@@ -176,10 +176,10 @@ tomcat-native.win.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-nativ
 tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-openssl-${tomcat-native-openssl.version}-win32-bin.zip
 
 # ----- NSIS, version 3.0 or later -----
-nsis.version=3.09
+nsis.version=3.10
 nsis.checksum.enabled=true
 nsis.checksum.algorithm=MD5|SHA-1
-nsis.checksum.value=2953f6074bcc4711b439a666eafbb91b|586855a743a6e0ade203d8758af303a48ee0716b
+nsis.checksum.value=e3e2803a13ead75e4471a51069d04c20|22cf776b463c6c845444328341219167abf399dc
 nsis.home=${base.path}/nsis-${nsis.version}
 nsis.exe=${nsis.home}/makensis.exe
 nsis.arch.dir=x86-unicode/
