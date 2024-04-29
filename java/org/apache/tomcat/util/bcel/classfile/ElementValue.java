@@ -60,6 +60,7 @@ public abstract class ElementValue {
     public static final byte PRIMITIVE_LONG = 'J';
     public static final byte PRIMITIVE_SHORT = 'S';
     public static final byte PRIMITIVE_BOOLEAN = 'Z';
+    static final ElementValue[] EMPTY_ARRAY = {};
 
     /**
      * Reads an {@code element_value} as an {@code ElementValue}.
