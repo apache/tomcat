@@ -253,10 +253,10 @@ unboundid.jar=${unboundid.home}/unboundid-ldapsdk-${unboundid.version}.jar
 unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.version}/unboundid-ldapsdk-${unboundid.version}.jar
 
 # ----- Checkstyle, version 6.16 or later -----
-checkstyle.version=10.14.1
+checkstyle.version=10.16.0
 checkstyle.checksum.enabled=true
 checkstyle.checksum.algorithm=SHA-512
-checkstyle.checksum.value=59c734883c7770429ef5f977f4139724da86caa932fb365a186e1bf47b5a6e04c718c1dba8ed383c0979a594586c608af1aa30bbec6f4c444c08c3009473e245
+checkstyle.checksum.value=a5bc5d725ddb3125c602385221f15c085d6f5244e36d5dc8b661f7adfa864c7bfcf0c68444632e75669a94d79fdf54173d38908b9f4612eb748619cb3d256142
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
