@@ -13,7 +13,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 package org.apache.tomcat.dbcp.dbcp2;
 
@@ -115,7 +114,7 @@ public final class Utils {
      * @param exceptionHandler Consumes exception thrown closing this resource.
      * @since 2.10.0
      */
-    public static void close(AutoCloseable autoCloseable, final Consumer<Exception> exceptionHandler) {
+    public static void close(final AutoCloseable autoCloseable, final Consumer<Exception> exceptionHandler) {
         if (autoCloseable != null) {
             try {
                 autoCloseable.close();
