@@ -447,19 +447,19 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
      * a "genuine" {@link Statement}.
      * </p>
      *
-     * @return The innermost delegate.
+     * @return The innermost delegate, may return null.
      *
      * @see #getDelegate
      */
     public Statement getInnermostDelegate() {
-        Statement s = statement;
-        while (s instanceof DelegatingStatement) {
-            s = ((DelegatingStatement) s).getDelegate();
-            if (this == s) {
+        Statement stmt = statement;
+        while (stmt instanceof DelegatingStatement) {
+            stmt = ((DelegatingStatement) stmt).getDelegate();
+            if (this == stmt) {
                 return null;
             }
         }
-        return s;
+        return stmt;
     }
 
     /**

@@ -458,7 +458,7 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
             final String name = dataSourceJmxObjectName.toString() + Constants.JMX_CONNECTION_BASE_EXT + connIndex;
             try {
                 connJmxName = new ObjectName(name);
-            } catch (MalformedObjectNameException e) {
+            } catch (final MalformedObjectNameException e) {
                 Utils.closeQuietly((AutoCloseable) conn);
                 throw new SQLException(name, e);
             }
