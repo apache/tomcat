@@ -202,6 +202,9 @@
         Commons Codec has been deprecated and will be removed in Tomcat 11.
         (markt)
       </update>
+      <update>
+        Update NSIS to 3.10. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
@@ -1089,7 +1092,7 @@
         Contributed by Michal Sobkiewicz. (schultz)
       </fix>
       <update>
-        Update NSIS to 3.0.9. (markt)
+        Update NSIS to 3.09. (markt)
       </update>
       <update>
         Update Checkstyle to 10.12.2. (markt)
