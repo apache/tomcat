@@ -304,26 +304,22 @@ final class CPDSConnectionFactory
     }
 
     @Override
-    public synchronized PooledObject<PooledConnectionAndInfo> makeObject() {
-        try {
-            PooledConnection pc = null;
-            if (userPassKey.getUserName() == null) {
-                pc = cpds.getPooledConnection();
-            } else {
-                pc = cpds.getPooledConnection(userPassKey.getUserName(), userPassKey.getPassword());
-            }
-            if (pc == null) {
-                throw new IllegalStateException("Connection pool data source returned null from getPooledConnection");
-            }
-            // should we add this object as a listener or the pool.
-            // consider the validateObject method in decision
-            pc.addConnectionEventListener(this);
-            final PooledConnectionAndInfo pci = new PooledConnectionAndInfo(pc, userPassKey);
-            pcMap.put(pc, pci);
-            return new DefaultPooledObject<>(pci);
-        } catch (final SQLException e) {
-            throw new RuntimeException(e.getMessage());
+    public synchronized PooledObject<PooledConnectionAndInfo> makeObject() throws SQLException {
+        PooledConnection pc = null;
+        if (userPassKey.getUserName() == null) {
+            pc = cpds.getPooledConnection();
+        } else {
+            pc = cpds.getPooledConnection(userPassKey.getUserName(), userPassKey.getPassword());
         }
+        if (pc == null) {
+            throw new IllegalStateException("Connection pool data source returned null from getPooledConnection");
+        }
+        // should we add this object as a listener or the pool.
+        // consider the validateObject method in decision
+        pc.addConnectionEventListener(this);
+        final PooledConnectionAndInfo pci = new PooledConnectionAndInfo(pc, userPassKey);
+        pcMap.put(pc, pci);
+        return new DefaultPooledObject<>(pci);
     }
 
     @Override

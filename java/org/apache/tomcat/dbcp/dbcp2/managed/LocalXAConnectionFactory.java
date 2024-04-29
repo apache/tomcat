@@ -60,7 +60,7 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
         private boolean originalAutoCommit; // @GuardedBy("this")
 
         /**
-         * Construct a new instance for a given connection.
+         * Constructs a new instance for a given connection.
          *
          * @param localTransaction A connection.
          */
@@ -266,7 +266,7 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
         }
 
         /**
-         * Signals that a the connection has been enrolled in a transaction. This method saves off the current auto
+         * Signals that a connection has been enrolled in a transaction. This method saves off the current auto
          * commit flag, and then disables auto commit. The original auto commit setting is restored when the transaction
          * completes.
          *
@@ -288,7 +288,7 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
                     throw new XAException("Already enlisted in another transaction with xid " + xid);
                 }
 
-                // save off the current auto commit flag so it can be restored after the transaction completes
+                // save off the current auto commit flag, so it can be restored after the transaction completes
                 try {
                     originalAutoCommit = connection.getAutoCommit();
                 } catch (final SQLException ignored) {
@@ -362,7 +362,7 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
         // create a XAResource to manage the connection during XA transactions
         final XAResource xaResource = new LocalXAResource(connection);
 
-        // register the xa resource for the connection
+        // register the XA resource for the connection
         transactionRegistry.registerConnection(connection, xaResource);
 
         return connection;

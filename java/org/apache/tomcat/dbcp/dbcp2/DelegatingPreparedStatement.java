@@ -167,6 +167,27 @@ public class DelegatingPreparedStatement extends DelegatingStatement implements 
         }
     }
 
+    protected void prepareToReturn() throws SQLException {
+        setClosedInternal(true);
+        removeThisTrace(getConnectionInternal());
+
+        // The JDBC spec requires that a statement close any open
+        // ResultSet's when it is closed.
+        // FIXME The PreparedStatement we're wrapping should handle this for us.
+        // See DBCP-10 for what could happen when ResultSets are closed twice.
+        final List<AbandonedTrace> traceList = getTrace();
+        if (traceList != null) {
+            final List<Exception> thrownList = new ArrayList<>();
+            traceList.forEach(trace -> trace.close(thrownList::add));
+            clearTrace();
+            if (!thrownList.isEmpty()) {
+                throw new SQLExceptionList(thrownList);
+            }
+        }
+
+        super.passivate();
+    }
+
     @Override
     public void setArray(final int i, final Array x) throws SQLException {
         checkOpen();
@@ -693,26 +714,5 @@ public class DelegatingPreparedStatement extends DelegatingStatement implements 
     public synchronized String toString() {
         final Statement statement = getDelegate();
         return statement == null ? "NULL" : statement.toString();
-    }
-
-    protected void prepareToReturn() throws SQLException {
-        setClosedInternal(true);
-        removeThisTrace(getConnectionInternal());
-
-        // The JDBC spec requires that a statement close any open
-        // ResultSet's when it is closed.
-        // FIXME The PreparedStatement we're wrapping should handle this for us.
-        // See DBCP-10 for what could happen when ResultSets are closed twice.
-        final List<AbandonedTrace> traceList = getTrace();
-        if (traceList != null) {
-            final List<Exception> thrownList = new ArrayList<>();
-            traceList.forEach(trace -> trace.close(thrownList::add));
-            clearTrace();
-            if (!thrownList.isEmpty()) {
-                throw new SQLExceptionList(thrownList);
-            }
-        }
-
-        super.passivate();
     }
 }

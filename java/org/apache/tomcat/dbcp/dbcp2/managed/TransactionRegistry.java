@@ -85,7 +85,7 @@ public class TransactionRegistry {
                 return null;
             }
 
-            // This is the transaction on the thread so no need to check it's status - we should try to use it and
+            // This is the transaction on the thread so no need to check its status - we should try to use it and
             // fail later based on the subsequent status
         } catch (final SystemException e) {
             throw new SQLException("Unable to determine current transaction ", e);

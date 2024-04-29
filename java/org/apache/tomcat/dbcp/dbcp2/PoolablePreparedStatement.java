@@ -49,12 +49,12 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
     private volatile boolean batchAdded;
 
     /**
-     * Constructor.
+     * Constructs a new instance.
      *
      * @param stmt
      *            my underlying {@link PreparedStatement}
      * @param key
-     *            my key" as used by {@link KeyedObjectPool}
+     *            my key as used by {@link KeyedObjectPool}
      * @param pool
      *            the {@link KeyedObjectPool} from which I was obtained.
      * @param conn
@@ -111,6 +111,15 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
                 throw new SQLException("Cannot close preparedstatement (return to pool failed)", e);
             }
         }
+    }
+
+    /**
+     * Package-protected for tests.
+     *
+     * @return The key.
+     */
+    K getKey() {
+        return key;
     }
 
     @Override

@@ -44,7 +44,7 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
     private final PStmtKey key;
 
     /**
-     * Constructor.
+     * Constructs a new instance.
      *
      * @param callableStatement
      *            the underlying {@link CallableStatement}

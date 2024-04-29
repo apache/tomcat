@@ -115,9 +115,7 @@ public class DataSourceXAConnectionFactory implements XAConnectionFactory {
             final String userName, final char[] userPassword, final TransactionSynchronizationRegistry transactionSynchronizationRegistry) {
         Objects.requireNonNull(transactionManager, "transactionManager");
         Objects.requireNonNull(xaDataSource, "xaDataSource");
-
         // We do allow the transactionSynchronizationRegistry to be null for non-app server environments
-
         this.transactionRegistry = new TransactionRegistry(transactionManager, transactionSynchronizationRegistry);
         this.xaDataSource = xaDataSource;
         this.userName = userName;
@@ -166,14 +164,11 @@ public class DataSourceXAConnectionFactory implements XAConnectionFactory {
         } else {
             xaConnection = xaDataSource.getXAConnection(userName, Utils.toString(userPassword));
         }
-
         // get the real connection and XAResource from the connection
         final Connection connection = xaConnection.getConnection();
         final XAResource xaResource = xaConnection.getXAResource();
-
-        // register the xa resource for the connection
+        // register the XA resource for the connection
         transactionRegistry.registerConnection(connection, xaResource);
-
         // The Connection we're returning is a handle on the XAConnection.
         // When the pool calling us closes the Connection, we need to
         // also close the XAConnection that holds the physical connection.

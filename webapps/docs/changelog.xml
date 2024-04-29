@@ -235,6 +235,9 @@
       <update>
         Update the internal fork of Apache Commons BCEL to 6.9.0. (markt)
       </update>
+      <update>
+        Update the internal fork of Apache Commons DBCP to 2.12.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
