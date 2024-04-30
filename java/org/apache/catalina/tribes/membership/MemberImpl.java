@@ -429,28 +429,16 @@ public class MemberImpl implements Member, java.io.Externalizable {
        return getMember(data,offset,length,new MemberImpl());
     }
 
-    /**
-     * Return the name of this object
-     * @return a unique name to the cluster
-     */
     @Override
     public String getName() {
         return "tcp://"+getHostname()+":"+getPort();
     }
 
-    /**
-     * Return the listen port of this member
-     * @return - tcp listen port
-     */
     @Override
     public int getPort()  {
         return this.port;
     }
 
-    /**
-     * Return the TCP listen host for this member
-     * @return IP address or host name
-     */
     @Override
     public byte[] getHost()  {
         return host;
@@ -478,12 +466,6 @@ public class MemberImpl implements Member, java.io.Externalizable {
         return msgCount.get();
     }
 
-    /**
-     * Contains information on how long this member has been online.
-     * The result is the number of milli seconds this member has been
-     * broadcasting its membership to the cluster.
-     * @return nr of milliseconds since this member started.
-     */
     @Override
     public long getMemberAliveTime() {
        return memberAliveTime;
@@ -530,9 +512,6 @@ public class MemberImpl implements Member, java.io.Externalizable {
 
 
 
-    /**
-     * String representation of this object
-     */
     @Override
     public String toString()  {
         StringBuilder buf = new StringBuilder(getClass().getName());
@@ -567,10 +546,6 @@ public class MemberImpl implements Member, java.io.Externalizable {
         return buf.toString();
     }
 
-    /**
-     * @see java.lang.Object#hashCode()
-     * @return The hash code
-     */
     @Override
     public int hashCode() {
         return getHost()[0]+getHost()[1]+getHost()[2]+getHost()[3];

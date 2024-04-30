@@ -167,9 +167,6 @@ public class RewriteCond {
         return null;
     }
 
-    /**
-     * String representation.
-     */
     @Override
     public String toString() {
         return "RewriteCond " + testString + " " + condPattern

@@ -31,9 +31,6 @@ import org.apache.tomcat.util.res.StringManager;
 public class SSISet implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSISet.class);
 
-    /**
-     * @see SSICommand
-     */
     @Override
     public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
             PrintWriter writer) throws SSIStopProcessingException {

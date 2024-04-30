@@ -102,16 +102,6 @@ public class PersistentValve extends ValveBase {
     }
 
 
-    /**
-     * Select the appropriate child Context to process this request, based on the specified request URI. If no matching
-     * Context can be found, return an appropriate HTTP error.
-     *
-     * @param request  Request to be processed
-     * @param response Response to be produced
-     *
-     * @exception IOException      if an input/output error occurred
-     * @exception ServletException if a servlet error occurred
-     */
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
 

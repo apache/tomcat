@@ -216,8 +216,16 @@ public interface Channel {
 
 
     /**
-     * Adds an interceptor to the channel message chain.
-     * @param interceptor ChannelInterceptor
+     * Adds an interceptor to the stack for message processing<br>
+     * Interceptors are ordered in the way they are added.<br>
+     * <code>channel.addInterceptor(A);</code><br>
+     * <code>channel.addInterceptor(C);</code><br>
+     * <code>channel.addInterceptor(B);</code><br>
+     * Will result in an interceptor stack like this:<br>
+     * <code>A -&gt; C -&gt; B</code><br>
+     * The complete stack will look like this:<br>
+     * <code>Channel -&gt; A -&gt; C -&gt; B -&gt; ChannelCoordinator</code><br>
+     * @param interceptor ChannelInterceptorBase
      */
     void addInterceptor(ChannelInterceptor interceptor);
 
@@ -335,7 +343,7 @@ public interface Channel {
     boolean hasMembers() ;
 
     /**
-     * Get all current group members
+     * Get all current group members.
      * @return all members or empty array, never null
      */
     Member[] getMembers() ;

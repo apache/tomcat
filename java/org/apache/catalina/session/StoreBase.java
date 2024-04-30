@@ -73,11 +73,6 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     }
 
 
-    /**
-     * Set the Manager with which this Store is associated.
-     *
-     * @param manager The newly associated Manager
-     */
     @Override
     public void setManager(Manager manager) {
         Manager oldManager = this.manager;
@@ -85,9 +80,6 @@ public abstract class StoreBase extends LifecycleBase implements Store {
         support.firePropertyChange("manager", oldManager, this.manager);
     }
 
-    /**
-     * @return the Manager with which the Store is associated.
-     */
     @Override
     public Manager getManager() {
         return this.manager;
@@ -96,21 +88,11 @@ public abstract class StoreBase extends LifecycleBase implements Store {
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Add a property change listener to this component.
-     *
-     * @param listener a value of type {@link PropertyChangeListener}
-     */
     @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         support.addPropertyChangeListener(listener);
     }
 
-    /**
-     * Remove a property change listener from this component.
-     *
-     * @param listener The listener to remove
-     */
     @Override
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         support.removePropertyChangeListener(listener);
@@ -266,9 +248,6 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     }
 
 
-    /**
-     * @return a String rendering of this object.
-     */
     @Override
     public String toString() {
         return ToStringUtil.toString(this, manager);

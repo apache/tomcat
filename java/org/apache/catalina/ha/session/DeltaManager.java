@@ -958,12 +958,6 @@ public class DeltaManager extends ClusterManagerBase {
     // -------------------------------------------------------- Replication
     // Methods
 
-    /**
-     * A message was received from another node, this is the callback method to implement if you are interested in
-     * receiving replication messages.
-     *
-     * @param cmsg - the message received.
-     */
     @Override
     public void messageDataReceived(ClusterMessage cmsg) {
         if (cmsg instanceof SessionMessage) {
@@ -991,15 +985,6 @@ public class DeltaManager extends ClusterManagerBase {
         }
     }
 
-    /**
-     * When the request has been completed, the replication valve will notify the manager, and the manager will decide
-     * whether any replication is needed or not. If there is a need for replication, the manager will create a session
-     * message and that will be replicated. The cluster determines where it gets sent.
-     *
-     * @param sessionId - the sessionId that just completed.
-     *
-     * @return a SessionMessage to be sent,
-     */
     @Override
     public ClusterMessage requestCompleted(String sessionId) {
         return requestCompleted(sessionId, false);

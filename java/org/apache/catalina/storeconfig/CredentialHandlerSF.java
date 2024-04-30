@@ -61,16 +61,7 @@ public class CredentialHandlerSF extends StoreFactoryBase {
 
     /**
      * Store the specified CredentialHandler properties and child (CredentialHandler)
-     *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aCredentialHandler
-     *            CredentialHandler whose properties are being stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
+     * {@inheritDoc}
      */
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aCredentialHandler,

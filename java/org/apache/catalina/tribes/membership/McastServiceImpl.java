@@ -246,12 +246,6 @@ public class McastServiceImpl extends MembershipProviderBase {
     }
 
 
-    /**
-     * Start the service
-     * @param level 1 starts the receiver, level 2 starts the sender
-     * @throws IOException if the service fails to start
-     * @throws IllegalStateException if the service is already started
-     */
     @Override
     public synchronized void start(int level) throws IOException {
         boolean valid = false;
@@ -309,12 +303,6 @@ public class McastServiceImpl extends MembershipProviderBase {
         }
     }
 
-    /**
-     * Stops the service.
-     * @param level Stop status
-     * @return <code>true</code> if the stop is complete
-     * @throws IOException if the service fails to disconnect from the sockets
-     */
     @Override
     public synchronized boolean stop(int level) throws IOException {
         boolean valid = false;

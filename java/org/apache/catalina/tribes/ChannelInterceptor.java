@@ -105,7 +105,8 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * to allow interceptors to clean up resources, time out object and
      * perform actions that are unrelated to sending/receiving data.
      */
-    @Override void heartbeat();
+    @Override
+    void heartbeat();
 
     /**
      * Intercepts the <code>Channel.hasMembers()</code> method
@@ -116,7 +117,7 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
 
     /**
      * Intercepts the <code>Channel.getMembers()</code> method
-     * @return Member[]
+     * @return the members
      * @see Channel#getMembers()
      */
     Member[] getMembers() ;
@@ -124,7 +125,7 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
     /**
      * Intercepts the <code>Channel.getLocalMember(boolean)</code> method
      * @param incAliveTime boolean
-     * @return Member
+     * @return the member that represents this node
      * @see Channel#getLocalMember(boolean)
      */
     Member getLocalMember(boolean incAliveTime) ;
@@ -165,6 +166,10 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      */
     void stop(int svc) throws ChannelException;
 
+    /**
+     * Fire an event.
+     * @param event the event
+     */
     void fireInterceptorEvent(InterceptorEvent event);
 
     /**

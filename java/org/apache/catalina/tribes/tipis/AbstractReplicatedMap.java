@@ -563,10 +563,6 @@ public abstract class AbstractReplicatedMap<K,V>
         this.state = State.STATETRANSFERRED;
     }
 
-    /**
-     * @param msg Serializable
-     * @return Serializable - null if no reply should be sent
-     */
     @Override
     public Serializable replyRequest(Serializable msg, final Member sender) {
         if (! (msg instanceof MapMessage)) {
@@ -628,12 +624,6 @@ public abstract class AbstractReplicatedMap<K,V>
 
     }
 
-    /**
-     * If the reply has already been sent to the requesting thread,
-     * the rpc callback can handle any data that comes in after the fact.
-     * @param msg Serializable
-     * @param sender Member
-     */
     @Override
     public void leftOver(Serializable msg, Member sender) {
         //left over membership messages
@@ -997,6 +987,13 @@ public abstract class AbstractReplicatedMap<K,V>
         return members[node];
     }
 
+    /**
+     * Publish info about a map pair (key/value) to other nodes in the cluster.
+     * @param key Object
+     * @param value Object
+     * @return Member - the backup node
+     * @throws ChannelException Cluster error
+     */
     protected abstract Member[] publishEntryInfo(Object key, Object value) throws ChannelException;
 
     @Override
@@ -1014,12 +1011,6 @@ public abstract class AbstractReplicatedMap<K,V>
 //              METHODS TO OVERRIDE
 //------------------------------------------------------------------------------
 
-    /**
-     * Removes an object from this map, it will also remove it from
-     *
-     * @param key Object
-     * @return Object
-     */
     @Override
     public V remove(Object key) {
         return remove(key,true);
@@ -1191,10 +1182,6 @@ public abstract class AbstractReplicatedMap<K,V>
     }
 
 
-    /**
-     * Copies all values from one map to this instance
-     * @param m Map
-     */
     @Override
     public void putAll(Map<? extends K, ? extends V> m) {
         for (Entry<? extends K, ? extends V> value : m.entrySet()) {
@@ -1654,10 +1641,6 @@ public abstract class AbstractReplicatedMap<K,V>
             }
         }
 
-        /**
-         * shallow clone
-         * @return Object
-         */
         @Override
         public MapMessage clone() {
             try {

@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.tribes.transport;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -84,29 +83,6 @@ public abstract class AbstractSender implements DataSender {
 
     }
 
-    /**
-     * connect
-     *
-     * @throws IOException
-     * TODO Implement this org.apache.catalina.tribes.transport.DataSender method
-     */
-    @Override
-    public abstract void connect() throws IOException;
-
-    /**
-     * disconnect
-     *
-     * TODO Implement this org.apache.catalina.tribes.transport.DataSender method
-     */
-    @Override
-    public abstract void disconnect();
-
-    /**
-     * keepalive
-     *
-     * @return boolean
-     * TODO Implement this org.apache.catalina.tribes.transport.DataSender method
-     */
     @Override
     public boolean keepalive() {
         boolean disconnect = false;

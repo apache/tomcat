@@ -616,12 +616,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     // ------------------------------------------------------- Reloader Methods
 
-    /**
-     * Adds the specified class file transformer to this class loader. The transformer will then be able to modify the
-     * bytecode of any classes loaded by this class loader after the invocation of this method.
-     *
-     * @param transformer The transformer to add to the class loader
-     */
     @Override
     public void addTransformer(ClassFileTransformer transformer) {
 
@@ -640,13 +634,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         log.info(sm.getString("webappClassLoader.addTransformer", transformer, getContextName()));
     }
 
-    /**
-     * Removes the specified class file transformer from this class loader. It will no longer be able to modify the byte
-     * code of any classes loaded by the class loader after the invocation of this method. However, any classes already
-     * modified by this transformer will remain transformed.
-     *
-     * @param transformer The transformer to remove
-     */
     @Override
     public void removeTransformer(ClassFileTransformer transformer) {
 
@@ -915,14 +902,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
-    /**
-     * Return an enumeration of <code>URLs</code> representing all of the resources with the given name. If no resources
-     * with this name are found, return an empty enumeration.
-     *
-     * @param name Name of the resources to be found
-     *
-     * @exception IOException if an input/output error occurs
-     */
     @Override
     public Enumeration<URL> findResources(String name) throws IOException {
 
@@ -1415,43 +1394,24 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     // ------------------------------------------------------ Lifecycle Methods
 
 
-    /**
-     * Add a lifecycle event listener to this component.
-     *
-     * @param listener The listener to add
-     */
     @Override
     public void addLifecycleListener(LifecycleListener listener) {
         // NOOP
     }
 
 
-    /**
-     * Get the lifecycle listeners associated with this lifecycle. If this Lifecycle has no listeners registered, a
-     * zero-length array is returned.
-     */
     @Override
     public LifecycleListener[] findLifecycleListeners() {
         return new LifecycleListener[0];
     }
 
 
-    /**
-     * Remove a lifecycle event listener from this component.
-     *
-     * @param listener The listener to remove
-     */
     @Override
     public void removeLifecycleListener(LifecycleListener listener) {
         // NOOP
     }
 
 
-    /**
-     * Obtain the current state of the source component.
-     *
-     * @return The current state of the source component.
-     */
     @Override
     public LifecycleState getState() {
         return state;
@@ -1470,11 +1430,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
-    /**
-     * Start the class loader.
-     *
-     * @exception LifecycleException if a lifecycle error occurs
-     */
     @Override
     public void start() throws LifecycleException {
 
@@ -1498,11 +1453,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
-    /**
-     * Stop the class loader.
-     *
-     * @exception LifecycleException if a lifecycle error occurs
-     */
     @Override
     public void stop() throws LifecycleException {
 
@@ -2028,8 +1978,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         return false;
     }
 
-    /*
-     * Get the set of current threads as an array.
+    /**
+     * @return the set of current threads as an array.
      */
     private Thread[] getThreads() {
         // Get the current thread group

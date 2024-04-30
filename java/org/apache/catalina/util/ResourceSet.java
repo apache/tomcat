@@ -127,12 +127,9 @@ public final class ResourceSet<T> extends HashSet<T> {
 
 
     /**
-     * Add the specified element to this set if it is not already present.
-     * Return <code>true</code> if the element was added.
+     * {@inheritDoc}
      *
-     * @param o The object to be added
-     *
-     * @exception IllegalStateException if this ResourceSet is locked
+     * @exception IllegalStateException if this set is currently locked
      */
     @Override
     public boolean add(T o) {
@@ -145,9 +142,9 @@ public final class ResourceSet<T> extends HashSet<T> {
 
 
     /**
-     * Remove all of the elements from this set.
+     * {@inheritDoc}
      *
-     * @exception IllegalStateException if this ResourceSet is locked
+     * @exception IllegalStateException if this set is currently locked
      */
     @Override
     public void clear() {
@@ -162,12 +159,9 @@ public final class ResourceSet<T> extends HashSet<T> {
 
 
     /**
-     * Remove the given element from this set if it is present.
-     * Return <code>true</code> if the element was removed.
+     * {@inheritDoc}
      *
-     * @param o The object to be removed
-     *
-     * @exception IllegalStateException if this ResourceSet is locked
+     * @exception IllegalStateException if this set is currently locked
      */
     @Override
     public boolean remove(Object o) {

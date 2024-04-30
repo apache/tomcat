@@ -226,17 +226,11 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
         return manager;
     }
 
-    /**
-     * @return Returns the cluster.
-     */
     @Override
     public CatalinaCluster getCluster() {
         return cluster;
     }
 
-    /**
-     * @param cluster The cluster to set.
-     */
     @Override
     public void setCluster(CatalinaCluster cluster) {
         this.cluster = cluster;

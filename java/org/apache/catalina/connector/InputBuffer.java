@@ -202,11 +202,6 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     }
 
 
-    /**
-     * Close the input buffer.
-     *
-     * @throws IOException An underlying IOException occurred
-     */
     @Override
     public void close() throws IOException {
         closed = true;
@@ -294,11 +289,6 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
 
     // ------------------------------------------------- Bytes Handling Methods
 
-    /**
-     * Reads new bytes in the byte chunk.
-     *
-     * @throws IOException An underlying IOException occurred
-     */
     @Override
     public int realReadBytes() throws IOException {
         if (closed) {

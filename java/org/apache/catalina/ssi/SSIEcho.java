@@ -35,9 +35,6 @@ public class SSIEcho implements SSICommand {
     protected static final String MISSING_VARIABLE_VALUE = "(none)";
 
 
-    /**
-     * @see SSICommand
-     */
     @Override
     public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
             PrintWriter writer) {

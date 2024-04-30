@@ -197,11 +197,6 @@ public class NamingContextListener implements LifecycleListener, ContainerListen
 
     // ---------------------------------------------- LifecycleListener Methods
 
-    /**
-     * Acknowledge the occurrence of the specified event.
-     *
-     * @param event LifecycleEvent that has occurred
-     */
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
 
@@ -348,11 +343,6 @@ public class NamingContextListener implements LifecycleListener, ContainerListen
     // ----------------------------------------- PropertyChangeListener Methods
 
 
-    /**
-     * Process property change events.
-     *
-     * @param event The property change event that has occurred
-     */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
 

@@ -2252,13 +2252,6 @@ public class JNDIRealm extends RealmBase {
     }
 
 
-    /**
-     * Get the password for the specified user.
-     *
-     * @param username The user name
-     *
-     * @return the password associated with the given principal's user name.
-     */
     @Override
     protected String getPassword(String username) {
         String userPassword = getUserPassword();
@@ -2312,13 +2305,6 @@ public class JNDIRealm extends RealmBase {
     }
 
 
-    /**
-     * Get the principal associated with the specified certificate.
-     *
-     * @param username The user name
-     *
-     * @return the Principal associated with the given certificate.
-     */
     @Override
     protected Principal getPrincipal(String username) {
         return getPrincipal(username, null);

@@ -315,9 +315,6 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
     }
 
 
-    /**
-     * @return the Store object which manages persistent Session storage for this Manager.
-     */
     @Override
     public Store getStore() {
         return this.store;
@@ -471,12 +468,6 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
         return session;
     }
 
-    /**
-     * Remove this Session from the active Sessions for this Manager, but not from the Store. (Used by the
-     * PersistentValve)
-     *
-     * @param session Session to be removed
-     */
     @Override
     public void removeSuper(Session session) {
         super.remove(session, false);

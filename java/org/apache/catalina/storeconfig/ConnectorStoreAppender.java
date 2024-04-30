@@ -214,13 +214,6 @@ public class ConnectorStoreAppender extends StoreAppender {
         }
     }
 
-    /**
-     * Print the open tag for connector attributes (override).
-     *
-     * @see org.apache.catalina.storeconfig.StoreAppender#printOpenTag(java.io.PrintWriter,
-     *      int, java.lang.Object,
-     *      org.apache.catalina.storeconfig.StoreDescription)
-     */
     @Override
     public void printOpenTag(PrintWriter aWriter, int indent, Object bean,
             StoreDescription aDesc) throws Exception {
@@ -230,13 +223,6 @@ public class ConnectorStoreAppender extends StoreAppender {
         aWriter.println(">");
     }
 
-    /**
-     * Print a tag for connector attributes (override).
-     *
-     * @see org.apache.catalina.storeconfig.StoreAppender#printTag(java.io.PrintWriter,
-     *      int, java.lang.Object,
-     *      org.apache.catalina.storeconfig.StoreDescription)
-     */
     @Override
     public void printTag(PrintWriter aWriter, int indent, Object bean,
             StoreDescription aDesc) throws Exception {
@@ -246,12 +232,6 @@ public class ConnectorStoreAppender extends StoreAppender {
         aWriter.println("/>");
     }
 
-    /**
-     * Print a value but replace certain attribute names.
-     *
-     * @see org.apache.catalina.storeconfig.StoreAppender#printValue(java.io.PrintWriter,
-     *      int, String, Object)
-     */
     @Override
     public void printValue(PrintWriter writer, int indent, String name,
             Object value) {

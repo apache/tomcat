@@ -53,9 +53,7 @@ public class StoreContextAppender extends StoreAppender {
      * Print Context Values. <ul><li> Special handling to default workDir.
      * </li><li> Don't save path at external context.xml </li><li> Don't
      * generate docBase for host.appBase webapps <LI></ul>
-     *
-     * @see org.apache.catalina.storeconfig.StoreAppender#isPrintValue(Object,
-     *      Object, String, StoreDescription)
+     * {@inheritDoc}
      */
     @Override
     public boolean isPrintValue(Object bean, Object bean2, String attrName,

@@ -93,27 +93,18 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     // ------------------------------------------------------------- Properties
 
 
-    /**
-     * Return the set of {@link Group}s to which this user belongs.
-     */
     @Override
     public Iterator<Group> getGroups() {
         return groups.iterator();
     }
 
 
-    /**
-     * Return the set of {@link Role}s assigned specifically to this user.
-     */
     @Override
     public Iterator<Role> getRoles() {
         return roles.iterator();
     }
 
 
-    /**
-     * Return the {@link UserDatabase} within which this User is defined.
-     */
     @Override
     public UserDatabase getUserDatabase() {
         return this.database;
@@ -123,11 +114,6 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Add a new {@link Group} to those this user belongs to.
-     *
-     * @param group The new group
-     */
     @Override
     public void addGroup(Group group) {
         if (groups.addIfAbsent(group)) {
@@ -136,11 +122,6 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     }
 
 
-    /**
-     * Add a new {@link Role} to those assigned specifically to this user.
-     *
-     * @param role The new role
-     */
     @Override
     public void addRole(Role role) {
         if (roles.addIfAbsent(role)) {
@@ -149,35 +130,18 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     }
 
 
-    /**
-     * Is this user in the specified group?
-     *
-     * @param group The group to check
-     */
     @Override
     public boolean isInGroup(Group group) {
         return groups.contains(group);
     }
 
 
-    /**
-     * Is this user specifically assigned the specified {@link Role}?  This
-     * method does <strong>NOT</strong> check for roles inherited based on
-     * {@link Group} membership.
-     *
-     * @param role The role to check
-     */
     @Override
     public boolean isInRole(Role role) {
         return roles.contains(role);
     }
 
 
-    /**
-     * Remove a {@link Group} from those this user belongs to.
-     *
-     * @param group The old group
-     */
     @Override
     public void removeGroup(Group group) {
         if (groups.remove(group)) {
@@ -186,9 +150,6 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     }
 
 
-    /**
-     * Remove all {@link Group}s from those this user belongs to.
-     */
     @Override
     public void removeGroups() {
         if (!groups.isEmpty()) {
@@ -198,11 +159,6 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     }
 
 
-    /**
-     * Remove a {@link Role} from those assigned to this user.
-     *
-     * @param role The old role
-     */
     @Override
     public void removeRole(Role role) {
         if (roles.remove(role)) {
@@ -211,9 +167,6 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     }
 
 
-    /**
-     * Remove all {@link Role}s from those assigned to this user.
-     */
     @Override
     public void removeRoles() {
         if (!roles.isEmpty()) {

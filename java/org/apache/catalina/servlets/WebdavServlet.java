@@ -250,9 +250,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Initialize this servlet.
-     */
     @Override
     public void init() throws ServletException {
 
@@ -432,9 +429,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     }
 
 
-    /**
-     * Determines the prefix for standard directory GET listings.
-     */
     @Override
     protected String getPathPrefix(final HttpServletRequest request) {
         // Repeat the servlet path (e.g. /webdav/) in the listing path
@@ -446,15 +440,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     }
 
 
-    /**
-     * OPTIONS Method.
-     *
-     * @param req  The Servlet request
-     * @param resp The Servlet response
-     *
-     * @throws ServletException If an error occurs
-     * @throws IOException      If an IO error occurs
-     */
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.addHeader("DAV", "1,2");
@@ -753,15 +738,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     }
 
 
-    /**
-     * DELETE Method.
-     *
-     * @param req  The Servlet request
-     * @param resp The Servlet response
-     *
-     * @throws ServletException If an error occurs
-     * @throws IOException      If an IO error occurs
-     */
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -779,15 +755,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     }
 
 
-    /**
-     * Process a PUT request for the specified resource.
-     *
-     * @param req  The servlet request we are processing
-     * @param resp The servlet response we are creating
-     *
-     * @exception IOException      if an input/output error occurs
-     * @exception ServletException if a servlet-specified error occurs
-     */
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -2173,13 +2140,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     }
 
 
-    /**
-     * Determines the methods normally allowed for the resource.
-     *
-     * @param req The Servlet request
-     *
-     * @return The allowed HTTP methods
-     */
     @Override
     protected String determineMethodsAllowed(HttpServletRequest req) {
 
@@ -2260,9 +2220,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         // ----------------------------------------------------- Public Methods
 
-        /**
-         * Get a String representation of this lock token.
-         */
         @Override
         public String toString() {
 

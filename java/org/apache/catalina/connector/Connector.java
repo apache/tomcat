@@ -1088,10 +1088,6 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
-    /**
-     * Provide a useful toString() implementation as it may be used when logging Lifecycle errors to identify the
-     * component.
-     */
     @Override
     public String toString() {
         // Not worth caching this right now

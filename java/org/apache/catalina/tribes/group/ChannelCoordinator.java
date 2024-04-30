@@ -90,33 +90,11 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
     }
 
 
-    /**
-     * Starts up the channel. This can be called multiple times for individual services to start
-     * The svc parameter can be the logical or value of any constants
-     * @param svc int value of <BR>
-     * DEFAULT - will start all services <BR>
-     * MBR_RX_SEQ - starts the membership receiver <BR>
-     * MBR_TX_SEQ - starts the membership broadcaster <BR>
-     * SND_TX_SEQ - starts the replication transmitter<BR>
-     * SND_RX_SEQ - starts the replication receiver<BR>
-     * @throws ChannelException if a startup error occurs or the service is already started.
-     */
     @Override
     public void start(int svc) throws ChannelException {
         this.internalStart(svc);
     }
 
-    /**
-     * Shuts down the channel. This can be called multiple times for individual services to shutdown
-     * The svc parameter can be the logical or value of any constants
-     * @param svc int value of <BR>
-     * DEFAULT - will shutdown all services <BR>
-     * MBR_RX_SEQ - stops the membership receiver <BR>
-     * MBR_TX_SEQ - stops the membership broadcaster <BR>
-     * SND_TX_SEQ - stops the replication transmitter<BR>
-     * SND_RX_SEQ - stops the replication receiver<BR>
-     * @throws ChannelException if a startup error occurs or the service is already started.
-     */
     @Override
     public void stop(int svc) throws ChannelException {
         this.internalStop(svc);
@@ -334,38 +312,22 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
         super.heartbeat();
     }
 
-    /**
-     * has members
-     */
     @Override
     public boolean hasMembers() {
         return this.getMembershipService().hasMembers();
     }
 
-    /**
-     * Get all current cluster members
-     * @return all members or empty array
-     */
     @Override
     public Member[] getMembers() {
         return this.getMembershipService().getMembers();
     }
 
-    /**
-     * @param mbr Member
-     * @return Member
-     */
     @Override
     public Member getMember(Member mbr){
         return this.getMembershipService().getMember(mbr);
     }
 
 
-    /**
-     * Return the member that represents this node.
-     *
-     * @return Member
-     */
     @Override
     public Member getLocalMember(boolean incAlive) {
         return this.getMembershipService().getLocalMember(incAlive);

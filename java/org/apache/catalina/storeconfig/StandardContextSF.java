@@ -201,12 +201,7 @@ public class StandardContextSF extends StoreFactoryBase {
 
     /**
      * Store the specified context element children.
-     *
-     * @param aWriter Current output writer
-     * @param indent Indentation level
-     * @param aContext Context to store
-     * @param parentDesc The element description
-     * @throws Exception Configuration storing error
+     * {@inheritDoc}
      */
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aContext,

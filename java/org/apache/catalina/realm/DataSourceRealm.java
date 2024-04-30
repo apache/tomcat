@@ -387,9 +387,6 @@ public class DataSourceRealm extends RealmBase {
         return null;
     }
 
-    /**
-     * @return the password associated with the given principal's user name.
-     */
     @Override
     protected String getPassword(String username) {
 
@@ -439,13 +436,6 @@ public class DataSourceRealm extends RealmBase {
     }
 
 
-    /**
-     * Return the Principal associated with the given user name.
-     *
-     * @param username the user name
-     *
-     * @return the principal object
-     */
     @Override
     protected Principal getPrincipal(String username) {
         Connection dbConnection = open();

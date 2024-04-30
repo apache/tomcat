@@ -40,6 +40,7 @@ public interface SessionMessage extends ClusterMessage {
      * Event type used when a session has been created on a node
      */
     int EVT_SESSION_CREATED = 1;
+
     /**
      * Event type used when a session has expired
      */
@@ -50,11 +51,13 @@ public interface SessionMessage extends ClusterMessage {
      * replicated sessions will not expire on the network
      */
     int EVT_SESSION_ACCESSED = 3;
+
     /**
      * Event type used when a server comes online for the first time. The first thing the newly started server wants to
      * do is to grab the all the sessions from one of the nodes and keep the same state in there
      */
     int EVT_GET_ALL_SESSIONS = 4;
+
     /**
      * Event type used when an attribute has been added to a session, the attribute will be sent to all the other nodes
      * in the cluster
@@ -82,8 +85,16 @@ public interface SessionMessage extends ClusterMessage {
      */
     int EVT_ALL_SESSION_NOCONTEXTMANAGER = 16;
 
+    /**
+     * @return the context name associated with this message
+     */
     String getContextName();
 
+    /**
+     * Clear text event type name (for logging purpose only).
+     *
+     * @return the event type in a string representation, useful for debugging
+     */
     String getEventTypeString();
 
     /**
