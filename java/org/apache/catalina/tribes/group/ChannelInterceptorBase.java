@@ -120,9 +120,6 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
         }
     }
 
-    /**
-     * has members
-     */
     @Override
     public boolean hasMembers() {
         if ( getNext()!=null ) {
@@ -132,10 +129,6 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
         }
     }
 
-    /**
-     * Get all current cluster members
-     * @return all members or empty array
-     */
     @Override
     public Member[] getMembers() {
         if ( getNext()!=null ) {
@@ -145,10 +138,6 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
         }
     }
 
-    /**
-     * @param mbr Member
-     * @return Member
-     */
     @Override
     public Member getMember(Member mbr) {
         if ( getNext()!=null) {
@@ -158,11 +147,6 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
         }
     }
 
-    /**
-     * Return the member that represents this node.
-     *
-     * @return Member
-     */
     @Override
     public Member getLocalMember(boolean incAlive) {
         if ( getNext()!=null ) {
@@ -172,17 +156,6 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
         }
     }
 
-    /**
-     * Starts up the channel. This can be called multiple times for individual services to start
-     * The svc parameter can be the logical or value of any constants
-     * @param svc int value of <BR>
-     * DEFAULT - will start all services <BR>
-     * MBR_RX_SEQ - starts the membership receiver <BR>
-     * MBR_TX_SEQ - starts the membership broadcaster <BR>
-     * SND_TX_SEQ - starts the replication transmitter<BR>
-     * SND_RX_SEQ - starts the replication receiver<BR>
-     * @throws ChannelException if a startup error occurs or the service is already started.
-     */
     @Override
     public void start(int svc) throws ChannelException {
         if ( getNext()!=null ) {
@@ -196,17 +169,6 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
         }
     }
 
-    /**
-     * Shuts down the channel. This can be called multiple times for individual services to shutdown
-     * The svc parameter can be the logical or value of any constants
-     * @param svc int value of <BR>
-     * DEFAULT - will shutdown all services <BR>
-     * MBR_RX_SEQ - stops the membership receiver <BR>
-     * MBR_TX_SEQ - stops the membership broadcaster <BR>
-     * SND_TX_SEQ - stops the replication transmitter<BR>
-     * SND_RX_SEQ - stops the replication receiver<BR>
-     * @throws ChannelException if a startup error occurs or the service is already started.
-     */
     @Override
     public void stop(int svc) throws ChannelException {
         if (getNext() != null) {
@@ -224,19 +186,11 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
         //empty operation
     }
 
-    /**
-     * Return the channel that is related to this interceptor
-     * @return Channel
-     */
     @Override
     public Channel getChannel() {
         return channel;
     }
 
-    /**
-     * Set the channel that is related to this interceptor
-     * @param channel The channel
-     */
     @Override
     public void setChannel(Channel channel) {
         this.channel = channel;

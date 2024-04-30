@@ -283,16 +283,6 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
         }
     }
 
-    /**
-     * Log the interesting request parameters, invoke the next Valve in the sequence, and log the interesting response
-     * parameters.
-     *
-     * @param request  The servlet request to be processed
-     * @param response The servlet response to be created
-     *
-     * @exception IOException      if an input/output error occurs
-     * @exception ServletException if a servlet error occurs
-     */
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
         long totalstart = 0;
@@ -355,13 +345,6 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
         nrOfCrossContextSendRequests.reset();
     }
 
-    /**
-     * Start this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
     @Override
     protected void startInternal() throws LifecycleException {
         if (cluster == null) {

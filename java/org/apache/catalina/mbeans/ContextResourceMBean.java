@@ -38,15 +38,6 @@ public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
 
     private static final StringManager sm = StringManager.getManager(ContextResourceMBean.class);
 
-    /**
-     * Obtain and return the value of a specific attribute of this MBean.
-     *
-     * @param name Name of the requested attribute
-     *
-     * @exception AttributeNotFoundException if this attribute is not supported by this MBean
-     * @exception MBeanException             if the initializer of an object throws an exception
-     * @exception ReflectionException        if a Java reflection exception occurs when invoking the getter
-     */
     @Override
     public Object getAttribute(String name) throws AttributeNotFoundException, MBeanException, ReflectionException {
 
@@ -80,15 +71,6 @@ public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
     }
 
 
-    /**
-     * Set the value of a specific attribute of this MBean.
-     *
-     * @param attribute The identification of the attribute to be set and the new value
-     *
-     * @exception AttributeNotFoundException if this attribute is not supported by this MBean
-     * @exception MBeanException             if the initializer of an object throws an exception
-     * @exception ReflectionException        if a Java reflection exception occurs when invoking the getter
-     */
     @Override
     public void setAttribute(Attribute attribute)
             throws AttributeNotFoundException, MBeanException, ReflectionException {

@@ -27,9 +27,6 @@ import java.util.Collection;
  * @author David Becker
  */
 public class SSIPrintenv implements SSICommand {
-    /**
-     * @see SSICommand
-     */
     @Override
     public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
             PrintWriter writer) {

@@ -19,7 +19,19 @@ package org.apache.catalina.ha.deploy;
 import java.io.File;
 
 public interface FileChangeListener {
+
+    /**
+     * Modification from watchDir war detected.
+     *
+     * @param f the modified file
+     */
     void fileModified(File f);
 
+    /**
+     * War remove from watchDir.
+     *
+     * @param f the file removed
+     */
     void fileRemoved(File f);
+
 }

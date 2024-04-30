@@ -29,16 +29,7 @@ public class PersistentManagerSF extends StoreFactoryBase {
 
     /**
      * Store the specified PersistentManager properties.
-     *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aManager
-     *            PersistentManager whose properties are being stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
+     * {@inheritDoc}
      */
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aManager,

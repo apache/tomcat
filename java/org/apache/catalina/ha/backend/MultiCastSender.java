@@ -26,7 +26,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-/*
+/**
  * Sender to proxies using multicast socket.
  */
 public class MultiCastSender implements Sender {

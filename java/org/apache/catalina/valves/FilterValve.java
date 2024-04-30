@@ -125,8 +125,6 @@ public class FilterValve extends ValveBase implements FilterConfig {
     }
 
     /**
-     * Gets the name of the Filter.
-     *
      * @return <code>null</code>
      */
     @Override
@@ -135,7 +133,7 @@ public class FilterValve extends ValveBase implements FilterConfig {
     }
 
     /**
-     * Gets the ServletContext. Note that this will be of limited use if the Valve/Filter is not attached to a
+     * @return the ServletContext. Note that this will be of limited use if the Valve/Filter is not attached to a
      * <code>&lt;Context&gt;</code>.
      */
     @Override
@@ -147,14 +145,6 @@ public class FilterValve extends ValveBase implements FilterConfig {
         }
     }
 
-    /**
-     * Gets the initialization parameter with the specified name.
-     *
-     * @param name The name of the initialization parameter.
-     *
-     * @return The value for the initialization parameter, or <code>null</code> if there is no value for the specified
-     *             initialization parameter name.
-     */
     @Override
     public String getInitParameter(String name) {
         if (null == filterInitParams) {
@@ -164,11 +154,6 @@ public class FilterValve extends ValveBase implements FilterConfig {
         }
     }
 
-    /**
-     * Gets an enumeration of the names of all initialization parameters.
-     *
-     * @return An enumeration of the names of all initialization parameters.
-     */
     @Override
     public Enumeration<String> getInitParameterNames() {
         if (null == filterInitParams) {

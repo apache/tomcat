@@ -31,11 +31,6 @@ public class ManagerSF extends StoreFactoryBase {
 
     private static Log log = LogFactory.getLog(ManagerSF.class);
 
-    /**
-     * Store the only the Manager elements
-     *
-     * @see NamingResourcesSF#storeChildren(PrintWriter, int, Object, StoreDescription)
-     */
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement)
             throws Exception {

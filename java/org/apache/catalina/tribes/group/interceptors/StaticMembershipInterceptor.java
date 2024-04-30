@@ -102,18 +102,11 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase
         }
     }
 
-    /**
-     * has members
-     */
     @Override
     public boolean hasMembers() {
         return super.hasMembers() || (members.size()>0);
     }
 
-    /**
-     * Get all current cluster members
-     * @return all members or empty array
-     */
     @Override
     public Member[] getMembers() {
         if ( members.size() == 0 ) {
@@ -134,10 +127,6 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase
         }//end if
     }
 
-    /**
-     * @param mbr Member
-     * @return Member
-     */
     @Override
     public Member getMember(Member mbr) {
         if ( members.contains(mbr) ) {
@@ -147,11 +136,6 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase
         }
     }
 
-    /**
-     * Return the member that represents this node.
-     *
-     * @return Member
-     */
     @Override
     public Member getLocalMember(boolean incAlive) {
         if (this.localMember != null ) {

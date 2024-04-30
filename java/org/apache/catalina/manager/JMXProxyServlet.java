@@ -65,9 +65,7 @@ public class JMXProxyServlet extends HttpServlet {
 
 
     // --------------------------------------------------------- Public Methods
-    /**
-     * Initialize this servlet.
-     */
+
     @Override
     public void init() throws ServletException {
         // Retrieve the MBean server
@@ -76,15 +74,6 @@ public class JMXProxyServlet extends HttpServlet {
     }
 
 
-    /**
-     * Process a GET request for the specified resource.
-     *
-     * @param request  The servlet request we are processing
-     * @param response The servlet response we are creating
-     *
-     * @exception IOException      if an input/output error occurs
-     * @exception ServletException if a servlet-specified error occurs
-     */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.setContentType("text/plain;charset=" + Constants.CHARSET);

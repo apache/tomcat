@@ -35,16 +35,7 @@ public class StandardEngineSF extends StoreFactoryBase {
 
     /**
      * Store the specified Engine properties.
-     *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aEngine
-     *            Object whose properties are being stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
+     * {@inheritDoc}
      */
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aEngine,

@@ -806,9 +806,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Return a string representation of this object.
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

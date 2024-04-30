@@ -74,11 +74,6 @@ public class ByteMessage implements Externalizable {
         this.message = message;
     }
 
-    /**
-     * @see java.io.Externalizable#readExternal
-     * @param in ObjectInput
-     * @throws IOException An IO error occurred
-     */
     @Override
     public void readExternal(ObjectInput in ) throws IOException {
         int length = in.readInt();
@@ -86,11 +81,6 @@ public class ByteMessage implements Externalizable {
         in.readFully(message);
     }
 
-    /**
-     * @see java.io.Externalizable#writeExternal
-     * @param out ObjectOutput
-     * @throws IOException An IO error occurred
-     */
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeInt(message!=null?message.length:0);

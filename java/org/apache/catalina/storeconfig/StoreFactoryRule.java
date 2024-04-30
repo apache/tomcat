@@ -73,14 +73,6 @@ public class StoreFactoryRule extends Rule {
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Handle the beginning of an XML element.
-     *
-     * @param namespace XML namespace
-     * @param name The element name
-     * @param attributes The attributes of this element
-     * @exception Exception if a processing error occurs
-     */
     @Override
     public void begin(String namespace, String name, Attributes attributes)
             throws Exception {

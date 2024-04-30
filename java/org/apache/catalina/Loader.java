@@ -59,7 +59,7 @@ public interface Loader {
 
 
     /**
-     * @return the Java class loader to be used by this Container.
+     * @return the Java class loader to be used by this Loader.
      */
     ClassLoader getClassLoader();
 

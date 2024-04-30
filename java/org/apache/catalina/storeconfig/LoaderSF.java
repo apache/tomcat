@@ -30,11 +30,6 @@ public class LoaderSF extends StoreFactoryBase {
 
     private static Log log = LogFactory.getLog(LoaderSF.class);
 
-    /**
-     * Store the only the Loader elements, when not default
-     *
-     * @see NamingResourcesSF#storeChildren(PrintWriter, int, Object, StoreDescription)
-     */
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement)
             throws Exception {

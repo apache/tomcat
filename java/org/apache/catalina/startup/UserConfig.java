@@ -248,7 +248,7 @@ public final class UserConfig implements LifecycleListener {
 
 
     /**
-     * Process the START event for an associated Host.
+     * Process the START and STOP events for an associated Host.
      *
      * @param event The lifecycle event that has occurred
      */

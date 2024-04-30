@@ -28,14 +28,7 @@ public class WebResourceRootSF extends StoreFactoryBase {
 
     /**
      * Store the specified Resources children.
-     *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
+     * {@inheritDoc}
      */
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aResourceRoot,

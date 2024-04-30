@@ -62,16 +62,7 @@ public class RealmSF extends StoreFactoryBase {
 
     /**
      * Store the specified Realm properties and child (Realm)
-     *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aRealm
-     *            Realm whose properties are being stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
+     * {@inheritDoc}
      */
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aRealm,

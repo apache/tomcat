@@ -304,13 +304,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     }
 
     /**
-     * Before the cluster invokes messageReceived the cluster will ask the receiver to accept or decline the message, In
-     * the future, when messages get big, the accept method will only take a message header
-     *
-     * @param msg ClusterMessage
-     *
-     * @return boolean - returns true to indicate that messageReceived should be invoked. If false is returned, the
-     *             messageReceived method will not be invoked.
+     * {@inheritDoc}
+     * This listener accepts only FileMessage or UndeployMessage.
      */
     @Override
     public boolean accept(ClusterMessage msg) {
@@ -408,11 +403,6 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
 
     }
 
-    /**
-     * Modification from watchDir war detected!
-     *
-     * @see org.apache.catalina.ha.deploy.FileChangeListener#fileModified(File)
-     */
     @Override
     public void fileModified(File newWar) {
         try {
@@ -444,11 +434,6 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         }
     }
 
-    /**
-     * War remove from watchDir
-     *
-     * @see org.apache.catalina.ha.deploy.FileChangeListener#fileRemoved(File)
-     */
     @Override
     public void fileRemoved(File removeWar) {
         try {
@@ -587,16 +572,6 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     }
 
     /*--Instance Getters/Setters--------------------------------*/
-    @Override
-    public boolean equals(Object listener) {
-        return super.equals(listener);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
     public String getDeployDir() {
         return deployDir;
     }

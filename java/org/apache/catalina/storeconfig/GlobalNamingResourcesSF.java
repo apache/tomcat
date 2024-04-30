@@ -28,12 +28,6 @@ import org.apache.juli.logging.LogFactory;
 public class GlobalNamingResourcesSF extends StoreFactoryBase {
     private static Log log = LogFactory.getLog(GlobalNamingResourcesSF.class);
 
-    /*
-     * Store with NamingResource Factory
-     *
-     * @see org.apache.catalina.storeconfig.IStoreFactory#store(java.io.PrintWriter,
-     *      int, java.lang.Object)
-     */
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement)
             throws Exception {

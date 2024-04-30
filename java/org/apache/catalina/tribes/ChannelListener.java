@@ -45,17 +45,4 @@ public interface ChannelListener {
      */
     boolean accept(Serializable msg, Member sender);
 
-    /**
-     * @param listener Object
-     * @return boolean
-     * @see Object#equals(Object)
-     */
-    @Override boolean equals(Object listener);
-
-    /**
-     * @return int
-     * @see Object#hashCode()
-     */
-    @Override int hashCode();
-
 }

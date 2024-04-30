@@ -129,19 +129,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         channel = null;
     }
 
-    /**
-     * getMessageListener
-     *
-     * @return MessageListener
-     */
     @Override
     public MessageListener getMessageListener() {
         return listener;
     }
 
-    /**
-     * @return The port
-     */
     @Override
     public int getPort() {
         return port;
@@ -155,11 +147,6 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         return txBufSize;
     }
 
-    /**
-     * setMessageListener
-     *
-     * @param listener MessageListener
-     */
     @Override
     public void setMessageListener(MessageListener listener) {
         this.listener = listener;

@@ -67,13 +67,6 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         super.stop();
     }
 
-    /**
-     * Start cluster receiver.
-     *
-     * @throws IOException If the receiver fails to start
-     *
-     * @see org.apache.catalina.tribes.ChannelReceiver#start()
-     */
     @Override
     public void start() throws IOException {
         super.start();

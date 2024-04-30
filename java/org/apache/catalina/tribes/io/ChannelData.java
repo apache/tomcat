@@ -91,79 +91,50 @@ public class ChannelData implements ChannelMessage {
         this.timestamp = timestamp;
     }
 
-    /**
-     * @return Returns the message byte buffer
-     */
     @Override
     public XByteBuffer getMessage() {
         return message;
     }
-    /**
-     * @param message The message to send.
-     */
+
     @Override
     public void setMessage(XByteBuffer message) {
         this.message = message;
     }
-    /**
-     * @return Returns the timestamp.
-     */
+
     @Override
     public long getTimestamp() {
         return timestamp;
     }
-    /**
-     * @param timestamp The timestamp to send
-     */
+
     @Override
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
-    /**
-     * @return Returns the uniqueId.
-     */
+
     @Override
     public byte[] getUniqueId() {
         return uniqueId;
     }
-    /**
-     * @param uniqueId The uniqueId to send.
-     */
+
     public void setUniqueId(byte[] uniqueId) {
         this.uniqueId = uniqueId;
     }
-    /**
-     * @return returns the message options
-     * see org.apache.catalina.tribes.Channel#sendMessage(org.apache.catalina.tribes.Member[], java.io.Serializable, int)
-     *
-     */
+
     @Override
     public int getOptions() {
         return options;
     }
-    /**
-     * Sets the message options.
-     *
-     * @param options the message options
-     */
+
     @Override
     public void setOptions(int options) {
         this.options = options;
     }
 
-    /**
-     * Returns the source or reply-to address
-     * @return Member
-     */
     @Override
     public Member getAddress() {
         return address;
     }
 
-    /**
-     * Sets the source or reply-to address
-     * @param address Member
-     */
     @Override
     public void setAddress(Member address) {
         this.address = address;
@@ -319,10 +290,6 @@ public class ChannelData implements ChannelMessage {
         return clone;
     }
 
-    /**
-     * Complete clone
-     * @return ClusterData
-     */
     @Override
     public Object deepclone() {
         byte[] d = this.getDataPackage();

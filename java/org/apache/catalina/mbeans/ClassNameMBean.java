@@ -31,9 +31,6 @@ package org.apache.catalina.mbeans;
  */
 public class ClassNameMBean<T> extends BaseCatalinaMBean<T> {
 
-    /**
-     * Return the fully qualified Java class name of the managed object for this MBean.
-     */
     @Override
     public String getClassName() {
         return this.resource.getClass().getName();

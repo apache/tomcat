@@ -113,20 +113,12 @@ public final class FileStore extends StoreBase {
     }
 
 
-    /**
-     * Return the name for this Store, used for logging.
-     */
     @Override
     public String getStoreName() {
         return storeName;
     }
 
 
-    /**
-     * Return the number of Sessions present in this Store.
-     *
-     * @exception IOException if an input/output error occurs
-     */
     @Override
     public int getSize() throws IOException {
         // Acquire the list of files in our storage directory
@@ -151,11 +143,6 @@ public final class FileStore extends StoreBase {
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Remove all of the Sessions in this Store.
-     *
-     * @exception IOException if an input/output error occurs
-     */
     @Override
     public void clear() throws IOException {
         String[] keys = keys();
@@ -165,12 +152,6 @@ public final class FileStore extends StoreBase {
     }
 
 
-    /**
-     * Return an array containing the session identifiers of all Sessions currently saved in this Store. If there are no
-     * such Sessions, a zero-length array is returned.
-     *
-     * @exception IOException if an input/output error occurred
-     */
     @Override
     public String[] keys() throws IOException {
         // Acquire the list of files in our storage directory
@@ -197,15 +178,6 @@ public final class FileStore extends StoreBase {
     }
 
 
-    /**
-     * Load and return the Session associated with the specified session identifier from this Store, without removing
-     * it. If there is no such stored Session, return <code>null</code>.
-     *
-     * @param id Session identifier of the session to load
-     *
-     * @exception ClassNotFoundException if a deserialization error occurs
-     * @exception IOException            if an input/output error occurs
-     */
     @Override
     public Session load(String id) throws ClassNotFoundException, IOException {
         // Open an input stream to the specified pathname, if any
@@ -241,14 +213,6 @@ public final class FileStore extends StoreBase {
     }
 
 
-    /**
-     * Remove the Session with the specified session identifier from this Store, if present. If no such Session is
-     * present, this method takes no action.
-     *
-     * @param id Session identifier of the Session to be removed
-     *
-     * @exception IOException if an input/output error occurs
-     */
     @Override
     public void remove(String id) throws IOException {
         File file = file(id);
@@ -266,14 +230,6 @@ public final class FileStore extends StoreBase {
     }
 
 
-    /**
-     * Save the specified Session into this Store. Any previously saved information for the associated session
-     * identifier is replaced.
-     *
-     * @param session Session to be saved
-     *
-     * @exception IOException if an input/output error occurs
-     */
     @Override
     public void save(Session session) throws IOException {
         // Open an output stream to the specified pathname, if any
