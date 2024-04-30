@@ -25,12 +25,6 @@ import org.apache.juli.logging.LogFactory;
 public class WatchedResourceSF extends StoreFactoryBase {
     private static Log log = LogFactory.getLog(WatchedResourceSF.class);
 
-    /*
-     * Store nested Element Value Arrays WatchedResource
-     *
-     * @see org.apache.catalina.config.IStoreFactory#store(java.io.PrintWriter,
-     *      int, java.lang.Object)
-     */
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement)
             throws Exception {

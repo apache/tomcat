@@ -159,18 +159,6 @@ public class GroupChannel extends ChannelInterceptorBase
     }
 
 
-    /**
-     * Adds an interceptor to the stack for message processing<br>
-     * Interceptors are ordered in the way they are added.<br>
-     * <code>channel.addInterceptor(A);</code><br>
-     * <code>channel.addInterceptor(C);</code><br>
-     * <code>channel.addInterceptor(B);</code><br>
-     * Will result in an interceptor stack like this:<br>
-     * <code>A -&gt; C -&gt; B</code><br>
-     * The complete stack will look like this:<br>
-     * <code>Channel -&gt; A -&gt; C -&gt; B -&gt; ChannelCoordinator</code><br>
-     * @param interceptor ChannelInterceptorBase
-     */
     @Override
     public void addInterceptor(ChannelInterceptor interceptor) {
         if ( interceptors == null ) {
@@ -213,36 +201,12 @@ public class GroupChannel extends ChannelInterceptorBase
     }
 
 
-    /**
-     * Send a message to the destinations specified
-     * @param destination Member[] - destination.length &gt; 0
-     * @param msg Serializable - the message to send
-     * @param options sender options, options can trigger guarantee levels and different
-     *                interceptors to react to the message see class documentation for the
-     *                <code>Channel</code> object.<br>
-     * @return UniqueId - the unique Id that was assigned to this message
-     * @throws ChannelException - if an error occurs processing the message
-     * @see org.apache.catalina.tribes.Channel
-     */
     @Override
     public UniqueId send(Member[] destination, Serializable msg, int options)
             throws ChannelException {
         return send(destination,msg,options,null);
     }
 
-    /**
-     * @param destination Member[] - destination.length &gt; 0
-     * @param msg Serializable - the message to send
-     * @param options sender options, options can trigger guarantee levels and different
-     *                interceptors to react to the message see class documentation for the
-     *                <code>Channel</code> object.<br>
-     * @param handler - callback object for error handling and completion notification,
-     *                  used when a message is sent asynchronously using the
-     *                  <code>Channel.SEND_OPTIONS_ASYNCHRONOUS</code> flag enabled.
-     * @return UniqueId - the unique Id that was assigned to this message
-     * @throws ChannelException - if an error occurs processing the message
-     * @see org.apache.catalina.tribes.Channel
-     */
     @Override
     public UniqueId send(Member[] destination, Serializable msg, int options, ErrorHandler handler)
             throws ChannelException {
@@ -476,12 +440,6 @@ public class GroupChannel extends ChannelInterceptorBase
 
     protected boolean ownExecutor = false;
 
-    /**
-     * Starts the channel.
-     * @param svc int - what service to start
-     * @throws ChannelException Start error
-     * @see org.apache.catalina.tribes.Channel#start(int)
-     */
     @Override
     public synchronized void start(int svc) throws ChannelException {
         setupDefaultStack();
@@ -517,12 +475,6 @@ public class GroupChannel extends ChannelInterceptorBase
         }
     }
 
-    /**
-     * Stops the channel.
-     * @param svc int
-     * @throws ChannelException Stop error
-     * @see org.apache.catalina.tribes.Channel#stop(int)
-     */
     @Override
     public synchronized void stop(int svc) throws ChannelException {
         if (monitorFuture != null) {
@@ -567,65 +519,36 @@ public class GroupChannel extends ChannelInterceptorBase
         this.utilityExecutor = utilityExecutor;
     }
 
-    /**
-     * Returns the channel receiver component
-     * @return ChannelReceiver
-     */
     @Override
     public ChannelReceiver getChannelReceiver() {
         return coordinator.getClusterReceiver();
     }
 
-    /**
-     * Returns the channel sender component
-     * @return ChannelSender
-     */
     @Override
     public ChannelSender getChannelSender() {
         return coordinator.getClusterSender();
     }
 
-    /**
-     * Returns the membership service component
-     * @return MembershipService
-     */
     @Override
     public MembershipService getMembershipService() {
         return coordinator.getMembershipService();
     }
 
-    /**
-     * Sets the channel receiver component
-     * @param clusterReceiver ChannelReceiver
-     */
     @Override
     public void setChannelReceiver(ChannelReceiver clusterReceiver) {
         coordinator.setClusterReceiver(clusterReceiver);
     }
 
-    /**
-     * Sets the channel sender component
-     * @param clusterSender ChannelSender
-     */
     @Override
     public void setChannelSender(ChannelSender clusterSender) {
         coordinator.setClusterSender(clusterSender);
     }
 
-    /**
-     * Sets the membership component
-     * @param membershipService MembershipService
-     */
     @Override
     public void setMembershipService(MembershipService membershipService) {
         coordinator.setMembershipService(membershipService);
     }
 
-    /**
-     * Adds a membership listener to the channel.<br>
-     * Membership listeners are uniquely identified using the equals(Object) method
-     * @param membershipListener MembershipListener
-     */
     @Override
     public void addMembershipListener(MembershipListener membershipListener) {
         if (!this.membershipListeners.contains(membershipListener) ) {
@@ -633,22 +556,11 @@ public class GroupChannel extends ChannelInterceptorBase
         }
     }
 
-    /**
-     * Removes a membership listener from the channel.<br>
-     * Membership listeners are uniquely identified using the equals(Object) method
-     * @param membershipListener MembershipListener
-     */
-
     @Override
     public void removeMembershipListener(MembershipListener membershipListener) {
         membershipListeners.remove(membershipListener);
     }
 
-    /**
-     * Adds a channel listener to the channel.<br>
-     * Channel listeners are uniquely identified using the equals(Object) method
-     * @param channelListener ChannelListener
-     */
     @Override
     public void addChannelListener(ChannelListener channelListener) {
         if (!this.channelListeners.contains(channelListener) ) {
@@ -659,20 +571,11 @@ public class GroupChannel extends ChannelInterceptorBase
         }
     }
 
-    /**
-     * Removes a channel listener from the channel.<br>
-     * Channel listeners are uniquely identified using the equals(Object) method
-     * @param channelListener ChannelListener
-     */
     @Override
     public void removeChannelListener(ChannelListener channelListener) {
         channelListeners.remove(channelListener);
     }
 
-    /**
-     * Returns an iterator of all the interceptors in this stack
-     * @return Iterator
-     */
     @Override
     public Iterator<ChannelInterceptor> getInterceptors() {
         return new InterceptorIterator(this.getNext(),this.coordinator);
@@ -709,28 +612,19 @@ public class GroupChannel extends ChannelInterceptorBase
         this.heartbeat = heartbeat;
     }
 
-    /**
-     * @see #setOptionCheck(boolean)
-     * @return boolean
-     */
     @Override
     public boolean getOptionCheck() {
         return optionCheck;
     }
 
-    /**
-     * @see #setHeartbeat(boolean)
-     * @return boolean
-     */
     @Override
     public boolean getHeartbeat() {
         return heartbeat;
     }
 
     /**
-     * Returns the sleep time in milliseconds that the internal heartbeat will
+     * @return the sleep time in milliseconds that the internal heartbeat will
      * sleep in between invocations of <code>Channel.heartbeat()</code>
-     * @return long
      */
     @Override
     public long getHeartbeatSleeptime() {

@@ -34,11 +34,6 @@ import org.apache.tomcat.util.descriptor.web.ContextResourceLink;
 public class NamingResourcesSF extends StoreFactoryBase {
     private static Log log = LogFactory.getLog(NamingResourcesSF.class);
 
-    /**
-     * Store the only the NamingResources elements
-     *
-     * @see NamingResourcesSF#storeChildren(PrintWriter, int, Object, StoreDescription)
-     */
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement)
             throws Exception {
@@ -56,21 +51,7 @@ public class NamingResourcesSF extends StoreFactoryBase {
 
     /**
      * Store the specified NamingResources properties.
-     *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aElement
-     *            Object whose properties are being stored
-     * @param elementDesc
-     *            element descriptor
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
-     *
-     * @see org.apache.catalina.storeconfig.StoreFactoryBase#storeChildren(java.io.PrintWriter,
-     *      int, java.lang.Object, StoreDescription)
+     * {@inheritDoc}
      */
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aElement,

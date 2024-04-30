@@ -59,12 +59,6 @@ public class RealmRuleSet implements RuleSet {
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Add the set of Rule instances defined in this RuleSet to the specified <code>Digester</code> instance,
-     * associating them with our namespace URI (if any). This method should only be called by a Digester instance.
-     *
-     * @param digester Digester instance to which the new Rule instances should be added.
-     */
     @Override
     public void addRuleInstances(Digester digester) {
         StringBuilder pattern = new StringBuilder(prefix);

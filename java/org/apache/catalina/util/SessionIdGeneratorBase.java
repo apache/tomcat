@@ -164,51 +164,29 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase implements Se
     }
 
 
-    /**
-     * Return the node identifier associated with this node which will be
-     * included in the generated session ID.
-     */
     @Override
     public String getJvmRoute() {
         return jvmRoute;
     }
 
 
-    /**
-     * Specify the node identifier associated with this node which will be
-     * included in the generated session ID.
-     *
-     * @param jvmRoute  The node identifier
-     */
     @Override
     public void setJvmRoute(String jvmRoute) {
         this.jvmRoute = jvmRoute;
     }
 
 
-    /**
-     * Return the number of bytes for a session ID
-     */
     @Override
     public int getSessionIdLength() {
         return sessionIdLength;
     }
 
 
-    /**
-     * Specify the number of bytes for a session ID
-     *
-     * @param sessionIdLength   Number of bytes
-     */
     @Override
     public void setSessionIdLength(int sessionIdLength) {
         this.sessionIdLength = sessionIdLength;
     }
 
-
-    /**
-     * Generate and return a new session identifier.
-     */
     @Override
     public String generateSessionId() {
         return generateSessionId(jvmRoute);

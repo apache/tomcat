@@ -57,10 +57,6 @@ public class ReplicationTransmitter implements ChannelSender {
 
     // ------------------------------------------------------------- public
 
-    /**
-     * Send data to one member
-     * @see org.apache.catalina.tribes.ChannelSender#sendMessage(org.apache.catalina.tribes.ChannelMessage, org.apache.catalina.tribes.Member[])
-     */
     @Override
     public void sendMessage(ChannelMessage message, Member[] destination) throws ChannelException {
         MultiPointSender sender = getTransport();

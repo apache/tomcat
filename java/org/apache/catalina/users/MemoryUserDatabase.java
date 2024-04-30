@@ -160,9 +160,6 @@ public class MemoryUserDatabase implements UserDatabase {
 
     // ------------------------------------------------------------- Properties
 
-    /**
-     * @return the set of {@link Group}s defined in this user database.
-     */
     @Override
     public Iterator<Group> getGroups() {
         readLock.lock();
@@ -174,9 +171,6 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-    /**
-     * @return the unique global identifier of this user database.
-     */
     @Override
     public String getId() {
         return this.id;
@@ -232,9 +226,6 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-    /**
-     * @return the set of {@link Role}s defined in this user database.
-     */
     @Override
     public Iterator<Role> getRoles() {
         readLock.lock();
@@ -246,9 +237,6 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-    /**
-     * @return the set of {@link User}s defined in this user database.
-     */
     @Override
     public Iterator<User> getUsers() {
         readLock.lock();
@@ -262,11 +250,6 @@ public class MemoryUserDatabase implements UserDatabase {
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Finalize access to this user database.
-     *
-     * @exception Exception if any exception is thrown during closing
-     */
     @Override
     public void close() throws Exception {
 
@@ -282,12 +265,6 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-    /**
-     * Create and return a new {@link Group} defined in this user database.
-     *
-     * @param groupname The group name of the new group (must be unique)
-     * @param description The description of this group
-     */
     @Override
     public Group createGroup(String groupname, String description) {
         if (groupname == null || groupname.length() == 0) {
@@ -307,12 +284,6 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-    /**
-     * Create and return a new {@link Role} defined in this user database.
-     *
-     * @param rolename The role name of the new group (must be unique)
-     * @param description The description of this group
-     */
     @Override
     public Role createRole(String rolename, String description) {
         if (rolename == null || rolename.length() == 0) {
@@ -332,13 +303,6 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-    /**
-     * Create and return a new {@link User} defined in this user database.
-     *
-     * @param username The logon username of the new user (must be unique)
-     * @param password The logon password of the new user
-     * @param fullName The full name of the new user
-     */
     @Override
     public User createUser(String username, String password, String fullName) {
 
@@ -359,12 +323,6 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-    /**
-     * Return the {@link Group} with the specified group name, if any; otherwise
-     * return <code>null</code>.
-     *
-     * @param groupname Name of the group to return
-     */
     @Override
     public Group findGroup(String groupname) {
         readLock.lock();
@@ -376,12 +334,6 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-    /**
-     * Return the {@link Role} with the specified role name, if any; otherwise
-     * return <code>null</code>.
-     *
-     * @param rolename Name of the role to return
-     */
     @Override
     public Role findRole(String rolename) {
         readLock.lock();
@@ -393,12 +345,6 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-    /**
-     * Return the {@link User} with the specified user name, if any; otherwise
-     * return <code>null</code>.
-     *
-     * @param username Name of the user to return
-     */
     @Override
     public User findUser(String username) {
         readLock.lock();
@@ -410,11 +356,6 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-    /**
-     * Initialize access to this user database.
-     *
-     * @exception Exception if any exception is thrown during opening
-     */
     @Override
     public void open() throws Exception {
         writeLock.lock();
@@ -460,11 +401,6 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-    /**
-     * Remove the specified {@link Group} from this user database.
-     *
-     * @param group The group to be removed
-     */
     @Override
     public void removeGroup(Group group) {
         readLock.lock();
@@ -481,11 +417,6 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-    /**
-     * Remove the specified {@link Role} from this user database.
-     *
-     * @param role The role to be removed
-     */
     @Override
     public void removeRole(Role role) {
         readLock.lock();
@@ -507,11 +438,6 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-    /**
-     * Remove the specified {@link User} from this user database.
-     *
-     * @param user The user to be removed
-     */
     @Override
     public void removeUser(User user) {
         readLock.lock();
@@ -540,12 +466,6 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-    /**
-     * Save any updated information to the persistent storage location for this
-     * user database.
-     *
-     * @exception Exception if any exception is thrown during saving
-     */
     @Override
     public void save() throws Exception {
 
@@ -749,9 +669,6 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-    /**
-     * Return a String representation of this UserDatabase.
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("MemoryUserDatabase[id=");

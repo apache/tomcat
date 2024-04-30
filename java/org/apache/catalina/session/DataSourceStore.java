@@ -139,9 +139,6 @@ public class DataSourceStore extends StoreBase {
         return name;
     }
 
-    /**
-     * @return the name for this Store, used for logging.
-     */
     @Override
     public String getStoreName() {
         return storeName;
@@ -377,14 +374,6 @@ public class DataSourceStore extends StoreBase {
         return keys;
     }
 
-    /**
-     * Return an integer containing a count of all Sessions currently saved in this Store. If there are no Sessions,
-     * <code>0</code> is returned.
-     *
-     * @return the count of all sessions currently saved in this Store
-     *
-     * @exception IOException if an input/output error occurred
-     */
     @Override
     public int getSize() throws IOException {
         int size = 0;
@@ -417,17 +406,6 @@ public class DataSourceStore extends StoreBase {
         return size;
     }
 
-    /**
-     * Load the Session associated with the id <code>id</code>. If no such session is found <code>null</code> is
-     * returned.
-     *
-     * @param id a value of type <code>String</code>
-     *
-     * @return the stored <code>Session</code>
-     *
-     * @exception ClassNotFoundException if an error occurs
-     * @exception IOException            if an input/output error occurred
-     */
     @Override
     public Session load(String id) throws ClassNotFoundException, IOException {
         StandardSession _session = null;
@@ -476,14 +454,6 @@ public class DataSourceStore extends StoreBase {
         return _session;
     }
 
-    /**
-     * Remove the Session with the specified session identifier from this Store, if present. If no such Session is
-     * present, this method takes no action.
-     *
-     * @param id Session identifier of the Session to be removed
-     *
-     * @exception IOException if an input/output error occurs
-     */
     @Override
     public void remove(String id) throws IOException {
 
@@ -531,11 +501,6 @@ public class DataSourceStore extends StoreBase {
         }
     }
 
-    /**
-     * Remove all of the Sessions in this Store.
-     *
-     * @exception IOException if an input/output error occurs
-     */
     @Override
     public void clear() throws IOException {
         String clearSql = "DELETE FROM " + sessionTable + " WHERE " + sessionAppCol + " = ?";
@@ -561,13 +526,6 @@ public class DataSourceStore extends StoreBase {
         }
     }
 
-    /**
-     * Save a session to the Store.
-     *
-     * @param session the session to be stored
-     *
-     * @exception IOException if an input/output error occurs
-     */
     @Override
     public void save(Session session) throws IOException {
         ByteArrayOutputStream bos = null;

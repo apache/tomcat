@@ -118,9 +118,6 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
 
     // ------------------------------------------------------------- Properties
 
-    /**
-     * Return the Java class loader to be used by this Container.
-     */
     @Override
     public ClassLoader getClassLoader() {
         return classLoader;
@@ -151,20 +148,12 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
     }
 
 
-    /**
-     * Return the "follow standard delegation model" flag used to configure our ClassLoader.
-     */
     @Override
     public boolean getDelegate() {
         return this.delegate;
     }
 
 
-    /**
-     * Set the "follow standard delegation model" flag used to configure our ClassLoader.
-     *
-     * @param delegate The new flag
-     */
     @Override
     public void setDelegate(boolean delegate) {
         boolean oldDelegate = this.delegate;
@@ -225,11 +214,6 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Add a property change listener to this component.
-     *
-     * @param listener The listener to add
-     */
     @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
 
@@ -238,10 +222,6 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
     }
 
 
-    /**
-     * Execute a periodic task, such as reloading, etc. This method will be invoked inside the classloading context of
-     * this container. Unexpected throwables will be caught and logged.
-     */
     @Override
     public void backgroundProcess() {
         Context context = getContext();
@@ -292,30 +272,18 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
     }
 
 
-    /**
-     * Has the internal repository associated with this Loader been modified, such that the loaded classes should be
-     * reloaded?
-     */
     @Override
     public boolean modified() {
         return classLoader != null ? classLoader.modified() : false;
     }
 
 
-    /**
-     * Remove a property change listener from this component.
-     *
-     * @param listener The listener to remove
-     */
     @Override
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         support.removePropertyChangeListener(listener);
     }
 
 
-    /**
-     * Return a String representation of this component.
-     */
     @Override
     public String toString() {
         return ToStringUtil.toString(this, context);
@@ -603,7 +571,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
     }
 
 
-    /*
+    /**
      * Implemented in a sub-class so EESpecProfile and EESpecProfiles are not loaded unless a profile is configured.
      * Otherwise, tomcat-embed-core.jar has a runtime dependency on the migration tool whether it is used or not.
      */

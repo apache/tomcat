@@ -645,16 +645,6 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Log a message summarizing the specified request and response, according to the format specified by the
-     * <code>pattern</code> property.
-     *
-     * @param request  Request being processed
-     * @param response Response being processed
-     *
-     * @exception IOException      if an input/output error has occurred
-     * @exception ServletException if a servlet error has occurred
-     */
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
         if (tlsAttributeRequired) {

@@ -65,9 +65,6 @@ public class GenericRole<UD extends UserDatabase> extends AbstractRole {
     // ------------------------------------------------------------- Properties
 
 
-    /**
-     * Return the {@link UserDatabase} within which this role is defined.
-     */
     @Override
     public UserDatabase getUserDatabase() {
         return this.database;

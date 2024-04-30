@@ -153,9 +153,6 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         return buffer.toString();
     }
 
-    /**
-     * Open the new log file for the date specified by <code>dateStamp</code>.
-     */
     @Override
     protected synchronized void open() {
         super.open();

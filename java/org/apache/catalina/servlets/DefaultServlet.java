@@ -287,18 +287,12 @@ public class DefaultServlet extends HttpServlet {
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Finalize this servlet.
-     */
     @Override
     public void destroy() {
         // NOOP
     }
 
 
-    /**
-     * Initialize this servlet.
-     */
     @Override
     public void init() throws ServletException {
 
@@ -505,15 +499,6 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-    /**
-     * Process a GET request for the specified resource.
-     *
-     * @param request  The servlet request we are processing
-     * @param response The servlet response we are creating
-     *
-     * @exception IOException      if an input/output error occurs
-     * @exception ServletException if a servlet-specified error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
@@ -524,15 +509,6 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-    /**
-     * Process a HEAD request for the specified resource.
-     *
-     * @param request  The servlet request we are processing
-     * @param response The servlet response we are creating
-     *
-     * @exception IOException      if an input/output error occurs
-     * @exception ServletException if a servlet-specified error occurs
-     */
     @Override
     protected void doHead(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
@@ -560,6 +536,13 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
+    /**
+     * Determines the methods normally allowed for the resource.
+     *
+     * @param req The Servlet request
+     *
+     * @return The allowed HTTP methods
+     */
     protected String determineMethodsAllowed(HttpServletRequest req) {
         StringBuilder allow = new StringBuilder();
 
@@ -586,15 +569,6 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-    /**
-     * Process a POST request for the specified resource.
-     *
-     * @param request  The servlet request we are processing
-     * @param response The servlet response we are creating
-     *
-     * @exception IOException      if an input/output error occurs
-     * @exception ServletException if a servlet-specified error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
@@ -602,15 +576,6 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-    /**
-     * Process a PUT request for the specified resource.
-     *
-     * @param req  The servlet request we are processing
-     * @param resp The servlet response we are creating
-     *
-     * @exception IOException      if an input/output error occurs
-     * @exception ServletException if a servlet-specified error occurs
-     */
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -726,15 +691,6 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-    /**
-     * Process a DELETE request for the specified resource.
-     *
-     * @param req  The servlet request we are processing
-     * @param resp The servlet response we are creating
-     *
-     * @exception IOException      if an input/output error occurs
-     * @exception ServletException if a servlet-specified error occurs
-     */
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 

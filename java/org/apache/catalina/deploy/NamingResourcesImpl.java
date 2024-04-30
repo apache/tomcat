@@ -163,9 +163,6 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     // ------------------------------------------------------------- Properties
 
 
-    /**
-     * @return the container with which the naming resources are associated.
-     */
     @Override
     public Object getContainer() {
         return container;
@@ -230,11 +227,6 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     }
 
 
-    /**
-     * Add an environment entry for this web application.
-     *
-     * @param environment New environment entry
-     */
     @Override
     public void addEnvironment(ContextEnvironment environment) {
 
@@ -375,11 +367,6 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     }
 
 
-    /**
-     * Add a resource reference for this web application.
-     *
-     * @param resource New resource reference
-     */
     @Override
     public void addResource(ContextResource resource) {
 
@@ -436,11 +423,6 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     }
 
 
-    /**
-     * Add a resource link for this web application.
-     *
-     * @param resourceLink New resource link
-     */
     @Override
     public void addResourceLink(ContextResourceLink resourceLink) {
 
@@ -727,11 +709,6 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     }
 
 
-    /**
-     * Remove any environment entry with the specified name.
-     *
-     * @param name Name of the environment entry to remove
-     */
     @Override
     public void removeEnvironment(String name) {
 
@@ -810,11 +787,6 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     }
 
 
-    /**
-     * Remove any resource reference with the specified name.
-     *
-     * @param name Name of the resource reference to remove
-     */
     @Override
     public void removeResource(String name) {
 
@@ -860,11 +832,6 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     }
 
 
-    /**
-     * Remove any resource link with the specified name.
-     *
-     * @param name Name of the resource link to remove
-     */
     @Override
     public void removeResourceLink(String name) {
 

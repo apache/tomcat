@@ -142,13 +142,6 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
         return AbstractReplicatedMap.MapMessage.MSG_BACKUP;
     }
 
-    /**
-     * publish info about a map pair (key/value) to other nodes in the cluster
-     * @param key Object
-     * @param value Object
-     * @return Member - the backup node
-     * @throws ChannelException Cluster error
-     */
     @Override
     protected Member[] publishEntryInfo(Object key, Object value) throws ChannelException {
         Log log = getLog();

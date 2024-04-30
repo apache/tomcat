@@ -61,11 +61,7 @@ public class SSIServlet extends HttpServlet {
 
 
     // ----------------- Public methods.
-    /**
-     * Initialize this servlet.
-     *
-     * @exception ServletException if an error occurs
-     */
+
     @Override
     public void init() throws ServletException {
 
@@ -97,7 +93,7 @@ public class SSIServlet extends HttpServlet {
 
 
     /**
-     * Process and forward the GET request to our <code>requestHandler()</code>*
+     * Process and forward the GET request to our <code>requestHandler()</code>.
      *
      * @param req a value of type 'HttpServletRequest'
      * @param res a value of type 'HttpServletResponse'

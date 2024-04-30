@@ -78,21 +78,26 @@ public interface Member extends Serializable {
      */
     long getMemberAliveTime();
 
+    /**
+     * Set the alive time in ms.
+     * @param memberAliveTime the value to set
+     */
     void setMemberAliveTime(long memberAliveTime);
 
     /**
      * The current state of the member
-     * @return boolean - true if the member is functioning correctly
+     * @return {@code true} if the member is functioning correctly
      */
     boolean isReady();
+
     /**
      * The current state of the member
-     * @return boolean - true if the member is suspect, but the crash has not been confirmed
+     * @return {@code true} if the member is suspect, but the crash has not been confirmed
      */
     boolean isSuspect();
 
     /**
-     * @return boolean - true if the member has been confirmed to malfunction
+     * @return {@code true} if the member has been confirmed to malfunction
      */
     boolean isFailing();
 
@@ -104,24 +109,29 @@ public interface Member extends Serializable {
     byte[] getUniqueId();
 
     /**
-     * returns the payload associated with this member
-     * @return byte[]
+     * @return the payload associated with this member
      */
     byte[] getPayload();
 
+    /**
+     * Set the payload associated with this member.
+     * @param payload the payload
+     */
     void setPayload(byte[] payload);
 
     /**
-     * returns the command associated with this member
-     * @return byte[]
+     * @return the command associated with this member
      */
     byte[] getCommand();
 
+    /**
+     * Set the command associated with this member.
+     * @param command the command
+     */
     void setCommand(byte[] command);
 
     /**
-     * Domain for this cluster
-     * @return byte[]
+     * @return the domain for this cluster
      */
     byte[] getDomain();
 
@@ -150,9 +160,13 @@ public interface Member extends Serializable {
     int getDataLength();
 
     /**
-     * @return boolean - true if the member is local member
+     * @return {@code true} if the member is local member
      */
     boolean isLocal();
 
+    /**
+     * Set if the member is local.
+     * @param local set to {@code true} if this is the local member
+     */
     void setLocal(boolean local);
 }

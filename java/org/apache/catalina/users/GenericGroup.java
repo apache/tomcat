@@ -82,27 +82,18 @@ public class GenericGroup<UD extends UserDatabase> extends AbstractGroup {
     // ------------------------------------------------------------- Properties
 
 
-    /**
-     * Return the set of {@link Role}s assigned specifically to this group.
-     */
     @Override
     public Iterator<Role> getRoles() {
         return roles.iterator();
     }
 
 
-    /**
-     * Return the {@link UserDatabase} within which this Group is defined.
-     */
     @Override
     public UserDatabase getUserDatabase() {
         return this.database;
     }
 
 
-    /**
-     * Return the set of {@link org.apache.catalina.User}s that are members of this group.
-     */
     @Override
     public Iterator<User> getUsers() {
         List<User> results = new ArrayList<>();
@@ -120,11 +111,6 @@ public class GenericGroup<UD extends UserDatabase> extends AbstractGroup {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Add a new {@link Role} to those assigned specifically to this group.
-     *
-     * @param role The new role
-     */
     @Override
     public void addRole(Role role) {
         if (roles.addIfAbsent(role)) {
@@ -133,22 +119,12 @@ public class GenericGroup<UD extends UserDatabase> extends AbstractGroup {
     }
 
 
-    /**
-     * Is this group specifically assigned the specified {@link Role}?
-     *
-     * @param role The role to check
-     */
     @Override
     public boolean isInRole(Role role) {
         return roles.contains(role);
     }
 
 
-    /**
-     * Remove a {@link Role} from those assigned to this group.
-     *
-     * @param role The old role
-     */
     @Override
     public void removeRole(Role role) {
         if (roles.remove(role)) {
@@ -157,9 +133,6 @@ public class GenericGroup<UD extends UserDatabase> extends AbstractGroup {
     }
 
 
-    /**
-     * Remove all {@link Role}s from those assigned to this group.
-     */
     @Override
     public void removeRoles() {
         if (!roles.isEmpty()) {

@@ -459,9 +459,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     }
 
 
-    /**
-     * Return a string representation of this object.
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

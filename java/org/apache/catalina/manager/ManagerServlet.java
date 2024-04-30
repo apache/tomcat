@@ -219,20 +219,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     // ----------------------------------------------- ContainerServlet Methods
 
 
-    /**
-     * Return the Wrapper with which we are associated.
-     */
     @Override
     public Wrapper getWrapper() {
         return this.wrapper;
     }
 
 
-    /**
-     * Set the Wrapper with which we are associated.
-     *
-     * @param wrapper The new wrapper
-     */
     @Override
     public void setWrapper(Wrapper wrapper) {
 
@@ -262,9 +254,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Finalize this servlet.
-     */
     @Override
     public void destroy() {
 
@@ -273,15 +262,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
-    /**
-     * Process a GET request for the specified resource.
-     *
-     * @param request  The servlet request we are processing
-     * @param response The servlet response we are creating
-     *
-     * @exception IOException      if an input/output error occurs
-     * @exception ServletException if a servlet-specified error occurs
-     */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -382,15 +362,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
-    /**
-     * Process a PUT request for the specified resource.
-     *
-     * @param request  The servlet request we are processing
-     * @param response The servlet response we are creating
-     *
-     * @exception IOException      if an input/output error occurs
-     * @exception ServletException if a servlet-specified error occurs
-     */
     @Override
     public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -437,9 +408,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
-    /**
-     * Initialize this servlet.
-     */
     @Override
     public void init() throws ServletException {
 

@@ -60,10 +60,10 @@ public interface IStoreConfig {
     void storeConfig();
 
     /**
-     * Store the specified Server properties.
+     * Write the configuration information for this entire <code>Server</code>
+     * out to the server.xml configuration file.
      *
-     * @param aServer
-     *            Object to be stored
+     * @param aServer Server instance
      * @return <code>true</code> if the store operation was successful
      */
     boolean store(Server aServer);

@@ -84,9 +84,6 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Initialize this servlet.
-     */
     @Override
     public void init() throws ServletException {
 
@@ -137,9 +134,6 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
     }
 
 
-    /**
-     * Finalize this servlet.
-     */
     @Override
     public void destroy() {
 
@@ -156,15 +150,6 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
     }
 
 
-    /**
-     * Process a GET request for the specified resource.
-     *
-     * @param request  The servlet request we are processing
-     * @param response The servlet response we are creating
-     *
-     * @exception IOException      if an input/output error occurs
-     * @exception ServletException if a servlet-specified error occurs
-     */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 

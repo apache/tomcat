@@ -46,13 +46,6 @@ public class CopyParentClassLoaderRule extends Rule {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Handle the beginning of an XML element.
-     *
-     * @param attributes The attributes of this element
-     *
-     * @exception Exception if a processing error occurs
-     */
     @Override
     public void begin(String namespace, String name, Attributes attributes) throws Exception {
 

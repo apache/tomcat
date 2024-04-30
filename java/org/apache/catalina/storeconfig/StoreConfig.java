@@ -67,12 +67,6 @@ public class StoreConfig implements IStoreConfig {
         serverFilename = string;
     }
 
-    /**
-     * Get the StoreRegistry with all factory to generate the
-     * server.xml/context.xml files.
-     *
-     * @see org.apache.catalina.storeconfig.IStoreConfig#getRegistry()
-     */
     @Override
     public StoreRegistry getRegistry() {
         return registry;
@@ -88,19 +82,11 @@ public class StoreConfig implements IStoreConfig {
         return server;
     }
 
-    /**
-     * set StoreRegistry
-     *
-     * @see org.apache.catalina.storeconfig.IStoreConfig#setRegistry(org.apache.catalina.storeconfig.StoreRegistry)
-     */
     @Override
     public void setRegistry(StoreRegistry aRegistry) {
         registry = aRegistry;
     }
 
-    /**
-     * Store current Server.
-     */
     @Override
     public void storeConfig() {
         store(server);
@@ -212,13 +198,6 @@ public class StoreConfig implements IStoreConfig {
         }
     }
 
-    /**
-     * Write the configuration information for this entire <code>Server</code>
-     * out to the server.xml configuration file.
-     *
-     * @param aServer Server instance
-     * @return <code>true</code> if the store operation was successful
-     */
     @Override
     public synchronized boolean store(Server aServer) {
         StoreFileMover mover = new StoreFileMover(Bootstrap.getCatalinaBase(),
@@ -236,9 +215,6 @@ public class StoreConfig implements IStoreConfig {
         return false;
     }
 
-    /**
-     * @see org.apache.catalina.storeconfig.IStoreConfig#store(org.apache.catalina.Context)
-     */
     @Override
     public synchronized boolean store(Context aContext) {
         try {
@@ -260,10 +236,6 @@ public class StoreConfig implements IStoreConfig {
         return false;
     }
 
-    /**
-     * @see org.apache.catalina.storeconfig.IStoreConfig#store(java.io.PrintWriter,
-     *      int, org.apache.catalina.Context)
-     */
     @Override
     public void store(PrintWriter aWriter, int indent,
             Context aContext) throws Exception {
@@ -285,10 +257,6 @@ public class StoreConfig implements IStoreConfig {
         }
     }
 
-    /**
-     * @see org.apache.catalina.storeconfig.IStoreConfig#store(java.io.PrintWriter,
-     *      int, org.apache.catalina.Host)
-     */
     @Override
     public void store(PrintWriter aWriter, int indent, Host aHost)
             throws Exception {
@@ -301,10 +269,6 @@ public class StoreConfig implements IStoreConfig {
         }
     }
 
-    /**
-     * @see org.apache.catalina.storeconfig.IStoreConfig#store(java.io.PrintWriter,
-     *      int, org.apache.catalina.Service)
-     */
     @Override
     public void store(PrintWriter aWriter, int indent,
             Service aService) throws Exception {
@@ -317,10 +281,6 @@ public class StoreConfig implements IStoreConfig {
         }
     }
 
-    /**
-     * @see org.apache.catalina.storeconfig.IStoreConfig#store(java.io.PrintWriter,
-     *      int, org.apache.catalina.Server)
-     */
     @Override
     public void store(PrintWriter writer, int indent,
             Server aServer) throws Exception {
