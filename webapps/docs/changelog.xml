@@ -217,6 +217,10 @@
         Examples: Increase the number of previous messages displayed when using
         the WebSocket chat application. (markt)
       </update>
+      <fix>
+        Examples: Improve performance of WebSocket snake application when
+        multiple clients disconnect at the same time. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
