@@ -185,6 +185,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Examples: Improve performance of WebSocket chat application when
+        multiple clients disconnect at the same time. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
