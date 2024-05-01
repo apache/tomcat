@@ -191,6 +191,10 @@
         Examples: Improve performance of WebSocket chat application when
         multiple clients disconnect at the same time. (markt)
       </fix>
+      <update>
+        Examples: Increase the number of previous messages displayed when using
+        the WebSocket chat application. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
