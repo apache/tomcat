@@ -120,7 +120,6 @@ public class SnakeAnnotation {
          * Assume all errors are fatal. Close the session and remove the snake from the game.
          */
         session.close();
-        onClose();
         /*
          * Correct action depends on root cause. Protect against infinite loops while looking for root cause.
          */
