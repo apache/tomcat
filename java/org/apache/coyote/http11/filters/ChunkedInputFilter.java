@@ -167,18 +167,12 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
     // ---------------------------------------------------- InputFilter Methods
 
-    /**
-     * Read the content length from the request.
-     */
     @Override
     public void setRequest(Request request) {
         // NO-OP - Request is fixed and passed to constructor.
     }
 
 
-    /**
-     * End the current request.
-     */
     @Override
     public long end() throws IOException {
         long swallowed = 0;
@@ -199,9 +193,6 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
     }
 
 
-    /**
-     * Amount of bytes still available in a buffer.
-     */
     @Override
     public int available() {
         int available = 0;
@@ -217,18 +208,12 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
     }
 
 
-    /**
-     * Set the next buffer in the filter pipeline.
-     */
     @Override
     public void setBuffer(InputBuffer buffer) {
         this.buffer = buffer;
     }
 
 
-    /**
-     * Make the filter ready to process the next request.
-     */
     @Override
     public void recycle() {
         remaining = 0;

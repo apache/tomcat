@@ -1013,9 +1013,6 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    /**
-     * Callback to write data from the buffer.
-     */
     @Override
     protected final void flush() throws IOException {
         // Calling code should ensure that there is no data in the buffers for
@@ -1031,9 +1028,6 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    /**
-     * Finish AJP response.
-     */
     @Override
     protected final void finishResponse() throws IOException {
         if (responseFinished) {

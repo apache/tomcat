@@ -185,7 +185,16 @@ public abstract class AbstractProcessorLight implements Processor {
      */
     protected abstract SocketState dispatch(SocketEvent status) throws IOException;
 
+    /**
+     * Calls the post process of the async state machine.
+     *
+     * @return The state the caller should put the socket in when this method returns
+     * @throws IOException If an I/O error occurs during the processing of the request
+     */
     protected abstract SocketState asyncPostProcess() throws IOException;
 
+    /**
+     * @return the logger associated with this processor type
+     */
     protected abstract Log getLog();
 }

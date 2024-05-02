@@ -207,11 +207,7 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
 
     // ----------------------------------------------- HttpOutputBuffer Methods
 
-    /**
-     * Flush the response.
-     *
-     * @throws IOException an underlying I/O error occurred
-     */
+
     @Override
     public void flush() throws IOException {
         if (lastActiveFilter == -1) {
@@ -528,9 +524,6 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
      */
     protected class SocketOutputBuffer implements HttpOutputBuffer {
 
-        /**
-         * Write chunk.
-         */
         @Override
         public int doWrite(ByteBuffer chunk) throws IOException {
             try {
