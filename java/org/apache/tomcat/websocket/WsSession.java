@@ -688,6 +688,22 @@ public class WsSession implements Session {
     }
 
 
+    /*
+     * Returns the session close timeout in milliseconds
+     */
+    private long getAbnormalSessionCloseSendTimeout() {
+        long result = 0;
+        Object obj = userProperties.get(Constants.ABNORMAL_SESSION_CLOSE_SEND_TIMEOUT_PROPERTY);
+        if (obj instanceof Long) {
+            result = ((Long) obj).longValue();
+        }
+        if (result <= 0) {
+            result = Constants.DEFAULT_ABNORMAL_SESSION_CLOSE_SEND_TIMEOUT;
+        }
+        return result;
+    }
+
+
     protected void checkCloseTimeout() {
         // Skip the check if no session close timeout has been set.
         if (sessionCloseTimeoutExpiry != null) {
@@ -767,7 +783,12 @@ public class WsSession implements Session {
         }
         msg.flip();
         try {
-            wsRemoteEndpoint.sendMessageBlock(Constants.OPCODE_CLOSE, msg, true);
+            if (closeCode == CloseCodes.NORMAL_CLOSURE) {
+                wsRemoteEndpoint.sendMessageBlock(Constants.OPCODE_CLOSE, msg, true);
+            } else {
+                wsRemoteEndpoint.sendMessageBlock(Constants.OPCODE_CLOSE, msg, true,
+                        getAbnormalSessionCloseSendTimeout());
+            }
         } catch (IOException | IllegalStateException e) {
             // Failed to send close message. Close the socket and let the caller
             // deal with the Exception
