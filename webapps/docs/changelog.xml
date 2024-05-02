@@ -194,6 +194,18 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>68884</bug>: Reduce the write timeout when writing WebSocket close
+        messages for abnormal closes. The timeout defaults to 50 milliseconds
+        and may be controlled using the
+        <code>org.apache.tomcat.websocket.ABNORMAL_SESSION_CLOSE_SEND_TIMEOUT</code>
+        property in the user properties collection associated with the WebSocket
+        session. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
