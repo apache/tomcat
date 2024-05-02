@@ -58,52 +58,30 @@ public class VoidInputFilter implements InputFilter {
 
     // ---------------------------------------------------- InputFilter Methods
 
-    /**
-     * Set the associated request.
-     */
     @Override
     public void setRequest(Request request) {
         // NOOP: Request isn't used so ignore it
     }
 
 
-    /**
-     * Set the next buffer in the filter pipeline.
-     */
     @Override
     public void setBuffer(InputBuffer buffer) {
         // NOOP: No body to read
     }
 
 
-    /**
-     * Make the filter ready to process the next request.
-     */
     @Override
     public void recycle() {
         // NOOP
     }
 
 
-    /**
-     * Return the name of the associated encoding; Here, the value is
-     * "void".
-     */
     @Override
     public ByteChunk getEncodingName() {
         return ENCODING;
     }
 
 
-    /**
-     * End the current request. It is acceptable to write extra bytes using
-     * buffer.doWrite during the execution of this method.
-     *
-     * @return Should return 0 unless the filter does some content length
-     * delimitation, in which case the number is the amount of extra bytes or
-     * missing bytes, which would indicate an error.
-     * Note: It is recommended that extra bytes be swallowed by the filter.
-     */
     @Override
     public long end() throws IOException {
         return 0;

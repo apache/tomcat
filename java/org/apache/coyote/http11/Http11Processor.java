@@ -867,9 +867,6 @@ public class Http11Processor extends AbstractProcessor {
     }
 
 
-    /**
-     * When committing the response, we have to validate the set of headers, as well as setup the response filters.
-     */
     @Override
     protected final void prepareResponse() throws IOException {
 
