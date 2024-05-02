@@ -39,10 +39,21 @@ public interface ApplicationBufferHandler {
         }
     };
 
+    /**
+     * Set the byte buffer.
+     * @param buffer the byte buffer
+     */
     void setByteBuffer(ByteBuffer buffer);
 
+    /**
+     * @return the byte buffer
+     */
     ByteBuffer getByteBuffer();
 
+    /**
+     * Expand the byte buffer to at least the given size. Some implementations may not implement this.
+     * @param size the desired size
+     */
     void expand(int size);
 
 }

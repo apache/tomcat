@@ -1153,9 +1153,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         }
 
 
-        /**
-         * Expected to be used by the Endpoint to release resources on socket close, errors etc.
-         */
         @Override
         public void release(SocketWrapperBase<S> socketWrapper) {
             Processor processor = (Processor) socketWrapper.takeCurrentProcessor();

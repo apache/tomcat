@@ -126,6 +126,7 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
 
 
     /**
+     * {@inheritDoc}
      * Read the content length from the request.
      */
     @Override
@@ -166,9 +167,6 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
     }
 
 
-    /**
-     * Amount of bytes still available in a buffer.
-     */
     @Override
     public int available() {
         // No data buffered here. Try the next filter in the chain.
@@ -176,18 +174,12 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
     }
 
 
-    /**
-     * Set the next buffer in the filter pipeline.
-     */
     @Override
     public void setBuffer(InputBuffer buffer) {
         this.buffer = buffer;
     }
 
 
-    /**
-     * Make the filter ready to process the next request.
-     */
     @Override
     public void recycle() {
         contentLength = -1;
@@ -195,10 +187,6 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
     }
 
 
-    /**
-     * Return the name of the associated encoding; Here, the value is
-     * "identity".
-     */
     @Override
     public ByteChunk getEncodingName() {
         return ENCODING;

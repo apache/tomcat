@@ -26,8 +26,20 @@ package org.apache.coyote;
  * @author Remy Maucherat
  */
 public enum ActionCode {
+
+    /**
+     * Acknowledge request, most often used for HTTP expectations.
+     */
     ACK,
+
+    /**
+     * Regular close.
+     */
     CLOSE,
+
+    /**
+     * Response commit, which means any initial bytes part of the response are going to be sent.
+     */
     COMMIT,
 
     /**

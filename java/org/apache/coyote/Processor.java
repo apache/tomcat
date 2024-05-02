@@ -56,6 +56,9 @@ public interface Processor {
      */
     boolean isUpgrade();
 
+    /**
+     * @return {@code true} if the Processor state is async, otherwise {@code false}
+     */
     boolean isAsync();
 
     /**

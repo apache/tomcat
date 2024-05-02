@@ -50,21 +50,34 @@ abstract class AbstractStream {
     }
 
 
+    /**
+     * @return the stream identifier
+     */
     final Integer getIdentifier() {
         return identifier;
     }
 
 
+    /**
+     * @return the stream identifier as a String
+     */
     final String getIdAsString() {
         return idAsString;
     }
 
 
+    /**
+     * @return the stream identifier
+     */
     final int getIdAsInt() {
         return identifier.intValue();
     }
 
 
+    /**
+     * Set the window size for this stream.
+     * @param windowSize the value
+     */
     final void setWindowSize(long windowSize) {
         windowAllocationLock.lock();
         try {
@@ -75,6 +88,9 @@ abstract class AbstractStream {
     }
 
 
+    /**
+     * @return the window size
+     */
     final long getWindowSize() {
         windowAllocationLock.lock();
         try {
@@ -120,6 +136,11 @@ abstract class AbstractStream {
     }
 
 
+    /**
+     * Decrement window size.
+     *
+     * @param decrement The amount by which the window size should be decreased
+     */
     final void decrementWindowSize(int decrement) {
         windowAllocationLock.lock();
         try {
@@ -137,11 +158,18 @@ abstract class AbstractStream {
     }
 
 
+    /**
+     * @return the requested amount of resources requested
+     */
     final int getConnectionAllocationRequested() {
         return connectionAllocationRequested;
     }
 
 
+    /**
+     * Set the amount of requested resources.
+     * @param connectionAllocationRequested the value
+     */
     final void setConnectionAllocationRequested(int connectionAllocationRequested) {
         log.trace(sm.getString("abstractStream.setConnectionAllocationRequested", getConnectionId(), getIdAsString(),
                 Integer.toString(this.connectionAllocationRequested), Integer.toString(connectionAllocationRequested)));
@@ -149,11 +177,18 @@ abstract class AbstractStream {
     }
 
 
+    /**
+     * @return the allocation that was made at the connection level
+     */
     final int getConnectionAllocationMade() {
         return connectionAllocationMade;
     }
 
 
+    /**
+     * Set the allocation made at the connection level.
+     * @param connectionAllocationMade the value
+     */
     final void setConnectionAllocationMade(int connectionAllocationMade) {
         log.trace(sm.getString("abstractStream.setConnectionAllocationMade", getConnectionId(), getIdAsString(),
                 Integer.toString(this.connectionAllocationMade), Integer.toString(connectionAllocationMade)));
@@ -161,5 +196,8 @@ abstract class AbstractStream {
     }
 
 
+    /**
+     * @return the connection id
+     */
     abstract String getConnectionId();
 }
