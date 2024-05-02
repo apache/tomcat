@@ -266,6 +266,9 @@
       <update>
         Update the internal fork of Apache Commons DBCP to 2.12.0. (markt)
       </update>
+      <add>
+        Improvements to Japanese translations by tak7iji. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
