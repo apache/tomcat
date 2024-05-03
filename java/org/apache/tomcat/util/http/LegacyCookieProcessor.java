@@ -219,7 +219,7 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
                     log.debug("Cookies: Parsing b[]: " + cookieValue.toString());
                 }
                 ByteChunk bc = cookieValue.getByteChunk();
-                processCookieHeader(bc.getBytes(), bc.getOffset(), bc.getLength(), serverCookies);
+                processCookieHeader(bc.getBytes(), bc.getStart(), bc.getLength(), serverCookies);
             }
 
             // search from the next position
