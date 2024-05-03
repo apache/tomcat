@@ -155,7 +155,7 @@
       </fix>
       <fix>
         Remove MBean metadata for attibutes that have been removed. Based on
-        <pr>719</pr> by Shawn Q. (markt)
+        pull request <pr>719</pr> by Shawn Q. (markt)
       </fix>
       <scode>
         Remove duplicate ID check from <code>Manager.rotateSessionId()</code>.
@@ -206,6 +206,11 @@
       <scode>
         Refactor HTTP header parsing to use common parsing code. (markt)
       </scode>
+      <fix>
+        When an invalid HTTP response header was dropped, an off-by-one error
+        meant that the first header in the response was also dropped. Fix based
+        on pull request <pr>710</pr> by foremans. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -424,7 +429,7 @@
     <changelog>
       <fix>
         Minor performance improvement for building filter chains. Based on
-        ideas from <pr>702</pr> by Luke Miao. (remm)
+        ideas from pull request <pr>702</pr> by Luke Miao. (remm)
       </fix>
       <fix>
         Align error handling for <code>Writer</code> and

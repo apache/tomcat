@@ -1052,7 +1052,8 @@ public class Http11Processor extends AbstractProcessor {
                     size--;
                     // Header buffer is corrupted. Reset it and start again.
                     outputBuffer.resetHeaderBuffer();
-                    i = 0;
+                    // -1 as it will be incremented at the start of the loop and header indexes start at 0.
+                    i = -1;
                     outputBuffer.sendStatus();
                 }
             }

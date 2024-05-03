@@ -110,6 +110,7 @@ public class TestHttp11OutputBuffer extends TomcatBaseTest {
             Assert.assertEquals(HttpServletResponse.SC_OK, rc);
             List<String> values = resHeaders.get(HeaderServlet.CUSTOM_HEADER_NAME);
             Assert.assertNull(values);
+            Assert.assertEquals(5, resHeaders.size());
         }
     }
 
