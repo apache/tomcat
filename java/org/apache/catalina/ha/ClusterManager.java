@@ -83,6 +83,7 @@ public interface ClusterManager extends Manager {
 
     /**
      * Set the cluster associated with this manager.
+     *
      * @param cluster the cluster
      */
     void setCluster(CatalinaCluster cluster);
@@ -91,7 +92,9 @@ public interface ClusterManager extends Manager {
      * Open stream and use correct ClassLoader (Container), switching thread context class loader.
      *
      * @param data the data
+     *
      * @return the object input stream
+     *
      * @throws IOException An error occurred
      */
     ReplicationStream getReplicationStream(byte[] data) throws IOException;
@@ -99,10 +102,12 @@ public interface ClusterManager extends Manager {
     /**
      * Open stream and use correct ClassLoader (Container), switching thread context class loader.
      *
-     * @param data the data
+     * @param data   the data
      * @param offset the offset in the data array
      * @param length the data length
+     *
      * @return the object input stream
+     *
      * @throws IOException An error occurred
      */
     ReplicationStream getReplicationStream(byte[] data, int offset, int length) throws IOException;

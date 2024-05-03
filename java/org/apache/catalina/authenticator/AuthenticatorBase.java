@@ -974,7 +974,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             associate(ssoId, request.getSessionInternal(true));
 
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("authenticator.reauthentication", request.getUserPrincipal().getName(), request.getAuthType()));
+                log.debug(sm.getString("authenticator.reauthentication", request.getUserPrincipal().getName(),
+                        request.getAuthType()));
             }
         }
 
@@ -1076,8 +1077,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 cookie.setDomain(ssoDomain);
             }
 
-            // Configure httpOnly on SSO cookie using same rules as session
-            // cookies
+            // Configure httpOnly on SSO cookie using same rules as session cookies
             if (request.getServletContext().getSessionCookieConfig().isHttpOnly() ||
                     request.getContext().getUseHttpOnly()) {
                 cookie.setHttpOnly(true);

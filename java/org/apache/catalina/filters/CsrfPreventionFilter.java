@@ -49,33 +49,26 @@ import org.apache.juli.logging.LogFactory;
  * <li>{@link HttpServletResponse#encodeRedirectURL(String)} and {@link HttpServletResponse#encodeURL(String)} are used
  * to encode all URLs returned to the client
  * </ul>
- *
  * <p>
- *   CSRF protection is enabled by generating random nonce values which are
- *   stored in the client's HTTP session. Each URL encoded using
- *   {@link HttpServletResponse#encodeURL(String)} has a URL parameter added
- *   which, when sent to the server in a future request, will be checked
- *   against this stored set of nonces for validity.
+ * CSRF protection is enabled by generating random nonce values which are stored in the client's HTTP session. Each URL
+ * encoded using {@link HttpServletResponse#encodeURL(String)} has a URL parameter added which, when sent to the server
+ * in a future request, will be checked against this stored set of nonces for validity.
  * </p>
- *
  * <p>
- *   Some URLs should be accessible even without a valid nonce parameter value.
- *   These URLs are known as "entry points" because clients should be able to
- *   "enter" the application without first establishing any valid tokens. These
- *   are configured with the <code>entryPoints</code> filter
- *   <code>init-param</code>.
+ * Some URLs should be accessible even without a valid nonce parameter value. These URLs are known as "entry points"
+ * because clients should be able to "enter" the application without first establishing any valid tokens. These are
+ * configured with the <code>entryPoints</code> filter <code>init-param</code>.
  * </p>
- *
  * <p>
- *   Some URLs should not have nonce parameters added to them at all
+ * Some URLs should not have nonce parameters added to them at all
  */
 public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
     /**
      * The default set of URL patterns for which nonces will not be appended.
      */
-    private static final String DEFAULT_NO_NONCE_URL_PATTERNS
-        = "*.css, *.js, *.gif, *.png, *.jpg, *.svg, *.ico, *.jpeg, *.mjs";
+    private static final String DEFAULT_NO_NONCE_URL_PATTERNS =
+            "*.css, *.js, *.gif, *.png, *.jpg, *.svg, *.ico, *.jpeg, *.mjs";
 
     /**
      * The servlet context in which this Filter is operating.
@@ -91,14 +84,12 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     private String nonceRequestParameterName = Constants.CSRF_NONCE_REQUEST_PARAM;
 
     /**
-     * Flag which determines whether this Filter is in "enforcement" mode
-     * (the default) or in "reporting" mode.
+     * Flag which determines whether this Filter is in "enforcement" mode (the default) or in "reporting" mode.
      */
     private boolean enforce = true;
 
     /**
-     * A set of comma-separated URL patterns which will have no nonce
-     * parameters added to them.
+     * A set of comma-separated URL patterns which will have no nonce parameters added to them.
      */
     private String noNoncePatterns = DEFAULT_NO_NONCE_URL_PATTERNS;
 
@@ -139,43 +130,34 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
     /**
-     * Sets the flag to enforce CSRF protection or just log failures as DEBUG
-     * messages.
+     * Sets the flag to enforce CSRF protection or just log failures as DEBUG messages.
      *
-     * @param enforce <code>true</code> to enforce CSRF protection or
-     *                <code>false</code> to log DEBUG messages and allow
-     *                all requests.
+     * @param enforce <code>true</code> to enforce CSRF protection or <code>false</code> to log DEBUG messages and allow
+     *                    all requests.
      */
     public void setEnforce(boolean enforce) {
         this.enforce = enforce;
     }
 
     /**
-     * Gets the flag to enforce CSRF protection or just log failures as DEBUG
-     * messages.
+     * Gets the flag to enforce CSRF protection or just log failures as DEBUG messages.
      *
-     * @return <code>true</code> if CSRF protection will be enforced or
-     *         <code>false</code> if all requests will be allowed and
-     *         failures will be logged as DEBUG messages.
+     * @return <code>true</code> if CSRF protection will be enforced or <code>false</code> if all requests will be
+     *             allowed and failures will be logged as DEBUG messages.
      */
     public boolean isEnforce() {
         return this.enforce;
     }
 
     /**
-     * Sets the list of URL patterns to suppress nonce-addition for.
+     * Sets the list of URL patterns to suppress nonce-addition for. Some URLs do not need nonces added to them such as
+     * static resources. By <i>not</i> adding nonces to those URLs, HTTP caches can be more effective because the CSRF
+     * prevention filter won't generate what look like unique URLs for those commonly-reused resources.
      *
-     * Some URLs do not need nonces added to them such as static resources.
-     * By <i>not</i> adding nonces to those URLs, HTTP caches can be more
-     * effective because the CSRF prevention filter won't generate what
-     * look like unique URLs for those commonly-reused resources.
-     *
-     * @param patterns A comma-separated list of URL patterns that will not
-     *        have nonces added to them. Patterns may begin or end with a
-     *        <code>*</code> character to denote a suffix-match or
-     *        prefix-match. Any matched URL will not have a CSRF nonce
-     *        added to it when passed through
-     *        {@link HttpServletResponse#encodeURL(String)}.
+     * @param patterns A comma-separated list of URL patterns that will not have nonces added to them. Patterns may
+     *                     begin or end with a <code>*</code> character to denote a suffix-match or prefix-match. Any
+     *                     matched URL will not have a CSRF nonce added to it when passed through
+     *                     {@link HttpServletResponse#encodeURL(String)}.
      */
     public void setNoNonceURLPatterns(String patterns) {
         this.noNoncePatterns = patterns;
@@ -188,7 +170,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     /**
      * Creates a collection of matchers from a comma-separated string of patterns.
      *
-     * @param context the Servlet context
+     * @param context  the Servlet context
      * @param patterns A comma-separated string of URL matching patterns.
      *
      * @return A collection of predicates representing the URL patterns.
@@ -222,11 +204,9 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      * Creates a predicate that can match the specified type of pattern.
      *
      * @param context the Servlet context
-     * @param pattern The pattern to match e.g. <code>*.foo</code> or
-     *                <code>/bar/*</code>.
+     * @param pattern The pattern to match e.g. <code>*.foo</code> or <code>/bar/*</code>.
      *
-     * @return A Predicate which can match the specified pattern, or
-     *         <code>null</code> if the pattern is null or blank.
+     * @return A Predicate which can match the specified pattern, or <code>null</code> if the pattern is null or blank.
      */
     protected static Predicate<String> createNoNoncePredicate(ServletContext context, String pattern) {
         if (null == pattern || 0 == pattern.trim().length()) {
@@ -246,10 +226,8 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
     /**
-     * A no-nonce Predicate that evaluates a MIME type instead of a URL.
-     *
-     * It can be used with any other Predicate for matching
-     * the actual value of the MIME type.
+     * A no-nonce Predicate that evaluates a MIME type instead of a URL. It can be used with any other Predicate for
+     * matching the actual value of the MIME type.
      */
     protected static class MimePredicate implements Predicate<String> {
         private final ServletContext context;
@@ -277,6 +255,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      */
     protected static class PrefixPredicate implements Predicate<String> {
         private final String prefix;
+
         public PrefixPredicate(String prefix) {
             this.prefix = prefix;
         }
@@ -292,6 +271,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      */
     protected static class SuffixPredicate implements Predicate<String> {
         private final String suffix;
+
         public SuffixPredicate(String suffix) {
             this.suffix = suffix;
         }
@@ -381,7 +361,8 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                         } else {
                             if (log.isTraceEnabled()) {
                                 log.trace("Would have rejecting request for " + getRequestedPath(req) + ", session " +
-                                        (null == session ? "(null)" : session.getId()) + " due to empty / missing nonce cache");
+                                        (null == session ? "(null)" : session.getId()) +
+                                        " due to empty / missing nonce cache");
                             }
                         }
                     } else if (!nonceCache.contains(previousNonce)) {
@@ -402,8 +383,8 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                         }
                     } else {
                         if (log.isTraceEnabled()) {
-                            log.trace(
-                                    "Allowing request to " + getRequestedPath(req) + " with valid CSRF nonce " + previousNonce);
+                            log.trace("Allowing request to " + getRequestedPath(req) + " with valid CSRF nonce " +
+                                    previousNonce);
                         }
                     }
                 }
@@ -448,19 +429,15 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
     /**
-     * Check to see if the request and path should be enforced or only
-     * observed and reported.
-     *
-     * Note that the <code>requestedPath</code> parameter is purely
-     * a performance optimization to avoid calling
+     * Check to see if the request and path should be enforced or only observed and reported. Note that the
+     * <code>requestedPath</code> parameter is purely a performance optimization to avoid calling
      * {@link #getRequestedPath(HttpServletRequest)} multiple times.
      *
-     * @param req The request.
+     * @param req           The request.
      * @param requestedPath The path of the request being evaluated.
      *
-     * @return <code>true</code> if the CSRF prevention should be enforced,
-     *         <code>false</code> if the CSRF prevention should only be
-     *         logged in DEBUG mode.
+     * @return <code>true</code> if the CSRF prevention should be enforced, <code>false</code> if the CSRF prevention
+     *             should only be logged in DEBUG mode.
      */
     protected boolean enforce(HttpServletRequest req, String requestedPath) {
         return isEnforce();
@@ -556,8 +533,8 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         private final String nonce;
         private final Collection<Predicate<String>> noNoncePatterns;
 
-        public CsrfResponseWrapper(HttpServletResponse response, String nonceRequestParameterName,
-                String nonce, Collection<Predicate<String>> noNoncePatterns) {
+        public CsrfResponseWrapper(HttpServletResponse response, String nonceRequestParameterName, String nonce,
+                Collection<Predicate<String>> noNoncePatterns) {
             super(response);
             this.nonceRequestParameterName = nonceRequestParameterName;
             this.nonce = nonce;

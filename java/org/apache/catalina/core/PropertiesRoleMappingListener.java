@@ -37,8 +37,8 @@ import org.apache.tomcat.util.res.StringManager;
  * This listener must only be nested within {@link Context} elements.
  * <p>
  * The keys represent application roles (e.g., admin, user, uservisor, etc.) while the values represent technical roles
- * (e.g., DNs, SIDs, UUIDs, etc.). A key can also be prefixed if, e.g., the properties file contains generic
- * application configuration as well: {@code app-roles.}.
+ * (e.g., DNs, SIDs, UUIDs, etc.). A key can also be prefixed if, e.g., the properties file contains generic application
+ * configuration as well: {@code app-roles.}.
  * <p>
  * Note: The default value for the {@code roleMappingFile} is {@code webapp:/WEB-INF/role-mapping.properties}.
  */
@@ -60,7 +60,8 @@ public class PropertiesRoleMappingListener implements LifecycleListener {
      * {@link ConfigFileLoader} supports.
      *
      * @param roleMappingFile the role mapping properties file to load from
-     * @throws NullPointerException if roleMappingFile is null
+     *
+     * @throws NullPointerException     if roleMappingFile is null
      * @throws IllegalArgumentException if roleMappingFile is empty
      */
     public void setRoleMappingFile(String roleMappingFile) {
@@ -116,7 +117,7 @@ public class PropertiesRoleMappingListener implements LifecycleListener {
             }
 
             int linkCount = 0;
-            for (Entry<Object, Object> prop : props.entrySet()) {
+            for (Entry<Object,Object> prop : props.entrySet()) {
                 String role = (String) prop.getKey();
 
                 if (keyPrefix != null) {

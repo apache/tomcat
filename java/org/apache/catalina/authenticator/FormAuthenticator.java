@@ -726,9 +726,9 @@ public class FormAuthenticator extends AuthenticatorBase {
                 }
             } else if (previousSavedRequest != null && previousSavedRequest.getOriginalMaxInactiveInterval() > 0) {
                 /*
-                 * The user may have refreshed the browser page during authentication. Transfer the original max inactive
-                 * interval from previous saved request to current one else, once authentication is completed, the session
-                 * will retain the the shorter authentication session timeout
+                 * The user may have refreshed the browser page during authentication. Transfer the original max
+                 * inactive interval from previous saved request to current one else, once authentication is completed,
+                 * the session will retain the the shorter authentication session timeout
                  */
                 saved.setOriginalMaxInactiveInterval(previousSavedRequest.getOriginalMaxInactiveInterval());
             }

@@ -939,8 +939,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     /**
      * {@inheritDoc}
      * <p>
-     * This is used to allow connectors to bind to restricted ports under Unix
-     * operating environments.
+     * This is used to allow connectors to bind to restricted ports under Unix operating environments.
      */
     @Override
     protected void initInternal() throws LifecycleException {
@@ -1032,10 +1031,10 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
     /**
      * @return the MBean domain for this server. The domain is obtained using the following search order:
-     * <ol>
-     * <li>Name of first {@link org.apache.catalina.Engine}.</li>
-     * <li>Name of first {@link Service}.</li>
-     * </ol>
+     *             <ol>
+     *             <li>Name of first {@link org.apache.catalina.Engine}.</li>
+     *             <li>Name of first {@link Service}.</li>
+     *             </ol>
      */
     @Override
     protected String getDomainInternal() {

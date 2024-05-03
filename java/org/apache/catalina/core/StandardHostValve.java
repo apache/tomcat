@@ -310,9 +310,9 @@ final class StandardHostValve extends ValveBase {
             }
         } else {
             /*
-             *  A custom error-page has not been defined for the exception that was thrown during request processing.
-             *  Set the status to 500 if an error status has not already been set and check for custom error-page for
-             *  the status.
+             * A custom error-page has not been defined for the exception that was thrown during request processing. Set
+             * the status to 500 if an error status has not already been set and check for custom error-page for the
+             * status.
              */
             if (response.getStatus() < HttpServletResponse.SC_BAD_REQUEST) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

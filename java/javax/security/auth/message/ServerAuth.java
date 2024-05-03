@@ -31,7 +31,8 @@ public interface ServerAuth {
      *
      * @throws AuthException If the a failure occurred in a manner that prevented the failure from being communicated
      *                           via messageInfo
-     */    AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject)
+     */
+    AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject)
             throws AuthException;
 
     /**

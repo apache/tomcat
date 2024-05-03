@@ -60,7 +60,8 @@ public class CombinedRealm extends RealmBase {
         realms.add(theRealm);
 
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("combinedRealm.addRealm", theRealm.getClass().getName(), Integer.toString(realms.size())));
+            log.debug(sm.getString("combinedRealm.addRealm", theRealm.getClass().getName(),
+                    Integer.toString(realms.size())));
         }
     }
 
