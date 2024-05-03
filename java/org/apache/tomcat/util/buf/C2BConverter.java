@@ -121,11 +121,11 @@ public final class C2BConverter {
         } else if (result.isOverflow()) {
             // Propagate current positions to the byte chunk and char chunk
             bc.setEnd(bb.position());
-            cc.setOffset(cb.position());
+            cc.setStart(cb.position());
         } else if (result.isUnderflow()) {
             // Propagate current positions to the byte chunk and char chunk
             bc.setEnd(bb.position());
-            cc.setOffset(cb.position());
+            cc.setStart(cb.position());
             // Put leftovers in the leftovers char buffer
             if (cc.getLength() > 0) {
                 leftovers.limit(leftovers.array().length);

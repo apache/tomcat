@@ -486,7 +486,7 @@ public class TestBasicAuthParser {
                         + ioe.getMessage());
             }
             // emulate tomcat server - offset points to method in header
-            authHeader.setOffset(initialOffset);
+            authHeader.setStart(initialOffset);
         }
 
         /*
@@ -506,7 +506,7 @@ public class TestBasicAuthParser {
                         + ioe.getMessage());
             }
             // emulate tomcat server - offset points to method in header
-            authHeader.setOffset(initialOffset);
+            authHeader.setStart(initialOffset);
         }
 
         /*

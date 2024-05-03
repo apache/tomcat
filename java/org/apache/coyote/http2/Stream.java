@@ -1364,7 +1364,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         final void insertReplayedBody(ByteChunk body) {
             readStateLock.lock();
             try {
-                inBuffer = ByteBuffer.wrap(body.getBytes(), body.getOffset(), body.getLength());
+                inBuffer = ByteBuffer.wrap(body.getBytes(), body.getStart(), body.getLength());
             } finally {
                 readStateLock.unlock();
             }

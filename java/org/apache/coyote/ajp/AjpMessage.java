@@ -167,7 +167,7 @@ public class AjpMessage {
             // values will be OK. Strings using other encodings may be
             // corrupted.
             byte[] buffer = bc.getBuffer();
-            for (int i = bc.getOffset(); i < bc.getLength(); i++) {
+            for (int i = bc.getStart(); i < bc.getLength(); i++) {
                 // byte values are signed i.e. -128 to 127
                 // The values are used unsigned. 0 to 31 are CTLs so they are
                 // filtered (apart from TAB which is 9). 127 is a control (DEL).
