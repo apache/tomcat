@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.buf;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -36,6 +37,7 @@ public class Asn1Parser {
     public static final int TAG_OCTET_STRING = 0x04;
     public static final int TAG_NULL = 0x05;
     public static final int TAG_OID = 0x06;
+    public static final int TAG_UTF8STRING = 0x0C;
     public static final int TAG_SEQUENCE = 0x30;
     public static final int TAG_ATTRIBUTE_BASE = 0xA0;
 
@@ -146,6 +148,12 @@ public class Asn1Parser {
 
     public byte[] parseOIDAsBytes() {
         return parseBytes(TAG_OID);
+    }
+
+
+    public String parseUTF8String() {
+        byte[] val = parseBytes(TAG_UTF8STRING);
+        return new String(val, StandardCharsets.UTF_8);
     }
 
 
