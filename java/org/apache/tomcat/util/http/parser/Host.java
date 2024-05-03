@@ -90,7 +90,7 @@ public class Host {
         MessageBytesReader(MessageBytes mb) {
             ByteChunk bc = mb.getByteChunk();
             bytes = bc.getBytes();
-            pos = bc.getOffset();
+            pos = bc.getStart();
             end = bc.getEnd();
         }
 

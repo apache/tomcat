@@ -161,11 +161,11 @@ public class B2CConverter {
         } else if (result.isOverflow()) {
             // Propagate current positions to the byte chunk and char chunk, if
             // this continues the char buffer will get resized
-            bc.setOffset(bb.position());
+            bc.setStart(bb.position());
             cc.setEnd(cb.position());
         } else if (result.isUnderflow()) {
             // Propagate current positions to the byte chunk and char chunk
-            bc.setOffset(bb.position());
+            bc.setStart(bb.position());
             cc.setEnd(cb.position());
             // Put leftovers in the leftovers byte buffer
             if (bc.getLength() > 0) {

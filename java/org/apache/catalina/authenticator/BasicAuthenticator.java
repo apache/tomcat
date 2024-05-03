@@ -152,7 +152,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
          */
         public BasicCredentials(ByteChunk input, Charset charset) throws IllegalArgumentException {
             authorization = input;
-            initialOffset = input.getOffset();
+            initialOffset = input.getStart();
             this.charset = charset;
 
             parseMethod();
@@ -203,7 +203,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
             System.arraycopy(authorization.getBuffer(), base64blobOffset, encoded, 0, base64blobLength);
             byte[] decoded = Base64.getDecoder().decode(encoded);
             // restore original offset
-            authorization.setOffset(initialOffset);
+            authorization.setStart(initialOffset);
             if (decoded == null) {
                 throw new IllegalArgumentException(sm.getString("basicAuthenticator.notBase64"));
             }
