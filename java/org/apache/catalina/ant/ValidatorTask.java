@@ -30,10 +30,10 @@ import org.xml.sax.InputSource;
 
 
 /**
- * Task for validating a web application deployment descriptor, using XML
- * schema validation.
+ * Task for validating a web application deployment descriptor, using XML schema validation.
  *
  * @author Remy Maucherat
+ *
  * @since 5.0
  */
 public class ValidatorTask extends BaseRedirectorHelperTask {
@@ -62,9 +62,8 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Execute the specified command.  This logic only performs the common
-     * attribute validation required by all subclasses; it does not perform
-     * any functional logic directly.
+     * Execute the specified command. This logic only performs the common attribute validation required by all
+     * subclasses; it does not perform any functional logic directly.
      *
      * @exception BuildException if a validation error occurs
      */
@@ -87,8 +86,7 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
 
         // Called through trusted manager interface. If running under a
         // SecurityManager assume that untrusted applications may be deployed.
-        Digester digester = DigesterFactory.newDigester(
-                true, true, null, Globals.IS_SECURITY_ENABLED);
+        Digester digester = DigesterFactory.newDigester(true, true, null, Globals.IS_SECURITY_ENABLED);
         try (InputStream stream = new BufferedInputStream(new FileInputStream(file.getCanonicalFile()))) {
             InputSource is = new InputSource(file.toURI().toURL().toExternalForm());
             is.setByteStream(stream);
