@@ -33,7 +33,7 @@ version.major=11
 version.minor=0
 version.build=0
 version.patch=0
-version.suffix=-M20
+version.suffix=-M21
 version.dev=-dev
 
 # ----- Build tools -----
