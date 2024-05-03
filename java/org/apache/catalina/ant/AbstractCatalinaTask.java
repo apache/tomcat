@@ -289,7 +289,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
      * Authenticator.setDefault() for authentication as the JRE then provides the DIGEST client implementation. However,
      * the above two are not compatible. When the request is made, the resulting 401 triggers an exception because, when
      * using streams, the InputStream is no longer available to send with the repeated request that now includes the
-     * appropriate Authorization header. The hack is to make a simple OPTIONS request- i.e. without a request body.This
+     * appropriate Authorization header. The hack is to make a simple OPTIONS request- i.e. without a request body. This
      * triggers authentication and the requirement to authenticate for this host is cached and used to provide an
      * appropriate Authorization when the next request is made (that includes a request body).
      */

@@ -136,6 +136,7 @@ class ApplicationRequest extends ServletRequestWrapper {
         return specialsSet.contains(name);
     }
 
+
     // ------------------------------------------ ServletRequestWrapper Methods
 
     /**
