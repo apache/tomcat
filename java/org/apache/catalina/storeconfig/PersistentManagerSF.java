@@ -29,11 +29,12 @@ public class PersistentManagerSF extends StoreFactoryBase {
 
     /**
      * Store the specified PersistentManager properties.
+     * <p>
      * {@inheritDoc}
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aManager,
-            StoreDescription parentDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aManager, StoreDescription parentDesc)
+            throws Exception {
         if (aManager instanceof PersistentManager) {
             PersistentManager manager = (PersistentManager) aManager;
 

@@ -27,12 +27,14 @@ public interface IStoreFactory {
 
     /**
      * Set the store appender.
+     *
      * @param storeWriter the writer
      */
     void setStoreAppender(StoreAppender storeWriter);
 
     /**
      * Set the registry.
+     *
      * @param aRegistry the registry to be associated with
      */
     void setRegistry(StoreRegistry aRegistry);
@@ -45,16 +47,17 @@ public interface IStoreFactory {
     /**
      * Store a server.xml element with attributes and children.
      *
-     * @param aWriter the writer to write to
-     * @param indent the indentation
+     * @param aWriter  the writer to write to
+     * @param indent   the indentation
      * @param aElement the element to write
+     *
      * @throws Exception if an error occurs
      */
-    void store(PrintWriter aWriter, int indent, Object aElement)
-            throws Exception;
+    void store(PrintWriter aWriter, int indent, Object aElement) throws Exception;
 
     /**
      * Store XML header.
+     *
      * @param aWriter the writer to write to
      */
     void storeXMLHead(PrintWriter aWriter);
