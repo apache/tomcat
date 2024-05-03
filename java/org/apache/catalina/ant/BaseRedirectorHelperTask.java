@@ -28,20 +28,16 @@ import org.apache.tools.ant.taskdefs.Redirector;
 import org.apache.tools.ant.types.RedirectorElement;
 
 /**
- * Abstract base class to add output redirection support for Catalina Ant tasks.
- * These tasks require Ant 1.5 or later.
+ * Abstract base class to add output redirection support for Catalina Ant tasks. These tasks require Ant 1.5 or later.
  * <br>
- * <strong>WARNING:</strong> due to depends chain, Ant could call a Task more
- * than once and this can affect the output redirection when configured. If you
- * are collecting the output in a property, it will collect the output of only
- * the first run, since Ant properties are immutable and once created they
- * cannot be changed. <br>
- * If you are collecting output in a file the file will be overwritten with the
- * output of the last run, unless you set append="true", in which case each run
- * will append it's output to the file.
- *
+ * <strong>WARNING:</strong> due to depends chain, Ant could call a Task more than once and this can affect the output
+ * redirection when configured. If you are collecting the output in a property, it will collect the output of only the
+ * first run, since Ant properties are immutable and once created they cannot be changed. <br>
+ * If you are collecting output in a file the file will be overwritten with the output of the last run, unless you set
+ * append="true", in which case each run will append it's output to the file.
  *
  * @author Gabriele Garuglieri
+ *
  * @since 5.5
  */
 public abstract class BaseRedirectorHelperTask extends Task {
@@ -65,37 +61,31 @@ public abstract class BaseRedirectorHelperTask extends Task {
     PrintStream redirectErrPrintStream = null;
 
     /**
-     * Whether to fail (with a BuildException) if ManagerServlet returns an
-     * error. The default behavior is to do so. <b> This flag does not control
-     * parameters checking. If the task is called with wrong or invalid
-     * parameters, it will throw BuildException independently from the setting
-     * of this flag. </b>
+     * Whether to fail (with a BuildException) if ManagerServlet returns an error. The default behavior is to do so. <b>
+     * This flag does not control parameters checking. If the task is called with wrong or invalid parameters, it will
+     * throw BuildException independently from the setting of this flag. </b>
      */
     protected boolean failOnError = true;
 
     /**
-     * <code>true</code> true when output redirection is requested for this task.
-     * Default is to log on Ant log.
+     * <code>true</code> true when output redirection is requested for this task. Default is to log on Ant log.
      */
     protected boolean redirectOutput = false;
 
     /**
-     * will be set to <code>true</code> when the configuration of the Redirector
-     * is complete.
+     * will be set to <code>true</code> when the configuration of the Redirector is complete.
      */
     protected boolean redirectorConfigured = false;
 
     /**
-     * Flag which indicates that, if redirected, output should also be always
-     * sent to the log. Default is that output is sent only to redirected
-     * streams.
+     * Flag which indicates that, if redirected, output should also be always sent to the log. Default is that output is
+     * sent only to redirected streams.
      */
     protected boolean alwaysLog = false;
 
 
     /**
-     * Whether to fail (with a BuildException) if ManagerServlet returns an
-     * error. The default behavior is to do so.
+     * Whether to fail (with a BuildException) if ManagerServlet returns an error. The default behavior is to do so.
      *
      * @param fail The new value of failonerror
      */
@@ -107,8 +97,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
     /**
      * Returns the value of the failOnError property.
      *
-     * @return <code>true</code> if the task should will if an error occurs,
-     *         otherwise <code>false</code>
+     * @return <code>true</code> if the task should will if an error occurs, otherwise <code>false</code>
      */
     public boolean isFailOnError() {
         return failOnError;
@@ -130,7 +119,6 @@ public abstract class BaseRedirectorHelperTask extends Task {
      * File the error output of the task is redirected to.
      *
      * @param error name of the error file
-     *
      */
     public void setError(File error) {
         redirector.setError(error);
@@ -139,11 +127,10 @@ public abstract class BaseRedirectorHelperTask extends Task {
 
 
     /**
-     * Controls whether error output is logged. This is only useful when output
-     * is being redirected and error output is desired in the Ant log
+     * Controls whether error output is logged. This is only useful when output is being redirected and error output is
+     * desired in the Ant log
      *
-     * @param logError if true the standard error is sent to the Ant log system
-     *            and not sent to output stream.
+     * @param logError if true the standard error is sent to the Ant log system and not sent to output stream.
      */
     public void setLogError(boolean logError) {
         redirector.setLogError(logError);
@@ -155,7 +142,6 @@ public abstract class BaseRedirectorHelperTask extends Task {
      * Property name whose value should be set to the output of the task.
      *
      * @param outputProperty property name
-     *
      */
     public void setOutputproperty(String outputProperty) {
         redirector.setOutputProperty(outputProperty);
@@ -167,7 +153,6 @@ public abstract class BaseRedirectorHelperTask extends Task {
      * Property name whose value should be set to the error of the task.
      *
      * @param errorProperty property name
-     *
      */
     public void setErrorProperty(String errorProperty) {
         redirector.setErrorProperty(errorProperty);
@@ -179,7 +164,6 @@ public abstract class BaseRedirectorHelperTask extends Task {
      * If true, append output to existing file.
      *
      * @param append if true, append output to existing file
-     *
      */
     public void setAppend(boolean append) {
         redirector.setAppend(append);
@@ -188,12 +172,9 @@ public abstract class BaseRedirectorHelperTask extends Task {
 
 
     /**
-     * If true, (error and non-error) output will be redirected as specified
-     * while being sent to Ant's logging mechanism as if no redirection had
-     * taken place. Defaults to false.
-     * <br>
-     * Actually handled internally, with Ant 1.6.3 it will be handled by the
-     * <code>Redirector</code> itself.
+     * If true, (error and non-error) output will be redirected as specified while being sent to Ant's logging mechanism
+     * as if no redirection had taken place. Defaults to false. <br>
+     * Actually handled internally, with Ant 1.6.3 it will be handled by the <code>Redirector</code> itself.
      *
      * @param alwaysLog <code>boolean</code>
      */
@@ -204,8 +185,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
 
 
     /**
-     * Whether output and error files should be created even when empty.
-     * Defaults to true.
+     * Whether output and error files should be created even when empty. Defaults to true.
      *
      * @param createEmptyFiles <CODE>boolean</CODE>.
      */
@@ -238,9 +218,8 @@ public abstract class BaseRedirectorHelperTask extends Task {
             redirectOutput = true;
         }
         /*
-         * Due to depends chain, Ant could call the Task more than once, this is
-         * to prevent that we attempt to configure uselessly more than once the
-         * Redirector.
+         * Due to depends chain, Ant could call the Task more than once, this is to prevent that we attempt to configure
+         * uselessly more than once the Redirector.
          */
         redirectorConfigured = true;
     }
@@ -264,10 +243,9 @@ public abstract class BaseRedirectorHelperTask extends Task {
 
 
     /**
-     * Ask redirector to close all the streams. It is necessary to call this
-     * method before leaving the Task to have the Streams flush their contents.
-     * If you are collecting output in a property, it will be created only if
-     * this method is called, otherwise you'll find it unset.
+     * Ask redirector to close all the streams. It is necessary to call this method before leaving the Task to have the
+     * Streams flush their contents. If you are collecting output in a property, it will be created only if this method
+     * is called, otherwise you'll find it unset.
      */
     protected void closeRedirector() {
         try {
@@ -278,8 +256,8 @@ public abstract class BaseRedirectorHelperTask extends Task {
             log("Error closing redirector: " + ioe.getMessage(), Project.MSG_ERR);
         }
         /*
-         * Due to depends chain, Ant could call the Task more than once, this is
-         * to prevent that we attempt to reuse the previously closed Streams.
+         * Due to depends chain, Ant could call the Task more than once, this is to prevent that we attempt to reuse the
+         * previously closed Streams.
          */
         redirectOutStream = null;
         redirectOutPrintStream = null;
@@ -313,7 +291,6 @@ public abstract class BaseRedirectorHelperTask extends Task {
      * Handles output with the INFO priority and flushes the stream.
      *
      * @param output The output to log. Should not be <code>null</code>.
-     *
      */
     @Override
     protected void handleFlush(String output) {
@@ -347,7 +324,6 @@ public abstract class BaseRedirectorHelperTask extends Task {
      * Handles error output with the ERR priority and flushes the stream.
      *
      * @param output The error output to log. Should not be <code>null</code>.
-     *
      */
     @Override
     protected void handleErrorFlush(String output) {
@@ -357,10 +333,9 @@ public abstract class BaseRedirectorHelperTask extends Task {
 
 
     /**
-     * Handles output with ERR priority to error stream and all other priorities
-     * to output stream.
+     * Handles output with ERR priority to error stream and all other priorities to output stream.
      *
-     * @param output The output to log. Should not be <code>null</code>.
+     * @param output   The output to log. Should not be <code>null</code>.
      * @param priority The priority level that should be used
      */
     protected void handleOutput(String output, int priority) {

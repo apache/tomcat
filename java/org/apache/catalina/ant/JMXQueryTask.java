@@ -24,8 +24,8 @@ import org.apache.tools.ant.BuildException;
 
 
 /**
- * Ant task that implements the JMX Query command
- * (<code>/jmxproxy/?qry</code>) supported by the Tomcat manager application.
+ * Ant task that implements the JMX Query command (<code>/jmxproxy/?qry</code>) supported by the Tomcat manager
+ * application.
  *
  * @author Vivek Chopra
  */
@@ -35,32 +35,37 @@ public class JMXQueryTask extends AbstractCatalinaTask {
 
     /**
      * The JMX query string
+     *
      * @see #setQuery(String)
      */
-    protected String query      = null;
+    protected String query = null;
 
     // Public Methods
 
     /**
      * Get method for the JMX query string
+     *
      * @return Query string
      */
-    public String getQuery () {
+    public String getQuery() {
         return this.query;
     }
 
     /**
      * Set method for the JMX query string.
-    * <p>Examples of query format:</p>
+     * <p>
+     * Examples of query format:
+     * </p>
      * <UL>
      * <LI>*:*</LI>
      * <LI>*:type=RequestProcessor,*</LI>
      * <LI>*:j2eeType=Servlet,*</LI>
      * <LI>Catalina:type=Environment,resourcetype=Global,name=simpleValue</LI>
      * </UL>
+     *
      * @param query JMX Query string
      */
-    public void setQuery (String query) {
+    public void setQuery(String query) {
         this.query = query;
     }
 
@@ -83,6 +88,6 @@ public class JMXQueryTask extends AbstractCatalinaTask {
             }
         }
         log("Query string is " + queryString);
-        execute ("/jmxproxy/" + queryString);
+        execute("/jmxproxy/" + queryString);
     }
 }
