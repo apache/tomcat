@@ -713,7 +713,7 @@ public class AjpProcessor extends AbstractProcessor {
             } else if (hId == Constants.SC_REQ_CONTENT_TYPE || (hId == -1 && tmpMB.equalsIgnoreCase("Content-Type"))) {
                 // just read the content-type header, so set it
                 ByteChunk bchunk = vMB.getByteChunk();
-                request.contentType().setBytes(bchunk.getBytes(), bchunk.getOffset(), bchunk.getLength());
+                request.contentType().setBytes(bchunk.getBytes(), bchunk.getStart(), bchunk.getLength());
             }
         }
 

@@ -163,7 +163,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             return false;
         }
 
-        authorizationBC.setOffset(authorizationBC.getOffset() + 10);
+        authorizationBC.setStart(authorizationBC.getStart() + 10);
 
         byte[] encoded = new byte[authorizationBC.getLength()];
         System.arraycopy(authorizationBC.getBuffer(), 0, encoded, 0, authorizationBC.getLength());

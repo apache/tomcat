@@ -46,7 +46,7 @@ public class SavedRequestInputFilter implements InputFilter {
 
     @Override
     public int doRead(ApplicationBufferHandler handler) throws IOException {
-        if(input.getOffset()>= input.getEnd()) {
+        if(input.getStart()>= input.getEnd()) {
             return -1;
         }
 
@@ -104,6 +104,6 @@ public class SavedRequestInputFilter implements InputFilter {
 
     @Override
     public boolean isFinished() {
-        return input.getOffset() >= input.getEnd();
+        return input.getStart() >= input.getEnd();
     }
 }

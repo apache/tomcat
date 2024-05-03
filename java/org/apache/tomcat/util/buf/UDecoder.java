@@ -98,7 +98,7 @@ public final class UDecoder {
     private void convert(ByteChunk mb, boolean query, EncodedSolidusHandling encodedSolidusHandling)
             throws IOException {
 
-        int start = mb.getOffset();
+        int start = mb.getStart();
         byte buff[] = mb.getBytes();
         int end = mb.getEnd();
 
