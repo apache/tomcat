@@ -29,12 +29,10 @@ import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.res.StringManager;
 
 
-
 /**
- * Implementation of <code>LifecycleListener</code> that will do the global
- * initialization of OpenSSL according to specified configuration parameters.
- * Using the listener is completely optional, but is needed for configuration
- * and full cleanup of a few native memory allocations.
+ * Implementation of <code>LifecycleListener</code> that will do the global initialization of OpenSSL according to
+ * specified configuration parameters. Using the listener is completely optional, but is needed for configuration and
+ * full cleanup of a few native memory allocations.
  */
 public class OpenSSLLifecycleListener implements LifecycleListener {
 
@@ -55,7 +53,8 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                     OpenSSLStatus.setInitialized(true);
                 } else {
                     try {
-                        Class<?> openSSLLibraryClass = Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
+                        Class<?> openSSLLibraryClass =
+                                Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                         openSSLLibraryClass.getMethod("init").invoke(null);
                     } catch (Throwable t) {
                         t = ExceptionUtils.unwrapInvocationTargetException(t);
@@ -85,8 +84,7 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
         boolean initError = false;
         if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
             if (!(event.getLifecycle() instanceof Server)) {
-                log.warn(sm.getString("listener.notServer",
-                        event.getLifecycle().getClass().getSimpleName()));
+                log.warn(sm.getString("listener.notServer", event.getLifecycle().getClass().getSimpleName()));
             }
             synchronized (lock) {
                 if (!JreCompat.isJre22Available()) {
@@ -95,7 +93,8 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                     return;
                 }
                 try {
-                    Class<?> openSSLLibraryClass = Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
+                    Class<?> openSSLLibraryClass =
+                            Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                     openSSLLibraryClass.getMethod("init").invoke(null);
                 } catch (Throwable t) {
                     t = ExceptionUtils.unwrapInvocationTargetException(t);
@@ -120,7 +119,8 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                 }
                 // Note: Without the listener, destroy will never be called (which is not a significant problem)
                 try {
-                    Class<?> openSSLLibraryClass = Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
+                    Class<?> openSSLLibraryClass =
+                            Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                     openSSLLibraryClass.getMethod("destroy").invoke(null);
                 } catch (Throwable t) {
                     t = ExceptionUtils.unwrapInvocationTargetException(t);
@@ -135,7 +135,8 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
     public String getSSLEngine() {
         if (JreCompat.isJre22Available()) {
             try {
-                Class<?> openSSLLibraryClass = Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
+                Class<?> openSSLLibraryClass =
+                        Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                 return (String) openSSLLibraryClass.getMethod("getSSLEngine").invoke(null);
             } catch (Throwable t) {
                 t = ExceptionUtils.unwrapInvocationTargetException(t);
@@ -148,7 +149,8 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
     public void setSSLEngine(String SSLEngine) {
         if (JreCompat.isJre22Available()) {
             try {
-                Class<?> openSSLLibraryClass = Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
+                Class<?> openSSLLibraryClass =
+                        Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                 openSSLLibraryClass.getMethod("setSSLEngine").invoke(null, SSLEngine);
             } catch (Throwable t) {
                 t = ExceptionUtils.unwrapInvocationTargetException(t);
@@ -160,7 +162,8 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
     public String getSSLRandomSeed() {
         if (JreCompat.isJre22Available()) {
             try {
-                Class<?> openSSLLibraryClass = Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
+                Class<?> openSSLLibraryClass =
+                        Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                 return (String) openSSLLibraryClass.getMethod("getSSLRandomSeed").invoke(null);
             } catch (Throwable t) {
                 t = ExceptionUtils.unwrapInvocationTargetException(t);
@@ -173,7 +176,8 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
     public void setSSLRandomSeed(String SSLRandomSeed) {
         if (JreCompat.isJre22Available()) {
             try {
-                Class<?> openSSLLibraryClass = Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
+                Class<?> openSSLLibraryClass =
+                        Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                 openSSLLibraryClass.getMethod("setSSLRandomSeed").invoke(null, SSLRandomSeed);
             } catch (Throwable t) {
                 t = ExceptionUtils.unwrapInvocationTargetException(t);
@@ -185,7 +189,8 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
     public String getFIPSMode() {
         if (JreCompat.isJre22Available()) {
             try {
-                Class<?> openSSLLibraryClass = Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
+                Class<?> openSSLLibraryClass =
+                        Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                 return (String) openSSLLibraryClass.getMethod("getFIPSMode").invoke(null);
             } catch (Throwable t) {
                 t = ExceptionUtils.unwrapInvocationTargetException(t);
@@ -198,7 +203,8 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
     public void setFIPSMode(String FIPSMode) {
         if (JreCompat.isJre22Available()) {
             try {
-                Class<?> openSSLLibraryClass = Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
+                Class<?> openSSLLibraryClass =
+                        Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                 openSSLLibraryClass.getMethod("setFIPSMode").invoke(null, FIPSMode);
             } catch (Throwable t) {
                 t = ExceptionUtils.unwrapInvocationTargetException(t);
@@ -210,7 +216,8 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
     public boolean isFIPSModeActive() {
         if (JreCompat.isJre22Available()) {
             try {
-                Class<?> openSSLLibraryClass = Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
+                Class<?> openSSLLibraryClass =
+                        Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                 return ((Boolean) openSSLLibraryClass.getMethod("isFIPSModeActive").invoke(null)).booleanValue();
             } catch (Throwable t) {
                 t = ExceptionUtils.unwrapInvocationTargetException(t);

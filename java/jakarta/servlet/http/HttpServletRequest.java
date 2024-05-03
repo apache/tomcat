@@ -508,8 +508,7 @@ public interface HttpServletRequest extends ServletRequest {
      *
      * @since Servlet 3.1
      */
-    <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass)
-            throws IOException, ServletException;
+    <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass) throws IOException, ServletException;
 
     /**
      * Obtain a Map of the trailer fields that is not backed by the request object.

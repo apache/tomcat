@@ -537,7 +537,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
      *
      * @param requestTime Request time
      * @param clusterTime Cluster time
-     * @param isAsync if the request was in async mode
+     * @param isAsync     if the request was in async mode
      */
     protected void updateStats(long requestTime, long clusterTime, boolean isAsync) {
         long currentTime = System.currentTimeMillis();
@@ -550,9 +550,11 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
                 if ((nrOfRequests.longValue() % 100) == 0) {
                     log.debug(sm.getString("ReplicationValve.stats",
                             new Object[] { Long.valueOf(totalRequestTime.longValue() / nrOfRequests.longValue()),
-                                    Long.valueOf(totalSendTime.longValue() / nrOfRequests.longValue()), Long.valueOf(nrOfRequests.longValue()),
-                                    Long.valueOf(nrOfSendRequests.longValue()), Long.valueOf(nrOfCrossContextSendRequests.longValue()),
-                                    Long.valueOf(nrOfFilterRequests.longValue()), Long.valueOf(totalRequestTime.longValue()),
+                                    Long.valueOf(totalSendTime.longValue() / nrOfRequests.longValue()),
+                                    Long.valueOf(nrOfRequests.longValue()), Long.valueOf(nrOfSendRequests.longValue()),
+                                    Long.valueOf(nrOfCrossContextSendRequests.longValue()),
+                                    Long.valueOf(nrOfFilterRequests.longValue()),
+                                    Long.valueOf(totalRequestTime.longValue()),
                                     Long.valueOf(totalSendTime.longValue()) }));
                 }
             }

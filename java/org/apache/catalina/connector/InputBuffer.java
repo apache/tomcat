@@ -325,7 +325,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
         if (e instanceof SocketTimeoutException) {
             try {
                 response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT);
-            } catch(IllegalStateException ex) {
+            } catch (IllegalStateException ex) {
                 // Response already committed
                 response.setStatus(HttpServletResponse.SC_REQUEST_TIMEOUT);
                 response.setError();
@@ -333,7 +333,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
         } else {
             try {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            } catch(IllegalStateException ex) {
+            } catch (IllegalStateException ex) {
                 // Response already committed
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.setError();

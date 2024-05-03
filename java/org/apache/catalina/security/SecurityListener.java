@@ -139,28 +139,24 @@ public class SecurityListener implements LifecycleListener {
     }
 
     /**
-     * Sets the number of days that may pass between the build-date of this
-     * Tomcat instance before warnings are printed.
+     * Sets the number of days that may pass between the build-date of this Tomcat instance before warnings are printed.
      *
-     * @param ageDays The number of days a Tomcat build is allowed to age
-     *                before logging warnings.
+     * @param ageDays The number of days a Tomcat build is allowed to age before logging warnings.
      */
     public void setBuildDateWarningAgeDays(String ageDays) {
         try {
             buildDateWarningAgeDays = Integer.parseInt(ageDays);
         } catch (NumberFormatException nfe) {
             // Just use the default and warn the user
-            log.warn(sm.getString("SecurityListener.buildDateAgeUnreadable",
-                    ageDays, String.valueOf(DEFAULT_BUILD_DATE_WARNING_AGE_DAYS)));
+            log.warn(sm.getString("SecurityListener.buildDateAgeUnreadable", ageDays,
+                    String.valueOf(DEFAULT_BUILD_DATE_WARNING_AGE_DAYS)));
         }
     }
 
     /**
-     * Gets the number of days that may pass between the build-date of this
-     * Tomcat instance before warnings are printed.
+     * Gets the number of days that may pass between the build-date of this Tomcat instance before warnings are printed.
      *
-     * @return The number of days a Tomcat build is allowed to age
-     *         before logging warnings.
+     * @return The number of days a Tomcat build is allowed to age before logging warnings.
      */
     public int getBuildDateWarningAgeDays() {
         return buildDateWarningAgeDays;
@@ -226,7 +222,8 @@ public class SecurityListener implements LifecycleListener {
         if (allowedAgeDays >= 0) {
             String buildDateString = ServerInfo.getServerBuiltISO();
 
-            if (null == buildDateString || buildDateString.length() < 1 || !Character.isDigit(buildDateString.charAt(0))) {
+            if (null == buildDateString || buildDateString.length() < 1 ||
+                    !Character.isDigit(buildDateString.charAt(0))) {
                 log.warn(sm.getString("SecurityListener.buildDateUnreadable", buildDateString));
             } else {
                 try {

@@ -119,7 +119,8 @@ public interface HttpServletResponse extends ServletResponse {
      * This method has no effect if called from an include.
      * <p>
      * This method accepts both relative and absolute URLs. Absolute URLs passed to this method are used as provided as
-     * the redirect location URL. Relative URLs are converted to absolute URLs. If converting a relative URL to an absolute URL then:
+     * the redirect location URL. Relative URLs are converted to absolute URLs. If converting a relative URL to an
+     * absolute URL then:
      * <ul>
      * <li>If the location is relative without a leading '/' the container interprets it as relative to the current
      * request URI.</li>

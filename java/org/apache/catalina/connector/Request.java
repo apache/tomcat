@@ -146,7 +146,6 @@ public class Request implements HttpServletRequest {
 
     // ------------------------------------------------------------- Properties
 
-
     /**
      * Coyote request.
      */
@@ -898,9 +897,9 @@ public class Request implements HttpServletRequest {
     /**
      * {@inheritDoc}
      * <p>
-     * The attribute names returned will only be those for the attributes set via
-     * {@link #setAttribute(String, Object)}. Tomcat internal attributes will not be included although they are
-     * accessible via {@link #getAttribute(String)}. The Tomcat internal attributes include:
+     * The attribute names returned will only be those for the attributes set via {@link #setAttribute(String, Object)}.
+     * Tomcat internal attributes will not be included although they are accessible via {@link #getAttribute(String)}.
+     * The Tomcat internal attributes include:
      * <ul>
      * <li>{@link Globals#DISPATCHER_TYPE_ATTR}</li>
      * <li>{@link Globals#DISPATCHER_REQUEST_PATH_ATTR}</li>
@@ -2481,6 +2480,7 @@ public class Request implements HttpServletRequest {
         getContext().getAuthenticator().logout(this);
     }
 
+
     @Override
     public Collection<Part> getParts() throws IOException, IllegalStateException, ServletException {
 
@@ -2498,6 +2498,7 @@ public class Request implements HttpServletRequest {
 
         return parts;
     }
+
 
     private void parseParts(boolean explicit) {
 

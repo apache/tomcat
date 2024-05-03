@@ -546,7 +546,9 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
 
     /**
      * Get the request.
+     *
      * @return the request
+     *
      * @deprecated Unused. This method will be removed in Tomcat 12.
      */
     @Deprecated

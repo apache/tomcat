@@ -87,6 +87,7 @@ public class ClusterSessionListener extends ClusterListener {
 
     /**
      * {@inheritDoc}
+     * <p>
      * This listener accepts only SessionMessage.
      */
     @Override

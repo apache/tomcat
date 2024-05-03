@@ -265,7 +265,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         }
 
         // Send response token on success and failure
-        response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE + " " + Base64.getEncoder().encodeToString(outToken));
+        response.setHeader(AUTH_HEADER_NAME,
+                AUTH_HEADER_VALUE_NEGOTIATE + " " + Base64.getEncoder().encodeToString(outToken));
 
         if (principal != null) {
             register(request, response, principal, Constants.SPNEGO_METHOD, principal.getName(), null);
