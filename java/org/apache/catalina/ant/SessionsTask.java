@@ -21,8 +21,7 @@ import org.apache.tools.ant.BuildException;
 
 
 /**
- * Ant task that implements the <code>/sessions</code> command
- * supported by the Tomcat manager application.
+ * Ant task that implements the <code>/sessions</code> command supported by the Tomcat manager application.
  *
  * @author Vivek Chopra
  */
