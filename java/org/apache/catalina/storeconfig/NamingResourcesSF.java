@@ -35,10 +35,8 @@ public class NamingResourcesSF extends StoreFactoryBase {
     private static Log log = LogFactory.getLog(NamingResourcesSF.class);
 
     @Override
-    public void store(PrintWriter aWriter, int indent, Object aElement)
-            throws Exception {
-        StoreDescription elementDesc = getRegistry().findDescription(
-                aElement.getClass());
+    public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
+        StoreDescription elementDesc = getRegistry().findDescription(aElement.getClass());
         if (elementDesc != null) {
             if (log.isTraceEnabled()) {
                 log.trace("store " + elementDesc.getTag() + "( " + aElement + " )");
@@ -51,11 +49,12 @@ public class NamingResourcesSF extends StoreFactoryBase {
 
     /**
      * Store the specified NamingResources properties.
+     * <p>
      * {@inheritDoc}
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aElement,
-            StoreDescription elementDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aElement, StoreDescription elementDesc)
+            throws Exception {
 
         if (aElement instanceof NamingResourcesImpl) {
             NamingResourcesImpl resources = (NamingResourcesImpl) aElement;
