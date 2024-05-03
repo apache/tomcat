@@ -133,6 +133,9 @@
       <fix>
         Add periodic checking for WebDAV locks expiration. (remm)
       </fix>
+      <fix>
+        Extend <code>Asn1Parser</code> to parse <code>UTF8String</code>s. (michaelo)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
