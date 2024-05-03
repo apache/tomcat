@@ -104,7 +104,7 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 9.0.89 (remm)" rtext="in development">
+<section name="Tomcat 9.0.89 (remm)" rtext="">
   <subsection name="Catalina">
     <changelog>
       <update>
