@@ -133,6 +133,7 @@ public interface CatalinaCluster extends Cluster {
 
     /**
      * Set the channel associated with the cluster.
+     *
      * @param channel the channel
      */
     void setChannel(Channel channel);

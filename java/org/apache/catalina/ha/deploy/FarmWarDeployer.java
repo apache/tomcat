@@ -228,7 +228,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
 
                                 Files.move(factory.getFile().toPath(), deployable.toPath());
                             } catch (IOException ioe) {
-                                log.error(sm.getString("farmWarDeployer.renameFail", factory.getFile(), deployable), ioe);
+                                log.error(sm.getString("farmWarDeployer.renameFail", factory.getFile(), deployable),
+                                        ioe);
                             } finally {
                                 removeServiced(contextName);
                             }
@@ -305,6 +306,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
 
     /**
      * {@inheritDoc}
+     * <p>
      * This listener accepts only FileMessage or UndeployMessage.
      */
     @Override

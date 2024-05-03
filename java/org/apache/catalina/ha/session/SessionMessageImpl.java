@@ -101,6 +101,7 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
 
     /**
      * Set message send time but only the first setting works (one shot)
+     *
      * @param time the timestamp
      */
     @Override

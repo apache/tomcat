@@ -103,8 +103,7 @@ public final class ApplicationFilterChain implements FilterChain {
             try {
                 Filter filter = filterConfig.getFilter();
 
-                if (request.isAsyncSupported() &&
-                        !(filterConfig.getFilterDef().getAsyncSupportedBoolean())) {
+                if (request.isAsyncSupported() && !(filterConfig.getFilterDef().getAsyncSupportedBoolean())) {
                     request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, Boolean.FALSE);
                 }
                 filter.doFilter(request, response, this);

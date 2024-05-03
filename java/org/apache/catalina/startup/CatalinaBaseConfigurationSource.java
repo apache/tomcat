@@ -63,7 +63,8 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
             InputStream stream = getClass().getClassLoader().getResourceAsStream(LEGACY_SERVER_EMBED_XML);
             if (stream != null) {
                 try {
-                    result = new Resource(stream, getClass().getClassLoader().getResource(LEGACY_SERVER_EMBED_XML).toURI());
+                    result = new Resource(stream,
+                            getClass().getClassLoader().getResource(LEGACY_SERVER_EMBED_XML).toURI());
                 } catch (URISyntaxException e) {
                     stream.close();
                 }

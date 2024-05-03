@@ -599,13 +599,11 @@ public class DataSourceStore extends StoreBase {
                 manager.getContext().getLogger().info(sm.getString("dataSourceStore.checkConnectionDBClosed"));
                 conn = open();
                 if (conn == null || conn.isClosed()) {
-                    manager.getContext().getLogger()
-                            .info(sm.getString("dataSourceStore.checkConnectionDBReOpenFail"));
+                    manager.getContext().getLogger().info(sm.getString("dataSourceStore.checkConnectionDBReOpenFail"));
                 }
             }
         } catch (SQLException ex) {
-            manager.getContext().getLogger()
-                    .error(sm.getString("dataSourceStore.checkConnectionSQLException", ex));
+            manager.getContext().getLogger().error(sm.getString("dataSourceStore.checkConnectionSQLException", ex));
         }
 
         return conn;

@@ -28,6 +28,7 @@ public interface ClusterMessage extends Serializable {
 
     /**
      * Set the member associated with the message.
+     *
      * @param member the member
      */
     void setAddress(Member member);
@@ -44,6 +45,7 @@ public interface ClusterMessage extends Serializable {
 
     /**
      * Set the timestamp for this message.
+     *
      * @param timestamp the timestamp
      */
     void setTimestamp(long timestamp);

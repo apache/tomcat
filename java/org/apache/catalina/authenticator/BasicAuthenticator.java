@@ -145,8 +145,8 @@ public class BasicAuthenticator extends AuthenticatorBase {
         /**
          * Parse the HTTP Authorization header for BASIC authentication as per RFC 7617.
          *
-         * @param input           The header value to parse in-place
-         * @param charset         The character set to use to convert the bytes to a string
+         * @param input   The header value to parse in-place
+         * @param charset The character set to use to convert the bytes to a string
          *
          * @throws IllegalArgumentException If the header does not conform to RFC 7617
          */

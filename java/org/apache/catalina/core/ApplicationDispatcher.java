@@ -289,8 +289,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         if (response instanceof ResponseFacade) {
             finished = true;
             ((ResponseFacade) response).finish();
-        } else if (context.getSuspendWrappedResponseAfterForward()
-                && response instanceof ServletResponseWrapper) {
+        } else if (context.getSuspendWrappedResponseAfterForward() && response instanceof ServletResponseWrapper) {
             ServletResponse baseResponse = response;
             do {
                 baseResponse = ((ServletResponseWrapper) baseResponse).getResponse();
