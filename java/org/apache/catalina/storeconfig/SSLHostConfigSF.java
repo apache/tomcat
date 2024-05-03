@@ -31,15 +31,17 @@ public class SSLHostConfigSF extends StoreFactoryBase {
 
     /**
      * Store nested SSLHostConfigCertificate elements.
+     * <p>
      * {@inheritDoc}
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aSSLHostConfig,
-            StoreDescription parentDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aSSLHostConfig, StoreDescription parentDesc)
+            throws Exception {
         if (aSSLHostConfig instanceof SSLHostConfig) {
             SSLHostConfig sslHostConfig = (SSLHostConfig) aSSLHostConfig;
             // Store nested <SSLHostConfigCertificate> elements
-            SSLHostConfigCertificate[] hostConfigsCertificates = sslHostConfig.getCertificates().toArray(new SSLHostConfigCertificate[0]);
+            SSLHostConfigCertificate[] hostConfigsCertificates =
+                    sslHostConfig.getCertificates().toArray(new SSLHostConfigCertificate[0]);
             // Remove a possible default UNDEFINED certificate
             if (hostConfigsCertificates.length > 1) {
                 ArrayList<SSLHostConfigCertificate> certificates = new ArrayList<>();

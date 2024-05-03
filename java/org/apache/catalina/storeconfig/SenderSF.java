@@ -28,11 +28,12 @@ public class SenderSF extends StoreFactoryBase {
 
     /**
      * Store the specified Sender child.
+     * <p>
      * {@inheritDoc}
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aSender,
-            StoreDescription parentDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aSender, StoreDescription parentDesc)
+            throws Exception {
         if (aSender instanceof ReplicationTransmitter) {
             ReplicationTransmitter transmitter = (ReplicationTransmitter) aSender;
             // Store nested <Transport> element
@@ -40,6 +41,6 @@ public class SenderSF extends StoreFactoryBase {
             if (transport != null) {
                 storeElement(aWriter, indent, transport);
             }
-       }
+        }
     }
 }

@@ -33,11 +33,12 @@ public class ChannelSF extends StoreFactoryBase {
 
     /**
      * Store the specified Channel children.
+     * <p>
      * {@inheritDoc}
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aChannel,
-            StoreDescription parentDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aChannel, StoreDescription parentDesc)
+            throws Exception {
         if (aChannel instanceof Channel) {
             Channel channel = (Channel) aChannel;
             if (channel instanceof ManagedChannel) {
@@ -63,6 +64,6 @@ public class ChannelSF extends StoreFactoryBase {
                     storeElement(aWriter, indent, interceptor);
                 }
             }
-       }
+        }
     }
 }

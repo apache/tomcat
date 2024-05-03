@@ -24,39 +24,35 @@ import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.deploy.NamingResourcesImpl;
 
 /**
- * Store server.xml Server element and children (
- * Listener,GlobalNamingResource,Service)
+ * Store server.xml Server element and children ( Listener,GlobalNamingResource,Service)
  */
 public class StandardServerSF extends StoreFactoryBase {
 
     @Override
-    public void store(PrintWriter aWriter, int indent, Object aServer)
-            throws Exception {
+    public void store(PrintWriter aWriter, int indent, Object aServer) throws Exception {
         storeXMLHead(aWriter);
         super.store(aWriter, indent, aServer);
     }
 
     /**
      * Store the specified server element children.
+     * <p>
      * {@inheritDoc}
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aObject,
-            StoreDescription parentDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aObject, StoreDescription parentDesc)
+            throws Exception {
         if (aObject instanceof StandardServer) {
             StandardServer server = (StandardServer) aObject;
             // Store nested <Listener> elements
             LifecycleListener listeners[] = server.findLifecycleListeners();
             storeElementArray(aWriter, indent, listeners);
             // Store nested <GlobalNamingResources> element
-            NamingResourcesImpl globalNamingResources = server
-                    .getGlobalNamingResources();
-            StoreDescription elementDesc = getRegistry().findDescription(
-                    NamingResourcesImpl.class.getName()
-                            + ".[GlobalNamingResources]");
+            NamingResourcesImpl globalNamingResources = server.getGlobalNamingResources();
+            StoreDescription elementDesc =
+                    getRegistry().findDescription(NamingResourcesImpl.class.getName() + ".[GlobalNamingResources]");
             if (elementDesc != null) {
-                elementDesc.getStoreFactory().store(aWriter, indent,
-                        globalNamingResources);
+                elementDesc.getStoreFactory().store(aWriter, indent, globalNamingResources);
             }
             // Store nested <Service> elements
             Service services[] = server.findServices();

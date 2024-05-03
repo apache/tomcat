@@ -31,11 +31,12 @@ public class StandardServiceSF extends StoreFactoryBase {
 
     /**
      * Store the specified service element children.
+     * <p>
      * {@inheritDoc}
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aService,
-            StoreDescription parentDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aService, StoreDescription parentDesc)
+            throws Exception {
         if (aService instanceof StandardService) {
             StandardService service = (StandardService) aService;
             // Store nested <Listener> elements

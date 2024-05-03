@@ -28,7 +28,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Move server.xml or context.xml as backup
- *
+ * <p>
  * TODO Get Encoding from Registry
  */
 public class StoreFileMover {
@@ -76,8 +76,7 @@ public class StoreFileMover {
     }
 
     /**
-     * @param basename
-     *            The basename to set.
+     * @param basename The basename to set.
      */
     public void setBasename(String basename) {
         this.basename = basename;
@@ -113,6 +112,7 @@ public class StoreFileMover {
 
     /**
      * Calculate file objects for the old and new configuration files.
+     *
      * @param basename The base path
      * @param encoding The encoding of the file
      * @param filename The file name
@@ -165,18 +165,18 @@ public class StoreFileMover {
         if (configOld.renameTo(configSave)) {
             if (!configNew.renameTo(configOld)) {
                 configSave.renameTo(configOld);
-                throw new IOException(sm.getString("storeFileMover.renameError",
-                        configNew.getAbsolutePath(), configOld.getAbsolutePath()));
+                throw new IOException(sm.getString("storeFileMover.renameError", configNew.getAbsolutePath(),
+                        configOld.getAbsolutePath()));
             }
         } else {
             if (!configOld.exists()) {
                 if (!configNew.renameTo(configOld)) {
-                    throw new IOException(sm.getString("storeFileMover.renameError",
-                            configNew.getAbsolutePath(), configOld.getAbsolutePath()));
+                    throw new IOException(sm.getString("storeFileMover.renameError", configNew.getAbsolutePath(),
+                            configOld.getAbsolutePath()));
                 }
             } else {
-                throw new IOException(sm.getString("storeFileMover.renameError",
-                        configOld.getAbsolutePath(), configSave.getAbsolutePath()));
+                throw new IOException(sm.getString("storeFileMover.renameError", configOld.getAbsolutePath(),
+                        configSave.getAbsolutePath()));
             }
         }
     }
@@ -185,11 +185,11 @@ public class StoreFileMover {
      * Open an output writer for the new configuration file.
      *
      * @return The writer
+     *
      * @throws IOException Failed opening a writer to the new file
      */
     public PrintWriter getWriter() throws IOException {
-        return new PrintWriter(new OutputStreamWriter(
-                new FileOutputStream(configNew), getEncoding()));
+        return new PrintWriter(new OutputStreamWriter(new FileOutputStream(configNew), getEncoding()));
     }
 
     /**
@@ -199,8 +199,8 @@ public class StoreFileMover {
      */
     protected String getTimeTag() {
         String ts = (new Timestamp(System.currentTimeMillis())).toString();
-        //        yyyy-mm-dd hh:mm:ss
-        //        0123456789012345678
+        // yyyy-mm-dd hh:mm:ss
+        // 0123456789012345678
         StringBuilder sb = new StringBuilder(".");
         sb.append(ts, 0, 10);
         sb.append('.');
