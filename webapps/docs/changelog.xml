@@ -152,6 +152,10 @@
       <fix>
         Extend <code>Asn1Parser</code> to parse <code>UTF8String</code>s. (michaelo)
       </fix>
+      <fix>
+        Remove MBean metadata for attibutes that have been removed. Based on
+        <pr>719</pr> by Shawn Q. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
