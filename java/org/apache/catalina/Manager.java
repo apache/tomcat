@@ -213,21 +213,7 @@ public interface Manager {
      * @return  The new session ID
      */
     default String rotateSessionId(Session session) {
-        String newSessionId = null;
-        // Assume the new Id is a duplicate until we prove it isn't. The
-        // chances of a duplicate are extremely low but the current ManagerBase
-        // code protects against duplicates so this default method does too.
-        boolean duplicate = true;
-        do {
-            newSessionId = getSessionIdGenerator().generateSessionId();
-            try {
-                if (findSession(newSessionId) == null) {
-                    duplicate = false;
-                }
-            } catch (IOException ioe) {
-                // Swallow. An IOE means the ID was known so continue looping
-            }
-        } while (duplicate);
+        String newSessionId = getSessionIdGenerator().generateSessionId();
         changeSessionId(session, newSessionId);
         return newSessionId;
     }
