@@ -96,6 +96,11 @@ public class BeanFactory implements ObjectFactory {
      * Create a new Bean instance.
      *
      * @param obj The reference object describing the Bean
+     * @param name the bound name
+     * @param nameCtx unused
+     * @param environment unused
+     * @return the object instance
+     * @throws NamingException if an error occur creating the instance
      */
     @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?,?> environment)
