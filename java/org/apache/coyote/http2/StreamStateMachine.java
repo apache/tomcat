@@ -85,7 +85,7 @@ class StreamStateMachine {
     public synchronized void sendReset() {
         if (state == State.IDLE) {
             throw new IllegalStateException(
-                    sm.getString("streamStateMachine.debug.change", connectionId, streamId, state));
+                    sm.getString("streamStateMachine.invalidReset", connectionId, streamId));
         }
         if (state.canReset()) {
             stateChange(state, State.CLOSED_RST_TX);
