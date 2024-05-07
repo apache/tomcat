@@ -113,9 +113,13 @@ public class ResourceLinkFactory implements ObjectFactory {
     // -------------------------------------------------- ObjectFactory Methods
 
     /**
-     * Create a new DataSource instance.
+     * Create a new resource instance.
      *
-     * @param obj The reference object describing the DataSource
+     * @param name the bound name
+     * @param nameCtx unused
+     * @param environment unused
+     * @return the object instance
+     * @throws NamingException if an error occur creating the instance
      */
     @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx,
