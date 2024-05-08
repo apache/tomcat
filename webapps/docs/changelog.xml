@@ -161,6 +161,10 @@
         <code>Connector</code> element, similar to the <code>Executor</code>
         element, for consistency. (remm)
       </update>
+      <fix>
+        Make counting of active HTTP/2 streams per connection more robust.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
