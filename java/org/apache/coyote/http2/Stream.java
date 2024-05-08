@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -91,6 +92,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     private final StreamInputBuffer inputBuffer;
     private final StreamOutputBuffer streamOutputBuffer = new StreamOutputBuffer();
     private final Http2OutputBuffer http2OutputBuffer = new Http2OutputBuffer(coyoteResponse, streamOutputBuffer);
+    private final AtomicBoolean removedFromActiveCount = new AtomicBoolean(false);
 
     // State machine would be too much overhead
     private int headerState = HEADER_STATE_START;
@@ -882,6 +884,20 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     public void setIncremental(boolean incremental) {
         this.incremental = incremental;
+    }
+
+
+    int decrementAndGetActiveRemoteStreamCount() {
+        /*
+         * Protect against mis-counting of active streams. This method should only be called once per stream but since
+         * the count of active streams is used to enforce the maximum concurrent streams limit, make sure each stream is
+         * only removed from the active count exactly once.
+         */
+        if (removedFromActiveCount.compareAndSet(false, true)) {
+            return handler.activeRemoteStreamCount.decrementAndGet();
+        } else {
+            return handler.activeRemoteStreamCount.get();
+        }
     }
 
 
