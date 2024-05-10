@@ -20,12 +20,18 @@ public interface EncryptInterceptorMBean {
 
     // Config
     int getOptionFlag();
+
     void setOptionFlag(int optionFlag);
 
     void setEncryptionAlgorithm(String algorithm);
+
     String getEncryptionAlgorithm();
+
     void setEncryptionKey(byte[] key);
+
     byte[] getEncryptionKey();
+
     void setProviderName(String provider);
+
     String getProviderName();
 }
