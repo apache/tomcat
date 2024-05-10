@@ -46,7 +46,7 @@ public abstract class MembershipServiceBase implements MembershipService, Member
 
     @Override
     public boolean hasMembers() {
-        if (getMembershipProvider() == null ) {
+        if (getMembershipProvider() == null) {
             return false;
         }
         return getMembershipProvider().hasMembers();
@@ -71,16 +71,16 @@ public abstract class MembershipServiceBase implements MembershipService, Member
     @Override
     public String[] getMembersByName() {
         Member[] currentMembers = getMembers();
-        String [] membernames ;
-        if(currentMembers != null) {
+        String[] membernames;
+        if (currentMembers != null) {
             membernames = new String[currentMembers.length];
             for (int i = 0; i < currentMembers.length; i++) {
-                membernames[i] = currentMembers[i].toString() ;
+                membernames[i] = currentMembers[i].toString();
             }
         } else {
-            membernames = new String[0] ;
+            membernames = new String[0];
         }
-        return membernames ;
+        return membernames;
     }
 
     @Override
@@ -100,7 +100,7 @@ public abstract class MembershipServiceBase implements MembershipService, Member
     }
 
     @Override
-    public void removeMembershipListener(){
+    public void removeMembershipListener() {
         listener = null;
     }
 
