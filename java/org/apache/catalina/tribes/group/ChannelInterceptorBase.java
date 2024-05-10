@@ -33,7 +33,7 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
     private ChannelInterceptor next;
     private ChannelInterceptor previous;
     private Channel channel;
-    //default value, always process
+    // default value, always process
     protected int optionFlag = 0;
 
     /**
@@ -46,10 +46,10 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
     }
 
     public boolean okToProcess(int messageFlags) {
-        if (this.optionFlag == 0 ) {
+        if (this.optionFlag == 0) {
             return true;
         }
-        return ((optionFlag&messageFlags) == optionFlag);
+        return ((optionFlag & messageFlags) == optionFlag);
     }
 
     @Override
@@ -83,8 +83,8 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
     }
 
     @Override
-    public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws
-        ChannelException {
+    public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload)
+            throws ChannelException {
         if (getNext() != null) {
             getNext().sendMessage(destination, msg, payload);
         }
@@ -99,7 +99,7 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
 
     @Override
     public void memberAdded(Member member) {
-        //notify upwards
+        // notify upwards
         if (getPrevious() != null) {
             getPrevious().memberAdded(member);
         }
@@ -107,7 +107,7 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
 
     @Override
     public void memberDisappeared(Member member) {
-        //notify upwards
+        // notify upwards
         if (getPrevious() != null) {
             getPrevious().memberDisappeared(member);
         }
@@ -122,7 +122,7 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
 
     @Override
     public boolean hasMembers() {
-        if ( getNext()!=null ) {
+        if (getNext() != null) {
             return getNext().hasMembers();
         } else {
             return false;
@@ -131,7 +131,7 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
 
     @Override
     public Member[] getMembers() {
-        if ( getNext()!=null ) {
+        if (getNext() != null) {
             return getNext().getMembers();
         } else {
             return null;
@@ -140,7 +140,7 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
 
     @Override
     public Member getMember(Member mbr) {
-        if ( getNext()!=null) {
+        if (getNext() != null) {
             return getNext().getMember(mbr);
         } else {
             return null;
@@ -149,7 +149,7 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
 
     @Override
     public Member getLocalMember(boolean incAlive) {
-        if ( getNext()!=null ) {
+        if (getNext() != null) {
             return getNext().getLocalMember(incAlive);
         } else {
             return null;
@@ -158,14 +158,14 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
 
     @Override
     public void start(int svc) throws ChannelException {
-        if ( getNext()!=null ) {
+        if (getNext() != null) {
             getNext().start(svc);
         }
         // register jmx
         JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
         if (jmxRegistry != null) {
-            this.oname = jmxRegistry.registerJmx(
-                    ",component=Interceptor,interceptorName=" + getClass().getSimpleName(), this);
+            this.oname = jmxRegistry.registerJmx(",component=Interceptor,interceptorName=" + getClass().getSimpleName(),
+                    this);
         }
     }
 
@@ -183,7 +183,7 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
 
     @Override
     public void fireInterceptorEvent(InterceptorEvent event) {
-        //empty operation
+        // empty operation
     }
 
     @Override
