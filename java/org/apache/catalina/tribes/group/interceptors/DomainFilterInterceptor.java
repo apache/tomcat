@@ -30,8 +30,7 @@ import org.apache.juli.logging.LogFactory;
 /**
  * Filters membership based on domain.
  */
-public class DomainFilterInterceptor extends ChannelInterceptorBase
-        implements DomainFilterInterceptorMBean {
+public class DomainFilterInterceptor extends ChannelInterceptorBase implements DomainFilterInterceptorMBean {
 
     private static final Log log = LogFactory.getLog(DomainFilterInterceptor.class);
     protected static final StringManager sm = StringManager.getManager(DomainFilterInterceptor.class);
@@ -53,25 +52,25 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase
                 }
             }
         }
-    }//messageReceived
+    }// messageReceived
 
 
     @Override
     public void memberAdded(Member member) {
-        if ( membership == null ) {
+        if (membership == null) {
             setupMembership();
         }
         boolean notify = false;
         synchronized (membership) {
-            notify = Arrays.equals(domain,member.getDomain());
-            if ( notify ) {
+            notify = Arrays.equals(domain, member.getDomain());
+            if (notify) {
                 notify = membership.memberAlive(member);
             }
         }
-        if ( notify ) {
+        if (notify) {
             super.memberAdded(member);
         } else {
-            if(log.isInfoEnabled()) {
+            if (log.isInfoEnabled()) {
                 log.info(sm.getString("domainFilterInterceptor.member.refused", member));
             }
         }
@@ -79,24 +78,24 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase
 
     @Override
     public void memberDisappeared(Member member) {
-        if ( membership == null ) {
+        if (membership == null) {
             setupMembership();
         }
         boolean notify = false;
         synchronized (membership) {
-            notify = Arrays.equals(domain,member.getDomain());
-            if ( notify ) {
+            notify = Arrays.equals(domain, member.getDomain());
+            if (notify) {
                 membership.removeMember(member);
             }
         }
-        if ( notify ) {
+        if (notify) {
             super.memberDisappeared(member);
         }
     }
 
     @Override
     public boolean hasMembers() {
-        if ( membership == null ) {
+        if (membership == null) {
             setupMembership();
         }
         return membership.hasMembers();
@@ -104,7 +103,7 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase
 
     @Override
     public Member[] getMembers() {
-        if ( membership == null ) {
+        if (membership == null) {
             setupMembership();
         }
         return membership.getMembers();
@@ -112,7 +111,7 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase
 
     @Override
     public Member getMember(Member mbr) {
-        if ( membership == null ) {
+        if (membership == null) {
             setupMembership();
         }
         return membership.getMember(mbr);
@@ -125,7 +124,7 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase
 
 
     protected synchronized void setupMembership() {
-        if ( membership == null ) {
+        if (membership == null) {
             membership = new Membership(super.getLocalMember(true));
         }
 
@@ -141,7 +140,7 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase
     }
 
     public void setDomain(String domain) {
-        if ( domain == null ) {
+        if (domain == null) {
             return;
         }
         if (domain.startsWith("{")) {
