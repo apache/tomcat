@@ -27,12 +27,12 @@ public class DirectByteArrayOutputStream extends OutputStream {
     private final XByteBuffer buffer;
 
     public DirectByteArrayOutputStream(int size) {
-        buffer = new XByteBuffer(size,false);
+        buffer = new XByteBuffer(size, false);
     }
 
     @Override
     public void write(int b) throws IOException {
-        buffer.append((byte)b);
+        buffer.append((byte) b);
     }
 
     public int size() {
