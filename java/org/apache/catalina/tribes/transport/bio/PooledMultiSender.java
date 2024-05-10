@@ -41,20 +41,21 @@ public class PooledMultiSender extends PooledSender {
     public void sendMessage(Member[] destination, ChannelMessage msg) throws ChannelException {
         MultiPointSender sender = null;
         try {
-            sender = (MultiPointSender)getSender();
+            sender = (MultiPointSender) getSender();
             if (sender == null) {
-                ChannelException cx = new ChannelException(sm.getString(
-                        "pooledMultiSender.unable.retrieve.sender", Long.toString(getMaxWait())));
+                ChannelException cx = new ChannelException(
+                        sm.getString("pooledMultiSender.unable.retrieve.sender", Long.toString(getMaxWait())));
                 for (int i = 0; i < destination.length; i++) {
-                    cx.addFaultyMember(destination[i], new NullPointerException(sm.getString("pooledMultiSender.retrieve.fail")));
+                    cx.addFaultyMember(destination[i],
+                            new NullPointerException(sm.getString("pooledMultiSender.retrieve.fail")));
                 }
                 throw cx;
             } else {
                 sender.sendMessage(destination, msg);
             }
             sender.keepalive();
-        }finally {
-            if ( sender != null ) {
+        } finally {
+            if (sender != null) {
                 returnSender(sender);
             }
         }
@@ -63,7 +64,7 @@ public class PooledMultiSender extends PooledSender {
     @Override
     public DataSender getNewDataSender() {
         MultipointBioSender sender = new MultipointBioSender();
-        AbstractSender.transferProperties(this,sender);
+        AbstractSender.transferProperties(this, sender);
         return sender;
     }
 }

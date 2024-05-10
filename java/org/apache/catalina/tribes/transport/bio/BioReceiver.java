@@ -48,11 +48,11 @@ public class BioReceiver extends ReceiverBase implements Runnable {
     public void start() throws IOException {
         super.start();
         try {
-            setPool(new RxTaskPool(getMaxThreads(),getMinThreads(),this));
+            setPool(new RxTaskPool(getMaxThreads(), getMinThreads(), this));
         } catch (Exception x) {
             log.fatal(sm.getString("bioReceiver.threadpool.fail"), x);
-            if ( x instanceof IOException ) {
-                throw (IOException)x;
+            if (x instanceof IOException) {
+                throw (IOException) x;
             } else {
                 throw new IOException(x.getMessage());
             }
@@ -69,8 +69,8 @@ public class BioReceiver extends ReceiverBase implements Runnable {
             t.start();
         } catch (Exception x) {
             log.fatal(sm.getString("bioReceiver.start.fail"), x);
-            if ( x instanceof IOException ) {
-                throw (IOException)x;
+            if (x instanceof IOException) {
+                throw (IOException) x;
             } else {
                 throw new IOException(x.getMessage());
             }
@@ -107,8 +107,8 @@ public class BioReceiver extends ReceiverBase implements Runnable {
         // allocate an unbound server socket channel
         serverSocket = new ServerSocket();
         // set the port the server channel will listen to
-        //serverSocket.bind(new InetSocketAddress(getBind(), getTcpListenPort()));
-        bind(serverSocket,getPort(),getAutoBind());
+        // serverSocket.bind(new InetSocketAddress(getBind(), getTcpListenPort()));
+        bind(serverSocket, getPort(), getAutoBind());
     }
 
 
@@ -128,32 +128,31 @@ public class BioReceiver extends ReceiverBase implements Runnable {
         }
         setListen(true);
 
-        while ( doListen() ) {
+        while (doListen()) {
             Socket socket = null;
-            if ( getTaskPool().available() < 1 ) {
-                if ( log.isWarnEnabled() ) {
+            if (getTaskPool().available() < 1) {
+                if (log.isWarnEnabled()) {
                     log.warn(sm.getString("bioReceiver.threads.busy"));
                 }
             }
-            BioReplicationTask task = (BioReplicationTask)getTaskPool().getRxTask();
-            if ( task == null )
-             {
-                continue; //should never happen
+            BioReplicationTask task = (BioReplicationTask) getTaskPool().getRxTask();
+            if (task == null) {
+                continue; // should never happen
             }
             try {
                 socket = serverSocket.accept();
-            }catch ( Exception x ) {
-                if ( doListen() ) {
+            } catch (Exception x) {
+                if (doListen()) {
                     throw x;
                 }
             }
-            if ( !doListen() ) {
-                task.serviceSocket(null,null);
+            if (!doListen()) {
+                task.serviceSocket(null, null);
                 getExecutor().execute(task);
                 task.close();
-                break; //regular shutdown
+                break; // regular shutdown
             }
-            if ( socket == null ) {
+            if (socket == null) {
                 continue;
             }
             socket.setReceiveBufferSize(getRxBufSize());
@@ -162,12 +161,12 @@ public class BioReceiver extends ReceiverBase implements Runnable {
             socket.setKeepAlive(getSoKeepAlive());
             socket.setOOBInline(getOoBInline());
             socket.setReuseAddress(getSoReuseAddress());
-            socket.setSoLinger(getSoLingerOn(),getSoLingerTime());
+            socket.setSoLinger(getSoLingerOn(), getSoLingerTime());
             socket.setSoTimeout(getTimeout());
             ObjectReader reader = new ObjectReader(socket);
-            task.serviceSocket(socket,reader);
+            task.serviceSocket(socket, reader);
             getExecutor().execute(task);
-        }//while
+        } // while
     }
 
 

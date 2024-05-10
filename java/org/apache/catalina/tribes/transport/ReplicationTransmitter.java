@@ -29,9 +29,7 @@ import org.apache.catalina.tribes.jmx.JmxRegistry;
 import org.apache.catalina.tribes.transport.nio.PooledParallelSender;
 
 /**
- * Transmit message to other cluster members
- * Actual senders are created based on the replicationMode
- * type
+ * Transmit message to other cluster members Actual senders are created based on the replicationMode type
  */
 public class ReplicationTransmitter implements ChannelSender {
 
@@ -60,7 +58,7 @@ public class ReplicationTransmitter implements ChannelSender {
     @Override
     public void sendMessage(ChannelMessage message, Member[] destination) throws ChannelException {
         MultiPointSender sender = getTransport();
-        sender.sendMessage(destination,message);
+        sender.sendMessage(destination, message);
     }
 
 
@@ -101,14 +99,13 @@ public class ReplicationTransmitter implements ChannelSender {
      */
     @Override
     public void heartbeat() {
-        if (getTransport()!=null) {
+        if (getTransport() != null) {
             getTransport().keepalive();
         }
     }
 
     /**
-     * add new cluster member and create sender ( s. replicationMode) transfer
-     * current properties to sender
+     * add new cluster member and create sender ( s. replicationMode) transfer current properties to sender
      *
      * @see org.apache.catalina.tribes.ChannelSender#add(org.apache.catalina.tribes.Member)
      */
