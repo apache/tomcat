@@ -41,7 +41,8 @@ public class CertificateStreamProvider extends AbstractStreamProvider {
 
     private final SSLSocketFactory factory;
 
-    CertificateStreamProvider(String clientCertFile, String clientKeyFile, String clientKeyPassword, String clientKeyAlgo, String caCertFile) throws Exception {
+    CertificateStreamProvider(String clientCertFile, String clientKeyFile, String clientKeyPassword,
+            String clientKeyAlgo, String caCertFile) throws Exception {
         char[] password = (clientKeyPassword != null) ? clientKeyPassword.toCharArray() : new char[0];
         KeyManager[] keyManagers = configureClientCert(clientCertFile, clientKeyFile, password, clientKeyAlgo);
         TrustManager[] trustManagers = configureCaCert(caCertFile);
@@ -55,21 +56,23 @@ public class CertificateStreamProvider extends AbstractStreamProvider {
         return factory;
     }
 
-    private static KeyManager[] configureClientCert(String clientCertFile, String clientKeyFile, char[] clientKeyPassword, String clientKeyAlgo) throws Exception {
+    private static KeyManager[] configureClientCert(String clientCertFile, String clientKeyFile,
+            char[] clientKeyPassword, String clientKeyAlgo) throws Exception {
         try (InputStream certInputStream = new FileInputStream(clientCertFile)) {
             CertificateFactory certFactory = CertificateFactory.getInstance("X509");
-            X509Certificate cert = (X509Certificate)certFactory.generateCertificate(certInputStream);
+            X509Certificate cert = (X509Certificate) certFactory.generateCertificate(certInputStream);
 
             PEMFile pemFile = new PEMFile(clientKeyFile, new String(clientKeyPassword), clientKeyAlgo);
             PrivateKey privKey = pemFile.getPrivateKey();
 
             KeyStore keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(null,  null);
+            keyStore.load(null, null);
 
             String alias = cert.getSubjectX500Principal().getName();
-            keyStore.setKeyEntry(alias, privKey, clientKeyPassword, new Certificate[]{cert});
+            keyStore.setKeyEntry(alias, privKey, clientKeyPassword, new Certificate[] { cert });
 
-            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            KeyManagerFactory keyManagerFactory =
+                    KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             keyManagerFactory.init(keyStore, clientKeyPassword);
 
             return keyManagerFactory.getKeyManagers();
