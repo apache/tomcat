@@ -36,7 +36,7 @@ public class JmxRegistry {
 
     private static final Log log = LogFactory.getLog(JmxRegistry.class);
     protected static final StringManager sm = StringManager.getManager(JmxRegistry.class);
-    private static ConcurrentHashMap<String, JmxRegistry> registryCache = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String,JmxRegistry> registryCache = new ConcurrentHashMap<>();
 
     private MBeanServer mbserver = ManagementFactory.getPlatformMBeanServer();
     private ObjectName baseOname = null;
@@ -60,8 +60,8 @@ public class JmxRegistry {
         if (!jmxChannel.isJmxEnabled()) {
             return null;
         }
-        ObjectName baseOn = createBaseObjectName(jmxChannel.getJmxDomain(),
-                jmxChannel.getJmxPrefix(), channel.getName());
+        ObjectName baseOn =
+                createBaseObjectName(jmxChannel.getJmxDomain(), jmxChannel.getJmxPrefix(), channel.getName());
         if (baseOn == null) {
             return null;
         }
@@ -131,7 +131,7 @@ public class JmxRegistry {
     }
 
     public void unregisterJmx(ObjectName oname) {
-        if (oname ==null) {
+        if (oname == null) {
             return;
         }
         try {
