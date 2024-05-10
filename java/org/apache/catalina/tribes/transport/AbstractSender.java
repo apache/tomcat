@@ -37,7 +37,7 @@ public abstract class AbstractSender implements DataSender {
     private Member destination;
     private InetAddress address;
     private int port;
-    private int maxRetryAttempts = 1;//1 resends
+    private int maxRetryAttempts = 1;// 1 resends
     private int attempt;
     private boolean tcpNoDelay = true;
     private boolean soKeepAlive = false;
@@ -52,8 +52,9 @@ public abstract class AbstractSender implements DataSender {
 
     /**
      * transfers sender properties from one sender to another
+     *
      * @param from AbstractSender
-     * @param to AbstractSender
+     * @param to   AbstractSender
      */
     public static void transferProperties(AbstractSender from, AbstractSender to) {
         to.rxBufSize = from.rxBufSize;
@@ -87,19 +88,19 @@ public abstract class AbstractSender implements DataSender {
     public boolean keepalive() {
         boolean disconnect = false;
         if (isUdpBased()) {
-            disconnect = true; //always disconnect UDP, TODO optimize the keepalive handling
-        } else if ( keepAliveCount >= 0 && requestCount>keepAliveCount ) {
+            disconnect = true; // always disconnect UDP, TODO optimize the keepalive handling
+        } else if (keepAliveCount >= 0 && requestCount > keepAliveCount) {
             disconnect = true;
-        } else if ( keepAliveTime >= 0 && (System.currentTimeMillis()-connectTime)>keepAliveTime ) {
+        } else if (keepAliveTime >= 0 && (System.currentTimeMillis() - connectTime) > keepAliveTime) {
             disconnect = true;
         }
-        if ( disconnect ) {
+        if (disconnect) {
             disconnect();
         }
         return disconnect;
     }
 
-    protected void setConnected(boolean connected){
+    protected void setConnected(boolean connected) {
         this.connected = connected;
     }
 

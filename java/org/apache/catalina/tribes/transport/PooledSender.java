@@ -28,14 +28,14 @@ import org.apache.juli.logging.LogFactory;
 public abstract class PooledSender extends AbstractSender implements MultiPointSender {
 
     private static final Log log = LogFactory.getLog(PooledSender.class);
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     private final SenderQueue queue;
     private int poolSize = 25;
     private long maxWait = 3000;
+
     public PooledSender() {
-        queue = new SenderQueue(this,poolSize);
+        queue = new SenderQueue(this, poolSize);
     }
 
     public abstract DataSender getNewDataSender();
@@ -51,7 +51,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
 
     @Override
     public synchronized void connect() throws IOException {
-        //do nothing, happens in the socket sender itself
+        // do nothing, happens in the socket sender itself
         queue.open();
         setConnected(true);
     }
@@ -91,8 +91,8 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
 
     @Override
     public boolean keepalive() {
-        //do nothing, the pool checks on every return
-        return (queue==null)?false:queue.checkIdleKeepAlive();
+        // do nothing, the pool checks on every return
+        return (queue == null) ? false : queue.checkIdleKeepAlive();
     }
 
     @Override
@@ -102,12 +102,12 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
 
     @Override
     public void remove(Member member) {
-        //no op for now, should not cancel out any keys
-        //can create serious sync issues
-        //all TCP connections are cleared out through keepalive
-        //and if remote node disappears
+        // no op for now, should not cancel out any keys
+        // can create serious sync issues
+        // all TCP connections are cleared out through keepalive
+        // and if remote node disappears
     }
-    //  ----------------------------------------------------- Inner Class
+    // ----------------------------------------------------- Inner Class
 
     private static class SenderQueue {
         private int limit = 25;
@@ -133,6 +133,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
         public int getLimit() {
             return limit;
         }
+
         /**
          * @param limit The limit to set.
          */
@@ -159,7 +160,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
 
         public synchronized DataSender getSender(long timeout) {
             long start = System.currentTimeMillis();
-            while ( true ) {
+            while (true) {
                 if (!isOpen) {
                     throw new IllegalStateException(sm.getString("pooledSender.closed.queue"));
                 }
@@ -172,35 +173,35 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
                 if (sender != null) {
                     inuse.add(sender);
                     return sender;
-                }//end if
+                } // end if
                 long delta = System.currentTimeMillis() - start;
-                if ( delta > timeout && timeout>0) {
+                if (delta > timeout && timeout > 0) {
                     return null;
                 } else {
                     try {
-                        wait(Math.max(timeout - delta,1));
-                    }catch (InterruptedException x){}
-                }//end if
+                        wait(Math.max(timeout - delta, 1));
+                    } catch (InterruptedException x) {
+                    }
+                } // end if
             }
         }
 
         public synchronized void returnSender(DataSender sender) {
-            if ( !isOpen) {
+            if (!isOpen) {
                 sender.disconnect();
                 return;
             }
-            //to do
+            // to do
             inuse.remove(sender);
-            //just in case the limit has changed
-            if ( notinuse.size() < this.getLimit() ) {
+            // just in case the limit has changed
+            if (notinuse.size() < this.getLimit()) {
                 notinuse.add(sender);
             } else {
                 try {
                     sender.disconnect();
                 } catch (Exception e) {
                     if (log.isDebugEnabled()) {
-                        log.debug(sm.getString(
-                                "PooledSender.senderDisconnectFail"), e);
+                        log.debug(sm.getString("PooledSender.senderDisconnectFail"), e);
                     }
                 }
             }
@@ -214,11 +215,11 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
             for (Object value : unused) {
                 DataSender sender = (DataSender) value;
                 sender.disconnect();
-            }//for
+            } // for
             for (Object o : used) {
                 DataSender sender = (DataSender) o;
                 sender.disconnect();
-            }//for
+            } // for
             notinuse.clear();
             inuse.clear();
             notifyAll();
