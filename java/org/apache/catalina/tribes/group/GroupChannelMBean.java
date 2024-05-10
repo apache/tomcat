@@ -39,11 +39,9 @@ public interface GroupChannelMBean {
 
     void stop(int svc) throws ChannelException;
 
-    UniqueId send(Member[] destination, Serializable msg, int options)
-            throws ChannelException;
+    UniqueId send(Member[] destination, Serializable msg, int options) throws ChannelException;
 
-    UniqueId send(Member[] destination, Serializable msg, int options, ErrorHandler handler)
-            throws ChannelException;
+    UniqueId send(Member[] destination, Serializable msg, int options, ErrorHandler handler) throws ChannelException;
 
     void addMembershipListener(MembershipListener listener);
 
@@ -53,9 +51,9 @@ public interface GroupChannelMBean {
 
     void removeChannelListener(ChannelListener listener);
 
-    boolean hasMembers() ;
+    boolean hasMembers();
 
-    Member[] getMembers() ;
+    Member[] getMembers();
 
     Member getLocalMember(boolean incAlive);
 
