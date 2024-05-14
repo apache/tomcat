@@ -49,36 +49,30 @@ import org.apache.tomcat.util.security.Escape;
 import org.xml.sax.Attributes;
 
 /**
- * Concrete implementation of {@link UserDatabase} that loads all defined users,
- * groups, and roles into an in-memory data structure, and uses a specified XML
- * file for its persistent storage.
+ * Concrete implementation of {@link UserDatabase} that loads all defined users, groups, and roles into an in-memory
+ * data structure, and uses a specified XML file for its persistent storage.
  * <p>
  * This class is thread-safe.
  * <p>
- * This class does not enforce what, in an RDBMS, would be called referential
- * integrity. Concurrent modifications may result in inconsistent data such as
- * a User retaining a reference to a Role that has been removed from the
- * database.
+ * This class does not enforce what, in an RDBMS, would be called referential integrity. Concurrent modifications may
+ * result in inconsistent data such as a User retaining a reference to a Role that has been removed from the database.
  *
  * @author Craig R. McClanahan
+ *
  * @since 4.1
  */
 /*
  * Implementation notes:
  *
- * Any operation that acts on a single element of the database (e.g. operations
- * that create, read, update or delete a user, role or group) must first obtain
- * the read lock. Operations that return iterators for users, roles or groups
+ * Any operation that acts on a single element of the database (e.g. operations that create, read, update or delete a
+ * user, role or group) must first obtain the read lock. Operations that return iterators for users, roles or groups
  * also fall into this category.
  *
- * Iterators must always be created from copies of the data to prevent possible
- * corruption of the iterator due to the remove of all elements from the
- * underlying Map that would occur during a subsequent re-loading of the
- * database.
+ * Iterators must always be created from copies of the data to prevent possible corruption of the iterator due to the
+ * remove of all elements from the underlying Map that would occur during a subsequent re-loading of the database.
  *
- * Any operation that acts on multiple elements and expects the database to
- * remain consistent during the operation (e.g. saving or loading the database)
- * must first obtain the write lock.
+ * Any operation that acts on multiple elements and expects the database to remain consistent during the operation (e.g.
+ * saving or loading the database) must first obtain the write lock.
  */
 public class MemoryUserDatabase implements UserDatabase {
 
@@ -110,7 +104,7 @@ public class MemoryUserDatabase implements UserDatabase {
     /**
      * The set of {@link Group}s defined in this database, keyed by group name.
      */
-    protected final Map<String, Group> groups = new ConcurrentHashMap<>();
+    protected final Map<String,Group> groups = new ConcurrentHashMap<>();
 
     /**
      * The unique global identifier of this user database.
@@ -118,20 +112,19 @@ public class MemoryUserDatabase implements UserDatabase {
     protected final String id;
 
     /**
-     * The relative (to <code>catalina.base</code>) or absolute pathname to the
-     * XML file in which we will save our persistent information.
+     * The relative (to <code>catalina.base</code>) or absolute pathname to the XML file in which we will save our
+     * persistent information.
      */
     protected String pathname = "conf/tomcat-users.xml";
 
     /**
-     * The relative or absolute pathname to the file in which our old
-     * information is stored while renaming is in progress.
+     * The relative or absolute pathname to the file in which our old information is stored while renaming is in
+     * progress.
      */
     protected String pathnameOld = pathname + ".old";
 
     /**
-     * The relative or absolute pathname of the file in which we write our new
-     * information prior to renaming.
+     * The relative or absolute pathname of the file in which we write our new information prior to renaming.
      */
     protected String pathnameNew = pathname + ".new";
 
@@ -143,12 +136,12 @@ public class MemoryUserDatabase implements UserDatabase {
     /**
      * The set of {@link Role}s defined in this database, keyed by role name.
      */
-    protected final Map<String, Role> roles = new ConcurrentHashMap<>();
+    protected final Map<String,Role> roles = new ConcurrentHashMap<>();
 
     /**
      * The set of {@link User}s defined in this database, keyed by user name.
      */
-    protected final Map<String, User> users = new ConcurrentHashMap<>();
+    protected final Map<String,User> users = new ConcurrentHashMap<>();
 
     private final ReentrantReadWriteLock dbLock = new ReentrantReadWriteLock();
     private final Lock readLock = dbLock.readLock();
@@ -218,7 +211,6 @@ public class MemoryUserDatabase implements UserDatabase {
     public boolean getWatchSource() {
         return watchSource;
     }
-
 
 
     public void setWatchSource(boolean watchSource) {
@@ -372,17 +364,13 @@ public class MemoryUserDatabase implements UserDatabase {
                 // Construct a digester to read the XML input file
                 Digester digester = new Digester();
                 try {
-                    digester.setFeature(
-                            "http://apache.org/xml/features/allow-java-encodings", true);
+                    digester.setFeature("http://apache.org/xml/features/allow-java-encodings", true);
                 } catch (Exception e) {
                     log.warn(sm.getString("memoryUserDatabase.xmlFeatureEncoding"), e);
                 }
-                digester.addFactoryCreate("tomcat-users/group",
-                        new MemoryGroupCreationFactory(this), true);
-                digester.addFactoryCreate("tomcat-users/role",
-                        new MemoryRoleCreationFactory(this), true);
-                digester.addFactoryCreate("tomcat-users/user",
-                        new MemoryUserCreationFactory(this), true);
+                digester.addFactoryCreate("tomcat-users/group", new MemoryGroupCreationFactory(this), true);
+                digester.addFactoryCreate("tomcat-users/role", new MemoryRoleCreationFactory(this), true);
+                digester.addFactoryCreate("tomcat-users/user", new MemoryUserCreationFactory(this), true);
 
                 // Parse the XML input to load this database
                 digester.parse(resource.getInputStream());
@@ -450,13 +438,11 @@ public class MemoryUserDatabase implements UserDatabase {
 
 
     /**
-     * Check for permissions to save this user database to persistent storage
-     * location.
+     * Check for permissions to save this user database to persistent storage location.
      *
      * @return <code>true</code> if the database is writable
      *
-     * @deprecated Use {@link #isWritable()}. This method will be removed in
-     *             Tomcat 10.1.x onwards.
+     * @deprecated Use {@link #isWritable()}. This method will be removed in Tomcat 10.1.x onwards.
      */
     @Deprecated
     public boolean isWriteable() {
@@ -465,8 +451,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
 
     /**
-     * Check for permissions to save this user database to persistent storage
-     * location.
+     * Check for permissions to save this user database to persistent storage location.
      *
      * @return <code>true</code> if the database is writable
      */
@@ -518,12 +503,12 @@ public class MemoryUserDatabase implements UserDatabase {
                 // Print entries for each defined role, group, and user
                 Iterator<?> values = null;
                 values = getRoles();
-                while(values.hasNext()) {
-                    Role role = (Role)values.next();
+                while (values.hasNext()) {
+                    Role role = (Role) values.next();
                     writer.print("  <role rolename=\"");
                     writer.print(Escape.xml(role.getRolename()));
                     writer.print("\"");
-                    if(null != role.getDescription()) {
+                    if (null != role.getDescription()) {
                         writer.print(" description=\"");
                         writer.print(Escape.xml(role.getDescription()));
                         writer.print("\"");
@@ -532,20 +517,20 @@ public class MemoryUserDatabase implements UserDatabase {
                 }
                 values = getGroups();
                 while (values.hasNext()) {
-                    Group group = (Group)values.next();
+                    Group group = (Group) values.next();
                     writer.print("  <group groupname=\"");
                     writer.print(Escape.xml(group.getName()));
                     writer.print("\"");
-                    if(null != group.getDescription()) {
+                    if (null != group.getDescription()) {
                         writer.print(" description=\"");
                         writer.print(Escape.xml(group.getDescription()));
                         writer.print("\"");
                     }
                     writer.print(" roles=\"");
-                    for (Iterator<Role> roles=group.getRoles(); roles.hasNext();) {
+                    for (Iterator<Role> roles = group.getRoles(); roles.hasNext();) {
                         Role role = roles.next();
                         writer.print(Escape.xml(role.getRolename()));
-                        if(roles.hasNext()) {
+                        if (roles.hasNext()) {
                             writer.print(',');
                         }
                     }
@@ -554,30 +539,30 @@ public class MemoryUserDatabase implements UserDatabase {
 
                 values = getUsers();
                 while (values.hasNext()) {
-                    User user = (User)values.next();
+                    User user = (User) values.next();
                     writer.print("  <user username=\"");
                     writer.print(Escape.xml(user.getUsername()));
                     writer.print("\" password=\"");
                     writer.print(Escape.xml(user.getPassword()));
                     writer.print("\"");
-                    if(null != user.getFullName()) {
+                    if (null != user.getFullName()) {
                         writer.print(" fullName=\"");
                         writer.print(Escape.xml(user.getFullName()));
                         writer.print("\"");
                     }
                     writer.print(" groups=\"");
-                    for (Iterator<Group> groups=user.getGroups(); groups.hasNext();) {
+                    for (Iterator<Group> groups = user.getGroups(); groups.hasNext();) {
                         Group group = groups.next();
                         writer.print(Escape.xml(group.getGroupname()));
-                        if(groups.hasNext()) {
+                        if (groups.hasNext()) {
                             writer.print(',');
                         }
                     }
                     writer.print("\" roles=\"");
-                    for (Iterator<Role> roles=user.getRoles(); roles.hasNext();) {
+                    for (Iterator<Role> roles = user.getRoles(); roles.hasNext();) {
                         Role role = roles.next();
                         writer.print(Escape.xml(role.getRolename()));
-                        if(roles.hasNext()) {
+                        if (roles.hasNext()) {
                             writer.print(',');
                         }
                     }
@@ -589,8 +574,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
                 // Check for errors that occurred while printing
                 if (writer.checkError()) {
-                    throw new IOException(sm.getString("memoryUserDatabase.writeException",
-                            fileNew.getAbsolutePath()));
+                    throw new IOException(sm.getString("memoryUserDatabase.writeException", fileNew.getAbsolutePath()));
                 }
             } catch (IOException e) {
                 if (fileNew.exists() && !fileNew.delete()) {
@@ -617,8 +601,7 @@ public class MemoryUserDatabase implements UserDatabase {
         }
         if (fileOrig.exists()) {
             if (!fileOrig.renameTo(fileOld)) {
-                throw new IOException(sm.getString("memoryUserDatabase.renameOld",
-                        fileOld.getAbsolutePath()));
+                throw new IOException(sm.getString("memoryUserDatabase.renameOld", fileOld.getAbsolutePath()));
             }
         }
         if (!fileNew.renameTo(fileOrig)) {
@@ -627,8 +610,7 @@ public class MemoryUserDatabase implements UserDatabase {
                     log.warn(sm.getString("memoryUserDatabase.restoreOrig", fileOld));
                 }
             }
-            throw new IOException(sm.getString("memoryUserDatabase.renameNew",
-                    fileOrig.getAbsolutePath()));
+            throw new IOException(sm.getString("memoryUserDatabase.renameNew", fileOrig.getAbsolutePath()));
         }
         if (fileOld.exists() && !fileOld.delete()) {
             throw new IOException(sm.getString("memoryUserDatabase.fileDelete", fileOld));

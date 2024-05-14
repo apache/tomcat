@@ -22,11 +22,15 @@ import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.security.Escape;
 
 /**
- * <p>Concrete implementation of {@link org.apache.catalina.User} for the
- * {@link MemoryUserDatabase} implementation of {@link UserDatabase}.</p>
+ * <p>
+ * Concrete implementation of {@link org.apache.catalina.User} for the {@link MemoryUserDatabase} implementation of
+ * {@link UserDatabase}.
+ * </p>
  *
  * @author Craig R. McClanahan
+ *
  * @since 4.1
+ *
  * @deprecated Use {@link GenericUser} instead.
  */
 @Deprecated
@@ -34,27 +38,27 @@ public class MemoryUser extends GenericUser<MemoryUserDatabase> {
 
 
     /**
-     * Package-private constructor used by the factory method in
-     * {@link MemoryUserDatabase}.
+     * Package-private constructor used by the factory method in {@link MemoryUserDatabase}.
      *
      * @param database The {@link MemoryUserDatabase} that owns this user
      * @param username Logon username of the new user
      * @param password Logon password of the new user
      * @param fullName Full name of the new user
      */
-    MemoryUser(MemoryUserDatabase database, String username,
-               String password, String fullName) {
+    MemoryUser(MemoryUserDatabase database, String username, String password, String fullName) {
         super(database, username, password, fullName, null, null);
     }
 
 
     /**
-     * <p>Return a String representation of this user in XML format.</p>
+     * <p>
+     * Return a String representation of this user in XML format.
+     * </p>
+     * <p>
+     * <strong>IMPLEMENTATION NOTE</strong> - For backwards compatibility, the reader that processes this entry will
+     * accept either <code>username</code> or <code>name</code> for the username property.
+     * </p>
      *
-     * <p><strong>IMPLEMENTATION NOTE</strong> - For backwards compatibility,
-     * the reader that processes this entry will accept either
-     * <code>username</code> or <code>name</code> for the username
-     * property.</p>
      * @return the XML representation
      */
     public String toXml() {
@@ -81,7 +85,9 @@ public class MemoryUser extends GenericUser<MemoryUserDatabase> {
 
 
     /**
-     * <p>Return a String representation of this user.</p>
+     * <p>
+     * Return a String representation of this user.
+     * </p>
      */
     @Override
     public String toString() {

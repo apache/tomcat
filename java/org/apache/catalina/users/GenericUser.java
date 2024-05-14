@@ -26,8 +26,9 @@ import org.apache.catalina.Role;
 import org.apache.catalina.UserDatabase;
 
 /**
- * <p>Concrete implementation of {@link org.apache.catalina.User} for a
- * {@link UserDatabase}.</p>
+ * <p>
+ * Concrete implementation of {@link org.apache.catalina.User} for a {@link UserDatabase}.
+ * </p>
  *
  * @param <UD> The specific type of UserDase with which this role is associated
  *
@@ -40,19 +41,16 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
 
 
     /**
-     * Package-private constructor used by the factory method in
-     * {@link UserDatabase}.
+     * Package-private constructor used by the factory method in {@link UserDatabase}.
      *
      * @param database The {@link UserDatabase} that owns this user
      * @param username Logon username of the new user
      * @param password Logon password of the new user
      * @param fullName Full name of the new user
-     * @param groups The groups of this user
-     * @param roles The roles of this user
+     * @param groups   The groups of this user
+     * @param roles    The roles of this user
      */
-    GenericUser(UD database, String username,
-               String password, String fullName, List<Group> groups,
-               List<Role> roles) {
+    GenericUser(UD database, String username, String password, String fullName, List<Group> groups, List<Role> roles) {
 
         super();
         this.database = database;

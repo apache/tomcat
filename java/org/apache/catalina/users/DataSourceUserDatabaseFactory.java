@@ -28,17 +28,17 @@ import javax.sql.DataSource;
 
 
 /**
- * <p>JNDI object creation factory for <code>DataSourceUserDatabase</code>
- * instances.  This makes it convenient to configure a user database
- * in the global JNDI resources associated with this Catalina instance,
- * and then link to that resource for web applications that administer
- * the contents of the user database.</p>
- *
- * <p>The <code>DataSourceUserDatabase</code> instance is configured based
- * on the following parameter values:</p>
+ * <p>
+ * JNDI object creation factory for <code>DataSourceUserDatabase</code> instances. This makes it convenient to configure
+ * a user database in the global JNDI resources associated with this Catalina instance, and then link to that resource
+ * for web applications that administer the contents of the user database.
+ * </p>
+ * <p>
+ * The <code>DataSourceUserDatabase</code> instance is configured based on the following parameter values:
+ * </p>
  * <ul>
- * <li><strong>dataSourceName</strong> - JNDI name of the DataSource, which
- * must be located in the same Context environment as the UserDatabase</li>
+ * <li><strong>dataSourceName</strong> - JNDI name of the DataSource, which must be located in the same Context
+ * environment as the UserDatabase</li>
  * </ul>
  *
  * @author Craig R. McClanahan
@@ -50,24 +50,22 @@ public class DataSourceUserDatabaseFactory implements ObjectFactory {
 
 
     /**
-     * <p>Create and return a new <code>DataSourceUserDatabase</code> instance
-     * that has been configured according to the properties of the
-     * specified <code>Reference</code>.  If you instance can be created,
-     * return <code>null</code> instead.</p>
+     * <p>
+     * Create and return a new <code>DataSourceUserDatabase</code> instance that has been configured according to the
+     * properties of the specified <code>Reference</code>. If you instance can be created, return <code>null</code>
+     * instead.
+     * </p>
      *
-     * @param obj The possibly null object containing location or
-     *  reference information that can be used in creating an object
-     * @param name The name of this object relative to <code>nameCtx</code>
-     * @param nameCtx The context relative to which the <code>name</code>
-     *  parameter is specified, or <code>null</code> if <code>name</code>
-     *  is relative to the default initial context
-     * @param environment The possibly null environment that is used in
-     *  creating this object
+     * @param obj         The possibly null object containing location or reference information that can be used in
+     *                        creating an object
+     * @param name        The name of this object relative to <code>nameCtx</code>
+     * @param nameCtx     The context relative to which the <code>name</code> parameter is specified, or
+     *                        <code>null</code> if <code>name</code> is relative to the default initial context
+     * @param environment The possibly null environment that is used in creating this object
      */
     @Override
-    public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-                                    Hashtable<?,?> environment)
-        throws Exception {
+    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?,?> environment)
+            throws Exception {
 
         // We only know how to deal with <code>javax.naming.Reference</code>s
         // that specify a class name of "org.apache.catalina.UserDatabase"

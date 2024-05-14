@@ -21,11 +21,15 @@ import org.apache.catalina.UserDatabase;
 import org.apache.tomcat.util.security.Escape;
 
 /**
- * <p>Concrete implementation of {@link org.apache.catalina.Role} for the
- * {@link MemoryUserDatabase} implementation of {@link UserDatabase}.</p>
+ * <p>
+ * Concrete implementation of {@link org.apache.catalina.Role} for the {@link MemoryUserDatabase} implementation of
+ * {@link UserDatabase}.
+ * </p>
  *
  * @author Craig R. McClanahan
+ *
  * @since 4.1
+ *
  * @deprecated Use {@link GenericRole} instead.
  */
 @Deprecated
@@ -33,21 +37,21 @@ public class MemoryRole extends GenericRole<MemoryUserDatabase> {
 
 
     /**
-     * Package-private constructor used by the factory method in
-     * {@link MemoryUserDatabase}.
+     * Package-private constructor used by the factory method in {@link MemoryUserDatabase}.
      *
-     * @param database The {@link MemoryUserDatabase} that owns this role
-     * @param rolename Role name of this role
+     * @param database    The {@link MemoryUserDatabase} that owns this role
+     * @param rolename    Role name of this role
      * @param description Description of this role
      */
-    MemoryRole(MemoryUserDatabase database,
-               String rolename, String description) {
+    MemoryRole(MemoryUserDatabase database, String rolename, String description) {
         super(database, rolename, description);
     }
 
 
     /**
-     * <p>Return a String representation of this role in XML format.</p>
+     * <p>
+     * Return a String representation of this role in XML format.
+     * </p>
      */
     @Override
     public String toString() {
