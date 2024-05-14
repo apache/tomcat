@@ -22,11 +22,15 @@ import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.security.Escape;
 
 /**
- * <p>Concrete implementation of {@link org.apache.catalina.Group} for the
- * {@link MemoryUserDatabase} implementation of {@link UserDatabase}.</p>
+ * <p>
+ * Concrete implementation of {@link org.apache.catalina.Group} for the {@link MemoryUserDatabase} implementation of
+ * {@link UserDatabase}.
+ * </p>
  *
  * @author Craig R. McClanahan
+ *
  * @since 4.1
+ *
  * @deprecated Use {@link GenericGroup} instead.
  */
 @Deprecated
@@ -34,21 +38,21 @@ public class MemoryGroup extends GenericGroup<MemoryUserDatabase> {
 
 
     /**
-     * Package-private constructor used by the factory method in
-     * {@link MemoryUserDatabase}.
+     * Package-private constructor used by the factory method in {@link MemoryUserDatabase}.
      *
-     * @param database The {@link MemoryUserDatabase} that owns this group
-     * @param groupname Group name of this group
+     * @param database    The {@link MemoryUserDatabase} that owns this group
+     * @param groupname   Group name of this group
      * @param description Description of this group
      */
-    MemoryGroup(MemoryUserDatabase database,
-                String groupname, String description) {
+    MemoryGroup(MemoryUserDatabase database, String groupname, String description) {
         super(database, groupname, description, null);
     }
 
 
     /**
-     * <p>Return a String representation of this group in XML format.</p>
+     * <p>
+     * Return a String representation of this group in XML format.
+     * </p>
      */
     @Override
     public String toString() {
