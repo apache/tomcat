@@ -24,7 +24,7 @@ import jakarta.el.ELResolver;
 import jakarta.el.ImportHandler;
 
 /**
- * Providers resolution of imports and static imports in the Jakarta Server Pages ELResolver chain.
+ * Providers resolution of imports and static imports in the Jakarta Pages ELResolver chain.
  *
  * @since JSP 3.1
  */

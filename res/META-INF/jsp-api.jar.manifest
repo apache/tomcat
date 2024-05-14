@@ -3,7 +3,7 @@ X-Compile-Source-JDK: @source.jdk@
 X-Compile-Target-JDK: @target.jdk@
 
 Name: jakarta/servlet/jsp/
-Specification-Title: Jakarta Server Pages
+Specification-Title: Jakarta Pages
 Specification-Version: @jsp.spec.version@
 Specification-Vendor: Eclipse Foundation
 Implementation-Title: jakarta.servlet.jsp
