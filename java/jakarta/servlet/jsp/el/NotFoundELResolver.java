@@ -27,7 +27,7 @@ import jakarta.el.ELResolver;
 import jakarta.el.PropertyNotFoundException;
 
 /**
- * The final resolver of the Jakarta Server Pages ELResolver chain. It always resolves the requested value, returning
+ * The final resolver of the Jakarta Pages ELResolver chain. It always resolves the requested value, returning
  * {@code null} when it does so.
  *
  * @since JSP 3.1
