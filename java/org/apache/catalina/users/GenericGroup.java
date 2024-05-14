@@ -28,8 +28,9 @@ import org.apache.catalina.UserDatabase;
 
 
 /**
- * <p>Concrete implementation of {@link org.apache.catalina.Group} for a
- * {@link UserDatabase}.</p>
+ * <p>
+ * Concrete implementation of {@link org.apache.catalina.Group} for a {@link UserDatabase}.
+ * </p>
  *
  * @param <UD> The specific type of UserDase with which this group is associated
  *
@@ -42,16 +43,14 @@ public class GenericGroup<UD extends UserDatabase> extends AbstractGroup {
 
 
     /**
-     * Package-private constructor used by the factory method in
-     * {@link UserDatabase}.
+     * Package-private constructor used by the factory method in {@link UserDatabase}.
      *
-     * @param database The {@link UserDatabase} that owns this group
-     * @param groupname Group name of this group
+     * @param database    The {@link UserDatabase} that owns this group
+     * @param groupname   Group name of this group
      * @param description Description of this group
-     * @param roles The roles of this group
+     * @param roles       The roles of this group
      */
-    GenericGroup(UD database,
-                String groupname, String description, List<Role> roles) {
+    GenericGroup(UD database, String groupname, String description, List<Role> roles) {
 
         super();
         this.database = database;

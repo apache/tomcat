@@ -21,9 +21,12 @@ import org.apache.catalina.Group;
 
 
 /**
- * <p>Convenience base class for {@link Group} implementations.</p>
+ * <p>
+ * Convenience base class for {@link Group} implementations.
+ * </p>
  *
  * @author Craig R. McClanahan
+ *
  * @since 4.1
  */
 public abstract class AbstractGroup implements Group {

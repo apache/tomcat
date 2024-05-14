@@ -61,17 +61,17 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      */
     protected final String id;
 
-    protected final ConcurrentHashMap<String, User> createdUsers = new ConcurrentHashMap<>();
-    protected final ConcurrentHashMap<String, User> modifiedUsers = new ConcurrentHashMap<>();
-    protected final ConcurrentHashMap<String, User> removedUsers = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,User> createdUsers = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,User> modifiedUsers = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,User> removedUsers = new ConcurrentHashMap<>();
 
-    protected final ConcurrentHashMap<String, Group> createdGroups = new ConcurrentHashMap<>();
-    protected final ConcurrentHashMap<String, Group> modifiedGroups = new ConcurrentHashMap<>();
-    protected final ConcurrentHashMap<String, Group> removedGroups = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,Group> createdGroups = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,Group> modifiedGroups = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,Group> removedGroups = new ConcurrentHashMap<>();
 
-    protected final ConcurrentHashMap<String, Role> createdRoles = new ConcurrentHashMap<>();
-    protected final ConcurrentHashMap<String, Role> modifiedRoles = new ConcurrentHashMap<>();
-    protected final ConcurrentHashMap<String, Role> removedRoles = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,Role> createdRoles = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,Role> modifiedRoles = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,Role> removedRoles = new ConcurrentHashMap<>();
 
 
     // ----------------------------------------------------- Instance Variables
@@ -269,7 +269,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      *
      * @param roleNameCol The column name
      */
-    public void setRoleNameCol( String roleNameCol ) {
+    public void setRoleNameCol(String roleNameCol) {
         this.roleNameCol = roleNameCol;
     }
 
@@ -285,8 +285,8 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      *
      * @param userCredCol The column name
      */
-    public void setUserCredCol( String userCredCol ) {
-       this.userCredCol = userCredCol;
+    public void setUserCredCol(String userCredCol) {
+        this.userCredCol = userCredCol;
     }
 
     /**
@@ -301,8 +301,8 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      *
      * @param userNameCol The column name
      */
-    public void setUserNameCol( String userNameCol ) {
-       this.userNameCol = userNameCol;
+    public void setUserNameCol(String userNameCol) {
+        this.userNameCol = userNameCol;
     }
 
     /**
@@ -317,7 +317,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      *
      * @param userRoleTable The table name
      */
-    public void setUserRoleTable( String userRoleTable ) {
+    public void setUserRoleTable(String userRoleTable) {
         this.userRoleTable = userRoleTable;
     }
 
@@ -333,8 +333,8 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      *
      * @param userTable The table name
      */
-    public void setUserTable( String userTable ) {
-      this.userTable = userTable;
+    public void setUserTable(String userTable) {
+        this.userTable = userTable;
     }
 
 
@@ -461,7 +461,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
         try {
             groupsReadLock.lock();
             try {
-                HashMap<String, Group> groups = new HashMap<>();
+                HashMap<String,Group> groups = new HashMap<>();
                 groups.putAll(createdGroups);
                 groups.putAll(modifiedGroups);
 
@@ -501,7 +501,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
         try {
             rolesReadLock.lock();
             try {
-                HashMap<String, Role> roles = new HashMap<>();
+                HashMap<String,Role> roles = new HashMap<>();
                 roles.putAll(createdRoles);
                 roles.putAll(modifiedRoles);
 
@@ -541,7 +541,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
         try {
             usersReadLock.lock();
             try {
-                HashMap<String, User> users = new HashMap<>();
+                HashMap<String,User> users = new HashMap<>();
                 users.putAll(createdUsers);
                 users.putAll(modifiedUsers);
 
@@ -934,7 +934,8 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
         if (log.isDebugEnabled()) {
             // As there are lots of parameters to configure, log some debug to help out
-            log.debug(sm.getString("dataSourceUserDatabase.features", Boolean.toString(userRoleTable != null && roleNameCol != null),
+            log.debug(sm.getString("dataSourceUserDatabase.features",
+                    Boolean.toString(userRoleTable != null && roleNameCol != null),
                     Boolean.toString(isRoleStoreDefined()), Boolean.toString(isGroupStoreDefined())));
         }
 
@@ -1567,16 +1568,18 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
     /**
      * Only use groups if the tables are fully defined.
+     *
      * @return true when groups are used
      */
     protected boolean isGroupStoreDefined() {
-        return groupTable != null && userGroupTable != null && groupNameCol != null
-                && groupRoleTable != null && isRoleStoreDefined();
+        return groupTable != null && userGroupTable != null && groupNameCol != null && groupRoleTable != null &&
+                isRoleStoreDefined();
     }
 
 
     /**
      * Only use roles if the tables are fully defined.
+     *
      * @return true when roles are used
      */
     protected boolean isRoleStoreDefined() {
