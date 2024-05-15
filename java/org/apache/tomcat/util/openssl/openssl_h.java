@@ -5336,6 +5336,39 @@ public class openssl_h {
         }
     }
 
+    private static MethodHandle ERR_error_string_n$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_POINTER,
+                openssl_h.C_LONG,
+                openssl_h.C_POINTER,
+                openssl_h.C_INT
+            );
+
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("ERR_error_string_n"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * char *ERR_error_string_n(unsigned long e, char *buf, size_t len)
+     * }
+     */
+    public static MemorySegment ERR_error_string_n(long e, MemorySegment buf, int len) {
+        var mh$ = ERR_error_string_n$MH();
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("ERR_error_string_n", e, buf, len);
+            }
+            return (MemorySegment) mh$.invokeExact(e, buf, len);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static MethodHandle PKCS12_verify_mac$MH() {
         class Holder {
             static final FunctionDescriptor DESC = FunctionDescriptor.of(

@@ -105,8 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.25 (schultz)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Fix OpenSSL FFM use of ERR_error_string with a 128 byte buffer,
+        and use ERR_error_string_n instead. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
-
 <section name="Tomcat 10.1.24 (schultz)" rtext="releaser in progress">
   <subsection name="Catalina">
     <changelog>

@@ -76,6 +76,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static final Cleaner cleaner = Cleaner.create();
 
+    private static final int OPENSSL_ERROR_MESSAGE_BUFFER_SIZE = 256;
+
     private static final String defaultProtocol = "TLS";
 
     private static final int SSL_AIDX_RSA     = 0;
@@ -564,7 +566,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 if ((sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null)
                         && SSL_CTX_load_verify_locations(state.sslCtx,
                                 caCertificateFileNative == null ? MemorySegment.NULL : caCertificateFileNative,
-                                        caCertificatePathNative == null ? MemorySegment.NULL : caCertificatePathNative) <= 0) {
+                                caCertificatePathNative == null ? MemorySegment.NULL : caCertificatePathNative) <= 0) {
                     logLastError("openssl.errorConfiguringLocations");
                 } else {
                     var caCerts = SSL_CTX_get_client_CA_list(state.sslCtx);
@@ -1326,8 +1328,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             try (var localArena = Arena.ofConfined()) {
                 do {
                     // Loop until getLastErrorNumber() returns SSL_ERROR_NONE
-                    var buf = localArena.allocate(ValueLayout.JAVA_BYTE, 128);
-                    ERR_error_string(error, buf);
+                    var buf = localArena.allocate(ValueLayout.JAVA_BYTE, OPENSSL_ERROR_MESSAGE_BUFFER_SIZE);
+                    ERR_error_string_n(error, buf, OPENSSL_ERROR_MESSAGE_BUFFER_SIZE);
                     String err = buf.getString(0);
                     if (sslError == null) {
                         sslError = err;
