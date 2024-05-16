@@ -39,7 +39,7 @@ import org.apache.catalina.User;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.UserDatabaseRealm;
 
-public class MemoryUserDatabaseTests {
+public class TestMemoryUserDatabase {
     private static File TEST_FILE = new File(System.getProperty("java.io.tmpdir"), "tomcat-users.xml");
 
     private static MemoryUserDatabase db;
