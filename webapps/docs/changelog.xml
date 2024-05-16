@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.90 (remm)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Revert Derby to 10.16.1.1 as that is the latest version of Derby that
+        runs on Java 17. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.89 (remm)" rtext="2024-05-07">
   <subsection name="Catalina">
