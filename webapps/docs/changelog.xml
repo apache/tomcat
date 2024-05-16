@@ -113,6 +113,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Revert Derby to 10.16.1.1 as that is the latest version of Derby that
+        runs on Java 17. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M20 (markt)" rtext="release in progress">
   <subsection name="Catalina">
