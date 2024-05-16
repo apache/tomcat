@@ -16,8 +16,12 @@
  */
 package org.apache.tomcat.util.net.openssl;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hamcrest.CoreMatchers;
@@ -26,9 +30,13 @@ import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.core.OpenSSLLifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -36,7 +44,23 @@ import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.TesterSupport;
 
+@RunWith(Parameterized.class)
 public class TestOpenSSLConf extends TomcatBaseTest {
+
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Object[]> parameters() {
+        List<Object[]> parameterSets = new ArrayList<>();
+        parameterSets.add(
+                new Object[] { "org.apache.tomcat.util.net.openssl.OpenSSLImplementation" });
+        parameterSets.add(
+                new Object[] { "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" });
+
+        return parameterSets;
+    }
+
+    @Parameter(0)
+    public String sslImplementationName;
+
 
     private static final String ENABLED_CIPHER = "AES256-SHA256";
     private static final String[] EXPECTED_CIPHERS = {ENABLED_CIPHER};
@@ -61,7 +85,19 @@ public class TestOpenSSLConf extends TomcatBaseTest {
 
         TesterSupport.initSsl(tomcat);
 
-        Assert.assertTrue(connector.setProperty("sslImplementationName", OpenSSLImplementation.class.getName()));
+        Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
+
+        if (OpenSSLImplementation.class.getName().equals(sslImplementationName)) {
+            AprLifecycleListener listener = new AprLifecycleListener();
+            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
+            StandardServer server = (StandardServer) tomcat.getServer();
+            server.addLifecycleListener(listener);
+        } else if ("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation".equals(sslImplementationName)) {
+            OpenSSLLifecycleListener listener = new OpenSSLLifecycleListener();
+            Assume.assumeTrue(OpenSSLLifecycleListener.isAvailable());
+            StandardServer server = (StandardServer) tomcat.getServer();
+            server.addLifecycleListener(listener);
+        }
 
         OpenSSLConf conf = new OpenSSLConf();
         for (int i = 0; i < commands.length;) {
@@ -95,7 +131,17 @@ public class TestOpenSSLConf extends TomcatBaseTest {
         String[] ciphers = sslHostConfig.getEnabledCiphers();
         MatcherAssert.assertThat("Wrong HostConfig ciphers", ciphers,
                 CoreMatchers.is(EXPECTED_CIPHERS));
-        ciphers = SSLContext.getCiphers(sslHostConfig.getOpenSslContext().longValue());
+        if (OpenSSLImplementation.class.getName().equals(sslImplementationName)) {
+            ciphers = SSLContext.getCiphers(sslHostConfig.getOpenSslContext().longValue());
+        } else {
+            Class<?> memorySegmentClass = Class.forName("java.lang.foreign.MemorySegment");
+            Object ssxCtxSegment = memorySegmentClass.getMethod("ofAddress", Long.TYPE)
+                .invoke(null, sslHostConfig.getOpenSslContext());
+            Method getCiphersMethod = Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLContext")
+                    .getDeclaredMethod("getCiphers", memorySegmentClass);
+            getCiphersMethod.setAccessible(true);
+            ciphers = (String[]) getCiphersMethod.invoke(null, ssxCtxSegment);
+        }
         MatcherAssert.assertThat("Wrong native SSL context ciphers", ciphers,
                 CoreMatchers.is(EXPECTED_CIPHERS));
     }
@@ -130,19 +176,4 @@ public class TestOpenSSLConf extends TomcatBaseTest {
         }
     }
 
-
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-
-        // Tests are only intended for OpenSSL
-        Assume.assumeTrue(TesterSupport.isOpensslAvailable());
-
-        Tomcat tomcat = getTomcatInstance();
-
-        AprLifecycleListener listener = new AprLifecycleListener();
-        Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
-        StandardServer server = (StandardServer) tomcat.getServer();
-        server.addLifecycleListener(listener);
-    }
 }
