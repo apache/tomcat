@@ -26,21 +26,20 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Provides introspection utilities that either require knowledge of Tomcat
- * internals or are solely used by Tomcat internals.
+ * Provides introspection utilities that either require knowledge of Tomcat internals or are solely used by Tomcat
+ * internals.
  */
 public class Introspection {
 
-    private static final StringManager sm =
-            StringManager.getManager("org.apache.catalina.util");
+    private static final StringManager sm = StringManager.getManager("org.apache.catalina.util");
 
 
     /**
-     * Extract the Java Bean property name from the setter name.
+     * Extract the Java Bean property name from the setter name. Note: This method assumes that the method name has
+     * already been checked for correctness.
      *
-     * Note: This method assumes that the method name has already been checked
-     *       for correctness.
      * @param setter The setter method
+     *
      * @return the bean property name
      */
     public static String getPropertyName(Method setter) {
@@ -49,19 +48,15 @@ public class Introspection {
 
 
     /**
-     * Determines if a method has a valid name and signature for a Java Bean
-     * setter.
+     * Determines if a method has a valid name and signature for a Java Bean setter.
      *
-     * @param method    The method to test
+     * @param method The method to test
      *
-     * @return  <code>true</code> if the method does have a valid name and
-     *          signature, else <code>false</code>
+     * @return <code>true</code> if the method does have a valid name and signature, else <code>false</code>
      */
     public static boolean isValidSetter(Method method) {
-        if (method.getName().startsWith("set")
-                && method.getName().length() > 3
-                && method.getParameterTypes().length == 1
-                && method.getReturnType().getName().equals("void")) {
+        if (method.getName().startsWith("set") && method.getName().length() > 3 &&
+                method.getParameterTypes().length == 1 && method.getReturnType().getName().equals("void")) {
             return true;
         }
         return false;
@@ -70,29 +65,25 @@ public class Introspection {
     /**
      * Determines if a method is a valid lifecycle callback method.
      *
-     * @param method
-     *            The method to test
+     * @param method The method to test
      *
-     * @return <code>true</code> if the method is a valid lifecycle callback
-     *         method, else <code>false</code>
+     * @return <code>true</code> if the method is a valid lifecycle callback method, else <code>false</code>
      */
     public static boolean isValidLifecycleCallback(Method method) {
-        if (method.getParameterTypes().length != 0
-                || Modifier.isStatic(method.getModifiers())
-                || method.getExceptionTypes().length > 0
-                || !method.getReturnType().getName().equals("void")) {
+        if (method.getParameterTypes().length != 0 || Modifier.isStatic(method.getModifiers()) ||
+                method.getExceptionTypes().length > 0 || !method.getReturnType().getName().equals("void")) {
             return false;
         }
         return true;
     }
 
     /**
-     * Attempt to load a class using the given Container's class loader. If the
-     * class cannot be loaded, a debug level log message will be written to the
-     * Container's log and null will be returned.
-     * @param context The class loader of this context will be used to attempt
-     *  to load the class
+     * Attempt to load a class using the given Container's class loader. If the class cannot be loaded, a debug level
+     * log message will be written to the Container's log and null will be returned.
+     *
+     * @param context   The class loader of this context will be used to attempt to load the class
      * @param className The class name
+     *
      * @return the loaded class or <code>null</code> if loading failed
      */
     public static Class<?> loadClass(Context context, String className) {
@@ -113,10 +104,9 @@ public class Introspection {
     /**
      * Converts the primitive type to its corresponding wrapper.
      *
-     * @param clazz
-     *            Class that will be evaluated
-     * @return if the parameter is a primitive type returns its wrapper;
-     *         otherwise returns the same class
+     * @param clazz Class that will be evaluated
+     *
+     * @return if the parameter is a primitive type returns its wrapper; otherwise returns the same class
      */
     public static Class<?> convertPrimitiveType(Class<?> clazz) {
         if (clazz.equals(char.class)) {

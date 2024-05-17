@@ -26,9 +26,10 @@ public class SessionConfig {
     private static final String DEFAULT_SESSION_PARAMETER_NAME = "jsessionid";
 
     /**
-     * Determine the name to use for the session cookie for the provided
-     * context.
+     * Determine the name to use for the session cookie for the provided context.
+     *
      * @param context The context
+     *
      * @return the cookie name for the context
      */
     public static String getSessionCookieName(Context context) {
@@ -36,9 +37,10 @@ public class SessionConfig {
     }
 
     /**
-     * Determine the name to use for the session path parameter for the provided
-     * context.
+     * Determine the name to use for the session path parameter for the provided context.
+     *
      * @param context The context
+     *
      * @return the parameter name for the session
      */
     public static String getSessionUriParamName(Context context) {
@@ -68,10 +70,10 @@ public class SessionConfig {
 
 
     /**
-     * Determine the value to use for the session cookie path for the provided
-     * context.
+     * Determine the value to use for the session cookie path for the provided context.
      *
      * @param context The context
+     *
      * @return the parameter name for the session
      */
     public static String getSessionCookiePath(Context context) {

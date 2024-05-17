@@ -27,13 +27,11 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class LifecycleMBeanBase extends LifecycleBase
-        implements JmxEnabled {
+public abstract class LifecycleMBeanBase extends LifecycleBase implements JmxEnabled {
 
     private static final Log log = LogFactory.getLog(LifecycleMBeanBase.class);
 
-    private static final StringManager sm =
-        StringManager.getManager("org.apache.catalina.util");
+    private static final StringManager sm = StringManager.getManager("org.apache.catalina.util");
 
 
     /* Cache components of the MBean registration. */
@@ -77,10 +75,9 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
 
 
     /**
-     * Method implemented by sub-classes to identify the domain in which MBeans
-     * should be registered.
+     * Method implemented by sub-classes to identify the domain in which MBeans should be registered.
      *
-     * @return  The name of the domain to use to register MBeans.
+     * @return The name of the domain to use to register MBeans.
      */
     protected abstract String getDomainInternal();
 
@@ -92,31 +89,26 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
 
 
     /**
-     * Allow sub-classes to specify the key properties component of the
-     * {@link ObjectName} that will be used to register this component.
+     * Allow sub-classes to specify the key properties component of the {@link ObjectName} that will be used to register
+     * this component.
      *
-     * @return  The string representation of the key properties component of the
-     *          desired {@link ObjectName}
+     * @return The string representation of the key properties component of the desired {@link ObjectName}
      */
     protected abstract String getObjectNameKeyProperties();
 
 
     /**
-     * Utility method to enable sub-classes to easily register additional
-     * components that don't implement {@link JmxEnabled} with an MBean server.
-     * <br>
-     * Note: This method should only be used once {@link #initInternal()} has
-     * been called and before {@link #destroyInternal()} has been called.
+     * Utility method to enable sub-classes to easily register additional components that don't implement
+     * {@link JmxEnabled} with an MBean server. <br>
+     * Note: This method should only be used once {@link #initInternal()} has been called and before
+     * {@link #destroyInternal()} has been called.
      *
-     * @param obj                       The object the register
-     * @param objectNameKeyProperties   The key properties component of the
-     *                                  object name to use to register the
-     *                                  object
+     * @param obj                     The object the register
+     * @param objectNameKeyProperties The key properties component of the object name to use to register the object
      *
-     * @return  The name used to register the object
+     * @return The name used to register the object
      */
-    protected final ObjectName register(Object obj,
-            String objectNameKeyProperties) {
+    protected final ObjectName register(Object obj, String objectNameKeyProperties) {
 
         // Construct an object name with the right domain
         StringBuilder name = new StringBuilder(getDomain());
@@ -137,15 +129,12 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
 
 
     /**
-     * Utility method to enable sub-classes to easily unregister additional
-     * components that don't implement {@link JmxEnabled} with an MBean server.
-     * <br>
-     * Note: This method should only be used once {@link #initInternal()} has
-     * been called and before {@link #destroyInternal()} has been called.
+     * Utility method to enable sub-classes to easily unregister additional components that don't implement
+     * {@link JmxEnabled} with an MBean server. <br>
+     * Note: This method should only be used once {@link #initInternal()} has been called and before
+     * {@link #destroyInternal()} has been called.
      *
-     * @param objectNameKeyProperties   The key properties component of the
-     *                                  object name to use to unregister the
-     *                                  object
+     * @param objectNameKeyProperties The key properties component of the object name to use to unregister the object
      */
     protected final void unregister(String objectNameKeyProperties) {
         // Construct an object name with the right domain
@@ -157,13 +146,12 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
 
 
     /**
-     * Utility method to enable sub-classes to easily unregister additional
-     * components that don't implement {@link JmxEnabled} with an MBean server.
-     * <br>
-     * Note: This method should only be used once {@link #initInternal()} has
-     * been called and before {@link #destroyInternal()} has been called.
+     * Utility method to enable sub-classes to easily unregister additional components that don't implement
+     * {@link JmxEnabled} with an MBean server. <br>
+     * Note: This method should only be used once {@link #initInternal()} has been called and before
+     * {@link #destroyInternal()} has been called.
      *
-     * @param on    The name of the component to unregister
+     * @param on The name of the component to unregister
      */
     protected final void unregister(ObjectName on) {
         Registry.getRegistry(null, null).unregisterComponent(on);
@@ -198,8 +186,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
 
 
     @Override
-    public final ObjectName preRegister(MBeanServer server, ObjectName name)
-            throws Exception {
+    public final ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
 
         this.oname = name;
         this.domain = name.getDomain().intern();

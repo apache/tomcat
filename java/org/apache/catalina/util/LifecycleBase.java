@@ -30,9 +30,8 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Base implementation of the {@link Lifecycle} interface that implements the
- * state transition rules for {@link Lifecycle#start()} and
- * {@link Lifecycle#stop()}
+ * Base implementation of the {@link Lifecycle} interface that implements the state transition rules for
+ * {@link Lifecycle#start()} and {@link Lifecycle#stop()}
  */
 public abstract class LifecycleBase implements Lifecycle {
 
@@ -57,13 +56,11 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Will a {@link LifecycleException} thrown by a sub-class during
-     * {@link #initInternal()}, {@link #startInternal()},
-     * {@link #stopInternal()} or {@link #destroyInternal()} be re-thrown for
-     * the caller to handle or will it be logged instead?
+     * Will a {@link LifecycleException} thrown by a sub-class during {@link #initInternal()}, {@link #startInternal()},
+     * {@link #stopInternal()} or {@link #destroyInternal()} be re-thrown for the caller to handle or will it be logged
+     * instead?
      *
-     * @return {@code true} if the exception will be re-thrown, otherwise
-     *         {@code false}
+     * @return {@code true} if the exception will be re-thrown, otherwise {@code false}
      */
     public boolean getThrowOnFailure() {
         return throwOnFailure;
@@ -71,13 +68,11 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Configure if a {@link LifecycleException} thrown by a sub-class during
-     * {@link #initInternal()}, {@link #startInternal()},
-     * {@link #stopInternal()} or {@link #destroyInternal()} will be re-thrown
-     * for the caller to handle or if it will be logged instead.
+     * Configure if a {@link LifecycleException} thrown by a sub-class during {@link #initInternal()},
+     * {@link #startInternal()}, {@link #stopInternal()} or {@link #destroyInternal()} will be re-thrown for the caller
+     * to handle or if it will be logged instead.
      *
-     * @param throwOnFailure {@code true} if the exception should be re-thrown,
-     *                       otherwise {@code false}
+     * @param throwOnFailure {@code true} if the exception should be re-thrown, otherwise {@code false}
      */
     public void setThrowOnFailure(boolean throwOnFailure) {
         this.throwOnFailure = throwOnFailure;
@@ -105,8 +100,8 @@ public abstract class LifecycleBase implements Lifecycle {
     /**
      * Allow sub classes to fire {@link Lifecycle} events.
      *
-     * @param type  Event type
-     * @param data  Data associated with event.
+     * @param type Event type
+     * @param data Data associated with event.
      */
     protected void fireLifecycleEvent(String type, Object data) {
         LifecycleEvent event = new LifecycleEvent(this, type, data);
@@ -133,8 +128,7 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Sub-classes implement this method to perform any instance initialisation
-     * required.
+     * Sub-classes implement this method to perform any instance initialisation required.
      *
      * @throws LifecycleException If the initialisation fails
      */
@@ -161,8 +155,7 @@ public abstract class LifecycleBase implements Lifecycle {
             init();
         } else if (state.equals(LifecycleState.FAILED)) {
             stop();
-        } else if (!state.equals(LifecycleState.INITIALIZED) &&
-                !state.equals(LifecycleState.STOPPED)) {
+        } else if (!state.equals(LifecycleState.INITIALIZED) && !state.equals(LifecycleState.STOPPED)) {
             invalidTransition(BEFORE_START_EVENT);
         }
 
@@ -189,15 +182,11 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Sub-classes must ensure that the state is changed to
-     * {@link LifecycleState#STARTING} during the execution of this method.
-     * Changing state will trigger the {@link Lifecycle#START_EVENT} event.
-     *
-     * If a component fails to start it may either throw a
-     * {@link LifecycleException} which will cause it's parent to fail to start
-     * or it can place itself in the error state in which case {@link #stop()}
-     * will be called on the failed component but the parent component will
-     * continue to start normally.
+     * Sub-classes must ensure that the state is changed to {@link LifecycleState#STARTING} during the execution of this
+     * method. Changing state will trigger the {@link Lifecycle#START_EVENT} event. If a component fails to start it may
+     * either throw a {@link LifecycleException} which will cause it's parent to fail to start or it can place itself in
+     * the error state in which case {@link #stop()} will be called on the failed component but the parent component
+     * will continue to start normally.
      *
      * @throws LifecycleException Start error occurred
      */
@@ -261,9 +250,8 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Sub-classes must ensure that the state is changed to
-     * {@link LifecycleState#STOPPING} during the execution of this method.
-     * Changing state will trigger the {@link Lifecycle#STOP_EVENT} event.
+     * Sub-classes must ensure that the state is changed to {@link LifecycleState#STOPPING} during the execution of this
+     * method. Changing state will trigger the {@link Lifecycle#STOP_EVENT} event.
      *
      * @throws LifecycleException Stop error occurred
      */
@@ -312,8 +300,7 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Sub-classes implement this method to perform any instance destruction
-     * required.
+     * Sub-classes implement this method to perform any instance destruction required.
      *
      * @throws LifecycleException If the destruction fails
      */
@@ -333,12 +320,12 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Provides a mechanism for sub-classes to update the component state.
-     * Calling this method will automatically fire any associated
-     * {@link Lifecycle} event. It will also check that any attempted state
-     * transition is valid for a sub-class.
+     * Provides a mechanism for sub-classes to update the component state. Calling this method will automatically fire
+     * any associated {@link Lifecycle} event. It will also check that any attempted state transition is valid for a
+     * sub-class.
      *
      * @param state The new state for this component
+     *
      * @throws LifecycleException when attempting to set an invalid state
      */
     protected synchronized void setState(LifecycleState state) throws LifecycleException {
@@ -347,17 +334,16 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Provides a mechanism for sub-classes to update the component state.
-     * Calling this method will automatically fire any associated
-     * {@link Lifecycle} event. It will also check that any attempted state
-     * transition is valid for a sub-class.
+     * Provides a mechanism for sub-classes to update the component state. Calling this method will automatically fire
+     * any associated {@link Lifecycle} event. It will also check that any attempted state transition is valid for a
+     * sub-class.
      *
      * @param state The new state for this component
      * @param data  The data to pass to the associated {@link Lifecycle} event
+     *
      * @throws LifecycleException when attempting to set an invalid state
      */
-    protected synchronized void setState(LifecycleState state, Object data)
-            throws LifecycleException {
+    protected synchronized void setState(LifecycleState state, Object data) throws LifecycleException {
         setStateInternal(state, data, true);
     }
 
@@ -385,12 +371,9 @@ public abstract class LifecycleBase implements Lifecycle {
             // stopInternal() permits STOPPING_PREP to STOPPING and FAILED to
             // STOPPING
             if (!(state == LifecycleState.FAILED ||
-                    (this.state == LifecycleState.STARTING_PREP &&
-                            state == LifecycleState.STARTING) ||
-                    (this.state == LifecycleState.STOPPING_PREP &&
-                            state == LifecycleState.STOPPING) ||
-                    (this.state == LifecycleState.FAILED &&
-                            state == LifecycleState.STOPPING))) {
+                    (this.state == LifecycleState.STARTING_PREP && state == LifecycleState.STARTING) ||
+                    (this.state == LifecycleState.STOPPING_PREP && state == LifecycleState.STOPPING) ||
+                    (this.state == LifecycleState.FAILED && state == LifecycleState.STOPPING))) {
                 // No other transition permitted
                 invalidTransition(state.name());
             }

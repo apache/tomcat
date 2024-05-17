@@ -24,8 +24,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 
 
 /**
- * Simple utility module to make it easy to plug in the server identifier
- * when integrating Tomcat.
+ * Simple utility module to make it easy to plug in the server identifier when integrating Tomcat.
  *
  * @author Craig R. McClanahan
  */
@@ -63,8 +62,7 @@ public class ServerInfo {
         String number = null;
 
         Properties props = new Properties();
-        try (InputStream is = ServerInfo.class.getResourceAsStream
-                ("/org/apache/catalina/util/ServerInfo.properties")) {
+        try (InputStream is = ServerInfo.class.getResourceAsStream("/org/apache/catalina/util/ServerInfo.properties")) {
             props.load(is);
             info = props.getProperty("server.info");
             built = props.getProperty("server.built");
@@ -128,16 +126,11 @@ public class ServerInfo {
         System.out.println("Server version: " + getServerInfo());
         System.out.println("Server built:   " + getServerBuilt());
         System.out.println("Server number:  " + getServerNumber());
-        System.out.println("OS Name:        " +
-                           System.getProperty("os.name"));
-        System.out.println("OS Version:     " +
-                           System.getProperty("os.version"));
-        System.out.println("Architecture:   " +
-                           System.getProperty("os.arch"));
-        System.out.println("JVM Version:    " +
-                           System.getProperty("java.runtime.version"));
-        System.out.println("JVM Vendor:     " +
-                           System.getProperty("java.vm.vendor"));
+        System.out.println("OS Name:        " + System.getProperty("os.name"));
+        System.out.println("OS Version:     " + System.getProperty("os.version"));
+        System.out.println("Architecture:   " + System.getProperty("os.arch"));
+        System.out.println("JVM Version:    " + System.getProperty("java.runtime.version"));
+        System.out.println("JVM Vendor:     " + System.getProperty("java.vm.vendor"));
     }
 
 }
