@@ -560,24 +560,24 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             } else {
                 // Client certificate verification based on trusted CA files and dirs
                 MemorySegment caCertificateFileNative = sslHostConfig.getCaCertificateFile() != null
-                        ? localArena.allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile())) : null;
+                        ? localArena.allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile())) : MemorySegment.NULL;
                 MemorySegment caCertificatePathNative = sslHostConfig.getCaCertificatePath() != null
-                        ? localArena.allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath())) : null;
+                        ? localArena.allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath())) : MemorySegment.NULL;
                 if ((sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null)
                         && SSL_CTX_load_verify_locations(state.sslCtx,
-                                caCertificateFileNative == null ? MemorySegment.NULL : caCertificateFileNative,
-                                caCertificatePathNative == null ? MemorySegment.NULL : caCertificatePathNative) <= 0) {
+                                caCertificateFileNative, caCertificatePathNative) <= 0) {
                     logLastError("openssl.errorConfiguringLocations");
                 } else {
                     var caCerts = SSL_CTX_get_client_CA_list(state.sslCtx);
                     if (MemorySegment.NULL.equals(caCerts)) {
-                        caCerts = SSL_load_client_CA_file(caCertificateFileNative == null ? MemorySegment.NULL : caCertificateFileNative);
+                        caCerts = SSL_load_client_CA_file(caCertificateFileNative);
                         if (!MemorySegment.NULL.equals(caCerts)) {
                             SSL_CTX_set_client_CA_list(state.sslCtx, caCerts);
                         }
                     } else {
-                        if (SSL_add_file_cert_subjects_to_stack(caCerts,
-                                caCertificateFileNative == null ? MemorySegment.NULL : caCertificateFileNative) <= 0) {
+                        // OpenSSL might crash here when passing null on some platforms
+                        if (MemorySegment.NULL.equals(caCertificateFileNative)
+                                || (SSL_add_file_cert_subjects_to_stack(caCerts, caCertificateFileNative) <= 0)) {
                             caCerts = MemorySegment.NULL;
                         }
                     }
