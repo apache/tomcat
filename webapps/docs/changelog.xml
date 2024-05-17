@@ -111,6 +111,10 @@
         Fix OpenSSL FFM use of ERR_error_string with a 128 byte buffer,
         and use ERR_error_string_n instead. (remm)
       </fix>
+      <fix>
+        Fix a crash on Windows setting CA certificate on null path.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
