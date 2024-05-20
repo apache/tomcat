@@ -44,6 +44,7 @@ public class Substitution {
 
     public class RewriteRuleBackReferenceElement extends SubstitutionElement {
         public int n;
+
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
             String result = rule.group(n);
@@ -52,9 +53,9 @@ public class Substitution {
             }
             if (escapeBackReferences) {
                 // Note: This should be consistent with the way httpd behaves.
-                //       We might want to consider providing a dedicated decoder
-                //       with an option to add additional safe characters to
-                //       provide users with more flexibility
+                // We might want to consider providing a dedicated decoder
+                // with an option to add additional safe characters to
+                // provide users with more flexibility
                 return URLEncoder.DEFAULT.encode(result, resolver.getUriCharset());
             } else {
                 return result;
@@ -64,6 +65,7 @@ public class Substitution {
 
     public static class RewriteCondBackReferenceElement extends SubstitutionElement {
         public int n;
+
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
             return (cond.group(n) == null ? "" : cond.group(n));
@@ -72,6 +74,7 @@ public class Substitution {
 
     public static class ServerVariableElement extends SubstitutionElement {
         public String key;
+
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
             return resolver.resolve(key);
@@ -80,6 +83,7 @@ public class Substitution {
 
     public static class ServerVariableEnvElement extends SubstitutionElement {
         public String key;
+
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
             return resolver.resolveEnv(key);
@@ -88,6 +92,7 @@ public class Substitution {
 
     public static class ServerVariableSslElement extends SubstitutionElement {
         public String key;
+
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
             return resolver.resolveSsl(key);
@@ -96,6 +101,7 @@ public class Substitution {
 
     public static class ServerVariableHttpElement extends SubstitutionElement {
         public String key;
+
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
             return resolver.resolveHttp(key);
@@ -106,6 +112,7 @@ public class Substitution {
         public RewriteMap map = null;
         public SubstitutionElement[] defaultValue = null;
         public SubstitutionElement[] key = null;
+
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
             String result = map.lookup(evaluateSubstitution(key, rule, cond, resolver));
@@ -119,19 +126,26 @@ public class Substitution {
     protected SubstitutionElement[] elements = null;
 
     protected String sub = null;
-    public String getSub() { return sub; }
-    public void setSub(String sub) { this.sub = sub; }
+
+    public String getSub() {
+        return sub;
+    }
+
+    public void setSub(String sub) {
+        this.sub = sub;
+    }
 
     private boolean escapeBackReferences;
+
     void setEscapeBackReferences(boolean escapeBackReferences) {
         this.escapeBackReferences = escapeBackReferences;
     }
 
-    public void parse(Map<String, RewriteMap> maps) {
+    public void parse(Map<String,RewriteMap> maps) {
         this.elements = parseSubstitution(sub, maps);
     }
 
-    private SubstitutionElement[] parseSubstitution(String sub, Map<String, RewriteMap> maps) {
+    private SubstitutionElement[] parseSubstitution(String sub, Map<String,RewriteMap> maps) {
 
         List<SubstitutionElement> elements = new ArrayList<>();
         int pos = 0;
@@ -186,7 +200,8 @@ public class Substitution {
                     }
                     newElement.map = maps.get(sub.substring(open + 1, colon));
                     if (newElement.map == null) {
-                        throw new IllegalArgumentException(sm.getString("substitution.noMap", sub.substring(open + 1, colon), sub));
+                        throw new IllegalArgumentException(
+                                sm.getString("substitution.noMap", sub.substring(open + 1, colon), sub));
                     }
                     String key = null;
                     String defaultValue = null;
@@ -269,7 +284,7 @@ public class Substitution {
         for (int i = start + 1; i < sub.length(); i++) {
             char c = sub.charAt(i);
             if (c == '{') {
-                char previousChar = sub.charAt(i-1);
+                char previousChar = sub.charAt(i - 1);
                 if (previousChar == '$' || previousChar == '%') {
                     nesting++;
                 }
@@ -288,13 +303,13 @@ public class Substitution {
         for (int i = start + 1; i < sub.length(); i++) {
             char c = sub.charAt(i);
             if (c == '{') {
-                char previousChar = sub.charAt(i-1);
+                char previousChar = sub.charAt(i - 1);
                 if (previousChar == '$' || previousChar == '%') {
                     nesting++;
                 }
             } else if (c == '}') {
                 nesting--;
-            } else if (colon ? c == ':' : c =='|') {
+            } else if (colon ? c == ':' : c == '|') {
                 if (nesting == 0) {
                     return i;
                 }
@@ -305,9 +320,11 @@ public class Substitution {
 
     /**
      * Evaluate the substitution based on the context.
-     * @param rule corresponding matched rule
-     * @param cond last matched condition
+     *
+     * @param rule     corresponding matched rule
+     * @param cond     last matched condition
      * @param resolver The property resolver
+     *
      * @return The substitution result
      */
     public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
@@ -323,16 +340,14 @@ public class Substitution {
     }
 
     /**
-     * Checks whether the first int is non negative and smaller than any non negative other int
-     * given with {@code others}.
+     * Checks whether the first int is non negative and smaller than any non negative other int given with
+     * {@code others}.
      *
-     * @param testPos
-     *            integer to test against
-     * @param others
-     *            list of integers that are paired against {@code testPos}. Any
-     *            negative integer will be ignored.
-     * @return {@code true} if {@code testPos} is not negative and is less then any given other
-     *         integer, {@code false} otherwise
+     * @param testPos integer to test against
+     * @param others  list of integers that are paired against {@code testPos}. Any negative integer will be ignored.
+     *
+     * @return {@code true} if {@code testPos} is not negative and is less then any given other integer, {@code false}
+     *             otherwise
      */
     private boolean isFirstPos(int testPos, int... others) {
         if (testPos < 0) {
