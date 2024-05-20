@@ -31,17 +31,18 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Implement a map for the txt: and rnd: mod_rewrite capabilities.
  */
-public class RandomizedTextRewriteMap implements RewriteMap{
+public class RandomizedTextRewriteMap implements RewriteMap {
 
     protected static final StringManager sm = StringManager.getManager(RandomizedTextRewriteMap.class);
 
     private static final Random random = new Random();
-    private final Map<String, String[]> map = new HashMap<>();
+    private final Map<String,String[]> map = new HashMap<>();
 
     /**
      * Create a map from a text file according to the mod_rewrite syntax.
+     *
      * @param txtFilePath the text file path
-     * @param useRandom if the map should produce random results
+     * @param useRandom   if the map should produce random results
      */
     public RandomizedTextRewriteMap(String txtFilePath, boolean useRandom) {
         String line;
@@ -49,7 +50,7 @@ public class RandomizedTextRewriteMap implements RewriteMap{
                 BufferedReader reader = new BufferedReader(new InputStreamReader(txtResource.getInputStream()))) {
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("#") || line.isEmpty()) {
-                    //Ignore comment or empty lines
+                    // Ignore comment or empty lines
                     continue;
                 }
                 String[] keyValuePair = line.split(" ", 2);
