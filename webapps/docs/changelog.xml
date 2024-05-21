@@ -105,6 +105,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.25 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add support for shallow copies when using WebDAV. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
