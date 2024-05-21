@@ -105,6 +105,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.90 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add support for shallow copies when using WebDAV. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>

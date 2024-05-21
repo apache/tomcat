@@ -1518,7 +1518,20 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         Map<String,Integer> errorList = new HashMap<>();
 
-        boolean result = copyResource(errorList, path, destinationPath);
+        boolean infiniteCopy = true;
+        String depthHeader = req.getHeader("Depth");
+        if (depthHeader != null) {
+            if (depthHeader.equals("infinity")) {
+                // NO-OP - this is the default
+            } else if (depthHeader.equals("0")) {
+                infiniteCopy = false;
+            } else {
+                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                return false;
+            }
+        }
+
+        boolean result = copyResource(errorList, path, destinationPath, infiniteCopy);
 
         if ((!result) || (!errorList.isEmpty())) {
             if (errorList.size() == 1) {
@@ -1547,16 +1560,18 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     /**
      * Copy a collection.
      *
-     * @param errorList Hashtable containing the list of errors which occurred during the copy operation
-     * @param source    Path of the resource to be copied
-     * @param dest      Destination path
+     * @param errorList    Map containing the list of errors which occurred during the copy operation
+     * @param source       Path of the resource to be copied
+     * @param dest         Destination path
+     * @param infiniteCopy {@code true} if this copy is to be an infinite copy, otherwise {@code false} for a shallow
+     *                         copy
      *
      * @return <code>true</code> if the copy was successful
      */
-    private boolean copyResource(Map<String,Integer> errorList, String source, String dest) {
+    private boolean copyResource(Map<String,Integer> errorList, String source, String dest, boolean infiniteCopy) {
 
         if (debug > 1) {
-            log("Copy: " + source + " To: " + dest);
+            log("Copy: " + source + " To: " + dest + " Infinite: " + infiniteCopy);
         }
 
         WebResource sourceResource = resources.getResource(source);
@@ -1582,7 +1597,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     childSrc += "/";
                 }
                 childSrc += entry;
-                copyResource(errorList, childSrc, childDest);
+                if (infiniteCopy) {
+                    copyResource(errorList, childSrc, childDest, true);
+                }
             }
         } else if (sourceResource.isFile()) {
             WebResource destResource = resources.getResource(dest);
