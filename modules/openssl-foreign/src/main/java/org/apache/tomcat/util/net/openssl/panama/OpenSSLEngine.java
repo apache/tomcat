@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
@@ -891,8 +890,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
             MemorySegment protocolAddress = protocolPointer.get(ValueLayout.ADDRESS, 0);
             byte[] name = protocolAddress.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
-            if (log.isDebugEnabled()) {
-                log.debug("Protocol negotiated [" + new String(name) + "]");
+            if (log.isTraceEnabled()) {
+                log.trace("Protocol negotiated [" + new String(name) + "]");
             }
             return new String(name);
         }
@@ -921,8 +920,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private void renegotiate() throws SSLException {
-        if (log.isDebugEnabled()) {
-            log.debug("Start renegotiate");
+        if (log.isTraceEnabled()) {
+            log.trace("Start renegotiate");
         }
         clearLastError();
         int code;
@@ -1109,7 +1108,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
     }
 
-    private static class InfoCallback implements SSL_set_info_callback$cb {
+    private static class InfoCallback implements SSL_set_info_callback$cb.Function {
         @Override
         public void apply(MemorySegment ssl, int where, int ret) {
             EngineState state = getState(ssl);
@@ -1123,7 +1122,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
     }
 
-    static class VerifyCallback implements SSL_set_verify$callback, SSL_CTX_set_verify$callback {
+    static class VerifyCallback implements SSL_set_verify$callback.Function, SSL_CTX_set_verify$callback.Function {
         @Override
         public int apply(int preverify_ok, MemorySegment /*X509_STORE_CTX*/ x509ctx) {
             MemorySegment ssl = X509_STORE_CTX_get_ex_data(x509ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
@@ -1132,8 +1131,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.address())));
                 return 0;
             }
-            if (log.isDebugEnabled()) {
-                log.debug("Verification in engine with mode [" + state.certificateVerifyMode + "] for " + state.ssl);
+            if (log.isTraceEnabled()) {
+                log.trace("Verification in engine with mode [" + state.certificateVerifyMode + "] for " + state.ssl);
             }
             int ok = preverify_ok;
             int errnum = X509_STORE_CTX_get_error(x509ctx);
@@ -1245,7 +1244,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                                         URL url = (new URI(urlString)).toURL();
                                         ocspResponse = processOCSPRequest(url, issuer, x509, x509ctx, localArenal);
                                         if (log.isDebugEnabled()) {
-                                            log.debug("OCSP response for URL: " + urlString + " was " + ocspResponse);
+                                            log.debug(sm.getString("engine.ocspResponse", urlString,
+                                                    Integer.toString(ocspResponse)));
                                         }
                                     } catch (MalformedURLException | URISyntaxException e) {
                                         log.warn(sm.getString("engine.invalidOCSPURL", urlString));
@@ -1683,17 +1683,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // Use another arena to avoid keeping a reference through segments
             // This also allows making further accesses to the main pointers safer
             this.ssl = ssl.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena,
-                    new Consumer<MemorySegment>() {
-                @Override
-                public void accept(MemorySegment t) {
-                    SSL_free(t);
-                }});
+                    (MemorySegment t) -> SSL_free(t));
             this.networkBIO = networkBIO.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena,
-                    new Consumer<MemorySegment>() {
-                @Override
-                public void accept(MemorySegment t) {
-                    BIO_free(t);
-                }});
+                    (MemorySegment t) -> BIO_free(t));
         }
 
         @Override
