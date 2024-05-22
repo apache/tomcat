@@ -263,6 +263,7 @@ public class openssl_h_Macros {
         return X509_LOOKUP_ctrl(x509Lookup, X509_L_ADD_DIR(), name, X509_FILETYPE_PEM(), MemorySegment.NULL);
     }
 
+
     /**
      * Pass a file which will be loaded into the store.
      * {@snippet lang = c : # define X509_LOOKUP_load_file(x,name,type) \
@@ -277,6 +278,15 @@ public class openssl_h_Macros {
      */
     public static long X509_LOOKUP_load_file(MemorySegment x509Lookup, MemorySegment name, long type) {
         return X509_LOOKUP_ctrl(x509Lookup, X509_L_FILE_LOAD(), name, X509_FILETYPE_PEM(), MemorySegment.NULL);
+    }
+
+
+    /**
+     * Return the d2i_ECPKParameters symbol.
+     * @return the symbol
+     */
+    public static MemorySegment d2i_ECPKParameters$SYMBOL() {
+        return openssl_h.findOrThrow("d2i_ECPKParameters"); 
     }
 
 }

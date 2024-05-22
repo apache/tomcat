@@ -27,37 +27,52 @@ import java.lang.invoke.MethodHandle;
 
 /**
  * {@snippet lang=c :
- * void (*cb)(const SSL *, int, int)
+ * typedef int (pem_password_cb)(char *, int, int, void *)
  * }
  */
 @SuppressWarnings("javadoc")
-public class SSL_set_info_callback$cb {
+public class pem_password_cb {
 
+    /**
+     * The function pointer signature, expressed as a functional interface
+     */
     public interface Function {
-        void apply(MemorySegment _x0, int _x1, int _x2);
+        int apply(MemorySegment buf, int size, int rwflag, MemorySegment userdata);
     }
 
-    private static final FunctionDescriptor $DESC = FunctionDescriptor.ofVoid(
+    private static final FunctionDescriptor $DESC = FunctionDescriptor.of(
+        openssl_h.C_INT,
         openssl_h.C_POINTER,
         openssl_h.C_INT,
-        openssl_h.C_INT
+        openssl_h.C_INT,
+        openssl_h.C_POINTER
     );
 
+    /**
+     * The descriptor of this function pointer
+     */
     public static FunctionDescriptor descriptor() {
         return $DESC;
     }
 
-    private static final MethodHandle UP$MH = openssl_h.upcallHandle(SSL_set_info_callback$cb.Function.class, "apply", $DESC);
+    private static final MethodHandle UP$MH = openssl_h.upcallHandle(pem_password_cb.Function.class, "apply", $DESC);
 
-    public static MemorySegment allocate(SSL_set_info_callback$cb.Function fi, Arena scope) {
-        return Linker.nativeLinker().upcallStub(UP$MH.bindTo(fi), $DESC, scope);
+    /**
+     * Allocates a new upcall stub, whose implementation is defined by {@code fi}.
+     * The lifetime of the returned segment is managed by {@code arena}
+     */
+    public static MemorySegment allocate(pem_password_cb.Function fi, Arena arena) {
+        return Linker.nativeLinker().upcallStub(UP$MH.bindTo(fi), $DESC, arena);
     }
 
     private static final MethodHandle DOWN$MH = Linker.nativeLinker().downcallHandle($DESC);
 
-    public static void invoke(MemorySegment funcPtr,MemorySegment _x0, int _x1, int _x2) {
+    /**
+     * Invoke the upcall stub {@code funcPtr}, with given parameters
+     */
+    public static int invoke(MemorySegment funcPtr,MemorySegment buf, int size, int rwflag, MemorySegment userdata) {
         try {
-             DOWN$MH.invokeExact(funcPtr, _x0, _x1, _x2);
+            return (int) DOWN$MH.invokeExact(funcPtr, buf, size, rwflag, userdata);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
