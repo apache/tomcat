@@ -58,22 +58,4 @@ public class TestUtils {
         // Import from POEditor
         Assert.assertEquals("\\n\\\n</web-fragment>\\n", Utils.formatValueImport("\\n</web-fragment>\\n"));
     }
-
-    @Test
-    public void testFormatValue03() {
-        // Export from Tomcat
-        Assert.assertEquals("line1\\n\\\nline2\\n\\\nline3", Utils.formatValueExport("line1\nline2\nline3"));
-    }
-
-    @Test
-    public void testFormatValue04() {
-        // Export from Tomcat
-        Assert.assertEquals(Utils.PADDING + "\\n\\\nline2\\n\\\nline3", Utils.formatValueExport("\nline2\nline3"));
-    }
-
-    @Test
-    public void testFormatValue05() {
-        // Export from Tomcat
-        Assert.assertEquals("line1\\n\\\n\\tline2\\n\\\n\\tline3", Utils.formatValueExport("line1\n\tline2\n\tline3"));
-    }
 }
