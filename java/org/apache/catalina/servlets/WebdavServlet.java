@@ -1585,19 +1585,19 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 }
             }
 
-            String[] entries = resources.list(source);
-            for (String entry : entries) {
-                String childDest = dest;
-                if (!childDest.equals("/")) {
-                    childDest += "/";
-                }
-                childDest += entry;
-                String childSrc = source;
-                if (!childSrc.equals("/")) {
-                    childSrc += "/";
-                }
-                childSrc += entry;
-                if (infiniteCopy) {
+            if (infiniteCopy) {
+                String[] entries = resources.list(source);
+                for (String entry : entries) {
+                    String childDest = dest;
+                    if (!childDest.equals("/")) {
+                        childDest += "/";
+                    }
+                    childDest += entry;
+                    String childSrc = source;
+                    if (!childSrc.equals("/")) {
+                        childSrc += "/";
+                    }
+                    childSrc += entry;
                     copyResource(errorList, childSrc, childDest, true);
                 }
             }
