@@ -140,6 +140,9 @@
       <update>
         Update to Jakarta Annotations API 3.0. (markt)
       </update>
+      <update>
+        Update to Jakarta Authentication API 3.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

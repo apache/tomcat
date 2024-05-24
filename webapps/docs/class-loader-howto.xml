@@ -152,7 +152,7 @@ loaders as it is initialized:</p>
     <li><em>jasper.jar</em> &#8212; Optional. Tomcat Jasper JSP Compiler and
         Runtime.</li>
     <li><em>jasper-el.jar</em> &#8212; Optional. Tomcat EL implementation.</li>
-    <li><em>jaspic-api.jar</em> &#8212; Jakarta Authentication 3.0 API.</li>
+    <li><em>jaspic-api.jar</em> &#8212; Jakarta Authentication 3.1 API.</li>
     <li><em>jsp-api.jar</em> &#8212; Optional. Jakarta Pages 4.0 API.</li>
     <li><em>servlet-api.jar</em> &#8212; Jakarta Servlet 6.1 API.</li>
     <li><em>tomcat-api.jar</em> &#8212; Several interfaces defined by Tomcat.
