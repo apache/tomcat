@@ -73,7 +73,7 @@
   <!--                       contents. [null]                               -->
   <!--                                                                      -->
   <!--   sendfileSize        If the connector used supports sendfile, this  -->
-  <!--                       represents the minimal file size in KiB for     -->
+  <!--                       represents the minimal file size in KiB for    -->
   <!--                       which sendfile will be used. Use a negative    -->
   <!--                       value to always disable sendfile.  [48]        -->
   <!--                                                                      -->
@@ -363,7 +363,7 @@
   <!--                        the arguments to the OS. See the CGI How-To   -->
   <!--                        for more details. The default varies by       -->
   <!--                        platform.                                     -->
-  <!--                        Windows: [[\w\Q-.\\/:\E]+]            -->
+  <!--                        Windows: [[\w\Q-.\\/:\E]+]                    -->
   <!--                        Others:  [.*]                                 -->
   <!--                        Note that internally the CGI Servlet treats   -->
   <!--                        [.*] as a special case to improve performance -->
@@ -374,7 +374,7 @@
   <!--                        command line arguments must match else the    -->
   <!--                        request will be rejected. The default matches -->
   <!--                        the allowed values defined by RFC3875.        -->
-  <!--                        [[\w\Q%;/?:@&,$-.!~*'()\E]+]          -->
+  <!--                        [[\w\Q%;/?:@&,$-.!~*'()\E]+]                  -->
   <!--                                                                      -->
   <!--   enableCmdLineArguments                                             -->
   <!--                        Are command line parameters generated from    -->
@@ -4741,7 +4741,7 @@
   <!-- If you define welcome files in your own application's web.xml        -->
   <!-- deployment descriptor, that list *replaces* the list configured      -->
   <!-- here, so be sure to include any of the default values that you wish  -->
-  <!-- to use within your application.                                       -->
+  <!-- to use within your application.                                      -->
 
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
