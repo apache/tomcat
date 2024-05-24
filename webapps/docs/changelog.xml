@@ -111,7 +111,7 @@
         Add support for shallow copies when using WebDAV. (markt)
       </add>
       <scode>
-        Deprecate the <code>WebdavFixFilter</code> as it is no longer required.
+        Remove the <code>WebdavFixFilter</code> as it is no longer required.
         (markt)
       </scode>
     </changelog>

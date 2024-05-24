@@ -1938,36 +1938,6 @@ org.apache.catalina.filters.RequestDumperFilter.handlers = \
 
 </section>
 
-
-<section name="WebDAV Fix Filter">
-
-  <subsection name="Introduction">
-
-    <p>This filter was written for Windows NT era Microsoft operating systems
-    that shipped with WebDAV clients that were not compliant with the RFC. This
-    filter is no longer required for current WebDAV clients provided by current
-    (Windows 10 / Windows Server 2012 onwards) Windows operating systems. It has
-    been deprecated and will be removed in Tomcat 11 onwards.
-    </p>
-
-  </subsection>
-
-  <subsection name="Filter Class Name">
-
-    <p>The filter class name for the WebDAV Fix Filter is
-    <strong><code>org.apache.catalina.filters.WebdavFixFilter</code>
-    </strong>.</p>
-
-  </subsection>
-
-  <subsection name="Initialisation parameters">
-
-    <p>The WebDAV Fix Filter does not support any initialization parameters.</p>
-
-  </subsection>
-
-</section>
-
 </body>
 
 </document>
