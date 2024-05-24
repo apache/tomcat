@@ -362,7 +362,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         private final Locale cacheDefaultLocale;
         private final DateFormatCache parent;
         protected final Cache cLFCache;
-        private final Map<String, Cache> formatCache = new HashMap<>();
+        private final Map<String,Cache> formatCache = new HashMap<>();
 
         protected DateFormatCache(int size, Locale loc, DateFormatCache parent) {
             cacheSize = size;
@@ -409,14 +409,14 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     /**
      * Global date format cache.
      */
-    private static final DateFormatCache globalDateCache = new DateFormatCache(globalCacheSize, Locale.getDefault(),
-            null);
+    private static final DateFormatCache globalDateCache =
+            new DateFormatCache(globalCacheSize, Locale.getDefault(), null);
 
     /**
      * Thread local date format cache.
      */
-    private static final ThreadLocal<DateFormatCache> localDateCache = ThreadLocal
-            .withInitial(() -> new DateFormatCache(localCacheSize, Locale.getDefault(), globalDateCache));
+    private static final ThreadLocal<DateFormatCache> localDateCache =
+            ThreadLocal.withInitial(() -> new DateFormatCache(localCacheSize, Locale.getDefault(), globalDateCache));
 
 
     /**
@@ -1341,7 +1341,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             /**
              * Append the time to the buffer in the appropriate format.
              *
-             * @param buf The buffer to append to.
+             * @param buf  The buffer to append to.
              * @param time The time to log in nanoseconds.
              */
             public abstract void append(CharArrayWriter buf, long time);
@@ -1917,7 +1917,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     // is encountered plus at the end.
                     default:
                 }
-            // Control (1-31), delete (127) or above 127
+                // Control (1-31), delete (127) or above 127
             } else {
                 // Write unchanged string parts
                 if (current > next) {

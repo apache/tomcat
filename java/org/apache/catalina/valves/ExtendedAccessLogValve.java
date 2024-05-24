@@ -171,8 +171,8 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         // Milli-seconds in 24 hours
         private static final long INTERVAL = (1000 * 60 * 60 * 24);
 
-        private static final ThreadLocal<ElementTimestampStruct> currentDate = ThreadLocal
-                .withInitial(() -> new ElementTimestampStruct("yyyy-MM-dd"));
+        private static final ThreadLocal<ElementTimestampStruct> currentDate =
+                ThreadLocal.withInitial(() -> new ElementTimestampStruct("yyyy-MM-dd"));
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
@@ -190,8 +190,8 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         // Milli-seconds in a second
         private static final long INTERVAL = 1000;
 
-        private static final ThreadLocal<ElementTimestampStruct> currentTime = ThreadLocal
-                .withInitial(() -> new ElementTimestampStruct("HH:mm:ss"));
+        private static final ThreadLocal<ElementTimestampStruct> currentTime =
+                ThreadLocal.withInitial(() -> new ElementTimestampStruct("HH:mm:ss"));
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
@@ -536,7 +536,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
 
                     if ("ns".equals(nextToken)) {
                         return new ElapsedTimeElement(ElapsedTimeElement.Style.NANOSECONDS);
-                    } else if("us".equals(nextToken)) {
+                    } else if ("us".equals(nextToken)) {
                         return new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
                     } else if ("ms".equals(nextToken)) {
                         return new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
