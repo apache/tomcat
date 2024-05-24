@@ -134,7 +134,7 @@ import org.xml.sax.SAXException;
  * <p>
  * There are some known limitations of this Servlet due to it not implementing the PROPPATCH method. Details of these
  * limitations and progress towards addressing them are being tracked under
- * <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=69046>bug 69046</a>.</p>
+ * <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=69046">bug 69046</a>.
  * </p>
  *
  * @see <a href="https://tools.ietf.org/html/rfc4918">RFC 4918</a>
