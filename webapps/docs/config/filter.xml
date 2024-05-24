@@ -1997,12 +1997,12 @@ org.apache.catalina.filters.RequestDumperFilter.handlers = \
 
   <subsection name="Introduction">
 
-    <p>Microsoft operating systems have two WebDAV clients. One is used with
-    port 80, the other is used for all other ports. The implementation used with
-    port 80 does not adhere to the WebDAV specification and fails when trying to
-    communicate with the Tomcat WebDAV Servlet. This Filter provides a fix for
-    this by forcing the use of the WebDAV implementation that works, even when
-    connecting via port 80.</p>
+    <p>This filter was written for Windows NT era Microsoft operating systems
+    that shipped with WebDAV clients that were not compliant with the RFC. This
+    filter is no longer required for current WebDAV clients provided by current
+    (Windows 10 / Windows Server 2012 onwards) Windows operating systems. It has
+    been deprecated and will be removed in Tomcat 11 onwards.
+    </p>
 
   </subsection>
 
