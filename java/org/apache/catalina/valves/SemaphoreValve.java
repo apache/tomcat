@@ -114,8 +114,7 @@ public class SemaphoreValve extends ValveBase {
 
 
     /**
-     * High concurrency status. This status code is returned as an
-     * error if concurrency is too high.
+     * High concurrency status. This status code is returned as an error if concurrency is too high.
      */
     protected int highConcurrencyStatus = -1;
 

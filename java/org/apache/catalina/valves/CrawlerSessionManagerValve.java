@@ -45,8 +45,8 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
     private static final Log log = LogFactory.getLog(CrawlerSessionManagerValve.class);
 
-    private final Map<String, String> clientIdSessionId = new ConcurrentHashMap<>();
-    private final Map<String, String> sessionIdClientId = new ConcurrentHashMap<>();
+    private final Map<String,String> clientIdSessionId = new ConcurrentHashMap<>();
+    private final Map<String,String> sessionIdClientId = new ConcurrentHashMap<>();
 
     private String crawlerUserAgents = ".*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*";
     private Pattern uaPattern = null;
@@ -139,7 +139,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
     }
 
 
-    public Map<String, String> getClientIpSessionId() {
+    public Map<String,String> getClientIpSessionId() {
         return clientIdSessionId;
     }
 
@@ -272,10 +272,10 @@ public class CrawlerSessionManagerValve extends ValveBase {
     private static class CrawlerHttpSessionBindingListener implements HttpSessionBindingListener, Serializable {
         private static final long serialVersionUID = 1L;
 
-        private final transient Map<String, String> clientIdSessionId;
+        private final transient Map<String,String> clientIdSessionId;
         private final transient String clientIdentifier;
 
-        private CrawlerHttpSessionBindingListener(Map<String, String> clientIdSessionId, String clientIdentifier) {
+        private CrawlerHttpSessionBindingListener(Map<String,String> clientIdSessionId, String clientIdentifier) {
             this.clientIdSessionId = clientIdSessionId;
             this.clientIdentifier = clientIdentifier;
         }

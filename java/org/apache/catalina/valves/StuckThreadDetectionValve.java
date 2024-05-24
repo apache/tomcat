@@ -78,7 +78,7 @@ public class StuckThreadDetectionValve extends ValveBase {
      * invoke()s finally clause). That way, Threads can be GC'ed, even though the Valve still thinks they are stuck
      * (caused by a long monitor interval)
      */
-    private final Map<Long, MonitoredThread> activeThreads = new ConcurrentHashMap<>();
+    private final Map<Long,MonitoredThread> activeThreads = new ConcurrentHashMap<>();
 
     private final Queue<CompletedStuckThread> completedStuckThreadsQueue = new ConcurrentLinkedQueue<>();
 
@@ -177,8 +177,8 @@ public class StuckThreadDetectionValve extends ValveBase {
             requestUrl.append('?');
             requestUrl.append(request.getQueryString());
         }
-        MonitoredThread monitoredThread = new MonitoredThread(currentThread, requestUrl.toString(),
-                interruptThreadThreshold > 0);
+        MonitoredThread monitoredThread =
+                new MonitoredThread(currentThread, requestUrl.toString(), interruptThreadThreshold > 0);
         activeThreads.put(key, monitoredThread);
 
         try {
@@ -215,8 +215,9 @@ public class StuckThreadDetectionValve extends ValveBase {
             }
         }
         // Check if any threads previously reported as stuck, have finished.
-        for (CompletedStuckThread completedStuckThread = completedStuckThreadsQueue
-                .poll(); completedStuckThread != null; completedStuckThread = completedStuckThreadsQueue.poll()) {
+        for (CompletedStuckThread completedStuckThread =
+                completedStuckThreadsQueue.poll(); completedStuckThread != null; completedStuckThread =
+                        completedStuckThreadsQueue.poll()) {
 
             int numStuckThreads = stuckCount.decrementAndGet();
             notifyStuckThreadCompleted(completedStuckThread, numStuckThreads);
