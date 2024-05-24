@@ -141,7 +141,8 @@ public class PersistentValve extends ValveBase {
                             mustReleaseSemaphore = false;
                             onSemaphoreNotAcquired(request, response);
                             if (containerLog.isDebugEnabled()) {
-                                containerLog.debug(sm.getString("persistentValve.acquireInterrupted", request.getDecodedRequestURI()));
+                                containerLog.debug(sm.getString("persistentValve.acquireInterrupted",
+                                        request.getDecodedRequestURI()));
                             }
                             return;
                         }
@@ -150,7 +151,8 @@ public class PersistentValve extends ValveBase {
                     if (!semaphore.tryAcquire()) {
                         onSemaphoreNotAcquired(request, response);
                         if (containerLog.isDebugEnabled()) {
-                            containerLog.debug(sm.getString("persistentValve.acquireFailed", request.getDecodedRequestURI()));
+                            containerLog.debug(
+                                    sm.getString("persistentValve.acquireFailed", request.getDecodedRequestURI()));
                         }
                         return;
                     }
@@ -231,9 +233,8 @@ public class PersistentValve extends ValveBase {
                             }
                             if (!stored) {
                                 if (containerLog.isTraceEnabled()) {
-                                    containerLog
-                                            .trace("newsessionId store: " + store + " session: " + session +
-                                                    " valid: " +
+                                    containerLog.trace(
+                                            "newsessionId store: " + store + " session: " + session + " valid: " +
                                                     (session == null ? "N/A" : Boolean.toString(session.isValid())) +
                                                     " stale: " + isSessionStale(session, System.currentTimeMillis()));
                                 }

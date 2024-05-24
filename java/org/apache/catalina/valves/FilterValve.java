@@ -134,7 +134,7 @@ public class FilterValve extends ValveBase implements FilterConfig {
 
     /**
      * @return the ServletContext. Note that this will be of limited use if the Valve/Filter is not attached to a
-     * <code>&lt;Context&gt;</code>.
+     *             <code>&lt;Context&gt;</code>.
      */
     @Override
     public ServletContext getServletContext() {
@@ -186,7 +186,8 @@ public class FilterValve extends ValveBase implements FilterConfig {
                                     ScheduledThreadPoolExecutor.class.getName().equals(args[0])) {
                                 return executor;
                             } else {
-                                throw new UnsupportedOperationException(sm.getString("filterValve.proxyServletContext"));
+                                throw new UnsupportedOperationException(
+                                        sm.getString("filterValve.proxyServletContext"));
                             }
                         }
                     });
