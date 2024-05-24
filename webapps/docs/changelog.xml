@@ -118,6 +118,9 @@
         Revert Derby to 10.16.1.1 as that is the latest version of Derby that
         runs on Java 17. (markt)
       </update>
+      <update>
+        Update to Commons Daemon 1.4.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
