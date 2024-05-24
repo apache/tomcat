@@ -170,20 +170,20 @@ nsis.nsdialogs.dll=${nsis.home}/Plugins/${nsis.arch.dir}nsDialogs.dll
 nsis.loc=${base-sf.loc}/nsis/nsis-${nsis.version}.zip
 
 # ----- Commons Daemon, version 1.2.0 or later -----
-commons-daemon.version=1.3.4
+commons-daemon.version=1.4.0
 
-# checksum for commons-daemon-1.3.4-bin.tar.gz
+# checksum for commons-daemon-1.4.0-bin.tar.gz
 commons-daemon.bin.checksum.enabled=true
 commons-daemon.bin.checksum.algorithm=SHA-512
-commons-daemon.bin.checksum.value=adc301fe9c7e50c5ed71c6775c8c41c33a369a05c30785ccb81209089603ae66563e958b466c99fc5cd27c12625bb7def68d7d91933aa8739eb645af37f3d03e
+commons-daemon.bin.checksum.value=15fccd35a711f91e5b4466d56f50585c7ae3a787a39c16e006617c86b9e9feee9fbf902582b08c2e896ca6a655500d805fdbb9c97f04f70321631168b8d42c81
 
 # checksums for commons-daemon-1.3.4-native-src.tar.gz, commons-daemon-1.3.4-bin-windows.zip
 commons-daemon.native.src.checksum.enabled=true
 commons-daemon.native.src.checksum.algorithm=SHA-512
-commons-daemon.native.src.checksum.value=3c10ca72fc0eb7f755c0b5452bb6d5e8b42d8f363767ffcd9a6f0883026e688ea7dff50ea05e2675a7cdf9f413cb8012ee6b79e16dfc1cd4d83bd775ea10216c
+commons-daemon.native.src.checksum.value=8a54200d547ef7ee647e8d4910fd3cb55bf7d8fc75de8f0e01bc701ef0b386ddc3843e6c9189e34d2afd62060fb6299ea83c421cf60c7d105d04cb45904500d3
 commons-daemon.native.win.checksum.enabled=true
 commons-daemon.native.win.checksum.algorithm=SHA-512
-commons-daemon.native.win.checksum.value=57a59d402dd0a1c99ed5da062b4616d54679e4208abec8b25742f5bf3ec1ee6b5187bc830edeaa218766215371b5519ce0a7186325c929c86b567a3078aa7555
+commons-daemon.native.win.checksum.value=5974d638994cbf821c17d0fc6b69bace08b0314ea5614c1a57175a02cda7c57a6b8ee49f8892206061f9d3385da5841db31d9ce9b3ce74cf4afc10ad8eeeee68
 
 commons-daemon.home=${base.path}/commons-daemon-${commons-daemon.version}
 commons-daemon.jar=${commons-daemon.home}/commons-daemon-${commons-daemon.version}.jar
