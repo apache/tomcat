@@ -116,9 +116,6 @@ public class AntCompiler extends Compiler {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Compile the servlet from .java file to .class file
-     */
     @Override
     protected void generateClass(Map<String,SmapStratum> smaps)
         throws FileNotFoundException, JasperException, Exception {
