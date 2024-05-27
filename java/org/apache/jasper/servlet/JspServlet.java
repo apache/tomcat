@@ -71,9 +71,6 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
     private String jspFile;
 
 
-    /*
-     * Initializes this JspServlet.
-     */
     @Override
     public void init(ServletConfig config) throws ServletException {
 
