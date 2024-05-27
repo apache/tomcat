@@ -25,15 +25,6 @@ import org.apache.jasper.JasperException;
  */
 class DefaultErrorHandler implements ErrorHandler {
 
-    /*
-     * Processes the given JSP parse error.
-     *
-     * @param fname Name of the JSP file in which the parse error occurred
-     * @param line Parse error line number
-     * @param column Parse error column number
-     * @param errMsg Parse error message
-     * @param exception Parse exception
-     */
     @Override
     public void jspError(String fname, int line, int column, String errMsg,
             Exception ex) throws JasperException {
@@ -43,23 +34,11 @@ class DefaultErrorHandler implements ErrorHandler {
                 ") " + errMsg, ex);
     }
 
-    /*
-     * Processes the given JSP parse error.
-     *
-     * @param errMsg Parse error message
-     * @param exception Parse exception
-     */
     @Override
     public void jspError(String errMsg, Exception ex) throws JasperException {
         throw new JasperException(errMsg, ex);
     }
 
-    /*
-     * Processes the given javac compilation errors.
-     *
-     * @param details Array of JavacErrorDetail instances corresponding to the
-     * compilation errors
-     */
     @Override
     public void javacError(JavacErrorDetail[] details) throws JasperException {
 
@@ -102,12 +81,6 @@ class DefaultErrorHandler implements ErrorHandler {
                 Localizer.getMessage("jsp.error.unable.compile") + ": " + buf);
     }
 
-    /**
-     * Processes the given javac error report and exception.
-     *
-     * @param errorReport Compilation error report
-     * @param exception Compilation exception
-     */
     @Override
     public void javacError(String errorReport, Exception exception)
     throws JasperException {

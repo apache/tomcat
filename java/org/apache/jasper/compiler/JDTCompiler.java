@@ -66,9 +66,6 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
 
     private final Log log = LogFactory.getLog(JDTCompiler.class); // must not be static
 
-    /**
-     * Compile the servlet from .java file to .class file
-     */
     @Override
     protected void generateClass(Map<String,SmapStratum> smaps)
         throws FileNotFoundException, JasperException, Exception {

@@ -60,9 +60,6 @@ public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
         _jspDestroy();
     }
 
-    /**
-     * Entry point into service.
-     */
     @Override
     public final void service(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
