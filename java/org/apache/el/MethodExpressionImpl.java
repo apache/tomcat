@@ -269,11 +269,6 @@ public final class MethodExpressionImpl extends MethodExpression implements
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
-     */
     @Override
     public void readExternal(ObjectInput in) throws IOException,
             ClassNotFoundException {
@@ -288,11 +283,6 @@ public final class MethodExpressionImpl extends MethodExpression implements
         this.varMapper = (VariableMapper) in.readObject();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
-     */
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeUTF(this.expr);
@@ -309,9 +299,6 @@ public final class MethodExpressionImpl extends MethodExpression implements
     }
 
 
-    /**
-     * @since EL 3.0
-     */
     @Override
     public boolean isParametersProvided() {
         return this.getNode().isParametersProvided();

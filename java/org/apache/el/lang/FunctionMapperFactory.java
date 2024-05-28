@@ -38,9 +38,6 @@ public class FunctionMapperFactory extends FunctionMapper {
     }
 
 
-    /* (non-Javadoc)
-     * @see jakarta.el.FunctionMapper#resolveFunction(String, String)
-     */
     @Override
     public Method resolveFunction(String prefix, String localName) {
         if (this.memento == null) {
