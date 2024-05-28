@@ -110,11 +110,6 @@ public final class ValueExpressionImpl extends ValueExpression implements
         this.expectedType = expectedType;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof ValueExpressionImpl)) {
@@ -127,11 +122,6 @@ public final class ValueExpressionImpl extends ValueExpression implements
         return this.getNode().equals(((ValueExpressionImpl) obj).getNode());
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.el.ValueExpression#getExpectedType()
-     */
     @Override
     public Class<?> getExpectedType() {
         return this.expectedType;
@@ -159,11 +149,6 @@ public final class ValueExpressionImpl extends ValueExpression implements
         return this.node;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.el.ValueExpression#getType(javax.el.ELContext)
-     */
     @Override
     public Class<?> getType(ELContext context) throws PropertyNotFoundException,
             ELException {
@@ -175,11 +160,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.el.ValueExpression#getValue(javax.el.ELContext)
-     */
+    @SuppressWarnings("unchecked")
     @Override
     public Object getValue(ELContext context) throws PropertyNotFoundException,
             ELException {
@@ -194,21 +175,11 @@ public final class ValueExpressionImpl extends ValueExpression implements
         return value;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return this.getNode().hashCode();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.el.ValueExpression#isLiteralText()
-     */
     @Override
     public boolean isLiteralText() {
         try {
@@ -218,11 +189,6 @@ public final class ValueExpressionImpl extends ValueExpression implements
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.el.ValueExpression#isReadOnly(javax.el.ELContext)
-     */
     @Override
     public boolean isReadOnly(ELContext context)
             throws PropertyNotFoundException, ELException {
@@ -246,12 +212,6 @@ public final class ValueExpressionImpl extends ValueExpression implements
         this.varMapper = (VariableMapper) in.readObject();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.el.ValueExpression#setValue(javax.el.ELContext,
-     *      java.lang.Object)
-     */
     @Override
     public void setValue(ELContext context, Object value)
             throws PropertyNotFoundException, PropertyNotWritableException,
@@ -277,9 +237,6 @@ public final class ValueExpressionImpl extends ValueExpression implements
         return "ValueExpression["+this.expr+"]";
     }
 
-    /**
-     * @since EL 2.2
-     */
     @Override
     public ValueReference getValueReference(ELContext context) {
         EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,

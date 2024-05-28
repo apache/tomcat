@@ -40,11 +40,6 @@ public class FunctionMapperImpl extends FunctionMapper implements
 
     protected ConcurrentMap<String, Function> functions = new ConcurrentHashMap<>();
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see javax.el.FunctionMapper#resolveFunction(String, String)
-     */
     @Override
     public Method resolveFunction(String prefix, String localName) {
         Function f = this.functions.get(prefix + ":" + localName);
@@ -65,21 +60,11 @@ public class FunctionMapperImpl extends FunctionMapper implements
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
-     */
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeObject(this.functions);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
-     */
     @SuppressWarnings("unchecked")
     @Override
     public void readExternal(ObjectInput in) throws IOException,
@@ -112,11 +97,6 @@ public class FunctionMapperImpl extends FunctionMapper implements
             // for serialization
         }
 
-        /*
-         * (non-Javadoc)
-         *
-         * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
-         */
         @Override
         public void writeExternal(ObjectOutput out) throws IOException {
             out.writeUTF((this.prefix != null) ? this.prefix : "");
@@ -132,11 +112,6 @@ public class FunctionMapperImpl extends FunctionMapper implements
             }
         }
 
-        /*
-         * (non-Javadoc)
-         *
-         * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
-         */
         @Override
         public void readExternal(ObjectInput in) throws IOException,
                 ClassNotFoundException {
@@ -164,9 +139,6 @@ public class FunctionMapperImpl extends FunctionMapper implements
             return this.m;
         }
 
-        /* (non-Javadoc)
-         * @see java.lang.Object#equals(java.lang.Object)
-         */
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof Function) {
@@ -175,9 +147,6 @@ public class FunctionMapperImpl extends FunctionMapper implements
             return false;
         }
 
-        /* (non-Javadoc)
-         * @see java.lang.Object#hashCode()
-         */
         @Override
         public int hashCode() {
             return (this.prefix + this.localName).hashCode();
