@@ -114,6 +114,10 @@
         Deprecate the <code>WebdavFixFilter</code> as it is no longer required.
         (markt)
       </scode>
+      <fix>
+        <bug>69066</bug>: Fix regression in SPNEGO authenticator when
+        processing Base64. Submitted by Daniel Lyko. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
