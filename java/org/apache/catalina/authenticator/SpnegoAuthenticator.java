@@ -168,7 +168,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         authorizationBC.setStart(authorizationBC.getStart() + 10);
 
         byte[] encoded = new byte[authorizationBC.getLength()];
-        System.arraycopy(authorizationBC.getBuffer(), 0, encoded, 0, authorizationBC.getLength());
+        System.arraycopy(authorizationBC.getBuffer(), authorizationBC.getStart(),
+                encoded, 0, authorizationBC.getLength());
         byte[] decoded = Base64.getDecoder().decode(encoded);
 
         if (getApplyJava8u40Fix()) {
