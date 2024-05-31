@@ -364,7 +364,7 @@ properties, which all are "true" by default:
     execute.test.nio2=true
 
 The SSL tests will be run twice. Once with the JSSE implementation and once
-with the OpenSSL implementation. The OpenSSL implementation can only can be
+with the OpenSSL implementation. The OpenSSL implementation can only be
 tested if Tomcat-Native library binaries are found by the testsuite. The
 "test.apr.loc" property specifies the directory where the library binaries are
 located.
