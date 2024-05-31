@@ -318,40 +318,6 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Removes the quotes on a string. RFC2617 states quotes are optional for all parameters except realm.
-     *
-     * @param quotedString   The quoted string
-     * @param quotesRequired <code>true</code> if quotes were required
-     *
-     * @return The unquoted string
-     * @deprecated This will be removed in Tomcat 11 onwards. Unused.
-     */
-    @Deprecated
-    protected static String removeQuotes(String quotedString, boolean quotesRequired) {
-        // support both quoted and non-quoted
-        if (quotedString.length() > 0 && quotedString.charAt(0) != '"' && !quotesRequired) {
-            return quotedString;
-        } else if (quotedString.length() > 2) {
-            return quotedString.substring(1, quotedString.length() - 1);
-        } else {
-            return "";
-        }
-    }
-
-    /**
-     * Removes the quotes on a string.
-     *
-     * @param quotedString The quoted string
-     *
-     * @return The unquoted string
-     * @deprecated This will be removed in Tomcat 11 onwards. Unused.
-     */
-    @Deprecated
-    protected static String removeQuotes(String quotedString) {
-        return removeQuotes(quotedString, false);
-    }
-
-    /**
      * Generate a unique token. The token is generated according to the following pattern. NOnceToken = Base64 (
      * NONCE_DIGEST ( client-IP ":" time-stamp ":" private-key ) ).
      *
