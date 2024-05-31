@@ -133,6 +133,15 @@
       <update>
         Update to Commons Daemon 1.4.0. (markt)
       </update>
+      <update>
+        Update to Objenesis 3.4. (markt)
+      </update>
+      <update>
+        Update to Checkstyle 10.17.0. (markt)
+      </update>
+      <update>
+        Update to SpotBugs 4.8.5. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
