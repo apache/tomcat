@@ -198,7 +198,7 @@ commons-daemon.bin.checksum.enabled=true
 commons-daemon.bin.checksum.algorithm=SHA-512
 commons-daemon.bin.checksum.value=15fccd35a711f91e5b4466d56f50585c7ae3a787a39c16e006617c86b9e9feee9fbf902582b08c2e896ca6a655500d805fdbb9c97f04f70321631168b8d42c81
 
-# checksums for commons-daemon-1.3.4-native-src.tar.gz, commons-daemon-1.3.4-bin-windows.zip
+# checksums for commons-daemon-1.4.0-native-src.tar.gz, commons-daemon-1.4.0-bin-windows.zip
 commons-daemon.native.src.checksum.enabled=true
 commons-daemon.native.src.checksum.algorithm=SHA-512
 commons-daemon.native.src.checksum.value=8a54200d547ef7ee647e8d4910fd3cb55bf7d8fc75de8f0e01bc701ef0b386ddc3843e6c9189e34d2afd62060fb6299ea83c421cf60c7d105d04cb45904500d3
@@ -256,10 +256,10 @@ cglib.jar=${cglib.home}/cglib-nodep-${cglib.version}.jar
 cglib.loc=${base-maven.loc}/cglib/cglib-nodep/${cglib.version}/cglib-nodep-${cglib.version}.jar
 
 # ----- objenesis, used by EasyMock, version 1.2 or later -----
-objenesis.version=3.3
+objenesis.version=3.4
 objenesis.checksum.enabled=true
 objenesis.checksum.algorithm=MD5|SHA-1
-objenesis.checksum.value=ab0e0b2ab81affdd7f38bcc60fd85571|1049c09f1de4331e8193e579448d0916d75b7631
+objenesis.checksum.value=51242320cb2bb25a3f36e2e21fa87de0|675cbe121a68019235d27f6c34b4f0ac30e07418
 objenesis.home=${base.path}/objenesis-${objenesis.version}
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
@@ -274,10 +274,10 @@ unboundid.jar=${unboundid.home}/unboundid-ldapsdk-${unboundid.version}.jar
 unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.version}/unboundid-ldapsdk-${unboundid.version}.jar
 
 # ----- Checkstyle, version 6.16 or later -----
-checkstyle.version=10.16.0
+checkstyle.version=10.17.0
 checkstyle.checksum.enabled=true
 checkstyle.checksum.algorithm=SHA-512
-checkstyle.checksum.value=a5bc5d725ddb3125c602385221f15c085d6f5244e36d5dc8b661f7adfa864c7bfcf0c68444632e75669a94d79fdf54173d38908b9f4612eb748619cb3d256142
+checkstyle.checksum.value=e35e8bb505a2cde19d361d95e9f70ff1481a4216824fdfe88d99de5607aae89c8fca1f38e768d2ae39c61269ee6be27e0b214f19861214448a5e46f30ccfbcac
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
@@ -292,10 +292,10 @@ jacoco.jar=${jacoco.home}/lib/jacocoant.jar
 jacoco.loc=${base-maven.loc}/org/jacoco/jacoco/${jacoco.version}/jacoco-${jacoco.version}.zip
 
 # ----- SpotBugs (originally FindBugs) -----
-spotbugs.version=4.8.4
+spotbugs.version=4.8.5
 spotbugs.checksum.enabled=true
 spotbugs.checksum.algorithm=SHA-512
-spotbugs.checksum.value=3bdd417e4cd8e451ccc7d6fa41940d22038cb4558af9d1919f7c1eb6e442158fa11c53620ee471ed5550c7ea33930cab283c66513a28bc8d744919bac9510f8f
+spotbugs.checksum.value=3310ffa7d18f4d9d8a87926bcd256709866bfa3337df69c183e18bb0491aa639f93c70ade764fdb13f499fa971980cd7ce99594e3e818f6cafc69675da901416
 spotbugs.home=${base.path}/spotbugs-${spotbugs.version}
 spotbugs.jar=${spotbugs.home}/lib/spotbugs-ant.jar
 spotbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${spotbugs.version}/spotbugs-${spotbugs.version}.tgz
