@@ -118,6 +118,10 @@
         <bug>69066</bug>: Fix regression in SPNEGO authenticator when
         processing Base64. Submitted by Daniel Lyko. (remm)
       </fix>
+      <update>
+        Update minimum recommended version of Tomcat Native to 1.3.0. Pull
+        request <pr>728</pr> provided by Dimitrios Soumis. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
