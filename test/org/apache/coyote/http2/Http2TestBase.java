@@ -111,7 +111,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected static final String TRAILER_HEADER_VALUE = "test";
 
     // Client
-    private Socket s;
+    protected Socket s;
     protected HpackEncoder hpackEncoder;
     protected Input input;
     protected TestOutput output;

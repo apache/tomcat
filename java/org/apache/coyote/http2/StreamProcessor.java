@@ -18,6 +18,7 @@ package org.apache.coyote.http2;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,6 +26,7 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.coyote.AbstractProcessor;
@@ -553,5 +555,23 @@ class StreamProcessor extends AbstractProcessor {
     @Override
     protected final SocketState dispatchEndRequest() throws IOException {
         return SocketState.CLOSED;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * First checks for a stream read timeout and processes it if detected. If no stream read timeout is detected then
+     * the superclass is called to check for an asynchronous processing timeout.
+     */
+    @Override
+    public void timeoutAsync(long now) {
+        if (stream.getInputBuffer().timeoutRead(now)) {
+            stream.getCoyoteRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION,
+                    new SocketTimeoutException(sm.getString("streamProcessor.streamReadTimeout")));
+            processSocketEvent(SocketEvent.ERROR, true);
+        } else {
+            super.timeoutAsync(now);
+        }
     }
 }

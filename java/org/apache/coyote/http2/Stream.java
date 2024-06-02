@@ -1160,6 +1160,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         abstract boolean isRequestBodyFullyRead();
 
         abstract void insertReplayedBody(ByteChunk body);
+
+        protected abstract boolean timeoutRead(long now);
     }
 
 
@@ -1186,6 +1188,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         // 'write mode'.
         private volatile ByteBuffer inBuffer;
         private volatile boolean readInterest;
+        // If readInterest is true, data must be available to read no later than this time.
+        private volatile long readTimeoutExpiry;
         private volatile boolean closed;
         private boolean resetReceived;
 
@@ -1285,6 +1289,12 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
                 if (!isRequestBodyFullyRead()) {
                     readInterest = true;
+                    long readTimeout = handler.getProtocol().getStreamReadTimeout();
+                    if (readTimeout > 0) {
+                        readTimeoutExpiry = System.currentTimeMillis() + handler.getProtocol().getStreamReadTimeout();
+                    } else {
+                        readTimeoutExpiry = Long.MAX_VALUE;
+                    }
                 }
 
                 return false;
@@ -1436,6 +1446,12 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 }
             }
         }
+
+
+        @Override
+        protected boolean timeoutRead(long now) {
+            return readInterest && now > readTimeoutExpiry;
+        }
     }
 
 
@@ -1496,6 +1512,13 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         @Override
         void insertReplayedBody(ByteChunk body) {
             // NO-OP
+        }
+
+
+        @Override
+        protected boolean timeoutRead(long now) {
+            // Reading from a saved request. Will never time out.
+            return false;
         }
     }
 }
