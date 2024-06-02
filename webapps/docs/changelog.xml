@@ -130,6 +130,10 @@
         Fix a crash on Windows setting CA certificate on null path.
         (remm)
       </fix>
+      <fix>
+        <bug>69068</bug>: Ensure read timouts are triggered for asynchronous,
+        non-blocking reads when using HTTP/2. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
