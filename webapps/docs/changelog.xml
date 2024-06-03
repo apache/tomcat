@@ -132,6 +132,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>68546</bug>: Small additional optimisation for initial loading of
+        Servlet code generated for JSPs. Based on a suggestion by Dan Armstrong.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
