@@ -1291,7 +1291,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     readInterest = true;
                     long readTimeout = handler.getProtocol().getStreamReadTimeout();
                     if (readTimeout > 0) {
-                        readTimeoutExpiry = System.currentTimeMillis() + handler.getProtocol().getStreamReadTimeout();
+                        readTimeoutExpiry = System.currentTimeMillis() + readTimeout;
                     } else {
                         readTimeoutExpiry = Long.MAX_VALUE;
                     }
