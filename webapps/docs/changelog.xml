@@ -150,6 +150,9 @@
       <update>
         Update to SpotBugs 4.8.5. (markt)
       </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
