@@ -130,6 +130,19 @@
         Fix a crash on Windows setting CA certificate on null path.
         (remm)
       </fix>
+      <fix>
+        <bug>69068</bug>: Ensure read timouts are triggered for asynchronous,
+        non-blocking reads when using HTTP/2. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>68546</bug>: Small additional optimisation for initial loading of
+        Servlet code generated for JSPs. Based on a suggestion by Dan Armstrong.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -156,6 +169,12 @@
       <update>
         Update to SpotBugs 4.8.5. (markt)
       </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations by tak7iji. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
