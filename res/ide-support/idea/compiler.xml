@@ -18,8 +18,10 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <excludeFromCompile>
+      <!--
       <directory url="file://$PROJECT_DIR$/java/org/apache/tomcat/util/openssl" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/java/org/apache/tomcat/util/net/openssl/panama" includeSubdirectories="true" />
+      -->
     </excludeFromCompile>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
