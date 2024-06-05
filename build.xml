@@ -1598,7 +1598,7 @@
     <echo message="Building Tomcat JDBC pool libraries"/>
     <ant antfile="${tomcat.jdbc.dir}/build.xml" dir="${tomcat.jdbc.dir}"
          inheritAll="false" target="build">
-      <property name="ant.tstamp.now.iso" value ="${ant.tstamp.now.iso}" />
+      <property name="ant.tstamp.now.iso" value ="${tstamp.iso.release}" />
       <property name="tstamp.file" value ="${tstamp.file}" />
       <property name="tomcat.pool" value="${tomcat.pool}" />
       <property name="tomcat.juli.jar" value="${tomcat-juli.jar}" />
