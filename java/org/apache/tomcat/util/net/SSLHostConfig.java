@@ -298,6 +298,11 @@ public class SSLHostConfig implements Serializable {
     // TODO: This certificate setter can be removed once it is no longer
     // necessary to support the old configuration attributes (Tomcat 10?).
 
+    /**
+     * @return The default certificate key password.
+     * @deprecated Obtain the prefered Certificate and call this method, there.
+     */
+    @Deprecated
     public String getCertificateKeyPassword() {
         if (defaultCertificate == null) {
             return null;
@@ -307,12 +312,22 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * @param certificateKeyPassword The password for the default certificate's key.
+     * @deprecated Obtain the prefered Certificate and call this method, there.
+     */
+    @Deprecated
     public void setCertificateKeyPassword(String certificateKeyPassword) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeyPassword(certificateKeyPassword);
     }
 
 
+    /**
+     * @return The password for the default certificate's key.
+     * @deprecated Obtain the prefered Certificate and call this method, there.
+     */
+    @Deprecated
     public String getCertificateKeyPasswordFile() {
         if (defaultCertificate == null) {
             return null;
@@ -322,6 +337,11 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * @param certificateKeyPasswordFile The file containing the password for the default certificate's key.
+     * @deprecated Obtain the prefered Certificate and call this method, there.
+     */
+    @Deprecated
     public void setCertificateKeyPasswordFile(String certificateKeyPasswordFile) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeyPasswordFile(certificateKeyPasswordFile);
@@ -564,6 +584,11 @@ public class SSLHostConfig implements Serializable {
     // TODO: These certificate setters can be removed once it is no longer
     // necessary to support the old configuration attributes (Tomcat 10?).
 
+    /**
+     * @return The key alias for the default certificate key.
+     * @deprecated Obtain the prefered Certificate and call this method, there.
+     */
+    @Deprecated
     public String getCertificateKeyAlias() {
         if (defaultCertificate == null) {
             return null;
@@ -571,12 +596,22 @@ public class SSLHostConfig implements Serializable {
             return defaultCertificate.getCertificateKeyAlias();
         }
     }
+    /**
+     * @param certificateKeyAlias The alias of the certificate key.
+     * @deprecated Obtain the prefered Certificate and call this method, there.
+     */
+    @Deprecated
     public void setCertificateKeyAlias(String certificateKeyAlias) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeyAlias(certificateKeyAlias);
     }
 
 
+    /**
+     * @return The keystore file for the default certificate.
+     * @deprecated Obtain the prefered Certificate and call this method, there.
+     */
+    @Deprecated
     public String getCertificateKeystoreFile() {
         if (defaultCertificate == null) {
             return null;
@@ -584,12 +619,22 @@ public class SSLHostConfig implements Serializable {
             return defaultCertificate.getCertificateKeystoreFile();
         }
     }
+    /**
+     * @param certificateKeystoreFile The file containing the certificate keystore.
+     * @deprecated Obtain the prefered Certificate and call this method, there.
+     */
+    @Deprecated
     public void setCertificateKeystoreFile(String certificateKeystoreFile) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeystoreFile(certificateKeystoreFile);
     }
 
 
+    /**
+     * @return The password for the default certificate's keystore.
+     * @deprecated Obtain the prefered Certificate and call this method, there.
+     */
+    @Deprecated
     public String getCertificateKeystorePassword() {
         if (defaultCertificate == null) {
             return null;
@@ -597,12 +642,22 @@ public class SSLHostConfig implements Serializable {
             return defaultCertificate.getCertificateKeystorePassword();
         }
     }
+    /**
+     * @param certificateKeystorePassword The password for the certificate keystore.
+     * @deprecated Obtain the prefered Certificate and call this method, there.
+     */
+    @Deprecated
     public void setCertificateKeystorePassword(String certificateKeystorePassword) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeystorePassword(certificateKeystorePassword);
     }
 
 
+    /**
+     * @return The file containing the default certificate's keystore password.
+     * @deprecated Obtain the prefered Certificate and call this method, there.
+     */
+    @Deprecated
     public String getCertificateKeystorePasswordFile() {
         if (defaultCertificate == null) {
             return null;
@@ -610,12 +665,22 @@ public class SSLHostConfig implements Serializable {
             return defaultCertificate.getCertificateKeystorePasswordFile();
         }
     }
+    /**
+     * @param certificateKeystorePasswordFile The file containing the default certificate's keystore password.
+     * @deprecated Obtain the prefered Certificate and call this method, there.
+     */
+    @Deprecated
     public void setCertificateKeystorePasswordFile(String certificateKeystorePasswordFile) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeystorePasswordFile(certificateKeystorePasswordFile);
     }
 
 
+    /**
+     * @return The provider for the default certificate's keystore.
+     * @deprecated Obtain the prefered Certificate and call this method, there.
+     */
+    @Deprecated
     public String getCertificateKeystoreProvider() {
         if (defaultCertificate == null) {
             return null;
@@ -623,12 +688,22 @@ public class SSLHostConfig implements Serializable {
             return defaultCertificate.getCertificateKeystoreProvider();
         }
     }
+    /**
+     * @param certificateKeystoreProvider The provider for the default certificate's keystore.
+     * @deprecated Obtain the prefered Certificate and call this method, there.
+     */
+    @Deprecated
     public void setCertificateKeystoreProvider(String certificateKeystoreProvider) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeystoreProvider(certificateKeystoreProvider);
     }
 
 
+    /**
+     * @return The type of the default certificate's keystore.
+     * @deprecated Obtain the prefered Certificate and call this method, there.
+     */
+    @Deprecated
     public String getCertificateKeystoreType() {
         if (defaultCertificate == null) {
             return null;
@@ -636,6 +711,11 @@ public class SSLHostConfig implements Serializable {
             return defaultCertificate.getCertificateKeystoreType();
         }
     }
+    /**
+     * @param certificateKeystoreType The type of the default certificate's keystore.
+     * @deprecated Obtain the prefered Certificate and call this method, there.
+     */
+    @Deprecated
     public void setCertificateKeystoreType(String certificateKeystoreType) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeystoreType(certificateKeystoreType);
