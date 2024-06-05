@@ -22,6 +22,8 @@
       <sourceFolder url="file://$MODULE_DIR$/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/webapps/examples/WEB-INF/classes" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/java/org/apache/tomcat/util/net/openssl/panama" />
+      <excludeFolder url="file://$MODULE_DIR$/java/org/apache/tomcat/util/openssl" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
