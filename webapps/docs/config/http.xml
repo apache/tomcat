@@ -625,9 +625,9 @@
       This setting dictates how many of these objects get cached.
       <code>-1</code> means unlimited, default is <code>200</code>.
       <code>0</code> means no request processor reuse. This has a very
-      significant impact on performance depending on the workload, but gives
-      additional security guarantees by avoidoing reuse of all request
-      processing objects.
+      significant impact on performance and garbage collection depending on
+      the workload, but provides additional security guarantees by avoiding
+      reuse of all request processing objects.
       If not using Servlet 3.0 asynchronous processing, an appropriate value
       is to use the same as the maxThreads setting. If using Servlet 3.0
       asynchronous processing, an appropriate value is to use the larger
