@@ -122,6 +122,14 @@
         Update minimum recommended version of Tomcat Native to 1.3.0. Pull
         request <pr>728</pr> provided by Dimitrios Soumis. (markt)
       </update>
+      <update>
+        The system property
+        <code>org.apache.catalina.connector.RECYCLE_FACADES</code> will now
+        default to <code>true</code> if not specified, which will in turn set
+        the default value for the <code>discardFacades</code> connector
+        attribute, thus causing facade objects to be discarded by default.
+        (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

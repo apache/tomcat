@@ -100,7 +100,7 @@
       reused. This setting has no effect when the security manager is enabled.
       If not specified, this attribute is set to the value of the
       <code>org.apache.catalina.connector.RECYCLE_FACADES</code> system
-      property, or <code>false</code> if not set.</p>
+      property, or <code>true</code> if not set.</p>
     </attribute>
 
     <attribute name="enableLookups" required="false">

@@ -284,7 +284,7 @@
     <property name="org.apache.catalina.connector. RECYCLE_FACADES">
       <p>If this is <code>true</code> or if a security manager is in use a new
       facade object will be created for each request.</p>
-      <p>If not specified, the default value of <code>false</code> will be used.</p>
+      <p>If not specified, the default value of <code>true</code> will be used.</p>
     </property>
 
     <property

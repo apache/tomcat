@@ -65,7 +65,7 @@ public class Connector extends LifecycleMBeanBase {
      * Alternate flag to enable recycling of facades.
      */
     public static final boolean RECYCLE_FACADES =
-            Boolean.parseBoolean(System.getProperty("org.apache.catalina.connector.RECYCLE_FACADES", "false"));
+            Boolean.parseBoolean(System.getProperty("org.apache.catalina.connector.RECYCLE_FACADES", "true"));
 
 
     public static final String INTERNAL_EXECUTOR_NAME = "Internal";
