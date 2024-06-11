@@ -118,6 +118,11 @@
         <bug>69066</bug>: Fix regression in SPNEGO authenticator when
         processing Base64. Submitted by Daniel Lyko. (remm)
       </fix>
+      <add>
+        Add <code>RealmBase.getPrincipal(GSSName, GSSCredential, GSSContext)</code>
+        for retrieving extended/additional information from an established
+        GSS context. (michaelo)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
