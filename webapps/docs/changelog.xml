@@ -130,6 +130,11 @@
         attribute, thus causing facade objects to be discarded by default.
         (remm)
       </update>
+      <add>
+        Add <code>RealmBase.getPrincipal(GSSName, GSSCredential, GSSContext)</code>
+        for retrieving extended/additional information from an established
+        GSS context. (michaelo)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

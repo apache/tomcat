@@ -492,7 +492,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     }
                 }
 
-                return getPrincipal(gssName, gssCredential);
+                return getPrincipal(gssName, gssCredential, gssContext);
             }
         } else {
             log.error(sm.getString("realmBase.gssContextNotEstablished"));
@@ -1244,6 +1244,20 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         }
 
         return p;
+    }
+
+
+    /**
+     * Get the principal associated with the specified {@link GSSName}.
+     *
+     * @param gssName       The GSS name
+     * @param gssCredential the GSS credential of the principal
+     * @param gssContext the established GSS context
+     *
+     * @return the principal associated with the given user name.
+     */
+    protected Principal getPrincipal(GSSName gssName, GSSCredential gssCredential, GSSContext gssContext) {
+        return getPrincipal(gssName, gssCredential);
     }
 
 
