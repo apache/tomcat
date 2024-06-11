@@ -298,7 +298,7 @@
         </th>
       </tr>
       <xsl:for-each select="attribute">
-        <tr>
+        <tr id="{concat(../../../@name, '_', ../../@name, '_', @name)}">
           <td>
             <xsl:if test="@required = 'true'">
               <strong><code class="attributeName"><xsl:value-of select="@name"/></code></strong>
