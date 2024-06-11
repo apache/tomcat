@@ -2315,6 +2315,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     // Re-throw the original exception
                     throw e;
                 }
+                if (clazz == null) {
+                    // Not BZ 68721
+                    throw e;
+                }
             }
             entry.loadedClass = clazz;
         }
