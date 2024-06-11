@@ -123,6 +123,11 @@
         for retrieving extended/additional information from an established
         GSS context. (michaelo)
       </add>
+      <fix>
+        Correct a regression in the fix for <bug>68721</bug> that caused some
+        instances of <code>LinkageError</code> to be reported as
+        <code>ClassNotFoundException</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
