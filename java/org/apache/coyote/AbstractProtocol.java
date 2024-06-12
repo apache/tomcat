@@ -275,6 +275,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     }
 
 
+    public int getMaxQueueSize() {
+        return endpoint.getMaxQueueSize();
+    }
+
+    public void setMaxQueueSize(int maxQueueSize) {
+        endpoint.setMaxQueueSize(maxQueueSize);
+    }
+
     public int getAcceptCount() {
         return endpoint.getAcceptCount();
     }
