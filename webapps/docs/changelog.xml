@@ -144,6 +144,11 @@
         <bug>69068</bug>: Ensure read timouts are triggered for asynchronous,
         non-blocking reads when using HTTP/2. (markt)
       </fix>
+      <update>
+        <bug>69133</bug>: Add task queue size configuration on the
+        <code>Connector</code> element, similar to the <code>Executor</code>
+        element, for consistency. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -813,6 +813,22 @@ public abstract class AbstractEndpoint<S,U> {
 
 
     /**
+     * Task queue capacity for the thread pool.
+     */
+    private int maxQueueSize = Integer.MAX_VALUE;
+    public void setMaxQueueSize(int maxQueueSize) {
+        this.maxQueueSize = maxQueueSize;
+    }
+    public int getMaxQueueSize() {
+        if (internalExecutor) {
+            return maxQueueSize;
+        } else {
+            return -1;
+        }
+    }
+
+
+    /**
      * Amount of time in milliseconds before the internal thread pool stops any idle threads
      * if the amount of thread is greater than the minimum amount of spare threads.
      */
@@ -1070,7 +1086,7 @@ public abstract class AbstractEndpoint<S,U> {
         if (getUseVirtualThreads()) {
             executor = new VirtualThreadExecutor(getName() + "-virt-");
         } else {
-            TaskQueue taskqueue = new TaskQueue();
+            TaskQueue taskqueue = new TaskQueue(maxQueueSize);
             TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-", daemon, getThreadPriority());
             executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), getThreadsMaxIdleTime(),
                     TimeUnit.MILLISECONDS, taskqueue, tf);
