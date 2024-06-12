@@ -3827,8 +3827,14 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     <mkdir dir="${tomcat.home}/lib"/>
 
     <echo>IntelliJ IDEA project directory created.
+
 The SDK was set to &quot;${build.java.version}&quot; so make sure that your IDE has an SDK with that name,
-or update the Project Settings accordingly.</echo>
+or update the Project Settings accordingly. Choose [File &gt; Project Structure] to open the settings dialog
+and set the SDK level, language level, etc. as needed.
+
+Some folders have been excluded by default as they require the latest SDK version and enabling of preview
+features. You can remove or comment out the exclusions to enable the directories in the .idea/tomcat.iml
+file, or via the IDEA UI by right-clicking folders, and choosing [Mark Directory as &gt; Cancel Exclusion]</echo>
   </target>
 
   <!-- ============================ NetBeans =============================== -->
