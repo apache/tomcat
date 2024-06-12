@@ -128,6 +128,11 @@
         instances of <code>LinkageError</code> to be reported as
         <code>ClassNotFoundException</code>. (markt)
       </fix>
+      <fix>
+        Ensure that static resources deployed via a JAR file remain accessible
+        when the context is configured to use a bloom filter. Based on pull
+        request <pr>730</pr> provided by bergander. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
