@@ -563,18 +563,6 @@
       <code>Integer.MAX_VALUE</code></p>
     </attribute>
 
-    <attribute name="maxThreads" required="false">
-      <p>The maximum number of request processing threads to be created
-      by this <strong>Connector</strong>, which therefore determines the
-      maximum number of simultaneous requests that can be handled.  If
-      not specified, this attribute is set to 200. If an executor is associated
-      with this connector, this attribute is ignored as the connector will
-      execute tasks using the executor rather than an internal thread pool. Note
-      that if an executor is configured any value set for this attribute will be
-      recorded correctly but it will be reported (e.g. via JMX) as
-      <code>-1</code> to make clear that it is not used.</p>
-    </attribute>
-
     <attribute name="maxSwallowSize" required="false">
       <p>The maximum number of request body bytes (excluding transfer encoding
       overhead) that will be swallowed by Tomcat for an aborted upload. An
