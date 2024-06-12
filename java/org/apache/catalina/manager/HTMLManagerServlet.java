@@ -82,6 +82,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     static final String connectorTrustedCertsJspPath = "/WEB-INF/jsp/connectorTrustedCerts.jsp";
 
     private boolean showProxySessions = false;
+    private String htmlSubTitle = null;
 
     // --------------------------------------------------------- Public Methods
 
@@ -303,6 +304,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
         Object[] args = new Object[2];
         args[0] = getServletContext().getContextPath();
         args[1] = smClient.getString("htmlManagerServlet.title");
+        if (htmlSubTitle != null) {
+            args[1] += "</font><br/><font size=\"+1\">" + htmlSubTitle;
+        }
 
         // HTML Header Section
         writer.print(MessageFormat.format(Constants.HTML_HEADER_SECTION, args));
@@ -737,6 +741,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
         String value = null;
         value = getServletConfig().getInitParameter("showProxySessions");
         showProxySessions = Boolean.parseBoolean(value);
+
+        htmlSubTitle = getServletConfig().getInitParameter("htmlSubTitle");
     }
 
     // ------------------------------------------------ Sessions administration
