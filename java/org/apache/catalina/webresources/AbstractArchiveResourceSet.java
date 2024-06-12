@@ -205,8 +205,10 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
          * If jarContents reports that this resource definitely does not contain the path, we can end this method and
          * move on to the next jar.
          */
-        if (jarContents != null && !jarContents.mightContainResource(path, webAppMount)) {
-            return new EmptyResource(root, path);
+        if (jarContents != null &&
+                !jarContents.mightContainResource(getInternalPath().isEmpty() ? path : getInternalPath() + path,
+                         webAppMount)) {
+                return new EmptyResource(root, path);
         }
 
         /*
