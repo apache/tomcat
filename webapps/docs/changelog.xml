@@ -164,6 +164,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Add the ability to set a sub-title for the Manager web application main
+        page. This is intended to allow users with lots of instances to easily
+        distinguish them. Based on pull request <pr>724</pr> by Simon Arame.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>

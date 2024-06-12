@@ -237,6 +237,25 @@ action does not have correct value of the token, the action will be denied.
 If the token has expired you can start again from the main page or
 <em>List Applications</em> page of Manager.</p>
 
+<p>To customize the subtitle of the HTML interface of the Manager web application,
+you can add any valid xml escaped html code to the <code>htmlSubTitle</code>
+initialisation parameter of the <code>HTMLManagerServlet</code>
+</p>
+
+<source><![CDATA[<servlet>
+  <servlet-name>HTMLManager</servlet-name>
+  <servlet-class>org.apache.catalina.manager.HTMLManagerServlet</servlet-class>
+  <init-param>
+    <param-name>htmlSubTitle</param-name>
+    <param-value>Company Inc.&lt;br&gt;&lt;i style=&apos;color:red&apos;&gt;Staging&lt;/i&gt;</param-value>
+  </init-param>
+  ...
+</servlet>]]></source>
+
+<p>The above string value would unescape and be appended to the title</p>
+
+<source><![CDATA[Company Inc.<br><i style='color:red'>Staging</i>]]></source>
+
 </section>
 
 <section name="Supported Manager Commands">
