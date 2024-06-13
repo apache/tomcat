@@ -74,6 +74,9 @@ public class OpenSSLLibrary {
 
     protected static final Object lock = new Object();
 
+    // Guarded by lock
+    private static int referenceCount = 0;
+
     static MemorySegment enginePointer = MemorySegment.NULL;
 
     static void initLibrary() {
@@ -159,6 +162,10 @@ public class OpenSSLLibrary {
     public static void init() {
         synchronized (lock) {
 
+            if (referenceCount++ != 0) {
+                // Already loaded (note test is performed before reference count is incremented)
+                return;
+            }
             if (OpenSSLStatus.isInitialized()) {
                 return;
             }
@@ -327,6 +334,10 @@ public class OpenSSLLibrary {
 
     public static void destroy() {
         synchronized (lock) {
+            if (--referenceCount != 0) {
+                // Still being used (note test is performed after reference count is decremented)
+                return;
+            }
             if (!OpenSSLStatus.isInitialized()) {
                 return;
             }
@@ -337,6 +348,7 @@ public class OpenSSLLibrary {
                     freeDHParameters();
                     if (!MemorySegment.NULL.equals(enginePointer)) {
                         ENGINE_free(enginePointer);
+                        enginePointer = MemorySegment.NULL;
                     }
                     FIPS_mode_set(0);
                 }

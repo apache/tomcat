@@ -16,9 +16,11 @@
  */
 package org.apache.catalina.core;
 
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 
@@ -26,27 +28,43 @@ public class TestAprLifecycleListener {
 
     @Test
     public void testMultipleServerInstancesUsingTomcatNativeLibrary01() throws Exception {
-        doTestMultipleServerInstancesUsingTomcatNativeLibrary(false);
+        doTestMultipleServerInstancesUsingTomcatNativeLibrary(false, false);
     }
 
 
     @Test
     public void testMultipleServerInstancesUsingTomcatNativeLibrary02() throws Exception {
-        doTestMultipleServerInstancesUsingTomcatNativeLibrary(true);
+        doTestMultipleServerInstancesUsingTomcatNativeLibrary(true, false);
     }
 
 
-    private void doTestMultipleServerInstancesUsingTomcatNativeLibrary(boolean reverseShutdownOrder) throws Exception {
+    @Test
+    public void testMultipleServerInstancesUsingFFM01() throws Exception {
+        Assume.assumeTrue(JreCompat.isJre22Available());
+        doTestMultipleServerInstancesUsingTomcatNativeLibrary(false, true);
+    }
+
+
+    @Test
+    public void testMultipleServerInstancesUsingFFM02() throws Exception {
+        Assume.assumeTrue(JreCompat.isJre22Available());
+        doTestMultipleServerInstancesUsingTomcatNativeLibrary(true, true);
+    }
+
+
+    private void doTestMultipleServerInstancesUsingTomcatNativeLibrary(boolean reverseShutdownOrder, boolean ffm) throws Exception {
         Tomcat tomcat1 = new Tomcat();
         tomcat1.setPort(0);
         TesterSupport.initSsl(tomcat1);
-        TesterSupport.configureSSLImplementation(tomcat1, OpenSSLImplementation.class.getName(), true);
+        TesterSupport.configureSSLImplementation(tomcat1,
+                ffm ? "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" : OpenSSLImplementation.class.getName(), true);
         tomcat1.init();
 
         Tomcat tomcat2 = new Tomcat();
         tomcat2.setPort(0);
         TesterSupport.initSsl(tomcat2);
-        TesterSupport.configureSSLImplementation(tomcat2, OpenSSLImplementation.class.getName(), true);
+        TesterSupport.configureSSLImplementation(tomcat2,
+                ffm ? "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" : OpenSSLImplementation.class.getName(), true);
         tomcat2.init();
 
         // Start 1, then 2

@@ -690,7 +690,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 keylen = EVP_PKEY_bits(pkey);
             }
             for (int i = 0; i < OpenSSLLibrary.dhParameters.length; i++) {
-                if (keylen >= OpenSSLLibrary.dhParameters[i].min) {
+                if (OpenSSLLibrary.dhParameters[i] != null && keylen >= OpenSSLLibrary.dhParameters[i].min) {
                     return OpenSSLLibrary.dhParameters[i].dh;
                 }
             }
