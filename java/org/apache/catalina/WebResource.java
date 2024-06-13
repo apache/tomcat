@@ -22,8 +22,7 @@ import java.security.cert.Certificate;
 import java.util.jar.Manifest;
 
 /**
- * Represents a file or directory within a web application. It borrows heavily
- * from {@link java.io.File}.
+ * Represents a file or directory within a web application. It borrows heavily from {@link java.io.File}.
  */
 public interface WebResource {
     /**
@@ -32,8 +31,8 @@ public interface WebResource {
     long getLastModified();
 
     /**
-     * @return the last modified time of this resource in the correct format for
-     * the HTTP Last-Modified header as specified by RFC 2616.
+     * @return the last modified time of this resource in the correct format for the HTTP Last-Modified header as
+     *             specified by RFC 2616.
      */
     String getLastModifiedHttp();
 
@@ -43,11 +42,9 @@ public interface WebResource {
     boolean exists();
 
     /**
-     * Indicates if this resource is required for applications to correctly scan
-     * the file structure but that does not exist in either the main or any
-     * additional {@link WebResourceSet}. For example, if an external
-     * directory is mapped to /WEB-INF/lib in an otherwise empty web
-     * application, /WEB-INF will be represented as a virtual resource.
+     * Indicates if this resource is required for applications to correctly scan the file structure but that does not
+     * exist in either the main or any additional {@link WebResourceSet}. For example, if an external directory is
+     * mapped to /WEB-INF/lib in an otherwise empty web application, /WEB-INF will be represented as a virtual resource.
      *
      * @return <code>true</code> for a virtual resource
      */
@@ -89,16 +86,16 @@ public interface WebResource {
     boolean canRead();
 
     /**
-     * @return The path of this resource relative to the web application root. If the
-     * resource is a directory, the return value will end in '/'.
+     * @return The path of this resource relative to the web application root. If the resource is a directory, the
+     *             return value will end in '/'.
      */
     String getWebappPath();
 
     /**
-     * Return the strong ETag if available (currently not supported) else return
-     * the weak ETag calculated from the content length and last modified.
+     * Return the strong ETag if available (currently not supported) else return the weak ETag calculated from the
+     * content length and last modified.
      *
-     * @return  The ETag for this resource
+     * @return The ETag for this resource
      */
     String getETag();
 
@@ -117,46 +114,42 @@ public interface WebResource {
     /**
      * Obtain an InputStream based on the contents of this resource.
      *
-     * @return  An InputStream based on the contents of this resource or
-     *          <code>null</code> if the resource does not exist or does not
-     *          represent a file
+     * @return An InputStream based on the contents of this resource or <code>null</code> if the resource does not exist
+     *             or does not represent a file
      */
     InputStream getInputStream();
 
     /**
-     * @return the binary content of this resource or {@code null} if it is not
-     *         available in a byte[] because, for example, it is too big.
+     * @return the binary content of this resource or {@code null} if it is not available in a byte[] because, for
+     *             example, it is too big.
      */
     byte[] getContent();
 
     /**
-     * @return The time the file was created. If not available, the result of
-     * {@link #getLastModified()} will be returned.
+     * @return The time the file was created. If not available, the result of {@link #getLastModified()} will be
+     *             returned.
      */
     long getCreation();
 
     /**
-     * @return a URL to access the resource or <code>null</code> if no such URL
-     * is available or if the resource does not exist.
+     * @return a URL to access the resource or <code>null</code> if no such URL is available or if the resource does not
+     *             exist.
      */
     URL getURL();
 
     /**
-     * @return the code base for this resource that will be used when looking up the
-     * assigned permissions for the code base in the security policy file when
-     * running under a security manager.
+     * @return the code base for this resource that will be used when looking up the assigned permissions for the code
+     *             base in the security policy file when running under a security manager.
      */
     URL getCodeBase();
 
     /**
-     * @return a reference to the WebResourceRoot of which this WebResource is a
-     * part.
+     * @return a reference to the WebResourceRoot of which this WebResource is a part.
      */
     WebResourceRoot getWebResourceRoot();
 
     /**
-     * @return the certificates that were used to sign this resource to verify
-     * it or @null if none.
+     * @return the certificates that were used to sign this resource to verify it or @null if none.
      *
      * @see java.util.jar.JarEntry#getCertificates()
      */

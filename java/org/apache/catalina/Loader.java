@@ -19,30 +19,21 @@ package org.apache.catalina;
 import java.beans.PropertyChangeListener;
 
 /**
- * A <b>Loader</b> represents a Java ClassLoader implementation that can
- * be used by a Container to load class files (within a repository associated
- * with the Loader) that are designed to be reloaded upon request, as well as
- * a mechanism to detect whether changes have occurred in the underlying
- * repository.
+ * A <b>Loader</b> represents a Java ClassLoader implementation that can be used by a Container to load class files
+ * (within a repository associated with the Loader) that are designed to be reloaded upon request, as well as a
+ * mechanism to detect whether changes have occurred in the underlying repository.
  * <p>
- * In order for a <code>Loader</code> implementation to successfully operate
- * with a <code>Context</code> implementation that implements reloading, it
- * must obey the following constraints:
+ * In order for a <code>Loader</code> implementation to successfully operate with a <code>Context</code> implementation
+ * that implements reloading, it must obey the following constraints:
  * <ul>
- * <li>Must implement <code>Lifecycle</code> so that the Context can indicate
- *     that a new class loader is required.
- * <li>The <code>start()</code> method must unconditionally create a new
- *     <code>ClassLoader</code> implementation.
- * <li>The <code>stop()</code> method must throw away its reference to the
- *     <code>ClassLoader</code> previously utilized, so that the class loader,
- *     all classes loaded by it, and all objects of those classes, can be
- *     garbage collected.
- * <li>Must allow a call to <code>stop()</code> to be followed by a call to
- *     <code>start()</code> on the same <code>Loader</code> instance.
- * <li>Based on a policy chosen by the implementation, must call the
- *     <code>Context.reload()</code> method on the owning <code>Context</code>
- *     when a change to one or more of the class files loaded by this class
- *     loader is detected.
+ * <li>Must implement <code>Lifecycle</code> so that the Context can indicate that a new class loader is required.
+ * <li>The <code>start()</code> method must unconditionally create a new <code>ClassLoader</code> implementation.
+ * <li>The <code>stop()</code> method must throw away its reference to the <code>ClassLoader</code> previously utilized,
+ * so that the class loader, all classes loaded by it, and all objects of those classes, can be garbage collected.
+ * <li>Must allow a call to <code>stop()</code> to be followed by a call to <code>start()</code> on the same
+ * <code>Loader</code> instance.
+ * <li>Based on a policy chosen by the implementation, must call the <code>Context.reload()</code> method on the owning
+ * <code>Context</code> when a change to one or more of the class files loaded by this class loader is detected.
  * </ul>
  *
  * @author Craig R. McClanahan
@@ -51,9 +42,8 @@ public interface Loader {
 
 
     /**
-     * Execute a periodic task, such as reloading, etc. This method will be
-     * invoked inside the classloading context of this container. Unexpected
-     * throwables will be caught and logged.
+     * Execute a periodic task, such as reloading, etc. This method will be invoked inside the classloading context of
+     * this container. Unexpected throwables will be caught and logged.
      */
     void backgroundProcess();
 
@@ -79,15 +69,13 @@ public interface Loader {
 
 
     /**
-     * @return the "follow standard delegation model" flag used to configure
-     * our ClassLoader.
+     * @return the "follow standard delegation model" flag used to configure our ClassLoader.
      */
     boolean getDelegate();
 
 
     /**
-     * Set the "follow standard delegation model" flag used to configure
-     * our ClassLoader.
+     * Set the "follow standard delegation model" flag used to configure our ClassLoader.
      *
      * @param delegate The new flag
      */
@@ -97,10 +85,10 @@ public interface Loader {
     /**
      * @return the reloadable flag for this Loader.
      *
-     * @deprecated Use {@link Context#getReloadable()}. This method will be
-     *             removed in Tomcat 10.
+     * @deprecated Use {@link Context#getReloadable()}. This method will be removed in Tomcat 10.
      */
-    @Deprecated boolean getReloadable();
+    @Deprecated
+    boolean getReloadable();
 
 
     /**
@@ -108,10 +96,10 @@ public interface Loader {
      *
      * @param reloadable The new reloadable flag
      *
-     * @deprecated Use {@link Context#setReloadable(boolean)}. This method will
-     *             be removed in Tomcat 10.
+     * @deprecated Use {@link Context#setReloadable(boolean)}. This method will be removed in Tomcat 10.
      */
-    @Deprecated void setReloadable(boolean reloadable);
+    @Deprecated
+    void setReloadable(boolean reloadable);
 
 
     /**
@@ -123,11 +111,10 @@ public interface Loader {
 
 
     /**
-     * Has the internal repository associated with this Loader been modified,
-     * such that the loaded classes should be reloaded?
+     * Has the internal repository associated with this Loader been modified, such that the loaded classes should be
+     * reloaded?
      *
-     * @return <code>true</code> when the repository has been modified,
-     *         <code>false</code> otherwise
+     * @return <code>true</code> when the repository has been modified, <code>false</code> otherwise
      */
     boolean modified();
 

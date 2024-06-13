@@ -18,13 +18,11 @@ package org.apache.catalina;
 
 
 /**
- * Common interface for component life cycle methods.  Catalina components
- * may implement this interface (as well as the appropriate interface(s) for
- * the functionality they support) in order to provide a consistent mechanism
- * to start and stop the component.
- * <br>
- * The valid state transitions for components that support {@link Lifecycle}
- * are:
+ * Common interface for component life cycle methods. Catalina components may implement this interface (as well as the
+ * appropriate interface(s) for the functionality they support) in order to provide a consistent mechanism to start and
+ * stop the component. <br>
+ * The valid state transitions for components that support {@link Lifecycle} are:
+ *
  * <pre>
  *            start()
  *  -----------------------------
@@ -74,9 +72,9 @@ package org.apache.catalina;
  * Attempting any other transition will throw {@link LifecycleException}.
  *
  * </pre>
- * The {@link LifecycleEvent}s fired during state changes are defined in the
- * methods that trigger the changed. No {@link LifecycleEvent}s are fired if the
- * attempted transition is not valid.
+ *
+ * The {@link LifecycleEvent}s fired during state changes are defined in the methods that trigger the changed. No
+ * {@link LifecycleEvent}s are fired if the attempted transition is not valid.
  *
  * @author Craig R. McClanahan
  */
@@ -153,18 +151,16 @@ public interface Lifecycle {
 
 
     /**
-     * The LifecycleEvent type for the "configure_start" event. Used by those
-     * components that use a separate component to perform configuration and
-     * need to signal when configuration should be performed - usually after
+     * The LifecycleEvent type for the "configure_start" event. Used by those components that use a separate component
+     * to perform configuration and need to signal when configuration should be performed - usually after
      * {@link #BEFORE_START_EVENT} and before {@link #START_EVENT}.
      */
     String CONFIGURE_START_EVENT = "configure_start";
 
 
     /**
-     * The LifecycleEvent type for the "configure_stop" event. Used by those
-     * components that use a separate component to perform configuration and
-     * need to signal when de-configuration should be performed - usually after
+     * The LifecycleEvent type for the "configure_stop" event. Used by those components that use a separate component to
+     * perform configuration and need to signal when de-configuration should be performed - usually after
      * {@link #STOP_EVENT} and before {@link #AFTER_STOP_EVENT}.
      */
     String CONFIGURE_STOP_EVENT = "configure_stop";
@@ -184,9 +180,8 @@ public interface Lifecycle {
     /**
      * Get the life cycle listeners associated with this life cycle.
      *
-     * @return An array containing the life cycle listeners associated with this
-     *         life cycle. If this component has no listeners registered, a
-     *         zero-length array is returned.
+     * @return An array containing the life cycle listeners associated with this life cycle. If this component has no
+     *             listeners registered, a zero-length array is returned.
      */
     LifecycleListener[] findLifecycleListeners();
 
@@ -200,91 +195,68 @@ public interface Lifecycle {
 
 
     /**
-     * Prepare the component for starting. This method should perform any
-     * initialization required post object creation. The following
-     * {@link LifecycleEvent}s will be fired in the following order:
+     * Prepare the component for starting. This method should perform any initialization required post object creation.
+     * The following {@link LifecycleEvent}s will be fired in the following order:
      * <ol>
-     *   <li>INIT_EVENT: On the successful completion of component
-     *                   initialization.</li>
+     * <li>INIT_EVENT: On the successful completion of component initialization.</li>
      * </ol>
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
+     *                                   used
      */
     void init() throws LifecycleException;
 
     /**
-     * Prepare for the beginning of active use of the public methods other than
-     * property getters/setters and life cycle methods of this component. This
-     * method should be called before any of the public methods other than
-     * property getters/setters and life cycle methods of this component are
-     * utilized. The following {@link LifecycleEvent}s will be fired in the
-     * following order:
+     * Prepare for the beginning of active use of the public methods other than property getters/setters and life cycle
+     * methods of this component. This method should be called before any of the public methods other than property
+     * getters/setters and life cycle methods of this component are utilized. The following {@link LifecycleEvent}s will
+     * be fired in the following order:
      * <ol>
-     *   <li>BEFORE_START_EVENT: At the beginning of the method. It is as this
-     *                           point the state transitions to
-     *                           {@link LifecycleState#STARTING_PREP}.</li>
-     *   <li>START_EVENT: During the method once it is safe to call start() for
-     *                    any child components. It is at this point that the
-     *                    state transitions to {@link LifecycleState#STARTING}
-     *                    and that the public methods other than property
-     *                    getters/setters and life cycle methods may be
-     *                    used.</li>
-     *   <li>AFTER_START_EVENT: At the end of the method, immediately before it
-     *                          returns. It is at this point that the state
-     *                          transitions to {@link LifecycleState#STARTED}.
-     *                          </li>
+     * <li>BEFORE_START_EVENT: At the beginning of the method. It is as this point the state transitions to
+     * {@link LifecycleState#STARTING_PREP}.</li>
+     * <li>START_EVENT: During the method once it is safe to call start() for any child components. It is at this point
+     * that the state transitions to {@link LifecycleState#STARTING} and that the public methods other than property
+     * getters/setters and life cycle methods may be used.</li>
+     * <li>AFTER_START_EVENT: At the end of the method, immediately before it returns. It is at this point that the
+     * state transitions to {@link LifecycleState#STARTED}.</li>
      * </ol>
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
+     *                                   used
      */
     void start() throws LifecycleException;
 
 
     /**
-     * Gracefully terminate the active use of the public methods other than
-     * property getters/setters and life cycle methods of this component. Once
-     * the STOP_EVENT is fired, the public methods other than property
-     * getters/setters and life cycle methods should not be used. The following
-     * {@link LifecycleEvent}s will be fired in the following order:
+     * Gracefully terminate the active use of the public methods other than property getters/setters and life cycle
+     * methods of this component. Once the STOP_EVENT is fired, the public methods other than property getters/setters
+     * and life cycle methods should not be used. The following {@link LifecycleEvent}s will be fired in the following
+     * order:
      * <ol>
-     *   <li>BEFORE_STOP_EVENT: At the beginning of the method. It is at this
-     *                          point that the state transitions to
-     *                          {@link LifecycleState#STOPPING_PREP}.</li>
-     *   <li>STOP_EVENT: During the method once it is safe to call stop() for
-     *                   any child components. It is at this point that the
-     *                   state transitions to {@link LifecycleState#STOPPING}
-     *                   and that the public methods other than property
-     *                   getters/setters and life cycle methods may no longer be
-     *                   used.</li>
-     *   <li>AFTER_STOP_EVENT: At the end of the method, immediately before it
-     *                         returns. It is at this point that the state
-     *                         transitions to {@link LifecycleState#STOPPED}.
-     *                         </li>
+     * <li>BEFORE_STOP_EVENT: At the beginning of the method. It is at this point that the state transitions to
+     * {@link LifecycleState#STOPPING_PREP}.</li>
+     * <li>STOP_EVENT: During the method once it is safe to call stop() for any child components. It is at this point
+     * that the state transitions to {@link LifecycleState#STOPPING} and that the public methods other than property
+     * getters/setters and life cycle methods may no longer be used.</li>
+     * <li>AFTER_STOP_EVENT: At the end of the method, immediately before it returns. It is at this point that the state
+     * transitions to {@link LifecycleState#STOPPED}.</li>
      * </ol>
+     * Note that if transitioning from {@link LifecycleState#FAILED} then the three events above will be fired but the
+     * component will transition directly from {@link LifecycleState#FAILED} to {@link LifecycleState#STOPPING},
+     * bypassing {@link LifecycleState#STOPPING_PREP}
      *
-     * Note that if transitioning from {@link LifecycleState#FAILED} then the
-     * three events above will be fired but the component will transition
-     * directly from {@link LifecycleState#FAILED} to
-     * {@link LifecycleState#STOPPING}, bypassing
-     * {@link LifecycleState#STOPPING_PREP}
-     *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
+     * @exception LifecycleException if this component detects a fatal error that needs to be reported
      */
     void stop() throws LifecycleException;
 
     /**
-     * Prepare to discard the object. The following {@link LifecycleEvent}s will
-     * be fired in the following order:
+     * Prepare to discard the object. The following {@link LifecycleEvent}s will be fired in the following order:
      * <ol>
-     *   <li>DESTROY_EVENT: On the successful completion of component
-     *                      destruction.</li>
+     * <li>DESTROY_EVENT: On the successful completion of component destruction.</li>
      * </ol>
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
+     *                                   used
      */
     void destroy() throws LifecycleException;
 
@@ -298,10 +270,9 @@ public interface Lifecycle {
 
 
     /**
-     * Obtain a textual representation of the current component state. Useful
-     * for JMX. The format of this string may vary between point releases and
-     * should not be relied upon to determine component state. To determine
-     * component state, use {@link #getState()}.
+     * Obtain a textual representation of the current component state. Useful for JMX. The format of this string may
+     * vary between point releases and should not be relied upon to determine component state. To determine component
+     * state, use {@link #getState()}.
      *
      * @return The name of the current component state.
      */
@@ -309,10 +280,8 @@ public interface Lifecycle {
 
 
     /**
-     * Marker interface used to indicate that the instance should only be used
-     * once. Calling {@link #stop()} on an instance that supports this interface
-     * will automatically call {@link #destroy()} after {@link #stop()}
-     * completes.
+     * Marker interface used to indicate that the instance should only be used once. Calling {@link #stop()} on an
+     * instance that supports this interface will automatically call {@link #destroy()} after {@link #stop()} completes.
      */
     interface SingleUse {
     }
