@@ -38,15 +38,16 @@ public class TestAprLifecycleListener {
 
     private void doTestMultipleServerInstancesUsingTomcatNativeLibrary(boolean reverseShutdownOrder) throws Exception {
         Tomcat tomcat1 = new Tomcat();
+        tomcat1.getServer().addLifecycleListener(new AprLifecycleListener());
         tomcat1.setPort(0);
         TesterSupport.initSsl(tomcat1);
-        TesterSupport.configureSSLImplementation(tomcat1, OpenSSLImplementation.class.getName(), true);
+        TesterSupport.configureSSLImplementation(tomcat1, OpenSSLImplementation.class.getName());
         tomcat1.init();
-
         Tomcat tomcat2 = new Tomcat();
+        tomcat2.getServer().addLifecycleListener(new AprLifecycleListener());
         tomcat2.setPort(0);
         TesterSupport.initSsl(tomcat2);
-        TesterSupport.configureSSLImplementation(tomcat2, OpenSSLImplementation.class.getName(), true);
+        TesterSupport.configureSSLImplementation(tomcat2, OpenSSLImplementation.class.getName());
         tomcat2.init();
 
         // Start 1, then 2
