@@ -133,6 +133,13 @@
         when the context is configured to use a bloom filter. Based on pull
         request <pr>730</pr> provided by bergander. (markt)
       </fix>
+      <add>
+        Introduce reference counting so the <code>AprLifecycleListener</code>
+        is more robust. This particularly targets more complex embedded
+        configurations with multiple server instances with independent
+        lifecycles where more than one server instance requires the
+        <code>AprLifecycleListener</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
