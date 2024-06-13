@@ -160,7 +160,6 @@ public final class ValueExpressionImpl extends ValueExpression implements
         return result;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Object getValue(ELContext context) throws PropertyNotFoundException,
             ELException {
