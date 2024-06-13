@@ -21,10 +21,13 @@ import java.security.Principal;
 
 
 /**
- * <p>Abstract representation of a security role, suitable for use in
- * environments like JAAS that want to deal with <code>Principals</code>.</p>
+ * <p>
+ * Abstract representation of a security role, suitable for use in environments like JAAS that want to deal with
+ * <code>Principals</code>.
+ * </p>
  *
  * @author Craig R. McClanahan
+ *
  * @since 4.1
  */
 public interface Role extends Principal {
@@ -48,15 +51,13 @@ public interface Role extends Principal {
 
 
     /**
-     * @return the role name of this role, which must be unique
-     * within the scope of a {@link UserDatabase}.
+     * @return the role name of this role, which must be unique within the scope of a {@link UserDatabase}.
      */
     String getRolename();
 
 
     /**
-     * Set the role name of this role, which must be unique
-     * within the scope of a {@link UserDatabase}.
+     * Set the role name of this role, which must be unique within the scope of a {@link UserDatabase}.
      *
      * @param rolename The new role name
      */
