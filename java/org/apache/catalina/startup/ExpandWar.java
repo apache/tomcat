@@ -251,8 +251,10 @@ public class ExpandWar {
             if (fileSrc.isDirectory()) {
                 result = copy(fileSrc, fileDest);
             } else {
-                try (FileChannel ic = (new FileInputStream(fileSrc)).getChannel();
-                        FileChannel oc = (new FileOutputStream(fileDest)).getChannel()) {
+                try (FileInputStream fis = new FileInputStream(fileSrc);
+                        FileChannel ic = (fis).getChannel();
+                        FileOutputStream fos = new FileOutputStream(fileDest);
+                        FileChannel oc = (fos).getChannel()) {
                     long size = ic.size();
                     long position = 0;
                     while (size > 0) {
