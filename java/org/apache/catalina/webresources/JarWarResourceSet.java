@@ -87,7 +87,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
      * JarWar can't optimise for a single resource so the Map is always returned.
      */
     @Override
-    protected Map<String, JarEntry> getArchiveEntries(boolean single) {
+    protected Map<String,JarEntry> getArchiveEntries(boolean single) {
         synchronized (archiveLock) {
             if (archiveEntries == null) {
                 JarFile warFile = null;
@@ -157,10 +157,10 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
 
         int targetVersion = JreCompat.getInstance().jarFileRuntimeMajorVersion();
 
-        Map<String, VersionedJarEntry> versionedEntries = new HashMap<>();
-        Iterator<Entry<String, JarEntry>> iter = archiveEntries.entrySet().iterator();
+        Map<String,VersionedJarEntry> versionedEntries = new HashMap<>();
+        Iterator<Entry<String,JarEntry>> iter = archiveEntries.entrySet().iterator();
         while (iter.hasNext()) {
-            Entry<String, JarEntry> entry = iter.next();
+            Entry<String,JarEntry> entry = iter.next();
             String name = entry.getKey();
             if (name.startsWith("META-INF/versions/")) {
                 // Remove the multi-release version
@@ -194,7 +194,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
             }
         }
 
-        for (Entry<String, VersionedJarEntry> versionedJarEntry : versionedEntries.entrySet()) {
+        for (Entry<String,VersionedJarEntry> versionedJarEntry : versionedEntries.entrySet()) {
             archiveEntries.put(versionedJarEntry.getKey(), versionedJarEntry.getValue().getJarEntry());
         }
     }
