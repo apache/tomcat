@@ -840,431 +840,511 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     // TODO: All of these SSL getters and setters can be removed once it is no
     // longer necessary to support the old configuration attributes (Tomcat 10?)
 
+    @Deprecated
     public String getSslEnabledProtocols() {
         registerDefaultSSLHostConfig();
         return StringUtils.join(defaultSSLHostConfig.getEnabledProtocols());
     }
 
+    @Deprecated
     public void setSslEnabledProtocols(String enabledProtocols) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setProtocols(enabledProtocols);
     }
 
+    @Deprecated
     public String getSSLProtocol() {
         registerDefaultSSLHostConfig();
         return StringUtils.join(defaultSSLHostConfig.getEnabledProtocols());
     }
 
+    @Deprecated
     public void setSSLProtocol(String sslProtocol) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setProtocols(sslProtocol);
     }
 
 
+    @Deprecated
     public String getKeystoreFile() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateKeystoreFile();
     }
 
+    @Deprecated
     public void setKeystoreFile(String keystoreFile) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateKeystoreFile(keystoreFile);
     }
 
+    @Deprecated
     public String getSSLCertificateChainFile() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateChainFile();
     }
 
+    @Deprecated
     public void setSSLCertificateChainFile(String certificateChainFile) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateChainFile(certificateChainFile);
     }
 
+    @Deprecated
     public String getSSLCertificateFile() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateFile();
     }
 
+    @Deprecated
     public void setSSLCertificateFile(String certificateFile) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateFile(certificateFile);
     }
 
+    @Deprecated
     public String getSSLCertificateKeyFile() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateKeyFile();
     }
 
+    @Deprecated
     public void setSSLCertificateKeyFile(String certificateKeyFile) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateKeyFile(certificateKeyFile);
     }
 
 
+    @Deprecated
     public String getAlgorithm() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getKeyManagerAlgorithm();
     }
 
+    @Deprecated
     public void setAlgorithm(String keyManagerAlgorithm) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setKeyManagerAlgorithm(keyManagerAlgorithm);
     }
 
 
+    @Deprecated
     public String getClientAuth() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateVerificationAsString();
     }
 
+    @Deprecated
     public void setClientAuth(String certificateVerification) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateVerification(certificateVerification);
     }
 
 
+    @Deprecated
     public String getSSLVerifyClient() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateVerificationAsString();
     }
 
+    @Deprecated
     public void setSSLVerifyClient(String certificateVerification) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateVerification(certificateVerification);
     }
 
 
+    @Deprecated
     public int getTrustMaxCertLength() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateVerificationDepth();
     }
 
+    @Deprecated
     public void setTrustMaxCertLength(int certificateVerificationDepth) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateVerificationDepth(certificateVerificationDepth);
     }
 
+    @Deprecated
     public int getSSLVerifyDepth() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateVerificationDepth();
     }
 
+    @Deprecated
     public void setSSLVerifyDepth(int certificateVerificationDepth) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateVerificationDepth(certificateVerificationDepth);
     }
 
 
+    @Deprecated
     public boolean getUseServerCipherSuitesOrder() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getHonorCipherOrder();
     }
 
+    @Deprecated
     public void setUseServerCipherSuitesOrder(boolean honorCipherOrder) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setHonorCipherOrder(honorCipherOrder);
     }
 
+    @Deprecated
     public boolean getSSLHonorCipherOrder() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getHonorCipherOrder();
     }
 
+    @Deprecated
     public void setSSLHonorCipherOrder(boolean honorCipherOrder) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setHonorCipherOrder(honorCipherOrder);
     }
 
 
+    @Deprecated
     public String getCiphers() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCiphers();
     }
 
+    @Deprecated
     public void setCiphers(String ciphers) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCiphers(ciphers);
     }
 
+    @Deprecated
     public String getSSLCipherSuite() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCiphers();
     }
 
+    @Deprecated
     public void setSSLCipherSuite(String ciphers) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCiphers(ciphers);
     }
 
 
+    @Deprecated
     public String getKeystorePass() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateKeystorePassword();
     }
 
+    @Deprecated
     public void setKeystorePass(String certificateKeystorePassword) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateKeystorePassword(certificateKeystorePassword);
     }
 
 
+    @Deprecated
     public String getKeystorePassFile() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateKeystorePasswordFile();
     }
 
+    @Deprecated
     public void setKeystorePassFile(String certificateKeystorePasswordFile) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateKeystorePasswordFile(certificateKeystorePasswordFile);
     }
 
 
+    @Deprecated
     public String getKeyPass() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateKeyPassword();
     }
 
+    @Deprecated
     public void setKeyPass(String certificateKeyPassword) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateKeyPassword(certificateKeyPassword);
     }
 
 
+    @Deprecated
     public String getKeyPassFile() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateKeyPasswordFile();
     }
 
+    @Deprecated
     public void setKeyPassFile(String certificateKeyPasswordFile) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateKeyPasswordFile(certificateKeyPasswordFile);
     }
 
 
+    @Deprecated
     public String getSSLPassword() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateKeyPassword();
     }
 
+    @Deprecated
     public void setSSLPassword(String certificateKeyPassword) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateKeyPassword(certificateKeyPassword);
     }
 
 
+    @Deprecated
     public String getSSLPasswordFile() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateKeyPasswordFile();
     }
 
+    @Deprecated
     public void setSSLPasswordFile(String certificateKeyPasswordFile) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateKeyPasswordFile(certificateKeyPasswordFile);
     }
 
 
+    @Deprecated
     public String getCrlFile() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateRevocationListFile();
     }
 
+    @Deprecated
     public void setCrlFile(String certificateRevocationListFile) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateRevocationListFile(certificateRevocationListFile);
     }
 
+    @Deprecated
     public String getSSLCARevocationFile() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateRevocationListFile();
     }
 
+    @Deprecated
     public void setSSLCARevocationFile(String certificateRevocationListFile) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateRevocationListFile(certificateRevocationListFile);
     }
 
+    @Deprecated
     public String getSSLCARevocationPath() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateRevocationListPath();
     }
 
+    @Deprecated
     public void setSSLCARevocationPath(String certificateRevocationListPath) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateRevocationListPath(certificateRevocationListPath);
     }
 
 
+    @Deprecated
     public String getKeystoreType() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateKeystoreType();
     }
 
+    @Deprecated
     public void setKeystoreType(String certificateKeystoreType) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateKeystoreType(certificateKeystoreType);
     }
 
 
+    @Deprecated
     public String getKeystoreProvider() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateKeystoreProvider();
     }
 
+    @Deprecated
     public void setKeystoreProvider(String certificateKeystoreProvider) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateKeystoreProvider(certificateKeystoreProvider);
     }
 
 
+    @Deprecated
     public String getKeyAlias() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCertificateKeyAlias();
     }
 
+    @Deprecated
     public void setKeyAlias(String certificateKeyAlias) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateKeyAlias(certificateKeyAlias);
     }
 
 
+    @Deprecated
     public String getTruststoreAlgorithm() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getTruststoreAlgorithm();
     }
 
+    @Deprecated
     public void setTruststoreAlgorithm(String truststoreAlgorithm) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setTruststoreAlgorithm(truststoreAlgorithm);
     }
 
 
+    @Deprecated
     public String getTruststoreFile() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getTruststoreFile();
     }
 
+    @Deprecated
     public void setTruststoreFile(String truststoreFile) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setTruststoreFile(truststoreFile);
     }
 
 
+    @Deprecated
     public String getTruststorePass() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getTruststorePassword();
     }
 
+    @Deprecated
     public void setTruststorePass(String truststorePassword) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setTruststorePassword(truststorePassword);
     }
 
 
+    @Deprecated
     public String getTruststoreType() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getTruststoreType();
     }
 
+    @Deprecated
     public void setTruststoreType(String truststoreType) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setTruststoreType(truststoreType);
     }
 
 
+    @Deprecated
     public String getTruststoreProvider() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getTruststoreProvider();
     }
 
+    @Deprecated
     public void setTruststoreProvider(String truststoreProvider) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setTruststoreProvider(truststoreProvider);
     }
 
 
+    @Deprecated
     public String getSslProtocol() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getSslProtocol();
     }
 
+    @Deprecated
     public void setSslProtocol(String sslProtocol) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setSslProtocol(sslProtocol);
     }
 
 
+    @Deprecated
     public int getSessionCacheSize() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getSessionCacheSize();
     }
 
+    @Deprecated
     public void setSessionCacheSize(int sessionCacheSize) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setSessionCacheSize(sessionCacheSize);
     }
 
 
+    @Deprecated
     public int getSessionTimeout() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getSessionTimeout();
     }
 
+    @Deprecated
     public void setSessionTimeout(int sessionTimeout) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setSessionTimeout(sessionTimeout);
     }
 
 
+    @Deprecated
     public String getSSLCACertificatePath() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCaCertificatePath();
     }
 
+    @Deprecated
     public void setSSLCACertificatePath(String caCertificatePath) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCaCertificatePath(caCertificatePath);
     }
 
 
+    @Deprecated
     public String getSSLCACertificateFile() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getCaCertificateFile();
     }
 
+    @Deprecated
     public void setSSLCACertificateFile(String caCertificateFile) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCaCertificateFile(caCertificateFile);
     }
 
 
+    @Deprecated
     public boolean getSSLDisableCompression() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getDisableCompression();
     }
 
+    @Deprecated
     public void setSSLDisableCompression(boolean disableCompression) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setDisableCompression(disableCompression);
     }
 
 
+    @Deprecated
     public boolean getSSLDisableSessionTickets() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getDisableSessionTickets();
     }
 
+    @Deprecated
     public void setSSLDisableSessionTickets(boolean disableSessionTickets) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setDisableSessionTickets(disableSessionTickets);
     }
 
 
+    @Deprecated
     public String getTrustManagerClassName() {
         registerDefaultSSLHostConfig();
         return defaultSSLHostConfig.getTrustManagerClassName();
     }
 
+    @Deprecated
     public void setTrustManagerClassName(String trustManagerClassName) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setTrustManagerClassName(trustManagerClassName);
