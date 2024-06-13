@@ -20,14 +20,12 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.mapper.Mapper;
 
 /**
- * A <strong>Service</strong> is a group of one or more
- * <strong>Connectors</strong> that share a single <strong>Container</strong>
- * to process their incoming requests.  This arrangement allows, for example,
- * a non-SSL and SSL connector to share the same population of web apps.
+ * A <strong>Service</strong> is a group of one or more <strong>Connectors</strong> that share a single
+ * <strong>Container</strong> to process their incoming requests. This arrangement allows, for example, a non-SSL and
+ * SSL connector to share the same population of web apps.
  * <p>
- * A given JVM can contain any number of Service instances; however, they are
- * completely independent of each other and share only the basic JVM facilities
- * and classes on the system class path.
+ * A given JVM can contain any number of Service instances; however, they are completely independent of each other and
+ * share only the basic JVM facilities and classes on the system class path.
  *
  * @author Craig R. McClanahan
  */
@@ -36,14 +34,13 @@ public interface Service extends Lifecycle {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return the <code>Engine</code> that handles requests for all
-     * <code>Connectors</code> associated with this Service.
+     * @return the <code>Engine</code> that handles requests for all <code>Connectors</code> associated with this
+     *             Service.
      */
     Engine getContainer();
 
     /**
-     * Set the <code>Engine</code> that handles requests for all
-     * <code>Connectors</code> associated with this Service.
+     * Set the <code>Engine</code> that handles requests for all <code>Connectors</code> associated with this Service.
      *
      * @param engine The new Engine
      */
@@ -74,9 +71,8 @@ public interface Service extends Lifecycle {
     void setServer(Server server);
 
     /**
-     * @return the parent class loader for this component. If not set, return
-     * {@link #getServer()} {@link Server#getParentClassLoader()}. If no server
-     * has been set, return the system class loader.
+     * @return the parent class loader for this component. If not set, return {@link #getServer()}
+     *             {@link Server#getParentClassLoader()}. If no server has been set, return the system class loader.
      */
     ClassLoader getParentClassLoader();
 
@@ -88,8 +84,7 @@ public interface Service extends Lifecycle {
     void setParentClassLoader(ClassLoader parent);
 
     /**
-     * @return the domain under which this container will be / has been
-     * registered.
+     * @return the domain under which this container will be / has been registered.
      */
     String getDomain();
 
@@ -97,8 +92,7 @@ public interface Service extends Lifecycle {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Add a new Connector to the set of defined Connectors, and associate it
-     * with this Service's Container.
+     * Add a new Connector to the set of defined Connectors, and associate it with this Service's Container.
      *
      * @param connector The Connector to be added
      */
@@ -112,9 +106,8 @@ public interface Service extends Lifecycle {
     Connector[] findConnectors();
 
     /**
-     * Remove the specified Connector from the set associated from this
-     * Service.  The removed Connector will also be disassociated from our
-     * Container.
+     * Remove the specified Connector from the set associated from this Service. The removed Connector will also be
+     * disassociated from our Container.
      *
      * @param connector The Connector to be removed
      */
@@ -122,25 +115,30 @@ public interface Service extends Lifecycle {
 
     /**
      * Adds a named executor to the service
+     *
      * @param ex Executor
      */
     void addExecutor(Executor ex);
 
     /**
      * Retrieves all executors
+     *
      * @return Executor[]
      */
     Executor[] findExecutors();
 
     /**
      * Retrieves executor by name, null if not found
+     *
      * @param name String
+     *
      * @return Executor
      */
     Executor getExecutor(String name);
 
     /**
      * Removes an executor from the service
+     *
      * @param ex Executor
      */
     void removeExecutor(Executor ex);

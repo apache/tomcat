@@ -22,12 +22,12 @@ import java.util.Iterator;
 
 
 /**
- * Abstract representation of a user in a {@link UserDatabase}.  Each user is
- * optionally associated with a set of {@link Group}s through which they inherit
- * additional security roles, and is optionally assigned a set of specific
+ * Abstract representation of a user in a {@link UserDatabase}. Each user is optionally associated with a set of
+ * {@link Group}s through which they inherit additional security roles, and is optionally assigned a set of specific
  * {@link Role}s.
  *
  * @author Craig R. McClanahan
+ *
  * @since 4.1
  */
 public interface User extends Principal {
@@ -57,17 +57,15 @@ public interface User extends Principal {
 
 
     /**
-     * @return the logon password of this user, optionally prefixed with the
-     * identifier of an encoding scheme surrounded by curly braces, such as
-     * <code>{md5}xxxxx</code>.
+     * @return the logon password of this user, optionally prefixed with the identifier of an encoding scheme surrounded
+     *             by curly braces, such as <code>{md5}xxxxx</code>.
      */
     String getPassword();
 
 
     /**
-     * Set the logon password of this user, optionally prefixed with the
-     * identifier of an encoding scheme surrounded by curly braces, such as
-     * <code>{md5}xxxxx</code>.
+     * Set the logon password of this user, optionally prefixed with the identifier of an encoding scheme surrounded by
+     * curly braces, such as <code>{md5}xxxxx</code>.
      *
      * @param password The new logon password
      */
@@ -87,15 +85,13 @@ public interface User extends Principal {
 
 
     /**
-     * @return the logon username of this user, which must be unique
-     * within the scope of a {@link UserDatabase}.
+     * @return the logon username of this user, which must be unique within the scope of a {@link UserDatabase}.
      */
     String getUsername();
 
 
     /**
-     * Set the logon username of this user, which must be unique within
-     * the scope of a {@link UserDatabase}.
+     * Set the logon username of this user, which must be unique within the scope of a {@link UserDatabase}.
      *
      * @param username The new logon username
      */
@@ -125,17 +121,18 @@ public interface User extends Principal {
      * Is this user in the specified {@link Group}?
      *
      * @param group The group to check
+     *
      * @return <code>true</code> if the user is in the specified group
      */
     boolean isInGroup(Group group);
 
 
     /**
-     * Is this user specifically assigned the specified {@link Role}?  This
-     * method does <strong>NOT</strong> check for roles inherited based on
-     * {@link Group} membership.
+     * Is this user specifically assigned the specified {@link Role}? This method does <strong>NOT</strong> check for
+     * roles inherited based on {@link Group} membership.
      *
      * @param role The role to check
+     *
      * @return <code>true</code> if the user has the specified role
      */
     boolean isInRole(Role role);

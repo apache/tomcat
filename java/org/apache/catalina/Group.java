@@ -20,11 +20,13 @@ import java.security.Principal;
 import java.util.Iterator;
 
 /**
- * <p>Abstract representation of a group of {@link User}s in a
- * {@link UserDatabase}.  Each user that is a member of this group
- * inherits the {@link Role}s assigned to the group.</p>
+ * <p>
+ * Abstract representation of a group of {@link User}s in a {@link UserDatabase}. Each user that is a member of this
+ * group inherits the {@link Role}s assigned to the group.
+ * </p>
  *
  * @author Craig R. McClanahan
+ *
  * @since 4.1
  */
 public interface Group extends Principal {
@@ -46,15 +48,13 @@ public interface Group extends Principal {
 
 
     /**
-     * @return the group name of this group, which must be unique
-     * within the scope of a {@link UserDatabase}.
+     * @return the group name of this group, which must be unique within the scope of a {@link UserDatabase}.
      */
     String getGroupname();
 
 
     /**
-     * Set the group name of this group, which must be unique
-     * within the scope of a {@link UserDatabase}.
+     * Set the group name of this group, which must be unique within the scope of a {@link UserDatabase}.
      *
      * @param groupname The new group name
      */
@@ -94,8 +94,7 @@ public interface Group extends Principal {
      *
      * @param role The role to check
      *
-     * @return <code>true</code> if the group is assigned to the specified role
-     *         otherwise <code>false</code>
+     * @return <code>true</code> if the group is assigned to the specified role otherwise <code>false</code>
      */
     boolean isInRole(Role role);
 
