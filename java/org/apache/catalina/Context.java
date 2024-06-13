@@ -87,11 +87,11 @@ public interface Context extends Container, ContextBind {
      */
     String CHANGE_SESSION_ID_EVENT = "changeSessionId";
 
-
     /**
      * Prefix for resource lookup.
      */
     String WEBAPP_PROTOCOL = "webapp:";
+
 
     // ------------------------------------------------------------- Properties
 
