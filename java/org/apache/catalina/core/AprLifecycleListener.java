@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Server;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Library;
@@ -33,6 +34,8 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Implementation of <code>LifecycleListener</code> that will init and and destroy APR.
+ * <p>
+ * This listener must only be nested within {@link Server} elements.
  * <p>
  * Only one instance of the APR/Native library may be loaded per JVM. Loading multiple instances will trigger a JVM
  * crash - typically when the Connectors are destroyed. This listener utilises reference counting to ensure that only
@@ -128,6 +131,9 @@ public class AprLifecycleListener implements LifecycleListener {
 
         if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
             synchronized (lock) {
+                if (!(event.getLifecycle() instanceof Server)) {
+                    log.warn(sm.getString("listener.notServer", event.getLifecycle().getClass().getSimpleName()));
+                }
                 if (referenceCount++ != 0) {
                     // Already loaded (note test is performed before reference count is incremented)
                     return;
