@@ -187,6 +187,10 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
             while (networkInterfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
+                if (networkInterface.isPointToPoint()) {
+                    // Skip point to point networks such as VPN tunnels
+                    continue;
+                }
                 if (networkInterface.isUp()) {
                     Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
                     while (inetAddresses.hasMoreElements()) {
