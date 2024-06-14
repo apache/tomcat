@@ -96,7 +96,7 @@
         <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" />
         <SSLHostConfig>
             <Certificate certificateKeystoreFile="conf/localhost-rsa.jks"
-                         type="RSA" />
+                         certificateKeystorePassword="changeit" type="RSA" />
         </SSLHostConfig>
     </Connector>
     -->
