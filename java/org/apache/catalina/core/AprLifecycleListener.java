@@ -103,6 +103,7 @@ public class AprLifecycleListener implements LifecycleListener {
 
     // Guarded by lock
     private static int referenceCount = 0;
+    private boolean instanceInitialized = false;
 
 
     public static boolean isAprAvailable() {
@@ -131,6 +132,7 @@ public class AprLifecycleListener implements LifecycleListener {
 
         if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
             synchronized (lock) {
+                instanceInitialized = true;
                 if (!(event.getLifecycle() instanceof Server)) {
                     log.warn(sm.getString("listener.notServer", event.getLifecycle().getClass().getSimpleName()));
                 }
@@ -163,8 +165,12 @@ public class AprLifecycleListener implements LifecycleListener {
             }
         } else if (Lifecycle.AFTER_DESTROY_EVENT.equals(event.getType())) {
             synchronized (lock) {
-                if (--referenceCount != 0) {
-                    // Still being used (note test is performed after reference count is decremented)
+                // Instance may get destroyed without ever being initialized
+                if (instanceInitialized) {
+                    referenceCount --;
+                }
+                if (referenceCount != 0) {
+                    // Still being used
                     return;
                 }
                 if (!AprStatus.isAprAvailable()) {
