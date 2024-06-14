@@ -767,7 +767,7 @@ public abstract class AbstractEndpoint<S,U> {
     public void setUseVirtualThreads(boolean useVirtualThreads) {
         this.useVirtualThreads = useVirtualThreads;
     }
-    public boolean getUseVirtualThreads() {
+    public boolean isUseVirtualThreads() {
         return useVirtualThreads;
     }
 
@@ -1238,7 +1238,7 @@ public abstract class AbstractEndpoint<S,U> {
 
     public void createExecutor() {
         internalExecutor = true;
-        if (getUseVirtualThreads()) {
+        if (isUseVirtualThreads()) {
             executor = new VirtualThreadExecutor(getName() + "-virt-");
         } else {
             TaskQueue taskqueue = new TaskQueue(maxQueueSize);
