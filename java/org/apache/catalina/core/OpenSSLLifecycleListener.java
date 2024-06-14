@@ -20,6 +20,7 @@ package org.apache.catalina.core;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Server;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -82,6 +83,9 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
 
         boolean initError = false;
         if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
+            if (!(event.getLifecycle() instanceof Server)) {
+                log.warn(sm.getString("listener.notServer", event.getLifecycle().getClass().getSimpleName()));
+            }
             synchronized (lock) {
                 if (!JreCompat.isJre22Available()) {
                     log.info(sm.getString("openssllistener.java22"));
