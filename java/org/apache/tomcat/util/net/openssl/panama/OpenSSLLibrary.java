@@ -334,11 +334,11 @@ public class OpenSSLLibrary {
 
     public static void destroy() {
         synchronized (lock) {
-            if (--referenceCount != 0) {
-                // Still being used (note test is performed after reference count is decremented)
+            if (!OpenSSLStatus.isInitialized()) {
                 return;
             }
-            if (!OpenSSLStatus.isInitialized()) {
+            if (--referenceCount != 0) {
+                // Still being used (note test is performed after reference count is decremented)
                 return;
             }
             OpenSSLStatus.setAvailable(false);
