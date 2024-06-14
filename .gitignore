@@ -29,6 +29,7 @@ mvn.properties
 .externalToolBuilders
 .fbprefs
 .idea
+.local
 .pmd
 .project
 .sdkmanrc
