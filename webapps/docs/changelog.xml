@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.91 (remm)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Improve the algorithm used to identify the IP address to use to unlock
+        the acceptor thread when a Connector is listening on all local
+        addresses. Interfaces that are configured for point to point connections
+        or are not currently up are now skipped. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.90 (remm)" rtext="release in progress">
   <subsection name="Catalina">
