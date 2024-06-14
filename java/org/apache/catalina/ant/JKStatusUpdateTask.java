@@ -22,10 +22,10 @@ import java.net.URLEncoder;
 import org.apache.tools.ant.BuildException;
 
 /**
- * Ant task that implements the <code>/status</code> command, supported by the
- * mod_jk status (1.2.9) application.
+ * Ant task that implements the <code>/status</code> command, supported by the mod_jk status (1.2.9) application.
  *
  * @author Peter Rossbach
+ *
  * @since 5.5.9
  */
 public class JKStatusUpdateTask extends AbstractCatalinaTask {
@@ -74,8 +74,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @param internalid
-     *            The internalid to set.
+     * @param internalid The internalid to set.
      */
     public void setInternalid(int internalid) {
         this.internalid = internalid;
@@ -89,8 +88,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @param lbForceSession
-     *            The lbForceSession to set.
+     * @param lbForceSession The lbForceSession to set.
      */
     public void setLbForceSession(Boolean lbForceSession) {
         this.lbForceSession = lbForceSession;
@@ -104,8 +102,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @param lbRecovertime
-     *            The lbRecovertime to set.
+     * @param lbRecovertime The lbRecovertime to set.
      */
     public void setLbRecovertime(Integer lbRecovertime) {
         this.lbRecovertime = lbRecovertime;
@@ -119,8 +116,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @param lbRetries
-     *            The lbRetries to set.
+     * @param lbRetries The lbRetries to set.
      */
     public void setLbRetries(Integer lbRetries) {
         this.lbRetries = lbRetries;
@@ -134,8 +130,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @param lbStickySession
-     *            The lbStickySession to set.
+     * @param lbStickySession The lbStickySession to set.
      */
     public void setLbStickySession(Boolean lbStickySession) {
         this.lbStickySession = lbStickySession;
@@ -149,8 +144,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @param worker
-     *            The worker to set.
+     * @param worker The worker to set.
      */
     public void setWorker(String worker) {
         this.worker = worker;
@@ -164,8 +158,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @param workerType
-     *            The workerType to set.
+     * @param workerType The workerType to set.
      */
     public void setWorkerType(String workerType) {
         this.workerType = workerType;
@@ -179,8 +172,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @param workerLb
-     *            The workerLb to set.
+     * @param workerLb The workerLb to set.
      */
     public void setWorkerLb(String workerLb) {
         this.workerLb = workerLb;
@@ -194,8 +186,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @param workerClusterDomain
-     *            The workerClusterDomain to set.
+     * @param workerClusterDomain The workerClusterDomain to set.
      */
     public void setWorkerClusterDomain(String workerClusterDomain) {
         this.workerClusterDomain = workerClusterDomain;
@@ -209,8 +200,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @param workerDisabled
-     *            The workerDisabled to set.
+     * @param workerDisabled The workerDisabled to set.
      */
     public void setWorkerDisabled(Boolean workerDisabled) {
         this.workerDisabled = workerDisabled;
@@ -238,8 +228,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @param workerLoadFactor
-     *            The workerLoadFactor to set.
+     * @param workerLoadFactor The workerLoadFactor to set.
      */
     public void setWorkerLoadFactor(Integer workerLoadFactor) {
         this.workerLoadFactor = workerLoadFactor;
@@ -253,8 +242,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @param workerRedirect
-     *            The workerRedirect to set.
+     * @param workerRedirect The workerRedirect to set.
      */
     public void setWorkerRedirect(String workerRedirect) {
         this.workerRedirect = workerRedirect;
@@ -263,8 +251,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     /**
      * Execute the requested operation.
      *
-     * @exception BuildException
-     *                if an error occurs
+     * @exception BuildException if an error occurs
      */
     @Override
     public void execute() throws BuildException {
@@ -279,11 +266,8 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     /**
      * Create JkStatus link
      * <ul>
-     * <li><b>load balance example:
-     * </b>http://localhost/status?cmd=update&mime=txt&w=lb&lf=false&ls=true</li>
-     * <li><b>worker example:
-     * </b>http://localhost/status?cmd=update&mime=txt&w=node1&l=lb&wf=1&wd=false&ws=false
-     * </li>
+     * <li><b>load balance example: </b>http://localhost/status?cmd=update&mime=txt&w=lb&lf=false&ls=true</li>
+     * <li><b>worker example: </b>http://localhost/status?cmd=update&mime=txt&w=node1&l=lb&wf=1&wd=false&ws=false</li>
      * </ul>
      *
      * @return create jkstatus link
@@ -297,7 +281,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
             sb.append(URLEncoder.encode(worker, getCharset()));
 
             if (isLBMode) {
-                //http://localhost/status?cmd=update&mime=txt&w=lb&lf=false&ls=true
+                // http://localhost/status?cmd=update&mime=txt&w=lb&lf=false&ls=true
                 if ((lbRetries != null)) { // > 0
                     sb.append("&lr=");
                     sb.append(lbRetries);
@@ -315,7 +299,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
                     sb.append(lbForceSession);
                 }
             } else {
-                //http://localhost/status?cmd=update&mime=txt&w=node1&l=lb&wf=1&wd=false&ws=false
+                // http://localhost/status?cmd=update&mime=txt&w=node1&l=lb&wf=1&wd=false&ws=false
                 if ((workerLb != null)) { // must be configured
                     sb.append("&l=");
                     sb.append(URLEncoder.encode(workerLb, getCharset()));
@@ -337,14 +321,12 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
                 }
                 if ((workerClusterDomain != null)) {
                     sb.append("&wc=");
-                    sb.append(URLEncoder.encode(workerClusterDomain,
-                            getCharset()));
+                    sb.append(URLEncoder.encode(workerClusterDomain, getCharset()));
                 }
             }
 
         } catch (UnsupportedEncodingException e) {
-            throw new BuildException("Invalid 'charset' attribute: "
-                    + getCharset());
+            throw new BuildException("Invalid 'charset' attribute: " + getCharset());
         }
         return sb;
     }
@@ -362,54 +344,44 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
         if ("lb".equals(workerType)) {
             if (lbRecovertime == null && lbRetries == null) {
                 throw new BuildException(
-                        "Must specify at a lb worker either 'lbRecovertime' or"
-                                + "'lbRetries' attribute");
+                        "Must specify at a lb worker either 'lbRecovertime' or" + "'lbRetries' attribute");
             }
             if (lbStickySession == null || lbForceSession == null) {
-                throw new BuildException("Must specify at a lb worker either"
-                        + "'lbStickySession' and 'lbForceSession' attribute");
+                throw new BuildException(
+                        "Must specify at a lb worker either" + "'lbStickySession' and 'lbForceSession' attribute");
             }
             if (null != lbRecovertime && 60 < lbRecovertime.intValue()) {
-                throw new BuildException(
-                        "The 'lbRecovertime' must be greater than 59");
+                throw new BuildException("The 'lbRecovertime' must be greater than 59");
             }
             if (null != lbRetries && 1 < lbRetries.intValue()) {
-                throw new BuildException(
-                        "The 'lbRetries' must be greater than 1");
+                throw new BuildException("The 'lbRetries' must be greater than 1");
             }
             isLBMode = true;
         } else if ("worker".equals(workerType)) {
             if (workerDisabled == null) {
-                throw new BuildException(
-                        "Must specify at a node worker 'workerDisabled' attribute");
+                throw new BuildException("Must specify at a node worker 'workerDisabled' attribute");
             }
             if (workerStopped == null) {
-                throw new BuildException(
-                        "Must specify at a node worker 'workerStopped' attribute");
+                throw new BuildException("Must specify at a node worker 'workerStopped' attribute");
             }
-            if (workerLoadFactor == null ) {
-                throw new BuildException(
-                        "Must specify at a node worker 'workerLoadFactor' attribute");
+            if (workerLoadFactor == null) {
+                throw new BuildException("Must specify at a node worker 'workerLoadFactor' attribute");
             }
             if (workerClusterDomain == null) {
-                throw new BuildException(
-                        "Must specify at a node worker 'workerClusterDomain' attribute");
+                throw new BuildException("Must specify at a node worker 'workerClusterDomain' attribute");
             }
             if (workerRedirect == null) {
-                throw new BuildException(
-                        "Must specify at a node worker 'workerRedirect' attribute");
+                throw new BuildException("Must specify at a node worker 'workerRedirect' attribute");
             }
             if (workerLb == null) {
                 throw new BuildException("Must specify 'workerLb' attribute");
             }
             if (workerLoadFactor.intValue() < 1) {
-                throw new BuildException(
-                        "The 'workerLoadFactor' must be greater or equal 1");
+                throw new BuildException("The 'workerLoadFactor' must be greater or equal 1");
             }
             isLBMode = false;
         } else {
-            throw new BuildException(
-                    "Only 'lb' and 'worker' supported as workerType attribute");
+            throw new BuildException("Only 'lb' and 'worker' supported as workerType attribute");
         }
     }
 }

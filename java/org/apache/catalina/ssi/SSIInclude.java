@@ -33,9 +33,6 @@ import org.apache.tomcat.util.res.StringManager;
 public final class SSIInclude implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIInclude.class);
 
-    /**
-     * @see SSICommand
-     */
     @Override
     public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
             PrintWriter writer) {

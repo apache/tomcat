@@ -37,9 +37,6 @@ public final class SSIFsize implements SSICommand {
     static final int ONE_MEBIBYTE = 1024 * 1024;
 
 
-    /**
-     * @see SSICommand
-     */
     @Override
     public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
             PrintWriter writer) {

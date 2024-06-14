@@ -28,7 +28,6 @@ import static org.apache.tomcat.util.openssl.openssl_h.*;
 import static org.apache.tomcat.util.openssl.openssl_h_Compatibility.*;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 

@@ -82,7 +82,7 @@ public class TestSsl extends TomcatBaseTest {
     public String connectorName;
 
     @Parameter(1)
-    public boolean needApr;
+    public boolean useOpenSSL;
 
     @Parameter(2)
     public String sslImplementationName;
@@ -99,7 +99,7 @@ public class TestSsl extends TomcatBaseTest {
         ctxt.addApplicationListener(WsContextListener.class.getName());
 
         TesterSupport.initSsl(tomcat);
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
@@ -126,7 +126,7 @@ public class TestSsl extends TomcatBaseTest {
         Connector connector = tomcat.getConnector();
         // Increase timeout as default (3s) can be too low for some CI systems
         Assert.assertTrue(connector.setProperty("connectionTimeout", "20000"));
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "post", new SimplePostServlet());
@@ -209,7 +209,7 @@ public class TestSsl extends TomcatBaseTest {
         TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS,
                 TesterSupport.JKS_PASS, null, TesterSupport.JKS_KEY_PASS, null);
 
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
@@ -245,7 +245,7 @@ public class TestSsl extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         TesterSupport.initSsl(tomcat);
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
         boolean renegotiationSupported = TesterSupport.isClientRenegotiationSupported(getTomcatInstance());
 

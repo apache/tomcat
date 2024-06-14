@@ -49,7 +49,7 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     protected Instant startTime;
     protected MessageDigest md5;
 
-    protected Map<String, String> headers = new HashMap<>();
+    protected Map<String,String> headers = new HashMap<>();
 
     protected String localIp;
     protected int port;
@@ -66,7 +66,9 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
 
     /**
      * Get value of environment variable.
+     *
      * @param keys the environment variables
+     *
      * @return the env variables values, or null if not found
      */
     protected static String getEnv(String... keys) {
@@ -81,8 +83,9 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     }
 
     /**
-     * Get the Kubernetes namespace, or "tomcat" if the Kubernetes environment variable
-     * cannot be found (with a warning log about the missing namespace).
+     * Get the Kubernetes namespace, or "tomcat" if the Kubernetes environment variable cannot be found (with a warning
+     * log about the missing namespace).
+     *
      * @return the namespace
      */
     protected String getNamespace() {
@@ -136,22 +139,24 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
 
     /**
      * Fetch current cluster members from the cloud orchestration.
+     *
      * @return the member array
      */
     protected abstract Member[] fetchMembers();
 
     /**
      * Add or remove specified member.
+     *
      * @param member the member to add
-     * @param add true if the member is added, false otherwise
+     * @param add    true if the member is added, false otherwise
      */
     protected void updateMember(Member member, boolean add) {
         if (add && !membership.memberAlive(member)) {
             return;
         }
         if (log.isDebugEnabled()) {
-            String message = add ? sm.getString("cloudMembershipProvider.add", member)
-                    : sm.getString("cloudMembershipProvider.remove", member);
+            String message = add ? sm.getString("cloudMembershipProvider.add", member) :
+                    sm.getString("cloudMembershipProvider.remove", member);
             log.debug(message);
         }
         Runnable r = () -> {

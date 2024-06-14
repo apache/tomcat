@@ -355,8 +355,7 @@ public class AccessLogValve extends AbstractAccessLogValve {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Execute a periodic task, such as reloading, etc. This method will be invoked inside the classloading context of
-     * this container. Unexpected throwables will be caught and logged.
+     * Provides support for access log rotation.
      */
     @Override
     public synchronized void backgroundProcess() {
@@ -559,11 +558,6 @@ public class AccessLogValve extends AbstractAccessLogValve {
     }
 
 
-    /**
-     * Log the specified message to the log file, switching files if the date has changed since the previous log call.
-     *
-     * @param message Message to be logged
-     */
     @Override
     public void log(CharArrayWriter message) {
 

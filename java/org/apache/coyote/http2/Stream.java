@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -88,6 +89,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     private final StreamInputBuffer inputBuffer;
     private final StreamOutputBuffer streamOutputBuffer = new StreamOutputBuffer();
     private final Http2OutputBuffer http2OutputBuffer = new Http2OutputBuffer(coyoteResponse, streamOutputBuffer);
+    private final AtomicBoolean removedFromActiveCount = new AtomicBoolean(false);
 
     // State machine would be too much overhead
     private int headerState = HEADER_STATE_START;
@@ -456,7 +458,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
                 if (headerState == HEADER_STATE_TRAILER) {
                     // HTTP/2 headers are already always lower case
-                    coyoteRequest.getTrailerFields().put(name, value);
+                    coyoteRequest.getMimeTrailerFields().addValue(name).setString(value);
                 } else {
                     coyoteRequest.getMimeHeaders().addValue(name).setString(value);
                 }
@@ -838,6 +840,20 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
+    int decrementAndGetActiveRemoteStreamCount() {
+        /*
+         * Protect against mis-counting of active streams. This method should only be called once per stream but since
+         * the count of active streams is used to enforce the maximum concurrent streams limit, make sure each stream is
+         * only removed from the active count exactly once.
+         */
+        if (removedFromActiveCount.compareAndSet(false, true)) {
+            return handler.activeRemoteStreamCount.decrementAndGet();
+        } else {
+            return handler.activeRemoteStreamCount.get();
+        }
+    }
+
+
     class StreamOutputBuffer implements HttpOutputBuffer, WriteBuffer.Sink {
 
         private final Lock writeLock = new ReentrantLock();
@@ -1075,6 +1091,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         abstract boolean isRequestBodyFullyRead();
 
         abstract void insertReplayedBody(ByteChunk body);
+
+        protected abstract boolean timeoutRead(long now);
     }
 
 
@@ -1101,6 +1119,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         // 'write mode'.
         private volatile ByteBuffer inBuffer;
         private volatile boolean readInterest;
+        // If readInterest is true, data must be available to read no later than this time.
+        private volatile long readTimeoutExpiry;
         private volatile boolean closed;
         private boolean resetReceived;
 
@@ -1199,6 +1219,12 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
                 if (!isRequestBodyFullyRead()) {
                     readInterest = true;
+                    long readTimeout = handler.getProtocol().getStreamReadTimeout();
+                    if (readTimeout > 0) {
+                        readTimeoutExpiry = System.currentTimeMillis() + readTimeout;
+                    } else {
+                        readTimeoutExpiry = Long.MAX_VALUE;
+                    }
                 }
 
                 return false;
@@ -1276,7 +1302,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         final void insertReplayedBody(ByteChunk body) {
             readStateLock.lock();
             try {
-                inBuffer = ByteBuffer.wrap(body.getBytes(), body.getOffset(), body.getLength());
+                inBuffer = ByteBuffer.wrap(body.getBytes(), body.getStart(), body.getLength());
             } finally {
                 readStateLock.unlock();
             }
@@ -1350,6 +1376,12 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 }
             }
         }
+
+
+        @Override
+        protected boolean timeoutRead(long now) {
+            return readInterest && now > readTimeoutExpiry;
+        }
     }
 
 
@@ -1410,6 +1442,13 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         @Override
         void insertReplayedBody(ByteChunk body) {
             // NO-OP
+        }
+
+
+        @Override
+        protected boolean timeoutRead(long now) {
+            // Reading from a saved request. Will never time out.
+            return false;
         }
     }
 }

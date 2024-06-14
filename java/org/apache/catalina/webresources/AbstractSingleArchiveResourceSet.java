@@ -61,7 +61,7 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
 
 
     @Override
-    protected Map<String, JarEntry> getArchiveEntries(boolean single) {
+    protected Map<String,JarEntry> getArchiveEntries(boolean single) {
         synchronized (archiveLock) {
             if (archiveEntries == null && !single) {
                 JarFile jarFile = null;

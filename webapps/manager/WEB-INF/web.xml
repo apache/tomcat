@@ -18,8 +18,8 @@
 <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
-  version="6.0"
+                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_1.xsd"
+  version="6.1"
   metadata-complete="true">
 
   <display-name>Tomcat Manager Application</display-name>
@@ -50,6 +50,13 @@
     <init-param>
       <param-name>showProxySessions</param-name>
       <param-value>true</param-value>
+    </init-param>
+    -->
+    <!-- Uncomment this to set a sub-title for the manager web application main
+         page. It must be XML escaped, valid HTML.
+    <init-param>
+      <param-name>htmlSubTitle</param-name>
+      <param-value>Sub-Title</param-value>
     </init-param>
     -->
     <multipart-config>

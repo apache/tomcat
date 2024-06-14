@@ -104,7 +104,322 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 11.0.0-M19 (markt)" rtext="in development">
+<section name="Tomcat 11.0.0-M22 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Improve the algorithm used to identify the IP address to use to unlock
+        the acceptor thread when a Connector is listening on all local
+        addresses. Interfaces that are configured for point to point connections
+        or are not currently up are now skipped. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 11.0.0-M21 (markt)" rtext="release in progress">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add support for shallow copies when using WebDAV. (markt)
+      </add>
+      <scode>
+        Remove the <code>WebdavFixFilter</code> as it is no longer required.
+        (markt)
+      </scode>
+      <fix>
+        <bug>69066</bug>: Fix regression in SPNEGO authenticator when
+        processing Base64. Submitted by Daniel Lyko. (remm)
+      </fix>
+      <add>
+        Add <code>RealmBase.getPrincipal(GSSName, GSSCredential, GSSContext)</code>
+        for retrieving extended/additional information from an established
+        GSS context. (michaelo)
+      </add>
+      <fix>
+        Correct a regression in the fix for <bug>68721</bug> that caused some
+        instances of <code>LinkageError</code> to be reported as
+        <code>ClassNotFoundException</code>. (markt)
+      </fix>
+      <fix>
+        Ensure that static resources deployed via a JAR file remain accessible
+        when the context is configured to use a bloom filter. Based on pull
+        request <pr>730</pr> provided by bergander. (markt)
+      </fix>
+      <add>
+        Introduce reference counting so the <code>AprLifecycleListener</code>
+        is more robust. This particularly targets more complex embedded
+        configurations with multiple server instances with independent
+        lifecycles where more than one server instance requires the
+        <code>AprLifecycleListener</code>. (markt)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Fix OpenSSL FFM use of ERR_error_string with a 128 byte buffer,
+        and use ERR_error_string_n instead. (remm)
+      </fix>
+      <fix>
+        Fix a crash on Windows setting CA certificate on null path.
+        (remm)
+      </fix>
+      <fix>
+        <bug>69068</bug>: Ensure read timouts are triggered for asynchronous,
+        non-blocking reads when using HTTP/2. (markt)
+      </fix>
+      <update>
+        <bug>69133</bug>: Add task queue size configuration on the
+        <code>Connector</code> element, similar to the <code>Executor</code>
+        element, for consistency. (remm)
+      </update>
+      <fix>
+        Make counting of active HTTP/2 streams per connection more robust.
+        (markt)
+      </fix>
+      <add>
+        Add support for TLS 1.3 client initiated re-keying. (markt)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>68546</bug>: Small additional optimisation for initial loading of
+        Servlet code generated for JSPs. Based on a suggestion by Dan Armstrong.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Add the ability to set a sub-title for the Manager web application main
+        page. This is intended to allow users with lots of instances to easily
+        distinguish them. Based on pull request <pr>724</pr> by Simon Arame.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Revert Derby to 10.16.1.1 as that is the latest version of Derby that
+        runs on Java 17. (markt)
+      </update>
+      <update>
+        Update to Commons Daemon 1.4.0. (markt)
+      </update>
+      <update>
+        Update to Jakarta Annotations API 3.0. (markt)
+      </update>
+      <update>
+        Update to Jakarta Authentication API 3.1. (markt)
+      </update>
+      <update>
+        Update to Objenesis 3.4. (markt)
+      </update>
+      <update>
+        Update to Checkstyle 10.17.0. (markt)
+      </update>
+      <update>
+        Update to SpotBugs 4.8.5. (markt)
+      </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations by tak7iji. (markt)
+      </add>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 11.0.0-M20 (markt)" rtext="2024-05-08">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Deprecate and remove <code>sessionCounter</code> (replaced by the
+        addition of the active session count and the expired session count,
+        as a reasonable approximation) and <code>duplicates</code> (which
+        does not represent a possible event in current implementations)
+        statistics from the session manager. (remm)
+      </update>
+      <fix>
+        <bug>68890</bug> Align output encoding of JSPs in the Manager webapp
+        with the XML declarations in those same files. (schultz)
+      </fix>
+      <fix>
+        Update Basic authentication to implement the requirements of RFC 7617
+        including the removal of the <code>trimCredentials</code> setting which
+        is now hard-coded to <code>false</code>. (markt)
+      </fix>
+      <add>
+        Small performance optimization when logging cookies with no values.
+        (schultz)
+      </add>
+      <fix>
+        Correct error handling for asynchronous requests. If the application
+        performs an dispatch during <code>AsyncListener.onError()</code> the
+        dispatch is now performed rather than completing the request using the
+        error page mechanism. (markt)
+      </fix>
+      <add>
+        Re-factor ElapsedTimeElement in AbstractAccessLogValve to use a customizable
+        style. (schultz)
+      </add>
+      <add>
+        Add more timescale options to AccessLogValve and ExtendedAccessLogValve.
+        Allow timescales to apply to "time-taken" token in ExtendedAccessLogValve.
+        (schultz)
+      </add>
+      <fix>
+        Fix WebDAV lock null (locks for non existing resources) thread safety
+        and removal. (remm)
+      </fix>
+      <fix>
+        Add periodic checking for WebDAV locks expiration. (remm)
+      </fix>
+      <fix>
+        Extend <code>Asn1Parser</code> to parse <code>UTF8String</code>s.
+        (michaelo)
+      </fix>
+      <fix>
+        Remove MBean metadata for attibutes that have been removed. Based on
+        pull request <pr>719</pr> by Shawn Q. (markt)
+      </fix>
+      <scode>
+        Remove duplicate ID check from <code>Manager.rotateSessionId()</code>.
+        (markt)
+      </scode>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Add OpenSSL FFM classes to <code>tomcat-embed-core.jar</code>. (remm)
+      </fix>
+      <fix>
+        Align non-secure and secure writes with NIO and skip the write attempt
+        when there are no bytes to be written. (markt)
+      </fix>
+      <fix>
+        Allow any positive value for <code>socket.unlockTimeout</code>. If a
+        negative or zero value is configured, the default of <code>250ms</code>
+        will be used. (mark)
+      </fix>
+      <fix>
+        Reduce the time spent waiting for the connector to unlock. The previous
+        default of 10s was noticeably too long for cases where the unlock has
+        failed. The wait time is now 100ms plus twice
+        <code>socket.unlockTimeout</code>. (markt)
+      </fix>
+      <fix>
+        Ensure that the <code>onAllDataRead()</code> event is triggered when the
+        request body uses chunked encoding and is read using non-blocking IO.
+        (markt)
+      </fix>
+      <fix>
+        <bug>68934</bug>: Add debug logging in the latch object when exceeding
+        <code>maxConnections</code>. (remm)
+      </fix>
+      <fix>
+        Refactor trailer field handling to use a <code>MimeHeaders</code>
+        instance to store trailer fields. (markt)
+      </fix>
+      <fix>
+        Ensure that multiple instances of the same trailer field are handled
+        correctly. (markt)
+      </fix>
+      <fix>
+        Fix non-blocking reads of chunked request bodies. (markt)
+      </fix>
+      <scode>
+        Refactor HTTP header parsing to use common parsing code. (markt)
+      </scode>
+      <fix>
+        When an invalid HTTP response header was dropped, an off-by-one error
+        meant that the first header in the response was also dropped. Fix based
+        on pull request <pr>710</pr> by foremans. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        Add support for specifying Java 23 (with the value <code>23</code>) as
+        the compiler source and/or compiler target for JSP compilation. If used
+        with an Eclipse JDT compiler version that does not support these values,
+        a warning will be logged and the default will used.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>68884</bug>: Reduce the write timeout when writing WebSocket close
+        messages for abnormal closes. The timeout defaults to 50 milliseconds
+        and may be controlled using the
+        <code>org.apache.tomcat.websocket.ABNORMAL_SESSION_CLOSE_SEND_TIMEOUT</code>
+        property in the user properties collection associated with the WebSocket
+        session. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Examples: Improve performance of WebSocket chat application when
+        multiple clients disconnect at the same time. (markt)
+      </fix>
+      <update>
+        Examples: Increase the number of previous messages displayed when using
+        the WebSocket chat application. (markt)
+      </update>
+      <fix>
+        Examples: Improve performance of WebSocket snake application when
+        multiple clients disconnect at the same time. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Switch to using the Base64 encoder and decoder provided by the JRE
+        rather than the version provided by Commons Codec. This removes the
+        internal fork of Commons Codec. (markt)
+      </update>
+      <update>
+        Update to the Eclipse JDT compiler 4.31. (markt)
+      </update>
+      <update>
+        Update NSIS to 3.10. (mark0t)
+      </update>
+      <update>
+        Update UnboundID to 7.0.0. (markt)
+      </update>
+      <update>
+        Update Checkstyle to 10.16.0. (markt)
+      </update>
+      <update>
+        Update JaCoCo to 0.8.12. (markt)
+      </update>
+      <update>
+        Update SpotBugs to 4.8.4. (markt)
+      </update>
+      <update>
+        Update the internal fork of Apache Commons BCEL to 6.9.0. (markt)
+      </update>
+      <update>
+        Update the internal fork of Apache Commons DBCP to 2.12.0. (markt)
+      </update>
+      <add>
+        Improvements to Japanese translations by tak7iji. (remm)
+      </add>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 11.0.0-M19 (remm)" rtext="2024-04-16">
   <subsection name="Catalina">
     <changelog>
       <update>
@@ -118,10 +433,121 @@
         build-date to the SecurityListener, and log a warning if the server
         is old. (schultz)
       </add>
+      <fix>
+        When using the <code>AsyncContext</code>, throw an
+        <code>IllegalStateException</code>, rather than allowing an
+        <code>NullPointerException</code>, if an attempt is made to use the
+        <code>AsyncContext</code> after it has been recycled. (markt)
+      </fix>
+      <add>
+        Add a default implementation for <code>HttpSession.getAccessor()</code>
+        to align with the Servlet 6.1 API. (markt)
+      </add>
+      <add>
+        Add the Jakarta EE 11 XML schemas and update Tomcat and included web
+        applications to use them. (markt)
+      </add>
+      <fix>
+        Change the thread-safety mechanism for protecting StandardServer.services
+        from a simple synchronized lock to a ReentrantReadWriteLock to allow
+        multiple readers to operate simultaneously. Based upon a suggestion by
+        Markus Wolfe. (schultz)
+      </fix>
+      <fix>
+        Improve Service connectors, Container children and Service executors
+        access sync using a ReentrantReadWriteLock. (remm)
+      </fix>
+      <fix>
+        Improve handling of integer overflow if an attempt is made to upload a
+        file via the Servlet API and the file is larger than
+        <code>Integer.MAX_VALUE</code>. (markt)
+      </fix>
+      <fix>
+        <bug>68862</bug>: Handle possible response commit when processing read
+        errors. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Add <code>threadsMaxIdleTime</code> attribute to the endpoint,
+        to allow configuring the amount of time before an internal executor
+        will scale back to the configured <code>minSpareThreads</code> size.
+        (remm)
+      </fix>
+      <update>
+        Adjust the <code>Set-Cookie</code> header generated by the
+        <code>Rfc6265CookieProcessor</code> so that attributes with a value of
+        the empty string will be output as bare attribute names without an
+        equals sign or value. This will simplify future support for similar new
+        attributes by removing the need for special handling. (markt)
+      </update>
+      <scode>
+        Refactor the internal representation of the <code>HttpOnly</code> and
+        <code>Secure</code> attributes to use the empty string as the value for
+        consistency with the recent changes to <code>Set-Cookie</code> header
+        generation. (markt)
+      </scode>
+      <fix>
+        Do not generate the <code>Max-Age</code> attribute for
+        <code>Set-Cookie</code> headers associated with cookies that have been
+        configured with a <code>Max-Age</code> value of zero as RFC 6265 does
+        not permit a value of zero in this case. (markt)
+      </fix>
+      <fix>
+        Correct a regression in the support for user provided
+        <code>SSLContext</code> instances that broke the
+        <code>org.apache.catalina.security.TLSCertificateReloadListener</code>.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Handle the case where the JSP engine forwards a request/response to a
+        Servlet that uses an <code>OutputStream</code> rather than a
+        <code>Writer</code>. This was triggering an
+        <code>IllegalStateException</code> on code paths where there was a
+        subsequent attempt to obtain a <code>Writer</code>. (markt)
+      </fix>
+      <fix>
+        Correctly handle the case where a tag library is packaged in a JAR file
+        and the web application is deployed as a WAR file rather than an
+        unpacked directory. (markt)
+      </fix>
+      <fix>
+        Prevent the web application's ClassLoader from being pinned by the JSP
+        compiler if an application uses a custom XMLInputFactory. Based upon a
+        suggestion from Simon Niederberger. (schultz)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update Checkstyle to 10.14.1. (markt)
+      </update>
+      <update>
+        Update the internal fork of Apache Commons BCEL to 6.8.2. (markt)
+      </update>
+      <update>
+        Update the internal fork of Apache Commons Codec to 1.16.1. (markt)
+      </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations by tak7iji. (remm)
+      </add>
+      <add>
+        Improvements to Chinese translations by leeyazhou. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 11.0.0-M18 (markt)" rtext="release in progress">
+<section name="Tomcat 11.0.0-M18 (markt)" rtext="2024-03-14">
   <subsection name="General">
     <changelog>
       <update>
@@ -133,7 +559,7 @@
     <changelog>
       <fix>
         Minor performance improvement for building filter chains. Based on
-        ideas from <pr>702</pr> by Luke Miao. (remm)
+        ideas from pull request <pr>702</pr> by Luke Miao. (remm)
       </fix>
       <fix>
         Align error handling for <code>Writer</code> and
@@ -1027,7 +1453,7 @@
   <subsection name="Other">
     <changelog>
       <update>
-        Update NSIS to 3.0.9. (markt)
+        Update NSIS to 3.09. (markt)
       </update>
       <update>
         Update Checkstyle to 10.12.2. (markt)

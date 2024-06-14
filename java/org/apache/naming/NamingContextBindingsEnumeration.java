@@ -60,9 +60,6 @@ public class NamingContextBindingsEnumeration
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Retrieves the next element in the enumeration.
-     */
     @Override
     public Binding next()
         throws NamingException {
@@ -70,9 +67,6 @@ public class NamingContextBindingsEnumeration
     }
 
 
-    /**
-     * Determines whether there are any more elements in the enumeration.
-     */
     @Override
     public boolean hasMore()
         throws NamingException {
@@ -80,9 +74,6 @@ public class NamingContextBindingsEnumeration
     }
 
 
-    /**
-     * Closes this enumeration.
-     */
     @Override
     public void close()
         throws NamingException {

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,6 @@ import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
@@ -160,7 +160,7 @@ public class TestPropertiesRoleMappingListener extends TomcatBaseTest {
         Map<String, List<String>> reqHead = new HashMap<>();
         List<String> head = new ArrayList<>();
         head.add(HttpServletRequest.BASIC_AUTH + " " +
-                Base64.encodeBase64String(credentials.getBytes(StandardCharsets.ISO_8859_1)));
+                Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.ISO_8859_1)));
         reqHead.put("Authorization", head);
         int rc = getUrl("http://localhost:" + getPort() + path, out, reqHead, null);
         Assert.assertEquals(statusCode, rc);

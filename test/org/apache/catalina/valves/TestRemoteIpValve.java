@@ -32,6 +32,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.tomcat.util.buf.StringUtils;
 
 /**
  * {@link RemoteIpValve} Tests
@@ -1031,14 +1032,14 @@ public class TestRemoteIpValve {
 
     @Test
     public void testCommaDelimitedListToStringArray() {
-        String[] actual = RemoteIpValve.commaDelimitedListToStringArray("element1, element2, element3");
+        String[] actual = StringUtils.splitCommaSeparated("element1, element2, element3");
         String[] expected = new String[] { "element1", "element2", "element3" };
         assertArrayEquals(expected, actual);
     }
 
     @Test
     public void testCommaDelimitedListToStringArrayMixedSpaceChars() {
-        String[] actual = RemoteIpValve.commaDelimitedListToStringArray("element1  , element2,\t element3");
+        String[] actual = StringUtils.splitCommaSeparated("element1  , element2,\t element3");
         String[] expected = new String[] { "element1", "element2", "element3" };
         assertArrayEquals(expected, actual);
     }

@@ -975,7 +975,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             associate(ssoId, request.getSessionInternal(true));
 
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("authenticator.reauthentication", request.getUserPrincipal().getName(), request.getAuthType()));
+                log.debug(sm.getString("authenticator.reauthentication", request.getUserPrincipal().getName(),
+                        request.getAuthType()));
             }
         }
 

@@ -116,34 +116,16 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
 
     // ----------------------------------------------------- ReplicatedMapEntry
 
-    /**
-     * Has the object changed since last replication and is not in a locked state
-     *
-     * @return boolean
-     */
     @Override
     public boolean isDirty() {
         return deltaRequest.getSize() > 0;
     }
 
-    /**
-     * If this returns true, the map will extract the diff using getDiff() Otherwise it will serialize the entire
-     * object.
-     *
-     * @return boolean
-     */
     @Override
     public boolean isDiffable() {
         return true;
     }
 
-    /**
-     * Returns a diff and sets the dirty map to false
-     *
-     * @return a serialized view of the difference
-     *
-     * @throws IOException IO error serializing
-     */
     @Override
     public byte[] getDiff() throws IOException {
         SynchronizedStack<DeltaRequest> deltaRequestPool = null;
@@ -183,15 +165,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
         return null;
     }
 
-    /**
-     * Applies a diff to an existing object.
-     *
-     * @param diff   Serialized diff data
-     * @param offset Array offset
-     * @param length Array length
-     *
-     * @throws IOException IO error deserializing
-     */
     @Override
     public void applyDiff(byte[] diff, int offset, int length) throws IOException, ClassNotFoundException {
         Thread currentThread = Thread.currentThread();
@@ -267,11 +240,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
         }
     }
 
-    /**
-     * If this returns true, to replicate that an object has been accessed
-     *
-     * @return boolean
-     */
     @Override
     public boolean isAccessReplicate() {
         long replDelta = System.currentTimeMillis() - getLastTimeReplicated();
@@ -281,9 +249,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
         return false;
     }
 
-    /**
-     * Access to an existing object.
-     */
     @Override
     public void accessEntry() {
         this.access();
@@ -293,19 +258,11 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
 
     // ----------------------------------------------------- Session Properties
 
-    /**
-     * returns true if this session is the primary session, if that is the case, the manager can expire it upon timeout.
-     */
     @Override
     public boolean isPrimarySession() {
         return isPrimarySession;
     }
 
-    /**
-     * Sets whether this is the primary session or not.
-     *
-     * @param primarySession Flag value
-     */
     @Override
     public void setPrimarySession(boolean primarySession) {
         this.isPrimarySession = primarySession;
@@ -324,11 +281,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     }
 
 
-    /**
-     * Set the session identifier for this session.
-     *
-     * @param id The new session identifier
-     */
     @Override
     public void setId(String id) {
         setId(id, true);
@@ -353,11 +305,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
         }
     }
 
-    /**
-     * Set the <code>isNew</code> flag for this session.
-     *
-     * @param isNew The new value for the <code>isNew</code> flag
-     */
     @Override
     public void setNew(boolean isNew) {
         setNew(isNew, true);
@@ -375,13 +322,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
         }
     }
 
-    /**
-     * Set the authenticated Principal that is associated with this Session. This provides an <code>Authenticator</code>
-     * with a means to cache a previously authenticated Principal, and avoid potentially expensive
-     * <code>Realm.authenticate()</code> calls on every request.
-     *
-     * @param principal The new Principal, or <code>null</code> if none
-     */
     @Override
     public void setPrincipal(Principal principal) {
         setPrincipal(principal, true);
@@ -399,11 +339,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
         }
     }
 
-    /**
-     * Set the authentication type used to authenticate our cached Principal, if any.
-     *
-     * @param authType The new cached authentication type
-     */
     @Override
     public void setAuthType(String authType) {
         setAuthType(authType, true);
@@ -421,9 +356,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
         }
     }
 
-    /**
-     * Return the <code>isValid</code> flag for this session.
-     */
     @Override
     public boolean isValid() {
         if (!this.isValid) {
@@ -455,9 +387,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
         return this.isValid;
     }
 
-    /**
-     * End the access and register to ReplicationValve (crossContext support)
-     */
     @Override
     public void endAccess() {
         super.endAccess();
@@ -468,12 +397,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
 
     // ------------------------------------------------- Session Public Methods
 
-    /**
-     * Perform the internal processing required to invalidate this session, without triggering an exception if the
-     * session has already expired.
-     *
-     * @param notify Should we notify listeners about the demise of this session?
-     */
     @Override
     public void expire(boolean notify) {
         expire(notify, true);
@@ -524,9 +447,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
         }
     }
 
-    /**
-     * Release all object references, and initialize instance variables, in preparation for reuse of this object.
-     */
     @Override
     public void recycle() {
         lockInternal();
@@ -539,9 +459,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     }
 
 
-    /**
-     * Return a string representation of this object.
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -599,15 +516,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     }
 
 
-    /**
-     * Read a serialized version of the contents of this session object from the specified object input stream, without
-     * requiring that the StandardSession itself have been serialized.
-     *
-     * @param stream The object input stream to read from
-     *
-     * @exception ClassNotFoundException if an unknown class is specified
-     * @exception IOException            if an input/output error occurs
-     */
     @Override
     public void readObjectData(ObjectInputStream stream) throws ClassNotFoundException, IOException {
         doReadObject((ObjectInput) stream);
@@ -617,14 +525,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
         doReadObject(stream);
     }
 
-    /**
-     * Write a serialized version of the contents of this session object to the specified object output stream, without
-     * requiring that the StandardSession itself have been serialized.
-     *
-     * @param stream The object output stream to write to
-     *
-     * @exception IOException if an input/output error occurs
-     */
     @Override
     public void writeObjectData(ObjectOutputStream stream) throws IOException {
         writeObjectData((ObjectOutput) stream);
@@ -646,7 +546,9 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
 
     /**
      * Get the request.
+     *
      * @return the request
+     *
      * @deprecated Unused. This method will be removed in Tomcat 12.
      */
     @Deprecated
@@ -707,18 +609,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
 
     // ----------------------------------------------HttpSession Public Methods
 
-    /**
-     * Remove the object bound with the specified name from this session. If the session does not have an object bound
-     * with this name, this method does nothing.
-     * <p>
-     * After this method executes, and if the object implements <code>HttpSessionBindingListener</code>, the container
-     * calls <code>valueUnbound()</code> on the object.
-     *
-     * @param name   Name of the object to remove from this session.
-     * @param notify Should we notify interested listeners that this attribute is being removed?
-     *
-     * @exception IllegalStateException if this method is called on an invalidated session
-     */
     @Override
     public void removeAttribute(String name, boolean notify) {
         removeAttribute(name, notify, true);
@@ -732,20 +622,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
         removeAttributeInternal(name, notify, addDeltaRequest);
     }
 
-    /**
-     * Bind an object to this session, using the specified name. If an object of the same name is already bound to this
-     * session, the object is replaced.
-     * <p>
-     * After this method executes, and if the object implements <code>HttpSessionBindingListener</code>, the container
-     * calls <code>valueBound()</code> on the object.
-     *
-     * @param name  Name to which the object is bound, cannot be null
-     * @param value Object to be bound, cannot be null
-     *
-     * @exception IllegalArgumentException if an attempt is made to add a non-serializable object in an environment
-     *                                         marked distributable.
-     * @exception IllegalStateException    if this method is called on an invalidated session
-     */
     @Override
     public void setAttribute(String name, Object value) {
         setAttribute(name, value, true, true);
@@ -820,17 +696,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
 
     // -------------------------------------------- HttpSession Private Methods
 
-    /**
-     * Read a serialized version of this session object from the specified object input stream.
-     * <p>
-     * <b>IMPLEMENTATION NOTE </b>: The reference to the owning Manager is not restored by this method, and must be set
-     * explicitly.
-     *
-     * @param stream The input stream to read from
-     *
-     * @exception ClassNotFoundException if an unknown class is specified
-     * @exception IOException            if an input/output error occurs
-     */
     @Override
     protected void doReadObject(ObjectInputStream stream) throws ClassNotFoundException, IOException {
         doReadObject((ObjectInput) stream);
@@ -935,20 +800,6 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     }
 
 
-    /**
-     * Write a serialized version of this session object to the specified object output stream.
-     * <p>
-     * <b>IMPLEMENTATION NOTE </b>: The owning Manager will not be stored in the serialized representation of this
-     * Session. After calling <code>readObject()</code>, you must set the associated Manager explicitly.
-     * <p>
-     * <b>IMPLEMENTATION NOTE </b>: Any attribute that is not Serializable will be unbound from the session, with
-     * appropriate actions if it implements HttpSessionBindingListener. If you do not want any such attributes, be sure
-     * the <code>distributable</code> property of the associated Manager is set to <code>true</code>.
-     *
-     * @param stream The output stream to write to
-     *
-     * @exception IOException if an input/output error occurs
-     */
     @Override
     protected void doWriteObject(ObjectOutputStream stream) throws IOException {
         doWriteObject((ObjectOutput) stream);

@@ -19,11 +19,11 @@ package org.apache.tomcat.util.http.parser;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -379,7 +379,7 @@ public class StructuredField {
             }
         }
 
-        return new SfByteSequence(Base64.decodeBase64(base64.toString()));
+        return new SfByteSequence(Base64.getDecoder().decode(base64.toString()));
     }
 
 

@@ -64,7 +64,7 @@ public class TimeBucketCounter {
     /**
      * Creates a new TimeBucketCounter with the specified lifetime.
      *
-     * @param bucketDuration duration in seconds, e.g. for 1 minute pass 60
+     * @param bucketDuration  duration in seconds, e.g. for 1 minute pass 60
      * @param executorService the executor service which will be used to run the maintenance
      */
     public TimeBucketCounter(int bucketDuration, ScheduledExecutorService executorService) {
@@ -89,8 +89,7 @@ public class TimeBucketCounter {
 
         // Start our thread
         if (sleeptime > 0) {
-            monitorFuture = executorService
-                    .scheduleWithFixedDelay(new MaintenanceMonitor(), 0, 60, TimeUnit.SECONDS);
+            monitorFuture = executorService.scheduleWithFixedDelay(new MaintenanceMonitor(), 0, 60, TimeUnit.SECONDS);
         }
     }
 
@@ -202,8 +201,7 @@ public class TimeBucketCounter {
     private class MaintenanceMonitor implements Runnable {
         @Override
         public void run() {
-            if (sleeptime > 0 &&
-                    (maintenanceFuture == null || maintenanceFuture.isDone())) {
+            if (sleeptime > 0 && (maintenanceFuture == null || maintenanceFuture.isDone())) {
                 if (maintenanceFuture != null && maintenanceFuture.isDone()) {
                     // There was an error executing the scheduled task, get it and log it
                     try {

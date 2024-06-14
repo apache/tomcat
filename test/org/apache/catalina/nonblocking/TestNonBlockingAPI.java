@@ -74,6 +74,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     private static final Log log = LogFactory.getLog(TestNonBlockingAPI.class);
 
+    private static String TRAILER_HEADER_NAME = "x-test";
+    private static String TRAILER_HEADER_VALUE = "abcde";
+
     private static final int CHUNK_SIZE = 1024 * 1024;
     private static final int WRITE_SIZE  = CHUNK_SIZE * 10;
     private static final byte[] DATA = new byte[WRITE_SIZE];
@@ -132,7 +135,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // No file system docBase required
         Context ctx = getProgrammaticRootContext();
 
-        NBReadServlet servlet = new NBReadServlet(ignoreIsReady, async);
+        NBReadServlet servlet = new NBReadServlet(ignoreIsReady, async, null);
         String servletName = NBReadServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMappingDecoded("/", servletName);
@@ -151,6 +154,436 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             Assert.assertEquals(listener.isReadyCount.get(), listener.nonContainerThreadCount.get());
         } else {
             Assert.assertEquals(5 * 8, servlet.listener.body.length());
+        }
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedNoSplits() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitBeforeChunkHeader() throws Exception {
+        String[] requestBody = new String[] {
+                "",
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInChunkHeader() throws Exception {
+        String[] requestBody = new String[] {
+                "1",
+                "4" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterChunkHeader() throws Exception {
+        String[] requestBody = new String[] {
+                "14",
+                SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInHeaderCrlf() throws Exception {
+        String[] requestBody = new String[] {
+                "14\r",
+                "\n" +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterHeaderCrlf() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF,
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitBeforeExtensionDelimter() throws Exception {
+        String[] requestBody = new String[] {
+                "14",
+                ";a=b" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterExtensionDelimter() throws Exception {
+        String[] requestBody = new String[] {
+                "14;",
+                "a=b" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInExtension() throws Exception {
+        String[] requestBody = new String[] {
+                "14;a",
+                "=b" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterExtension() throws Exception {
+        String[] requestBody = new String[] {
+                "14;a=b",
+                SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInChunkBody() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345",
+                "678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitBeforeChunkBodyCrlf() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED",
+                SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInChunkBodyCrlf() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED\r",
+                "\n" +
+                "0" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterChunkBodyCrlf() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF,
+                "0" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitBeforeEndChunkCrlf() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0",
+                SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInEndChunkCrlf() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" +
+                "\r",
+                "\n" +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterEndChunkCrlf() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" +
+                SimpleHttpClient.CRLF,
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitBeforeTrailer() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF,
+                TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInTrailerName() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                "x-te",
+                "st" + ": " + TRAILER_HEADER_VALUE + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterTrailerName() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                TRAILER_HEADER_NAME,
+                ": " + TRAILER_HEADER_VALUE + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterTrailerDelimter() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                TRAILER_HEADER_NAME + ":",
+                " " + TRAILER_HEADER_VALUE + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitBeforeTrailerValue() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                TRAILER_HEADER_NAME + ": ",
+                TRAILER_HEADER_VALUE + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInTrailerValue() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                TRAILER_HEADER_NAME + ": abc",
+                "de" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterTrailerValue() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE,
+                SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInTrailerCrlf() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + "\r",
+                "\n" +
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterTrailerCrlf() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + SimpleHttpClient.CRLF,
+                SimpleHttpClient.CRLF};
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInFinalCrlf() throws Exception {
+        String[] requestBody = new String[] {
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" +
+                SimpleHttpClient.CRLF +
+                "\r",
+                "\n"};
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitMaximum() throws Exception {
+        String requestBody = new String(
+                "14" + SimpleHttpClient.CRLF +
+                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF);
+
+        String[] requestBodySplit = new String[requestBody.length()];
+        for (int i = 0; i < requestBody.length(); i++) {
+            requestBodySplit[i] = Character.toString(requestBody.charAt(i));
+        }
+
+        doTestNonBlockingReadChunked(requestBodySplit, TRAILER_HEADER_VALUE);
+    }
+
+
+    private void doTestNonBlockingReadChunked(String[] requestBody) throws Exception {
+        doTestNonBlockingReadChunked(requestBody, null);
+    }
+
+
+    private void doTestNonBlockingReadChunked(String[] requestBody, String expectedTrailerFieldValue) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        NBReadServlet servlet = new NBReadServlet(false, true, expectedTrailerFieldValue);
+        String servletName = NBReadServlet.class.getName();
+        Tomcat.addServlet(ctx, servletName, servlet);
+        ctx.addServletMappingDecoded("/", servletName);
+
+        tomcat.getConnector().setProperty("allowedTrailerHeaders", TRAILER_HEADER_NAME);
+
+        tomcat.start();
+
+        // Add the headers to the first part of the chunked body
+        requestBody[0] =
+                "GET / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost" + getPort() + SimpleHttpClient.CRLF +
+                "Transfer-Encoding: chunked" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF +
+                requestBody[0];
+
+        Client client = new Client();
+        client.setPort(getPort());
+        client.setRequest(requestBody);
+        /*
+         *  Reduce default pause to speed up test execution. Pause only needs to be long enough that each part of the
+         *  request is read separately.
+         */
+        client.setRequestPause(200);
+        client.connect();
+        client.sendRequest();
+
+        client.setUseContentLength(true);
+        client.readResponse(true);
+
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    private static class Client extends SimpleHttpClient {
+        @Override
+        public boolean isResponseBodyOK() {
+            return "OK".equals(getResponseBody());
         }
     }
 
@@ -532,11 +965,13 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
         private final boolean async;
         private final boolean ignoreIsReady;
+        private final String expectedTrailerFieldValue;
         transient TestReadListener listener;
 
-        public NBReadServlet(boolean ignoreIsReady, boolean async) {
+        public NBReadServlet(boolean ignoreIsReady, boolean async, String expectedTrailerFieldValue) {
             this.async = async;
             this.ignoreIsReady = ignoreIsReady;
+            this.expectedTrailerFieldValue = expectedTrailerFieldValue;
         }
 
         @Override
@@ -573,9 +1008,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             // step 2 - notify on read
             ServletInputStream in = req.getInputStream();
             if (async) {
-                listener = new TestAsyncReadListener(actx, false, ignoreIsReady);
+                listener = new TestAsyncReadListener(actx, false, ignoreIsReady, expectedTrailerFieldValue);
             } else {
-                listener = new TestReadListener(actx, false, ignoreIsReady);
+                listener = new TestReadListener(actx, false, ignoreIsReady, expectedTrailerFieldValue);
             }
             in.setReadListener(listener);
         }
@@ -664,15 +1099,18 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         protected final AsyncContext ctx;
         protected final boolean usingNonBlockingWrite;
         protected final boolean ignoreIsReady;
+        protected final String expectedTrailerFieldValue;
         protected final StringBuilder body = new StringBuilder();
 
 
         TestReadListener(AsyncContext ctx,
                 boolean usingNonBlockingWrite,
-                boolean ignoreIsReady) {
+                boolean ignoreIsReady,
+                String expectedTrailerFieldValue) {
             this.ctx = ctx;
             this.usingNonBlockingWrite = usingNonBlockingWrite;
             this.ignoreIsReady = ignoreIsReady;
+            this.expectedTrailerFieldValue = expectedTrailerFieldValue;
         }
 
         @Override
@@ -700,7 +1138,14 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             if (!usingNonBlockingWrite) {
                 String msg;
                 if (body.toString().endsWith("FINISHED")) {
-                    msg = "OK";
+                    String trailerFieldValue = ((HttpServletRequest) ctx.getRequest()).getTrailerFields().get("x-test");
+                    if (trailerFieldValue == null && expectedTrailerFieldValue == null ||
+                            trailerFieldValue != null && trailerFieldValue.equals(expectedTrailerFieldValue)) {
+                        msg = "OK";
+                    } else {
+                        System.out.println("Trailer value was [" + trailerFieldValue + "]");
+                        msg = "FAILED";
+                    }
                 } else {
                     msg = "FAILED";
                 }
@@ -727,9 +1172,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         AtomicInteger containerThreadCount = new AtomicInteger(0);
         AtomicInteger nonContainerThreadCount = new AtomicInteger(0);
 
-        TestAsyncReadListener(AsyncContext ctx,
-                boolean usingNonBlockingWrite, boolean ignoreIsReady) {
-            super(ctx, usingNonBlockingWrite, ignoreIsReady);
+        TestAsyncReadListener(AsyncContext ctx, boolean usingNonBlockingWrite, boolean ignoreIsReady,
+                String expectedTrailerFieldValue) {
+            super(ctx, usingNonBlockingWrite, ignoreIsReady, expectedTrailerFieldValue);
         }
 
         @Override

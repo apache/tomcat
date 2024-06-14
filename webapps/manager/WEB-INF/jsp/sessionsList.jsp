@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<%@page session="false" contentType="text/html; charset=ISO-8859-1" %>
+<%@page session="false" contentType="text/html; charset=UTF-8" %>
 <%@page import="java.util.Collection" %>
 <%@page import="org.apache.catalina.manager.JspHelper" %>
 <%@page import="org.apache.catalina.Session" %>
@@ -36,7 +36,7 @@
    Collection<Session> activeSessions = (Collection<Session>) request.getAttribute("activeSessions");
 %>
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <meta http-equiv="pragma" content="no-cache"/><!-- HTTP 1.0 -->
     <meta http-equiv="cache-control" content="no-cache,must-revalidate"/><!-- HTTP 1.1 -->
     <meta http-equiv="expires" content="0"/><!-- 0 is an invalid value and should be treated as 'now' -->

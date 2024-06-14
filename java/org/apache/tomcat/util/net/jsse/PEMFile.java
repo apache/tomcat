@@ -39,6 +39,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +54,6 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.tomcat.util.buf.Asn1Parser;
 import org.apache.tomcat.util.buf.Asn1Writer;
 import org.apache.tomcat.util.buf.HexUtils;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.res.StringManager;
 import org.ietf.jgss.GSSException;
@@ -110,8 +110,7 @@ public class PEMFile {
         StringBuilder result = new StringBuilder();
         result.append(Part.BEGIN_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY);
         result.append(System.lineSeparator());
-        Base64 b64 = new Base64(64);
-        result.append(b64.encodeAsString(certificate.getEncoded()));
+        result.append(Base64.getMimeEncoder().encodeToString(certificate.getEncoded()));
         result.append(Part.END_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY);
         return result.toString();
     }
@@ -250,7 +249,7 @@ public class PEMFile {
         public String ivHex = null;
 
         private byte[] decode() {
-            return Base64.decodeBase64(content);
+            return Base64.getMimeDecoder().decode(content);
         }
 
         public X509Certificate toCertificate() throws CertificateException {

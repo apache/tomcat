@@ -29,6 +29,7 @@ mvn.properties
 .externalToolBuilders
 .fbprefs
 .idea
+.local
 .pmd
 .project
 .sdkmanrc
@@ -40,6 +41,7 @@ mvn.properties
 *.iws
 *.jj
 *.tmp
+.*.s[a-w][a-z]
 maven-resolver-ant-tasks-*.jar
 thumbs.db
 Thumbs.db

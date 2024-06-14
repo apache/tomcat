@@ -71,33 +71,9 @@ public final class Constants {
 
 
     /**
-     * 'A'.
-     */
-    public static final byte A = (byte) 'A';
-
-
-    /**
-     * 'a'.
-     */
-    public static final byte a = (byte) 'a';
-
-
-    /**
-     * 'Z'.
-     */
-    public static final byte Z = (byte) 'Z';
-
-
-    /**
      * '?'.
      */
     public static final byte QUESTION = (byte) '?';
-
-
-    /**
-     * Lower case offset.
-     */
-    public static final byte LC_OFFSET = A - a;
 
 
     /* Various constant "strings" */

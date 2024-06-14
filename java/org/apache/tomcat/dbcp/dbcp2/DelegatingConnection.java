@@ -120,7 +120,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     }
 
     /**
-     * Clears the cached state. Call when you known that the underlying connection may have been accessed
+     * Clears the cached state. Call when you know that the underlying connection may have been accessed
      * directly.
      */
     public void clearCachedState() {
@@ -646,7 +646,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
 
     protected void passivate() throws SQLException {
         // The JDBC specification requires that a Connection close any open
-        // Statement's when it is closed.
+        // Statements when it is closed.
         // DBCP-288. Not all the traced objects will be statements
         final List<AbandonedTrace> traceList = getTrace();
         if (!Utils.isEmpty(traceList)) {

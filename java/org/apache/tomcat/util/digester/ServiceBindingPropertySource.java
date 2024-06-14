@@ -27,6 +27,11 @@ import org.apache.tomcat.util.IntrospectionUtils;
  * A {@link org.apache.tomcat.util.IntrospectionUtils.PropertySource}
  * that uses Kubernetes service bindings to resolve expressions.
  *
+ * <p>
+ *   The Kubernetes service binding specification can be found at
+ *   <a href="https://servicebinding.io/">https://servicebinding.io/</a>.
+ * </p>
+ *
  * <p><strong>Usage example:</strong></p>
  *
  * Configure the certificate with a service binding.

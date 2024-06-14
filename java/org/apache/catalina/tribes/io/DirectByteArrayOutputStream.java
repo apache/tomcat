@@ -27,20 +27,12 @@ public class DirectByteArrayOutputStream extends OutputStream {
     private final XByteBuffer buffer;
 
     public DirectByteArrayOutputStream(int size) {
-        buffer = new XByteBuffer(size,false);
+        buffer = new XByteBuffer(size, false);
     }
 
-    /**
-     * Writes the specified byte to this output stream.
-     *
-     * @param b the <code>byte</code>.
-     * @throws IOException if an I/O error occurs. In particular, an
-     *   <code>IOException</code> may be thrown if the output stream has
-     *   been closed.
-     */
     @Override
     public void write(int b) throws IOException {
-        buffer.append((byte)b);
+        buffer.append((byte) b);
     }
 
     public int size() {

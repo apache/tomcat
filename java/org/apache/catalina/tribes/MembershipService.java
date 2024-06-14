@@ -61,7 +61,7 @@ public interface MembershipService {
 
 
     /**
-     * Starts the membership service. If a membership listeners is added
+     * Stops the membership service. If a membership listeners is added
      * the listener will start to receive membership events.
      * @param level - level MBR_RX stops listening for members, level MBR_TX
      * stops broad casting the server
@@ -135,6 +135,10 @@ public interface MembershipService {
      */
     void setPayload(byte[] payload);
 
+    /**
+     * Set the associated domain.
+     * @param domain the domain
+     */
     void setDomain(byte[] domain);
 
     /**

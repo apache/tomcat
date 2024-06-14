@@ -357,28 +357,10 @@ import org.apache.tomcat.util.http.parser.Host;
  * </p>
  */
 public class RemoteIpValve extends ValveBase {
-
-    /**
-     * {@link Pattern} for a comma delimited string that support whitespace characters
-     */
-    private static final Pattern commaSeparatedValuesPattern = Pattern.compile("\\s*,\\s*");
-
     /**
      * Logger
      */
     private static final Log log = LogFactory.getLog(RemoteIpValve.class);
-
-    /**
-     * Convert a given comma delimited String into an array of String
-     *
-     * @param commaDelimitedStrings The string to convert
-     *
-     * @return array of String (non <code>null</code>)
-     */
-    protected static String[] commaDelimitedListToStringArray(String commaDelimitedStrings) {
-        return (commaDelimitedStrings == null || commaDelimitedStrings.length() == 0) ? new String[0]
-                : commaSeparatedValuesPattern.split(commaDelimitedStrings);
-    }
 
     private String hostHeader = null;
 
@@ -401,8 +383,8 @@ public class RemoteIpValve extends ValveBase {
     /**
      * @see #setInternalProxies(String)
      */
-    private Pattern internalProxies = Pattern
-            .compile("10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" + "192\\.168\\.\\d{1,3}\\.\\d{1,3}|" +
+    private Pattern internalProxies =
+            Pattern.compile("10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" + "192\\.168\\.\\d{1,3}\\.\\d{1,3}|" +
                     "169\\.254\\.\\d{1,3}\\.\\d{1,3}|" + "127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" +
                     "100\\.6[4-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" + "100\\.[7-9]{1}\\d{1}\\.\\d{1,3}\\.\\d{1,3}|" +
                     "100\\.1[0-1]{1}\\d{1}\\.\\d{1,3}\\.\\d{1,3}|" + "100\\.12[0-7]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
@@ -608,7 +590,7 @@ public class RemoteIpValve extends ValveBase {
                 concatRemoteIpHeaderValue.append(e.nextElement());
             }
 
-            String[] remoteIpHeaderValue = commaDelimitedListToStringArray(concatRemoteIpHeaderValue.toString());
+            String[] remoteIpHeaderValue = StringUtils.splitCommaSeparated(concatRemoteIpHeaderValue.toString());
             int idx;
             if (!isInternal) {
                 proxiesHeaderValue.addFirst(originalRemoteAddr);
@@ -769,7 +751,7 @@ public class RemoteIpValve extends ValveBase {
         if (!protocolHeaderValue.contains(",")) {
             return protocolHeaderHttpsValue.equalsIgnoreCase(protocolHeaderValue);
         }
-        String[] forwardedProtocols = commaDelimitedListToStringArray(protocolHeaderValue);
+        String[] forwardedProtocols = StringUtils.splitCommaSeparated(protocolHeaderValue);
         if (forwardedProtocols.length == 0) {
             return false;
         }

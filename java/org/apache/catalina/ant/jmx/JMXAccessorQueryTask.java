@@ -155,10 +155,7 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
                     }
                     continue;
                 }
-                if (value == null) {
-                    continue;
-                }
-                if ("modelerType".equals(attName)) {
+                if (value == null || "modelerType".equals(attName)) {
                     continue;
                 }
                 createProperty(pname + attName, value);

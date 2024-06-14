@@ -76,24 +76,49 @@ public interface ClusterManager extends Manager {
      */
     void setName(String name);
 
+    /**
+     * @return the cluster associated with this manager
+     */
     CatalinaCluster getCluster();
 
+    /**
+     * Set the cluster associated with this manager.
+     *
+     * @param cluster the cluster
+     */
     void setCluster(CatalinaCluster cluster);
 
     /**
      * Open stream and use correct ClassLoader (Container), switching thread context class loader.
      *
-     * @param data The data
+     * @param data the data
      *
-     * @return The object input stream
+     * @return the object input stream
      *
      * @throws IOException An error occurred
      */
     ReplicationStream getReplicationStream(byte[] data) throws IOException;
 
+    /**
+     * Open stream and use correct ClassLoader (Container), switching thread context class loader.
+     *
+     * @param data   the data
+     * @param offset the offset in the data array
+     * @param length the data length
+     *
+     * @return the object input stream
+     *
+     * @throws IOException An error occurred
+     */
     ReplicationStream getReplicationStream(byte[] data, int offset, int length) throws IOException;
 
+    /**
+     * @return {@code true} if listeners are notified on replication
+     */
     boolean isNotifyListenersOnReplication();
 
+    /**
+     * @return a clone of a template manager configuration
+     */
     ClusterManager cloneFromTemplate();
 }

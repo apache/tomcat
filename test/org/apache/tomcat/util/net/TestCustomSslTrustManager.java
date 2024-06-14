@@ -61,7 +61,7 @@ public class TestCustomSslTrustManager extends TomcatBaseTest {
     public String connectorName;
 
     @Parameter(1)
-    public boolean needApr;
+    public boolean useOpenSSL;
 
     @Parameter(2)
     public String sslImplementationName;
@@ -96,7 +96,7 @@ public class TestCustomSslTrustManager extends TomcatBaseTest {
         TesterSupport.configureClientCertContext(tomcat);
 
         Connector connector = tomcat.getConnector();
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
         // Override the defaults
         ProtocolHandler handler = connector.getProtocolHandler();

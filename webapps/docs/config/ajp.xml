@@ -319,14 +319,6 @@
       value is 100.</p>
     </attribute>
 
-    <attribute name="acceptorThreadCount" required="false">
-      <p>The number of threads to be used to accept connections. Increase this
-      value on a multi CPU machine, although you would never really need more
-      than <code>2</code>. Also, with a lot of non keep alive connections, you
-      might want to increase this value as well. Default value is
-      <code>1</code>.</p>
-    </attribute>
-
     <attribute name="acceptorThreadPriority" required="false">
       <p>The priority of the acceptor threads. The threads used to accept
       new connections. The default value is <code>5</code> (the value of the

@@ -30,27 +30,18 @@ import org.apache.catalina.ha.tcp.SimpleTcpCluster;
 import org.apache.catalina.tribes.Channel;
 
 /**
- * Generate Cluster Element with Membership,Sender,Receiver,Deployer and
- * ReplicationValve
+ * Generate Cluster Element with Membership,Sender,Receiver,Deployer and ReplicationValve
  */
 public class CatalinaClusterSF extends StoreFactoryBase {
 
     /**
      * Store the specified Cluster children.
-     *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aCluster
-     *            Cluster whose properties are being stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
+     * <p>
+     * {@inheritDoc}
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aCluster,
-            StoreDescription parentDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aCluster, StoreDescription parentDesc)
+            throws Exception {
         if (aCluster instanceof CatalinaCluster) {
             CatalinaCluster cluster = (CatalinaCluster) aCluster;
             if (cluster instanceof SimpleTcpCluster) {
@@ -78,10 +69,10 @@ public class CatalinaClusterSF extends StoreFactoryBase {
 
             if (aCluster instanceof SimpleTcpCluster) {
                 // Store nested <Listener> elements
-                LifecycleListener listeners[] = ((SimpleTcpCluster)cluster).findLifecycleListeners();
+                LifecycleListener listeners[] = ((SimpleTcpCluster) cluster).findLifecycleListeners();
                 storeElementArray(aWriter, indent, listeners);
                 // Store nested <ClusterListener> elements
-                ClusterListener mlisteners[] = ((SimpleTcpCluster)cluster).findClusterListeners();
+                ClusterListener mlisteners[] = ((SimpleTcpCluster) cluster).findClusterListeners();
                 List<ClusterListener> clusterListeners = new ArrayList<>();
                 for (ClusterListener clusterListener : mlisteners) {
                     if (clusterListener != deployer) {

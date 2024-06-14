@@ -30,10 +30,10 @@ import java.util.regex.Pattern;
 import org.apache.tools.ant.BuildException;
 
 /**
- * Ant task that implements the <code>/deploy</code> command, supported by the
- * Tomcat manager application.
+ * Ant task that implements the <code>/deploy</code> command, supported by the Tomcat manager application.
  *
  * @author Craig R. McClanahan
+ *
  * @since 4.1
  */
 public class DeployTask extends AbstractCatalinaCommandTask {
@@ -55,8 +55,7 @@ public class DeployTask extends AbstractCatalinaCommandTask {
 
 
     /**
-     * URL of the server local web application archive (WAR) file to be
-     * deployed.
+     * URL of the server local web application archive (WAR) file to be deployed.
      */
     protected String localWar = null;
 
@@ -123,8 +122,7 @@ public class DeployTask extends AbstractCatalinaCommandTask {
             throw new BuildException("Must specify 'path' attribute");
         }
         if ((war == null) && (localWar == null) && (config == null) && (tag == null)) {
-            throw new BuildException(
-                            "Must specify either 'war', 'localWar', 'config', or 'tag' attribute");
+            throw new BuildException("Must specify either 'war', 'localWar', 'config', or 'tag' attribute");
         }
         // Building an input stream on the WAR to upload, if any
         BufferedInputStream stream = null;
@@ -141,7 +139,7 @@ public class DeployTask extends AbstractCatalinaCommandTask {
                     throw new BuildException(e);
                 }
             } else {
-                FileInputStream fsInput= null;
+                FileInputStream fsInput = null;
                 try {
                     fsInput = new FileInputStream(war);
                     FileChannel fsChannel = fsInput.getChannel();

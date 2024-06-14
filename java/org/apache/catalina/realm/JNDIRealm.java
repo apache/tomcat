@@ -64,6 +64,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
@@ -962,11 +963,12 @@ public class JNDIRealm extends RealmBase {
         if (cipherSuites == null || cipherSuitesArray != null) {
             return cipherSuitesArray;
         }
-        if (this.cipherSuites.trim().isEmpty()) {
+        this.cipherSuites = this.cipherSuites.trim();
+        if (this.cipherSuites.isEmpty()) {
             containerLog.warn(sm.getString("jndiRealm.emptyCipherSuites"));
             this.cipherSuitesArray = null;
         } else {
-            this.cipherSuitesArray = cipherSuites.trim().split("\\s*,\\s*");
+            this.cipherSuitesArray = StringUtils.splitCommaSeparated(cipherSuites);
             if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("jndiRealm.cipherSuites", Arrays.toString(this.cipherSuitesArray)));
             }
@@ -2252,13 +2254,6 @@ public class JNDIRealm extends RealmBase {
     }
 
 
-    /**
-     * Get the password for the specified user.
-     *
-     * @param username The user name
-     *
-     * @return the password associated with the given principal's user name.
-     */
     @Override
     protected String getPassword(String username) {
         String userPassword = getUserPassword();
@@ -2312,13 +2307,6 @@ public class JNDIRealm extends RealmBase {
     }
 
 
-    /**
-     * Get the principal associated with the specified certificate.
-     *
-     * @param username The user name
-     *
-     * @return the Principal associated with the given certificate.
-     */
     @Override
     protected Principal getPrincipal(String username) {
         return getPrincipal(username, null);

@@ -74,7 +74,14 @@ public class javaURLContextFactory
 
 
     /**
-     * Crete a new Context's instance.
+     * Create a new Context's instance.
+     * @param obj unused
+     * @param name unused
+     * @param nameCtx unused
+     * @param environment the environment used
+     * @return a selector context if the thread or classloader are bound, and
+     *   null otherwise
+     * @throws NamingException not thrown by this implementationm
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -91,6 +98,10 @@ public class javaURLContextFactory
 
     /**
      * Get a new (writable) initial context.
+     * @param environment the environment used
+     * @return a selector context if the thread or classloader are bound, and
+     *   a shared writable context otherwise
+     * @throws NamingException not thrown by this implementationm
      */
     @SuppressWarnings("unchecked")
     @Override

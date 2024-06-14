@@ -23,21 +23,17 @@ import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.catalina.startup.Catalina;
 
 /**
- * A <code>Server</code> element represents the entire Catalina
- * servlet container.  Its attributes represent the characteristics of
- * the servlet container as a whole.  A <code>Server</code> may contain
- * one or more <code>Services</code>, and the top level set of naming
- * resources.
+ * A <code>Server</code> element represents the entire Catalina servlet container. Its attributes represent the
+ * characteristics of the servlet container as a whole. A <code>Server</code> may contain one or more
+ * <code>Services</code>, and the top level set of naming resources.
  * <p>
- * Normally, an implementation of this interface will also implement
- * <code>Lifecycle</code>, such that when the <code>start()</code> and
- * <code>stop()</code> methods are called, all of the defined
- * <code>Services</code> are also started or stopped.
+ * Normally, an implementation of this interface will also implement <code>Lifecycle</code>, such that when the
+ * <code>start()</code> and <code>stop()</code> methods are called, all of the defined <code>Services</code> are also
+ * started or stopped.
  * <p>
- * In between, the implementation must open a server socket on the port number
- * specified by the <code>port</code> property.  When a connection is accepted,
- * the first line is read and compared with the specified shutdown command.
- * If the command matches, shutdown of the server is initiated.
+ * In between, the implementation must open a server socket on the port number specified by the <code>port</code>
+ * property. When a connection is accepted, the first line is read and compared with the specified shutdown command. If
+ * the command matches, shutdown of the server is initiated.
  *
  * @author Craig R. McClanahan
  */
@@ -56,8 +52,7 @@ public interface Server extends Lifecycle {
      *
      * @param globalNamingResources The new global naming resources
      */
-    void setGlobalNamingResources
-        (NamingResourcesImpl globalNamingResources);
+    void setGlobalNamingResources(NamingResourcesImpl globalNamingResources);
 
 
     /**
@@ -85,27 +80,24 @@ public interface Server extends Lifecycle {
     void setPort(int port);
 
     /**
-     * Get the number that offsets the port used for shutdown commands.
-     * For example, if port is 8005, and portOffset is 1000,
-     * the server listens at 9005.
+     * Get the number that offsets the port used for shutdown commands. For example, if port is 8005, and portOffset is
+     * 1000, the server listens at 9005.
      *
      * @return the port offset
      */
     int getPortOffset();
 
     /**
-     * Set the number that offsets the server port used for shutdown commands.
-     * For example, if port is 8005, and you set portOffset to 1000,
-     * connector listens at 9005.
+     * Set the number that offsets the server port used for shutdown commands. For example, if port is 8005, and you set
+     * portOffset to 1000, connector listens at 9005.
      *
      * @param portOffset sets the port offset
      */
     void setPortOffset(int portOffset);
 
     /**
-     * Get the actual port on which server is listening for the shutdown commands.
-     * If you do not set port offset, port is returned. If you set
-     * port offset, port offset + port is returned.
+     * Get the actual port on which server is listening for the shutdown commands. If you do not set port offset, port
+     * is returned. If you set port offset, port offset + port is returned.
      *
      * @return the port with offset
      */
@@ -140,9 +132,9 @@ public interface Server extends Lifecycle {
 
 
     /**
-     * @return the parent class loader for this component. If not set, return
-     * {@link #getCatalina()} {@link Catalina#getParentClassLoader()}. If
-     * catalina has not been set, return the system class loader.
+     * @return the parent class loader for this component. If not set, return {@link #getCatalina()}
+     *             {@link Catalina#getParentClassLoader()}. If catalina has not been set, return the system class
+     *             loader.
      */
     ClassLoader getParentClassLoader();
 
@@ -169,15 +161,13 @@ public interface Server extends Lifecycle {
 
 
     /**
-     * @return the configured base (instance) directory. Note that home and base
-     * may be the same (and are by default). If this is not set the value
-     * returned by {@link #getCatalinaHome()} will be used.
+     * @return the configured base (instance) directory. Note that home and base may be the same (and are by default).
+     *             If this is not set the value returned by {@link #getCatalinaHome()} will be used.
      */
     File getCatalinaBase();
 
     /**
-     * Set the configured base (instance) directory. Note that home and base
-     * may be the same (and are by default).
+     * Set the configured base (instance) directory. Note that home and base may be the same (and are by default).
      *
      * @param catalinaBase the configured base directory
      */
@@ -185,14 +175,12 @@ public interface Server extends Lifecycle {
 
 
     /**
-     * @return the configured home (binary) directory. Note that home and base
-     * may be the same (and are by default).
+     * @return the configured home (binary) directory. Note that home and base may be the same (and are by default).
      */
     File getCatalinaHome();
 
     /**
-     * Set the configured home (binary) directory. Note that home and base
-     * may be the same (and are by default).
+     * Set the configured home (binary) directory. Note that home and base may be the same (and are by default).
      *
      * @param catalinaHome the configured home directory
      */
@@ -201,6 +189,7 @@ public interface Server extends Lifecycle {
 
     /**
      * Get the utility thread count.
+     *
      * @return the thread count
      */
     int getUtilityThreads();
@@ -208,6 +197,7 @@ public interface Server extends Lifecycle {
 
     /**
      * Set the utility thread count.
+     *
      * @param utilityThreads the new thread count
      */
     void setUtilityThreads(int utilityThreads);
@@ -234,6 +224,7 @@ public interface Server extends Lifecycle {
      * Find the specified Service
      *
      * @param name Name of the Service to be returned
+     *
      * @return the specified Service, or <code>null</code> if none exists.
      */
     Service findService(String name);
@@ -246,8 +237,7 @@ public interface Server extends Lifecycle {
 
 
     /**
-     * Remove the specified Service from the set associated from this
-     * Server.
+     * Remove the specified Service from the set associated from this Server.
      *
      * @param service The Service to be removed
      */
@@ -255,8 +245,7 @@ public interface Server extends Lifecycle {
 
 
     /**
-     * @return the token necessary for operations on the associated JNDI naming
-     * context.
+     * @return the token necessary for operations on the associated JNDI naming context.
      */
     Object getNamingToken();
 

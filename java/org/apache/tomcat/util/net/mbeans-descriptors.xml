@@ -29,16 +29,8 @@
     <attribute   name="acceptCount"
                  type="int"/>
 
-    <attribute   name="acceptorThreadCount"
-                 type="int"/>
-
     <attribute   name="acceptorThreadPriority"
                  type="int"/>
-
-    <attribute   name="alpnSupported"
-                 type="boolean"
-            writeable="false"
-                   is="true"/>
 
     <attribute   name="bindOnInit"
                  type="boolean"/>
@@ -66,10 +58,6 @@
 
     <attribute   name="defaultSSLHostConfigName"
                  type="java.lang.String"/>
-
-    <attribute   name="deferAccept"
-                 type="boolean"
-            writeable="false"/>
 
     <attribute   name="domain"
                  type="java.lang.String"/>
@@ -111,9 +99,6 @@
                  type="boolean"
             writeable="false"
                    is="true"/>
-
-    <attribute   name="pollerThreadCount"
-                 type="int"/>
 
     <attribute   name="pollerThreadPriority"
                  type="int"/>
@@ -259,16 +244,8 @@
     <attribute   name="acceptCount"
                  type="int"/>
 
-    <attribute   name="acceptorThreadCount"
-                 type="int"/>
-
     <attribute   name="acceptorThreadPriority"
                  type="int"/>
-
-    <attribute   name="alpnSupported"
-                 type="boolean"
-            writeable="false"
-                   is="true"/>
 
     <attribute   name="bindOnInit"
                  type="boolean"/>
@@ -296,10 +273,6 @@
 
     <attribute   name="defaultSSLHostConfigName"
                  type="java.lang.String"/>
-
-    <attribute   name="deferAccept"
-                 type="boolean"
-            writeable="false"/>
 
     <attribute   name="domain"
                  type="java.lang.String"/>

@@ -22,6 +22,13 @@
       <sourceFolder url="file://$MODULE_DIR$/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/webapps/examples/WEB-INF/classes" isTestSource="true" />
+
+      <!-- The directories below are excluded by default as they require the FFM API which is
+          available as a preview feature in Java SDK 22. If you wish to use the FFM API in the
+          IDE then set your project and module SDK levels to Java 22 or later, enable preview
+          features if needed, and comment out or remove the excludeFolder lines below. !-->
+      <excludeFolder url="file://$MODULE_DIR$/java/org/apache/tomcat/util/net/openssl/panama" />
+      <excludeFolder url="file://$MODULE_DIR$/java/org/apache/tomcat/util/openssl" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -36,7 +36,7 @@ public class SnakeTimer {
 
     private static Timer gameTimer = null;
 
-    private static final long TICK_DELAY = 100;
+    static final long TICK_DELAY = 100;
 
     private static final ConcurrentHashMap<Integer, Snake> snakes =
             new ConcurrentHashMap<>();
@@ -73,8 +73,7 @@ public class SnakeTimer {
                 sb.append(',');
             }
         }
-        broadcast(String.format("{\"type\": \"update\", \"data\" : [%s]}",
-                sb.toString()));
+        broadcast(String.format("{\"type\": \"update\", \"data\" : [%s]}", sb.toString()));
     }
 
     protected static void broadcast(String message) {

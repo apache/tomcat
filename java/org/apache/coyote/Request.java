@@ -110,7 +110,7 @@ public final class Request {
     private final MessageBytes localAddrMB = MessageBytes.newInstance();
 
     private final MimeHeaders headers = new MimeHeaders();
-    private final Map<String, String> trailerFields = new HashMap<>();
+    private final MimeHeaders trailerFields = new MimeHeaders();
 
     /**
      * Path parameters
@@ -293,6 +293,11 @@ public final class Request {
 
 
     public Map<String, String> getTrailerFields() {
+        return trailerFields.toMap();
+    }
+
+
+    public MimeHeaders getMimeTrailerFields() {
         return trailerFields;
     }
 
@@ -736,12 +741,14 @@ public final class Request {
         threadId = 0;
     }
 
+    @SuppressWarnings("deprecation")
     public void setRequestThread() {
         Thread t = Thread.currentThread();
         threadId = t.getId();
         getRequestProcessor().setWorkerThreadName(t.getName());
     }
 
+    @SuppressWarnings("deprecation")
     public boolean isRequestThread() {
         return Thread.currentThread().getId() == threadId;
     }
@@ -780,7 +787,13 @@ public final class Request {
         charsetHolder = CharsetHolder.EMPTY;
         expectation = false;
         headers.recycle();
-        trailerFields.clear();
+        trailerFields.recycle();
+        /*
+         *  Trailer fields are limited in size by bytes. The following call ensures that any request with a large number
+         *  of small trailer fields doesn't result in a long lasting, large array of headers inside the MimeHeader
+         *  instance.
+         */
+        trailerFields.setLimit(MimeHeaders.DEFAULT_HEADER_SIZE);
         serverNameMB.recycle();
         serverPort = -1;
         localAddrMB.recycle();

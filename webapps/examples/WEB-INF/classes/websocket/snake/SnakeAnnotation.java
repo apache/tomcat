@@ -75,6 +75,9 @@ public class SnakeAnnotation {
 
     @OnOpen
     public void onOpen(Session session) {
+        // If the messages take longer than TICK_DELAY to be sent, the game isn't going to work properly.
+        session.getUserProperties().put("org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT",
+                Long.valueOf(SnakeTimer.TICK_DELAY));
         this.snake = new Snake(id, session);
         SnakeTimer.addSnake(snake);
         StringBuilder sb = new StringBuilder();
@@ -87,8 +90,7 @@ public class SnakeAnnotation {
                 sb.append(',');
             }
         }
-        SnakeTimer.broadcast(String.format("{\"type\": \"join\",\"data\":[%s]}",
-                sb.toString()));
+        SnakeTimer.broadcast(String.format("{\"type\": \"join\",\"data\":[%s]}", sb.toString()));
     }
 
 
@@ -109,8 +111,7 @@ public class SnakeAnnotation {
     @OnClose
     public void onClose() {
         SnakeTimer.removeSnake(snake);
-        SnakeTimer.broadcast(String.format("{\"type\": \"leave\", \"id\": %d}",
-                Integer.valueOf(id)));
+        SnakeTimer.broadcast(String.format("{\"type\": \"leave\", \"id\": %d}", Integer.valueOf(id)));
     }
 
 
@@ -120,7 +121,6 @@ public class SnakeAnnotation {
          * Assume all errors are fatal. Close the session and remove the snake from the game.
          */
         session.close();
-        onClose();
         /*
          * Correct action depends on root cause. Protect against infinite loops while looking for root cause.
          */

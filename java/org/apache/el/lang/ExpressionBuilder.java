@@ -173,11 +173,6 @@ public final class ExpressionBuilder implements NodeVisitor {
         return n;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.sun.el.parser.NodeVisitor#visit(com.sun.el.parser.Node)
-     */
     @Override
     public void visit(Node node) throws ELException {
         if (node instanceof AstFunction) {

@@ -576,7 +576,7 @@ public final class MessageBytes implements Cloneable, Serializable {
             current = current / 10;
             buf[end++] = HexUtils.getHex(digit);
         }
-        byteC.setOffset(0);
+        byteC.setStart(0);
         byteC.setEnd(end);
         // Inverting buffer
         end--;

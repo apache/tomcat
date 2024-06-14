@@ -41,6 +41,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.CharsetUtil;
 import org.apache.tomcat.util.buf.EncodedSolidusHandling;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
@@ -528,7 +529,7 @@ public class Connector extends LifecycleMBeanBase {
         HashSet<String> methodSet = new HashSet<>();
 
         if (null != methods) {
-            methodSet.addAll(Arrays.asList(methods.split("\\s*,\\s*")));
+            methodSet.addAll(Arrays.asList(StringUtils.splitCommaSeparated(methods)));
         }
 
         if (methodSet.contains("TRACE")) {
@@ -1008,14 +1009,14 @@ public class Connector extends LifecycleMBeanBase {
             setParseBodyMethods(getParseBodyMethods());
         }
 
-        if (JreCompat.isJre22Available() && OpenSSLStatus.getUseOpenSSL() && OpenSSLStatus.isAvailable()
-                && protocolHandler instanceof AbstractHttp11Protocol) {
+        if (JreCompat.isJre22Available() && OpenSSLStatus.getUseOpenSSL() && OpenSSLStatus.isAvailable() &&
+                protocolHandler instanceof AbstractHttp11Protocol) {
             // Use FFM and OpenSSL if available
             AbstractHttp11Protocol<?> jsseProtocolHandler = (AbstractHttp11Protocol<?>) protocolHandler;
             if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
                 // OpenSSL is compatible with the JSSE configuration, so use it if it is available
-                jsseProtocolHandler.setSslImplementationName
-                    ("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation");
+                jsseProtocolHandler
+                        .setSslImplementationName("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation");
             }
         } else if (AprStatus.isAprAvailable() && AprStatus.getUseOpenSSL() &&
                 protocolHandler instanceof AbstractHttp11Protocol) {
@@ -1110,10 +1111,6 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
-    /**
-     * Provide a useful toString() implementation as it may be used when logging Lifecycle errors to identify the
-     * component.
-     */
     @Override
     public String toString() {
         // Not worth caching this right now

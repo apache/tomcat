@@ -207,11 +207,7 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
 
     // ----------------------------------------------- HttpOutputBuffer Methods
 
-    /**
-     * Flush the response.
-     *
-     * @throws IOException an underlying I/O error occurred
-     */
+
     @Override
     public void flush() throws IOException {
         if (lastActiveFilter == -1) {
@@ -392,7 +388,7 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
             // values will be OK. Strings using other encodings may be
             // corrupted.
             byte[] buffer = bc.getBuffer();
-            for (int i = bc.getOffset(); i < bc.getLength(); i++) {
+            for (int i = bc.getStart(); i < bc.getLength(); i++) {
                 // byte values are signed i.e. -128 to 127
                 // The values are used unsigned. 0 to 31 are CTLs so they are
                 // filtered (apart from TAB which is 9). 127 is a control (DEL).
@@ -528,9 +524,6 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
      */
     protected class SocketOutputBuffer implements HttpOutputBuffer {
 
-        /**
-         * Write chunk.
-         */
         @Override
         public int doWrite(ByteBuffer chunk) throws IOException {
             try {

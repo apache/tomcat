@@ -76,6 +76,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static final Cleaner cleaner = Cleaner.create();
 
+    private static final int OPENSSL_ERROR_MESSAGE_BUFFER_SIZE = 256;
+
     private static final String defaultProtocol = "TLS";
 
     private static final int SSL_AIDX_RSA     = 0;
@@ -558,24 +560,24 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             } else {
                 // Client certificate verification based on trusted CA files and dirs
                 MemorySegment caCertificateFileNative = sslHostConfig.getCaCertificateFile() != null
-                        ? localArena.allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile())) : null;
+                        ? localArena.allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile())) : MemorySegment.NULL;
                 MemorySegment caCertificatePathNative = sslHostConfig.getCaCertificatePath() != null
-                        ? localArena.allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath())) : null;
+                        ? localArena.allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath())) : MemorySegment.NULL;
                 if ((sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null)
                         && SSL_CTX_load_verify_locations(state.sslCtx,
-                                caCertificateFileNative == null ? MemorySegment.NULL : caCertificateFileNative,
-                                        caCertificatePathNative == null ? MemorySegment.NULL : caCertificatePathNative) <= 0) {
+                                caCertificateFileNative, caCertificatePathNative) <= 0) {
                     logLastError("openssl.errorConfiguringLocations");
                 } else {
                     var caCerts = SSL_CTX_get_client_CA_list(state.sslCtx);
                     if (MemorySegment.NULL.equals(caCerts)) {
-                        caCerts = SSL_load_client_CA_file(caCertificateFileNative == null ? MemorySegment.NULL : caCertificateFileNative);
+                        caCerts = SSL_load_client_CA_file(caCertificateFileNative);
                         if (!MemorySegment.NULL.equals(caCerts)) {
                             SSL_CTX_set_client_CA_list(state.sslCtx, caCerts);
                         }
                     } else {
-                        if (SSL_add_file_cert_subjects_to_stack(caCerts,
-                                caCertificateFileNative == null ? MemorySegment.NULL : caCertificateFileNative) <= 0) {
+                        // OpenSSL might crash here when passing null on some platforms
+                        if (MemorySegment.NULL.equals(caCertificateFileNative)
+                                || (SSL_add_file_cert_subjects_to_stack(caCerts, caCertificateFileNative) <= 0)) {
                             caCerts = MemorySegment.NULL;
                         }
                     }
@@ -688,7 +690,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 keylen = EVP_PKEY_bits(pkey);
             }
             for (int i = 0; i < OpenSSLLibrary.dhParameters.length; i++) {
-                if (keylen >= OpenSSLLibrary.dhParameters[i].min) {
+                if (OpenSSLLibrary.dhParameters[i] != null && keylen >= OpenSSLLibrary.dhParameters[i].min) {
                     return OpenSSLLibrary.dhParameters[i].dh;
                 }
             }
@@ -1326,8 +1328,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             try (var localArena = Arena.ofConfined()) {
                 do {
                     // Loop until getLastErrorNumber() returns SSL_ERROR_NONE
-                    var buf = localArena.allocate(ValueLayout.JAVA_BYTE, 128);
-                    ERR_error_string(error, buf);
+                    var buf = localArena.allocate(ValueLayout.JAVA_BYTE, OPENSSL_ERROR_MESSAGE_BUFFER_SIZE);
+                    ERR_error_string_n(error, buf, OPENSSL_ERROR_MESSAGE_BUFFER_SIZE);
                     String err = buf.getString(0);
                     if (sslError == null) {
                         sslError = err;

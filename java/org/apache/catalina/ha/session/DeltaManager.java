@@ -572,10 +572,7 @@ public class DeltaManager extends ClusterManagerBase {
                 session.setAccessCount(0);
                 session.resetDeltaRequest();
                 // FIXME How inform other session id cache like SingleSignOn
-                // increment sessionCounter to correct stats report
-                if (findSession(session.getIdInternal()) == null) {
-                    sessionCounter++;
-                } else {
+                if (findSession(session.getIdInternal()) != null) {
                     sessionReplaceCounter++;
                     // FIXME better is to grap this sessions again !
                     if (log.isWarnEnabled()) {
@@ -842,12 +839,6 @@ public class DeltaManager extends ClusterManagerBase {
     // -------------------------------------------------------- Replication
     // Methods
 
-    /**
-     * A message was received from another node, this is the callback method to implement if you are interested in
-     * receiving replication messages.
-     *
-     * @param cmsg - the message received.
-     */
     @Override
     public void messageDataReceived(ClusterMessage cmsg) {
         if (cmsg instanceof SessionMessage) {
@@ -875,15 +866,6 @@ public class DeltaManager extends ClusterManagerBase {
         }
     }
 
-    /**
-     * When the request has been completed, the replication valve will notify the manager, and the manager will decide
-     * whether any replication is needed or not. If there is a need for replication, the manager will create a session
-     * message and that will be replicated. The cluster determines where it gets sent.
-     *
-     * @param sessionId - the sessionId that just completed.
-     *
-     * @return a SessionMessage to be sent,
-     */
     @Override
     public ClusterMessage requestCompleted(String sessionId) {
         return requestCompleted(sessionId, false);
@@ -979,7 +961,6 @@ public class DeltaManager extends ClusterManagerBase {
         sessionReplaceCounter = 0;
         counterNoStateTransferred = 0;
         setMaxActive(getActiveSessions());
-        sessionCounter = getActiveSessions();
         counterReceive_EVT_ALL_SESSION_DATA = 0;
         counterReceive_EVT_GET_ALL_SESSIONS = 0;
         counterReceive_EVT_SESSION_ACCESSED = 0;

@@ -24,9 +24,14 @@ public interface MessageListener {
 
     /**
      * Receive a message from the IO components in the Channel stack
-     * @param msg ChannelMessage
+     * @param msg the message
      */
     void messageReceived(ChannelMessage msg);
 
+    /**
+     * Allows skipping processing of the specified message.
+     * @param msg the message
+     * @return {@code true} if the message will be processed
+     */
     boolean accept(ChannelMessage msg);
 }

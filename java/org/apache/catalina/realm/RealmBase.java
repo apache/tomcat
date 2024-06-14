@@ -484,7 +484,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     }
                 }
 
-                return getPrincipal(gssName, gssCredential);
+                return getPrincipal(gssName, gssCredential, gssContext);
             }
         } else {
             log.error(sm.getString("realmBase.gssContextNotEstablished"));
@@ -1206,6 +1206,20 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *
      * @param gssName       The GSS name
      * @param gssCredential the GSS credential of the principal
+     * @param gssContext the established GSS context
+     *
+     * @return the principal associated with the given user name.
+     */
+    protected Principal getPrincipal(GSSName gssName, GSSCredential gssCredential, GSSContext gssContext) {
+        return getPrincipal(gssName, gssCredential);
+    }
+
+
+    /**
+     * Get the principal associated with the specified {@link GSSName}.
+     *
+     * @param gssName       The GSS name
+     * @param gssCredential the GSS credential of the principal
      *
      * @return the principal associated with the given user name.
      */
@@ -1274,9 +1288,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * specified, the default for the CredentialHandler will be used.</li>
      * <li><b>-h</b> - The fully qualified class name of the CredentialHandler to use. If not specified, the built-in
      * handlers will be tested in turn and the first one to accept the specified algorithm will be used.</li>
-     * <li><b>-f</b> - The name of the file that contains passwords to encode. Each
-     *                 line in the file should contain only one password. Using this
-     *                 option ignores other password input.</li>
+     * <li><b>-f</b> - The name of the file that contains passwords to encode. Each line in the file should contain only
+     * one password. Using this option ignores other password input.</li>
      * </ul>
      * <p>
      * This generation process currently supports the following CredentialHandlers, the correct one being selected based
@@ -1288,6 +1301,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * </ul>
      *
      * @param args The parameters passed on the command line
+     *
+     * @throws IOException If an error occurs reading the password file
      */
     public static void main(String args[]) throws IOException {
 
@@ -1315,7 +1330,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         // Note: Reducing args.length requirement to argIndex+1 so that -f works and ignores
         // trailing words
-        while (args.length > argIndex + 1 && args[argIndex].length() == 2 && args[argIndex].charAt(0) == '-' && !endOfList) {
+        while (args.length > argIndex + 1 && args[argIndex].length() == 2 && args[argIndex].charAt(0) == '-' &&
+                !endOfList) {
             switch (args[argIndex].charAt(1)) {
                 case 'a': {
                     algorithm = args[argIndex + 1];
@@ -1346,7 +1362,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     break;
                 }
                 case '-': {
-                    // When encountering --  option don't parse anything else as an option
+                    // When encountering -- option don't parse anything else as an option
                     endOfList = true;
                     // The -- opt doesn't take an argument, decrement the argIndex so that it parses
                     // all remaining args
@@ -1434,8 +1450,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 // A FileNotFound is the likely exception here and self-explanatory. Softly
                 // reporting it and exit 1 so that you can tell it failed from the command line.
                 if (e instanceof java.io.FileNotFoundException) {
-                    System.err.println("cannot stat '" + passwordFile +
-                            "': No such file or directory");
+                    System.err.println("cannot stat '" + passwordFile + "': No such file or directory");
                     // Not sure if using an exit here is OK, but I wanted to return a code that
                     // showed failure.
                     System.exit(1);
@@ -1455,9 +1470,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     }
 
     private static void usage() {
-        System.out.println("Usage: RealmBase [-a <algorithm>] [-e <encoding>]"
-              + " [-i <iterations>] [-s <salt-length>] [-k <key-length>]"
-              + " [-h <handler-class-name>] | <XX credentials>");
+        System.out.println("Usage: RealmBase [-a <algorithm>] [-e <encoding>]" +
+                " [-i <iterations>] [-s <salt-length>] [-k <key-length>]" +
+                " [-h <handler-class-name>] | <XX credentials>");
     }
 
 

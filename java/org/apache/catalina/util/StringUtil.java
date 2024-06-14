@@ -14,26 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jakarta.annotation;
+package org.apache.catalina.util;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.regex.Pattern;
 
-/**
- * Identifies a POJO as a managed bean.
- *
- * @since Common Annotations 1.1
- *
- * @deprecated This will be removed no earlier than Jakarta EE 11. Use CDI beans instead.
- */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Deprecated(since = "2.1.1", forRemoval = true)
-public @interface ManagedBean {
+public class StringUtil {
     /**
-     * @return Name of the managed bean
+     * {@link Pattern} for a comma delimited string that support whitespace characters
      */
-    String value() default "";
+    private static final Pattern commaSeparatedValuesPattern = Pattern.compile("\\s*,\\s*");
+
+    /**
+     * Splits a comma-separated string into an array of String values. Whitespace around the commas is removed. Null or
+     * empty values will return a zero-element array.
+     *
+     * @param s The string to split by commas.
+     *
+     * @return An array of String values.
+     */
+    public static String[] splitCommaSeparated(String s) {
+        return (s == null || s.length() == 0) ? new String[0] : commaSeparatedValuesPattern.split(s);
+
+    }
 }

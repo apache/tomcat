@@ -37,7 +37,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
     private URL baseUrl;
     private String baseUrlString;
     private JarFile archive = null;
-    protected Map<String, JarEntry> archiveEntries = null;
+    protected Map<String,JarEntry> archiveEntries = null;
     protected final Object archiveLock = new Object();
     private long archiveUseCount = 0;
     private JarContents jarContents;
@@ -163,7 +163,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
      *
      * @return The archives entries mapped to their names or null if {@link #getArchiveEntry(String)} should be used.
      */
-    protected abstract Map<String, JarEntry> getArchiveEntries(boolean single);
+    protected abstract Map<String,JarEntry> getArchiveEntries(boolean single);
 
 
     /**
@@ -205,7 +205,8 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
          * If jarContents reports that this resource definitely does not contain the path, we can end this method and
          * move on to the next jar.
          */
-        if (jarContents != null && !jarContents.mightContainResource(path, webAppMount)) {
+        if (jarContents != null && !jarContents
+                .mightContainResource(getInternalPath().isEmpty() ? path : getInternalPath() + path, webAppMount)) {
             return new EmptyResource(root, path);
         }
 
@@ -243,7 +244,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                     // Calls JarFile.getJarEntry() which is multi-release aware
                     jarEntry = getArchiveEntry(pathInJar);
                 } else {
-                    Map<String, JarEntry> jarEntries = getArchiveEntries(true);
+                    Map<String,JarEntry> jarEntries = getArchiveEntries(true);
                     if (!(pathInJar.charAt(pathInJar.length() - 1) == '/')) {
                         if (jarEntries == null) {
                             jarEntry = getArchiveEntry(pathInJar + '/');

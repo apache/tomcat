@@ -44,11 +44,6 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
     // ------------------------------------------------- ObjectFactory Methods
 
 
-    /**
-     * Create a new DataSource instance.
-     *
-     * @param obj The reference object describing the DataSource
-     */
     @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?,?> environment)
         throws NamingException {

@@ -221,8 +221,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
             cookie.setHttpOnly(true);
         }
 
-        cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR,
-                Boolean.toString(context.getUsePartitioned()));
+        cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR, Boolean.toString(context.getUsePartitioned()));
 
         cookie.setPath(SessionConfig.getSessionCookiePath(context));
 

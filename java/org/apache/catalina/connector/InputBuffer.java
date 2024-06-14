@@ -186,11 +186,6 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     }
 
 
-    /**
-     * Close the input buffer.
-     *
-     * @throws IOException An underlying IOException occurred
-     */
     @Override
     public void close() throws IOException {
         closed = true;
@@ -243,7 +238,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("inputBuffer.requiresNonBlocking"));
             }
-            return false;
+            return true;
         }
         if (isFinished()) {
             // If this is a non-container thread, need to trigger a read
@@ -278,11 +273,6 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
 
     // ------------------------------------------------- Bytes Handling Methods
 
-    /**
-     * Reads new bytes in the byte chunk.
-     *
-     * @throws IOException An underlying IOException occurred
-     */
     @Override
     public int realReadBytes() throws IOException {
         if (closed) {
@@ -316,9 +306,21 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
         Response response = request.getResponse();
         request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, e);
         if (e instanceof SocketTimeoutException) {
-            response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT);
+            try {
+                response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT);
+            } catch (IllegalStateException ex) {
+                // Response already committed
+                response.setStatus(HttpServletResponse.SC_REQUEST_TIMEOUT);
+                response.setError();
+            }
         } else {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            try {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            } catch (IllegalStateException ex) {
+                // Response already committed
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setError();
+            }
         }
     }
 

@@ -57,7 +57,7 @@ public class TestClientCert extends TomcatBaseTest {
     public String connectorName;
 
     @Parameter(1)
-    public boolean needApr;
+    public boolean useOpenSSL;
 
     @Parameter(2)
     public String sslImplementationName;
@@ -216,6 +216,6 @@ public class TestClientCert extends TomcatBaseTest {
 
         TesterSupport.configureClientSsl();
 
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
     }
 }

@@ -84,34 +84,24 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
         uniqueId = uniqueID;
     }
 
-    /**
-     * returns the event type
-     *
-     * @return one of the event types EVT_XXXX
-     */
     @Override
     public int getEventType() {
         return mEvtType;
     }
 
-    /**
-     * @return the serialized data for the session
-     */
     @Override
     public byte[] getSession() {
         return mSession;
     }
 
-    /**
-     * @return the session ID for the session
-     */
     @Override
     public String getSessionID() {
         return mSessionID;
     }
 
     /**
-     * set message send time but only the first setting works (one shot)
+     * Set message send time but only the first setting works (one shot)
+     *
      * @param time the timestamp
      */
     @Override
@@ -127,11 +117,6 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
         return serializationTimestamp;
     }
 
-    /**
-     * clear text event type name (for logging purpose only)
-     *
-     * @return the event type in a string representation, useful for debugging
-     */
     @Override
     public String getEventTypeString() {
         switch (mEvtType) {

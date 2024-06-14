@@ -41,11 +41,19 @@ abstract class AbstractNonZeroStream extends AbstractStream {
     }
 
 
+    /**
+     * @return {@code true} if the state indicates a close
+     */
     final boolean isClosedFinal() {
         return state.isClosedFinal();
     }
 
 
+    /**
+     * Check the frame type against the state
+     * @param frameType the type
+     * @throws Http2Exception if an error is detected
+     */
     final void checkState(FrameType frameType) throws Http2Exception {
         state.checkFrameType(frameType);
     }
@@ -59,5 +67,10 @@ abstract class AbstractNonZeroStream extends AbstractStream {
      */
     abstract ByteBuffer getInputByteBuffer();
 
+    /**
+     * Notify that some data has been received.
+     * @param payloadSize the byte count
+     * @throws Http2Exception if an error is detected
+     */
     abstract void receivedData(int payloadSize) throws Http2Exception;
 }

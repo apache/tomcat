@@ -56,20 +56,12 @@ public final class PasswdUserDatabase implements UserDatabase {
     private UserConfig userConfig = null;
 
 
-    /**
-     * Return the UserConfig listener with which we are associated.
-     */
     @Override
     public UserConfig getUserConfig() {
         return userConfig;
     }
 
 
-    /**
-     * Set the UserConfig listener with which we are associated.
-     *
-     * @param userConfig The new UserConfig listener
-     */
     @Override
     public void setUserConfig(UserConfig userConfig) {
         this.userConfig = userConfig;
@@ -77,20 +69,12 @@ public final class PasswdUserDatabase implements UserDatabase {
     }
 
 
-    /**
-     * Return an absolute pathname to the home directory for the specified user.
-     *
-     * @param user User for which a home directory should be retrieved
-     */
     @Override
     public String getHome(String user) {
         return homes.get(user);
     }
 
 
-    /**
-     * Return an enumeration of the user names defined on this server.
-     */
     @Override
     public Enumeration<String> getUsers() {
         return Collections.enumeration(homes.keySet());

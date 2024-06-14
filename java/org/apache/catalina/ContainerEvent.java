@@ -43,8 +43,8 @@ public final class ContainerEvent extends EventObject {
      * Construct a new ContainerEvent with the specified parameters.
      *
      * @param container Container on which this event occurred
-     * @param type Event type
-     * @param data Event data
+     * @param type      Event type
+     * @param data      Event data
      */
     public ContainerEvent(Container container, String type, Object data) {
         super(container);
@@ -76,9 +76,8 @@ public final class ContainerEvent extends EventObject {
     /**
      * Return the event type of this event.
      *
-     * @return The event type of this event. Although this is a String, it is
-     *         safe to rely on the value returned by this method remaining
-     *         consistent between point releases.
+     * @return The event type of this event. Although this is a String, it is safe to rely on the value returned by this
+     *             method remaining consistent between point releases.
      */
     public String getType() {
         return this.type;
@@ -90,7 +89,6 @@ public final class ContainerEvent extends EventObject {
      */
     @Override
     public String toString() {
-        return "ContainerEvent['" + getContainer() + "','" +
-                getType() + "','" + getData() + "']";
+        return "ContainerEvent['" + getContainer() + "','" + getType() + "','" + getData() + "']";
     }
 }

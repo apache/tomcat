@@ -31,7 +31,7 @@ import org.apache.catalina.Role;
 import org.apache.catalina.User;
 import org.apache.catalina.startup.LoggingBaseTest;
 
-public class DataSourceUserDatabaseTests extends LoggingBaseTest {
+public class TestDataSourceUserDatabase extends LoggingBaseTest {
 
     public static final String SIMPLE_SCHEMA =
             "create table users (\n"

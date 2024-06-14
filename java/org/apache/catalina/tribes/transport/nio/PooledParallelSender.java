@@ -33,13 +33,13 @@ public class PooledParallelSender extends PooledSender implements PooledParallel
         if (!isConnected()) {
             throw new ChannelException(sm.getString("pooledParallelSender.sender.disconnected"));
         }
-        ParallelNioSender sender = (ParallelNioSender)getSender();
+        ParallelNioSender sender = (ParallelNioSender) getSender();
         if (sender == null) {
-            ChannelException cx = new ChannelException(sm.getString(
-                    "pooledParallelSender.unable.retrieveSender.timeout",
-                    Long.toString(getMaxWait())));
+            ChannelException cx = new ChannelException(
+                    sm.getString("pooledParallelSender.unable.retrieveSender.timeout", Long.toString(getMaxWait())));
             for (Member member : destination) {
-                cx.addFaultyMember(member, new NullPointerException(sm.getString("pooledParallelSender.unable.retrieveSender")));
+                cx.addFaultyMember(member,
+                        new NullPointerException(sm.getString("pooledParallelSender.unable.retrieveSender")));
             }
             throw cx;
         } else {
@@ -62,10 +62,10 @@ public class PooledParallelSender extends PooledSender implements PooledParallel
     public DataSender getNewDataSender() {
         try {
             ParallelNioSender sender = new ParallelNioSender();
-            transferProperties(this,sender);
+            transferProperties(this, sender);
             return sender;
-        } catch ( IOException x ) {
-            throw new RuntimeException(sm.getString("pooledParallelSender.unable.open"),x);
+        } catch (IOException x) {
+            throw new RuntimeException(sm.getString("pooledParallelSender.unable.open"), x);
         }
     }
 }

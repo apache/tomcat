@@ -37,9 +37,11 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * This listener must only be nested within {@link Server} elements.
  * <p>
- * <strong>Note</strong>: If you are running Tomcat in an embedded fashion and have more than one Server instance per
- * JVM, this listener <em>must not</em> be added to the {@code Server} instances, but handled outside by the calling
- * code which is bootstrapping the embedded Tomcat instances. Not doing so will lead to JVM crashes.
+ * Only one instance of the APR/Native library may be loaded per JVM. Loading multiple instances will trigger a JVM
+ * crash - typically when the Connectors are destroyed. This listener utilises reference counting to ensure that only
+ * one instance of the APR/Native library is loaded at any one time.
+ * <p>
+ * If multiple listener configurations are found, only the first one initialised will be used.
  *
  * @since 4.1
  */
@@ -99,6 +101,11 @@ public class AprLifecycleListener implements LifecycleListener {
 
     protected static final Object lock = new Object();
 
+    // Guarded by lock
+    private static int referenceCount = 0;
+    private boolean instanceInitialized = false;
+
+
     public static boolean isAprAvailable() {
         // https://bz.apache.org/bugzilla/show_bug.cgi?id=48613
         if (AprStatus.isInstanceCreated()) {
@@ -125,8 +132,13 @@ public class AprLifecycleListener implements LifecycleListener {
 
         if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
             synchronized (lock) {
+                instanceInitialized = true;
                 if (!(event.getLifecycle() instanceof Server)) {
                     log.warn(sm.getString("listener.notServer", event.getLifecycle().getClass().getSimpleName()));
+                }
+                if (referenceCount++ != 0) {
+                    // Already loaded (note test is performed before reference count is incremented)
+                    return;
                 }
                 init();
                 for (String msg : initInfoLogMessages) {
@@ -153,6 +165,14 @@ public class AprLifecycleListener implements LifecycleListener {
             }
         } else if (Lifecycle.AFTER_DESTROY_EVENT.equals(event.getType())) {
             synchronized (lock) {
+                // Instance may get destroyed without ever being initialized
+                if (instanceInitialized) {
+                    referenceCount --;
+                }
+                if (referenceCount != 0) {
+                    // Still being used
+                    return;
+                }
                 if (!AprStatus.isAprAvailable()) {
                     return;
                 }

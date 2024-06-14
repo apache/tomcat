@@ -66,7 +66,7 @@ public class TestLargeUpload extends Http2TestBase {
     public String connectorName;
 
     @Parameter(3)
-    public boolean needApr;
+    public boolean useOpenSSL;
 
     @Parameter(4)
     public String sslImplementationName;
@@ -159,6 +159,6 @@ public class TestLargeUpload extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
     }
 }

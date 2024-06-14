@@ -110,7 +110,7 @@ public class TestCookieProcessorGeneration {
 
     @Test
     public void testMaxAgeZero() {
-        doTestMaxAge(0, "foo=bar; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:10 GMT");
+        doTestMaxAge(0, "foo=bar; Expires=Thu, 01 Jan 1970 00:00:10 GMT");
     }
 
     @Test
@@ -267,7 +267,16 @@ public class TestCookieProcessorGeneration {
                     cookie.getMaxAge() > 0) {
                 // Expires attribute will depend on time cookie is generated so
                 // use a modified test
-                Assert.assertTrue(cookieProcessor.generateHeader(cookie, null).startsWith(expected));
+                String result = cookieProcessor.generateHeader(cookie, null);
+                int posExpiresStart = result.indexOf("Expires");
+                if (posExpiresStart > -1) {
+                    int posExpiresEnd = result.indexOf(';', posExpiresStart);
+                    if (posExpiresEnd > -1) {
+                        // Expires was not at the end of the header - remove it
+                        result = result.substring(0, posExpiresStart -1) + result.substring(posExpiresEnd + 1);
+                    }
+                }
+                Assert.assertTrue(result.startsWith(expected));
             } else {
                 Assert.assertEquals(expected, cookieProcessor.generateHeader(cookie, null));
             }

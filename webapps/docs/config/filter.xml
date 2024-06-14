@@ -1938,36 +1938,6 @@ org.apache.catalina.filters.RequestDumperFilter.handlers = \
 
 </section>
 
-
-<section name="WebDAV Fix Filter">
-
-  <subsection name="Introduction">
-
-    <p>Microsoft operating systems have two WebDAV clients. One is used with
-    port 80, the other is used for all other ports. The implementation used with
-    port 80 does not adhere to the WebDAV specification and fails when trying to
-    communicate with the Tomcat WebDAV Servlet. This Filter provides a fix for
-    this by forcing the use of the WebDAV implementation that works, even when
-    connecting via port 80.</p>
-
-  </subsection>
-
-  <subsection name="Filter Class Name">
-
-    <p>The filter class name for the WebDAV Fix Filter is
-    <strong><code>org.apache.catalina.filters.WebdavFixFilter</code>
-    </strong>.</p>
-
-  </subsection>
-
-  <subsection name="Initialisation parameters">
-
-    <p>The WebDAV Fix Filter does not support any initialization parameters.</p>
-
-  </subsection>
-
-</section>
-
 </body>
 
 </document>

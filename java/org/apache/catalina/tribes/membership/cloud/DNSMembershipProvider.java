@@ -33,11 +33,9 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * A {@link org.apache.catalina.tribes.MembershipProvider} that uses DNS to retrieve the members of a cluster.<br>
- *
  * <p>
  * <strong>Configuration example for Kubernetes</strong>
  * </p>
- *
  * {@code server.xml }
  *
  * <pre>
@@ -61,7 +59,6 @@ import org.apache.juli.logging.LogFactory;
  *  </pre>
  *
  * minimal example for the Service my-tomcat-app-membership, note the <strong>selector</strong><br>
- *
  * {@code dns-membership-service.yml }
  *
  * <pre>
@@ -80,8 +77,8 @@ import org.apache.juli.logging.LogFactory;
  * }
  * </pre>
  *
- * First Tomcat pod minimal example, note the <strong>labels</strong> that must correspond to the <strong>selector</strong> in the service.<br>
- *
+ * First Tomcat pod minimal example, note the <strong>labels</strong> that must correspond to the
+ * <strong>selector</strong> in the service.<br>
  * {@code tomcat1.yml }
  *
  * <pre>
@@ -102,7 +99,6 @@ import org.apache.juli.logging.LogFactory;
  * </pre>
  *
  * Environment variable configuration<br>
- *
  * {@code DNS_MEMBERSHIP_SERVICE_NAME=my-tomcat-app-membership }
  */
 
@@ -158,7 +154,8 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
                 if (ip.equals(localIp)) {
                     // Update the UID on initial lookup
                     Member localMember = service.getLocalMember(false);
-                    if (localMember.getUniqueId() == CloudMembershipService.INITIAL_ID && localMember instanceof MemberImpl) {
+                    if (localMember.getUniqueId() == CloudMembershipService.INITIAL_ID &&
+                            localMember instanceof MemberImpl) {
                         ((MemberImpl) localMember).setUniqueId(id);
                     }
                     continue;
@@ -186,8 +183,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
         Member[] members = membership.getMembers();
         if (members != null) {
             for (Member member : members) {
-                if (Arrays.equals(sender.getHost(), member.getHost())
-                        && sender.getPort() == member.getPort()) {
+                if (Arrays.equals(sender.getHost(), member.getHost()) && sender.getPort() == member.getPort()) {
                     found = true;
                     break;
                 }

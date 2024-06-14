@@ -70,13 +70,6 @@ public class SetNextNamingRule extends Rule {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Process the end of this element.
-     *
-     * @param namespace the namespace URI of the matching element, or an empty string if the parser is not namespace
-     *                      aware or the element has no namespace
-     * @param name      the local name if the parser is namespace aware, or just the element name otherwise
-     */
     @Override
     public void end(String namespace, String name) throws Exception {
 
@@ -110,9 +103,6 @@ public class SetNextNamingRule extends Rule {
     }
 
 
-    /**
-     * Render a printable version of this Rule.
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("SetNextRule[");

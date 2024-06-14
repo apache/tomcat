@@ -29,12 +29,15 @@ public class openssl_h_Compatibility {
     // OpenSSL 1.1 FIPS_mode
     public static int FIPS_mode() {
         class Holder {
+            static final String NAME = "FIPS_mode";
             static final FunctionDescriptor DESC = FunctionDescriptor.of(JAVA_INT);
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("FIPS_mode"),
-                    DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
         }
         var mh$ = Holder.MH;
         try {
+            if (openssl_h.TRACE_DOWNCALLS) {
+                openssl_h.traceDowncall(Holder.NAME);
+            }
             return (int) mh$.invokeExact();
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
@@ -44,12 +47,15 @@ public class openssl_h_Compatibility {
     // OpenSSL 1.1 FIPS_mode_set
     public static int FIPS_mode_set(int r) {
         class Holder {
+            static final String NAME = "FIPS_mode_set";
             static final FunctionDescriptor DESC = FunctionDescriptor.of(JAVA_INT, JAVA_INT);
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("FIPS_mode_set"),
-                    DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
         }
         var mh$ = Holder.MH;
         try {
+            if (openssl_h.TRACE_DOWNCALLS) {
+                openssl_h.traceDowncall(Holder.NAME, Integer.valueOf(r));
+            }
             return (int) mh$.invokeExact(r);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
@@ -59,12 +65,15 @@ public class openssl_h_Compatibility {
     // OpenSSL 1.1 EVP_PKEY_base_id
     public static int EVP_PKEY_base_id(MemorySegment pkey) {
         class Holder {
+            static final String NAME = "EVP_PKEY_base_id";
             static final FunctionDescriptor DESC = FunctionDescriptor.of(JAVA_INT, openssl_h.C_POINTER);
-            static final MethodHandle MH = Linker.nativeLinker()
-                    .downcallHandle(openssl_h.findOrThrow("EVP_PKEY_base_id"), DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
         }
         var mh$ = Holder.MH;
         try {
+            if (openssl_h.TRACE_DOWNCALLS) {
+                openssl_h.traceDowncall(Holder.NAME, pkey);
+            }
             return (int) mh$.invokeExact(pkey);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
@@ -74,12 +83,15 @@ public class openssl_h_Compatibility {
     // OpenSSL 1.1 EVP_PKEY_bits
     public static int EVP_PKEY_bits(MemorySegment pkey) {
         class Holder {
+            static final String NAME = "EVP_PKEY_bits";
             static final FunctionDescriptor DESC = FunctionDescriptor.of(JAVA_INT, openssl_h.C_POINTER);
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("EVP_PKEY_bits"),
-                    DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
         }
         var mh$ = Holder.MH;
         try {
+            if (openssl_h.TRACE_DOWNCALLS) {
+                openssl_h.traceDowncall(Holder.NAME, pkey);
+            }
             return (int) mh$.invokeExact(pkey);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
@@ -89,12 +101,15 @@ public class openssl_h_Compatibility {
     // OpenSSL 1.1 SSL_get_peer_certificate
     public static MemorySegment SSL_get_peer_certificate(MemorySegment s) {
         class Holder {
+            static final String NAME = "SSL_get_peer_certificate";
             static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
-            static final MethodHandle MH = Linker.nativeLinker()
-                    .downcallHandle(openssl_h.findOrThrow("SSL_get_peer_certificate"), DESC);
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
         }
         var mh$ = Holder.MH;
         try {
+            if (openssl_h.TRACE_DOWNCALLS) {
+                openssl_h.traceDowncall(Holder.NAME, s);
+            }
             return (java.lang.foreign.MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);

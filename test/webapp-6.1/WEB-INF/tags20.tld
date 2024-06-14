@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -13,18 +14,24 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<html>
-<head>
-</head>
-<body bgcolor="white">
-<p>
-This package contains basic classes for the
-<a href="https://commons.apache.org/bcel/">Byte Code Engineering Library</a>
- and constants defined by the
-<a href="https://docs.oracle.com/javase/specs/">
- JVM specification</a>.
-</p>
-</body>
-</html>
+--><taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+      http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+      version="2.0">
+  <tlib-version>1.0</tlib-version>
+  <short-name>Tags20</short-name>
+  <uri>http://tomcat.apache.org/tags20</uri>
+
+  <tag>
+    <name>Echo</name>
+    <tag-class>org.apache.jasper.compiler.TestValidator$Echo</tag-class>
+    <body-content>empty</body-content>
+    <attribute>
+      <name>echo</name>
+      <required>yes</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+</taglib>

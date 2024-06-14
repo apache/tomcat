@@ -379,7 +379,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     }
 
 
-
     @Override
     public String getMethod() {
         return method;

@@ -175,7 +175,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
 
     public void append(CharChunk src) throws IOException {
-        append(src.getBuffer(), src.getOffset(), src.getLength());
+        append(src.getBuffer(), src.getStart(), src.getLength());
     }
 
 
@@ -468,7 +468,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
 
     public boolean equals(CharChunk cc) {
-        return equals(cc.getChars(), cc.getOffset(), cc.getLength());
+        return equals(cc.getChars(), cc.getStart(), cc.getLength());
     }
 
 
@@ -632,7 +632,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     public CharSequence subSequence(int start, int end) {
         try {
             CharChunk result = (CharChunk) this.clone();
-            result.setOffset(this.start + start);
+            result.setStart(this.start + start);
             result.setEnd(this.start + end);
             return result;
         } catch (CloneNotSupportedException e) {

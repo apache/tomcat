@@ -466,9 +466,6 @@ public class JAASRealm extends RealmBase {
     }
 
 
-    /**
-     * @return the <code>Principal</code> associated with the given user name.
-     */
     @Override
     protected Principal getPrincipal(String username) {
 

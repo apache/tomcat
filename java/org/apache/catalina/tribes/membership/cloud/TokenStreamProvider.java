@@ -43,7 +43,7 @@ public class TokenStreamProvider extends AbstractStreamProvider {
     }
 
     @Override
-    public InputStream openStream(String url, Map<String, String> headers, int connectTimeout, int readTimeout)
+    public InputStream openStream(String url, Map<String,String> headers, int connectTimeout, int readTimeout)
             throws IOException {
         // Set token header
         if (token != null) {

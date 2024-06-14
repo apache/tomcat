@@ -409,8 +409,14 @@ public abstract class AbstractEndpoint<S,U> {
             }
 
             SSLContext sslContext = certificate.getSslContext();
+            SSLContext sslContextGenerated = certificate.getSslContextGenerated();
             // Generate the SSLContext from configuration unless (e.g. embedded) an SSLContext has been provided.
-            if (sslContext == null) {
+            // Need to handle both initial configuration and reload.
+            // Initial, SSLContext provided     - sslContext will be non-null and sslContextGenerated will be null
+            // Initial, SSLContext not provided - sslContext null and sslContextGenerated will be null
+            // Reload,  SSLContext provided     - sslContext will be non-null and sslContextGenerated will be null
+            // Reload,  SSLContext not provided - sslContext non-null and equal to sslContextGenerated
+            if (sslContext == null || sslContext == sslContextGenerated) {
                 try {
                     sslContext = sslUtil.createSSLContext(negotiableProtocols);
                 } catch (Exception e) {
@@ -523,7 +529,6 @@ public abstract class AbstractEndpoint<S,U> {
             // Only try to negotiate if both client and server have at least
             // one protocol in common
             // Note: Tomcat does not explicitly negotiate http/1.1
-            // TODO: Is this correct? Should it change?
             List<String> commonProtocols = new ArrayList<>(negotiableProtocols);
             commonProtocols.retainAll(clientRequestedApplicationProtocols);
             if (commonProtocols.size() > 0) {
@@ -976,6 +981,46 @@ public abstract class AbstractEndpoint<S,U> {
 
 
     /**
+     * Task queue capacity for the thread pool.
+     */
+    private int maxQueueSize = Integer.MAX_VALUE;
+    public void setMaxQueueSize(int maxQueueSize) {
+        this.maxQueueSize = maxQueueSize;
+    }
+    public int getMaxQueueSize() {
+        if (internalExecutor) {
+            return maxQueueSize;
+        } else {
+            return -1;
+        }
+    }
+
+
+    /**
+     * Amount of time in milliseconds before the internal thread pool stops any idle threads
+     * if the amount of thread is greater than the minimum amount of spare threads.
+     */
+    private int threadsMaxIdleTime = 60000;
+    public void setThreadsMaxIdleTime(int threadsMaxIdleTime) {
+        this.threadsMaxIdleTime = threadsMaxIdleTime;
+        Executor executor = this.executor;
+        if (internalExecutor && executor instanceof ThreadPoolExecutor) {
+            // The internal executor should always be an instance of
+            // org.apache.tomcat.util.threads.ThreadPoolExecutor but it may be
+            // null if the endpoint is not running.
+            // This check also avoids various threading issues.
+            ((ThreadPoolExecutor) executor).setKeepAliveTime(threadsMaxIdleTime, TimeUnit.MILLISECONDS);
+        }
+    }
+    public int getThreadsMaxIdleTime() {
+        if (internalExecutor) {
+            return threadsMaxIdleTime;
+        } else {
+            return -1;
+        }
+    }
+
+    /**
      * Priority of the worker threads.
      */
     protected int threadPriority = Thread.NORM_PRIORITY;
@@ -1196,10 +1241,11 @@ public abstract class AbstractEndpoint<S,U> {
         if (getUseVirtualThreads()) {
             executor = new VirtualThreadExecutor(getName() + "-virt-");
         } else {
-            TaskQueue taskqueue = new TaskQueue();
+            TaskQueue taskqueue = new TaskQueue(maxQueueSize);
             TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-", daemon, getThreadPriority());
-            executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS,taskqueue, tf);
-            taskqueue.setParent( (ThreadPoolExecutor) executor);
+            executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), getThreadsMaxIdleTime(),
+                    TimeUnit.MILLISECONDS, taskqueue, tf);
+            taskqueue.setParent((ThreadPoolExecutor) executor);
         }
     }
 
@@ -1210,6 +1256,7 @@ public abstract class AbstractEndpoint<S,U> {
             this.executor = null;
             if (executor instanceof ThreadPoolExecutor) {
                 //this is our internal one, so we need to shut it down
+                @SuppressWarnings("resource")
                 ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
                 tpe.shutdownNow();
                 long timeout = getExecutorTerminationTimeoutMillis();
@@ -1254,28 +1301,21 @@ public abstract class AbstractEndpoint<S,U> {
             unlockAddress = getUnlockAddress(localAddress);
 
             try (java.net.Socket s = new java.net.Socket()) {
-                int stmo = 2 * 1000;
-                int utmo = 2 * 1000;
-                if (getSocketProperties().getSoTimeout() > stmo) {
-                    stmo = getSocketProperties().getSoTimeout();
-                }
-                if (getSocketProperties().getUnlockTimeout() > utmo) {
-                    utmo = getSocketProperties().getUnlockTimeout();
-                }
-                s.setSoTimeout(stmo);
+                // Never going to read from this socket so the timeout doesn't matter. Use the unlock timeout.
+                s.setSoTimeout(getSocketProperties().getUnlockTimeout());
                 // Newer MacOS versions (e.g. Ventura 13.2) appear to linger for ~1s on close when linger is disabled.
-                // That causes delays when running the unit tests. Explicitly enableing linger but with a timeout of
+                // That causes delays when running the unit tests. Explicitly enabling linger but with a timeout of
                 // zero seconds seems to fix the issue.
                 s.setSoLinger(true, 0);
                 if (getLog().isTraceEnabled()) {
                     getLog().trace("About to unlock socket for:" + unlockAddress);
                 }
-                s.connect(unlockAddress,utmo);
+                s.connect(unlockAddress, getSocketProperties().getUnlockTimeout());
                 if (getLog().isTraceEnabled()) {
                     getLog().trace("Socket unlock completed for:" + unlockAddress);
                 }
             }
-            // Wait for up to 1000ms acceptor threads to unlock. Particularly
+            // Wait for up to 1000ms for acceptor thread to unlock. Particularly
             // for the unit tests, we want to exit this loop as quickly as
             // possible. However, we also don't want to trigger excessive CPU
             // usage if the unlock takes longer than expected. Therefore, we
@@ -1308,21 +1348,23 @@ public abstract class AbstractEndpoint<S,U> {
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
             while (networkInterfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
-                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-                while (inetAddresses.hasMoreElements()) {
-                    InetAddress inetAddress = inetAddresses.nextElement();
-                    if (localAddress.getAddress().getClass().isAssignableFrom(inetAddress.getClass())) {
-                        if (inetAddress.isLoopbackAddress()) {
-                            if (loopbackUnlockAddress == null) {
-                                loopbackUnlockAddress = inetAddress;
+                if (!networkInterface.isPointToPoint() && networkInterface.isUp()) {
+                    Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+                    while (inetAddresses.hasMoreElements()) {
+                        InetAddress inetAddress = inetAddresses.nextElement();
+                        if (localAddress.getAddress().getClass().isAssignableFrom(inetAddress.getClass())) {
+                            if (inetAddress.isLoopbackAddress()) {
+                                if (loopbackUnlockAddress == null) {
+                                    loopbackUnlockAddress = inetAddress;
+                                }
+                            } else if (inetAddress.isLinkLocalAddress()) {
+                                if (linkLocalUnlockAddress == null) {
+                                    linkLocalUnlockAddress = inetAddress;
+                                }
+                            } else {
+                                // Use a non-link local, non-loop back address by default
+                                return new InetSocketAddress(inetAddress, localAddress.getPort());
                             }
-                        } else if (inetAddress.isLinkLocalAddress()) {
-                            if (linkLocalUnlockAddress == null) {
-                                linkLocalUnlockAddress = inetAddress;
-                            }
-                        } else {
-                            // Use a non-link local, non-loop back address by default
-                            return new InetSocketAddress(inetAddress, localAddress.getPort());
                         }
                     }
                 }
@@ -1637,7 +1679,7 @@ public abstract class AbstractEndpoint<S,U> {
     public final void closeServerSocketGraceful() {
         if (bindState == BindState.BOUND_ON_START) {
             // Stop accepting new connections
-            acceptor.stop(-1);
+            acceptor.stopMillis(-1);
             // Release locks that may be preventing the acceptor from stopping
             releaseConnectionLatch();
             unlockAccept();

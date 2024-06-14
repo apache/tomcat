@@ -52,7 +52,7 @@ public class ServletResponseWrapperInclude extends HttpServletResponseWrapper {
     }
 
     /**
-     * Returns a wrapper around the JspWriter of the including page.
+     * @return a wrapper around the JspWriter of the including page.
      */
     @Override
     public PrintWriter getWriter() throws IOException {

@@ -54,6 +54,8 @@ public class Cookie implements Cloneable, Serializable {
 
     private static final CookieNameValidator validation = new RFC6265Validator();
 
+    private static final String EMPTY_STRING = "";
+
     private static final long serialVersionUID = 2L;
 
     /**
@@ -238,7 +240,7 @@ public class Cookie implements Cloneable, Serializable {
      * @see #getSecure
      */
     public void setSecure(boolean flag) {
-        setAttributeInternal(SECURE, Boolean.toString(flag));
+        setAttributeInternal(SECURE, EMPTY_STRING);
     }
 
 
@@ -251,7 +253,7 @@ public class Cookie implements Cloneable, Serializable {
      * @see #setSecure
      */
     public boolean getSecure() {
-        return Boolean.parseBoolean(getAttribute(SECURE));
+        return EMPTY_STRING.equals(getAttribute(SECURE));
     }
 
 
@@ -347,7 +349,7 @@ public class Cookie implements Cloneable, Serializable {
      * @since Servlet 3.0
      */
     public void setHttpOnly(boolean httpOnly) {
-        setAttributeInternal(HTTP_ONLY, Boolean.toString(httpOnly));
+        setAttributeInternal(HTTP_ONLY, EMPTY_STRING);
     }
 
 
@@ -359,7 +361,7 @@ public class Cookie implements Cloneable, Serializable {
      * @since Servlet 3.0
      */
     public boolean isHttpOnly() {
-        return Boolean.parseBoolean(getAttribute(HTTP_ONLY));
+        return EMPTY_STRING.equals(getAttribute(HTTP_ONLY));
     }
 
 

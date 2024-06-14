@@ -275,6 +275,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     }
 
 
+    public int getMaxQueueSize() {
+        return endpoint.getMaxQueueSize();
+    }
+
+    public void setMaxQueueSize(int maxQueueSize) {
+        endpoint.setMaxQueueSize(maxQueueSize);
+    }
+
     public int getAcceptCount() {
         return endpoint.getAcceptCount();
     }
@@ -458,7 +466,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     }
 
 
-    protected Handler<S> getHandler() {
+    public Handler<S> getHandler() {
         return handler;
     }
 
@@ -1107,9 +1115,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         }
 
 
-        /**
-         * Expected to be used by the Endpoint to release resources on socket close, errors etc.
-         */
         @Override
         public void release(SocketWrapperBase<S> socketWrapper) {
             Processor processor = (Processor) socketWrapper.takeCurrentProcessor();

@@ -292,6 +292,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     public boolean isStarted() {
         AtomicBoolean result = new AtomicBoolean(false);
+        Request request = this.request;
+        check();
         request.getCoyoteRequest().action(ActionCode.ASYNC_IS_STARTED, result);
         return result.get();
     }
@@ -435,6 +437,12 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 // complete() or dispatch(). Complete the async processing.
                 complete();
             }
+        } else if (request.isAsyncDispatching()) {
+            /*
+             * AsyncListener.onError() called dispatch. Clear the error state on the response else the dispatch will
+             * trigger error page handling.
+             */
+            request.getResponse().resetError();
         }
     }
 

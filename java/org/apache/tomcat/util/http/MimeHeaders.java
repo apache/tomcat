@@ -19,9 +19,14 @@ package org.apache.tomcat.util.http;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -140,6 +145,36 @@ public class MimeHeaders {
             }
         }
         return sw.toString();
+    }
+
+
+    public Map<String,String> toMap() {
+        if (count == 0) {
+            return Collections.emptyMap();
+        }
+        Map<String,String> result = new HashMap<>();
+
+        for (int i = 0; i < count; i++) {
+            String name = headers[i].getName().toStringType();
+            String value = headers[i].getValue().toStringType();
+            result.merge(name, value, StringUtils::join);
+        }
+        return result;
+    }
+
+
+    public void filter(Set<String> allowedHeaders) {
+        int j = -1;
+        for (int i = 0; i < count; i++) {
+            String name = headers[i].getName().toStringType();
+            if (allowedHeaders.contains(name)) {
+                ++j;
+                if (j != i) {
+                    headers[j] = headers[i];
+                }
+            }
+        }
+        count = ++j;
     }
 
 

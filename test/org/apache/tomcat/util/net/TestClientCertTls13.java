@@ -64,7 +64,7 @@ public class TestClientCertTls13 extends TomcatBaseTest {
     public String connectorName;
 
     @Parameter(1)
-    public boolean needApr;
+    public boolean useOpenSSL;
 
     @Parameter(2)
     public String sslImplementationName;
@@ -107,9 +107,9 @@ public class TestClientCertTls13 extends TomcatBaseTest {
         TesterSupport.configureClientSsl();
 
         Connector connector = tomcat.getConnector();
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, needApr);
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
-        if (needApr) {
+        if (useOpenSSL) {
             if (OpenSSLImplementation.class.getName().equals(sslImplementationName)) {
                 // Need at least OpenSSL 1.1.1 for TLSv1.3 support
                 Assume.assumeTrue(SSL.version() >= 0x1010100f);

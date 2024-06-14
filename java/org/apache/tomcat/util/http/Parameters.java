@@ -376,7 +376,7 @@ public final class Parameters {
             data.toBytes();
         }
         ByteChunk bc = data.getByteChunk();
-        processParameters(bc.getBytes(), bc.getOffset(), bc.getLength(), charset);
+        processParameters(bc.getBytes(), bc.getStart(), bc.getLength(), charset);
     }
 
     /**

@@ -26,8 +26,9 @@ import org.apache.catalina.Role;
 import org.apache.catalina.UserDatabase;
 
 /**
- * <p>Concrete implementation of {@link org.apache.catalina.User} for a
- * {@link UserDatabase}.</p>
+ * <p>
+ * Concrete implementation of {@link org.apache.catalina.User} for a {@link UserDatabase}.
+ * </p>
  *
  * @param <UD> The specific type of UserDase with which this role is associated
  *
@@ -40,19 +41,16 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
 
 
     /**
-     * Package-private constructor used by the factory method in
-     * {@link UserDatabase}.
+     * Package-private constructor used by the factory method in {@link UserDatabase}.
      *
      * @param database The {@link UserDatabase} that owns this user
      * @param username Logon username of the new user
      * @param password Logon password of the new user
      * @param fullName Full name of the new user
-     * @param groups The groups of this user
-     * @param roles The roles of this user
+     * @param groups   The groups of this user
+     * @param roles    The roles of this user
      */
-    GenericUser(UD database, String username,
-               String password, String fullName, List<Group> groups,
-               List<Role> roles) {
+    GenericUser(UD database, String username, String password, String fullName, List<Group> groups, List<Role> roles) {
 
         super();
         this.database = database;
@@ -93,27 +91,18 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     // ------------------------------------------------------------- Properties
 
 
-    /**
-     * Return the set of {@link Group}s to which this user belongs.
-     */
     @Override
     public Iterator<Group> getGroups() {
         return groups.iterator();
     }
 
 
-    /**
-     * Return the set of {@link Role}s assigned specifically to this user.
-     */
     @Override
     public Iterator<Role> getRoles() {
         return roles.iterator();
     }
 
 
-    /**
-     * Return the {@link UserDatabase} within which this User is defined.
-     */
     @Override
     public UserDatabase getUserDatabase() {
         return this.database;
@@ -123,11 +112,6 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Add a new {@link Group} to those this user belongs to.
-     *
-     * @param group The new group
-     */
     @Override
     public void addGroup(Group group) {
         if (groups.addIfAbsent(group)) {
@@ -136,11 +120,6 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     }
 
 
-    /**
-     * Add a new {@link Role} to those assigned specifically to this user.
-     *
-     * @param role The new role
-     */
     @Override
     public void addRole(Role role) {
         if (roles.addIfAbsent(role)) {
@@ -149,35 +128,18 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     }
 
 
-    /**
-     * Is this user in the specified group?
-     *
-     * @param group The group to check
-     */
     @Override
     public boolean isInGroup(Group group) {
         return groups.contains(group);
     }
 
 
-    /**
-     * Is this user specifically assigned the specified {@link Role}?  This
-     * method does <strong>NOT</strong> check for roles inherited based on
-     * {@link Group} membership.
-     *
-     * @param role The role to check
-     */
     @Override
     public boolean isInRole(Role role) {
         return roles.contains(role);
     }
 
 
-    /**
-     * Remove a {@link Group} from those this user belongs to.
-     *
-     * @param group The old group
-     */
     @Override
     public void removeGroup(Group group) {
         if (groups.remove(group)) {
@@ -186,9 +148,6 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     }
 
 
-    /**
-     * Remove all {@link Group}s from those this user belongs to.
-     */
     @Override
     public void removeGroups() {
         if (!groups.isEmpty()) {
@@ -198,11 +157,6 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     }
 
 
-    /**
-     * Remove a {@link Role} from those assigned to this user.
-     *
-     * @param role The old role
-     */
     @Override
     public void removeRole(Role role) {
         if (roles.remove(role)) {
@@ -211,9 +165,6 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     }
 
 
-    /**
-     * Remove all {@link Role}s from those assigned to this user.
-     */
     @Override
     public void removeRoles() {
         if (!roles.isEmpty()) {

@@ -101,16 +101,6 @@ public class PersistentValve extends ValveBase {
     }
 
 
-    /**
-     * Select the appropriate child Context to process this request, based on the specified request URI. If no matching
-     * Context can be found, return an appropriate HTTP error.
-     *
-     * @param request  Request to be processed
-     * @param response Response to be produced
-     *
-     * @exception IOException      if an input/output error occurred
-     * @exception ServletException if a servlet error occurred
-     */
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
 
@@ -151,7 +141,8 @@ public class PersistentValve extends ValveBase {
                             mustReleaseSemaphore = false;
                             onSemaphoreNotAcquired(request, response);
                             if (containerLog.isDebugEnabled()) {
-                                containerLog.debug(sm.getString("persistentValve.acquireInterrupted", request.getDecodedRequestURI()));
+                                containerLog.debug(sm.getString("persistentValve.acquireInterrupted",
+                                        request.getDecodedRequestURI()));
                             }
                             return;
                         }
@@ -160,7 +151,8 @@ public class PersistentValve extends ValveBase {
                     if (!semaphore.tryAcquire()) {
                         onSemaphoreNotAcquired(request, response);
                         if (containerLog.isDebugEnabled()) {
-                            containerLog.debug(sm.getString("persistentValve.acquireFailed", request.getDecodedRequestURI()));
+                            containerLog.debug(
+                                    sm.getString("persistentValve.acquireFailed", request.getDecodedRequestURI()));
                         }
                         return;
                     }
@@ -241,9 +233,8 @@ public class PersistentValve extends ValveBase {
                             }
                             if (!stored) {
                                 if (containerLog.isTraceEnabled()) {
-                                    containerLog
-                                            .trace("newsessionId store: " + store + " session: " + session +
-                                                    " valid: " +
+                                    containerLog.trace(
+                                            "newsessionId store: " + store + " session: " + session + " valid: " +
                                                     (session == null ? "N/A" : Boolean.toString(session.isValid())) +
                                                     " stale: " + isSessionStale(session, System.currentTimeMillis()));
                                 }

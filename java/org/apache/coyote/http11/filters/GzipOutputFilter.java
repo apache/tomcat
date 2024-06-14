@@ -88,7 +88,8 @@ public class GzipOutputFilter implements OutputFilter {
     // --------------------------------------------------- OutputFilter Methods
 
     /**
-     * Added to allow flushing to happen for the gzip'ed outputstream
+     * {@inheritDoc}
+     * Added to allow flushing to happen for the gzip'ed outputstream.
      */
     @Override
     public void flush() throws IOException {
@@ -131,9 +132,6 @@ public class GzipOutputFilter implements OutputFilter {
     }
 
 
-    /**
-     * Make the filter ready to process the next request.
-     */
     @Override
     public void recycle() {
         // Set compression stream to null

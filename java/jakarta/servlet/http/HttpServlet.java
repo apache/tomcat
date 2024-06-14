@@ -242,10 +242,10 @@ public abstract class HttpServlet extends GenericServlet {
      * When using HTTP 1.1 chunked encoding (which means that the response has a Transfer-Encoding header), do not set
      * the Content-Length header.
      * <p>
-     * This method does not need to be either safe or idempotent. Operations requested through POST can have side
-     * effects for which the user can be held accountable, for example, updating stored data or buying items online.
+     * This method is neither safe nor idempotent. Operations requested through PATCH have side effects for which the
+     * user can be held accountable.
      * <p>
-     * If the HTTP POST request is incorrectly formatted, <code>doPost</code> returns an HTTP "Bad Request" message.
+     * If the HTTP PATCH request is incorrectly formatted, <code>doPost</code> returns an HTTP "Bad Request" message.
      *
      * @param req  an {@link HttpServletRequest} object that contains the request the client has made of the servlet
      * @param resp an {@link HttpServletResponse} object that contains the response the servlet sends to the client

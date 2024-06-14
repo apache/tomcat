@@ -43,12 +43,6 @@ public class ClusterSessionListener extends ClusterListener {
 
     // --Logic---------------------------------------------------
 
-    /**
-     * Callback from the cluster, when a message is received, The cluster will broadcast it invoking the messageReceived
-     * on the receiver.
-     *
-     * @param myobj ClusterMessage - the message received from the cluster
-     */
     @Override
     public void messageReceived(ClusterMessage myobj) {
         if (myobj instanceof SessionMessage) {
@@ -92,12 +86,9 @@ public class ClusterSessionListener extends ClusterListener {
     }
 
     /**
-     * Accept only SessionMessage
-     *
-     * @param msg ClusterMessage
-     *
-     * @return boolean - returns true to indicate that messageReceived should be invoked. If false is returned, the
-     *             messageReceived method will not be invoked.
+     * {@inheritDoc}
+     * <p>
+     * This listener accepts only SessionMessage.
      */
     @Override
     public boolean accept(ClusterMessage msg) {

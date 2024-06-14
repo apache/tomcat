@@ -835,10 +835,10 @@ public class Tomcat {
         System.setProperty(Globals.CATALINA_HOME_PROP, server.getCatalinaHome().getPath());
     }
 
-    static final String[] silences =
-            new String[] { "org.apache.coyote.http11.Http11NioProtocol", "org.apache.catalina.core.StandardService",
-                    "org.apache.catalina.core.StandardEngine", "org.apache.catalina.startup.ContextConfig",
-                    "org.apache.catalina.core.ApplicationContext", "org.apache.catalina.core.AprLifecycleListener" };
+    static final String[] silences = new String[] { "org.apache.coyote.http11.Http11NioProtocol",
+            "org.apache.catalina.core.StandardService", "org.apache.catalina.core.StandardEngine",
+            "org.apache.catalina.startup.ContextConfig", "org.apache.catalina.core.ApplicationContext",
+            "org.apache.catalina.core.AprLifecycleListener", "org.apache.catalina.core.OpenSSLLifecycleListener" };
 
     private boolean silent = false;
 

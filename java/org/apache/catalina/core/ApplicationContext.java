@@ -303,11 +303,6 @@ public class ApplicationContext implements ServletContext {
     }
 
 
-    /**
-     * Return the MIME type of the specified file, or <code>null</code> if the MIME type cannot be determined.
-     *
-     * @param file Filename for which to identify a MIME type
-     */
     @Override
     public String getMimeType(String file) {
 
@@ -327,11 +322,6 @@ public class ApplicationContext implements ServletContext {
     }
 
 
-    /**
-     * Return a <code>RequestDispatcher</code> object that acts as a wrapper for the named servlet.
-     *
-     * @param name Name of the servlet for which a dispatcher is requested
-     */
     @Override
     public RequestDispatcher getNamedDispatcher(String name) {
 
