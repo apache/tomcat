@@ -63,6 +63,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.LibraryNotFoundError;
 import org.apache.tomcat.jni.SSL;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
@@ -105,10 +106,16 @@ public final class TesterSupport {
         int version = 0;
         String err = "";
         try {
-            Library.initialize(null);
-            available = true;
-            version = SSL.version();
-            Library.terminate();
+            if (JreCompat.isJre22Available()) {
+                // Try with FFM
+                Class<?> openSSL = Class.forName("org.apache.tomcat.util.openssl.openssl_h");
+                version = ((Long) openSSL.getMethod("OpenSSL_version_num").invoke(null)).intValue();
+            } else {
+                Library.initialize(null);
+                available = true;
+                version = SSL.version();
+                Library.terminate();
+            }
         } catch (Exception | LibraryNotFoundError ex) {
             err = ex.getMessage();
         }
