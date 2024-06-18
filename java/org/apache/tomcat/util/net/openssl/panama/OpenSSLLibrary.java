@@ -218,9 +218,12 @@ public class OpenSSLLibrary {
 
                 // Set the random seed, translated to the Java way
                 boolean seedDone = false;
-                if (SSLRandomSeed != null || SSLRandomSeed.length() != 0 || !"builtin".equals(SSLRandomSeed)) {
+                if (SSLRandomSeed != null && SSLRandomSeed.length() != 0 && !"builtin".equals(SSLRandomSeed)) {
                     var randomSeed = memorySession.allocateFrom(SSLRandomSeed);
                     seedDone = RAND_load_file(randomSeed, 128) > 0;
+                    if (!seedDone) {
+                        log.warn(sm.getString("openssllibrary.errorSettingSSLRandomSeed", SSLRandomSeed, OpenSSLLibrary.getLastError()));
+                    }
                 }
                 if (!seedDone) {
                     // Use a regular random to get some bytes
@@ -455,5 +458,39 @@ public class OpenSSLLibrary {
         }
         return ciphers.toArray(new String[0]);
     }
+
+    private static final int OPENSSL_ERROR_MESSAGE_BUFFER_SIZE = 256;
+
+    /**
+     * Many calls to SSL methods do not check the last error. Those that do
+     * check the last error need to ensure that any previously ignored error is
+     * cleared prior to the method call else errors may be falsely reported.
+     * Ideally, before any SSL_read, SSL_write, clearLastError should always
+     * be called, and getLastError should be called after on any negative or
+     * zero result.
+     * @return the first error in the stack
+     */
+    static String getLastError() {
+        String sslError = null;
+        long error = ERR_get_error();
+        if (error != SSL_ERROR_NONE()) {
+            try (var localArena = Arena.ofConfined()) {
+                do {
+                    // Loop until getLastErrorNumber() returns SSL_ERROR_NONE
+                    var buf = localArena.allocate(ValueLayout.JAVA_BYTE, OPENSSL_ERROR_MESSAGE_BUFFER_SIZE);
+                    ERR_error_string_n(error, buf, OPENSSL_ERROR_MESSAGE_BUFFER_SIZE);
+                    String err = buf.getString(0);
+                    if (sslError == null) {
+                        sslError = err;
+                    }
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("engine.openSSLError", Long.toString(error), err));
+                    }
+                } while ((error = ERR_get_error()) != SSL_ERROR_NONE());
+            }
+        }
+        return sslError;
+    }
+
 
 }
