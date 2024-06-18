@@ -187,6 +187,7 @@ public class ImportHandler {
         javaLangClassNames.add("Runtime.Version");
         javaLangClassNames.add("RuntimePermission");
         javaLangClassNames.add("ScopedValue");
+        javaLangClassNames.add("ScopedValue.CallableOp");
         javaLangClassNames.add("ScopedValue.Carrier");
         javaLangClassNames.add("SecurityManager");
         javaLangClassNames.add("Short");

@@ -115,6 +115,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Update the optimisation in <code>jakarta.el.ImportHandler</code> so it
+        is aware of new classes added to the <code>java.lang</code> package in
+        Java 23. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M21 (markt)" rtext="release in progress">
   <subsection name="Catalina">
