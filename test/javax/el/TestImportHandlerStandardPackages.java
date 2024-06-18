@@ -60,7 +60,7 @@ public class TestImportHandlerStandardPackages {
             // every test run. The intention is that it will catch new classes
             // when the tests are run on a newer JRE.
             // The latest version of the JRE where this test is known to pass is
-            // - OpenJDK 19 EA 22
+            // - OpenJDK 24 EA 2
             if (!JreCompat.isJre9Available()) {
                 return;
             }
