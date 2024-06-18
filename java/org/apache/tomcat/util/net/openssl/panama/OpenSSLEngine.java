@@ -944,7 +944,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private void checkLastError() throws SSLException {
-        String sslError = OpenSSLContext.getLastError();
+        String sslError = OpenSSLLibrary.getLastError();
         if (sslError != null) {
             // Many errors can occur during handshake and need to be reported
             if (!handshakeFinished) {
@@ -960,7 +960,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Clear out any errors, but log a warning.
      */
     private static void clearLastError() {
-        OpenSSLContext.getLastError();
+        OpenSSLLibrary.getLastError();
     }
 
     private SSLEngineResult.Status getEngineStatus() {
