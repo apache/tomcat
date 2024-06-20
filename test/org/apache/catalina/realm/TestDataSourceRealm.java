@@ -26,10 +26,12 @@ import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.LoggingBaseTest;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestDataSourceRealm extends LoggingBaseTest {
 
@@ -94,6 +96,8 @@ public class TestDataSourceRealm extends LoggingBaseTest {
 
     @Test
     public void testRealm() throws Exception {
+
+        Assume.assumeTrue(JreCompat.isJre16Available());
 
         db = new DerbyDataSourceRealm("dsRealm");
         db.setUserTable("users");
