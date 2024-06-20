@@ -758,9 +758,9 @@ public class TesterContext implements Context {
         String charset = localEncodingMap.get(locale.toString());
         if (charset == null) {
             charset = localEncodingMap.get(locale.getLanguage() + "_" + locale.getCountry());
-            if (charset == null) {
-                charset = localEncodingMap.get(locale.getLanguage());
-            }
+        }
+        if (charset == null) {
+            charset = localEncodingMap.get(locale.getLanguage());
         }
         return charset;
     }
