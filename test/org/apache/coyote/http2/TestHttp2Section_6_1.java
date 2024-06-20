@@ -17,7 +17,7 @@
 package org.apache.coyote.http2;
 
 import java.util.logging.Level;
-import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -48,8 +48,8 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
 
     @Test
     public void testDataFrameWithPadding() throws Exception {
-        LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.ALL);
-        LogManager.getLogManager().getLogger("org.apache.tomcat.util.net").setLevel(Level.ALL);
+        Logger.getLogger("org.apache.coyote").setLevel(Level.ALL);
+        Logger.getLogger("org.apache.tomcat.util.net").setLevel(Level.ALL);
         try {
             http2Connect();
 
@@ -82,8 +82,8 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
                     "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n" + "3-Body-119\n" +
                     "3-EndOfStream\n", trace);
         } finally {
-            LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.INFO);
-            LogManager.getLogManager().getLogger("org.apache.tomcat.util.net").setLevel(Level.INFO);
+            Logger.getLogger("org.apache.coyote").setLevel(Level.INFO);
+            Logger.getLogger("org.apache.tomcat.util.net").setLevel(Level.INFO);
         }
     }
 
