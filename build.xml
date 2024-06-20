@@ -1985,7 +1985,7 @@
 
   <target name="test-only-nio" description="Runs the JUnit test cases or NIO without test preparations. Does not stop on errors."
           depends="setup-jacoco,test-openssl-exists" if="${execute.test.nio}">
-    <runtests protocol="org.apache.coyote.http11.Http11Nio2Protocol"
+    <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
   </target>
 
