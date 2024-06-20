@@ -1978,11 +1978,21 @@
     </condition>
   </target>
 
-  <property name="opens.javalang" value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
-  <property name="opens.javaio" value="--add-opens=java.base/java.io=ALL-UNNAMED"/>
-  <property name="opens.sunrmi" value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
-  <property name="opens.javautil" value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
-  <property name="opens.javautilconcurrent" value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"/>
+  <condition property="opens.javalang" value="--add-opens=java.base/java.lang=ALL-UNNAMED" else="-Dtest10=1">
+    <javaversion atleast="9"/>
+  </condition>
+  <condition property="opens.javaio" value="--add-opens=java.base/java.io=ALL-UNNAMED" else="-Dtest11=1">
+    <javaversion atleast="9"/>
+  </condition>
+  <condition property="opens.sunrmi" value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED" else="-Dtest12=1">
+    <javaversion atleast="9"/>
+  </condition>
+  <condition property="opens.javautil" value="--add-opens=java.base/java.util=ALL-UNNAMED" else="-Dtest13=1">
+    <javaversion atleast="9"/>
+  </condition>
+  <condition property="opens.javautilconcurrent" value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED" else="-Dtest14=1">
+    <javaversion atleast="9"/>
+  </condition>
 
   <macrodef name="runtests"
             description="Runs the unit tests using the specified connector.
@@ -2824,7 +2834,7 @@ asf.ldap.username=${release.asfusername}
   <target name="release-version-check" >
     <fail message="Release builds must use Java version ${build.java.version} or newer (${java.version} is installed)">
       <condition>
-        <not><javaversion atleast="${build.java.version}" /></not>
+        <not><javaversion atleast="${release.java.version}" /></not>
       </condition>
     </fail>
   </target>
