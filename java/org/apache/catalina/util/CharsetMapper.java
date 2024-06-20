@@ -103,9 +103,9 @@ public class CharsetMapper {
         String charset = map.getProperty(locale.toString());
         if (charset == null) {
             charset = map.getProperty(locale.getLanguage() + "_" + locale.getCountry());
-            if (charset == null) {
-                charset = map.getProperty(locale.getLanguage());
-            }
+        }
+        if (charset == null) {
+            charset = map.getProperty(locale.getLanguage());
         }
         return charset;
     }
