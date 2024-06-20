@@ -110,11 +110,15 @@
   <property name="min.java.version" value="17"/>
   <property name="build.java.version" value="17"/>
   <property name="release.java.version" value="22"/>
+  <property name="skip.build.java.version" value="false"/>
 
   <!-- Check Java Build Version -->
   <fail message="Java version ${build.java.version} or newer is required (${java.version} is installed)">
     <condition>
-      <not><javaversion atleast="${build.java.version}" /></not>
+      <and>
+        <not><javaversion atleast="${build.java.version}"/></not>
+        <not><istrue value="${skip.build.java.version}"/></not>
+      </and>
     </condition>
   </fail>
 
@@ -1930,6 +1934,9 @@
   <target name="test" description="Runs the JUnit test cases"
           depends="test-nio,test-nio2,coverage-report,test-status" />
 
+  <target name="test-only" description="Runs the JUnit test cases, without compilation"
+          depends="test-only-nio,test-only-nio2,test-status" />
+
   <target name="test-status"
           description="Analyses logs directory and reports on skipped tests, test failures and test errors">
     <fileset id="test.result.skippedtests" dir="${test.reports}" includes="*.txt">
@@ -1971,10 +1978,22 @@
               extension=".NIO" />
   </target>
 
+  <target name="test-only-nio" description="Runs the JUnit test cases or NIO without test preparations. Does not stop on errors."
+          depends="setup-jacoco,test-openssl-exists" if="${execute.test.nio}">
+    <runtests protocol="org.apache.coyote.http11.Http11Nio2Protocol"
+              extension=".NIO" />
+  </target>
+
   <target name="test-nio2" description="Runs the JUnit test cases for NIO2. Does not stop on errors."
           depends="setup-jacoco,test-compile,deploy,test-openssl-exists" if="${execute.test.nio2}">
     <runtests protocol="org.apache.coyote.http11.Http11Nio2Protocol"
               extension=".NIO2" />
+  </target>
+
+  <target name="test-only-nio2" description="Runs the JUnit test cases or NIO2 without test preparations. Does not stop on errors."
+          depends="setup-jacoco,test-openssl-exists" if="${execute.test.nio2}">
+    <runtests protocol="org.apache.coyote.http11.Http11Nio2Protocol"
+          extension=".NIO2" />
   </target>
 
   <target name="test-openssl-exists" description="Checks for the OpenSSL binary">
@@ -3913,7 +3932,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     </antcall>
   </target>
 
-  <target name="setup-bnd" depends="download-bnd">
+  <target name="setup-bnd" depends="download-bnd" unless="skip.build.java.version">
     <!-- Add bnd tasks to project -->
     <path id="bnd.classpath">
       <fileset file="${bnd.jar}" />
@@ -3988,7 +4007,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     </sequential>
   </macrodef>
 
-  <target name="add-osgi" if="${addOSGi}" >
+  <target name="add-osgi" if="${addOSGi}" unless="skip.build.java.version">
     <echo message="add-osgi ${jarfile} ${addOSGi}"></echo>
     <local name="filename"/>
     <basename property="filename" file="${jarfile}"/>
