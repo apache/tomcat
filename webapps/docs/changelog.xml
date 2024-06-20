@@ -122,6 +122,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Add <code>test-only</code> build target to allow running only the
+        testsuite, supporting Java versions down to the minimum supported
+        to run Tomcat. (rjung)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.25 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
