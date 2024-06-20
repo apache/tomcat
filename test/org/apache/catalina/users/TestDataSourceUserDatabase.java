@@ -24,12 +24,14 @@ import java.util.Iterator;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Group;
 import org.apache.catalina.Role;
 import org.apache.catalina.User;
 import org.apache.catalina.startup.LoggingBaseTest;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestDataSourceUserDatabase extends LoggingBaseTest {
 
@@ -119,6 +121,8 @@ public class TestDataSourceUserDatabase extends LoggingBaseTest {
     @Test
     public void testBasicUserRoleDatabase()
         throws Exception {
+        Assume.assumeTrue(JreCompat.isJre16Available());
+
         // Test functionality with the DataSourceRealm schema
 
         db = new DerbyUserDatabase("simple");
@@ -169,6 +173,7 @@ public class TestDataSourceUserDatabase extends LoggingBaseTest {
     @Test
     public void testUserDatabase()
         throws Exception {
+        Assume.assumeTrue(JreCompat.isJre16Available());
 
         db = new DerbyUserDatabase("full");
         db.setReadonly(false);
