@@ -49,7 +49,21 @@ public class TestAsyncContextImplListenerOnComplete extends TomcatBaseTest {
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=68227
      */
     @Test
-    public void testAfterNetworkErrorThenDispatch() throws Exception {
+    public void testAfterNetworkErrorThenDispatchWithoutRuntimeException() throws Exception {
+        doTestAfterNetworkErrorThenDispatch(false);
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=69121
+     */
+    @Test
+    public void testAfterNetworkErrorThenDispatchWithRuntimeException() throws Exception {
+        doTestAfterNetworkErrorThenDispatch(true);
+    }
+
+
+    private void doTestAfterNetworkErrorThenDispatch(boolean dispatchThrowsRuntimeException) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
@@ -59,7 +73,8 @@ public class TestAsyncContextImplListenerOnComplete extends TomcatBaseTest {
         // Latch to track that complete has been called
         CountDownLatch completeLatch = new CountDownLatch(1);
 
-        Wrapper servletWrapper = tomcat.addServlet("", "repro-servlet", new ReproServlet(completeLatch));
+        Wrapper servletWrapper =
+                tomcat.addServlet("", "repro-servlet", new ReproServlet(completeLatch, dispatchThrowsRuntimeException));
         servletWrapper.addMapping("/repro");
         servletWrapper.setAsyncSupported(true);
         servletWrapper.setLoadOnStartup(1);
@@ -97,9 +112,11 @@ public class TestAsyncContextImplListenerOnComplete extends TomcatBaseTest {
         private final EventSource eventSource = new EventSource();
 
         private final CountDownLatch completeLatch;
+        private final boolean throwRuntimeExceptionOnErrorDispatch;
 
-        ReproServlet(CountDownLatch completeLatch) {
+        ReproServlet(CountDownLatch completeLatch, boolean throwRuntimeExceptionOnErrorDispatch) {
             this.completeLatch = completeLatch;
+            this.throwRuntimeExceptionOnErrorDispatch = throwRuntimeExceptionOnErrorDispatch;
         }
 
         @Override
@@ -115,6 +132,10 @@ public class TestAsyncContextImplListenerOnComplete extends TomcatBaseTest {
                 AsyncContext context = req.startAsync();
                 context.addListener(new ReproAsyncListener());
                 eventSource.add(context);
+            } else if (req.getDispatcherType() == DispatcherType.ASYNC && throwRuntimeExceptionOnErrorDispatch) {
+                // The only async dispatch to this servlet is on an error
+                // Spring will throw a RuntimeException here if it detects that the response is no longer usable
+                throw new RuntimeException();
             }
         }
 
