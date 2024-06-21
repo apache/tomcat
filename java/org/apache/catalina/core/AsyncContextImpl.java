@@ -345,7 +345,6 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 fireOnComplete();
             }
         } catch (RuntimeException x) {
-            // doInternalComplete(true);
             if (x.getCause() instanceof ServletException) {
                 throw (ServletException) x.getCause();
             }
