@@ -32,11 +32,11 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
 /**
- * Abstract base class for Ant tasks that interact with the <em>Manager</em> web
- * application for dynamically deploying and undeploying applications. These
- * tasks require Ant 1.4 or later.
+ * Abstract base class for Ant tasks that interact with the <em>Manager</em> web application for dynamically deploying
+ * and undeploying applications. These tasks require Ant 1.4 or later.
  *
  * @author Craig R. McClanahan
+ *
  * @since 4.1
  */
 public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
@@ -107,16 +107,14 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
     }
 
     /**
-     * If set to true - ignore the constraint of the first line of the response
-     * message that must be "OK -".
+     * If set to true - ignore the constraint of the first line of the response message that must be "OK -".
      * <p>
-     * When this attribute is set to {@code false} (the default), the first line
-     * of server response is expected to start with "OK -". If it does not then
-     * the task is considered as failed and the first line is treated as an
-     * error message.
+     * When this attribute is set to {@code false} (the default), the first line of server response is expected to start
+     * with "OK -". If it does not then the task is considered as failed and the first line is treated as an error
+     * message.
      * <p>
-     * When this attribute is set to {@code true}, the first line of the
-     * response is treated like any other, regardless of its text.
+     * When this attribute is set to {@code true}, the first line of the response is treated like any other, regardless
+     * of its text.
      */
     protected boolean ignoreResponseConstraint = false;
 
@@ -132,9 +130,8 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Execute the specified command. This logic only performs the common
-     * attribute validation required by all subclasses; it does not perform any
-     * functional logic directly.
+     * Execute the specified command. This logic only performs the common attribute validation required by all
+     * subclasses; it does not perform any functional logic directly.
      *
      * @exception BuildException if a validation error occurs
      */
@@ -159,19 +156,18 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
 
 
     /**
-     * Execute the specified command, based on the configured properties. The
-     * input stream will be closed upon completion of this task, whether it was
-     * executed successfully or not.
+     * Execute the specified command, based on the configured properties. The input stream will be closed upon
+     * completion of this task, whether it was executed successfully or not.
      *
-     * @param command Command to be executed
-     * @param istream InputStream to include in an HTTP PUT, if any
-     * @param contentType Content type to specify for the input, if any
+     * @param command       Command to be executed
+     * @param istream       InputStream to include in an HTTP PUT, if any
+     * @param contentType   Content type to specify for the input, if any
      * @param contentLength Content length to specify for the input, if any
      *
      * @exception BuildException if an error occurs
      */
     public void execute(String command, InputStream istream, String contentType, long contentLength)
-                    throws BuildException {
+            throws BuildException {
 
         URLConnection conn = null;
         InputStreamReader reader = null;
@@ -233,7 +229,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 int ch = reader.read();
                 if (ch < 0) {
                     break;
-                } else if ((ch == '\r') || (ch == '\n')) {
+                } else if (ch == '\r' || ch == '\n') {
                     // in Win \r\n would cause handleOutput() to be called
                     // twice, the second time with an empty string,
                     // producing blank lines
@@ -289,19 +285,13 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
 
 
     /*
-     * This is a hack.
-     * We need to use streaming to avoid OOME on large uploads.
-     * We'd like to use Authenticator.setDefault() for authentication as the JRE
-     * then provides the DIGEST client implementation.
-     * However, the above two are not compatible. When the request is made, the
-     * resulting 401 triggers an exception because, when using streams, the
-     * InputStream is no longer available to send with the repeated request that
-     * now includes the appropriate Authorization header.
-     * The hack is to make a simple OPTIONS request- i.e. without a request
-     * body.
-     * This triggers authentication and the requirement to authenticate for this
-     * host is cached and used to provide an appropriate Authorization when the
-     * next request is made (that includes a request body).
+     * This is a hack. We need to use streaming to avoid OOME on large uploads. We'd like to use
+     * Authenticator.setDefault() for authentication as the JRE then provides the DIGEST client implementation. However,
+     * the above two are not compatible. When the request is made, the resulting 401 triggers an exception because, when
+     * using streams, the InputStream is no longer available to send with the repeated request that now includes the
+     * appropriate Authorization header. The hack is to make a simple OPTIONS request- i.e. without a request body. This
+     * triggers authentication and the requirement to authenticate for this host is cached and used to provide an
+     * appropriate Authorization when the next request is made (that includes a request body).
      */
     private void preAuthenticate() throws IOException, URISyntaxException {
         URLConnection conn = null;

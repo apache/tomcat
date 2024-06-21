@@ -35,7 +35,15 @@ class EncodingDetector {
 
     private static final XMLInputFactory XML_INPUT_FACTORY;
     static {
-        XML_INPUT_FACTORY = XMLInputFactory.newInstance();
+        ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(EncodingDetector.class.getClassLoader());
+            XML_INPUT_FACTORY = XMLInputFactory.newFactory();
+        } finally {
+            if (oldCl != null) {
+                Thread.currentThread().setContextClassLoader(oldCl);
+            }
+        }
     }
 
     private final String encoding;

@@ -21,17 +21,17 @@
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>27</version>
+        <version>30</version>
     </parent>
 
     <groupId>org.apache.tomcat</groupId>
     <artifactId>tomcat-coyote-openssl</artifactId>
-    <name>Apache Tomcat OpenSSL support for Java 21</name>
-    <description>OpenSSL support using new APIs included in Java 21</description>
+    <name>Apache Tomcat OpenSSL support for Java 22</name>
+    <description>OpenSSL support using FFM API included in Java 22</description>
     <version>0.1-SNAPSHOT</version>
 
     <properties>
-        <tomcat.version>9.0.73</tomcat.version>
+        <tomcat.version>11.0.0-M18</tomcat.version>
         <project.build.outputTimestamp>2021-12-02T12:00:00Z</project.build.outputTimestamp>
     </properties>
 
@@ -78,18 +78,14 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>21</source>
-                    <target>21</target>
-                    <compilerArgs>
-                        <arg>--enable-preview</arg>
-                    </compilerArgs>
+                    <release>22</release>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <source>19</source> 
+                    <source>22</source>
                 </configuration>
             </plugin>
         </plugins>

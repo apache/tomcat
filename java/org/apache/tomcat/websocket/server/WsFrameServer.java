@@ -57,8 +57,8 @@ public class WsFrameServer extends WsFrameBase {
      * @throws IOException if an I/O error occurs while processing the available data
      */
     private void onDataAvailable() throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug("wsFrameServer.onDataAvailable");
+        if (log.isTraceEnabled()) {
+            log.trace("wsFrameServer.onDataAvailable");
         }
         if (isOpen() && inputBuffer.hasRemaining() && !isSuspended()) {
             // There might be a data that was left in the buffer when
@@ -73,13 +73,14 @@ public class WsFrameServer extends WsFrameBase {
             inputBuffer.position(inputBuffer.limit()).limit(inputBuffer.capacity());
             int read = socketWrapper.read(false, inputBuffer);
             inputBuffer.limit(inputBuffer.position()).reset();
-            if (read < 0) {
+            // Some error conditions in NIO2 will trigger a return of zero and close the socket
+            if (read < 0 || socketWrapper.isClosed()) {
                 throw new EOFException();
             } else if (read == 0) {
                 return;
             }
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("wsFrameServer.bytesRead", Integer.toString(read)));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("wsFrameServer.bytesRead", Integer.toString(read)));
             }
             processInputBuffer();
         }

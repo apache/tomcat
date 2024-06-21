@@ -84,9 +84,6 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Initialize this servlet.
-     */
     @Override
     public void init() throws ServletException {
 
@@ -131,15 +128,12 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
             mBeanServer.addNotificationListener(objectName, this, null, null);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log(sm.getString("managerServlet.error.jmx"), e);
         }
 
     }
 
 
-    /**
-     * Finalize this servlet.
-     */
     @Override
     public void destroy() {
 
@@ -150,85 +144,72 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
             objectName = new ObjectName(onStr);
             mBeanServer.removeNotificationListener(objectName, this, null, null);
         } catch (Exception e) {
-            e.printStackTrace();
+            log(sm.getString("managerServlet.error.jmx"), e);
         }
 
     }
 
 
-    /**
-     * Process a GET request for the specified resource.
-     *
-     * @param request The servlet request we are processing
-     * @param response The servlet response we are creating
-     *
-     * @exception IOException if an input/output error occurs
-     * @exception ServletException if a servlet-specified error occurs
-     */
     @Override
-    public void doGet(HttpServletRequest request,
-                      HttpServletResponse response)
-        throws IOException, ServletException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        StringManager smClient = StringManager.getManager(
-                Constants.Package, request.getLocales());
+        StringManager smClient = StringManager.getManager(Constants.Package, request.getLocales());
 
-        // mode is flag for HTML or XML output
+        // mode is flag for HTML, JSON or XML output
         int mode = 0;
         // if ?XML=true, set the mode to XML
-        if (request.getParameter("XML") != null
-            && request.getParameter("XML").equals("true")) {
+        if (request.getParameter("XML") != null && request.getParameter("XML").equals("true")) {
             mode = 1;
+        }
+        // if ?JSON=true, set the mode to JSON
+        if (request.getParameter("JSON") != null && request.getParameter("JSON").equals("true")) {
+            mode = 2;
         }
         StatusTransformer.setContentType(response, mode);
 
         PrintWriter writer = response.getWriter();
 
         boolean completeStatus = false;
-        if ((request.getPathInfo() != null)
-            && (request.getPathInfo().equals("/all"))) {
+        if (request.getPathInfo() != null && request.getPathInfo().equals("/all")) {
             completeStatus = true;
         }
         // use StatusTransformer to output status
         Object[] args = new Object[1];
-        args[0] = request.getContextPath();
-        StatusTransformer.writeHeader(writer,args,mode);
+        args[0] = getServletContext().getContextPath();
+        StatusTransformer.writeHeader(writer, args, mode);
 
         // Body Header Section
         args = new Object[2];
-        args[0] = request.getContextPath();
+        args[0] = getServletContext().getContextPath();
         if (completeStatus) {
             args[1] = smClient.getString("statusServlet.complete");
         } else {
             args[1] = smClient.getString("statusServlet.title");
         }
         // use StatusTransformer to output status
-        StatusTransformer.writeBody(writer,args,mode);
+        StatusTransformer.writeBody(writer, args, mode);
 
         // Manager Section
         args = new Object[9];
         args[0] = smClient.getString("htmlManagerServlet.manager");
-        args[1] = response.encodeURL(request.getContextPath() + "/html/list");
+        args[1] = response.encodeURL(getServletContext().getContextPath() + "/html/list");
         args[2] = smClient.getString("htmlManagerServlet.list");
         args[3] = // External link
-            (request.getContextPath() + "/" +
-             smClient.getString("htmlManagerServlet.helpHtmlManagerFile"));
+                getServletContext().getContextPath() + "/" +
+                        smClient.getString("htmlManagerServlet.helpHtmlManagerFile");
         args[4] = smClient.getString("htmlManagerServlet.helpHtmlManager");
         args[5] = // External link
-            (request.getContextPath() + "/" +
-             smClient.getString("htmlManagerServlet.helpManagerFile"));
+                getServletContext().getContextPath() + "/" + smClient.getString("htmlManagerServlet.helpManagerFile");
         args[6] = smClient.getString("htmlManagerServlet.helpManager");
         if (completeStatus) {
-            args[7] = response.encodeURL
-                (request.getContextPath() + "/status");
+            args[7] = response.encodeURL(getServletContext().getContextPath() + "/status");
             args[8] = smClient.getString("statusServlet.title");
         } else {
-            args[7] = response.encodeURL
-                (request.getContextPath() + "/status/all");
+            args[7] = response.encodeURL(getServletContext().getContextPath() + "/status/all");
             args[8] = smClient.getString("statusServlet.complete");
         }
         // use StatusTransformer to output status
-        StatusTransformer.writeManager(writer,args,mode);
+        StatusTransformer.writeManager(writer, args, mode);
 
         // Server Header Section
         args = new Object[9];
@@ -242,7 +223,7 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
         args[7] = smClient.getString("htmlManagerServlet.serverHostname");
         args[8] = smClient.getString("htmlManagerServlet.serverIPAddress");
         // use StatusTransformer to output status
-        StatusTransformer.writePageHeading(writer,args,mode);
+        StatusTransformer.writePageHeading(writer, args, mode);
 
         // Server Row Section
         args = new Object[8];
@@ -256,7 +237,7 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
             InetAddress address = InetAddress.getLocalHost();
             args[6] = address.getHostName();
             args[7] = address.getHostAddress();
-         } catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
             args[6] = "-";
             args[7] = "-";
         }
@@ -277,36 +258,32 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
             args[7] = smClient.getString("htmlManagerServlet.jvmTableTitleMaximum");
             args[8] = smClient.getString("htmlManagerServlet.jvmTableTitleUsed");
             // use StatusTransformer to output status
-            StatusTransformer.writeVMState(writer,mode, args);
+            StatusTransformer.writeVMState(writer, mode, args);
 
-            for (ObjectName objectName : threadPools) {
-                String name = objectName.getKeyProperty("name");
-                args = new Object[19];
-                args[0] = smClient.getString("htmlManagerServlet.connectorStateMaxThreads");
-                args[1] = smClient.getString("htmlManagerServlet.connectorStateThreadCount");
-                args[2] = smClient.getString("htmlManagerServlet.connectorStateThreadBusy");
-                args[3] = smClient.getString("htmlManagerServlet.connectorStateAliveSocketCount");
-                args[4] = smClient.getString("htmlManagerServlet.connectorStateMaxProcessingTime");
-                args[5] = smClient.getString("htmlManagerServlet.connectorStateProcessingTime");
-                args[6] = smClient.getString("htmlManagerServlet.connectorStateRequestCount");
-                args[7] = smClient.getString("htmlManagerServlet.connectorStateErrorCount");
-                args[8] = smClient.getString("htmlManagerServlet.connectorStateBytesReceived");
-                args[9] = smClient.getString("htmlManagerServlet.connectorStateBytesSent");
-                args[10] = smClient.getString("htmlManagerServlet.connectorStateTableTitleStage");
-                args[11] = smClient.getString("htmlManagerServlet.connectorStateTableTitleTime");
-                args[12] = smClient.getString("htmlManagerServlet.connectorStateTableTitleBSent");
-                args[13] = smClient.getString("htmlManagerServlet.connectorStateTableTitleBRecv");
-                args[14] = smClient.getString("htmlManagerServlet.connectorStateTableTitleClientForw");
-                args[15] = smClient.getString("htmlManagerServlet.connectorStateTableTitleClientAct");
-                args[16] = smClient.getString("htmlManagerServlet.connectorStateTableTitleVHost");
-                args[17] = smClient.getString("htmlManagerServlet.connectorStateTableTitleRequest");
-                args[18] = smClient.getString("htmlManagerServlet.connectorStateHint");
-                // use StatusTransformer to output status
-                StatusTransformer.writeConnectorState(writer, objectName, name, mBeanServer, globalRequestProcessors,
-                        requestProcessors, mode, args);
-            }
+            args = new Object[19];
+            args[0] = smClient.getString("htmlManagerServlet.connectorStateMaxThreads");
+            args[1] = smClient.getString("htmlManagerServlet.connectorStateThreadCount");
+            args[2] = smClient.getString("htmlManagerServlet.connectorStateThreadBusy");
+            args[3] = smClient.getString("htmlManagerServlet.connectorStateAliveSocketCount");
+            args[4] = smClient.getString("htmlManagerServlet.connectorStateMaxProcessingTime");
+            args[5] = smClient.getString("htmlManagerServlet.connectorStateProcessingTime");
+            args[6] = smClient.getString("htmlManagerServlet.connectorStateRequestCount");
+            args[7] = smClient.getString("htmlManagerServlet.connectorStateErrorCount");
+            args[8] = smClient.getString("htmlManagerServlet.connectorStateBytesReceived");
+            args[9] = smClient.getString("htmlManagerServlet.connectorStateBytesSent");
+            args[10] = smClient.getString("htmlManagerServlet.connectorStateTableTitleStage");
+            args[11] = smClient.getString("htmlManagerServlet.connectorStateTableTitleTime");
+            args[12] = smClient.getString("htmlManagerServlet.connectorStateTableTitleBSent");
+            args[13] = smClient.getString("htmlManagerServlet.connectorStateTableTitleBRecv");
+            args[14] = smClient.getString("htmlManagerServlet.connectorStateTableTitleClientForw");
+            args[15] = smClient.getString("htmlManagerServlet.connectorStateTableTitleClientAct");
+            args[16] = smClient.getString("htmlManagerServlet.connectorStateTableTitleVHost");
+            args[17] = smClient.getString("htmlManagerServlet.connectorStateTableTitleRequest");
+            args[18] = smClient.getString("htmlManagerServlet.connectorStateHint");
+            StatusTransformer.writeConnectorsState(writer, mBeanServer, threadPools, globalRequestProcessors,
+                    requestProcessors, mode, args);
 
-            if ((request.getPathInfo() != null) && (request.getPathInfo().equals("/all"))) {
+            if (request.getPathInfo() != null && request.getPathInfo().equals("/all")) {
                 // Note: Retrieving the full status is much slower
                 // use StatusTransformer to output status
                 StatusTransformer.writeDetailedState(writer, mBeanServer, mode);
@@ -324,14 +301,11 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
     // ------------------------------------------- NotificationListener Methods
 
     @Override
-    public void handleNotification(Notification notification,
-                                   java.lang.Object handback) {
+    public void handleNotification(Notification notification, Object handback) {
 
         if (notification instanceof MBeanServerNotification) {
-            ObjectName objectName =
-                ((MBeanServerNotification) notification).getMBeanName();
-            if (notification.getType().equals
-                (MBeanServerNotification.REGISTRATION_NOTIFICATION)) {
+            ObjectName objectName = ((MBeanServerNotification) notification).getMBeanName();
+            if (notification.getType().equals(MBeanServerNotification.REGISTRATION_NOTIFICATION)) {
                 String type = objectName.getKeyProperty("type");
                 if (type != null) {
                     if (type.equals("ThreadPool")) {

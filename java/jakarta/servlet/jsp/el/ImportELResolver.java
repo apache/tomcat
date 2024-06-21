@@ -24,8 +24,7 @@ import jakarta.el.ELResolver;
 import jakarta.el.ImportHandler;
 
 /**
- * Providers resolution of imports and static imports in the Jakarta Server
- * Pages ELResolver chain.
+ * Providers resolution of imports and static imports in the Jakarta Pages ELResolver chain.
  *
  * @since JSP 3.1
  */
@@ -40,7 +39,7 @@ public class ImportELResolver extends ELResolver {
             key = Class.forName("org.apache.el.parser.AstIdentifier");
         } catch (Exception e) {
             // Ignore: Expected if not running on Tomcat. Not a problem since
-            //         this just allows a short-cut.
+            // this just allows a short-cut.
         }
         AST_IDENTIFIER_KEY = key;
     }
@@ -90,8 +89,8 @@ public class ImportELResolver extends ELResolver {
                         if (clazz != null) {
                             try {
                                 result = clazz.getField(key).get(null);
-                            } catch (IllegalArgumentException | IllegalAccessException |
-                                    NoSuchFieldException | SecurityException e) {
+                            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException |
+                                    SecurityException e) {
                                 // Most (all?) of these should have been
                                 // prevented by the checks when the import
                                 // was defined.

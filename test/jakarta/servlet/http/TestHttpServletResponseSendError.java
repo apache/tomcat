@@ -130,7 +130,7 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         if (async) {
             Wrapper w = Tomcat.addServlet(ctx, "target",
@@ -283,15 +283,6 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
                 e.printStackTrace();
             }
 
-/*
-            if (errorPoint == AsyncErrorPoint.THREAD_B_AFTER_COMPLETE) {
-                if (useDispatch) {
-                    ac.complete();
-                } else {
-                    ac.dispatch("/dispatch");
-                }
-            }
- */
             if (throwException) {
                 throw new SendErrorException();
             } else {

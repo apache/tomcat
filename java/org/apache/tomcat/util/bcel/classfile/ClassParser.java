@@ -27,12 +27,12 @@ import java.util.List;
 import org.apache.tomcat.util.bcel.Const;
 
 /**
- * Wrapper class that parses a given Java .class file. The method <a href ="#parse">parse</a> returns a
- * <a href ="JavaClass.html"> JavaClass</a> object on success. When an I/O error or an inconsistency occurs an
+ * Wrapper class that parses a given Java .class file. The method <a href="#parse">parse</a> returns a
+ * <a href="JavaClass.html"> JavaClass</a> object on success. When an I/O error or an inconsistency occurs an
  * appropriate exception is propagated back to the caller.
  *
  * The structure and the names comply, except for a few conveniences, exactly with the
- * <a href="http://docs.oracle.com/javase/specs/"> JVM specification 1.0</a>. See this paper for further details about
+ * <a href="https://docs.oracle.com/javase/specs/"> JVM specification 1.0</a>. See this paper for further details about
  * the structure of a bytecode file.
  */
 public final class ClassParser {
@@ -62,7 +62,7 @@ public final class ClassParser {
     /**
      * Parses the given Java class file and return an object that represents the contained data, i.e., constants, methods,
      * fields and commands. A <em>ClassFormatException</em> is raised, if the file is not a valid .class file. (This does
-     * not include verification of the byte code as it is performed by the java interpreter).
+     * not include verification of the byte code as it is performed by the Java interpreter).
      *
      * @return Class object representing the parsed class file
      * @throws IOException if an I/O error occurs.

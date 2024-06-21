@@ -56,6 +56,9 @@ public interface Processor {
      */
     boolean isUpgrade();
 
+    /**
+     * @return {@code true} if the Processor state is async, otherwise {@code false}
+     */
     boolean isAsync();
 
     /**
@@ -65,7 +68,7 @@ public interface Processor {
      * represent a timeout that is triggered independently of the socket read/write timeouts.
      *
      * @param now The time (as returned by {@link System#currentTimeMillis()} to use as the current time to determine
-     *                whether the timeout has expired. If negative, the timeout will always be treated as ifq it has
+     *                whether the timeout has expired. If negative, the timeout will always be treated as if it has
      *                expired.
      */
     void timeoutAsync(long now);

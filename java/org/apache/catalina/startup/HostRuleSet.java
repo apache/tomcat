@@ -20,10 +20,8 @@ import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
 
 /**
- * <p><strong>RuleSet</strong> for processing the contents of a
- * Host definition element.  This <code>RuleSet</code> does NOT include
- * any rules for nested Context which should be added via instances of
- * <code>ContextRuleSet</code>.</p>
+ * <strong>RuleSet</strong> for processing the contents of a Host definition element. This <code>RuleSet</code> does NOT
+ * include any rules for nested Context which should be added via instances of <code>ContextRuleSet</code>.
  *
  * @author Craig R. McClanahan
  */
@@ -40,8 +38,7 @@ public class HostRuleSet implements RuleSet {
     // ------------------------------------------------------------ Constructor
 
     /**
-     * Construct an instance of this <code>RuleSet</code> with the default
-     * matching pattern prefix.
+     * Construct an instance of this <code>RuleSet</code> with the default matching pattern prefix.
      */
     public HostRuleSet() {
         this("");
@@ -49,11 +46,9 @@ public class HostRuleSet implements RuleSet {
 
 
     /**
-     * Construct an instance of this <code>RuleSet</code> with the specified
-     * matching pattern prefix.
+     * Construct an instance of this <code>RuleSet</code> with the specified matching pattern prefix.
      *
-     * @param prefix Prefix for matching pattern rules (including the
-     *  trailing slash character)
+     * @param prefix Prefix for matching pattern rules (including the trailing slash character)
      */
     public HostRuleSet(String prefix) {
         this.prefix = prefix;
@@ -62,61 +57,38 @@ public class HostRuleSet implements RuleSet {
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * <p>Add the set of Rule instances defined in this RuleSet to the
-     * specified <code>Digester</code> instance, associating them with
-     * our namespace URI (if any).  This method should only be called
-     * by a Digester instance.</p>
-     *
-     * @param digester Digester instance to which the new Rule instances
-     *  should be added.
-     */
     @Override
     public void addRuleInstances(Digester digester) {
 
-        digester.addObjectCreate(prefix + "Host",
-                                 "org.apache.catalina.core.StandardHost",
-                                 "className");
+        digester.addObjectCreate(prefix + "Host", "org.apache.catalina.core.StandardHost", "className");
         digester.addSetProperties(prefix + "Host");
+        digester.addRule(prefix + "Host", new CopyParentClassLoaderRule());
         digester.addRule(prefix + "Host",
-                         new CopyParentClassLoaderRule());
-        digester.addRule(prefix + "Host",
-                         new LifecycleListenerRule
-                         ("org.apache.catalina.startup.HostConfig",
-                          "hostConfigClass"));
-        digester.addSetNext(prefix + "Host",
-                            "addChild",
-                            "org.apache.catalina.Container");
+                new LifecycleListenerRule("org.apache.catalina.startup.HostConfig", "hostConfigClass"));
+        digester.addSetNext(prefix + "Host", "addChild", "org.apache.catalina.Container");
 
-        digester.addCallMethod(prefix + "Host/Alias",
-                               "addAlias", 0);
+        digester.addCallMethod(prefix + "Host/Alias", "addAlias", 0);
 
-        //Cluster configuration start
-        digester.addObjectCreate(prefix + "Host/Cluster",
-                                 null, // MUST be specified in the element
-                                 "className");
+        // Cluster configuration start
+        digester.addObjectCreate(prefix + "Host/Cluster", null, // MUST be specified in the element
+                "className");
         digester.addSetProperties(prefix + "Host/Cluster");
-        digester.addSetNext(prefix + "Host/Cluster",
-                            "setCluster",
-                            "org.apache.catalina.Cluster");
-        //Cluster configuration end
+        digester.addSetNext(prefix + "Host/Cluster", "setCluster", "org.apache.catalina.Cluster");
+        // Cluster configuration end
 
-        digester.addObjectCreate(prefix + "Host/Listener",
-                                 null, // MUST be specified in the element
-                                 "className");
+        digester.addObjectCreate(prefix + "Host/Listener", null, // MUST be specified in the element
+                "className");
         digester.addSetProperties(prefix + "Host/Listener");
-        digester.addSetNext(prefix + "Host/Listener",
-                            "addLifecycleListener",
-                            "org.apache.catalina.LifecycleListener");
+        digester.addSetNext(prefix + "Host/Listener", "addLifecycleListener", "org.apache.catalina.LifecycleListener");
 
         digester.addRuleSet(new RealmRuleSet(prefix + "Host/"));
 
-        digester.addObjectCreate(prefix + "Host/Valve",
-                                 null, // MUST be specified in the element
-                                 "className");
+        digester.addObjectCreate(prefix + "Host/Valve", null, // MUST be specified in the element
+                "className");
         digester.addSetProperties(prefix + "Host/Valve");
-        digester.addSetNext(prefix + "Host/Valve",
-                            "addValve",
-                            "org.apache.catalina.Valve");
+        digester.addCallMethod(prefix + "Host/Valve/init-param", "addInitParam", 2);
+        digester.addCallParam(prefix + "Host/Valve/init-param/param-name", 0);
+        digester.addCallParam(prefix + "Host/Valve/init-param/param-value", 1);
+        digester.addSetNext(prefix + "Host/Valve", "addValve", "org.apache.catalina.Valve");
     }
 }

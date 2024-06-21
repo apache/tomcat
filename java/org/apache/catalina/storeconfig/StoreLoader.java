@@ -48,11 +48,9 @@ import org.apache.tomcat.util.file.ConfigurationSource.Resource;
  * }
  * </pre>
  *
- *
  * Convention:
  * <ul>
- * <li>Factories at subpackage <i>org.apache.catalina.core.storeconfig.xxxSF
- * </i>.</li>
+ * <li>Factories at subpackage <i>org.apache.catalina.core.storeconfig.xxxSF </i>.</li>
  * <li>Element name are the unique Class name</li>
  * <li>SF for StoreFactory</li>
  * <li>standard implementation is false</li>
@@ -61,12 +59,9 @@ import org.apache.tomcat.util.file.ConfigurationSource.Resource;
  * <ul>
  * <li>Registry XML format is a very good option</li>
  * <li>Store format is not fix</li>
- * <li>We hope with the parent declaration we can build recursive child store
- * operation //dream</li>
- * <li>Problem is to access child data from array,collections or normal detail
- * object</li>
- * <li>Default definitions for Listener, Valve Resource? - Based on interface
- * type!</li>
+ * <li>We hope with the parent declaration we can build recursive child store operation //dream</li>
+ * <li>Problem is to access child data from array,collections or normal detail object</li>
+ * <li>Default definitions for Listener, Valve Resource? - Based on interface type!</li>
  * </ul>
  */
 public class StoreLoader {
@@ -78,7 +73,7 @@ public class StoreLoader {
 
     private StoreRegistry registry;
 
-    private URL registryResource ;
+    private URL registryResource;
 
     /**
      * @return Returns the registry.
@@ -88,16 +83,15 @@ public class StoreLoader {
     }
 
     /**
-     * @param registry
-     *            The registry to set.
+     * @param registry The registry to set.
      */
     public void setRegistry(StoreRegistry registry) {
         this.registry = registry;
     }
 
     /**
-     * Create and configure the Digester we will be using for setup store
-     * registry.
+     * Create and configure the Digester we will be using for setup store registry.
+     *
      * @return the XML digester that will be used to parse the configuration
      */
     protected static Digester createDigester() {
@@ -107,24 +101,18 @@ public class StoreLoader {
         digester.setClassLoader(StoreRegistry.class.getClassLoader());
 
         // Configure the actions we will be using
-        digester.addObjectCreate("Registry",
-                "org.apache.catalina.storeconfig.StoreRegistry", "className");
+        digester.addObjectCreate("Registry", "org.apache.catalina.storeconfig.StoreRegistry", "className");
         digester.addSetProperties("Registry");
-        digester.addObjectCreate("Registry/Description",
-                        "org.apache.catalina.storeconfig.StoreDescription",
-                        "className");
+        digester.addObjectCreate("Registry/Description", "org.apache.catalina.storeconfig.StoreDescription",
+                "className");
         digester.addSetProperties("Registry/Description");
-        digester.addRule("Registry/Description", new StoreFactoryRule(
-                "org.apache.catalina.storeconfig.StoreFactoryBase",
-                "storeFactoryClass",
-                "org.apache.catalina.storeconfig.StoreAppender",
-                "storeAppenderClass"));
+        digester.addRule("Registry/Description",
+                new StoreFactoryRule("org.apache.catalina.storeconfig.StoreFactoryBase", "storeFactoryClass",
+                        "org.apache.catalina.storeconfig.StoreAppender", "storeAppenderClass"));
         digester.addSetNext("Registry/Description", "registerDescription",
                 "org.apache.catalina.storeconfig.StoreDescription");
-        digester.addCallMethod("Registry/Description/TransientAttribute",
-                "addTransientAttribute", 0);
-        digester.addCallMethod("Registry/Description/TransientChild",
-                "addTransientChild", 0);
+        digester.addCallMethod("Registry/Description/TransientAttribute", "addTransientAttribute", 0);
+        digester.addCallMethod("Registry/Description/TransientChild", "addTransientChild", 0);
 
         return digester;
 
@@ -133,26 +121,24 @@ public class StoreLoader {
     /**
      * Load registry configuration.
      *
-     * @param path Path to the configuration file, may be null to use the default
-     *  name server-registry.xml
+     * @param path Path to the configuration file, may be null to use the default name server-registry.xml
+     *
      * @throws Exception when the configuration file isn't found or a parse error occurs
      */
     public void load(String path) throws Exception {
-        try (Resource resource = (path == null) ?
-                ConfigFileLoader.getSource().getConfResource("server-registry.xml")
-                : ConfigFileLoader.getSource().getResource(path);
-                InputStream is = resource.getInputStream()) {
+        try (Resource resource = (path == null) ? ConfigFileLoader.getSource().getConfResource("server-registry.xml") :
+                ConfigFileLoader.getSource().getResource(path); InputStream is = resource.getInputStream()) {
             registryResource = resource.getURI().toURL();
             synchronized (digester) {
                 registry = (StoreRegistry) digester.parse(is);
             }
         } catch (IOException e) {
             // Try default classloader location
-            try (InputStream is = StoreLoader.class
-                    .getResourceAsStream("/org/apache/catalina/storeconfig/server-registry.xml")) {
+            try (InputStream is =
+                    StoreLoader.class.getResourceAsStream("/org/apache/catalina/storeconfig/server-registry.xml")) {
                 if (is != null) {
-                    registryResource = StoreLoader.class
-                            .getResource("/org/apache/catalina/storeconfig/server-registry.xml");
+                    registryResource =
+                            StoreLoader.class.getResource("/org/apache/catalina/storeconfig/server-registry.xml");
                     synchronized (digester) {
                         registry = (StoreRegistry) digester.parse(is);
                     }

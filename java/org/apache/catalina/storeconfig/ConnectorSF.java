@@ -29,8 +29,8 @@ import org.apache.tomcat.util.net.SSLHostConfig;
 public class ConnectorSF extends StoreFactoryBase {
 
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aConnector,
-            StoreDescription parentDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aConnector, StoreDescription parentDesc)
+            throws Exception {
 
         if (aConnector instanceof Connector) {
             Connector connector = (Connector) aConnector;
@@ -48,24 +48,21 @@ public class ConnectorSF extends StoreFactoryBase {
         }
     }
 
-    protected void printOpenTag(PrintWriter aWriter, int indent, Object bean,
-            StoreDescription aDesc) throws Exception {
+    protected void printOpenTag(PrintWriter aWriter, int indent, Object bean, StoreDescription aDesc) throws Exception {
         aWriter.print("<");
         aWriter.print(aDesc.getTag());
         storeConnectorAttributes(aWriter, indent, bean, aDesc);
         aWriter.println(">");
     }
 
-    protected void storeConnectorAttributes(PrintWriter aWriter, int indent,
-            Object bean, StoreDescription aDesc) throws Exception {
+    protected void storeConnectorAttributes(PrintWriter aWriter, int indent, Object bean, StoreDescription aDesc)
+            throws Exception {
         if (aDesc.isAttributes()) {
-            getStoreAppender().printAttributes(aWriter, indent, false, bean,
-                    aDesc);
+            getStoreAppender().printAttributes(aWriter, indent, false, bean, aDesc);
         }
     }
 
-    protected void printTag(PrintWriter aWriter, int indent, Object bean,
-            StoreDescription aDesc) throws Exception {
+    protected void printTag(PrintWriter aWriter, int indent, Object bean, StoreDescription aDesc) throws Exception {
         aWriter.print("<");
         aWriter.print(aDesc.getTag());
         storeConnectorAttributes(aWriter, indent, bean, aDesc);

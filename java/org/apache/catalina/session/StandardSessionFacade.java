@@ -120,4 +120,10 @@ public class StandardSessionFacade implements HttpSession {
     public boolean isNew() {
         return session.isNew();
     }
+
+
+    @Override
+    public Accessor getAccessor() {
+        return session.getAccessor();
+    }
 }

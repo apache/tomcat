@@ -69,11 +69,11 @@ public class LockOutRealm extends CombinedRealm {
      * Users whose last authentication attempt failed. Entries will be ordered in access order from least recent to most
      * recent.
      */
-    protected Map<String, LockRecord> failedUsers = null;
+    protected Map<String,LockRecord> failedUsers = null;
 
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         /*
          * Configure the list of failed users to delete the oldest entry once it exceeds the specified size. This is an
          * LRU cache so if the cache size is exceeded the users who most recently failed authentication will be
@@ -83,7 +83,7 @@ public class LockOutRealm extends CombinedRealm {
             private static final long serialVersionUID = 1L;
 
             @Override
-            protected boolean removeEldestEntry(Map.Entry<String, LockRecord> eldest) {
+            protected boolean removeEldestEntry(Map.Entry<String,LockRecord> eldest) {
                 if (size() > cacheSize) {
                     // Check to see if this element has been removed too quickly
                     long timeInCache = (System.currentTimeMillis() - eldest.getValue().getLastFailureTime()) / 1000;
@@ -106,8 +106,8 @@ public class LockOutRealm extends CombinedRealm {
     public Principal authenticate(String username, String clientDigest, String nonce, String nc, String cnonce,
             String qop, String realmName, String digestA2, String algorithm) {
 
-        Principal authenticatedUser = super.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realmName,
-                digestA2, algorithm);
+        Principal authenticatedUser =
+                super.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realmName, digestA2, algorithm);
         return filterLockedAccounts(username, authenticatedUser);
     }
 

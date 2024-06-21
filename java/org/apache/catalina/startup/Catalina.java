@@ -54,18 +54,16 @@ import org.xml.sax.InputSource;
 
 
 /**
- * Startup/Shutdown shell program for Catalina.  The following command line
- * options are recognized:
+ * Startup/Shutdown shell program for Catalina. The following command line options are recognized:
  * <ul>
- * <li><b>-config {pathname}</b> - Set the pathname of the configuration file
- *     to be processed.  If a relative path is specified, it will be
- *     interpreted as relative to the directory pathname specified by the
- *     "catalina.base" system property.   [conf/server.xml]</li>
- * <li><b>-help</b>      - Display usage information.</li>
- * <li><b>-nonaming</b>  - Disable naming support.</li>
+ * <li><b>-config {pathname}</b> - Set the pathname of the configuration file to be processed. If a relative path is
+ * specified, it will be interpreted as relative to the directory pathname specified by the "catalina.base" system
+ * property. [conf/server.xml]</li>
+ * <li><b>-help</b> - Display usage information.</li>
+ * <li><b>-nonaming</b> - Disable naming support.</li>
  * <li><b>configtest</b> - Try to test the config</li>
- * <li><b>start</b>      - Start an instance of Catalina.</li>
- * <li><b>stop</b>       - Stop the currently running instance of Catalina.</li>
+ * <li><b>start</b> - Start an instance of Catalina.</li>
+ * <li><b>stop</b> - Stop the currently running instance of Catalina.</li>
  * </ul>
  *
  * @author Craig R. McClanahan
@@ -77,8 +75,7 @@ public class Catalina {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     public static final String SERVER_XML = "conf/server.xml";
 
@@ -98,8 +95,7 @@ public class Catalina {
     /**
      * The shared extensions class loader for this server.
      */
-    protected ClassLoader parentClassLoader =
-        Catalina.class.getClassLoader();
+    protected ClassLoader parentClassLoader = Catalina.class.getClassLoader();
 
 
     /**
@@ -135,8 +131,7 @@ public class Catalina {
     /**
      * Rethrow exceptions on init failure.
      */
-    protected boolean throwOnInitFailure =
-            Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE");
+    protected boolean throwOnInitFailure = Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE");
 
 
     /**
@@ -239,8 +234,7 @@ public class Catalina {
 
 
     /**
-     * @return <code>true</code> if an exception should be thrown if an error
-     * occurs during server init
+     * @return <code>true</code> if an exception should be thrown if an error occurs during server init
      */
     public boolean getThrowOnInitFailure() {
         return throwOnInitFailure;
@@ -249,6 +243,7 @@ public class Catalina {
 
     /**
      * Set the behavior regarding errors that could occur during server init.
+     *
      * @param throwOnInitFailure the new flag value
      */
     public void setThrowOnInitFailure(boolean throwOnInitFailure) {
@@ -314,6 +309,7 @@ public class Catalina {
      * Process the specified command line arguments.
      *
      * @param args Command line arguments to process
+     *
      * @return <code>true</code> if we should continue processing
      */
     protected boolean arguments(String args[]) {
@@ -368,6 +364,7 @@ public class Catalina {
 
     /**
      * Return a File object representing our configuration file.
+     *
      * @return the main configuration file
      */
     protected File configFile() {
@@ -383,6 +380,7 @@ public class Catalina {
 
     /**
      * Create and configure the Digester we will be using for startup.
+     *
      * @return the main digester to parse server.xml
      */
     protected Digester createStartDigester() {
@@ -390,7 +388,7 @@ public class Catalina {
         Digester digester = new Digester();
         digester.setValidating(false);
         digester.setRulesValidation(true);
-        Map<Class<?>, List<String>> fakeAttributes = new HashMap<>();
+        Map<Class<?>,List<String>> fakeAttributes = new HashMap<>();
         // Ignore className on all elements
         List<String> objectAttrs = new ArrayList<>();
         objectAttrs.add("className");
@@ -407,107 +405,75 @@ public class Catalina {
         digester.setUseContextClassLoader(true);
 
         // Configure the actions we will be using
-        digester.addObjectCreate("Server",
-                                 "org.apache.catalina.core.StandardServer",
-                                 "className");
+        digester.addObjectCreate("Server", "org.apache.catalina.core.StandardServer", "className");
         digester.addSetProperties("Server");
-        digester.addSetNext("Server",
-                            "setServer",
-                            "org.apache.catalina.Server");
+        digester.addSetNext("Server", "setServer", "org.apache.catalina.Server");
 
-        digester.addObjectCreate("Server/GlobalNamingResources",
-                                 "org.apache.catalina.deploy.NamingResourcesImpl");
+        digester.addObjectCreate("Server/GlobalNamingResources", "org.apache.catalina.deploy.NamingResourcesImpl");
         digester.addSetProperties("Server/GlobalNamingResources");
-        digester.addSetNext("Server/GlobalNamingResources",
-                            "setGlobalNamingResources",
-                            "org.apache.catalina.deploy.NamingResourcesImpl");
+        digester.addSetNext("Server/GlobalNamingResources", "setGlobalNamingResources",
+                "org.apache.catalina.deploy.NamingResourcesImpl");
 
-        digester.addRule("Server/Listener",
-                new ListenerCreateRule(null, "className"));
+        digester.addRule("Server/Listener", new ListenerCreateRule(null, "className"));
         digester.addSetProperties("Server/Listener");
-        digester.addSetNext("Server/Listener",
-                            "addLifecycleListener",
-                            "org.apache.catalina.LifecycleListener");
+        digester.addSetNext("Server/Listener", "addLifecycleListener", "org.apache.catalina.LifecycleListener");
 
-        digester.addObjectCreate("Server/Service",
-                                 "org.apache.catalina.core.StandardService",
-                                 "className");
+        digester.addObjectCreate("Server/Service", "org.apache.catalina.core.StandardService", "className");
         digester.addSetProperties("Server/Service");
-        digester.addSetNext("Server/Service",
-                            "addService",
-                            "org.apache.catalina.Service");
+        digester.addSetNext("Server/Service", "addService", "org.apache.catalina.Service");
 
-        digester.addObjectCreate("Server/Service/Listener",
-                                 null, // MUST be specified in the element
-                                 "className");
+        digester.addObjectCreate("Server/Service/Listener", null, // MUST be specified in the element
+                "className");
         digester.addSetProperties("Server/Service/Listener");
-        digester.addSetNext("Server/Service/Listener",
-                            "addLifecycleListener",
-                            "org.apache.catalina.LifecycleListener");
+        digester.addSetNext("Server/Service/Listener", "addLifecycleListener", "org.apache.catalina.LifecycleListener");
 
-        //Executor
-        digester.addObjectCreate("Server/Service/Executor",
-                         "org.apache.catalina.core.StandardThreadExecutor",
-                         "className");
+        // Executor
+        digester.addObjectCreate("Server/Service/Executor", "org.apache.catalina.core.StandardThreadExecutor",
+                "className");
         digester.addSetProperties("Server/Service/Executor");
 
-        digester.addSetNext("Server/Service/Executor",
-                            "addExecutor",
-                            "org.apache.catalina.Executor");
+        digester.addSetNext("Server/Service/Executor", "addExecutor", "org.apache.catalina.Executor");
 
-        digester.addRule("Server/Service/Connector",
-                         new ConnectorCreateRule());
+        digester.addRule("Server/Service/Connector", new ConnectorCreateRule());
         digester.addSetProperties("Server/Service/Connector",
-                new String[]{"executor", "sslImplementationName", "protocol"});
-        digester.addSetNext("Server/Service/Connector",
-                            "addConnector",
-                            "org.apache.catalina.connector.Connector");
+                new String[] { "executor", "sslImplementationName", "protocol" });
+        digester.addSetNext("Server/Service/Connector", "addConnector", "org.apache.catalina.connector.Connector");
 
         digester.addRule("Server/Service/Connector", new AddPortOffsetRule());
 
-        digester.addObjectCreate("Server/Service/Connector/SSLHostConfig",
-                                 "org.apache.tomcat.util.net.SSLHostConfig");
+        digester.addObjectCreate("Server/Service/Connector/SSLHostConfig", "org.apache.tomcat.util.net.SSLHostConfig");
         digester.addSetProperties("Server/Service/Connector/SSLHostConfig");
-        digester.addSetNext("Server/Service/Connector/SSLHostConfig",
-                "addSslHostConfig",
+        digester.addSetNext("Server/Service/Connector/SSLHostConfig", "addSslHostConfig",
                 "org.apache.tomcat.util.net.SSLHostConfig");
 
-        digester.addRule("Server/Service/Connector/SSLHostConfig/Certificate",
-                         new CertificateCreateRule());
-        digester.addSetProperties("Server/Service/Connector/SSLHostConfig/Certificate", new String[]{"type"});
-        digester.addSetNext("Server/Service/Connector/SSLHostConfig/Certificate",
-                            "addCertificate",
-                            "org.apache.tomcat.util.net.SSLHostConfigCertificate");
+        digester.addRule("Server/Service/Connector/SSLHostConfig/Certificate", new CertificateCreateRule());
+        digester.addSetProperties("Server/Service/Connector/SSLHostConfig/Certificate", new String[] { "type" });
+        digester.addSetNext("Server/Service/Connector/SSLHostConfig/Certificate", "addCertificate",
+                "org.apache.tomcat.util.net.SSLHostConfigCertificate");
 
         digester.addObjectCreate("Server/Service/Connector/SSLHostConfig/OpenSSLConf",
-                                 "org.apache.tomcat.util.net.openssl.OpenSSLConf");
+                "org.apache.tomcat.util.net.openssl.OpenSSLConf");
         digester.addSetProperties("Server/Service/Connector/SSLHostConfig/OpenSSLConf");
-        digester.addSetNext("Server/Service/Connector/SSLHostConfig/OpenSSLConf",
-                            "setOpenSslConf",
-                            "org.apache.tomcat.util.net.openssl.OpenSSLConf");
+        digester.addSetNext("Server/Service/Connector/SSLHostConfig/OpenSSLConf", "setOpenSslConf",
+                "org.apache.tomcat.util.net.openssl.OpenSSLConf");
 
         digester.addObjectCreate("Server/Service/Connector/SSLHostConfig/OpenSSLConf/OpenSSLConfCmd",
-                                 "org.apache.tomcat.util.net.openssl.OpenSSLConfCmd");
+                "org.apache.tomcat.util.net.openssl.OpenSSLConfCmd");
         digester.addSetProperties("Server/Service/Connector/SSLHostConfig/OpenSSLConf/OpenSSLConfCmd");
-        digester.addSetNext("Server/Service/Connector/SSLHostConfig/OpenSSLConf/OpenSSLConfCmd",
-                            "addCmd",
-                            "org.apache.tomcat.util.net.openssl.OpenSSLConfCmd");
+        digester.addSetNext("Server/Service/Connector/SSLHostConfig/OpenSSLConf/OpenSSLConfCmd", "addCmd",
+                "org.apache.tomcat.util.net.openssl.OpenSSLConfCmd");
 
-        digester.addObjectCreate("Server/Service/Connector/Listener",
-                                 null, // MUST be specified in the element
-                                 "className");
+        digester.addObjectCreate("Server/Service/Connector/Listener", null, // MUST be specified in the element
+                "className");
         digester.addSetProperties("Server/Service/Connector/Listener");
-        digester.addSetNext("Server/Service/Connector/Listener",
-                            "addLifecycleListener",
-                            "org.apache.catalina.LifecycleListener");
+        digester.addSetNext("Server/Service/Connector/Listener", "addLifecycleListener",
+                "org.apache.catalina.LifecycleListener");
 
-        digester.addObjectCreate("Server/Service/Connector/UpgradeProtocol",
-                                  null, // MUST be specified in the element
-                                  "className");
+        digester.addObjectCreate("Server/Service/Connector/UpgradeProtocol", null, // MUST be specified in the element
+                "className");
         digester.addSetProperties("Server/Service/Connector/UpgradeProtocol");
-        digester.addSetNext("Server/Service/Connector/UpgradeProtocol",
-                            "addUpgradeProtocol",
-                            "org.apache.coyote.UpgradeProtocol");
+        digester.addSetNext("Server/Service/Connector/UpgradeProtocol", "addUpgradeProtocol",
+                "org.apache.coyote.UpgradeProtocol");
 
         // Add RuleSets for nested elements
         digester.addRuleSet(new NamingRuleSet("Server/GlobalNamingResources/"));
@@ -518,8 +484,7 @@ public class Catalina {
         digester.addRuleSet(new NamingRuleSet("Server/Service/Engine/Host/Context/"));
 
         // When the 'engine' is found, set the parentClassLoader.
-        digester.addRule("Server/Service/Engine",
-                         new SetParentClassLoaderRule(parentClassLoader));
+        digester.addRule("Server/Service/Engine", new SetParentClassLoaderRule(parentClassLoader));
         addClusterRuleSet(digester, "Server/Service/Engine/Cluster/");
 
         return digester;
@@ -539,17 +504,16 @@ public class Catalina {
             digester.addRuleSet(ruleSet);
         } catch (Exception e) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("catalina.noCluster",
-                        e.getClass().getName() + ": " +  e.getMessage()), e);
+                log.debug(sm.getString("catalina.noCluster", e.getClass().getName() + ": " + e.getMessage()), e);
             } else if (log.isInfoEnabled()) {
-                log.info(sm.getString("catalina.noCluster",
-                        e.getClass().getName() + ": " +  e.getMessage()));
+                log.info(sm.getString("catalina.noCluster", e.getClass().getName() + ": " + e.getMessage()));
             }
         }
     }
 
     /**
      * Create and configure the Digester we will be using for shutdown.
+     *
      * @return the digester to process the stop operation
      */
     protected Digester createStopDigester() {
@@ -559,13 +523,9 @@ public class Catalina {
         digester.setUseContextClassLoader(true);
 
         // Configure the rules we need for shutting down
-        digester.addObjectCreate("Server",
-                                 "org.apache.catalina.core.StandardServer",
-                                 "className");
+        digester.addObjectCreate("Server", "org.apache.catalina.core.StandardServer", "className");
         digester.addSetProperties("Server");
-        digester.addSetNext("Server",
-                            "setServer",
-                            "org.apache.catalina.Server");
+        digester.addSetNext("Server", "setServer", "org.apache.catalina.Server");
 
         return digester;
 
@@ -574,15 +534,16 @@ public class Catalina {
 
     protected void parseServerXml(boolean start) {
         // Set configuration source
-        ConfigFileLoader.setSource(new CatalinaBaseConfigurationSource(Bootstrap.getCatalinaBaseFile(), getConfigFile()));
+        ConfigFileLoader
+                .setSource(new CatalinaBaseConfigurationSource(Bootstrap.getCatalinaBaseFile(), getConfigFile()));
         File file = configFile();
 
         if (useGeneratedCode && !Digester.isGeneratedCodeLoaderSet()) {
             // Load loader
             String loaderClassName = generatedCodePackage + ".DigesterGeneratedCodeLoader";
             try {
-                Digester.GeneratedCodeLoader loader = (Digester.GeneratedCodeLoader)
-                        Catalina.class.getClassLoader().loadClass(loaderClassName).getDeclaredConstructor().newInstance();
+                Digester.GeneratedCodeLoader loader = (Digester.GeneratedCodeLoader) Catalina.class.getClassLoader()
+                        .loadClass(loaderClassName).getDeclaredConstructor().newInstance();
                 Digester.setGeneratedCodeLoader(loader);
             } catch (Exception e) {
                 if (log.isDebugEnabled()) {
@@ -640,8 +601,8 @@ public class Catalina {
                 digester.parse(inputSource);
                 if (generateCode) {
                     generateClassFooter(digester);
-                    try (FileWriter writer = new FileWriter(new File(serverXmlLocation,
-                            start ? "ServerXml.java" : "ServerXmlStop.java"))) {
+                    try (FileWriter writer = new FileWriter(
+                            new File(serverXmlLocation, start ? "ServerXml.java" : "ServerXmlStop.java"))) {
                         writer.write(digester.getGeneratedCode().toString());
                     }
                     digester.endGeneratingCode();
@@ -745,14 +706,15 @@ public class Catalina {
             getServer().init();
         } catch (LifecycleException e) {
             if (throwOnInitFailure) {
-                throw new java.lang.Error(e);
+                throw new Error(e);
             } else {
                 log.error(sm.getString("catalina.initError"), e);
             }
         }
 
-        if(log.isInfoEnabled()) {
-            log.info(sm.getString("catalina.init", Long.toString(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t1))));
+        if (log.isInfoEnabled()) {
+            log.info(sm.getString("catalina.init",
+                    Long.toString(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t1))));
         }
     }
 
@@ -796,13 +758,14 @@ public class Catalina {
             try {
                 getServer().destroy();
             } catch (LifecycleException e1) {
-                log.debug("destroy() failed for failed Server ", e1);
+                log.debug(sm.getString("catalina.destroyFail"), e1);
             }
             return;
         }
 
         if (log.isInfoEnabled()) {
-            log.info(sm.getString("catalina.startup", Long.toString(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t1))));
+            log.info(sm.getString("catalina.startup",
+                    Long.toString(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t1))));
         }
 
         if (generateCode) {
@@ -822,8 +785,7 @@ public class Catalina {
             // if JULI's hook completes before the CatalinaShutdownHook()
             LogManager logManager = LogManager.getLogManager();
             if (logManager instanceof ClassLoaderLogManager) {
-                ((ClassLoaderLogManager) logManager).setUseShutdownHook(
-                        false);
+                ((ClassLoaderLogManager) logManager).setUseShutdownHook(false);
             }
         }
 
@@ -849,8 +811,7 @@ public class Catalina {
                 // log messages are not lost
                 LogManager logManager = LogManager.getLogManager();
                 if (logManager instanceof ClassLoaderLogManager) {
-                    ((ClassLoaderLogManager) logManager).setUseShutdownHook(
-                            true);
+                    ((ClassLoaderLogManager) logManager).setUseShutdownHook(true);
                 }
             }
         } catch (Throwable t) {
@@ -863,8 +824,7 @@ public class Catalina {
         try {
             Server s = getServer();
             LifecycleState state = s.getState();
-            if (LifecycleState.STOPPING_PREP.compareTo(state) <= 0
-                    && LifecycleState.DESTROYED.compareTo(state) >= 0) {
+            if (LifecycleState.STOPPING_PREP.compareTo(state) <= 0 && LifecycleState.DESTROYED.compareTo(state) >= 0) {
                 // Nothing to do. stop() was already called
             } else {
                 s.stop();
@@ -912,23 +872,20 @@ public class Catalina {
         } else {
             System.setProperty("catalina.useNaming", "true");
             String value = "org.apache.naming";
-            String oldValue =
-                System.getProperty(javax.naming.Context.URL_PKG_PREFIXES);
+            String oldValue = System.getProperty(javax.naming.Context.URL_PKG_PREFIXES);
             if (oldValue != null) {
                 value = value + ":" + oldValue;
             }
             System.setProperty(javax.naming.Context.URL_PKG_PREFIXES, value);
-            if( log.isDebugEnabled() ) {
-                log.debug("Setting naming prefix=" + value);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("catalina.namingPrefix", value));
             }
-            value = System.getProperty
-                (javax.naming.Context.INITIAL_CONTEXT_FACTORY);
+            value = System.getProperty(javax.naming.Context.INITIAL_CONTEXT_FACTORY);
             if (value == null) {
-                System.setProperty
-                    (javax.naming.Context.INITIAL_CONTEXT_FACTORY,
-                     "org.apache.naming.java.javaURLContextFactory");
+                System.setProperty(javax.naming.Context.INITIAL_CONTEXT_FACTORY,
+                        "org.apache.naming.java.javaURLContextFactory");
             } else {
-                log.debug("INITIAL_CONTEXT_FACTORY already set " + value );
+                log.debug(sm.getString("catalina.initialContextFactory", value));
             }
         }
     }
@@ -939,7 +896,8 @@ public class Catalina {
         StringBuilder code = new StringBuilder();
         code.append("package ").append(generatedCodePackage).append(';').append(System.lineSeparator());
         code.append("public class ").append(loaderClassName);
-        code.append(" implements org.apache.tomcat.util.digester.Digester.GeneratedCodeLoader {").append(System.lineSeparator());
+        code.append(" implements org.apache.tomcat.util.digester.Digester.GeneratedCodeLoader {")
+                .append(System.lineSeparator());
         code.append("public Object loadGeneratedCode(String className) {").append(System.lineSeparator());
         code.append("switch (className) {").append(System.lineSeparator());
         for (String generatedClassName : Digester.getGeneratedClasses()) {
@@ -953,7 +911,7 @@ public class Catalina {
             writer.write(code.toString());
         } catch (IOException e) {
             // Should not happen
-            log.debug("Error writing code loader", e);
+            log.debug(sm.getString("catalina.loaderWriteFail"), e);
         }
     }
 
@@ -1017,8 +975,7 @@ public class Catalina {
 
 
     /**
-     * Rule that sets the parent class loader for the top object on the stack,
-     * which must be a <code>Container</code>.
+     * Rule that sets the parent class loader for the top object on the stack, which must be a <code>Container</code>.
      */
 
     final class SetParentClassLoaderRule extends Rule {
@@ -1032,11 +989,10 @@ public class Catalina {
         ClassLoader parentClassLoader = null;
 
         @Override
-        public void begin(String namespace, String name, Attributes attributes)
-            throws Exception {
+        public void begin(String namespace, String name, Attributes attributes) throws Exception {
 
-            if (digester.getLogger().isDebugEnabled()) {
-                digester.getLogger().debug("Setting parent class loader");
+            if (digester.getLogger().isTraceEnabled()) {
+                digester.getLogger().trace("Setting parent class loader");
             }
 
             Container top = (Container) digester.peek();

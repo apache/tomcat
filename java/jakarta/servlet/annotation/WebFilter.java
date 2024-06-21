@@ -27,35 +27,22 @@ import jakarta.servlet.DispatcherType;
 /**
  * The annotation used to declare a Servlet {@link jakarta.servlet.Filter}. <br>
  * <br>
- *
- * This annotation will be processed by the container during deployment, the
- * Filter class in which it is found will be created as per the configuration
- * and applied to the URL patterns, {@link jakarta.servlet.Servlet}s and
+ * This annotation will be processed by the container during deployment, the Filter class in which it is found will be
+ * created as per the configuration and applied to the URL patterns, {@link jakarta.servlet.Servlet}s and
  * {@link jakarta.servlet.DispatcherType}s.<br>
  * <br>
- *
- * If the name attribute is not defined, the fully qualified name of the class
- * is used.<br>
+ * If the name attribute is not defined, the fully qualified name of the class is used.<br>
  * <br>
- *
- * At least one URL pattern MUST be declared in either the {@code value} or
- * {@code urlPattern} attribute of the annotation, but not both.<br>
+ * At least one URL pattern MUST be declared in either the {@code value} or {@code urlPattern} attribute of the
+ * annotation, but not both.<br>
  * <br>
- *
- * The {@code value} attribute is recommended for use when the URL pattern is
- * the only attribute being set, otherwise the {@code urlPattern} attribute
- * should be used.<br>
+ * The {@code value} attribute is recommended for use when the URL pattern is the only attribute being set, otherwise
+ * the {@code urlPattern} attribute should be used.<br>
  * <br>
- *
- * The annotated class MUST implement {@link jakarta.servlet.Filter}.
- *
- * E.g.
- *
- * <code>@WebFilter("/path/*")</code><br>
+ * The annotated class MUST implement {@link jakarta.servlet.Filter}. E.g. <code>@WebFilter("/path/*")</code><br>
  * <code>public class AnExampleFilter implements Filter { ... </code><br>
  *
  * @since Servlet 3.0 (Section 8.1.2)
- *
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -101,6 +88,7 @@ public @interface WebFilter {
      * A convenience method, to allow extremely simple annotation of a class.
      *
      * @return array of URL patterns
+     *
      * @see #urlPatterns()
      */
     String[] value() default {};
@@ -113,7 +101,7 @@ public @interface WebFilter {
     /**
      * @return array of DispatcherTypes to which this filter applies
      */
-    DispatcherType[] dispatcherTypes() default {DispatcherType.REQUEST};
+    DispatcherType[] dispatcherTypes() default { DispatcherType.REQUEST };
 
     /**
      * @return asynchronous operation supported by this Filter

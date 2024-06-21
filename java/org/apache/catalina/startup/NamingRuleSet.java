@@ -20,8 +20,7 @@ import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
 
 /**
- * <p><strong>RuleSet</strong> for processing the JNDI Enterprise Naming
- * Context resource declaration elements.</p>
+ * <strong>RuleSet</strong> for processing the JNDI Enterprise Naming Context resource declaration elements.
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
@@ -39,8 +38,7 @@ public class NamingRuleSet implements RuleSet {
     // ------------------------------------------------------------ Constructor
 
     /**
-     * Construct an instance of this <code>RuleSet</code> with the default
-     * matching pattern prefix.
+     * Construct an instance of this <code>RuleSet</code> with the default matching pattern prefix.
      */
     public NamingRuleSet() {
         this("");
@@ -48,11 +46,9 @@ public class NamingRuleSet implements RuleSet {
 
 
     /**
-     * Construct an instance of this <code>RuleSet</code> with the specified
-     * matching pattern prefix.
+     * Construct an instance of this <code>RuleSet</code> with the specified matching pattern prefix.
      *
-     * @param prefix Prefix for matching pattern rules (including the
-     *  trailing slash character)
+     * @param prefix Prefix for matching pattern rules (including the trailing slash character)
      */
     public NamingRuleSet(String prefix) {
         this.prefix = prefix;
@@ -61,65 +57,43 @@ public class NamingRuleSet implements RuleSet {
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * <p>Add the set of Rule instances defined in this RuleSet to the
-     * specified <code>Digester</code> instance, associating them with
-     * our namespace URI (if any).  This method should only be called
-     * by a Digester instance.</p>
-     *
-     * @param digester Digester instance to which the new Rule instances
-     *  should be added.
-     */
     @Override
     public void addRuleInstances(Digester digester) {
 
-        digester.addObjectCreate(prefix + "Ejb",
-                                 "org.apache.tomcat.util.descriptor.web.ContextEjb");
+        digester.addObjectCreate(prefix + "Ejb", "org.apache.tomcat.util.descriptor.web.ContextEjb");
         digester.addSetProperties(prefix + "Ejb");
         digester.addRule(prefix + "Ejb",
-                new SetNextNamingRule("addEjb",
-                            "org.apache.tomcat.util.descriptor.web.ContextEjb"));
+                new SetNextNamingRule("addEjb", "org.apache.tomcat.util.descriptor.web.ContextEjb"));
 
-        digester.addObjectCreate(prefix + "Environment",
-                                 "org.apache.tomcat.util.descriptor.web.ContextEnvironment");
+        digester.addObjectCreate(prefix + "Environment", "org.apache.tomcat.util.descriptor.web.ContextEnvironment");
         digester.addSetProperties(prefix + "Environment");
         digester.addRule(prefix + "Environment",
-                            new SetNextNamingRule("addEnvironment",
-                            "org.apache.tomcat.util.descriptor.web.ContextEnvironment"));
+                new SetNextNamingRule("addEnvironment", "org.apache.tomcat.util.descriptor.web.ContextEnvironment"));
 
-        digester.addObjectCreate(prefix + "LocalEjb",
-                                 "org.apache.tomcat.util.descriptor.web.ContextLocalEjb");
+        digester.addObjectCreate(prefix + "LocalEjb", "org.apache.tomcat.util.descriptor.web.ContextLocalEjb");
         digester.addSetProperties(prefix + "LocalEjb");
         digester.addRule(prefix + "LocalEjb",
-                new SetNextNamingRule("addLocalEjb",
-                            "org.apache.tomcat.util.descriptor.web.ContextLocalEjb"));
+                new SetNextNamingRule("addLocalEjb", "org.apache.tomcat.util.descriptor.web.ContextLocalEjb"));
 
-        digester.addObjectCreate(prefix + "Resource",
-                                 "org.apache.tomcat.util.descriptor.web.ContextResource");
+        digester.addObjectCreate(prefix + "Resource", "org.apache.tomcat.util.descriptor.web.ContextResource");
         digester.addSetProperties(prefix + "Resource");
         digester.addRule(prefix + "Resource",
-                new SetNextNamingRule("addResource",
-                            "org.apache.tomcat.util.descriptor.web.ContextResource"));
+                new SetNextNamingRule("addResource", "org.apache.tomcat.util.descriptor.web.ContextResource"));
 
         digester.addObjectCreate(prefix + "ResourceEnvRef",
-            "org.apache.tomcat.util.descriptor.web.ContextResourceEnvRef");
+                "org.apache.tomcat.util.descriptor.web.ContextResourceEnvRef");
         digester.addSetProperties(prefix + "ResourceEnvRef");
-        digester.addRule(prefix + "ResourceEnvRef",
-                new SetNextNamingRule("addResourceEnvRef",
-                            "org.apache.tomcat.util.descriptor.web.ContextResourceEnvRef"));
+        digester.addRule(prefix + "ResourceEnvRef", new SetNextNamingRule("addResourceEnvRef",
+                "org.apache.tomcat.util.descriptor.web.ContextResourceEnvRef"));
 
-        digester.addObjectCreate(prefix + "ServiceRef",
-            "org.apache.tomcat.util.descriptor.web.ContextService");
+        digester.addObjectCreate(prefix + "ServiceRef", "org.apache.tomcat.util.descriptor.web.ContextService");
         digester.addSetProperties(prefix + "ServiceRef");
         digester.addRule(prefix + "ServiceRef",
-                new SetNextNamingRule("addService",
-                            "org.apache.tomcat.util.descriptor.web.ContextService"));
+                new SetNextNamingRule("addService", "org.apache.tomcat.util.descriptor.web.ContextService"));
 
-        digester.addObjectCreate(prefix + "Transaction",
-            "org.apache.tomcat.util.descriptor.web.ContextTransaction");
+        digester.addObjectCreate(prefix + "Transaction", "org.apache.tomcat.util.descriptor.web.ContextTransaction");
         digester.addSetProperties(prefix + "Transaction");
         digester.addRule(prefix + "Transaction",
-                new SetNextNamingRule("setTransaction",
-                            "org.apache.tomcat.util.descriptor.web.ContextTransaction"));
+                new SetNextNamingRule("setTransaction", "org.apache.tomcat.util.descriptor.web.ContextTransaction"));
     }
 }

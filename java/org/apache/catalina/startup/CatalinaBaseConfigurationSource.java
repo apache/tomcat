@@ -33,6 +33,8 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
 
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
+    public static final String LEGACY_SERVER_EMBED_XML = "server-embed.xml";
+
     private final String serverXmlPath;
     private final File catalinaBaseFile;
     private final URI catalinaBaseUri;
@@ -58,10 +60,11 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
         }
         if (result == null) {
             // Compatibility with legacy server-embed.xml location
-            InputStream stream = getClass().getClassLoader().getResourceAsStream("server-embed.xml");
+            InputStream stream = getClass().getClassLoader().getResourceAsStream(LEGACY_SERVER_EMBED_XML);
             if (stream != null) {
                 try {
-                    result = new Resource(stream, getClass().getClassLoader().getResource("server-embed.xml").toURI());
+                    result = new Resource(stream,
+                            getClass().getClassLoader().getResource(LEGACY_SERVER_EMBED_XML).toURI());
                 } catch (URISyntaxException e) {
                     stream.close();
                 }

@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http2;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -58,7 +60,6 @@ import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.coyote.http2.Http2Parser.Output;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
@@ -77,7 +78,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         List<Object[]> parameterSets = new ArrayList<>();
 
         for (int loop = 0; loop < loopCount; loop++) {
-            for (Boolean useAsyncIO : TomcatBaseTest.booleans) {
+            for (Boolean useAsyncIO : booleans) {
                 parameterSets.add(new Object[] { Integer.valueOf(loop), useAsyncIO });
             }
         }
@@ -105,14 +106,14 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     static {
         byte[] empty = new byte[0];
-        EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.encodeBase64URLSafeString(empty) + "\r\n";
+        EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.getUrlEncoder().encodeToString(empty) + "\r\n";
     }
 
     protected static final String TRAILER_HEADER_NAME = "x-trailertest";
     protected static final String TRAILER_HEADER_VALUE = "test";
 
     // Client
-    private Socket s;
+    protected Socket s;
     protected HpackEncoder hpackEncoder;
     protected Input input;
     protected TestOutput output;
@@ -647,7 +648,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void configureAndStartWebApplication() throws LifecycleException {
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "empty", new EmptyServlet());
         ctxt.addServletMappingDecoded("/empty", "empty");
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
@@ -673,7 +674,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         s = socketFactory.createSocket("localhost", getPort());
         s.setSoTimeout(30000);
 
-        os = s.getOutputStream();
+        os = new BufferedOutputStream(s.getOutputStream());
         InputStream is = s.getInputStream();
 
         input = new TestInput(is);
@@ -1043,7 +1044,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             while (len > 0) {
                 int read = is.read(data, off, len);
                 if (read == -1) {
-                    throw new IOException("End of input stream");
+                    throw new IOException("End of input stream with [" + len + "] bytes left to read");
                 }
                 off += read;
                 len -= read;
@@ -1119,13 +1120,6 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void receivedEndOfStream(int streamId) {
-            lastStreamId = Integer.toString(streamId);
-            trace.append(lastStreamId + "-EndOfStream\n");
-        }
-
-
-        @Override
         public HeaderEmitter headersStart(int streamId, boolean headersEndStream) {
             lastStreamId = Integer.toString(streamId);
             trace.append(lastStreamId + "-HeadersStart\n");
@@ -1173,8 +1167,18 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void headersEnd(int streamId) {
+        public void headersEnd(int streamId, boolean endOfStream) {
             trace.append(streamId + "-HeadersEnd\n");
+            if (endOfStream) {
+                receivedEndOfStream(streamId) ;
+            }
+        }
+
+
+        @Override
+        public void receivedEndOfStream(int streamId) {
+            lastStreamId = Integer.toString(streamId);
+            trace.append(lastStreamId + "-EndOfStream\n");
         }
 
 
@@ -1261,14 +1265,6 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             // NO-OP
             // Many tests swallow request bodies which triggers this
             // notification. It is added to the trace to reduce noise.
-        }
-
-
-        public void pushPromise(int streamId, int pushedStreamId) {
-            trace.append(streamId);
-            trace.append("-PushPromise-");
-            trace.append(pushedStreamId);
-            trace.append("\n");
         }
 
 

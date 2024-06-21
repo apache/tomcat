@@ -43,6 +43,9 @@ class BeanSupportFull extends BeanSupport {
                     this.properties.put(pd.getName(), new BeanPropertyFull(type, pd));
                 }
                 /*
+                 * https://bugs.openjdk.org/browse/JDK-8071693 - Introspector ignores default interface methods.
+                 *
+                 * This bug is fixed in Java 21 b21. This workaround can be removed once the minimum Java version is 21.
                  * Populating from any interfaces causes default methods to be included.
                  */
                 populateFromInterfaces(type);

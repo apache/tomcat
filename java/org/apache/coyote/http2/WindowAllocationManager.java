@@ -16,6 +16,8 @@
  */
 package org.apache.coyote.http2;
 
+import java.util.concurrent.TimeUnit;
+
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Response;
 import org.apache.juli.logging.Log;
@@ -127,32 +129,57 @@ class WindowAllocationManager {
 
 
     private boolean isWaitingFor(int waitTarget) {
-        synchronized (stream) {
+        stream.windowAllocationLock.lock();
+        try {
             return (waitingFor & waitTarget) > 0;
+        } finally {
+            stream.windowAllocationLock.unlock();
         }
     }
 
 
-    private void waitFor(int waitTarget, long timeout) throws InterruptedException {
-        synchronized (stream) {
+    private void waitFor(int waitTarget, final long timeout) throws InterruptedException {
+        stream.windowAllocationLock.lock();
+        try {
             if (waitingFor != NONE) {
                 throw new IllegalStateException(sm.getString("windowAllocationManager.waitFor.ise",
                         stream.getConnectionId(), stream.getIdAsString()));
             }
 
             waitingFor = waitTarget;
+            long startNanos = -1;
 
-            if (timeout < 0) {
-                stream.wait();
-            } else {
-                stream.wait(timeout);
-            }
+            // Loop to handle spurious wake-ups
+            do {
+                if (timeout < 0) {
+                    stream.windowAllocationAvailable.await();
+                } else {
+                    long timeoutRemaining;
+                    if (startNanos == -1) {
+                        startNanos = System.nanoTime();
+                        timeoutRemaining = timeout;
+                    } else {
+                        long elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
+                        if (elapsedMillis == 0) {
+                            elapsedMillis = 1;
+                        }
+                        timeoutRemaining = timeout - elapsedMillis;
+                        if (timeoutRemaining <= 0) {
+                            return;
+                        }
+                    }
+                    stream.windowAllocationAvailable.await(timeoutRemaining, TimeUnit.MILLISECONDS);
+                }
+            } while (waitingFor != NONE);
+        } finally {
+            stream.windowAllocationLock.unlock();
         }
     }
 
 
     private void waitForNonBlocking(int waitTarget) {
-        synchronized (stream) {
+        stream.windowAllocationLock.lock();
+        try {
             if (waitingFor == NONE) {
                 waitingFor = waitTarget;
             } else if (waitingFor == waitTarget) {
@@ -162,14 +189,16 @@ class WindowAllocationManager {
                 throw new IllegalStateException(sm.getString("windowAllocationManager.waitFor.ise",
                         stream.getConnectionId(), stream.getIdAsString()));
             }
-
+        } finally {
+            stream.windowAllocationLock.unlock();
         }
     }
 
 
     private void notify(int notifyTarget) {
 
-        synchronized (stream) {
+        stream.windowAllocationLock.lock();
+        try {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("windowAllocationManager.notify", stream.getConnectionId(),
                         stream.getIdAsString(), Integer.toString(waitingFor), Integer.toString(notifyTarget)));
@@ -190,7 +219,7 @@ class WindowAllocationManager {
                             log.debug(sm.getString("windowAllocationManager.notified", stream.getConnectionId(),
                                     stream.getIdAsString()));
                         }
-                        stream.notify();
+                        stream.windowAllocationAvailable.signal();
                     } else {
                         // Non-blocking so dispatch
                         if (log.isDebugEnabled()) {
@@ -205,6 +234,8 @@ class WindowAllocationManager {
                     }
                 }
             }
+        } finally {
+            stream.windowAllocationLock.unlock();
         }
     }
 }

@@ -60,6 +60,7 @@ public abstract class ElementValue {
     public static final byte PRIMITIVE_LONG = 'J';
     public static final byte PRIMITIVE_SHORT = 'S';
     public static final byte PRIMITIVE_BOOLEAN = 'Z';
+    static final ElementValue[] EMPTY_ARRAY = {};
 
     /**
      * Reads an {@code element_value} as an {@code ElementValue}.
@@ -119,7 +120,7 @@ public abstract class ElementValue {
             final int numArrayVals = input.readUnsignedShort();
             final ElementValue[] evalues = new ElementValue[numArrayVals];
             for (int j = 0; j < numArrayVals; j++) {
-                evalues[j] = ElementValue.readElementValue(input, cpool, arrayNesting);
+                evalues[j] = readElementValue(input, cpool, arrayNesting);
             }
             return new ArrayElementValue(ARRAY, evalues, cpool);
 

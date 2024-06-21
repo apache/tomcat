@@ -20,6 +20,7 @@ package org.apache.catalina.ssi;
 import java.io.PrintWriter;
 
 import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Return the result associated with the supplied Server Variable.
  *
@@ -34,12 +35,9 @@ public class SSIEcho implements SSICommand {
     protected static final String MISSING_VARIABLE_VALUE = "(none)";
 
 
-    /**
-     * @see SSICommand
-     */
     @Override
-    public long process(SSIMediator ssiMediator, String commandName,
-            String[] paramNames, String[] paramValues, PrintWriter writer) {
+    public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
+            PrintWriter writer) {
         String encoding = DEFAULT_ENCODING;
         String originalValue = null;
         String errorMessage = ssiMediator.getConfigErrMsg();
@@ -60,7 +58,8 @@ public class SSIEcho implements SSICommand {
                 writer.write(ssiMediator.encode(errorMessage, SSIMediator.ENCODING_ENTITY));
             }
         }
-        String variableValue = ssiMediator.getVariableValue(originalValue, encoding);
+        String variableValue = (originalValue == null) ? MISSING_VARIABLE_VALUE :
+                ssiMediator.getVariableValue(originalValue, encoding);
         if (variableValue == null) {
             variableValue = MISSING_VARIABLE_VALUE;
         }
@@ -70,8 +69,8 @@ public class SSIEcho implements SSICommand {
 
 
     protected boolean isValidEncoding(String encoding) {
-        return encoding.equalsIgnoreCase(SSIMediator.ENCODING_URL)
-                || encoding.equalsIgnoreCase(SSIMediator.ENCODING_ENTITY)
-                || encoding.equalsIgnoreCase(SSIMediator.ENCODING_NONE);
+        return encoding.equalsIgnoreCase(SSIMediator.ENCODING_URL) ||
+                encoding.equalsIgnoreCase(SSIMediator.ENCODING_ENTITY) ||
+                encoding.equalsIgnoreCase(SSIMediator.ENCODING_NONE);
     }
 }

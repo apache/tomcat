@@ -19,8 +19,8 @@ package jakarta.servlet;
 import java.util.Map;
 
 /**
- * Configures the session cookies used by the web application associated with
- * the ServletContext from which this SessionCookieConfig was obtained.
+ * Configures the session cookies used by the web application associated with the ServletContext from which this
+ * SessionCookieConfig was obtained.
  *
  * @since Servlet 3.0
  */
@@ -31,8 +31,7 @@ public interface SessionCookieConfig {
      *
      * @param name The name of the session cookie
      *
-     * @throws IllegalStateException if the associated ServletContext has
-     *         already been initialised
+     * @throws IllegalStateException if the associated ServletContext has already been initialised
      */
     void setName(String name);
 
@@ -48,8 +47,7 @@ public interface SessionCookieConfig {
      *
      * @param domain The session cookie domain
      *
-     * @throws IllegalStateException if the associated ServletContext has
-     *         already been initialised
+     * @throws IllegalStateException if the associated ServletContext has already been initialised
      */
     void setDomain(String domain);
 
@@ -65,14 +63,12 @@ public interface SessionCookieConfig {
      *
      * @param path The session cookie path
      *
-     * @throws IllegalStateException if the associated ServletContext has
-     *         already been initialised
+     * @throws IllegalStateException if the associated ServletContext has already been initialised
      */
     void setPath(String path);
 
     /**
-     * Obtain the path to use for session cookies. This is normally the context
-     * path.
+     * Obtain the path to use for session cookies. This is normally the context path.
      *
      * @return The path to use for session cookies.
      */
@@ -83,8 +79,7 @@ public interface SessionCookieConfig {
      *
      * @param comment Ignore
      *
-     * @throws IllegalStateException if the associated ServletContext has
-     *         already been initialised
+     * @throws IllegalStateException if the associated ServletContext has already been initialised
      *
      * @deprecated This is no longer required with RFC 6265
      */
@@ -106,8 +101,7 @@ public interface SessionCookieConfig {
      *
      * @param httpOnly The httpOnly setting to use for session cookies
      *
-     * @throws IllegalStateException if the associated ServletContext has
-     *         already been initialised
+     * @throws IllegalStateException if the associated ServletContext has already been initialised
      */
     void setHttpOnly(boolean httpOnly);
 
@@ -123,8 +117,7 @@ public interface SessionCookieConfig {
      *
      * @param secure The secure setting to use for session cookies
      *
-     * @throws IllegalStateException if the associated ServletContext has
-     *         already been initialised
+     * @throws IllegalStateException if the associated ServletContext has already been initialised
      */
     void setSecure(boolean secure);
 
@@ -139,8 +132,8 @@ public interface SessionCookieConfig {
      * Sets the maximum age.
      *
      * @param MaxAge the maximum age to set
-     * @throws IllegalStateException if the associated ServletContext has
-     *         already been initialised
+     *
+     * @throws IllegalStateException if the associated ServletContext has already been initialised
      */
     void setMaxAge(int MaxAge);
 
@@ -152,32 +145,27 @@ public interface SessionCookieConfig {
     int getMaxAge();
 
     /**
-     * Sets the value for the given session cookie attribute. When a value is
-     * set via this method, the value returned by the attribute specific getter
-     * (if any) must be consistent with the value set via this method.
+     * Sets the value for the given session cookie attribute. When a value is set via this method, the value returned by
+     * the attribute specific getter (if any) must be consistent with the value set via this method.
      *
      * @param name  Name of attribute to set
      * @param value Value of attribute
      *
-     * @throws IllegalStateException if the associated ServletContext has
-     *         already been initialised
-     *
-     * @throws IllegalArgumentException If the attribute name is null or
-     *         contains any characters not permitted for use in Cookie names.
-     *
-     * @throws NumberFormatException If the attribute is known to be numerical
-     *         but the provided value cannot be parsed to a number.
+     * @throws IllegalStateException    if the associated ServletContext has already been initialised
+     * @throws IllegalArgumentException If the attribute name is null or contains any characters not permitted for use
+     *                                      in Cookie names.
+     * @throws NumberFormatException    If the attribute is known to be numerical but the provided value cannot be
+     *                                      parsed to a number.
      *
      * @since Servlet 6.0
      */
     void setAttribute(String name, String value);
 
     /**
-     * Obtain the value for a sesison cookie given attribute. Values returned
-     * from this method must be consistent with the values set and returned by
-     * the attribute specific getters and setters in this class.
+     * Obtain the value for a sesison cookie given attribute. Values returned from this method must be consistent with
+     * the values set and returned by the attribute specific getters and setters in this class.
      *
-     * @param name  Name of attribute to return
+     * @param name Name of attribute to return
      *
      * @return Value of specified attribute
      *
@@ -186,8 +174,7 @@ public interface SessionCookieConfig {
     String getAttribute(String name);
 
     /**
-     * Obtain the Map of attributes and values (excluding version) for this
-     * session cookie.
+     * Obtain the Map of attributes and values (excluding version) for this session cookie.
      *
      * @return A read-only Map of attributes to values, excluding version.
      *

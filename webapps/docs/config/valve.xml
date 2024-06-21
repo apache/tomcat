@@ -288,9 +288,12 @@
     <li><b><code>%A</code></b> - Local IP address</li>
     <li><b><code>%b</code></b> - Bytes sent, excluding HTTP headers, or '-' if zero</li>
     <li><b><code>%B</code></b> - Bytes sent, excluding HTTP headers</li>
+    <li><b><code>%D</code></b> - Time taken to process the request in microseconds</li>
+    <li><b><code>%F</code></b> - Time taken to commit the response, in milliseconds</li>
     <li><b><code>%h</code></b> - Remote host name (or IP address if
         <code>enableLookups</code> for the connector is false)</li>
     <li><b><code>%H</code></b> - Request protocol</li>
+    <li><b><code>%I</code></b> - Current request thread name (can compare later with stacktraces)</li>
     <li><b><code>%l</code></b> - Remote logical username from identd (always returns
         '-')</li>
     <li><b><code>%m</code></b> - Request method (GET, POST, etc.)</li>
@@ -301,13 +304,10 @@
     <li><b><code>%s</code></b> - HTTP status code of the response</li>
     <li><b><code>%S</code></b> - User session ID</li>
     <li><b><code>%t</code></b> - Date and time, in Common Log Format</li>
+    <li><b><code>%T</code></b> - Time taken to process the request, in seconds</li>
     <li><b><code>%u</code></b> - Remote user that was authenticated (if any), else '-' (escaped if required)</li>
     <li><b><code>%U</code></b> - Requested URL path</li>
     <li><b><code>%v</code></b> - Local server name</li>
-    <li><b><code>%D</code></b> - Time taken to process the request in microseconds</li>
-    <li><b><code>%T</code></b> - Time taken to process the request, in seconds</li>
-    <li><b><code>%F</code></b> - Time taken to commit the response, in milliseconds</li>
-    <li><b><code>%I</code></b> - Current request thread name (can compare later with stacktraces)</li>
     <li><b><code>%X</code></b> - Connection status when response is completed:
       <ul>
       <li><code>X</code> = Connection aborted before the response completed.</li>
@@ -331,15 +331,16 @@
     <li><b><code>%{xxx}i</code></b> write value of incoming header with name <code>xxx</code> (escaped if required)</li>
     <li><b><code>%{xxx}o</code></b> write value of outgoing header with name <code>xxx</code> (escaped if required)</li>
     <li><b><code>%{xxx}c</code></b> write value of cookie(s) with name <code>xxx</code> (comma separated and escaped if required)</li>
-    <li><b><code>%{xxx}r</code></b> write value of ServletRequest attribute with name <code>xxx</code> (escaped if required)</li>
-    <li><b><code>%{xxx}s</code></b> write value of HttpSession attribute with name <code>xxx</code> (escaped if required)</li>
+    <li><b><code>%{xxx}r</code></b> write value of ServletRequest attribute with name <code>xxx</code> (escaped if required, value <code>??</code> if request is null)</li>
+    <li><b><code>%{xxx}s</code></b> write value of HttpSession attribute with name <code>xxx</code> (escaped if required, value <code>??</code> if request is null)</li>
     <li><b><code>%{xxx}p</code></b> write local (server) port (<code>xxx==local</code>) or
         remote (client) port (<code>xxx=remote</code>)</li>
     <li><b><code>%{xxx}t</code></b> write timestamp at the end of the request formatted using the
         enhanced SimpleDateFormat pattern <code>xxx</code></li>
     <li><b><code>%{xxx}T</code></b> write time taken to process the request using unit <code>xxx</code>
-        where valid units are <code>ms</code> for milliseconds, <code>us</code> for microseconds,
-        and <code>s</code> for seconds. <code>%{s}T</code> is equivalent to <code>%T</code> as well
+        where valid units are <code>ns</code> for nanoseconds, <code>us</code> for microseconds,
+        <code>ms</code> for milliseconds, <code>fracsec</code> for fractional seconds, or <code>s</code> for whole seconds.
+        <code>%{s}T</code> is equivalent to <code>%T</code> as well
         as <code>%{us}T</code> is equivalent to <code>%D</code>.</li>
     </ul>
 
@@ -369,7 +370,7 @@
     <li><code>&quot;</code> is escaped as <code>\&quot;</code></li>
     <li><code>\</code> is escaped as <code>\\</code></li>
     <li>Standard C escaping are used for <code>\f</code>, <code>\n</code>,
-        <code>\r</code>, <code>\t</code> and <code>\v</code></li>
+        <code>\r</code> and <code>\t</code></li>
     <li>Any other control characters or characters with code points above 127
         are encoded using the standard Java unicode escaping
         (<code>\uXXXX</code>)</li>
@@ -382,6 +383,10 @@
     <p>The shorthand pattern <code>pattern=&quot;combined&quot;</code>
     appends the values of the <code>Referer</code> and <code>User-Agent</code>
     headers, each in double quotes, to the <code>common</code> pattern.</p>
+
+    <p>Fields using unknown pattern identifiers will be logged as <code>???X???</code>
+    where <code>X</code> is the unknown identifier. Fields with unknown pattern identifier
+    plus <code>{xxx}</code> key will be logged as <code>???</code>.</p>
 
     <p>When Tomcat is operating behind a reverse proxy, the client information
     logged by the Access Log Valve may represent the reverse proxy, the browser
@@ -461,7 +466,9 @@
     <li><b>s-ip</b> - Local IP address</li>
     <li><b>sc-status</b> - HTTP status code of the response</li>
     <li><b>time</b> - Time the request was served in HH:mm:ss format for GMT</li>
-    <li><b>time-taken</b> - Time (in seconds as floating point) taken to serve the request</li>
+    <li><b>time-taken</b> - Time (in seconds) taken to serve the request. Can also use the
+      suffixes <code>-ns</code> for nanoseconds, <code>-us</code> for microseconds,
+      <code>-ms</code> for milliseconds, <code>-fracsec</code> for fractional seconds.</li>
     <li><b>x-threadname</b> - Current request thread name (can compare later with stacktraces)</li>
     </ul>
 
@@ -508,9 +515,9 @@
   <subsection name="Introduction">
 
     <p>The <strong>JSON Access Log Valve</strong> extends the
-    <a href="#Access_Log_Valve">Access Log Valve</a> class, and so
+    <a href="#Access_Log_Valve">Access Log Valve</a>, and so
     uses the same self-contained logging logic.  This means it
-    implements many of the same file handling attributes.  The main
+    implements the same file handling attributes.  The main
     difference to the standard <code>AccessLogValve</code> is that
     <code>JsonAccessLogValve</code> creates log files which
     follow the JSON syntax as defined by
@@ -535,32 +542,66 @@
 
     </attributes>
 
-    <p>While the pattern supported are the same as for the regular access log,
-    those are mapped to specific JSON attribute names. The attributes are the
-    following:
+    <p>While the patterns supported are the same as for the regular
+    <a href="#Access_Log_Valve">Access Log Valve</a>,
+    there are a few differences:
     <ul>
-    <li>a: remoteAddr</li>
-    <li>A: localAddr</li>
-    <li>b: size (byteSent: size)</li>
-    <li>B: byteSentNC</li>
-    <li>D: elapsedTime</li>
-    <li>F: firstByteTime</li>
-    <li>h: host</li>
-    <li>H: protocol</li>
-    <li>l: logicalUserName</li>
-    <li>m: method</li>
-    <li>p: port</li>
-    <li>q: query</li>
-    <li>r: request</li>
-    <li>s: statusCode</li>
-    <li>S: sessionId</li>
-    <li>t: time (dateTime: time)</li>
-    <li>T: elapsedTimeS</li>
-    <li>u: user</li>
-    <li>U: path (requestURI: path)</li>
-    <li>v: localServerName</li>
-    <li>I: threadName</li>
-    <li>X: connectionStatus</li>
+    <li>requests are logged as JSON objects.</li>
+    <li>each supported "%X" single character pattern
+        identifier results in a key value pair in this object.
+        See below for the list of keys used for the respective pattern
+        identifiers.</li>
+    <li>each pattern identifiers using a subkey of the form <code>%{xxx}X</code>
+        where "X" is one of "a", "p" or "t"
+        results in a key value pair of the form "key-xxx".
+        See below for the list of keys used for the respective pattern
+        identifiers.</li>
+    <li>each pattern identifiers using a subkey of the form <code>%{xxx}X</code>
+        where "X" is one of "c", "i", "o", "r" or "s"
+        results in a sub object. See below for the key pointing at this
+        sub object. The keys in the sub object are the "xxx" subkeys in the pattern.</li>
+    <li>each unsupported "%X" character pattern
+        identifier results in a key value pair using the key "other-X".</li>
+    <li>the values logged are the same as the ones logged by
+        the standard <a href="#Access_Log_Valve">Access Log Valve</a>
+        for the same pattern identifiers.</li>
+    <li>any "xxx" subkeys get Json escaped.</li>
+    <li>any verbatim text between pattern identifiers gets silently ignored.</li>
+    </ul>
+    The JSON object keys used for the pattern identifiers which
+    do not generate a sub object are the following:
+    <ul>
+    <li><b><code>%a</code></b>: remoteAddr</li>
+    <li><b><code>%A</code></b>: localAddr</li>
+    <li><b><code>%b</code></b>: size</li>
+    <li><b><code>%B</code></b>: byteSentNC</li>
+    <li><b><code>%D</code></b>: elapsedTime</li>
+    <li><b><code>%F</code></b>: firstByteTime</li>
+    <li><b><code>%h</code></b>: host</li>
+    <li><b><code>%H</code></b>: protocol</li>
+    <li><b><code>%I</code></b>: threadName</li>
+    <li><b><code>%l</code></b>: logicalUserName</li>
+    <li><b><code>%m</code></b>: method</li>
+    <li><b><code>%p</code></b>: port</li>
+    <li><b><code>%q</code></b>: query</li>
+    <li><b><code>%r</code></b>: request</li>
+    <li><b><code>%s</code></b>: statusCode</li>
+    <li><b><code>%S</code></b>: sessionId</li>
+    <li><b><code>%t</code></b>: time</li>
+    <li><b><code>%T</code></b>: elapsedTimeS</li>
+    <li><b><code>%u</code></b>: user</li>
+    <li><b><code>%U</code></b>: path</li>
+    <li><b><code>%v</code></b>: localServerName</li>
+    <li><b><code>%X</code></b>: connectionStatus</li>
+    </ul>
+    The JSON object keys used for the pattern identifiers which
+    generate a sub object are the following:
+    <ul>
+    <li><b><code>%c</code></b>: cookies</li>
+    <li><b><code>%i</code></b>: requestHeaders</li>
+    <li><b><code>%o</code></b>: responseHeaders</li>
+    <li><b><code>%r</code></b>: requestAttributes</li>
+    <li><b><code>%s</code></b>: sessionAttributes</li>
     </ul>
     </p>
 
@@ -1521,12 +1562,6 @@
         If not specified, the default value is <code>false</code>.</p>
       </attribute>
 
-      <attribute name="trimCredentials" required="false">
-        <p>Controls whether leading and/or trailing whitespace is removed from
-        the parsed credentials. If not specified, the default value is
-        <code>true</code>.</p>
-      </attribute>
-
     </attributes>
 
   </subsection>
@@ -1555,7 +1590,7 @@
 
     <attributes>
 
-      <attribute name="algoirthms" required="false">
+      <attribute name="algorithms" required="false">
         <p>A comma-separated list of digest algorithms to be used for the
         authentication process. Algorithms may be specified using the Java
         Standard names or the names used by RFC 7616. If not specified, the
@@ -2517,6 +2552,13 @@
         <strong>false</strong>.</p>
       </attribute>
 
+      <attribute name="highConcurrencyStatus" required="false">
+        <p>The error status code which will be returned to the client, if the
+        value is positive, when a permit cannot be acquired from the
+        sepmaphore. The default value is <strong>-1</strong>, which will mean
+        no error status will be sent back.</p>
+      </attribute>
+
       <attribute name="interruptible" required="false">
         <p>Flag to determine if a thread may be interrupted until a permit is
         available. The default value is <strong>false</strong>.</p>
@@ -2596,6 +2638,27 @@
         filter=&quot;.*\.gif|.*\.js|.*\.jpeg|.*\.jpg|.*\.png|.*\.htm|.*\.html|.*\.css|.*\.txt&quot;</code>.
         The filter is a regular expression using
         <code>java.util.regex</code>.</p>
+      </attribute>
+
+      <attribute name="semaphoreAcquireUninterruptibly" required="false">
+        <p>Flag to determine if a thread that blocks waiting for the per session
+        Semaphore should do so uninterruptibly. Has no effect if
+        <strong>semaphoreBlockOnAcquire</strong> is <code>false</code>. If not
+        specified, the default value of <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="semaphoreBlockOnAcquire" required="false">
+        <p>Flag to determine if a thread that wishes to acquire the per session
+        Semaphore when it is held by another thread should block until it can
+        acquire the Semaphore or if the waiting request be rejected. If not
+        specified, the default value of <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="semaphoreFairness" required="false">
+        <p>Flag to determine if the per session Semaphore will grant requests
+        for the Semaphore in the same order they were received. Has no effect if
+        <strong>semaphoreBlockOnAcquire</strong> is <code>false</code>. If not
+        specified, the default value of <code>true</code> will be used.</p>
       </attribute>
 
     </attributes>

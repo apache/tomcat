@@ -19,7 +19,7 @@ package org.apache.tomcat.util.scan;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,7 +44,7 @@ public class TestAbstractInputStreamJar {
         sb.append(f.toURI().toURL());
         sb.append("*/WEB-INF/lib/test.jar");
 
-        Jar jar = JarFactory.newInstance(new URL(sb.toString()));
+        Jar jar = JarFactory.newInstance(URI.create(sb.toString()).toURL());
 
         InputStream is1 = jar.getInputStream("META-INF/resources/index.html");
         ByteArrayOutputStream baos1 = new ByteArrayOutputStream();

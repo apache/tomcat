@@ -63,7 +63,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
     private static final Log log = LogFactory.getLog(PerUserPoolDataSource.class);
 
     private static <K, V> HashMap<K, V> createMap() {
-        // Should there be a default size different than what this ctor provides?
+        // Should there be a default size different from what this ctor provides?
         return new HashMap<>();
     }
 
@@ -685,7 +685,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
      * Supports Serialization interface.
      *
      * @param in
-     *            a {@code java.io.ObjectInputStream} value
+     *            a {@link java.io.ObjectInputStream} value
      * @throws IOException
      *             if an error occurs
      * @throws ClassNotFoundException
@@ -722,16 +722,16 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         pool.setLifo(getPerUserLifo(userName));
         pool.setMaxIdle(getPerUserMaxIdle(userName));
         pool.setMaxTotal(getPerUserMaxTotal(userName));
-        pool.setMaxWait(Duration.ofMillis(getPerUserMaxWaitMillis(userName)));
-        pool.setMinEvictableIdle(getPerUserMinEvictableIdleDuration(userName));
+        pool.setMaxWait(getPerUserMaxWaitDuration(userName));
+        pool.setMinEvictableIdleDuration(getPerUserMinEvictableIdleDuration(userName));
         pool.setMinIdle(getPerUserMinIdle(userName));
         pool.setNumTestsPerEvictionRun(getPerUserNumTestsPerEvictionRun(userName));
-        pool.setSoftMinEvictableIdle(getPerUserSoftMinEvictableIdleDuration(userName));
+        pool.setSoftMinEvictableIdleDuration(getPerUserSoftMinEvictableIdleDuration(userName));
         pool.setTestOnCreate(getPerUserTestOnCreate(userName));
         pool.setTestOnBorrow(getPerUserTestOnBorrow(userName));
         pool.setTestOnReturn(getPerUserTestOnReturn(userName));
         pool.setTestWhileIdle(getPerUserTestWhileIdle(userName));
-        pool.setTimeBetweenEvictionRuns(getPerUserDurationBetweenEvictionRuns(userName));
+        pool.setDurationBetweenEvictionRuns(getPerUserDurationBetweenEvictionRuns(userName));
 
         pool.setSwallowedExceptionListener(new SwallowedExceptionLogger(log));
 

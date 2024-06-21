@@ -17,7 +17,7 @@
 package websocket.snake;
 
 import java.awt.Color;
-import java.io.EOFException;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -75,6 +75,9 @@ public class SnakeAnnotation {
 
     @OnOpen
     public void onOpen(Session session) {
+        // If the messages take longer than TICK_DELAY to be sent, the game isn't going to work properly.
+        session.getUserProperties().put("org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT",
+                Long.valueOf(SnakeTimer.TICK_DELAY));
         this.snake = new Snake(id, session);
         SnakeTimer.addSnake(snake);
         StringBuilder sb = new StringBuilder();
@@ -87,8 +90,7 @@ public class SnakeAnnotation {
                 sb.append(',');
             }
         }
-        SnakeTimer.broadcast(String.format("{\"type\": \"join\",\"data\":[%s]}",
-                sb.toString()));
+        SnakeTimer.broadcast(String.format("{\"type\": \"join\",\"data\":[%s]}", sb.toString()));
     }
 
 
@@ -109,25 +111,30 @@ public class SnakeAnnotation {
     @OnClose
     public void onClose() {
         SnakeTimer.removeSnake(snake);
-        SnakeTimer.broadcast(String.format("{\"type\": \"leave\", \"id\": %d}",
-                Integer.valueOf(id)));
+        SnakeTimer.broadcast(String.format("{\"type\": \"leave\", \"id\": %d}", Integer.valueOf(id)));
     }
 
 
     @OnError
-    public void onError(Throwable t) throws Throwable {
-        // Most likely cause is a user closing their browser. Check to see if
-        // the root cause is EOF and if it is ignore it.
-        // Protect against infinite loops.
+    public void onError(Throwable t, Session session) throws Throwable {
+        /*
+         * Assume all errors are fatal. Close the session and remove the snake from the game.
+         */
+        session.close();
+        /*
+         * Correct action depends on root cause. Protect against infinite loops while looking for root cause.
+         */
         int count = 0;
         Throwable root = t;
         while (root.getCause() != null && count < 20) {
             root = root.getCause();
             count ++;
         }
-        if (root instanceof EOFException) {
-            // Assume this is triggered by the user closing their browser and
-            // ignore it.
+        if (root instanceof IOException) {
+            /*
+             * User going away can present in different ways depending on their platform and exactly what went wrong.
+             * Assume that any IO issue is some form of the user going away and ignore it.
+             */
         } else {
             throw t;
         }

@@ -89,12 +89,12 @@ public final class JspRuntimeContext {
             loader = this.getClass().getClassLoader();
         }
 
-        if (log.isDebugEnabled()) {
+        if (log.isTraceEnabled()) {
             if (loader != null) {
-                log.debug(Localizer.getMessage("jsp.message.parent_class_loader_is",
+                log.trace(Localizer.getMessage("jsp.message.parent_class_loader_is",
                                                loader.toString()));
             } else {
-                log.debug(Localizer.getMessage("jsp.message.parent_class_loader_is",
+                log.trace(Localizer.getMessage("jsp.message.parent_class_loader_is",
                                                "<none>"));
             }
         }
@@ -117,8 +117,8 @@ public final class JspRuntimeContext {
 
         if (options.getMaxLoadedJsps() > 0) {
             jspQueue = new FastRemovalDequeue<>(options.getMaxLoadedJsps());
-            if (log.isDebugEnabled()) {
-                log.debug(Localizer.getMessage("jsp.message.jsp_queue_created",
+            if (log.isTraceEnabled()) {
+                log.trace(Localizer.getMessage("jsp.message.jsp_queue_created",
                                                "" + options.getMaxLoadedJsps(), context.getContextPath()));
             }
         }
@@ -210,8 +210,8 @@ public final class JspRuntimeContext {
         FastRemovalDequeue<JspServletWrapper>.Entry entry = jspQueue.push(jsw);
         JspServletWrapper replaced = entry.getReplaced();
         if (replaced != null) {
-            if (log.isDebugEnabled()) {
-                log.debug(Localizer.getMessage("jsp.message.jsp_removed_excess",
+            if (log.isTraceEnabled()) {
+                log.trace(Localizer.getMessage("jsp.message.jsp_removed_excess",
                                                replaced.getJspUri(), context.getContextPath()));
             }
             unloadJspServletWrapper(replaced);
@@ -444,8 +444,8 @@ public final class JspRuntimeContext {
 
         String path = cpath.toString() + cp;
 
-        if(log.isDebugEnabled()) {
-            log.debug("Compilation classpath initialized: " + path);
+        if(log.isTraceEnabled()) {
+            log.trace("Compilation classpath initialized: " + path);
         }
         return path;
     }
@@ -481,8 +481,8 @@ public final class JspRuntimeContext {
                 JspServletWrapper jsw = (JspServletWrapper) wrapper;
                 synchronized (jsw) {
                     if (jsw.getLastUsageTime() < unloadBefore) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(Localizer.getMessage("jsp.message.jsp_removed_idle",
+                        if (log.isTraceEnabled()) {
+                            log.trace(Localizer.getMessage("jsp.message.jsp_removed_idle",
                                     jsw.getJspUri(), context.getContextPath(),
                                     "" + (now - jsw.getLastUsageTime())));
                         }

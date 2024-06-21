@@ -26,7 +26,6 @@ Export-Package: \
     org.apache.catalina.tribes.membership,\
     org.apache.catalina.tribes.tipis,\
     org.apache.catalina.tribes.transport,\
-    org.apache.catalina.tribes.transport.bio,\
     org.apache.catalina.tribes.transport.nio,\
     org.apache.catalina.tribes.util
 

@@ -38,7 +38,6 @@ Export-Package: \
     org.apache.catalina.security,\
     org.apache.catalina.servlets,\
     org.apache.catalina.session,\
-    org.apache.catalina.ssi,\
     org.apache.catalina.startup,\
     org.apache.catalina.users,\
     org.apache.catalina.util,\
@@ -83,6 +82,8 @@ Export-Package: \
     org.apache.tomcat.util.net,\
     org.apache.tomcat.util.net.openssl,\
     org.apache.tomcat.util.net.openssl.ciphers,\
+    org.apache.tomcat.util.net.openssl.panama,\
+    org.apache.tomcat.util.openssl,\
     org.apache.tomcat.util.res,\
     org.apache.tomcat.util.scan,\
     org.apache.tomcat.util.security,\
@@ -99,11 +100,11 @@ Export-Package: \
 
 Provide-Capability: \
     osgi.contract;\
-        osgi.contract=JavaJASPIC;\
+        osgi.contract=JakartaAuthentication;\
         version:Version=${jaspic.spec.version};\
         uses:='${packages;NAMED;jakarta.security.auth.message.*}',\
     osgi.contract;\
-        osgi.contract=JavaServlet;\
+        osgi.contract=JakartaServlet;\
         version:Version=${servlet.spec.version};\
         uses:='${packages;NAMED;jakarta.servlet.*;NAMED;!jakarta.servlet.jsp.*}'
 

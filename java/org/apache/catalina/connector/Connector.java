@@ -41,8 +41,11 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.CharsetUtil;
 import org.apache.tomcat.util.buf.EncodedSolidusHandling;
+import org.apache.tomcat.util.buf.StringUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -208,13 +211,13 @@ public class Connector extends LifecycleMBeanBase {
     protected int maxParameterCount = 1000;
 
     /**
-     * Maximum size of a POST which will be automatically parsed by the container. 2MB by default.
+     * Maximum size of a POST which will be automatically parsed by the container. 2 MiB by default.
      */
     protected int maxPostSize = 2 * 1024 * 1024;
 
 
     /**
-     * Maximum size of a POST which will be saved by the container during authentication. 4kB by default
+     * Maximum size of a POST which will be saved by the container during authentication. 4 KiB by default
      */
     protected int maxSavePostSize = 4 * 1024;
 
@@ -526,7 +529,7 @@ public class Connector extends LifecycleMBeanBase {
         HashSet<String> methodSet = new HashSet<>();
 
         if (null != methods) {
-            methodSet.addAll(Arrays.asList(methods.split("\\s*,\\s*")));
+            methodSet.addAll(Arrays.asList(StringUtils.splitCommaSeparated(methods)));
         }
 
         if (methodSet.contains("TRACE")) {
@@ -894,25 +897,33 @@ public class Connector extends LifecycleMBeanBase {
      * Create (or allocate) and return a Request object suitable for specifying the contents of a Request to the
      * responsible Container.
      *
+     * @param coyoteRequest The Coyote request with which the Request object will always be associated. In normal usage
+     *                          this must be non-null. In some test scenarios, it may be possible to use a null request
+     *                          without triggering an NPE.
+     *
      * @return a new Servlet request object
      */
-    public Request createRequest() {
-        return new Request(this);
+    public Request createRequest(org.apache.coyote.Request coyoteRequest) {
+        return new Request(this, coyoteRequest);
     }
 
 
     /**
-     * Create (or allocate) and return a Response object suitable for receiving the contents of a Response from the
-     * responsible Container.
+     * Create and return a Response object suitable for receiving the contents of a Response from the responsible
+     * Container.
+     *
+     * @param coyoteResponse The Coyote request with which the Response object will always be associated. In normal
+     *                           usage this must be non-null. In some test scenarios, it may be possible to use a null
+     *                           response without triggering an NPE.
      *
      * @return a new Servlet response object
      */
-    public Response createResponse() {
+    public Response createResponse(org.apache.coyote.Response coyoteResponse) {
         int size = protocolHandler.getDesiredBufferSize();
         if (size > 0) {
-            return new Response(size);
+            return new Response(coyoteResponse, size);
         } else {
-            return new Response();
+            return new Response(coyoteResponse);
         }
     }
 
@@ -992,23 +1003,31 @@ public class Connector extends LifecycleMBeanBase {
         // Initialize adapter
         adapter = new CoyoteAdapter(this);
         protocolHandler.setAdapter(adapter);
-        if (service != null) {
-            protocolHandler.setUtilityExecutor(service.getServer().getUtilityExecutor());
-        }
 
         // Make sure parseBodyMethodsSet has a default
         if (null == parseBodyMethodsSet) {
             setParseBodyMethods(getParseBodyMethods());
         }
 
-        if (AprStatus.isAprAvailable() && AprStatus.getUseOpenSSL() &&
+        if (JreCompat.isJre22Available() && OpenSSLStatus.getUseOpenSSL() && OpenSSLStatus.isAvailable() &&
                 protocolHandler instanceof AbstractHttp11Protocol) {
+            // Use FFM and OpenSSL if available
+            AbstractHttp11Protocol<?> jsseProtocolHandler = (AbstractHttp11Protocol<?>) protocolHandler;
+            if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
+                // OpenSSL is compatible with the JSSE configuration, so use it if it is available
+                jsseProtocolHandler
+                        .setSslImplementationName("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation");
+            }
+        } else if (AprStatus.isAprAvailable() && AprStatus.getUseOpenSSL() &&
+                protocolHandler instanceof AbstractHttp11Protocol) {
+            // Use tomcat-native and OpenSSL otherwise, if available
             AbstractHttp11Protocol<?> jsseProtocolHandler = (AbstractHttp11Protocol<?>) protocolHandler;
             if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
                 // OpenSSL is compatible with the JSSE configuration, so use it if APR is available
                 jsseProtocolHandler.setSslImplementationName(OpenSSLImplementation.class.getName());
             }
         }
+        // Otherwise the default JSSE will be used
 
         try {
             protocolHandler.init();
@@ -1035,9 +1054,15 @@ public class Connector extends LifecycleMBeanBase {
 
         setState(LifecycleState.STARTING);
 
+        // Configure the utility executor before starting the protocol handler
+        if (protocolHandler != null && service != null) {
+            protocolHandler.setUtilityExecutor(service.getServer().getUtilityExecutor());
+        }
+
         try {
             protocolHandler.start();
         } catch (Exception e) {
+            // Includes NPE - protocolHandler will be null for invalid protocol if throwOnFailure is false
             throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerStartFailed"), e);
         }
     }
@@ -1060,6 +1085,11 @@ public class Connector extends LifecycleMBeanBase {
         } catch (Exception e) {
             throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerStopFailed"), e);
         }
+
+        // Remove the utility executor once the protocol handler has been stopped
+        if (protocolHandler != null) {
+            protocolHandler.setUtilityExecutor(null);
+        }
     }
 
 
@@ -1081,27 +1111,28 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
-    /**
-     * Provide a useful toString() implementation as it may be used when logging Lifecycle errors to identify the
-     * component.
-     */
     @Override
     public String toString() {
         // Not worth caching this right now
         StringBuilder sb = new StringBuilder("Connector[");
-        sb.append(getProtocol());
-        sb.append('-');
-        String id = (protocolHandler != null) ? protocolHandler.getId() : null;
-        if (id != null) {
-            sb.append(id);
-        } else {
-            int port = getPortWithOffset();
-            if (port > 0) {
-                sb.append(port);
+        String name = (String) getProperty("name");
+        if (name == null) {
+            sb.append(getProtocol());
+            sb.append('-');
+            String id = (protocolHandler != null) ? protocolHandler.getId() : null;
+            if (id != null) {
+                sb.append(id);
             } else {
-                sb.append("auto-");
-                sb.append(getProperty("nameIndex"));
+                int port = getPortWithOffset();
+                if (port > 0) {
+                    sb.append(port);
+                } else {
+                    sb.append("auto-");
+                    sb.append(getProperty("nameIndex"));
+                }
             }
+        } else {
+            sb.append(name);
         }
         sb.append(']');
         return sb.toString();

@@ -25,7 +25,6 @@ import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
@@ -452,7 +451,7 @@ public class MapperListener extends LifecycleMBeanBase implements ContainerListe
 
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
-        if (event.getType().equals(Lifecycle.AFTER_START_EVENT)) {
+        if (event.getType().equals(AFTER_START_EVENT)) {
             Object obj = event.getSource();
             if (obj instanceof Wrapper) {
                 Wrapper w = (Wrapper) obj;
@@ -471,7 +470,7 @@ public class MapperListener extends LifecycleMBeanBase implements ContainerListe
             } else if (obj instanceof Host) {
                 registerHost((Host) obj);
             }
-        } else if (event.getType().equals(Lifecycle.BEFORE_STOP_EVENT)) {
+        } else if (event.getType().equals(BEFORE_STOP_EVENT)) {
             Object obj = event.getSource();
             if (obj instanceof Wrapper) {
                 unregisterWrapper((Wrapper) obj);

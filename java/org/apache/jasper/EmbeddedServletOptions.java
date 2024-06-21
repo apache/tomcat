@@ -124,12 +124,12 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Compiler target VM.
      */
-    private String compilerTargetVM = "11";
+    private String compilerTargetVM = "17";
 
     /**
      * The compiler source VM.
      */
-    private String compilerSourceVM = "11";
+    private String compilerSourceVM = "17";
 
     /**
      * The compiler class name.
@@ -248,9 +248,6 @@ public final class EmbeddedServletOptions implements Options {
         return quoteAttributeEL;
     }
 
-    /**
-     * Are we keeping generated code around?
-     */
     @Override
     public boolean getKeepGenerated() {
         return keepGenerated;
@@ -266,130 +263,81 @@ public final class EmbeddedServletOptions implements Options {
         return isPoolingEnabled;
     }
 
-    /**
-     * Are we supporting HTML mapped servlets?
-     */
     @Override
     public boolean getMappedFile() {
         return mappedFile;
     }
 
-    /**
-     * Should class files be compiled with debug information?
-     */
     @Override
     public boolean getClassDebugInfo() {
         return classDebugInfo;
     }
 
-    /**
-     * Background JSP compile thread check interval
-     */
     @Override
     public int getCheckInterval() {
         return checkInterval;
     }
 
-    /**
-     * Modification test interval.
-     */
     @Override
     public int getModificationTestInterval() {
         return modificationTestInterval;
     }
 
-    /**
-     * Re-compile on failure.
-     */
     @Override
     public boolean getRecompileOnFail() {
         return recompileOnFail;
     }
 
-    /**
-     * Is Jasper being used in development mode?
-     */
     @Override
     public boolean getDevelopment() {
         return development;
     }
 
-    /**
-     * Is the generation of SMAP info for JSR45 debugging suppressed?
-     */
     @Override
     public boolean isSmapSuppressed() {
         return isSmapSuppressed;
     }
 
-    /**
-     * Should SMAP info for JSR45 debugging be dumped to a file?
-     */
     @Override
     public boolean isSmapDumped() {
         return isSmapDumped;
     }
 
-    /**
-     * Are Text strings to be generated as char arrays?
-     */
     @Override
     public boolean genStringAsCharArray() {
         return this.genStringAsCharArray;
     }
 
-    /**
-     * What is my scratch dir?
-     */
     @Override
     public File getScratchDir() {
         return scratchDir;
     }
 
-    /**
-     * What classpath should I use while compiling the servlets
-     * generated from JSP files?
-     */
     @Override
     public String getClassPath() {
         return classpath;
     }
 
-    /**
-     * Is generation of X-Powered-By response header enabled/disabled?
-     */
     @Override
     public boolean isXpoweredBy() {
         return xpoweredBy;
     }
 
-    /**
-     * Compiler to use.
-     */
     @Override
     public String getCompiler() {
         return compiler;
     }
 
-    /**
-     * @see Options#getCompilerTargetVM
-     */
     @Override
     public String getCompilerTargetVM() {
         return compilerTargetVM;
     }
 
-    /**
-     * @see Options#getCompilerSourceVM
-     */
     @Override
     public String getCompilerSourceVM() {
         return compilerSourceVM;
     }
 
-    /**
-     * Java compiler class to use.
-     */
     @Override
     public String getCompilerClassName() {
         return compilerClassName;
@@ -443,28 +391,16 @@ public final class EmbeddedServletOptions implements Options {
         return null;
     }
 
-    /**
-     * Should we include a source fragment in exception messages, which could be displayed
-     * to the developer ?
-     */
     @Override
     public boolean getDisplaySourceFragment() {
         return displaySourceFragment;
     }
 
-    /**
-     * Should jsps be unloaded if to many are loaded?
-     * If set to a value greater than 0 eviction of jsps is started. Default: -1
-     */
     @Override
     public int getMaxLoadedJsps() {
         return maxLoadedJsps;
     }
 
-    /**
-     * Should any jsps be unloaded when being idle for this time in seconds?
-     * If set to a value greater than 0 eviction of jsps is started. Default: -1
-     */
     @Override
     public int getJspIdleTimeout() {
         return jspIdleTimeout;

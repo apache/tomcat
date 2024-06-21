@@ -84,7 +84,7 @@ final class ConnectionImpl extends DelegatingConnection<Connection> {
     }
 
     /**
-     * Get the delegated connection, if allowed.
+     * Gets the delegated connection, if allowed.
      *
      * @return the internal connection, or null if access is not allowed.
      * @see #isAccessToUnderlyingConnectionAllowed()
@@ -98,7 +98,7 @@ final class ConnectionImpl extends DelegatingConnection<Connection> {
     }
 
     /**
-     * Get the innermost connection, if allowed.
+     * Gets the innermost connection, if allowed.
      *
      * @return the innermost internal connection, or null if access is not allowed.
      * @see #isAccessToUnderlyingConnectionAllowed()
@@ -109,6 +109,15 @@ final class ConnectionImpl extends DelegatingConnection<Connection> {
             return super.getInnermostDelegateInternal();
         }
         return null;
+    }
+
+    /**
+     * Package-private for tests.
+     *
+     * @return the PooledConnectionImpl.
+     */
+    PooledConnectionImpl getPooledConnectionImpl() {
+        return pooledConnection;
     }
 
     /**
@@ -126,7 +135,7 @@ final class ConnectionImpl extends DelegatingConnection<Connection> {
      * be returned, otherwise delegate to the wrapped JDBC 1.x {@link java.sql.Connection}.
      *
      * @param sql
-     *            an SQL statement that may contain one or more '?' parameter placeholders. Typically this statement is
+     *            an SQL statement that may contain one or more '?' parameter placeholders. Typically, this statement is
      *            specified using JDBC call escape syntax.
      * @return a default {@code CallableStatement} object containing the pre-compiled SQL statement.
      * @throws SQLException
@@ -245,6 +254,10 @@ final class ConnectionImpl extends DelegatingConnection<Connection> {
         }
     }
 
+    //
+    // Methods for accessing the delegate connection
+    //
+
     /**
      * If pooling of {@code PreparedStatement}s is turned on in the {@link DriverAdapterCPDS}, a pooled object may
      * be returned, otherwise delegate to the wrapped JDBC 1.x {@link java.sql.Connection}.
@@ -264,10 +277,6 @@ final class ConnectionImpl extends DelegatingConnection<Connection> {
             return null;
         }
     }
-
-    //
-    // Methods for accessing the delegate connection
-    //
 
     @Override
     public PreparedStatement prepareStatement(final String sql, final int resultSetType, final int resultSetConcurrency,

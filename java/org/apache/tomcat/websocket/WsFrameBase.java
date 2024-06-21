@@ -82,8 +82,8 @@ public abstract class WsFrameBase {
     private volatile State state = State.NEW_FRAME;
     private volatile boolean open = true;
 
-    private static final AtomicReferenceFieldUpdater<WsFrameBase, ReadState> READ_STATE_UPDATER = AtomicReferenceFieldUpdater
-            .newUpdater(WsFrameBase.class, ReadState.class, "readState");
+    private static final AtomicReferenceFieldUpdater<WsFrameBase,ReadState> READ_STATE_UPDATER =
+            AtomicReferenceFieldUpdater.newUpdater(WsFrameBase.class, ReadState.class, "readState");
     private volatile ReadState readState = ReadState.WAITING;
 
     public WsFrameBase(WsSession wsSession, Transformation transformation) {
@@ -207,8 +207,8 @@ public abstract class WsFrameBase {
         }
         payloadLength = b & 0x7F;
         state = State.PARTIAL_HEADER;
-        if (getLog().isDebugEnabled()) {
-            getLog().debug(sm.getString("wsFrame.partialHeaderComplete", Boolean.toString(fin), Integer.toString(rsv),
+        if (getLog().isTraceEnabled()) {
+            getLog().trace(sm.getString("wsFrame.partialHeaderComplete", Boolean.toString(fin), Integer.toString(rsv),
                     Integer.toString(opCode), Long.toString(payloadLength)));
         }
         return true;
@@ -680,20 +680,36 @@ public abstract class WsFrameBase {
 
 
     /**
-     * WAITING - not suspended Server case: waiting for a notification that data is ready to be read from the socket,
-     * the socket is registered to the poller Client case: data has been read from the socket and is waiting for data to
-     * be processed PROCESSING - not suspended Server case: reading from the socket and processing the data Client case:
-     * processing the data if such has already been read and more data will be read from the socket SUSPENDING_WAIT -
-     * suspended, a call to suspend() was made while in WAITING state. A call to resume() will do nothing and will
-     * transition to WAITING state SUSPENDING_PROCESS - suspended, a call to suspend() was made while in PROCESSING
-     * state. A call to resume() will do nothing and will transition to PROCESSING state SUSPENDED - suspended Server
-     * case: processing data finished (SUSPENDING_PROCESS) / a notification was received that data is ready to be read
-     * from the socket (SUSPENDING_WAIT), socket is not registered to the poller Client case: processing data finished
-     * (SUSPENDING_PROCESS) / data has been read from the socket and is available for processing (SUSPENDING_WAIT) A
-     * call to resume() will: Server case: register the socket to the poller Client case: resume data processing CLOSING
-     * - not suspended, a close will be send
-     *
      * <pre>
+     * WAITING            - not suspended
+     *                      Server case: waiting for a notification that data is ready to be read from the socket, the
+     *                                   socket is registered to the poller
+     *                      Client case: data has been read from the socket and is waiting for data to be processed
+     *
+     * PROCESSING         - not suspended
+     *                      Server case: reading from the socket and processing the data
+     *                      Client case: processing the data if such has already been read and more data will be read
+     *                                   from the socket
+     *
+     * SUSPENDING_WAIT    - suspended, a call to suspend() was made while in WAITING state. A call to resume() will do
+     *                      nothing and will transition to WAITING state
+     *
+     * SUSPENDING_PROCESS - suspended, a call to suspend() was made while in PROCESSING state. A call to resume() will
+     *                      do nothing and will transition to PROCESSING state
+     *
+     * SUSPENDED          - suspended
+     *                      Server case: processing data finished (SUSPENDING_PROCESS) / a notification was received
+     *                                   that data is ready to be read from the socket (SUSPENDING_WAIT), socket is not
+     *                                   registered to the poller
+     *                      Client case: processing data finished (SUSPENDING_PROCESS) / data has been read from the
+     *                                   socket and is available for processing (SUSPENDING_WAIT)
+     *                      A call to resume() will:
+     *                      Server case: register the socket to the poller
+     *                      Client case: resume data processing
+     *
+     * CLOSING            - not suspended, a close will be sent
+     *
+     *
      *     resume           data to be        resume
      *     no action        processed         no action
      *  |---------------| |---------------| |----------|

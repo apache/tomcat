@@ -32,7 +32,6 @@ import java.security.cert.Certificate;
 import java.text.Collator;
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -327,7 +326,7 @@ public class CachedResource implements WebResource {
          *
          * One option to resolve this issue is to use a custom URL scheme for resource URLs. This would allow us, via
          * registration of a URLStreamHandlerFactory, to control how the resources are accessed and ensure that all
-         * access go via the cache We took this approach for war: URLs so we can use jar:war:file: URLs to reference
+         * access go via the cache. We took this approach for war: URLs so we can use jar:war:file: URLs to reference
          * resources in unpacked WAR files. However, because URL.setURLStreamHandlerFactory() may only be called once,
          * this can cause problems when using other libraries that also want to use a custom URL scheme.
          *
@@ -340,8 +339,9 @@ public class CachedResource implements WebResource {
             return null;
         }
         try {
-            CachedResourceURLStreamHandler handler = new CachedResourceURLStreamHandler(resourceURL, root, webAppPath,
-                    usesClassLoaderResources);
+            CachedResourceURLStreamHandler handler =
+                    new CachedResourceURLStreamHandler(resourceURL, root, webAppPath, usesClassLoaderResources);
+            @SuppressWarnings("deprecation")
             URL result = new URL(null, resourceURL.toExternalForm(), handler);
             handler.setCacheURL(result);
             return result;
@@ -619,13 +619,5 @@ public class CachedResource implements WebResource {
             return ((JarURLConnection) resourceURL.openConnection()).getJarFile();
         }
 
-        @Override
-        public JarEntry getJarEntry() throws IOException {
-            if (getEntryName() == null) {
-                return null;
-            } else {
-                return super.getJarEntry();
-            }
-        }
     }
 }

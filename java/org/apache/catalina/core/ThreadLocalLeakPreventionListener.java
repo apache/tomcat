@@ -101,7 +101,9 @@ public class ThreadLocalLeakPreventionListener extends FrameworkListener {
 
         if (!(context instanceof StandardContext) ||
                 !((StandardContext) context).getRenewThreadsWhenStoppingContext()) {
-            log.debug("Not renewing threads when the context is stopping. " + "It is not configured to do it.");
+            if (log.isTraceEnabled()) {
+                log.trace("Not renewing threads when the context is stopping. It is not configured to do it.");
+            }
             return;
         }
 
@@ -117,9 +119,11 @@ public class ThreadLocalLeakPreventionListener extends FrameworkListener {
                 }
 
                 if (executor instanceof ThreadPoolExecutor) {
+                    @SuppressWarnings("resource")
                     ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executor;
                     threadPoolExecutor.contextStopping();
                 } else if (executor instanceof StandardThreadExecutor) {
+                    @SuppressWarnings("resource")
                     StandardThreadExecutor stdThreadExecutor = (StandardThreadExecutor) executor;
                     stdThreadExecutor.contextStopping();
                 }

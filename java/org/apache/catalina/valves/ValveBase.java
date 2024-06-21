@@ -142,7 +142,7 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         setState(LifecycleState.STARTING);
     }
 
@@ -155,7 +155,7 @@ public abstract class ValveBase extends LifecycleMBeanBase implements Contained,
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
         setState(LifecycleState.STOPPING);
     }
 

@@ -27,14 +27,11 @@ import java.util.Collection;
  * @author David Becker
  */
 public class SSIPrintenv implements SSICommand {
-    /**
-     * @see SSICommand
-     */
     @Override
-    public long process(SSIMediator ssiMediator, String commandName,
-            String[] paramNames, String[] paramValues, PrintWriter writer) {
+    public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
+            PrintWriter writer) {
         long lastModified = 0;
-        //any arguments should produce an error
+        // any arguments should produce an error
         if (paramNames.length > 0) {
             String errorMessage = ssiMediator.getConfigErrMsg();
             writer.write(errorMessage);
@@ -42,7 +39,7 @@ public class SSIPrintenv implements SSICommand {
             Collection<String> variableNames = ssiMediator.getVariableNames();
             for (String variableName : variableNames) {
                 String variableValue = ssiMediator.getVariableValue(variableName, SSIMediator.ENCODING_ENTITY);
-                //This shouldn't happen, since all the variable names must
+                // This shouldn't happen, since all the variable names must
                 // have values
                 if (variableValue == null) {
                     variableValue = "(none)";

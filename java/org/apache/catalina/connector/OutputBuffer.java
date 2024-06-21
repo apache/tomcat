@@ -51,7 +51,7 @@ public class OutputBuffer extends Writer {
     /**
      * Encoder cache.
      */
-    private final Map<Charset, C2BConverter> encoders = new HashMap<>();
+    private final Map<Charset,C2BConverter> encoders = new HashMap<>();
 
 
     /**
@@ -112,7 +112,7 @@ public class OutputBuffer extends Writer {
     /**
      * Associated Coyote response.
      */
-    private Response coyoteResponse;
+    private final Response coyoteResponse;
 
 
     /**
@@ -126,28 +126,20 @@ public class OutputBuffer extends Writer {
     /**
      * Create the buffer with the specified initial size.
      *
-     * @param size Buffer size to use
+     * @param size           Buffer size to use
+     * @param coyoteResponse The associated Coyote response
      */
-    public OutputBuffer(int size) {
+    public OutputBuffer(int size, Response coyoteResponse) {
         defaultBufferSize = size;
         bb = ByteBuffer.allocate(size);
         clear(bb);
         cb = CharBuffer.allocate(size);
         clear(cb);
+        this.coyoteResponse = coyoteResponse;
     }
 
 
     // ------------------------------------------------------------- Properties
-
-    /**
-     * Associated Coyote response.
-     *
-     * @param coyoteResponse Associated Coyote response
-     */
-    public void setResponse(Response coyoteResponse) {
-        this.coyoteResponse = coyoteResponse;
-    }
-
 
     /**
      * Is the response output suspended ?
@@ -231,9 +223,7 @@ public class OutputBuffer extends Writer {
         if ((!coyoteResponse.isCommitted()) && (coyoteResponse.getContentLengthLong() == -1)) {
             // If this didn't cause a commit of the response, the final content
             // length can be calculated.
-            if (!coyoteResponse.isCommitted()) {
-                coyoteResponse.setContentLength(bb.remaining());
-            }
+            coyoteResponse.setContentLength(bb.remaining());
         }
 
         if (coyoteResponse.getStatus() == HttpServletResponse.SC_SWITCHING_PROTOCOLS) {
@@ -319,9 +309,6 @@ public class OutputBuffer extends Writer {
         if (closed) {
             return;
         }
-        if (coyoteResponse == null) {
-            return;
-        }
 
         // If we really have something to write
         if (buf.remaining() > 0) {
@@ -339,7 +326,6 @@ public class OutputBuffer extends Writer {
                 // An IOException on a write is almost always due to
                 // the remote client aborting the request. Wrap this
                 // so that it can be handled better by the error dispatcher.
-                coyoteResponse.setErrorException(e);
                 throw new ClientAbortException(e);
             }
         }
@@ -546,15 +532,11 @@ public class OutputBuffer extends Writer {
             return;
         }
 
-        Charset charset = null;
-
-        if (coyoteResponse != null) {
-            CharsetHolder charsetHolder = coyoteResponse.getCharsetHolder();
-            // setCharacterEncoding() was called with an invalid character set
-            // Trigger an UnsupportedEncodingException
-            charsetHolder.validate();
-            charset = charsetHolder.getCharset();
-        }
+        CharsetHolder charsetHolder = coyoteResponse.getCharsetHolder();
+        // setCharacterEncoding() was called with an invalid character set
+        // Trigger an UnsupportedEncodingException
+        charsetHolder.validate();
+        Charset charset = charsetHolder.getCharset();
 
         if (charset == null) {
             charset = org.apache.coyote.Constants.DEFAULT_BODY_CHARSET;
@@ -716,6 +698,12 @@ public class OutputBuffer extends Writer {
             }
         }
     }
+
+
+    public void setErrorException(Exception e) {
+        coyoteResponse.setErrorException(e);
+    }
+
 
     private void appendByteArray(byte src[], int off, int len) throws IOException {
         if (len == 0) {

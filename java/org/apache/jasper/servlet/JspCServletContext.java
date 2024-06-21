@@ -232,113 +232,66 @@ public class JspCServletContext implements ServletContext {
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Return the specified context attribute, if any.
-     *
-     * @param name Name of the requested attribute
-     */
     @Override
     public Object getAttribute(String name) {
         return myAttributes.get(name);
     }
 
 
-    /**
-     * Return an enumeration of context attribute names.
-     */
     @Override
     public Enumeration<String> getAttributeNames() {
         return Collections.enumeration(myAttributes.keySet());
     }
 
 
-    /**
-     * Return the servlet context for the specified path.
-     *
-     * @param uripath Server-relative path starting with '/'
-     */
     @Override
     public ServletContext getContext(String uripath) {
         return null;
     }
 
 
-    /**
-     * Return the context path.
-     */
     @Override
     public String getContextPath() {
         return null;
     }
 
 
-    /**
-     * Return the specified context initialization parameter.
-     *
-     * @param name Name of the requested parameter
-     */
     @Override
     public String getInitParameter(String name) {
         return myParameters.get(name);
     }
 
 
-    /**
-     * Return an enumeration of the names of context initialization
-     * parameters.
-     */
     @Override
     public Enumeration<String> getInitParameterNames() {
         return Collections.enumeration(myParameters.keySet());
     }
 
 
-    /**
-     * Return the Servlet API major version number.
-     */
     @Override
     public int getMajorVersion() {
         return 4;
     }
 
 
-    /**
-     * Return the MIME type for the specified filename.
-     *
-     * @param file Filename whose MIME type is requested
-     */
     @Override
     public String getMimeType(String file) {
         return null;
     }
 
 
-    /**
-     * Return the Servlet API minor version number.
-     */
     @Override
     public int getMinorVersion() {
         return 0;
     }
 
 
-    /**
-     * Return a request dispatcher for the specified servlet name.
-     *
-     * @param name Name of the requested servlet
-     */
     @Override
     public RequestDispatcher getNamedDispatcher(String name) {
         return null;
     }
 
 
-    /**
-     * Return the real path for the specified context-relative
-     * virtual path.
-     *
-     * @param path The context-relative virtual path to resolve
-     */
     @Override
     public String getRealPath(String path) {
         if (!myResourceBaseURL.getProtocol().equals("file")) {
@@ -348,7 +301,11 @@ public class JspCServletContext implements ServletContext {
             return null;
         }
         try {
-            File f = new File(getResource(path).toURI());
+            URL url = getResource(path);
+            if (url == null) {
+                return null;
+            }
+            File f = new File(url.toURI());
             return f.getAbsolutePath();
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -357,26 +314,12 @@ public class JspCServletContext implements ServletContext {
     }
 
 
-    /**
-     * Return a request dispatcher for the specified context-relative path.
-     *
-     * @param path Context-relative path for which to acquire a dispatcher
-     */
     @Override
     public RequestDispatcher getRequestDispatcher(String path) {
         return null;
     }
 
 
-    /**
-     * Return a URL object of a resource that is mapped to the
-     * specified context-relative path.
-     *
-     * @param path Context-relative path of the desired resource
-     *
-     * @exception MalformedURLException if the resource path is
-     *  not properly formed
-     */
     @Override
     public URL getResource(String path) throws MalformedURLException {
 
@@ -416,16 +359,14 @@ public class JspCServletContext implements ServletContext {
     }
 
 
-    /**
-     * Return an InputStream allowing access to the resource at the
-     * specified context-relative path.
-     *
-     * @param path Context-relative path of the desired resource
-     */
     @Override
     public InputStream getResourceAsStream(String path) {
         try {
-            return getResource(path).openStream();
+            URL url = getResource(path);
+            if (url == null) {
+                return null;
+            }
+            return url.openStream();
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             return null;
@@ -433,12 +374,6 @@ public class JspCServletContext implements ServletContext {
     }
 
 
-    /**
-     * Return the set of resource paths for the "directory" at the
-     * specified context path.
-     *
-     * @param path Context-relative base path
-     */
     @Override
     public Set<String> getResourcePaths(String path) {
 
@@ -497,41 +432,24 @@ public class JspCServletContext implements ServletContext {
     }
 
 
-    /**
-     * Return descriptive information about this server.
-     */
     @Override
     public String getServerInfo() {
         return "JspC/ApacheTomcat11";
     }
 
 
-    /**
-     * Return the name of this servlet context.
-     */
     @Override
     public String getServletContextName() {
         return getServerInfo();
     }
 
 
-    /**
-     * Log the specified message.
-     *
-     * @param message The message to be logged
-     */
     @Override
     public void log(String message) {
         myLogWriter.println(message);
     }
 
 
-    /**
-     * Log the specified message and exception.
-     *
-     * @param message The message to be logged
-     * @param exception The exception to be logged
-     */
     @Override
     public void log(String message, Throwable exception) {
         myLogWriter.println(message);
@@ -539,23 +457,12 @@ public class JspCServletContext implements ServletContext {
     }
 
 
-    /**
-     * Remove the specified context attribute.
-     *
-     * @param name Name of the attribute to remove
-     */
     @Override
     public void removeAttribute(String name) {
         myAttributes.remove(name);
     }
 
 
-    /**
-     * Set or replace the specified context attribute.
-     *
-     * @param name Name of the context attribute to set
-     * @param value Corresponding attribute value
-     */
     @Override
     public void setAttribute(String name, Object value) {
         myAttributes.put(name, value);
@@ -629,7 +536,7 @@ public class JspCServletContext implements ServletContext {
 
 
     @Override
-    public jakarta.servlet.ServletRegistration.Dynamic addJspFile(String jspName, String jspFile) {
+    public ServletRegistration.Dynamic addJspFile(String jspName, String jspFile) {
         return null;
     }
 

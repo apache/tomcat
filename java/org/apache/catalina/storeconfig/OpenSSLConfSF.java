@@ -28,11 +28,12 @@ public class OpenSSLConfSF extends StoreFactoryBase {
 
     /**
      * Store nested OpenSSLConfCmd elements.
+     * <p>
      * {@inheritDoc}
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aOpenSSLConf,
-            StoreDescription parentDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aOpenSSLConf, StoreDescription parentDesc)
+            throws Exception {
         if (aOpenSSLConf instanceof OpenSSLConf) {
             OpenSSLConf openSslConf = (OpenSSLConf) aOpenSSLConf;
             // Store nested <OpenSSLConfCmd> elements

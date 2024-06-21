@@ -142,14 +142,14 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     /**
      * The initialization parameters for this servlet, keyed by parameter name.
      */
-    protected HashMap<String, String> parameters = new HashMap<>();
+    protected HashMap<String,String> parameters = new HashMap<>();
 
 
     /**
      * The security role references for this servlet, keyed by role name used in the servlet. The corresponding value is
      * the role name of the web application itself.
      */
-    protected HashMap<String, String> references = new HashMap<>();
+    protected HashMap<String,String> references = new HashMap<>();
 
 
     /**
@@ -238,26 +238,12 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
         this.overridable = overridable;
     }
 
-    /**
-     * Return the available date/time for this servlet, in milliseconds since the epoch. If this date/time is
-     * Long.MAX_VALUE, it is considered to mean that unavailability is permanent and any request for this servlet will
-     * return an SC_NOT_FOUND error. If this date/time is in the future, any request for this servlet will return an
-     * SC_SERVICE_UNAVAILABLE error. If it is zero, the servlet is currently available.
-     */
     @Override
     public long getAvailable() {
         return this.available;
     }
 
 
-    /**
-     * Set the available date/time for this servlet, in milliseconds since the epoch. If this date/time is
-     * Long.MAX_VALUE, it is considered to mean that unavailability is permanent and any request for this servlet will
-     * return an SC_NOT_FOUND error. If this date/time is in the future, any request for this servlet will return an
-     * SC_SERVICE_UNAVAILABLE error.
-     *
-     * @param available The new available date/time
-     */
     @Override
     public void setAvailable(long available) {
         long oldAvailable = this.available;
@@ -278,9 +264,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * @return the load-on-startup order value (negative value means load on first call).
-     */
     @Override
     public int getLoadOnStartup() {
 
@@ -296,11 +279,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Set the load-on-startup order value (negative value means load on first call).
-     *
-     * @param value New load-on-startup value
-     */
     @Override
     public void setLoadOnStartup(int value) {
 
@@ -356,20 +334,12 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * @return the run-as identity for this servlet.
-     */
     @Override
     public String getRunAs() {
         return this.runAs;
     }
 
 
-    /**
-     * Set the run-as identity for this servlet.
-     *
-     * @param runAs New run-as identity value
-     */
     @Override
     public void setRunAs(String runAs) {
 
@@ -380,20 +350,12 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * @return the fully qualified servlet class name for this servlet.
-     */
     @Override
     public String getServletClass() {
         return this.servletClass;
     }
 
 
-    /**
-     * Set the fully qualified servlet class name for this servlet.
-     *
-     * @param servletClass Servlet class name
-     */
     @Override
     public void setServletClass(String servletClass) {
 
@@ -419,9 +381,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * @return <code>true</code> if the Servlet has been marked unavailable.
-     */
     @Override
     public boolean isUnavailable() {
 
@@ -480,18 +439,12 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * @return the associated servlet instance.
-     */
     @Override
     public Servlet getServlet() {
         return instance;
     }
 
 
-    /**
-     * Set the associated servlet instance.
-     */
     @Override
     public void setServlet(Servlet servlet) {
         instance = servlet;
@@ -500,12 +453,8 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Execute a periodic task, such as reloading, etc. This method will be invoked inside the classloading context of
-     * this container. Unexpected throwables will be caught and logged.
-     */
     @Override
-    public void backgroundProcess() {
+    public synchronized void backgroundProcess() {
         super.backgroundProcess();
 
         if (!getState().isAvailable()) {
@@ -554,12 +503,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Add a new servlet initialization parameter for this servlet.
-     *
-     * @param name  Name of this initialization parameter to add
-     * @param value Value of this initialization parameter to add
-     */
     @Override
     public void addInitParameter(String name, String value) {
 
@@ -574,11 +517,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Add a mapping associated with the Wrapper.
-     *
-     * @param mapping The new wrapper mapping
-     */
     @Override
     public void addMapping(String mapping) {
 
@@ -595,12 +533,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Add a new security role reference record to the set of records for this servlet.
-     *
-     * @param name Role name used within this servlet
-     * @param link Role name used within the web application
-     */
     @Override
     public void addSecurityReference(String name, String link) {
 
@@ -615,12 +547,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Allocate an initialized instance of this Servlet that is ready to have its <code>service()</code> method called.
-     *
-     * @exception ServletException if the servlet init() method threw an exception
-     * @exception ServletException if a loading error occurs
-     */
     @Override
     public Servlet allocate() throws ServletException {
 
@@ -636,8 +562,8 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
             synchronized (this) {
                 if (instance == null) {
                     try {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Allocating instance");
+                        if (log.isTraceEnabled()) {
+                            log.trace("Allocating instance");
                         }
                         instance = loadServlet();
                         newInstance = true;
@@ -669,24 +595,12 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Decrement the allocation count for this servlet.
-     *
-     * @param servlet The servlet to be returned
-     *
-     * @exception ServletException if a deallocation error occurs
-     */
     @Override
     public void deallocate(Servlet servlet) throws ServletException {
         countAllocated.decrementAndGet();
     }
 
 
-    /**
-     * Return the value for the specified initialization parameter name, if any; otherwise return <code>null</code>.
-     *
-     * @param name Name of the requested initialization parameter
-     */
     @Override
     public String findInitParameter(String name) {
 
@@ -700,9 +614,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Return the names of all defined initialization parameters for this servlet.
-     */
     @Override
     public String[] findInitParameters() {
 
@@ -716,9 +627,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Return the mappings associated with this wrapper.
-     */
     @Override
     public String[] findMappings() {
 
@@ -732,12 +640,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Return the security role link for the specified security role reference name, if any; otherwise return
-     * <code>null</code>.
-     *
-     * @param name Security role reference used within this servlet
-     */
     @Override
     public String findSecurityReference(String name) {
         String reference = null;
@@ -763,10 +665,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Return the set of security role reference names associated with this servlet, if any; otherwise return a
-     * zero-length array.
-     */
     @Override
     public String[] findSecurityReferences() {
 
@@ -781,17 +679,12 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
 
 
     /**
-     * Load and initialize an instance of this servlet, if there is not already at least one initialized instance. This
-     * can be used, for example, to load servlets that are marked in the deployment descriptor to be loaded at server
-     * startup time.
+     * {@inheritDoc}
      * <p>
      * <b>IMPLEMENTATION NOTE</b>: Servlets whose classnames begin with <code>org.apache.catalina.</code> (so-called
      * "container" servlets) are loaded by the same classloader that loaded this class, rather than the classloader for
      * the current web application. This gives such classes access to Catalina internals, which are prevented for
      * classes loaded for web applications.
-     *
-     * @exception ServletException if the servlet init() method threw an exception
-     * @exception ServletException if some other loading problem occurs
      */
     @Override
     public synchronized void load() throws ServletException {
@@ -939,11 +832,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
         }
     }
 
-    /**
-     * Remove the specified initialization parameter from this servlet.
-     *
-     * @param name Name of the initialization parameter to remove
-     */
     @Override
     public void removeInitParameter(String name) {
 
@@ -958,11 +846,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Remove a mapping associated with the wrapper.
-     *
-     * @param mapping The pattern to remove
-     */
     @Override
     public void removeMapping(String mapping) {
 
@@ -979,11 +862,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Remove any security role reference for the specified role name.
-     *
-     * @param name Security role used within this servlet to be removed
-     */
     @Override
     public void removeSecurityReference(String name) {
 
@@ -998,12 +876,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Process an UnavailableException, marking this servlet as unavailable for the specified amount of time.
-     *
-     * @param unavailable The exception that occurred, or <code>null</code> to mark this servlet as permanently
-     *                        unavailable
-     */
     @Override
     public void unavailable(UnavailableException unavailable) {
         getServletContext().log(sm.getString("standardWrapper.unavailable", getName()));
@@ -1022,13 +894,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Unload all initialized instances of this servlet, after calling the <code>destroy()</code> method for each
-     * instance. This can be used, for example, prior to shutting down the entire servlet engine, or prior to reloading
-     * all of the classes from the Loader associated with our Loader's repository.
-     *
-     * @exception ServletException if an exception is thrown by the destroy() method
-     */
     @Override
     public synchronized void unload() throws ServletException {
 
@@ -1111,21 +976,12 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     // -------------------------------------------------- ServletConfig Methods
 
 
-    /**
-     * @return the initialization parameter value for the specified name, if any; otherwise return <code>null</code>.
-     *
-     * @param name Name of the initialization parameter to retrieve
-     */
     @Override
     public String getInitParameter(String name) {
         return findInitParameter(name);
     }
 
 
-    /**
-     * @return the set of initialization parameter names defined for this servlet. If none are defined, an empty
-     *             Enumeration is returned.
-     */
     @Override
     public Enumeration<String> getInitParameterNames() {
 
@@ -1139,9 +995,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * @return the servlet context with which this servlet is associated.
-     */
     @Override
     public ServletContext getServletContext() {
         if (parent == null) {
@@ -1154,9 +1007,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * @return the name of this servlet.
-     */
     @Override
     public String getServletName() {
         return getName();
@@ -1280,7 +1130,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         // Send j2ee.state.starting notification
         if (this.getObjectName() != null) {
@@ -1310,7 +1160,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         setAvailable(Long.MAX_VALUE);
 
@@ -1408,12 +1258,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Remove a JMX notificationListener
-     *
-     * @see javax.management.NotificationEmitter#removeNotificationListener(javax.management.NotificationListener,
-     *          javax.management.NotificationFilter, java.lang.Object)
-     */
     @Override
     public void removeNotificationListener(NotificationListener listener, NotificationFilter filter, Object object)
             throws ListenerNotFoundException {
@@ -1422,15 +1266,8 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
 
     protected MBeanNotificationInfo[] notificationInfo;
 
-    /**
-     * Get JMX Broadcaster Info
-     *
-     * @see javax.management.NotificationBroadcaster#getNotificationInfo()
-     */
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
-        // FIXME: we not send j2ee.state.failed
-        // FIXME: we not send j2ee.attribute.changed
         if (notificationInfo == null) {
             notificationInfo = new MBeanNotificationInfo[] {
                     new MBeanNotificationInfo(new String[] { "j2ee.object.created" }, Notification.class.getName(),
@@ -1450,12 +1287,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Add a JMX-NotificationListener
-     *
-     * @see javax.management.NotificationBroadcaster#addNotificationListener(javax.management.NotificationListener,
-     *          javax.management.NotificationFilter, java.lang.Object)
-     */
     @Override
     public void addNotificationListener(NotificationListener listener, NotificationFilter filter, Object object)
             throws IllegalArgumentException {
@@ -1463,11 +1294,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     }
 
 
-    /**
-     * Remove a JMX-NotificationListener
-     *
-     * @see javax.management.NotificationBroadcaster#removeNotificationListener(javax.management.NotificationListener)
-     */
     @Override
     public void removeNotificationListener(NotificationListener listener) throws ListenerNotFoundException {
         broadcaster.removeNotificationListener(listener);

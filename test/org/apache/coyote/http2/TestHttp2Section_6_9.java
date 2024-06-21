@@ -93,12 +93,20 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         // Default connection window size is 64k - 1. Initial request will have
         // used 8k (56k -1).
 
-        // Use up the remaining connection window. These requests require 56k
-        // but there is only 56k - 1 available.
-        for (int i = 3; i < 17; i += 2) {
+        // Use up the remaining connection window. These requests require 48k.
+        for (int i = 3; i < 15; i += 2) {
             sendSimpleGetRequest(i);
             readSimpleGetResponse();
+            Assert.assertEquals(getSimpleResponseTrace(i), output.getTrace());
+            output.clearTrace();
         }
+        // This request requires 8k but there is only 8k-1 available
+        sendSimpleGetRequest(15);
+        readSimpleGetResponse();
+        String expected = getResponseBodyFrameTrace(15, 200, "application/octet-stream", null, "8191", "8192");
+        // No end of stream
+        expected = expected.substring(0, expected.length() - "15-EndOfStream\n".length());
+        Assert.assertEquals(expected, output.getTrace());
         output.clearTrace();
 
         // It should be possible to send a request that generates an empty

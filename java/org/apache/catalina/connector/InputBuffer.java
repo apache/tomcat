@@ -18,6 +18,7 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.net.SocketTimeoutException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -26,9 +27,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.ReadListener;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.Request;
+import org.apache.coyote.BadRequestException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
@@ -65,7 +68,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     /**
      * Encoder cache.
      */
-    private static final Map<Charset, SynchronizedStack<B2CConverter>> encoders = new ConcurrentHashMap<>();
+    private static final Map<Charset,SynchronizedStack<B2CConverter>> encoders = new ConcurrentHashMap<>();
 
     // ----------------------------------------------------- Instance Variables
 
@@ -102,7 +105,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     /**
      * Associated Coyote request.
      */
-    private Request coyoteRequest;
+    private final org.apache.coyote.Request coyoteRequest;
 
 
     /**
@@ -128,21 +131,21 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
 
     /**
      * Default constructor. Allocate the buffer with the default buffer size.
+     *
+     * @param coyoteRequest The associated Coyote request
      */
-    public InputBuffer() {
-
-        this(DEFAULT_BUFFER_SIZE);
-
+    public InputBuffer(org.apache.coyote.Request coyoteRequest) {
+        this(DEFAULT_BUFFER_SIZE, coyoteRequest);
     }
 
 
     /**
      * Alternate constructor which allows specifying the initial buffer size.
      *
-     * @param size Buffer size to use
+     * @param size          Buffer size to use
+     * @param coyoteRequest The associated Coyote request
      */
-    public InputBuffer(int size) {
-
+    public InputBuffer(int size, org.apache.coyote.Request coyoteRequest) {
         this.size = size;
         bb = ByteBuffer.allocate(size);
         clear(bb);
@@ -150,18 +153,6 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
         clear(cb);
         readLimit = size;
 
-    }
-
-
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Associated Coyote request.
-     *
-     * @param coyoteRequest Associated Coyote request
-     */
-    public void setRequest(Request coyoteRequest) {
         this.coyoteRequest = coyoteRequest;
     }
 
@@ -195,11 +186,6 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     }
 
 
-    /**
-     * Close the input buffer.
-     *
-     * @throws IOException An underlying IOException occurred
-     */
     @Override
     public void close() throws IOException {
         closed = true;
@@ -252,7 +238,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("inputBuffer.requiresNonBlocking"));
             }
-            return false;
+            return true;
         }
         if (isFinished()) {
             // If this is a non-container thread, need to trigger a read
@@ -287,17 +273,9 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
 
     // ------------------------------------------------- Bytes Handling Methods
 
-    /**
-     * Reads new bytes in the byte chunk.
-     *
-     * @throws IOException An underlying IOException occurred
-     */
     @Override
     public int realReadBytes() throws IOException {
         if (closed) {
-            return -1;
-        }
-        if (coyoteRequest == null) {
             return -1;
         }
 
@@ -307,11 +285,42 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
 
         try {
             return coyoteRequest.doRead(this);
+        } catch (BadRequestException bre) {
+            // Make the exception visible to the application
+            handleReadException(bre);
+            throw bre;
         } catch (IOException ioe) {
-            coyoteRequest.setErrorException(ioe);
-            // An IOException on a read is almost always due to
-            // the remote client aborting the request.
+            handleReadException(ioe);
+            // Any other IOException on a read is almost always due to the remote client aborting the request.
+            // Make the exception visible to the application
             throw new ClientAbortException(ioe);
+        }
+    }
+
+
+    private void handleReadException(Exception e) throws IOException {
+        // Set flag used by asynchronous processing to detect errors on non-container threads
+        coyoteRequest.setErrorException(e);
+        // In synchronous processing, this exception may be swallowed by the application so set error flags here.
+        Request request = (Request) coyoteRequest.getNote(CoyoteAdapter.ADAPTER_NOTES);
+        Response response = request.getResponse();
+        request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, e);
+        if (e instanceof SocketTimeoutException) {
+            try {
+                response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT);
+            } catch (IllegalStateException ex) {
+                // Response already committed
+                response.setStatus(HttpServletResponse.SC_REQUEST_TIMEOUT);
+                response.setError();
+            }
+        } else {
+            try {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            } catch (IllegalStateException ex) {
+                // Response already committed
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setError();
+            }
         }
     }
 
@@ -531,10 +540,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
             return;
         }
 
-        Charset charset = null;
-        if (coyoteRequest != null) {
-            charset = coyoteRequest.getCharsetHolder().getValidatedCharset();
-        }
+        Charset charset = coyoteRequest.getCharsetHolder().getValidatedCharset();
 
         if (charset == null) {
             charset = org.apache.coyote.Constants.DEFAULT_BODY_CHARSET;

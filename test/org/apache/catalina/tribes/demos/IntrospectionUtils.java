@@ -164,9 +164,6 @@ public final class IntrospectionUtils {
             }
         } catch (InvocationTargetException ie) {
             Throwable cause = ie.getCause();
-            if (cause instanceof ThreadDeath) {
-                throw (ThreadDeath) cause;
-            }
             if (cause instanceof VirtualMachineError) {
                 throw (VirtualMachineError) cause;
             }

@@ -45,7 +45,7 @@ public class TestCachedResource extends TomcatBaseTest {
 
         URL d1 = root.getResource("/d1").getURL();
 
-        URL d1f1 = new URL(d1, "d1-f1.txt");
+        URL d1f1 = d1.toURI().resolve("d1-f1.txt").toURL();
 
         try (InputStream is = d1f1.openStream()) {
             Assert.assertNotNull(is);

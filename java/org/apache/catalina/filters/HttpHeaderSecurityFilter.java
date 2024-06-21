@@ -60,11 +60,6 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     private static final String BLOCK_CONTENT_TYPE_SNIFFING_HEADER_VALUE = "nosniff";
     private boolean blockContentTypeSniffingEnabled = true;
 
-    // Cross-site scripting filter protection
-    private static final String XSS_PROTECTION_HEADER_NAME = "X-XSS-Protection";
-    private static final String XSS_PROTECTION_HEADER_VALUE = "1; mode=block";
-    private boolean xssProtectionEnabled = true;
-
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         super.init(filterConfig);
@@ -115,11 +110,6 @@ public class HttpHeaderSecurityFilter extends FilterBase {
             if (blockContentTypeSniffingEnabled) {
                 httpResponse.setHeader(BLOCK_CONTENT_TYPE_SNIFFING_HEADER_NAME,
                         BLOCK_CONTENT_TYPE_SNIFFING_HEADER_VALUE);
-            }
-
-            // cross-site scripting filter protection
-            if (xssProtectionEnabled) {
-                httpResponse.setHeader(XSS_PROTECTION_HEADER_NAME, XSS_PROTECTION_HEADER_VALUE);
             }
         }
 
@@ -238,18 +228,10 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     }
 
 
-    public boolean isXssProtectionEnabled() {
-        return xssProtectionEnabled;
-    }
-
-
-    public void setXssProtectionEnabled(boolean xssProtectionEnabled) {
-        this.xssProtectionEnabled = xssProtectionEnabled;
-    }
-
-
     private enum XFrameOption {
-        DENY("DENY"), SAME_ORIGIN("SAMEORIGIN"), ALLOW_FROM("ALLOW-FROM");
+        DENY("DENY"),
+        SAME_ORIGIN("SAMEORIGIN"),
+        ALLOW_FROM("ALLOW-FROM");
 
 
         private final String headerValue;

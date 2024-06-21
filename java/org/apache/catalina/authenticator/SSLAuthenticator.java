@@ -73,15 +73,15 @@ public class SSLAuthenticator extends AuthenticatorBase {
         }
 
         // Retrieve the certificate chain for this client
-        if (containerLog.isDebugEnabled()) {
-            containerLog.debug(" Looking up certificates");
+        if (containerLog.isTraceEnabled()) {
+            containerLog.trace(" Looking up certificates");
         }
 
         X509Certificate certs[] = getRequestCertificates(request);
 
         if ((certs == null) || (certs.length < 1)) {
             if (containerLog.isDebugEnabled()) {
-                containerLog.debug("  No certificates included with this request");
+                containerLog.debug(sm.getString("sslAuthenticatorValve.noCertificates"));
             }
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, sm.getString("authenticator.certificates"));
             return false;
@@ -91,7 +91,7 @@ public class SSLAuthenticator extends AuthenticatorBase {
         Principal principal = context.getRealm().authenticate(certs);
         if (principal == null) {
             if (containerLog.isDebugEnabled()) {
-                containerLog.debug("  Realm.authenticate() returned false");
+                containerLog.debug(sm.getString("sslAuthenticatorValve.authFailed"));
             }
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, sm.getString("authenticator.unauthorized"));
             return false;
@@ -145,7 +145,7 @@ public class SSLAuthenticator extends AuthenticatorBase {
 
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         super.startInternal();
 

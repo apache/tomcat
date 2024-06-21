@@ -59,9 +59,16 @@
     <module name="IllegalInstantiation"/>
 
     <!-- Imports -->
-    <module name="AvoidStarImport"/>
+    <module name="AvoidStarImport">
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h.*"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h_Compatibility.*"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h_Macros.*"/>
+    </module>
     <module name="AvoidStaticImport">
         <property name="excludes" value="org.apache.catalina.startup.SimpleHttpClient.CRLF"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h.*"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h_Compatibility.*"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h_Macros.*"/>
         <property name="excludes" value="org.hamcrest.MatcherAssert.*"/>
         <property name="excludes" value="org.hamcrest.core.IsInstanceOf.*"/>
     </module>
@@ -97,17 +104,17 @@
     <!-- ~9000 errors
     <module name="MissingJavadocMethod"/>
     -->
-    <!-- ~1400 errors
+    <!-- ~1500 errors
     <module name="MissingJavadocType"/>
     -->
     <module name="NonEmptyAtclauseDescription"/>
-    <!-- ~1500 errors
+    <!-- ~1400 errors
     <module name="RequireEmptyLineBeforeBlockTagGroup"/>
     -->
     <module name="SingleLineJavadoc"/>
 
     <!-- Miscellaneous -->
-    <!-- ~4100 errors
+    <!-- ~3300 errors
     <module name="Indentation">
         <property name="lineWrappingIndentation" value="8"/>
     </module>
@@ -121,7 +128,7 @@
     <module name="GenericWhitespace"/>
     <module name="EmptyForInitializerPad"/>
     <module name="EmptyForIteratorPad"/>
-    <!--  ~ 1100 errors
+    <!--  ~ 1000 errors
     <module name="OperatorWrap">
       <property name="option" value="eol"/>
     </module>

@@ -164,8 +164,10 @@ public class DirResourceSet extends AbstractFileResourceSet {
                                 // path that was contributed by 'f' and check
                                 // that what is left does not contain a symlink.
                                 absPath = entry.getAbsolutePath().substring(f.getAbsolutePath().length());
-                                if (entry.getCanonicalPath().length() >= f.getCanonicalPath().length()) {
-                                    canPath = entry.getCanonicalPath().substring(f.getCanonicalPath().length());
+                                String entryCanPath = entry.getCanonicalPath();
+                                String fCanPath = f.getCanonicalPath();
+                                if (entryCanPath.length() >= fCanPath.length()) {
+                                    canPath = entryCanPath.substring(fCanPath.length());
                                     if (absPath.equals(canPath)) {
                                         symlink = false;
                                     }

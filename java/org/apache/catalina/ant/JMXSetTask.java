@@ -24,8 +24,8 @@ import org.apache.tools.ant.BuildException;
 
 
 /**
- * Ant task that implements the JMX Set command (<code>/jmxproxy/?set</code>)
- * supported by the Tomcat manager application.
+ * Ant task that implements the JMX Set command (<code>/jmxproxy/?set</code>) supported by the Tomcat manager
+ * application.
  *
  * @author Vivek Chopra
  */
@@ -36,7 +36,7 @@ public class JMXSetTask extends AbstractCatalinaTask {
     /**
      * The full bean name
      */
-    protected String bean      = null;
+    protected String bean = null;
 
     /**
      * The attribute you wish to alter
@@ -46,55 +46,61 @@ public class JMXSetTask extends AbstractCatalinaTask {
     /**
      * The new value for the attribute
      */
-    protected String value     = null;
+    protected String value = null;
 
     // Public Methods
 
     /**
      * Get method for the bean name
+     *
      * @return Bean name
      */
-    public String getBean () {
+    public String getBean() {
         return this.bean;
     }
 
     /**
      * Set method for the bean name
+     *
      * @param bean Bean name
      */
-    public void setBean (String bean) {
+    public void setBean(String bean) {
         this.bean = bean;
     }
 
     /**
      * Get method for the attribute name
+     *
      * @return Attribute name
      */
-    public String getAttribute () {
+    public String getAttribute() {
         return this.attribute;
     }
 
     /**
      * Set method for the attribute name
+     *
      * @param attribute Attribute name
      */
-    public void setAttribute (String attribute) {
+    public void setAttribute(String attribute) {
         this.attribute = attribute;
     }
 
     /**
      * Get method for the attribute value
+     *
      * @return Attribute value
      */
-    public String getValue () {
+    public String getValue() {
         return this.value;
     }
 
     /**
      * Set method for the attribute value.
+     *
      * @param value Attribute value
      */
-    public void setValue (String value) {
+    public void setValue(String value) {
         this.value = value;
     }
 
@@ -109,13 +115,10 @@ public class JMXSetTask extends AbstractCatalinaTask {
         if (bean == null || attribute == null || value == null) {
             throw new BuildException("Must specify 'bean', 'attribute' and 'value' attributes");
         }
-        log("Setting attribute " + attribute +
-                            " in bean " + bean +
-                            " to " + value);
+        log("Setting attribute " + attribute + " in bean " + bean + " to " + value);
         try {
-            execute("/jmxproxy/?set=" + URLEncoder.encode(bean, getCharset())
-                    + "&att=" + URLEncoder.encode(attribute, getCharset())
-                    + "&val=" + URLEncoder.encode(value, getCharset()));
+            execute("/jmxproxy/?set=" + URLEncoder.encode(bean, getCharset()) + "&att=" +
+                    URLEncoder.encode(attribute, getCharset()) + "&val=" + URLEncoder.encode(value, getCharset()));
         } catch (UnsupportedEncodingException e) {
             throw new BuildException("Invalid 'charset' attribute: " + getCharset());
         }

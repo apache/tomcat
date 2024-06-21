@@ -29,7 +29,6 @@ import jakarta.servlet.ServletException;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -221,9 +220,6 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
         this.requestAttributesEnabled = requestAttributesEnabled;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean getRequestAttributesEnabled() {
         return requestAttributesEnabled;
@@ -431,15 +427,6 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * This method is invoked by Tomcat on each query.
-     *
-     * @param request  The Request object.
-     * @param response The Response object.
-     *
-     * @exception IOException      Should not be thrown.
-     * @exception ServletException Database SQLException is wrapped in a ServletException.
-     */
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
         getNext().invoke(request, response);
@@ -626,15 +613,13 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
-
+    protected void startInternal() throws LifecycleException {
         try {
             open();
         } catch (SQLException e) {
             throw new LifecycleException(e);
         }
-
-        setState(LifecycleState.STARTING);
+        super.startInternal();
     }
 
 
@@ -646,10 +631,8 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
-
-        setState(LifecycleState.STOPPING);
-
+    protected void stopInternal() throws LifecycleException {
+        super.stopInternal();
         close();
     }
 

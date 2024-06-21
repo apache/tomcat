@@ -32,9 +32,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * Sends a ping to all members.
- * Configure this interceptor with the TcpFailureDetector below it,
- * and the TcpFailureDetector will act as the membership guide.
+ * Sends a ping to all members. Configure this interceptor with the TcpFailureDetector below it, and the
+ * TcpFailureDetector will act as the membership guide.
  */
 
 public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPingInterceptorMBean {
@@ -42,13 +41,12 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
     private static final Log log = LogFactory.getLog(TcpPingInterceptor.class);
     protected static final StringManager sm = StringManager.getManager(TcpPingInterceptor.class);
 
-    protected static final byte[] TCP_PING_DATA = new byte[] {
-        79, -89, 115, 72, 121, -33, 67, -55, -97, 111, -119, -128, -95, 91, 7, 20,
-        125, -39, 82, 91, -21, -33, 67, -102, -73, 126, -66, -113, -127, 103, 30, -74,
-        55, 21, -66, -121, 69, 33, 76, -88, -65, 10, 77, 19, 83, 56, 21, 50,
-        85, -10, -108, -73, 58, -33, 33, 120, -111, 4, 125, -41, 114, -124, -64, -43};
+    protected static final byte[] TCP_PING_DATA = new byte[] { 79, -89, 115, 72, 121, -33, 67, -55, -97, 111, -119,
+            -128, -95, 91, 7, 20, 125, -39, 82, 91, -21, -33, 67, -102, -73, 126, -66, -113, -127, 103, 30, -74, 55, 21,
+            -66, -121, 69, 33, 76, -88, -65, 10, 77, 19, 83, 56, 21, 50, 85, -10, -108, -73, 58, -33, 33, 120, -111, 4,
+            125, -41, 114, -124, -64, -43 };
 
-    protected long interval = 1000; //1 second
+    protected long interval = 1000; // 1 second
 
     protected boolean useThread = false;
     protected boolean staticOnly = false;
@@ -63,25 +61,25 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
     public synchronized void start(int svc) throws ChannelException {
         super.start(svc);
         running = true;
-        if ( thread == null && useThread) {
+        if (thread == null && useThread) {
             thread = new PingThread();
             thread.setDaemon(true);
             String channelName = "";
             if (getChannel().getName() != null) {
                 channelName = "[" + getChannel().getName() + "]";
             }
-            thread.setName("TcpPingInterceptor.PingThread" + channelName +"-"+cnt.addAndGet(1));
+            thread.setName("TcpPingInterceptor.PingThread" + channelName + "-" + cnt.addAndGet(1));
             thread.start();
         }
 
-        //acquire the interceptors to invoke on send ping events
+        // acquire the interceptors to invoke on send ping events
         ChannelInterceptor next = getNext();
-        while ( next != null ) {
-            if ( next instanceof TcpFailureDetector ) {
-                failureDetector = new WeakReference<>((TcpFailureDetector)next);
+        while (next != null) {
+            if (next instanceof TcpFailureDetector) {
+                failureDetector = new WeakReference<>((TcpFailureDetector) next);
             }
-            if ( next instanceof StaticMembershipInterceptor ) {
-                staticMembers = new WeakReference<>((StaticMembershipInterceptor)next);
+            if (next instanceof StaticMembershipInterceptor) {
+                staticMembers = new WeakReference<>((StaticMembershipInterceptor) next);
             }
             next = next.getNext();
         }
@@ -133,15 +131,13 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
     }
 
     protected void sendPing() {
-        TcpFailureDetector tcpFailureDetector =
-                failureDetector != null ? failureDetector.get() : null;
+        TcpFailureDetector tcpFailureDetector = failureDetector != null ? failureDetector.get() : null;
         if (tcpFailureDetector != null) {
             // We have a reference to the failure detector
             // Piggy back on it
             tcpFailureDetector.checkMembers(true);
         } else {
-            StaticMembershipInterceptor smi =
-                    staticOnly && staticMembers != null ? staticMembers.get() : null;
+            StaticMembershipInterceptor smi = staticOnly && staticMembers != null ? staticMembers.get() : null;
             if (smi != null) {
                 sendPingMessage(smi.getMembers());
             } else {
@@ -151,38 +147,38 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
     }
 
     protected void sendPingMessage(Member[] members) {
-        if ( members == null || members.length == 0 ) {
+        if (members == null || members.length == 0) {
             return;
         }
-        ChannelData data = new ChannelData(true);//generates a unique Id
+        ChannelData data = new ChannelData(true);// generates a unique Id
         data.setAddress(getLocalMember(false));
         data.setTimestamp(System.currentTimeMillis());
         data.setOptions(getOptionFlag());
         data.setMessage(new XByteBuffer(TCP_PING_DATA, false));
         try {
             super.sendMessage(members, data, null);
-        }catch (ChannelException x) {
-            log.warn(sm.getString("tcpPingInterceptor.ping.failed"),x);
+        } catch (ChannelException x) {
+            log.warn(sm.getString("tcpPingInterceptor.ping.failed"), x);
         }
     }
 
     @Override
     public void messageReceived(ChannelMessage msg) {
-        //catch incoming
+        // catch incoming
         boolean process = true;
-        if ( okToProcess(msg.getOptions()) ) {
-            //check to see if it is a ping message, if so, process = false
-            process = ( (msg.getMessage().getLength() != TCP_PING_DATA.length) ||
-                        (!Arrays.equals(TCP_PING_DATA,msg.getMessage().getBytes()) ) );
-        }//end if
+        if (okToProcess(msg.getOptions())) {
+            // check to see if it is a ping message, if so, process = false
+            process = ((msg.getMessage().getLength() != TCP_PING_DATA.length) ||
+                    (!Arrays.equals(TCP_PING_DATA, msg.getMessage().getBytes())));
+        } // end if
 
-        //ignore the message, it doesn't have the flag set
-        if ( process ) {
+        // ignore the message, it doesn't have the flag set
+        if (process) {
             super.messageReceived(msg);
-        } else if ( log.isDebugEnabled() ) {
-            log.debug("Received a TCP ping packet:"+msg);
+        } else if (log.isTraceEnabled()) {
+            log.trace("Received a TCP ping packet:" + msg);
         }
-    }//messageReceived
+    }// messageReceived
 
     protected class PingThread extends Thread {
         @Override
@@ -191,12 +187,12 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
                 try {
                     sleep(interval);
                     sendPing();
-                }catch ( InterruptedException ix ) {
+                } catch (InterruptedException ix) {
                     // Ignore. Probably triggered by a call to stop().
                     // In the highly unlikely event it was a different trigger,
                     // simply ignore it and continue.
-                }catch ( Exception x )  {
-                    log.warn(sm.getString("tcpPingInterceptor.pingFailed.pingThread"),x);
+                } catch (Exception x) {
+                    log.warn(sm.getString("tcpPingInterceptor.pingFailed.pingThread"), x);
                 }
             }
         }

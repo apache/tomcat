@@ -24,8 +24,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * StoreFactory saves special elements.
- * Output was generate with StoreAppenders.
+ * StoreFactory saves special elements. Output was generate with StoreAppenders.
  */
 public class StoreFactoryBase implements IStoreFactory {
     private static Log log = LogFactory.getLog(StoreFactoryBase.class);
@@ -37,8 +36,7 @@ public class StoreFactoryBase implements IStoreFactory {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm = StringManager
-            .getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     /**
      * The descriptive information string for this implementation.
@@ -46,47 +44,29 @@ public class StoreFactoryBase implements IStoreFactory {
     private static final String info = "org.apache.catalina.config.StoreFactoryBase/1.0";
 
     /**
-     * @return descriptive information about this Factory implementation and the
-     * corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
+     * @return descriptive information about this Factory implementation and the corresponding version number, in the
+     *             format <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
     public String getInfo() {
         return info;
     }
 
-    /**
-     * @return Returns the storeAppender.
-     */
     @Override
     public StoreAppender getStoreAppender() {
         return storeAppender;
     }
 
-    /**
-     * @param storeAppender
-     *            The storeAppender to set.
-     */
     @Override
     public void setStoreAppender(StoreAppender storeAppender) {
         this.storeAppender = storeAppender;
     }
 
-    /**
-     * Set Registry
-     *
-     * @see org.apache.catalina.storeconfig.IStoreFactory#setRegistry(org.apache.catalina.storeconfig.StoreRegistry)
-     */
     @Override
     public void setRegistry(StoreRegistry aRegistry) {
         registry = aRegistry;
 
     }
 
-    /**
-     * get Registry
-     *
-     * @see org.apache.catalina.storeconfig.IStoreFactory#getRegistry()
-     */
     @Override
     public StoreRegistry getRegistry() {
 
@@ -101,91 +81,81 @@ public class StoreFactoryBase implements IStoreFactory {
         aWriter.println("\"?>");
     }
 
-    /**
-     * Store a server.xml element with attributes and children
-     *
-     * @see org.apache.catalina.storeconfig.IStoreFactory#store(java.io.PrintWriter,
-     *      int, java.lang.Object)
-     */
     @Override
-    public void store(PrintWriter aWriter, int indent, Object aElement)
-            throws Exception {
+    public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
 
-        StoreDescription elementDesc = getRegistry().findDescription(
-                aElement.getClass());
+        StoreDescription elementDesc = getRegistry().findDescription(aElement.getClass());
 
         if (elementDesc != null) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("factory.storeTag",
-                        elementDesc.getTag(), aElement));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("factory.storeTag", elementDesc.getTag(), aElement));
             }
             getStoreAppender().printIndent(aWriter, indent + 2);
             if (!elementDesc.isChildren()) {
-                getStoreAppender().printTag(aWriter, indent, aElement,
-                        elementDesc);
+                getStoreAppender().printTag(aWriter, indent, aElement, elementDesc);
             } else {
-                getStoreAppender().printOpenTag(aWriter, indent + 2, aElement,
-                        elementDesc);
+                getStoreAppender().printOpenTag(aWriter, indent + 2, aElement, elementDesc);
                 storeChildren(aWriter, indent + 2, aElement, elementDesc);
                 getStoreAppender().printIndent(aWriter, indent + 2);
                 getStoreAppender().printCloseTag(aWriter, elementDesc);
             }
         } else {
-            log.warn(sm.getString("factory.storeNoDescriptor", aElement
-                    .getClass()));
+            log.warn(sm.getString("factory.storeNoDescriptor", aElement.getClass()));
         }
     }
 
     /**
      * Must Implement at subclass for custom store children handling.
      *
-     * @param aWriter Current output writer
-     * @param indent Indentation level
-     * @param aElement Current element
+     * @param aWriter     Current output writer
+     * @param indent      Indentation level
+     * @param aElement    Current element
      * @param elementDesc The element description
+     *
      * @throws Exception Configuration storing error
      */
-    public void storeChildren(PrintWriter aWriter, int indent, Object aElement,
-            StoreDescription elementDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aElement, StoreDescription elementDesc)
+            throws Exception {
     }
 
     /**
-     * Store only elements from storeChildren methods that are not a transient
-     * child.
+     * Store only elements from storeChildren methods that are not a transient child.
      *
-     * @param aWriter Current output writer
-     * @param indent Indentation level
+     * @param aWriter     Current output writer
+     * @param indent      Indentation level
      * @param aTagElement Current element
+     *
      * @throws Exception Configuration storing error
      */
-    protected void storeElement(PrintWriter aWriter, int indent,
-            Object aTagElement) throws Exception {
+    protected void storeElement(PrintWriter aWriter, int indent, Object aTagElement) throws Exception {
         if (aTagElement != null) {
-            IStoreFactory elementFactory = getRegistry().findStoreFactory(
-                    aTagElement.getClass());
+            IStoreFactory elementFactory = getRegistry().findStoreFactory(aTagElement.getClass());
 
             if (elementFactory != null) {
-                StoreDescription desc = getRegistry().findDescription(
-                        aTagElement.getClass());
-                if (!desc.isTransientChild(aTagElement.getClass().getName())) {
-                    elementFactory.store(aWriter, indent, aTagElement);
+                StoreDescription desc = getRegistry().findDescription(aTagElement.getClass());
+                if (desc != null) {
+                    if (!desc.isTransientChild(aTagElement.getClass().getName())) {
+                        elementFactory.store(aWriter, indent, aTagElement);
+                    }
+                } else {
+                    log.warn(sm.getString("factory.storeNoDescriptor", aTagElement.getClass()));
                 }
             } else {
-                log.warn(sm.getString("factory.storeNoDescriptor", aTagElement
-                        .getClass()));
+                log.warn(sm.getString("factory.storeNoDescriptor", aTagElement.getClass()));
             }
         }
     }
 
     /**
      * Save an array of elements.
-     * @param aWriter Current output writer
-     * @param indent Indentation level
+     *
+     * @param aWriter  Current output writer
+     * @param indent   Indentation level
      * @param elements Array of elements
+     *
      * @throws Exception Configuration storing error
      */
-    protected void storeElementArray(PrintWriter aWriter, int indent,
-            Object[] elements) throws Exception {
+    protected void storeElementArray(PrintWriter aWriter, int indent, Object[] elements) throws Exception {
         if (elements != null) {
             for (Object element : elements) {
                 try {

@@ -71,9 +71,6 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
     private String jspFile;
 
 
-    /*
-     * Initializes this JspServlet.
-     */
     @Override
     public void init(ServletConfig config) throws ServletException {
 
@@ -291,13 +288,13 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             }
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("JspEngine --> " + jspUri);
-            log.debug("\t     ServletPath: " + request.getServletPath());
-            log.debug("\t        PathInfo: " + request.getPathInfo());
-            log.debug("\t        RealPath: " + context.getRealPath(jspUri));
-            log.debug("\t      RequestURI: " + request.getRequestURI());
-            log.debug("\t     QueryString: " + request.getQueryString());
+        if (log.isTraceEnabled()) {
+            log.trace("JspEngine --> " + jspUri);
+            log.trace("\t     ServletPath: " + request.getServletPath());
+            log.trace("\t        PathInfo: " + request.getPathInfo());
+            log.trace("\t        RealPath: " + context.getRealPath(jspUri));
+            log.trace("\t      RequestURI: " + request.getRequestURI());
+            log.trace("\t     QueryString: " + request.getQueryString());
         }
 
         try {
@@ -314,8 +311,8 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
     @Override
     public void destroy() {
-        if (log.isDebugEnabled()) {
-            log.debug("JspServlet.destroy()");
+        if (log.isTraceEnabled()) {
+            log.trace("JspServlet.destroy()");
         }
 
         rctxt.destroy();

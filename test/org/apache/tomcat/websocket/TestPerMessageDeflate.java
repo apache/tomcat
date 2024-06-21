@@ -87,7 +87,7 @@ public class TestPerMessageDeflate {
 
         MessagePart compressedPart = compressedParts.get(0);
 
-        // Set up the decompression and process the received messafe
+        // Set up the decompression and process the received message
         PerMessageDeflate perMessageDeflateRx = PerMessageDeflate.negotiate(preferences, true);
         perMessageDeflateRx.setNext(new TesterTransformation(compressedPart.getPayload()));
 
@@ -100,6 +100,55 @@ public class TestPerMessageDeflate {
         Assert.assertEquals(TransformationResult.END_OF_FRAME, tr);
     }
 
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=66681
+     */
+    @Test
+    public void testFlushBatchMessagePart() throws IOException {
+        // Set up the extension using defaults
+        List<Parameter> parameters = Collections.emptyList();
+        List<List<Parameter>> preferences = new ArrayList<>();
+        preferences.add(parameters);
+
+        // Set up the compression and sending of the message.
+        PerMessageDeflate perMessageDeflateTx = PerMessageDeflate.negotiate(preferences, true);
+        perMessageDeflateTx.setNext(new TesterTransformation());
+
+        List<MessagePart> uncompressedParts = new ArrayList<>();
+
+        // First message part
+        byte[] data = new byte[1024];
+        ByteBuffer bb = ByteBuffer.wrap(data);
+        MessagePart mp1 = new MessagePart(true, 0, Constants.OPCODE_BINARY, bb, null, null, -1);
+        uncompressedParts.add(mp1);
+
+        // Flush message (replicates result of calling flushBatch()
+        MessagePart mp2 = new MessagePart(true, 0, Constants.INTERNAL_OPCODE_FLUSH, null, null, null, -1);
+        uncompressedParts.add(mp2);
+
+        List<MessagePart> compressedParts = perMessageDeflateTx.sendMessagePart(uncompressedParts);
+
+        Assert.assertEquals(2,  compressedParts.size());
+
+        // Check the first compressed part
+        MessagePart compressedPart1 = compressedParts.get(0);
+
+        // Set up the decompression and process the received message
+        PerMessageDeflate perMessageDeflateRx = PerMessageDeflate.negotiate(preferences, true);
+        perMessageDeflateRx.setNext(new TesterTransformation(compressedPart1.getPayload()));
+
+        ByteBuffer received = ByteBuffer.allocate(8192);
+
+        TransformationResult tr = perMessageDeflateRx.getMoreData(compressedPart1.getOpCode(), compressedPart1.isFin(),
+                compressedPart1.getRsv(), received);
+
+        Assert.assertEquals(1024, received.position());
+        Assert.assertEquals(TransformationResult.END_OF_FRAME, tr);
+
+        // Check the second compressed part (should be passed through unchanged)
+        Assert.assertEquals(mp2, compressedParts.get(1));
+    }
 
     /*
      * Minimal implementation to enable other transformations to be tested. It is NOT robust.

@@ -62,15 +62,12 @@
         <li><strong>Java location</strong>: The installer will provide a default
             JRE to use to run the service. The installer uses the registry to
             determine the base path of a Java <min-java-version/> or later JRE,
-            including the JRE installed as part of the full JDK. When running on
-            a 64-bit operating system, the installer will first look for a
-            64-bit JRE and only look for a 32-bit JRE if a 64-bit JRE is not
-            found. If a JRE cannot be found when running on a 64-bit operating
-            system, the installer will look for a 64-bit JDK. Finally, if a JRE
-            or JDK has not been found, the installer will try to use the
-            <code>JAVA_HOME</code> environment variable. It is not mandatory to
-            use the default JRE detected by the installer. Any installed Java
-            <min-java-version/> or later JRE (32-bit or 64-bit) may be
+            including the JRE installed as part of the full JDK. The installer
+            will first look for a JRE and only look for a JDK if a JRE is not
+            found. Finally, if a JRE or JDK has not been found, the installer
+            will try to use the <code>JAVA_HOME</code> environment variable. It
+            is not mandatory to use the default JRE detected by the installer.
+            Any installed Java <min-java-version/> or later JRE may be
             used.</li>
         <li><strong>Tray icon</strong>: When Tomcat is run as a service, there
             will not be any tray icon present when Tomcat is running. Note that

@@ -17,7 +17,6 @@
 package org.apache.catalina.valves;
 
 import java.io.CharArrayWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,7 +32,9 @@ import org.apache.tomcat.util.json.JSONFilter;
 
 /**
  * Access log valve derivative that rewrites entries as JSON.
- * <b>Important note: the attribute names are not final</b>
+ * <p>
+ * <b>Important note: the attribute names are not final.</b>
+ * <p>
  * Patterns are mapped to attributes as followed:
  * <ul>
  * <li>a: remoteAddr</li>
@@ -58,24 +59,31 @@ import org.apache.tomcat.util.json.JSONFilter;
  * <li>v: localServerName</li>
  * <li>I: threadName</li>
  * <li>X: connectionStatus</li>
+ * <li>%{xxx}a: remoteAddress-xxx</li>
+ * <li>%{xxx}p: port-xxx</li>
+ * <li>%{xxx}t: time-xxx</li>
+ * <li>%{xxx}c: cookies</li>
+ * <li>%{xxx}i: requestHeaders</li>
+ * <li>%{xxx}o: responseHeaders</li>
+ * <li>%{xxx}r: requestAttributes</li>
+ * <li>%{xxx}s: sessionAttributes</li>
  * </ul>
- * The attribute list is based on
- * https://github.com/fluent/fluentd/blob/master/lib/fluent/plugin/parser_apache2.rb#L72
+ * The attribute list is based on https://github.com/fluent/fluentd/blob/master/lib/fluent/plugin/parser_apache2.rb#L72
  */
 public class JsonAccessLogValve extends AccessLogValve {
 
-    private static final Map<Character, String> PATTERNS;
+    private static final Map<Character,String> PATTERNS;
     static {
-        // FIXME: finalize attribute names
-        Map<Character, String> pattern2AttributeName = new HashMap<>();
+        Map<Character,String> pattern2AttributeName = new HashMap<>();
         pattern2AttributeName.put(Character.valueOf('a'), "remoteAddr");
         pattern2AttributeName.put(Character.valueOf('A'), "localAddr");
-        pattern2AttributeName.put(Character.valueOf('b'), "size"); /* byteSent -> size */
+        pattern2AttributeName.put(Character.valueOf('b'), "size");
         pattern2AttributeName.put(Character.valueOf('B'), "byteSentNC");
         pattern2AttributeName.put(Character.valueOf('D'), "elapsedTime");
         pattern2AttributeName.put(Character.valueOf('F'), "firstByteTime");
         pattern2AttributeName.put(Character.valueOf('h'), "host");
         pattern2AttributeName.put(Character.valueOf('H'), "protocol");
+        pattern2AttributeName.put(Character.valueOf('I'), "threadName");
         pattern2AttributeName.put(Character.valueOf('l'), "logicalUserName");
         pattern2AttributeName.put(Character.valueOf('m'), "method");
         pattern2AttributeName.put(Character.valueOf('p'), "port");
@@ -83,21 +91,68 @@ public class JsonAccessLogValve extends AccessLogValve {
         pattern2AttributeName.put(Character.valueOf('r'), "request");
         pattern2AttributeName.put(Character.valueOf('s'), "statusCode");
         pattern2AttributeName.put(Character.valueOf('S'), "sessionId");
-        pattern2AttributeName.put(Character.valueOf('t'), "time"); /* dateTime -> time */
+        pattern2AttributeName.put(Character.valueOf('t'), "time");
         pattern2AttributeName.put(Character.valueOf('T'), "elapsedTimeS");
         pattern2AttributeName.put(Character.valueOf('u'), "user");
-        pattern2AttributeName.put(Character.valueOf('U'), "path"); /* requestURI -> path */
+        pattern2AttributeName.put(Character.valueOf('U'), "path");
         pattern2AttributeName.put(Character.valueOf('v'), "localServerName");
-        pattern2AttributeName.put(Character.valueOf('I'), "threadName");
         pattern2AttributeName.put(Character.valueOf('X'), "connectionStatus");
         PATTERNS = Collections.unmodifiableMap(pattern2AttributeName);
     }
 
+    private static final Map<Character,String> SUB_OBJECT_PATTERNS;
+    static {
+        Map<Character,String> pattern2AttributeName = new HashMap<>();
+        pattern2AttributeName.put(Character.valueOf('c'), "cookies");
+        pattern2AttributeName.put(Character.valueOf('i'), "requestHeaders");
+        pattern2AttributeName.put(Character.valueOf('o'), "responseHeaders");
+        pattern2AttributeName.put(Character.valueOf('r'), "requestAttributes");
+        pattern2AttributeName.put(Character.valueOf('s'), "sessionAttributes");
+        SUB_OBJECT_PATTERNS = Collections.unmodifiableMap(pattern2AttributeName);
+    }
+
+    /**
+     * write any char
+     */
+    protected static class CharElement implements AccessLogElement {
+        private final char ch;
+
+        public CharElement(char ch) {
+            this.ch = ch;
+        }
+
+        @Override
+        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+            buf.write(ch);
+        }
+    }
+
+    private boolean addSubkeyedItems(ListIterator<AccessLogElement> iterator, List<JsonWrappedElement> elements,
+            String patternAttribute) {
+        if (!elements.isEmpty()) {
+            iterator.add(new StringElement("\"" + patternAttribute + "\": {"));
+            for (JsonWrappedElement element : elements) {
+                iterator.add(element);
+                iterator.add(new CharElement(','));
+            }
+            iterator.previous();
+            iterator.remove();
+            iterator.add(new StringElement("},"));
+            return true;
+        }
+        return false;
+    }
+
     @Override
     protected AccessLogElement[] createLogElements() {
+        Map<Character,List<JsonWrappedElement>> subTypeLists = new HashMap<>();
+        for (Character pattern : SUB_OBJECT_PATTERNS.keySet()) {
+            subTypeLists.put(pattern, new ArrayList<>());
+        }
+        boolean hasSub = false;
         List<AccessLogElement> logElements = new ArrayList<>(Arrays.asList(super.createLogElements()));
         ListIterator<AccessLogElement> lit = logElements.listIterator();
-        lit.add((buf, date, req, resp, time) -> buf.write('{'));
+        lit.add(new CharElement('{'));
         while (lit.hasNext()) {
             AccessLogElement logElement = lit.next();
             // remove all other elements, like StringElements
@@ -105,57 +160,58 @@ public class JsonAccessLogValve extends AccessLogValve {
                 lit.remove();
                 continue;
             }
-            lit.add((buf, date, req, resp, time) -> buf.write(','));
+            // Remove items which should be written as
+            // Json objects and add them later in correct order
+            JsonWrappedElement wrappedLogElement = (JsonWrappedElement) logElement;
+            AccessLogElement ale = wrappedLogElement.getDelegate();
+            if (ale instanceof HeaderElement) {
+                subTypeLists.get(Character.valueOf('i')).add(wrappedLogElement);
+                lit.remove();
+            } else if (ale instanceof ResponseHeaderElement) {
+                subTypeLists.get(Character.valueOf('o')).add(wrappedLogElement);
+                lit.remove();
+            } else if (ale instanceof RequestAttributeElement) {
+                subTypeLists.get(Character.valueOf('r')).add(wrappedLogElement);
+                lit.remove();
+            } else if (ale instanceof SessionAttributeElement) {
+                subTypeLists.get(Character.valueOf('s')).add(wrappedLogElement);
+                lit.remove();
+            } else if (ale instanceof CookieElement) {
+                subTypeLists.get(Character.valueOf('c')).add(wrappedLogElement);
+                lit.remove();
+            } else {
+                // Keep the simple items and add separator
+                lit.add(new CharElement(','));
+            }
         }
-        // remove last comma again
+        // Add back the items that are output as Json objects
+        for (Character pattern : SUB_OBJECT_PATTERNS.keySet()) {
+            if (addSubkeyedItems(lit, subTypeLists.get(pattern), SUB_OBJECT_PATTERNS.get(pattern))) {
+                hasSub = true;
+            }
+        }
+        // remove last comma (or possibly "},")
         lit.previous();
         lit.remove();
-        lit.add((buf, date, req, resp, time) -> buf.write('}'));
-        return logElements.toArray(new AccessLogElement[logElements.size()]);
+        // Last item was a sub object, close it
+        if (hasSub) {
+            lit.add(new StringElement("}}"));
+        } else {
+            lit.add(new CharElement('}'));
+        }
+        return logElements.toArray(new AccessLogElement[0]);
+    }
+
+    @Override
+    protected AccessLogElement createAccessLogElement(String name, char pattern) {
+        AccessLogElement ale = super.createAccessLogElement(name, pattern);
+        return new JsonWrappedElement(pattern, name, true, ale);
     }
 
     @Override
     protected AccessLogElement createAccessLogElement(char pattern) {
         AccessLogElement ale = super.createAccessLogElement(pattern);
-        String attributeName = PATTERNS.get(Character.valueOf(pattern));
-        if (attributeName == null) {
-            attributeName = "other-" + new String(JSONFilter.escape(pattern));
-        }
-        return new JsonWrappedElement(attributeName, true, ale);
-    }
-
-    /**
-     * JSON string escaping writer
-     */
-    private static class JsonCharArrayWriter extends CharArrayWriter {
-
-        JsonCharArrayWriter(int i) {
-            super(i);
-        }
-
-        @Override
-        public void write(int c) {
-            try {
-                super.write(JSONFilter.escape((char) c));
-            } catch (IOException e) {
-                // ignore
-            }
-        }
-
-        @Override
-        public void write(char[] c, int off, int len) {
-            try {
-                super.write(JSONFilter.escape(new String(c, off, len)));
-            } catch (IOException e) {
-                // ignore
-            }
-        }
-
-        @Override
-        public void write(String str, int off, int len) {
-            CharSequence escaped = JSONFilter.escape(str, off, len);
-            super.write(escaped.toString(), 0, escaped.length());
-        }
+        return new JsonWrappedElement(pattern, true, ale);
     }
 
     private static class JsonWrappedElement implements AccessLogElement, CachedElement {
@@ -168,10 +224,30 @@ public class JsonAccessLogValve extends AccessLogValve {
             return JSONFilter.escape(nonEscaped);
         }
 
-        JsonWrappedElement(String attributeName, boolean quoteValue, AccessLogElement delegate) {
-            this.attributeName = escapeJsonString(attributeName);
+        JsonWrappedElement(char pattern, String key, boolean quoteValue, AccessLogElement delegate) {
             this.quoteValue = quoteValue;
             this.delegate = delegate;
+            String patternAttribute = PATTERNS.get(Character.valueOf(pattern));
+            if (patternAttribute == null) {
+                patternAttribute = "other-" + Character.toString(pattern);
+            }
+            if (key != null && !"".equals(key)) {
+                if (SUB_OBJECT_PATTERNS.containsKey(Character.valueOf(pattern))) {
+                    this.attributeName = escapeJsonString(key);
+                } else {
+                    this.attributeName = escapeJsonString(patternAttribute + "-" + key);
+                }
+            } else {
+                this.attributeName = escapeJsonString(patternAttribute);
+            }
+        }
+
+        JsonWrappedElement(char pattern, boolean quoteValue, AccessLogElement delegate) {
+            this(pattern, null, quoteValue, delegate);
+        }
+
+        public AccessLogElement getDelegate() {
+            return delegate;
         }
 
         @Override
@@ -180,13 +256,7 @@ public class JsonAccessLogValve extends AccessLogValve {
             if (quoteValue) {
                 buf.append('"');
             }
-            CharArrayWriter valueWriter = new JsonCharArrayWriter(8);
-            try {
-                delegate.addElement(valueWriter, date, request, response, time);
-                valueWriter.writeTo(buf);
-            } catch (IOException e) {
-                // ignore
-            }
+            delegate.addElement(buf, date, request, response, time);
             if (quoteValue) {
                 buf.append('"');
             }

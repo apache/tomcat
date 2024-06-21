@@ -92,7 +92,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     /**
      * The configuration information for this <code>LoginModule</code>.
      */
-    protected Map<String, ?> options = null;
+    protected Map<String,?> options = null;
 
 
     /**
@@ -110,7 +110,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     /**
      * The state information that is shared with other configured <code>LoginModule</code> instances.
      */
-    protected Map<String, ?> sharedState = null;
+    protected Map<String,?> sharedState = null;
 
 
     /**
@@ -122,8 +122,8 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     // --------------------------------------------------------- Public Methods
 
     public JAASMemoryLoginModule() {
-        if (log.isDebugEnabled()) {
-            log.debug("MEMORY LOGIN MODULE");
+        if (log.isTraceEnabled()) {
+            log.trace("MEMORY LOGIN MODULE");
         }
     }
 
@@ -143,8 +143,8 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             committed = false;
             principal = null;
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Abort");
+        if (log.isTraceEnabled()) {
+            log.trace("Abort");
         }
         return true;
     }
@@ -152,8 +152,8 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
 
     @Override
     public boolean commit() throws LoginException {
-        if (log.isDebugEnabled()) {
-            log.debug("commit " + principal);
+        if (log.isTraceEnabled()) {
+            log.trace("commit " + principal);
         }
 
         // If authentication was not successful, just return false
@@ -181,10 +181,10 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
 
 
     @Override
-    public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
-            Map<String, ?> options) {
-        if (log.isDebugEnabled()) {
-            log.debug("Init");
+    public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String,?> sharedState,
+            Map<String,?> options) {
+        if (log.isTraceEnabled()) {
+            log.trace("Init");
         }
 
         // Save configuration values
@@ -213,7 +213,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             credentialHandler = new MessageDigestCredentialHandler();
         }
 
-        for (Entry<String, ?> entry : options.entrySet()) {
+        for (Entry<String,?> entry : options.entrySet()) {
             if ("pathname".equals(entry.getKey())) {
                 continue;
             }
@@ -266,7 +266,8 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         try {
             callbackHandler.handle(callbacks);
             username = ((NameCallback) callbacks[0]).getName();
-            password = new String(((PasswordCallback) callbacks[1]).getPassword());
+            char[] passwordArray = ((PasswordCallback) callbacks[1]).getPassword();
+            password = (passwordArray == null) ? null : new String(passwordArray);
             nonce = ((TextInputCallback) callbacks[2]).getText();
             nc = ((TextInputCallback) callbacks[3]).getText();
             cnonce = ((TextInputCallback) callbacks[4]).getText();
@@ -292,7 +293,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("login " + username + " " + principal);
+            log.debug(sm.getString("jaasMemoryLoginModule.login", username, principal));
         }
 
         // Report results based on success or failure

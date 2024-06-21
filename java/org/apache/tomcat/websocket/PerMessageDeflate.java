@@ -314,13 +314,17 @@ public class PerMessageDeflate implements Transformation {
 
         for (MessagePart uncompressedPart : uncompressedParts) {
             byte opCode = uncompressedPart.getOpCode();
-            boolean emptyPart = uncompressedPart.getPayload().limit() == 0;
-            emptyMessage = emptyMessage && emptyPart;
             if (Util.isControl(opCode)) {
                 // Control messages can appear in the middle of other messages
-                // and must not be compressed. Pass it straight through
+                // and must not be compressed. Pass it straight through.
                 allCompressedParts.add(uncompressedPart);
-            } else if (emptyMessage && uncompressedPart.isFin()) {
+                continue;
+            }
+
+            if (uncompressedPart.getPayload().limit() != 0) {
+                emptyMessage = false;
+            }
+            if (emptyMessage && uncompressedPart.isFin()) {
                 // Zero length messages can't be compressed so pass the
                 // final (empty) part straight through.
                 allCompressedParts.add(uncompressedPart);
@@ -329,9 +333,15 @@ public class PerMessageDeflate implements Transformation {
                 ByteBuffer uncompressedPayload = uncompressedPart.getPayload();
                 SendHandler uncompressedIntermediateHandler = uncompressedPart.getIntermediateHandler();
 
-                deflater.setInput(uncompressedPayload.array(),
-                        uncompressedPayload.arrayOffset() + uncompressedPayload.position(),
-                        uncompressedPayload.remaining());
+                if (uncompressedPayload.hasArray()) {
+                    deflater.setInput(uncompressedPayload.array(),
+                            uncompressedPayload.arrayOffset() + uncompressedPayload.position(),
+                            uncompressedPayload.remaining());
+                } else {
+                    byte[] bytes = new byte[uncompressedPayload.remaining()];
+                    uncompressedPayload.get(bytes);
+                    deflater.setInput(bytes, 0, bytes.length);
+                }
 
                 int flush = (uncompressedPart.isFin() ? Deflater.SYNC_FLUSH : Deflater.NO_FLUSH);
                 boolean deflateRequired = true;

@@ -16,6 +16,10 @@
  */
 package org.apache.coyote.http2;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -33,6 +37,8 @@ abstract class AbstractStream {
     private final String idAsString;
 
     private long windowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
+    protected final Lock windowAllocationLock = new ReentrantLock();
+    protected final Condition windowAllocationAvailable = windowAllocationLock.newCondition();
 
     private volatile int connectionAllocationRequested = 0;
     private volatile int connectionAllocationMade = 0;
@@ -44,28 +50,54 @@ abstract class AbstractStream {
     }
 
 
+    /**
+     * @return the stream identifier
+     */
     final Integer getIdentifier() {
         return identifier;
     }
 
 
+    /**
+     * @return the stream identifier as a String
+     */
     final String getIdAsString() {
         return idAsString;
     }
 
 
+    /**
+     * @return the stream identifier
+     */
     final int getIdAsInt() {
         return identifier.intValue();
     }
 
 
-    final synchronized void setWindowSize(long windowSize) {
-        this.windowSize = windowSize;
+    /**
+     * Set the window size for this stream.
+     * @param windowSize the value
+     */
+    final void setWindowSize(long windowSize) {
+        windowAllocationLock.lock();
+        try {
+            this.windowSize = windowSize;
+        } finally {
+            windowAllocationLock.unlock();
+        }
     }
 
 
-    final synchronized long getWindowSize() {
-        return windowSize;
+    /**
+     * @return the window size
+     */
+    final long getWindowSize() {
+        windowAllocationLock.lock();
+        try {
+            return windowSize;
+        } finally {
+            windowAllocationLock.unlock();
+        }
     }
 
 
@@ -76,64 +108,96 @@ abstract class AbstractStream {
      *
      * @throws Http2Exception If the window size is now higher than the maximum allowed
      */
-    synchronized void incrementWindowSize(int increment) throws Http2Exception {
-        // No need for overflow protection here.
-        // Increment can't be more than Integer.MAX_VALUE and once windowSize
-        // goes beyond 2^31-1 an error is triggered.
-        windowSize += increment;
+    void incrementWindowSize(int increment) throws Http2Exception {
+        windowAllocationLock.lock();
+        try {
+            // No need for overflow protection here.
+            // Increment can't be more than Integer.MAX_VALUE and once windowSize
+            // goes beyond 2^31-1 an error is triggered.
+            windowSize += increment;
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("abstractStream.windowSizeInc", getConnectionId(), getIdAsString(),
-                    Integer.toString(increment), Long.toString(windowSize)));
-        }
-
-        if (windowSize > ConnectionSettingsBase.MAX_WINDOW_SIZE) {
-            String msg = sm.getString("abstractStream.windowSizeTooBig", getConnectionId(), identifier,
-                    Integer.toString(increment), Long.toString(windowSize));
-            if (identifier.intValue() == 0) {
-                throw new ConnectionException(msg, Http2Error.FLOW_CONTROL_ERROR);
-            } else {
-                throw new StreamException(msg, Http2Error.FLOW_CONTROL_ERROR, identifier.intValue());
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("abstractStream.windowSizeInc", getConnectionId(), getIdAsString(),
+                        Integer.toString(increment), Long.toString(windowSize)));
             }
+
+            if (windowSize > ConnectionSettingsBase.MAX_WINDOW_SIZE) {
+                String msg = sm.getString("abstractStream.windowSizeTooBig", getConnectionId(), identifier,
+                        Integer.toString(increment), Long.toString(windowSize));
+                if (identifier.intValue() == 0) {
+                    throw new ConnectionException(msg, Http2Error.FLOW_CONTROL_ERROR);
+                } else {
+                    throw new StreamException(msg, Http2Error.FLOW_CONTROL_ERROR, identifier.intValue());
+                }
+            }
+        } finally {
+            windowAllocationLock.unlock();
         }
     }
 
 
-    final synchronized void decrementWindowSize(int decrement) {
-        // No need for overflow protection here. Decrement can never be larger
-        // the Integer.MAX_VALUE and once windowSize goes negative no further
-        // decrements are permitted
-        windowSize -= decrement;
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("abstractStream.windowSizeDec", getConnectionId(), getIdAsString(),
-                    Integer.toString(decrement), Long.toString(windowSize)));
+    /**
+     * Decrement window size.
+     *
+     * @param decrement The amount by which the window size should be decreased
+     */
+    final void decrementWindowSize(int decrement) {
+        windowAllocationLock.lock();
+        try {
+            // No need for overflow protection here. Decrement can never be larger
+            // the Integer.MAX_VALUE and once windowSize goes negative no further
+            // decrements are permitted
+            windowSize -= decrement;
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("abstractStream.windowSizeDec", getConnectionId(), getIdAsString(),
+                        Integer.toString(decrement), Long.toString(windowSize)));
+            }
+        } finally {
+            windowAllocationLock.unlock();
         }
     }
 
 
+    /**
+     * @return the requested amount of resources requested
+     */
     final int getConnectionAllocationRequested() {
         return connectionAllocationRequested;
     }
 
 
+    /**
+     * Set the amount of requested resources.
+     * @param connectionAllocationRequested the value
+     */
     final void setConnectionAllocationRequested(int connectionAllocationRequested) {
-        log.debug(sm.getString("abstractStream.setConnectionAllocationRequested", getConnectionId(), getIdAsString(),
+        log.trace(sm.getString("abstractStream.setConnectionAllocationRequested", getConnectionId(), getIdAsString(),
                 Integer.toString(this.connectionAllocationRequested), Integer.toString(connectionAllocationRequested)));
         this.connectionAllocationRequested = connectionAllocationRequested;
     }
 
 
+    /**
+     * @return the allocation that was made at the connection level
+     */
     final int getConnectionAllocationMade() {
         return connectionAllocationMade;
     }
 
 
+    /**
+     * Set the allocation made at the connection level.
+     * @param connectionAllocationMade the value
+     */
     final void setConnectionAllocationMade(int connectionAllocationMade) {
-        log.debug(sm.getString("abstractStream.setConnectionAllocationMade", getConnectionId(), getIdAsString(),
+        log.trace(sm.getString("abstractStream.setConnectionAllocationMade", getConnectionId(), getIdAsString(),
                 Integer.toString(this.connectionAllocationMade), Integer.toString(connectionAllocationMade)));
         this.connectionAllocationMade = connectionAllocationMade;
     }
 
 
+    /**
+     * @return the connection id
+     */
     abstract String getConnectionId();
 }

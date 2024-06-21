@@ -38,6 +38,7 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.Constants;
 import org.apache.tomcat.websocket.Transformation;
 import org.apache.tomcat.websocket.WsRemoteEndpointImplBase;
+import org.apache.tomcat.websocket.WsSession;
 
 /**
  * This is the server side {@link jakarta.websocket.RemoteEndpoint} implementation - i.e. what the server uses to send
@@ -102,15 +103,19 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     protected boolean acquireMessagePartInProgressSemaphore(byte opCode, long timeoutExpiry)
             throws InterruptedException {
 
-        // Only close requires special handling.
-        if (opCode != Constants.OPCODE_CLOSE) {
+        /*
+         * Special handling is required only when all of the following are true:
+         * - A close message is being sent
+         * - This thread currently holds the socketWrapper lock (i.e. the thread is current processing a socket event)
+         */
+        if (!(opCode == Constants.OPCODE_CLOSE && socketWrapper.getLock().isHeldByCurrentThread())) {
+            // Skip special handling
             return super.acquireMessagePartInProgressSemaphore(opCode, timeoutExpiry);
         }
 
         int socketWrapperLockCount = socketWrapper.getLock().getHoldCount();
         while (!messagePartInProgress.tryAcquire()) {
-            long timeout = timeoutExpiry - System.currentTimeMillis();
-            if (timeout < 0) {
+            if (timeoutExpiry < System.currentTimeMillis()) {
                 return false;
             }
             try {
@@ -144,7 +149,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
             if (block) {
                 timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
                 if (timeout <= 0) {
-                    SendResult sr = new SendResult(new SocketTimeoutException());
+                    SendResult sr = new SendResult(getSession(), new SocketTimeoutException());
                     handler.onResult(sr);
                     return;
                 }
@@ -166,7 +171,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                                 if (timeout <= 0) {
                                     failed(new SocketTimeoutException(), null);
                                 } else {
-                                    handler.onResult(SENDRESULT_OK);
+                                    handler.onResult(new SendResult(getSession()));
                                 }
                             } else {
                                 wsWriteTimeout.unregister(WsRemoteEndpointImplServer.this);
@@ -177,7 +182,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                         @Override
                         public void failed(Throwable exc, Void attachment) {
                             if (block) {
-                                SendResult sr = new SendResult(exc);
+                                SendResult sr = new SendResult(getSession(), exc);
                                 handler.onResult(sr);
                             } else {
                                 wsWriteTimeout.unregister(WsRemoteEndpointImplServer.this);
@@ -199,7 +204,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     for (ByteBuffer buffer : buffers) {
                         long timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
                         if (timeout <= 0) {
-                            SendResult sr = new SendResult(new SocketTimeoutException());
+                            SendResult sr = new SendResult(getSession(), new SocketTimeoutException());
                             handler.onResult(sr);
                             return;
                         }
@@ -208,15 +213,15 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     }
                     long timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
                     if (timeout <= 0) {
-                        SendResult sr = new SendResult(new SocketTimeoutException());
+                        SendResult sr = new SendResult(getSession(), new SocketTimeoutException());
                         handler.onResult(sr);
                         return;
                     }
                     socketWrapper.setWriteTimeout(timeout);
                     socketWrapper.flush(true);
-                    handler.onResult(SENDRESULT_OK);
+                    handler.onResult(new SendResult(getSession()));
                 } catch (IOException e) {
-                    SendResult sr = new SendResult(e);
+                    SendResult sr = new SendResult(getSession(), e);
                     handler.onResult(sr);
                 }
             }
@@ -341,7 +346,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
         buffers = null;
         if (sh != null) {
             if (useDispatch) {
-                OnResultRunnable r = new OnResultRunnable(sh, t);
+                OnResultRunnable r = new OnResultRunnable(getSession(), sh, t);
                 try {
                     socketWrapper.execute(r);
                 } catch (RejectedExecutionException ree) {
@@ -356,9 +361,9 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 }
             } else {
                 if (t == null) {
-                    sh.onResult(new SendResult());
+                    sh.onResult(new SendResult(getSession()));
                 } else {
-                    sh.onResult(new SendResult(t));
+                    sh.onResult(new SendResult(getSession(), t));
                 }
             }
         }
@@ -373,10 +378,12 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
     private static class OnResultRunnable implements Runnable {
 
+        private final WsSession session;
         private final SendHandler sh;
         private final Throwable t;
 
-        private OnResultRunnable(SendHandler sh, Throwable t) {
+        private OnResultRunnable(WsSession session, SendHandler sh, Throwable t) {
+            this.session = session;
             this.sh = sh;
             this.t = t;
         }
@@ -384,9 +391,9 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
         @Override
         public void run() {
             if (t == null) {
-                sh.onResult(new SendResult());
+                sh.onResult(new SendResult(session));
             } else {
-                sh.onResult(new SendResult(t));
+                sh.onResult(new SendResult(session, t));
             }
         }
     }

@@ -20,7 +20,7 @@ import java.io.File;
 
 public final class Library {
 
-    /* Default library names */
+    /* Default library names - use 2.x in preference to 1.x if both are available */
     private static final String [] NAMES = {"tcnative-2", "libtcnative-2", "tcnative-1", "libtcnative-1"};
     /* System property used to define CATALINA_HOME */
     private static final String CATALINA_HOME_PROP = "catalina.home";
@@ -38,7 +38,7 @@ public final class Library {
             try {
                 System.load(library.getAbsolutePath());
                 loaded = true;
-            } catch (ThreadDeath | VirtualMachineError t) {
+            } catch (VirtualMachineError t) {
                 throw t;
             } catch (Throwable t) {
                 if (library.exists()) {
@@ -61,7 +61,7 @@ public final class Library {
                 try {
                     System.loadLibrary(value);
                     loaded = true;
-                } catch (ThreadDeath | VirtualMachineError t) {
+                } catch (VirtualMachineError t) {
                     throw t;
                 } catch (Throwable t) {
                     String name = System.mapLibraryName(value);
@@ -97,12 +97,13 @@ public final class Library {
         System.loadLibrary(libraryName);
     }
 
-    /* create global TCN's APR pool
-     * This has to be the first call to TCN library.
+    /**
+     * Create Tomcat Native's global APR pool. This has to be the first call to TCN library.
      */
     private static native boolean initialize();
-    /* destroy global TCN's APR pool
-     * This has to be the last call to TCN library.
+    /**
+     * Destroys Tomcat Native's global APR pool. This has to be the last call to TCN library. This will destroy any APR
+     * root pools that have not been explicitly destroyed.
      */
     public static native void terminate();
     /* Internal function for loading APR Features */

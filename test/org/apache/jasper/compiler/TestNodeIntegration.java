@@ -28,12 +28,10 @@ public class TestNodeIntegration extends TomcatBaseTest {
     public void testJspAttributeIsLiteral() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug55642a.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug55642a.jsp");
 
         String result = res.toString();
 
-        Assert.assertTrue(
-                result.indexOf("/test/bug5nnnn/bug55642b.jsp?foo=bar&a=1&b=2") > 0);
+        Assert.assertTrue(result.indexOf("/test/bug5nnnn/bug55642b.jsp?foo=bar&a=1&b=2") > 0);
     }
 }

@@ -31,13 +31,14 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.connector.ClientAbortException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.coyote.BadRequestException;
 import org.apache.coyote.CloseNowException;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.InvalidParameterException;
 import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -63,7 +64,7 @@ final class StandardWrapperValve extends ValveBase {
     // Some JMX statistics. This valve is associated with a StandardWrapper.
     // We expose the StandardWrapper as JMX ( j2eeType=Servlet ). The fields
     // are here for performance.
-    private volatile long processingTime;
+    private final LongAdder processingTime = new LongAdder();
     private volatile long maxTime;
     private volatile long minTime = Long.MAX_VALUE;
     private final LongAdder requestCount = new LongAdder();
@@ -168,7 +169,14 @@ final class StandardWrapperValve extends ValveBase {
                 }
 
             }
-        } catch (ClientAbortException | CloseNowException e) {
+        } catch (BadRequestException e) {
+            if (container.getLogger().isDebugEnabled()) {
+                container.getLogger().debug(
+                        sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), e);
+            }
+            throwable = e;
+            exception(request, response, e, HttpServletResponse.SC_BAD_REQUEST);
+        } catch (CloseNowException e) {
             if (container.getLogger().isDebugEnabled()) {
                 container.getLogger().debug(
                         sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), e);
@@ -189,12 +197,19 @@ final class StandardWrapperValve extends ValveBase {
             // do not want to do exception(request, response, e) processing
         } catch (ServletException e) {
             Throwable rootCause = StandardWrapper.getRootCause(e);
-            if (!(rootCause instanceof ClientAbortException)) {
+            if (!(rootCause instanceof BadRequestException)) {
                 container.getLogger().error(sm.getString("standardWrapper.serviceExceptionRoot", wrapper.getName(),
                         context.getName(), e.getMessage()), rootCause);
             }
             throwable = e;
             exception(request, response, e);
+        } catch (InvalidParameterException e) {
+            if (container.getLogger().isDebugEnabled()) {
+                container.getLogger().debug(
+                        sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), e);
+            }
+            throwable = e;
+            exception(request, response, e, e.getErrorCode());
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
             container.getLogger()
@@ -237,7 +252,7 @@ final class StandardWrapperValve extends ValveBase {
             long t2 = System.currentTimeMillis();
 
             long time = t2 - t1;
-            processingTime += time;
+            processingTime.add(time);
             if (time > maxTime) {
                 maxTime = time;
             }
@@ -271,13 +286,21 @@ final class StandardWrapperValve extends ValveBase {
      * @param exception The exception that occurred (which possibly wraps a root cause exception
      */
     private void exception(Request request, Response response, Throwable exception) {
+        if (exception.getCause() instanceof InvalidParameterException) {
+            exception(request, response, exception, ((InvalidParameterException) exception.getCause()).getErrorCode());
+        } else {
+            exception(request, response, exception, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private void exception(Request request, Response response, Throwable exception, int errorCode) {
         request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, exception);
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        response.setStatus(errorCode);
         response.setError();
     }
 
     public long getProcessingTime() {
-        return processingTime;
+        return processingTime.sum();
     }
 
     public long getMaxTime() {

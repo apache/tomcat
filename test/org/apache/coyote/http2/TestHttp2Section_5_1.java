@@ -18,7 +18,7 @@ package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -315,7 +315,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
     @Test
     public void testErrorOnWaitingStream01() throws Exception {
-        LogManager.getLogManager().getLogger("org.apache.coyote.http2").setLevel(Level.ALL);
+        Logger.getLogger("org.apache.coyote.http2").setLevel(Level.ALL);
         try {
             // http2Connect() - modified
             enableHttp2(1);
@@ -365,7 +365,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
             parser.readFrame();
             Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]\n", output.getTrace());
         } finally {
-            LogManager.getLogManager().getLogger("org.apache.coyote.http2").setLevel(Level.INFO);
+            Logger.getLogger("org.apache.coyote.http2").setLevel(Level.INFO);
         }
     }
 

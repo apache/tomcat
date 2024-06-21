@@ -19,8 +19,10 @@ package org.apache.catalina.mbeans;
 import org.apache.tomcat.util.modeler.ManagedBean;
 
 /**
- * <p>A <strong>ModelMBean</strong> implementation for the
- * <code>org.apache.catalina.users.MemoryUserDatabase</code> component.</p>
+ * <p>
+ * A <strong>ModelMBean</strong> implementation for the <code>org.apache.catalina.users.MemoryUserDatabase</code>
+ * component.
+ * </p>
  *
  * @author Craig R. McClanahan
  */

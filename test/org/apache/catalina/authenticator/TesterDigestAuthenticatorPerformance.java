@@ -41,6 +41,10 @@ import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 
+/*
+ * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
+ * excluded due to the name starting Tester...
+ */
 public class TesterDigestAuthenticatorPerformance {
 
     private static String USER = "user";
@@ -250,7 +254,7 @@ public class TesterDigestAuthenticatorPerformance {
         private String authHeader = null;
 
         TesterDigestRequest() {
-            super(null);
+            super(null, null);
         }
 
         @Override

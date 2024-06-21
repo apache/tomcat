@@ -125,7 +125,7 @@ public class JarResourceRoot extends AbstractResource {
         String url = baseUrl + "!/";
         try {
             return new URI(url).toURL();
-        } catch (MalformedURLException | URISyntaxException e) {
+        } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("fileResource.getUrlFail", url), e);
             }

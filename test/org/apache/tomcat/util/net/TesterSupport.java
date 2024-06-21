@@ -52,20 +52,24 @@ import org.junit.Assert;
 import org.junit.Assume;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.authenticator.SSLAuthenticator;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.core.OpenSSLLifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.LibraryNotFoundError;
 import org.apache.tomcat.jni.SSL;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.jsse.JSSEImplementation;
+import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 
 public final class TesterSupport {
 
@@ -78,7 +82,9 @@ public final class TesterSupport {
     public static final String LOCALHOST_RSA_JKS = SSL_DIR + "localhost-rsa.jks";
     public static final String LOCALHOST_KEYPASS_JKS = SSL_DIR + "localhost-rsa-copy1.jks";
     public static final String JKS_PASS = "changeit";
+    public static final String JKS_PASS_FILE = SSL_DIR + "keystore-password";
     public static final String JKS_KEY_PASS = "tomcatpass";
+    public static final String JKS_KEY_PASS_FILE = SSL_DIR + "key-password";
     public static final String CA_CERT_PEM = SSL_DIR + CA_ALIAS + "-cert.pem";
     public static final String LOCALHOST_EC_CERT_PEM = SSL_DIR + "localhost-ec-cert.pem";
     public static final String LOCALHOST_EC_KEY_PEM = SSL_DIR + "localhost-ec-key.pem";
@@ -100,10 +106,16 @@ public final class TesterSupport {
         int version = 0;
         String err = "";
         try {
-            Library.initialize(null);
-            available = true;
-            version = SSL.version();
-            Library.terminate();
+            if (JreCompat.isJre22Available()) {
+                // Try with FFM
+                Class<?> openSSL = Class.forName("org.apache.tomcat.util.openssl.openssl_h");
+                version = ((Long) openSSL.getMethod("OpenSSL_version_num").invoke(null)).intValue();
+            } else {
+                Library.initialize(null);
+                available = true;
+                version = SSL.version();
+                Library.terminate();
+            }
         } catch (Exception | LibraryNotFoundError ex) {
             err = ex.getMessage();
         }
@@ -133,11 +145,11 @@ public final class TesterSupport {
     }
 
     public static void initSsl(Tomcat tomcat) {
-        initSsl(tomcat, LOCALHOST_RSA_JKS, null, null);
+        initSsl(tomcat, LOCALHOST_RSA_JKS, null, null, null, null);
     }
 
     protected static void initSsl(Tomcat tomcat, String keystore,
-            String keystorePass, String keyPass) {
+            String keystorePass, String keystorePassFile, String keyPass, String keyPassFile) {
 
         Connector connector = tomcat.getConnector();
         connector.setSecure(true);
@@ -159,8 +171,14 @@ public final class TesterSupport {
         sslHostConfig.setSslProtocol("tls");
         certificate.setCertificateKeystoreFile(new File(keystore).getAbsolutePath());
         sslHostConfig.setTruststoreFile(new File(CA_JKS).getAbsolutePath());
+        if (keystorePassFile != null) {
+            certificate.setCertificateKeystorePasswordFile(new File(keystorePassFile).getAbsolutePath());
+        }
         if (keystorePass != null) {
             certificate.setCertificateKeystorePassword(keystorePass);
+        }
+        if (keyPassFile != null) {
+            certificate.setCertificateKeyPasswordFile(new File(keyPassFile).getAbsolutePath());
         }
         if (keyPass != null) {
             certificate.setCertificateKeyPassword(keyPass);
@@ -195,14 +213,12 @@ public final class TesterSupport {
         ClientSSLSocketFactory clientSSLSocketFactory = null;
         try {
             SSLContext sc;
-            if (TesterSupport.TLSV13_AVAILABLE) {
+            if (TLSV13_AVAILABLE) {
                  sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
             } else {
                 sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_2);
             }
-            sc.init(TesterSupport.getUser1KeyManagers(),
-                    TesterSupport.getTrustManagers(),
-                    null);
+            sc.init(getUser1KeyManagers(), getTrustManagers(), null);
             clientSSLSocketFactory = new ClientSSLSocketFactory(sc.getSocketFactory());
             javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(clientSSLSocketFactory);
         } catch (Exception e) {
@@ -231,17 +247,24 @@ public final class TesterSupport {
         return true;
     }
 
-    public static void configureSSLImplementation(Tomcat tomcat, String sslImplementationName) {
-        try {
-            Class.forName(sslImplementationName);
-        } catch (Exception e) {
-            Assume.assumeNoException(e);
+    public static void configureSSLImplementation(Tomcat tomcat, String sslImplementationName, boolean useOpenSSL) {
+        if (useOpenSSL) {
+            LifecycleListener listener = null;
+            if (OpenSSLImplementation.class.getName().equals(sslImplementationName)) {
+                listener = new AprLifecycleListener();
+                Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
+            } else {
+                listener = new OpenSSLLifecycleListener();
+                Assume.assumeTrue(OpenSSLLifecycleListener.isAvailable());
+            }
+            StandardServer server = (StandardServer) tomcat.getServer();
+            server.addLifecycleListener(listener);
         }
         Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
     }
 
     public static void configureClientCertContext(Tomcat tomcat) {
-        TesterSupport.initSsl(tomcat);
+        initSsl(tomcat);
 
         /* When running on Java 11, TLSv1.3 is enabled by default. The JSSE
          * implementation of TLSv1.3 does not support

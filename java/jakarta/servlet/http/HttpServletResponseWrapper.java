@@ -262,7 +262,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
      * @since Servlet 4.0
      */
     @Override
-    public void setTrailerFields(Supplier<Map<String, String>> supplier) {
+    public void setTrailerFields(Supplier<Map<String,String>> supplier) {
         this._getHttpServletResponse().setTrailerFields(supplier);
     }
 
@@ -275,7 +275,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
      * @since Servlet 4.0
      */
     @Override
-    public Supplier<Map<String, String>> getTrailerFields() {
+    public Supplier<Map<String,String>> getTrailerFields() {
         return this._getHttpServletResponse().getTrailerFields();
     }
 }

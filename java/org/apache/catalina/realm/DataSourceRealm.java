@@ -28,6 +28,7 @@ import javax.naming.Context;
 import javax.sql.DataSource;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Server;
 import org.apache.naming.ContextBindings;
 
 /**
@@ -226,9 +227,9 @@ public class DataSourceRealm extends RealmBase {
     /**
      * {@inheritDoc}
      * <p>
-     * If there are any errors with the JDBC connection, executing the query or anything this method returns
-     * null (doesn't authenticate). This event is also logged, and the connection will be closed so that a subsequent
-     * request will automatically re-open it.
+     * If there are any errors with the JDBC connection, executing the query or anything this method returns null
+     * (doesn't authenticate). This event is also logged, and the connection will be closed so that a subsequent request
+     * will automatically re-open it.
      */
     @Override
     public Principal authenticate(String username, String credentials) {
@@ -366,7 +367,13 @@ public class DataSourceRealm extends RealmBase {
                 context = ContextBindings.getClassLoader();
                 context = (Context) context.lookup("comp/env");
             } else {
-                context = getServer().getGlobalNamingContext();
+                Server server = getServer();
+                if (server == null) {
+                    connectionSuccess = false;
+                    containerLog.error(sm.getString("dataSourceRealm.noNamingContext"));
+                    return null;
+                }
+                context = server.getGlobalNamingContext();
             }
             DataSource dataSource = (DataSource) context.lookup(dataSourceName);
             Connection connection = dataSource.getConnection();
@@ -380,9 +387,6 @@ public class DataSourceRealm extends RealmBase {
         return null;
     }
 
-    /**
-     * @return the password associated with the given principal's user name.
-     */
     @Override
     protected String getPassword(String username) {
 
@@ -432,13 +436,6 @@ public class DataSourceRealm extends RealmBase {
     }
 
 
-    /**
-     * Return the Principal associated with the given user name.
-     *
-     * @param username the user name
-     *
-     * @return the principal object
-     */
     @Override
     protected Principal getPrincipal(String username) {
         Connection dbConnection = open();

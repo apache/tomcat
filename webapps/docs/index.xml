@@ -35,7 +35,7 @@
 
 <p>This is the top-level entry point of the documentation bundle for the
 <strong>Apache Tomcat</strong> Servlet/JSP container.  Apache Tomcat version
-<version-major-minor/> implements the Servlet 6.0 and JavaServer Pages 4.0
+<version-major-minor/> implements the Servlet 6.0 and Pages 4.0
 <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">specifications</a> from
 <a href="https://jakarta.ee/">Jakarta EE</a>, and includes many
 additional features that make it a useful platform for developing and deploying
@@ -120,8 +120,6 @@ Apache Tomcat, and using many of the Apache Tomcat features.</p>
     Configuring virtual hosting in Apache Tomcat.</li>
 <li><a href="aio.html"><strong>Advanced IO</strong></a> -
     Extensions available over regular, blocking IO.</li>
-<li><a href="extras.html"><strong>Additional Components</strong></a> -
-    Obtaining additional, optional components.</li>
 <li><a href="maven-jars.html"><strong>Using Tomcat libraries with Maven</strong></a> -
     Obtaining Tomcat jars through Maven.</li>
 <li><a href="security-howto.html"><strong>Security Considerations</strong></a> -
@@ -138,6 +136,8 @@ Apache Tomcat, and using many of the Apache Tomcat features.</p>
     Using the regexp based rewrite valve for conditional URL and host rewrite.</li>
 <li><a href="cdi.html"><strong>CDI and JAX-RS support</strong></a> -
     Configuring CDI,JAX-RS and Eclipse Microprofile support.</li>
+<li><a href="graal.html"><strong>AOT compilation support</strong></a> -
+    Ahead of Time compilation support with GraalVM/Native Image.</li>
 </ol>
 
 </section>

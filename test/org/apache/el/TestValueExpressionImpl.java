@@ -328,4 +328,60 @@ public class TestValueExpressionImpl extends ELBaseTest {
         Assert.assertNotNull(result);
         Assert.assertTrue(result.isEmpty());
     }
+
+
+    @Test
+    public void testArrayLength01() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanA beanA = new TesterBeanA();
+        beanA.setValArray(new String[3]);
+
+        ValueExpression var = factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("beanA", var);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanA.valArray.length}", Integer.class);
+
+        // Check the result
+        Integer result = (Integer) ve.getValue(context);
+        Assert.assertEquals(Integer.valueOf(3), result);
+    }
+
+
+    @Test
+    public void testArrayLength02() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanA beanA = new TesterBeanA();
+        beanA.setValArray(new String[0]);
+
+        ValueExpression var = factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("beanA", var);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanA.valArray.length}", Integer.class);
+
+        // Check the result
+        Integer result = (Integer) ve.getValue(context);
+        Assert.assertEquals(Integer.valueOf(0), result);
+    }
+
+
+    @Test
+    public void testArrayLength03() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanA beanA = new TesterBeanA();
+
+        ValueExpression var = factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("beanA", var);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanA.valArray.length}", Integer.class);
+
+        // Check the result
+        Integer result = (Integer) ve.getValue(context);
+        Assert.assertNull(result);
+    }
 }

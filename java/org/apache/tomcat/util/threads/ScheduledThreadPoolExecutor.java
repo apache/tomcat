@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.threads;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -50,7 +51,7 @@ public class ScheduledThreadPoolExecutor implements ScheduledExecutorService {
 
     @Override
     public List<Runnable> shutdownNow() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

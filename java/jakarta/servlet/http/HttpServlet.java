@@ -85,8 +85,8 @@ public abstract class HttpServlet extends GenericServlet {
     private static final String LSTRING_FILE = "jakarta.servlet.http.LocalStrings";
     private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
-    private static final List<String> SENSITIVE_HTTP_HEADERS = Arrays.asList("authorization", "cookie", "x-forwarded",
-            "forwarded", "proxy-authorization");
+    private static final List<String> SENSITIVE_HTTP_HEADERS =
+            Arrays.asList("authorization", "cookie", "x-forwarded", "forwarded", "proxy-authorization");
 
     /**
      * @deprecated May be removed in a future release
@@ -130,9 +130,9 @@ public abstract class HttpServlet extends GenericServlet {
      * Overriding this method to support a GET request also automatically supports an HTTP HEAD request. A HEAD request
      * is a GET request that returns no body in the response, only the request header fields.
      * <p>
-     * When overriding this method, read the request data, write the response headers, get the response's Writer
-     * or output stream object, and finally, write the response data. It's best to include content type and encoding.
-     * When using a <code>PrintWriter</code> object to return the response, set the content type before accessing the
+     * When overriding this method, read the request data, write the response headers, get the response's Writer or
+     * output stream object, and finally, write the response data. It's best to include content type and encoding. When
+     * using a <code>PrintWriter</code> object to return the response, set the content type before accessing the
      * <code>PrintWriter</code> object.
      * <p>
      * The servlet container must write the headers before committing the response, because in HTTP the headers must be
@@ -226,9 +226,9 @@ public abstract class HttpServlet extends GenericServlet {
      * Called by the server (via the <code>service</code> method) to allow a servlet to handle a PATCH request. The HTTP
      * PATCH method allows the client to partially modify an existing resource.
      * <p>
-     * When overriding this method, read the request data and write the response headers, get the response's Writer
-     * or output stream object, and finally, write the response data. It's best to include content type and encoding.
-     * When using a <code>PrintWriter</code> object to return the response, set the content type before accessing the
+     * When overriding this method, read the request data and write the response headers, get the response's Writer or
+     * output stream object, and finally, write the response data. It's best to include content type and encoding. When
+     * using a <code>PrintWriter</code> object to return the response, set the content type before accessing the
      * <code>PrintWriter</code> object.
      * <p>
      * The servlet container must write the headers before committing the response, because in HTTP the headers must be
@@ -242,10 +242,10 @@ public abstract class HttpServlet extends GenericServlet {
      * When using HTTP 1.1 chunked encoding (which means that the response has a Transfer-Encoding header), do not set
      * the Content-Length header.
      * <p>
-     * This method does not need to be either safe or idempotent. Operations requested through POST can have side
-     * effects for which the user can be held accountable, for example, updating stored data or buying items online.
+     * This method is neither safe nor idempotent. Operations requested through PATCH have side effects for which the
+     * user can be held accountable.
      * <p>
-     * If the HTTP POST request is incorrectly formatted, <code>doPost</code> returns an HTTP "Bad Request" message.
+     * If the HTTP PATCH request is incorrectly formatted, <code>doPost</code> returns an HTTP "Bad Request" message.
      *
      * @param req  an {@link HttpServletRequest} object that contains the request the client has made of the servlet
      * @param resp an {@link HttpServletResponse} object that contains the response the servlet sends to the client
@@ -269,9 +269,9 @@ public abstract class HttpServlet extends GenericServlet {
      * POST method allows the client to send data of unlimited length to the Web server a single time and is useful when
      * posting information such as credit card numbers.
      * <p>
-     * When overriding this method, read the request data, write the response headers, get the response's Writer
-     * or output stream object, and finally, write the response data. It's best to include content type and encoding.
-     * When using a <code>PrintWriter</code> object to return the response, set the content type before accessing the
+     * When overriding this method, read the request data, write the response headers, get the response's Writer or
+     * output stream object, and finally, write the response data. It's best to include content type and encoding. When
+     * using a <code>PrintWriter</code> object to return the response, set the content type before accessing the
      * <code>PrintWriter</code> object.
      * <p>
      * The servlet container must write the headers before committing the response, because in HTTP the headers must be
@@ -465,7 +465,7 @@ public abstract class HttpServlet extends GenericServlet {
 
     private static Method[] getAllDeclaredMethods(Class<?> c) {
 
-        if (c.equals(jakarta.servlet.http.HttpServlet.class)) {
+        if (c.equals(HttpServlet.class)) {
             return null;
         }
 
@@ -532,8 +532,8 @@ public abstract class HttpServlet extends GenericServlet {
         int responseLength;
 
         String CRLF = "\r\n";
-        StringBuilder buffer = new StringBuilder("TRACE ").append(req.getRequestURI()).append(' ')
-                .append(req.getProtocol());
+        StringBuilder buffer =
+                new StringBuilder("TRACE ").append(req.getRequestURI()).append(' ').append(req.getProtocol());
 
         Enumeration<String> reqHeaderNames = req.getHeaderNames();
 
@@ -565,7 +565,7 @@ public abstract class HttpServlet extends GenericServlet {
      * Is the provided HTTP request header considered sensitive and therefore should be excluded from the response to a
      * {@code TRACE} request?
      * <p>
-     * By default, the headers thats start with any of the following are considered sensitive:
+     * By default, the headers that start with any of the following are considered sensitive:
      * <ul>
      * <li>authorization</li>
      * <li>cookie</li>

@@ -23,11 +23,14 @@ import java.security.SecureRandom;
 import java.util.Map;
 
 import org.apache.tomcat.util.buf.HexUtils;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Authenticator supporting the DIGEST authentication method.
  */
 public class DigestAuthenticator extends Authenticator {
+
+    private static final StringManager sm = StringManager.getManager(DigestAuthenticator.class);
 
     public static final String schemeName = "digest";
     private static final Object cnonceGeneratorLock = new Object();
@@ -80,7 +83,7 @@ public class DigestAuthenticator extends Authenticator {
         }
 
         catch (NoSuchAlgorithmException e) {
-            throw new AuthenticationException("Unable to generate request digest " + e.getMessage());
+            throw new AuthenticationException(sm.getString("digestAuthenticator.algorithm", e.getMessage()));
         }
 
         challenge.append("algorithm=" + algorithm + ",");

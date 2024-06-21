@@ -28,32 +28,21 @@ import org.apache.juli.logging.LogFactory;
 public class GlobalNamingResourcesSF extends StoreFactoryBase {
     private static Log log = LogFactory.getLog(GlobalNamingResourcesSF.class);
 
-    /*
-     * Store with NamingResource Factory
-     *
-     * @see org.apache.catalina.storeconfig.IStoreFactory#store(java.io.PrintWriter,
-     *      int, java.lang.Object)
-     */
     @Override
-    public void store(PrintWriter aWriter, int indent, Object aElement)
-            throws Exception {
+    public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
 
         if (aElement instanceof NamingResourcesImpl) {
 
-            StoreDescription elementDesc = getRegistry().findDescription(
-                    NamingResourcesImpl.class.getName()
-                            + ".[GlobalNamingResources]");
+            StoreDescription elementDesc =
+                    getRegistry().findDescription(NamingResourcesImpl.class.getName() + ".[GlobalNamingResources]");
 
             if (elementDesc != null) {
                 getStoreAppender().printIndent(aWriter, indent + 2);
-                getStoreAppender().printOpenTag(aWriter, indent + 2, aElement,
-                        elementDesc);
+                getStoreAppender().printOpenTag(aWriter, indent + 2, aElement, elementDesc);
                 NamingResourcesImpl resources = (NamingResourcesImpl) aElement;
-                StoreDescription resourcesdesc = getRegistry().findDescription(
-                        NamingResourcesImpl.class.getName());
+                StoreDescription resourcesdesc = getRegistry().findDescription(NamingResourcesImpl.class.getName());
                 if (resourcesdesc != null) {
-                    resourcesdesc.getStoreFactory().store(aWriter, indent + 2,
-                            resources);
+                    resourcesdesc.getStoreFactory().store(aWriter, indent + 2, resources);
                 } else {
                     log.warn(sm.getString("globalNamingResourcesSF.noFactory"));
                 }

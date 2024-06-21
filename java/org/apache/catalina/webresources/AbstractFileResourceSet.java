@@ -99,15 +99,14 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
             return null;
         }
 
-        // Ensure that the file is not outside the fileBase. This should not be
-        // possible for standard requests (the request is normalized early in
-        // the request processing) but might be possible for some access via the
-        // Servlet API (RequestDispatcher, HTTP/2 push etc.) therefore these
-        // checks are retained as an additional safety measure
-        // absoluteBase has been normalized so absPath needs to be normalized as
-        // well.
+        /*
+         * Ensure that the file is not outside the fileBase. This should not be possible for standard requests (the
+         * request is normalized early in the request processing) but might be possible for some access via the Servlet
+         * API (e.g. RequestDispatcher) therefore these checks are retained as an additional safety measure absoluteBase
+         * has been normalized so absPath needs to be normalized as well.
+         */
         String absPath = normalize(file.getAbsolutePath());
-        if (absoluteBase.length() > absPath.length()) {
+        if (absPath == null || absoluteBase.length() > absPath.length()) {
             return null;
         }
 
@@ -116,6 +115,11 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         // applies to the request path
         absPath = absPath.substring(absoluteBase.length());
         canPath = canPath.substring(canonicalBase.length());
+
+        // The remaining request path must start with '/' if it has non-zero length
+        if (canPath.length() > 0 && canPath.charAt(0) != File.separatorChar) {
+            return null;
+        }
 
         // Case sensitivity check
         // The normalized requested path should be an exact match the equivalent

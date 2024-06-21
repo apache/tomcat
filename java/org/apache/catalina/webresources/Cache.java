@@ -52,7 +52,7 @@ public class Cache {
     private LongAdder lookupCount = new LongAdder();
     private LongAdder hitCount = new LongAdder();
 
-    private final ConcurrentMap<String, CachedResource> resourceCache = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String,CachedResource> resourceCache = new ConcurrentHashMap<>();
 
     public Cache(StandardRoot root) {
         this.root = root;
@@ -83,8 +83,8 @@ public class Cache {
         if (cacheEntry == null) {
             // Local copy to ensure consistency
             int objectMaxSizeBytes = getObjectMaxSizeBytes();
-            CachedResource newCacheEntry = new CachedResource(this, root, path, getTtl(), objectMaxSizeBytes,
-                    useClassLoaderResources);
+            CachedResource newCacheEntry =
+                    new CachedResource(this, root, path, getTtl(), objectMaxSizeBytes, useClassLoaderResources);
 
             // Concurrent callers will end up with the same CachedResource
             // instance
@@ -161,8 +161,8 @@ public class Cache {
         if (cacheEntry == null) {
             // Local copy to ensure consistency
             int objectMaxSizeBytes = getObjectMaxSizeBytes();
-            CachedResource newCacheEntry = new CachedResource(this, root, path, getTtl(), objectMaxSizeBytes,
-                    useClassLoaderResources);
+            CachedResource newCacheEntry =
+                    new CachedResource(this, root, path, getTtl(), objectMaxSizeBytes, useClassLoaderResources);
 
             // Concurrent callers will end up with the same CachedResource
             // instance
@@ -207,8 +207,8 @@ public class Cache {
         // Create an ordered set of all cached resources with the least recently
         // used first. This is a background process so we can afford to take the
         // time to order the elements first
-        TreeSet<CachedResource> orderedResources = new TreeSet<>(
-                Comparator.comparingLong(CachedResource::getNextCheck));
+        TreeSet<CachedResource> orderedResources =
+                new TreeSet<>(Comparator.comparingLong(CachedResource::getNextCheck));
         orderedResources.addAll(resourceCache.values());
 
         Iterator<CachedResource> iter = orderedResources.iterator();

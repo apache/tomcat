@@ -21,15 +21,13 @@ import java.nio.charset.Charset;
 
 /**
  * Represents a character encoding to be used for a request or response.
- *
- * <p>Historically the Servlet API has used Strings for this information with
- * lazy conversion to Charset. Sometimes the API required that an invalid name
- * triggered an exception. Sometimes the invalid name was treated as if it had
- * never been set. This resulted in classes storing both the String
- * and, if the name was valid, the Charset with validation and conversion logic
- * spread throughout those classes.
- *
- * <p>This class is an attempt to encapsulate that behaviour.
+ * <p>
+ * Historically the Servlet API has used Strings for this information with lazy conversion to Charset. Sometimes the API
+ * required that an invalid name triggered an exception. Sometimes the invalid name was treated as if it had never been
+ * set. This resulted in classes storing both the String and, if the name was valid, the Charset with validation and
+ * conversion logic spread throughout those classes.
+ * <p>
+ * This class is an attempt to encapsulate that behaviour.
  */
 public class CharsetHolder {
 
@@ -76,9 +74,8 @@ public class CharsetHolder {
 
 
     /**
-     * Returns the Charset, {@code null} if no Charset has been specified, or
-     * {@code null} if the holder was created using the name of a Charset that
-     * the JRE does not recognise.
+     * Returns the Charset, {@code null} if no Charset has been specified, or {@code null} if the holder was created
+     * using the name of a Charset that the JRE does not recognise.
      *
      * @return The Charset or {@code null} it is not set or invalid
      */
@@ -92,8 +89,8 @@ public class CharsetHolder {
      *
      * @return The validated Charset or {@code null} if is not set
      *
-     * @throws UnsupportedEncodingException if the holder was created using the
-     *     name of a Charset that the JRE does not recognise
+     * @throws UnsupportedEncodingException if the holder was created using the name of a Charset that the JRE does not
+     *                                          recognise
      */
     public Charset getValidatedCharset() throws UnsupportedEncodingException {
         validate();
@@ -102,11 +99,9 @@ public class CharsetHolder {
 
 
     /**
-     * Throws an exception if the instance holds a name that without a matching
-     * Charset.
+     * Throws an exception if the instance holds a name that without a matching Charset.
      *
-     * @throws UnsupportedEncodingException if the holder contains a name
-     *     without a matching Charset
+     * @throws UnsupportedEncodingException if the holder contains a name without a matching Charset
      */
     public void validate() throws UnsupportedEncodingException {
         if (name != null && charset == null) {

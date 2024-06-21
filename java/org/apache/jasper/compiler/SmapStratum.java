@@ -172,12 +172,6 @@ public class SmapStratum {
      */
     public void optimizeLineSection() {
 
-/* Some debugging code
-        for (int i = 0; i < lineData.size(); i++) {
-            LineInfo li = (LineInfo)lineData.get(i);
-            System.out.print(li.toString());
-        }
- */
         //Incorporate each LineInfo into the previous LineInfo's
         //outputLineIncrement, if possible
         int i = 0;

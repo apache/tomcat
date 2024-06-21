@@ -46,7 +46,7 @@ public class FileMessageFactory {
     /**
      * The number of bytes that we read from file
      */
-    public static final int READ_SIZE = 1024 * 10; // 10kb
+    public static final int READ_SIZE = 1024 * 10; // 10 KiB
 
     /**
      * The file that we are reading/writing
@@ -97,7 +97,7 @@ public class FileMessageFactory {
      * Messages received out of order are held in the buffer until required. If everything is worked as expected,
      * messages will spend very little time in the buffer.
      */
-    protected final Map<Long, FileMessage> msgBuffer = new ConcurrentHashMap<>();
+    protected final Map<Long,FileMessage> msgBuffer = new ConcurrentHashMap<>();
 
     /**
      * The bytes that we hold the data in, not thread safe.
@@ -134,8 +134,8 @@ public class FileMessageFactory {
     private FileMessageFactory(File f, boolean openForWrite) throws FileNotFoundException, IOException {
         this.file = f;
         this.openForWrite = openForWrite;
-        if (log.isDebugEnabled()) {
-            log.debug("open file " + f + " write " + openForWrite);
+        if (log.isTraceEnabled()) {
+            log.trace("FileMessageFactory open file " + f + " write " + openForWrite);
         }
         if (openForWrite) {
             if (!file.exists()) {
@@ -211,8 +211,8 @@ public class FileMessageFactory {
         if (!openForWrite) {
             throw new IllegalArgumentException(sm.getString("fileMessageFactory.cannotWrite"));
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Message " + msg + " data " + HexUtils.toHexString(msg.getData()) + " data length " +
+        if (log.isTraceEnabled()) {
+            log.trace("Message " + msg + " data " + HexUtils.toHexString(msg.getData()) + " data length " +
                     msg.getDataLength() + " out " + out);
         }
 

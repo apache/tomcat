@@ -186,9 +186,8 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 }
 
                 /*
-                 * Initialize the SeedGenerator of the JVM, as some platforms use
-                 * a thread which could end up being associated with a webapp rather
-                 * than the container.
+                 * Initialize the SeedGenerator of the JVM, as some platforms use a thread which could end up being
+                 * associated with a webapp rather than the container.
                  */
                 if (initSeedGenerator) {
                     SecureRandom.getSeed(1);

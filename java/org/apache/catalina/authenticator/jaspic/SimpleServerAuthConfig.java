@@ -33,10 +33,9 @@ import jakarta.security.auth.message.module.ServerAuthModule;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Basic implementation primarily intended for use when using third-party
- * {@link ServerAuthModule} implementations that only provide the module. This
- * implementation supports configuring the {@link ServerAuthContext} with
- * multiple modules.
+ * Basic implementation primarily intended for use when using third-party {@link ServerAuthModule} implementations that
+ * only provide the module. This implementation supports configuring the {@link ServerAuthContext} with multiple
+ * modules.
  */
 public class SimpleServerAuthConfig implements ServerAuthConfig {
 
@@ -92,8 +91,8 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
 
 
     @Override
-    public ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject,
-            Map<String,Object> properties) throws AuthException {
+    public ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject, Map<String,Object> properties)
+            throws AuthException {
         ServerAuthContext serverAuthContext = this.serverAuthContext;
         if (serverAuthContext == null) {
             synchronized (this) {
@@ -113,12 +112,10 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
                     while (moduleClassName instanceof String) {
                         try {
                             Class<?> clazz = Class.forName((String) moduleClassName);
-                            ServerAuthModule module =
-                                    (ServerAuthModule) clazz.getConstructor().newInstance();
+                            ServerAuthModule module = (ServerAuthModule) clazz.getConstructor().newInstance();
                             module.initialize(null, null, handler, mergedProperties);
                             modules.add(module);
-                        } catch (ReflectiveOperationException | IllegalArgumentException |
-                                SecurityException e) {
+                        } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
                             AuthException ae = new AuthException();
                             ae.initCause(e);
                             throw ae;

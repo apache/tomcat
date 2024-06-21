@@ -34,7 +34,7 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
         Tomcat.addServlet(ctxt, "large", new LargeHeaderServlet());
@@ -118,7 +118,7 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "ReadRequestBodyServlet", new ReadRequestBodyServlet());
         ctxt.addServletMappingDecoded("/", "ReadRequestBodyServlet");
 
@@ -176,7 +176,7 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
 
@@ -201,10 +201,10 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
             buildPostRequest(frameHeader, headersPayload, false, dataFrameHeader, dataFramePayload, null, stream);
             writeFrame(frameHeader, headersPayload);
 
-            // 500 response (triggered by IOException trying to read body that never arrived)
+            // 400 response (triggered by IOException trying to read body that never arrived)
             parser.readFrame();
             Assert.assertTrue(output.getTrace(),
-                    output.getTrace().startsWith(stream + "-HeadersStart\n" + stream + "-Header-[:status]-[500]\n"));
+                    output.getTrace().startsWith(stream + "-HeadersStart\n" + stream + "-Header-[:status]-[400]\n"));
             output.clearTrace();
 
             // reset frame

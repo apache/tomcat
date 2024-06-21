@@ -50,9 +50,11 @@ public class ResolverImpl extends Resolver {
 
     /**
      * The following are not implemented:
-     * - SERVER_ADMIN
-     * - API_VERSION
-     * - IS_SUBREQ
+     * <ul>
+     * <li>SERVER_ADMIN</li>
+     * <li>API_VERSION</li>
+     * <li>IS_SUBREQ</li>
+     * </ul>
      */
     @Override
     public String resolve(String key) {
@@ -113,8 +115,7 @@ public class ResolverImpl extends Resolver {
         } else if (key.equals("SERVER_SOFTWARE")) {
             return "tomcat";
         } else if (key.equals("THE_REQUEST")) {
-            return request.getMethod() + " " + request.getRequestURI()
-            + " " + request.getProtocol();
+            return request.getMethod() + " " + request.getRequestURI() + " " + request.getProtocol();
         } else if (key.equals("REQUEST_URI")) {
             return request.getRequestURI();
         } else if (key.equals("REQUEST_FILENAME")) {
@@ -171,25 +172,30 @@ public class ResolverImpl extends Resolver {
                 return sslSupport.getCipherSuite();
             } else if (key.equals("SSL_CIPHER_EXPORT")) {
                 String cipherSuite = sslSupport.getCipherSuite();
-                Set<Cipher> cipherList = OpenSSLCipherConfigurationParser.parse(cipherSuite);
-                if (cipherList.size() == 1) {
-                    Cipher cipher = cipherList.iterator().next();
-                    if (cipher.getLevel().equals(EncryptionLevel.EXP40)
-                            || cipher.getLevel().equals(EncryptionLevel.EXP56)) {
-                        return "true";
-                    } else {
-                        return "false";
+                if (cipherSuite != null) {
+                    Set<Cipher> cipherList = OpenSSLCipherConfigurationParser.parse(cipherSuite);
+                    if (cipherList.size() == 1) {
+                        Cipher cipher = cipherList.iterator().next();
+                        if (cipher.getLevel().equals(EncryptionLevel.EXP40) ||
+                                cipher.getLevel().equals(EncryptionLevel.EXP56)) {
+                            return "true";
+                        } else {
+                            return "false";
+                        }
                     }
                 }
             } else if (key.equals("SSL_CIPHER_ALGKEYSIZE")) {
                 String cipherSuite = sslSupport.getCipherSuite();
-                Set<Cipher> cipherList = OpenSSLCipherConfigurationParser.parse(cipherSuite);
-                if (cipherList.size() == 1) {
-                    Cipher cipher = cipherList.iterator().next();
-                    return String.valueOf(cipher.getAlg_bits());
+                if (cipherSuite != null) {
+                    Set<Cipher> cipherList = OpenSSLCipherConfigurationParser.parse(cipherSuite);
+                    if (cipherList.size() == 1) {
+                        Cipher cipher = cipherList.iterator().next();
+                        return String.valueOf(cipher.getAlg_bits());
+                    }
                 }
             } else if (key.equals("SSL_CIPHER_USEKEYSIZE")) {
-                return sslSupport.getKeySize().toString();
+                Integer keySize = sslSupport.getKeySize();
+                return (keySize == null) ? null : sslSupport.getKeySize().toString();
             } else if (key.startsWith("SSL_CLIENT_")) {
                 X509Certificate[] certificates = sslSupport.getPeerCertificateChain();
                 if (certificates != null && certificates.length > 0) {
@@ -269,13 +275,13 @@ public class ResolverImpl extends Resolver {
             try {
                 return PEMFile.toPEM(certificates[0]);
             } catch (CertificateEncodingException e) {
+                // Ignore
             }
         } else if (key.startsWith("CERT_CHAIN_")) {
             key = key.substring("CERT_CHAIN_".length());
             try {
                 return PEMFile.toPEM(certificates[Integer.parseInt(key)]);
-            } catch (NumberFormatException | ArrayIndexOutOfBoundsException
-                    | CertificateEncodingException e) {
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException | CertificateEncodingException e) {
                 // Ignore
             }
         }
@@ -283,7 +289,7 @@ public class ResolverImpl extends Resolver {
     }
 
     private String resolveComponent(String fullDN, String component) {
-        HashMap<String, String> components = new HashMap<>();
+        HashMap<String,String> components = new HashMap<>();
         StringTokenizer tokenizer = new StringTokenizer(fullDN, ",");
         while (tokenizer.hasMoreElements()) {
             String token = tokenizer.nextToken().trim();
@@ -310,8 +316,7 @@ public class ResolverImpl extends Resolver {
                     return elements.get(n);
                 }
             }
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException
-                | CertificateParsingException e) {
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException | CertificateParsingException e) {
             // Ignore
         }
         return null;
@@ -335,14 +340,14 @@ public class ResolverImpl extends Resolver {
             return false;
         } else {
             switch (type) {
-            case 0:
-                return resource.isDirectory();
-            case 1:
-                return resource.isFile();
-            case 2:
-                return resource.isFile() && resource.getContentLength() > 0;
-            default:
-                return false;
+                case 0:
+                    return resource.isDirectory();
+                case 1:
+                    return resource.isFile();
+                case 2:
+                    return resource.isFile() && resource.getContentLength() > 0;
+                default:
+                    return false;
             }
         }
     }

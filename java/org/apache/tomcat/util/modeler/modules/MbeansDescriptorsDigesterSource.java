@@ -46,9 +46,11 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
         digester.setValidating(false);
         URL url = Registry.getRegistry(null, null).getClass().getResource
             ("/org/apache/tomcat/util/modeler/mbeans-descriptors.dtd");
-        digester.register
+        if (url != null) {
+            digester.register
             ("-//Apache Software Foundation//DTD Model MBeans Configuration File",
-                url.toString());
+                    url.toString());
+        }
 
         // Configure the parsing rules
         digester.addObjectCreate

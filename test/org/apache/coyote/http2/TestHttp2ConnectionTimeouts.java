@@ -16,7 +16,6 @@
  */
 package org.apache.coyote.http2;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 public class TestHttp2ConnectionTimeouts extends Http2TestBase {
@@ -33,8 +32,6 @@ public class TestHttp2ConnectionTimeouts extends Http2TestBase {
         validateHttp2InitialResponse();
 
         // Wait for timeout - should receive GoAway frame
-        parser.readFrame();
-
-        Assert.assertEquals("0-Goaway-[1]-[0]-[null]", output.getTrace());
+        handleGoAwayResponse(1, Http2Error.NO_ERROR);
     }
 }

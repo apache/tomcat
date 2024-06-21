@@ -120,7 +120,7 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
         enableHttp2();
         configureAndStartWebApplication();
         openClientConnection();
-        doHttpUpgrade(Http2TestBase.DEFAULT_CONNECTION_HEADER_VALUE, "h2c", "", false);
+        doHttpUpgrade(DEFAULT_CONNECTION_HEADER_VALUE, "h2c", "", false);
         parseHttp11Response();
     }
 
@@ -130,8 +130,8 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
         enableHttp2();
         configureAndStartWebApplication();
         openClientConnection();
-        doHttpUpgrade(Http2TestBase.DEFAULT_CONNECTION_HEADER_VALUE, "h2c",
-                Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER + Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER, false);
+        doHttpUpgrade(DEFAULT_CONNECTION_HEADER_VALUE, "h2c", EMPTY_HTTP2_SETTINGS_HEADER + EMPTY_HTTP2_SETTINGS_HEADER,
+                false);
         parseHttp11Response();
     }
 
@@ -141,7 +141,7 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
         enableHttp2();
         configureAndStartWebApplication();
         openClientConnection();
-        doHttpUpgrade("Upgrade", "h2c", Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER, false);
+        doHttpUpgrade("Upgrade", "h2c", EMPTY_HTTP2_SETTINGS_HEADER, false);
         parseHttp11Response();
     }
 
@@ -151,7 +151,7 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
         enableHttp2();
         configureAndStartWebApplication();
         openClientConnection();
-        doHttpUpgrade("Upgrade\r\nConnection: HTTP2-Settings", "h2c", Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER, true);
+        doHttpUpgrade("Upgrade\r\nConnection: HTTP2-Settings", "h2c", EMPTY_HTTP2_SETTINGS_HEADER, true);
         sendClientPreface();
         validateHttp2InitialResponse();
     }
@@ -162,7 +162,7 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
         enableHttp2();
         configureAndStartWebApplication();
         openClientConnection();
-        doHttpUpgrade("HTTP2-Settings\r\nConnection: Upgrade", "h2c", Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER, true);
+        doHttpUpgrade("HTTP2-Settings\r\nConnection: Upgrade", "h2c", EMPTY_HTTP2_SETTINGS_HEADER, true);
         sendClientPreface();
         validateHttp2InitialResponse();
     }

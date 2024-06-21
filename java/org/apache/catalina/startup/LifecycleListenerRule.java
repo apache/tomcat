@@ -25,17 +25,14 @@ import org.xml.sax.Attributes;
 
 
 /**
- * Rule that creates a new {@link LifecycleListener} and associates it with the
- * top object on the stack which must implement {@link Container}. The
- * implementation class to be used is determined by:
+ * Rule that creates a new {@link LifecycleListener} and associates it with the top object on the stack which must
+ * implement {@link Container}. The implementation class to be used is determined by:
  * <ol>
- * <li>Does the top element on the stack specify an implementation class using
- *     the attribute specified when this rule was created?</li>
- * <li>Does the parent {@link Container} of the {@link Container} on the top of
- *     the stack specify an implementation class using the attribute specified
- *     when this rule was created?</li>
- * <li>Use the default implementation class specified when this rule was
- *     created.</li>
+ * <li>Does the top element on the stack specify an implementation class using the attribute specified when this rule
+ * was created?</li>
+ * <li>Does the parent {@link Container} of the {@link Container} on the top of the stack specify an implementation
+ * class using the attribute specified when this rule was created?</li>
+ * <li>Use the default implementation class specified when this rule was created.</li>
  * </ol>
  */
 public class LifecycleListenerRule extends Rule {
@@ -47,10 +44,9 @@ public class LifecycleListenerRule extends Rule {
     /**
      * Construct a new instance of this Rule.
      *
-     * @param listenerClass Default name of the LifecycleListener
-     *  implementation class to be created
-     * @param attributeName Name of the attribute that optionally
-     *  includes an override name of the LifecycleListener class
+     * @param listenerClass Default name of the LifecycleListener implementation class to be created
+     * @param attributeName Name of the attribute that optionally includes an override name of the LifecycleListener
+     *                          class
      */
     public LifecycleListenerRule(String listenerClass, String attributeName) {
 
@@ -64,8 +60,7 @@ public class LifecycleListenerRule extends Rule {
 
 
     /**
-     * The attribute name of an attribute that can override the
-     * implementation class name.
+     * The attribute name of an attribute that can override the implementation class name.
      */
     private final String attributeName;
 
@@ -79,16 +74,8 @@ public class LifecycleListenerRule extends Rule {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Handle the beginning of an XML element.
-     *
-     * @param attributes The attributes of this element
-     *
-     * @exception Exception if a processing error occurs
-     */
     @Override
-    public void begin(String namespace, String name, Attributes attributes)
-        throws Exception {
+    public void begin(String namespace, String name, Attributes attributes) throws Exception {
 
         Container c = (Container) digester.peek();
         Container p = null;
@@ -109,8 +96,7 @@ public class LifecycleListenerRule extends Rule {
 
         // Check the container's parent for the specified attribute
         if (p != null && className == null) {
-            String configClass =
-                (String) IntrospectionUtils.getProperty(p, attributeName);
+            String configClass = (String) IntrospectionUtils.getProperty(p, attributeName);
             if (configClass != null && configClass.length() > 0) {
                 className = configClass;
             }

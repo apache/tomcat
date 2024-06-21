@@ -44,8 +44,8 @@ public abstract class AbstractProcessorLight implements Processor {
         do {
             if (dispatches != null) {
                 DispatchType nextDispatch = dispatches.next();
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug("Processing dispatch type: [" + nextDispatch + "]");
+                if (getLog().isTraceEnabled()) {
+                    getLog().trace("Processing dispatch type: [" + nextDispatch + "]");
                 }
                 state = dispatch(nextDispatch.getSocketStatus());
                 if (!dispatches.hasNext()) {
@@ -69,15 +69,20 @@ public abstract class AbstractProcessorLight implements Processor {
                 state = SocketState.CLOSED;
             }
 
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(
+            if (getLog().isTraceEnabled()) {
+                getLog().trace(
                         "Socket: [" + socketWrapper + "], Status in: [" + status + "], State out: [" + state + "]");
             }
 
-            if (isAsync()) {
+            /*
+             * If state is already CLOSED don't call asyncPostProcess() as that will likely change the the state to some
+             * other value causing processing to continue when it should cease. The AsyncStateMachine will be recycled
+             * as part of the Processor clean-up on CLOSED so it doesn't matter what state it is left in at this point.
+             */
+            if (isAsync() && state != SocketState.CLOSED) {
                 state = asyncPostProcess();
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug(
+                if (getLog().isTraceEnabled()) {
+                    getLog().trace(
                             "Socket: [" + socketWrapper + "], State after async post processing: [" + state + "]");
                 }
             }
@@ -180,7 +185,16 @@ public abstract class AbstractProcessorLight implements Processor {
      */
     protected abstract SocketState dispatch(SocketEvent status) throws IOException;
 
+    /**
+     * Calls the post process of the async state machine.
+     *
+     * @return The state the caller should put the socket in when this method returns
+     * @throws IOException If an I/O error occurs during the processing of the request
+     */
     protected abstract SocketState asyncPostProcess() throws IOException;
 
+    /**
+     * @return the logger associated with this processor type
+     */
     protected abstract Log getLog();
 }

@@ -21,8 +21,7 @@ import java.util.Enumeration;
 
 
 /**
- * Abstraction of the set of users defined by the operating system on the
- * current server platform.
+ * Abstraction of the set of users defined by the operating system on the current server platform.
  *
  * @author Craig R. McClanahan
  */

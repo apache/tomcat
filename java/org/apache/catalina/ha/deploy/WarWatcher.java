@@ -51,7 +51,7 @@ public class WarWatcher {
     /**
      * Currently deployed files
      */
-    protected final Map<String, WarInfo> currentStatus = new HashMap<>();
+    protected final Map<String,WarInfo> currentStatus = new HashMap<>();
 
     /*--Constructor---------------------------------------------*/
 
@@ -85,8 +85,8 @@ public class WarWatcher {
         }
 
         // Check all the status codes and update the FarmDeployer
-        for (Iterator<Map.Entry<String, WarInfo>> i = currentStatus.entrySet().iterator(); i.hasNext();) {
-            Map.Entry<String, WarInfo> entry = i.next();
+        for (Iterator<Map.Entry<String,WarInfo>> i = currentStatus.entrySet().iterator(); i.hasNext();) {
+            Map.Entry<String,WarInfo> entry = i.next();
             WarInfo info = entry.getValue();
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("warWatcher.checkingWar", info.getWar()));

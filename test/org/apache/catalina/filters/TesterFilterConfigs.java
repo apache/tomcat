@@ -16,12 +16,15 @@
  */
 package org.apache.catalina.filters;
 
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Map;
 
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletContext;
 
 import org.apache.tomcat.unittest.TesterServletContext;
+import org.apache.tomcat.util.descriptor.web.FilterDef;
 
 public class TesterFilterConfigs {
     public static final String HTTPS_WWW_APACHE_ORG = "https://www.apache.org";
@@ -195,6 +198,38 @@ public class TesterFilterConfigs {
 
         return generateFilterConfig(allowedHttpHeaders, allowedHttpMethods, allowedOrigins, exposedHeaders,
                 supportCredentials, preflightMaxAge, decorateRequest);
+    }
+
+    public static FilterConfig generateFilterConfig(FilterDef filterDef) {
+
+        TesterServletContext mockServletContext = new TesterServletContext();
+        Map<String,String> parameters = filterDef.getParameterMap();
+
+        FilterConfig filterConfig = new FilterConfig() {
+
+            @Override
+            public String getFilterName() {
+                return filterDef.getFilterName();
+            }
+
+            @Override
+            public ServletContext getServletContext() {
+                return mockServletContext;
+            }
+
+            @Override
+            public String getInitParameter(String name) {
+
+                return parameters.get(name);
+            }
+
+            @Override
+            public Enumeration<String> getInitParameterNames() {
+                return Collections.enumeration(parameters.keySet());
+            }
+        };
+
+        return filterConfig;
     }
 
     private static FilterConfig generateFilterConfig(final String allowedHttpHeaders, final String allowedHttpMethods,

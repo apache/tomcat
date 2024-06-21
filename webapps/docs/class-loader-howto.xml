@@ -130,7 +130,7 @@ loaders as it is initialized:</p>
     </ul>
     <p>By default, this includes the following:</p>
     <ul>
-    <li><em>annotations-api.jar</em> &#8212; Jakarta Annotations 2.1.1 classes.
+    <li><em>annotations-api.jar</em> &#8212; Jakarta Annotations 3.0 classes.
         </li>
     <li><em>catalina.jar</em> &#8212; Implementation of the Catalina servlet
         container portion of Tomcat.</li>
@@ -152,7 +152,7 @@ loaders as it is initialized:</p>
     <li><em>jasper.jar</em> &#8212; Optional. Tomcat Jasper JSP Compiler and
         Runtime.</li>
     <li><em>jasper-el.jar</em> &#8212; Optional. Tomcat EL implementation.</li>
-    <li><em>jaspic-api.jar</em> &#8212; Jakarta Authentication 3.0 API.</li>
+    <li><em>jaspic-api.jar</em> &#8212; Jakarta Authentication 3.1 API.</li>
     <li><em>jsp-api.jar</em> &#8212; Optional. Jakarta Pages 4.0 API.</li>
     <li><em>servlet-api.jar</em> &#8212; Jakarta Servlet 6.1 API.</li>
     <li><em>tomcat-api.jar</em> &#8212; Several interfaces defined by Tomcat.
@@ -175,12 +175,12 @@ loaders as it is initialized:</p>
         components of Apache Tomcat.</li>
     <li><em>tomcat-util-scan.jar</em> &#8212; Provides the class scanning
         functionality used by Tomcat.</li>
-    <li><em>tomcat-websocket.jar</em> &#8212; Optional. Jakarta WebSocket 2.1
+    <li><em>tomcat-websocket.jar</em> &#8212; Optional. Jakarta WebSocket 2.2
         implementation</li>
-    <li><em>websocket-api.jar</em> &#8212; Optional. Jakarta WebSocket 2.1 API
+    <li><em>websocket-api.jar</em> &#8212; Optional. Jakarta WebSocket 2.2 API
         </li>
     <li><em>websocket-client-api.jar</em> &#8212; Optional. Jakarta WebSocket
-        2.1 Client API</li>
+        2.2 Client API</li>
     </ul></li>
 <li><p><strong>WebappX</strong> &#8212; A class loader is created for each web
     application that is deployed in a single Tomcat instance.  All unpacked

@@ -81,7 +81,7 @@ public class ChannelCreator {
         String transport = "org.apache.catalina.tribes.transport.nio.PooledParallelSender";
         String receiver = "org.apache.catalina.tribes.transport.nio.NioReceiver";
         boolean async = false;
-        int asyncsize = 1024 * 1024 * 50; // 50MB
+        int asyncsize = 1024 * 1024 * 50; // 50 MiB
         boolean throughput = false;
         boolean failuredetect = false;
 

@@ -40,7 +40,7 @@ public class TestTomcatClassLoader extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "ClassLoaderReport", new ClassLoaderReport(null));
         ctx.addServletMappingDecoded("/", "ClassLoaderReport");
@@ -62,7 +62,7 @@ public class TestTomcatClassLoader extends TomcatBaseTest {
         tomcat.getServer().setParentClassLoader(cl);
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "ClassLoaderReport", new ClassLoaderReport(cl));
         ctx.addServletMappingDecoded("/", "ClassLoaderReport");

@@ -65,7 +65,7 @@ enum Setting {
                 return NO_RFC7540_PRIORITIES;
             }
             default: {
-                return Setting.UNKNOWN;
+                return UNKNOWN;
             }
         }
     }

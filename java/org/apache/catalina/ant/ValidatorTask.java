@@ -29,10 +29,10 @@ import org.xml.sax.InputSource;
 
 
 /**
- * Task for validating a web application deployment descriptor, using XML
- * schema validation.
+ * Task for validating a web application deployment descriptor, using XML schema validation.
  *
  * @author Remy Maucherat
+ *
  * @since 5.0
  */
 public class ValidatorTask extends BaseRedirectorHelperTask {
@@ -61,9 +61,8 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Execute the specified command.  This logic only performs the common
-     * attribute validation required by all subclasses; it does not perform
-     * any functional logic directly.
+     * Execute the specified command. This logic only performs the common attribute validation required by all
+     * subclasses; it does not perform any functional logic directly.
      *
      * @exception BuildException if a validation error occurs
      */

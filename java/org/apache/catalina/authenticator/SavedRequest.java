@@ -60,7 +60,7 @@ public final class SavedRequest implements Serializable {
      * The set of Headers associated with this Request. Each key is a header name, while the value is a List containing
      * one or more actual values for this header. The values are returned as an Iterator when you ask for them.
      */
-    private final Map<String, List<String>> headers = new HashMap<>();
+    private final Map<String,List<String>> headers = new HashMap<>();
 
     public void addHeader(String name, String value) {
         headers.computeIfAbsent(name, k -> new ArrayList<>()).add(value);

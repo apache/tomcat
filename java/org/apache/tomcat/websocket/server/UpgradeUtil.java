@@ -19,6 +19,7 @@ package org.apache.tomcat.websocket.server;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
@@ -37,7 +38,6 @@ import jakarta.websocket.Extension;
 import jakarta.websocket.HandshakeResponse;
 import jakarta.websocket.server.ServerEndpointConfig;
 
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 import org.apache.tomcat.websocket.Constants;
@@ -95,7 +95,7 @@ public class UpgradeUtil {
             return;
         }
         key = req.getHeader(Constants.WS_KEY_HEADER_NAME);
-        if (key == null) {
+        if (!validateKey(key)) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
@@ -224,6 +224,31 @@ public class UpgradeUtil {
     }
 
 
+    /*
+     * Validate the key. It should be the base64 encoding of a random 16-byte value. 16-bytes are encoded in 24 base64
+     * characters.
+     */
+    private static boolean validateKey(String key) {
+        if (key == null) {
+            return false;
+        }
+
+        if (key.length() != 24) {
+            return false;
+        }
+
+        try {
+            byte[] decoded = Base64.getDecoder().decode(key);
+            if (decoded.length != 16) {
+                return false;
+            }
+        } catch (IllegalArgumentException iae) {
+            return false;
+        }
+        return true;
+    }
+
+
     private static List<Transformation> createTransformations(List<Extension> negotiatedExtensions) {
 
         TransformationFactory factory = TransformationFactory.getInstance();
@@ -303,6 +328,6 @@ public class UpgradeUtil {
 
     private static String getWebSocketAccept(String key) {
         byte[] digest = ConcurrentMessageDigest.digestSHA1(key.getBytes(StandardCharsets.ISO_8859_1), WS_ACCEPT);
-        return Base64.encodeBase64String(digest);
+        return Base64.getEncoder().encodeToString(digest);
     }
 }

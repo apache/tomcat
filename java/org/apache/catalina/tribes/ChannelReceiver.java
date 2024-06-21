@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.tribes;
 
+import java.io.IOException;
 
 /**
  * ChannelReceiver Interface<br>
@@ -28,9 +29,9 @@ public interface ChannelReceiver extends Heartbeat {
 
     /**
      * Start listening for incoming messages on the host/port
-     * @throws java.io.IOException Listen failed
+     * @throws IOException Listen failed
      */
-    void start() throws java.io.IOException;
+    void start() throws IOException;
 
     /**
      * Stop listening for messages

@@ -24,8 +24,8 @@ import jakarta.el.ELResolver;
 import jakarta.el.PropertyNotFoundException;
 
 /**
- * The final resolver of the Jakarta Server Pages ELResolver chain. It always
- * resolves the requested value, returning {@code null} when it does so.
+ * The final resolver of the Jakarta Pages ELResolver chain. It always resolves the requested value, returning
+ * {@code null} when it does so.
  *
  * @since JSP 3.1
  */
@@ -44,19 +44,16 @@ public class NotFoundELResolver extends ELResolver {
     /**
      * {@inheritDoc}
      * <p>
-     * Resolves the property and always returns {@code null} unless the provided
-     * context contains a Boolean object with value {@code Boolean.TRUE} as the
-     * value associated with the key
-     * {@code jakarta.servlet.jsp.el.NotFoundELResolver.class} in which case an
-     * exception is thrown. This is to support implementation of the
-     * {@code errorOnELNotFound} page/tag directive.
+     * Resolves the property and always returns {@code null} unless the provided context contains a Boolean object with
+     * value {@code Boolean.TRUE} as the value associated with the key
+     * {@code jakarta.servlet.jsp.el.NotFoundELResolver.class} in which case an exception is thrown. This is to support
+     * implementation of the {@code errorOnELNotFound} page/tag directive.
      *
      * @return Always {@code null}
      *
-     * @throws PropertyNotFoundException if the provided context contains a
-     *         Boolean object with value {@code Boolean.TRUE} as the value
-     *         associated with the key
-     *         {@code jakarta.servlet.jsp.el.NotFoundELResolver.class}
+     * @throws PropertyNotFoundException if the provided context contains a Boolean object with value
+     *                                       {@code Boolean.TRUE} as the value associated with the key
+     *                                       {@code jakarta.servlet.jsp.el.NotFoundELResolver.class}
      */
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
@@ -88,8 +85,7 @@ public class NotFoundELResolver extends ELResolver {
     /**
      * {@inheritDoc}
      * <p>
-     * No-op. In normal usage, {@link ScopedAttributeELResolver} will have
-     * responded.
+     * No-op. In normal usage, {@link ScopedAttributeELResolver} will have responded.
      */
     @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {

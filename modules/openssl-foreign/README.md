@@ -2,20 +2,13 @@
 
 ## This module is experimental
 
-It uses the JEP 442 API. More details on this API are available
-at `https://openjdk.java.net/jeps/442`.
+It uses the JEP 454 API. More details on this API are available
+at `https://openjdk.java.net/jeps/454`.
 
-## Building Java 21 with the JEP 442 API
+## Building
 
-Clone `https://github.com/openjdk/panama-foreign/` in some location and
-checkout the main branch. This is a Java 21 development JVM
-with the JEP 442 API. It may fail to build. When this happens, step back
-one commit at a time until it does.
-
-```
-bash configure
-make images
-```
+The module can be built using Java 22 preview 20+. It can be built and run
+with Apache Tomcat 9.0 or newer.
 
 ## Running
 
@@ -53,14 +46,14 @@ Example connector:
 Run Tomcat using the additional Java options that allow access to the API and
 native code:
 ```
-export JAVA_OPTS="--enable-preview --enable-native-access=ALL-UNNAMED"
+export JAVA_OPTS="--enable-native-access=ALL-UNNAMED"
 ```
 
 ## Generating the OpenSSL API code using jextract (optional)
 
 jextract is now available in its own standalone repository. Clone
 `https://github.com/openjdk/jextract` in some location and
-checkout the branch that supports Java 21. Please refer to the
+checkout the branch that supports Java 22. Please refer to the
 instructions from the repository for building. It should be the
 `panama` branch.
 

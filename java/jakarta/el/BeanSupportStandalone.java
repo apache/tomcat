@@ -49,7 +49,7 @@ class BeanSupportStandalone extends BeanSupport {
 
 
     private static PropertyDescriptor[] getPropertyDescriptors(Class<?> type) {
-        Map<String, PropertyDescriptor> pds = new HashMap<>();
+        Map<String,PropertyDescriptor> pds = new HashMap<>();
         Method[] methods = type.getMethods();
         for (Method method : methods) {
             if (!Modifier.isStatic(method.getModifiers())) {

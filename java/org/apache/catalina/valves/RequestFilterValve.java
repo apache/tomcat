@@ -331,7 +331,7 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         if (!allowValid || !denyValid) {
             throw new LifecycleException(sm.getString("requestFilterValve.configInvalid"));
         }

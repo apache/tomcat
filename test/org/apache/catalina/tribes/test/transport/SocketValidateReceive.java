@@ -52,7 +52,7 @@ public class SocketValidateReceive {
                 public void run() {
                     while ( true ) {
                         try {
-                            Thread.sleep(1000);
+                            sleep(1000);
                             printStats(start, mb, count, df, total);
                         }catch ( Exception x ) { /* Ignore */ }
                     }
@@ -89,8 +89,8 @@ public class SocketValidateReceive {
         long time = System.currentTimeMillis();
         double seconds = ((double)(time-start))/1000;
         System.out.println("Throughput " + df.format(mb/seconds) +
-                " MB/seconds messages " + count + ", total " + mb +
-                " MB, total " + total + " bytes.");
+                " MiB/s messages " + count + ", total " + mb +
+                " MiB total " + total + " bytes.");
     }
 
     public static class MyDataReader {

@@ -39,7 +39,6 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
 
     // Defaults (defined by the specification)
     static final int DEFAULT_HEADER_TABLE_SIZE = Hpack.DEFAULT_TABLE_SIZE;
-    static final boolean DEFAULT_ENABLE_PUSH = true;
     static final long DEFAULT_MAX_CONCURRENT_STREAMS = UNLIMITED;
     static final int DEFAULT_INITIAL_WINDOW_SIZE = (1 << 16) - 1;
     static final int DEFAULT_MAX_FRAME_SIZE = MIN_MAX_FRAME_SIZE;
@@ -48,15 +47,15 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
     // Defaults (defined by Tomcat)
     static final long DEFAULT_NO_RFC7540_PRIORITIES = 1;
 
-    Map<Setting, Long> current = new ConcurrentHashMap<>();
-    Map<Setting, Long> pending = new ConcurrentHashMap<>();
+    Map<Setting,Long> current = new ConcurrentHashMap<>();
+    Map<Setting,Long> pending = new ConcurrentHashMap<>();
 
 
     ConnectionSettingsBase(String connectionId) {
         this.connectionId = connectionId;
         // Set up the defaults
         current.put(Setting.HEADER_TABLE_SIZE, Long.valueOf(DEFAULT_HEADER_TABLE_SIZE));
-        current.put(Setting.ENABLE_PUSH, Long.valueOf(DEFAULT_ENABLE_PUSH ? 1 : 0));
+        current.put(Setting.ENABLE_PUSH, Long.valueOf(0));
         current.put(Setting.MAX_CONCURRENT_STREAMS, Long.valueOf(DEFAULT_MAX_CONCURRENT_STREAMS));
         current.put(Setting.INITIAL_WINDOW_SIZE, Long.valueOf(DEFAULT_INITIAL_WINDOW_SIZE));
         current.put(Setting.MAX_FRAME_SIZE, Long.valueOf(DEFAULT_MAX_FRAME_SIZE));
@@ -66,8 +65,8 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
 
 
     final void set(Setting setting, long value) throws T {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("connectionSettings.debug", connectionId, getEndpointName(), setting,
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("connectionSettings.debug", connectionId, getEndpointName(), setting,
                     Long.toString(value)));
         }
 
@@ -210,9 +209,9 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
 
     private void validateMaxFrameSize(long maxFrameSize) throws T {
         if (maxFrameSize < MIN_MAX_FRAME_SIZE || maxFrameSize > MAX_MAX_FRAME_SIZE) {
-            String msg = sm.getString("connectionSettings.maxFrameSizeInvalid", connectionId,
-                    Long.toString(maxFrameSize), Integer.toString(MIN_MAX_FRAME_SIZE),
-                    Integer.toString(MAX_MAX_FRAME_SIZE));
+            String msg =
+                    sm.getString("connectionSettings.maxFrameSizeInvalid", connectionId, Long.toString(maxFrameSize),
+                            Integer.toString(MIN_MAX_FRAME_SIZE), Integer.toString(MAX_MAX_FRAME_SIZE));
             throwException(msg, Http2Error.PROTOCOL_ERROR);
         }
     }

@@ -37,7 +37,7 @@
 <section name="Introduction">
 
 <p>Tomcat <version-major-minor/> uses the Jasper 2 JSP Engine to implement
-the <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">JavaServer Pages 2.3</a>
+the <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Jakarta Pages 4.0</a>
 specification.</p>
 
 <p>Jasper 2 has been redesigned to significantly improve performance over
@@ -106,10 +106,10 @@ set then <code>setenv.[sh|bat]</code> should be used to add
 to the <code>CLASSPATH</code> environment variable.</li>
 
 <li><strong>compilerSourceVM</strong> - What JDK version are the source files
-compatible with? (Default value: <code>11</code>)</li>
+compatible with? (Default value: <code>17</code>)</li>
 
 <li><strong>compilerTargetVM</strong> - What JDK version are the generated files
-compatible with? (Default value: <code>11</code>)</li>
+compatible with? (Default value: <code>17</code>)</li>
 
 <li><strong>development</strong> - Is Jasper used in development mode? If true,
 the frequency at which JSPs are checked for modification may be specified via

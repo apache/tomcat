@@ -42,7 +42,6 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http2.Http2TestBase;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
-import org.apache.tomcat.util.compat.JreCompat;
 
 /*
  * Split into multiple tests as a single test takes so long it impacts the time
@@ -198,7 +197,7 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        StandardContext ctxt = (StandardContext) tomcat.addContext("", null);
+        StandardContext ctxt = (StandardContext) getProgrammaticRootContext();
 
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
@@ -244,13 +243,12 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
             boolean resetBufferSize = false;
 
             if (Boolean.parseBoolean(getServletConfig().getInitParameter(LEGACY_DO_HEAD)) &&
-                    JreCompat.isJre19Available() && "HEAD".equals(req.getMethod()) && useWriter &&
-                    resetType != ResetType.NONE) {
+                    "HEAD".equals(req.getMethod()) && useWriter && resetType != ResetType.NONE) {
                 /*
-                 * Using legacy HEAD handling with a Writer on Java 19+.
+                 * Using legacy HEAD handling with a Writer.
+                 *
                  * HttpServlet wraps the response. The test is sensitive to
-                 * buffer sizes. The size of the buffer HttpServlet uses varies
-                 * with Java version. For the tests to pass the number of
+                 * buffer sizes. For the tests to pass the number of
                  * characters that can be written before the response is
                  * committed needs to be the same.
                  *
@@ -258,14 +256,8 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
                  * bytes. When a Writer is used, an additional 8192 byte buffer
                  * is used for char->byte.
                  *
-                 * With Java <19, the char->byte buffer used by HttpServlet
-                 * processing HEAD requests in legacy mode is created as a 8192
-                 * byte buffer which is consistent with the buffer Tomcat uses
-                 * internally.
-                 *
-                 * With Java 19+, the char->byte buffer used by HttpServlet
-                 * processing HEAD requests in legacy mode is created as a 512
-                 * byte buffer.
+                 * The char->byte buffer used by HttpServlet processing HEAD
+                 * requests in legacy mode is created as a 512 byte buffer.
                  *
                  * If the response isn't reset, none of this matters as it is
                  * just the size of the response buffer and the size of the
@@ -273,13 +265,12 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
                  * However, if the response is reset then things get interesting
                  * as the amount of response data that can be written before
                  * committing the response is the combination of the char->byte
-                 * buffer and the response buffer. Because the char->byte buffer
-                 * size in legacy mode varies with Java version, the size of the
-                 * response buffer needs to be adjusted to compensate so that
-                 * both GET and HEAD can write the same amount of data before
-                 * committing the response. To make matters worse, to obtain the
-                 * correct behaviour the response buffer size needs to be reset
-                 * back to 8192 after the reset.
+                 * buffer and the response buffer. The size of the response
+                 * buffer needs to be adjusted so that both GET and HEAD can
+                 * write the same amount of data before committing the response.
+                 * To make matters worse, to obtain the correct behaviour the
+                 * response buffer size needs to be reset back to 8192 after the
+                 * reset.
                  *
                  * This is why the legacy mode is problematic and the new
                  * approach of the container handling HEAD is better.
@@ -290,9 +281,7 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
                     adjustedBufferSize = originalBufferSize;
                 }
 
-                // Adjust for smaller initial char -> byte buffer in Java 19+
-                // originalBufferSize initial size in Java <19
-                // 512 initial size in Java 19+
+                // Adjust for smaller initial char -> byte buffer
                 adjustedBufferSize = adjustedBufferSize + originalBufferSize - 512;
 
                 resetBufferSize = true;

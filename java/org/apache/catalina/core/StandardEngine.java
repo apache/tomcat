@@ -29,7 +29,6 @@ import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
@@ -91,11 +90,6 @@ public class StandardEngine extends ContainerBase implements Engine {
 
     // ------------------------------------------------------------- Properties
 
-    /**
-     * Obtain the configured Realm and provide a default Realm implementation when no explicit configuration is set.
-     *
-     * @return configured realm, or a {@link NullRealm} by default
-     */
     @Override
     public Realm getRealm() {
         Realm configured = super.getRealm();
@@ -109,20 +103,12 @@ public class StandardEngine extends ContainerBase implements Engine {
     }
 
 
-    /**
-     * Return the default host.
-     */
     @Override
     public String getDefaultHost() {
         return defaultHost;
     }
 
 
-    /**
-     * Set the default host.
-     *
-     * @param host The new default host
-     */
     @Override
     public void setDefaultHost(String host) {
 
@@ -140,41 +126,24 @@ public class StandardEngine extends ContainerBase implements Engine {
     }
 
 
-    /**
-     * Set the cluster-wide unique identifier for this Engine. This value is only useful in a load-balancing scenario.
-     * <p>
-     * This property should not be changed once it is set.
-     */
     @Override
     public void setJvmRoute(String routeId) {
         jvmRouteId = routeId;
     }
 
 
-    /**
-     * Retrieve the cluster-wide unique identifier for this Engine. This value is only useful in a load-balancing
-     * scenario.
-     */
     @Override
     public String getJvmRoute() {
         return jvmRouteId;
     }
 
 
-    /**
-     * Return the <code>Service</code> with which we are associated (if any).
-     */
     @Override
     public Service getService() {
         return this.service;
     }
 
 
-    /**
-     * Set the <code>Service</code> with which we are associated (if any).
-     *
-     * @param service The service that owns this Engine
-     */
     @Override
     public void setService(Service service) {
         this.service = service;
@@ -184,9 +153,9 @@ public class StandardEngine extends ContainerBase implements Engine {
 
 
     /**
-     * Add a child Container, only if the proposed child is an implementation of Host.
-     *
-     * @param child Child container to be added
+     * {@inheritDoc}
+     * <p>
+     * The child must be an implementation of <code>Host</code>.
      */
     @Override
     public void addChild(Container child) {
@@ -222,15 +191,8 @@ public class StandardEngine extends ContainerBase implements Engine {
     }
 
 
-    /**
-     * Start this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         // Log our server identification information
         if (log.isInfoEnabled()) {
@@ -243,6 +205,8 @@ public class StandardEngine extends ContainerBase implements Engine {
 
 
     /**
+     * {@inheritDoc}
+     * <p>
      * Override the default implementation. If no access log is defined for the Engine, look for one in the Engine's
      * default host and then the default host's ROOT context. If still none is found, return the default NoOp access
      * log.
@@ -301,9 +265,6 @@ public class StandardEngine extends ContainerBase implements Engine {
     }
 
 
-    /**
-     * Return the parent class loader for this component.
-     */
     @Override
     public ClassLoader getParentClassLoader() {
         if (parentClassLoader != null) {
@@ -427,8 +388,7 @@ public class StandardEngine extends ContainerBase implements Engine {
             }
 
             String type = event.getType();
-            if (Lifecycle.AFTER_START_EVENT.equals(type) || Lifecycle.BEFORE_STOP_EVENT.equals(type) ||
-                    Lifecycle.BEFORE_DESTROY_EVENT.equals(type)) {
+            if (AFTER_START_EVENT.equals(type) || BEFORE_STOP_EVENT.equals(type) || BEFORE_DESTROY_EVENT.equals(type)) {
                 // Container is being started/stopped/removed
                 // Force re-calculation and disable listener since it won't
                 // be re-used
@@ -456,7 +416,7 @@ public class StandardEngine extends ContainerBase implements Engine {
             if (disabled) {
                 return;
             }
-            if (Container.ADD_CHILD_EVENT.equals(event.getType())) {
+            if (ADD_CHILD_EVENT.equals(event.getType())) {
                 Context context = (Context) event.getData();
                 if (context.getPath().isEmpty()) {
                     // Force re-calculation and disable listener since it won't

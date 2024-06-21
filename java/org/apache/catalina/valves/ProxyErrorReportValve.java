@@ -31,12 +31,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.util.IOTools;
 import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -209,10 +209,10 @@ public class ProxyErrorReportValve extends ErrorReportValve {
                 response.setContentLength(httpURLConnection.getContentLength());
                 OutputStream outputStream = response.getOutputStream();
                 InputStream inputStream = url.openStream();
-                IOUtils.copy(inputStream, outputStream);
-            } catch (URISyntaxException | IOException e) {
+                IOTools.flow(inputStream, outputStream);
+            } catch (URISyntaxException | IOException | IllegalArgumentException e) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Proxy error to " + urlString, e);
+                    log.debug(sm.getString("proxyErrorReportValve.error", urlString), e);
                 }
                 // Ignore
             } finally {

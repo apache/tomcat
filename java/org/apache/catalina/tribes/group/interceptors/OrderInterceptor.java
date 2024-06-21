@@ -31,39 +31,39 @@ import org.apache.catalina.tribes.util.StringManager;
 
 
 /**
- * The order interceptor guarantees that messages are received in the same order they were
- * sent.
- * This interceptor works best with the ack=true setting. <br>
- * There is no point in
- * using this with the replicationMode="fastasynchqueue" as this mode guarantees ordering.<BR>
- * If you are using the mode ack=false replicationMode=pooled, and have a lot of concurrent threads,
- * this interceptor can really slow you down, as many messages will be completely out of order
- * and the queue might become rather large. If this is the case, then you might want to set
- * the value OrderInterceptor.maxQueue = 25 (meaning that we will never keep more than 25 messages in our queue)
- * <br><b>Configuration Options</b><br>
- * OrderInterceptor.expire=&lt;milliseconds&gt; - if a message arrives out of order, how long before we act on it <b>default=3000ms</b><br>
- * OrderInterceptor.maxQueue=&lt;max queue size&gt; - how much can the queue grow to ensure ordering.
- *   This setting is useful to avoid OutOfMemoryErrors<b>default=Integer.MAX_VALUE</b><br>
- * OrderInterceptor.forwardExpired=&lt;boolean&gt; - this flag tells the interceptor what to
- * do when a message has expired or the queue has grown larger than the maxQueue value.
- * true means that the message is sent up the stack to the receiver that will receive and out of order message
- * false means, forget the message and reset the message counter. <b>default=true</b>
+ * The order interceptor guarantees that messages are received in the same order they were sent. This interceptor works
+ * best with the ack=true setting. <br>
+ * There is no point in using this with the replicationMode="fastasynchqueue" as this mode guarantees ordering.<BR>
+ * If you are using the mode ack=false replicationMode=pooled, and have a lot of concurrent threads, this interceptor
+ * can really slow you down, as many messages will be completely out of order and the queue might become rather large.
+ * If this is the case, then you might want to set the value OrderInterceptor.maxQueue = 25 (meaning that we will never
+ * keep more than 25 messages in our queue) <br>
+ * <b>Configuration Options</b><br>
+ * OrderInterceptor.expire=&lt;milliseconds&gt; - if a message arrives out of order, how long before we act on it
+ * <b>default=3000ms</b><br>
+ * OrderInterceptor.maxQueue=&lt;max queue size&gt; - how much can the queue grow to ensure ordering. This setting is
+ * useful to avoid OutOfMemoryErrors<b>default=Integer.MAX_VALUE</b><br>
+ * OrderInterceptor.forwardExpired=&lt;boolean&gt; - this flag tells the interceptor what to do when a message has
+ * expired or the queue has grown larger than the maxQueue value. true means that the message is sent up the stack to
+ * the receiver that will receive and out of order message false means, forget the message and reset the message
+ * counter. <b>default=true</b>
  */
 public class OrderInterceptor extends ChannelInterceptorBase {
     protected static final StringManager sm = StringManager.getManager(OrderInterceptor.class);
-    private final Map<Member, Counter> outcounter = new HashMap<>();
-    private final Map<Member, Counter> incounter = new HashMap<>();
-    private final Map<Member, MessageOrder> incoming = new HashMap<>();
+    private final Map<Member,Counter> outcounter = new HashMap<>();
+    private final Map<Member,Counter> incounter = new HashMap<>();
+    private final Map<Member,MessageOrder> incoming = new HashMap<>();
     private long expire = 3000;
     private boolean forwardExpired = true;
     private int maxQueue = Integer.MAX_VALUE;
 
     final ReentrantReadWriteLock inLock = new ReentrantReadWriteLock(true);
-    final ReentrantReadWriteLock outLock= new ReentrantReadWriteLock(true);
+    final ReentrantReadWriteLock outLock = new ReentrantReadWriteLock(true);
 
     @Override
-    public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
-        if ( !okToProcess(msg.getOptions()) ) {
+    public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload)
+            throws ChannelException {
+        if (!okToProcess(msg.getOptions())) {
             super.sendMessage(destination, msg, payload);
             return;
         }
@@ -77,10 +77,10 @@ public class OrderInterceptor extends ChannelInterceptorBase {
                 } finally {
                     outLock.writeLock().unlock();
                 }
-                //reduce byte copy
+                // reduce byte copy
                 msg.getMessage().append(nr);
                 try {
-                    getNext().sendMessage(new Member[]{member}, msg, payload);
+                    getNext().sendMessage(new Member[] { member }, msg, payload);
                 } finally {
                     msg.getMessage().trim(4);
                 }
@@ -90,42 +90,45 @@ public class OrderInterceptor extends ChannelInterceptorBase {
                 }
                 cx.addFaultyMember(x.getFaultyMembers());
             }
-        }//for
-        if ( cx != null ) {
+        } // for
+        if (cx != null) {
             throw cx;
         }
     }
 
     @Override
     public void messageReceived(ChannelMessage msg) {
-        if ( !okToProcess(msg.getOptions()) ) {
+        if (!okToProcess(msg.getOptions())) {
             super.messageReceived(msg);
             return;
         }
-        int msgnr = XByteBuffer.toInt(msg.getMessage().getBytesDirect(),msg.getMessage().getLength()-4);
+        int msgnr = XByteBuffer.toInt(msg.getMessage().getBytesDirect(), msg.getMessage().getLength() - 4);
         msg.getMessage().trim(4);
-        MessageOrder order = new MessageOrder(msgnr,(ChannelMessage)msg.deepclone());
+        MessageOrder order = new MessageOrder(msgnr, (ChannelMessage) msg.deepclone());
         inLock.writeLock().lock();
         try {
-            if ( processIncoming(order) ) {
-                processLeftOvers(msg.getAddress(),false);
+            if (processIncoming(order)) {
+                processLeftOvers(msg.getAddress(), false);
             }
         } finally {
             inLock.writeLock().unlock();
         }
     }
+
     protected void processLeftOvers(Member member, boolean force) {
         MessageOrder tmp = incoming.get(member);
-        if ( force ) {
+        if (force) {
             Counter cnt = getInCounter(member);
             cnt.setCounter(Integer.MAX_VALUE);
         }
-        if ( tmp!= null ) {
+        if (tmp != null) {
             processIncoming(tmp);
         }
     }
+
     /**
      * @param order MessageOrder
+     *
      * @return boolean - true if a message expired and was processed
      */
     protected boolean processIncoming(MessageOrder order) {
@@ -134,16 +137,16 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         Counter cnt = getInCounter(member);
 
         MessageOrder tmp = incoming.get(member);
-        if ( tmp != null ) {
-            order = MessageOrder.add(tmp,order);
+        if (tmp != null) {
+            order = MessageOrder.add(tmp, order);
         }
 
 
-        while ( (order!=null) && (order.getMsgNr() <= cnt.getCounter())  ) {
-            //we are right on target. process orders
-            if ( order.getMsgNr() == cnt.getCounter() ) {
+        while ((order != null) && (order.getMsgNr() <= cnt.getCounter())) {
+            // we are right on target. process orders
+            if (order.getMsgNr() == cnt.getCounter()) {
                 cnt.inc();
-            } else if ( order.getMsgNr() > cnt.getCounter() ) {
+            } else if (order.getMsgNr() > cnt.getCounter()) {
                 cnt.setCounter(order.getMsgNr());
             }
             super.messageReceived(order.getMessage());
@@ -153,22 +156,22 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         MessageOrder head = order;
         MessageOrder prev = null;
         tmp = order;
-        //flag to empty out the queue when it larger than maxQueue
-        boolean empty = order!=null?order.getCount()>=maxQueue:false;
-        while ( tmp != null ) {
-            //process expired messages or empty out the queue
-            if ( tmp.isExpired(expire) || empty ) {
-                //reset the head
-                if ( tmp == head ) {
+        // flag to empty out the queue when it larger than maxQueue
+        boolean empty = order != null ? order.getCount() >= maxQueue : false;
+        while (tmp != null) {
+            // process expired messages or empty out the queue
+            if (tmp.isExpired(expire) || empty) {
+                // reset the head
+                if (tmp == head) {
                     head = tmp.next;
                 }
-                cnt.setCounter(tmp.getMsgNr()+1);
-                if ( getForwardExpired() ) {
+                cnt.setCounter(tmp.getMsgNr() + 1);
+                if (getForwardExpired()) {
                     super.messageReceived(tmp.getMessage());
                 }
                 tmp.setMessage(null);
                 tmp = tmp.next;
-                if ( prev != null ) {
+                if (prev != null) {
                     prev.next = tmp;
                 }
                 result = true;
@@ -177,7 +180,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
                 tmp = tmp.next;
             }
         }
-        if ( head == null ) {
+        if (head == null) {
             incoming.remove(member);
         } else {
             incoming.put(member, head);
@@ -187,18 +190,18 @@ public class OrderInterceptor extends ChannelInterceptorBase {
 
     @Override
     public void memberAdded(Member member) {
-        //notify upwards
+        // notify upwards
         super.memberAdded(member);
     }
 
     @Override
     public void memberDisappeared(Member member) {
-        //reset counters - lock free
+        // reset counters - lock free
         incounter.remove(member);
         outcounter.remove(member);
-        //clear the remaining queue
-        processLeftOvers(member,true);
-        //notify upwards
+        // clear the remaining queue
+        processLeftOvers(member, true);
+        // notify upwards
         super.memberDisappeared(member);
     }
 
@@ -209,19 +212,19 @@ public class OrderInterceptor extends ChannelInterceptorBase {
 
     protected Counter getInCounter(Member mbr) {
         Counter cnt = incounter.get(mbr);
-        if ( cnt == null ) {
+        if (cnt == null) {
             cnt = new Counter();
-            cnt.inc(); //always start at 1 for incoming
-            incounter.put(mbr,cnt);
+            cnt.inc(); // always start at 1 for incoming
+            incounter.put(mbr, cnt);
         }
         return cnt;
     }
 
     protected Counter getOutCounter(Member mbr) {
         Counter cnt = outcounter.get(mbr);
-        if ( cnt == null ) {
+        if (cnt == null) {
             cnt = new Counter();
-            outcounter.put(mbr,cnt);
+            outcounter.put(mbr, cnt);
         }
         return cnt;
     }
@@ -247,13 +250,14 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         private MessageOrder next;
         private final int msgNr;
         private ChannelMessage msg = null;
-        public MessageOrder(int msgNr,ChannelMessage msg) {
+
+        public MessageOrder(int msgNr, ChannelMessage msg) {
             this.msgNr = msgNr;
             this.msg = msg;
         }
 
         public boolean isExpired(long expireTime) {
-            return (System.currentTimeMillis()-received) > expireTime;
+            return (System.currentTimeMillis() - received) > expireTime;
         }
 
         public ChannelMessage getMessage() {
@@ -267,6 +271,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         public void setNext(MessageOrder order) {
             this.next = order;
         }
+
         public MessageOrder getNext() {
             return next;
         }
@@ -274,7 +279,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         public int getCount() {
             int counter = 1;
             MessageOrder tmp = next;
-            while ( tmp != null ) {
+            while (tmp != null) {
                 counter++;
                 tmp = tmp.next;
             }
@@ -283,33 +288,33 @@ public class OrderInterceptor extends ChannelInterceptorBase {
 
         @SuppressWarnings("null") // prev cannot be null
         public static MessageOrder add(MessageOrder head, MessageOrder add) {
-            if ( head == null ) {
+            if (head == null) {
                 return add;
             }
-            if ( add == null ) {
+            if (add == null) {
                 return head;
             }
-            if ( head == add ) {
+            if (head == add) {
                 return add;
             }
 
-            if ( head.getMsgNr() > add.getMsgNr() ) {
+            if (head.getMsgNr() > add.getMsgNr()) {
                 add.next = head;
                 return add;
             }
 
             MessageOrder iter = head;
             MessageOrder prev = null;
-            while ( iter.getMsgNr() < add.getMsgNr() && (iter.next !=null ) ) {
+            while (iter.getMsgNr() < add.getMsgNr() && (iter.next != null)) {
                 prev = iter;
                 iter = iter.next;
             }
-            if ( iter.getMsgNr() < add.getMsgNr() ) {
-                //add after
+            if (iter.getMsgNr() < add.getMsgNr()) {
+                // add after
                 add.next = iter.next;
                 iter.next = add;
             } else if (iter.getMsgNr() > add.getMsgNr()) {
-                //add before
+                // add before
                 prev.next = add; // prev cannot be null here, warning suppressed
                 add.next = iter;
 

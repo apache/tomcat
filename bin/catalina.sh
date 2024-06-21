@@ -292,6 +292,7 @@ JAVA_OPTS="$JAVA_OPTS --add-opens=java.base/java.io=ALL-UNNAMED"
 JAVA_OPTS="$JAVA_OPTS --add-opens=java.base/java.util=ALL-UNNAMED"
 JAVA_OPTS="$JAVA_OPTS --add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
 JAVA_OPTS="$JAVA_OPTS --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"
+JAVA_OPTS="$JAVA_OPTS --enable-native-access=ALL-UNNAMED"
 
 # ----- Execute The Requested Command -----------------------------------------
 

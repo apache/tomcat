@@ -148,20 +148,17 @@
       files) obtained from the query string and, for POST requests, the request
       body if the content type is
       <code>application/x-www-form-urlencoded</code> or
-      <code>multipart/form-data</code>. Request parameters beyond this limit
-      will be ignored. A value of less than 0 means no limit. If not specified,
-      a default of 1000 is used. Note that <code>FailedRequestFilter</code>
-      <a href="filter.html">filter</a> can be used to reject requests that
-      exceed the limit.</p>
+      <code>multipart/form-data</code>. Requests that exceed this limit will be
+      rejected. A value of less than 0 means no limit. If not specified, a
+      default of 1000 is used.</p>
     </attribute>
 
     <attribute name="maxPostSize" required="false">
       <p>The maximum size in bytes of the POST which will be handled by
       the container FORM URL parameter parsing. The limit can be disabled by
-      setting this attribute to a value less than zero. If not specified, this
-      attribute is set to 2097152 (2 megabytes). Note that the
-      <a href="filter.html#Failed_Request_Filter"><code>FailedRequestFilter</code></a>
-      can be used to reject requests that exceed this limit.</p>
+      setting this attribute to a value less than zero. Requests that exceed
+      this limit will be rejected. If not specified, this attribute is set to
+      2097152 (2 MiB).</p>
     </attribute>
 
     <attribute name="maxSavePostSize" required="false">
@@ -339,13 +336,6 @@
       with either <code>0.0.0.0</code> or <code>::</code>.</p>
     </attribute>
 
-    <attribute name="allowHostHeaderMismatch" required="false">
-      <p>By default Tomcat will reject requests that specify a host in the
-      request line but specify a different host in the host header. This
-      check can be disabled by setting this attribute to <code>true</code>. If
-      not specified, the default is <code>false</code>.</p>
-    </attribute>
-
     <attribute name="allowedTrailerHeaders" required="false">
       <p>By default Tomcat will ignore all trailer headers when processing
       chunked input. For a header to be processed, it must be added to this
@@ -391,7 +381,7 @@
       your bandwidth) and using the sendfile feature (saving your CPU cycles).
       If the connector supports the sendfile feature, e.g. the NIO connector,
       using sendfile will take precedence over compression. The symptoms will
-      be that static files greater that 48 Kb will be sent uncompressed.
+      be that static files greater that 48 KiB will be sent uncompressed.
       You can turn off sendfile by setting <code>useSendfile</code> attribute
       of the connector, as documented below, or change the sendfile usage
       threshold in the configuration of the
@@ -518,7 +508,7 @@
       <p>Provides the default value for
       <strong>maxHttpRequestHeaderSize</strong> and
       <strong>maxHttpResponseHeaderSize</strong>. If not specified, this
-      attribute is set to 8192 (8 KB).</p>
+      attribute is set to 8192 (8 KiB).</p>
     </attribute>
 
     <attribute name="maxHttpRequestHeaderSize" required="false">
@@ -553,13 +543,19 @@
       If not specified, this attribute is set to 100.</p>
     </attribute>
 
+    <attribute name="maxQueueSize" required="false">
+      <p>(int) The maximum number of runnable tasks that can queue up awaiting
+      execution before they are rejected. The default value is
+      <code>Integer.MAX_VALUE</code></p>
+    </attribute>
+
     <attribute name="maxSwallowSize" required="false">
       <p>The maximum number of request body bytes (excluding transfer encoding
       overhead) that will be swallowed by Tomcat for an aborted upload. An
       aborted upload is when Tomcat knows that the request body is going to be
       ignored but the client still sends it. If Tomcat does not swallow the body
       the client is unlikely to see the response. If not specified the default
-      of 2097152 (2 megabytes) will be used. A value of less than zero indicates
+      of 2097152 (2 MiB) will be used. A value of less than zero indicates
       that no limit should be enforced.</p>
     </attribute>
 
@@ -605,19 +601,16 @@
     <attribute name="processorCache" required="false">
       <p>The protocol handler caches Processor objects to speed up performance.
       This setting dictates how many of these objects get cached.
-      <code>-1</code> means unlimited, default is <code>200</code>. If not using
-      Servlet 3.0 asynchronous processing, a good default is to use the same as
-      the maxThreads setting. If using Servlet 3.0 asynchronous processing, a
-      good default is to use the larger of maxThreads and the maximum number of
-      expected concurrent requests (synchronous and asynchronous).</p>
-    </attribute>
-
-    <attribute name="rejectIllegalHeader" required="false">
-      <p>If an HTTP request is received that contains an illegal header name or
-      value (e.g. the header name is not a token) this setting determines if the
-      request will be rejected with a 400 response (<code>true</code>) or if the
-      illegal header be ignored (<code>false</code>). The default value is
-      <code>true</code> which will cause the request to be rejected.</p>
+      <code>-1</code> means unlimited, default is <code>200</code>.
+      <code>0</code> means no request processor reuse. This has a very
+      significant impact on performance and garbage collection depending on
+      the workload, but provides additional security guarantees by avoiding
+      reuse of all request processing objects.
+      If not using Servlet 3.0 asynchronous processing, an appropriate value
+      is to use the same as the maxThreads setting. If using Servlet 3.0
+      asynchronous processing, an appropriate value is to use the larger
+      of maxThreads and the maximum number of expected concurrent requests
+      (synchronous and asynchronous).</p>
     </attribute>
 
     <attribute name="relaxedPathChars" required="false">
@@ -700,6 +693,19 @@
       <code>-1</code> to make clear that it is not used.</p>
     </attribute>
 
+    <attribute name="threadsMaxIdleTime" required="false">
+      <p>The amount of time in milliseconds that threads will be kept alive by
+      the thread pool, if there are more than <code>minSpareThreads</code>
+      threads in the executor. If not specified, the default of
+      <code>60000</code> milliseconds is used. If an executor is associated
+      with this connector, this attribute
+      is ignored as the connector will execute tasks using the executor rather
+      than an internal thread pool. Note that if an executor is configured any
+      value set for this attribute will be recorded correctly but it will be
+      reported (e.g. via JMX) as <code>-1</code> to make clear that it is not
+      used.</p>
+    </attribute>
+
     <attribute name="throwOnFailure" required="false">
       <p>If the Connector experiences an Exception during a Lifecycle transition
       should the Exception be rethrown or logged? If not specified, the default
@@ -718,6 +724,13 @@
       <code>Keep-Alive</code> HTTP response header as described in
       <a href="https://tools.ietf.org/html/draft-thomson-hybi-http-timeout-03">this
       Internet-Draft</a>. The default value is <code>true</code>.</p>
+    </attribute>
+
+    <attribute name="useVirtualThreads" required="false">
+      <p>(bool) Use this attribute to enable or disable usage of virtual threads
+      with the internal executor. If an executor is associated with this
+      connector, this attribute is ignored. The default value is
+      <code>false</code>.</p>
     </attribute>
 
   </attributes>
@@ -796,8 +809,11 @@
         be used for all three.</p>
       </attribute>
       <attribute name="socket.unlockTimeout" required="false">
-        <p>(int) The timeout for a socket unlock. When a connector is stopped, it will try to release the acceptor thread by opening a connector to itself.
-           The default value is <code>250</code> and the value is in milliseconds</p>
+        <p>(int) The timeout for a socket unlock. When a connector is stopped,
+        it will try to release the acceptor thread by opening a connector to
+        itself. The default value is <code>250</code> and the value is in
+        milliseconds. This vaoue must be positive. Negative or zero values will
+        be ignored.</p>
       </attribute>
     </attributes>
   </subsection>
@@ -1019,7 +1035,7 @@
       <attribute name="socket.processorCache" required="false">
         <p>(int)Tomcat will cache SocketProcessor objects to reduce garbage
         collection. The integer value specifies how many objects to keep in the
-        cache at most. The default is <code>500</code>. Other values are
+        cache at most. The default is <code>0</code>. Other values are
         <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
       </attribute>
 
@@ -1077,7 +1093,7 @@
 
   <subsection name="HTTP/2 Support">
 
-  <p>HTTP/2 is support is provided for TLS (h2), non-TLS via HTTP upgrade (h2c)
+  <p>HTTP/2 support is provided for TLS (h2), non-TLS via HTTP upgrade (h2c)
      and direct HTTP/2 (h2c) connections. To enable HTTP/2 support for an HTTP
      connector the following <strong>UpgradeProtocol</strong> element must be
      nested within the <strong>Connector</strong> with a
@@ -1209,7 +1225,8 @@
       <code>optionalNoCA</code> if you want client certificates to be optional
       and you don't want Tomcat to check them against the list of trusted CAs.
       If the TLS provider doesn't support this option (OpenSSL does, JSSE does
-      not) it is treated as if <code>optional</code> was specified. A
+      not) it is treated as if <code>optional</code> was specified. If
+      <code>optionalNoCA</code> is configured then OCSP will also be disabled.
       <code>none</code> value (which is the default) will not require a
       certificate chain unless the client requests a resource protected by a
       security constraint that uses <code>CLIENT-CERT</code> authentication.</p>
@@ -1238,11 +1255,19 @@
       documentation for the list of ciphers supported and the syntax).
       Alternatively, a comma separated list of ciphers using the standard
       OpenSSL cipher names or the standard JSSE cipher names may be used.</p>
-      <p>When converting from OpenSSL syntax to JSSE ciphers for JSSE based
-      connectors, the behaviour of the OpenSSL syntax parsing is kept aligned
-      with the behaviour of the OpenSSL 1.1.0 development branch.</p>
+      <p>Different versions of OpenSSL may interpret the same cipher string
+      differently. For example, the <code>CCM8</code> ciphers were moved from
+      <code>HIGH</code> to <code>MEDIUM</code> in OpenSSL 3.2. Regardless of
+      the OpenSSL or JSSE version used, Tomcat converts the provided cipher
+      value to a list of ciphers in a manner consistent with the latest OpenSSL
+      development branch. This list of ciphers is then passed to the SSL
+      implementation.</p>
       <p>Only the ciphers that are supported by the SSL implementation will be
-      used.</p>
+      used. Any ciphers in the list derived from a non-default cipher string
+      that are not supported by the SSL implementation will be logged in a
+      <code>WARNING</code> message when the Connector starts. The warning can be
+      avoided by providing an explicit list of ciphers that are supported by the
+      configured SSL implementation.</p>
       <p>If not specified, a default (using the OpenSSL notation) of
       <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA</code> will be
       used.</p>
@@ -1480,7 +1505,18 @@
       certificate from the specified file.</p>
       <p>If not specified, the default behaviour for JSSE is to use the
       <strong>certificateKeystorePassword</strong>. For OpenSSL the default
-      behaviour is not to use a password.</p>
+      behaviour is not to use a password, but OpenSSL will prompt for one,
+      if required.</p>
+    </attribute>
+
+    <attribute name="certificateKeyPasswordFile" required="false">
+      <p>The password file used to access the private key associated with the server
+      certificate from the specified file. This attribute takes precedence over
+      <strong>certificateKeyPassword</strong>.</p>
+      <p>If not specified, the default behaviour for JSSE is to use the
+      <strong>certificateKeystorePasswordFile</strong>. For OpenSSL the default
+      behaviour is not to use a password (file), but OpenSSL will prompt for one,
+      if required.</p>
     </attribute>
 
     <attribute name="certificateKeystoreFile" required="false">
@@ -1504,6 +1540,13 @@
       <p>The password to use to access the keystore containing the server&apos;s
       private key and certificate. If not specified, a default of
       <code>changeit</code> will be used.</p>
+    </attribute>
+
+    <attribute name="certificateKeystorePasswordFile" required="false">
+      <p>JSSE only.</p>
+      <p>The password file to use to access the keystore containing the server&apos;s
+      private key and certificate. This attribute takes precedence over
+      <strong>certificateKeystorePassword</strong>.</p>
     </attribute>
 
     <attribute name="certificateKeystoreProvider" required="false">
@@ -1549,6 +1592,10 @@
   implementation depending on the processor being used,
   and can be complemented with many commercial accelerator components.</p>
 
+  <p>When OpenSSL FFM support is enabled, the connectors will default to using
+  OpenSSL through JSSE, which is equivalent but uses the Java FFM API from
+  Java 22 to access OpenSSL.</p>
+
   <p>The following NIO and NIO2 SSL configuration attributes are not specific to
   a virtual host and, therefore, must be configured on the connector.</p>
 
@@ -1578,6 +1625,9 @@
       will automatically enable it and the default value of this attribute
       becomes
       <code>org.apache.tomcat.util.net.openssl.OpenSSLImplementation</code>.
+      The FFM API from Java 22 may also be used to enable OpenSSL support, in
+      which case the default value of the attribute becomes
+      <code>org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation</code>.
       In that case, the attributes from either JSSE and OpenSSL
       configuration styles can be used, as long as the two types are not mixed
       (for example, it is not allowed to define use of a Java keystore and

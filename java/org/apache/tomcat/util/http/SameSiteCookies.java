@@ -53,7 +53,7 @@ public enum SameSiteCookies {
     }
 
     public static SameSiteCookies fromString(String value) {
-        for (SameSiteCookies sameSiteCookies : SameSiteCookies.values()) {
+        for (SameSiteCookies sameSiteCookies : values()) {
             if (sameSiteCookies.getValue().equalsIgnoreCase(value)) {
                 return sameSiteCookies;
             }

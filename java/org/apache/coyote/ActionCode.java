@@ -26,8 +26,20 @@ package org.apache.coyote;
  * @author Remy Maucherat
  */
 public enum ActionCode {
+
+    /**
+     * Acknowledge request, most often used for HTTP expectations.
+     */
     ACK,
+
+    /**
+     * Regular close.
+     */
     CLOSE,
+
+    /**
+     * Response commit, which means any initial bytes part of the response are going to be sent.
+     */
     COMMIT,
 
     /**
@@ -231,16 +243,6 @@ public enum ActionCode {
      * processing wasn't triggered by a read or write event on the socket.
      */
     DISPATCH_EXECUTE,
-
-    /**
-     * Is server push supported and allowed for the current request?
-     */
-    IS_PUSH_SUPPORTED,
-
-    /**
-     * Push a request on behalf of the client of the current request.
-     */
-    PUSH_REQUEST,
 
     /**
      * Are the request trailer fields ready to be read? Note that this returns true if it is known that request trailer

@@ -21,12 +21,7 @@ Notes of things to consider for the next major Tomcat release (11.x)
     Useful reference:
     https://stackoverflow.com/questions/5161504/ocsp-revocation-on-client-certificate
 
- 2. Integrate Panama OpenSSL module once Java 21 is available. Building Tomcat
-    releases would then require at least Java 21.
+ 2. Add QUIC support using OpenSSL and FFM.
 
- 3. Add QUIC support using OpenSSL and Panama.
-
- 4. Update minimum Java version to 21.
-
- 5. Implement an optional Loom module that provides
+ 3. Implement an optional Loom module that provides
     o.a.c.http11.Http11BioLoomProtocol

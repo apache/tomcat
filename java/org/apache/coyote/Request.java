@@ -17,6 +17,7 @@
 package org.apache.coyote;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.http.ServerCookies;
+import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -108,7 +110,7 @@ public final class Request {
     private final MessageBytes localAddrMB = MessageBytes.newInstance();
 
     private final MimeHeaders headers = new MimeHeaders();
-    private final Map<String, String> trailerFields = new HashMap<>();
+    private final MimeHeaders trailerFields = new MimeHeaders();
 
     /**
      * Path parameters
@@ -291,6 +293,11 @@ public final class Request {
 
 
     public Map<String, String> getTrailerFields() {
+        return trailerFields.toMap();
+    }
+
+
+    public MimeHeaders getMimeTrailerFields() {
         return trailerFields;
     }
 
@@ -474,10 +481,10 @@ public final class Request {
 
     public String getContentType() {
         contentType();
-        if ((contentTypeMB == null) || contentTypeMB.isNull()) {
+        if (contentTypeMB == null || contentTypeMB.isNull()) {
             return null;
         }
-        return contentTypeMB.toString();
+        return contentTypeMB.toStringType();
     }
 
 
@@ -734,12 +741,14 @@ public final class Request {
         threadId = 0;
     }
 
+    @SuppressWarnings("deprecation")
     public void setRequestThread() {
         Thread t = Thread.currentThread();
         threadId = t.getId();
         getRequestProcessor().setWorkerThreadName(t.getName());
     }
 
+    @SuppressWarnings("deprecation")
     public boolean isRequestThread() {
         return Thread.currentThread().getId() == threadId;
     }
@@ -778,7 +787,13 @@ public final class Request {
         charsetHolder = CharsetHolder.EMPTY;
         expectation = false;
         headers.recycle();
-        trailerFields.clear();
+        trailerFields.recycle();
+        /*
+         *  Trailer fields are limited in size by bytes. The following call ensures that any request with a large number
+         *  of small trailer fields doesn't result in a long lasting, large array of headers inside the MimeHeader
+         *  instance.
+         */
+        trailerFields.setLimit(MimeHeaders.DEFAULT_HEADER_SIZE);
         serverNameMB.recycle();
         serverPort = -1;
         localAddrMB.recycle();
@@ -843,7 +858,7 @@ public final class Request {
     }
 
     public boolean isProcessing() {
-        return reqProcessorMX.getStage() == org.apache.coyote.Constants.STAGE_SERVICE;
+        return reqProcessorMX.getStage() == Constants.STAGE_SERVICE;
     }
 
     /**
@@ -857,20 +872,17 @@ public final class Request {
         if (contentType == null) {
             return null;
         }
-        int start = contentType.indexOf("charset=");
-        if (start < 0) {
-            return null;
+
+        MediaType mediaType = null;
+        try {
+            mediaType = MediaType.parseMediaType(new StringReader(contentType));
+        } catch (IOException e) {
+            // Ignore - null test below handles this
         }
-        String encoding = contentType.substring(start + 8);
-        int end = encoding.indexOf(';');
-        if (end >= 0) {
-            encoding = encoding.substring(0, end);
-        }
-        encoding = encoding.trim();
-        if ((encoding.length() > 2) && (encoding.startsWith("\"")) && (encoding.endsWith("\""))) {
-            encoding = encoding.substring(1, encoding.length() - 1);
+        if (mediaType != null) {
+            return mediaType.getCharset();
         }
 
-        return encoding.trim();
+        return null;
     }
 }

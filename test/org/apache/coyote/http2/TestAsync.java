@@ -60,7 +60,7 @@ public class TestAsync extends Http2TestBase {
             "largeInitialWindow[{5}]")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
-        Collection<Object[]> baseData = Http2TestBase.data();
+        Collection<Object[]> baseData = data();
 
         for (Object[] base : baseData) {
             for (Boolean expandConnectionFirst : booleans) {
@@ -105,7 +105,7 @@ public class TestAsync extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
         Wrapper w = Tomcat.addServlet(ctxt, "async", new AsyncServlet(blockCount, useNonContainerThreadForWrite));

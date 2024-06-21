@@ -99,9 +99,6 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         } catch (Exception x) {
             if (x instanceof InvocationTargetException) {
                 Throwable cause = x.getCause();
-                if (cause instanceof ThreadDeath) {
-                    throw (ThreadDeath) cause;
-                }
                 if (cause instanceof VirtualMachineError) {
                     throw (VirtualMachineError) cause;
                 }
@@ -156,7 +153,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     /**
      * Class to measure query execute time.
      */
-    protected class StatementProxy<T extends java.sql.Statement> implements InvocationHandler {
+    protected class StatementProxy<T extends Statement> implements InvocationHandler {
 
         protected boolean closed = false;
         protected T delegate;

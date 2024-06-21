@@ -136,7 +136,7 @@ public class Nio2Channel implements AsynchronousByteChannel {
 
     @Override
     public String toString() {
-        return super.toString() + ":" + sc.toString();
+        return super.toString() + ":" + sc;
     }
 
     @Override

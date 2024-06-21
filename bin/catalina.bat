@@ -89,11 +89,11 @@ rem                   "-Djdk.tls.ephemeralDHKeySize=2048"
 rem
 rem   CATALINA_LOGGING_CONFIG (Optional) Override Tomcat's logging config file
 rem                   Example (all one line)
-rem                   set CATALINA_LOGGING_CONFIG="-Djava.util.logging.config.file=%CATALINA_BASE%\conf\logging.properties"
+rem                   set CATALINA_LOGGING_CONFIG=-Djava.util.logging.config.file="%CATALINA_BASE%\conf\logging.properties"
 rem
 rem   LOGGING_MANAGER (Optional) Override Tomcat's logging manager
 rem                   Example (all one line)
-rem                   set LOGGING_MANAGER="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
+rem                   set LOGGING_MANAGER=-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
 rem
 rem   TITLE           (Optional) Specify the title of Tomcat window. The default
 rem                   TITLE is Tomcat if it's not specified.
@@ -219,6 +219,7 @@ set "JAVA_OPTS=%JAVA_OPTS% --add-opens=java.base/java.io=ALL-UNNAMED"
 set "JAVA_OPTS=%JAVA_OPTS% --add-opens=java.base/java.util=ALL-UNNAMED"
 set "JAVA_OPTS=%JAVA_OPTS% --add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
 set "JAVA_OPTS=%JAVA_OPTS% --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"
+set "JAVA_OPTS=%JAVA_OPTS% --enable-native-access=ALL-UNNAMED"
 
 rem ----- Execute The Requested Command ---------------------------------------
 
@@ -234,7 +235,7 @@ echo Using JAVA_HOME:       "%JAVA_HOME%"
 echo Using CLASSPATH:       "%CLASSPATH%"
 echo Using CATALINA_OPTS:   "%CATALINA_OPTS%"
 
-set _EXECJAVA=%_RUNJAVA%
+set _EXECJAVA="%_RUNJAVA%"
 set MAINCLASS=org.apache.catalina.startup.Bootstrap
 set ACTION=start
 set DEBUG_OPTS=
@@ -277,7 +278,7 @@ goto end
 
 :doDebug
 shift
-set _EXECJAVA=%_RUNJDB%
+set _EXECJAVA="%_RUNJDB%"
 set DEBUG_OPTS=-sourcepath "%CATALINA_HOME%\..\..\java"
 goto execCmd
 
@@ -288,7 +289,7 @@ goto execCmd
 :doStart
 shift
 if "%TITLE%" == "" set TITLE=Tomcat
-set _EXECJAVA=start "%TITLE%" %_RUNJAVA%
+set _EXECJAVA=start "%TITLE%" "%_RUNJAVA%"
 goto execCmd
 
 :doStop

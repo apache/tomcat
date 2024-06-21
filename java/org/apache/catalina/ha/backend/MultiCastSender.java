@@ -26,11 +26,10 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-/*
+/**
  * Sender to proxies using multicast socket.
  */
-public class MultiCastSender
-    implements Sender {
+public class MultiCastSender implements Sender {
 
     private static final Log log = LogFactory.getLog(HeartbeatListener.class);
     private static final StringManager sm = StringManager.getManager(MultiCastSender.class);
@@ -52,7 +51,7 @@ public class MultiCastSender
             try {
                 group = InetAddress.getByName(config.getGroup());
                 if (config.getHost() != null) {
-                    InetAddress addr =  InetAddress.getByName(config.getHost());
+                    InetAddress addr = InetAddress.getByName(config.getHost());
                     InetSocketAddress addrs = new InetSocketAddress(addr, config.getMultiport());
                     s = new MulticastSocket(addrs);
                 } else {

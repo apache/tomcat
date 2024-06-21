@@ -30,6 +30,7 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.SimpleHttpClient;
+import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
@@ -65,7 +66,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
     @Test
     public void testFirstTrailingHeadersLF() throws Exception {
-        doTestChunkingCRLF(true, true, false, true, true, true);
+        doTestChunkingCRLF(true, true, false, true, true, false);
     }
 
     @Test
@@ -75,7 +76,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
     @Test
     public void testSecondTrailingHeadersLF() throws Exception {
-        doTestChunkingCRLF(true, true, true, false, true, true);
+        doTestChunkingCRLF(true, true, true, false, true, false);
     }
 
     @Test
@@ -97,7 +98,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Configure allowed trailer headers
         Assert.assertTrue(tomcat.getConnector().setProperty("allowedTrailerHeaders", "x-trailer1,x-trailer2"));
@@ -157,27 +158,72 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         }
     }
 
+
     @Test
-    public void testTrailingHeadersSizeLimit() throws Exception {
+    public void testTrailingHeadersSizeLimitBelowLimit() throws Exception {
+        doTestTrailingHeadersSizeLimit(17, "x-trailer: Test", false);
+    }
+
+
+    @Test
+    public void testTrailingHeadersSizeLimitAtLimit() throws Exception {
+        doTestTrailingHeadersSizeLimit(18, "x-trailer: Test", false);
+    }
+
+
+    @Test
+    public void testTrailingHeadersSizeLimitAboveLimit() throws Exception {
+        doTestTrailingHeadersSizeLimit(19, "x-trailer: Test", true);
+    }
+
+
+    /*
+     * This test uses the fact that the header is simply concatenated to insert a pipelined request. The pipelined
+     * request should not trigger the trailing header size limit. Note that 19 is just enough for the first request.
+     */
+    @Test
+    public void testTrailingHeadersSizeLimitPipelining() throws Exception {
+        doTestTrailingHeadersSizeLimit(19,
+                "x-trailer: Test" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF +
+                "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: any" + SimpleHttpClient.CRLF +
+                "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
+                "Content-Type: application/x-www-form-urlencoded" + SimpleHttpClient.CRLF +
+                "Connection: close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF +
+                "3" + SimpleHttpClient.CRLF +
+                "a=0" + SimpleHttpClient.CRLF +
+                "4" + SimpleHttpClient.CRLF +
+                "&b=1" + SimpleHttpClient.CRLF +
+                "0" + SimpleHttpClient.CRLF +
+                "x-trailer: Test",
+                true);
+    }
+
+
+    /*
+     * Since limit includes CRLF at end of trailer and final CRLF
+     */
+    private void doTestTrailingHeadersSizeLimit(int trailerSizeLimit, String trailerHeader, boolean pass) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet(false));
         ctx.addServletMappingDecoded("/", "servlet");
 
         // Limit the size of the trailing header
-        Assert.assertTrue(tomcat.getConnector().setProperty("maxTrailerSize", "10"));
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxTrailerSize", Integer.toString(trailerSizeLimit)));
         tomcat.start();
 
         String[] request = new String[]{
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: any" + SimpleHttpClient.CRLF +
             "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
-            "Content-Type: application/x-www-form-urlencoded" +
-                    SimpleHttpClient.CRLF +
+            "Content-Type: application/x-www-form-urlencoded" + SimpleHttpClient.CRLF +
             "Connection: close" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF +
             "3" + SimpleHttpClient.CRLF +
@@ -185,7 +231,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             "4" + SimpleHttpClient.CRLF +
             "&b=1" + SimpleHttpClient.CRLF +
             "0" + SimpleHttpClient.CRLF +
-            "x-trailer: Test" + SimpleHttpClient.CRLF +
+            trailerHeader + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF };
 
         TrailerClient client =
@@ -194,9 +240,11 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         client.connect();
         client.processRequest();
-        // Expected to fail because the trailers are longer
-        // than the set limit of 10 bytes
-        Assert.assertTrue(client.isResponse500());
+        if (pass) {
+            Assert.assertTrue(client.isResponse200());
+        } else {
+            Assert.assertTrue(client.isResponse500());
+        }
     }
 
 
@@ -226,7 +274,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
                 "maxExtensionSize", Integer.toString(EXT_SIZE_LIMIT)));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet(ok));
         ctx.addServletMappingDecoded("/", "servlet");
@@ -274,7 +322,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet(true));
         ctx.addServletMappingDecoded("/", "servlet");
@@ -373,7 +421,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         BodyReadServlet servlet = new BodyReadServlet(expectPass, readLimit);
         Tomcat.addServlet(ctx, "servlet", servlet);
@@ -425,6 +473,83 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             }
             Assert.assertEquals(0, servlet.getCountRead());
             Assert.assertTrue(servlet.getExceptionDuringRead());
+        }
+    }
+
+
+    @Test
+    public void testTrailerHeaderNameNotTokenThrowException() throws Exception {
+        doTestTrailerHeaderNameNotToken(false);
+    }
+
+    @Test
+    public void testTrailerHeaderNameNotTokenSwallowException() throws Exception {
+        doTestTrailerHeaderNameNotToken(true);
+    }
+
+    private void doTestTrailerHeaderNameNotToken(boolean swallowException) throws Exception {
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "servlet", new SwallowBodyServlet(swallowException));
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        tomcat.start();
+
+        String[] request = new String[]{
+            "POST / HTTP/1.1" + SimpleHttpClient.CRLF +
+            "Host: localhost" + SimpleHttpClient.CRLF +
+            "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
+            "Content-Type: application/x-www-form-urlencoded" + SimpleHttpClient.CRLF +
+            "Connection: close" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF +
+            "3" + SimpleHttpClient.CRLF +
+            "a=0" + SimpleHttpClient.CRLF +
+            "4" + SimpleHttpClient.CRLF +
+            "&b=1" + SimpleHttpClient.CRLF +
+            "0" + SimpleHttpClient.CRLF +
+            "x@trailer: Test" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF };
+
+        TrailerClient client = new TrailerClient(tomcat.getConnector().getLocalPort());
+        client.setRequest(request);
+
+        client.connect();
+        client.processRequest();
+        // Expected to fail because of invalid trailer header name
+        Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+    }
+
+    private static class SwallowBodyServlet extends HttpServlet {
+        private static final long serialVersionUID = 1L;
+
+        private final boolean swallowException;
+
+        SwallowBodyServlet(boolean swallowException) {
+            this.swallowException = swallowException;
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            PrintWriter pw = resp.getWriter();
+
+            // Read the body
+            InputStream is = req.getInputStream();
+            try {
+                while (is.read() > -1) {
+                }
+                pw.write("OK");
+            } catch (IOException ioe) {
+                if (!swallowException) {
+                    throw ioe;
+                }
+            }
         }
     }
 
@@ -542,6 +667,114 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         @Override
         public boolean isResponseBodyOK() {
             return getResponseBody().contains("TestTestTest");
+        }
+    }
+
+
+    @Test
+    public void doTestIncompleteChunkedBody() throws Exception {
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "servlet", new SwallowBodyServlet(false));
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        tomcat.start();
+
+        String[] request = new String[]{
+            "POST / HTTP/1.1" + SimpleHttpClient.CRLF +
+            "Host: localhost" + SimpleHttpClient.CRLF +
+            "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF +
+            "3" + SimpleHttpClient.CRLF };
+
+        TrailerClient client = new TrailerClient(tomcat.getConnector().getLocalPort());
+        client.setUseContentLength(true);
+
+        client.setRequest(request);
+        client.connect();
+        try {
+            client.processRequest();
+        } catch (IOException ioe) {
+            // Ignore - Triggered by connection being dropped after error
+        }
+        // NIO2 may (will?) return null here
+        String responseLine = client.getResponseLine();
+        if (responseLine == null) {
+            // 400 response not read(/written?) before connection was dropped.
+        } else {
+            Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+        }
+    }
+
+
+    @Test
+    public void doTestMaxSwallowSizeBelow() throws Exception {
+        doTestMaxSwallowSize(1000, true);
+    }
+
+
+    @Test
+    public void doTestMaxSwallowSizeAbove() throws Exception {
+        doTestMaxSwallowSize(10, false);
+    }
+
+
+    private void doTestMaxSwallowSize(int maxSwallowSize, boolean pass) throws Exception {
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        tomcat.getConnector().setProperty("connectionTimeout", "300000");
+        // Reduce limits to facilitate testing
+        tomcat.getConnector().setProperty("maxSwallowSize", Integer.toString(maxSwallowSize));
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "servlet", new TesterServlet(false));
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        tomcat.start();
+
+        String[] request = new String[]{
+            "GET / HTTP/1.1" + SimpleHttpClient.CRLF +
+            "Host: localhost" + SimpleHttpClient.CRLF +
+            "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF +
+            "20" + SimpleHttpClient.CRLF +
+            "01234567890123456789012345678901" + SimpleHttpClient.CRLF +
+            "0" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF };
+
+        TrailerClient client = new TrailerClient(tomcat.getConnector().getLocalPort());
+        client.setUseContentLength(true);
+
+        client.setRequest(request);
+        client.connect();
+        client.sendRequest();
+        client.readResponse(true);
+
+        // Response is committed before connection is closed.
+        Assert.assertTrue(client.getResponseLine(), client.isResponse200());
+
+        // Repeat request - should fail
+        client.resetResponse();
+        client.sendRequest();
+        try {
+            client.readResponse(true);
+        } catch (IOException ioe) {
+            // Ignore - in case the read fails due to a closed connection
+        }
+        if (pass) {
+            Assert.assertTrue(client.getResponseLine(), client.isResponse200());
+        } else {
+            // Connection reset
+            Assert.assertNull(client.getResponseLine());
         }
     }
 }

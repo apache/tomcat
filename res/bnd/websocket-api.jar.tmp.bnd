@@ -22,7 +22,7 @@ Export-Package: \
 
 Provide-Capability: \
     osgi.contract;\
-        osgi.contract=JavaWebSockets;\
+        osgi.contract=JakartaWebSocket;\
         version:Version=${websocket.spec.version};\
         uses:='${packages;NAMED;jakarta.websocket.*}'
 
@@ -35,7 +35,7 @@ Require-Capability: \
     osgi.ee;\
         filter:="(&(osgi.ee=JavaSE)(version=1.8))"
 
--namesection: jakarta/websocket*/;\
+-namesection: jakarta/websocket/server*/;\
     Specification-Title=Jakarta WebSocket;\
     Specification-Version=${websocket.spec.version}${websocket.revision};\
     Specification-Vendor=Eclipse Foundation;\

@@ -329,7 +329,7 @@ public class ErrorReportValve extends ValveBase {
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 if (container.getLogger().isDebugEnabled()) {
-                    container.getLogger().debug("Failure to set the content-type of response", t);
+                    container.getLogger().debug(sm.getString("errorReportValve.contentTypeFail"), t);
                 }
             }
             Writer writer = response.getReporter();

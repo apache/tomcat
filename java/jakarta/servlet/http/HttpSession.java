@@ -17,6 +17,7 @@
 package jakarta.servlet.http;
 
 import java.util.Enumeration;
+import java.util.function.Consumer;
 
 import jakarta.servlet.ServletContext;
 
@@ -51,6 +52,10 @@ import jakarta.servlet.ServletContext;
  * <p>
  * Session information is scoped only to the current web application ( <code>ServletContext</code>), so information
  * stored in one context will not be directly visible in another.
+ * <p>
+ * This object is <b>only</b> valid within the scope of the HTTP request from which it was obtained. Once the processing
+ * of that request returns to the container, this object must not be used. If there is a requirement to access the
+ * session outside of the scope of an HTTP request then this must be done via {@code #getAccessor()}.
  *
  * @see HttpSessionBindingListener
  */
@@ -194,4 +199,37 @@ public interface HttpSession {
      * @exception IllegalStateException if this method is called on an already invalidated session
      */
     boolean isNew();
+
+    /**
+     * Provides a mechanism for applications to interact with the {@code HttpSession} outside of the scope of an HTTP
+     * request.
+     */
+    interface Accessor {
+        /**
+         * Call to access the session with the same semantics as if the session was accessed during an HTTP request.
+         * <p>
+         * The effect of this call on the session is as if an HTTP request starts; {@link Consumer#accept(Object)} is
+         * called with the associated session object enabling the application to interact with the session; and, once
+         * that method returns, the HTTP request ends.
+         *
+         * @param sessionConsumer the application provided {@link Consumer} instance that will access the session
+         *
+         * @throws IllegalStateException if the session with the ID to which the {@link Accessor} is associated is no
+         *                                   longer valid
+         */
+        void access(Consumer<HttpSession> sessionConsumer);
+    }
+
+    /**
+     * Provides a mechanism for applications to interact with the {@code HttpSession} outside of the scope of an HTTP
+     * request.
+     *
+     * @return An {@link Accessor} instance linked to the current session ID (if the session ID is changed the
+     *             {@link Accessor} will no longer be able to access this session)
+     *
+     * @throws IllegalStateException if this method is called on an invalid session
+     */
+    default Accessor getAccessor() {
+        return null;
+    }
 }

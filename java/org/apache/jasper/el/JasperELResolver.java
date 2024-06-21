@@ -18,6 +18,7 @@ package org.apache.jasper.el;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jakarta.el.ArrayELResolver;
@@ -29,6 +30,7 @@ import jakarta.el.ELResolver;
 import jakarta.el.ListELResolver;
 import jakarta.el.MapELResolver;
 import jakarta.el.PropertyNotFoundException;
+import jakarta.el.RecordELResolver;
 import jakarta.el.ResourceBundleELResolver;
 import jakarta.el.StaticFieldELResolver;
 import jakarta.servlet.jsp.el.ImplicitObjectELResolver;
@@ -70,6 +72,7 @@ public class JasperELResolver extends CompositeELResolver {
         if (JspRuntimeLibrary.GRAAL) {
             add(new GraalBeanELResolver());
         }
+        add(new RecordELResolver());
         add(new BeanELResolver());
         add(new ScopedAttributeELResolver());
         add(new ImportELResolver());
@@ -196,6 +199,10 @@ public class JasperELResolver extends CompositeELResolver {
         @Override
         public Object getValue(ELContext context, Object base,
                 Object property) {
+            Objects.requireNonNull(context);
+            if (base == null || property == null) {
+                return null;
+            }
             Object value = null;
             Method method = getReadMethod(base.getClass(), property.toString());
             if (method != null) {
@@ -214,7 +221,8 @@ public class JasperELResolver extends CompositeELResolver {
         @Override
         public void setValue(ELContext context, Object base, Object property,
                 Object value) {
-            if (base == null) {
+            Objects.requireNonNull(context);
+            if (base == null || property == null) {
                 return;
             }
             Method method = getWriteMethod(base.getClass(), property.toString(), value.getClass());
@@ -232,6 +240,10 @@ public class JasperELResolver extends CompositeELResolver {
         @Override
         public boolean isReadOnly(ELContext context, Object base,
                 Object property) {
+            Objects.requireNonNull(context);
+            if (base == null || property == null) {
+                return false;
+            }
             Class<?> beanClass = base.getClass();
             String prop = property.toString();
             Method readMethod = getReadMethod(beanClass, prop);
@@ -283,6 +295,9 @@ public class JasperELResolver extends CompositeELResolver {
 
         @Override
         public Class<?> getCommonPropertyType(ELContext context, Object base) {
+            if (base != null) {
+                return Object.class;
+            }
             return null;
         }
     }

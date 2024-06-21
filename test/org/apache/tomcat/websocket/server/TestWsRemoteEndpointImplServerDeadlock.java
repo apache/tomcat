@@ -105,7 +105,7 @@ public class TestWsRemoteEndpointImplServerDeadlock extends WebSocketBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("useAsyncIO", useAsyncIO.toString()));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(Bug66508Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
@@ -124,6 +124,9 @@ public class TestWsRemoteEndpointImplServerDeadlock extends WebSocketBaseTest {
         // Server buffers are full. Server cannot send any more messages.
         // Server is now blocked waiting for the client to read the messages.
 
+        // Set a short session close timeout (milliseconds)
+        session.getUserProperties().put(
+            org.apache.tomcat.websocket.Constants.SESSION_CLOSE_TIMEOUT_PROPERTY, Long.valueOf(2000));
         // Close the session from the client
         session.close();
 
@@ -134,7 +137,9 @@ public class TestWsRemoteEndpointImplServerDeadlock extends WebSocketBaseTest {
         Object state = f.get(Bug66508Endpoint.serverSession);
         int count = 0;
         long start = System.nanoTime();
-        while (!"CLOSED".equals(state.toString()) && count < 100) {
+        // Send times out after 20s so test should complete in less than that. Allow large margin as VMs can sometimes
+        // be slow when running tests.
+        while (!"CLOSED".equals(state.toString()) && count < 190) {
             count++;
             Thread.sleep(100);
             state = f.get(Bug66508Endpoint.serverSession);

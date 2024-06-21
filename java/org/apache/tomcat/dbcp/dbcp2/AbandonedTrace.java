@@ -37,7 +37,7 @@ import org.apache.tomcat.dbcp.pool2.TrackedUse;
  */
 public class AbandonedTrace implements TrackedUse, AutoCloseable {
 
-    static void add(AbandonedTrace receiver, AbandonedTrace trace) {
+    static void add(final AbandonedTrace receiver, final AbandonedTrace trace) {
         if (receiver != null) {
             receiver.addTrace(trace);
         }

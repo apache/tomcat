@@ -30,7 +30,7 @@ import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.json.JSONParser;
 
 /*
- * Not run automatically (due to name) as if requires a local git clone of
+ * Not run automatically (due to name) as it requires a local git clone of
  * https://github.com/httpwg/structured-field-tests
  */
 public class TesterHttpWgStructuredField {

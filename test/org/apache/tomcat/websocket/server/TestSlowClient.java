@@ -40,7 +40,7 @@ public class TestSlowClient extends WebSocketBaseTest {
     @Test
     public void testSendingFromAppThread() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         // Server side endpoint that sends a stream of messages on a new thread
         // in response to any message received.
         ctx.addApplicationListener(TesterFirehoseServer.ConfigThread.class.getName());
@@ -70,6 +70,9 @@ public class TestSlowClient extends WebSocketBaseTest {
             count++;
         }
         Assert.assertTrue(wsSession.isOpen());
+        // Set a short session close timeout (milliseconds)
+        wsSession.getUserProperties().put(
+            org.apache.tomcat.websocket.Constants.SESSION_CLOSE_TIMEOUT_PROPERTY, Long.valueOf(2000));
         wsSession.close();
 
         // BZ 64848 (non-container thread variant)

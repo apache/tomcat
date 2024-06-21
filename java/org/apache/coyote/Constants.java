@@ -55,8 +55,8 @@ public final class Constants {
 
     /**
      * The request attribute that can be used by a servlet to pass to the connector the name of the file that is to be
-     * served by sendfile. The value should be {@code java.lang.String} that is {@code File.getCanonicalPath()} of the
-     * file to be served.
+     * served by sendfile. The value should be {@code String} that is {@code File.getCanonicalPath()} of the file to be
+     * served.
      */
     public static final String SENDFILE_FILENAME_ATTR = "org.apache.tomcat.sendfile.filename";
 

@@ -26,9 +26,11 @@ import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -130,6 +132,7 @@ public class AjpProcessor extends AbstractProcessor {
 
         // Build Map of Java Servlet to Jakarta Servlet attribute names
         Map<String, String> m = new HashMap<>();
+        m.put("jakarta.servlet.request.secure_protocol", "jakarta.servlet.request.secure_protocol");
         m.put("jakarta.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite");
         m.put("jakarta.servlet.request.key_size", "jakarta.servlet.request.key_size");
         m.put("jakarta.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session");
@@ -374,7 +377,7 @@ public class AjpProcessor extends AbstractProcessor {
                         socketWrapper.flush(true);
                     } catch (IOException e) {
                         if (getLog().isDebugEnabled()) {
-                            getLog().debug("Pong message failed", e);
+                            getLog().debug(sm.getString("ajpprocessor.pongFail"), e);
                         }
                         setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                     }
@@ -384,7 +387,7 @@ public class AjpProcessor extends AbstractProcessor {
                     // Unexpected packet type. Unread body packets should have
                     // been swallowed in finish().
                     if (getLog().isDebugEnabled()) {
-                        getLog().debug("Unexpected message: " + type);
+                        getLog().debug(sm.getString("ajpprocessor.unexpectedMessage", Integer.toString(type)));
                     }
                     setErrorState(ErrorState.CLOSE_CONNECTION_NOW, null);
                     break;
@@ -641,6 +644,7 @@ public class AjpProcessor extends AbstractProcessor {
     /**
      * After reading the request headers, we have to setup the request filters.
      */
+    @SuppressWarnings("deprecation")
     private void prepareRequest() {
 
         // Translate the HTTP method code to a String.
@@ -718,7 +722,7 @@ public class AjpProcessor extends AbstractProcessor {
             } else if (hId == Constants.SC_REQ_CONTENT_TYPE || (hId == -1 && tmpMB.equalsIgnoreCase("Content-Type"))) {
                 // just read the content-type header, so set it
                 ByteChunk bchunk = vMB.getByteChunk();
-                request.contentType().setBytes(bchunk.getBytes(), bchunk.getOffset(), bchunk.getLength());
+                request.contentType().setBytes(bchunk.getBytes(), bchunk.getStart(), bchunk.getLength());
             }
         }
 
@@ -749,6 +753,7 @@ public class AjpProcessor extends AbstractProcessor {
                             // Ignore invalid value
                         }
                     } else if (n.equals(Constants.SC_A_SSL_PROTOCOL)) {
+                        request.setAttribute(SSLSupport.SECURE_PROTOCOL_KEY, v);
                         request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, v);
                     } else if (n.equals("JK_LB_ACTIVATION")) {
                         request.setAttribute(n, v);
@@ -796,11 +801,12 @@ public class AjpProcessor extends AbstractProcessor {
                     break;
 
                 case Constants.SC_A_AUTH_TYPE:
-                    if (protocol.getTomcatAuthentication()) {
-                        // ignore server
-                        requestHeaderMessage.getBytes(tmpMB);
-                    } else {
+                    if (protocol.getTomcatAuthorization() || !protocol.getTomcatAuthentication()) {
+                        // Implies tomcatAuthentication == false
                         requestHeaderMessage.getBytes(request.getAuthType());
+                    } else {
+                        // Ignore user information from reverse proxy
+                        requestHeaderMessage.getBytes(tmpMB);
                     }
                     break;
 
@@ -956,43 +962,47 @@ public class AjpProcessor extends AbstractProcessor {
         responseMsgPos = -1;
 
         int numHeaders = headers.size();
-        for (int i = 0; i < numHeaders; i++) {
-            if (i == 0) {
-                // Write AJP message header
-                responseMessage.reset();
-                responseMessage.appendByte(Constants.JK_AJP13_SEND_HEADERS);
+        boolean needAjpMessageHeader = true;
+        while (needAjpMessageHeader) {
+            // Write AJP message header
+            responseMessage.reset();
+            responseMessage.appendByte(Constants.JK_AJP13_SEND_HEADERS);
 
-                // Write HTTP response line
-                responseMessage.appendInt(statusCode);
-                // Reason phrase is optional but mod_jk + httpd 2.x fails with a null
-                // reason phrase - bug 45026
-                tmpMB.setString(Integer.toString(response.getStatus()));
-                responseMessage.appendBytes(tmpMB);
+            // Write HTTP response line
+            responseMessage.appendInt(statusCode);
+            // Reason phrase is optional but mod_jk + httpd 2.x fails with a null
+            // reason phrase - bug 45026
+            tmpMB.setString(Integer.toString(response.getStatus()));
+            responseMessage.appendBytes(tmpMB);
 
-                // Start headers
-                responseMessage.appendInt(numHeaders);
-            }
+            // Start headers
+            responseMessage.appendInt(numHeaders);
 
-            try {
-                // Write headers
-                MessageBytes hN = headers.getName(i);
-                int hC = Constants.getResponseAjpIndex(hN.toString());
-                if (hC > 0) {
-                    responseMessage.appendInt(hC);
-                } else {
-                    responseMessage.appendBytes(hN);
+            needAjpMessageHeader = false;
+
+            for (int i = 0; i < numHeaders; i++) {
+                try {
+                    // Write headers
+                    MessageBytes hN = headers.getName(i);
+                    int hC = Constants.getResponseAjpIndex(hN.toString());
+                    if (hC > 0) {
+                        responseMessage.appendInt(hC);
+                    } else {
+                        responseMessage.appendBytes(hN);
+                    }
+                    MessageBytes hV = headers.getValue(i);
+                    responseMessage.appendBytes(hV);
+                } catch (IllegalArgumentException iae) {
+                    // Log the problematic header
+                    log.warn(sm.getString("ajpprocessor.response.invalidHeader", headers.getName(i), headers.getValue(i)),
+                            iae);
+                    // Remove the problematic header
+                    headers.removeHeader(i);
+                    numHeaders--;
+                    // Restart writing of AJP message
+                    needAjpMessageHeader = true;
+                    break;
                 }
-                MessageBytes hV = headers.getValue(i);
-                responseMessage.appendBytes(hV);
-            } catch (IllegalArgumentException iae) {
-                // Log the problematic header
-                log.warn(sm.getString("ajpprocessor.response.invalidHeader", headers.getName(i), headers.getValue(i)),
-                        iae);
-                // Remove the problematic header
-                headers.removeHeader(i);
-                numHeaders--;
-                // Reset loop and start again
-                i = -1;
             }
         }
 
@@ -1003,9 +1013,6 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    /**
-     * Callback to write data from the buffer.
-     */
     @Override
     protected final void flush() throws IOException {
         // Calling code should ensure that there is no data in the buffers for
@@ -1021,9 +1028,6 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    /**
-     * Finish AJP response.
-     */
     @Override
     protected final void finishResponse() throws IOException {
         if (responseFinished) {
@@ -1127,10 +1131,10 @@ public class AjpProcessor extends AbstractProcessor {
     @Override
     protected final void populateSslRequestAttributes() {
         if (!certificates.isNull()) {
+            List<X509Certificate> jsseCerts = new ArrayList<>();
             ByteChunk certData = certificates.getByteChunk();
-            X509Certificate jsseCerts[] = null;
-            ByteArrayInputStream bais = new ByteArrayInputStream(certData.getBytes(), certData.getStart(),
-                    certData.getLength());
+            ByteArrayInputStream bais =
+                    new ByteArrayInputStream(certData.getBytes(), certData.getStart(), certData.getLength());
             // Fill the elements.
             try {
                 CertificateFactory cf;
@@ -1142,21 +1146,13 @@ public class AjpProcessor extends AbstractProcessor {
                 }
                 while (bais.available() > 0) {
                     X509Certificate cert = (X509Certificate) cf.generateCertificate(bais);
-                    if (jsseCerts == null) {
-                        jsseCerts = new X509Certificate[1];
-                        jsseCerts[0] = cert;
-                    } else {
-                        X509Certificate[] temp = new X509Certificate[jsseCerts.length + 1];
-                        System.arraycopy(jsseCerts, 0, temp, 0, jsseCerts.length);
-                        temp[jsseCerts.length] = cert;
-                        jsseCerts = temp;
-                    }
+                    jsseCerts.add(cert);
                 }
             } catch (CertificateException | NoSuchProviderException e) {
                 getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
                 return;
             }
-            request.setAttribute(SSLSupport.CERTIFICATE_KEY, jsseCerts);
+            request.setAttribute(SSLSupport.CERTIFICATE_KEY, jsseCerts.toArray(new X509Certificate[0]));
         }
     }
 

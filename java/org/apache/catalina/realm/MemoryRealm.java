@@ -65,13 +65,13 @@ public class MemoryRealm extends RealmBase {
     /**
      * The set of valid Principals for this Realm, keyed by user name.
      */
-    private final Map<String, GenericPrincipal> principals = new HashMap<>();
+    private final Map<String,GenericPrincipal> principals = new HashMap<>();
 
 
     /**
      * The set of credentials for this Realm, keyed by user name.
      */
-    private final Map<String, String> credentials = new HashMap<>();
+    private final Map<String,String> credentials = new HashMap<>();
 
 
     // ------------------------------------------------------------- Properties
@@ -187,6 +187,7 @@ public class MemoryRealm extends RealmBase {
      *             necessary.
      */
     protected Digester getDigester() {
+        // Keep locking for subclass compatibility
         synchronized (digesterLock) {
             if (digester == null) {
                 digester = new Digester();
@@ -222,20 +223,20 @@ public class MemoryRealm extends RealmBase {
         String pathName = getPathname();
         try (InputStream is = ConfigFileLoader.getSource().getResource(pathName).getInputStream()) {
             // Load the contents of the database file
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("memoryRealm.loadPath", pathName));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("memoryRealm.loadPath", pathName));
             }
 
-            Digester digester = getDigester();
-            try {
-                synchronized (digester) {
+            synchronized (digesterLock) {
+                Digester digester = getDigester();
+                try {
                     digester.push(this);
                     digester.parse(is);
+                } catch (Exception e) {
+                    throw new LifecycleException(sm.getString("memoryRealm.readXml"), e);
+                } finally {
+                    digester.reset();
                 }
-            } catch (Exception e) {
-                throw new LifecycleException(sm.getString("memoryRealm.readXml"), e);
-            } finally {
-                digester.reset();
             }
         } catch (IOException ioe) {
             throw new LifecycleException(sm.getString("memoryRealm.loadExist", pathName), ioe);

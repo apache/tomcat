@@ -32,27 +32,22 @@ public class RealmSF extends StoreFactoryBase {
     private static Log log = LogFactory.getLog(RealmSF.class);
 
     @Override
-    public void store(PrintWriter aWriter, int indent, Object aElement)
-            throws Exception {
+    public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
         if (aElement instanceof CombinedRealm) {
-            StoreDescription elementDesc = getRegistry().findDescription(
-                    aElement.getClass());
+            StoreDescription elementDesc = getRegistry().findDescription(aElement.getClass());
 
             if (elementDesc != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("factory.storeTag",
-                            elementDesc.getTag(), aElement));
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("factory.storeTag", elementDesc.getTag(), aElement));
                 }
                 getStoreAppender().printIndent(aWriter, indent + 2);
-                getStoreAppender().printOpenTag(aWriter, indent + 2, aElement,
-                            elementDesc);
+                getStoreAppender().printOpenTag(aWriter, indent + 2, aElement, elementDesc);
                 storeChildren(aWriter, indent + 2, aElement, elementDesc);
                 getStoreAppender().printIndent(aWriter, indent + 2);
                 getStoreAppender().printCloseTag(aWriter, elementDesc);
             } else {
                 if (log.isWarnEnabled()) {
-                    log.warn(sm.getString("factory.storeNoDescriptor",
-                            aElement.getClass()));
+                    log.warn(sm.getString("factory.storeNoDescriptor", aElement.getClass()));
                 }
             }
         } else {
@@ -61,21 +56,11 @@ public class RealmSF extends StoreFactoryBase {
     }
 
     /**
-     * Store the specified Realm properties and child (Realm)
-     *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aRealm
-     *            Realm whose properties are being stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
+     * Store the specified Realm properties and child (Realm) {@inheritDoc}
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aRealm,
-            StoreDescription parentDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aRealm, StoreDescription parentDesc)
+            throws Exception {
         if (aRealm instanceof CombinedRealm) {
             CombinedRealm combinedRealm = (CombinedRealm) aRealm;
 
@@ -85,7 +70,8 @@ public class RealmSF extends StoreFactoryBase {
         }
         // Store nested <CredentialHandler> element
         CredentialHandler credentialHandler = ((Realm) aRealm).getCredentialHandler();
-        if (credentialHandler != null) {
+        if (credentialHandler != null && !(credentialHandler.getClass().getName()
+                .equals("org.apache.catalina.realm.CombinedRealm$CombinedRealmCredentialHandler"))) {
             storeElement(aWriter, indent, credentialHandler);
         }
     }

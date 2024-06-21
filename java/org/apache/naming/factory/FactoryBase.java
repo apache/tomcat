@@ -35,11 +35,6 @@ public abstract class FactoryBase implements ObjectFactory {
 
     private static final StringManager sm = StringManager.getManager(FactoryBase.class);
 
-    /**
-     * Creates a new object instance.
-     *
-     * @param obj The reference object describing the object to create
-     */
     @Override
     public final Object getObjectInstance(Object obj, Name name, Context nameCtx,
             Hashtable<?,?> environment) throws Exception {
@@ -76,9 +71,6 @@ public abstract class FactoryBase implements ObjectFactory {
                 } catch(Throwable t) {
                     if (t instanceof NamingException) {
                         throw (NamingException) t;
-                    }
-                    if (t instanceof ThreadDeath) {
-                        throw (ThreadDeath) t;
                     }
                     if (t instanceof VirtualMachineError) {
                         throw (VirtualMachineError) t;

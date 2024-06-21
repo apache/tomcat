@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.core;
 
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -25,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -32,27 +32,23 @@ import java.util.NoSuchElementException;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletRequestWrapper;
 import jakarta.servlet.http.HttpServletMapping;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.PushBuilder;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
-import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.res.StringManager;
-
 
 /**
  * Wrapper around a <code>jakarta.servlet.http.HttpServletRequest</code> that transforms an application request object
@@ -74,38 +70,29 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * The set of attribute names that are special for request dispatchers.
      */
-    protected static final String specials[] = { RequestDispatcher.INCLUDE_REQUEST_URI,
-            RequestDispatcher.INCLUDE_CONTEXT_PATH, RequestDispatcher.INCLUDE_SERVLET_PATH,
-            RequestDispatcher.INCLUDE_PATH_INFO, RequestDispatcher.INCLUDE_QUERY_STRING,
-            RequestDispatcher.INCLUDE_MAPPING, RequestDispatcher.FORWARD_REQUEST_URI,
-            RequestDispatcher.FORWARD_CONTEXT_PATH, RequestDispatcher.FORWARD_SERVLET_PATH,
-            RequestDispatcher.FORWARD_PATH_INFO, RequestDispatcher.FORWARD_QUERY_STRING,
-            RequestDispatcher.FORWARD_MAPPING };
-
-    private static final int SPECIALS_FIRST_FORWARD_INDEX = 6;
-
-
-    // ----------------------------------------------------------- Constructors
-
-
-    /**
-     * Construct a new wrapped request around the specified servlet request.
-     *
-     * @param request      The servlet request being wrapped
-     * @param context      The target context for the wrapped request
-     * @param crossContext {@code true} if the wrapped request will be a cross-context request, otherwise {@code false}
+    protected static final String specials[] =
+            { RequestDispatcher.INCLUDE_REQUEST_URI, RequestDispatcher.INCLUDE_CONTEXT_PATH,
+                    RequestDispatcher.INCLUDE_SERVLET_PATH, RequestDispatcher.INCLUDE_PATH_INFO,
+                    RequestDispatcher.INCLUDE_QUERY_STRING, RequestDispatcher.INCLUDE_MAPPING,
+                    RequestDispatcher.FORWARD_REQUEST_URI, RequestDispatcher.FORWARD_CONTEXT_PATH,
+                    RequestDispatcher.FORWARD_SERVLET_PATH, RequestDispatcher.FORWARD_PATH_INFO,
+                    RequestDispatcher.FORWARD_QUERY_STRING, RequestDispatcher.FORWARD_MAPPING };
+    /*
+     * This duplicates specials to some extent but has been added to improve the performance of [get|set|is]Special().
+     * It may be possible to remove specials but that will require changes to AttributeNamesEnumerator.
      */
-    ApplicationHttpRequest(HttpServletRequest request, Context context, boolean crossContext) {
-
-        super(request);
-        this.context = context;
-        this.crossContext = crossContext;
-        setRequest(request);
-
+    private static final Map<String,Integer> specialsMap = new HashMap<>();
+    static {
+        for (int i = 0; i < specials.length; i++) {
+            specialsMap.put(specials[i], Integer.valueOf(i));
+        }
     }
 
+    private static final int shortestSpecialNameLength =
+            specialsMap.keySet().stream().mapToInt(s -> s.length()).min().getAsInt();
 
-    // ----------------------------------------------------- Instance Variables
+
+    private static final int SPECIALS_FIRST_FORWARD_INDEX = 6;
 
 
     /**
@@ -131,11 +118,15 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     protected DispatcherType dispatcherType = null;
 
+    /**
+     * The HTTP method for this request.
+     */
+    private String method;
 
     /**
      * The request parameters for this request. This is initialized from the wrapped request.
      */
-    protected Map<String, String[]> parameters = null;
+    protected Map<String,String[]> parameters = null;
 
 
     /**
@@ -198,6 +189,21 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     protected final Object[] specialAttributes = new Object[specials.length];
 
 
+    /**
+     * Construct a new wrapped request around the specified servlet request.
+     *
+     * @param request      The servlet request being wrapped
+     * @param context      The target context for the wrapped request
+     * @param crossContext {@code true} if the wrapped request will be a cross-context request, otherwise {@code false}
+     */
+    ApplicationHttpRequest(HttpServletRequest request, Context context, boolean crossContext) {
+        super(request);
+        this.context = context;
+        this.crossContext = crossContext;
+        setRequest(request);
+    }
+
+
     // ------------------------------------------------- ServletRequest Methods
 
     @Override
@@ -241,7 +247,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
                 return specialAttributes[pos];
             }
         }
-
     }
 
 
@@ -261,11 +266,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     @Override
     public void removeAttribute(String name) {
-
         if (!removeSpecial(name)) {
             getRequest().removeAttribute(name);
         }
-
     }
 
 
@@ -289,7 +292,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (!setSpecial(name, value)) {
             getRequest().setAttribute(name, value);
         }
-
     }
 
 
@@ -354,7 +356,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         }
 
         return context.getServletContext().getRequestDispatcher(relative);
-
     }
 
 
@@ -369,13 +370,18 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
     // --------------------------------------------- HttpServletRequest Methods
 
-
     /**
      * Override the <code>getContextPath()</code> method of the wrapped request.
      */
     @Override
     public String getContextPath() {
         return this.contextPath;
+    }
+
+
+    @Override
+    public String getMethod() {
+        return method;
     }
 
 
@@ -400,7 +406,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getParameterMap()</code> method of the wrapped request.
      */
     @Override
-    public Map<String, String[]> getParameterMap() {
+    public Map<String,String[]> getParameterMap() {
         parseParameters();
         return parameters;
     }
@@ -552,7 +558,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         } else {
             return super.getSession(create);
         }
-
     }
 
 
@@ -597,20 +602,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     }
 
 
-    @Override
-    public PushBuilder newPushBuilder() {
-        ServletRequest current = getRequest();
-        while (current instanceof ServletRequestWrapper) {
-            current = ((ServletRequestWrapper) current).getRequest();
-        }
-        if (current instanceof RequestFacade) {
-            return ((RequestFacade) current).newPushBuilder(this);
-        } else {
-            return null;
-        }
-    }
-
-
     // -------------------------------------------------------- Package Methods
 
     /**
@@ -618,7 +609,12 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     public void recycle() {
         if (session != null) {
-            session.endAccess();
+            try {
+                session.endAccess();
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                context.getLogger().warn(sm.getString("applicationHttpRequest.sessionEndAccessFail"), t);
+            }
         }
     }
 
@@ -629,9 +625,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param contextPath The new context path
      */
     void setContextPath(String contextPath) {
-
         this.contextPath = contextPath;
-
     }
 
 
@@ -641,9 +635,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param pathInfo The new path info
      */
     void setPathInfo(String pathInfo) {
-
         this.pathInfo = pathInfo;
-
     }
 
 
@@ -653,9 +645,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param queryString The new query string
      */
     void setQueryString(String queryString) {
-
         this.queryString = queryString;
-
     }
 
 
@@ -674,6 +664,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         // Initialize the path elements for this request
         contextPath = request.getContextPath();
+        method = request.getMethod();
         pathInfo = request.getPathInfo();
         queryString = request.getQueryString();
         requestURI = request.getRequestURI();
@@ -683,14 +674,22 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
+     * Set the request method for this request.
+     *
+     * @param method The new request method
+     */
+    void setMethod(String method) {
+        this.method = method;
+    }
+
+
+    /**
      * Set the request URI for this request.
      *
      * @param requestURI The new request URI
      */
     void setRequestURI(String requestURI) {
-
         this.requestURI = requestURI;
-
     }
 
 
@@ -700,9 +699,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param servletPath The new servlet path
      */
     void setServletPath(String servletPath) {
-
         this.servletPath = servletPath;
-
     }
 
 
@@ -719,7 +716,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         parameters = new ParameterMap<>();
         parameters.putAll(getRequest().getParameterMap());
         mergeParameters();
-        ((ParameterMap<String, String[]>) parameters).setLocked(true);
+        ((ParameterMap<String,String[]>) parameters).setLocked(true);
         parsedParams = true;
     }
 
@@ -747,14 +744,11 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param name Attribute name to be tested
      */
     protected boolean isSpecial(String name) {
-
-        for (String special : specials) {
-            if (special.equals(name)) {
-                return true;
-            }
+        // Performance - see BZ 68089
+        if (name.length() < shortestSpecialNameLength) {
+            return false;
         }
-        return false;
-
+        return specialsMap.containsKey(name);
     }
 
 
@@ -764,12 +758,15 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @return the special attribute pos, or -1 if it is not a special attribute
      */
     protected int getSpecial(String name) {
-        for (int i = 0; i < specials.length; i++) {
-            if (specials[i].equals(name)) {
-                return i;
-            }
+        // Performance - see BZ 68089
+        if (name.length() < shortestSpecialNameLength) {
+            return -1;
         }
-        return -1;
+        Integer index = specialsMap.get(name);
+        if (index == null) {
+            return -1;
+        }
+        return index.intValue();
     }
 
 
@@ -779,13 +776,16 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @return true if the attribute was a special attribute, false otherwise
      */
     protected boolean setSpecial(String name, Object value) {
-        for (int i = 0; i < specials.length; i++) {
-            if (specials[i].equals(name)) {
-                specialAttributes[i] = value;
-                return true;
-            }
+        // Performance - see BZ 68089
+        if (name.length() < shortestSpecialNameLength) {
+            return false;
         }
-        return false;
+        Integer index = specialsMap.get(name);
+        if (index == null) {
+            return false;
+        }
+        specialAttributes[index.intValue()] = value;
+        return true;
     }
 
 
@@ -795,13 +795,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @return true if the attribute was a special attribute, false otherwise
      */
     protected boolean removeSpecial(String name) {
-        for (int i = 0; i < specials.length; i++) {
-            if (specials[i].equals(name)) {
-                specialAttributes[i] = null;
-                return true;
-            }
-        }
-        return false;
+        return setSpecial(name, null);
     }
 
 
@@ -832,7 +826,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     // ------------------------------------------------------ Private Methods
-
 
     /**
      * Merge the parameters from the saved query parameter string (if any), and the parameters already present on this
@@ -888,7 +881,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     // ----------------------------------- AttributeNamesEnumerator Inner Class
-
 
     /**
      * Utility class used to expose the special attributes as being available as request attributes.
@@ -946,8 +938,5 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             }
             return result;
         }
-
     }
-
-
 }

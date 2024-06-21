@@ -205,7 +205,7 @@ final class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserP
     /**
      * Invalidates the PooledConnection in the pool. The KeyedCPDSConnectionFactory closes the connection and pool
      * counters are updated appropriately. Also clears any idle instances associated with the user name that was used to
-     * create the PooledConnection. Connections associated with this user are not affected and they will not be
+     * create the PooledConnection. Connections associated with this user are not affected, and they will not be
      * automatically closed on return to the pool.
      */
     @Override

@@ -26,9 +26,8 @@ import org.apache.tomcat.util.IntrospectionUtils;
 public class CertificateStoreAppender extends StoreAppender {
 
     @Override
-    protected Object checkAttribute(StoreDescription desc,
-            PropertyDescriptor descriptor, String attributeName, Object bean,
-            Object bean2) {
+    protected Object checkAttribute(StoreDescription desc, PropertyDescriptor descriptor, String attributeName,
+            Object bean, Object bean2) {
         if (attributeName.equals("type")) {
             return IntrospectionUtils.getProperty(bean, descriptor.getName());
         } else {

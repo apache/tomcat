@@ -23,8 +23,6 @@ import java.util.List;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.apache.coyote.http2.Http2TestBase;
-
 /*
  * Split into multiple tests as a single test takes so long it impacts the time
  * of an entire test run.
@@ -34,7 +32,7 @@ public class TestHttpServletDoHeadValidWrite1023 extends HttpServletDoHeadBaseTe
 
     @Parameterized.Parameters(name = "{index}: {0} {1} {2} {3} {4} {5} {6} {7} {8}")
     public static Collection<Object[]> parameters() {
-        Collection<Object[]> baseData = Http2TestBase.data();
+        Collection<Object[]> baseData = data();
 
         List<Object[]> parameterSets = new ArrayList<>();
         for (Object[] base : baseData) {

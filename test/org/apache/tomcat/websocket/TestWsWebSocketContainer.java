@@ -75,7 +75,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
     public void testConnectToServerEndpoint() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
@@ -106,11 +106,11 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
     }
 
 
-    @Test(expected = jakarta.websocket.DeploymentException.class)
+    @Test(expected = DeploymentException.class)
     public void testConnectToServerEndpointInvalidScheme() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
 
         tomcat.start();
@@ -121,11 +121,11 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
     }
 
 
-    @Test(expected = jakarta.websocket.DeploymentException.class)
+    @Test(expected = DeploymentException.class)
     public void testConnectToServerEndpointNoHost() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
 
         tomcat.start();
@@ -189,7 +189,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
@@ -304,7 +304,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
          */
         public static void clearBlock() {
             synchronized (monitor) {
-                BlockingPojo.block = false;
+                block = false;
                 monitor.notifyAll();
             }
         }
@@ -363,7 +363,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
     public void testGetOpenSessions() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
@@ -413,7 +413,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
     public void testSessionExpiryOnUserPropertyReadIdleTimeout() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
@@ -453,7 +453,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
     public void testSessionExpiryOnUserPropertyWriteIdleTimeout() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
@@ -551,7 +551,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
@@ -633,7 +633,7 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
     private void doTestPerMessageDeflateClient(String msg, int count) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");

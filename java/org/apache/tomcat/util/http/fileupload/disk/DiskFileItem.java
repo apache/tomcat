@@ -53,10 +53,10 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  * {@link #getInputStream()} and process the file without attempting to load
  * it into memory, which may come handy with large files.
  *
- * <p>Temporary files, which are created for file items, should be
- * deleted later on.</p>
+ * <p>Temporary files, which are created for file items, will be deleted when
+ * the associated request is recycled.</p>
  *
- * @since 1.1
+ * @since FileUpload 1.1
  */
 public class DiskFileItem
     implements FileItem {
@@ -289,6 +289,7 @@ public class DiskFileItem
      * or {@code null} if the data cannot be read
      *
      * @throws UncheckedIOException if an I/O error occurs
+     * @throws ArithmeticException if the file {@code size} overflows an int
      */
     @Override
     public byte[] get() throws UncheckedIOException {
@@ -299,7 +300,7 @@ public class DiskFileItem
             return cachedContent != null ? cachedContent.clone() : new byte[0];
         }
 
-        final byte[] fileData = new byte[(int) getSize()];
+        final byte[] fileData = new byte[Math.toIntExact(getSize())];
 
         try (InputStream fis = Files.newInputStream(dfos.getFile().toPath())) {
             IOUtils.readFully(fis, fileData);
@@ -375,8 +376,6 @@ public class DiskFileItem
         if (isInMemory()) {
             try (OutputStream fout = Files.newOutputStream(file.toPath())) {
                 fout.write(get());
-            } catch (final IOException e) {
-                throw new IOException("Unexpected output data");
             }
         } else {
             final File outputFile = getStoreLocation();
@@ -396,8 +395,7 @@ public class DiskFileItem
              * desired file.
              */
             if (file.exists() && !file.delete()) {
-                throw new FileUploadException(
-                        "Cannot write uploaded file to disk!");
+                throw new FileUploadException("Cannot write uploaded file to disk!");
             }
             if (!outputFile.renameTo(file)) {
                 BufferedInputStream in = null;
@@ -586,8 +584,7 @@ public class DiskFileItem
     @Override
     public String toString() {
         return String.format("name=%s, StoreLocation=%s, size=%s bytes, isFormField=%s, FieldName=%s",
-                      getName(), getStoreLocation(), Long.valueOf(getSize()),
-                      Boolean.valueOf(isFormField()), getFieldName());
+                getName(), getStoreLocation(), Long.valueOf(getSize()), Boolean.valueOf(isFormField()), getFieldName());
     }
 
     /**

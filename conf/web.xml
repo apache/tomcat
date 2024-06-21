@@ -18,8 +18,8 @@
 <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
-  version="6.0">
+                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_1.xsd"
+  version="6.1">
 
   <!-- ======================== Introduction ============================== -->
   <!-- This document defines default values for *all* web applications      -->
@@ -78,7 +78,7 @@
   <!--                       contents. [null]                               -->
   <!--                                                                      -->
   <!--   sendfileSize        If the connector used supports sendfile, this  -->
-  <!--                       represents the minimal file size in KB for     -->
+  <!--                       represents the minimal file size in KiB for    -->
   <!--                       which sendfile will be used. Use a negative    -->
   <!--                       value to always disable sendfile.  [48]        -->
   <!--                                                                      -->
@@ -116,6 +116,11 @@
   <!--                       headers only valid for GET requests, RFC 9110  -->
   <!--                       (which obsoletes RFC 7233) now allows partial  -->
   <!--                       puts. [true]                                   -->
+  <!--                                                                      -->
+  <!--   directoryRedirectStatusCode                                        -->
+  <!--                       Status code to use for directory redirects.    -->
+  <!--                       Possible values: 301, 302, 307, 308            -->
+  <!--                       [302]                                          -->
 
     <servlet>
         <servlet-name>default</servlet-name>
@@ -155,9 +160,9 @@
   <!--                       pages.  See the jasper documentation for more  -->
   <!--                       information.                                   -->
   <!--                                                                      -->
-  <!--   compilerSourceVM    Compiler source VM. [11]                      -->
+  <!--   compilerSourceVM    Compiler source VM. [17]                       -->
   <!--                                                                      -->
-  <!--   compilerTargetVM    Compiler target VM. [11]                      -->
+  <!--   compilerTargetVM    Compiler target VM. [17]                       -->
   <!--                                                                      -->
   <!--   development         Is Jasper used in development mode? If true,   -->
   <!--                       the frequency at which JSPs are checked for    -->
@@ -359,7 +364,7 @@
   <!--                        the arguments to the OS. See the CGI How-To   -->
   <!--                        for more details. The default varies by       -->
   <!--                        platform.                                     -->
-  <!--                        Windows: [[\w\Q-.\\/:\E]+]            -->
+  <!--                        Windows: [[\w\Q-.\\/:\E]+]                    -->
   <!--                        Others:  [.*]                                 -->
   <!--                        Note that internally the CGI Servlet treats   -->
   <!--                        [.*] as a special case to improve performance -->
@@ -370,7 +375,7 @@
   <!--                        command line arguments must match else the    -->
   <!--                        request will be rejected. The default matches -->
   <!--                        the allowed values defined by RFC3875.        -->
-  <!--                        [[\w\Q%;/?:@&,$-.!~*'()\E]+]          -->
+  <!--                        [[\w\Q%;/?:@&,$-.!~*'()\E]+]                  -->
   <!--                                                                      -->
   <!--   enableCmdLineArguments                                             -->
   <!--                        Are command line parameters generated from    -->
@@ -517,19 +522,6 @@
     </filter>
 -->
 
-  <!-- A filter that triggers request parameters parsing and rejects the    -->
-  <!-- request if some parameters were skipped because of parsing errors or -->
-  <!-- request size limitations.                                            -->
-<!--
-    <filter>
-        <filter-name>failedRequestFilter</filter-name>
-        <filter-class>
-          org.apache.catalina.filters.FailedRequestFilter
-        </filter-class>
-        <async-supported>true</async-supported>
-    </filter>
--->
-
 
   <!-- NOTE: An SSI Servlet is also available as an alternative SSI         -->
   <!-- implementation. Use either the Servlet or the Filter but NOT both.   -->
@@ -604,14 +596,6 @@
 <!--
     <filter-mapping>
         <filter-name>setCharacterEncodingFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
--->
-
-  <!-- The mapping for the Failed Request Filter -->
-<!--
-    <filter-mapping>
-        <filter-name>failedRequestFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 -->
@@ -1767,6 +1751,10 @@
         <mime-type>application/vnd.geogebra.file</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>ggs</extension>
+        <mime-type>application/vnd.geogebra.slides</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>ggt</extension>
         <mime-type>application/vnd.geogebra.tool</mime-type>
     </mime-mapping>
@@ -2471,6 +2459,10 @@
         <mime-type>video/mj2</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>mjs</extension>
+        <mime-type>text/javascript</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>mk3d</extension>
         <mime-type>video/x-matroska</mime-type>
     </mime-mapping>
@@ -2907,6 +2899,10 @@
     <mime-mapping>
         <extension>oprc</extension>
         <mime-type>application/vnd.palm</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>opus</extension>
+        <mime-type>audio/ogg</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>org</extension>
@@ -4725,7 +4721,7 @@
   <!-- If you define welcome files in your own application's web.xml        -->
   <!-- deployment descriptor, that list *replaces* the list configured      -->
   <!-- here, so be sure to include any of the default values that you wish  -->
-  <!-- to use within your application.                                       -->
+  <!-- to use within your application.                                      -->
 
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>

@@ -53,8 +53,10 @@ public class Http2Protocol implements UpgradeProtocol {
     // Maximum amount of streams which can be concurrently executed over
     // a single connection
     static final int DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION = 20;
-
+    // Default factor used when adjusting overhead count for overhead frames
     static final int DEFAULT_OVERHEAD_COUNT_FACTOR = 10;
+    // Default factor used when adjusting overhead count for reset frames
+    static final int DEFAULT_OVERHEAD_RESET_FACTOR = 50;
     // Not currently configurable. This makes the practical limit for
     // overheadCountFactor to be ~20. The exact limit will vary with traffic
     // patterns.
@@ -85,6 +87,7 @@ public class Http2Protocol implements UpgradeProtocol {
     private int maxHeaderCount = Constants.DEFAULT_MAX_HEADER_COUNT;
     private int maxTrailerCount = Constants.DEFAULT_MAX_TRAILER_COUNT;
     private int overheadCountFactor = DEFAULT_OVERHEAD_COUNT_FACTOR;
+    private int overheadResetFactor = DEFAULT_OVERHEAD_RESET_FACTOR;
     private int overheadContinuationThreshold = DEFAULT_OVERHEAD_CONTINUATION_THRESHOLD;
     private int overheadDataThreshold = DEFAULT_OVERHEAD_DATA_THRESHOLD;
     private int overheadWindowUpdateThreshold = DEFAULT_OVERHEAD_WINDOW_UPDATE_THRESHOLD;
@@ -128,8 +131,8 @@ public class Http2Protocol implements UpgradeProtocol {
     @Override
     public InternalHttpUpgradeHandler getInternalUpgradeHandler(SocketWrapperBase<?> socketWrapper, Adapter adapter,
             Request coyoteRequest) {
-        return socketWrapper.hasAsyncIO() ? new Http2AsyncUpgradeHandler(this, adapter, coyoteRequest, socketWrapper)
-                : new Http2UpgradeHandler(this, adapter, coyoteRequest, socketWrapper);
+        return socketWrapper.hasAsyncIO() ? new Http2AsyncUpgradeHandler(this, adapter, coyoteRequest, socketWrapper) :
+                new Http2UpgradeHandler(this, adapter, coyoteRequest, socketWrapper);
     }
 
 
@@ -287,6 +290,20 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public void setOverheadCountFactor(int overheadCountFactor) {
         this.overheadCountFactor = overheadCountFactor;
+    }
+
+
+    public int getOverheadResetFactor() {
+        return overheadResetFactor;
+    }
+
+
+    public void setOverheadResetFactor(int overheadResetFactor) {
+        if (overheadResetFactor < 0) {
+            this.overheadResetFactor = 0;
+        } else {
+            this.overheadResetFactor = overheadResetFactor;
+        }
     }
 
 

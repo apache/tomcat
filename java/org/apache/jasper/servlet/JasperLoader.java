@@ -108,7 +108,7 @@ public class JasperLoader extends URLClassLoader {
     /**
      * Delegate to parent
      *
-     * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)
+     * @see java.lang.ClassLoader#getResourceAsStream(String)
      */
     @Override
     public InputStream getResourceAsStream(String name) {

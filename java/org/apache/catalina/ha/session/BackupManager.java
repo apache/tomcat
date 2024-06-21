@@ -32,8 +32,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-public class BackupManager extends ClusterManagerBase
-        implements MapOwner, DistributedManager {
+public class BackupManager extends ClusterManagerBase implements MapOwner, DistributedManager {
 
     private final Log log = LogFactory.getLog(BackupManager.class); // must not be static
 
@@ -42,7 +41,7 @@ public class BackupManager extends ClusterManagerBase
      */
     protected static final StringManager sm = StringManager.getManager(BackupManager.class);
 
-    protected static final long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
+    protected static final long DEFAULT_REPL_TIMEOUT = 15000;// 15 seconds
 
     /**
      * The name of this manager
@@ -52,7 +51,7 @@ public class BackupManager extends ClusterManagerBase
     /**
      * Flag for how this map sends messages.
      */
-    private int mapSendOptions = Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK;
+    private int mapSendOptions = Channel.SEND_OPTIONS_SYNCHRONIZED_ACK | Channel.SEND_OPTIONS_USE_ACK;
 
     /**
      * Timeout for RPC messages.
@@ -71,16 +70,15 @@ public class BackupManager extends ClusterManagerBase
 
     /**
      * Constructor, just calls super()
-     *
      */
     public BackupManager() {
         super();
     }
 
 
-//******************************************************************************/
-//      ClusterManager Interface
-//******************************************************************************/
+    // ******************************************************************************/
+    // ClusterManager Interface
+    // ******************************************************************************/
 
     @Override
     public void messageDataReceived(ClusterMessage msg) {
@@ -91,20 +89,19 @@ public class BackupManager extends ClusterManagerBase
         if (!getState().isAvailable()) {
             return null;
         }
-        LazyReplicatedMap<String,Session> map =
-                (LazyReplicatedMap<String,Session>)sessions;
-        map.replicate(sessionId,false);
+        LazyReplicatedMap<String,Session> map = (LazyReplicatedMap<String,Session>) sessions;
+        map.replicate(sessionId, false);
         return null;
     }
 
 
-//=========================================================================
-// OVERRIDE THESE METHODS TO IMPLEMENT THE REPLICATION
-//=========================================================================
+    // =========================================================================
+    // OVERRIDE THESE METHODS TO IMPLEMENT THE REPLICATION
+    // =========================================================================
     @Override
     public void objectMadePrimary(Object key, Object value) {
         if (value instanceof DeltaSession) {
-            DeltaSession session = (DeltaSession)value;
+            DeltaSession session = (DeltaSession) value;
             synchronized (session) {
                 session.access();
                 session.setPrimarySession(true);
@@ -126,18 +123,16 @@ public class BackupManager extends ClusterManagerBase
 
 
     /**
-     * Start this component and implement the requirements
-     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
+     * Start this component and implement the requirements of
+     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}. Starts the cluster communication channel, this
+     * will connect with the other nodes in the cluster, and request the current session state to be transferred to this
+     * node.
      *
-     * Starts the cluster communication channel, this will connect with the
-     * other nodes in the cluster, and request the current session state to be
-     * transferred to this node.
-     *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
+     *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         super.startInternal();
 
@@ -145,50 +140,46 @@ public class BackupManager extends ClusterManagerBase
             if (cluster == null) {
                 throw new LifecycleException(sm.getString("backupManager.noCluster", getName()));
             }
-            LazyReplicatedMap<String,Session> map = new LazyReplicatedMap<>(
-                    this, cluster.getChannel(), rpcTimeout, getMapName(),
-                    getClassLoaders(), terminateOnStartFailure);
+            LazyReplicatedMap<String,Session> map = new LazyReplicatedMap<>(this, cluster.getChannel(), rpcTimeout,
+                    getMapName(), getClassLoaders(), terminateOnStartFailure);
             map.setChannelSendOptions(mapSendOptions);
             map.setAccessTimeout(accessTimeout);
             this.sessions = map;
-        }  catch ( Exception x ) {
-            log.error(sm.getString("backupManager.startUnable", getName()),x);
-            throw new LifecycleException(sm.getString("backupManager.startFailed", getName()),x);
+        } catch (Exception x) {
+            log.error(sm.getString("backupManager.startUnable", getName()), x);
+            throw new LifecycleException(sm.getString("backupManager.startFailed", getName()), x);
         }
         setState(LifecycleState.STARTING);
     }
 
     public String getMapName() {
-        String name = cluster.getManagerName(getName(),this)+"-"+"map";
-        if ( log.isDebugEnabled() ) {
-            log.debug("Backup manager, Setting map name to:"+name);
+        String name = cluster.getManagerName(getName(), this) + "-" + "map";
+        if (log.isTraceEnabled()) {
+            log.trace("Backup manager, Setting map name to:" + name);
         }
         return name;
     }
 
 
     /**
-     * Stop this component and implement the requirements
-     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
+     * Stop this component and implement the requirements of
+     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}. This will disconnect the cluster communication
+     * channel and stop the listener thread.
      *
-     * This will disconnect the cluster communication channel and stop the
-     * listener thread.
-     *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
+     *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("backupManager.stopped", getName()));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("backupManager.stopped", getName()));
         }
 
         setState(LifecycleState.STOPPING);
 
         if (sessions instanceof LazyReplicatedMap) {
-            LazyReplicatedMap<String,Session> map =
-                    (LazyReplicatedMap<String,Session>)sessions;
+            LazyReplicatedMap<String,Session> map = (LazyReplicatedMap<String,Session>) sessions;
             map.breakdown();
         }
 
@@ -218,9 +209,10 @@ public class BackupManager extends ClusterManagerBase
 
     /**
      * returns the SendOptions as a comma separated list of names
+     *
      * @return a comma separated list of the option names
      */
-    public String getMapSendOptionsName(){
+    public String getMapSendOptionsName() {
         return Channel.getSendOptionsAsString(mapSendOptions);
     }
 
@@ -266,14 +258,13 @@ public class BackupManager extends ClusterManagerBase
 
     @Override
     public int getActiveSessionsFull() {
-        LazyReplicatedMap<String,Session> map =
-                (LazyReplicatedMap<String,Session>)sessions;
+        LazyReplicatedMap<String,Session> map = (LazyReplicatedMap<String,Session>) sessions;
         return map.sizeFull();
     }
 
     @Override
     public Set<String> getSessionIdsFull() {
-        LazyReplicatedMap<String,Session> map = (LazyReplicatedMap<String,Session>)sessions;
+        LazyReplicatedMap<String,Session> map = (LazyReplicatedMap<String,Session>) sessions;
         Set<String> sessionIds = new HashSet<>(map.keySetFull());
         return sessionIds;
     }

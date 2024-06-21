@@ -48,7 +48,8 @@ public class MBeanDumper {
      * The following code to dump MBeans has been copied from JMXProxyServlet.
      *
      * @param mbeanServer the MBean server
-     * @param names a set of object names for which to dump the info
+     * @param names       a set of object names for which to dump the info
+     *
      * @return a string representation of the MBeans
      */
     public static String dumpBeans(MBeanServer mbeanServer, Set<ObjectName> names) {
@@ -80,8 +81,7 @@ public class MBeanDumper {
                     if ("modelerType".equals(attName)) {
                         continue;
                     }
-                    if (attName.indexOf('=') >= 0 || attName.indexOf(':') >= 0
-                            || attName.indexOf(' ') >= 0) {
+                    if (attName.indexOf('=') >= 0 || attName.indexOf(':') >= 0 || attName.indexOf(' ') >= 0) {
                         continue;
                     }
 
@@ -114,8 +114,8 @@ public class MBeanDumper {
                         Class<?> c = value.getClass();
                         if (c.isArray()) {
                             int len = Array.getLength(value);
-                            StringBuilder sb = new StringBuilder("Array["
-                                    + c.getComponentType().getName() + "] of length " + len);
+                            StringBuilder sb =
+                                    new StringBuilder("Array[" + c.getComponentType().getName() + "] of length " + len);
                             if (len > 0) {
                                 sb.append(CRLF);
                             }
@@ -130,9 +130,8 @@ public class MBeanDumper {
                         } else if (TabularData.class.isInstance(value)) {
                             TabularData tab = TabularData.class.cast(value);
                             StringJoiner joiner = new StringJoiner(CRLF);
-                            joiner.add(
-                                    "TabularData[" + tab.getTabularType().getRowType().getTypeName()
-                                            + "] of length " + tab.size());
+                            joiner.add("TabularData[" + tab.getTabularType().getRowType().getTypeName() +
+                                    "] of length " + tab.size());
                             for (Object item : tab.values()) {
                                 joiner.add(tableItemToString(item));
                             }

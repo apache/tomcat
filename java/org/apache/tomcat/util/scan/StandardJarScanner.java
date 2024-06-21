@@ -192,8 +192,12 @@ public class StandardJarScanner implements JarScanner {
                     URL url = null;
                     try {
                         url = context.getResource(path);
-                        processedURLs.add(url);
-                        process(scanType, callback, url, path, true, null);
+                        if (url != null) {
+                            processedURLs.add(url);
+                            process(scanType, callback, url, path, true, null);
+                        } else {
+                            log.warn(sm.getString("jarScan.webinflibFail", path));
+                        }
                     } catch (IOException e) {
                         log.warn(sm.getString("jarScan.webinflibFail", url), e);
                     }

@@ -90,7 +90,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("packetSize", Integer.toString(ajpPacketSize)));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
         ctx.addServletMappingDecoded("/", "snoop");
@@ -507,7 +507,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         tomcat.start();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "helloWorld", new HelloWorldServlet());
         ctx.addServletMappingDecoded("/", "helloWorld");
@@ -571,7 +571,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         tomcat.start();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "helloWorld", new HelloWorldServlet());
         ctx.addServletMappingDecoded("/", "helloWorld");
@@ -678,7 +678,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug55453", new Tester304WithBodyServlet());
         ctx.addServletMappingDecoded("/", "bug55453");
@@ -732,7 +732,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         ReadBodyServlet servlet = new ReadBodyServlet(callAvailable);
         Tomcat.addServlet(ctx, "ReadBody", servlet);
@@ -787,7 +787,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("packetSize", Integer.toString(ajpPacketSize)));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         FixedResponseSizeServlet servlet = new FixedResponseSizeServlet(15000, 16000);
         Tomcat.addServlet(ctx, "FixedResponseSizeServlet", servlet);
@@ -829,7 +829,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug66512", new InvalidHeaderServlet());
         ctx.addServletMappingDecoded("/", "bug66512");
@@ -879,6 +879,60 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             resp.setHeader(VALID_HEADER_A_NAME, VALID_HEADER_A_VALUE);
             resp.setHeader(INVALID_HEADER_B_NAME, INVALID_HEADER_B_VALUE);
             resp.setHeader(VALID_HEADER_C_NAME, VALID_HEADER_C_VALUE);
+        }
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=66591
+     */
+    @Test
+    public void testNoHeaders() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "bug66591", new NoHeadersServlet());
+        ctx.addServletMappingDecoded("/", "bug66591");
+
+        tomcat.start();
+
+        SimpleAjpClient ajpClient = new SimpleAjpClient();
+        ajpClient.setPort(getPort());
+        ajpClient.connect();
+
+        validateCpong(ajpClient.cping());
+
+        TesterAjpMessage forwardMessage = ajpClient.createForwardMessage();
+        forwardMessage.end();
+
+        TesterAjpMessage responseHeaderMessage = ajpClient.sendMessage(forwardMessage, null);
+
+        // Expect 3 messages: headers, body chunk, end
+        Map<String, List<String>> responseHeaders = validateResponseHeaders(responseHeaderMessage, 200, "200");
+        Assert.assertTrue(responseHeaders.isEmpty());
+
+        String body = extractResponseBody(ajpClient.readMessage());
+        Assert.assertTrue(body.isEmpty());
+
+        validateResponseEnd(ajpClient.readMessage(), true);
+
+        // Double check the connection is still open
+        validateCpong(ajpClient.cping());
+
+        ajpClient.disconnect();
+    }
+
+
+    private static class NoHeadersServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.flushBuffer();
         }
     }
 
@@ -943,7 +997,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Assert.assertEquals(0x03, message.readByte());
 
         int len = message.readInt();
-        Assert.assertTrue(len > 0);
+        Assert.assertTrue(len >= 0);
         return message.readString(len);
     }
 

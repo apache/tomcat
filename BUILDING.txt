@@ -104,7 +104,7 @@ package.
 
  *  Source packages can be downloaded from:
 
-        https://tomcat.apache.org/download-@VERSION_MAJOR@0.cgi
+        https://tomcat.apache.org/download-@VERSION_MAJOR@.cgi
 
 The location where the source has been placed will be further referred as
 ${tomcat.source}.
@@ -364,7 +364,7 @@ properties, which all are "true" by default:
     execute.test.nio2=true
 
 The SSL tests will be run twice. Once with the JSSE implementation and once
-with the OpenSSL implementation. The OpenSSL implementation can only can be
+with the OpenSSL implementation. The OpenSSL implementation can only be
 tested if Tomcat-Native library binaries are found by the testsuite. The
 "test.apr.loc" property specifies the directory where the library binaries are
 located.
@@ -374,7 +374,7 @@ By default the "test.apr.loc" property specifies the following location:
     output/build/bin/
 
 If you are on Windows and want to test the OpenSSL TLS implementation you can
-put the tcnative-1.dll file into ${tomcat.source}/bin/ and it will be
+put the tcnative-2.dll file into ${tomcat.source}/bin/ and it will be
 copied into the above directory when the build runs.
 
 The unit tests include tests of the clustering functionality which require
@@ -488,29 +488,47 @@ NOTE: Cobertura is licensed under GPL v2 with parts of it being under
 
         output/coverage
 
- 7. The performance tests are written to run reasonably powerful machines (such
-    as a developer may use day to day) assuming no other resource hungry
+ 7. The performance tests are written to run on reasonably powerful machines
+    (such as a developer may use day to day) assuming no other resource hungry
     processes are running.
 
-    These assumptions are not always true (e.g. on CI systems running in a
-    virtual machine) so the performance tests may be deactivated by using the
-    following property:
+    Performance tests may be an absolute test (how long to complete a number
+    of iterations of an operation or set of operations) or may be a relative
+    test (how long two or more different approaches take to generate the same
+    result). The absolute tests may be destructive in that they run until the
+    system runs out of resources.
+
+    Where there is no benefit in running an absolute performance test as part
+    of a standard test run, the test will be excluded by naming it
+    Tester*Performance.java.
+
+    The relative tests are included as part of a standard test run however,
+    where the assumptions made about host capabilities are  not true (e.g. on
+    CI systems running in virtual machine) the tests may be deactivated by
+    using the following property:
 
         test.excludePerformance=true
 
- 8. Some tests include checks that the access log valve entries are as expected.
+ 8. Some tests are require large heaps (e.g. 8GB). The CI systems used by the
+    project either cannot support heaps of this size or do not support them by
+    default. These tests are therefore disabled by default and may be enabled by
+    using the following property:
+
+        test.includeLargeHeap=true
+
+ 9. Some tests include checks that the access log valve entries are as expected.
     These checks include timings. On slower / loaded systems these checks will
     often fail. The checks may be relaxed by using the following property:
 
         test.relaxTiming=true
 
- 9. It is known that some platforms (e.g. OSX El Capitan) require IPv4 to
-    be the default for the multicast tests to work. This is configured by
-    the following property:
+ 10. It is known that some platforms (e.g. OSX El Capitan) require IPv4 to
+     be the default for the multicast tests to work. This is configured by
+     the following property:
 
         java.net.preferIPv4Stack=true
 
- 10. By default the output of unit tests is sent to the console and can be
+ 11. By default the output of unit tests is sent to the console and can be
      quite verbose. The output can be deactivated by setting the property:
 
         test.verbose=false
