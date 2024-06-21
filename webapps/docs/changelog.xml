@@ -125,6 +125,11 @@
         Clean and log OpenSSL errors before processing of OpenSSL conf commands
         in the FFM code. (remm)
       </fix>
+      <fix>
+        <bug>69121</bug>: Ensure that the <code>onComplete()</code> event is
+        triggered if <code>AsyncListener.onError()</code> dispatches to a target
+        that throws an exception. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
