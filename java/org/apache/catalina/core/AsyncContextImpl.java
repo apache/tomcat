@@ -77,10 +77,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     private final AtomicBoolean hasOnErrorReturned = new AtomicBoolean(false);
 
     public AsyncContextImpl(Request request) {
+        this.request = request;
         if (log.isTraceEnabled()) {
             logDebug("Constructor");
         }
-        this.request = request;
     }
 
     @Override
