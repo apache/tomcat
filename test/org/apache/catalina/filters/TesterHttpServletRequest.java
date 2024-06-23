@@ -48,8 +48,8 @@ import javax.servlet.http.PushBuilder;
 
 public class TesterHttpServletRequest implements HttpServletRequest {
 
-    private Map<String, Object> attributes = new HashMap<>();
-    private Map<String, List<String>> headers = new HashMap<>();
+    private final Map<String, Object> attributes = new HashMap<>();
+    private final Map<String, List<String>> headers = new HashMap<>();
     private String method;
     private String scheme;
     private String serverName;
@@ -110,9 +110,14 @@ public class TesterHttpServletRequest implements HttpServletRequest {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This test implementation is hard coded to return an empty Hashmap.
+     */
     @Override
     public Map<String, String[]> getParameterMap() {
-        throw new RuntimeException("Not implemented");
+        return new HashMap<>();
     }
 
     @Override
@@ -183,9 +188,14 @@ public class TesterHttpServletRequest implements HttpServletRequest {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This test implementation is hard coded to return false.
+     */
     @Override
     public boolean isSecure() {
-        throw new RuntimeException("Not implemented");
+        return false;
     }
 
     @Override
@@ -251,7 +261,7 @@ public class TesterHttpServletRequest implements HttpServletRequest {
 
     @Override
     public Enumeration<String> getHeaders(String name) {
-        throw new RuntimeException("Not implemented");
+        return Collections.enumeration(headers.get(name));
     }
 
     @Override
@@ -293,9 +303,14 @@ public class TesterHttpServletRequest implements HttpServletRequest {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This test implementation is hard coded to return null.
+     */
     @Override
     public String getQueryString() {
-        throw new RuntimeException("Not implemented");
+        return null;
     }
 
     @Override
@@ -308,9 +323,14 @@ public class TesterHttpServletRequest implements HttpServletRequest {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This test implementation is hard coded to return null.
+     */
     @Override
     public Principal getUserPrincipal() {
-        throw new RuntimeException("Not implemented");
+        return null;
     }
 
     @Override
@@ -318,9 +338,14 @@ public class TesterHttpServletRequest implements HttpServletRequest {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This test implementation is hard coded to return null.
+     */
     @Override
     public String getRequestURI() {
-        throw new RuntimeException("Not implemented");
+        return null;
     }
 
     @Override
@@ -333,9 +358,14 @@ public class TesterHttpServletRequest implements HttpServletRequest {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This test implementation is hard coded to return null.
+     */
     @Override
     public HttpSession getSession(boolean create) {
-        throw new RuntimeException("Not implemented");
+        return null;
     }
 
     @Override
@@ -434,10 +464,20 @@ public class TesterHttpServletRequest implements HttpServletRequest {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This test implementation is hard coded to return a new instance of the httpUpgradeHandlerClass.
+     */
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass)
-            throws IOException, ServletException {
-        throw new RuntimeException("Not implemented");
+        throws IOException, ServletException  {
+        try {
+            return httpUpgradeHandlerClass.getDeclaredConstructor().newInstance();
+        }catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ignore){
+
+        }
+        return null;
     }
 
     @Override
