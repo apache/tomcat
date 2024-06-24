@@ -37,6 +37,7 @@ import org.apache.catalina.Group;
 import org.apache.catalina.Role;
 import org.apache.catalina.User;
 import org.apache.catalina.realm.GenericPrincipal;
+import org.apache.catalina.realm.TestMemoryRealm;
 import org.apache.catalina.realm.UserDatabaseRealm;
 
 public class TestMemoryUserDatabase {
@@ -49,15 +50,7 @@ public class TestMemoryUserDatabase {
         throws Exception {
 
         try(BufferedWriter out = new BufferedWriter(new FileWriter(TEST_FILE))) {
-            out.write("<?xml version=\"1.0\" ?>"
-                    + "<tomcat-users xmlns=\"http://tomcat.apache.org/xml\""
-                    + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-                    + " xsi:schemaLocation=\"http://tomcat.apache.org/xml/tomcat-users.xsd\""
-                    + " version=\"1.0\">"
-                    + "<role rolename=\"testrole\" />"
-                    + "<group groupname=\"testgroup\" />"
-                    + "<user username=\"admin\" password=\"sekr3t\" roles=\"testrole, otherrole\" groups=\"testgroup, othergroup\" />"
-                    + "</tomcat-users>");
+            out.write(TestMemoryRealm.CONFIG);
         }
 
         db = new MemoryUserDatabase();
