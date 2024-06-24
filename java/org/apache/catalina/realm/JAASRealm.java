@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.realm;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -40,12 +41,13 @@ import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.file.ConfigFileLoader;
+import org.apache.tomcat.util.file.ConfigurationSource;
 
 /**
  * <p>
  * Implementation of <b>Realm</b> that authenticates users via the <em>Java Authentication and Authorization
- * Service</em> (JAAS). JAAS support requires either JDK 1.4 (which includes it as part of the standard platform) or JDK
- * 1.3 (with the plug-in <code>jaas.jar</code> file).
+ * Service</em> (JAAS).
  * </p>
  * <p>
  * The value configured for the <code>appName</code> property is passed to the
@@ -593,15 +595,25 @@ public class JAASRealm extends RealmBase {
                     jaasConfigurationLoaded = true;
                     return null;
                 }
-                URL resource = Thread.currentThread().getContextClassLoader().getResource(configFile);
-                URI uri = resource.toURI();
                 @SuppressWarnings("unchecked")
                 Class<Configuration> sunConfigFile =
                         (Class<Configuration>) Class.forName("com.sun.security.auth.login.ConfigFile");
                 Constructor<Configuration> constructor = sunConfigFile.getConstructor(URI.class);
-                Configuration config = constructor.newInstance(uri);
+                URL resource = Thread.currentThread().getContextClassLoader().getResource(configFile);
+                Configuration config = null;
+                if (resource == null) {
+                    try (ConfigurationSource.Resource configFileResource = ConfigFileLoader.getSource().getResource(configFile)) {
+                        config = constructor.newInstance(configFileResource.getURI());
+                        this.jaasConfigurationLoaded = true;
+                    } catch (IOException ioe) {
+                        throw new RuntimeException(sm.getString("jaasRealm.configFileNotFound", configFile));
+                    }
+                } else {
+                    URI uri = resource.toURI();
+                    config = constructor.newInstance(uri);
+                    this.jaasConfigurationLoaded = true;
+                }
                 this.jaasConfiguration = config;
-                this.jaasConfigurationLoaded = true;
                 return this.jaasConfiguration;
             }
         } catch (InvocationTargetException ex) {
