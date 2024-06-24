@@ -16,12 +16,32 @@
  */
 package org.apache.tomcat.websocket.server;
 
+import java.lang.reflect.Field;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterRegistration;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.websocket.*;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.Decoder;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.Encoder;
+import jakarta.websocket.HandshakeResponse;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
 import jakarta.websocket.server.ServerEndpoint;
 import jakarta.websocket.server.ServerEndpointConfig;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.filters.TesterHttpServletRequest;
@@ -34,19 +54,6 @@ import org.apache.tomcat.websocket.TesterEchoServer;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
 import org.apache.tomcat.websocket.WebSocketBaseTest;
 import org.apache.tomcat.websocket.pojo.TesterUtil.SimpleClient;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.lang.reflect.Field;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 
 public class TestWsServerContainer extends WebSocketBaseTest {
 
@@ -478,7 +485,7 @@ public class TestWsServerContainer extends WebSocketBaseTest {
     }
 
     private static class DummyDecoder implements Decoder {
-        public DummyDecoder(String ignoredParam) {
+        DummyDecoder(String ignoredParam) {
         }
     }
 
@@ -560,7 +567,7 @@ public class TestWsServerContainer extends WebSocketBaseTest {
     }
 
     private static class DummyConfigurator extends ServerEndpointConfig.Configurator {
-        public DummyConfigurator(String ignoredParam) {
+        DummyConfigurator(String ignoredParam) {
         }
 
     }
@@ -576,7 +583,7 @@ public class TestWsServerContainer extends WebSocketBaseTest {
     public static class DummyPojo3 {
     }
 
-    private static class DummyEncoder implements Encoder {
+    public static class DummyEncoder implements Encoder {
         public DummyEncoder() {
         }
     }
