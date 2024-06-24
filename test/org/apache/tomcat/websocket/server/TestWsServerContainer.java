@@ -16,13 +16,25 @@
  */
 package org.apache.tomcat.websocket.server;
 
+import java.lang.reflect.Field;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.Filter;
+import javax.servlet.FilterRegistration;
+import javax.servlet.http.HttpServletResponse;
 import javax.websocket.ContainerProvider;
+import javax.websocket.Decoder;
 import javax.websocket.DeploymentException;
+import javax.websocket.Encoder;
+import javax.websocket.EndpointConfig;
+import javax.websocket.HandshakeResponse;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import javax.websocket.server.ServerEndpoint;
@@ -33,14 +45,16 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.filters.TesterHttpServletRequest;
+import org.apache.catalina.filters.TesterHttpServletResponse;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.unittest.TesterServletContext;
+import org.apache.tomcat.websocket.Constants;
 import org.apache.tomcat.websocket.TesterEchoServer;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
 import org.apache.tomcat.websocket.WebSocketBaseTest;
 import org.apache.tomcat.websocket.pojo.TesterUtil.SimpleClient;
-
 
 public class TestWsServerContainer extends WebSocketBaseTest {
 
@@ -441,7 +455,9 @@ public class TestWsServerContainer extends WebSocketBaseTest {
 
         HttpServletResponse response = new TesterHttpServletResponse();
 
-        ServerEndpointConfig sec = ServerEndpointConfig.Builder.create(Object.class, "/").subprotocols(List.of("testProtocol")).build();
+        ArrayList<String> protocols = new ArrayList<>();
+        protocols.add("testProtocol");
+        ServerEndpointConfig sec = ServerEndpointConfig.Builder.create(Object.class, "/").subprotocols(protocols).build();
 
         WsServerContainer container = new WsServerContainer(new TesterServletContext());
 
@@ -464,7 +480,9 @@ public class TestWsServerContainer extends WebSocketBaseTest {
 
         HttpServletResponse response = new TesterHttpServletResponse();
 
-        ServerEndpointConfig sec = ServerEndpointConfig.Builder.create(Object.class, "/").decoders(List.of(DummyDecoder.class)).build();
+        ArrayList<Class<? extends Decoder>> decoders = new ArrayList<>();
+        decoders.add(DummyDecoder.class);
+        ServerEndpointConfig sec = ServerEndpointConfig.Builder.create(Object.class, "/").decoders(decoders).build();
 
         WsServerContainer container = new WsServerContainer(new TesterServletContext());
 
@@ -472,7 +490,15 @@ public class TestWsServerContainer extends WebSocketBaseTest {
     }
 
     private static class DummyDecoder implements Decoder {
-        public DummyDecoder(String ignoredParam) {
+        DummyDecoder(String ignoredParam) {
+        }
+
+        @Override
+        public void init(EndpointConfig endpointConfig) {
+        }
+
+        @Override
+        public void destroy() {
         }
     }
 
@@ -554,7 +580,7 @@ public class TestWsServerContainer extends WebSocketBaseTest {
     }
 
     private static class DummyConfigurator extends ServerEndpointConfig.Configurator {
-        public DummyConfigurator(String ignoredParam) {
+        DummyConfigurator(String ignoredParam) {
         }
 
     }
@@ -570,8 +596,16 @@ public class TestWsServerContainer extends WebSocketBaseTest {
     public static class DummyPojo3 {
     }
 
-    private static class DummyEncoder implements Encoder {
+    public static class DummyEncoder implements Encoder {
         public DummyEncoder() {
+        }
+
+        @Override
+        public void init(EndpointConfig endpointConfig) {
+        }
+
+        @Override
+        public void destroy() {
         }
     }
 

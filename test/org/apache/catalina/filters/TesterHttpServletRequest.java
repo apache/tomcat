@@ -19,6 +19,7 @@ package org.apache.catalina.filters;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -471,11 +472,10 @@ public class TesterHttpServletRequest implements HttpServletRequest {
      */
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass)
-        throws IOException, ServletException  {
+        throws IOException, ServletException {
         try {
             return httpUpgradeHandlerClass.getDeclaredConstructor().newInstance();
-        }catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ignore){
-
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ignore) {
         }
         return null;
     }
