@@ -45,6 +45,7 @@ public class TestJAASRealm extends TomcatBaseTest {
         try (PrintWriter writer = new PrintWriter(loginConfFile)) {
             writer.write(CONFIG);
         }
+        addDeleteOnTearDown(loginConfFile);
 
         JAASRealm jaasRealm = new JAASRealm();
         jaasRealm.setAppName("CustomLogin");
