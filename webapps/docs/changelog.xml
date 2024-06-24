@@ -111,6 +111,12 @@
         Allow <code>JAASRealm</code> to use the configuration source to load a
         configured <code>configFile</code>, for easier use with testing. (remm)
       </fix>
+      <fix>
+        Fix a potential <code>NullPointerException</code> in classes that extend
+        <code>ServletResponse</code> when
+        <code>setCharacterEncoding(Charset)</code> is called with
+        <code>null</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

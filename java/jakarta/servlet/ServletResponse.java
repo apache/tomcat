@@ -178,7 +178,11 @@ public interface ServletResponse {
      * @since Servlet 6.1
      */
     default void setCharacterEncoding(Charset encoding) {
-        setCharacterEncoding(encoding.name());
+        if (encoding == null) {
+            setCharacterEncoding((String) null);
+        } else {
+            setCharacterEncoding(encoding.name());
+        }
     }
 
     /**
