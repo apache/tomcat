@@ -16,16 +16,36 @@
  */
 package org.apache.catalina.filters;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConnection;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletMapping;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpUpgradeHandler;
+import jakarta.servlet.http.Part;
 
 public class TesterHttpServletRequest implements HttpServletRequest {
 
@@ -442,7 +462,7 @@ public class TesterHttpServletRequest implements HttpServletRequest {
      */
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass)
-        throws IOException, ServletException  {
+        throws IOException, ServletException {
         try {
             return httpUpgradeHandlerClass.getDeclaredConstructor().newInstance();
         }catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ignore){
