@@ -116,7 +116,7 @@ public final class TesterSupport {
                 version = SSL.version();
                 Library.terminate();
             }
-        } catch (Exception | LibraryNotFoundError ex) {
+        } catch (Exception | LibraryNotFoundError | ExceptionInInitializerError ex) {
             err = ex.getMessage();
         }
         OPENSSL_AVAILABLE = available;
