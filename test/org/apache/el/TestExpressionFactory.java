@@ -17,6 +17,7 @@
 package org.apache.el;
 
 import jakarta.el.ELContext;
+import jakarta.el.ELException;
 import jakarta.el.ExpressionFactory;
 
 import org.junit.Assert;
@@ -44,5 +45,40 @@ public class TestExpressionFactory {
         Assert.assertNotNull(context);
 
         factory.createValueExpression(context, "foo", null);
+    }
+
+
+    @Test
+    public void testCoerceToTypeString() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        TestObject testObjectA = new TestObject();
+        String result = factory.coerceToType(testObjectA, String.class);
+        Assert.assertEquals(TestObject.OK, result);
+    }
+
+
+    @Test(expected = ELException.class)
+    public void testCoerceToTypeStringThrowsException() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        TestObjectException testObjectA = new TestObjectException();
+        factory.coerceToType(testObjectA, String.class);
+    }
+
+
+    private static class TestObject{
+
+        private static final String OK = "OK";
+        @Override
+        public String toString() {
+            return OK;
+        }
+    }
+
+    private static class TestObjectException{
+
+        @Override
+        public String toString() {
+            throw new RuntimeException();
+        }
     }
 }
