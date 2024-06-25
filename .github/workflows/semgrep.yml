@@ -26,7 +26,6 @@ on:
       - main
       - 10.1.x
       - 9.0.x
-      - 8.5.x
   # Schedule the CI job (this method uses cron syntax):
   schedule:
     - cron: '12 11 * * *' # Sets Semgrep to scan every day at 11:12 UTC.
@@ -47,5 +46,5 @@ jobs:
     if: (github.actor != 'dependabot[bot]')
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: semgrep ci
