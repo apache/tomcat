@@ -111,6 +111,10 @@
         Allow <code>JAASRealm</code> to use the configuration source to load a
         configured <code>configFile</code>, for easier use with testing. (remm)
       </fix>
+      <fix>
+        Add missing algorithm callback to the <code>JAASCallbackHandler</code>.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

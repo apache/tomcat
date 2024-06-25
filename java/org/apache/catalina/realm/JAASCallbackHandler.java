@@ -97,6 +97,7 @@ public class JAASCallbackHandler implements CallbackHandler {
         this.realmName = realmName;
         this.digestA2 = digestA2;
         this.authMethod = authMethod;
+        this.algorithm = algorithm;
     }
 
     // ----------------------------------------------------- Instance Variables
@@ -157,6 +158,11 @@ public class JAASCallbackHandler implements CallbackHandler {
      */
     protected final String authMethod;
 
+    /**
+     * Algorithm.
+     */
+    protected final String algorithm;
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -204,6 +210,8 @@ public class JAASCallbackHandler implements CallbackHandler {
                     cb.setText(digestA2);
                 } else if (cb.getPrompt().equals("authMethod")) {
                     cb.setText(authMethod);
+                } else if (cb.getPrompt().equals("algorithm")) {
+                    cb.setText(algorithm);
                 } else if (cb.getPrompt().equals("catalinaBase")) {
                     cb.setText(realm.getContainer().getCatalinaBase().getAbsolutePath());
                 } else {
