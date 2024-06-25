@@ -124,6 +124,11 @@
         triggered if <code>AsyncListener.onError()</code> dispatches to a target
         that throws an exception. (markt)
       </fix>
+      <fix>
+        Following the trailer header field refactoring, <code>-1</code> is no
+        longer an allowed value for <code>maxTrailerSize</code>. Adjust
+        documentation accordingly. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
