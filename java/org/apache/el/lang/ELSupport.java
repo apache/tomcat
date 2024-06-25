@@ -33,6 +33,7 @@ import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.LambdaExpression;
 
+import org.apache.el.util.ExceptionUtils;
 import org.apache.el.util.MessageFactory;
 
 
@@ -473,7 +474,15 @@ public class ELSupport {
         } else if (obj instanceof Enum<?>) {
             return ((Enum<?>) obj).name();
         } else {
-            return obj.toString();
+            try {
+                return obj.toString();
+            } catch (ELException e) {
+                // Unlikely but you never know
+                throw e;
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                throw new ELException(t);
+            }
         }
     }
 
