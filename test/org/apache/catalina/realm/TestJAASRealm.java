@@ -35,6 +35,12 @@ public class TestJAASRealm extends TomcatBaseTest {
             "    sufficient;\n" +
             "};";
 
+    private static final String CONFIG_MEMORY =
+            "MemoryLogin {\n" +
+            "    org.apache.catalina.realm.JAASMemoryLoginModule\n" +
+            "    sufficient pathname=\"tomcat-users-lm.xml\";\n" +
+            "};";
+
     @Test
     public void testRealm() throws Exception {
 
@@ -65,6 +71,43 @@ public class TestJAASRealm extends TomcatBaseTest {
         Assert.assertTrue(p instanceof GenericPrincipal);
         GenericPrincipal gp = (GenericPrincipal) p;
         Assert.assertTrue(gp.hasRole("role1"));
+    }
+
+    @Test
+    public void testMemoryLoginModule() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File tomcatUsersXml = new File(getTemporaryDirectory(), "tomcat-users-lm.xml");
+        try (PrintWriter writer = new PrintWriter(tomcatUsersXml)) {
+            writer.write(TestMemoryRealm.CONFIG);
+        }
+        addDeleteOnTearDown(tomcatUsersXml);
+
+        // Write login config to the temp path
+        File loginConfFile = new File(getTemporaryDirectory(), "memoryLoginConfig.conf");
+        try (PrintWriter writer = new PrintWriter(loginConfFile)) {
+            writer.write(CONFIG_MEMORY.replace("tomcat-users-lm.xml", tomcatUsersXml.getAbsolutePath()));
+        }
+        addDeleteOnTearDown(loginConfFile);
+
+        JAASRealm jaasRealm = new JAASRealm();
+        jaasRealm.setAppName("MemoryLogin");
+        jaasRealm.setCredentialHandler(new MessageDigestCredentialHandler());
+        jaasRealm.setUserClassNames(GenericPrincipal.class.getName());
+        jaasRealm.setRoleClassNames(GenericPrincipal.class.getName());
+        jaasRealm.setConfigFile(loginConfFile.getAbsolutePath());
+        Context context = tomcat.addContext("/jaastest", null);
+        context.setRealm(jaasRealm);
+
+        tomcat.start();
+
+        Principal p = jaasRealm.authenticate("foo", "bar");
+        Assert.assertNull(p);
+        p = jaasRealm.authenticate("admin", "sekr3t");
+        Assert.assertNotNull(p);
+        Assert.assertTrue(p instanceof GenericPrincipal);
+        GenericPrincipal gp = (GenericPrincipal) p;
+        Assert.assertTrue(gp.hasRole("testrole"));
     }
 
 }
