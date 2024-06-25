@@ -86,7 +86,11 @@ public class TestJAASRealm extends TomcatBaseTest {
         // Write login config to the temp path
         File loginConfFile = new File(getTemporaryDirectory(), "memoryLoginConfig.conf");
         try (PrintWriter writer = new PrintWriter(loginConfFile)) {
-            writer.write(CONFIG_MEMORY.replace("tomcat-users-lm.xml", tomcatUsersXml.getAbsolutePath()));
+            String path = tomcatUsersXml.getAbsolutePath();
+            if (File.separatorChar == '\\') {
+                path = path.replace("\\", "\\\\");
+            }
+            writer.write(CONFIG_MEMORY.replace("tomcat-users-lm.xml", path));
         }
         addDeleteOnTearDown(loginConfFile);
 
