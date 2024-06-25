@@ -144,6 +144,11 @@
         is aware of new classes added to the <code>java.lang</code> package in
         Java 23. (markt)
       </fix>
+      <fix>
+        Ensure that an exception in <code>toString()</code> still results in an
+        <code>ELException</code> when an object is coerced to a String using
+        <code>ExpressionFactory.coerceToType()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
