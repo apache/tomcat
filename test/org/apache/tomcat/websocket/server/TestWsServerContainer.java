@@ -485,13 +485,15 @@ public class TestWsServerContainer extends WebSocketBaseTest {
     }
 
     private static class DummyDecoder implements Decoder {
+        @SuppressWarnings("unused")
         DummyDecoder(String ignoredParam) {
         }
     }
 
     @Test
     public void testFilterRegistrationFailure() {
-        new WsServerContainer(new TesterServletContext(){
+        @SuppressWarnings("unused")
+        Object obj = new WsServerContainer(new TesterServletContext(){
             @Override
             public FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
                 return null;
@@ -567,6 +569,7 @@ public class TestWsServerContainer extends WebSocketBaseTest {
     }
 
     private static class DummyConfigurator extends ServerEndpointConfig.Configurator {
+        @SuppressWarnings("unused")
         DummyConfigurator(String ignoredParam) {
         }
 
