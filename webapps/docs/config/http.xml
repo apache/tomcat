@@ -573,8 +573,8 @@
 
     <attribute name="maxTrailerSize" required="false">
       <p>Limits the total length of trailing headers in the last chunk of
-      a chunked HTTP request. If the value is <code>-1</code>, no limit will be
-      imposed. If not specified, the default value of <code>8192</code> will be
+      a chunked HTTP request. This must be a positive integer value.
+      If not specified, the default value of <code>8192</code> will be
       used.</p>
     </attribute>
 
