@@ -172,6 +172,7 @@
   <property name="catalina-storeconfig-src.jar" value="${tomcat.src.jars}/catalina-storeconfig-src.jar"/>
   <property name="tomcat-jni-src.jar" value="${tomcat.src.jars}/tomcat-jni-src.jar"/>
   <property name="tomcat-coyote-src.jar" value="${tomcat.src.jars}/tomcat-coyote-src.jar"/>
+  <property name="tomcat-coyote-ffm-src.jar" value="${tomcat.src.jars}/tomcat-coyote-ffm-src.jar"/>
   <property name="tomcat-dbcp-src.jar" value="${tomcat.src.jars}/tomcat-dbcp-src.jar"/>
   <property name="tomcat-api-src.jar" value="${tomcat.src.jars}/tomcat-api-src.jar"/>
   <property name="tomcat-util-src.jar" value="${tomcat.src.jars}/tomcat-util-src.jar"/>
@@ -3311,6 +3312,11 @@ asf.ldap.username=${release.asfusername}
     <jarIt jarfile="${tomcat-coyote-src.jar}"
       filesDir="java"
       filesId="files.tomcat-coyote" />
+
+    <!-- Protocol handlers - Coyote OpenSSL FFM -->
+    <jarIt jarfile="${tomcat-coyote-ffm-src.jar}"
+      filesDir="java"
+      filesId="files.tomcat-coyote-ffm" />
 
     <!-- WebSocket implementation JAR File -->
     <jarIt jarfile="${tomcat-websocket-src.jar}"
