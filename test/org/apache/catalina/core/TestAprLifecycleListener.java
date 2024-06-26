@@ -71,7 +71,7 @@ public class TestAprLifecycleListener {
 
         Tomcat tomcat2 = new Tomcat();
         Path base2 = Files.createTempDirectory(tmpDir, "tomcat2-");
-        tomcat1.setBaseDir(base2.toAbsolutePath().toString());
+        tomcat2.setBaseDir(base2.toAbsolutePath().toString());
         tomcat2.setPort(0);
         TesterSupport.initSsl(tomcat2);
         TesterSupport.configureSSLImplementation(tomcat2,
