@@ -189,7 +189,7 @@
             <compilation-unit>
                 <package-root>test</package-root>
                 <unit-tests/>
-                <classpath mode="compile">output/classes:output/testclasses:output/build/webapps/examples/WEB-INF/classes:@JUNIT_JAR@:@EASYMOCK_JAR@:@OBJENESIS_JAR@:@HAMCREST_JAR@:@UNBOUNDID_JAR@</classpath>
+                <classpath mode="compile">output/classes:output/testclasses:output/build/webapps/examples/WEB-INF/classes:@JUNIT_JAR@:@EASYMOCK_JAR@:@BYTEBUDDY_JAR@:@OBJENESIS_JAR@:@HAMCREST_JAR@:@UNBOUNDID_JAR@</classpath>
                 <source-level>@BUILD_JAVA_VERSION@</source-level>
             </compilation-unit>
         </java-data>
