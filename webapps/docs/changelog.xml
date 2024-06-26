@@ -180,6 +180,9 @@
         to run Tomcat. (rjung)
       </update>
       <update>
+        Update to the Eclipse JDT compiler 4.32. (markt)
+      </update>
+      <update>
         Update UnboundID to 7.0.1. (markt)
       </update>
       <update>

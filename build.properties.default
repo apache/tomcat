@@ -127,11 +127,11 @@ base-maven.loc=https://repo.maven.apache.org/maven2
 # https://download.eclipse.org/eclipse/downloads/drops4/R-4.31-202402290520/
 # https://download.eclipse.org/eclipse/downloads/drops4/R-4.31-202402290520/checksum/eclipse-4.31-SUMSSHA512
 #
-jdt.version=4.31
-jdt.release=R-4.31-202402290520
+jdt.version=4.32
+jdt.release=R-4.32-202406010610
 jdt.checksum.enabled=true
 jdt.checksum.algorithm=SHA-512
-jdt.checksum.value=1f31bea2297013601ba7a3e0a8c65d7b621601c106fe10bf2a11af625d63aa0772941fa029fb392cd9fe2314203e6ef7e04a94dc938e15961108494139fae3e8
+jdt.checksum.value=8937dede817b8c37f23e0b42162bdd0f722e34e40f75a35b9ca45a17bc78c1a0d65ddaa81b5e6916c7cd8895023a04dd6112031c952ab4584e72e6a1f35f1608
 jdt.home=${base.path}/ecj-${jdt.version}
 jdt.jar=${jdt.home}/ecj-${jdt.version}.jar
 # The download will be moved to the archive area eventually. We are taking care of that in advance.
