@@ -167,6 +167,9 @@
         testsuite, supporting Java versions down to the minimum supported
         to run Tomcat. (rjung)
       </update>
+      <update>
+        Update to SpotBugs 4.8.6. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
