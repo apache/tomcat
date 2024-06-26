@@ -166,6 +166,9 @@
         to run Tomcat. (rjung)
       </update>
       <update>
+        Update UnboundID to 7.0.1. (markt)
+      </update>
+      <update>
         Update to SpotBugs 4.8.6. (markt)
       </update>
     </changelog>
