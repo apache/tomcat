@@ -170,6 +170,13 @@
         <code>ELException</code> when an object is coerced to a String using
         <code>ExpressionFactory.coerceToType()</code>. (markt)
       </fix>
+      <add>
+        Add support for specifying Java 24 (with the value <code>24</code>) as
+        the compiler source and/or compiler target for JSP compilation. If used
+        with an Eclipse JDT compiler version that does not support these values,
+        a warning will be logged and the default will used.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
