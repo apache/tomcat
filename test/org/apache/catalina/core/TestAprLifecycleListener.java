@@ -16,6 +16,10 @@
  */
 package org.apache.catalina.core;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -53,7 +57,12 @@ public class TestAprLifecycleListener {
 
 
     private void doTestMultipleServerInstancesUsingTomcatNativeLibrary(boolean reverseShutdownOrder, boolean ffm) throws Exception {
+        Path tmpDir = Paths.get(System.getProperty("tomcat.test.temp", "output/tmp"));
+        Files.createDirectories(tmpDir);
+
         Tomcat tomcat1 = new Tomcat();
+        Path base1 = Files.createTempDirectory(tmpDir, "tomcat1-");
+        tomcat1.setBaseDir(base1.toAbsolutePath().toString());
         tomcat1.setPort(0);
         TesterSupport.initSsl(tomcat1);
         TesterSupport.configureSSLImplementation(tomcat1,
@@ -61,6 +70,8 @@ public class TestAprLifecycleListener {
         tomcat1.init();
 
         Tomcat tomcat2 = new Tomcat();
+        Path base2 = Files.createTempDirectory(tmpDir, "tomcat2-");
+        tomcat1.setBaseDir(base2.toAbsolutePath().toString());
         tomcat2.setPort(0);
         TesterSupport.initSsl(tomcat2);
         TesterSupport.configureSSLImplementation(tomcat2,
@@ -85,5 +96,5 @@ public class TestAprLifecycleListener {
             tomcat2.stop();
             tomcat2.destroy();
         }
-}
+    }
 }
