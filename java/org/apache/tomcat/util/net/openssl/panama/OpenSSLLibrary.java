@@ -180,6 +180,7 @@ public class OpenSSLLibrary {
                 // Main library init
                 initLibrary();
 
+                OpenSSLStatus.setVersion(OpenSSL_version_num());
                 // OpenSSL 3 onwards uses providers
                 boolean isOpenSSL3 = (OpenSSL_version_num() >= 0x3000000fL);
 

@@ -25,6 +25,7 @@ public class OpenSSLStatus {
     private static volatile boolean available = false;
     private static volatile boolean useOpenSSL = true;
     private static volatile boolean instanceCreated = false;
+    private static volatile long version = 0;
 
 
     public static boolean isLibraryInitialized() {
@@ -66,4 +67,19 @@ public class OpenSSLStatus {
     public static void setInstanceCreated(boolean instanceCreated) {
         OpenSSLStatus.instanceCreated = instanceCreated;
     }
+
+    /**
+     * @return the version
+     */
+    public static long getVersion() {
+        return version;
+    }
+
+    /**
+     * @param version the version to set
+     */
+    public static void setVersion(long version) {
+        OpenSSLStatus.version = version;
+    }
+
 }

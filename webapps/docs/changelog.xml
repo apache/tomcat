@@ -115,6 +115,10 @@
         Add missing algorithm callback to the <code>JAASCallbackHandler</code>.
         (remm)
       </fix>
+      <fix>
+        Add the OpenSSL version number on the APR and OpenSSL status classes.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
