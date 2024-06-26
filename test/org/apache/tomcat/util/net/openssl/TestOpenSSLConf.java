@@ -98,6 +98,7 @@ public class TestOpenSSLConf extends TomcatBaseTest {
             StandardServer server = (StandardServer) tomcat.getServer();
             server.addLifecycleListener(listener);
         }
+        Assert.assertNotNull("Test configuragiton error: Invalid sslImplementationName", listener);
         // Initialize only the listener as the OpenSSL version is not available before
         listener.lifecycleEvent(new LifecycleEvent(tomcat.getServer(), Lifecycle.BEFORE_INIT_EVENT, null));
     }
