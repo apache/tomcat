@@ -37,6 +37,8 @@ jobs:
         exclude:
           - isMain: true
             java: 17
+          - os: windows-latest
+            java: 21
     name: JDK${{ matrix.java }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
