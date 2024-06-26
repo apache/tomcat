@@ -18,6 +18,8 @@
 Bundle-Name: tomcat-api
 Bundle-SymbolicName: org.apache.tomcat-api
 Export-Package: org.apache.tomcat
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -jpms-module-info: \
     ${module.name};\

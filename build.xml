@@ -142,6 +142,7 @@
   <property name="catalina-ant.jar" value="${tomcat.build}/lib/catalina-ant.jar"/>
   <property name="catalina-storeconfig.jar" value="${tomcat.build}/lib/catalina-storeconfig.jar"/>
   <property name="tomcat-coyote.jar" value="${tomcat.build}/lib/tomcat-coyote.jar"/>
+  <property name="tomcat-coyote-ffm.jar" value="${tomcat.build}/lib/tomcat-coyote-ffm.jar"/>
   <property name="tomcat-dbcp.jar" value="${tomcat.build}/lib/tomcat-dbcp.jar"/>
   <property name="tomcat-jni.jar" value="${tomcat.build}/lib/tomcat-jni.jar"/>
   <property name="tomcat-api.jar" value="${tomcat.build}/lib/tomcat-api.jar"/>
@@ -548,7 +549,6 @@
     <include name="org/apache/tomcat/util/json/**" />
     <include name="org/apache/tomcat/util/log/**" />
     <include name="org/apache/tomcat/util/net/**" />
-    <include name="org/apache/tomcat/util/openssl/**"/>
     <include name="org/apache/tomcat/util/res/**" />
     <include name="org/apache/tomcat/util/security/**" />
     <include name="org/apache/tomcat/util/threads/**" />
@@ -761,6 +761,11 @@
     <include name="org/apache/tomcat/util/log/**" />
     <include name="org/apache/tomcat/util/modeler/**" />
     <include name="org/apache/tomcat/util/net/**" />
+    <exclude name="org/apache/tomcat/util/net/openssl/panama/**"/>
+  </patternset>
+
+  <patternset id="files.tomcat-coyote-ffm">
+    <include name="org/apache/tomcat/util/net/openssl/panama/**"/>
     <include name="org/apache/tomcat/util/openssl/**"/>
   </patternset>
 
@@ -1200,6 +1205,13 @@
     <jarIt jarfile="${tomcat-coyote.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.tomcat-coyote"
+      addOSGi="true" />
+
+    <!-- OpenSSL FFM - Coyote -->
+    <jarIt jarfile="${tomcat-coyote-ffm.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.tomcat-coyote-ffm"
+      manifest="${tomcat.manifests}/tomcat-coyote-ffm.jar.manifest"
       addOSGi="true" />
 
     <!-- WebSocket implementation JAR File -->

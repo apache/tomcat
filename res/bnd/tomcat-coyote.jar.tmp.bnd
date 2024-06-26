@@ -37,9 +37,9 @@ Export-Package: \
     org.apache.tomcat.util.net,\
     org.apache.tomcat.util.net.jsse,\
     org.apache.tomcat.util.net.openssl,\
-    org.apache.tomcat.util.net.openssl.ciphers,\
-    org.apache.tomcat.util.net.openssl.panama,\
-    org.apache.tomcat.util.openssl
+    org.apache.tomcat.util.net.openssl.ciphers
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -includepackage: \
     org.apache.tomcat.util.bcel,\

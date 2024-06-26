@@ -45,6 +45,8 @@ Export-Package: \
     org.apache.catalina.webresources.war,\
     org.apache.catalina.manager.util,\
     org.apache.catalina
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -includepackage: \
     org.apache.naming.factory.webservices
