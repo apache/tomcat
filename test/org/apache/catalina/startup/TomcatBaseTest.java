@@ -64,7 +64,6 @@ import org.apache.catalina.webresources.StandardRoot;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
-import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.util.scan.StandardJarScanFilter;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 
@@ -73,13 +72,6 @@ import org.apache.tomcat.util.scan.StandardJarScanner;
  * don't have to keep writing the cleanup code.
  */
 public abstract class TomcatBaseTest extends LoggingBaseTest {
-
-    /*
-     * Ensures APR Library.initialize() and Library.terminate() don't interfere
-     * with the calls from the Lifecycle listener and trigger a JVM crash
-     */
-    @SuppressWarnings("unused")
-    private static final boolean ignored = TesterSupport.OPENSSL_AVAILABLE;
 
     // Used by parameterized tests. Defined here to reduce duplication.
     protected static final Boolean[] booleans = new Boolean[] { Boolean.FALSE, Boolean.TRUE };

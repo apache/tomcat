@@ -29,9 +29,11 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.core.AprStatus;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 
 /**
  * The keys and certificates used in this file are all available in svn and were
@@ -108,7 +110,7 @@ public class TestClientCertTls13 extends TomcatBaseTest {
         TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
         if (useOpenSSL) {
-            Assume.assumeTrue(TesterSupport.getOpensslVersion() >= 0x1010100f);
+            Assume.assumeTrue(AprStatus.getOpenSSLVersion() >= 0x1010100f || OpenSSLStatus.getVersion() >= 0x1010100f);
         }
 
         // Tests default to TLSv1.2 when client cert auth is used
