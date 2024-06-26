@@ -119,6 +119,13 @@
         Add the OpenSSL version number on the APR and OpenSSL status classes.
         (remm)
       </fix>
+      <fix>
+        <bug>69131</bug>: Expand the implementation of the <code>filter</code>
+        value of the Authenticator attribute <code>allowCorsPreflight</code>, so
+        that it applies to all requests that match the configured URL patterns
+        for the CORS filter, rather than only applying if the CORS filter is
+        mapped to <code>/*</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
