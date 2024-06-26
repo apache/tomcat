@@ -245,6 +245,7 @@
     <pathelement location="${hamcrest.jar}"/>
     <pathelement location="${easymock.jar}"/>
     <pathelement location="${objenesis.jar}"/>
+    <pathelement location="${bytebuddy.jar}"/>
     <pathelement location="${unboundid.jar}"/>
     <pathelement location="${derby.jar}"/>
     <pathelement location="${derby-shared.jar}"/>
@@ -262,6 +263,7 @@
     <filter token="EASYMOCK_JAR" value="${easymock.jar}"/>
     <filter token="HAMCREST_JAR" value="${hamcrest.jar}"/>
     <filter token="OBJENESIS_JAR" value="${objenesis.jar}"/>
+    <filter token="BYTEBUDDY_JAR" value="${bytebuddy.jar}"/>
     <filter token="BND_JAR" value="${bnd.jar}"/>
     <filter token="UNBOUNDID_JAR" value="${unboundid.jar}"/>
     <filter token="JUNIT_JAR" value="${junit.jar}"/>
@@ -3420,6 +3422,15 @@ asf.ldap.username=${release.asfusername}
       <param name="checksum.enabled" value="${objenesis.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${objenesis.checksum.algorithm}"/>
       <param name="checksum.value" value="${objenesis.checksum.value}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${bytebuddy.loc}"/>
+      <param name="destfile" value="${bytebuddy.jar}"/>
+      <param name="destdir" value="${bytebuddy.home}"/>
+      <param name="checksum.enabled" value="${bytebuddy.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${bytebuddy.checksum.algorithm}"/>
+      <param name="checksum.value" value="${bytebuddy.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadfile">
