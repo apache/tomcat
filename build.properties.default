@@ -271,10 +271,10 @@ jacoco.jar=${jacoco.home}/lib/jacocoant.jar
 jacoco.loc=${base-maven.loc}/org/jacoco/jacoco/${jacoco.version}/jacoco-${jacoco.version}.zip
 
 # ----- SpotBugs (originally FindBugs) -----
-spotbugs.version=4.8.5
+spotbugs.version=4.8.6
 spotbugs.checksum.enabled=true
 spotbugs.checksum.algorithm=SHA-512
-spotbugs.checksum.value=3310ffa7d18f4d9d8a87926bcd256709866bfa3337df69c183e18bb0491aa639f93c70ade764fdb13f499fa971980cd7ce99594e3e818f6cafc69675da901416
+spotbugs.checksum.value=2fe8083fe52bd04b6b1ac8fe9ea3c1ae544aa6eb07ea0d602a46d54d0537355e8a79af687ee2f96cbd7bd59d60d74609e4b89df97ec935387fc6cf925e0a3dd6
 spotbugs.home=${base.path}/spotbugs-${spotbugs.version}
 spotbugs.jar=${spotbugs.home}/lib/spotbugs-ant.jar
 spotbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${spotbugs.version}/spotbugs-${spotbugs.version}.tgz
