@@ -15,13 +15,13 @@
 
 -include: build-defaults.bnd
 
-Bundle-Name: tomcat-juli
-Bundle-SymbolicName: org.apache.tomcat-juli
+Bundle-Name: tomcat-coyote-ffm
+Bundle-SymbolicName: org.apache.tomcat-coyote-ffm
 Export-Package: \
-    org.apache.juli,\
-    org.apache.juli.logging
-X-Compile-Source-JDK: ${compile.release}
-X-Compile-Target-JDK: ${compile.release}
+    org.apache.tomcat.util.net.openssl.panama,\
+    org.apache.tomcat.util.openssl
+X-Compile-Source-JDK: ${release.java.version}
+X-Compile-Target-JDK: ${release.java.version}
 
 -jpms-module-info: \
     ${module.name};\

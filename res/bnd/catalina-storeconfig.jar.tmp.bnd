@@ -18,6 +18,8 @@
 Bundle-Name: tomcat-storeconfig
 Bundle-SymbolicName: org.apache.tomcat-storeconfig
 Export-Package: org.apache.catalina.storeconfig
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -jpms-module-info: \
     ${module.name};\

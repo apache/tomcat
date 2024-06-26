@@ -156,6 +156,11 @@
         longer an allowed value for <code>maxTrailerSize</code>. Adjust
         documentation accordingly. (remm)
       </fix>
+      <update>
+        Move OpenSSL support using FFM to a separate JAR named
+        <code>tomcat-coyote-ffm.jar</code> that advertises Java 22 in its
+        manifest. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">

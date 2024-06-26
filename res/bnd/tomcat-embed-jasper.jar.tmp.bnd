@@ -31,6 +31,8 @@ Export-Package: \
     org.apache.jasper.tagplugins.jstl.core,\
     org.apache.jasper.util,\
     org.apache.tomcat.util.descriptor.tld
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -includepackage: \
     org.apache.jasper.resources

@@ -353,6 +353,7 @@
      <doMavenInstall artifactId="tomcat-util"/>
      <doMavenInstall artifactId="tomcat-util-scan"/>
      <doMavenInstall artifactId="tomcat-coyote"/>
+     <doMavenInstall artifactId="tomcat-coyote-ffm"/>
      <doMavenInstall artifactId="tomcat-dbcp"/>
      <doMavenInstall artifactId="tomcat-websocket"/>
 
@@ -460,6 +461,7 @@
     <doMavenDeploy artifactId="tomcat-util"/>
     <doMavenDeploy artifactId="tomcat-util-scan"/>
     <doMavenDeploy artifactId="tomcat-coyote"/>
+    <doMavenDeploy artifactId="tomcat-coyote-ffm"/>
     <doMavenDeploy artifactId="tomcat-dbcp"/>
     <doMavenDeploy artifactId="tomcat-websocket"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-cs"/>

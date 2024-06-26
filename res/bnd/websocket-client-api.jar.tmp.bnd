@@ -19,6 +19,8 @@ Bundle-Name: tomcat-websocket-client-api
 Bundle-SymbolicName: org.apache.tomcat-websocket-client-api
 Export-Package: \
     jakarta.websocket;version=${websocket.spec.version}
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 Require-Capability: \
     osgi.extender;\
