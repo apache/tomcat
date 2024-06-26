@@ -244,10 +244,10 @@ objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
 
 # ----- UnboundID, used by unit tests, version 5.1.4 or later -----
-unboundid.version=7.0.0
+unboundid.version=7.0.1
 unboundid.checksum.enabled=true
 unboundid.checksum.algorithm=SHA-512
-unboundid.checksum.value=e9f9d1f5b954ab6939d5bf799f399a26896271547cc1fd061bb2710dc83d8ff6ae0d2fadf3062eccd8717ff0891c92fc871acfcefdf09c0fe8fa36018d609e5e
+unboundid.checksum.value=6bd8681b89886989a65316bbe03429263c0f8b442ac92e17d55dffa1035f12d8fc0b363fba8a23cac7a1d6fc93f1c50233ace83ca8769f5a0a3eee8544a9a5cb
 unboundid.home=${base.path}/unboundid-${unboundid.version}
 unboundid.jar=${unboundid.home}/unboundid-ldapsdk-${unboundid.version}.jar
 unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.version}/unboundid-ldapsdk-${unboundid.version}.jar
