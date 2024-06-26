@@ -36,6 +36,7 @@
     <classpathentry kind="lib" path="@EASYMOCK_JAR@"/>
     <classpathentry kind="lib" path="@HAMCREST_JAR@"/>
     <classpathentry kind="lib" path="@OBJENESIS_JAR@"/>
+    <classpathentry kind="lib" path="@BYTEBUDDY_JAR@"/>
     <classpathentry kind="lib" path="@BND_JAR@"/>
     <classpathentry kind="lib" path="@MIGRATION_JAR@"/>
     <classpathentry kind="lib" path="@UNBOUNDID_JAR@"/>
