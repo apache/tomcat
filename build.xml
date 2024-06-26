@@ -247,7 +247,6 @@
     <pathelement location="${junit.jar}"/>
     <pathelement location="${hamcrest.jar}"/>
     <pathelement location="${easymock.jar}"/>
-    <pathelement location="${cglib.jar}"/>
     <pathelement location="${objenesis.jar}"/>
     <pathelement location="${unboundid.jar}"/>
     <pathelement location="${derby.jar}"/>
@@ -263,7 +262,6 @@
     <filter token="JDT_JAR" value="${jdt.jar}"/>
     <filter token="EASYMOCK_JAR" value="${easymock.jar}"/>
     <filter token="HAMCREST_JAR" value="${hamcrest.jar}"/>
-    <filter token="CGLIB_JAR" value="${cglib.jar}"/>
     <filter token="OBJENESIS_JAR" value="${objenesis.jar}"/>
     <filter token="BND_JAR" value="${bnd.jar}"/>
     <filter token="MIGRATION_JAR" value="${migration-lib.jar}"/>
@@ -3393,15 +3391,6 @@ asf.ldap.username=${release.asfusername}
       <param name="checksum.enabled" value="${easymock.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${easymock.checksum.algorithm}"/>
       <param name="checksum.value" value="${easymock.checksum.value}"/>
-    </antcall>
-
-    <antcall target="downloadfile">
-      <param name="sourcefile" value="${cglib.loc}"/>
-      <param name="destfile" value="${cglib.jar}"/>
-      <param name="destdir" value="${cglib.home}"/>
-      <param name="checksum.enabled" value="${cglib.checksum.enabled}"/>
-      <param name="checksum.algorithm" value="${cglib.checksum.algorithm}"/>
-      <param name="checksum.value" value="${cglib.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadfile">

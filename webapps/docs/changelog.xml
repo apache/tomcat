@@ -200,6 +200,10 @@
       <update>
         Update to SpotBugs 4.8.6. (markt)
       </update>
+      <update>
+        Remove cglib dependency as it is not required by the verion of EasyMock
+        used by the unit tests. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
