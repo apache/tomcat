@@ -71,4 +71,22 @@ public class TestJspCompilationContext extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertTrue(body.toString().contains("00 - OK"));
     }
+
+
+    /*
+     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=69135
+     */
+    @Test
+    public void testTagFileInJarIncludeAbsolute() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk body = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug6nnnn/bug69135.jsp", body, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertTrue(body.toString(), body.toString().contains("00 - OK"));
+
+    }
 }
