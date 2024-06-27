@@ -163,6 +163,22 @@
         a warning will be logged and the default will used.
         (markt)
       </add>
+      <fix>
+        <bug>69135</bug>: When using include directives in a tag file packaged
+        in a JAR file, ensure that context relative includes are processed
+        correctly. (markt)
+      </fix>
+      <fix>
+        <bug>69135</bug>: When using include directives in a tag file packaged
+        in a JAR file, ensure that file relative includes are processed
+        correctly. (markt)
+      </fix>
+      <fix>
+        <bug>69135</bug>: When using include directives in a tag file packaged
+        in a JAR file, ensure that file relative includes are are not permitted
+        to access files outside of the <code>/META_INF/tags/</code> directory
+        nor outside of the JAR file. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

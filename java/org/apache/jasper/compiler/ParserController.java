@@ -43,6 +43,7 @@ import org.xml.sax.Attributes;
 class ParserController implements TagConstants {
 
     private static final String CHARSET = "charset=";
+    private static final String TAGS_IN_JAR_LOCATION = "/META-INF/tags/";
 
     private final JspCompilationContext ctxt;
     private final Compiler compiler;
@@ -186,6 +187,7 @@ class ParserController implements TagConstants {
      * @param jar  The JAR file from which to read the JSP page or tag file,
      * or null if the JSP page or tag file is to be read from the filesystem
      */
+    @SuppressWarnings("null") // jar can't be null if processingTagInJar is true
     private Node.Nodes doParse(String inFileName, Node parent, Jar jar)
             throws FileNotFoundException, JasperException, IOException {
 
@@ -194,7 +196,17 @@ class ParserController implements TagConstants {
         isBomPresent = false;
         isDefaultPageEncoding = false;
 
+        boolean processingTagInJar = jar != null && baseDirStack.peekFirst() != null &&
+                baseDirStack.peekFirst().startsWith(TAGS_IN_JAR_LOCATION);
         String absFileName = resolveFileName(inFileName);
+        if (processingTagInJar && !absFileName.startsWith(TAGS_IN_JAR_LOCATION)) {
+            /*
+             * An included file is being parsed that was included from the standard location for tag files in JAR but
+             * tries to escape that location to either somewhere in the JAR not under the standard location or outside
+             * of the JAR. Neither of these are permitted.
+             */
+            err.jspError("jsp.error.invalid.includeInTagFileJar", inFileName, jar.getJarFileURL().toString());
+        }
         String jspConfigPageEnc = getJspConfigPageEncoding(absFileName);
 
         // Figure out what type of JSP document and encoding type we are
