@@ -77,7 +77,7 @@ public class TestJspCompilationContext extends TomcatBaseTest {
      * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=69135
      */
     @Test
-    public void testTagFileInJarIncludeAbsolute() throws Exception {
+    public void testTagFileInJarIncludesValid() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk body = new ByteChunk();
@@ -86,7 +86,11 @@ public class TestJspCompilationContext extends TomcatBaseTest {
                 "/test/bug6nnnn/bug69135.jsp", body, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        // Context relative include (starts with "/")
         Assert.assertTrue(body.toString(), body.toString().contains("00 - OK"));
 
+        // Resource relative include (does not start with "/")
+        Assert.assertTrue(body.toString(), body.toString().contains("01 - OK"));
     }
 }
