@@ -16,3 +16,4 @@
 --%>
 <%@ taglib uri="http://tomcat.apache.org/bug69135-lib" prefix="bz69135" %>
 <bz69135:absolute index="00" />
+<bz69135:relative-valid index="01" />
