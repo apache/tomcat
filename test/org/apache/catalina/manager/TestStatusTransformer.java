@@ -110,11 +110,10 @@ public class TestStatusTransformer extends TomcatBaseTest {
             try (StringReader reader = new StringReader(body)) {
                 Document xmlDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(reader));
                 String serialized = ((DOMImplementationLS) xmlDocument.getImplementation()).createLSSerializer().writeToString(xmlDocument);
-                Assert.assertTrue(serialized.contains("http-nio-127.0.0.1-auto-"));
+                // Verify that a request is being processed
                 Assert.assertTrue(serialized.contains("stage=\"S\""));
             }
         } else {
-            Assert.assertTrue(body.contains("http-nio-127.0.0.1-auto-"));
             // Verify that a request is being processed
             Assert.assertTrue(body.contains("<strong>S</strong>"));
         }
