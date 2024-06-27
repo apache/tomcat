@@ -20,6 +20,7 @@ import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -519,7 +520,9 @@ class ParserController implements TagConstants {
     private String resolveFileName(String inFileName) {
         String fileName = inFileName.replace('\\', '/');
         boolean isAbsolute = fileName.startsWith("/");
-        fileName = isAbsolute ? fileName : baseDirStack.peekFirst() + fileName;
+        if (!isAbsolute) {
+            fileName = Paths.get(baseDirStack.peekFirst() + fileName).normalize().toString();
+        }
         String baseDir = fileName.substring(0, fileName.lastIndexOf('/') + 1);
         baseDirStack.addFirst(baseDir);
         return fileName;
