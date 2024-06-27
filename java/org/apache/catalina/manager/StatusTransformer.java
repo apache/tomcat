@@ -451,7 +451,7 @@ public class StatusTransformer {
                     "</th><th>" + args[17] + "</th></tr>");
 
             for (ObjectName objectName : requestProcessors) {
-                if (name.equals(objectName.getKeyProperty("worker"))) {
+                if (name.equals(getConnectorName(objectName.getKeyProperty("worker")))) {
                     writer.print("<tr>");
                     writeProcessorState(writer, objectName, mBeanServer, mode);
                     writer.print("</tr>");
@@ -494,7 +494,7 @@ public class StatusTransformer {
 
                 writer.write("<workers>");
                 for (ObjectName objectName : requestProcessors) {
-                    if (name.equals(objectName.getKeyProperty("worker"))) {
+                    if (name.equals(getConnectorName(objectName.getKeyProperty("worker")))) {
                         writeProcessorState(writer, objectName, mBeanServer, mode);
                     }
                 }
@@ -549,6 +549,19 @@ public class StatusTransformer {
         }
     }
 
+
+    /**
+     * Return the connector name without the port, for auto port connectors.
+     * @param name the connector name
+     * @return the name without the port for the auto connectors
+     */
+    protected static String getConnectorName(String name) {
+        if (name.indexOf("-auto-") > 0) {
+            return name.substring(0, name.lastIndexOf("-")) + "\"";
+        } else {
+            return name;
+        }
+    }
 
     /**
      * Write processor state.
