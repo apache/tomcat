@@ -91,9 +91,14 @@ public class TestStatusTransformer extends TomcatBaseTest {
 
         String requestline = null;
         switch (mode) {
-            case XML -> requestline = "GET /status/all?XML=true HTTP/1.1";
-            case JSON -> requestline = "GET /status/all?JSON=true HTTP/1.1";
-            default -> requestline = "GET /status/all HTTP/1.1";
+            case XML:
+                requestline = "GET /status/all?XML=true HTTP/1.1";
+                break;
+            case JSON:
+                requestline = "GET /status/all?JSON=true HTTP/1.1";
+                break;
+            default:
+                requestline = "GET /status/all HTTP/1.1";
         }
         client.setRequest(new String[] {
                 requestline + CRLF +
