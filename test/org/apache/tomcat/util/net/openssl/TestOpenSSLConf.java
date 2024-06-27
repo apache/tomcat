@@ -86,21 +86,19 @@ public class TestOpenSSLConf extends TomcatBaseTest {
 
         Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
 
-        LifecycleListener listener = null;
         if (OpenSSLImplementation.class.getName().equals(sslImplementationName)) {
-            listener = new AprLifecycleListener();
+            LifecycleListener listener = new AprLifecycleListener();
             Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
             StandardServer server = (StandardServer) tomcat.getServer();
             server.addLifecycleListener(listener);
+            // Initialize only the listener as the OpenSSL version is not available before initializeSSL
+            listener.lifecycleEvent(new LifecycleEvent(tomcat.getServer(), Lifecycle.BEFORE_INIT_EVENT, null));
         } else if ("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation".equals(sslImplementationName)) {
-            listener = new OpenSSLLifecycleListener();
+            LifecycleListener listener = new OpenSSLLifecycleListener();
             Assume.assumeTrue(OpenSSLLifecycleListener.isAvailable());
             StandardServer server = (StandardServer) tomcat.getServer();
             server.addLifecycleListener(listener);
         }
-        Assert.assertNotNull("Test configuragiton error: Invalid sslImplementationName", listener);
-        // Initialize only the listener as the OpenSSL version is not available before
-        listener.lifecycleEvent(new LifecycleEvent(tomcat.getServer(), Lifecycle.BEFORE_INIT_EVENT, null));
     }
 
     private SSLHostConfig initOpenSSLConfCmd(String... commands) throws Exception {
