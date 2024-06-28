@@ -55,7 +55,7 @@ public class openssl_h {
         // Note: Some system libraries such as libcrypto must use a versioned name on MacOS
         // See https://github.com/sergot/openssl/issues/81
         if (os.indexOf("mac") >= 0) {
-            libName = "/usr/lib/libssl.46";
+            libName = "ssl.46";
         }
         SYMBOL_LOOKUP = SymbolLookup.libraryLookup(System.mapLibraryName(libName), LIBRARY_ARENA)
                 .or(SymbolLookup.loaderLookup())
