@@ -33,11 +33,13 @@ jobs:
         isMain:
           - ${{ contains(github.ref, 'main') }}
         java: [ 17, 21, 22 ]
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
         exclude:
           - isMain: true
             java: 17
           - os: windows-latest
+            java: 21
+          - os: macos-latest
             java: 21
     name: JDK${{ matrix.java }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -61,5 +63,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: JDK${{ matrix.java }}-${{ matrix.os }}-logs
-        path: output/build/logs/TEST*.txt
+        path: |
+          hs_err_*.log
+          output/build/logs/TEST*.txt
         retention-days: 7
