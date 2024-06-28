@@ -22,6 +22,7 @@ package org.apache.tomcat.util.openssl;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
@@ -49,7 +50,14 @@ public class openssl_h {
     static final boolean TRACE_DOWNCALLS = Boolean.getBoolean("jextract.trace.downcalls");
     static final SymbolLookup SYMBOL_LOOKUP;
     static {
-        SYMBOL_LOOKUP = SymbolLookup.libraryLookup(System.mapLibraryName("ssl"), LIBRARY_ARENA)
+        String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+        String libName = "ssl";
+        // Note: Some system libraries such as libcrypto must use a versioned name on MacOS
+        // See https://github.com/sergot/openssl/issues/81
+        if (os.indexOf("mac") >= 0) {
+            libName = "/usr/lib/libssl.46.dylib";
+        }
+        SYMBOL_LOOKUP = SymbolLookup.libraryLookup(System.mapLibraryName(libName), LIBRARY_ARENA)
                 .or(SymbolLookup.loaderLookup())
                 .or(Linker.nativeLinker().defaultLookup());
     }
