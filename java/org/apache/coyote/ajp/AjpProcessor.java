@@ -982,8 +982,8 @@ public class AjpProcessor extends AbstractProcessor {
                     responseMessage.appendBytes(hV);
                 } catch (IllegalArgumentException iae) {
                     // Log the problematic header
-                    log.warn(sm.getString("ajpprocessor.response.invalidHeader", headers.getName(i), headers.getValue(i)),
-                            iae);
+                    log.warn(sm.getString("ajpprocessor.response.invalidHeader", headers.getName(i),
+                            headers.getValue(i)), iae);
                     // Remove the problematic header
                     headers.removeHeader(i);
                     numHeaders--;
