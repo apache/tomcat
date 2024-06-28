@@ -221,6 +221,9 @@
         Update EasyMock to 5.3.0. This adds a test dependency on Byte-Buddy
         1.14.17. (markt)
       </update>
+      <add>
+        Improvements to Czech translations by Vladimír Chlup. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
