@@ -45,7 +45,7 @@ import java.util.TreeMap;
  * Cookies affect the caching of the Web pages that use them. HTTP 1.0 does not cache pages that use cookies created
  * with this class. This class does not support the cache control defined with HTTP 1.1.
  * <p>
- * This class supports both the RFC 6265 specification.
+ * This class supports the RFC 6265 specification.
  */
 public class Cookie implements Cloneable, Serializable {
 
