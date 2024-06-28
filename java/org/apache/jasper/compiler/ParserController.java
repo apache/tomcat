@@ -20,7 +20,8 @@ import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Paths;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -198,7 +199,12 @@ class ParserController implements TagConstants {
 
         boolean processingTagInJar = jar != null && baseDirStack.peekFirst() != null &&
                 baseDirStack.peekFirst().startsWith(TAGS_IN_JAR_LOCATION);
-        String absFileName = resolveFileName(inFileName);
+        String absFileName = null;
+        try {
+            absFileName = resolveFileName(inFileName);
+        } catch (URISyntaxException e) {
+            err.jspError("jsp.error.invalid.includeInTagFileJar", inFileName, jar.getJarFileURL().toString());
+        }
         if (processingTagInJar && !absFileName.startsWith(TAGS_IN_JAR_LOCATION)) {
             /*
              * An included file is being parsed that was included from the standard location for tag files in JAR but
@@ -529,11 +535,12 @@ class ParserController implements TagConstants {
      * The 'root' file is always an 'absolute' path, so no need to put an
      * initial value in the baseDirStack.
      */
-    private String resolveFileName(String inFileName) {
+    private String resolveFileName(String inFileName) throws URISyntaxException {
         String fileName = inFileName.replace('\\', '/');
         boolean isAbsolute = fileName.startsWith("/");
         if (!isAbsolute) {
-            fileName = Paths.get(baseDirStack.peekFirst() + fileName).normalize().toString().replace('\\', '/');
+            URI uri = new URI(baseDirStack.peekFirst() + fileName);
+            fileName = uri.normalize().toString();
         }
         String baseDir = fileName.substring(0, fileName.lastIndexOf('/') + 1);
         baseDirStack.addFirst(baseDir);
