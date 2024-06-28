@@ -126,6 +126,10 @@
         for the CORS filter, rather than only applying if the CORS filter is
         mapped to <code>/*</code>. (markt)
       </fix>
+      <fix>
+        Using the <code>OpenSSLListener</code> will now cause the connector to
+        use OpenSSL if available. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
