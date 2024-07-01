@@ -28,6 +28,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.AprStatus;
 import org.apache.catalina.startup.Tomcat;
@@ -51,11 +53,11 @@ public class TestClientCertTls13 extends TomcatBaseTest {
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
         parameterSets.add(new Object[] {
-                "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
+                "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation", Boolean.FALSE});
         parameterSets.add(new Object[] {
-                "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+                "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation", Boolean.TRUE});
         parameterSets.add(new Object[] {
-                "OpenSSL-FFM", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+                "OpenSSL-FFM", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation", Boolean.FALSE});
 
         return parameterSets;
     }
@@ -68,6 +70,9 @@ public class TestClientCertTls13 extends TomcatBaseTest {
 
     @Parameter(2)
     public String sslImplementationName;
+
+    @Parameter(3)
+    public boolean initSslImplementation;
 
 
     @Test
@@ -110,6 +115,11 @@ public class TestClientCertTls13 extends TomcatBaseTest {
         TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
         if (useOpenSSL) {
+            // getOpenSSLVersion() requires that the listener has been initialised
+            if (initSslImplementation) {
+                tomcat.getServer().findLifecycleListeners()[0].lifecycleEvent(
+                        new LifecycleEvent(tomcat.getServer(), Lifecycle.BEFORE_INIT_EVENT, null));
+            }
             Assume.assumeTrue(AprStatus.getOpenSSLVersion() >= 0x1010100f || OpenSSLStatus.getVersion() >= 0x1010100f);
         }
 
