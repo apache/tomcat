@@ -23,6 +23,9 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+
+import org.apache.tomcat.util.compat.JrePlatform;
+
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 
@@ -49,9 +52,18 @@ public class openssl_h {
     static final boolean TRACE_DOWNCALLS = Boolean.getBoolean("jextract.trace.downcalls");
     static final SymbolLookup SYMBOL_LOOKUP;
     static {
-        SYMBOL_LOOKUP = SymbolLookup.libraryLookup(System.mapLibraryName("ssl"), LIBRARY_ARENA)
-                .or(SymbolLookup.loaderLookup())
-                .or(Linker.nativeLinker().defaultLookup());
+        if (JrePlatform.IS_MAC_OS) {
+            /*
+             * On Mac OS SymbolLookup.libraryLookup() appears to ignore java.library.path which means the LibreSSL
+             * library will be found which will then fail. Therefore, skip that lookup on Mac OS.
+             */
+            System.loadLibrary("ssl");
+            SYMBOL_LOOKUP = SymbolLookup.loaderLookup().or(Linker.nativeLinker().defaultLookup());
+        } else {
+            SYMBOL_LOOKUP = SymbolLookup.libraryLookup(System.mapLibraryName("ssl"), LIBRARY_ARENA)
+                    .or(SymbolLookup.loaderLookup())
+                    .or(Linker.nativeLinker().defaultLookup());
+        }
     }
 
     static void traceDowncall(String name, Object... args) {
