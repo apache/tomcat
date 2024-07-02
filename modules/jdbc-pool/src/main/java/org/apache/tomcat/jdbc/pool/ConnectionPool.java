@@ -1521,37 +1521,42 @@ public class ConnectionPool {
 
 
     private static volatile Timer poolCleanTimer = null;
+    private static final Object cleanerLock = new Object();
     private static Set<PoolCleaner> cleaners = new HashSet<>();
 
-    private static synchronized void registerCleaner(PoolCleaner cleaner) {
-        unregisterCleaner(cleaner);
-        cleaners.add(cleaner);
-        if (poolCleanTimer == null) {
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-            try {
-                Thread.currentThread().setContextClassLoader(ConnectionPool.class.getClassLoader());
-                // Create the timer thread in a PrivilegedAction so that a
-                // reference to the web application class loader is not created
-                // via Thread.inheritedAccessControlContext
-                poolCleanTimer = new Timer("Tomcat JDBC Pool Cleaner[" +
-                        System.identityHashCode(ConnectionPool.class.getClassLoader()) + ":"+
+    private static  void registerCleaner(PoolCleaner cleaner) {
+        synchronized (cleanerLock) {
+            unregisterCleaner(cleaner);
+            cleaners.add(cleaner);
+            if (poolCleanTimer == null) {
+                ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                try {
+                    Thread.currentThread().setContextClassLoader(ConnectionPool.class.getClassLoader());
+                    // Create the timer thread in a PrivilegedAction so that a
+                    // reference to the web application class loader is not created
+                    // via Thread.inheritedAccessControlContext
+                    poolCleanTimer = new Timer("Tomcat JDBC Pool Cleaner[" +
+                        System.identityHashCode(ConnectionPool.class.getClassLoader()) + ":" +
                         System.currentTimeMillis() + "]", true);
-            } finally {
-                Thread.currentThread().setContextClassLoader(loader);
+                } finally {
+                    Thread.currentThread().setContextClassLoader(loader);
+                }
             }
+            poolCleanTimer.schedule(cleaner, cleaner.sleepTime, cleaner.sleepTime);
         }
-        poolCleanTimer.schedule(cleaner, cleaner.sleepTime,cleaner.sleepTime);
     }
 
-    private static synchronized void unregisterCleaner(PoolCleaner cleaner) {
-        boolean removed = cleaners.remove(cleaner);
-        if (removed) {
-            cleaner.cancel();
-            if (poolCleanTimer != null) {
-                poolCleanTimer.purge();
-                if (cleaners.isEmpty()) {
-                    poolCleanTimer.cancel();
-                    poolCleanTimer = null;
+    private static void unregisterCleaner(PoolCleaner cleaner) {
+        synchronized (cleanerLock) {
+            boolean removed = cleaners.remove(cleaner);
+            if (removed) {
+                cleaner.cancel();
+                if (poolCleanTimer != null) {
+                    poolCleanTimer.purge();
+                    if (cleaners.isEmpty()) {
+                        poolCleanTimer.cancel();
+                        poolCleanTimer = null;
+                    }
                 }
             }
         }
