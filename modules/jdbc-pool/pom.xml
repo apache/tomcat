@@ -98,6 +98,9 @@
           <debug>true</debug>
           <showDeprecation>true</showDeprecation>
           <showWarnings>true</showWarnings>
+          <compilerArgs>
+            <arg>-parameters</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
       <plugin>
