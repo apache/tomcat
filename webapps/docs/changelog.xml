@@ -161,6 +161,10 @@
         <code>tomcat-coyote-ffm.jar</code> that advertises Java 22 in its
         manifest. (remm)
       </update>
+      <fix>
+        Fix search for OpenSSL library for FFM on Mac OS so that
+        <code>java.library.path</code> is searched. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
