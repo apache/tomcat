@@ -32,6 +32,14 @@ import static java.lang.foreign.ValueLayout.*;
 @SuppressWarnings({"javadoc", "boxing"})
 public class openssl_h {
 
+    /*
+     * On Mac OS SymbolLookup.libraryLookup() appears to ignore java.library.path which means the LibreSSL
+     * library will be found which will then fail. Therefore, skip that lookup on Mac OS.
+     */
+    public static final boolean USE_SYSTEM_LOAD_LIBRARY = Boolean.getBoolean("org.apache.tomcat.util.openssl.USE_SYSTEM_LOAD_LIBRARY");
+    public static final String LIBRARY_NAME = System.getProperty("org.apache.tomcat.util.openssl.LIBRARY_NAME",
+            (JrePlatform.IS_MAC_OS) ? "ssl.48" : "ssl");
+
     openssl_h() {
         // Suppresses public default constructor, ensuring non-instantiability,
         // but allows generated subclasses in same package.
@@ -52,15 +60,11 @@ public class openssl_h {
     static final boolean TRACE_DOWNCALLS = Boolean.getBoolean("jextract.trace.downcalls");
     static final SymbolLookup SYMBOL_LOOKUP;
     static {
-        if (JrePlatform.IS_MAC_OS) {
-            /*
-             * On Mac OS SymbolLookup.libraryLookup() appears to ignore java.library.path which means the LibreSSL
-             * library will be found which will then fail. Therefore, skip that lookup on Mac OS.
-             */
-            System.loadLibrary("ssl");
+        if (USE_SYSTEM_LOAD_LIBRARY) {
+            System.loadLibrary(LIBRARY_NAME);
             SYMBOL_LOOKUP = SymbolLookup.loaderLookup().or(Linker.nativeLinker().defaultLookup());
         } else {
-            SYMBOL_LOOKUP = SymbolLookup.libraryLookup(System.mapLibraryName("ssl"), LIBRARY_ARENA)
+            SYMBOL_LOOKUP = SymbolLookup.libraryLookup(System.mapLibraryName(LIBRARY_NAME), LIBRARY_ARENA)
                     .or(SymbolLookup.loaderLookup())
                     .or(Linker.nativeLinker().defaultLookup());
         }
@@ -4257,6 +4261,40 @@ public class openssl_h {
                 traceDowncall("SSL_CTX_ctrl", ctx, cmd, larg, parg);
             }
             return (long) mh$.invokeExact(ctx, cmd, larg, parg);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static MethodHandle SSL_ctrl$MH() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_LONG,
+                openssl_h.C_POINTER,
+                openssl_h.C_INT,
+                openssl_h.C_LONG,
+                openssl_h.C_POINTER
+            );
+
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("SSL_ctrl"),
+                    DESC);
+        }
+        return Holder.MH;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * long SSL_ctrl(SSL *ssl, int cmd, long larg, void *parg)
+     * }
+     */
+    public static long SSL_ctrl(MemorySegment ssl, int cmd, long larg, MemorySegment parg) {
+        var mh$ = SSL_ctrl$MH();
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("SSL_ctrl", ssl, cmd, larg, parg);
+            }
+            return (long) mh$.invokeExact(ssl, cmd, larg, parg);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }

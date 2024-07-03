@@ -66,6 +66,7 @@ import org.apache.tomcat.util.openssl.SSL_CTX_set_alpn_select_cb$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_cert_verify_callback$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_tmp_dh_callback$dh;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_verify$callback;
+import org.apache.tomcat.util.openssl.openssl_h_Compatibility;
 import org.apache.tomcat.util.openssl.pem_password_cb;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -135,13 +136,13 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static String[] getCiphers(MemorySegment sslCtx) {
         MemorySegment sk = SSL_CTX_get_ciphers(sslCtx);
-        int len = OPENSSL_sk_num(sk);
+        int len = openssl_h_Compatibility.OPENSSL_sk_num(sk);
         if (len <= 0) {
             return null;
         }
         ArrayList<String> ciphers = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
-            MemorySegment cipher = OPENSSL_sk_value(sk, i);
+            MemorySegment cipher = openssl_h_Compatibility.OPENSSL_sk_value(sk, i);
             MemorySegment cipherName = SSL_CIPHER_get_name(cipher);
             ciphers.add(cipherName.getString(0));
         }
@@ -243,14 +244,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             SSL_CTX_set_min_proto_version(sslCtx, prot);
 
             // Disable compression, usually unsafe
-            SSL_CTX_set_options(sslCtx, SSL_OP_NO_COMPRESSION());
+            openssl_h_Compatibility.SSL_CTX_set_options(sslCtx, SSL_OP_NO_COMPRESSION());
 
             // Disallow a session from being resumed during a renegotiation,
             // so that an acceptable cipher suite can be negotiated.
-            SSL_CTX_set_options(sslCtx, SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION());
+            openssl_h_Compatibility.SSL_CTX_set_options(sslCtx, SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION());
 
-            SSL_CTX_set_options(sslCtx, SSL_OP_SINGLE_DH_USE());
-            SSL_CTX_set_options(sslCtx, SSL_OP_SINGLE_ECDH_USE());
+            openssl_h_Compatibility.SSL_CTX_set_options(sslCtx, SSL_OP_SINGLE_DH_USE());
+            openssl_h_Compatibility.SSL_CTX_set_options(sslCtx, SSL_OP_SINGLE_ECDH_USE());
 
             // Default session context id and cache size
             SSL_CTX_sess_set_cache_size(sslCtx, 256);
@@ -463,31 +464,31 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         boolean success = true;
         try (var localArena = Arena.ofConfined()) {
             if (sslHostConfig.getInsecureRenegotiation()) {
-                SSL_CTX_set_options(state.sslCtx, SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION());
+                openssl_h_Compatibility.SSL_CTX_set_options(state.sslCtx, SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION());
             } else {
-                SSL_CTX_clear_options(state.sslCtx, SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION());
+                openssl_h_Compatibility.SSL_CTX_clear_options(state.sslCtx, SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION());
             }
 
             // Use server's preference order for ciphers (rather than
             // client's)
             if (sslHostConfig.getHonorCipherOrder()) {
-                SSL_CTX_set_options(state.sslCtx, SSL_OP_CIPHER_SERVER_PREFERENCE());
+                openssl_h_Compatibility.SSL_CTX_set_options(state.sslCtx, SSL_OP_CIPHER_SERVER_PREFERENCE());
             } else {
-                SSL_CTX_clear_options(state.sslCtx, SSL_OP_CIPHER_SERVER_PREFERENCE());
+                openssl_h_Compatibility.SSL_CTX_clear_options(state.sslCtx, SSL_OP_CIPHER_SERVER_PREFERENCE());
             }
 
             // Disable compression if requested
             if (sslHostConfig.getDisableCompression()) {
-                SSL_CTX_set_options(state.sslCtx, SSL_OP_NO_COMPRESSION());
+                openssl_h_Compatibility.SSL_CTX_set_options(state.sslCtx, SSL_OP_NO_COMPRESSION());
             } else {
-                SSL_CTX_clear_options(state.sslCtx, SSL_OP_NO_COMPRESSION());
+                openssl_h_Compatibility.SSL_CTX_clear_options(state.sslCtx, SSL_OP_NO_COMPRESSION());
             }
 
             // Disable TLS Session Tickets (RFC4507) to protect perfect forward secrecy
             if (sslHostConfig.getDisableSessionTickets()) {
-                SSL_CTX_set_options(state.sslCtx, SSL_OP_NO_TICKET());
+                openssl_h_Compatibility.SSL_CTX_set_options(state.sslCtx, SSL_OP_NO_TICKET());
             } else {
-                SSL_CTX_clear_options(state.sslCtx, SSL_OP_NO_TICKET());
+                openssl_h_Compatibility.SSL_CTX_clear_options(state.sslCtx, SSL_OP_NO_TICKET());
             }
 
             // List the ciphers that the client is permitted to negotiate
@@ -622,7 +623,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     log.error(sm.getString("openssl.errApplyConf"), e);
                 }
                 // Reconfigure the enabled protocols
-                long opts = SSL_CTX_get_options(state.sslCtx);
+                long opts = openssl_h_Compatibility.SSL_CTX_get_options(state.sslCtx);
                 List<String> enabled = new ArrayList<>();
                 // Seems like there is no way to explicitly disable SSLv2Hello
                 // in OpenSSL so it is always enabled
@@ -757,11 +758,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             MemorySegment ssl = X509_STORE_CTX_get_ex_data(x509_ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
             MemorySegment /*STACK_OF(X509)*/ sk = X509_STORE_CTX_get0_untrusted(x509_ctx);
-            int len = OPENSSL_sk_num(sk);
+            int len = openssl_h_Compatibility.OPENSSL_sk_num(sk);
             byte[][] certificateChain = new byte[len][];
             try (var localArena = Arena.ofConfined()) {
                 for (int i = 0; i < len; i++) {
-                    MemorySegment/*(X509*)*/ x509 = OPENSSL_sk_value(sk, i);
+                    MemorySegment/*(X509*)*/ x509 = openssl_h_Compatibility.OPENSSL_sk_value(sk, i);
                     MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
                     int length = i2d_X509(x509, bufPointer);
                     if (length < 0) {

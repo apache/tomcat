@@ -105,6 +105,22 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0-M23 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Add FFM compatibility methods for LibreSSL support. Renegotiation is
+        not supported at the moment. (remm)
+      </update>
+      <update>
+        Add <code>org.apache.tomcat.util.openssl.LIBRARY_NAME</code> (specifies
+        the name of the library to load) and
+        <code>org.apache.tomcat.util.openssl.USE_SYSTEM_LOAD_LIBRARY</code>
+        (set to <code>true</code> to use <code>System.loadLibrary</code> rather
+        than the FFM library loading code) to configure the OpenSSL library
+        loading using FFM. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M22 (markt)" rtext="release in progress">
   <subsection name="Catalina">
