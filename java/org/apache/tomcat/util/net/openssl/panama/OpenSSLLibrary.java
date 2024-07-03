@@ -30,6 +30,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
+import org.apache.tomcat.util.openssl.openssl_h_Compatibility;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -421,7 +422,7 @@ public class OpenSSLLibrary {
             initLibrary();
             var sslCtx = SSL_CTX_new(TLS_server_method());
             try {
-                SSL_CTX_set_options(sslCtx, SSL_OP_ALL());
+                openssl_h_Compatibility.SSL_CTX_set_options(sslCtx, SSL_OP_ALL());
                 SSL_CTX_set_cipher_list(sslCtx, localArena.allocateFrom(ciphers));
                 var ssl = SSL_new(sslCtx);
                 SSL_set_accept_state(ssl);
@@ -447,13 +448,13 @@ public class OpenSSLLibrary {
 
     static String[] getCiphers(MemorySegment ssl) {
         MemorySegment sk = SSL_get_ciphers(ssl);
-        int len = OPENSSL_sk_num(sk);
+        int len = openssl_h_Compatibility.OPENSSL_sk_num(sk);
         if (len <= 0) {
             return null;
         }
         ArrayList<String> ciphers = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
-            MemorySegment cipher = OPENSSL_sk_value(sk, i);
+            MemorySegment cipher = openssl_h_Compatibility.OPENSSL_sk_value(sk, i);
             MemorySegment cipherName = SSL_CIPHER_get_name(cipher);
             ciphers.add(cipherName.getString(0));
         }

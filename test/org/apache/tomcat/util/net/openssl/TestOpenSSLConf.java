@@ -96,6 +96,7 @@ public class TestOpenSSLConf extends TomcatBaseTest {
         } else if ("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation".equals(sslImplementationName)) {
             LifecycleListener listener = new OpenSSLLifecycleListener();
             Assume.assumeTrue(OpenSSLLifecycleListener.isAvailable());
+            Assume.assumeFalse(Class.forName("org.apache.tomcat.util.openssl.openssl_h_Compatibility").getField("LIBRESSL").getBoolean(null));
             StandardServer server = (StandardServer) tomcat.getServer();
             server.addLifecycleListener(listener);
         }

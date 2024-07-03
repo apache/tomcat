@@ -20,11 +20,17 @@ package org.apache.tomcat.util.openssl;
 import java.lang.invoke.MethodHandle;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
+import static org.apache.tomcat.util.openssl.openssl_h.OpenSSL_version;
 
 /**
  * Methods used present in older OpenSSL versions but not in the current major version.
  */
 public class openssl_h_Compatibility {
+
+    public static final boolean LIBRESSL;
+    static {
+        LIBRESSL = OpenSSL_version(0).getString(0).contains("LibreSSL");
+    }
 
     // OpenSSL 1.1 FIPS_mode
     public static int FIPS_mode() {
@@ -113,6 +119,101 @@ public class openssl_h_Compatibility {
             return (java.lang.foreign.MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    // LibreSSL SSL_CTRL_OPTIONS
+    public static final int SSL_CTRL_OPTIONS = 32;
+
+    // LibreSSL SSL_CTX_get_options
+    public static long SSL_CTX_get_options(MemorySegment ctx) {
+        if (LIBRESSL) {
+            return openssl_h.SSL_CTX_ctrl(ctx, SSL_CTRL_OPTIONS, 0, MemorySegment.NULL);
+        } else {
+            return openssl_h.SSL_CTX_get_options(ctx);
+        }
+    }
+
+    // LibreSSL SSL_CTX_set_options
+    public static long SSL_CTX_set_options(MemorySegment ctx, long op) {
+        if (LIBRESSL) {
+            return openssl_h.SSL_CTX_ctrl(ctx, SSL_CTRL_OPTIONS, op, MemorySegment.NULL);
+        } else {
+            return openssl_h.SSL_CTX_set_options(ctx, op);
+        }
+    }
+
+    // LibreSSL SSL_get_options
+    public static long SSL_get_options(MemorySegment s) {
+        if (LIBRESSL) {
+            return openssl_h.SSL_ctrl(s, SSL_CTRL_OPTIONS, 0, MemorySegment.NULL);
+        } else {
+            return openssl_h.SSL_get_options(s);
+        }
+    }
+
+    // LibreSSL SSL_set_options
+    public static long SSL_set_options(MemorySegment s, long op) {
+        if (LIBRESSL) {
+            return openssl_h.SSL_ctrl(s, SSL_CTRL_OPTIONS, op, MemorySegment.NULL);
+        } else {
+            return openssl_h.SSL_set_options(s, op);
+        }
+    }
+
+    // LibreSSL SSL_CTRL_CLEAR_OPTIONS
+    public static final int SSL_CTRL_CLEAR_OPTIONS = 77;
+
+    // LibreSSL SSL_CTX_set_options
+    public static long SSL_CTX_clear_options(MemorySegment ctx, long op) {
+        if (LIBRESSL) {
+            return openssl_h.SSL_CTX_ctrl(ctx, SSL_CTRL_CLEAR_OPTIONS, op, MemorySegment.NULL);
+        } else {
+            return openssl_h.SSL_CTX_clear_options(ctx, op);
+        }
+    }
+
+    // LibreSSL OPENSSL_sk_num
+    public static int OPENSSL_sk_num(MemorySegment x0) {
+        if (LIBRESSL) {
+            class Holder {
+                static final String NAME = "sk_num";
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
+                static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                if (openssl_h.TRACE_DOWNCALLS) {
+                    openssl_h.traceDowncall(Holder.NAME, x0);
+                }
+                return (int) mh$.invokeExact(x0);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else {
+            return openssl_h.OPENSSL_sk_num(x0);
+        }
+    }
+
+    // LibreSSL OPENSSL_sk_value
+    public static MemorySegment OPENSSL_sk_value(MemorySegment x0, int x1) {
+        if (LIBRESSL) {
+            class Holder {
+                static final String NAME = "sk_value";
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT);
+                static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                if (openssl_h.TRACE_DOWNCALLS) {
+                    openssl_h.traceDowncall(Holder.NAME, x0, x1);
+                }
+                return (MemorySegment) mh$.invokeExact(x0, x1);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else {
+            return openssl_h.OPENSSL_sk_value(x0, x1);
         }
     }
 

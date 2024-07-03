@@ -64,6 +64,7 @@ import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationPars
 import org.apache.tomcat.util.openssl.SSL_CTX_set_verify$callback;
 import org.apache.tomcat.util.openssl.SSL_set_info_callback$cb;
 import org.apache.tomcat.util.openssl.SSL_set_verify$callback;
+import org.apache.tomcat.util.openssl.openssl_h_Compatibility;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -719,7 +720,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         List<String> enabled = new ArrayList<>();
         // Seems like there is no way to explicitly disable SSLv2Hello in OpenSSL so it is always enabled
         enabled.add(Constants.SSL_PROTO_SSLv2Hello);
-        long opts = SSL_get_options(state.ssl);
+        long opts = openssl_h_Compatibility.SSL_get_options(state.ssl);
         if ((opts & SSL_OP_NO_TLSv1()) == 0) {
             enabled.add(Constants.SSL_PROTO_TLSv1);
         }
@@ -783,25 +784,25 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
         }
         // Enable all and then disable what we not want
-        SSL_set_options(state.ssl, SSL_OP_ALL());
+        openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_ALL());
 
         if (!sslv2) {
-            SSL_set_options(state.ssl, SSL_OP_NO_SSLv2());
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_SSLv2());
         }
         if (!sslv3) {
-            SSL_set_options(state.ssl, SSL_OP_NO_SSLv3());
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_SSLv3());
         }
         if (!tlsv1) {
-            SSL_set_options(state.ssl, SSL_OP_NO_TLSv1());
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_TLSv1());
         }
         if (!tlsv1_1) {
-            SSL_set_options(state.ssl, SSL_OP_NO_TLSv1_1());
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_TLSv1_1());
         }
         if (!tlsv1_2) {
-            SSL_set_options(state.ssl, SSL_OP_NO_TLSv1_2());
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_TLSv1_2());
         }
         if (!tlsv1_3) {
-            SSL_set_options(state.ssl, SSL_OP_NO_TLSv1_3());
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_TLSv1_3());
         }
     }
 
@@ -853,14 +854,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private byte[][] getPeerCertChain() {
         MemorySegment/*STACK_OF(X509)*/ sk = SSL_get_peer_cert_chain(state.ssl);
-        int len = OPENSSL_sk_num(sk);
+        int len = openssl_h_Compatibility.OPENSSL_sk_num(sk);
         if (len <= 0) {
             return null;
         }
         byte[][] certificateChain = new byte[len][];
         try (var localArena = Arena.ofConfined()) {
             for (int i = 0; i < len; i++) {
-                MemorySegment/*(X509*)*/ x509 = OPENSSL_sk_value(sk, i);
+                MemorySegment/*(X509*)*/ x509 = openssl_h_Compatibility.OPENSSL_sk_value(sk, i);
                 MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
                 int length = i2d_X509(x509, bufPointer);
                 if (length < 0) {
