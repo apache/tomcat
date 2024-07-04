@@ -597,6 +597,22 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
+    final void writeEarlyHints() throws IOException {
+        MimeHeaders headers = coyoteResponse.getMimeHeaders();
+        String originalStatus = headers.getHeader(":status");
+        headers.setValue(":status").setString("103");
+        try {
+            handler.writeHeaders(this, 0, headers, false, Constants.DEFAULT_HEADERS_FRAME_SIZE);
+        } finally {
+            if (originalStatus == null) {
+                headers.removeHeader(":status");
+            } else {
+                headers.setValue(":status").setString(originalStatus);
+            }
+        }
+    }
+
+
     @Override
     final String getConnectionId() {
         return handler.getConnectionId();
