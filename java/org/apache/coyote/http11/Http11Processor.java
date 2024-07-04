@@ -1038,7 +1038,7 @@ public class Http11Processor extends AbstractProcessor {
 
         // Build the response header
         try {
-            outputBuffer.sendStatus();
+            outputBuffer.sendStatus(response.getStatus());
 
             int size = headers.size();
             for (int i = 0; i < size; i++) {
@@ -1055,7 +1055,7 @@ public class Http11Processor extends AbstractProcessor {
                     outputBuffer.resetHeaderBuffer();
                     // -1 as it will be incremented at the start of the loop and header indexes start at 0.
                     i = -1;
-                    outputBuffer.sendStatus();
+                    outputBuffer.sendStatus(response.getStatus());
                 }
             }
             outputBuffer.endHeaders();
