@@ -1036,9 +1036,15 @@ public class Http11Processor extends AbstractProcessor {
             headers.setValue("Server").setString(server);
         }
 
-        // Build the response header
+        writeHeaders(response.getStatus(), headers);
+
+        outputBuffer.commit();
+    }
+
+
+    private void writeHeaders(int status, MimeHeaders headers) {
         try {
-            outputBuffer.sendStatus(response.getStatus());
+            outputBuffer.sendStatus(status);
 
             int size = headers.size();
             for (int i = 0; i < size; i++) {
@@ -1055,7 +1061,7 @@ public class Http11Processor extends AbstractProcessor {
                     outputBuffer.resetHeaderBuffer();
                     // -1 as it will be incremented at the start of the loop and header indexes start at 0.
                     i = -1;
-                    outputBuffer.sendStatus(response.getStatus());
+                    outputBuffer.sendStatus(status);
                 }
             }
             outputBuffer.endHeaders();
@@ -1066,9 +1072,8 @@ public class Http11Processor extends AbstractProcessor {
             outputBuffer.resetHeaderBuffer();
             throw t;
         }
-
-        outputBuffer.commit();
     }
+
 
     private static boolean isConnectionToken(MimeHeaders headers, String token) throws IOException {
         MessageBytes connection = headers.getValue(Constants.CONNECTION);
