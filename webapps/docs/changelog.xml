@@ -169,6 +169,10 @@
         than the FFM library loading code) to configure the OpenSSL library
         loading using FFM. (remm)
       </update>
+      <update>
+        Add FFM compatibility methods for BoringSSL support. Renegotiation is
+        not supported in many cases. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
