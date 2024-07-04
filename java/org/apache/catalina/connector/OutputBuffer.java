@@ -286,7 +286,7 @@ public class OutputBuffer extends Writer {
         try {
             doFlush = true;
             if (initial) {
-                coyoteResponse.sendHeaders();
+                coyoteResponse.commit();
                 initial = false;
             }
             if (cb.remaining() > 0) {

@@ -438,8 +438,19 @@ public final class Response {
 
     /**
      * Signal that we're done with the headers, and body will follow.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 11 onwards. Use {@link #commit()}.
      */
+    @Deprecated
     public void sendHeaders() {
+        commit();
+    }
+
+
+    /**
+     * Signal that we're done with the headers, and body will follow.
+     */
+    public void commit() {
         action(ActionCode.COMMIT, this);
         setCommitted(true);
     }
