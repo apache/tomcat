@@ -52,7 +52,7 @@ public class openssl_h_Macros {
             var mh$ = Holder.MH;
             try {
                 if (openssl_h.TRACE_DOWNCALLS) {
-                    openssl_h.traceDowncall(Holder.NAME, sslCtx, version);
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx, Long.valueOf(version));
                 }
                 return (long) mh$.invokeExact(sslCtx, version);
             } catch (Throwable ex$) {
@@ -85,7 +85,7 @@ public class openssl_h_Macros {
             var mh$ = Holder.MH;
             try {
                 if (openssl_h.TRACE_DOWNCALLS) {
-                    openssl_h.traceDowncall(Holder.NAME, sslCtx, version);
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx, Long.valueOf(version));
                 }
                 return (long) mh$.invokeExact(sslCtx, version);
             } catch (Throwable ex$) {
@@ -150,7 +150,7 @@ public class openssl_h_Macros {
             var mh$ = Holder.MH;
             try {
                 if (openssl_h.TRACE_DOWNCALLS) {
-                    openssl_h.traceDowncall(Holder.NAME, sslCtx, cacheSize);
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx, Long.valueOf(cacheSize));
                 }
                 return (long) mh$.invokeExact(sslCtx, cacheSize);
             } catch (Throwable ex$) {
@@ -215,7 +215,7 @@ public class openssl_h_Macros {
             var mh$ = Holder.MH;
             try {
                 if (openssl_h.TRACE_DOWNCALLS) {
-                    openssl_h.traceDowncall(Holder.NAME, sslCtx, cacheMode);
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx, Long.valueOf(cacheMode));
                 }
                 return (long) mh$.invokeExact(sslCtx, cacheMode);
             } catch (Throwable ex$) {
@@ -282,7 +282,7 @@ public class openssl_h_Macros {
             var mh$ = Holder.MH;
             try {
                 if (openssl_h.TRACE_DOWNCALLS) {
-                    openssl_h.traceDowncall(Holder.NAME, sslCtx, keys, keyLength);
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx, keys, Long.valueOf(keyLength));
                 }
                 return (long) mh$.invokeExact(sslCtx, keys, keyLength);
             } catch (Throwable ex$) {
@@ -412,7 +412,7 @@ public class openssl_h_Macros {
             var mh$ = Holder.MH;
             try {
                 if (openssl_h.TRACE_DOWNCALLS) {
-                    openssl_h.traceDowncall(Holder.NAME, sslCtx, groupsList, listLength);
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx, groupsList, Integer.valueOf(listLength));
                 }
                 return (long) mh$.invokeExact(sslCtx, groupsList, listLength);
             } catch (Throwable ex$) {
@@ -463,7 +463,7 @@ public class openssl_h_Macros {
      * @return the symbol
      */
     public static MemorySegment d2i_ECPKParameters$SYMBOL() {
-        return openssl_h.findOrThrow("d2i_ECPKParameters"); 
+        return openssl_h.findOrThrow("d2i_ECPKParameters");
     }
 
 }

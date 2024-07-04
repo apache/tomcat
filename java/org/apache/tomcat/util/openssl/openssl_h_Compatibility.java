@@ -217,7 +217,7 @@ public class openssl_h_Compatibility {
             var mh$ = Holder.MH;
             try {
                 if (openssl_h.TRACE_DOWNCALLS) {
-                    openssl_h.traceDowncall(Holder.NAME, x0, x1);
+                    openssl_h.traceDowncall(Holder.NAME, x0, Integer.valueOf(x1));
                 }
                 return (MemorySegment) mh$.invokeExact(x0, x1);
             } catch (Throwable ex$) {
