@@ -53,6 +53,7 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
@@ -1900,6 +1901,54 @@ public class TestHttp11Processor extends TomcatBaseTest {
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+        }
+    }
+
+
+    @Test
+    public void testEarlyHints() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        // Add servlet
+        Tomcat.addServlet(ctx, "EarlyHintsServlet", new EarlyHintsServlet());
+        ctx.addServletMappingDecoded("/ehs", "EarlyHintsServlet");
+
+        tomcat.start();
+
+        String request = "GET /ehs HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF;
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] { request });
+
+        client.connect(600000, 600000);
+        client.processRequest(false);
+
+        Assert.assertEquals(103, client.getStatusCode());
+
+        client.readResponse(false);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+    }
+
+
+    private static class EarlyHintsServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.addHeader("Link", "</style.css>; rel=preload; as=style");
+
+            ((ResponseFacade) resp).sendEarlyHints();
+
+            resp.setCharacterEncoding("UTF-8");
+            resp.setContentType("text/plain");
+
+            resp.getWriter().write("OK");
         }
     }
 }

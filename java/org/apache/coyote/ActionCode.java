@@ -274,5 +274,10 @@ public enum ActionCode {
     /**
      * Obtain the stream identifier for the request. Used with multiplexing protocols such as HTTP/2.
      */
-    STREAM_ID
+    STREAM_ID,
+
+    /**
+     * Send an RFC 8297 Early Hints informational response.
+     */
+    EARLY_HINTS
 }

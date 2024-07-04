@@ -1244,6 +1244,14 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
+    protected void earlyHints() throws IOException {
+        writeHeaders(103, response.getMimeHeaders());
+        outputBuffer.writeHeaders();
+        outputBuffer.resetHeaderBuffer();
+    }
+
+
+    @Override
     protected final void flush() throws IOException {
         outputBuffer.flush();
     }

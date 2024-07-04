@@ -262,6 +262,13 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
+    protected void earlyHints() throws IOException {
+        // TODO Auto-generated method stub
+        // NO-OP for now
+    }
+
+
+    @Override
     protected final void flush() throws IOException {
         stream.getOutputBuffer().flush();
     }

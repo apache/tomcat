@@ -393,6 +393,14 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 ack((ContinueResponseTiming) param);
                 break;
             }
+            case EARLY_HINTS: {
+                try {
+                    earlyHints();
+                } catch (IOException e) {
+                    handleIOException(e);
+                }
+                break;
+            }
             case CLIENT_FLUSH: {
                 action(ActionCode.COMMIT, null);
                 try {
@@ -748,6 +756,9 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
      * @param continueResponseTiming specifies when an acknowledgment should be sent
      */
     protected abstract void ack(ContinueResponseTiming continueResponseTiming);
+
+
+    protected abstract void earlyHints() throws IOException;
 
 
     /**

@@ -325,6 +325,10 @@ public class ResponseFacade implements HttpServletResponse {
     }
 
 
+    public void sendEarlyHints() {
+        response.sendEarlyHints();
+    }
+
     @Override
     public String encodeUrl(String url) {
         checkFacade();

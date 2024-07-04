@@ -1123,6 +1123,20 @@ public class Response implements HttpServletResponse {
     }
 
 
+    public void sendEarlyHints() {
+        if (isCommitted()) {
+            return;
+        }
+
+        // Ignore any call from an included servlet
+        if (included) {
+            return;
+        }
+
+        getCoyoteResponse().action(ActionCode.EARLY_HINTS, null);
+    }
+
+
     @Override
     public void sendError(int status) throws IOException {
         sendError(status, null);
