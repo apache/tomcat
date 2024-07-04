@@ -1021,10 +1021,8 @@ public class Response implements HttpServletResponse {
      *
      * @param continueResponseTiming Indicates when the request for the ACK originated so it can be compared with the
      *                                   configured timing for ACK responses.
-     *
-     * @exception IOException if an input/output error occurs
      */
-    public void sendAcknowledgement(ContinueResponseTiming continueResponseTiming) throws IOException {
+    public void sendAcknowledgement(ContinueResponseTiming continueResponseTiming) {
 
         if (isCommitted()) {
             return;
