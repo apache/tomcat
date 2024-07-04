@@ -263,8 +263,7 @@ class StreamProcessor extends AbstractProcessor {
 
     @Override
     protected void earlyHints() throws IOException {
-        // TODO Auto-generated method stub
-        // NO-OP for now
+        stream.writeEarlyHints();
     }
 
 
