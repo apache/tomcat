@@ -114,8 +114,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
-    static final boolean OPENSSL_3 = (OpenSSL_version_num() >= 0x3000000fL);
-
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
     private final boolean alpn;
@@ -1053,57 +1051,61 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 // Try to read DH parameters from the (first) SSLCertificateFile
                 if (index == SSL_AIDX_RSA) {
                     BIO_reset(certificateBIO);
-                    if (!OPENSSL_3) {
-                        var dh = PEM_read_bio_DHparams(certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
-                        if (!MemorySegment.NULL.equals(dh)) {
-                            SSL_CTX_set_tmp_dh(state.sslCtx, dh);
-                            DH_free(dh);
-                        }
-                    } else {
-                        var pkey = PEM_read_bio_Parameters(certificateBIO, MemorySegment.NULL);
-                        if (!MemorySegment.NULL.equals(pkey)) {
-                            int numBits = EVP_PKEY_get_bits(pkey);
-                            if (SSL_CTX_set0_tmp_dh_pkey(state.sslCtx, pkey) <= 0) {
-                                EVP_PKEY_free(pkey);
-                            } else {
-                                log.debug(sm.getString("openssl.setCustomDHParameters", Integer.valueOf(numBits), certificate.getCertificateFile()));
+                    if (!openssl_h_Compatibility.BORINGSSL) {
+                        if (!openssl_h_Compatibility.OPENSSL3) {
+                            var dh = PEM_read_bio_DHparams(certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
+                            if (!MemorySegment.NULL.equals(dh)) {
+                                SSL_CTX_set_tmp_dh(state.sslCtx, dh);
+                                DH_free(dh);
                             }
                         } else {
-                            String errMessage = OpenSSLLibrary.getLastError();
-                            if (errMessage != null) {
-                                log.debug(sm.getString("openssl.errorReadingPEMParameters", errMessage, certificate.getCertificateFile()));
+                            var pkey = PEM_read_bio_Parameters(certificateBIO, MemorySegment.NULL);
+                            if (!MemorySegment.NULL.equals(pkey)) {
+                                int numBits = EVP_PKEY_get_bits(pkey);
+                                if (SSL_CTX_set0_tmp_dh_pkey(state.sslCtx, pkey) <= 0) {
+                                    EVP_PKEY_free(pkey);
+                                } else {
+                                    log.debug(sm.getString("openssl.setCustomDHParameters", Integer.valueOf(numBits), certificate.getCertificateFile()));
+                                }
+                            } else {
+                                String errMessage = OpenSSLLibrary.getLastError();
+                                if (errMessage != null) {
+                                    log.debug(sm.getString("openssl.errorReadingPEMParameters", errMessage, certificate.getCertificateFile()));
+                                }
+                                SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_DH_AUTO(), 1, MemorySegment.NULL);
                             }
-                            SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_DH_AUTO(), 1, MemorySegment.NULL);
                         }
                     }
                 }
                 // Similarly, try to read the ECDH curve name from SSLCertificateFile...
                 BIO_reset(certificateBIO);
-                if (!OPENSSL_3) {
-                    var ecparams = PEM_read_bio_ECPKParameters(certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
-                    if (!MemorySegment.NULL.equals(ecparams)) {
-                        int nid = EC_GROUP_get_curve_name(ecparams);
-                        var eckey = EC_KEY_new_by_curve_name(nid);
-                        SSL_CTX_set_tmp_ecdh(state.sslCtx, eckey);
-                        EC_KEY_free(eckey);
-                        EC_GROUP_free(ecparams);
-                    }
-                    // Set callback for DH parameters
-                    SSL_CTX_set_tmp_dh_callback(state.sslCtx, SSL_CTX_set_tmp_dh_callback$dh.allocate(new TmpDHCallback(), contextArena));
-                } else {
-                    var ecparams = PEM_ASN1_read_bio(d2i_ECPKParameters$SYMBOL(),
-                            PEM_STRING_ECPARAMETERS(), certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
-                    if (!MemorySegment.NULL.equals(ecparams)) {
-                        int curveNid = EC_GROUP_get_curve_name(ecparams);
-                        var curveNidAddress = localArena.allocateFrom(ValueLayout.JAVA_INT, curveNid);
-                        if (SSL_CTX_set1_groups(state.sslCtx, curveNidAddress, 1) <= 0) {
-                            curveNid = 0;
+                if (!openssl_h_Compatibility.BORINGSSL) {
+                    if (!openssl_h_Compatibility.OPENSSL3) {
+                        var ecparams = PEM_read_bio_ECPKParameters(certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
+                        if (!MemorySegment.NULL.equals(ecparams)) {
+                            int nid = EC_GROUP_get_curve_name(ecparams);
+                            var eckey = EC_KEY_new_by_curve_name(nid);
+                            SSL_CTX_set_tmp_ecdh(state.sslCtx, eckey);
+                            EC_KEY_free(eckey);
+                            EC_GROUP_free(ecparams);
                         }
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("openssl.setECDHCurve", Integer.valueOf(curveNid),
-                                    certificate.getCertificateFile()));
+                        // Set callback for DH parameters
+                        SSL_CTX_set_tmp_dh_callback(state.sslCtx, SSL_CTX_set_tmp_dh_callback$dh.allocate(new TmpDHCallback(), contextArena));
+                    } else {
+                        var ecparams = PEM_ASN1_read_bio(d2i_ECPKParameters$SYMBOL(),
+                                PEM_STRING_ECPARAMETERS(), certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
+                        if (!MemorySegment.NULL.equals(ecparams)) {
+                            int curveNid = EC_GROUP_get_curve_name(ecparams);
+                            var curveNidAddress = localArena.allocateFrom(ValueLayout.JAVA_INT, curveNid);
+                            if (SSL_CTX_set1_groups(state.sslCtx, curveNidAddress, 1) <= 0) {
+                                curveNid = 0;
+                            }
+                            if (log.isDebugEnabled()) {
+                                log.debug(sm.getString("openssl.setECDHCurve", Integer.valueOf(curveNid),
+                                        certificate.getCertificateFile()));
+                            }
+                            EC_GROUP_free(ecparams);
                         }
-                        EC_GROUP_free(ecparams);
                     }
                 }
                 // Set certificate chain file
@@ -1212,7 +1214,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     logLastError("openssl.errorPrivateKeyCheck");
                     return false;
                 }
-                if (!OPENSSL_3) {
+                if (!openssl_h_Compatibility.OPENSSL3) {
                     // Set callback for DH parameters
                     SSL_CTX_set_tmp_dh_callback(state.sslCtx,
                             SSL_CTX_set_tmp_dh_callback$dh.allocate(new TmpDHCallback(), contextArena));

@@ -53,7 +53,6 @@ import javax.net.ssl.SSLSessionBindingListener;
 import javax.net.ssl.SSLSessionContext;
 
 import static org.apache.tomcat.util.openssl.openssl_h.*;
-import static org.apache.tomcat.util.openssl.openssl_h_Compatibility.*;
 import static org.apache.tomcat.util.openssl.openssl_h_Macros.*;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -192,7 +191,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         } else {
             SSL_set_accept_state(ssl);
         }
-        SSL_set_verify_result(ssl, X509_V_OK());
+        openssl_h_Compatibility.SSL_set_verify_result(ssl, X509_V_OK());
         try (var localArena = Arena.ofConfined()) {
             var internalBIOPointer = localArena.allocate(ValueLayout.ADDRESS);
             var networkBIOPointer = localArena.allocate(ValueLayout.ADDRESS);
@@ -838,7 +837,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private byte[] getPeerCertificate() {
         try (var localArena = Arena.ofConfined()) {
-            MemorySegment/*(X509*)*/ x509 = (OpenSSLContext.OPENSSL_3 ? SSL_get1_peer_certificate(state.ssl) : SSL_get_peer_certificate(state.ssl));
+            MemorySegment/*(X509*)*/ x509 = openssl_h_Compatibility.SSL_get_peer_certificate(state.ssl);
             MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
             int length = i2d_X509(x509, bufPointer);
             if (length <= 0) {
@@ -1154,7 +1153,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE());
             if (verifyErrorIsOptional && (state.certificateVerifyMode == OpenSSLContext.OPTIONAL_NO_CA)) {
                 ok = 1;
-                SSL_set_verify_result(state.ssl, X509_V_OK());
+                openssl_h_Compatibility.SSL_set_verify_result(state.ssl, X509_V_OK());
             }
             /*
              * Expired certificates vs. "expired" CRLs: by default, OpenSSL
