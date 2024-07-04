@@ -275,5 +275,10 @@ public enum ActionCode {
     /**
      * Obtain the servlet connection instance for the network connection supporting the current request.
      */
-    SERVLET_CONNECTION
+    SERVLET_CONNECTION,
+
+    /**
+     * Send an RFC 8297 Early Hints informational response.
+     */
+    EARLY_HINTS
 }

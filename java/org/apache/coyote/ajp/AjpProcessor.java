@@ -1055,6 +1055,13 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     @Override
+    protected void earlyHints() throws IOException {
+        // TODO Auto-generated method stub
+        // NO-OP for now
+    }
+
+
+    @Override
     protected final int available(boolean doRead) {
         if (endOfStream) {
             return 0;

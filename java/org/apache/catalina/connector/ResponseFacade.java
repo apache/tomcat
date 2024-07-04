@@ -324,6 +324,10 @@ public class ResponseFacade implements HttpServletResponse {
     }
 
 
+    public void sendEarlyHints() {
+        response.sendEarlyHints();
+    }
+
     @Override
     public void sendError(int sc, String msg) throws IOException {
         checkCommitted("coyoteResponse.sendError.ise");
