@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +37,7 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
@@ -585,5 +587,70 @@ public class TestStreamProcessor extends Http2TestBase {
 
         String trace = output.getTrace();
         Assert.assertTrue(trace, trace.contains("3-Header-[:status]-[501]"));
+    }
+
+
+    @Test
+    public void testEarlyHints() throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctxt = getProgrammaticRootContext();
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMappingDecoded("/simple", "simple");
+        Tomcat.addServlet(ctxt, "ehs", new EarlyHintsServlet());
+        ctxt.addServletMappingDecoded("/ehs", "ehs");
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        // Disable overhead protection for window update as it breaks some tests
+        http2Protocol.setOverheadWindowUpdateThreshold(0);
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, 3, "/ehs");
+
+        // Write the headers
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[103]\n" +
+                "3-Header-[link]-[</style.css>; rel=preload; as=style]\n" + "3-HeadersEnd\n", output.getTrace());
+        output.clearTrace();
+
+        parser.readFrame();
+        parser.readFrame();
+
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[200]\n" +
+                "3-Header-[link]-[</style.css>; rel=preload; as=style]\n" +
+                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
+                "3-Header-[content-length]-[2]\n" +
+                "3-Header-[date]-[" + DEFAULT_DATE + "]\n" + "3-HeadersEnd\n" + "3-Body-2\n" + "3-EndOfStream\n",
+                output.getTrace());
+    }
+
+
+    private static class EarlyHintsServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.addHeader("Link", "</style.css>; rel=preload; as=style");
+
+            ((ResponseFacade) resp).sendEarlyHints();
+
+            resp.setCharacterEncoding(StandardCharsets.UTF_8);
+            resp.setContentType("text/plain");
+
+            resp.getWriter().write("OK");
+        }
     }
 }
