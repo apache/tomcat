@@ -437,8 +437,7 @@ public final class Response {
 
 
     /**
-     * Signal that we're done with the headers, and body will follow. Any implementation needs to notify ContextManager,
-     * to allow interceptors to fix headers.
+     * Signal that we're done with the headers, and body will follow.
      */
     public void sendHeaders() {
         action(ActionCode.COMMIT, this);
