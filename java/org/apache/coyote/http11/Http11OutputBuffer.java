@@ -320,14 +320,26 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
 
     /**
      * Send the response status line.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 11. Use {@link #sendStatus(int)}.
      */
+    @Deprecated
     public void sendStatus() {
+        sendStatus(response.getStatus());
+    }
+
+
+    /**
+     * Send the response status line.
+     *
+     * @param status The HTTP status code to include in the status line
+     */
+    public void sendStatus(int status) {
         // Write protocol name
         write(Constants.HTTP_11_BYTES);
         headerBuffer.put(Constants.SP);
 
         // Write status code
-        int status = response.getStatus();
         switch (status) {
             case 200:
                 write(Constants._200_BYTES);
