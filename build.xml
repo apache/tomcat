@@ -352,6 +352,7 @@
     <include name="**/*.shtml"/>
     <include name="**/*.svg"/>
     <include name="**/*.tag"/>
+    <include name="**/*.tagf"/>
     <include name="**/*.tagx"/>
     <include name="**/*.tasks"/>
     <include name="**/*.tld"/>
