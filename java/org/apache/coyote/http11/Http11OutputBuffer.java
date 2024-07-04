@@ -300,7 +300,10 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
      */
     protected void commit() throws IOException {
         response.setCommitted(true);
+        writeHeaders();
+    }
 
+    protected void writeHeaders() throws IOException {
         if (headerBuffer.position() > 0) {
             // Sending the response header buffer
             headerBuffer.flip();
