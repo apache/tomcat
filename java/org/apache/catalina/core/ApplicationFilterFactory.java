@@ -95,29 +95,12 @@ public final class ApplicationFilterFactory {
 
         String servletName = wrapper.getName();
 
-        // Add the relevant path-mapped filters to this filter chain
+        // Add relevant path-mapped and servlet name-matched filters to this filter chain
         for (FilterMap filterMap : filterMaps) {
             if (!matchDispatcher(filterMap, dispatcher)) {
                 continue;
             }
-            if (!FilterUtil.matchFiltersURL(filterMap, requestPath)) {
-                continue;
-            }
-            ApplicationFilterConfig filterConfig =
-                    (ApplicationFilterConfig) context.findFilterConfig(filterMap.getFilterName());
-            if (filterConfig == null) {
-                log.warn(sm.getString("applicationFilterFactory.noFilterConfig", filterMap.getFilterName()));
-                continue;
-            }
-            filterChain.addFilter(filterConfig);
-        }
-
-        // Add filters that match on servlet name second
-        for (FilterMap filterMap : filterMaps) {
-            if (!matchDispatcher(filterMap, dispatcher)) {
-                continue;
-            }
-            if (!matchFiltersServlet(filterMap, servletName)) {
+            if (!FilterUtil.matchFiltersURL(filterMap, requestPath) && !matchFiltersServlet(filterMap, servletName)) {
                 continue;
             }
             ApplicationFilterConfig filterConfig =
