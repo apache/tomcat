@@ -2784,10 +2784,12 @@ gpg.exec=${gpg.exec}
 # Set the user name to use to upload the artefacts to Nexus.
 asf.ldap.username=${release.asfusername}
 </echo>
-    <replace file="webapps/docs/changelog.xml"
-        encoding="UTF-8"
-        token="rtext=&quot;in development&quot;"
-        value="rtext=&quot;&quot;" />
+    <!-- Update the changelog to include the release-manager's asfid and remove any rtext -->
+    <replaceregexp file="webapps/docs/changelog.xml"
+               encoding="UTF-8"
+                 byline="true"
+                  match="&lt;section name=&quot;Tomcat ${version.major}.${version.minor}.${version.build}${version.suffix} \([^)]*\).*&gt;"
+                replace="&lt;section name=&quot;Tomcat ${version.major}.${version.minor}.${version.build}${version.suffix} \(${release.asfusername}\)&quot; rtext=&quot;&quot;&gt;" />
   </target>
 
   <target name="release"
