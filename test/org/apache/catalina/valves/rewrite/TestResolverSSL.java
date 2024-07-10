@@ -18,23 +18,58 @@ package org.apache.catalina.valves.rewrite;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import javax.servlet.ServletException;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.core.OpenSSLLifecycleListener;
+import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.TesterSupport;
+import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 
+@RunWith(Parameterized.class)
 public class TestResolverSSL extends TomcatBaseTest {
+
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Object[]> parameters() {
+        List<Object[]> parameterSets = new ArrayList<>();
+        parameterSets.add(new Object[] {
+                "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
+        parameterSets.add(new Object[] {
+                "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+        parameterSets.add(new Object[] {
+                "OpenSSL-FFM", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+
+        return parameterSets;
+    }
+
+    @Parameter(0)
+    public String connectorName;
+
+    @Parameter(1)
+    public boolean useOpenSSL;
+
+    @Parameter(2)
+    public String sslImplementationName;
+
 
     @Test
     public void testSslEnv() throws Exception {
@@ -139,5 +174,27 @@ public class TestResolverSSL extends TomcatBaseTest {
         TesterSupport.configureClientCertContext(tomcat);
 
         TesterSupport.configureClientSsl();
+
+        String protocol = tomcat.getConnector().getProtocolHandlerClassName();
+        if (protocol.contains("Apr")) {
+            // Only run for OpenSSL to avoid running the test multiple times
+            Assume.assumeTrue(OpenSSLImplementation.class.getName().equals(sslImplementationName));
+        } else {
+            Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
+
+            if (useOpenSSL) {
+                if (OpenSSLImplementation.class.getName().equals(sslImplementationName)) {
+                    AprLifecycleListener listener = new AprLifecycleListener();
+                    Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
+                    StandardServer server = (StandardServer) tomcat.getServer();
+                    server.addLifecycleListener(listener);
+                } else if ("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation".equals(sslImplementationName)) {
+                    OpenSSLLifecycleListener listener = new OpenSSLLifecycleListener();
+                    Assume.assumeTrue(OpenSSLLifecycleListener.isAvailable());
+                    StandardServer server = (StandardServer) tomcat.getServer();
+                    server.addLifecycleListener(listener);
+                }
+            }
+        }
     }
 }

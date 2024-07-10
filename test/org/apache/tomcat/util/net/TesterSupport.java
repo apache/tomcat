@@ -55,13 +55,11 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.authenticator.SSLAuthenticator;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.core.AprStatus;
 import org.apache.catalina.core.OpenSSLLifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.tomcat.jni.Library;
-import org.apache.tomcat.jni.LibraryNotFoundError;
-import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
@@ -88,9 +86,6 @@ public final class TesterSupport {
     public static final String LOCALHOST_EC_KEY_PEM = SSL_DIR + "localhost-ec-key.pem";
     public static final String LOCALHOST_RSA_CERT_PEM = SSL_DIR + "localhost-rsa-cert.pem";
     public static final String LOCALHOST_RSA_KEY_PEM = SSL_DIR + "localhost-rsa-key.pem";
-    public static final boolean OPENSSL_AVAILABLE;
-    public static final int OPENSSL_VERSION;
-    public static final String OPENSSL_ERROR;
     public static final boolean TLSV13_AVAILABLE;
 
     public static final String ROLE = "testrole";
@@ -101,35 +96,12 @@ public final class TesterSupport {
 
     static {
         boolean available = false;
-        int version = 0;
-        String err = "";
-        try {
-            Library.initialize(null);
-            available = true;
-            version = SSL.version();
-            Library.terminate();
-        } catch (Exception | LibraryNotFoundError ex) {
-            err = ex.getMessage();
-        }
-        OPENSSL_AVAILABLE = available;
-        OPENSSL_VERSION = version;
-        OPENSSL_ERROR = err;
-
-        available = false;
         try {
             SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
             available = true;
         } catch (NoSuchAlgorithmException ex) {
         }
         TLSV13_AVAILABLE = available;
-    }
-
-    public static boolean isOpensslAvailable() {
-        return OPENSSL_AVAILABLE;
-    }
-
-    public static int getOpensslVersion() {
-        return OPENSSL_VERSION;
     }
 
     public static boolean isTlsv13Available() {
@@ -709,7 +681,7 @@ public final class TesterSupport {
 
         if (connector.getProtocolHandlerClassName().contains("Apr")) {
             // APR connector so OpenSSL is used for TLS.
-            if (SSL.version() >= 0x1010100f) {
+            if (AprStatus.getOpenSSLVersion() >= 0x1010100f) {
                 return Constants.SSL_PROTO_TLSv1_3;
             } else {
                 return Constants.SSL_PROTO_TLSv1_2;
