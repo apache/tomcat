@@ -37,6 +37,7 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
@@ -45,8 +46,10 @@ import org.apache.tomcat.util.buf.CharsetUtil;
 import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.buf.UDecoder;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -997,8 +1000,18 @@ public class Connector extends LifecycleMBeanBase {
             throw new LifecycleException(
                     sm.getString("coyoteConnector.protocolHandlerNoAprLibrary", getProtocolHandlerClassName()));
         }
-        if (AprStatus.isAprAvailable() && AprStatus.getUseOpenSSL() &&
-                protocolHandler instanceof AbstractHttp11JsseProtocol) {
+        if (JreCompat.isJre22Available() && OpenSSLStatus.getUseOpenSSL() && OpenSSLStatus.isAvailable() &&
+                protocolHandler instanceof AbstractHttp11Protocol) {
+            // Use FFM and OpenSSL if available
+            AbstractHttp11JsseProtocol<?> jsseProtocolHandler = (AbstractHttp11JsseProtocol<?>) protocolHandler;
+            if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
+                // OpenSSL is compatible with the JSSE configuration, so use it if it is available
+                jsseProtocolHandler
+                        .setSslImplementationName("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation");
+            }
+        } else if (AprStatus.isAprAvailable() && AprStatus.getUseOpenSSL() &&
+                protocolHandler instanceof AbstractHttp11Protocol) {
+            // Use tomcat-native and OpenSSL otherwise, if available
             AbstractHttp11JsseProtocol<?> jsseProtocolHandler = (AbstractHttp11JsseProtocol<?>) protocolHandler;
             if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
                 // OpenSSL is compatible with the JSSE configuration, so use it if APR is available
