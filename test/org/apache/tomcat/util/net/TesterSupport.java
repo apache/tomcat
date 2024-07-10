@@ -51,9 +51,11 @@ import org.junit.Assert;
 import org.junit.Assume;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.authenticator.SSLAuthenticator;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.core.OpenSSLLifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
@@ -65,6 +67,7 @@ import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.jsse.JSSEImplementation;
+import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 
 public final class TesterSupport {
 
@@ -181,6 +184,28 @@ public final class TesterSupport {
         }
     }
 
+    public static void configureSSLImplementation(Tomcat tomcat, String sslImplementationName, boolean useOpenSSL) {
+        String protocol = tomcat.getConnector().getProtocolHandlerClassName();
+        if (protocol.contains("Apr")) {
+            // Only run for OpenSSL to avoid running the test multiple times
+            Assume.assumeTrue(OpenSSLImplementation.class.getName().equals(sslImplementationName));
+        } else {
+            if (useOpenSSL) {
+                LifecycleListener listener = null;
+                if (OpenSSLImplementation.class.getName().equals(sslImplementationName)) {
+                    listener = new AprLifecycleListener();
+                    Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
+                } else {
+                    listener = new OpenSSLLifecycleListener();
+                    Assume.assumeTrue(OpenSSLLifecycleListener.isAvailable());
+                }
+                StandardServer server = (StandardServer) tomcat.getServer();
+                server.addLifecycleListener(listener);
+            }
+            Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
+        }
+    }
+
     protected static KeyManager[] getUser1KeyManagers() throws Exception {
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(
                 KeyManagerFactory.getDefaultAlgorithm());
@@ -238,10 +263,10 @@ public final class TesterSupport {
             // Disabled by default in 1.1.20 windows binary (2010-07-27)
             return false;
         }
-        String sslImplementation = System.getProperty("tomcat.test.sslImplementation");
-        if (sslImplementation != null && !"${test.sslImplementation}".equals(sslImplementation)
-                && !JSSEImplementation.class.getName().equals(sslImplementation)) {
-            // Assume custom SSL is not supporting this
+        // Disabled for Tomcat Native (part of response to CVE-2009-3555)
+        // Only JRE provided JSSE implementation supports this
+        String sslImplementation = (String) tomcat.getConnector().getProperty("sslImplementationName");
+        if (!JSSEImplementation.class.getName().equals(sslImplementation)) {
             return false;
         }
 

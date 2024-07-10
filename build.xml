@@ -454,6 +454,7 @@
     <exclude name="org/apache/tomcat/util/log" />
     <exclude name="org/apache/tomcat/util/modeler" />
     <exclude name="org/apache/tomcat/util/net" />
+    <exclude name="org/apache/tomcat/util/openssl"/>
     <exclude name="org/apache/tomcat/util/scan" />
   </patternset>
 
@@ -2437,6 +2438,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <include name="org/**"/>
         <exclude name="org/apache/el/parser/**"/>
         <exclude name="org/apache/tomcat/util/json/**"/>
+        <exclude name="org/apache/tomcat/util/net/openssl/panama/**"/>
+        <exclude name="org/apache/tomcat/util/openssl/**"/>
       </packageset>
       <!--jdbc-pool src files for javadoc-->
       <packageset dir="${tomcat.dist}/src/modules/jdbc-pool/src/main/java"/>
