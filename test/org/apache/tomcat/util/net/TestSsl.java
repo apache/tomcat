@@ -232,6 +232,8 @@ public class TestSsl extends TomcatBaseTest {
         TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS,
                       null, TesterSupport.JKS_PASS_FILE, null, TesterSupport.JKS_KEY_PASS_FILE);
 
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
+
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
             "/examples/servlets/servlet/HelloWorldExample");
