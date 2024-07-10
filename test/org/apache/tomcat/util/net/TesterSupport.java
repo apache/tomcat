@@ -245,19 +245,6 @@ public final class TesterSupport {
         return true;
     }
 
-    public static void configureSSLImplementation(Tomcat tomcat, String sslImplementationName) {
-        try {
-            Class.forName(sslImplementationName);
-        } catch (Exception e) {
-            Assume.assumeNoException(e);
-        }
-        Connector connector = tomcat.getConnector();
-        if (!connector.getProtocolHandlerClassName().contains("Apr")) {
-            // Skip this for APR. It is not supported.
-            Assert.assertTrue(connector.setProperty("sslImplementationName", sslImplementationName));
-        }
-    }
-
     public static void configureClientCertContext(Tomcat tomcat) {
         initSsl(tomcat);
 
