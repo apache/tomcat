@@ -21,6 +21,8 @@ on:
   pull_request:
     branches:
       - main
+      - 10.1.x
+      - 9.0.x
 
 env:
   LC_ALL: en_US.UTF-8
