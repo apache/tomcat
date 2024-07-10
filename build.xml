@@ -2741,6 +2741,9 @@ skip.installer property in build.properties" />
   <target name="pre-release" depends="-pre-release-lone-target-check, -pre-release-read-asf-username"
       description="Prepares for a release build by writing build.properties.release which contains information about the release-build environment.">
     <antversion property="antversion"/>
+    <exec executable="${java25.home}/bin/javac" outputproperty="javac25.version">
+      <arg value="-version" />
+    </exec>
     <echo file="build.properties.release"># -----------------------------------------------------------------------------
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -2785,6 +2788,8 @@ gpg.exec=${gpg.exec}
 # Java Name:       ${java.vm.name}
 # Java Vendor:     ${java.vm.vendor}
 # Java Version:    ${java.vm.version}
+#
+# Javac with FFM version: ${javac25.version}
 
 # The following is provided for information only. Builds will be repeatable
 # whether or not the build environment is consistent with this information.
