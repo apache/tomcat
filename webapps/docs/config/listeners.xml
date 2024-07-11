@@ -83,8 +83,8 @@
   <subsection name="APR Lifecycle Listener - org.apache.catalina.core.AprLifecycleListener">
 
     <p>The <strong>APR Lifecycle Listener</strong> checks for the presence of
-    the APR/native library and loads the library if it is present. For more
-    information see the <a href="../apr.html">APR/native guide</a>.</p>
+    the Apache Tomcat Native library and loads the library if it is present.
+    For more information see the <a href="../apr.html">APR/native guide</a>.</p>
 
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements.</p>
@@ -369,6 +369,67 @@
       processing.</p>
 
     </subsection>
+
+  </subsection>
+
+  <subsection name="OpenSSL Lifecycle Listener - org.apache.catalina.core.OpenSSLLifecycleListener">
+
+    <p>The <strong>OpenSSL Lifecycle Listener</strong> checks for the presence
+    of the OpenSSL library and loads the library if it is present. This
+    uses the FFM API from Java 22 instead of additional native code. When
+    enabled and successfully loaded, NIO and NIO2 connector will then make use
+    of OpenSSL for TLS functionality. This is a functional replacement to the
+    <strong>APR Lifecycle Listener</strong> described above.</p>
+
+    <p>This listener must only be nested within <a href="server.html">Server</a>
+    elements.</p>
+
+    <p>The following additional attributes are supported by the <strong>OpenSSL
+    Lifecycle Listener</strong>:</p>
+
+    <attributes>
+
+      <attribute name="SSLEngine" required="false">
+        <p>Name of the SSLEngine to use, for OpenSSL 1.x.</p>
+        <p>See the <a href="http://www.openssl.org/">Official OpenSSL website</a>
+        for more details on supported SSL hardware engines and manufacturers.
+        </p>
+      </attribute>
+
+      <attribute name="SSLRandomSeed" required="false">
+        <p>Entropy source used to seed the SSLEngine's PRNG. The default value
+        is <code>builtin</code>. On development systems, you may want to set
+        this to <code>/dev/urandom</code> to allow quicker start times.</p>
+      </attribute>
+
+      <attribute name="FIPSMode" required="false">
+        <p>The behaviour of this attribute depends on whether Tomcat Native has
+        been compiled against OpenSSL 1.x or OpenSSL 3.x.</p>
+        <p>For OpenSSL 1.x: Set to <code>on</code> to request that OpenSSL be in
+        FIPS mode (if OpenSSL is already in FIPS mode, it will remain in FIPS
+        mode).
+        Set to <code>enter</code> to force OpenSSL to enter FIPS mode (an
+        error will occur if OpenSSL is already in FIPS mode).
+        Set to <code>require</code> to require that OpenSSL <i>already</i> be
+        in FIPS mode (an error will occur if OpenSSL is not already in FIPS
+        mode).</p>
+        <p>For OpenSSL 3.x: <code>on</code>, <code>enter</code> and
+        <code>require</code> all behave the same way. If the FIPS provider is
+        the default provider, it will be used. If the FIPS provider is not the
+        default provider, an error will occur.</p>
+        <p>FIPS mode <em>requires you to have a FIPS-capable OpenSSL library</em>.
+        If this attribute is set to anything other than <code>off</code>, the
+        <b>SSLEngine</b> must be enabled as well.</p>
+        <p>The default value is <code>off</code>.</p>
+      </attribute>
+
+      <attribute name="useOpenSSL" required="false">
+        <p>This attribute controls the auto-selection of the OpenSSL JSSE
+        implementation. The default is <code>true</code> which will use OpenSSL
+        if the FFM API is available.</p>
+      </attribute>
+
+    </attributes>
 
   </subsection>
 
