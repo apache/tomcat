@@ -17,6 +17,9 @@
 package org.apache.tomcat.websocket;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +31,9 @@ import javax.websocket.WebSocketContainer;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
@@ -36,7 +42,30 @@ import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
+@RunWith(Parameterized.class)
 public class TestWsWebSocketContainerSSL extends WebSocketBaseTest {
+
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Object[]> parameters() {
+        List<Object[]> parameterSets = new ArrayList<>();
+        parameterSets.add(new Object[] { "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation" });
+        parameterSets.add(
+                new Object[] { "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation" });
+        parameterSets.add(new Object[] { "OpenSSL-FFM", Boolean.TRUE,
+                "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" });
+
+        return parameterSets;
+    }
+
+    @Parameter(0)
+    public String connectorName;
+
+    @Parameter(1)
+    public boolean useOpenSSL;
+
+    @Parameter(2)
+    public String sslImplementationName;
+
 
     private static final String MESSAGE_STRING_1 = "qwerty";
 
@@ -49,8 +78,6 @@ public class TestWsWebSocketContainerSSL extends WebSocketBaseTest {
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
-
-        TesterSupport.initSsl(tomcat);
 
         tomcat.start();
 
@@ -72,5 +99,16 @@ public class TestWsWebSocketContainerSSL extends WebSocketBaseTest {
         Queue<String> messages = handler.getMessages();
         Assert.assertEquals(1, messages.size());
         Assert.assertEquals(MESSAGE_STRING_1, messages.peek());
+    }
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        TesterSupport.initSsl(tomcat);
+
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
     }
 }

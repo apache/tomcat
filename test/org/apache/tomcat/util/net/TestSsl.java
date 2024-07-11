@@ -23,7 +23,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -40,9 +43,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -54,7 +61,31 @@ import org.apache.tomcat.websocket.server.WsContextListener;
  * generated using a test CA the files for which are in the Tomcat PMC private
  * repository since not all of them are AL2 licensed.
  */
+@RunWith(Parameterized.class)
 public class TestSsl extends TomcatBaseTest {
+
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Object[]> parameters() {
+        List<Object[]> parameterSets = new ArrayList<>();
+        parameterSets.add(new Object[] {
+                "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
+        parameterSets.add(new Object[] {
+                "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+        parameterSets.add(new Object[] {
+                "OpenSSL-FFM", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+
+        return parameterSets;
+    }
+
+    @Parameter(0)
+    public String connectorName;
+
+    @Parameter(1)
+    public boolean useOpenSSL;
+
+    @Parameter(2)
+    public String sslImplementationName;
+
 
     @Test
     public void testSimpleSsl() throws Exception {
@@ -67,6 +98,7 @@ public class TestSsl extends TomcatBaseTest {
         ctxt.addApplicationListener(WsContextListener.class.getName());
 
         TesterSupport.initSsl(tomcat);
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
@@ -90,8 +122,10 @@ public class TestSsl extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         TesterSupport.initSsl(tomcat);
+        Connector connector = tomcat.getConnector();
         // Increase timeout as default (3s) can be too low for some CI systems
-        Assert.assertTrue(tomcat.getConnector().setProperty("connectionTimeout", "20000"));
+        Assert.assertTrue(connector.setProperty("connectionTimeout", "20000"));
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "post", new SimplePostServlet());
@@ -174,6 +208,8 @@ public class TestSsl extends TomcatBaseTest {
         TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS,
                 TesterSupport.JKS_PASS, null, TesterSupport.JKS_KEY_PASS, null);
 
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
+
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
             "/examples/servlets/servlet/HelloWorldExample");
@@ -195,6 +231,8 @@ public class TestSsl extends TomcatBaseTest {
         TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS,
                       null, TesterSupport.JKS_PASS_FILE, null, TesterSupport.JKS_KEY_PASS_FILE);
 
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
+
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
             "/examples/servlets/servlet/HelloWorldExample");
@@ -208,6 +246,7 @@ public class TestSsl extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         TesterSupport.initSsl(tomcat);
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
         boolean renegotiationSupported = TesterSupport.isClientRenegotiationSupported(getTomcatInstance());
 

@@ -17,6 +17,9 @@
 package org.apache.tomcat.websocket;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +32,9 @@ import javax.websocket.WebSocketContainer;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
@@ -38,7 +44,30 @@ import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.SleepingText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
+@RunWith(Parameterized.class)
 public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
+
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Object[]> parameters() {
+        List<Object[]> parameterSets = new ArrayList<>();
+        parameterSets.add(new Object[] { "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation" });
+        parameterSets.add(
+                new Object[] { "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation" });
+        parameterSets.add(new Object[] { "OpenSSL-FFM", Boolean.TRUE,
+                "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" });
+
+        return parameterSets;
+    }
+
+    @Parameter(0)
+    public String connectorName;
+
+    @Parameter(1)
+    public boolean useOpenSSL;
+
+    @Parameter(2)
+    public String sslImplementationName;
+
 
     @Test
     public void testConnectToServerEndpoint() throws Exception {
@@ -48,8 +77,6 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
         ctx.addApplicationListener(TesterFirehoseServer.ConfigInline.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
-
-        TesterSupport.initSsl(tomcat);
 
         tomcat.start();
 
@@ -88,8 +115,6 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
         ctx.addApplicationListener(TesterFirehoseServer.ConfigInline.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
-
-        TesterSupport.initSsl(tomcat);
 
         tomcat.start();
 
@@ -138,5 +163,16 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
             org.apache.tomcat.websocket.Constants.SESSION_CLOSE_TIMEOUT_PROPERTY, Long.valueOf(2000));
         // Close the client session.
         wsSession.close();
+    }
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        TesterSupport.initSsl(tomcat);
+
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
     }
 }

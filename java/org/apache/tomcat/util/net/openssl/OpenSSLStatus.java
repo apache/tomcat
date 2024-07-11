@@ -14,29 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.core;
+package org.apache.tomcat.util.net.openssl;
 
 /**
- * Holds APR status without the need to load other classes.
+ * Holds OpenSSL status without the need to load other classes.
  */
-public class AprStatus {
-    private static volatile boolean aprInitialized = false;
-    private static volatile boolean aprAvailable = false;
-    private static volatile boolean useAprConnector = false;
+public class OpenSSLStatus {
+    private static volatile boolean libraryInitialized = false;
+    private static volatile boolean initialized = false;
+    private static volatile boolean available = false;
     private static volatile boolean useOpenSSL = true;
     private static volatile boolean instanceCreated = false;
-    private static volatile int openSSLVersion = 0;
+    private static volatile long version = 0;
 
-    public static boolean isAprInitialized() {
-        return aprInitialized;
+
+    public static boolean isLibraryInitialized() {
+        return libraryInitialized;
     }
 
-    public static boolean isAprAvailable() {
-        return aprAvailable;
+    public static boolean isInitialized() {
+        return initialized;
     }
 
-    public static boolean getUseAprConnector() {
-        return useAprConnector;
+    public static boolean isAvailable() {
+        return available;
     }
 
     public static boolean getUseOpenSSL() {
@@ -47,38 +48,38 @@ public class AprStatus {
         return instanceCreated;
     }
 
-    public static void setAprInitialized(boolean aprInitialized) {
-        AprStatus.aprInitialized = aprInitialized;
+    public static void setLibraryInitialized(boolean libraryInitialized) {
+        OpenSSLStatus.libraryInitialized = libraryInitialized;
     }
 
-    public static void setAprAvailable(boolean aprAvailable) {
-        AprStatus.aprAvailable = aprAvailable;
+    public static void setInitialized(boolean initialized) {
+        OpenSSLStatus.initialized = initialized;
     }
 
-    public static void setUseAprConnector(boolean useAprConnector) {
-        AprStatus.useAprConnector = useAprConnector;
+    public static void setAvailable(boolean available) {
+        OpenSSLStatus.available = available;
     }
 
     public static void setUseOpenSSL(boolean useOpenSSL) {
-        AprStatus.useOpenSSL = useOpenSSL;
+        OpenSSLStatus.useOpenSSL = useOpenSSL;
     }
 
     public static void setInstanceCreated(boolean instanceCreated) {
-        AprStatus.instanceCreated = instanceCreated;
+        OpenSSLStatus.instanceCreated = instanceCreated;
     }
 
     /**
-     * @return the openSSLVersion
+     * @return the version
      */
-    public static int getOpenSSLVersion() {
-        return openSSLVersion;
+    public static long getVersion() {
+        return version;
     }
 
     /**
-     * @param openSSLVersion the openSSLVersion to set
+     * @param version the version to set
      */
-    public static void setOpenSSLVersion(int openSSLVersion) {
-        AprStatus.openSSLVersion = openSSLVersion;
+    public static void setVersion(long version) {
+        OpenSSLStatus.version = version;
     }
 
 }

@@ -59,9 +59,16 @@
     <module name="IllegalInstantiation"/>
 
     <!-- Imports -->
-    <module name="AvoidStarImport"/>
+    <module name="AvoidStarImport">
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h.*"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h_Compatibility.*"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h_Macros.*"/>
+    </module>
     <module name="AvoidStaticImport">
         <property name="excludes" value="org.apache.catalina.startup.SimpleHttpClient.CRLF"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h.*"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h_Compatibility.*"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h_Macros.*"/>
         <property name="excludes" value="org.hamcrest.MatcherAssert.*"/>
         <property name="excludes" value="org.hamcrest.core.IsInstanceOf.*"/>
     </module>

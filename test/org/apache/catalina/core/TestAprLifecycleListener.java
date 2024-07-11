@@ -20,9 +20,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
+import org.apache.coyote.http11.Http11NioProtocol;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 
@@ -30,35 +33,70 @@ public class TestAprLifecycleListener {
 
     @Test
     public void testMultipleServerInstancesUsingTomcatNativeLibrary01() throws Exception {
-        doTestMultipleServerInstancesUsingTomcatNativeLibrary(false);
+        doTestMultipleServerInstancesUsingTomcatNativeLibrary(false, false);
     }
 
 
     @Test
     public void testMultipleServerInstancesUsingTomcatNativeLibrary02() throws Exception {
-        doTestMultipleServerInstancesUsingTomcatNativeLibrary(true);
+        doTestMultipleServerInstancesUsingTomcatNativeLibrary(true, false);
     }
 
 
-    private void doTestMultipleServerInstancesUsingTomcatNativeLibrary(boolean reverseShutdownOrder) throws Exception {
+    @Test
+    public void testMultipleServerInstancesUsingFFM01() throws Exception {
+        Assume.assumeTrue(JreCompat.isJre22Available());
+        doTestMultipleServerInstancesUsingTomcatNativeLibrary(false, true);
+    }
+
+
+    @Test
+    public void testMultipleServerInstancesUsingFFM02() throws Exception {
+        Assume.assumeTrue(JreCompat.isJre22Available());
+        doTestMultipleServerInstancesUsingTomcatNativeLibrary(true, true);
+    }
+
+    private void doTestMultipleServerInstancesUsingTomcatNativeLibrary(boolean reverseShutdownOrder, boolean ffm) throws Exception {
         Path tmpDir = Paths.get(System.getProperty("tomcat.test.temp", "output/tmp"));
         Files.createDirectories(tmpDir);
 
+        String protocol = System.getProperty("tomcat.test.protocol", Http11NioProtocol.class.getName());
+        if (protocol.contains("Apr")) {
+            Assume.assumeFalse(ffm);
+        }
+
         Tomcat tomcat1 = new Tomcat();
-        tomcat1.getServer().addLifecycleListener(new AprLifecycleListener());
         Path base1 = Files.createTempDirectory(tmpDir, "tomcat1-");
         tomcat1.setBaseDir(base1.toAbsolutePath().toString());
         tomcat1.setPort(0);
+        // Add AprLifecycleListener if we are using the Apr connector
+        if (protocol.contains("Apr")) {
+            StandardServer server = (StandardServer) tomcat1.getServer();
+            AprLifecycleListener listener = new AprLifecycleListener();
+            listener.setUseAprConnector(true);
+            listener.setSSLRandomSeed("/dev/urandom");
+            server.addLifecycleListener(listener);
+        }
         TesterSupport.initSsl(tomcat1);
-        TesterSupport.configureSSLImplementation(tomcat1, OpenSSLImplementation.class.getName());
+        TesterSupport.configureSSLImplementation(tomcat1,
+                ffm ? "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" : OpenSSLImplementation.class.getName(), true);
         tomcat1.init();
+
         Tomcat tomcat2 = new Tomcat();
-        tomcat2.getServer().addLifecycleListener(new AprLifecycleListener());
         Path base2 = Files.createTempDirectory(tmpDir, "tomcat2-");
         tomcat2.setBaseDir(base2.toAbsolutePath().toString());
         tomcat2.setPort(0);
+        // Add AprLifecycleListener if we are using the Apr connector
+        if (protocol.contains("Apr")) {
+            StandardServer server = (StandardServer) tomcat2.getServer();
+            AprLifecycleListener listener = new AprLifecycleListener();
+            listener.setUseAprConnector(true);
+            listener.setSSLRandomSeed("/dev/urandom");
+            server.addLifecycleListener(listener);
+        }
         TesterSupport.initSsl(tomcat2);
-        TesterSupport.configureSSLImplementation(tomcat2, OpenSSLImplementation.class.getName());
+        TesterSupport.configureSSLImplementation(tomcat2,
+                ffm ? "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" : OpenSSLImplementation.class.getName(), true);
         tomcat2.init();
 
         // Start 1, then 2
