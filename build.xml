@@ -2893,7 +2893,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
       </condition>
     </fail>
     <condition property="no-ffm">
-      <not><isset property="${java25.home}" /></not>
+      <not><isset property="java25.home" /></not>
     </condition>
     <echo level="error" if:set="no-ffm">JAVAC VERSION 22 OR NEWER IS REQUIRED FOR RELEASE (java25.home property is set to ${java25.home})</echo>
   </target>
