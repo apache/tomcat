@@ -77,7 +77,7 @@
 
   <subsection name="Standard Implementation">
 
-  <p>This implemtenation uses a pool of platform threads to execute the tasks assigned to the Executor.</p>
+  <p>This implementation uses a pool of platform threads to execute the tasks assigned to the Executor.</p>
 
   <p>The <code>className</code> attribute must be <code>org.apache.catalina.core.StandardThreadExecutor</code> to use
      this implementation.</p>
@@ -126,7 +126,7 @@
 
   <subsection name="Virtual Thread Implementation">
 
-  <p>This implemtenation uses a new virtual thread to execute each task assigned to the Executor. This Executor requires
+  <p>This implementation uses a new virtual thread to execute each task assigned to the Executor. This Executor requires
      a minimum Java version of Java 21.</p>
 
   <p>The <code>className</code> attribute must be <code>org.apache.catalina.core.StandardVirtualThreadExecutor</code> to
