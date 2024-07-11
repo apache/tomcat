@@ -1022,7 +1022,7 @@
     </javac>
     <!-- Compile internal server components that use FFM -->
     <condition property="has-ffm">
-      <isset property="java25.home" />
+      <isset property="java-ffm.home" />
     </condition>
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
@@ -1030,7 +1030,7 @@
            release="22"
            encoding="ISO-8859-1"
            includeAntRuntime="true"
-           fork="true" executable="${java25.home}/bin/javac"
+           fork="true" executable="${java-ffm.home}/bin/javac"
            if:set="has-ffm" >
       <!-- Uncomment this to show unchecked warnings:
       <compilerarg value="-Xlint:unchecked"/>
@@ -2741,7 +2741,7 @@ skip.installer property in build.properties" />
   <target name="pre-release" depends="-pre-release-lone-target-check, -pre-release-read-asf-username"
       description="Prepares for a release build by writing build.properties.release which contains information about the release-build environment.">
     <antversion property="antversion"/>
-    <exec executable="${java25.home}/bin/javac" outputproperty="javac25.version">
+    <exec executable="${java-ffm.home}/bin/javac" outputproperty="javac25.version">
       <arg value="-version" />
     </exec>
     <echo file="build.properties.release"># -----------------------------------------------------------------------------
@@ -2893,9 +2893,9 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
       </condition>
     </fail>
     <condition property="no-ffm">
-      <not><isset property="java25.home" /></not>
+      <not><isset property="java-ffm.home" /></not>
     </condition>
-    <echo level="error" if:set="no-ffm">JAVAC VERSION 22 OR NEWER IS REQUIRED FOR RELEASE (java25.home property is set to ${java25.home})</echo>
+    <echo level="error" if:set="no-ffm">JAVAC VERSION 22 OR NEWER IS REQUIRED FOR RELEASE (java-ffm.home property is set to ${java-ffm.home})</echo>
   </target>
 
   <target name="gpg-init-1">
