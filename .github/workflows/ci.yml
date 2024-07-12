@@ -1,0 +1,60 @@
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+
+name: Smoke Test
+
+on:
+  push:
+    branches:
+      - 9.0.x
+  pull_request:
+    branches:
+      - 9.0.x
+
+env:
+  LC_ALL: en_US.UTF-8
+
+jobs:
+  JDKxx_Matrix:
+    strategy:
+      fail-fast: false
+      matrix:
+        isMain:
+          - ${{ contains(github.ref, 'main') }}
+        java: [ 22 ]
+        os: [ ubuntu-latest ]
+    name: JDK${{ matrix.java }} ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Git Checkout
+      uses: actions/checkout@v4
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ matrix.java }}
+        distribution: zulu
+    - name: Build
+      run: |
+        ant -noinput echoproperties deploy embed test-nio test-status
+      env:
+        ANT_OPTS: -Dtest.openssl.exists=false -Dtest.excludePerformance=true -Dtest.exclude=jakarta/servlet/http/TestHttpServletDoHeadValidWrite0.java,jakarta/servlet/http/TestHttpServletDoHeadValidWrite1023.java,jakarta/servlet/http/TestHttpServletDoHeadValidWrite1024.java,jakarta/servlet/http/TestHttpServletDoHeadValidWrite1025.java,jakarta/servlet/http/TestHttpServletDoHeadValidWrite1.java,jakarta/servlet/http/TestHttpServletDoHeadValidWrite511.java,jakarta/servlet/http/TestHttpServletDoHeadValidWrite512.java,jakarta/servlet/http/TestHttpServletDoHeadValidWrite513.java,jakarta/servlet/http/TestHttpServletResponseSendError.java,org/apache/catalina/authenticator/TestFormAuthenticatorA.java,org/apache/catalina/authenticator/TestFormAuthenticatorB.java,org/apache/catalina/authenticator/TestFormAuthenticatorC.java,org/apache/catalina/authenticator/TestSSOnonLoginAndBasicAuthenticator.java,org/apache/catalina/authenticator/TestSSOnonLoginAndDigestAuthenticator.java,org/apache/catalina/core/TestAsyncContextImpl.java,org/apache/catalina/core/TestAsyncContextStateChanges.java,org/apache/catalina/core/TestStandardContextResources.java,org/apache/catalina/core/TestStandardWrapper.java,org/apache/catalina/loader/TestVirtualContext.java,org/apache/catalina/mapper/TestMapperWebapps.java,org/apache/catalina/nonblocking/TestNonBlockingAPI.java,org/apache/catalina/servlets/TestDefaultServletEncodingPassThroughBom.java,org/apache/catalina/servlets/TestDefaultServletEncodingWithBom.java,org/apache/catalina/servlets/TestDefaultServletEncodingWithoutBom.java,org/apache/catalina/servlets/TestDefaultServletIfMatchRequests.java,org/apache/catalina/servlets/TestDefaultServlet.java,org/apache/catalina/servlets/TestDefaultServletOptions.java,org/apache/catalina/servlets/TestWebdavServletOptionsFile.java,org/apache/catalina/startup/TestContextConfig.java,org/apache/catalina/startup/TestHostConfigAutomaticDeploymentA.java,org/apache/catalina/startup/TestHostConfigAutomaticDeploymentB.java,org/apache/catalina/startup/TestHostConfigAutomaticDeploymentC.java,org/apache/catalina/valves/rewrite/TestRewriteValve.java,org/apache/catalina/valves/TestStuckThreadDetectionValve.java,org/apache/coyote/ajp/TestAbstractAjpProcessor.java,org/apache/coyote/http11/filters/TestChunkedInputFilter.java,org/apache/coyote/http11/TestHttp11InputBufferCRLF.java,org/apache/coyote/http11/TestHttp11InputBuffer.java,org/apache/coyote/http11/TestHttp11Processor.java,org/apache/coyote/http2/TestAsync.java,org/apache/coyote/http2/TestHttp2ConnectionTimeouts.java,org/apache/coyote/http2/TestHttp2Limits.java,org/apache/coyote/http2/TestHttp2Section_6_8.java,org/apache/coyote/http2/TestHttp2Timeouts.java,org/apache/coyote/http2/TestStreamQueryString.java,org/apache/el/TestELInJsp.java,org/apache/jasper/compiler/TestCompiler.java,org/apache/jasper/compiler/TestEncodingDetector.java,org/apache/jasper/compiler/TestGenerator.java,org/apache/jasper/compiler/TestJspConfig.java,org/apache/jasper/compiler/TestJspDocumentParser.java,org/apache/jasper/compiler/TestValidator.java,org/apache/jasper/optimizations/TestELInterpreterTagSetters.java,org/apache/jasper/optimizations/TestStringInterpreterTagSetters.java,org/apache/jasper/runtime/TestCustomHttpJspPage.java,org/apache/jasper/runtime/TestJspContextWrapper.java,org/apache/jasper/runtime/TestJspRuntimeLibrary.java,org/apache/jasper/runtime/TestPageContextImpl.java,org/apache/jasper/servlet/TestTldScanner.java,org/apache/naming/resources/TestWarDirContext.java,org/apache/naming/TestEnvEntry.java,org/apache/tomcat/util/net/TestClientCert.java,org/apache/tomcat/util/net/TestCustomSslTrustManager.java,org/apache/tomcat/util/net/TestSSLHostConfigCompat.java,org/apache/tomcat/util/net/TestSsl.java,org/apache/tomcat/websocket/server/TestSlowClient.java,org/apache/tomcat/websocket/server/TestWsRemoteEndpointImplServerDeadlock.java,org/apache/tomcat/websocket/TestWebSocketFrameClientSSL.java,org/apache/tomcat/websocket/TestWsWebSocketContainer.java
+
+      continue-on-error:
+        true
+    - name: Upload logs
+      uses: actions/upload-artifact@v4
+      with:
+        name: JDK${{ matrix.java }}-${{ matrix.os }}-logs
+        path: |
+          hs_err_*.log
+          output/build/logs/TEST*.txt
+        retention-days: 7
