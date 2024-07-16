@@ -4021,7 +4021,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     </antcall>
   </target>
 
-  <target name="setup-bnd" depends="download-bnd" unless="skip.build.java.version">
+  <target name="setup-bnd" depends="download-bnd" unless="${skip.build.java.version}">
     <!-- Add bnd tasks to project -->
     <path id="bnd.classpath">
       <fileset file="${bnd.jar}" />
@@ -4096,7 +4096,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     </sequential>
   </macrodef>
 
-  <target name="add-osgi" if="${addOSGi}" unless="skip.build.java.version" >
+  <target name="add-osgi" if="${addOSGi}" unless="${skip.build.java.version}" >
     <echo message="add-osgi ${jarfile} ${addOSGi}"></echo>
     <local name="filename"/>
     <basename property="filename" file="${jarfile}"/>
