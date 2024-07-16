@@ -19,6 +19,8 @@ Bundle-Name: tomcat-jsp-api
 Bundle-SymbolicName: org.apache.tomcat-jsp-api
 Export-Package: \
     javax.servlet.jsp.*;version=2.3
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 Provide-Capability: \
     osgi.contract;\
