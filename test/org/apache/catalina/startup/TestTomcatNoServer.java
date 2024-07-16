@@ -21,6 +21,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -84,6 +86,16 @@ public class TestTomcatNoServer {
                         "]-[" + ctx.findMimeMapping(missingExtension) + "]");
             }
             Assert.fail("Embedded is missing [" + missingInWebXml.size() + "] entries compared to conf/web.xml");
+        }
+    }
+
+    @Test
+    public void testJarsDecoration() throws Exception {
+        File libDir = new File(LoggingBaseTest.getBuildDirectory(), "lib");
+        try (JarFile catalinaJar = new JarFile(new File(libDir, "tomcat-util.jar"))) {
+            Manifest manifest = catalinaJar.getManifest();
+            Assert.assertFalse(manifest.getMainAttributes().getValue("Export-Package").isEmpty());
+            Assert.assertNotNull(catalinaJar.getJarEntry("module-info.class"));
         }
     }
 }
