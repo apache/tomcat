@@ -110,7 +110,6 @@
   <property name="min.java.version" value="11"/>
   <property name="build.java.version" value="17"/>
   <property name="release.java.version" value="22"/>
-  <property name="skip.build.java.version" value="false"/>
 
   <!-- Check Java Build Version -->
   <fail message="Java version ${build.java.version} or newer is required (${java.version} is installed)">

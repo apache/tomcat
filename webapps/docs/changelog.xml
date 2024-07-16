@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.27 (schultz)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Fix packaging regression with missing osgi information following
+        addition of the <code>test-only</code> build target. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.26 (schultz)" rtext="2024-07-12">
   <subsection name="Catalina">
