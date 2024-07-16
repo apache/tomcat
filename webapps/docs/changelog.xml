@@ -116,6 +116,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Fix packaging regression with missing osgi information following
+        addition of the <code>test-only</code> build target. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.91 (remm)" rtext="2024-07-08">
   <subsection name="Catalina">
