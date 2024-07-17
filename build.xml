@@ -4126,7 +4126,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     >
       <classpath>
         <pathelement location="${bnd.jar}"/>
-        <fileset dir="${tomcat.output}" includes="${libs}" />
+        <fileset dir="${tomcat.output}" includes="${libs}" excludes="build/lib/tomcat-i18n-*.jar" />
       </classpath>
       <bndfiles>
         <pathelement location="${tomcat.bnd}/${filename}.tmp.bnd"/>
