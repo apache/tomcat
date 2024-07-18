@@ -38,7 +38,13 @@ import java.util.Calendar;
 import java.util.Map;
 
 public class ResultSet implements java.sql.ResultSet {
-    boolean hasNext = true;
+
+    private final Statement owner;
+    private boolean hasNext = true;
+
+    public ResultSet(Statement owner) {
+        this.owner = owner;
+    }
 
     @Override
     public boolean absolute(int row) throws SQLException {
@@ -437,7 +443,7 @@ public class ResultSet implements java.sql.ResultSet {
     @Override
     public Statement getStatement() throws SQLException {
         // TODO Auto-generated method stub
-        return null;
+        return owner;
     }
 
     @Override
@@ -1218,6 +1224,5 @@ public class ResultSet implements java.sql.ResultSet {
         // TODO Auto-generated method stub
         return null;
     }
-
 
 }

@@ -729,7 +729,7 @@ public class Statement implements CallableStatement {
     @Override
     public ResultSet executeQuery() throws SQLException {
         // TODO Auto-generated method stub
-        return new org.apache.tomcat.jdbc.test.driver.ResultSet();
+        return new org.apache.tomcat.jdbc.test.driver.ResultSet(this);
     }
 
     @Override
@@ -1101,7 +1101,7 @@ public class Statement implements CallableStatement {
     @Override
     public ResultSet executeQuery(String sql) throws SQLException {
         // TODO Auto-generated method stub
-        return new org.apache.tomcat.jdbc.test.driver.ResultSet();
+        return new org.apache.tomcat.jdbc.test.driver.ResultSet(this);
     }
 
     @Override
@@ -1149,7 +1149,7 @@ public class Statement implements CallableStatement {
     @Override
     public ResultSet getGeneratedKeys() throws SQLException {
         // TODO Auto-generated method stub
-        return new org.apache.tomcat.jdbc.test.driver.ResultSet();
+        return new org.apache.tomcat.jdbc.test.driver.ResultSet(this);
     }
 
     @Override
@@ -1185,7 +1185,7 @@ public class Statement implements CallableStatement {
     @Override
     public ResultSet getResultSet() throws SQLException {
         // TODO Auto-generated method stub
-        return null;
+        return new org.apache.tomcat.jdbc.test.driver.ResultSet(this);
     }
 
     @Override
