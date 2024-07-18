@@ -316,10 +316,12 @@ public final class Library {
     public static boolean tryCleanUpLock(long cleanupGeneration) {
         try {
             boolean result = cleanUpLock.readLock().tryLock(0, TimeUnit.SECONDS);
-            if (result &&  generation.get() == cleanupGeneration) {
-                return true;
+            if (result) {
+                if (generation.get() == cleanupGeneration) {
+                    return true;
+                }
+                cleanUpLock.readLock().unlock();
             }
-            cleanUpLock.readLock().unlock();
         } catch (InterruptedException e) {
             // Treated the same way as not getting the lock
         }
