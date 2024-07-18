@@ -20,6 +20,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
@@ -38,6 +40,23 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
     protected static final String PREPARE_CALL          = "prepareCall";
     protected static final int    PREPARE_CALL_IDX      = 2;
 
+    /**
+     * {@link Statement#getResultSet()}
+     */
+    protected static final String GET_RESULTSET = "getResultSet";
+
+    /**
+     * {@link Statement#getGeneratedKeys()}
+     */
+    protected static final String GET_GENERATED_KEYS = "getGeneratedKeys";
+
+    /**
+     * {@link ResultSet#getStatement()}
+     */
+    protected static final String GET_STATEMENT = "getStatement";
+
+    protected static final int    RESULTSET_IDX         = 3;
+
     protected static final String[] STATEMENT_TYPES = {CREATE_STATEMENT, PREPARE_STATEMENT, PREPARE_CALL};
     protected static final int    STATEMENT_TYPE_COUNT = STATEMENT_TYPES.length;
 
@@ -51,7 +70,7 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
     /**
      * the constructors that are used to create statement proxies
      */
-    protected static final Constructor<?>[] constructors = new Constructor[STATEMENT_TYPE_COUNT];
+    protected static final Constructor<?>[] constructors = new Constructor[STATEMENT_TYPE_COUNT + 1];
 
     public  AbstractCreateStatementInterceptor() {
         super();
