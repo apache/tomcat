@@ -105,6 +105,18 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0-M23 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add support for RFC 8297 (Early Hints). Applications can use this
+        feature by casting the <code>HttpServletResponse</code> to
+        <code>org.apache.catalina.connector.Reponse</code> and then calling the
+        method <code>void sendEarlyHints()</code>. This method will be added to
+        the Servlet API (removing the need for the cast) in Servlet 6.2 onwards.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <update>
