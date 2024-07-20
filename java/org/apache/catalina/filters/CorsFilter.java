@@ -350,7 +350,7 @@ public class CorsFilter extends GenericFilter {
         response.resetBuffer();
 
         if (log.isDebugEnabled()) {
-            sm.getString("corsFilter.invalidRequest", origin, method, accessControlRequestHeaders);
+            log.debug(sm.getString("corsFilter.invalidRequest", origin, method, accessControlRequestHeaders));
         }
     }
 
