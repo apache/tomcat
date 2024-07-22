@@ -115,6 +115,12 @@
         the Servlet API (removing the need for the cast) in Servlet 6.2 onwards.
         (markt)
       </add>
+      <fix>
+        <bug>69214</bug>: Do not reject a CORS request that uses POST but does
+        not include a <code>content-type</code> header. Tomcat now correctly
+        processes this as a simple CORS request. Based on a patch suggested by
+        thebluemountain. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
