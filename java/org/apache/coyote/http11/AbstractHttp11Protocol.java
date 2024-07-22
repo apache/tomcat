@@ -751,7 +751,10 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     // ------------------------------------------------------------- Common code
 
     @Override
-    protected abstract Processor createProcessor();
+    protected Processor createProcessor() {
+        Http11Processor processor = new Http11Processor(this, adapter);
+        return processor;
+    }
 
 
     @Override
