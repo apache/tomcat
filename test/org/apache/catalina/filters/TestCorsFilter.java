@@ -418,40 +418,40 @@ public class TestCorsFilter {
      */
     @Test
     public void testDoFilterSameHostWithOrigin01() throws IOException, ServletException {
-        doTestDoFilterSameHostWithOrigin01("http://localhost:8080", "http", "localhost", 8080, false);
+        doTestDoFilterSameHostWithOrigin("http://localhost:8080", "http", "localhost", 8080, false);
     }
 
     @Test
     public void testDoFilterSameHostWithOrigin02() throws IOException, ServletException {
-        doTestDoFilterSameHostWithOrigin01("http://localhost:8080", "https", "localhost", 8080, true);
+        doTestDoFilterSameHostWithOrigin("http://localhost:8080", "https", "localhost", 8080, true);
     }
 
     @Test
     public void testDoFilterSameHostWithOrigin03() throws IOException, ServletException {
-        doTestDoFilterSameHostWithOrigin01("http://localhost:8080", "http", "localhost", 8081, true);
+        doTestDoFilterSameHostWithOrigin("http://localhost:8080", "http", "localhost", 8081, true);
     }
 
     @Test
     public void testDoFilterSameHostWithOrigin04() throws IOException, ServletException {
-        doTestDoFilterSameHostWithOrigin01("http://localhost:8080", "http", "foo.dev.local", 8080, true);
+        doTestDoFilterSameHostWithOrigin("http://localhost:8080", "http", "foo.dev.local", 8080, true);
     }
 
     @Test
     public void testDoFilterSameHostWithOrigin05() throws IOException, ServletException {
-        doTestDoFilterSameHostWithOrigin01("https://localhost:8443", "https", "localhost", 8443, false);
+        doTestDoFilterSameHostWithOrigin("https://localhost:8443", "https", "localhost", 8443, false);
     }
 
     @Test
     public void testDoFilterSameHostWithOrigin06() throws IOException, ServletException {
-        doTestDoFilterSameHostWithOrigin01("https://localhost", "https", "localhost", 443, false);
+        doTestDoFilterSameHostWithOrigin("https://localhost", "https", "localhost", 443, false);
     }
 
     @Test
     public void testDoFilterSameHostWithOrigin07() throws IOException, ServletException {
-        doTestDoFilterSameHostWithOrigin01("http://localhost", "http", "localhost", 80, false);
+        doTestDoFilterSameHostWithOrigin("http://localhost", "http", "localhost", 80, false);
     }
 
-    private void doTestDoFilterSameHostWithOrigin01(String origin, String scheme, String host, int port, boolean isCors)
+    private void doTestDoFilterSameHostWithOrigin(String origin, String scheme, String host, int port, boolean isCors)
             throws IOException, ServletException {
 
         TesterHttpServletRequest request = new TesterHttpServletRequest();
