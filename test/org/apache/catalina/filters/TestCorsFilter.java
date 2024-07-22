@@ -703,10 +703,26 @@ public class TestCorsFilter {
      * @throws ServletException
      */
     @Test
-    public void testCheckSimpleRequestType() throws ServletException {
+    public void testCheckSimpleRequestTypeGet() throws ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTP_TOMCAT_APACHE_ORG);
         request.setMethod("GET");
+        CorsFilter corsFilter = new CorsFilter();
+        corsFilter.init(TesterFilterConfigs.getDefaultFilterConfig());
+        CorsFilter.CORSRequestType requestType = corsFilter.checkRequestType(request);
+        Assert.assertEquals(CorsFilter.CORSRequestType.SIMPLE, requestType);
+    }
+
+    /*
+     * Happy path test, when a valid CORS Simple request arrives.
+     *
+     * @throws ServletException
+     */
+    @Test
+    public void testCheckSimpleRequestTypePost() throws ServletException {
+        TesterHttpServletRequest request = new TesterHttpServletRequest();
+        request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTP_TOMCAT_APACHE_ORG);
+        request.setMethod("POST");
         CorsFilter corsFilter = new CorsFilter();
         corsFilter.init(TesterFilterConfigs.getDefaultFilterConfig());
         CorsFilter.CORSRequestType requestType = corsFilter.checkRequestType(request);
