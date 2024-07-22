@@ -25,6 +25,8 @@ import java.util.Optional;
  * This resolver handles base objects that are instances of {@link Optional}.
  * <p>
  * This resolver is always a read-only resolver since {@link Optional} instances are immutable.
+ *
+ * @since EL 6.0
  */
 public class OptionalELResolver extends ELResolver {
 
