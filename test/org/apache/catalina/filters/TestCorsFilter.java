@@ -1036,14 +1036,15 @@ public class TestCorsFilter {
      * @throws ServletException
      */
     @Test
-    public void testCheckForSchemeVariance() throws ServletException {
+    public void testCheckForSchemeVariance() throws ServletException, IOException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
+        TesterHttpServletResponse response = new TesterHttpServletResponse();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, "https://tomcat.apache.org");
         request.setMethod("POST");
         CorsFilter corsFilter = new CorsFilter();
         corsFilter.init(TesterFilterConfigs.getSpecificOriginFilterConfig());
-        CorsFilter.CORSRequestType requestType = corsFilter.checkRequestType(request);
-        Assert.assertEquals(CorsFilter.CORSRequestType.INVALID_CORS, requestType);
+        corsFilter.doFilter(request, response, filterChain);
+        Assert.assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatus());
     }
 
     /*
