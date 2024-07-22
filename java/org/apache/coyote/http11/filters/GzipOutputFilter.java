@@ -88,8 +88,7 @@ public class GzipOutputFilter implements OutputFilter {
     // --------------------------------------------------- OutputFilter Methods
 
     /**
-     * {@inheritDoc}
-     * Added to allow flushing to happen for the gzip'ed outputstream.
+     * {@inheritDoc} Added to allow flushing to happen for the gzip'ed outputstream.
      */
     @Override
     public void flush() throws IOException {
@@ -142,26 +141,29 @@ public class GzipOutputFilter implements OutputFilter {
     // ------------------------------------------- FakeOutputStream Inner Class
 
 
-    protected class FakeOutputStream
-        extends OutputStream {
+    protected class FakeOutputStream extends OutputStream {
         protected final ByteBuffer outputChunk = ByteBuffer.allocate(1);
+
         @Override
-        public void write(int b)
-            throws IOException {
+        public void write(int b) throws IOException {
             // Shouldn't get used for good performance, but is needed for
             // compatibility with Sun JDK 1.4.0
             outputChunk.put(0, (byte) (b & 0xff));
             buffer.doWrite(outputChunk);
         }
+
         @Override
-        public void write(byte[] b, int off, int len)
-            throws IOException {
+        public void write(byte[] b, int off, int len) throws IOException {
             buffer.doWrite(ByteBuffer.wrap(b, off, len));
         }
+
         @Override
-        public void flush() throws IOException {/*NOOP*/}
+        public void flush() throws IOException {
+            /* NOOP */}
+
         @Override
-        public void close() throws IOException {/*NOOP*/}
+        public void close() throws IOException {
+            /* NOOP */}
     }
 
 

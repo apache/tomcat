@@ -166,9 +166,9 @@ public class Http11Processor extends AbstractProcessor {
         outputBuffer.addFilter(new IdentityOutputFilter());
 
         // Create and add the chunked filters.
-        inputBuffer.addFilter(
-                new ChunkedInputFilter(request, protocol.getMaxTrailerSize(), protocol.getAllowedTrailerHeadersInternal(),
-                        protocol.getMaxExtensionSize(), protocol.getMaxSwallowSize()));
+        inputBuffer.addFilter(new ChunkedInputFilter(request, protocol.getMaxTrailerSize(),
+                protocol.getAllowedTrailerHeadersInternal(), protocol.getMaxExtensionSize(),
+                protocol.getMaxSwallowSize()));
         outputBuffer.addFilter(new ChunkedOutputFilter());
 
         // Create and add the void filters.
@@ -988,8 +988,8 @@ public class Http11Processor extends AbstractProcessor {
             }
 
             if (protocol.getUseKeepAliveResponseHeader()) {
-                boolean connectionKeepAlivePresent = isConnectionToken(request.getMimeHeaders(),
-                        Constants.KEEP_ALIVE_HEADER_VALUE_TOKEN);
+                boolean connectionKeepAlivePresent =
+                        isConnectionToken(request.getMimeHeaders(), Constants.KEEP_ALIVE_HEADER_VALUE_TOKEN);
 
                 if (connectionKeepAlivePresent) {
                     int keepAliveTimeout = protocol.getKeepAliveTimeout();
