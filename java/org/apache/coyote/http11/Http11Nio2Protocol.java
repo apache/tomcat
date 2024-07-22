@@ -46,8 +46,6 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
     }
 
 
-    // ----------------------------------------------------- JMX related methods
-
     @Override
     protected String getNamePrefix() {
         if (isSSLEnabled()) {
