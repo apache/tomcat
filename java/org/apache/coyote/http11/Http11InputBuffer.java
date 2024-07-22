@@ -751,12 +751,14 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     }
 
 
-    // --------------------------------------------------------- Private Methods
-
     /**
      * Attempts to read some data into the input buffer.
      *
+     * @param block Should blocking IO be used when filling the input buffer
+     *
      * @return <code>true</code> if more data was added to the input buffer otherwise <code>false</code>
+     *
+     * @throws IOException if an IO error occurs while filling the input buffer
      */
     private boolean fill(boolean block) throws IOException {
 
