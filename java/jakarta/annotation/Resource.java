@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  *
  * @since Common Annotations 1.0
  */
-@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
+@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(Resources.class)
 public @interface Resource {
