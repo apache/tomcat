@@ -32,8 +32,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class UpgradeServletInputStream extends ServletInputStream {
 
     private static final Log log = LogFactory.getLog(UpgradeServletInputStream.class);
-    private static final StringManager sm =
-            StringManager.getManager(UpgradeServletInputStream.class);
+    private static final StringManager sm = StringManager.getManager(UpgradeServletInputStream.class);
 
     private final UpgradeProcessorBase processor;
     private final SocketWrapperBase<?> socketWrapper;
@@ -57,8 +56,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
     @Override
     public final boolean isFinished() {
         if (listener == null) {
-            throw new IllegalStateException(
-                    sm.getString("upgrade.sis.isFinished.ise"));
+            throw new IllegalStateException(sm.getString("upgrade.sis.isFinished.ise"));
         }
         return eof;
     }
@@ -67,8 +65,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
     @Override
     public final boolean isReady() {
         if (listener == null) {
-            throw new IllegalStateException(
-                    sm.getString("upgrade.sis.isReady.ise"));
+            throw new IllegalStateException(sm.getString("upgrade.sis.isReady.ise"));
         }
 
         if (eof || closed) {
@@ -92,12 +89,10 @@ public class UpgradeServletInputStream extends ServletInputStream {
     @Override
     public final void setReadListener(ReadListener listener) {
         if (listener == null) {
-            throw new IllegalArgumentException(
-                    sm.getString("upgrade.sis.readListener.null"));
+            throw new IllegalArgumentException(sm.getString("upgrade.sis.readListener.null"));
         }
         if (this.listener != null) {
-            throw new IllegalArgumentException(
-                    sm.getString("upgrade.sis.readListener.set"));
+            throw new IllegalArgumentException(sm.getString("upgrade.sis.readListener.set"));
         }
         if (closed) {
             throw new IllegalStateException(sm.getString("upgrade.sis.read.closed"));
@@ -169,7 +164,6 @@ public class UpgradeServletInputStream extends ServletInputStream {
             throw ioe;
         }
     }
-
 
 
     @Override

@@ -658,6 +658,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     /**
      * Available bytes in the buffers for the current request. Note that when requests are pipelined, the data in
      * byteBuffer may relate to the next request rather than this one.
+     *
      * @return the amount of bytes available, 0 if none, and 1 if there was an IO error to trigger a read
      */
     int available(boolean read) {
@@ -701,6 +702,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     /**
      * Has all of the request body been read? There are subtle differences between this and available() &gt; 0 primarily
      * because of having to handle faking non-blocking reads with the blocking IO connector.
+     *
      * @return {@code true} if the request has been fully read
      */
     boolean isFinished() {

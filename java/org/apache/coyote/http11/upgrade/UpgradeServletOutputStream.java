@@ -32,8 +32,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class UpgradeServletOutputStream extends ServletOutputStream {
 
     private static final Log log = LogFactory.getLog(UpgradeServletOutputStream.class);
-    private static final StringManager sm =
-            StringManager.getManager(UpgradeServletOutputStream.class);
+    private static final StringManager sm = StringManager.getManager(UpgradeServletOutputStream.class);
 
     private final UpgradeProcessorBase processor;
     private final SocketWrapperBase<?> socketWrapper;
@@ -61,7 +60,6 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     private boolean registered = false;
 
 
-
     public UpgradeServletOutputStream(UpgradeProcessorBase processor, SocketWrapperBase<?> socketWrapper,
             UpgradeInfo upgradeInfo) {
         this.processor = processor;
@@ -73,8 +71,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     @Override
     public final boolean isReady() {
         if (listener == null) {
-            throw new IllegalStateException(
-                    sm.getString("upgrade.sos.canWrite.ise"));
+            throw new IllegalStateException(sm.getString("upgrade.sos.canWrite.ise"));
         }
         if (closed) {
             return false;
@@ -88,7 +85,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
                 // for write and multiple registrations will cause problems.
                 registered = true;
                 return false;
-            } else if (registered){
+            } else if (registered) {
                 // The socket is already registered for write and multiple
                 // registrations will cause problems.
                 return false;
@@ -104,12 +101,10 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     @Override
     public final void setWriteListener(WriteListener listener) {
         if (listener == null) {
-            throw new IllegalArgumentException(
-                    sm.getString("upgrade.sos.writeListener.null"));
+            throw new IllegalArgumentException(sm.getString("upgrade.sos.writeListener.null"));
         }
         if (this.listener != null) {
-            throw new IllegalArgumentException(
-                    sm.getString("upgrade.sos.writeListener.set"));
+            throw new IllegalArgumentException(sm.getString("upgrade.sos.writeListener.set"));
         }
         if (closed) {
             throw new IllegalStateException(sm.getString("upgrade.sos.write.closed"));
