@@ -141,6 +141,10 @@
         Add FFM compatibility methods for BoringSSL support. Renegotiation is
         not supported in many cases. (remm)
       </update>
+      <fix>
+        Ensure that HTTP/2 stream input buffers are only created when there is a
+        request body to be read. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
