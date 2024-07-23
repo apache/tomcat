@@ -483,9 +483,7 @@ class StreamProcessor extends AbstractProcessor {
      * The checks performed below are based on the checks in Http11InputBuffer.
      */
     private boolean validateRequest() {
-        HttpParser httpParser = new HttpParser(
-                ((AbstractHttp11Protocol<?>) handler.getProtocol().getHttp11Protocol()).getRelaxedPathChars(),
-                ((AbstractHttp11Protocol<?>) handler.getProtocol().getHttp11Protocol()).getRelaxedQueryChars());
+        HttpParser httpParser = ((AbstractHttp11Protocol<?>) handler.getProtocol().getHttp11Protocol()).getHttpParser();
 
         // Method name must be a token
         String method = request.method().toString();

@@ -136,6 +136,11 @@
         Ensure that HTTP/2 stream input buffers are only created when there is a
         request body to be read. (markt)
       </fix>
+      <scode>
+        Refactor creation of HttpParser instances from the Processor level to
+        the Protocol level since the parser configuration depends on the
+        protocol and the parser is, otherwise, stateless. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
