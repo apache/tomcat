@@ -1015,9 +1015,9 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             writeLock.lock();
             try {
                 /*
-                 * Need to ensure that there is exactly one call to flush even when there is no data to write. Too few calls
-                 * (i.e. zero) and the end of stream message is not sent for a completed asynchronous write. Too many calls
-                 * and the end of stream message is sent too soon and trailer headers are not sent.
+                 * Need to ensure that there is exactly one call to flush even when there is no data to write. Too few
+                 * calls (i.e. zero) and the end of stream message is not sent for a completed asynchronous write. Too
+                 * many calls and the end of stream message is sent too soon and trailer headers are not sent.
                  */
                 boolean dataInBuffer = buffer.position() > 0;
                 boolean flushed = false;

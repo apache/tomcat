@@ -51,7 +51,9 @@ abstract class AbstractNonZeroStream extends AbstractStream {
 
     /**
      * Check the frame type against the state
+     *
      * @param frameType the type
+     *
      * @throws Http2Exception if an error is detected
      */
     final void checkState(FrameType frameType) throws Http2Exception {
@@ -69,7 +71,9 @@ abstract class AbstractNonZeroStream extends AbstractStream {
 
     /**
      * Notify that some data has been received.
+     *
      * @param payloadSize the byte count
+     *
      * @throws Http2Exception if an error is detected
      */
     abstract void receivedData(int payloadSize) throws Http2Exception;
