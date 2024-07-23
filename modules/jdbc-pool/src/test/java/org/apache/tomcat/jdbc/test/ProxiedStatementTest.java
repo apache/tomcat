@@ -16,16 +16,16 @@
  */
 package org.apache.tomcat.jdbc.test;
 
-import org.apache.tomcat.jdbc.test.driver.Driver;
-import org.junit.Test;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static org.junit.Assert.assertNotEquals;
+import org.junit.Assert;
+import org.junit.Test;
+
+import org.apache.tomcat.jdbc.test.driver.Driver;
 
 public class ProxiedStatementTest extends DefaultTestCase {
 
@@ -34,8 +34,8 @@ public class ProxiedStatementTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = this.datasource.getConnection();
-             PreparedStatement statement = con.prepareStatement("sql")) {
-            assertNotEquals(statement, null);
+                PreparedStatement statement = con.prepareStatement("sql")) {
+            Assert.assertNotEquals(statement, null);
         }
     }
 
@@ -44,8 +44,8 @@ public class ProxiedStatementTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = this.datasource.getConnection();
-             Statement statement = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)) {
-            assertNotEquals(statement, "");
+                Statement statement = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)) {
+            Assert.assertNotEquals(statement, "");
         }
     }
 
@@ -54,8 +54,8 @@ public class ProxiedStatementTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = this.datasource.getConnection();
-             Statement statement = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)) {
-            assertNotEquals(statement, new org.apache.tomcat.jdbc.test.driver.Statement());
+                Statement statement = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)) {
+            Assert.assertNotEquals(statement, new org.apache.tomcat.jdbc.test.driver.Statement());
         }
     }
 }

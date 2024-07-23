@@ -442,7 +442,6 @@ public class ResultSet implements java.sql.ResultSet {
 
     @Override
     public Statement getStatement() throws SQLException {
-        // TODO Auto-generated method stub
         return owner;
     }
 
@@ -602,7 +601,6 @@ public class ResultSet implements java.sql.ResultSet {
     public boolean next() throws SQLException {
         boolean next = hasNext;
         hasNext = false;
-        // TODO Auto-generated method stub
         return next;
     }
 
