@@ -731,6 +731,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
     /**
      * When committing the response, we have to validate the set of headers, as well as setup the response filters.
+     *
      * @throws IOException IO exception during commit
      */
     protected abstract void prepareResponse() throws IOException;
@@ -738,6 +739,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
     /**
      * Finish the current response.
+     *
      * @throws IOException IO exception during the write
      */
     protected abstract void finishResponse() throws IOException;
@@ -745,6 +747,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
     /**
      * Process acknowledgment of the request.
+     *
      * @param continueResponseTiming specifies when an acknowledgment should be sent
      */
     protected abstract void ack(ContinueResponseTiming continueResponseTiming);
@@ -755,6 +758,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
     /**
      * Callback to write data from the buffer.
+     *
      * @throws IOException IO exception during the write
      */
     protected abstract void flush() throws IOException;
@@ -762,15 +766,17 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
     /**
      * Queries if bytes are available in buffers.
+     *
      * @param doRead {@code true} to perform a read when no bytes are availble
+     *
      * @return the amount of bytes that are known to be available
      */
     protected abstract int available(boolean doRead);
 
 
     /**
-     * Set the specified byte chunk as the request body that will be read. This allows saving and
-     * processing requests.
+     * Set the specified byte chunk as the request body that will be read. This allows saving and processing requests.
+     *
      * @param body the byte chunk containing all the request bytes
      */
     protected abstract void setRequestBody(ByteChunk body);
@@ -783,8 +789,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Swallowing bytes is required for pipelining requests, so this allows to avoid doing extra operations
-     * in case an error occurs and the connection is to be closed instead.
+     * Swallowing bytes is required for pipelining requests, so this allows to avoid doing extra operations in case an
+     * error occurs and the connection is to be closed instead.
      */
     protected abstract void disableSwallowRequest();
 
@@ -895,8 +901,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * When using non blocking IO, register to get a callback when polling determines that bytes
-     * are available for reading.
+     * When using non blocking IO, register to get a callback when polling determines that bytes are available for
+     * reading.
      */
     protected abstract void registerReadInterest();
 

@@ -115,7 +115,7 @@ public final class Request {
     /**
      * Path parameters
      */
-    private final Map<String, String> pathParameters = new HashMap<>();
+    private final Map<String,String> pathParameters = new HashMap<>();
 
     /**
      * Notes.
@@ -156,7 +156,7 @@ public final class Request {
     private final MessageBytes remoteUser = MessageBytes.newInstance();
     private boolean remoteUserNeedsAuthorization = false;
     private final MessageBytes authType = MessageBytes.newInstance();
-    private final HashMap<String, Object> attributes = new HashMap<>();
+    private final HashMap<String,Object> attributes = new HashMap<>();
 
     private Response response;
     private volatile ActionHook hook;
@@ -295,7 +295,7 @@ public final class Request {
     }
 
 
-    public Map<String, String> getTrailerFields() {
+    public Map<String,String> getTrailerFields() {
         return trailerFields.toMap();
     }
 
@@ -556,7 +556,7 @@ public final class Request {
         attributes.put(name, o);
     }
 
-    public HashMap<String, Object> getAttributes() {
+    public HashMap<String,Object> getAttributes() {
         return attributes;
     }
 
@@ -776,9 +776,9 @@ public final class Request {
         headers.recycle();
         trailerFields.recycle();
         /*
-         *  Trailer fields are limited in size by bytes. The following call ensures that any request with a large number
-         *  of small trailer fields doesn't result in a long lasting, large array of headers inside the MimeHeader
-         *  instance.
+         * Trailer fields are limited in size by bytes. The following call ensures that any request with a large number
+         * of small trailer fields doesn't result in a long lasting, large array of headers inside the MimeHeader
+         * instance.
          */
         trailerFields.setLimit(MimeHeaders.DEFAULT_HEADER_SIZE);
         serverNameMB.recycle();
