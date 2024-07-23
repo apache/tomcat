@@ -92,9 +92,6 @@ public class Http11Processor extends AbstractProcessor {
     private final Http11OutputBuffer outputBuffer;
 
 
-    private final HttpParser httpParser;
-
-
     /**
      * Tracks how many internal filters are in the filter library so they are skipped when looking for pluggable
      * filters.
@@ -153,9 +150,7 @@ public class Http11Processor extends AbstractProcessor {
         super(adapter);
         this.protocol = protocol;
 
-        httpParser = new HttpParser(protocol.getRelaxedPathChars(), protocol.getRelaxedQueryChars());
-
-        inputBuffer = new Http11InputBuffer(request, protocol.getMaxHttpRequestHeaderSize(), httpParser);
+        inputBuffer = new Http11InputBuffer(request, protocol.getMaxHttpRequestHeaderSize(), protocol.getHttpParser());
         request.setInputBuffer(inputBuffer);
 
         outputBuffer = new Http11OutputBuffer(response, protocol.getMaxHttpResponseHeaderSize());
@@ -757,7 +752,7 @@ public class Http11Processor extends AbstractProcessor {
         // Validate the characters in the URI. %nn decoding will be checked at
         // the point of decoding.
         for (int i = uriBC.getStart(); i < uriBC.getEnd(); i++) {
-            if (!httpParser.isAbsolutePathRelaxed(uriB[i])) {
+            if (!protocol.getHttpParser().isAbsolutePathRelaxed(uriB[i])) {
                 badRequest("http11processor.request.invalidUri");
                 break;
             }
