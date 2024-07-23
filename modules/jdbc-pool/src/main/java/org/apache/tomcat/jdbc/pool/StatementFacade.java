@@ -60,16 +60,16 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             } else if (compare(PREPARE_STATEMENT, name)) {
                 // prepareStatement
                 constructor = getConstructor(PREPARE_STATEMENT_IDX, PreparedStatement.class);
-                sql = (String)args[0];
+                sql = (String) args[0];
             } else if (compare(PREPARE_CALL, name)) {
                 // prepareCall
                 constructor = getConstructor(PREPARE_CALL_IDX, CallableStatement.class);
-                sql = (String)args[0];
+                sql = (String) args[0];
             } else {
                 // do nothing
                 return statement;
             }
-            return constructor.newInstance(new Object[] { new StatementProxy(statement,sql) });
+            return constructor.newInstance(new Object[] { new StatementProxy(statement, sql) });
         } catch (Exception x) {
             logger.warn("Unable to create statement proxy.", x);
         }
@@ -83,6 +83,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
         protected boolean closed = false;
         protected Object delegate;
         protected final String query;
+
         public StatementProxy(Object parent, String query) {
             this.delegate = parent;
             this.query = query;
@@ -90,47 +91,49 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            if (compare(TOSTRING_VAL,method)) {
+            if (compare(TOSTRING_VAL, method)) {
                 return toString();
             }
             if (compare(EQUALS_VAL, method)) {
                 if (args[0] == null || !Proxy.isProxyClass(args[0].getClass())) {
                     return Boolean.FALSE;
                 }
-                return Boolean.valueOf(
-                        this.equals(Proxy.getInvocationHandler(args[0])));
+                return Boolean.valueOf(this.equals(Proxy.getInvocationHandler(args[0])));
             }
             if (compare(HASHCODE_VAL, method)) {
                 return Integer.valueOf(this.hashCode());
             }
             if (compare(CLOSE_VAL, method)) {
                 if (delegate == null) {
-                  return null;
+                    return null;
                 }
             }
             if (compare(ISCLOSED_VAL, method)) {
                 if (delegate == null) {
-                  return Boolean.TRUE;
+                    return Boolean.TRUE;
                 }
             }
             if (delegate == null) {
-              throw new SQLException("Statement closed.");
+                throw new SQLException("Statement closed.");
             }
 
             if (compare(GET_RESULTSET, method)) {
-                return getConstructor(RESULTSET_IDX, ResultSet.class).newInstance(new ResultSetProxy(method.invoke(delegate,args), proxy));
+                return getConstructor(RESULTSET_IDX, ResultSet.class)
+                        .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
             }
             if (compare(GET_GENERATED_KEYS, method)) {
-                return getConstructor(RESULTSET_IDX, ResultSet.class).newInstance(new ResultSetProxy(method.invoke(delegate,args), proxy));
+                return getConstructor(RESULTSET_IDX, ResultSet.class)
+                        .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
             }
             if (compare(EXECUTE_QUERY, method)) {
-                return getConstructor(RESULTSET_IDX, ResultSet.class).newInstance(new ResultSetProxy(method.invoke(delegate,args), proxy));
+                return getConstructor(RESULTSET_IDX, ResultSet.class)
+                        .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
             }
 
-            Object result =  null;
+            Object result = null;
             try {
-                //invoke next
-                result =  method.invoke(delegate,args);
+                // invoke next
+                result = method.invoke(delegate, args);
             } catch (Throwable t) {
                 if (t instanceof InvocationTargetException && t.getCause() != null) {
                     throw t.getCause();
@@ -138,7 +141,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                     throw t;
                 }
             }
-            //perform close cleanup
+            // perform close cleanup
             if (compare(CLOSE_VAL, method)) {
                 delegate = null;
             }
@@ -152,7 +155,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
 
         @Override
         public boolean equals(Object obj) {
-            return this==obj;
+            return this == obj;
         }
 
         @Override
@@ -181,15 +184,14 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            if (compare(TOSTRING_VAL,method)) {
+            if (compare(TOSTRING_VAL, method)) {
                 return toString();
             }
             if (compare(EQUALS_VAL, method)) {
                 if (args[0] == null || !Proxy.isProxyClass(args[0].getClass())) {
                     return Boolean.FALSE;
                 }
-                return Boolean.valueOf(
-                    this.equals(Proxy.getInvocationHandler(args[0])));
+                return Boolean.valueOf(this.equals(Proxy.getInvocationHandler(args[0])));
             }
             if (compare(HASHCODE_VAL, method)) {
                 return Integer.valueOf(this.hashCode());
@@ -214,8 +216,8 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
 
             Object result;
             try {
-                //invoke next
-                result =  method.invoke(delegate,args);
+                // invoke next
+                result = method.invoke(delegate, args);
             } catch (Throwable t) {
                 if (t instanceof InvocationTargetException && t.getCause() != null) {
                     throw t.getCause();
@@ -223,7 +225,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                     throw t;
                 }
             }
-            //perform close cleanup
+            // perform close cleanup
             if (compare(CLOSE_VAL, method)) {
                 delegate = null;
             }
@@ -237,16 +239,12 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
 
         @Override
         public boolean equals(Object obj) {
-            return this==obj;
+            return this == obj;
         }
 
         @Override
         public String toString() {
-            return ResultSetProxy.class.getName() + "[Proxy=" +
-                hashCode() +
-                "; Delegate=" +
-                delegate +
-                ']';
+            return ResultSetProxy.class.getName() + "[Proxy=" + hashCode() + "; Delegate=" + delegate + ']';
         }
     }
 
