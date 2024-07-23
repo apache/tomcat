@@ -45,6 +45,7 @@ import org.apache.coyote.http11.upgrade.UpgradeGroupInfo;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorExternal;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
 import org.apache.tomcat.util.buf.StringUtils;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.modeler.Util;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -58,6 +59,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     private final CompressionConfig compressionConfig = new CompressionConfig();
 
+    private HttpParser httpParser = null;
 
     public AbstractHttp11Protocol(AbstractEndpoint<S,?> endpoint) {
         super(endpoint);
@@ -82,6 +84,8 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
             upgradeProtocol.setHttp11Protocol(this);
         }
+
+        httpParser = new HttpParser(relaxedPathChars, relaxedQueryChars);
     }
 
 
@@ -117,6 +121,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     @Override
     protected AbstractEndpoint<S,?> getEndpoint() {
         return super.getEndpoint();
+    }
+
+
+    public HttpParser getHttpParser() {
+        return httpParser;
     }
 
 
