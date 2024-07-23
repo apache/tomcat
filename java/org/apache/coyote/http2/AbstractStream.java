@@ -76,6 +76,7 @@ abstract class AbstractStream {
 
     /**
      * Set the window size for this stream.
+     *
      * @param windowSize the value
      */
     final void setWindowSize(long windowSize) {
@@ -168,6 +169,7 @@ abstract class AbstractStream {
 
     /**
      * Set the amount of requested resources.
+     *
      * @param connectionAllocationRequested the value
      */
     final void setConnectionAllocationRequested(int connectionAllocationRequested) {
@@ -187,6 +189,7 @@ abstract class AbstractStream {
 
     /**
      * Set the allocation made at the connection level.
+     *
      * @param connectionAllocationMade the value
      */
     final void setConnectionAllocationMade(int connectionAllocationMade) {

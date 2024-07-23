@@ -702,8 +702,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
     }
 
-    void writeHeaders(Stream stream, MimeHeaders mimeHeaders, boolean endOfStream, int payloadSize)
-            throws IOException {
+    void writeHeaders(Stream stream, MimeHeaders mimeHeaders, boolean endOfStream, int payloadSize) throws IOException {
         // This ensures the Stream processing thread has control of the socket.
         Lock lock = socketWrapper.getLock();
         lock.lock();
@@ -960,7 +959,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     backLogStreams.add(stream);
 
                 } else {
-                     // The connection window has sufficient capacity for this reservation. Allocate the full amount.
+                    // The connection window has sufficient capacity for this reservation. Allocate the full amount.
                     allocation = reservation;
                     decrementWindowSize(allocation);
                 }
@@ -1614,10 +1613,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 }
             }
             /*
-             *  Need to process end of stream before calling processStreamOnContainerThread to avoid a race condition
-             *  where the container thread finishes before end of stream is processed, thinks the request hasn't been
-             *  fully read so issues a RST with error code 0 (NO_ERROR) to tell the client not to send the request body,
-             *  if any. This breaks tests and generates unnecessary RST messages for standard clients.
+             * Need to process end of stream before calling processStreamOnContainerThread to avoid a race condition
+             * where the container thread finishes before end of stream is processed, thinks the request hasn't been
+             * fully read so issues a RST with error code 0 (NO_ERROR) to tell the client not to send the request body,
+             * if any. This breaks tests and generates unnecessary RST messages for standard clients.
              */
             if (endOfStream) {
                 receivedEndOfStream(stream);
