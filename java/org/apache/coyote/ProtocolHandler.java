@@ -154,7 +154,8 @@ public interface ProtocolHandler {
      *
      * @deprecated This method will be removed in Tomcat 10.1.x onwards
      */
-    @Deprecated boolean isAprRequired();
+    @Deprecated
+    boolean isAprRequired();
 
 
     /**

@@ -77,7 +77,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
      * Endpoint that provides low-level network I/O - must be matched to the ProtocolHandler implementation
      * (ProtocolHandler using NIO, requires NIO Endpoint etc.).
      */
-    private final AbstractEndpoint<S, ?> endpoint;
+    private final AbstractEndpoint<S,?> endpoint;
 
 
     private Handler<S> handler;
@@ -91,7 +91,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     private ScheduledFuture<?> timeoutFuture = null;
     private ScheduledFuture<?> monitorFuture;
 
-    public AbstractProtocol(AbstractEndpoint<S, ?> endpoint) {
+    public AbstractProtocol(AbstractEndpoint<S,?> endpoint) {
         this.endpoint = endpoint;
         ConnectionHandler<S> cHandler = new ConnectionHandler<>(this);
         getEndpoint().setHandler(cHandler);
@@ -491,7 +491,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
     // ----------------------------------------------- Accessors for sub-classes
 
-    protected AbstractEndpoint<S, ?> getEndpoint() {
+    protected AbstractEndpoint<S,?> getEndpoint() {
         return endpoint;
     }
 
