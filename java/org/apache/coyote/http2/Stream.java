@@ -204,9 +204,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         // Set the new state first since read and write both check this
         state.receivedReset();
         // Reads wait internally so need to call a method to break the wait()
-        if (inputBuffer != null) {
-            inputBuffer.receiveReset();
-        }
+        inputBuffer.receiveReset();
         cancelAllocationRequests();
     }
 
@@ -624,11 +622,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     @Override
     final ByteBuffer getInputByteBuffer() {
-        if (inputBuffer == null) {
-            // This must either be an HTTP upgrade. There should not be a request body so return a zero length
-            // ByteBuffer to trigger a flow control error.
-            return ZERO_LENGTH_BYTEBUFFER;
-        }
         return inputBuffer.getInBuffer();
     }
 
@@ -677,9 +670,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     Http2Error.PROTOCOL_ERROR);
         }
         state.receivedEndOfStream();
-        if (inputBuffer != null) {
-            inputBuffer.notifyEof();
-        }
+        inputBuffer.notifyEof();
     }
 
 
@@ -761,9 +752,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 handler.sendStreamReset(state, se);
 
                 cancelAllocationRequests();
-                if (inputBuffer != null) {
-                    inputBuffer.swallowUnread();
-                }
+                inputBuffer.swallowUnread();
             } catch (IOException ioe) {
                 ConnectionException ce =
                         new ConnectionException(sm.getString("stream.reset.fail", getConnectionId(), getIdAsString()),
