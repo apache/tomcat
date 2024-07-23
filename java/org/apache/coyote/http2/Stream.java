@@ -626,8 +626,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     @Override
-    final ByteBuffer getInputByteBuffer() {
-        return inputBuffer.getInBuffer();
+    final ByteBuffer getInputByteBuffer(boolean create) {
+        return inputBuffer.getInBuffer(create);
     }
 
 
@@ -788,7 +788,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
         int remaining;
         // May be null if stream was closed before any DATA frames were processed.
-        ByteBuffer inputByteBuffer = getInputByteBuffer();
+        ByteBuffer inputByteBuffer = getInputByteBuffer(false);
         if (inputByteBuffer == null) {
             remaining = 0;
         } else {
@@ -1171,7 +1171,19 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
         abstract void notifyEof();
 
-        abstract ByteBuffer getInBuffer();
+        /**
+         * Return, creating if necessary, the input buffer.
+         *
+         * @return The input buffer
+         *
+         * @deprecated Unused. Will be removed in Tomcat 11.
+         */
+        @Deprecated
+        ByteBuffer getInBuffer() {
+            return getInBuffer(true);
+        }
+
+        abstract ByteBuffer getInBuffer(boolean create);
 
         abstract void onDataAvailable() throws IOException;
 
@@ -1382,8 +1394,10 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
         @Override
-        final ByteBuffer getInBuffer() {
-            ensureBuffersExist();
+        final ByteBuffer getInBuffer(boolean create) {
+            if (create) {
+                ensureBuffersExist();
+            }
             return inBuffer;
         }
 
@@ -1510,7 +1524,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
 
         @Override
-        ByteBuffer getInBuffer() {
+        ByteBuffer getInBuffer(boolean create) {
             return null;
         }
 

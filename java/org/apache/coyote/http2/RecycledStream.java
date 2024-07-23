@@ -59,7 +59,7 @@ class RecycledStream extends AbstractNonZeroStream {
      * payload than the remaining flow control window is received for this recycled stream.
      */
     @Override
-    ByteBuffer getInputByteBuffer() {
+    ByteBuffer getInputByteBuffer(boolean create) {
         if (remainingFlowControlWindow < 0) {
             return ZERO_LENGTH_BYTEBUFFER;
         } else {
