@@ -685,7 +685,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         byte[] payloadLength = new byte[3];
         ByteUtil.setThreeBytes(payloadLength, 0, len);
 
-        socketWrapper.getLock().lock();
+        Lock lock = socketWrapper.getLock();
+        lock.lock();
         try {
             socketWrapper.write(true, payloadLength, 0, payloadLength.length);
             socketWrapper.write(true, GOAWAY, 0, GOAWAY.length);
@@ -695,18 +696,19 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             }
             socketWrapper.flush(true);
         } finally {
-            socketWrapper.getLock().unlock();
+            lock.unlock();
         }
     }
 
     void writeHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders, boolean endOfStream, int payloadSize)
             throws IOException {
         // This ensures the Stream processing thread has control of the socket.
-        socketWrapper.getLock().lock();
+        Lock lock = socketWrapper.getLock();
+        lock.lock();
         try {
             doWriteHeaders(stream, pushedStreamId, mimeHeaders, endOfStream, payloadSize);
         } finally {
-            socketWrapper.getLock().unlock();
+            lock.unlock();
         }
         stream.sentHeaders();
         if (endOfStream) {
@@ -909,7 +911,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     protected void processWrites() throws IOException {
-        socketWrapper.getLock().lock();
+        Lock lock = socketWrapper.getLock();
+        lock.lock();
         try {
             if (socketWrapper.flush(false)) {
                 socketWrapper.registerWriteInterest();
@@ -919,7 +922,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 pingManager.sendPing(false);
             }
         } finally {
-            socketWrapper.getLock().unlock();
+            lock.unlock();
         }
     }
 
