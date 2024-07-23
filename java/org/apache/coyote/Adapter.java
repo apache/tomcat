@@ -61,18 +61,22 @@ public interface Adapter {
 
     /**
      * Dispatch asynchronous event.
-     * @param req the request object
-     * @param res the response object
+     *
+     * @param req    the request object
+     * @param res    the response object
      * @param status the event being processed
+     *
      * @return {@code true} if the dispatch was successful
+     *
      * @throws Exception If the processing fails unexpectedly
      */
     boolean asyncDispatch(Request req, Response res, SocketEvent status) throws Exception;
 
     /**
      * Callback to allow logging access outside of the execution of the regular service.
-     * @param req the request object
-     * @param res the response object
+     *
+     * @param req  the request object
+     * @param res  the response object
      * @param time time taken to process the request/response in milliseconds (use 0 if not known)
      */
     void log(Request req, Response res, long time);

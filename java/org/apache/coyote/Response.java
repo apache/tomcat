@@ -82,7 +82,7 @@ public final class Response {
     final MimeHeaders headers = new MimeHeaders();
 
 
-    private Supplier<Map<String, String>> trailerFieldsSupplier = null;
+    private Supplier<Map<String,String>> trailerFieldsSupplier = null;
 
     /**
      * Associated output buffer.
@@ -399,7 +399,7 @@ public final class Response {
     }
 
 
-    public void setTrailerFields(Supplier<Map<String, String>> supplier) {
+    public void setTrailerFields(Supplier<Map<String,String>> supplier) {
         AtomicBoolean trailerFieldsSupported = new AtomicBoolean(false);
         action(ActionCode.IS_TRAILER_FIELDS_SUPPORTED, trailerFieldsSupported);
         if (!trailerFieldsSupported.get()) {
@@ -410,7 +410,7 @@ public final class Response {
     }
 
 
-    public Supplier<Map<String, String>> getTrailerFields() {
+    public Supplier<Map<String,String>> getTrailerFields() {
         return trailerFieldsSupplier;
     }
 
