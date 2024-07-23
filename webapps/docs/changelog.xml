@@ -134,6 +134,17 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>69206</bug>: Ensure statements returned from <code>Statement</code>
+        methods <code>executeQuery()</code>, <code>getResultSet()</code> and
+        <code>getGeneratedKeys()</code> are correctly wrapped before being
+        returned to the caller. Based on pull request <pr>742</pr> provided by
+        Michael Clarke.
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>

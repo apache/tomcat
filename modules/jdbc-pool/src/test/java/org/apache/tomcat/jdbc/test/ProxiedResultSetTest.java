@@ -16,19 +16,16 @@
  */
 package org.apache.tomcat.jdbc.test;
 
-import org.apache.tomcat.jdbc.test.driver.Driver;
-import org.junit.Test;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Assert;
+import org.junit.Test;
+
+import org.apache.tomcat.jdbc.test.driver.Driver;
 
 public class ProxiedResultSetTest extends DefaultTestCase {
 
@@ -37,9 +34,9 @@ public class ProxiedResultSetTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = this.datasource.getConnection();
-             PreparedStatement statement = con.prepareStatement("");
-             ResultSet resultSet = statement.executeQuery()) {
-            assertEquals(statement, resultSet.getStatement());
+                PreparedStatement statement = con.prepareStatement("");
+                ResultSet resultSet = statement.executeQuery()) {
+            Assert.assertEquals(statement, resultSet.getStatement());
         }
     }
 
@@ -48,9 +45,9 @@ public class ProxiedResultSetTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = this.datasource.getConnection();
-             Statement statement = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-             ResultSet resultSet = statement.getGeneratedKeys()) {
-            assertEquals(statement, resultSet.getStatement());
+                Statement statement = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+                ResultSet resultSet = statement.getGeneratedKeys()) {
+            Assert.assertEquals(statement, resultSet.getStatement());
         }
     }
 
@@ -59,9 +56,9 @@ public class ProxiedResultSetTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = this.datasource.getConnection();
-             Statement statement = con.createStatement();
-             ResultSet resultSet = statement.executeQuery("")) {
-            assertEquals(statement, resultSet.getStatement());
+                Statement statement = con.createStatement();
+                ResultSet resultSet = statement.executeQuery("")) {
+            Assert.assertEquals(statement, resultSet.getStatement());
         }
     }
 
@@ -70,9 +67,9 @@ public class ProxiedResultSetTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = this.datasource.getConnection();
-             Statement statement = con.createStatement();
-             ResultSet resultSet = statement.getResultSet()) {
-            assertEquals(statement, resultSet.getStatement());
+                Statement statement = con.createStatement();
+                ResultSet resultSet = statement.getResultSet()) {
+            Assert.assertEquals(statement, resultSet.getStatement());
         }
     }
 
@@ -81,11 +78,11 @@ public class ProxiedResultSetTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = datasource.getConnection();
-             Statement statement = con.createStatement();
-             ResultSet resultSet = statement.getResultSet()) {
-            assertFalse(resultSet.isClosed());
+                Statement statement = con.createStatement();
+                ResultSet resultSet = statement.getResultSet()) {
+            Assert.assertFalse(resultSet.isClosed());
             resultSet.close();
-            assertTrue(resultSet.isClosed());
+            Assert.assertTrue(resultSet.isClosed());
         }
     }
 
@@ -94,11 +91,11 @@ public class ProxiedResultSetTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = datasource.getConnection();
-             Statement statement = con.createStatement();
-             ResultSet resultSet = statement.getResultSet()) {
+                Statement statement = con.createStatement();
+                ResultSet resultSet = statement.getResultSet()) {
             int hashcode = resultSet.hashCode();
             resultSet.close();
-            assertEquals(hashcode, resultSet.hashCode());
+            Assert.assertEquals(hashcode, resultSet.hashCode());
         }
     }
 
@@ -107,13 +104,13 @@ public class ProxiedResultSetTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = datasource.getConnection();
-             Statement statement = con.createStatement();
-             ResultSet resultSet = statement.getResultSet()) {
-            assertNotEquals(resultSet, "");
-            assertEquals(resultSet, resultSet);
+                Statement statement = con.createStatement();
+                ResultSet resultSet = statement.getResultSet()) {
+            Assert.assertNotEquals(resultSet, "");
+            Assert.assertEquals(resultSet, resultSet);
             resultSet.close();
-            assertNotEquals(resultSet, "");
-            assertEquals(resultSet, resultSet);
+            Assert.assertNotEquals(resultSet, "");
+            Assert.assertEquals(resultSet, resultSet);
         }
     }
 
@@ -123,12 +120,12 @@ public class ProxiedResultSetTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = datasource.getConnection();
-             Statement statement = con.createStatement();
-             ResultSet resultSet = statement.getResultSet()) {
+                Statement statement = con.createStatement();
+                ResultSet resultSet = statement.getResultSet()) {
             String toStringResult = resultSet.toString();
             resultSet.close();
             // the delegate will change, so we can't compare the whole string
-            assertEquals(toStringResult.substring(0, 50), resultSet.toString().substring(0, 50));
+            Assert.assertEquals(toStringResult.substring(0, 50), resultSet.toString().substring(0, 50));
         }
     }
 
@@ -138,9 +135,9 @@ public class ProxiedResultSetTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = this.datasource.getConnection();
-             PreparedStatement statement = con.prepareStatement("sql");
-             ResultSet resultSet = statement.executeQuery()) {
-            assertNotEquals(resultSet, null);
+                PreparedStatement statement = con.prepareStatement("sql");
+                ResultSet resultSet = statement.executeQuery()) {
+            Assert.assertNotEquals(resultSet, null);
         }
     }
 
@@ -149,9 +146,9 @@ public class ProxiedResultSetTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = this.datasource.getConnection();
-             PreparedStatement statement = con.prepareStatement("sql");
-             ResultSet resultSet = statement.executeQuery()) {
-            assertNotEquals(resultSet, "");
+                PreparedStatement statement = con.prepareStatement("sql");
+                ResultSet resultSet = statement.executeQuery()) {
+            Assert.assertNotEquals(resultSet, "");
         }
     }
 
@@ -160,9 +157,9 @@ public class ProxiedResultSetTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = this.datasource.getConnection();
-             PreparedStatement statement = con.prepareStatement("sql");
-             ResultSet resultSet = statement.executeQuery()) {
-            assertNotEquals(resultSet, new org.apache.tomcat.jdbc.test.driver.ResultSet(statement));
+                PreparedStatement statement = con.prepareStatement("sql");
+                ResultSet resultSet = statement.executeQuery()) {
+            Assert.assertNotEquals(resultSet, new org.apache.tomcat.jdbc.test.driver.ResultSet(statement));
         }
     }
 
@@ -171,9 +168,9 @@ public class ProxiedResultSetTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = this.datasource.getConnection();
-             PreparedStatement statement = con.prepareStatement("sql");
-             ResultSet resultSet = statement.executeQuery()) {
-            assertEquals(resultSet, resultSet);
+                PreparedStatement statement = con.prepareStatement("sql");
+                ResultSet resultSet = statement.executeQuery()) {
+            Assert.assertEquals(resultSet, resultSet);
         }
     }
 
@@ -182,12 +179,12 @@ public class ProxiedResultSetTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = this.datasource.getConnection();
-             PreparedStatement statement = con.prepareStatement("sql");
-             ResultSet resultSet = statement.executeQuery();
-             Connection con2 = this.datasource.getConnection();
-             PreparedStatement statement2 = con2.prepareStatement("sql");
-             ResultSet resultSet2 = statement2.executeQuery()) {
-            assertNotEquals(resultSet, resultSet2);
+                PreparedStatement statement = con.prepareStatement("sql");
+                ResultSet resultSet = statement.executeQuery();
+                Connection con2 = this.datasource.getConnection();
+                PreparedStatement statement2 = con2.prepareStatement("sql");
+                ResultSet resultSet2 = statement2.executeQuery()) {
+            Assert.assertNotEquals(resultSet, resultSet2);
         }
     }
 }
