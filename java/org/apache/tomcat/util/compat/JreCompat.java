@@ -27,11 +27,15 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.security.PrivilegedExceptionAction;
 import java.util.Deque;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionException;
 import java.util.jar.JarFile;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
+import javax.security.auth.Subject;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -49,6 +53,7 @@ public class JreCompat {
     private static final boolean jre9Available;
     private static final boolean jre11Available;
     private static final boolean jre16Available;
+    private static final boolean jre18Available;
     private static final boolean jre19Available;
     private static final boolean jre21Available;
     private static final boolean jre22Available;
@@ -76,6 +81,7 @@ public class JreCompat {
             jre22Available = true;
             jre21Available = true;
             jre19Available = true;
+            jre18Available = true;
             jre16Available = true;
             jre9Available = true;
         } else if (Jre21Compat.isSupported()) {
@@ -83,6 +89,7 @@ public class JreCompat {
             jre22Available = false;
             jre21Available = true;
             jre19Available = true;
+            jre18Available = true;
             jre16Available = true;
             jre9Available = true;
         } else if (Jre19Compat.isSupported()) {
@@ -90,6 +97,15 @@ public class JreCompat {
             jre22Available = false;
             jre21Available = false;
             jre19Available = true;
+            jre18Available = true;
+            jre16Available = true;
+            jre9Available = true;
+        } else if (Jre18Compat.isSupported()) {
+            instance = new Jre19Compat();
+            jre22Available = false;
+            jre21Available = false;
+            jre19Available = false;
+            jre18Available = true;
             jre16Available = true;
             jre9Available = true;
         } else if (Jre16Compat.isSupported()) {
@@ -97,6 +113,7 @@ public class JreCompat {
             jre22Available = false;
             jre21Available = false;
             jre19Available = false;
+            jre18Available = false;
             jre16Available = true;
             jre9Available = true;
         } else if (Jre9Compat.isSupported()) {
@@ -104,6 +121,7 @@ public class JreCompat {
             jre22Available = false;
             jre21Available = false;
             jre19Available = false;
+            jre18Available = false;
             jre16Available = false;
             jre9Available = true;
         } else {
@@ -111,6 +129,7 @@ public class JreCompat {
             jre22Available = false;
             jre21Available = false;
             jre19Available = false;
+            jre18Available = false;
             jre16Available = false;
             jre9Available = false;
         }
@@ -156,6 +175,11 @@ public class JreCompat {
 
     public static boolean isJre16Available() {
         return jre16Available;
+    }
+
+
+    public static boolean isJre18Available() {
+        return jre18Available;
     }
 
 
@@ -379,6 +403,23 @@ public class JreCompat {
      */
     public SocketChannel openUnixDomainSocketChannel() {
         throw new UnsupportedOperationException(sm.getString("jreCompat.noUnixDomainSocket"));
+    }
+
+
+    // Java 8 implementations of Java 18 methods
+
+    public <T> T callAs(Subject subject, Callable<T> action) throws CompletionException {
+        try {
+            return Subject.doAs(subject, new PrivilegedExceptionAction<T>() {
+
+                @Override
+                public T run() throws Exception {
+                    return action.call();
+                }
+            });
+        } catch (Exception e) {
+            throw new CompletionException(e);
+        }
     }
 
 
