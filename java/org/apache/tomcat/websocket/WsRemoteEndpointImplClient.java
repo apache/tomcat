@@ -26,7 +26,12 @@ import java.util.concurrent.locks.ReentrantLock;
 import jakarta.websocket.SendHandler;
 import jakarta.websocket.SendResult;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
+
+    private final Log log = LogFactory.getLog(WsRemoteEndpointImplClient.class); // must not be static
 
     private final AsyncChannelWrapper channel;
     private final ReentrantLock lock = new ReentrantLock();
@@ -63,6 +68,8 @@ public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
             try {
                 channel.write(byteBuffer).get(timeout, TimeUnit.MILLISECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                log.warn(sm.getString("wsRemoteEndpointClient.writeFailed", Long.valueOf(blockingWriteTimeoutExpiry),
+                        Long.valueOf(timeout)), e);
                 handler.onResult(new SendResult(getSession(), e));
                 return;
             }
