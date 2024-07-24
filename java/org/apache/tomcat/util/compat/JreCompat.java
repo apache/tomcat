@@ -17,6 +17,11 @@
 package org.apache.tomcat.util.compat;
 
 import java.lang.reflect.Field;
+import java.security.PrivilegedExceptionAction;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionException;
+
+import javax.security.auth.Subject;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -29,6 +34,7 @@ public class JreCompat {
 
     private static final JreCompat instance;
     private static final boolean graalAvailable;
+    private static final boolean jre18Available;
     private static final boolean jre19Available;
     private static final boolean jre21Available;
     private static final boolean jre22Available;
@@ -53,21 +59,31 @@ public class JreCompat {
             jre22Available = true;
             jre21Available = true;
             jre19Available = true;
+            jre18Available = true;
         } else if (Jre21Compat.isSupported()) {
             instance = new Jre21Compat();
             jre22Available = false;
             jre21Available = true;
             jre19Available = true;
+            jre18Available = true;
         } else if (Jre19Compat.isSupported()) {
             instance = new Jre19Compat();
             jre22Available = false;
             jre21Available = false;
             jre19Available = true;
+            jre18Available = true;
+        } else if (Jre18Compat.isSupported()) {
+            instance = new Jre19Compat();
+            jre22Available = false;
+            jre21Available = false;
+            jre19Available = false;
+            jre18Available = true;
         } else {
             instance = new JreCompat();
             jre22Available = false;
             jre21Available = false;
             jre19Available = false;
+            jre18Available = false;
         }
     }
 
@@ -79,6 +95,11 @@ public class JreCompat {
 
     public static boolean isGraalAvailable() {
         return graalAvailable;
+    }
+
+
+    public static boolean isJre18Available() {
+        return jre18Available;
     }
 
 
@@ -94,6 +115,24 @@ public class JreCompat {
 
     public static boolean isJre22Available() {
         return jre22Available;
+    }
+
+
+    // Java 17 implementations of Java 18 methods
+
+    @SuppressWarnings("removal")
+    public <T> T callAs(Subject subject, Callable<T> action) throws CompletionException {
+        try {
+            return Subject.doAs(subject, new PrivilegedExceptionAction<T>() {
+
+                @Override
+                public T run() throws Exception {
+                    return action.call();
+                }
+            });
+        } catch (Exception e) {
+            throw new CompletionException(e);
+        }
     }
 
 
