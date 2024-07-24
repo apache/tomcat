@@ -121,6 +121,11 @@
         processes this as a simple CORS request. Based on a patch suggested by
         thebluemountain. (markt)
       </fix>
+      <fix>
+        Refactor <code>SpnegoAuthenticator</code> so it uses
+        <code>Subject.callAs()</code> rather than <code>Subject.doAs()</code>
+        when the available. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
