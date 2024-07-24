@@ -150,6 +150,12 @@
         the Protocol level since the parser configuration depends on the
         protocol and the parser is, otherwise, stateless. (markt)
       </scode>
+      <add>
+        Align HTTP/2 with HTTP/1.1 and recycle the container internal request
+        and response processing objects by default. This behaviour can be
+        controlled via the new <code>discardRequestsAndResponses</code>
+        attribute on the HTTP/2 upgrade protocol. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">

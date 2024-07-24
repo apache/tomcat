@@ -80,6 +80,14 @@
 
   <attributes>
 
+    <attribute name="discardRequestsAndResponses" required="false">
+      <p>A boolean value which can be used to enable or disable the recycling
+      of the container internal request and response processing objects. If set
+      to <code>true</code> the request and response objects will be set for
+      garbage collection after every request, otherwise they will be reused.
+      If not specified, this attribute is set to <code>false</code>.</p>
+    </attribute>
+
     <attribute name="initialWindowSize" required="false">
       <p>Controls the initial size of the flow control window for streams that
       Tomcat advertises to clients. If not specified, the default value of

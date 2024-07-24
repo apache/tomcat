@@ -85,10 +85,10 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     private final Http2UpgradeHandler handler;
     private final WindowAllocationManager allocationManager = new WindowAllocationManager(this);
     private final Request coyoteRequest;
-    private final Response coyoteResponse = new Response();
+    private final Response coyoteResponse;
     private final StreamInputBuffer inputBuffer;
     private final StreamOutputBuffer streamOutputBuffer = new StreamOutputBuffer();
-    private final Http2OutputBuffer http2OutputBuffer = new Http2OutputBuffer(coyoteResponse, streamOutputBuffer);
+    private final Http2OutputBuffer http2OutputBuffer;
     private final AtomicBoolean removedFromActiveCount = new AtomicBoolean(false);
 
     // State machine would be too much overhead
@@ -114,13 +114,22 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         super(handler.getConnectionId(), identifier);
         this.handler = handler;
         setWindowSize(handler.getRemoteSettings().getInitialWindowSize());
+        Response coyoteResponse = handler.getProtocol().popResponse();
+        this.coyoteResponse = coyoteResponse;
+        http2OutputBuffer = new Http2OutputBuffer(this.coyoteResponse, streamOutputBuffer);
+
         if (coyoteRequest == null) {
             // HTTP/2 new request
-            this.coyoteRequest = new Request();
+            coyoteRequest = handler.getProtocol().popRequest();
+            this.coyoteRequest = coyoteRequest;
             this.inputBuffer = new StandardStreamInputBuffer();
             this.coyoteRequest.setInputBuffer(inputBuffer);
         } else {
             // HTTP/1.1 upgrade
+            /*
+             * Implementation note. The request passed in is always newly created so it is safe to recycle it for re-use
+             * in the Stream.recyle() method
+             */
             this.coyoteRequest = coyoteRequest;
             this.inputBuffer =
                     new SavedRequestStreamInputBuffer((SavedRequestInputFilter) coyoteRequest.getInputBuffer());
@@ -785,6 +794,10 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             remaining = inputByteBuffer.remaining();
         }
         handler.replaceStream(this, new RecycledStream(getConnectionId(), getIdentifier(), state, remaining));
+        coyoteRequest.recycle();
+        handler.getProtocol().pushRequest(coyoteRequest);
+        coyoteResponse.recycle();
+        handler.getProtocol().pushResponse(coyoteResponse);
     }
 
 
