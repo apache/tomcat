@@ -38,7 +38,7 @@ public class Jre18Compat extends JreCompat {
         Method m1 = null;
 
         try {
-            m1 = Subject.class.getMethod("classAS", Subject.class, Callable.class);
+            m1 = Subject.class.getMethod("callAs", Subject.class, Callable.class);
         } catch (NoSuchMethodException e) {
             // Must before-Java 18
             log.debug(sm.getString("jre18Compat.javaPre18"), e);
