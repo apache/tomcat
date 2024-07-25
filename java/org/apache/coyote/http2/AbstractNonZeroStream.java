@@ -66,21 +66,9 @@ abstract class AbstractNonZeroStream extends AbstractStream {
      *
      * @return {@code null} if the DATA frame payload can be swallowed, or a ByteBuffer with at least enough space
      *             remaining for the current flow control window for stream data from the client.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 11.
-     */
-    @Deprecated
-    ByteBuffer getInputByteBuffer() {
-        return getInputByteBuffer(true);
-    }
-
-    /**
-     * Obtain the ByteBuffer to store DATA frame payload data for this stream that has been received from the client.
-     *
-     * @return {@code null} if the DATA frame payload can be swallowed, or a ByteBuffer with at least enough space
-     *             remaining for the current flow control window for stream data from the client.
      */
     abstract ByteBuffer getInputByteBuffer(boolean create);
+
 
     /**
      * Notify that some data has been received.

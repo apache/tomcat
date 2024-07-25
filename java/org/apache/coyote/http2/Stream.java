@@ -1100,18 +1100,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
         abstract void notifyEof();
 
-        /**
-         * Return, creating if necessary, the input buffer.
-         *
-         * @return The input buffer
-         *
-         * @deprecated Unused. Will be removed in Tomcat 11.
-         */
-        @Deprecated
-        ByteBuffer getInBuffer() {
-            return getInBuffer(true);
-        }
-
         abstract ByteBuffer getInBuffer(boolean create);
 
         abstract void onDataAvailable() throws IOException;
