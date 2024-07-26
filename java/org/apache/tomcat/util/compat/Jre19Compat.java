@@ -22,7 +22,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-public class Jre19Compat extends Jre18Compat {
+public class Jre19Compat extends JreCompat {
 
     private static final Log log = LogFactory.getLog(Jre19Compat.class);
     private static final StringManager sm = StringManager.getManager(Jre19Compat.class);
