@@ -18,6 +18,10 @@ package org.apache.tomcat.util.compat;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionException;
+
+import javax.security.auth.Subject;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -31,6 +35,7 @@ public class Jre21Compat extends Jre19Compat {
     private static final Method nameMethod;
     private static final Method startMethod;
     private static final Method ofVirtualMethod;
+    private static final Method callAsMethod;
 
 
     static {
@@ -38,12 +43,14 @@ public class Jre21Compat extends Jre19Compat {
         Method m1 = null;
         Method m2 = null;
         Method m3 = null;
+        Method m4 = null;
 
         try {
             c1 = Class.forName("java.lang.Thread$Builder");
             m1 = c1.getMethod("name", String.class, long.class);
             m2 = c1.getMethod("start", Runnable.class);
             m3 = Thread.class.getMethod("ofVirtual", (Class<?>[]) null);
+            m4 = Subject.class.getMethod("callAs", Subject.class, Callable.class);
         } catch (ClassNotFoundException e) {
             // Must be pre-Java 21
             log.debug(sm.getString("jre21Compat.javaPre21"), e);
@@ -54,6 +61,7 @@ public class Jre21Compat extends Jre19Compat {
         nameMethod = m1;
         startMethod = m2;
         ofVirtualMethod = m3;
+        callAsMethod = m4;
     }
 
     static boolean isSupported() {
@@ -77,6 +85,23 @@ public class Jre21Compat extends Jre19Compat {
             startMethod.invoke(threadBuilder, command);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new UnsupportedOperationException(e);
+        }
+    }
+
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T callAs(Subject subject, Callable<T> action) throws CompletionException {
+        try {
+            return (T) callAsMethod.invoke(null, subject, action);
+        } catch (IllegalAccessException e) {
+            throw new CompletionException(e);
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof CompletionException) {
+                throw (CompletionException) cause;
+            }
+            throw new CompletionException(e);
         }
     }
 }
