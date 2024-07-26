@@ -241,7 +241,7 @@ public class JreCompat {
      *
      * So, the slightly longer description for this method is:
      *
-     * Java 17 implementation of a method replaced between Java 18 and 22 with the replacement method being used by
+     * Java 11 implementation of a method replaced between Java 18 and 22 with the replacement method being used by
      * Tomcat when running on Java 21 onwards.
      */
 
