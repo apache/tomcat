@@ -167,6 +167,9 @@
       <update>
         Update Tomcat Native to 2.0.8. (markt)
       </update>
+      <update>
+        Update Byte Buddy to 1.14.18. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
