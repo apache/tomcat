@@ -180,6 +180,9 @@
         Fix packaging regression with missing osgi information following
         addition of the <code>test-only</code> build target. (remm)
       </fix>
+      <update>
+        Update Tomcat Native to 2.0.8. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
