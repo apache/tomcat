@@ -170,6 +170,9 @@
       <update>
         Update Byte Buddy to 1.14.18. (markt)
       </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
