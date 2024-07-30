@@ -89,6 +89,7 @@
   <property name="tomcat.i18n"           value="${tomcat.output}/i18n"/>
   <property name="tomcat.manifests"      value="${tomcat.output}/manifests"/>
   <property name="tomcat.release"        value="${tomcat.output}/release"/>
+  <property name="tomcat.release.verify" value="${tomcat.output}/verify" />
   <property name="tomcat.src.jars"       value="${tomcat.output}/src-jars"/>
   <property name="test.classes"          value="${tomcat.output}/testclasses"/>
   <property name="test.run.classes"      value="${tomcat.output}/classes"/>
@@ -4192,17 +4193,17 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
       <!-- First, try to find a released version hash. -->
       <antcall target="trydownload">
         <param name="sourcefile" value="https://dist.apache.org/repos/dist/release/tomcat/tomcat-${version.major}/v${version}/@{src-or-bin}/@{basefile}.sha512" />
-        <param name="destfile" value="verify/@{basefile}.sha512" />
+        <param name="destfile" value="${tomcat.release.verify}/@{basefile}.sha512" />
       </antcall>
       <!-- If necessary, try to find a dev version hash. -->
       <antcall target="trydownload">
         <param name="sourcefile" value="https://dist.apache.org/repos/dist/dev/tomcat/tomcat-${version.major}/v${version}/@{src-or-bin}/@{basefile}.sha512" />
-        <param name="destfile" value="verify/@{basefile}.sha512" />
+        <param name="destfile" value="${tomcat.release.verify}/@{basefile}.sha512" />
       </antcall>
 
       <condition property="success">
         <or>
-          <available file="verify/@{basefile}.sha512" />
+          <available file="${tomcat.release.verify}/@{basefile}.sha512" />
           <and>
             <contains string="${version}" substring="11.0." /><!-- Super hack -->
             <contains string="@{basefile}" substring="x86" />
@@ -4223,18 +4224,18 @@ Unable to locate release hash for @{basefile}
 
     <sequential>
 <!--
-      <echo>Comparing hash files output/release/v${version}/@{src-or-bin}/@{basefile}.sha512 verify/@{basefile}.sha512</echo>
+      <echo>Comparing hash files output/release/v${version}/@{src-or-bin}/@{basefile}.sha512 ${tomcat.release.verify}/@{basefile}.sha512</echo>
 -->
       <condition property="reproducible-@{num}">
         <filesmatch file1="output/release/v${version}/@{src-or-bin}/@{basefile}.sha512"
-                    file2="verify/@{basefile}.sha512"/>
+                    file2="${tomcat.release.verify}/@{basefile}.sha512"/>
       </condition>
       <echo if:set="reproducible-@{num}">Signature MATCH for @{src-or-bin}/@{basefile}</echo>
       <echo unless:set="reproducible-@{num}">
 Signature mismatch for @{src-or-bin}/@{basefile}:
   </echo>
       <printfile unless:set="reproducible-@{num}" file="output/release/v${version}/@{src-or-bin}/@{basefile}.sha512" />
-      <printfile unless:set="reproducible-@{num}" file="verify/@{basefile}.sha512" />
+      <printfile unless:set="reproducible-@{num}" file="${tomcat.release.verify}/@{basefile}.sha512" />
     </sequential>
   </macrodef>
 
@@ -4250,8 +4251,8 @@ This does not appear to be a copy of a released tag; no build.properties.release
 
 It appears there are no build artifacts to verify. Please run 'ant release' first.
 </fail>
-    <delete dir="verify" />
-    <mkdir dir="verify" />
+    <delete dir="${tomcat.release.verify}" />
+    <mkdir dir="${tomcat.release.verify}" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}-deployer.tar.gz" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}-deployer.zip" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
