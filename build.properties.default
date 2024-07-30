@@ -81,6 +81,13 @@ test.threads=1
 # multicast tests to work
 java.net.preferIPv4Stack=false
 
+# MacOS requires non-default settings to test FFM with OpenSSL. Eg:
+#openssl.ffm.1=-Dorg.apache.tomcat.util.openssl.USE_SYSTEM_LOAD_LIBRARY=true
+#openssl.ffm.2=-Dorg.apache.tomcat.util.openssl.LIBRARY_NAME=ssl
+openssl.ffm.1=-DNoop1
+openssl.ffm.2=-DNoop2
+
+
 # ----- Release build settings -----
 # Location of GPG executable
 gpg.exec=/path/to/gpg
