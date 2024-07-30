@@ -2071,6 +2071,9 @@
           <jvmarg value="${opens.javautil}"/>
           <jvmarg value="${opens.javautilconcurrent}"/>
           <jvmarg value="${native.nativeaccess}"/>
+          <!-- These are managed as jvmargs rather than sysproperty because the default varies by OS -->
+          <jvmarg value="${openssl.ffm.1}" />
+          <jvmarg value="${openssl.ffm.2}" />
 
           <classpath refid="tomcat.test.classpath" />
 
