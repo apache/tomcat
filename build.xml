@@ -315,9 +315,12 @@
     <include name="**/.gitignore"/>
     <include name="**/*.bnd"/>
     <include name="**/*.classpath"/>
+    <include name="**/*.conf"/>
     <include name="**/*.css"/>
     <include name="**/*.dtd"/>
     <include name="**/*.editorconfig"/>
+    <include name="**/*.h"/>
+    <include name="**/*.header"/>
     <include name="**/*.htm"/>
     <include name="**/*.html"/>
     <include name="**/*.iml"/>
