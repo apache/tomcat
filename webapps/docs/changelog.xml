@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0-M24 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>69234</bug>: Fix a regression caused by the refactoring to use
+        <code>java.net.URI</code> rather than <code>java.net.URL</code> that
+        broke support for parallel deployment with WAR files. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M23 (markt)" rtext="release in progress">
   <subsection name="Catalina">
