@@ -110,8 +110,7 @@ public class Http2Protocol implements UpgradeProtocol {
      * [1] https://github.com/markt-asf/spring-boot-http2
      */
     private boolean discardRequestsAndResponses = false;
-    private final SynchronizedStack<Request> recycledRequests = new SynchronizedStack<>();
-    private final SynchronizedStack<Response> recycledResponses = new SynchronizedStack<>();
+    private final SynchronizedStack<Request> recycledRequestsAndResponses = new SynchronizedStack<>();
 
     @Override
     public String getHttpUpgradeName(boolean isSSLEnabled) {
@@ -379,8 +378,7 @@ public class Http2Protocol implements UpgradeProtocol {
     @Override
     public void setHttp11Protocol(AbstractHttp11Protocol<?> http11Protocol) {
         this.http11Protocol = http11Protocol;
-        recycledRequests.setLimit(http11Protocol.getMaxConnections());
-        recycledResponses.setLimit(http11Protocol.getMaxConnections());
+        recycledRequestsAndResponses.setLimit(http11Protocol.getMaxConnections());
 
         try {
             ObjectName oname = this.http11Protocol.getONameForUpgrade(getUpgradeProtocolName());
@@ -418,42 +416,24 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
 
-    Request popRequest() {
-        Request request = null;
+    Request popRequestAndResponse() {
+        Request requestAndResponse = null;
         if (!discardRequestsAndResponses) {
-            request = recycledRequests.pop();
+            requestAndResponse = recycledRequestsAndResponses.pop();
         }
-        if (request == null) {
-            request = new Request();
+        if (requestAndResponse == null) {
+            requestAndResponse = new Request();
+            Response response = new Response();
+            requestAndResponse.setResponse(response);
         }
-        return request;
+        return requestAndResponse;
     }
 
 
-    void pushRequest(Request request) {
-        request.recycle();
+    void pushRequestAndResponse(Request requestAndResponse) {
+        requestAndResponse.recycle();
         if (!discardRequestsAndResponses) {
-            recycledRequests.push(request);
-        }
-    }
-
-
-    Response popResponse() {
-        Response response = null;
-        if (!discardRequestsAndResponses) {
-            response = recycledResponses.pop();
-        }
-        if (response == null) {
-            response = new Response();
-        }
-        return response;
-    }
-
-
-    void pushResponse(Response response) {
-        response.recycle();
-        if (!discardRequestsAndResponses) {
-            recycledResponses.push(response);
+            recycledRequestsAndResponses.push(requestAndResponse);
         }
     }
 }
