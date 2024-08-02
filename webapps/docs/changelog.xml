@@ -104,7 +104,9 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 10.1.28 (schultz)" rtext="in development">
+<section name="Tomcat 10.1.29 (schultz)" rtext="release in progress">
+</section>
+<section name="Tomcat 10.1.28 (schultz)" rtext="release in progress">
   <subsection name="Coyote">
     <changelog>
       <fix>
