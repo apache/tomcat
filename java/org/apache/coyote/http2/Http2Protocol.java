@@ -379,6 +379,8 @@ public class Http2Protocol implements UpgradeProtocol {
     @Override
     public void setHttp11Protocol(AbstractHttp11Protocol<?> http11Protocol) {
         this.http11Protocol = http11Protocol;
+        recycledRequests.setLimit(http11Protocol.getMaxConnections());
+        recycledResponses.setLimit(http11Protocol.getMaxConnections());
 
         try {
             ObjectName oname = this.http11Protocol.getONameForUpgrade(getUpgradeProtocolName());
