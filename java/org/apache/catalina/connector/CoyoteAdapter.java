@@ -308,18 +308,19 @@ public class CoyoteAdapter implements Adapter {
         if (request == null) {
             // Create objects
             request = connector.createRequest(req);
+            response = connector.createResponse(res);
+
+            // Link objects
+            request.setResponse(response);
+            response.setRequest(request);
+
+            // Set as notes
             req.setNote(ADAPTER_NOTES, request);
+            res.setNote(ADAPTER_NOTES, response);
+
+            // Set query string encoding
             req.getParameters().setQueryStringCharset(connector.getURICharset());
         }
-
-        if (response == null) {
-            response = connector.createResponse(res);
-            res.setNote(ADAPTER_NOTES, response);
-        }
-
-        // Link objects
-        request.setResponse(response);
-        response.setRequest(request);
 
         if (connector.getXpoweredBy()) {
             response.addHeader("X-Powered-By", POWERED_BY);
