@@ -118,25 +118,24 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         super(handler.getConnectionId(), identifier);
         this.handler = handler;
         setWindowSize(handler.getRemoteSettings().getInitialWindowSize());
-        Response coyoteResponse = handler.getProtocol().popResponse();
-        this.coyoteResponse = coyoteResponse;
-        http2OutputBuffer = new Http2OutputBuffer(this.coyoteResponse, streamOutputBuffer);
 
         if (coyoteRequest == null) {
             // HTTP/2 new request
-            coyoteRequest = handler.getProtocol().popRequest();
-            this.coyoteRequest = coyoteRequest;
+            this.coyoteRequest = handler.getProtocol().popRequestAndResponse();
+            this.coyoteResponse = this.coyoteRequest.getResponse();
             this.inputBuffer = new StandardStreamInputBuffer();
             this.coyoteRequest.setInputBuffer(inputBuffer);
         } else {
             // HTTP/2 Push or HTTP/1.1 upgrade
             /*
              * Implementation note. The request passed in is always newly created so it is safe to recycle it for re-use
-             * in the Stream.recyle() method
+             * in the Stream.recyle() method. Need to create a matching, new response.
              */
             this.coyoteRequest = coyoteRequest;
+            this.coyoteResponse = new Response();
+            this.coyoteRequest.setResponse(coyoteResponse);
             this.inputBuffer =
-                    new SavedRequestStreamInputBuffer((SavedRequestInputFilter) coyoteRequest.getInputBuffer());
+                    new SavedRequestStreamInputBuffer((SavedRequestInputFilter) this.coyoteRequest.getInputBuffer());
             // Headers have been read by this point
             state.receivedStartOfHeaders();
             if (HTTP_UPGRADE_STREAM.equals(identifier)) {
@@ -156,6 +155,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             state.receivedEndOfStream();
         }
         this.coyoteRequest.setSendfile(handler.hasAsyncIO() && handler.getProtocol().getUseSendfile());
+        http2OutputBuffer = new Http2OutputBuffer(this.coyoteResponse, streamOutputBuffer);
         this.coyoteResponse.setOutputBuffer(http2OutputBuffer);
         this.coyoteRequest.setResponse(coyoteResponse);
         this.coyoteRequest.protocol().setString("HTTP/2.0");
@@ -807,9 +807,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
         handler.replaceStream(this, new RecycledStream(getConnectionId(), getIdentifier(), state, remaining));
         coyoteRequest.recycle();
-        handler.getProtocol().pushRequest(coyoteRequest);
         coyoteResponse.recycle();
-        handler.getProtocol().pushResponse(coyoteResponse);
+        handler.getProtocol().pushRequestAndResponse(coyoteRequest);
     }
 
 
