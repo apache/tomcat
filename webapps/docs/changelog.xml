@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.93 (remm)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Correct regressions in the refactoring that added recycling of the
+        coyote request and response to the HTTP/2 processing. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.92 (remm)" rtext="release in progress">
   <subsection name="Catalina">
