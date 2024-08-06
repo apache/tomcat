@@ -108,7 +108,7 @@
   <subsection name="Other">
     <changelog>
       <add>
-        Exclude the <code>tomcat-coyote-ffm.jar</code> from JAR sacnning by
+        Exclude the <code>tomcat-coyote-ffm.jar</code> from JAR scanning by
         default. (markt)
       </add>
     </changelog>
