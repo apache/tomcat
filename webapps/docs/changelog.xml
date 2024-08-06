@@ -111,6 +111,11 @@
         Exclude the <code>tomcat-coyote-ffm.jar</code> from JAR scanning by
         default. (markt)
       </add>
+      <fix>
+        Change the default log handler level to <code>ALL</code> so log messages
+        are not dropped by default if a logger is configured to use trace
+        (<code>FINEST</code>) level logging. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
