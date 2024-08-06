@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.29 (schultz)" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Switch the <code>TldScanner</code> back to logging detailed scan
+        results at debug level rather than trace level. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
