@@ -1340,8 +1340,8 @@
        two additional attributes to allow a shared data source to be used with different credentials.
        When these two additional attributes are used in combination with the <code>javax.sql.DataSource</code>
        type, different contexts can share a global data source with different credentials.
-       Under the hood, what happens is that a call to <a href="http://docs.oracle.com/javase/7/docs/api/javax/sql/DataSource.html#getConnection()"><code>getConnection()</code></a>
-       is simply translated to a call <a href="http://docs.oracle.com/javase/7/docs/api/javax/sql/DataSource.html#getConnection(java.lang.String,%20java.lang.String)">
+       Under the hood, what happens is that a call to <a href="https://docs.oracle.com/javase/8/docs/api/javax/sql/DataSource.html#getConnection()"><code>getConnection()</code></a>
+       is simply translated to a call <a href="https://docs.oracle.com/javase/8/docs/api/javax/sql/DataSource.html#getConnection(java.lang.String,%20java.lang.String)">
        <code>getConnection(username, password)</code></a> on the global data source. This is an easy way to get code to be transparent to what schemas are being used,
        yet be able to control connections (or pools) in the global configuration.
     </p>

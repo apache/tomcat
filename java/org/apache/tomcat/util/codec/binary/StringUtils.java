@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Converts String to and from bytes using the encodings required by the Java specification. These encodings are
- * specified in <a href="http://download.oracle.com/javase/7/docs/api/java/nio/charset/Charset.html">
+ * specified in <a href="https://docs.oracle.com/javase/8/docs/api/java/nio/charset/Charset.html">
  * Standard charsets</a>.
  *
  * <p>This class is immutable and thread-safe.</p>
