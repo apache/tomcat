@@ -704,6 +704,9 @@ public class WsSession implements Session {
      * @param closeReason The reason contained within the received close message.
      */
     public void onClose(CloseReason closeReason) {
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("wsSession.onClose.entry", closeReason, getId(), state));
+        }
         if (state.compareAndSet(State.OPEN, State.CLOSING)) {
             // Standard close.
 
