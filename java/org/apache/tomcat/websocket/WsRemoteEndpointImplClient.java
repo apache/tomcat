@@ -56,6 +56,7 @@ public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
                 if (timeout < 0) {
                     SendResult sr = new SendResult(new IOException(sm.getString("wsRemoteEndpoint.writeTimeout")));
                     handler.onResult(sr);
+                    return;
                 }
             }
 
