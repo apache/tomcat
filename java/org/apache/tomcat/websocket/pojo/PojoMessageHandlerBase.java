@@ -25,8 +25,12 @@ import javax.websocket.MessageHandler;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WrappedMessageHandler;
+import org.apache.tomcat.websocket.WsSession;
 
 /**
  * Common implementation code for the POJO message handlers.
@@ -34,6 +38,9 @@ import org.apache.tomcat.websocket.WrappedMessageHandler;
  * @param <T> The type of message to handle
  */
 public abstract class PojoMessageHandlerBase<T> implements WrappedMessageHandler {
+
+    private final Log log = LogFactory.getLog(PojoMessageHandlerBase.class); // must not be static
+    private static final StringManager sm = StringManager.getManager(PojoMessageHandlerBase.class);
 
     protected final Object pojo;
     protected final Method method;
@@ -110,7 +117,13 @@ public abstract class PojoMessageHandlerBase<T> implements WrappedMessageHandler
     protected final void handlePojoMethodException(Throwable t) {
         t = ExceptionUtils.unwrapInvocationTargetException(t);
         ExceptionUtils.handleThrowable(t);
-        if (t instanceof RuntimeException) {
+        if (t instanceof EncodeException) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("pojoMessageHandlerBase.encodeFail", pojo.getClass().getName(), session.getId()),
+                        t);
+            }
+            ((WsSession) session).getLocal().onError(session, t);
+        } else if (t instanceof RuntimeException) {
             throw (RuntimeException) t;
         } else {
             throw new RuntimeException(t.getMessage(), t);
