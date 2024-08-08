@@ -117,21 +117,21 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                 throw new SQLException("Statement closed.");
             }
 
-            if (compare(GET_RESULTSET, method)) {
-                return getConstructor(RESULTSET_IDX, ResultSet.class)
-                        .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
-            }
-            if (compare(GET_GENERATED_KEYS, method)) {
-                return getConstructor(RESULTSET_IDX, ResultSet.class)
-                        .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
-            }
-            if (compare(EXECUTE_QUERY, method)) {
-                return getConstructor(RESULTSET_IDX, ResultSet.class)
-                        .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
-            }
-
-            Object result = null;
+            Object result;
             try {
+                if (compare(GET_RESULTSET, method)) {
+                    return getConstructor(RESULTSET_IDX, ResultSet.class)
+                        .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
+                }
+                if (compare(GET_GENERATED_KEYS, method)) {
+                    return getConstructor(RESULTSET_IDX, ResultSet.class)
+                        .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
+                }
+                if (compare(EXECUTE_QUERY, method)) {
+                    return getConstructor(RESULTSET_IDX, ResultSet.class)
+                        .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
+                }
+
                 // invoke next
                 result = method.invoke(delegate, args);
             } catch (Throwable t) {
