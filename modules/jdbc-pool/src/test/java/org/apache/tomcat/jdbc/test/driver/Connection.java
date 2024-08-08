@@ -218,7 +218,7 @@ public class Connection implements java.sql.Connection {
 
     @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return new org.apache.tomcat.jdbc.test.driver.Statement();
+        return new org.apache.tomcat.jdbc.test.driver.Statement(true);
     }
 
     @Override

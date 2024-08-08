@@ -58,4 +58,34 @@ public class ProxiedStatementTest extends DefaultTestCase {
             Assert.assertNotEquals(statement, new org.apache.tomcat.jdbc.test.driver.Statement());
         }
     }
+
+    @Test
+    public void shouldUnwrapInvocationTargetExceptionFromGetResultSet() throws SQLException {
+        this.datasource.setDriverClassName(Driver.class.getName());
+        this.datasource.setUrl("jdbc:tomcat:test");
+        try (Connection con = this.datasource.getConnection();
+             Statement statement = con.prepareStatement("sql", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT)) {
+            Assert.assertThrows("Throwing exception on execute", SQLException.class, statement::getResultSet);
+        }
+    }
+
+    @Test
+    public void shouldUnwrapInvocationTargetExceptionFromExecute() throws SQLException {
+        this.datasource.setDriverClassName(Driver.class.getName());
+        this.datasource.setUrl("jdbc:tomcat:test");
+        try (Connection con = this.datasource.getConnection();
+             Statement statement = con.prepareStatement("sql", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT)) {
+            Assert.assertThrows("Throwing exception on execute", SQLException.class, () -> statement.executeQuery(""));
+        }
+    }
+
+    @Test
+    public void shouldUnwrapInvocationTargetExceptionFromGetGeneratedKeys() throws SQLException {
+        this.datasource.setDriverClassName(Driver.class.getName());
+        this.datasource.setUrl("jdbc:tomcat:test");
+        try (Connection con = this.datasource.getConnection();
+             Statement statement = con.prepareStatement("sql", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT)) {
+            Assert.assertThrows("Throwing exception on execute", SQLException.class, statement::getGeneratedKeys);
+        }
+    }
 }
