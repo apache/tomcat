@@ -17,10 +17,13 @@
 package org.apache.tomcat.websocket;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jakarta.servlet.ServletContextEvent;
 import jakarta.websocket.DeploymentException;
+import jakarta.websocket.OnError;
 import jakarta.websocket.OnMessage;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerContainer;
@@ -192,12 +195,39 @@ public class TesterEchoServer {
     @ServerEndpoint("/echoWriterError")
     public static class WriterError {
 
+        public static final String MSG_ERROR = "error";
+        public static final String MSG_COUNT = "count";
+        public static final String RESULT_PASS = "PASS";
+        public static final String RESULT_FAIL = "FAIL";
+
+        private AtomicInteger errorCount = new AtomicInteger(0);
+
         @OnMessage
-        public void echoTextMessage(Session session, @SuppressWarnings("unused") String msg) {
-            try {
-                session.getBasicRemote().getSendWriter();
-                // Simulate an error
-                throw new RuntimeException();
+        public void echoTextMessage(Session session, String msg) {
+            try (Writer w = session.getBasicRemote().getSendWriter()) {
+                if (MSG_ERROR.equals(msg)) {
+                    // Simulate an error
+                    throw new RuntimeException();
+                } else if (MSG_COUNT.equals(msg)) {
+                    int count = 0;
+                    while (count < 200 && errorCount.get() == 0) {
+                        // 200 * 50 == 10,000ms == 10s
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            // Ignore
+                        }
+                        count++;
+                    }
+                    if (errorCount.get() == 1) {
+                        w.write(RESULT_PASS);
+                    } else {
+                        w.write(RESULT_FAIL);
+                    }
+                } else {
+                    // Default is echo
+                   w.write(msg);
+                }
             } catch (IOException e) {
                 // Should not happen
                 try {
@@ -206,6 +236,12 @@ public class TesterEchoServer {
                     // Ignore
                 }
             }
+        }
+
+
+        @OnError
+        public void onError(@SuppressWarnings("unused") Throwable t) {
+            errorCount.incrementAndGet();
         }
     }
 

@@ -120,10 +120,10 @@
         again before throwing the exception. (markt)
       </fix>
       <fix>
-        An EncodeException being thrown during a message write should not
-        automatically cause the connection to close. The application should
-        handle the exception and make the decision whether or not to close the
-        connection. (markt)
+        An Exception being thrown during message processing (e.g. in a method
+        annotated with <code>@onMessage</code>) should not automatically cause
+        the connection to close. The application should handle the exception and
+        make the decision whether or not to close the connection. (markt)
       </fix>
     </changelog>
   </subsection>

@@ -17,6 +17,7 @@
 package org.apache.tomcat.websocket.pojo;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
@@ -114,19 +115,20 @@ public abstract class PojoMessageHandlerBase<T> implements WrappedMessageHandler
     }
 
 
-    protected final void handlePojoMethodException(Throwable t) {
-        t = ExceptionUtils.unwrapInvocationTargetException(t);
+    protected final void handlePojoMethodInvocationTargetException(InvocationTargetException e) {
+        /*
+         * This is a failure during the execution of onMessage. This does not normally need to trigger the failure of
+         * the WebSocket connection.
+         */
+        Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
+        // Check for JVM wide issues
         ExceptionUtils.handleThrowable(t);
-        if (t instanceof EncodeException) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("pojoMessageHandlerBase.encodeFail", pojo.getClass().getName(), session.getId()),
-                        t);
-            }
-            ((WsSession) session).getLocal().onError(session, t);
-        } else if (t instanceof RuntimeException) {
-            throw (RuntimeException) t;
-        } else {
-            throw new RuntimeException(t.getMessage(), t);
+        // Log at debug level since this is an application issue and the application should be handling this.
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("pojoMessageHandlerBase.onMessafeFail", pojo.getClass().getName(), session.getId()),
+                    t);
         }
+        // Notify the application of the issue so it can handle it.
+        ((WsSession) session).getLocal().onError(session, t);
     }
 }
