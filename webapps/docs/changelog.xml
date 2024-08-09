@@ -111,6 +111,9 @@
         Switch the <code>TldScanner</code> back to logging detailed scan
         results at debug level rather than trace level. (markt)
       </fix>
+      <fix>
+        Simplify the implementation of <code>OptionalELResolver</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

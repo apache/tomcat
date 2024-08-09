@@ -58,11 +58,7 @@ public class OptionalELResolver extends ELResolver {
 
         if (base instanceof Optional) {
             context.setPropertyResolved(base, property);
-            if (((Optional<?>) base).isEmpty()) {
-                if (property == null) {
-                    return null;
-                }
-            } else {
+            if (((Optional<?>) base).isPresent()) {
                 if (property == null) {
                     return ((Optional<?>) base).get();
                 } else {
