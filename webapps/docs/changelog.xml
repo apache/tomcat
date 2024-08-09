@@ -141,7 +141,7 @@
         <bug>69255</bug>: Correct a regression in the fix for <bug>69206</bug>
         that meant exceptions executing statements were wrapped in an
         <code>java.lang.reflect.UndeclaredThrowableException</code> rather than
-        the applicaiton seeing the original <code>SQLException</code>. Fixed
+        the application seeing the original <code>SQLException</code>. Fixed
         by pull request <pr>744</pr> provided by Michael Clarke. (markt)
       </fix>
     </changelog>
