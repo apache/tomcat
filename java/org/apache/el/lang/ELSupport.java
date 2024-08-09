@@ -51,20 +51,20 @@ public class ELSupport {
 
     /**
      * Compare two objects, after coercing to the same type if appropriate.
-     *
+     * <p>
      * If the objects are identical, or they are equal according to
      * {@link #equals(ELContext, Object, Object)} then return 0.
-     *
+     * <p>
      * If either object is a BigDecimal, then coerce both to BigDecimal first.
      * Similarly for Double(Float), BigInteger, and Long(Integer, Char, Short, Byte).
-     *
+     * <p>
      * Otherwise, check that the first object is an instance of Comparable, and compare
      * against the second object. If that is null, return 1, otherwise
      * return the result of comparing against the second object.
-     *
+     * <p>
      * Similarly, if the second object is Comparable, if the first is null, return -1,
      * else return the result of comparing against the first object.
-     *
+     * <p>
      * A null object is considered as:
      * <ul>
      * <li>ZERO when compared with Numbers</li>
@@ -122,11 +122,15 @@ public class ELSupport {
 
     /**
      * Compare two objects for equality, after coercing to the same type if appropriate.
-     *
+     * <p>
      * If the objects are identical (including both null) return true.
+     * <p>
      * If either object is null, return false.
+     * <p>
      * If either object is Boolean, coerce both to Boolean and check equality.
+     * <p>
      * Similarly for Enum, String, BigDecimal, Double(Float), Long(Integer, Short, Byte, Character)
+     * <p>
      * Otherwise default to using Object.equals().
      *
      * @param ctx the context in which this equality test is taking place
@@ -171,9 +175,10 @@ public class ELSupport {
         }
     }
 
-    // Going to have to have some casts /raw types somewhere so doing it here
-    // keeps them all in one place. There might be a neater / better solution
-    // but I couldn't find it
+    /*
+     *  Going to have to have some casts /raw types somewhere so doing it here keeps them all in one place. There might
+     *  be a neater / better solution but I couldn't find it.
+     */
     @SuppressWarnings("unchecked")
     public static final Enum<?> coerceToEnum(final ELContext ctx, final Object obj,
             @SuppressWarnings("rawtypes") Class type) {
