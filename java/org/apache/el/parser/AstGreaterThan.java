@@ -32,8 +32,7 @@ public final class AstGreaterThan extends BooleanNode {
     }
 
     @Override
-    public Object getValue(EvaluationContext ctx)
-            throws ELException {
+    public Object getValue(EvaluationContext ctx) throws ELException {
         Object obj0 = this.children[0].getValue(ctx);
         if (obj0 == null) {
             return Boolean.FALSE;

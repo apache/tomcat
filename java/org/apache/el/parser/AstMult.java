@@ -32,8 +32,7 @@ public final class AstMult extends ArithmeticNode {
     }
 
     @Override
-    public Object getValue(EvaluationContext ctx)
-            throws ELException {
+    public Object getValue(EvaluationContext ctx) throws ELException {
         Object obj0 = this.children[0].getValue(ctx);
         Object obj1 = this.children[1].getValue(ctx);
         return ELArithmetic.multiply(obj0, obj1);
