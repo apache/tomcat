@@ -121,15 +121,15 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             try {
                 if (compare(GET_RESULTSET, method)) {
                     return getConstructor(RESULTSET_IDX, ResultSet.class)
-                        .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
+                            .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
                 }
                 if (compare(GET_GENERATED_KEYS, method)) {
                     return getConstructor(RESULTSET_IDX, ResultSet.class)
-                        .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
+                            .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
                 }
                 if (compare(EXECUTE_QUERY, method)) {
                     return getConstructor(RESULTSET_IDX, ResultSet.class)
-                        .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
+                            .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
                 }
 
                 // invoke next
