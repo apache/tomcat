@@ -32,8 +32,7 @@ public final class AstOr extends BooleanNode {
     }
 
     @Override
-    public Object getValue(EvaluationContext ctx)
-            throws ELException {
+    public Object getValue(EvaluationContext ctx) throws ELException {
         Object obj = this.children[0].getValue(ctx);
         Boolean b = ELSupport.coerceToBoolean(ctx, obj, true);
         if (b.booleanValue()) {

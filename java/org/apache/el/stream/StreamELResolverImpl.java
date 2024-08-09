@@ -38,8 +38,7 @@ public class StreamELResolverImpl extends ELResolver {
     }
 
     @Override
-    public void setValue(ELContext context, Object base, Object property,
-            Object value) {
+    public void setValue(ELContext context, Object base, Object property, Object value) {
         // NO-OP
     }
 
@@ -50,8 +49,7 @@ public class StreamELResolverImpl extends ELResolver {
 
     @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
     @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
-            Object base) {
+    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
         return null;
     }
 
@@ -61,8 +59,7 @@ public class StreamELResolverImpl extends ELResolver {
     }
 
     @Override
-    public Object invoke(ELContext context, Object base, Object method,
-            Class<?>[] paramTypes, Object[] params) {
+    public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
 
         if ("stream".equals(method) && params.length == 0) {
             if (base.getClass().isArray()) {

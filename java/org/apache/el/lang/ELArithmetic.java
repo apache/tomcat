@@ -27,6 +27,7 @@ import org.apache.el.util.MessageFactory;
 
 /**
  * A helper class of Arithmetic defined by the EL Specification
+ *
  * @author Jacob Hookom [jacob@hookom.net]
  */
 public abstract class ELArithmetic {
@@ -56,8 +57,7 @@ public abstract class ELArithmetic {
 
         @Override
         protected Number divide(Number num0, Number num1) {
-            return ((BigDecimal) num0).divide((BigDecimal) num1,
-                    RoundingMode.HALF_UP);
+            return ((BigDecimal) num0).divide((BigDecimal) num1, RoundingMode.HALF_UP);
         }
 
         @Override
@@ -190,13 +190,9 @@ public abstract class ELArithmetic {
 
         @Override
         public boolean matches(Object obj0, Object obj1) {
-            return (obj0 instanceof Double
-                    || obj1 instanceof Double
-                    || obj0 instanceof Float
-                    || obj1 instanceof Float
-                    || (obj0 instanceof String && ELSupport
-                            .isStringFloat((String) obj0)) || (obj1 instanceof String && ELSupport
-                    .isStringFloat((String) obj1)));
+            return (obj0 instanceof Double || obj1 instanceof Double || obj0 instanceof Float ||
+                    obj1 instanceof Float || (obj0 instanceof String && ELSupport.isStringFloat((String) obj0)) ||
+                    (obj1 instanceof String && ELSupport.isStringFloat((String) obj1)));
         }
     }
 
@@ -359,10 +355,8 @@ public abstract class ELArithmetic {
     }
 
     public static final boolean isNumberType(final Class<?> type) {
-        return type == Long.TYPE || type == Double.TYPE ||
-            type == Byte.TYPE || type == Short.TYPE ||
-            type == Integer.TYPE || type == Float.TYPE ||
-            Number.class.isAssignableFrom(type);
+        return type == Long.TYPE || type == Double.TYPE || type == Byte.TYPE || type == Short.TYPE ||
+                type == Integer.TYPE || type == Float.TYPE || Number.class.isAssignableFrom(type);
     }
 
     protected ELArithmetic() {

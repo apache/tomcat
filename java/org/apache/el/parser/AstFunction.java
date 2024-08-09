@@ -163,7 +163,8 @@ public final class AstFunction extends SimpleNode {
                     if (m.isVarArgs() && i == methodParameterCount - 1) {
                         if (inputParameterCount < methodParameterCount) {
                             params[i] = new Object[] { null };
-                        } else if (inputParameterCount == methodParameterCount && isArray(parameters.jjtGetChild(i).getValue(ctx))) {
+                        } else if (inputParameterCount == methodParameterCount &&
+                                isArray(parameters.jjtGetChild(i).getValue(ctx))) {
                             params[i] = parameters.jjtGetChild(i).getValue(ctx);
                         } else {
                             Object[] varargs = new Object[inputParameterCount - methodParameterCount + 1];
