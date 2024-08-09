@@ -41,8 +41,7 @@ public class MethodExpressionLiteral extends MethodExpression implements Externa
         // do nothing
     }
 
-    public MethodExpressionLiteral(String expr, Class<?> expectedType,
-            Class<?>[] paramTypes) {
+    public MethodExpressionLiteral(String expr, Class<?> expectedType, Class<?>[] paramTypes) {
         this.expr = expr;
         this.expectedType = expectedType;
         this.paramTypes = paramTypes;
@@ -51,8 +50,7 @@ public class MethodExpressionLiteral extends MethodExpression implements Externa
     @Override
     public MethodInfo getMethodInfo(ELContext context) throws ELException {
         context.notifyBeforeEvaluation(getExpressionString());
-        MethodInfo result =
-                new MethodInfo(this.expr, this.expectedType, this.paramTypes);
+        MethodInfo result = new MethodInfo(this.expr, this.expectedType, this.paramTypes);
         context.notifyAfterEvaluation(getExpressionString());
         return result;
     }
@@ -97,15 +95,13 @@ public class MethodExpressionLiteral extends MethodExpression implements Externa
         if (!type.isEmpty()) {
             this.expectedType = ReflectionUtil.forName(type);
         }
-        this.paramTypes = ReflectionUtil.toTypeArray(((String[]) in
-                .readObject()));
+        this.paramTypes = ReflectionUtil.toTypeArray(((String[]) in.readObject()));
     }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeUTF(this.expr);
-        out.writeUTF((this.expectedType != null) ? this.expectedType.getName()
-                : "");
+        out.writeUTF((this.expectedType != null) ? this.expectedType.getName() : "");
         out.writeObject(ReflectionUtil.toTypeNameArray(this.paramTypes));
     }
 }

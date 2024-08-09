@@ -31,8 +31,7 @@ public final class AstFalse extends BooleanNode {
     }
 
     @Override
-    public Object getValue(EvaluationContext ctx)
-            throws ELException {
+    public Object getValue(EvaluationContext ctx) throws ELException {
         return Boolean.FALSE;
     }
 }

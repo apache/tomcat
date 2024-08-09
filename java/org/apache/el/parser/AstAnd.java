@@ -31,8 +31,7 @@ public final class AstAnd extends BooleanNode {
     }
 
     @Override
-    public Object getValue(EvaluationContext ctx)
-            throws ELException {
+    public Object getValue(EvaluationContext ctx) throws ELException {
         Object obj = children[0].getValue(ctx);
         Boolean b = coerceToBoolean(ctx, obj, true);
         if (!b.booleanValue()) {
