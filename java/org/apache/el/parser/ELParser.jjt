@@ -113,7 +113,7 @@ void Semicolon() : {}
 void Assignment() : {}
 {
     LOOKAHEAD(4) LambdaExpression() |
-    Choice() ( LOOKAHEAD(2) <ASSIGN> Assignment() #Assign(2) )*
+    Ternary() ( LOOKAHEAD(2) <ASSIGN> Assignment() #Assign(2) )*
 }
 
 /*
@@ -121,7 +121,7 @@ void Assignment() : {}
  */
 void LambdaExpression() #LambdaExpression : {}
 {
-    LambdaParameters() <ARROW> ( LOOKAHEAD(3) LambdaExpression() | Choice() )
+    LambdaParameters() <ARROW> ( LOOKAHEAD(3) LambdaExpression() | Ternary() )
 }
 
 /*
@@ -141,18 +141,24 @@ void LambdaExpressionOrInvocation() #LambdaExpression : {}
     <LPAREN>
         LambdaParameters()
         <ARROW>
-        ( LOOKAHEAD(3) LambdaExpression() | Choice() )
+        ( LOOKAHEAD(3) LambdaExpression() | Ternary() )
     <RPAREN>
     ( MethodParameters() )*
 }
 
 /*
- * Choice
- * For Choice markup a ? b : c, then Or
+ * Ternary
+ * For '?:' '? :', then Or
  */
-void Choice() : {}
+void Ternary() : {}
 {
-    Or() (LOOKAHEAD(3) <QUESTIONMARK> Choice() <COLON> Choice() #Choice(3))*
+    Or()
+    (
+    LOOKAHEAD(3)
+        (<QUESTIONMARK><COLON> Ternary() #Elvis(2))
+    |
+        (<QUESTIONMARK> Ternary() <COLON> Ternary() #Choice(3))
+    )*
 }
 
 /*

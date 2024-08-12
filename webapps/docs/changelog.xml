@@ -134,6 +134,10 @@
   </subsection>
   <subsection name="Jasper">
     <changelog>
+      <add>
+        Add support for the new Elvis operator (<code>:?</code>) in Jakarta
+        Expression language. (markt)
+      </add>
       <fix>
         Switch the <code>TldScanner</code> back to logging detailed scan
         results at debug level rather than trace level. (markt)
