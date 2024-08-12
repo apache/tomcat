@@ -28,7 +28,6 @@ import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 import org.apache.el.util.MessageFactory;
 
-
 /**
  * @author Jacob Hookom [jacob@hookom.net]
  */
@@ -47,29 +46,35 @@ public abstract class SimpleNode extends ELSupport implements Node {
 
     protected String image;
 
+
     public SimpleNode(int i) {
         id = i;
     }
+
 
     @Override
     public void jjtOpen() {
         // NOOP by default
     }
 
+
     @Override
     public void jjtClose() {
         // NOOP by default
     }
+
 
     @Override
     public void jjtSetParent(Node n) {
         parent = (SimpleNode) n;
     }
 
+
     @Override
     public Node jjtGetParent() {
         return parent;
     }
+
 
     @Override
     public void jjtAddChild(Node n, int i) {
@@ -83,10 +88,12 @@ public abstract class SimpleNode extends ELSupport implements Node {
         children[i] = (SimpleNode) n;
     }
 
+
     @Override
     public Node jjtGetChild(int i) {
         return children[i];
     }
+
 
     @Override
     public int jjtGetNumChildren() {
@@ -100,47 +107,50 @@ public abstract class SimpleNode extends ELSupport implements Node {
      * otherwise overriding toString() is probably all you need to do.
      */
 
+
     @Override
     public String toString() {
         if (this.image != null) {
-            return ELParserTreeConstants.jjtNodeName[id] + "[" + this.image
-                    + "]";
+            return ELParserTreeConstants.jjtNodeName[id] + "[" + this.image + "]";
         }
         return ELParserTreeConstants.jjtNodeName[id];
     }
+
 
     @Override
     public String getImage() {
         return image;
     }
 
+
     public void setImage(String image) {
         this.image = image;
     }
 
+
     @Override
-    public Class<?> getType(EvaluationContext ctx)
-            throws ELException {
+    public Class<?> getType(EvaluationContext ctx) throws ELException {
         throw new UnsupportedOperationException();
     }
 
+
     @Override
-    public Object getValue(EvaluationContext ctx)
-            throws ELException {
+    public Object getValue(EvaluationContext ctx) throws ELException {
         throw new UnsupportedOperationException();
     }
 
+
     @Override
-    public boolean isReadOnly(EvaluationContext ctx)
-            throws ELException {
+    public boolean isReadOnly(EvaluationContext ctx) throws ELException {
         return true;
     }
 
+
     @Override
-    public void setValue(EvaluationContext ctx, Object value)
-            throws ELException {
+    public void setValue(EvaluationContext ctx, Object value) throws ELException {
         throw new PropertyNotWritableException(MessageFactory.get("error.syntax.set"));
     }
+
 
     @Override
     public void accept(NodeVisitor visitor) throws Exception {
@@ -152,15 +162,15 @@ public abstract class SimpleNode extends ELSupport implements Node {
         }
     }
 
+
     @Override
-    public Object invoke(EvaluationContext ctx, Class<?>[] paramTypes,
-            Object[] paramValues) throws ELException {
+    public Object invoke(EvaluationContext ctx, Class<?>[] paramTypes, Object[] paramValues) throws ELException {
         throw new UnsupportedOperationException();
     }
 
+
     @Override
-    public MethodInfo getMethodInfo(EvaluationContext ctx,
-            Class<?>[] paramTypes) throws ELException {
+    public MethodInfo getMethodInfo(EvaluationContext ctx, Class<?>[] paramTypes) throws ELException {
         throw new UnsupportedOperationException();
     }
 
@@ -174,6 +184,7 @@ public abstract class SimpleNode extends ELSupport implements Node {
         result = prime * result + ((image == null) ? 0 : image.hashCode());
         return result;
     }
+
 
     @Override
     public boolean equals(Object obj) {
@@ -200,6 +211,7 @@ public abstract class SimpleNode extends ELSupport implements Node {
         return true;
     }
 
+
     /**
      * @since EL 2.2
      */
@@ -207,6 +219,7 @@ public abstract class SimpleNode extends ELSupport implements Node {
     public ValueReference getValueReference(EvaluationContext ctx) {
         return null;
     }
+
 
     /**
      * @since EL 2.2

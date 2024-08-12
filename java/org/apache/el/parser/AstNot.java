@@ -21,19 +21,21 @@ import javax.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 
-
 /**
  * @author Jacob Hookom [jacob@hookom.net]
  */
 public final class AstNot extends SimpleNode {
+
     public AstNot(int id) {
         super(id);
     }
+
 
     @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {
         return Boolean.class;
     }
+
 
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {

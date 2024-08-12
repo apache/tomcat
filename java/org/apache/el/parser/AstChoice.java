@@ -21,20 +21,22 @@ import javax.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 
-
 /**
  * @author Jacob Hookom [jacob@hookom.net]
  */
 public final class AstChoice extends SimpleNode {
+
     public AstChoice(int id) {
         super(id);
     }
+
 
     @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {
         Object val = this.getValue(ctx);
         return (val != null) ? val.getClass() : null;
     }
+
 
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {

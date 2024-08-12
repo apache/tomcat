@@ -31,14 +31,15 @@ import org.apache.el.lang.EvaluationContext;
 import org.apache.el.util.MessageFactory;
 import org.apache.el.util.Validation;
 
-
 /**
  * @author Jacob Hookom [jacob@hookom.net]
  */
 public final class AstIdentifier extends SimpleNode {
+
     public AstIdentifier(int id) {
         super(id);
     }
+
 
     @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {
@@ -56,6 +57,7 @@ public final class AstIdentifier extends SimpleNode {
         }
         return result;
     }
+
 
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
@@ -116,6 +118,7 @@ public final class AstIdentifier extends SimpleNode {
         throw new PropertyNotFoundException(MessageFactory.get("error.resolver.unhandled.null", this.image));
     }
 
+
     @Override
     public boolean isReadOnly(EvaluationContext ctx) throws ELException {
         VariableMapper varMapper = ctx.getVariableMapper();
@@ -132,6 +135,7 @@ public final class AstIdentifier extends SimpleNode {
         }
         return result;
     }
+
 
     @Override
     public void setValue(EvaluationContext ctx, Object value) throws ELException {
@@ -150,6 +154,7 @@ public final class AstIdentifier extends SimpleNode {
         }
     }
 
+
     @Override
     public Object invoke(EvaluationContext ctx, Class<?>[] paramTypes, Object[] paramValues) throws ELException {
         return this.getMethodExpression(ctx).invoke(ctx.getELContext(), paramValues);
@@ -160,6 +165,7 @@ public final class AstIdentifier extends SimpleNode {
     public MethodInfo getMethodInfo(EvaluationContext ctx, Class<?>[] paramTypes) throws ELException {
         return this.getMethodExpression(ctx).getMethodInfo(ctx.getELContext());
     }
+
 
     @Override
     public void setImage(String image) {

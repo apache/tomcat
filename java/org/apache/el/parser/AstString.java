@@ -21,16 +21,18 @@ import javax.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 
-
 /**
  * @author Jacob Hookom [jacob@hookom.net]
  */
 public final class AstString extends SimpleNode {
+
     public AstString(int id) {
         super(id);
     }
 
+
     private volatile String string;
+
 
     public String getString() {
         if (this.string == null) {
@@ -39,15 +41,18 @@ public final class AstString extends SimpleNode {
         return this.string;
     }
 
+
     @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {
         return String.class;
     }
 
+
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
         return this.getString();
     }
+
 
     @Override
     public void setImage(String image) {

@@ -25,9 +25,11 @@ import javax.el.ELException;
 import org.apache.el.lang.EvaluationContext;
 
 public class AstListData extends SimpleNode {
+
     public AstListData(int id) {
         super(id);
     }
+
 
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
@@ -41,6 +43,7 @@ public class AstListData extends SimpleNode {
 
         return result;
     }
+
 
     @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {

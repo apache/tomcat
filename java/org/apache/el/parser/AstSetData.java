@@ -30,6 +30,7 @@ public class AstSetData extends SimpleNode {
         super(id);
     }
 
+
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
         Set<Object> result = new HashSet<>();
@@ -42,6 +43,7 @@ public class AstSetData extends SimpleNode {
 
         return result;
     }
+
 
     @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {

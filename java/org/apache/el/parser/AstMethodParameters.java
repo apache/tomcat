@@ -23,9 +23,11 @@ import java.util.List;
 import org.apache.el.lang.EvaluationContext;
 
 public final class AstMethodParameters extends SimpleNode {
+
     public AstMethodParameters(int id) {
         super(id);
     }
+
 
     public Object[] getParameters(EvaluationContext ctx) {
         List<Object> params = new ArrayList<>();
@@ -34,6 +36,7 @@ public final class AstMethodParameters extends SimpleNode {
         }
         return params.toArray(new Object[0]);
     }
+
 
     @Override
     public String toString() {

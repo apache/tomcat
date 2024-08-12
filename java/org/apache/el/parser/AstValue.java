@@ -34,7 +34,6 @@ import org.apache.el.stream.Optional;
 import org.apache.el.util.MessageFactory;
 import org.apache.el.util.ReflectionUtil;
 
-
 /**
  * @author Jacob Hookom [jacob@hookom.net]
  */
@@ -42,15 +41,19 @@ public final class AstValue extends SimpleNode {
 
     private static final Object[] EMPTY_ARRAY = new Object[0];
 
+
     protected static class Target {
+
         protected Object base;
 
         protected Object property;
     }
 
+
     public AstValue(int id) {
         super(id);
     }
+
 
     @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {
@@ -62,6 +65,7 @@ public final class AstValue extends SimpleNode {
         }
         return result;
     }
+
 
     private Target getTarget(EvaluationContext ctx) throws ELException {
         // evaluate expr-a to value-a
@@ -123,6 +127,7 @@ public final class AstValue extends SimpleNode {
         return t;
     }
 
+
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
         Object base = this.children[0].getValue(ctx);
@@ -162,6 +167,7 @@ public final class AstValue extends SimpleNode {
         return base;
     }
 
+
     @Override
     public boolean isReadOnly(EvaluationContext ctx) throws ELException {
         Target t = getTarget(ctx);
@@ -172,6 +178,7 @@ public final class AstValue extends SimpleNode {
         }
         return result;
     }
+
 
     @Override
     public void setValue(EvaluationContext ctx, Object value) throws ELException {
@@ -186,6 +193,7 @@ public final class AstValue extends SimpleNode {
             throw new PropertyNotFoundException(MessageFactory.get("error.resolver.unhandled", t.base, t.property));
         }
     }
+
 
     @Override
     // Interface el.parser.Node uses raw types (and is auto-generated)
@@ -202,6 +210,7 @@ public final class AstValue extends SimpleNode {
         Method m = ReflectionUtil.getMethod(ctx, t.base, t.property, types, null);
         return new MethodInfo(m.getName(), m.getReturnType(), m.getParameterTypes());
     }
+
 
     @Override
     // Interface el.parser.Node uses a raw type (and is auto-generated)
@@ -241,6 +250,7 @@ public final class AstValue extends SimpleNode {
         }
         return result;
     }
+
 
     private Object[] convertArgs(EvaluationContext ctx, Object[] src, Method m) {
         Class<?>[] types = m.getParameterTypes();
@@ -294,6 +304,7 @@ public final class AstValue extends SimpleNode {
 
         return dest;
     }
+
 
     private Class<?>[] getTypesFromValues(Object[] values) {
         if (values == null) {

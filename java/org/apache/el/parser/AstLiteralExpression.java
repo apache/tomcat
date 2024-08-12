@@ -21,24 +21,27 @@ import javax.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 
-
 /**
  * @author Jacob Hookom [jacob@hookom.net]
  */
 public final class AstLiteralExpression extends SimpleNode {
+
     public AstLiteralExpression(int id) {
         super(id);
     }
+
 
     @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {
         return String.class;
     }
 
+
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
         return this.image;
     }
+
 
     @Override
     public void setImage(String image) {
