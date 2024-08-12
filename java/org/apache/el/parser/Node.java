@@ -25,7 +25,6 @@ import jakarta.el.ValueReference;
 
 import org.apache.el.lang.EvaluationContext;
 
-
 /* All AST nodes must implement this interface.  It provides basic
    machinery for constructing the parent and child relationships
    between nodes. */
@@ -36,54 +35,76 @@ import org.apache.el.lang.EvaluationContext;
 @SuppressWarnings("all") // Ignore warnings in generated code
 public interface Node {
 
-  /** This method is called after the node has been made the current
+    /** This method is called after the node has been made the current
     node.  It indicates that child nodes can now be added to it. */
-  void jjtOpen();
+    void jjtOpen();
 
-  /** This method is called after all the child nodes have been
+
+    /** This method is called after all the child nodes have been
     added. */
-  void jjtClose();
+    void jjtClose();
 
-  /** This pair of methods are used to inform the node of its
+
+    /** This pair of methods are used to inform the node of its
     parent. */
-  void jjtSetParent(Node n);
-  Node jjtGetParent();
+    void jjtSetParent(Node n);
 
-  /** This method tells the node to add its argument to the node's
+
+    Node jjtGetParent();
+
+
+    /** This method tells the node to add its argument to the node's
     list of children.  */
-  void jjtAddChild(Node n, int i);
+    void jjtAddChild(Node n, int i);
 
-  /** This method returns a child node.  The children are numbered
+
+    /** This method returns a child node.  The children are numbered
      from zero, left to right. */
-  Node jjtGetChild(int i);
+    Node jjtGetChild(int i);
 
-  /** Return the number of children the node has. */
-  int jjtGetNumChildren();
 
-  String getImage();
+    /** Return the number of children the node has. */
+    int jjtGetNumChildren();
 
-  Object getValue(EvaluationContext ctx) throws ELException;
-  void setValue(EvaluationContext ctx, Object value) throws ELException;
-  Class<?> getType(EvaluationContext ctx) throws ELException;
-  boolean isReadOnly(EvaluationContext ctx) throws ELException;
-  void accept(NodeVisitor visitor) throws Exception;
-  MethodInfo getMethodInfo(EvaluationContext ctx, Class<?>[] paramTypes)
-          throws ELException;
-  Object invoke(EvaluationContext ctx, Class<?>[] paramTypes,
-          Object[] paramValues) throws ELException;
 
-  /**
-   * @since EL 2.2
-   */
-  ValueReference getValueReference(EvaluationContext ctx);
+    String getImage();
 
-  /**
-   * @since EL 2.2
-   */
-  boolean isParametersProvided();
 
-  /**
-   * @since EL 5.0
-   */
-  MethodReference getMethodReference(EvaluationContext ctx);
+    Object getValue(EvaluationContext ctx) throws ELException;
+
+
+    void setValue(EvaluationContext ctx, Object value) throws ELException;
+
+
+    Class<?> getType(EvaluationContext ctx) throws ELException;
+
+
+    boolean isReadOnly(EvaluationContext ctx) throws ELException;
+
+
+    void accept(NodeVisitor visitor) throws Exception;
+
+
+    MethodInfo getMethodInfo(EvaluationContext ctx, Class<?>[] paramTypes) throws ELException;
+
+
+    Object invoke(EvaluationContext ctx, Class<?>[] paramTypes, Object[] paramValues) throws ELException;
+
+
+    /**
+     * @since EL 2.2
+     */
+    ValueReference getValueReference(EvaluationContext ctx);
+
+
+    /**
+     * @since EL 2.2
+     */
+    boolean isParametersProvided();
+
+
+    /**
+     * @since EL 5.0
+     */
+    MethodReference getMethodReference(EvaluationContext ctx);
 }

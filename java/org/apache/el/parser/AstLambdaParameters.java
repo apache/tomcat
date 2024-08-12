@@ -23,6 +23,7 @@ public class AstLambdaParameters extends SimpleNode {
         super(id);
     }
 
+
     @Override
     public String toString() {
         // Purely for debug purposes. May not be complete or correct. Certainly
@@ -38,6 +39,5 @@ public class AstLambdaParameters extends SimpleNode {
         result.append(")->");
         return result.toString();
     }
-
 }
 /* JavaCC - OriginalChecksum=a8c1609257dac59e41c43d6ed91072c6 (do not edit this line) */

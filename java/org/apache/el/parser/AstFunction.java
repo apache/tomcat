@@ -31,7 +31,6 @@ import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 import org.apache.el.util.MessageFactory;
 
-
 /**
  * @author Jacob Hookom [jacob@hookom.net]
  */
@@ -41,13 +40,16 @@ public final class AstFunction extends SimpleNode {
 
     protected String prefix = "";
 
+
     public AstFunction(int id) {
         super(id);
     }
 
+
     public String getLocalName() {
         return localName;
     }
+
 
     public String getOutputName() {
         if (this.prefix == null) {
@@ -57,9 +59,11 @@ public final class AstFunction extends SimpleNode {
         }
     }
 
+
     public String getPrefix() {
         return prefix;
     }
+
 
     @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {
@@ -76,6 +80,7 @@ public final class AstFunction extends SimpleNode {
         }
         return m.getReturnType();
     }
+
 
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
@@ -213,6 +218,7 @@ public final class AstFunction extends SimpleNode {
     public void setLocalName(String localName) {
         this.localName = localName;
     }
+
 
     public void setPrefix(String prefix) {
         this.prefix = prefix;

@@ -23,16 +23,18 @@ import jakarta.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 
-
 /**
  * @author Jacob Hookom [jacob@hookom.net]
  */
 public final class AstFloatingPoint extends SimpleNode {
+
     public AstFloatingPoint(int id) {
         super(id);
     }
 
+
     private volatile Number number;
+
 
     public Number getFloatingPoint() {
         // The parser should ensure the format of the string to be parsed.
@@ -53,10 +55,12 @@ public final class AstFloatingPoint extends SimpleNode {
         return this.number;
     }
 
+
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
         return this.getFloatingPoint();
     }
+
 
     @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {

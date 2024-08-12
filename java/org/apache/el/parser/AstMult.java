@@ -22,14 +22,15 @@ import jakarta.el.ELException;
 import org.apache.el.lang.ELArithmetic;
 import org.apache.el.lang.EvaluationContext;
 
-
 /**
  * @author Jacob Hookom [jacob@hookom.net]
  */
 public final class AstMult extends ArithmeticNode {
+
     public AstMult(int id) {
         super(id);
     }
+
 
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {

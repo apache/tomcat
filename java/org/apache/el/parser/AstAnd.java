@@ -22,14 +22,15 @@ import jakarta.el.ELException;
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 
-
 /**
  * @author Jacob Hookom [jacob@hookom.net]
  */
 public final class AstAnd extends BooleanNode {
+
     public AstAnd(int id) {
         super(id);
     }
+
 
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {

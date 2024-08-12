@@ -29,6 +29,7 @@ public abstract class ArithmeticNode extends SimpleNode {
         super(i);
     }
 
+
     @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {
         return Number.class;

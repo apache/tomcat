@@ -22,7 +22,6 @@ import jakarta.el.ELException;
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 
-
 /**
  * @author Jacob Hookom [jacob@hookom.net]
  */
@@ -32,10 +31,12 @@ public final class AstCompositeExpression extends SimpleNode {
         super(id);
     }
 
+
     @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {
         return String.class;
     }
+
 
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
