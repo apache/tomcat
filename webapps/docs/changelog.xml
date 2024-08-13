@@ -890,7 +890,7 @@
         Make asynchronous error handling more robust. Ensure that once the call
         to <code>AsyncListener.onError()</code> has returned to the container,
         only container threads can access the <code>AsyncContext</code>. This
-        protects against various race conditions that woudl otherwise occur if
+        protects against various race conditions that would otherwise occur if
         application threads continued to access the <code>AsyncContext</code>.
       </fix>
       <fix>
