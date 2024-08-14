@@ -105,6 +105,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.29 (schultz)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Correct a regression in the fix for non-blocking reads of chunked
+        request bodies that caused <code>InputStream.available()</code> to
+        return a non-zero value when there was no data to read. In some
+        circumstances this could cause a blocking read to block waiting for more
+        data rather than return the data it had already received. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
