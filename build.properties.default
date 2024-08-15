@@ -29,11 +29,11 @@
 # -----------------------------------------------------------------------------
 
 # ----- Version Control Flags -----
-version.major=11
+version.major=12
 version.minor=0
 version.build=0
 version.patch=0
-version.suffix=-M25
+version.suffix=-M1
 version.dev=-dev
 
 # ----- Build tools -----
