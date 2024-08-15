@@ -22,6 +22,3 @@ Notes of things to consider for the next major Tomcat release (11.x)
     https://stackoverflow.com/questions/5161504/ocsp-revocation-on-client-certificate
 
  2. Add QUIC support using OpenSSL and FFM.
-
- 3. Implement an optional Loom module that provides
-    o.a.c.http11.Http11BioLoomProtocol
