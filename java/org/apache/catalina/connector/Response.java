@@ -1037,6 +1037,7 @@ public class Response implements HttpServletResponse {
     }
 
 
+    @Override
     public void sendEarlyHints() {
         if (isCommitted()) {
             return;

@@ -113,6 +113,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add support for the new Servlet API method
+        <code>HttpServletResponse.sendEarlyHints()</code>. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>

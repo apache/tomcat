@@ -140,6 +140,17 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
 
 
     /**
+     * The default behavior of this method is to call sendEarlyHints() on the wrapped response object.
+     *
+     * @since Servlet 6.2
+     */
+    @Override
+    public void sendEarlyHints() {
+        this._getHttpServletResponse().sendEarlyHints();
+    }
+
+
+    /**
      * The default behavior of this method is to call setDateHeader(String name, long date) on the wrapped response
      * object.
      */

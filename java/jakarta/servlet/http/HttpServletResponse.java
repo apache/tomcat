@@ -213,6 +213,17 @@ public interface HttpServletResponse extends ServletResponse {
     void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException;
 
     /**
+     * Sends a 103 response to the client using the current response headers. This method does not commit the response and
+     * may be called multiple times before the response is committed. The current response headers may include some headers
+     * that have been added automatcially by the container.
+     * <p>
+     * This method has no effect if called after the response has been committed.
+     *
+     * @since Servlet 6.2
+     */
+    void sendEarlyHints();
+
+    /**
      * Sets a response header with the given name and date-value. The date is specified in terms of milliseconds since
      * the epoch. If the header had already been set, the new value overwrites the previous one. The
      * <code>containsHeader</code> method can be used to test for the presence of a header before setting its value.
@@ -385,6 +396,14 @@ public interface HttpServletResponse extends ServletResponse {
      * Status code (101) indicating the server is switching protocols according to Upgrade header.
      */
     int SC_SWITCHING_PROTOCOLS = 101;
+
+    /**
+     * Status code (103) indicating that the server is likely to send a final response containing the headers present in
+     * this informational response.
+     *
+     * @since Servlet 6.2
+     */
+    int SC_EARLY_HINTS = 103;
 
     /**
      * Status code (200) indicating the request succeeded normally.
