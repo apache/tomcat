@@ -57,18 +57,18 @@
   <property name="md5sum.binary-prefix"  value=" *" />
 
   <!-- Exact spec versions (for the manifests etc.) -->
-  <property name="servlet.spec.version"    value="6.1" />
-  <property name="servlet.revision"        value="" />
-  <property name="jsp.spec.version"        value="4.0" />
-  <property name="jsp.revision"            value="" />
-  <property name="el.spec.version"         value="6.0" />
-  <property name="el.revision"             value="" />
-  <property name="websocket.spec.version"  value="2.2" />
-  <property name="websocket.revision"      value="" />
-  <property name="jaspic.spec.version"     value="3.1" />
-  <property name="jaspic.revision"         value="" />
-  <property name="annotation.spec.version" value="3.0" />
-  <property name="annotation.revision"     value="" />
+  <property name="servlet.spec.version"    value="6.2" />
+  <property name="servlet.revision"        value="DRAFT" />
+  <property name="jsp.spec.version"        value="4.1" />
+  <property name="jsp.revision"            value="DRAFT" />
+  <property name="el.spec.version"         value="6.1" />
+  <property name="el.revision"             value="DRAFT" />
+  <property name="websocket.spec.version"  value="2.3" />
+  <property name="websocket.revision"      value="DRAFT" />
+  <property name="jaspic.spec.version"     value="3.2" />
+  <property name="jaspic.revision"         value="DRAFT" />
+  <property name="annotation.spec.version" value="3.1" />
+  <property name="annotation.revision"     value="DRAFT" />
 
   <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
