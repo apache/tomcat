@@ -18,7 +18,7 @@
 <project name="Apache Tomcat Documentation"
         href="https://tomcat.apache.org/">
 
-    <title>Apache Tomcat 11</title>
+    <title>Apache Tomcat 12</title>
 
     <logo href="/images/tomcat.gif">
       The Apache Tomcat Servlet/JSP Container

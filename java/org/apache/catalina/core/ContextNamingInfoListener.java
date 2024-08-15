@@ -40,7 +40,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <li>Display Name: {@code context/displayName} from {@link Context#getDisplayName()}</li>
  * </ul>
  * <p>
- * See the <a href="https://tomcat.apache.org/tomcat-11.0-doc/config/context.html#Naming">Tomcat documentation</a> for
+ * See the <a href="https://tomcat.apache.org/tomcat-12.0-doc/config/context.html#Naming">Tomcat documentation</a> for
  * more details on the values.
  */
 public class ContextNamingInfoListener implements LifecycleListener {

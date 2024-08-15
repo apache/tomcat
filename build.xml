@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 11.0" default="deploy" basedir="."
+<project name="Tomcat 12.0" default="deploy" basedir="."
   xmlns:if="ant:if"
   xmlns:unless="ant:unless"
   xmlns:jacoco="antlib:org.jacoco.ant"
@@ -2124,7 +2124,7 @@
       <executiondata>
         <file file="${coverage.datafile}"/>
       </executiondata>
-      <structure name="Tomcat 11.0.x Code Coverage">
+      <structure name="Tomcat 12.0.x Code Coverage">
         <classfiles>
           <fileset dir="${tomcat.classes}"/>
         </classfiles>
@@ -4145,7 +4145,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
         <or>
           <available file="${tomcat.release.verify}/@{basefile}.sha512" />
           <and>
-            <contains string="${version}" substring="11.0." /><!-- Super hack -->
+            <contains string="${version}" substring="12.0." /><!-- Super hack -->
             <contains string="@{basefile}" substring="x86" />
           </and>
         </or>
@@ -4240,7 +4240,7 @@ reproducible-10=${reproducible-10}
         <isset property="reproducible-4" />
         <or>
           <isset property="reproducible-5" />
-          <contains string="${version}" substring="11.0." /><!-- Super hack, Tomcat 11 does not produce x86 binaries. -->
+          <contains string="${version}" substring="12.0." /><!-- Super hack, Tomcat 12 does not produce x86 binaries. -->
         </or>
         <isset property="reproducible-6" />
         <isset property="reproducible-7" />

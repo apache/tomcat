@@ -50,7 +50,7 @@ public class JreCompat {
         }
         graalAvailable = result || System.getProperty("org.graalvm.nativeimage.imagecode") != null;
 
-        // This is Tomcat 11.0.x with a minimum Java version of Java 17.
+        // This is Tomcat 12.0.x with a minimum Java version of Java 17.
         // Look for the highest supported JVM first
         if (Jre22Compat.isSupported()) {
             instance = new Jre22Compat();

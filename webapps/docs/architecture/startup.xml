@@ -46,7 +46,7 @@ different ways to start tomcat, including:
 <p>
 A <a href="startup/serverStartup.txt">text description</a> of the startup
 procedure created for Tomcat 5. The updated version of this description for
-Tomcat 11 will be included in the updated diagrams and diagram descriptions in
+Tomcat 12 will be included in the updated diagrams and diagram descriptions in
 the following section. This text file will be removed when that update is
 complete.
 </p>
@@ -56,7 +56,7 @@ complete.
 <p>
 The <a href="startup/serverStartup.pdf">UML sequence diagram</a> of the startup
 procedure created for Tomcat 5 is gradually being replaced with updated diagrams
-based on Tomcat 11. The scope of these diagrams may be adjusted as they are
+based on Tomcat 12. The scope of these diagrams may be adjusted as they are
 produced.
 </p>
 <p>

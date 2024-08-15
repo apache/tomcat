@@ -34,9 +34,9 @@
   <xsl:param    name="subdir"              select="''"/>
   <xsl:param    name="relative-path"       select="'.'"/>
   <!-- Keep versions in sync with build.xml -->
-  <xsl:param    name="version"             select="'11.0.x'"/>
-  <xsl:param    name="majorversion"        select="'11'"/>
-  <xsl:param    name="majorminorversion"   select="'11.0'"/>
+  <xsl:param    name="version"             select="'12.0.x'"/>
+  <xsl:param    name="majorversion"        select="'12'"/>
+  <xsl:param    name="majorminorversion"   select="'12.0'"/>
   <xsl:param    name="minjavaversion"      select="'17'"/>
   <xsl:param    name="buildjavaversion"    select="'22'"/>
   <xsl:param    name="antversionrequired"  select="'1.10.2'"/>
@@ -46,9 +46,9 @@
   <xsl:param    name="buglink"             select="'https://bz.apache.org/bugzilla/show_bug.cgi?id='"/>
   <xsl:param    name="prlink"              select="'https://github.com/apache/tomcat/pull/'"/>
   <xsl:param    name="revlink"             select="'https://svn.apache.org/viewvc?view=rev&amp;rev='"/>
-  <xsl:param    name="doclink"             select="'https://tomcat.apache.org/tomcat-11.0-doc'"/>
-  <xsl:param    name="sylink"              select="'https://tomcat.apache.org/security-11.html'"/>
-  <xsl:param    name="dllink"              select="'https://tomcat.apache.org/download-11.cgi'"/>
+  <xsl:param    name="doclink"             select="'https://tomcat.apache.org/tomcat-12.0-doc'"/>
+  <xsl:param    name="sylink"              select="'https://tomcat.apache.org/security-12.html'"/>
+  <xsl:param    name="dllink"              select="'https://tomcat.apache.org/download-12.cgi'"/>
   <xsl:param    name="sitedir"             select="''"/>
   <xsl:param    name="filename"            select="'-'"/>
 

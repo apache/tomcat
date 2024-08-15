@@ -86,8 +86,8 @@ do let us know.</p>
     <ul>
       <li>
         <strong>CATALINA_HOME</strong>: Represents the root of your Tomcat
-        installation, for example <code>/home/tomcat/apache-tomcat-11.0.0</code>
-        or <code>C:\Program Files\apache-tomcat-11.0.0</code>.
+        installation, for example <code>/home/tomcat/apache-tomcat-12.0.0</code>
+        or <code>C:\Program Files\apache-tomcat-12.0.0</code>.
       </li>
       <li>
         <strong>CATALINA_BASE</strong>: Represents the root of a runtime

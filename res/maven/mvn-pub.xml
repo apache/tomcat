@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 11.0 Maven Deployment" default="" basedir="."
+<project name="Tomcat 12.0 Maven Deployment" default="" basedir="."
          xmlns:resolver="antlib:org.apache.maven.resolver.ant"
          xmlns:if="ant:if"
          xmlns:unless="ant:unless">
