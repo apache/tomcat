@@ -82,7 +82,7 @@ can download the sources from the "Source Code Distributions" section of the
 Download Page. There is one such page for every major Tomcat version:
 
 - [Tomcat 11](https://tomcat.apache.org/download-11.cgi)
-- [Tomcat 11](https://tomcat.apache.org/download-10.cgi)
+- [Tomcat 10](https://tomcat.apache.org/download-10.cgi)
 - [Tomcat 9](https://tomcat.apache.org/download-90.cgi)
 
 ##### Manual Patch Generation
