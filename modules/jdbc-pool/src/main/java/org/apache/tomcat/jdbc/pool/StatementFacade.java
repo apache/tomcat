@@ -119,21 +119,24 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
 
             Object result;
             try {
-                if (compare(GET_RESULTSET, method)) {
-                    return getConstructor(RESULTSET_IDX, ResultSet.class)
-                            .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
-                }
-                if (compare(GET_GENERATED_KEYS, method)) {
-                    return getConstructor(RESULTSET_IDX, ResultSet.class)
-                            .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
-                }
-                if (compare(EXECUTE_QUERY, method)) {
-                    return getConstructor(RESULTSET_IDX, ResultSet.class)
-                            .newInstance(new ResultSetProxy(method.invoke(delegate, args), proxy));
-                }
-
                 // invoke next
                 result = method.invoke(delegate, args);
+
+                // Don't create a ResultSet proxy for null
+                if (result != null) {
+                    if (compare(GET_RESULTSET, method)) {
+                        return getConstructor(RESULTSET_IDX, ResultSet.class)
+                                .newInstance(new ResultSetProxy(result, proxy));
+                    }
+                    if (compare(GET_GENERATED_KEYS, method)) {
+                        return getConstructor(RESULTSET_IDX, ResultSet.class)
+                                .newInstance(new ResultSetProxy(result, proxy));
+                    }
+                    if (compare(EXECUTE_QUERY, method)) {
+                        return getConstructor(RESULTSET_IDX, ResultSet.class)
+                                .newInstance(new ResultSetProxy(result, proxy));
+                    }
+                }
             } catch (Throwable t) {
                 if (t instanceof InvocationTargetException && t.getCause() != null) {
                     throw t.getCause();
