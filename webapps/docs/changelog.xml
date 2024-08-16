@@ -160,6 +160,12 @@
         the application seeing the original <code>SQLException</code>. Fixed
         by pull request <pr>744</pr> provided by Michael Clarke. (markt)
       </fix>
+      <fix>
+        <bug>69279</bug>: Correct a regression in the fix for <bug>69206</bug>
+        that meant that methods that previously returned a <code>null</code>
+        <code>ResultSet</code> were returning a proxy with a null delegate.
+        Fixed by pull request <pr>745</pr> provided by Huub de Beer. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
