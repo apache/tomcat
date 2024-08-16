@@ -46,7 +46,7 @@
 
   - files used simply to ensure directories are not empty
 
-  - *.bmp, *.dia files are binary
+  - *.bmp, *.dia and *.vpd files are binary
     (*.gif, *.jpg are also binary, but are automatically detected by RAT as
     ones, so no explicit configuration is needed)
 
@@ -100,6 +100,7 @@ output/dist/src/test/webapp/bug53257/*.txt
 output/dist/src/test/webapp/bug53257/foo bar/foobar.txt
 output/dist/src/test/webapp/bug66609/a&a.txt
 output/dist/src/test/webapp/bug66609/b'b.txt
+output/dist/src/test/webapp/jsp/ok.html
 output/dist/src/test/webapp-fragments/WEB-INF/classes/*.txt
 output/dist/src/test/webresources/dir1/d1/d1-f1.txt
 output/dist/src/test/webresources/dir1/d2/d2-f1.txt
@@ -118,6 +119,7 @@ test/webapp/bug53257/*.txt
 test/webapp/bug53257/foo bar/foobar.txt
 test/webapp/bug66609/a&a.txt
 test/webapp/bug66609/b'b.txt
+test/webapp/jsp/ok.html
 test/webapp-fragments/WEB-INF/classes/*.txt
 test/webresources/dir1/d1/d1-f1.txt
 test/webresources/dir1/d2/d2-f1.txt
@@ -205,6 +207,7 @@ output/dist/temp/safeToDelete.tmp
 
 **/*.bmp
 **/*.dia
+**/*.vpd
 
 **/*.md
 
