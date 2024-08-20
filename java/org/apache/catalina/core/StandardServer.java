@@ -143,13 +143,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     private Service[] services = new Service[0];
 
-    private final Lock servicesReadLock;
-    private final Lock servicesWriteLock;
-    {
-        ReentrantReadWriteLock servicesLock = new ReentrantReadWriteLock();
-        servicesReadLock = servicesLock.readLock();
-        servicesWriteLock = servicesLock.writeLock();
-    }
+    private final ReentrantReadWriteLock servicesLock = new ReentrantReadWriteLock();
+    private final Lock servicesReadLock = servicesLock.readLock();
+    private final Lock servicesWriteLock = servicesLock.writeLock();
 
     /**
      * The shutdown command string we are looking for.
