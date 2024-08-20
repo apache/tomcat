@@ -1456,15 +1456,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             // If the file name is used, then don't parse the trailing arguments
             argIndex = args.length;
 
-            try {
-                BufferedReader br;
-                // Special case, allow for - filename to refer to stdin
-                if (passwordFile.equals("-")) {
-                    br = new BufferedReader(new InputStreamReader(System.in));
-                } else {
-                    br = new BufferedReader(new FileReader(passwordFile));
-                }
-
+            // Special case, allow for - filename to refer to stdin
+            try (BufferedReader br = passwordFile.equals("-") ? new BufferedReader(new InputStreamReader(System.in))
+                    : new BufferedReader(new FileReader(passwordFile))) {
                 String line;
                 while ((line = br.readLine()) != null) {
                     // Mutate each line in the file, or stdin
