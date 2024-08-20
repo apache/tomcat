@@ -102,7 +102,7 @@ public class Cookie {
      */
     @Deprecated
     public static void parseCookie(byte[] bytes, int offset, int len, ServerCookies serverCookies) {
-        parseCookie(bytes, offset, len, serverCookies, NoEqualsCookie.IGNORE);
+        parseCookie(bytes, offset, len, serverCookies, NoEqualsCookie.NAME);
     }
 
 
