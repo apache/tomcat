@@ -121,6 +121,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Change the default value of the <code>noEqualsCookie</code> attribute of
+        the <code>Rfc6265CookieProcessor</code> from <code>name</code> to
+        <code>ignore</code>. (markt)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <add>
