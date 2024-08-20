@@ -168,7 +168,7 @@ public class TestCookies {
     }
 
     @Test
-    public void testEmptyPairsRfc6265CookieNoEqualsName() {
+    public void testEmptyPairsRfc6265NoEqualsCookieName() {
         test(true, "foo;a=b; ;bar", NAME, FOO_EMPTY, A, BAR_EMPTY);
         test(true, "foo;a=b;;bar", NAME, FOO_EMPTY, A, BAR_EMPTY);
         test(true, "foo;a=b; ;;bar=rab", NAME, FOO_EMPTY, A, BAR);
@@ -179,7 +179,7 @@ public class TestCookies {
 
 
     @Test
-    public void testEmptyPairsRfc6265CookieNoEqualsIgnore() {
+    public void testEmptyPairsRfc6265NoEqualsCookieIgnore() {
         test(true, "foo;a=b; ;bar", IGNORE, A);
         test(true, "foo;a=b;;bar", IGNORE, A);
         test(true, "foo;a=b; ;;bar=rab", IGNORE, A, BAR);
@@ -190,7 +190,7 @@ public class TestCookies {
 
 
     @Test
-    public void testEmptyPairsRfc6265CookieNoEqualsDefault() {
+    public void testEmptyPairsRfc6265NoEqualsCookieDefault() {
         test(true, "foo;a=b; ;bar", FOO_EMPTY, A, BAR_EMPTY);
         test(true, "foo;a=b;;bar", FOO_EMPTY, A, BAR_EMPTY);
         test(true, "foo;a=b; ;;bar=rab", FOO_EMPTY, A, BAR);
@@ -573,15 +573,15 @@ public class TestCookies {
     }
 
 
-    private void test(boolean useRfc6265, String header, String cookieNoEquals, Cookie... expected) {
+    private void test(boolean useRfc6265, String header, String noEqualsCookie, Cookie... expected) {
         MimeHeaders mimeHeaders = new MimeHeaders();
         ServerCookies serverCookies = new ServerCookies(4);
         CookieProcessor cookieProcessor;
 
         if (useRfc6265) {
             cookieProcessor = new Rfc6265CookieProcessor();
-            if (cookieNoEquals != null) {
-                ((Rfc6265CookieProcessor) cookieProcessor).setNoEqualsCookie(cookieNoEquals);
+            if (noEqualsCookie != null) {
+                ((Rfc6265CookieProcessor) cookieProcessor).setNoEqualsCookie(noEqualsCookie);
             }
         } else {
             cookieProcessor = new LegacyCookieProcessor();

@@ -152,10 +152,10 @@ public class TestCookieParsing extends TomcatBaseTest {
     }
 
 
-    private void doTestRfc6265NoEquals(String cookieNoEquals, String expected) throws Exception {
+    private void doTestRfc6265NoEquals(String noEqualsCookie, String expected) throws Exception {
         Rfc6265CookieProcessor cookieProcessor = new Rfc6265CookieProcessor();
-        if (cookieNoEquals != null) {
-            cookieProcessor.setNoEqualsCookie(cookieNoEquals);
+        if (noEqualsCookie != null) {
+            cookieProcessor.setNoEqualsCookie(noEqualsCookie);
         }
         TestCookieParsingClient client = new TestCookieParsingClient(cookieProcessor, COOKIES_WITH_NAME_OR_VALUE_ONLY,
                 expected);
