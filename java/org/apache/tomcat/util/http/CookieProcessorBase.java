@@ -42,6 +42,23 @@ public abstract class CookieProcessorBase implements CookieProcessor {
 
     private boolean partitioned = false;
 
+    private NoEqualsCookie noEqualsCookie = NoEqualsCookie.NAME;
+
+
+    public String getNoEqualsCookie() {
+        return noEqualsCookie.getValue();
+    }
+
+
+    protected NoEqualsCookie getNoEqualsCookieInternal() {
+        return noEqualsCookie;
+    }
+
+
+    public void setNoEqualsCookie(String noEqualsCookie) {
+        this.noEqualsCookie = NoEqualsCookie.fromString(noEqualsCookie);
+    }
+
 
     public SameSiteCookies getSameSiteCookies() {
         return sameSiteCookies;

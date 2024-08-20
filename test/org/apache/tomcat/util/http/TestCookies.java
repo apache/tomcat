@@ -26,6 +26,9 @@ import org.junit.Test;
 import org.apache.tomcat.util.buf.MessageBytes;
 
 public class TestCookies {
+    private static final String NAME = "NAME";
+    private static final String IGNORE = "IGNORE";
+
     private final Cookie FOO = new Cookie("foo", "bar");
     private final Cookie FOO_EMPTY = new Cookie("foo", "");
     private final Cookie FOO_CONTROL = new Cookie("foo", "b\u00e1r");
@@ -54,8 +57,53 @@ public class TestCookies {
         test("foo=bar;a=b; ;", FOO, A);
     }
 
+
     @Test
-    public void testNameOnlyAreDroppedRfc6265() {
+    public void testNameOnlyAreDroppedRfc6265NoEqualsName() {
+        // Name only cookies are not dropped in RFC6265
+        test("foo=;a=b; ;", NAME, FOO_EMPTY, A);
+        test("foo;a=b; ;", NAME,  FOO_EMPTY, A);
+        test("foo;a=b;bar", NAME,  FOO_EMPTY, A, BAR_EMPTY);
+        test("foo;a=b;bar;", NAME,  FOO_EMPTY, A, BAR_EMPTY);
+        test("foo;a=b;bar ", NAME,  FOO_EMPTY, A, BAR_EMPTY);
+        test("foo;a=b;bar ;", NAME,  FOO_EMPTY, A, BAR_EMPTY);
+
+        // Bug 49000
+        Cookie fred = new Cookie("fred", "1");
+        Cookie jim = new Cookie("jim", "2");
+        Cookie bobEmpty = new Cookie("bob", "");
+        Cookie george = new Cookie("george", "3");
+        test("fred=1; jim=2; bob", NAME,  fred, jim, bobEmpty);
+        test("fred=1; jim=2; bob; george=3", NAME,  fred, jim, bobEmpty, george);
+        test("fred=1; jim=2; bob=; george=3", NAME,  fred, jim, bobEmpty, george);
+        test("fred=1; jim=2; bob=", NAME,  fred, jim, bobEmpty);
+    }
+
+
+    @Test
+    public void testNameOnlyAreDroppedRfc6265NoEqualsIgnore() {
+        // Name only cookies are not dropped in RFC6265
+        test("foo=;a=b; ;", IGNORE, FOO_EMPTY, A);
+        test("foo;a=b; ;", IGNORE, A);
+        test("foo;a=b;bar", IGNORE, A);
+        test("foo;a=b;bar;", IGNORE, A);
+        test("foo;a=b;bar ", IGNORE, A);
+        test("foo;a=b;bar ;", IGNORE, A);
+
+        // Bug 49000
+        Cookie fred = new Cookie("fred", "1");
+        Cookie jim = new Cookie("jim", "2");
+        Cookie bobEmpty = new Cookie("bob", "");
+        Cookie george = new Cookie("george", "3");
+        test("fred=1; jim=2; bob", IGNORE, fred, jim);
+        test("fred=1; jim=2; bob; george=3", IGNORE, fred, jim, george);
+        test("fred=1; jim=2; bob=; george=3", IGNORE, fred, jim, bobEmpty, george);
+        test("fred=1; jim=2; bob=", IGNORE, fred, jim, bobEmpty);
+    }
+
+
+    @Test
+    public void testNameOnlyAreDroppedRfc6265NoEqualsDefault() {
         // Name only cookies are not dropped in RFC6265
         test("foo=;a=b; ;", FOO_EMPTY, A);
         test("foo;a=b; ;", FOO_EMPTY, A);
@@ -75,6 +123,7 @@ public class TestCookies {
         test("fred=1; jim=2; bob=", fred, jim, bobEmpty);
     }
 
+
     @Test
     public void testQuotedValueRfc6265() {
         test("foo=bar;a=\"b\"", FOO, A_QUOTED);
@@ -87,7 +136,29 @@ public class TestCookies {
     }
 
     @Test
-    public void testEmptyPairsRfc6265() {
+    public void testEmptyPairsRfc6265CookieNoEqualsName() {
+        test("foo;a=b; ;bar", NAME, FOO_EMPTY, A, BAR_EMPTY);
+        test("foo;a=b;;bar", NAME, FOO_EMPTY, A, BAR_EMPTY);
+        test("foo;a=b; ;;bar=rab", NAME, FOO_EMPTY, A, BAR);
+        test("foo;a=b;; ;bar=rab", NAME, FOO_EMPTY, A, BAR);
+        test("foo;a=b;;#;bar=rab", NAME, FOO_EMPTY, A, HASH_EMPTY, BAR);
+        test("foo;a=b;;\\;bar=rab", NAME, FOO_EMPTY, A, BAR);
+    }
+
+
+    @Test
+    public void testEmptyPairsRfc6265CookieNoEqualsIgnore() {
+        test("foo;a=b; ;bar", IGNORE, A);
+        test("foo;a=b;;bar", IGNORE, A);
+        test("foo;a=b; ;;bar=rab", IGNORE, A, BAR);
+        test("foo;a=b;; ;bar=rab", IGNORE, A, BAR);
+        test("foo;a=b;;#;bar=rab", IGNORE, A, BAR);
+        test("foo;a=b;;\\;bar=rab", IGNORE,A, BAR);
+    }
+
+
+    @Test
+    public void testEmptyPairsRfc6265CookieNoEqualsDefault() {
         test("foo;a=b; ;bar", FOO_EMPTY, A, BAR_EMPTY);
         test("foo;a=b;;bar", FOO_EMPTY, A, BAR_EMPTY);
         test("foo;a=b; ;;bar=rab", FOO_EMPTY, A, BAR);
@@ -95,6 +166,7 @@ public class TestCookies {
         test("foo;a=b;;#;bar=rab", FOO_EMPTY, A, HASH_EMPTY, BAR);
         test("foo;a=b;;\\;bar=rab", FOO_EMPTY, A, BAR);
     }
+
 
     @Test
     public void testSeparatorsInValueRfc6265() {
@@ -112,6 +184,12 @@ public class TestCookies {
     public void v1NameOnlyRfc6265() {
         test("$Version=1;foo=;a=b; ; ", $VERSION_1, FOO_EMPTY, A);
         test("$Version=1;foo= ;a=b; ; ", $VERSION_1, FOO_EMPTY, A);
+
+        // Name
+        test("$Version=1;foo;a=b; ; ", NAME, $VERSION_1, FOO_EMPTY, A);
+        // Ignore
+        test("$Version=1;foo;a=b; ; ", IGNORE, $VERSION_1, A);
+        // Default
         test("$Version=1;foo;a=b; ; ", $VERSION_1, FOO_EMPTY, A);
     }
 
@@ -287,9 +365,18 @@ public class TestCookies {
 
 
     private void test(String header, Cookie... expected) {
+        test(header, null, expected);
+    }
+
+
+    private void test(String header, String cookieNoEquals, Cookie... expected) {
+
         MimeHeaders mimeHeaders = new MimeHeaders();
         ServerCookies serverCookies = new ServerCookies(4);
-        CookieProcessor cookieProcessor = new Rfc6265CookieProcessor();
+        Rfc6265CookieProcessor cookieProcessor = new Rfc6265CookieProcessor();
+        if (cookieNoEquals != null) {
+            cookieProcessor.setNoEqualsCookie(cookieNoEquals);
+        }
         MessageBytes cookieHeaderValue = mimeHeaders.addValue("Cookie");
         byte[] bytes = header.getBytes(StandardCharsets.UTF_8);
         cookieHeaderValue.setBytes(bytes, 0, bytes.length);
