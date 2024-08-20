@@ -241,7 +241,9 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         @Override
         public boolean test(String t) {
             String mimeType = context.getMimeType(t);
-
+            if (mimeType == null) {
+                return false;
+            }
             return predicate.test(mimeType);
         }
 
