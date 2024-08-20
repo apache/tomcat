@@ -40,9 +40,13 @@ public class TestCookieParsing extends TomcatBaseTest {
             "name=equals=middle", "name==equalsstart", "name=equalsend=" };
     private static final String COOKIES_WITH_EQUALS_TRUNC = "name=equalsname=name=equalsend";
 
-    private static final String[] COOKIES_WITH_NAME_ONLY = new String[] {
-            "bob", "bob=" };
-    private static final String COOKIES_WITH_NAME_ONLY_CONCAT = "bob=bob=";
+    private static final String[] COOKIES_WITH_NAME_OR_VALUE_ONLY = new String[] { "bob=", "bob", "=bob" };
+
+    // First two are treated as name and no value, third is invalid (therefore ignored)
+    private static final String COOKIES_WITH_NAME_OR_VALUE_ONLY_NAME_CONCAT = "bob=bob=";
+
+    // First is treated as name and no value, second is ignored and third is invalid (therefore ignored)
+    private static final String COOKIES_WITH_NAME_OR_VALUE_ONLY_IGNORE_CONCAT = "bob=";
 
     private static final String[] COOKIES_WITH_SEPS = new String[] {
             "name=val/ue" };
@@ -120,22 +124,41 @@ public class TestCookieParsing extends TomcatBaseTest {
 
         String expected;
         if (nameOnly) {
-            expected = COOKIES_WITH_NAME_ONLY_CONCAT;
+            /*
+             * The legacy cookie processor skips all white space and non-token characters when looking for the cookie
+             * name. This means "=bob" is parsed as a cookie with name bob. This behaviour was exposed when adding the
+             * tests for the noEqualsCookie option. When adding the noEqualsCookie option the intention was not to
+             * change the existing behaviour. Therefore this potentially unintended behaviour has been left unchanged.
+             */
+            expected = COOKIES_WITH_NAME_OR_VALUE_ONLY_NAME_CONCAT + "bob=";
         } else {
             expected = "";
         }
         TestCookieParsingClient client = new TestCookieParsingClient(
-                legacyCookieProcessor, COOKIES_WITH_NAME_ONLY, expected);
+                legacyCookieProcessor, COOKIES_WITH_NAME_OR_VALUE_ONLY, expected);
         client.doRequest();
     }
 
 
     @Test
-    public void testRfc6265NameOnly() throws Exception {
-        // Always allows equals
-        TestCookieParsingClient client = new TestCookieParsingClient(
-                new Rfc6265CookieProcessor(), COOKIES_WITH_NAME_ONLY,
-                COOKIES_WITH_NAME_ONLY_CONCAT);
+    public void testRfc6265NameOrValueOnlyIgnore() throws Exception {
+        doTestRfc6265NoEquals("ignore", COOKIES_WITH_NAME_OR_VALUE_ONLY_IGNORE_CONCAT);
+    }
+
+
+    @Test
+    public void testRfc6265NameOrValueOnlyDefault() throws Exception {
+        doTestRfc6265NoEquals(null, COOKIES_WITH_NAME_OR_VALUE_ONLY_NAME_CONCAT);
+    }
+
+
+    private void doTestRfc6265NoEquals(String cookieNoEquals, String expected) throws Exception {
+        Rfc6265CookieProcessor cookieProcessor = new Rfc6265CookieProcessor();
+        if (cookieNoEquals != null) {
+            cookieProcessor.setNoEqualsCookie(cookieNoEquals);
+        }
+        TestCookieParsingClient client = new TestCookieParsingClient(cookieProcessor, COOKIES_WITH_NAME_OR_VALUE_ONLY,
+                expected);
         client.doRequest();
     }
 

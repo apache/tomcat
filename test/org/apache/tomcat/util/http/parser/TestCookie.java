@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+import org.apache.tomcat.util.http.NoEqualsCookie;
 import org.apache.tomcat.util.http.ServerCookies;
 
 @RunWith(Parameterized.class)
@@ -84,7 +85,7 @@ public class TestCookie {
     public void testParseThreeCookieHeader() {
         ServerCookies serverCookies = new ServerCookies(3);
         byte[] inputBytes = cookieHeader.getBytes(StandardCharsets.ISO_8859_1);
-        Cookie.parseCookie(inputBytes, 0, inputBytes.length, serverCookies);
+        Cookie.parseCookie(inputBytes, 0, inputBytes.length, serverCookies, NoEqualsCookie.NAME);
         Assert.assertEquals(3,  serverCookies.getCookieCount());
         Assert.assertEquals("first", serverCookies.getCookie(0).getName().toString());
         Assert.assertEquals("1", serverCookies.getCookie(0).getValue().toString());
