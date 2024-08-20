@@ -109,7 +109,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.0-M24 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.0-M25 plus the additional changes listed below. (markt)
       </scode>
     </changelog>
   </subsection>
@@ -121,76 +121,12 @@
       </add>
     </changelog>
   </subsection>
-  <subsection name="Coyote">
-    <changelog>
-      <fix>
-        Correct a regression in the fix for non-blocking reads of chunked
-        request bodies that caused <code>InputStream.available()</code> to
-        return a non-zero value when there was no data to read. In some
-        circumstances this could cause a blocking read to block waiting for more
-        data rather than return the data it had already received. (markt)
-      </fix>
-    </changelog>
-  </subsection>
   <subsection name="Jasper">
     <changelog>
       <add>
         Add support for the new Elvis operator (<code>:?</code>) in Jakarta
         Expression language. (markt)
       </add>
-      <fix>
-        Switch the <code>TldScanner</code> back to logging detailed scan
-        results at debug level rather than trace level. (markt)
-      </fix>
-      <fix>
-        Simplify the implementation of <code>OptionalELResolver</code>. (markt)
-      </fix>
-    </changelog>
-  </subsection>
-  <subsection name="WebSocket">
-    <changelog>
-      <fix>
-        If a blocking message write exceeds the timeout, don't attempt the write
-        again before throwing the exception. (markt)
-      </fix>
-      <fix>
-        An Exception being thrown during message processing (e.g. in a method
-        annotated with <code>@onMessage</code>) should not automatically cause
-        the connection to close. The application should handle the exception and
-        make the decision whether or not to close the connection. (markt)
-      </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Web applications">
-    <changelog>
-      <fix>
-        Documentation. Align the logging configuration documentation with the
-        current defaults. (markt)
-      </fix>
-    </changelog>
-  </subsection>
-  <subsection name="jdbc-pool">
-    <changelog>
-      <fix>
-        <bug>69255</bug>: Correct a regression in the fix for <bug>69206</bug>
-        that meant exceptions executing statements were wrapped in an
-        <code>java.lang.reflect.UndeclaredThrowableException</code> rather than
-        the application seeing the original <code>SQLException</code>. Fixed
-        by pull request <pr>744</pr> provided by Michael Clarke. (markt)
-      </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Other">
-    <changelog>
-      <add>
-        Exclude the <code>tomcat-coyote-ffm.jar</code> from JAR scanning by
-        default. (markt)
-      </add>
-      <fix>
-        Change the default log handler level to <code>ALL</code> so log messages
-        are not dropped by default if a logger is configured to use trace
-        (<code>FINEST</code>) level logging. (markt)
-      </fix>
     </changelog>
   </subsection>
 </section>
