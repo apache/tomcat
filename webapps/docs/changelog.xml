@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0-M25 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Implement the recent clarification from the Jakarta Servlet project that
+        if a content length is declared then once that many bytes have been
+        written to the response, further writes should trigger an
+        <code>IOException</code>. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
