@@ -56,7 +56,7 @@ public class TestCookies {
 
 
     @Test
-    public void testNameOnlyAreDroppedRfc6265NoEqualsName() {
+    public void testNameOnlyAreDroppedRfc6265WithoutEqualsName() {
         // Name only cookies are not dropped in RFC6265
         test("foo=;a=b; ;", NAME, FOO_EMPTY, A);
         test("foo;a=b; ;", NAME,  FOO_EMPTY, A);
@@ -78,7 +78,7 @@ public class TestCookies {
 
 
     @Test
-    public void testNameOnlyAreDroppedRfc6265NoEqualsIgnore() {
+    public void testNameOnlyAreDroppedRfc6265WithoutEqualsIgnore() {
         // Name only cookies are not dropped in RFC6265
         test("foo=;a=b; ;", IGNORE, FOO_EMPTY, A);
         test("foo;a=b; ;", IGNORE, A);
@@ -100,7 +100,7 @@ public class TestCookies {
 
 
     @Test
-    public void testNameOnlyAreDroppedRfc6265NoEqualsDefault() {
+    public void testNameOnlyAreDroppedRfc6265WithoutEqualsDefault() {
         // Name only cookies are not dropped in RFC6265
         test("foo=;a=b; ;", FOO_EMPTY, A);
         test("foo;a=b; ;", FOO_EMPTY, A);
@@ -128,7 +128,7 @@ public class TestCookies {
     }
 
     @Test
-    public void testEmptyPairsRfc6265NoEqualsCookieName() {
+    public void testEmptyPairsRfc6265CookiesWithoutEqualsName() {
         test("foo;a=b; ;bar", NAME, FOO_EMPTY, A, BAR_EMPTY);
         test("foo;a=b;;bar", NAME, FOO_EMPTY, A, BAR_EMPTY);
         test("foo;a=b; ;;bar=rab", NAME, FOO_EMPTY, A, BAR);
@@ -139,7 +139,7 @@ public class TestCookies {
 
 
     @Test
-    public void testEmptyPairsRfc6265NoEqualsCookieIgnore() {
+    public void testEmptyPairsRfc6265CookiesWithoutEqualsIgnore() {
         test("foo;a=b; ;bar", IGNORE, A);
         test("foo;a=b;;bar", IGNORE, A);
         test("foo;a=b; ;;bar=rab", IGNORE, A, BAR);
@@ -150,7 +150,7 @@ public class TestCookies {
 
 
     @Test
-    public void testEmptyPairsRfc6265NoEqualsCookieDefault() {
+    public void testEmptyPairsRfc6265CookiesWithoutEqualsDefault() {
         test("foo;a=b; ;bar", FOO_EMPTY, A, BAR_EMPTY);
         test("foo;a=b;;bar", FOO_EMPTY, A, BAR_EMPTY);
         test("foo;a=b; ;;bar=rab", FOO_EMPTY, A, BAR);
@@ -360,13 +360,13 @@ public class TestCookies {
     }
 
 
-    private void test(String header, String noEqualsCookie, Cookie... expected) {
+    private void test(String header, String cookiesWithoutEquals, Cookie... expected) {
 
         MimeHeaders mimeHeaders = new MimeHeaders();
         ServerCookies serverCookies = new ServerCookies(4);
         Rfc6265CookieProcessor cookieProcessor = new Rfc6265CookieProcessor();
-        if (noEqualsCookie != null) {
-            cookieProcessor.setNoEqualsCookie(noEqualsCookie);
+        if (cookiesWithoutEquals != null) {
+            cookieProcessor.setCookiesWithoutEquals(cookiesWithoutEquals);
         }
         MessageBytes cookieHeaderValue = mimeHeaders.addValue("Cookie");
         byte[] bytes = header.getBytes(StandardCharsets.UTF_8);
