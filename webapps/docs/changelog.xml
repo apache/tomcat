@@ -180,7 +180,10 @@
         (<code>FINEST</code>) level logging. (markt)
       </fix>
       <update>
-        Update Hmacrest to 3.0. (markt)
+        Update Hamcrest to 3.0. (markt)
+      </update>
+      <update>
+        Update EasyMock to 5.4.0. (markt)
       </update>
     </changelog>
   </subsection>
