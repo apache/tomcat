@@ -48,7 +48,7 @@
                  type="boolean"/>
 
     <attribute   name="allowedRequestAttributesPattern"
-          description="Regular expression that any custom request attributes muct match else the request will be rejected"
+          description="Regular expression that any custom request attributes must match else the request will be rejected"
                  type="java.lang.String"/>
 
     <attribute   name="allowTrace"
