@@ -16,6 +16,7 @@ on:
   push:
     branches:
       - main
+      - 11.0.x
       - 10.1.x
       - 9.0.x
   pull_request:
