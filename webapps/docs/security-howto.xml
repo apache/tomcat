@@ -133,7 +133,7 @@
       <p>The examples web application should always be removed from any security
       sensitive installation. While the examples web application does not
       contain any known vulnerabilities, it is known to contain features
-      (particularly the cookie examples that display the contents of all
+      (particularly the cookie examples that display the contents of all cookies
       received and allow new cookies to be set) that may be used by an attacker
       in conjunction with a vulnerability in another application deployed on the
       Tomcat instance to obtain additional information that would otherwise be
