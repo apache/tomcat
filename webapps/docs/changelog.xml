@@ -192,6 +192,9 @@
         are not dropped by default if a logger is configured to use trace
         (<code>FINEST</code>) level logging. (markt)
       </fix>
+      <update>
+        Update Hmacrest to 3.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
