@@ -75,26 +75,26 @@ public class TestCookieParsing extends TomcatBaseTest {
 
     @Test
     public void testRfc6265NameOrValueOnlyName() throws Exception {
-        doTestRfc6265NoEquals("name", COOKIES_WITH_NAME_OR_VALUE_ONLY_NAME_CONCAT);
+        doTestRfc6265WithoutEquals("name", COOKIES_WITH_NAME_OR_VALUE_ONLY_NAME_CONCAT);
     }
 
 
     @Test
     public void testRfc6265NameOrValueOnlyIgnore() throws Exception {
-        doTestRfc6265NoEquals("ignore", COOKIES_WITH_NAME_OR_VALUE_ONLY_IGNORE_CONCAT);
+        doTestRfc6265WithoutEquals("ignore", COOKIES_WITH_NAME_OR_VALUE_ONLY_IGNORE_CONCAT);
     }
 
 
     @Test
     public void testRfc6265NameOrValueOnlyDefault() throws Exception {
-        doTestRfc6265NoEquals(null, COOKIES_WITH_NAME_OR_VALUE_ONLY_NAME_CONCAT);
+        doTestRfc6265WithoutEquals(null, COOKIES_WITH_NAME_OR_VALUE_ONLY_NAME_CONCAT);
     }
 
 
-    private void doTestRfc6265NoEquals(String noEqualsCookie, String expected) throws Exception {
+    private void doTestRfc6265WithoutEquals(String cookiesWithoutEquals, String expected) throws Exception {
         Rfc6265CookieProcessor cookieProcessor = new Rfc6265CookieProcessor();
-        if (noEqualsCookie != null) {
-            cookieProcessor.setNoEqualsCookie(noEqualsCookie);
+        if (cookiesWithoutEquals != null) {
+            cookieProcessor.setCookiesWithoutEquals(cookiesWithoutEquals);
         }
         TestCookieParsingClient client = new TestCookieParsingClient(cookieProcessor, COOKIES_WITH_NAME_OR_VALUE_ONLY,
                 expected);

@@ -125,7 +125,7 @@
         data rather than return the data it had already received. (markt)
       </fix>
       <add>
-        Add a new attribute <code>noEqualsCookie</code> to the
+        Add a new attribute <code>cookiesWithoutEquals</code> to the
         <code>Rfc6265CookieProcessor</code>. The default behaviour is unchanged.
         (markt)
       </add>
