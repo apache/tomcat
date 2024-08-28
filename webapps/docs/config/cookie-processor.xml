@@ -99,7 +99,7 @@
 
     <attributes>
 
-      <attribute name="noEqualsCookie" required="false">
+      <attribute name="cookiesWithoutEquals" required="false">
         <p>Determines how a cookie received from a user agent should be
         interpreted when the name value pair does not contain an equals sign.
         The default value is <code>ignore</code> which means the cookie will be

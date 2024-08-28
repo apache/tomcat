@@ -20,7 +20,7 @@ import java.util.Locale;
 
 import org.apache.tomcat.util.res.StringManager;
 
-public enum NoEqualsCookie {
+public enum CookiesWithoutEquals {
     IGNORE("ignore"),
     NAME("name");
     /*
@@ -34,11 +34,11 @@ public enum NoEqualsCookie {
      */
 
 
-    private static final StringManager sm = StringManager.getManager(NoEqualsCookie.class);
+    private static final StringManager sm = StringManager.getManager(CookiesWithoutEquals.class);
 
     private final String value;
 
-    NoEqualsCookie(String value) {
+    CookiesWithoutEquals(String value) {
         this.value = value;
     }
 
@@ -46,15 +46,15 @@ public enum NoEqualsCookie {
         return value;
     }
 
-    public static NoEqualsCookie fromString(String from) {
+    public static CookiesWithoutEquals fromString(String from) {
         String trimmedLower = from.trim().toLowerCase(Locale.ENGLISH);
 
-        for (NoEqualsCookie value : values()) {
+        for (CookiesWithoutEquals value : values()) {
             if (value.getValue().equals(trimmedLower)) {
                 return value;
             }
         }
 
-        throw new IllegalStateException(sm.getString("noEqualsCookie.invalid", from));
+        throw new IllegalStateException(sm.getString("cookiesWithoutEquals.invalid", from));
     }
 }
