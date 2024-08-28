@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.http.NoEqualsCookie;
+import org.apache.tomcat.util.http.CookiesWithoutEquals;
 import org.apache.tomcat.util.http.ServerCookie;
 import org.apache.tomcat.util.http.ServerCookies;
 import org.apache.tomcat.util.log.UserDataHelper;
@@ -115,21 +115,21 @@ public class Cookie {
      */
     @Deprecated
     public static void parseCookie(byte[] bytes, int offset, int len, ServerCookies serverCookies) {
-        parseCookie(bytes, offset, len, serverCookies, NoEqualsCookie.NAME);
+        parseCookie(bytes, offset, len, serverCookies, CookiesWithoutEquals.NAME);
     }
 
 
     /**
      * Parse byte array as cookie header.
      *
-     * @param bytes          Source
-     * @param offset         Start point in array
-     * @param len            Number of bytes to read
-     * @param serverCookies  Structure to store results
-     * @param noEqualsCookie How to handle a cookie name-value-pair that does not contain an equals character
+     * @param bytes                Source
+     * @param offset               Start point in array
+     * @param len                  Number of bytes to read
+     * @param serverCookies        Structure to store results
+     * @param cookiesWithoutEquals How to handle a cookie name-value-pair that does not contain an equals character
      */
     public static void parseCookie(byte[] bytes, int offset, int len, ServerCookies serverCookies,
-            NoEqualsCookie noEqualsCookie) {
+            CookiesWithoutEquals cookiesWithoutEquals) {
 
         // ByteBuffer is used throughout this parser as it allows the byte[]
         // and position information to be easily passed between parsing methods
@@ -147,7 +147,7 @@ public class Cookie {
         SkipResult skipResult = skipBytes(bb, VERSION_BYTES);
         if (skipResult != SkipResult.FOUND) {
             // No need to reset position since skipBytes() will have done it
-            parseCookieRfc6265(bb, serverCookies, noEqualsCookie);
+            parseCookieRfc6265(bb, serverCookies, cookiesWithoutEquals);
             return;
         }
 
@@ -158,7 +158,7 @@ public class Cookie {
             // Need to reset position as skipByte() will only have reset to
             // position before it was called
             bb.position(mark);
-            parseCookieRfc6265(bb, serverCookies, noEqualsCookie);
+            parseCookieRfc6265(bb, serverCookies, cookiesWithoutEquals);
             return;
         }
 
@@ -220,7 +220,8 @@ public class Cookie {
     }
 
 
-    private static void parseCookieRfc6265(ByteBuffer bb, ServerCookies serverCookies,NoEqualsCookie noEqualsCookie) {
+    private static void parseCookieRfc6265(ByteBuffer bb, ServerCookies serverCookies,
+            CookiesWithoutEquals cookiesWithoutEquals) {
 
         boolean moreToProcess = true;
 
@@ -261,7 +262,7 @@ public class Cookie {
 
             if (name.hasRemaining()) {
                 if (value == null) {
-                    switch (noEqualsCookie) {
+                    switch (cookiesWithoutEquals) {
                         case IGNORE: {
                             // This name-value-pair is a NO-OP
                             break;

@@ -127,8 +127,9 @@ public class TestCookieParsing extends TomcatBaseTest {
             /*
              * The legacy cookie processor skips all white space and non-token characters when looking for the cookie
              * name. This means "=bob" is parsed as a cookie with name bob. This behaviour was exposed when adding the
-             * tests for the noEqualsCookie option. When adding the noEqualsCookie option the intention was not to
-             * change the existing behaviour. Therefore this potentially unintended behaviour has been left unchanged.
+             * tests for the cookiesWithoutEquals option. When adding the cookiesWithoutEquals option the intention was
+             * not to change the existing behaviour. Therefore this potentially unintended behaviour has been left
+             * unchanged.
              */
             expected = COOKIES_WITH_NAME_OR_VALUE_ONLY_NAME_CONCAT + "bob=";
         } else {
@@ -142,20 +143,20 @@ public class TestCookieParsing extends TomcatBaseTest {
 
     @Test
     public void testRfc6265NameOrValueOnlyIgnore() throws Exception {
-        doTestRfc6265NoEquals("ignore", COOKIES_WITH_NAME_OR_VALUE_ONLY_IGNORE_CONCAT);
+        doTestRfc6265WithoutEquals("ignore", COOKIES_WITH_NAME_OR_VALUE_ONLY_IGNORE_CONCAT);
     }
 
 
     @Test
     public void testRfc6265NameOrValueOnlyDefault() throws Exception {
-        doTestRfc6265NoEquals(null, COOKIES_WITH_NAME_OR_VALUE_ONLY_NAME_CONCAT);
+        doTestRfc6265WithoutEquals(null, COOKIES_WITH_NAME_OR_VALUE_ONLY_NAME_CONCAT);
     }
 
 
-    private void doTestRfc6265NoEquals(String noEqualsCookie, String expected) throws Exception {
+    private void doTestRfc6265WithoutEquals(String cookiesWithoutEquals, String expected) throws Exception {
         Rfc6265CookieProcessor cookieProcessor = new Rfc6265CookieProcessor();
-        if (noEqualsCookie != null) {
-            cookieProcessor.setNoEqualsCookie(noEqualsCookie);
+        if (cookiesWithoutEquals != null) {
+            cookieProcessor.setCookiesWithoutEquals(cookiesWithoutEquals);
         }
         TestCookieParsingClient client = new TestCookieParsingClient(cookieProcessor, COOKIES_WITH_NAME_OR_VALUE_ONLY,
                 expected);

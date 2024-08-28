@@ -89,7 +89,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
                 ByteChunk bc = cookieValue.getByteChunk();
 
                 Cookie.parseCookie(bc.getBytes(), bc.getStart(), bc.getLength(), serverCookies,
-                        getNoEqualsCookieInternal());
+                        getCookiesWithoutEqualsInternal());
             }
 
             // search from the next position
