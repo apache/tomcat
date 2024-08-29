@@ -221,6 +221,54 @@ public final class Const {
     public static final int MAX_ARRAY_DIMENSIONS = 255;
 
     /**
+     * Minor version number of class files for Java 22: {@value}.
+     *
+     * @see #MAJOR_22
+     * @since 6.10.0
+     */
+    public static final short MINOR_22 = 0;
+
+    /**
+     * Minor version number of class files for Java 23: {@value}.
+     *
+     * @see #MAJOR_23
+     * @since 6.10.0
+     */
+    public static final short MINOR_23 = 0;
+
+    /**
+     * Minor version number of class files for Java 24: {@value}.
+     *
+     * @see #MAJOR_24
+     * @since 6.10.0
+     */
+    public static final short MINOR_24 = 0;
+
+    /**
+     * Major version number of class files for Java 22: {@value}.
+     *
+     * @see #MINOR_22
+     * @since 6.10.0
+     */
+    public static final short MAJOR_22 = 66;
+
+    /**
+     * Major version number of class files for Java 23: {@value}.
+     *
+     * @see #MINOR_23
+     * @since 6.10.0
+     */
+    public static final short MAJOR_23 = 67;
+
+    /**
+     * Major version number of class files for Java 24: {@value}.
+     *
+     * @see #MINOR_24
+     * @since 6.10.0
+     */
+    public static final short MAJOR_24 = 68;
+
+    /**
      * Get the CONSTANT_NAMES entry at the given index.
      *
      * @param index index into {@code CONSTANT_NAMES}.
