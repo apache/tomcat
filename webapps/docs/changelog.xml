@@ -194,6 +194,9 @@
       <update>
         Update the internal fork of Apache Commons BCEL to 6.10.0. (markt)
       </update>
+      <add>
+        Improvements to Spanish translations by Fernando. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
