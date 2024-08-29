@@ -37,7 +37,7 @@ Unused code is removed
 Sub-tree:
 src/main/java/org/apache/bcel
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
-rel/commons-bcel-6.9.0 (2024-04-27)
+rel/commons-bcel-6.10.0 (2024-07-23)
 
 FileUpload
 ----------
