@@ -64,6 +64,7 @@ public class Import {
 
             if (!cKey.pkg.equals(currentPkg)) {
                 currentPkg = cKey.pkg;
+                currentGroup = "zzz";
                 if (w != null) {
                     w.close();
                 }
