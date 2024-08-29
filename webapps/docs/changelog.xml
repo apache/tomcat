@@ -204,6 +204,9 @@
       <update>
         Update CheckStyle to 10.18.0. (markt)
       </update>
+      <update>
+        Update the internal fork of Apache Commons BCEL to 6.10.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
