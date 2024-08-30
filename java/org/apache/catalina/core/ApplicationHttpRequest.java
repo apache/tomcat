@@ -710,8 +710,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             return;
         }
 
-        parameters = new ParameterMap<>();
-        parameters.putAll(getRequest().getParameterMap());
+        parameters = new ParameterMap<>(getRequest().getParameterMap());
         mergeParameters();
         ((ParameterMap<String,String[]>) parameters).setLocked(true);
         parsedParams = true;
