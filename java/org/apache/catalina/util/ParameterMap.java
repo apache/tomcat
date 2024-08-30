@@ -88,6 +88,19 @@ public final class ParameterMap<K, V> implements Map<K,V>, Serializable {
 
 
     /**
+     * Optimised constructor for ParameterMap.
+     *
+     * @see "https://bz.apache.org/bugzilla/show_bug.cgi?id=69285"
+     *
+     * @param map Map whose contents are duplicated in the new map
+     */
+    public ParameterMap(ParameterMap<K,V> map) {
+        delegatedMap = new LinkedHashMap<>(map.delegatedMap);
+        unmodifiableDelegatedMap = Collections.unmodifiableMap(delegatedMap);
+    }
+
+
+    /**
      * The current lock state of this parameter map.
      */
     private boolean locked = false;
