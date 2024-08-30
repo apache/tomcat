@@ -128,6 +128,11 @@
         <code>Rfc6265CookieProcessor</code>. The default behaviour is unchanged.
         (markt)
       </add>
+      <fix>
+        Ensure that Tomcat sends a TLS close_notify message after receiving one
+        from the client when using the <code>OpenSSLImplementation</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
