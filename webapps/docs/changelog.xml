@@ -113,6 +113,11 @@
         written to the response, further writes should trigger an
         <code>IOException</code>. (markt)
       </add>
+      <fix>
+        Improve performance of
+        <code>ApplicationHttpRequest.parseParameters()</code>. Based on sample
+        code and test cases provided by John Engebretson. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
