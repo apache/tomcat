@@ -577,10 +577,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             return;
         }
 
-        // We can re-use the MimeHeaders from the response since they have
-        // already been processed by the encoder at this point
-        MimeHeaders mimeHeaders = coyoteResponse.getMimeHeaders();
-        mimeHeaders.recycle();
+        /*
+         * Need a dedicated MimeHeaders for trailers as the MimeHeaders from the response needs to be retained in case
+         * the access log needs to log header values.
+         */
+        MimeHeaders mimeHeaders = new MimeHeaders();
 
         Map<String,String> headerMap = supplier.get();
         if (headerMap == null) {
