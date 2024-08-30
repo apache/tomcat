@@ -139,6 +139,11 @@
         from the client when using the <code>OpenSSLImplementation</code>.
         (markt)
       </fix>
+      <fix>
+        <bug>69301</bug>: Fix trailer headers replacing non-trailer headers when
+        writing response headers to the access log. Based on a patch and test
+        case provided by hypnoce. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
