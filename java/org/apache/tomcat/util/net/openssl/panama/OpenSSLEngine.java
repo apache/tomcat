@@ -370,8 +370,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
             // If isOutboundDone is set, then the data from the network BIO
             // was the close_notify message -- we are not required to wait
-            // for the receipt the peer's close_notify message -- shutdown.
-            if (isOutboundDone) {
+            // for the receipt of the peer's close_notify message -- shutdown.
+            if (isOutboundDone()) {
                 shutdown();
             }
 
@@ -471,9 +471,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         // protect against protocol overflow attack vector
         if (len > MAX_ENCRYPTED_PACKET_LENGTH) {
-            isInboundDone = true;
-            isOutboundDone = true;
-            engineClosed = true;
             shutdown();
             throw new SSLException(sm.getString("engine.oversizedPacket"));
         }
@@ -549,7 +546,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         // Check to see if we received a close_notify message from the peer
         if (!receivedShutdown && (SSL_get_shutdown(state.ssl) & SSL_RECEIVED_SHUTDOWN()) == SSL_RECEIVED_SHUTDOWN()) {
             receivedShutdown = true;
-            closeOutbound();
             closeInbound();
         }
 
@@ -603,7 +599,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         isInboundDone = true;
         engineClosed = true;
 
-        shutdown();
+        if (isOutboundDone()) {
+            // Only call shutdown if there is no outbound data pending.
+            shutdown();
+        }
 
         if (accepted != Accepted.NOT && !receivedShutdown) {
             throw new SSLException(sm.getString("engine.inboundClose"));
@@ -1038,13 +1037,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         // Check if we are in the shutdown phase
         if (engineClosed) {
-            // Waiting to send the close_notify message
             if (BIO_ctrl_pending(state.networkBIO) != 0) {
+                // Waiting to send the close_notify message
                 return SSLEngineResult.HandshakeStatus.NEED_WRAP;
             }
 
-            // Must be waiting to receive the close_notify message
-            return SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
+            if (!isInboundDone()) {
+                // Must be waiting to receive the close_notify message
+                return SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
+            }
         }
 
         return SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING;
