@@ -15,12 +15,10 @@ name: Smoke Test
 on:
   push:
     branches:
-      - main
-      - 10.1.x
-      - 9.0.x
+      - 11.0.x
   pull_request:
     branches:
-      - main
+      - 11.0.x
 
 env:
   LC_ALL: en_US.UTF-8
@@ -32,19 +30,8 @@ jobs:
       matrix:
         isMain:
           - ${{ contains(github.ref, 'main') }}
-        java: [ 17, 21, 22, 24-ea ]
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
-        exclude:
-          - isMain: true
-            java: 17
-          - os: windows-latest
-            java: 21
-          - os: macos-latest
-            java: 21
-          - os: windows-latest
-            java: 24-ea
-          - os: macos-latest
-            java: 24-ea
+        java: [ 22 ]
+        os: [ ubuntu-latest ]
     name: JDK${{ matrix.java }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
