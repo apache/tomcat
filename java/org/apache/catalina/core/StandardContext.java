@@ -2128,10 +2128,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     @Override
     public ServletContext getServletContext() {
-        /*
-         * This method is called (multiple times) during context start which is single threaded so there is concurrency
-         * issue here.
-         */
+        // This method is called multiple times during context start which is single threaded
+        // so there is no concurrency issue
         if (context == null) {
             context = new ApplicationContext(this);
             if (altDDName != null) {
