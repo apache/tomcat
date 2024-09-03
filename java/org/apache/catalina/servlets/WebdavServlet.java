@@ -217,7 +217,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * Key : path <br>
      * Value : LockInfo
      */
-    private final Map<String,LockInfo> resourceLocks = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,LockInfo> resourceLocks = new ConcurrentHashMap<>();
 
 
     /**
@@ -227,13 +227,13 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * Value : List of lock-null resource which are members of the collection. Each element of the List is the path
      * associated with the lock-null resource.
      */
-    private final Map<String,List<String>> lockNullResources = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,CopyOnWriteArrayList<String>> lockNullResources = new ConcurrentHashMap<>();
 
 
     /**
      * List of the inheritable collection locks.
      */
-    private final List<LockInfo> collectionLocks = Collections.synchronizedList(new ArrayList<>());
+    private final CopyOnWriteArrayList<LockInfo> collectionLocks = new CopyOnWriteArrayList<>();
 
 
     /**
