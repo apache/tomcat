@@ -601,6 +601,10 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 addDispatch(DispatchType.NON_BLOCKING_WRITE);
                 break;
             }
+            case DISPATCH_ERROR: {
+                addDispatch(DispatchType.NON_BLOCKING_ERROR);
+                break;
+            }
             case DISPATCH_EXECUTE: {
                 executeDispatches();
                 break;

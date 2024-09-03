@@ -138,6 +138,11 @@
         writing response headers to the access log. Based on a patch and test
         case provided by hypnoce. (markt)
       </fix>
+      <fix>
+        <bug>69302</bug>: If an HTTP/2 client resets a stream before the request
+        body is fully written, ensure that any <code>ReadListener</code> is
+        notified via a call to <code>ReadListener.onErrror()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
