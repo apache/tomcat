@@ -33,6 +33,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
+import jakarta.servlet.RequestDispatcher;
+
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.CloseNowException;
 import org.apache.coyote.InputBuffer;
@@ -1238,7 +1240,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         // If readInterest is true, data must be available to read no later than this time.
         private volatile long readTimeoutExpiry;
         private volatile boolean closed;
-        private boolean resetReceived;
+        private volatile boolean resetReceived;
 
         @SuppressWarnings("deprecation")
         @Override
@@ -1332,6 +1334,16 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             try {
                 if (available() > 0) {
                     return true;
+                }
+
+                if (resetReceived) {
+                    // Trigger ReadListener.onError()
+                    getCoyoteRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION,
+                            new IOException(sm.getString("stream.clientResetRequest")));
+                    coyoteRequest.action(ActionCode.DISPATCH_ERROR, null);
+                    coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
+
+                    return false;
                 }
 
                 if (!isRequestBodyFullyRead()) {
@@ -1455,6 +1467,22 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     inBuffer.notifyAll();
                 }
             }
+
+            // If a read is in progress, cancel it.
+            readStateLock.lock();
+            try {
+                if (readInterest) {
+                    readInterest = false;
+                }
+            } finally {
+                readStateLock.unlock();
+            }
+
+            // Trigger ReadListener.onError()
+            getCoyoteRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION,
+                    new IOException(sm.getString("stream.clientResetRequest")));
+            coyoteRequest.action(ActionCode.DISPATCH_ERROR, null);
+            coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
         }
 
         @Override
