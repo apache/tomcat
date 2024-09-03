@@ -76,6 +76,7 @@ public class Import {
                 FileOutputStream fos = new FileOutputStream(outFile);
                 w = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
                 org.apache.tomcat.buildutil.Utils.insertLicense(w);
+                Utils.insertEditInstructions(w);
             }
 
             if (!currentGroup.equals(cKey.group)) {
