@@ -26,8 +26,9 @@ import org.junit.Test;
 
 public class TestParameterMapPerformance {
 
-    private final int numTests = 5;
-    private final int numTestIterations = 1000000;
+    private static final int NUM_TESTS = 10;
+    private static final int NUM_SKIP = 4;
+    private static final int NUM_TEST_ITERATIONS = 1000000;
 
     private ParameterMap<Integer,Object> baseParams;
     private ParameterMap<Integer,Object> testParams;
@@ -44,16 +45,16 @@ public class TestParameterMapPerformance {
         baseParams.setLocked(true);
 
         // warmup
-        for (int i = 0; i < numTestIterations; i++) {
+        for (int i = 0; i < NUM_TEST_ITERATIONS; i++) {
             useStandardConstructor();
             useOptimizedMapConstructor();
         }
 
         List<Long> standardDurations = new ArrayList<>();
-        for (int i = 0; i < numTests; i++) {
+        for (int i = 0; i < NUM_TESTS; i++) {
             System.gc();
             long startStandard = System.currentTimeMillis();
-            for (int j = 0; j < numTestIterations; j++) {
+            for (int j = 0; j < NUM_TEST_ITERATIONS; j++) {
                 useStandardConstructor();
             }
             long duration = System.currentTimeMillis() - startStandard;
@@ -64,13 +65,13 @@ public class TestParameterMapPerformance {
          * The CI systems tend to produce outliers that lead to false failures so skip the longest two runs.
          */
         long standardTotalDuration =
-                standardDurations.stream().sorted().limit(numTests - 2).reduce(Long::sum).get().longValue();
+                standardDurations.stream().sorted().limit(NUM_TESTS - 2).reduce(Long::sum).get().longValue();
 
         List<Long> optimizedDurations = new ArrayList<>();
-        for (int i = 0; i < numTests; i++) {
+        for (int i = 0; i < NUM_TESTS; i++) {
             System.gc();
             long startOptimized = System.currentTimeMillis();
-            for (int j = 0; j < numTestIterations; j++) {
+            for (int j = 0; j < NUM_TEST_ITERATIONS; j++) {
                 useOptimizedMapConstructor();
             }
             long duration = System.currentTimeMillis() - startOptimized;
@@ -81,7 +82,7 @@ public class TestParameterMapPerformance {
          * The CI systems tend to produce outliers that lead to false failures so skip the longest two runs.
          */
         long optimizedTotalDuration =
-                optimizedDurations.stream().sorted().limit(numTests - 2).reduce(Long::sum).get().longValue();
+                optimizedDurations.stream().sorted().limit(NUM_TESTS - NUM_SKIP).reduce(Long::sum).get().longValue();
 
         Assert.assertTrue("Standard: " + standardTotalDuration + "ms, Optimized: " + optimizedTotalDuration + "ms",
                 optimizedTotalDuration < standardTotalDuration);
