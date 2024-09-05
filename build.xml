@@ -360,6 +360,7 @@
     <include name="**/*.tasks"/>
     <include name="**/*.tld"/>
     <include name="**/*.txt"/>
+    <include name="**/*.uml"/>
     <include name="**/*.xhtml"/>
     <include name="**/*.xml"/>
     <include name="**/*.xsd"/>
