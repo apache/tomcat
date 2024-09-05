@@ -248,7 +248,8 @@ In CATALINA_BASE:
           The setenv scripts were described above. The tomcat-juli library
           is documented in the Logging chapter in the User Guide.
 
- * conf - Server configuration files (including server.xml)
+ * conf - Server configuration files (typically all of them, including
+          server.xml)
 
  * lib  - Libraries and classes, as explained below
 
