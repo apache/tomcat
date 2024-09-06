@@ -216,8 +216,11 @@
       <p>By default, a non-TLS, HTTP/1.1 connector is configured on port 8080.
       Connectors that will not be used should be removed from server.xml.</p>
 
-      <p>AJP Connectors should only be used on trusted networks or be
-      appropriately secured with a suitable <code>secret</code> attribute.</p>
+      <p>AJP is a clear text protocol. AJP Connectors should normally only be
+      used on trusted networks. If used on an untrusted network, use of the
+      <code>secret</code> attribute will limit access to authorised clients but
+      the <code>secret</code> attribute will be visible to anyone who can
+      observe network traffic.</p>
 
       <p>AJP Connectors block forwarded requests with unknown request
       attributes. Known safe and/or expected attributes may be allowed by
