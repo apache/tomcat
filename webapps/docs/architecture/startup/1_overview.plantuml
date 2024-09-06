@@ -23,22 +23,18 @@ Bootstrap -> Bootstrap: initClassLoaders()
 
 Bootstrap -->> Catalina ** : newInstance()
 
-Bootstrap -> Catalina: setParentClassLoader()
-activate Catalina
+Bootstrap -> Catalina ++: setParentClassLoader()
 |||
 Bootstrap <<-- Catalina:
 deactivate Catalina
 
-Bootstrap -> Catalina: start()
-activate Catalina
+Bootstrap -> Catalina ++: start()
 
-Catalina -> Catalina: load()
-activate Catalina
+Catalina -> Catalina ++: load()
 
 Catalina -> Catalina: initNaming()
 
-Catalina -> Catalina: parseServerXml()
-activate Catalina
+Catalina -> Catalina ++: parseServerXml()
 
 Catalina -->> Digester ** :
 note right of Digester
@@ -49,8 +45,7 @@ note right of Digester
   simplicity
 end note
 
-Catalina -> Digester: parse()
-activate Digester
+Catalina -> Digester ++: parse()
 |||
 
 Digester -->> Server ** :
@@ -63,8 +58,7 @@ deactivate Catalina
 
 Catalina -> Catalina: initStream()
 
-Catalina -> Server: init()
-activate Server
+Catalina -> Server ++: init()
 |||
 Catalina <<-- Server:
 deactivate Server
@@ -72,12 +66,11 @@ deactivate Server
 Catalina -->> Catalina:
 deactivate Catalina
 
-Catalina -> Server: start()
-activate Server
+Catalina -> Server ++: start()
 Catalina <<-- Server:
+deactivate Server
 
-Catalina -> Catalina: await()
-activate Catalina
+Catalina -> Catalina ++: await()
 note right of Catalina
   This is where Tomcat spends
   time serving requests
@@ -85,13 +78,13 @@ end note
 Catalina -->> Catalina:
 deactivate Catalina
 
-Catalina -> Catalina: stop()
-activate Catalina
+Catalina -> Catalina ++: stop()
 
-Catalina -> Server: stop()
+Catalina -> Server ++: stop()
 Catalina <<-- Server:
+deactivate Server
 
-Catalina -> Server: destroy()
+Catalina -> Server ++: destroy()
 Catalina <<-- Server:
 deactivate Server
 
