@@ -19,35 +19,97 @@ hide footbox
 skinparam style strictuml
 
 activate Catalina
-activate Server
-activate "Global\nNaming\nResources"
-activate Services
-activate Engine
-activate Executors
-activate MapperListener
-activate Connectors
-activate Protocol
 
 Catalina -> Server: init()
+activate Server
 
 Server -> Server: fireLifecycleEvent(\n    BEFORE_INIT_EVENT)
 
 Server -> Server: initInternal()
 activate Server
 
-Server -> "Global\nNaming\nResources" : init()
+Server -> "Global\nNaming\nResources" as GNR: init()
+activate GNR
+
+GNR -> GNR: fireLifecycleEvent(\n    BEFORE_INIT_EVENT)
+GNR -> GNR: initInternal()
+GNR -> GNR: fireLifecycleEvent(\n    AFTER_INIT_EVENT)
+
+Server  <<-- GNR
+deactivate GNR
+
 Server -> "Service(s)" as Services: init()
+activate Services
+
+Services -> Services: fireLifecycleEvent(\n    BEFORE_INIT_EVENT)
+
+Services -> Services: initInternal()
+activate Services
 
 Services -> Engine: init()
+activate Engine
+
+Engine -> Engine: fireLifecycleEvent(\n    BEFORE_INIT_EVENT)
+Engine -> Engine: initInternal()
+Engine -> Engine: fireLifecycleEvent(\n    AFTER_INIT_EVENT)
+
+Services <<-- Engine
+deactivate Engine
+
 Services -> "Executor(s)" as Executors: init()
+activate Executors
+
+Executors -> Executors: fireLifecycleEvent(\n    BEFORE_INIT_EVENT)
+Executors -> Executors: initInternal()
+Executors -> Executors: fireLifecycleEvent(\n    AFTER_INIT_EVENT)
+
+Services <<-- Executors
+deactivate Executors
+
 Services -> "Mapper\nListener" as MapperListener: init()
+activate MapperListener
+
+MapperListener -> MapperListener: fireLifecycleEvent(\n    BEFORE_INIT_EVENT)
+MapperListener -> MapperListener: initInternal()
+MapperListener -> MapperListener: fireLifecycleEvent(\n    AFTER_INIT_EVENT)
+
+Services <<-- MapperListener
+deactivate MapperListener
+
 Services -> "Connector(s)" as Connectors: init()
+activate Connectors
+
+Connectors -> Connectors: fireLifecycleEvent(\n    BEFORE_INIT_EVENT)
+Connectors -> Connectors: initInternal()
+activate Connectors
 
 Connectors -->> CoyoteAdapter **
-activate CoyoteAdapter
 
 Connectors -> Protocol: setAdapter()
+activate Protocol
+Connectors <<-- Protocol
+deactivate Protocol
+
 Connectors -> Protocol: init()
+activate Protocol
+Connectors <<-- Protocol
+deactivate Protocol
+
+Connectors -->> Connectors
+deactivate Connectors
+
+Connectors -> Connectors: fireLifecycleEvent(\n    AFTER_INIT_EVENT)
+
+Services <<-- Connectors
+deactivate Connectors
+
+Services -> Services: fireLifecycleEvent(\n    AFTER_INIT_EVENT)
+
+Services -->> Services
+deactivate Services
+
+Server <<-- Services
+deactivate Services
 
 Server -->> Server
 deactivate Server
@@ -55,5 +117,6 @@ deactivate Server
 Server -> Server: fireLifecycleEvent(\n    AFTER_INIT_EVENT)
 
 Server -->> Catalina
+deactivate Server
 
 @enduml
