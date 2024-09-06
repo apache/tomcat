@@ -20,23 +20,19 @@ skinparam style strictuml
 
 activate Catalina
 
-Catalina -> Server: start()
-activate Server
+Catalina -> Server ++: start()
 
 Server -> Server: fireLifecycleEvent(\n    BEFORE_START_EVENT)
 
-Server -> Server: startInternal()
-activate Server
+Server -> Server ++: startInternal()
 
 Server -> Server: fireLifecycleEvent(\n    CONFIGURE_START_EVENT)
 Server -> Server: fireLifecycleEvent(\n    START_EVENT)
 
-Server -> "Global\nNaming\nResources" as GNR: start()
-activate GNR
+Server -> "Global\nNaming\nResources" as GNR ++: start()
 
 GNR -> GNR: fireLifecycleEvent(\n    BEFORE_START_EVENT)
-GNR -> GNR: startInternal()
-activate GNR
+GNR -> GNR ++: startInternal()
 
 GNR -> GNR: fireLifecycleEvent(\n    CONFIGURE_START_EVENT)
 GNR -> GNR: fireLifecycleEvent(\n    START_EVENT)
@@ -49,23 +45,19 @@ GNR -> GNR: fireLifecycleEvent(\n    AFTER_START_EVENT)
 Server  <<-- GNR
 deactivate GNR
 
-Server -> "Service(s)" as Services: start()
-activate Services
+Server -> "Service(s)" as Services ++: start()
 
 Services -> Services: fireLifecycleEvent(\n    BEFORE_START_EVENT)
 
-Services -> Services: startInternal()
-activate Services
+Services -> Services ++: startInternal()
 
 Services -> Services: fireLifecycleEvent(\n    START_EVENT)
 
-Services -> Engine: start()
-activate Engine
+Services -> Engine ++: start()
 
 Engine -> Engine: fireLifecycleEvent(\n    BEFORE_START_EVENT)
 
-Engine -> Engine: startInternal()
-activate Engine
+Engine -> Engine ++: startInternal()
 
 Engine -> Engine: fireLifecycleEvent(\n    START_EVENT)
 
@@ -77,13 +69,11 @@ Engine -> Engine: fireLifecycleEvent(\n    AFTER_START_EVENT)
 Services <<-- Engine
 deactivate Engine
 
-Services -> "Executor(s)" as Executors: start()
-activate Executors
+Services -> "Executor(s)" as Executors ++: start()
 
 Executors -> Executors: fireLifecycleEvent(\n    BEFORE_START_EVENT)
 
-Executors -> Executors: startInternal()
-activate Executors
+Executors -> Executors ++: startInternal()
 
 Executors -> Executors: fireLifecycleEvent(\n    START_EVENT)
 
@@ -95,13 +85,11 @@ Executors -> Executors: fireLifecycleEvent(\n    AFTER_START_EVENT)
 Services <<-- Executors
 deactivate Executors
 
-Services -> "Mapper\nListener" as MapperListener: start()
-activate MapperListener
+Services -> "Mapper\nListener" as MapperListener ++: start()
 
 MapperListener -> MapperListener: fireLifecycleEvent(\n    BEFORE_START_EVENT)
 
-MapperListener -> MapperListener: startInternal()
-activate MapperListener
+MapperListener -> MapperListener ++: startInternal()
 
 MapperListener -> MapperListener: fireLifecycleEvent(\n    START_EVENT)
 
@@ -113,17 +101,14 @@ MapperListener -> MapperListener: fireLifecycleEvent(\n    AFTER_START_EVENT)
 Services <<-- MapperListener
 deactivate MapperListener
 
-Services -> "Connector(s)" as Connectors: start()
-activate Connectors
+Services -> "Connector(s)" as Connectors ++: start()
 
 Connectors -> Connectors: fireLifecycleEvent(\n    BEFORE_START_EVENT)
-Connectors -> Connectors: startInternal()
-activate Connectors
+Connectors -> Connectors ++: startInternal()
 
 Connectors -> Connectors: fireLifecycleEvent(\n    START_EVENT)
 
-Connectors -> Protocol: start()
-activate Protocol
+Connectors -> Protocol ++: start()
 Connectors <<-- Protocol
 deactivate Protocol
 
