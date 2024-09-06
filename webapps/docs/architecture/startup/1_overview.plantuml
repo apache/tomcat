@@ -25,8 +25,7 @@ Bootstrap -->> Catalina ** : newInstance()
 
 Bootstrap -> Catalina ++: setParentClassLoader()
 |||
-Bootstrap <<-- Catalina:
-deactivate Catalina
+return
 
 Bootstrap -> Catalina ++: start()
 
@@ -46,53 +45,49 @@ note right of Digester
 end note
 
 Catalina -> Digester ++: parse()
-|||
 
 Digester -->> Server ** :
 
-Catalina <<-- Digester:
-deactivate Digester
+return
 
-Catalina -->> Catalina:
-deactivate Catalina
+return
 
+|||
 Catalina -> Catalina: initStream()
 
 Catalina -> Server ++: init()
 |||
-Catalina <<-- Server:
-deactivate Server
+return
 
-Catalina -->> Catalina:
-deactivate Catalina
+return
 
+|||
 Catalina -> Server ++: start()
-Catalina <<-- Server:
-deactivate Server
+|||
+return
 
+|||
 Catalina -> Catalina ++: await()
 note right of Catalina
   This is where Tomcat spends
   time serving requests
 end note
-Catalina -->> Catalina:
-deactivate Catalina
+return
 
+|||
 Catalina -> Catalina ++: stop()
 
 Catalina -> Server ++: stop()
-Catalina <<-- Server:
-deactivate Server
+|||
+return
 
 Catalina -> Server ++: destroy()
-Catalina <<-- Server:
-deactivate Server
+|||
+return
 
-Catalina -->> Catalina:
-deactivate Catalina
+return
 
-Bootstrap <<-- Catalina:
-deactivate Catalina
+return
 
 deactivate Bootstrap
 @enduml
