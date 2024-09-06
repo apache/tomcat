@@ -346,6 +346,7 @@
     <include name="**/*.nsi"/>
     <include name="**/*.pem"/>
     <include name="**/*.pl"/>
+    <include name="**/*.plantuml"/>
     <include name="**/*.policy"/>
     <include name="**/*.pom"/>
     <include name="**/*.project"/>
@@ -360,7 +361,6 @@
     <include name="**/*.tasks"/>
     <include name="**/*.tld"/>
     <include name="**/*.txt"/>
-    <include name="**/*.uml"/>
     <include name="**/*.xhtml"/>
     <include name="**/*.xml"/>
     <include name="**/*.xsd"/>
