@@ -103,10 +103,10 @@ Connectors -> Connectors: fireLifecycleEvent(\n    AFTER_INIT_EVENT)
 Services <<-- Connectors
 deactivate Connectors
 
-Services -> Services: fireLifecycleEvent(\n    AFTER_INIT_EVENT)
-
 Services -->> Services
 deactivate Services
+
+Services -> Services: fireLifecycleEvent(\n    AFTER_INIT_EVENT)
 
 Server <<-- Services
 deactivate Services
