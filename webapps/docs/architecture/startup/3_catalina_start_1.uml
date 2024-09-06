@@ -1,0 +1,154 @@
+@startuml
+
+' Licensed to the Apache Software Foundation (ASF) under one or more
+' contributor license agreements.  See the NOTICE file distributed with
+' this work for additional information regarding copyright ownership.
+' The ASF licenses this file to You under the Apache License, Version 2.0
+' (the "License"); you may not use this file except in compliance with
+' the License.  You may obtain a copy of the License at
+'
+'     http://www.apache.org/licenses/LICENSE-2.0
+'
+' Unless required by applicable law or agreed to in writing, software
+' distributed under the License is distributed on an "AS IS" BASIS,
+' WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+' See the License for the specific language governing permissions and
+' limitations under the License.
+
+hide footbox
+skinparam style strictuml
+
+activate Catalina
+
+Catalina -> Server: start()
+activate Server
+
+Server -> Server: fireLifecycleEvent(\n    BEFORE_START_EVENT)
+
+Server -> Server: startInternal()
+activate Server
+
+Server -> Server: fireLifecycleEvent(\n    CONFIGURE_START_EVENT)
+Server -> Server: fireLifecycleEvent(\n    START_EVENT)
+
+Server -> "Global\nNaming\nResources" as GNR: start()
+activate GNR
+
+GNR -> GNR: fireLifecycleEvent(\n    BEFORE_START_EVENT)
+GNR -> GNR: startInternal()
+activate GNR
+
+GNR -> GNR: fireLifecycleEvent(\n    CONFIGURE_START_EVENT)
+GNR -> GNR: fireLifecycleEvent(\n    START_EVENT)
+
+GNR -->> GNR
+deactivate GNR
+
+GNR -> GNR: fireLifecycleEvent(\n    AFTER_START_EVENT)
+
+Server  <<-- GNR
+deactivate GNR
+
+Server -> "Service(s)" as Services: start()
+activate Services
+
+Services -> Services: fireLifecycleEvent(\n    BEFORE_START_EVENT)
+
+Services -> Services: startInternal()
+activate Services
+
+Services -> Services: fireLifecycleEvent(\n    START_EVENT)
+
+Services -> Engine: start()
+activate Engine
+
+Engine -> Engine: fireLifecycleEvent(\n    BEFORE_START_EVENT)
+
+Engine -> Engine: startInternal()
+activate Engine
+
+Engine -> Engine: fireLifecycleEvent(\n    START_EVENT)
+
+Engine -->> Engine
+deactivate Engine
+
+Engine -> Engine: fireLifecycleEvent(\n    AFTER_START_EVENT)
+
+Services <<-- Engine
+deactivate Engine
+
+Services -> "Executor(s)" as Executors: start()
+activate Executors
+
+Executors -> Executors: fireLifecycleEvent(\n    BEFORE_START_EVENT)
+
+Executors -> Executors: startInternal()
+activate Executors
+
+Executors -> Executors: fireLifecycleEvent(\n    START_EVENT)
+
+Executors -->> Executors
+deactivate Executors
+
+Executors -> Executors: fireLifecycleEvent(\n    AFTER_START_EVENT)
+
+Services <<-- Executors
+deactivate Executors
+
+Services -> "Mapper\nListener" as MapperListener: start()
+activate MapperListener
+
+MapperListener -> MapperListener: fireLifecycleEvent(\n    BEFORE_START_EVENT)
+
+MapperListener -> MapperListener: startInternal()
+activate MapperListener
+
+MapperListener -> MapperListener: fireLifecycleEvent(\n    START_EVENT)
+
+MapperListener -->> MapperListener
+deactivate MapperListener
+
+MapperListener -> MapperListener: fireLifecycleEvent(\n    AFTER_START_EVENT)
+
+Services <<-- MapperListener
+deactivate MapperListener
+
+Services -> "Connector(s)" as Connectors: start()
+activate Connectors
+
+Connectors -> Connectors: fireLifecycleEvent(\n    BEFORE_START_EVENT)
+Connectors -> Connectors: startInternal()
+activate Connectors
+
+Connectors -> Connectors: fireLifecycleEvent(\n    START_EVENT)
+
+Connectors -> Protocol: start()
+activate Protocol
+Connectors <<-- Protocol
+deactivate Protocol
+
+Connectors -->> Connectors
+deactivate Connectors
+
+Connectors -> Connectors: fireLifecycleEvent(\n    AFTER_INIT_EVENT)
+
+Services <<-- Connectors
+deactivate Connectors
+
+Services -->> Services
+deactivate Services
+
+Services -> Services: fireLifecycleEvent(\n    AFTER_START_EVENT)
+
+Server <<-- Services
+deactivate Services
+
+Server -->> Server
+deactivate Server
+
+Server -> Server: fireLifecycleEvent(\n    AFTER_START_EVENT)
+
+Server -->> Catalina
+deactivate Server
+
+@enduml
