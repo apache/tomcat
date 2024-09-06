@@ -291,7 +291,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     protected void decrementActiveRemoteStreamCount(Stream stream) {
-        setConnectionTimeoutForStreamCount(stream.decrementAndGetActiveRemoteStreamCount());
+        if (stream != null) {
+            setConnectionTimeoutForStreamCount(stream.decrementAndGetActiveRemoteStreamCount());
+        }
     }
 
 
