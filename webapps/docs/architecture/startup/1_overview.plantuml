@@ -55,16 +55,20 @@ return
 |||
 Catalina -> Catalina: initStream()
 
+group More detail in diagram 2
 Catalina -> Server ++: init()
 |||
 return
+end
 
 return
 
 |||
+group More detail in diagram 3
 Catalina -> Server ++: start()
 |||
 return
+end
 
 |||
 Catalina -> Catalina ++: await()
