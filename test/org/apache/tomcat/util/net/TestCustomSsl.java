@@ -62,6 +62,8 @@ public class TestCustomSsl extends TomcatBaseTest {
         File keystoreFile = new File(TesterSupport.LOCALHOST_RSA_JKS);
         certificate.setCertificateKeystoreFile(keystoreFile.getAbsolutePath());
 
+        certificate.setCertificateKeyPassword(TesterSupport.JKS_PASS);
+
         connector.setSecure(true);
         Assert.assertTrue(connector.setProperty("SSLEnabled", "true"));
 

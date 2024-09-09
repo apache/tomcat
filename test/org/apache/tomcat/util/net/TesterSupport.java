@@ -109,6 +109,7 @@ public final class TesterSupport {
     }
 
     public static void initSsl(Tomcat tomcat) {
+        // TLS material for tests uses default password
         initSsl(tomcat, LOCALHOST_RSA_JKS, null, null, null, null);
     }
 
@@ -141,7 +142,7 @@ public final class TesterSupport {
         if (keystorePass != null) {
             certificate.setCertificateKeystorePassword(keystorePass);
         } else {
-            certificate.setCertificateKeystorePassword("changeit");
+            certificate.setCertificateKeystorePassword(JKS_PASS);
         }
         if (keyPassFile != null) {
             certificate.setCertificateKeyPasswordFile(new File(keyPassFile).getAbsolutePath());
