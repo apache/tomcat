@@ -128,6 +128,11 @@
         attribute of the <code>Rfc6265CookieProcessor</code> from
         <code>name</code> to <code>ignore</code>. (markt)
       </update>
+      <update>
+        Remove default password value (was <code>changeit</code>) for the
+        <code>certificateKeystorePassword</code> attribute of a certificate.
+        (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">

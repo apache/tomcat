@@ -1538,8 +1538,7 @@
     <attribute name="certificateKeystorePassword" required="false">
       <p>JSSE only.</p>
       <p>The password to use to access the keystore containing the server&apos;s
-      private key and certificate. If not specified, a default of
-      <code>changeit</code> will be used.</p>
+      private key and certificate.</p>
     </attribute>
 
     <attribute name="certificateKeystorePasswordFile" required="false">
