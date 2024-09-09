@@ -140,6 +140,8 @@ public final class TesterSupport {
         }
         if (keystorePass != null) {
             certificate.setCertificateKeystorePassword(keystorePass);
+        } else {
+            certificate.setCertificateKeystorePassword("changeit");
         }
         if (keyPassFile != null) {
             certificate.setCertificateKeyPasswordFile(new File(keyPassFile).getAbsolutePath());

@@ -244,6 +244,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         case KEYSTORE: {
             SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
             sslHostConfigCertificateRsa.setCertificateKeystoreFile(getPath(TesterSupport.LOCALHOST_RSA_JKS));
+            sslHostConfigCertificateRsa.setCertificateKeystorePassword("changeit");
             sslHostConfig.addCertificate(sslHostConfigCertificateRsa);
             break;
         }
@@ -251,6 +252,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
             SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
             sslHostConfigCertificateRsa.setCertificateFile(getPath(TesterSupport.LOCALHOST_RSA_CERT_PEM));
             sslHostConfigCertificateRsa.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_RSA_KEY_PEM));
+            sslHostConfigCertificateRsa.setCertificateKeyPassword("changeit");
             sslHostConfig.addCertificate(sslHostConfigCertificateRsa);
             break;
         }
@@ -264,6 +266,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         case KEYSTORE: {
             SSLHostConfigCertificate sslHostConfigCertificateEc = new SSLHostConfigCertificate(sslHostConfig, Type.EC);
             sslHostConfigCertificateEc.setCertificateKeystoreFile(getPath(TesterSupport.LOCALHOST_EC_JKS));
+            sslHostConfigCertificateEc.setCertificateKeystorePassword("changeit");
             sslHostConfig.addCertificate(sslHostConfigCertificateEc);
             break;
         }
@@ -271,6 +274,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
             SSLHostConfigCertificate sslHostConfigCertificateEc = new SSLHostConfigCertificate(sslHostConfig, Type.EC);
             sslHostConfigCertificateEc.setCertificateFile(getPath(TesterSupport.LOCALHOST_EC_CERT_PEM));
             sslHostConfigCertificateEc.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_EC_KEY_PEM));
+            sslHostConfigCertificateEc.setCertificateKeyPassword("changeit");
             sslHostConfig.addCertificate(sslHostConfigCertificateEc);
             break;
         }
