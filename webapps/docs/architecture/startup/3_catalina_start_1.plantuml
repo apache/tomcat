@@ -54,6 +54,7 @@ Services -> Services: fireLifecycleEvent(\n    START_EVENT)
 
 Services -> Engine ++: start()
 
+group More detail in diagram 4
 Engine -> Engine: fireLifecycleEvent(\n    BEFORE_START_EVENT)
 
 Engine -> Engine ++: startInternal()
@@ -64,6 +65,7 @@ return
 
 |||
 Engine -> Engine: fireLifecycleEvent(\n    AFTER_START_EVENT)
+end group
 
 return
 
