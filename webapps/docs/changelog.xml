@@ -232,7 +232,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.93 (remm)" rtext="release in progress">
+<section name="Tomcat 9.0.93 (remm)" rtext="2024-08-06">
   <subsection name="Coyote">
     <changelog>
       <fix>
