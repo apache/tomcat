@@ -82,7 +82,7 @@ return
 
 Container -> Container: fireLifecycleEvent(\n    START_EVENT)
 
-group If backgroundProcessorDelay > 0 (Engine defaults to 10, other Containers -1) 
+group If backgroundProcessorDelay > 0 (Engine defaults to 10, other Containers -1)
 Container -> UtilityExecutor ++: scheduleWithFixedDelay()
 UtilityExecutor --> ContainerBackgroundProcessor **
 note right of ContainerBackgroundProcessor
