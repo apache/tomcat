@@ -92,7 +92,8 @@ following diagram.
 Clusters, Realms and Valves.
 </p>
 <p>
-Diagram 5 will show how the Context initialises the Filters, Servlets etc.
+<a href="startup/5_catalina_start_3.png">Diagram 5</a> shows the start process
+for Context elements as it is rather more involved that the other Containers.
 </p>
 <p>
 Diagram 6 will show HostConfig.
