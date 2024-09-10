@@ -83,13 +83,22 @@ associated with a single Protocol instance and a single CoyoteAdapter instance.
 <a href="startup/3_catalina_start_1.png">Diagram 3</a> shows how Tomcat starts
 the objects created by the Digester that were initialized in the previous step.
 This diagram also shows when lifecycle events are fired. There is more detail to
-the starting of the Engine which is shown inthe following diagram.
+the starting of the Engine (and other Containers) which is shown in the
+following diagram.
 </p>
 <p>
-Diagram 4 will show how the Host initialises the Context(s).
+<a href="startup/4_catalina_start_2.png">Diagram 4</a> shows how Containers
+(Engines, Hosts, Contexts and Wrappers) start along with any supporting
+Clusters, Realms and Valves.
 </p>
 <p>
 Diagram 5 will show how the Context initialises the Filters, Servlets etc.
+</p>
+<p>
+Diagram 6 will show HostConfig.
+</p>
+<p>
+Diagram 7 will show ContextConfig.
 </p>
 </subsection>
 
