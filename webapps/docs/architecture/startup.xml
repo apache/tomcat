@@ -96,11 +96,15 @@ Clusters, Realms and Valves.
 for Context elements as it is rather more involved that the other Containers.
 </p>
 <p>
-<a href="startup/6_catalina_host_config.png">Diagram 5</a> shows how the
+<a href="startup/6_catalina_host_config.png">Diagram 6</a> shows how the
 HostConfig component responds to lifecycle events triggered by the Host to
 deploy web applications to the Host.</p>
 <p>
-Diagram 7 will show ContextConfig.
+<a href="startup/7_catalina_context_config.png">Diagram 7</a> shows how the
+ContextConfig component responds to lifecycle events triggered by the Context to
+parse the global and application provided configuration files to create a merged
+web.xml file that is then used, along with other settings, to configure the web
+application.
 </p>
 </subsection>
 
