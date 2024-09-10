@@ -240,7 +240,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     /**
      * Secret information used to generate reasonably secure lock ids.
      */
-    private String secret = "catalina";
+    private String secret = null;
 
 
     /**
@@ -264,6 +264,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         if (getServletConfig().getInitParameter("secret") != null) {
             secret = getServletConfig().getInitParameter("secret");
+        } else {
+            log(sm.getString("webdavservlet.noSecret"));
         }
 
         if (getServletConfig().getInitParameter("maxDepth") != null) {

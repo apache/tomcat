@@ -119,6 +119,10 @@
         Add support for the new Servlet API method
         <code>HttpServletResponse.sendEarlyHints()</code>. (markt)
       </add>
+      <update>
+        Remove default value (was <code>catalina</code>) for the
+        <code>secret</code> init parameter of the WebDAV Servlet. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
