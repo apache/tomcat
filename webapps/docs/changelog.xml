@@ -106,7 +106,7 @@
 -->
 <section name="Tomcat 9.0.95 (remm)" rtext="in development">
 </section>
-<section name="Tomcat 9.0.94 (remm)" rtext="release in progress">
+<section name="Tomcat 9.0.94 (remm)" rtext="2024-09-10">
   <subsection name="Catalina">
     <changelog>
       <fix>
