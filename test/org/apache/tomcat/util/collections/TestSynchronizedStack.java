@@ -95,6 +95,86 @@ public class TestSynchronizedStack {
         Assert.assertNull(stack.pop());
     }
 
+    
+    @Test
+    public void testResetUnlimited() {
+        SynchronizedStack<Object> stack = new SynchronizedStack<>(2, 3);
+
+        Object o1 = new Object();
+        Object o2 = new Object();
+        Object o3 = new Object();
+        Object o4 = new Object();
+
+        stack.push(o1);
+        stack.push(o2);
+        stack.push(o3);
+        Assert.assertFalse(stack.push(o4));
+
+        stack.setLimit(-1);
+        stack.push(o4);
+
+        Assert.assertSame(stack.pop(), o4);
+        Assert.assertSame(stack.pop(), o3);
+
+        Assert.assertSame(stack.pop(), o2);
+        Assert.assertSame(stack.pop(), o1);
+        Assert.assertNull(stack.pop());
+    }
+
+    @Test
+    public void testResetLowerLimit() {
+        SynchronizedStack<Object> stack = new SynchronizedStack<>(2, 3);
+
+        Object o1 = new Object();
+        Object o2 = new Object();
+        Object o3 = new Object();
+        Object o4 = new Object();
+
+        stack.push(o1);
+        stack.push(o2);
+        stack.push(o3);
+        Assert.assertFalse(stack.push(o4));
+
+        stack.setLimit(2);
+        
+        Assert.assertNotNull(stack.pop());
+        Assert.assertNotNull(stack.pop());
+        Assert.assertNull(stack.pop());
+        
+        Assert.assertTrue(stack.push(o1));
+        Assert.assertTrue(stack.push(o2));
+        Assert.assertFalse(stack.push(o3));
+
+        Assert.assertSame(stack.pop(), o2);
+        Assert.assertSame(stack.pop(), o1);
+
+        Assert.assertNull(stack.pop());
+    }
+
+    @Test
+    public void testResetHigher() {
+        SynchronizedStack<Object> stack = new SynchronizedStack<>(2, 3);
+
+        Object o1 = new Object();
+        Object o2 = new Object();
+        Object o3 = new Object();
+        Object o4 = new Object();
+
+        stack.push(o1);
+        stack.push(o2);
+        stack.push(o3);
+        Assert.assertFalse(stack.push(o4));
+
+        stack.setLimit(4);
+
+        Assert.assertTrue(stack.push(o4));
+        Assert.assertSame(stack.pop(), o4);
+        Assert.assertSame(stack.pop(), o3);
+        Assert.assertSame(stack.pop(), o2);
+        Assert.assertSame(stack.pop(), o1);
+
+        Assert.assertNull(stack.pop());
+    }
 
     @Test
     public void testLimitExpand() {
