@@ -19,7 +19,7 @@ package org.apache.tomcat.util.collections;
 /**
  * This is intended as a (mostly) GC-free alternative to
  * {@link java.util.Stack} when the requirement is to create a pool of re-usable
- * objects with no requirement to shrink the pool. The aim is to provide the
+ * objects. The aim is to provide the
  * bare minimum of required functionality as quickly as possible with minimum
  * garbage.
  *
@@ -30,7 +30,6 @@ public class SynchronizedStack<T> {
     public static final int DEFAULT_SIZE = 128;
     private static final int DEFAULT_LIMIT = -1;
 
-    private int size;
     private int limit;
 
     /*
@@ -45,21 +44,26 @@ public class SynchronizedStack<T> {
         this(DEFAULT_SIZE, DEFAULT_LIMIT);
     }
 
-    public SynchronizedStack(int size, int limit) {
-        if (limit > -1 && size > limit) {
-            this.size = limit;
+    public SynchronizedStack(int initialCapacity, int limit) {
+        if (initialCapacity < 0) {
+            throw new IllegalArgumentException("Illegal initialCapacity: " + initialCapacity);
+        }
+
+        if (limit < -1) {
+            throw new IllegalArgumentException("Illegal limit: " + limit);
+        } else if (limit > -1 && initialCapacity > limit) {
+            stack = new Object[limit];
         } else {
-            this.size = size;
+            stack = new Object[initialCapacity];
         }
         this.limit = limit;
-        stack = new Object[this.size];
     }
 
 
     public synchronized boolean push(T obj) {
         index++;
-        if (index == size) {
-            if (limit == -1 || size < limit) {
+        if (index == stack.length) {
+            if (limit == -1 || stack.length < limit) {
                 expand();
             } else {
                 index--;
@@ -89,21 +93,48 @@ public class SynchronizedStack<T> {
         index = -1;
     }
 
+    /**
+     * Sets the limit of this stack. If the new limit is smaller than the
+     * current pushed elements size,  all elements at index {@code limit} 
+     * are discarded.
+     * @param limit
+     */
     public synchronized void setLimit(int limit) {
+        if (limit < -1) {
+            throw new IllegalArgumentException("Illegal limit: " + limit);
+        }
         this.limit = limit;
+        if (this.limit == -1) {
+            return;
+        }
+
+        if (this.limit < stack.length) {
+            shrink();
+        }
     }
 
+    private void shrink() {
+        if (this.limit == -1 || this.limit >= stack.length) {
+            return;
+        }
+        int newSize = this.limit;
+        Object[] newStack = new Object[newSize];
+        System.arraycopy(stack, 0, newStack, 0, newSize);
+        stack = newStack;
+        if (this.index > newSize - 1) {
+            this.index = newSize - 1;
+        }
+    }
     private void expand() {
-        int newSize = size * 2;
+        int newSize = stack.length * 2;
         if (limit != -1 && newSize > limit) {
             newSize = limit;
         }
         Object[] newStack = new Object[newSize];
-        System.arraycopy(stack, 0, newStack, 0, size);
+        System.arraycopy(stack, 0, newStack, 0, stack.length);
         // This is the only point where garbage is created by throwing away the
         // old array. Note it is only the array, not the contents, that becomes
         // garbage.
         stack = newStack;
-        size = newSize;
     }
 }
