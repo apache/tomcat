@@ -109,7 +109,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.0-M26 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.0 plus the additional changes listed below. (markt)
       </scode>
     </changelog>
   </subsection>
