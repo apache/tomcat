@@ -31,14 +31,10 @@ public class ByteBufferUtils {
     private static final Log log = LogFactory.getLog(ByteBufferUtils.class);
 
     private static final Object unsafe;
-    private static final Method cleanerMethod;
-    private static final Method cleanMethod;
     private static final Method invokeCleanerMethod;
 
     static {
         ByteBuffer tempBuffer = ByteBuffer.allocateDirect(0);
-        Method cleanerMethodLocal = null;
-        Method cleanMethodLocal = null;
         Object unsafeLocal = null;
         Method invokeCleanerMethodLocal = null;
         try {
@@ -54,8 +50,6 @@ public class ByteBufferUtils {
             unsafeLocal = null;
             invokeCleanerMethodLocal = null;
         }
-        cleanerMethod = cleanerMethodLocal;
-        cleanMethod = cleanMethodLocal;
         unsafe = unsafeLocal;
         invokeCleanerMethod = invokeCleanerMethodLocal;
     }
@@ -101,16 +95,7 @@ public class ByteBufferUtils {
     }
 
     public static void cleanDirectBuffer(ByteBuffer buf) {
-        if (cleanMethod != null) {
-            try {
-                cleanMethod.invoke(cleanerMethod.invoke(buf));
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException |
-                    SecurityException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("byteBufferUtils.cleaner"), e);
-                }
-            }
-        } else if (invokeCleanerMethod != null) {
+        if (invokeCleanerMethod != null) {
             try {
                 invokeCleanerMethod.invoke(unsafe, buf);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException |
