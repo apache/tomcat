@@ -2672,6 +2672,51 @@
 
 </section>
 
+<section name="Parameter Limit Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Parameter Limit Valve</strong> is used to limit the number of parameters allowed in HTTP requests.
+    The valve can be configured with a global parameter limit, which applies to all requests,
+    and specific limits for certain URL patterns.
+    Requests exceeding the defined parameter limits will result in an HTTP 400 Bad Request error.</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Parameter Limit Valve</strong> supports the following
+    configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.ParameterLimitValve</strong>.</p>
+      </attribute>
+
+      <attribute name="maxGlobalParams" required="false">
+        <p>The maximum number of parameters allowed in any HTTP request.
+        If the number of parameters in a request exceeds this limit,
+        the request will be rejected with an HTTP 400 error.
+        The value must be an integer greater than zero.
+        Default value: <code>1000</code></p>
+      </attribute>
+
+      <attribute name="urlPatternLimits" required="false">
+        <p>A comma-separated list of URL patterns and their respective parameter limits.
+        Each entry should follow the format <code>urlPattern=limit</code>.
+        The valve will apply the limit defined for a URL pattern when a request matches that pattern.
+        If no pattern matches, the global limit will be used.
+        For example: <code>/api/.*=100,/admin/.*=50</code>.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
 </body>
 
 
