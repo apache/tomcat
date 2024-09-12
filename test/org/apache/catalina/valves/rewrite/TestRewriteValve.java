@@ -618,6 +618,23 @@ public class TestRewriteValve extends TomcatBaseTest {
                 "/c", null, "aAa");
     }
 
+    @Test
+    public void testRewriteEmptyHeader() throws Exception {
+
+        // Disable the following of redirects for this test only
+        boolean originalValue = HttpURLConnection.getFollowRedirects();
+        HttpURLConnection.setFollowRedirects(false);
+        try {
+            Map<String, List<String>> resHead = new HashMap<>();
+            Map<String, List<String>> reqHead = new HashMap<>();
+            reqHead.put("\"\"", Arrays.asList(new String[]{"Test"}));
+            doTestRewriteEx("RewriteCond %{HTTP:} .+\nRewriteRule .* - [F]", "",
+                null, null, null, false, resHead, reqHead);
+        } finally {
+            HttpURLConnection.setFollowRedirects(originalValue);
+        }
+    }
+
 
     @Test
     public void testHostRewrite() throws Exception {
@@ -741,6 +758,12 @@ public class TestRewriteValve extends TomcatBaseTest {
 
     private void doTestRewrite(String config, String request, String expectedURI, String expectedQueryString,
             String expectedAttributeValue, boolean valveSkip) throws Exception {
+        doTestRewriteEx(config, request, expectedURI, expectedQueryString,
+                expectedAttributeValue, valveSkip, null, null);
+    }
+
+    private void doTestRewriteEx(String config, String request, String expectedURI, String expectedQueryString,
+            String expectedAttributeValue, boolean valveSkip, Map<String, List<String>> resHead, Map<String, List<String>> reqHead ) throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
 
@@ -770,7 +793,10 @@ public class TestRewriteValve extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() + request, res, null);
+        int rc = methodUrl("http://localhost:" + getPort() + request, res, DEFAULT_CLIENT_TIMEOUT_MS,
+            reqHead,
+            resHead,
+            "GET", true);
         res.setCharset(StandardCharsets.UTF_8);
 
         if (expectedURI == null) {
