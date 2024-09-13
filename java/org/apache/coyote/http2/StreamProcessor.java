@@ -85,6 +85,15 @@ class StreamProcessor extends AbstractProcessor {
             // Note: The regular processor uses the socketWrapper lock, but using that here triggers a deadlock
             processLock.lock();
             try {
+                /*
+                 * In some scenarios, error handling may trigger multiple ERROR events for the same stream. The first
+                 * ERROR event process will close the stream and recycle it. Once the stream has been recycled it should
+                 * not be used for processing any further events. The check below ensures that this is the case. In
+                 * particular, Stream.recycle() should not be called more than once per Stream.
+                 */
+                if (!stream.equals(handler.getStream(stream.getIdAsInt()))) {
+                    return;
+                }
                 // HTTP/2 equivalent of AbstractConnectionHandler#process() without the
                 // socket <-> processor mapping
                 SocketState state = SocketState.CLOSED;
