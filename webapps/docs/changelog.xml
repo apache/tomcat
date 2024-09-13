@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.95 (remm)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Fix <bug>69320</bug>, a regression in the fix for <bug>69302</bug> that
+        meant the HTTP/2 processing was likely to be broken for all clients once
+        any client sent an HTTP/2 reset frame. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.94 (remm)" rtext="2024-09-10">
   <subsection name="Catalina">
