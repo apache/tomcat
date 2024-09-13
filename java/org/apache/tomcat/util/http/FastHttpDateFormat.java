@@ -71,9 +71,9 @@ public final class FastHttpDateFormat {
     }
 
     /**
-     * Instant on which the currentDate object was generated.
+     * Instant on which the currentDate object was generated. 
      */
-    private static volatile long currentDateGenerated = 0L;
+    private static volatile long currentDateGeneratedInSeconds = 0L;
 
 
     /**
@@ -103,12 +103,11 @@ public final class FastHttpDateFormat {
      * @return the HTTP date
      */
     public static String getCurrentDate() {
-        long now = System.currentTimeMillis();
-        // Ignore millisecond part.
-        now -= now % 1000L;
-        if (now != currentDateGenerated) {
-            currentDate = FORMAT_RFC5322.format(new Date(now));
-            currentDateGenerated = now;
+        // according rfc5322, date/time data is accurate to the second.
+        long nowInSeconds = System.currentTimeMillis() / 1000L;
+        if (nowInSeconds != currentDateGeneratedInSeconds) {
+            currentDate = FORMAT_RFC5322.format(new Date(nowInSeconds * 1000L));
+            currentDateGeneratedInSeconds = nowInSeconds;
         }
         return currentDate;
     }
