@@ -71,7 +71,7 @@ public final class FastHttpDateFormat {
     }
 
     /**
-     * Instant on which the currentDate object was generated. 
+     * Instant on which the currentDate object was generated.
      */
     private static volatile long currentDateGeneratedInSeconds = 0L;
 
