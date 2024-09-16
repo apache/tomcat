@@ -105,6 +105,7 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0 (markt)" rtext="in development">
+</section>
 <section name="Tomcat 11.0.0-M26 (markt)" rtext="release in progress">
   <subsection name="Coyote">
     <changelog>
