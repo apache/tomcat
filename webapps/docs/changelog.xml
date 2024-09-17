@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.31 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Ensure that <code>ServerAuthModule.initialize()</code> is called when
+        the module is configured via <code>registerServerAuthModule()</code>.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.30 (schultz)" rtext="2024-09-17">
   <subsection name="Coyote">
