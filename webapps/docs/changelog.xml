@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.96 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Ensure that the Jakarta Authentication <code>CallbackHandler</code> only
+        creates one <code>GenericPrincipal</code> in the <code>Subject</code>.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.95 (remm)" rtext="release in progress">
   <subsection name="Coyote">
