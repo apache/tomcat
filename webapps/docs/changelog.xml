@@ -109,7 +109,12 @@
     <changelog>
       <fix>
         Ensure that <code>ServerAuthModule.initialize()</code> is called when
-        the module is configured via <code>registerServerAuthModule()</code>.
+        a Jakarta Authentication module is configured via
+        <code>registerServerAuthModule()</code>. (markt)
+      </fix>
+      <fix>
+        Ensure that the Jakarta Authentication <code>CallbackHandler</code> only
+        creates one <code>GenericPrincipal</code> in the <code>Subject</code>.
         (markt)
       </fix>
     </changelog>
