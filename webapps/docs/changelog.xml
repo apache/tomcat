@@ -117,6 +117,11 @@
         explicitly set the HTTP response status to 500 as the
         <code>ServerAuthContext</code> may not have set it. (markt)
       </fix>
+      <fix>
+        When persisting the Jakarta Authentication provider configuration,
+        create any necessary parent directories that don't already exist.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
