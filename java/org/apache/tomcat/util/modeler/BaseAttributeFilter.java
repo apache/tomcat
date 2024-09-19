@@ -136,7 +136,7 @@ public class BaseAttributeFilter implements NotificationFilter {
             return false;
         }
         synchronized (names) {
-            if (names.size() < 1) {
+            if (names.isEmpty()) {
                 return true;
             } else {
                 return names.contains(acn.getAttributeName());
