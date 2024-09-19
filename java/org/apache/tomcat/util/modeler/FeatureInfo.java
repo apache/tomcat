@@ -23,18 +23,17 @@ import javax.management.MBeanFeatureInfo;
 
 
 /**
- * <p>Convenience base class for <code>AttributeInfo</code> and
- * <code>OperationInfo</code> classes that will be used to collect configuration
+ * <p>Convenience base class that will be used to collect configuration
  * information for the <code>ModelMBean</code> beans exposed for management.</p>
- *
+ * <p>The feature described can be an attribute, an operation, a
+ * parameter, or a notification.
  * @author Craig R. McClanahan
  */
-public class FeatureInfo implements Serializable {
+public abstract class FeatureInfo implements Serializable {
     private static final long serialVersionUID = -911529176124712296L;
 
     protected String description = null;
     protected String name = null;
-    protected MBeanFeatureInfo info = null;
 
     // all have type except Constructor
     protected String type = null;
@@ -51,6 +50,7 @@ public class FeatureInfo implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+        afterNodeChanged();
     }
 
 
@@ -64,6 +64,7 @@ public class FeatureInfo implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+        afterNodeChanged();
     }
 
     /**
@@ -75,7 +76,35 @@ public class FeatureInfo implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+        afterNodeChanged();
     }
 
+    /**
+     * Always builds a new instance of concrete {@link MBeanFeatureInfo} describes current {@link FeatureInfo} object.
+     * @return instance of {@link MBeanFeatureInfo}, describes current concrete {@link FeatureInfo} object.
+     */
+    protected abstract MBeanFeatureInfo buildMBeanInfo();
+    
+    private transient MBeanFeatureInfo infoCache = null;
 
+    /**
+     * Retrieves the latest MBean exposed management purpose.
+     * 
+     * @return latest mbean exposed for management, from cache if exists.
+     */
+    protected final MBeanFeatureInfo getLatestMBeanInfo() {
+        if (infoCache == null) {
+            infoCache = buildMBeanInfo();
+        }
+        return infoCache;
+    }
+    
+    /**
+     * Callback when {@link FeatureInfo} node change occurs.
+     * 
+     */
+    protected void afterNodeChanged() {
+        // clear MBean info cache.
+        infoCache = null;
+    }
 }

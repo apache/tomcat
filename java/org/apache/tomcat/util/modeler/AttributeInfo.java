@@ -120,19 +120,10 @@ public class AttributeInfo extends FeatureInfo {
 
     // --------------------------------------------------------- Public Methods
 
-
-    /**
-     * Create and return a <code>ModelMBeanAttributeInfo</code> object that
-     * corresponds to the attribute described by this instance.
-     * @return the attribute info
-     */
-    MBeanAttributeInfo createAttributeInfo() {
-        // Return our cached information (if any)
-        if (info == null) {
-            info = new MBeanAttributeInfo(getName(), getType(), getDescription(),
-                            isReadable(), isWriteable(), false);
-        }
-        return (MBeanAttributeInfo)info;
+    @Override
+    protected MBeanAttributeInfo buildMBeanInfo() {
+        return new MBeanAttributeInfo(getName(), getType(), getDescription(),
+                isReadable(), isWriteable(), false);
     }
 
     // -------------------------------------------------------- Private Methods
@@ -162,6 +153,4 @@ public class AttributeInfo extends FeatureInfo {
         sb.append(name.substring(1));
         return sb.toString();
     }
-
-
 }
