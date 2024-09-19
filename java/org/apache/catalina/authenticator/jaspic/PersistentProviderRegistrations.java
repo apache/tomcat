@@ -94,6 +94,7 @@ public final class PersistentProviderRegistrations {
     static void writeProviders(Providers providers, File configFile) {
         File configFileOld = new File(configFile.getAbsolutePath() + ".old");
         File configFileNew = new File(configFile.getAbsolutePath() + ".new");
+        File configParent = configFileNew.getParentFile();
 
         // Remove left over temporary files if present
         if (configFileOld.exists()) {
@@ -106,6 +107,12 @@ public final class PersistentProviderRegistrations {
             if (configFileNew.delete()) {
                 throw new SecurityException(sm.getString("persistentProviderRegistrations.existsDeleteFail",
                         configFileNew.getAbsolutePath()));
+            }
+        }
+        if (!configParent.exists()) {
+            if (!configParent.mkdirs()) {
+                throw new SecurityException(sm.getString("persistentProviderRegistrations.mkdirsFail",
+                        configParent.getAbsolutePath()));
             }
         }
 
