@@ -112,6 +112,11 @@
         creates one <code>GenericPrincipal</code> in the <code>Subject</code>.
         (markt)
       </fix>
+      <fix>
+        If the Jakarta Authentication process fails with an Exception,
+        explicitly set the HTTP response status to 500 as the
+        <code>ServerAuthContext</code> may not have set it. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
