@@ -98,13 +98,13 @@ public final class PersistentProviderRegistrations {
 
         // Remove left over temporary files if present
         if (configFileOld.exists()) {
-            if (configFileOld.delete()) {
+            if (!configFileOld.delete()) {
                 throw new SecurityException(sm.getString("persistentProviderRegistrations.existsDeleteFail",
                         configFileOld.getAbsolutePath()));
             }
         }
         if (configFileNew.exists()) {
-            if (configFileNew.delete()) {
+            if (!configFileNew.delete()) {
                 throw new SecurityException(sm.getString("persistentProviderRegistrations.existsDeleteFail",
                         configFileNew.getAbsolutePath()));
             }
