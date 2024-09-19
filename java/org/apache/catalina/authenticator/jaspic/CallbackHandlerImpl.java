@@ -68,7 +68,9 @@ public class CallbackHandlerImpl implements CallbackHandler, Contained {
                 if (callback instanceof CallerPrincipalCallback) {
                     CallerPrincipalCallback cpc = (CallerPrincipalCallback) callback;
                     name = cpc.getName();
-                    principal = cpc.getPrincipal();
+                    if (cpc.getPrincipal() != null) {
+                        principal = cpc.getPrincipal();
+                    }
                     subject = cpc.getSubject();
                 } else if (callback instanceof GroupPrincipalCallback) {
                     GroupPrincipalCallback gpc = (GroupPrincipalCallback) callback;
