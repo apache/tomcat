@@ -127,6 +127,11 @@
         create any necessary parent directories that don't already exist.
         (markt)
       </fix>
+      <fix>
+        Correct the logic used to detect errors when deleting temporary files
+        associated with persisting the Jakarta Authentication provider
+        configuration. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
