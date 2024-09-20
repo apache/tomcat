@@ -42,23 +42,6 @@ different ways to start tomcat, including:
   <li>Automatically as a Windows service.</li>
 </ul>
 
-<subsection name="description">
-<p>
-A <a href="startup/serverStartup.txt">text description</a> of the startup
-procedure created for Tomcat 5. The updated version of this description for
-Tomcat 11 will be included in the updated diagrams and diagram descriptions in
-the following section. This text file will be removed when that update is
-complete.
-</p>
-</subsection>
-
-<subsection name="diagram">
-<p>
-The <a href="startup/serverStartup.pdf">UML sequence diagram</a> of the startup
-procedure created for Tomcat 5 is gradually being replaced with updated diagrams
-based on Tomcat 11. The scope of these diagrams may be adjusted as they are
-produced.
-</p>
 <p>
 A series of UML diagrams have been created to document the start-up process for
 Tomcat.
@@ -106,20 +89,14 @@ parse the global and application provided configuration files to create a merged
 web.xml file that is then used, along with other settings, to configure the web
 application.
 </p>
-</subsection>
 
-<subsection name="comments">
 <p>
-The startup process can be customized in many ways, both
-by modifying Tomcat code and by implementing your own
-LifecycleListeners which are then registered in the server.xml
-configuration file.
+The startup process can be customized in many ways by implementing your own
+LifecycleListeners which are then registered in the server.xml configuration
+file.
 </p>
 
-</subsection>
-
 </section>
-
 
 </body>
 </document>
