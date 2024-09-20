@@ -142,7 +142,7 @@
         <code>FastHttpDateFormat#getCurrentDate()</code> (used to generate Date
         headers for HTTP responses) generates the correct string for the given
         input. Prior to this change, the output may have wrong by one second in
-        some cases. (markt)
+        some cases. Pull request <pr>751</pr> provided by Chenjp. (markt)
       </fix>
     </changelog>
   </subsection>
