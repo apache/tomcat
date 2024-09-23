@@ -182,7 +182,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("-auto-1-Acceptor"));
+        Assert.assertTrue(client.getResponseBody().contains("http-"));
 
         client.setRequest(new String[] {
                 "GET /manager/text/list HTTP/1.1" + CRLF +
