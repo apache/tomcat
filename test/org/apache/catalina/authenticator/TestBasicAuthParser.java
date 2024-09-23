@@ -438,7 +438,7 @@ public class TestBasicAuthParser {
      * for BASIC Authentication.
      * Note: only used internally, so no need to validate arguments.
      */
-    private static final class BasicAuthHeader {
+    public static final class BasicAuthHeader {
 
         private static final byte[] HEADER =
                 "authorization: ".getBytes(StandardCharsets.ISO_8859_1);
@@ -448,7 +448,7 @@ public class TestBasicAuthParser {
         /*
          * This method creates a valid base64 blob
          */
-        private BasicAuthHeader(String method, String username,
+        public BasicAuthHeader(String method, String username,
                 String password) {
             this(method, username, password, null);
         }
@@ -529,7 +529,7 @@ public class TestBasicAuthParser {
             }
         }
 
-        private ByteChunk getHeader() {
+        public ByteChunk getHeader() {
             return authHeader;
         }
     }
