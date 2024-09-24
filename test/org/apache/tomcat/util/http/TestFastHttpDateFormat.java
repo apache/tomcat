@@ -22,44 +22,52 @@ import org.junit.Test;
 public class TestFastHttpDateFormat {
 
     @Test
-    public void testGetCurrentDateInSameSecond() {
-        long now = System.currentTimeMillis();
-        try {
-            Thread.sleep(1000L - now % 1000);
-        } catch (InterruptedException e) {
-            // Ignore
-        }
-        now = System.currentTimeMillis();
-        String s1 = FastHttpDateFormat.getCurrentDate();
-        long lastMillisInSameSecond = now - now % 1000 + 900L;
-        try {
-            Thread.sleep(lastMillisInSameSecond - now);
-        } catch (InterruptedException e) {
-            // Ignore
-        }
-        String s2 = FastHttpDateFormat.getCurrentDate();
-        Assert.assertEquals("Two same RFC5322 format dates are expected.", s1, s2);
-    }
+    public void testGetCurrentDate() {
+        /*
+         * Run three iterations of the test. The runs are offset by 1300 seconds to ensure that FastHttpDateFormat is
+         * using a 1s window aligned with the start of a second.
+         */
+        for (int i = 0; i < 3; i++) {
+            if (i > 0) {
+                try {
+                    Thread.sleep(1300);
+                } catch (InterruptedException e) {
+                    Assert.fail("InterruptedException observed");
+                }
+            }
+            String d1 = FastHttpDateFormat.getCurrentDate();
+            long start = System.currentTimeMillis() / 1000;
 
-    @Test
-    public void testGetCurrentDateNextToAnotherSecond() {
-        long now = System.currentTimeMillis();
+            long t1 = 0;
+            long t2 = 0;
+            long t3 = start;
+            String d2 = d1;
 
-        try {
-            Thread.sleep(2000L - now % 1000 + 500L);
-        } catch (InterruptedException e) {
-            // Ignore
-        }
-        now = System.currentTimeMillis();
-        String s1 = FastHttpDateFormat.getCurrentDate();
-        long firstMillisOfNextSecond = now - now % 1000 + 1100L;
-        try {
-            Thread.sleep(firstMillisOfNextSecond - now);
-        } catch (InterruptedException e) {
-            // Ignore
-        }
+            /*
+             * Run this test for 3s. Should normally see 3 changes of date. May, very rarely, see 2.
+             */
+            int changes = 0;
+            while (t3 - start < 3) {
 
-        String s2 = FastHttpDateFormat.getCurrentDate();
-        Assert.assertFalse("Two different RFC5322 format dates are expected.", s1.equals(s2));
+                // Copy results to next slot, dropping the oldest (t3 and d2)
+                d2 = d1;
+                t3 = t2;
+                t2 = t1;
+
+                // Get current results. The date must be obtained before the current time.
+                d1 = FastHttpDateFormat.getCurrentDate();
+                t1 = System.currentTimeMillis() / 1000;
+
+                // Has the formatted date changed
+                if (!d2.equals(d1)) {
+                    changes++;
+                    // Then the second must have changed
+                    if (t1 == t2 && t2 == t3) {
+                        Assert.fail("Formatted date changed withint the same second");
+                    }
+                }
+            }
+            Assert.assertTrue("Saw [" + changes + "] in formatted date", changes > 1 && changes < 4);
+        }
     }
 }
