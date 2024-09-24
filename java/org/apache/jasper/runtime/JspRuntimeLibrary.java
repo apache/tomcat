@@ -1084,15 +1084,7 @@ public class JspRuntimeLibrary {
     }
 
 
-    public static void releaseTag(Tag tag, InstanceManager instanceManager, boolean reused) {
-        // Caller ensures pool is non-null if reuse is true
-        if (!reused) {
-            releaseTag(tag, instanceManager);
-        }
-    }
-
-
-    protected static void releaseTag(Tag tag, InstanceManager instanceManager) {
+    public static void releaseTag(Tag tag, InstanceManager instanceManager) {
         try {
             tag.release();
         } catch (Throwable t) {
