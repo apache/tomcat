@@ -58,6 +58,8 @@ public class TestManagerWebapp extends TomcatBaseTest {
      */
     @Test
     public void testServlets() throws Exception {
+        // Avoid possible locking failure due to deployment with the manager in testDeploy
+        ignoreTearDown = true;
         Tomcat tomcat = getTomcatInstance();
         tomcat.setAddDefaultWebXmlToWebapp(false);
         tomcat.addUser("admin", "sekr3t");
