@@ -153,6 +153,10 @@
         input. Prior to this change, the output may have wrong by one second in
         some cases. Pull request <pr>751</pr> provided by Chenjp. (markt)
       </fix>
+      <fix>
+        Request start time may not have been accurately recorded for HTTP/1.1
+        requests preceded by a large number of blank lines. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
