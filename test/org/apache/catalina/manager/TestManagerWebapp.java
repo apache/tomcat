@@ -60,20 +60,14 @@ public class TestManagerWebapp extends TomcatBaseTest {
     public void testServlets() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         tomcat.setAddDefaultWebXmlToWebapp(false);
-
-        File configFile = new File(getTemporaryDirectory(), "tomcat-users-manager.xml");
-        try (PrintWriter writer = new PrintWriter(configFile)) {
-            writer.write(CONFIG);
-        }
-        addDeleteOnTearDown(configFile);
-
-        MemoryRealm memoryRealm = new MemoryRealm();
-        memoryRealm.setCredentialHandler(new MessageDigestCredentialHandler());
-        memoryRealm.setPathname(configFile.getAbsolutePath());
-        tomcat.getEngine().setRealm(memoryRealm);
+        tomcat.addUser("admin", "sekr3t");
+        tomcat.addRole("admin", "manager-gui");
+        tomcat.addRole("admin", "manager-script");
+        tomcat.addRole("admin", "manager-jmx");
+        tomcat.addRole("admin", "manager-status");
 
         // Add manager webapp
-        File appDir = new File(System.getProperty("tomcat.test.basedir"), "webapps/manager");
+        File appDir = new File(getBuildDirectory(), "webapps/manager");
         tomcat.addWebapp(null, "/manager", appDir.getAbsolutePath());
 
         tomcat.start();
@@ -195,6 +189,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("/manager:running"));
 
+        tomcat.stop();
     }
 
     @Test
@@ -215,7 +210,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         tomcat.getEngine().setRealm(memoryRealm);
 
         // Add manager webapp
-        File appDir = new File(System.getProperty("tomcat.test.basedir"), "webapps/manager");
+        File appDir = new File(getBuildDirectory(), "webapps/manager");
         Context ctx = tomcat.addWebapp(null, "/manager", appDir.getAbsolutePath());
 
         // Add host config otherwise there's no JMX deployer bean
@@ -384,6 +379,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
 
+        tomcat.stop();
     }
 
 }
