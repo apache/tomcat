@@ -155,6 +155,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>69333</bug>: Remove unnecessary code from generated JSPs. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M26 (markt)" rtext="release in progress">
   <subsection name="Coyote">
