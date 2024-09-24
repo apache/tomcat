@@ -17,7 +17,10 @@
 package org.apache.catalina.manager;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -29,9 +32,14 @@ import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.TestBasicAuthParser.BasicAuthHeader;
 import org.apache.catalina.realm.MemoryRealm;
 import org.apache.catalina.realm.MessageDigestCredentialHandler;
+import org.apache.catalina.startup.Catalina;
+import org.apache.catalina.startup.HostConfig;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.storeconfig.StoreConfigLifecycleListener;
+import org.apache.catalina.util.IOTools;
+import org.apache.catalina.util.URLEncoder;
 
 public class TestManagerWebapp extends TomcatBaseTest {
 
@@ -51,6 +59,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
     @Test
     public void testServlets() throws Exception {
         Tomcat tomcat = getTomcatInstance();
+        tomcat.setAddDefaultWebXmlToWebapp(false);
 
         File configFile = new File(getTemporaryDirectory(), "tomcat-users-manager.xml");
         try (PrintWriter writer = new PrintWriter(configFile)) {
@@ -61,11 +70,11 @@ public class TestManagerWebapp extends TomcatBaseTest {
         MemoryRealm memoryRealm = new MemoryRealm();
         memoryRealm.setCredentialHandler(new MessageDigestCredentialHandler());
         memoryRealm.setPathname(configFile.getAbsolutePath());
+        tomcat.getEngine().setRealm(memoryRealm);
 
         // Add manager webapp
         File appDir = new File(System.getProperty("tomcat.test.basedir"), "webapps/manager");
-        Context ctx = tomcat.addWebapp(null, "/manager", appDir.getAbsolutePath());
-        ctx.setRealm(memoryRealm);
+        tomcat.addWebapp(null, "/manager", appDir.getAbsolutePath());
 
         tomcat.start();
 
@@ -77,14 +86,6 @@ public class TestManagerWebapp extends TomcatBaseTest {
         };
         client.setPort(getPort());
         String basicHeader = (new BasicAuthHeader("Basic", "admin", "sekr3t")).getHeader().toString();
-
-        client.setRequest(new String[] {
-                "GET /manager/ HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF + CRLF });
-        client.connect();
-        client.processRequest(true);
-        Assert.assertEquals(HttpServletResponse.SC_FOUND, client.getStatusCode());
 
         client.setRequest(new String[] {
                 "GET /manager/html HTTP/1.1" + CRLF +
@@ -193,6 +194,195 @@ public class TestManagerWebapp extends TomcatBaseTest {
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("/manager:running"));
+
+    }
+
+    @Test
+    public void testDeploy() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.setAddDefaultWebXmlToWebapp(false);
+        tomcat.getServer().addLifecycleListener(new StoreConfigLifecycleListener());
+
+        File configFile = new File(getTemporaryDirectory(), "tomcat-users-manager-delpoy.xml");
+        try (PrintWriter writer = new PrintWriter(configFile)) {
+            writer.write(CONFIG);
+        }
+        addDeleteOnTearDown(configFile);
+
+        MemoryRealm memoryRealm = new MemoryRealm();
+        memoryRealm.setCredentialHandler(new MessageDigestCredentialHandler());
+        memoryRealm.setPathname(configFile.getAbsolutePath());
+        tomcat.getEngine().setRealm(memoryRealm);
+
+        // Add manager webapp
+        File appDir = new File(System.getProperty("tomcat.test.basedir"), "webapps/manager");
+        Context ctx = tomcat.addWebapp(null, "/manager", appDir.getAbsolutePath());
+
+        // Add host config otherwise there's no JMX deployer bean
+        HostConfig hostConfig = new HostConfig();
+        ctx.getParent().addLifecycleListener(hostConfig);
+
+        tomcat.start();
+
+        SimpleHttpClient client = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+        client.setPort(getPort());
+        String basicHeader = (new BasicAuthHeader("Basic", "admin", "sekr3t")).getHeader().toString();
+
+        appDir = new File(System.getProperty("tomcat.test.basedir"), "webapps/examples");
+
+        client.setRequest(new String[] {
+                "GET /manager/text/deploy?war=" + URLEncoder.QUERY.encode(appDir.getAbsolutePath(), StandardCharsets.UTF_8) + " HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Authorization: " + basicHeader + CRLF +
+                "Connection: Close" + CRLF + CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("OK - "));
+
+        client.setRequest(new String[] {
+                "GET /examples/servlets/servlet/RequestInfoExample HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Connection: Close" + CRLF + CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("/examples/servlets/servlet/RequestInfoExample"));
+
+        client.setRequest(new String[] {
+                "GET /manager/text/stop?path=/examples HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Authorization: " + basicHeader + CRLF +
+                "Connection: Close" + CRLF + CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+
+        client.setRequest(new String[] {
+                "GET /examples/servlets/servlet/RequestInfoExample HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Connection: Close" + CRLF + CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, client.getStatusCode());
+
+        client.setRequest(new String[] {
+                "GET /manager/text/start?path=/examples HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Authorization: " + basicHeader + CRLF +
+                "Connection: Close" + CRLF + CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+
+        client.setRequest(new String[] {
+                "GET /examples/servlets/servlet/RequestInfoExample HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Connection: Close" + CRLF + CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("/examples/servlets/servlet/RequestInfoExample"));
+
+        client.setRequest(new String[] {
+                "GET /manager/text/save HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Authorization: " + basicHeader + CRLF +
+                "Connection: Close" + CRLF + CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+
+        client.setRequest(new String[] {
+                "GET /manager/text/save?path=/examples HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Authorization: " + basicHeader + CRLF +
+                "Connection: Close" + CRLF + CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+
+        File serverXml = new File(tomcat.getServer().getCatalinaBase(), Catalina.SERVER_XML);
+        Assert.assertTrue(serverXml.canRead());
+        addDeleteOnTearDown(serverXml);
+        String serverXmlDump = "";
+        try (FileReader reader = new FileReader(serverXml);
+                StringWriter writer = new StringWriter()) {
+            IOTools.flow(reader, writer);
+            serverXmlDump = writer.toString();
+        }
+        Assert.assertTrue(serverXmlDump.contains("StoreConfigLifecycleListener"));
+
+        client.setRequest(new String[] {
+                "GET /manager/text/reload?path=/examples HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Authorization: " + basicHeader + CRLF +
+                "Connection: Close" + CRLF + CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+
+        client.setRequest(new String[] {
+                "GET /manager/text/list HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Authorization: " + basicHeader + CRLF +
+                "Connection: Close" + CRLF + CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("/examples:running"));
+
+        client.setRequest(new String[] {
+                "GET /examples/servlets/servlet/RequestInfoExample HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Connection: Close" + CRLF + CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("/examples/servlets/servlet/RequestInfoExample"));
+
+        client.setRequest(new String[] {
+                "GET /manager/text/list HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Authorization: " + basicHeader + CRLF +
+                "Connection: Close" + CRLF + CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("/examples:running"));
+
+        client.setRequest(new String[] {
+                "GET /manager/text/undeploy?path=/examples HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Authorization: " + basicHeader + CRLF +
+                "Connection: Close" + CRLF + CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+
+        client.setRequest(new String[] {
+                "GET /manager/text/list HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Authorization: " + basicHeader + CRLF +
+                "Connection: Close" + CRLF + CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertFalse(client.getResponseBody().contains("/examples:running"));
+
+        client.setRequest(new String[] {
+                "GET /manager/text/findleaks?statusLine=true HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Authorization: " + basicHeader + CRLF +
+                "Connection: Close" + CRLF + CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
 
     }
 
