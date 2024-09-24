@@ -150,10 +150,14 @@ public class StoreFileMover {
             }
         }
         String sb = getTimeTag();
-        configSave = new File(configFile + sb);
-        if (!configSave.isAbsolute()) {
-            configSave = new File(getBasename(), configFile + sb);
-        }
+        int i = 0;
+        do {
+            configSave = new File(configFile + sb + "-" + String.valueOf(i));
+            if (!configSave.isAbsolute()) {
+                configSave = new File(getBasename(), configFile + sb + "-" + String.valueOf(i));
+            }
+            i++;
+        } while (configSave.exists());
     }
 
     /**
