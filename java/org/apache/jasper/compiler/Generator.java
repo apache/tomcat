@@ -2163,7 +2163,7 @@ class Generator {
             saveScriptingVars(n, VariableInfo.AT_BEGIN);
 
             String tagHandlerClassName = tagHandlerClass.getCanonicalName();
-            if (isPoolingEnabled && !(n.implementsJspIdConsumer())) {
+            if (usePooling(n)) {
                 out.printin(tagHandlerClassName);
                 out.print(" ");
                 out.print(tagHandlerVar);
@@ -2175,16 +2175,9 @@ class Generator {
                 out.print(".get(");
                 out.print(tagHandlerClassName);
                 out.println(".class);");
-                out.printin("boolean ");
-                out.print(tagHandlerVar);
-                out.println("_reused = false;");
             } else {
                 writeNewInstance(tagHandlerVar, tagHandlerClass);
             }
-
-            // Wrap use of tag in try/finally to ensure clean-up takes place
-            out.printil("try {");
-            out.pushIndent();
 
             // includes setting the context
             generateSetters(n, tagHandlerVar, handlerInfo, false);
@@ -2372,32 +2365,18 @@ class Generator {
                 out.printil("}");
             }
 
-            // Print tag reuse
-            if (isPoolingEnabled && !(n.implementsJspIdConsumer())) {
+            if (usePooling(n)) {
+                // Print tag reuse
                 out.printin(n.getTagHandlerPoolName());
                 out.print(".reuse(");
                 out.print(tagHandlerVar);
                 out.println(");");
-                out.printin(tagHandlerVar);
-                out.println("_reused = true;");
-            }
 
-            // Ensure clean-up takes place
-            // Use JspRuntimeLibrary to minimise code in _jspService()
-            out.popIndent();
-            out.printil("} finally {");
-            out.pushIndent();
-            out.printin("org.apache.jasper.runtime.JspRuntimeLibrary.releaseTag(");
-            out.print(tagHandlerVar);
-            out.print(", _jsp_getInstanceManager(), ");
-            if (isPoolingEnabled && !(n.implementsJspIdConsumer())) {
+                // Clean-up
+                out.printin("org.apache.jasper.runtime.JspRuntimeLibrary.releaseTag(");
                 out.print(tagHandlerVar);
-                out.println("_reused);");
-            } else {
-                out.println("false);");
+                out.println(", _jsp_getInstanceManager());");
             }
-            out.popIndent();
-            out.printil("}");
 
             // Declare and synchronize AT_END scripting variables (must do this
             // outside the try/catch/finally block)
@@ -2406,6 +2385,12 @@ class Generator {
 
             restoreScriptingVars(n, VariableInfo.AT_BEGIN);
         }
+
+
+        private boolean usePooling(Node.CustomTag n) {
+            return isPoolingEnabled && !(n.implementsJspIdConsumer());
+        }
+
 
         private void generateCustomDoTag(Node.CustomTag n,
                 TagHandlerInfo handlerInfo, String tagHandlerVar)
