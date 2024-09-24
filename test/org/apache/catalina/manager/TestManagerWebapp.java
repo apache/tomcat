@@ -66,8 +66,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         tomcat.addRole("admin", "manager-jmx");
         tomcat.addRole("admin", "manager-status");
 
+        File webappDir = new File(getBuildDirectory(), "webapps");
+
         // Add manager webapp
-        File appDir = new File(getBuildDirectory(), "webapps/manager");
+        File appDir = new File(webappDir, "manager");
         tomcat.addWebapp(null, "/manager", appDir.getAbsolutePath());
 
         tomcat.start();
@@ -194,11 +196,13 @@ public class TestManagerWebapp extends TomcatBaseTest {
 
     @Test
     public void testDeploy() throws Exception {
+        // Avoid possible locking failure due to deployment with the manager
+        ignoreTearDown = true;
         Tomcat tomcat = getTomcatInstance();
         tomcat.setAddDefaultWebXmlToWebapp(false);
         tomcat.getServer().addLifecycleListener(new StoreConfigLifecycleListener());
 
-        File configFile = new File(getTemporaryDirectory(), "tomcat-users-manager-delpoy.xml");
+        File configFile = new File(getTemporaryDirectory(), "tomcat-users-manager-deploy.xml");
         try (PrintWriter writer = new PrintWriter(configFile)) {
             writer.write(CONFIG);
         }
@@ -209,8 +213,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         memoryRealm.setPathname(configFile.getAbsolutePath());
         tomcat.getEngine().setRealm(memoryRealm);
 
+        File webappDir = new File(getBuildDirectory(), "webapps");
+
         // Add manager webapp
-        File appDir = new File(getBuildDirectory(), "webapps/manager");
+        File appDir = new File(webappDir, "manager");
         Context ctx = tomcat.addWebapp(null, "/manager", appDir.getAbsolutePath());
 
         // Add host config otherwise there's no JMX deployer bean
@@ -228,7 +234,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         client.setPort(getPort());
         String basicHeader = (new BasicAuthHeader("Basic", "admin", "sekr3t")).getHeader().toString();
 
-        appDir = new File(System.getProperty("tomcat.test.basedir"), "webapps/examples");
+        appDir = new File(webappDir, "examples");
 
         client.setRequest(new String[] {
                 "GET /manager/text/deploy?war=" + URLEncoder.QUERY.encode(appDir.getAbsolutePath(), StandardCharsets.UTF_8) + " HTTP/1.1" + CRLF +
