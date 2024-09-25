@@ -50,4 +50,47 @@ public class TestAstAnd {
         Boolean result = processor.eval("null && null");
         Assert.assertEquals(Boolean.FALSE, result);
     }
+
+    @Test
+    public void test05() {
+        ELProcessor processor = new ELProcessor();
+        Boolean result = processor.eval("true && true && true && true && true");
+        Assert.assertEquals(Boolean.TRUE, result);
+    }
+
+    @Test
+    public void test06() {
+        ELProcessor processor = new ELProcessor();
+        Boolean result = processor.eval("true && true && true && true && false");
+        Assert.assertEquals(Boolean.FALSE, result);
+    }
+
+    @Test
+    public void test07() {
+        ELProcessor processor = new ELProcessor();
+        Boolean result = processor.eval("false && true && true && true && true");
+        Assert.assertEquals(Boolean.FALSE, result);
+    }
+
+    @Test
+    public void test08() {
+        ELProcessor processor = new ELProcessor();
+        Boolean result = processor.eval("true && false && true && true && true");
+        Assert.assertEquals(Boolean.FALSE, result);
+    }
+
+    @Test
+    public void test09() {
+        ELProcessor processor = new ELProcessor();
+        Boolean result = processor.eval("true && true && false && true && true");
+        Assert.assertEquals(Boolean.FALSE, result);
+    }
+
+    @Test
+    public void test10() {
+        ELProcessor processor = new ELProcessor();
+        Boolean result = processor.eval("true && true && true && false &&  true");
+        Assert.assertEquals(Boolean.FALSE, result);
+    }
+
 }
