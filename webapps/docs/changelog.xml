@@ -155,6 +155,10 @@
       <fix>
         <bug>69333</bug>: Remove unnecessary code from generated JSPs. (markt)
       </fix>
+      <fix>
+        <bug>69338</bug>: Improve the performance of processing expressions that
+        include AND or OR operations with more than two operands. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
