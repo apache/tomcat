@@ -5,18 +5,15 @@ package org.apache.el.parser;
 /** Token Manager. */
 @SuppressWarnings("all") // Ignore warnings in generated code
 public class ELParserTokenManager implements ELParserConstants {
-
     java.util.Deque<Integer> deque = new java.util.ArrayDeque<Integer>();
 
     /** Debug output. */
     public java.io.PrintStream debugStream = System.out;
 
-
     /** Set debug output. */
     public void setDebugStream(java.io.PrintStream ds) {
         debugStream = ds;
     }
-
 
     private final int jjStopStringLiteralDfa_0(int pos, long active0) {
         switch (pos) {
@@ -31,18 +28,15 @@ public class ELParserTokenManager implements ELParserConstants {
         }
     }
 
-
     private final int jjStartNfa_0(int pos, long active0) {
         return jjMoveNfa_0(jjStopStringLiteralDfa_0(pos, active0), pos + 1);
     }
-
 
     private int jjStopAtPos(int pos, int kind) {
         jjmatchedKind = kind;
         jjmatchedPos = pos;
         return pos + 1;
     }
-
 
     private int jjMoveStringLiteralDfa0_0() {
         switch (curChar) {
@@ -54,7 +48,6 @@ public class ELParserTokenManager implements ELParserConstants {
                 return jjMoveNfa_0(7, 0);
         }
     }
-
 
     private int jjMoveStringLiteralDfa1_0(long active0) {
         try {
@@ -77,12 +70,9 @@ public class ELParserTokenManager implements ELParserConstants {
         return jjStartNfa_0(0, active0);
     }
 
-
     static final long[] jjbitVec0 =
             { 0xfffffffffffffffeL, 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffffffffffffffffL };
-
     static final long[] jjbitVec2 = { 0x0L, 0x0L, 0xffffffffffffffffL, 0xffffffffffffffffL };
-
 
     private int jjMoveNfa_0(int startState, int curPos) {
         int startsAt = 0;
@@ -305,7 +295,6 @@ public class ELParserTokenManager implements ELParserConstants {
         }
     }
 
-
     private final int jjStopStringLiteralDfa_2(int pos, long active0) {
         switch (pos) {
             case 0:
@@ -390,11 +379,9 @@ public class ELParserTokenManager implements ELParserConstants {
         }
     }
 
-
     private final int jjStartNfa_2(int pos, long active0) {
         return jjMoveNfa_2(jjStopStringLiteralDfa_2(pos, active0), pos + 1);
     }
-
 
     private int jjMoveStringLiteralDfa0_2() {
         switch (curChar) {
@@ -474,7 +461,6 @@ public class ELParserTokenManager implements ELParserConstants {
                 return jjMoveNfa_2(0, 0);
         }
     }
-
 
     private int jjMoveStringLiteralDfa1_2(long active0) {
         try {
@@ -556,7 +542,6 @@ public class ELParserTokenManager implements ELParserConstants {
         return jjStartNfa_2(0, active0);
     }
 
-
     private int jjMoveStringLiteralDfa2_2(long old0, long active0) {
         if (((active0 &= old0)) == 0L) {
             return jjStartNfa_2(0, old0);
@@ -599,7 +584,6 @@ public class ELParserTokenManager implements ELParserConstants {
         return jjStartNfa_2(1, active0);
     }
 
-
     private int jjMoveStringLiteralDfa3_2(long old0, long active0) {
         if (((active0 &= old0)) == 0L) {
             return jjStartNfa_2(1, old0);
@@ -631,7 +615,6 @@ public class ELParserTokenManager implements ELParserConstants {
         return jjStartNfa_2(2, active0);
     }
 
-
     private int jjMoveStringLiteralDfa4_2(long old0, long active0) {
         if (((active0 &= old0)) == 0L) {
             return jjStartNfa_2(2, old0);
@@ -661,7 +644,6 @@ public class ELParserTokenManager implements ELParserConstants {
         return jjStartNfa_2(3, active0);
     }
 
-
     private int jjMoveStringLiteralDfa5_2(long old0, long active0) {
         if (((active0 &= old0)) == 0L) {
             return jjStartNfa_2(3, old0);
@@ -680,7 +662,6 @@ public class ELParserTokenManager implements ELParserConstants {
         }
         return jjStartNfa_2(4, active0);
     }
-
 
     private int jjMoveStringLiteralDfa6_2(long old0, long active0) {
         if (((active0 &= old0)) == 0L) {
@@ -701,7 +682,6 @@ public class ELParserTokenManager implements ELParserConstants {
         return jjStartNfa_2(5, active0);
     }
 
-
     private int jjMoveStringLiteralDfa7_2(long old0, long active0) {
         if (((active0 &= old0)) == 0L) {
             return jjStartNfa_2(5, old0);
@@ -721,7 +701,6 @@ public class ELParserTokenManager implements ELParserConstants {
         return jjStartNfa_2(6, active0);
     }
 
-
     private int jjMoveStringLiteralDfa8_2(long old0, long active0) {
         if (((active0 &= old0)) == 0L) {
             return jjStartNfa_2(6, old0);
@@ -740,7 +719,6 @@ public class ELParserTokenManager implements ELParserConstants {
         }
         return jjStartNfa_2(7, active0);
     }
-
 
     private int jjMoveStringLiteralDfa9_2(long old0, long active0) {
         if (((active0 &= old0)) == 0L) {
@@ -764,7 +742,6 @@ public class ELParserTokenManager implements ELParserConstants {
         return jjStartNfa_2(8, active0);
     }
 
-
     private int jjStartNfaWithStates_2(int pos, int kind, int state) {
         jjmatchedKind = kind;
         jjmatchedPos = pos;
@@ -776,19 +753,12 @@ public class ELParserTokenManager implements ELParserConstants {
         return jjMoveNfa_2(state, pos + 1);
     }
 
-
     static final long[] jjbitVec3 = { 0x1ff00000fffffffeL, 0xffffffffffffc000L, 0xffffffffL, 0x600000000000000L };
-
     static final long[] jjbitVec4 = { 0x0L, 0x0L, 0x0L, 0xff7fffffff7fffffL };
-
     static final long[] jjbitVec5 = { 0x0L, 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffffffffffffffffL };
-
     static final long[] jjbitVec6 = { 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffffL, 0x0L };
-
     static final long[] jjbitVec7 = { 0xffffffffffffffffL, 0xffffffffffffffffL, 0x0L, 0x0L };
-
     static final long[] jjbitVec8 = { 0x3fffffffffffL, 0x0L, 0x0L, 0x0L };
-
 
     private int jjMoveNfa_2(int startState, int curPos) {
         int startsAt = 0;
@@ -1217,7 +1187,6 @@ public class ELParserTokenManager implements ELParserConstants {
         }
     }
 
-
     private final int jjStopStringLiteralDfa_1(int pos, long active0) {
         switch (pos) {
             case 0:
@@ -1302,11 +1271,9 @@ public class ELParserTokenManager implements ELParserConstants {
         }
     }
 
-
     private final int jjStartNfa_1(int pos, long active0) {
         return jjMoveNfa_1(jjStopStringLiteralDfa_1(pos, active0), pos + 1);
     }
-
 
     private int jjMoveStringLiteralDfa0_1() {
         switch (curChar) {
@@ -1386,7 +1353,6 @@ public class ELParserTokenManager implements ELParserConstants {
                 return jjMoveNfa_1(0, 0);
         }
     }
-
 
     private int jjMoveStringLiteralDfa1_1(long active0) {
         try {
@@ -1468,7 +1434,6 @@ public class ELParserTokenManager implements ELParserConstants {
         return jjStartNfa_1(0, active0);
     }
 
-
     private int jjMoveStringLiteralDfa2_1(long old0, long active0) {
         if (((active0 &= old0)) == 0L) {
             return jjStartNfa_1(0, old0);
@@ -1511,7 +1476,6 @@ public class ELParserTokenManager implements ELParserConstants {
         return jjStartNfa_1(1, active0);
     }
 
-
     private int jjMoveStringLiteralDfa3_1(long old0, long active0) {
         if (((active0 &= old0)) == 0L) {
             return jjStartNfa_1(1, old0);
@@ -1543,7 +1507,6 @@ public class ELParserTokenManager implements ELParserConstants {
         return jjStartNfa_1(2, active0);
     }
 
-
     private int jjMoveStringLiteralDfa4_1(long old0, long active0) {
         if (((active0 &= old0)) == 0L) {
             return jjStartNfa_1(2, old0);
@@ -1573,7 +1536,6 @@ public class ELParserTokenManager implements ELParserConstants {
         return jjStartNfa_1(3, active0);
     }
 
-
     private int jjMoveStringLiteralDfa5_1(long old0, long active0) {
         if (((active0 &= old0)) == 0L) {
             return jjStartNfa_1(3, old0);
@@ -1592,7 +1554,6 @@ public class ELParserTokenManager implements ELParserConstants {
         }
         return jjStartNfa_1(4, active0);
     }
-
 
     private int jjMoveStringLiteralDfa6_1(long old0, long active0) {
         if (((active0 &= old0)) == 0L) {
@@ -1613,7 +1574,6 @@ public class ELParserTokenManager implements ELParserConstants {
         return jjStartNfa_1(5, active0);
     }
 
-
     private int jjMoveStringLiteralDfa7_1(long old0, long active0) {
         if (((active0 &= old0)) == 0L) {
             return jjStartNfa_1(5, old0);
@@ -1633,7 +1593,6 @@ public class ELParserTokenManager implements ELParserConstants {
         return jjStartNfa_1(6, active0);
     }
 
-
     private int jjMoveStringLiteralDfa8_1(long old0, long active0) {
         if (((active0 &= old0)) == 0L) {
             return jjStartNfa_1(6, old0);
@@ -1652,7 +1611,6 @@ public class ELParserTokenManager implements ELParserConstants {
         }
         return jjStartNfa_1(7, active0);
     }
-
 
     private int jjMoveStringLiteralDfa9_1(long old0, long active0) {
         if (((active0 &= old0)) == 0L) {
@@ -1676,7 +1634,6 @@ public class ELParserTokenManager implements ELParserConstants {
         return jjStartNfa_1(8, active0);
     }
 
-
     private int jjStartNfaWithStates_1(int pos, int kind, int state) {
         jjmatchedKind = kind;
         jjmatchedPos = pos;
@@ -1687,7 +1644,6 @@ public class ELParserTokenManager implements ELParserConstants {
         }
         return jjMoveNfa_1(state, pos + 1);
     }
-
 
     private int jjMoveNfa_1(int startState, int curPos) {
         int startsAt = 0;
@@ -2116,7 +2072,6 @@ public class ELParserTokenManager implements ELParserConstants {
         }
     }
 
-
     /** Token literal values. */
     public static final String[] jjstrLiteralImages = { "", null, "\44\173", "\43\173", null, null, null, null, "\173",
             "\175", null, null, null, null, "\164\162\165\145", "\146\141\154\163\145", "\156\165\154\154", "\56",
@@ -2125,7 +2080,6 @@ public class ELParserTokenManager implements ELParserConstants {
             "\46\46", "\141\156\144", "\174\174", "\157\162", "\145\155\160\164\171",
             "\151\156\163\164\141\156\143\145\157\146", "\52", "\53", "\55", "\77", "\57", "\144\151\166", "\45",
             "\155\157\144", "\53\75", "\75", "\55\76", null, null, null, null, null, null, };
-
 
     protected Token jjFillToken() {
         final Token t;
@@ -2150,10 +2104,8 @@ public class ELParserTokenManager implements ELParserConstants {
         return t;
     }
 
-
     static final int[] jjnextStates = { 0, 1, 3, 4, 2, 0, 1, 4, 2, 0, 1, 4, 5, 2, 0, 1, 2, 6, 16, 17, 18, 23, 24, 11,
             12, 14, 6, 7, 9, 3, 4, 21, 22, 25, 26, };
-
 
     private static final boolean jjCanMove_0(int hiByte, int i1, int i2, long l1, long l2) {
         switch (hiByte) {
@@ -2166,7 +2118,6 @@ public class ELParserTokenManager implements ELParserConstants {
                 return false;
         }
     }
-
 
     private static final boolean jjCanMove_1(int hiByte, int i1, int i2, long l1, long l2) {
         switch (hiByte) {
@@ -2188,19 +2139,12 @@ public class ELParserTokenManager implements ELParserConstants {
         }
     }
 
-
     int curLexState = 0;
-
     int defaultLexState = 0;
-
     int jjnewStateCnt;
-
     int jjround;
-
     int jjmatchedPos;
-
     int jjmatchedKind;
-
 
     /** Get the next Token. */
     public Token getNextToken() {
@@ -2303,14 +2247,12 @@ public class ELParserTokenManager implements ELParserConstants {
         }
     }
 
-
     void SkipLexicalActions(Token matchedToken) {
         switch (jjmatchedKind) {
             default:
                 break;
         }
     }
-
 
     void MoreLexicalActions() {
         jjimageLen += (lengthOfMatch = jjmatchedPos + 1);
@@ -2319,7 +2261,6 @@ public class ELParserTokenManager implements ELParserConstants {
                 break;
         }
     }
-
 
     void TokenLexicalActions(Token matchedToken) {
         switch (jjmatchedKind) {
@@ -2348,7 +2289,6 @@ public class ELParserTokenManager implements ELParserConstants {
         }
     }
 
-
     private void jjCheckNAdd(int state) {
         if (jjrounds[state] != jjround) {
             jjstateSet[jjnewStateCnt++] = state;
@@ -2356,26 +2296,22 @@ public class ELParserTokenManager implements ELParserConstants {
         }
     }
 
-
     private void jjAddStates(int start, int end) {
         do {
             jjstateSet[jjnewStateCnt++] = jjnextStates[start];
         } while (start++ != end);
     }
 
-
     private void jjCheckNAddTwoStates(int state1, int state2) {
         jjCheckNAdd(state1);
         jjCheckNAdd(state2);
     }
-
 
     private void jjCheckNAddStates(int start, int end) {
         do {
             jjCheckNAdd(jjnextStates[start]);
         } while (start++ != end);
     }
-
 
     /** Constructor. */
     public ELParserTokenManager(SimpleCharStream stream) {
@@ -2387,24 +2323,22 @@ public class ELParserTokenManager implements ELParserConstants {
         input_stream = stream;
     }
 
-
     /** Constructor. */
     public ELParserTokenManager(SimpleCharStream stream, int lexState) {
         ReInit(stream);
         SwitchTo(lexState);
     }
 
-
     /** Reinitialise parser. */
 
     public void ReInit(SimpleCharStream stream) {
+
 
         jjmatchedPos = jjnewStateCnt = 0;
         curLexState = defaultLexState;
         input_stream = stream;
         ReInitRounds();
     }
-
 
     private void ReInitRounds() {
         int i;
@@ -2414,7 +2348,6 @@ public class ELParserTokenManager implements ELParserConstants {
         }
     }
 
-
     /** Reinitialise parser. */
     public void ReInit(SimpleCharStream stream, int lexState)
 
@@ -2422,7 +2355,6 @@ public class ELParserTokenManager implements ELParserConstants {
         ReInit(stream);
         SwitchTo(lexState);
     }
-
 
     /** Switch to specified lex state. */
     public void SwitchTo(int lexState) {
@@ -2442,28 +2374,17 @@ public class ELParserTokenManager implements ELParserConstants {
     public static final int[] jjnewLexState = { -1, -1, 1, 1, -1, -1, -1, -1, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, };
-
     static final long[] jjtoToken = { 0x23ffffffffffef0fL, };
-
     static final long[] jjtoSkip = { 0xf0L, };
-
     static final long[] jjtoSpecial = { 0x0L, };
-
     static final long[] jjtoMore = { 0x0L, };
-
     protected SimpleCharStream input_stream;
 
     private final int[] jjrounds = new int[30];
-
     private final int[] jjstateSet = new int[2 * 30];
-
     private final StringBuilder jjimage = new StringBuilder();
-
     private StringBuilder image = jjimage;
-
     private int jjimageLen;
-
     private int lengthOfMatch;
-
     protected int curChar;
 }

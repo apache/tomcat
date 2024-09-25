@@ -3,17 +3,12 @@ package org.apache.el.parser;
 
 @SuppressWarnings("all") // Ignore warnings in generated code
 public class JJTELParserState {
-
     private java.util.List<Node> nodes;
-
     private java.util.List<Integer> marks;
 
     private int sp; // number of nodes on stack
-
     private int mk; // current mark
-
     private boolean node_created;
-
 
     public JJTELParserState() {
         nodes = new java.util.ArrayList<Node>();
@@ -22,7 +17,6 @@ public class JJTELParserState {
         mk = 0;
     }
 
-
     /*
      * Determines whether the current node was actually closed and pushed. This should only be called in the final user
      * action of a node scope.
@@ -30,7 +24,6 @@ public class JJTELParserState {
     public boolean nodeCreated() {
         return node_created;
     }
-
 
     /*
      * Call this to reinitialize the node stack. It is called automatically by the parser's ReInit() method.
@@ -42,7 +35,6 @@ public class JJTELParserState {
         mk = 0;
     }
 
-
     /*
      * Returns the root node of the AST. It only makes sense to call this after a successful parse.
      */
@@ -50,13 +42,11 @@ public class JJTELParserState {
         return nodes.get(0);
     }
 
-
     /* Pushes a node on to the stack. */
     public void pushNode(Node n) {
         nodes.add(n);
         ++sp;
     }
-
 
     /*
      * Returns the node on the top of the stack, and remove it from the stack.
@@ -68,12 +58,10 @@ public class JJTELParserState {
         return nodes.remove(nodes.size() - 1);
     }
 
-
     /* Returns the node currently on the top of the stack. */
     public Node peekNode() {
         return nodes.get(nodes.size() - 1);
     }
-
 
     /*
      * Returns the number of children on the stack in the current node scope.
