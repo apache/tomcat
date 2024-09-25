@@ -157,6 +157,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        The manager webapp will now be able to access certificates again when
+        OpenSSL is used. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.95 (remm)" rtext="release in progress">
   <subsection name="Coyote">
