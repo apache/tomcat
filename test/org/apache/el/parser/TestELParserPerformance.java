@@ -19,8 +19,13 @@ package org.apache.el.parser;
 import java.io.StringReader;
 
 import jakarta.el.ELBaseTest;
+import jakarta.el.ELContext;
+import jakarta.el.ELManager;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.ValueExpression;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.tomcat.util.collections.SynchronizedStack;
@@ -90,5 +95,51 @@ public class TestELParserPerformance extends ELBaseTest {
         }
 
         Assert.assertTrue("Using new ElParser() was faster then using ELParser.ReInit", reinitTotalTime < newTotalTime);
+    }
+
+
+    /*
+     * Ignored by default since this is an absolute test primarily for
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=69338
+     */
+    @Ignore
+    @Test
+    public void testAstAnd() {
+
+        ELManager manager = new ELManager();
+        ELContext context = manager.getELContext();
+        ExpressionFactory factory = ELManager.getExpressionFactory();
+
+        long durations[] = new long[9];
+        for (int j = 0; j < 5; j++) {
+            for (int operandCount = 2; operandCount < 11; operandCount ++) {
+
+                StringBuilder sb = new StringBuilder("${true");
+                for (int i = 2; i <= operandCount; i++) {
+                    sb.append(" && true");
+                }
+                sb.append("}");
+
+                String expression = sb.toString();
+
+                long start = System.nanoTime();
+
+                for (int i = 0; i < 2000000; i++) {
+                    ValueExpression ve = factory.createValueExpression(context, expression, Boolean.class);
+                    Boolean result = ve.getValue(context);
+                    Assert.assertEquals(Boolean.TRUE, result);
+                }
+
+                long duration = System.nanoTime() - start;
+
+                if (j > 0) {
+                    durations[operandCount - 2] += duration;
+                }
+            }
+        }
+        for (int operandCount = 2; operandCount < 11; operandCount ++) {
+            System.out.println("Operand count [" + operandCount + "], duration [" + durations[operandCount -2] + "]");
+        }
+        System.out.println("");
     }
 }
