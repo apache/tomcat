@@ -100,8 +100,8 @@ public class AstLambdaExpression extends SimpleNode {
         methodParameterIndex++;
 
         while (result instanceof LambdaExpression && methodParameterIndex < jjtGetNumChildren()) {
-            result = ((LambdaExpression) result).invoke(
-                    ((AstMethodParameters) children[methodParameterIndex]).getParameters(ctx));
+            result = ((LambdaExpression) result)
+                    .invoke(((AstMethodParameters) children[methodParameterIndex]).getParameters(ctx));
             methodParameterIndex++;
         }
 

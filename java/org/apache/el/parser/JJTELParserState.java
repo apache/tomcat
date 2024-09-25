@@ -23,16 +23,18 @@ public class JJTELParserState {
     }
 
 
-    /* Determines whether the current node was actually closed and
-     pushed.  This should only be called in the final user action of a
-     node scope.  */
+    /*
+     * Determines whether the current node was actually closed and pushed. This should only be called in the final user
+     * action of a node scope.
+     */
     public boolean nodeCreated() {
         return node_created;
     }
 
 
-    /* Call this to reinitialize the node stack.  It is called
-     automatically by the parser's ReInit() method. */
+    /*
+     * Call this to reinitialize the node stack. It is called automatically by the parser's ReInit() method.
+     */
     public void reset() {
         nodes.clear();
         marks.clear();
@@ -41,8 +43,9 @@ public class JJTELParserState {
     }
 
 
-    /* Returns the root node of the AST.  It only makes sense to call
-     this after a successful parse. */
+    /*
+     * Returns the root node of the AST. It only makes sense to call this after a successful parse.
+     */
     public Node rootNode() {
         return nodes.get(0);
     }
@@ -55,8 +58,9 @@ public class JJTELParserState {
     }
 
 
-    /* Returns the node on the top of the stack, and remove it from the
-     stack.  */
+    /*
+     * Returns the node on the top of the stack, and remove it from the stack.
+     */
     public Node popNode() {
         if (--sp < mk) {
             mk = marks.remove(marks.size() - 1);
@@ -71,8 +75,9 @@ public class JJTELParserState {
     }
 
 
-    /* Returns the number of children on the stack in the current node
-     scope. */
+    /*
+     * Returns the number of children on the stack in the current node scope.
+     */
     public int nodeArity() {
         return sp - mk;
     }
@@ -93,10 +98,10 @@ public class JJTELParserState {
     }
 
 
-    /* A definite node is constructed from a specified number of
-     children.  That number of nodes are popped from the stack and
-     made the children of the definite node.  Then the definite node
-     is pushed on to the stack. */
+    /*
+     * A definite node is constructed from a specified number of children. That number of nodes are popped from the
+     * stack and made the children of the definite node. Then the definite node is pushed on to the stack.
+     */
     public void closeNodeScope(Node n, int num) {
         mk = marks.remove(marks.size() - 1);
         while (num-- > 0) {
@@ -110,11 +115,11 @@ public class JJTELParserState {
     }
 
 
-    /* A conditional node is constructed if its condition is true.  All
-     the nodes that have been pushed since the node was opened are
-     made children of the conditional node, which is then pushed
-     on to the stack.  If the condition is false the node is not
-     constructed and they are left on the stack. */
+    /*
+     * A conditional node is constructed if its condition is true. All the nodes that have been pushed since the node
+     * was opened are made children of the conditional node, which is then pushed on to the stack. If the condition is
+     * false the node is not constructed and they are left on the stack.
+     */
     public void closeNodeScope(Node n, boolean condition) {
         if (condition) {
             int a = nodeArity();
