@@ -50,4 +50,46 @@ public class TestAstOr {
         Boolean result = processor.eval("null || null");
         Assert.assertEquals(Boolean.FALSE, result);
     }
+
+    @Test
+    public void test05() {
+        ELProcessor processor = new ELProcessor();
+        Boolean result = processor.eval("false || false || false || false || false");
+        Assert.assertEquals(Boolean.FALSE, result);
+    }
+
+    @Test
+    public void test06() {
+        ELProcessor processor = new ELProcessor();
+        Boolean result = processor.eval("false || false || false || false || true");
+        Assert.assertEquals(Boolean.TRUE, result);
+    }
+
+    @Test
+    public void test07() {
+        ELProcessor processor = new ELProcessor();
+        Boolean result = processor.eval("true || false || false || false || false");
+        Assert.assertEquals(Boolean.TRUE, result);
+    }
+
+    @Test
+    public void test08() {
+        ELProcessor processor = new ELProcessor();
+        Boolean result = processor.eval("false || true || false || false || false");
+        Assert.assertEquals(Boolean.TRUE, result);
+    }
+
+    @Test
+    public void test09() {
+        ELProcessor processor = new ELProcessor();
+        Boolean result = processor.eval("false || false || true || false || false");
+        Assert.assertEquals(Boolean.TRUE, result);
+    }
+
+    @Test
+    public void test10() {
+        ELProcessor processor = new ELProcessor();
+        Boolean result = processor.eval("false || false || false || true ||  false");
+        Assert.assertEquals(Boolean.TRUE, result);
+    }
 }
