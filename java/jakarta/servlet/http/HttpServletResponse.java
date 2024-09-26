@@ -213,9 +213,9 @@ public interface HttpServletResponse extends ServletResponse {
     void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException;
 
     /**
-     * Sends a 103 response to the client using the current response headers. This method does not commit the response and
-     * may be called multiple times before the response is committed. The current response headers may include some headers
-     * that have been added automatcially by the container.
+     * Sends a 103 response to the client using the current response headers. This method does not commit the response
+     * and may be called multiple times before the response is committed. The current response headers may include some
+     * headers that have been added automatically by the container.
      * <p>
      * This method has no effect if called after the response has been committed.
      *
