@@ -350,6 +350,8 @@ public class OpenSSLLibrary {
 
             try {
                 if (OpenSSL_version_num() < 0x3000000fL) {
+                    // There could be unreferenced SSL_CTX still waiting for GC
+                    System.gc();
                     freeDHParameters();
                     if (!MemorySegment.NULL.equals(enginePointer)) {
                         ENGINE_free(enginePointer);
