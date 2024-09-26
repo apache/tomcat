@@ -792,7 +792,7 @@ public class TestStreamProcessor extends Http2TestBase {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.addHeader("server", "TestServerApp");
 
-            resp.setCharacterEncoding(StandardCharsets.UTF_8);
+            resp.setCharacterEncoding("UTF-8");
             resp.setContentType("text/plain");
 
             resp.getWriter().write("OK");
