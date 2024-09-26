@@ -160,8 +160,13 @@
       <add>
         Add <code>server</code> and <code>serverRemoveAppProvidedValues</code>
         to the list of attributes the HTTP/2 protocol will inherit from the
-        HTTP/1.1 connector it is nested within. 
+        HTTP/1.1 connector it is nested within. (markt)
       </add>
+      <fix>
+        Avoid possible crashes when using Apache Tomcat Native, caused by
+        destroying SSLContext objects through GC after APR has been terminated.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
