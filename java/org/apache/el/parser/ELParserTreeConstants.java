@@ -28,31 +28,32 @@ public interface ELParserTreeConstants {
     int JJTDIV = 23;
     int JJTMOD = 24;
     int JJTNEGATIVE = 25;
-    int JJTNOT = 26;
-    int JJTEMPTY = 27;
-    int JJTVALUE = 28;
-    int JJTDOTSUFFIX = 29;
-    int JJTBRACKETSUFFIX = 30;
-    int JJTMETHODPARAMETERS = 31;
-    int JJTSETDATA = 32;
-    int JJTLISTDATA = 33;
-    int JJTMAPDATA = 34;
-    int JJTMAPENTRY = 35;
-    int JJTIDENTIFIER = 36;
-    int JJTFUNCTION = 37;
-    int JJTTRUE = 38;
-    int JJTFALSE = 39;
-    int JJTFLOATINGPOINT = 40;
-    int JJTINTEGER = 41;
-    int JJTSTRING = 42;
-    int JJTNULL = 43;
+    int JJTNOTEMPTY = 26;
+    int JJTNOT = 27;
+    int JJTEMPTY = 28;
+    int JJTVALUE = 29;
+    int JJTDOTSUFFIX = 30;
+    int JJTBRACKETSUFFIX = 31;
+    int JJTMETHODPARAMETERS = 32;
+    int JJTSETDATA = 33;
+    int JJTLISTDATA = 34;
+    int JJTMAPDATA = 35;
+    int JJTMAPENTRY = 36;
+    int JJTIDENTIFIER = 37;
+    int JJTFUNCTION = 38;
+    int JJTTRUE = 39;
+    int JJTFALSE = 40;
+    int JJTFLOATINGPOINT = 41;
+    int JJTINTEGER = 42;
+    int JJTSTRING = 43;
+    int JJTNULL = 44;
 
 
     String[] jjtNodeName = { "CompositeExpression", "LiteralExpression", "DeferredExpression", "DynamicExpression",
             "void", "Semicolon", "Assign", "LambdaExpression", "LambdaParameters", "Elvis", "Choice", "Or", "And",
             "Equal", "NotEqual", "LessThan", "GreaterThan", "LessThanEqual", "GreaterThanEqual", "Concatenation",
-            "Plus", "Minus", "Mult", "Div", "Mod", "Negative", "Not", "Empty", "Value", "DotSuffix", "BracketSuffix",
-            "MethodParameters", "SetData", "ListData", "MapData", "MapEntry", "Identifier", "Function", "True", "False",
-            "FloatingPoint", "Integer", "String", "Null", };
+            "Plus", "Minus", "Mult", "Div", "Mod", "Negative", "NotEmpty", "Not", "Empty", "Value", "DotSuffix",
+            "BracketSuffix", "MethodParameters", "SetData", "ListData", "MapData", "MapEntry", "Identifier", "Function",
+            "True", "False", "FloatingPoint", "Integer", "String", "Null", };
 }
-/* JavaCC - OriginalChecksum=993ae4858a4f3806b4217fe368faaecf (do not edit this line) */
+/* JavaCC - OriginalChecksum=bf490de1f9b26486497de3154abf559e (do not edit this line) */
