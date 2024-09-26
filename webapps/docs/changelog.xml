@@ -176,7 +176,8 @@
       </fix>
       <fix>
         <bug>69338</bug>: Improve the performance of processing expressions that
-        include AND or OR operations with more than two operands. (markt)
+        include AND or OR operations with more than two operands and expressions
+        that use <code>not empty</code>. (markt)
       </fix>
     </changelog>
   </subsection>
