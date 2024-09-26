@@ -242,6 +242,19 @@ class StreamProcessor extends AbstractProcessor {
             headers.addValue("date").setString(FastHttpDateFormat.getCurrentDate());
         }
 
+        // Server header
+        if (protocol != null) {
+            String server = protocol.getHttp11Protocol().getServer();
+            if (server == null) {
+                if (protocol.getHttp11Protocol().getServerRemoveAppProvidedValues()) {
+                    headers.removeHeader("server");
+                }
+            } else {
+                // server always overrides anything the app might set
+                headers.setValue("Server").setString(server);
+            }
+        }
+
         // Exclude some HTTP header fields where the value is determined only
         // while generating the content as per section 9.3.2 of RFC 9110.
         if (coyoteRequest != null && coyoteRequest.method().equals("HEAD")) {

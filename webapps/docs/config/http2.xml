@@ -244,6 +244,8 @@
     <li>maxSavePostSize</li>
     <li>maxTrailerSize</li>
     <li>noCompressionUserAgents</li>
+    <li>server</li>
+    <li>serverRemoveAppProvidedValues</li>
   </ul>
 
   </subsection>
