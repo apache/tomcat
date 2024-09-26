@@ -193,6 +193,8 @@ public class AprLifecycleListener implements LifecycleListener {
         AprStatus.setAprAvailable(false);
         fipsModeActive = false;
         sslInitialized = false; // Well we cleaned the pool in terminate.
+        // There could be unreferenced SSL_CTX still waiting for GC
+        System.gc();
         Library.threadSafeTerminate();
     }
 
