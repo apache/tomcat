@@ -18,6 +18,7 @@
 package org.apache.el.parser;
 
 public final class AstEmpty extends AstAbstractEmpty {
+
     public AstEmpty(int id) {
         super(id, false);
     }

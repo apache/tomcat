@@ -27,6 +27,7 @@ import org.apache.el.lang.EvaluationContext;
 public abstract class AstAbstractEmpty extends SimpleNode {
 
     private final Boolean RETURN_EMPTY;
+
     private final Boolean RETURN_NOT_EMPTY;
 
 
@@ -41,10 +42,12 @@ public abstract class AstAbstractEmpty extends SimpleNode {
         }
     }
 
+
     @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {
         return Boolean.class;
     }
+
 
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
