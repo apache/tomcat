@@ -157,6 +157,11 @@
         Request start time may not have been accurately recorded for HTTP/1.1
         requests preceded by a large number of blank lines. (markt)
       </fix>
+      <add>
+        Add <code>server</code> and <code>serverRemoveAppProvidedValues</code>
+        to the list of attributes the HTTP/2 protocol will inherit from the
+        HTTP/1.1 connector it is nested within. 
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
