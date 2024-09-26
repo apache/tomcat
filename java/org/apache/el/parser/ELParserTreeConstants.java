@@ -27,31 +27,32 @@ public interface ELParserTreeConstants {
     int JJTDIV = 22;
     int JJTMOD = 23;
     int JJTNEGATIVE = 24;
-    int JJTNOT = 25;
-    int JJTEMPTY = 26;
-    int JJTVALUE = 27;
-    int JJTDOTSUFFIX = 28;
-    int JJTBRACKETSUFFIX = 29;
-    int JJTMETHODPARAMETERS = 30;
-    int JJTSETDATA = 31;
-    int JJTLISTDATA = 32;
-    int JJTMAPDATA = 33;
-    int JJTMAPENTRY = 34;
-    int JJTIDENTIFIER = 35;
-    int JJTFUNCTION = 36;
-    int JJTTRUE = 37;
-    int JJTFALSE = 38;
-    int JJTFLOATINGPOINT = 39;
-    int JJTINTEGER = 40;
-    int JJTSTRING = 41;
-    int JJTNULL = 42;
+    int JJTNOTEMPTY = 25;
+    int JJTNOT = 26;
+    int JJTEMPTY = 27;
+    int JJTVALUE = 28;
+    int JJTDOTSUFFIX = 29;
+    int JJTBRACKETSUFFIX = 30;
+    int JJTMETHODPARAMETERS = 31;
+    int JJTSETDATA = 32;
+    int JJTLISTDATA = 33;
+    int JJTMAPDATA = 34;
+    int JJTMAPENTRY = 35;
+    int JJTIDENTIFIER = 36;
+    int JJTFUNCTION = 37;
+    int JJTTRUE = 38;
+    int JJTFALSE = 39;
+    int JJTFLOATINGPOINT = 40;
+    int JJTINTEGER = 41;
+    int JJTSTRING = 42;
+    int JJTNULL = 43;
 
 
     String[] jjtNodeName = { "CompositeExpression", "LiteralExpression", "DeferredExpression", "DynamicExpression",
             "void", "Semicolon", "Assign", "LambdaExpression", "LambdaParameters", "Choice", "Or", "And", "Equal",
             "NotEqual", "LessThan", "GreaterThan", "LessThanEqual", "GreaterThanEqual", "Concatenation", "Plus",
-            "Minus", "Mult", "Div", "Mod", "Negative", "Not", "Empty", "Value", "DotSuffix", "BracketSuffix",
-            "MethodParameters", "SetData", "ListData", "MapData", "MapEntry", "Identifier", "Function", "True", "False",
-            "FloatingPoint", "Integer", "String", "Null", };
+            "Minus", "Mult", "Div", "Mod", "Negative", "NotEmpty", "Not", "Empty", "Value", "DotSuffix",
+            "BracketSuffix", "MethodParameters", "SetData", "ListData", "MapData", "MapEntry", "Identifier", "Function",
+            "True", "False", "FloatingPoint", "Integer", "String", "Null", };
 }
-/* JavaCC - OriginalChecksum=40650ef76eedbdb11f7d9a6683a802ca (do not edit this line) */
+/* JavaCC - OriginalChecksum=58426e2a94f76068fe7c0861a913f9a5 (do not edit this line) */
