@@ -262,6 +262,9 @@ void Unary() : {}
 {
         <MINUS> Unary() #Negative
     |
+        LOOKAHEAD(2)
+        (<NOT0>|<NOT1>) <EMPTY> Unary() #NotEmpty
+    |
         (<NOT0>|<NOT1>) Unary() #Not
     |
         <EMPTY> Unary() #Empty
