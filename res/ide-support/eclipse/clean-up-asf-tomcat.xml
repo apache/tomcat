@@ -27,6 +27,7 @@
         <setting id="cleanup.add_missing_override_annotations_interface_methods" value="true"/>
         <setting id="cleanup.add_missing_override_annotations" value="true"/>
         <setting id="cleanup.add_serial_version_id" value="false"/>
+        <setting id="cleanup.also_simplify_lambda" value="true"/>
         <setting id="cleanup.always_use_blocks" value="true"/>
         <setting id="cleanup.always_use_parentheses_in_expressions" value="false"/>
         <setting id="cleanup.always_use_this_for_non_static_field_access" value="false"/>
@@ -115,6 +116,7 @@
         <setting id="cleanup.remove_unused_private_members" value="false"/>
         <setting id="cleanup.remove_unused_private_methods" value="true"/>
         <setting id="cleanup.remove_unused_private_types" value="true"/>
+        <setting id="cleanup.replace_deprecated_calls" value="false"/>
         <setting id="cleanup.return_expression" value="false"/>
         <setting id="cleanup.simplify_lambda_expression_and_method_ref" value="false"/>
         <setting id="cleanup.single_used_field" value="false"/>
@@ -126,6 +128,7 @@
         <setting id="cleanup.stringbuffer_to_stringbuilder" value="false"/>
         <setting id="cleanup.stringbuilder_for_local_vars" value="true"/>
         <setting id="cleanup.stringbuilder" value="false"/>
+        <setting id="cleanup.stringconcat_stringbuffer_stringbuilder" value="false"/>
         <setting id="cleanup.stringconcat_to_textblock" value="false"/>
         <setting id="cleanup.substring" value="false"/>
         <setting id="cleanup.switch" value="false"/>
