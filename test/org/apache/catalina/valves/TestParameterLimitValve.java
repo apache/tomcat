@@ -16,154 +16,301 @@
  */
 package org.apache.catalina.valves;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
-import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequestParametersBaseTest;
 
-import org.junit.Before;
+import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.catalina.connector.Request;
-import org.apache.catalina.connector.Response;
-import org.easymock.EasyMock;
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
+import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestParameterLimitValve {
+public class TestParameterLimitValve extends ServletRequestParametersBaseTest {
 
-    private ParameterLimitValve valve;
-    private Request request;
-    private Response response;
-    private ValveBase next;
+    @Test
+    public void testSpecificUrlPatternLimitExceeded() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
 
-    @Before
-    public void setUp() {
-        valve = new ParameterLimitValve();
-        request = EasyMock.createMock(Request.class);
-        response = EasyMock.createMock(Response.class);
-        next = EasyMock.createMock(ValveBase.class);
-        valve.setNext(next);
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        parameterLimitValve.setUrlPatternLimits("/special/.*=2");
+        ctx.getPipeline().addValve(parameterLimitValve);
+
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMappingDecoded("/special/endpoint", "snoop");
+
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+            "/special/endpoint?param1=value1&param2=value2&param3=value3",
+            new ByteChunk(), null);
+
+        Assert.assertEquals(400, rc);
     }
 
     @Test
-    public void testGlobalParameterLimitExceeded() throws IOException, ServletException {
-        valve.setMaxGlobalParams(2);
+    public void testSpecificUrlPatternLimitNotExceeded() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
 
-        Map<String, String[]> parameters = new HashMap<>();
-        parameters.put("param1", new String[]{"value1"});
-        parameters.put("param2", new String[]{"value2"});
-        parameters.put("param3", new String[]{"value3"});
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
 
-        EasyMock.expect(request.getRequestURI()).andReturn("/some/uri");
-        EasyMock.expect(request.getParameterMap()).andReturn(parameters);
-        response.sendError(Response.SC_BAD_REQUEST, "Too many parameters for this URL: [/some/uri]");
-        EasyMock.expectLastCall();
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        parameterLimitValve.setUrlPatternLimits("/special/.*=2");
+        ctx.getPipeline().addValve(parameterLimitValve);
 
-        EasyMock.replay(request, response);
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMappingDecoded("/special/endpoint", "snoop");
 
-        valve.invoke(request, response);
+        tomcat.start();
 
-        EasyMock.verify(request, response);
+        int rc = getUrl("http://localhost:" + getPort() + "/special/endpoint?param1=value1&param2=value2",
+            new ByteChunk(), null);
+
+        Assert.assertEquals(200, rc);
     }
 
     @Test
-    public void testGlobalParameterLimitNotExceeded() throws IOException, ServletException {
-        valve.setMaxGlobalParams(3);
+    public void testSpecificUrlPatternLimitExceededPostMethod() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
 
-        Map<String, String[]> parameters = new HashMap<>();
-        parameters.put("param1", new String[]{"value1"});
-        parameters.put("param2", new String[]{"value2"});
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
 
-        EasyMock.expect(request.getRequestURI()).andReturn("/some/uri");
-        EasyMock.expect(request.getParameterMap()).andReturn(parameters);
-        next.invoke(request, response);
-        EasyMock.expectLastCall();
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        parameterLimitValve.setUrlPatternLimits("/special/.*=2");
+        ctx.getPipeline().addValve(parameterLimitValve);
 
-        EasyMock.replay(request, response, next);
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMappingDecoded("/special/endpoint", "snoop");
 
-        valve.invoke(request, response);
+        tomcat.start();
 
-        EasyMock.verify(request, response, next);
+        byte[] body = ("POST / HTTP/1.1" + CRLF +
+            "Host: localhost:" + getPort() + CRLF +
+            "Connection: close" + CRLF +
+            "Transfer-Encoding: chunked" + CRLF +
+            "Content-Type: application/x-www-form-urlencoded" + CRLF +
+            CRLF +
+            "param1=value1&param2=value2&param3=value3" + CRLF).getBytes(StandardCharsets.UTF_8);
+
+        int rc = postUrl(body,"http://localhost:" + getPort() + "/special/endpoint",
+            new ByteChunk(), null);
+
+        Assert.assertEquals(400, rc);
     }
 
     @Test
-    public void testSpecificUrlPatternLimitExceeded() throws IOException, ServletException {
-        valve.setMaxGlobalParams(100);
-        valve.setUrlPatternLimits("/special/.*=2");
+    public void testSpecificUrlPatternLimitNotExceededPostMethod() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
 
-        Map<String, String[]> parameters = new HashMap<>();
-        parameters.put("param1", new String[]{"value1"});
-        parameters.put("param2", new String[]{"value2"});
-        parameters.put("param3", new String[]{"value3"});
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
 
-        EasyMock.expect(request.getRequestURI()).andReturn("/special/endpoint");
-        EasyMock.expect(request.getParameterMap()).andReturn(parameters);
-        response.sendError(Response.SC_BAD_REQUEST, "Too many parameters for this URL: [/special/endpoint]");
-        EasyMock.expectLastCall();
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        parameterLimitValve.setUrlPatternLimits("/special/.*=2");
+        ctx.getPipeline().addValve(parameterLimitValve);
 
-        EasyMock.replay(request, response);
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMappingDecoded("/special/endpoint", "snoop");
 
-        valve.invoke(request, response);
+        tomcat.start();
 
-        EasyMock.verify(request, response);
+        byte[] body = ("POST / HTTP/1.1" + CRLF +
+            "Host: localhost:" + getPort() + CRLF +
+            "Connection: close" + CRLF +
+            "Transfer-Encoding: chunked" + CRLF +
+            "Content-Type: application/x-www-form-urlencoded" + CRLF +
+            CRLF +
+            "param1=value1&param2=value2" + CRLF).getBytes(StandardCharsets.UTF_8);
+
+        int rc = postUrl(body, "http://localhost:" + getPort() + "/special/endpoint",
+            new ByteChunk(), null);
+
+        Assert.assertEquals(200, rc);
     }
 
     @Test
-    public void testSpecificUrlPatternLimitNotExceeded() throws IOException, ServletException {
-        valve.setMaxGlobalParams(100);
-        valve.setUrlPatternLimits("/special/.*=3");
+    public void testMultipleSpecificUrlPatternsLimitExceeded() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
 
-        Map<String, String[]> parameters = new HashMap<>();
-        parameters.put("param1", new String[]{"value1"});
-        parameters.put("param2", new String[]{"value2"});
+        tomcat.getConnector().setMaxParameterCount(2);
 
-        EasyMock.expect(request.getRequestURI()).andReturn("/special/endpoint");
-        EasyMock.expect(request.getParameterMap()).andReturn(parameters);
-        next.invoke(request, response);
-        EasyMock.expectLastCall();
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
 
-        EasyMock.replay(request, response, next);
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        parameterLimitValve.setUrlPatternLimits("/special/.*=2,/special2/.*=3,/my/special/url1=1");
+        ctx.getPipeline().addValve(parameterLimitValve);
 
-        valve.invoke(request, response);
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMappingDecoded("/special/endpoint", "snoop");
+        ctx.addServletMappingDecoded("/special2/endpoint", "snoop");
+        ctx.addServletMappingDecoded("/my/special/url1", "snoop");
+        ctx.addServletMappingDecoded("/my/special/url2", "snoop");
 
-        EasyMock.verify(request, response, next);
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+            "/special/endpoint?param1=value1&param2=value2&param3=value3",
+            new ByteChunk(), null);
+        Assert.assertEquals(400, rc);
+
+        rc = getUrl("http://localhost:" + getPort() +
+            "/special2/endpoint?param1=value1&param2=value2&param3=value3&param4=value4",
+            new ByteChunk(), null);
+        Assert.assertEquals(400, rc);
+
+        rc = getUrl("http://localhost:" + getPort() +
+                "/my/special/url1?param1=value1&param2=value2",
+            new ByteChunk(), null);
+        Assert.assertEquals(400, rc);
+
+        rc = getUrl("http://localhost:" + getPort() +
+                "/my/special/url2?param1=value1&param2=value2&param3=value3",
+            new ByteChunk(), null);
+        Assert.assertEquals(400, rc);
     }
 
     @Test
-    public void testNoMatchingPatternWithGlobalLimit() throws IOException, ServletException {
-        valve.setMaxGlobalParams(2);
+    public void testMultipleSpecificUrlPatternsLimitNotExceeded() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
 
-        Map<String, String[]> parameters = new HashMap<>();
-        parameters.put("param1", new String[]{"value1"});
-        parameters.put("param2", new String[]{"value2"});
+        tomcat.getConnector().setMaxParameterCount(2);
 
-        EasyMock.expect(request.getRequestURI()).andReturn("/other/endpoint");
-        EasyMock.expect(request.getParameterMap()).andReturn(parameters);
-        next.invoke(request, response);
-        EasyMock.expectLastCall();
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
 
-        EasyMock.replay(request, response, next);
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        parameterLimitValve.setUrlPatternLimits("/special/.*=2,/special2/.*=3,/my/special/url1=1");
+        ctx.getPipeline().addValve(parameterLimitValve);
 
-        valve.invoke(request, response);
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMappingDecoded("/special/endpoint", "snoop");
+        ctx.addServletMappingDecoded("/special2/endpoint", "snoop");
+        ctx.addServletMappingDecoded("/my/special/url1", "snoop");
+        ctx.addServletMappingDecoded("/my/special/url2", "snoop");
 
-        EasyMock.verify(request, response, next);
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/special/endpoint?param1=value1&param2=value2",
+            new ByteChunk(), null);
+        Assert.assertEquals(200, rc);
+
+        rc = getUrl("http://localhost:" + getPort() +
+                "/special2/endpoint?param1=value1&param2=value2&param3=value3",
+            new ByteChunk(), null);
+        Assert.assertEquals(200, rc);
+
+        rc = getUrl("http://localhost:" + getPort() +
+                "/my/special/url1?param1=value1",
+            new ByteChunk(), null);
+        Assert.assertEquals(200, rc);
+
+        rc = getUrl("http://localhost:" + getPort() +
+                "/my/special/url2?param1=value1&param2=value2",
+            new ByteChunk(), null);
+        Assert.assertEquals(200, rc);
     }
 
     @Test
-    public void testEmptyParameters() throws IOException, ServletException {
-        valve.setMaxGlobalParams(2);
+    public void testSpecificUrlPatternLimitExceededWithBothQueryParamsAndPostMethod() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
 
-        Map<String, String[]> parameters = new HashMap<>();
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
 
-        EasyMock.expect(request.getRequestURI()).andReturn("/other/endpoint");
-        EasyMock.expect(request.getParameterMap()).andReturn(parameters);
-        next.invoke(request, response);
-        EasyMock.expectLastCall();
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        parameterLimitValve.setUrlPatternLimits("/special/.*=2");
+        ctx.getPipeline().addValve(parameterLimitValve);
 
-        EasyMock.replay(request, response, next);
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMappingDecoded("/special/endpoint", "snoop");
 
-        valve.invoke(request, response);
+        tomcat.start();
 
-        EasyMock.verify(request, response, next);
+        byte[] body = ("POST / HTTP/1.1" + CRLF +
+            "Host: localhost:" + getPort() + CRLF +
+            "Connection: close" + CRLF +
+            "Transfer-Encoding: chunked" + CRLF +
+            "Content-Type: application/x-www-form-urlencoded" + CRLF +
+            CRLF +
+            "param1=value1&param2=value2" + CRLF).getBytes(StandardCharsets.UTF_8);
+
+        int rc = postUrl(body, "http://localhost:" + getPort() + "/special/endpoint?param3=value3",
+            new ByteChunk(), null);
+
+        Assert.assertEquals(400, rc);
+    }
+
+    @Test
+    public void testSpecificUrlPatternLimitNotExceededWithBothQueryParamsAndPostMethod() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        parameterLimitValve.setUrlPatternLimits("/special/.*=2");
+        ctx.getPipeline().addValve(parameterLimitValve);
+
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMappingDecoded("/special/endpoint", "snoop");
+
+        tomcat.start();
+
+        byte[] body = ("POST / HTTP/1.1" + CRLF +
+            "Host: localhost:" + getPort() + CRLF +
+            "Connection: close" + CRLF +
+            "Transfer-Encoding: chunked" + CRLF +
+            "Content-Type: application/x-www-form-urlencoded" + CRLF +
+            CRLF +
+            "param1=value1" + CRLF).getBytes(StandardCharsets.UTF_8);
+
+        int rc = postUrl(body, "http://localhost:" + getPort() + "/special/endpoint?param2=value2",
+            new ByteChunk(), null);
+
+        Assert.assertEquals(200, rc);
+    }
+
+    @Test
+    public void testNoMatchingPatternWithConnectorLimit() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        tomcat.getConnector().setMaxParameterCount(1);
+
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        parameterLimitValve.setUrlPatternLimits("/special/.*=2");
+        ctx.getPipeline().addValve(parameterLimitValve);
+
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMappingDecoded("/other/endpoint", "snoop");
+
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/other/endpoint?param1=value1&param2=value2",
+            new ByteChunk(), null);
+
+        Assert.assertEquals(400, rc);
+    }
+
+    @Test
+    public void testEmptyParameters() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        parameterLimitValve.setUrlPatternLimits("/special/.*=2");
+        ctx.getPipeline().addValve(parameterLimitValve);
+
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMappingDecoded("/special/endpoint", "snoop");
+
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/special/endpoint", new ByteChunk(), null);
+
+        Assert.assertEquals(200, rc);
     }
 }

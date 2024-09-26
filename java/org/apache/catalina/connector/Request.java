@@ -144,6 +144,9 @@ public class Request implements HttpServletRequest {
      */
     public Request(Connector connector, org.apache.coyote.Request coyoteRequest) {
         this.connector = connector;
+        if (connector != null) {
+            this.maxParameterCount = connector.getMaxParameterCount();
+        }
         this.coyoteRequest = coyoteRequest;
         inputBuffer = new InputBuffer(coyoteRequest);
     }
@@ -410,6 +413,10 @@ public class Request implements HttpServletRequest {
 
     private HttpServletRequest applicationRequest = null;
 
+    /**
+     * The maximum number of request parameters
+     */
+    private int maxParameterCount = -1;
 
     // --------------------------------------------------------- Public Methods
 
@@ -440,6 +447,11 @@ public class Request implements HttpServletRequest {
         userPrincipal = null;
         subject = null;
         parametersParsed = false;
+        if (connector != null ) {
+            maxParameterCount = connector.getMaxParameterCount();
+        } else {
+            maxParameterCount = -1;
+        }
         if (parts != null) {
             for (Part part : parts) {
                 try {
@@ -828,6 +840,14 @@ public class Request implements HttpServletRequest {
         coyoteRequest.setServerPort(port);
     }
 
+    /**
+     * Set the maximum number of request parameters (GET plus POST) for a single request
+     *
+     * @param maxParameterCount The maximum number of request parameters
+     */
+    public void setMaxParameterCount(int maxParameterCount) {
+        this.maxParameterCount = maxParameterCount;
+    }
 
     // ------------------------------------------------- ServletRequest Methods
 
@@ -2428,7 +2448,6 @@ public class Request implements HttpServletRequest {
             }
         }
 
-        int maxParameterCount = getConnector().getMaxParameterCount();
         Parameters parameters = coyoteRequest.getParameters();
         parameters.setLimit(maxParameterCount);
 
@@ -2767,8 +2786,6 @@ public class Request implements HttpServletRequest {
 
         Parameters parameters = coyoteRequest.getParameters();
 
-        // Set this every time in case limit has been changed via JMX
-        int maxParameterCount = getConnector().getMaxParameterCount();
         if (parts != null && maxParameterCount > 0) {
             maxParameterCount -= parts.size();
         }
