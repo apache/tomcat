@@ -141,4 +141,36 @@ public class TestELParserPerformance {
         }
         System.out.println("");
     }
+
+
+    /*
+     * Ignored by default since this is an absolute test primarily for
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=69338
+     */
+    @Ignore
+    @Test
+    public void testAstNotEmpty() {
+
+        ELManager manager = new ELManager();
+        ELContext context = manager.getELContext();
+        ExpressionFactory factory = ELManager.getExpressionFactory();
+
+        for (int j = 0; j < 5; j++) {
+
+            String expression = "${not empty 'abc'}";
+
+            long start = System.nanoTime();
+
+            for (int i = 0; i < 10000000; i++) {
+                ValueExpression ve = factory.createValueExpression(context, expression, Boolean.class);
+                Boolean result = ve.getValue(context);
+                Assert.assertEquals(Boolean.TRUE, result);
+            }
+
+            long duration = System.nanoTime() - start;
+            System.out.println("duration [" + duration + "]");
+
+        }
+        System.out.println("");
+    }
 }
