@@ -311,8 +311,8 @@
 
   </attributes>
 
-  <p>The HTTP/2 upgrade protocol will also inherit the following limits from the
-  <a href="http.html">HTTP Connector</a> it is nested with:</p>
+  <p>The HTTP/2 upgrade protocol will also inherit the following attributes from
+  the <a href="http.html">HTTP Connector</a> within which it is nested:</p>
 
   <ul>
     <li>maxCookieCount</li>
