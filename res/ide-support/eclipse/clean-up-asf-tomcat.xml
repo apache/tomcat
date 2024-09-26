@@ -145,7 +145,7 @@
         <setting id="cleanup.use_anonymous_class_creation" value="false"/>
         <setting id="cleanup.use_autoboxing" value="false"/>
         <setting id="cleanup.use_blocks_only_for_return_and_throw" value="false"/>
-        <setting id="cleanup.use_blocks" value="false"/>
+        <setting id="cleanup.use_blocks" value="true"/>
         <setting id="cleanup.use_directly_map_method" value="false"/>
         <setting id="cleanup.use_lambda" value="true"/>
         <setting id="cleanup.use_parentheses_in_expressions" value="false"/>
