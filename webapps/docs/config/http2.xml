@@ -319,6 +319,8 @@
     <li>maxParameterCount</li>
     <li>maxPostSize</li>
     <li>maxSavePostSize</li>
+    <li>server</li>
+    <li>serverRemoveAppProvidedValues</li>
   </ul>
 
   </subsection>

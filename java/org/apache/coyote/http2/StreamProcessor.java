@@ -241,6 +241,19 @@ class StreamProcessor extends AbstractProcessor {
         if (statusCode >= 200 && headers.getValue("date") == null) {
             headers.addValue("date").setString(FastHttpDateFormat.getCurrentDate());
         }
+
+        // Server header
+        if (protocol != null) {
+            String server = ((AbstractHttp11Protocol<?>) protocol.getHttp11Protocol()).getServer();
+            if (server == null) {
+                if (((AbstractHttp11Protocol<?>) protocol.getHttp11Protocol()).getServerRemoveAppProvidedValues()) {
+                    headers.removeHeader("server");
+                }
+            } else {
+                // server always overrides anything the app might set
+                headers.setValue("Server").setString(server);
+            }
+        }
     }
 
 

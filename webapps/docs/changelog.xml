@@ -148,6 +148,11 @@
         input. Prior to this change, the output may have wrong by one second in
         some cases. Pull request <pr>751</pr> provided by Chenjp. (markt)
       </fix>
+      <add>
+        Add <code>server</code> and <code>serverRemoveAppProvidedValues</code>
+        to the list of attributes the HTTP/2 protocol will inherit from the
+        HTTP/1.1 connector it is nested within. 
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
