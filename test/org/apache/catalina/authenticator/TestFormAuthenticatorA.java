@@ -40,11 +40,11 @@ import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.websocket.server.WsContextListener;
-import org.apache.tomcat.util.buf.ByteChunk;
 
 /*
  * Test FORM authentication for sessions that do and do not use cookies.
@@ -222,7 +222,7 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
 
 
     /*
-     * Test to ensure that the Expir and 
+     * Test to ensure that the expire and date headers use a GMT date.
      */
     @Test
     public void testDateAndExpireHeadersUseGMT() throws Exception {
@@ -235,7 +235,7 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
         ctxt.getPipeline().addValve(form);
         tomcat.start();
 
-        Map<String,List<String>> responseHeaders = new HashMap();
+        Map<String,List<String>> responseHeaders = new HashMap<>();
         ByteChunk bc = new ByteChunk();
         String path = "http://localhost:" + getPort() + "/examples/jsp/security/protected/index.jsp";
         int rc = getUrl(path, bc, responseHeaders);
