@@ -16,7 +16,7 @@
  */
 package org.apache.el.parser;
 
-import jakarta.el.ELProcessor;
+import javax.el.ELProcessor;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class TestAstNotEmpty {
     @Test
     public void test01() {
         ELProcessor processor = new ELProcessor();
-        Boolean result = processor.eval("not empty 'abc'");
+        Object result = processor.eval("not empty 'abc'");
         Assert.assertEquals(Boolean.TRUE, result);
     }
 
@@ -34,7 +34,7 @@ public class TestAstNotEmpty {
     @Test
     public void test02() {
         ELProcessor processor = new ELProcessor();
-        Boolean result = processor.eval("not empty ''");
+        Object result = processor.eval("not empty ''");
         Assert.assertEquals(Boolean.FALSE, result);
     }
 }

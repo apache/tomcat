@@ -163,7 +163,7 @@ public class TestELParserPerformance {
 
             for (int i = 0; i < 10000000; i++) {
                 ValueExpression ve = factory.createValueExpression(context, expression, Boolean.class);
-                Boolean result = ve.getValue(context);
+                Object result = ve.getValue(context);
                 Assert.assertEquals(Boolean.TRUE, result);
             }
 
