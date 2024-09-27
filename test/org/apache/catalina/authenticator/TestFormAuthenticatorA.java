@@ -239,16 +239,16 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
         ByteChunk bc = new ByteChunk();
         String path = "http://localhost:" + getPort() + "/examples/jsp/security/protected/index.jsp";
         int rc = getUrl(path, bc, responseHeaders);
-        Assert.assertTrue(String.format("Expecting 200, but got ", rc), rc == 200);
+        Assert.assertTrue(String.format("Expecting 200, but got ", Integer.valueOf(rc)), rc == 200);
         String expiresDate = responseHeaders.get("Expires").get(0).toString();
 
         String ExpectedDateFormatRegx = "^[A-za-z]{3}, \\d{2} \\w{3} \\d{4} \\d{2}:\\d{2}:\\d{2} GMT$";
         Pattern pattern = Pattern.compile(ExpectedDateFormatRegx);
-        Matcher matcher = pattern.matcher((CharSequence)expiresDate);
+        Matcher matcher = pattern.matcher(expiresDate);
         Assert.assertTrue("Expires header date not in expected format", matcher.matches());
 
         String Date = responseHeaders.get("Date").get(0).toString();
-        matcher = pattern.matcher((CharSequence)Date);
+        matcher = pattern.matcher(Date);
         Assert.assertTrue("Date header not in expected format", matcher.matches());
     }
 
