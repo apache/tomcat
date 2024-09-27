@@ -38,16 +38,18 @@ public class TestFastHttpDateFormat {
             String d1 = FastHttpDateFormat.getCurrentDate();
             long start = System.currentTimeMillis() / 1000;
 
-            long t1 = 0;
+            long t1 = start;
             long t2 = 0;
-            long t3 = start;
+            long t3 = 0;
             String d2 = d1;
 
             /*
-             * Run this test for 3s. Should normally see 3 changes of date. May, very rarely, see 2.
+             * Run this test for 3s. Should normally see 3 changes of date. Because d1 and t1 are not set atomically,
+             * it is possible for them to be inconsistent. That inconsistency can lead to one more or one less change
+             * than typically expected. Therefore, the test accepts 2, 3 or 4 changes.
              */
             int changes = 0;
-            while (t3 - start < 3) {
+            while (t1 - start < 3) {
 
                 // Copy results to next slot, dropping the oldest (t3 and d2)
                 d2 = d1;
@@ -63,11 +65,11 @@ public class TestFastHttpDateFormat {
                     changes++;
                     // Then the second must have changed
                     if (t1 == t2 && t2 == t3) {
-                        Assert.fail("Formatted date changed withint the same second");
+                        Assert.fail("Formatted date changed within the same second");
                     }
                 }
             }
-            Assert.assertTrue("Saw [" + changes + "] in formatted date", changes > 1 && changes < 4);
+            Assert.assertTrue("Saw [" + changes + "] changes in formatted date", changes > 1 && changes < 5);
         }
     }
 }
