@@ -61,8 +61,8 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         byte[] trailerFrameHeader = new byte[9];
         ByteBuffer trailerPayload = ByteBuffer.allocate(256);
 
-        buildPostRequest(headersFrameHeader, headersPayload, false, dataFrameHeader, dataPayload, null,
-                trailerFrameHeader, trailerPayload, 3);
+        buildPostRequest(headersFrameHeader, headersPayload, false, dataFrameHeader, dataPayload, null, true, 3);
+        buildTrailerHeaders(trailerFrameHeader, trailerPayload, 3);
 
         // Write the headers
         writeFrame(headersFrameHeader, headersPayload);
@@ -136,7 +136,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         ByteBuffer dataPayload = ByteBuffer.allocate(256);
 
         buildPostRequest(headersFrameHeader, headersPayload, true, null, -1, "/simple", dataFrameHeader, dataPayload,
-                null, null, null, 3);
+                null, false, 3);
 
         // Write the headers
         writeFrame(headersFrameHeader, headersPayload);

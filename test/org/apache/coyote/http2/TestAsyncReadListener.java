@@ -77,7 +77,8 @@ public class TestAsyncReadListener extends Http2TestBase {
 
 
         buildPostRequest(headersFrameHeader, headersPayload, false, null, -1, "/async", dataFrameHeader, dataPayload,
-            null, trailerFrameHeader, trailerPayload, 3);
+            null, true, 3);
+        buildTrailerHeaders(trailerFrameHeader, trailerPayload, 3);
 
         synchronized (asyncServlet) {
             // Write the headers
