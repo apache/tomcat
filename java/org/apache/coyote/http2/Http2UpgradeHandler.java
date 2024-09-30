@@ -118,8 +118,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     private final ConcurrentNavigableMap<Integer,AbstractNonZeroStream> streams = new ConcurrentSkipListMap<>();
     protected final AtomicInteger activeRemoteStreamCount = new AtomicInteger(0);
-    // Start at -1 so the 'add 2' logic in closeIdleStreams() works
-    private volatile int maxActiveRemoteStreamId = -1;
+    private volatile int maxActiveRemoteStreamId = 0;
     private volatile int maxProcessedStreamId;
     private final PingManager pingManager = getPingManager();
     private volatile int newStreamsSinceLastPrune = 0;
@@ -177,7 +176,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             Integer key = Integer.valueOf(1);
             Stream stream = new Stream(key, this, coyoteRequest);
             streams.put(key, stream);
-            maxActiveRemoteStreamId = 1;
+            maxActiveRemoteStreamId = 0;
             activeRemoteStreamCount.set(1);
             maxProcessedStreamId = 1;
         }
@@ -1536,16 +1535,19 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         if (connectionState.get().isNewStreamAllowed()) {
             Stream stream = getStream(streamId, false);
             if (stream == null) {
-                stream = createRemoteStream(streamId);
-                activeRemoteStreamCount.incrementAndGet();
-            }
-            if (streamId < maxActiveRemoteStreamId) {
-                throw new ConnectionException(sm.getString("upgradeHandler.stream.old", Integer.valueOf(streamId),
-                        Integer.valueOf(maxActiveRemoteStreamId)), Http2Error.PROTOCOL_ERROR);
+                // New stream
+                if (streamId > maxActiveRemoteStreamId) {
+                    stream = createRemoteStream(streamId);
+                    activeRemoteStreamCount.incrementAndGet();
+                    maxActiveRemoteStreamId = streamId;
+                } else {
+                    // ID for new stream must always be greater than any previous stream
+                    throw new ConnectionException(sm.getString("upgradeHandler.stream.old", Integer.valueOf(streamId),
+                            Integer.valueOf(maxActiveRemoteStreamId)), Http2Error.PROTOCOL_ERROR);
+                }
             }
             stream.checkState(FrameType.HEADERS);
             stream.receivedStartOfHeaders(headersEndStream);
-            closeIdleStreams(streamId);
             return stream;
         } else {
             if (log.isTraceEnabled()) {
@@ -1555,18 +1557,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             // Stateless so a static can be used to save on GC
             return HEADER_SINK;
         }
-    }
-
-
-    private void closeIdleStreams(int newMaxActiveRemoteStreamId) {
-        final ConcurrentNavigableMap<Integer,AbstractNonZeroStream> subMap = streams.subMap(
-                Integer.valueOf(maxActiveRemoteStreamId), false, Integer.valueOf(newMaxActiveRemoteStreamId), false);
-        for (AbstractNonZeroStream stream : subMap.values()) {
-            if (stream instanceof Stream) {
-                ((Stream) stream).closeIfIdle();
-            }
-        }
-        maxActiveRemoteStreamId = newMaxActiveRemoteStreamId;
     }
 
 
