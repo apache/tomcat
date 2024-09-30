@@ -348,7 +348,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         ByteBuffer dataPayload = ByteBuffer.allocate(128);
 
         buildPostRequest(headersFrameHeader, headersPayload, useExpectation, "application/x-www-form-urlencoded",
-                contentLength, "/parameter", dataFrameHeader, dataPayload, padding, null, null, streamId);
+                contentLength, "/parameter", dataFrameHeader, dataPayload, padding, false, streamId);
         writeFrame(headersFrameHeader, headersPayload);
         if (body != null) {
             dataPayload.put(body.getBytes(StandardCharsets.ISO_8859_1));
@@ -360,19 +360,18 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload, boolean useExpectation,
             byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding, int streamId) {
         buildPostRequest(headersFrameHeader, headersPayload, useExpectation, dataFrameHeader, dataPayload, padding,
-                null, null, streamId);
+                false, streamId);
     }
 
     protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload, boolean useExpectation,
-            byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding, byte[] trailersFrameHeader,
-            ByteBuffer trailersPayload, int streamId) {
+            byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding, boolean withTrailers, int streamId) {
         buildPostRequest(headersFrameHeader, headersPayload, useExpectation, null, -1, "/simple", dataFrameHeader,
-                dataPayload, padding, trailersFrameHeader, trailersPayload, streamId);
+                dataPayload, padding, withTrailers, streamId);
     }
 
     protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload, boolean useExpectation,
             String contentType, long contentLength, String path, byte[] dataFrameHeader, ByteBuffer dataPayload,
-            byte[] padding, byte[] trailersFrameHeader, ByteBuffer trailersPayload, int streamId) {
+            byte[] padding, boolean withTrailers, int streamId) {
 
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString("POST");
@@ -419,17 +418,19 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         ByteUtil.setThreeBytes(dataFrameHeader, 0, dataPayload.limit());
         // Data is type 0
         // Flags: End of stream 1, Padding 8
-        if (trailersPayload == null) {
-            dataFrameHeader[4] = 0x01;
-        } else {
+        if (withTrailers) {
             dataFrameHeader[4] = 0x00;
+        } else {
+            dataFrameHeader[4] = 0x01;
         }
         if (padding != null) {
             dataFrameHeader[4] += 0x08;
         }
         ByteUtil.set31Bits(dataFrameHeader, 5, streamId);
+    }
 
-        // Trailers
+
+    protected void buildTrailerHeaders(byte[] trailersFrameHeader, ByteBuffer trailersPayload, int streamId) {
         if (trailersPayload != null) {
             MimeHeaders trailerHeaders = new MimeHeaders();
             trailerHeaders.addValue(TRAILER_HEADER_NAME).setString(TRAILER_HEADER_VALUE);
