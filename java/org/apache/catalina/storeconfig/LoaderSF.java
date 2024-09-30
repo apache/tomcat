@@ -44,9 +44,7 @@ public class LoaderSF extends StoreFactoryBase {
             }
         } else {
             if (log.isWarnEnabled()) {
-                if (log.isWarnEnabled()) {
-                    log.warn(sm.getString("factory.storeNoDescriptor", aElement.getClass()));
-                }
+                log.warn(sm.getString("factory.storeNoDescriptor", aElement.getClass()));
             }
         }
     }

@@ -60,7 +60,8 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         long sleepTime = rateLimitFilter.bucketCounter.getMillisUntilNextBucket();
         System.out.printf("Sleeping %d millis for the next time bucket to start\n", Long.valueOf(sleepTime));
         Thread.sleep(sleepTime);
-
+        
+        long nowInNano = System.nanoTime();
         TestClient tc1 = new TestClient(rateLimitFilter, filterChain, "10.20.20.5", 200, 5);
         TestClient tc2 = new TestClient(rateLimitFilter, filterChain, "10.20.20.10", 200, 10);
 
@@ -75,7 +76,7 @@ public class TestRateLimitFilter extends TomcatBaseTest {
             Thread.sleep(100);
             count++;
         }
-
+        System.out.println("Elapsed nano time:"+(System.nanoTime() - nowInNano));
         Assert.assertEquals(200, tc1.results[24]); // only 25 requests made, all allowed
 
         Assert.assertEquals(200, tc2.results[49]); // only 25 requests made, all allowed
