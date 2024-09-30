@@ -21,8 +21,6 @@ import java.nio.ByteBuffer;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.coyote.http11.AbstractHttp11Protocol;
-
 /**
  * Unit tests for Section 6.8 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
  * The order of tests in this class is aligned with the order of the requirements in the RFC.
@@ -82,7 +80,7 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
         // Ensure we see all the Window updates
         http2Protocol.setOverheadWindowUpdateThreshold(0);
         // Enable trailer headers
-        ((AbstractHttp11Protocol<?>) http2Protocol.getHttp11Protocol()).setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
+        http2Protocol.setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
 
         Thread.sleep(PING_ACK_DELAY_MS + TIMING_MARGIN_MS);
 
