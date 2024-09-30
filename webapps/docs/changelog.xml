@@ -158,6 +158,12 @@
         destroying SSLContext objects through GC after APR has been terminated.
         (remm)
       </fix>
+      <fix>
+        Improve HTTP/2 handling of trailer fields for requests. Trailer fields
+        no longer need to be recieved before the headers of the subsequent
+        stream nor are trailer fields for an in progress stream swallowed if the 
+        Connector is paused before the trailer fields are received. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

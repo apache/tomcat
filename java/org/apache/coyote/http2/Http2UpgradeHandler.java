@@ -1586,14 +1586,15 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     @Override
     public HeaderEmitter headersStart(int streamId, boolean headersEndStream) throws Http2Exception, IOException {
 
-        // Check the pause state before processing headers since the pause state
-        // determines if a new stream is created or if this stream is ignored.
-        checkPauseState();
+        Stream stream = getStream(streamId, false);
+        if (stream == null) {
+            // New stream
 
-        if (connectionState.get().isNewStreamAllowed()) {
-            Stream stream = getStream(streamId, false);
-            if (stream == null) {
-                // New stream
+            // Check the pause state before processing headers since the pause state
+            // determines if a new stream is created or if this stream is ignored.
+            checkPauseState();
+
+            if (connectionState.get().isNewStreamAllowed()) {
                 if (streamId > maxActiveRemoteStreamId) {
                     stream = createRemoteStream(streamId);
                     activeRemoteStreamCount.incrementAndGet();
@@ -1603,18 +1604,19 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     throw new ConnectionException(sm.getString("upgradeHandler.stream.old", Integer.valueOf(streamId),
                             Integer.valueOf(maxActiveRemoteStreamId)), Http2Error.PROTOCOL_ERROR);
                 }
+            } else {
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("upgradeHandler.noNewStreams", connectionId, Integer.toString(streamId)));
+                }
+                reduceOverheadCount(FrameType.HEADERS);
+                // Stateless so a static can be used to save on GC
+                return HEADER_SINK;
             }
-            stream.checkState(FrameType.HEADERS);
-            stream.receivedStartOfHeaders(headersEndStream);
-            return stream;
-        } else {
-            if (log.isTraceEnabled()) {
-                log.trace(sm.getString("upgradeHandler.noNewStreams", connectionId, Integer.toString(streamId)));
-            }
-            reduceOverheadCount(FrameType.HEADERS);
-            // Stateless so a static can be used to save on GC
-            return HEADER_SINK;
         }
+
+        stream.checkState(FrameType.HEADERS);
+        stream.receivedStartOfHeaders(headersEndStream);
+        return stream;
     }
 
 
