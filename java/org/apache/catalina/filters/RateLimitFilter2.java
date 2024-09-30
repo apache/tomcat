@@ -153,9 +153,9 @@ public class RateLimitFilter2 extends GenericFilter {
     private String statusMessage = DEFAULT_STATUS_MESSAGE;
 
     public static final String HEADER_WINDOW_SECOND = "X-RateLimit-Window-Second";
-    
+
     public static final String HEADER_WINDOW_REQUESTS = "X-RateLimit-Window-NrOfRequests";
-    
+
     public static final String HEADER_REMAINING = "X-RateLimit-NrOfRemaining";
 
     public static final String HEADER_CURRENT = "X-RateLimit-NrOfCurrent";
@@ -176,11 +176,19 @@ public class RateLimitFilter2 extends GenericFilter {
         param = config.getInitParameter(PARAM_BUCKET_DURATION);
         if (param != null) {
             bucketDuration = Integer.parseInt(param);
+            if (bucketDuration <= 0) {
+                throw new IllegalArgumentException(
+                        sm.getString("rateLimitFilter.invalidBucketDuration", bucketDuration));
+            }
         }
 
         param = config.getInitParameter(PARAM_BUCKET_REQUESTS);
         if (param != null) {
             bucketRequests = Integer.parseInt(param);
+            if (bucketRequests <= 0) {
+                throw new IllegalArgumentException(
+                        sm.getString("rateLimitFilter.invalidBucketRequests", bucketRequests));
+            }
         }
 
         param = config.getInitParameter(PARAM_ENFORCE);
@@ -235,7 +243,7 @@ public class RateLimitFilter2 extends GenericFilter {
                 ((HttpServletResponse) response).setIntHeader(HEADER_CURRENT, reqCount);
             }
         }
-        
+
         if (enforce && (reqCount > bucketRequests)) {
 
             ((HttpServletResponse) response).sendError(statusCode, statusMessage);

@@ -44,7 +44,8 @@ public class FixedWindowRateLimiter {
     private final int accessTimesThreshold;
     private final boolean enforce;
 
-    private final ScheduledExecutorService executorService;
+
+
 
     /**
      * Map to hold the buckets
@@ -57,7 +58,11 @@ public class FixedWindowRateLimiter {
     private ScheduledFuture<?> maintenanceFuture;
 
     private ScheduledFuture<?> monitorFuture;
-
+    
+    private final ScheduledExecutorService executorService;
+    
+    private long sleeptime;
+    
     /**
      * Creates a new FixedWindowRateLimiter with the specified lifetime.
      * 
@@ -73,13 +78,14 @@ public class FixedWindowRateLimiter {
         this.accessTimesThreshold = nrOfRequestsThreshold;
         this.enforce = enforce;
         this.executorService = executorService;
+        this.sleeptime = windowUnitInMillis >> 1;
         monitorFuture = executorService.scheduleWithFixedDelay(new MaintenanceMonitor(), 0, 180, TimeUnit.SECONDS);
     }
 
     /**
-     * @param identifier target key of the {@link FixedWindowRateLimiter} effect on. 
+     * @param identifier target key of the {@link FixedWindowRateLimiter} effect on.
      * 
-     * @return the increased nrOfRequests. Value <code>1</code> returned if newWindow start.  
+     * @return the increased nrOfRequests. Value <code>1</code> returned if newWindow start.
      */
     public int increment(String identifier) {
         return map.computeIfAbsent(identifier, v -> new LimiterRuntimeEntry(windowUnit)).incrementAndGet();
@@ -88,7 +94,7 @@ public class FixedWindowRateLimiter {
     /**
      * Attempts to acquire for an access permit.
      * 
-     * @param identifier target key of the {@link FixedWindowRateLimiter} effect on. 
+     * @param identifier target key of the {@link FixedWindowRateLimiter} effect on.
      * 
      * @return a negative value on failure of <tt>enforce and rate exceeded</tt>; a positive value indicates access
      *             times inner current fixed window. The returned value may exceed <tt>threshold</tt> only when
@@ -142,7 +148,7 @@ public class FixedWindowRateLimiter {
             long now = System.currentTimeMillis();
             if (now - windowTimestamp >= windowUnitInMillis) {
                 // new window start.
-                long newWindowTimestamp = now - now % windowUnitInMillis;
+                long newWindowTimestamp = now / windowUnitInMillis * windowUnitInMillis;
                 synchronized (lock) {
                     if (windowTimestamp != newWindowTimestamp) {
                         windowTimestamp = newWindowTimestamp;
@@ -173,7 +179,7 @@ public class FixedWindowRateLimiter {
             long now = System.currentTimeMillis();
             if (now - windowTimestamp >= windowUnitInMillis) {
                 // new window start.
-                long newWindowTimestamp = now - now % windowUnitInMillis;
+                long newWindowTimestamp = now / windowUnitInMillis * windowUnitInMillis;
                 synchronized (lock) {
                     if (windowTimestamp != newWindowTimestamp) {
                         windowTimestamp = newWindowTimestamp;
@@ -226,7 +232,7 @@ public class FixedWindowRateLimiter {
                         log.error(sm.getString("timebucket.maintenance.error"), e);
                     }
                 }
-                maintenanceFuture = executorService.scheduleWithFixedDelay(new Maintenance(), 0, 60, TimeUnit.SECONDS);
+                maintenanceFuture = executorService.scheduleWithFixedDelay(new Maintenance(), sleeptime, sleeptime, TimeUnit.SECONDS);
             }
         }
     }
