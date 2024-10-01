@@ -49,7 +49,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
             + " xsi:schemaLocation=\"http://tomcat.apache.org/xml/tomcat-users.xsd\""
             + " version=\"1.0\">"
             + "<role rolename=\"admin\" />"
-            + "<user username=\"admin\" password=\"sekr3t\" roles=\"manager-gui,manager-script,manager-jmx,manager-status\" />"
+            + "<user username=\"admin\" password=\"sekr3t\" roles=\"manager-gui,manager-script,manager-jmx,manager-status,admin-gui,admin-script\" />"
             + "</tomcat-users>";
 
     /**
