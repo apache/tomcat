@@ -19,8 +19,8 @@ package org.apache.coyote.http2;
 import java.nio.ByteBuffer;
 
 /**
- * Represents a closed stream in the priority tree. Used in preference to the full {@link Stream} as has much lower
- * memory usage.
+ * Represents a closed stream and is used to correctly respond to (or ignore) frames for the stream that are processed
+ * after the stream has been closed. Used in preference to the full {@link Stream} as has much lower memory usage.
  */
 class RecycledStream extends AbstractNonZeroStream {
 
