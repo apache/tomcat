@@ -87,9 +87,9 @@ class StreamProcessor extends AbstractProcessor {
             try {
                 /*
                  * In some scenarios, error handling may trigger multiple ERROR events for the same stream. The first
-                 * ERROR event process will close the stream and recycle it. Once the stream has been recycled it should
-                 * not be used for processing any further events. The check below ensures that this is the case. In
-                 * particular, Stream.recycle() should not be called more than once per Stream.
+                 * ERROR event processed will close the stream, replace it and recycle it. Once the stream has been
+                 * replaced it should not be used for processing any further events. When it is known that processing is
+                 * going to be a NO-OP, exit early.
                  */
                 if (!stream.equals(handler.getStream(stream.getIdAsInt()))) {
                     return;
@@ -130,8 +130,8 @@ class StreamProcessor extends AbstractProcessor {
                             stream.close(se);
                         } else {
                             if (!stream.isActive()) {
-                                // stream.close() will call recycle so only need it here
-                                stream.recycle();
+                                // Close calls replace() so need the same call here
+                                stream.replace();
                             }
                         }
                     }
@@ -146,6 +146,7 @@ class StreamProcessor extends AbstractProcessor {
                     state = SocketState.CLOSED;
                 } finally {
                     if (state == SocketState.CLOSED) {
+                        stream.recycle();
                         recycle();
                     }
                 }
