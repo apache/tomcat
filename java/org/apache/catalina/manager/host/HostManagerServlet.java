@@ -593,7 +593,7 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
 
         try {
             MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
-            ObjectName oname = new ObjectName(engine.getDomain() + ":type=StoreConfig");
+            ObjectName oname = new ObjectName("Catalina:type=StoreConfig");
             platformMBeanServer.invoke(oname, "storeConfig", null, null);
             writer.println(smClient.getString("hostManagerServlet.persisted"));
         } catch (Exception e) {
