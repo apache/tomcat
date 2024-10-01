@@ -21,7 +21,7 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
