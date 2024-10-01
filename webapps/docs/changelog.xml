@@ -164,6 +164,12 @@
         stream nor are trailer fields for an in progress stream swallowed if the
         Connector is paused before the trailer fields are received. (markt)
       </fix>
+      <fix>
+        Ensure the request and response are not recycled too soon for an HTTP/2
+        stream when a stream level error is detected during the processing of
+        incoming HTTP/2 frames. This could lead to incorrect processing times
+        appearing in the access log. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
