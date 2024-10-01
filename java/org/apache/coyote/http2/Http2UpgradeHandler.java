@@ -118,7 +118,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     private final ConcurrentNavigableMap<Integer,AbstractNonZeroStream> streams = new ConcurrentSkipListMap<>();
     protected final AtomicInteger activeRemoteStreamCount = new AtomicInteger(0);
-    private volatile int maxActiveRemoteStreamId = 0;
     private volatile int maxProcessedStreamId;
     private final AtomicInteger nextLocalStreamId = new AtomicInteger(2);
     private final PingManager pingManager = getPingManager();
@@ -177,7 +176,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             Integer key = Integer.valueOf(1);
             Stream stream = new Stream(key, this, coyoteRequest);
             streams.put(key, stream);
-            maxActiveRemoteStreamId = 0;
             activeRemoteStreamCount.set(1);
             maxProcessedStreamId = 1;
         }
@@ -1598,14 +1596,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             checkPauseState();
 
             if (connectionState.get().isNewStreamAllowed()) {
-                if (streamId > maxActiveRemoteStreamId) {
+                if (streamId > maxProcessedStreamId) {
                     stream = createRemoteStream(streamId);
                     activeRemoteStreamCount.incrementAndGet();
-                    maxActiveRemoteStreamId = streamId;
                 } else {
                     // ID for new stream must always be greater than any previous stream
                     throw new ConnectionException(sm.getString("upgradeHandler.stream.old", Integer.valueOf(streamId),
-                            Integer.valueOf(maxActiveRemoteStreamId)), Http2Error.PROTOCOL_ERROR);
+                            Integer.valueOf(maxProcessedStreamId)), Http2Error.PROTOCOL_ERROR);
                 }
             } else {
                 if (log.isTraceEnabled()) {
