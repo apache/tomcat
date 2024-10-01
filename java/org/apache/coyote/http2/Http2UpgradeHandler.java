@@ -1879,9 +1879,23 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     void replaceStream(AbstractNonZeroStream original, AbstractNonZeroStream replacement) {
         AbstractNonZeroStream current = streams.get(original.getIdentifier());
-        // Only replace the stream if it currently uses the full implementation.
+        /*
+         * Only replace the Stream once. No point replacing one RecycledStream instance with another.
+         *
+         * This method is called from both StreamProcessor and Http2UpgradeHandler which may be operating on the Stream
+         * concurrently. It is therefore expected that there will be duplicate calls to this method - primarily
+         * triggered by stream errors when processing incoming frames.
+         */
         if (current instanceof Stream) {
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("upgradeHandler.replace.first", getConnectionId(), original.getIdAsString()));
+            }
             streams.put(original.getIdentifier(), replacement);
+        } else {
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString(
+                        "upgradeHandler.replace.duplicate", getConnectionId(), original.getIdAsString()));
+            }
         }
     }
 
