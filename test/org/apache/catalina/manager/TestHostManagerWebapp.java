@@ -43,6 +43,7 @@ public class TestHostManagerWebapp extends TomcatBaseTest {
     @Test
     public void testServlet() throws Exception {
         Tomcat tomcat = getTomcatInstance();
+        tomcat.setAddDefaultWebXmlToWebapp(false);
         tomcat.getServer().addLifecycleListener(new StoreConfigLifecycleListener());
 
         File configFile = new File(getTemporaryDirectory(), "tomcat-users-host-manager.xml");
