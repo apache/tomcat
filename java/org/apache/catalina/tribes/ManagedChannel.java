@@ -19,7 +19,6 @@ package org.apache.catalina.tribes;
 import java.util.Iterator;
 
 /**
- * Channel interface
  * A managed channel interface gives you access to the components of the channels
  * such as senders, receivers, interceptors etc for configurations purposes
  */
