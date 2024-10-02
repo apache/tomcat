@@ -1817,8 +1817,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             streams.put(original.getIdentifier(), replacement);
         } else {
             if (log.isTraceEnabled()) {
-                log.trace(sm.getString(
-                        "upgradeHandler.replace.duplicate", getConnectionId(), original.getIdAsString()));
+                log.trace(
+                        sm.getString("upgradeHandler.replace.duplicate", getConnectionId(), original.getIdAsString()));
             }
         }
     }
