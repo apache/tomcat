@@ -201,6 +201,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update Byte Buddy to 1.15.3. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.30 (schultz)" rtext="2024-09-17">
   <subsection name="Coyote">
