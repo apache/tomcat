@@ -2494,7 +2494,7 @@ public class DefaultServlet extends HttpServlet {
     protected IOException copyRange(InputStream istream, ServletOutputStream ostream, long start, long end) {
 
         if (debug > 10) {
-            log("Serving bytes:" + start + "-" + end);
+            log("Serving bytes: " + start + "-" + end);
         }
 
         long skipped = 0;
