@@ -167,7 +167,7 @@ public class AprLifecycleListener implements LifecycleListener {
             synchronized (lock) {
                 // Instance may get destroyed without ever being initialized
                 if (instanceInitialized) {
-                    referenceCount --;
+                    referenceCount--;
                 }
                 if (referenceCount != 0) {
                     // Still being used

@@ -53,7 +53,7 @@ import org.apache.tomcat.util.res.StringManager;
  * </ul>
  *
  * @deprecated This will be removed in Tomcat 11 onwards. This filter is no longer required. The WebDAV client in
- *             Windows 10 / Windows Server 2012 onwards works correctly without this filter.
+ *                 Windows 10 / Windows Server 2012 onwards works correctly without this filter.
  */
 @Deprecated
 public class WebdavFixFilter extends GenericFilter {
