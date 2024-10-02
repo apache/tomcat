@@ -123,6 +123,11 @@
         Remove default value (was <code>catalina</code>) for the
         <code>secret</code> init parameter of the WebDAV Servlet. (remm)
       </update>
+      <fix>
+        <bug>69359</bug>: <code>WebdavServlet</code> duplicates
+        <code>getRelativePath()</code> method from super class with
+        incorrect Javadoc. (michaelo)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
