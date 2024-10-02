@@ -805,8 +805,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
      *
      * It is important that this method is not called until any concurrent processing for the stream has completed. This
      * is currently achieved by:
+     *
      * - only the StreamProcessor calls this method
+     *
      * - the Http2UpgradeHandler does not call this method
+     *
      * - this method is called once the StreamProcessor considers the Stream closed
      *
      * In theory, the protection against duplicate calls is not required in this method (the code in StreamProcessor
