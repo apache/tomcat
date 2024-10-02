@@ -22,7 +22,8 @@ import java.util.ArrayList;
  * A channel exception is thrown when an internal error happens
  * somewhere in the channel.
  * <p>
- * When a global error happens, the cause can be retrieved using <code>getCause()</code><br><br>
+ * When a global error happens, the cause can be retrieved using <code>getCause()</code>.
+ * <p>
  * If an application is sending a message and some of the recipients fail to receive it,
  * the application can retrieve what recipients failed by using the <code>getFaultyMembers()</code>
  * method. This way, an application will always know if a message was delivered successfully or not.
