@@ -207,7 +207,7 @@
         Update to the Eclipse JDT compiler 4.33. (markt)
       </update>
       <update>
-        Update Byte Buddy to 1.15.0. (markt)
+        Update Byte Buddy to 1.15.3. (markt)
       </update>
     </changelog>
   </subsection>
