@@ -408,11 +408,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * @param request The servlet request we are processing
      */
     @Override
-    protected String getRelativePath(HttpServletRequest request) {
-        return getRelativePath(request, false);
-    }
-
-    @Override
     protected String getRelativePath(HttpServletRequest request, boolean allowEmptyPath) {
         String pathInfo;
 
