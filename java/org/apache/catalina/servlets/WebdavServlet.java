@@ -1693,7 +1693,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         if (!resource.isDirectory()) {
             if (!resource.delete()) {
-                resp.sendError(WebdavStatus.SC_INTERNAL_SERVER_ERROR);
+                resp.sendError(WebdavStatus.SC_METHOD_NOT_ALLOWED);
                 return false;
             }
         } else {
@@ -1702,7 +1702,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
             deleteCollection(req, path, errorList);
             if (!resource.delete()) {
-                errorList.put(path, Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                errorList.put(path, Integer.valueOf(WebdavStatus.SC_METHOD_NOT_ALLOWED));
             }
 
             if (!errorList.isEmpty()) {
@@ -1769,7 +1769,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     if (!childResource.isDirectory()) {
                         // If it's not a collection, then it's an unknown
                         // error
-                        errorList.put(childName, Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                        errorList.put(childName, Integer.valueOf(WebdavStatus.SC_METHOD_NOT_ALLOWED));
                     }
                 }
             }
