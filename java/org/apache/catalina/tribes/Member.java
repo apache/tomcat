@@ -20,13 +20,16 @@ import java.io.Serializable;
 
 /**
  * The Member interface, defines a member in the group.
- * Each member can carry a set of properties, defined by the actual implementation.<BR>
- * A member is identified by the host/ip/uniqueId<br>
- * The host is what interface the member is listening to, to receive data<br>
- * The port is what port the member is listening to, to receive data<br>
- * The uniqueId defines the session id for the member. This is an important feature
+ * Each member can carry a set of properties, defined by the actual implementation.
+ * <p>
+ * A member is identified by the host/ip/uniqueId.
+ * <ul>
+ * <li>The host is what interface the member is listening to, to receive data</li>
+ * <li>The port is what port the member is listening to, to receive data</li>
+ * <li>The uniqueId defines the session id for the member. This is an important feature
  * since a member that has crashed and the starts up again on the same port/host is
- * not guaranteed to be the same member, so no state transfers will ever be confused
+ * not guaranteed to be the same member, so no state transfers will ever be confused.</li>
+ * </ul>
  */
 public interface Member extends Serializable {
 
@@ -85,13 +88,13 @@ public interface Member extends Serializable {
     void setMemberAliveTime(long memberAliveTime);
 
     /**
-     * The current state of the member
+     * The current state of the member.
      * @return {@code true} if the member is functioning correctly
      */
     boolean isReady();
 
     /**
-     * The current state of the member
+     * The current state of the member.
      * @return {@code true} if the member is suspect, but the crash has not been confirmed
      */
     boolean isSuspect();

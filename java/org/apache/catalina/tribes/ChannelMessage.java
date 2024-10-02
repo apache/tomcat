@@ -23,7 +23,7 @@ import org.apache.catalina.tribes.io.XByteBuffer;
 /**
  * Message that is passed through the interceptor stack after the
  * data serialized in the Channel object and then passed down to the
- * interceptor and eventually down to the ChannelSender component
+ * interceptor and eventually down to the ChannelSender component.
  *
  */
 public interface ChannelMessage extends Serializable, Cloneable {
@@ -31,7 +31,7 @@ public interface ChannelMessage extends Serializable, Cloneable {
 
     /**
      * Get the address that this message originated from.
-     * Almost always <code>Channel.getLocalMember(boolean)</code><br>
+     * Almost always <code>Channel.getLocalMember(boolean)</code>.
      * This would be set to a different address
      * if the message was being relayed from a host other than the one
      * that originally sent it.

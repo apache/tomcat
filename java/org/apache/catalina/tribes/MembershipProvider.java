@@ -29,20 +29,24 @@ public interface MembershipProvider {
 
     /**
      * Start the membership provider.
-     * @param level the readiness level <BR>
-     * Channel.DEFAULT - will start all services <BR>
-     * Channel.MBR_RX_SEQ - starts the membership receiver <BR>
-     * Channel.MBR_TX_SEQ - starts the membership broadcaster <BR>
+     * @param level the readiness level
+     * <ul>
+     * <li>Channel.DEFAULT - will start all services</li>
+     * <li>Channel.MBR_RX_SEQ - starts the membership receiver</li>
+     * <li>Channel.MBR_TX_SEQ - starts the membership broadcaster</li>
+     * </ul>
      * @throws Exception if an error occurs
      */
     void start(int level) throws Exception;
 
     /**
      * Stop the membership provider.
-     * @param level the readiness level <BR>
-     * Channel.DEFAULT - will stop all services <BR>
-     * Channel.MBR_RX_SEQ - stops the membership receiver <BR>
-     * Channel.MBR_TX_SEQ - stops the membership broadcaster <BR>
+     * @param level the readiness level
+     * <ul>
+     * <li>Channel.DEFAULT - will stop all services</li>
+     * <li>Channel.MBR_RX_SEQ - stops the membership receiver</li>
+     * <li>Channel.MBR_TX_SEQ - stops the membership broadcaster</li>
+     * </ul>
      * @return {@code true} if successful
      * @throws Exception if an error occurs
      */
