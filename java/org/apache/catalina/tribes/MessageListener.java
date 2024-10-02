@@ -17,20 +17,22 @@
 package org.apache.catalina.tribes;
 
 /**
- * The listener to be registered with the ChannelReceiver, internal Tribes
- * component.
+ * The listener to be registered with the ChannelReceiver, internal Tribes component.
  */
 public interface MessageListener {
 
     /**
      * Receive a message from the IO components in the Channel stack
+     *
      * @param msg the message
      */
     void messageReceived(ChannelMessage msg);
 
     /**
      * Allows skipping processing of the specified message.
+     *
      * @param msg the message
+     *
      * @return {@code true} if the message will be processed
      */
     boolean accept(ChannelMessage msg);
