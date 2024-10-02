@@ -1465,7 +1465,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         destinationPath = destinationPath.substring(reqContextPath.length() + req.getServletPath().length());
 
         if (debug > 0) {
-            log("Dest path :" + destinationPath);
+            log("Dest path: " + destinationPath);
         }
 
         // Check destination path to protect special subdirectories
@@ -1727,7 +1727,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     private void deleteCollection(HttpServletRequest req, String path, Map<String,Integer> errorList) {
 
         if (debug > 1) {
-            log("Delete:" + path);
+            log("Delete collection: " + path);
         }
 
         // Prevent deletion of special subdirectories
