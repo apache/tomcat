@@ -147,6 +147,10 @@
         <code>WebdavServlet</code> and <code>DefaultServlet</code>.
         (michaelo)
       </fix>
+      <fix>
+        Make <code>WebdavServlet</code> properly return the <code>Allow</code>
+        header when deletion of a resource is not allowed. (michaelo)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
