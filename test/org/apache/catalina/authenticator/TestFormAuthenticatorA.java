@@ -18,8 +18,12 @@ package org.apache.catalina.authenticator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -36,6 +40,7 @@ import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
@@ -213,6 +218,38 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
 
         Assert.assertTrue(!originalSessionId.equals(newSessionId));
         client.reset();
+    }
+
+
+    /*
+     * Test to ensure that the expire and date headers use a GMT date.
+     */
+    @Test
+    public void testDateAndExpireHeadersUseGMT() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File(getBuildDirectory(), "webapps/examples");
+        Context ctxt  = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        FormAuthenticator form = new FormAuthenticator();
+        form.setSecurePagesWithPragma(true);
+        ctxt.getPipeline().addValve(form);
+        tomcat.start();
+
+        Map<String,List<String>> responseHeaders = new HashMap<>();
+        ByteChunk bc = new ByteChunk();
+        String path = "http://localhost:" + getPort() + "/examples/jsp/security/protected/index.jsp";
+        int rc = getUrl(path, bc, responseHeaders);
+        Assert.assertTrue(String.format("Expecting 200, but got ", Integer.valueOf(rc)), rc == 200);
+        String expiresDate = responseHeaders.get("Expires").get(0).toString();
+
+        String ExpectedDateFormatRegx = "^[A-za-z]{3}, \\d{2} \\w{3} \\d{4} \\d{2}:\\d{2}:\\d{2} GMT$";
+        Pattern pattern = Pattern.compile(ExpectedDateFormatRegx);
+        Matcher matcher = pattern.matcher(expiresDate);
+        Assert.assertTrue("Expires header date not in expected format", matcher.matches());
+
+        String Date = responseHeaders.get("Date").get(0).toString();
+        matcher = pattern.matcher(Date);
+        Assert.assertTrue("Date header not in expected format", matcher.matches());
     }
 
 

@@ -167,7 +167,7 @@ void Ternary() : {}
  */
 void Or() : {}
 {
-    And() ((<OR0>|<OR1>) And() #Or(2))*
+    And() [((<OR0>|<OR1>) And())+ #Or(jjtree.nodeArity() + 1)]
 }
 
 /*
@@ -176,7 +176,7 @@ void Or() : {}
  */
 void And() : {}
 {
-    Equality() ((<AND0>|<AND1>) Equality() #And(2))*
+    Equality() [((<AND0>|<AND1>) Equality())+ #And(jjtree.nodeArity() + 1)]
 }
 
 /*
@@ -261,6 +261,9 @@ void Multiplication() : {}
 void Unary() : {}
 {
         <MINUS> Unary() #Negative
+    |
+        LOOKAHEAD(2)
+        (<NOT0>|<NOT1>) <EMPTY> Unary() #NotEmpty
     |
         (<NOT0>|<NOT1>) Unary() #Not
     |

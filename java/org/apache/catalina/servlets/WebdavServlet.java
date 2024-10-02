@@ -130,7 +130,6 @@ import org.xml.sax.SAXException;
  * mapping configuration above, the context will be accessible to normal users as before. Those users with the necessary
  * access will be able to edit content available via http://host:port/context/content using
  * http://host:port/context/webdavedit/content
- *
  * <p>
  * There are some known limitations of this Servlet due to it not implementing the PROPPATCH method. Details of these
  * limitations and progress towards addressing them are being tracked under
@@ -410,11 +409,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      *
      * @param request The servlet request we are processing
      */
-    @Override
-    protected String getRelativePath(HttpServletRequest request) {
-        return getRelativePath(request, false);
-    }
-
     @Override
     protected String getRelativePath(HttpServletRequest request, boolean allowEmptyPath) {
         String pathInfo;
@@ -1473,7 +1467,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         destinationPath = destinationPath.substring(reqContextPath.length() + req.getServletPath().length());
 
         if (debug > 0) {
-            log("Dest path :" + destinationPath);
+            log("Dest path: " + destinationPath);
         }
 
         // Check destination path to protect special subdirectories
@@ -1701,7 +1695,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         if (!resource.isDirectory()) {
             if (!resource.delete()) {
-                resp.sendError(WebdavStatus.SC_INTERNAL_SERVER_ERROR);
+                sendNotAllowed(req, resp);
                 return false;
             }
         } else {
@@ -1710,7 +1704,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
             deleteCollection(req, path, errorList);
             if (!resource.delete()) {
-                errorList.put(path, Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                errorList.put(path, Integer.valueOf(WebdavStatus.SC_METHOD_NOT_ALLOWED));
             }
 
             if (!errorList.isEmpty()) {
@@ -1735,7 +1729,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     private void deleteCollection(HttpServletRequest req, String path, Map<String,Integer> errorList) {
 
         if (debug > 1) {
-            log("Delete:" + path);
+            log("Delete collection: " + path);
         }
 
         // Prevent deletion of special subdirectories
@@ -1777,7 +1771,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     if (!childResource.isDirectory()) {
                         // If it's not a collection, then it's an unknown
                         // error
-                        errorList.put(childName, Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                        errorList.put(childName, Integer.valueOf(WebdavStatus.SC_METHOD_NOT_ALLOWED));
                     }
                 }
             }
@@ -1811,7 +1805,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             generatedXML.writeElement("D", "response", XMLWriter.OPENING);
 
             generatedXML.writeElement("D", "href", XMLWriter.OPENING);
-            generatedXML.writeText(getServletContext().getContextPath() + errorPath);
+            generatedXML.writeText(req.getContextPath() + errorPath);
             generatedXML.writeElement("D", "href", XMLWriter.CLOSING);
 
             generatedXML.writeElement("D", "status", XMLWriter.OPENING);

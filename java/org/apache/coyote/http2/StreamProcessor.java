@@ -85,6 +85,15 @@ class StreamProcessor extends AbstractProcessor {
             // Note: The regular processor uses the socketWrapper lock, but using that here triggers a deadlock
             processLock.lock();
             try {
+                /*
+                 * In some scenarios, error handling may trigger multiple ERROR events for the same stream. The first
+                 * ERROR event processed will close the stream, replace it and recycle it. Once the stream has been
+                 * replaced it should not be used for processing any further events. When it is known that processing is
+                 * going to be a NO-OP, exit early.
+                 */
+                if (!stream.equals(handler.getStream(stream.getIdAsInt()))) {
+                    return;
+                }
                 // HTTP/2 equivalent of AbstractConnectionHandler#process() without the
                 // socket <-> processor mapping
                 SocketState state = SocketState.CLOSED;
@@ -121,8 +130,8 @@ class StreamProcessor extends AbstractProcessor {
                             stream.close(se);
                         } else {
                             if (!stream.isActive()) {
-                                // stream.close() will call recycle so only need it here
-                                stream.recycle();
+                                // Close calls replace() so need the same call here
+                                stream.replace();
                             }
                         }
                     }
@@ -137,6 +146,7 @@ class StreamProcessor extends AbstractProcessor {
                     state = SocketState.CLOSED;
                 } finally {
                     if (state == SocketState.CLOSED) {
+                        stream.recycle();
                         recycle();
                     }
                 }
@@ -231,6 +241,19 @@ class StreamProcessor extends AbstractProcessor {
         // application has already set one
         if (statusCode >= 200 && headers.getValue("date") == null) {
             headers.addValue("date").setString(FastHttpDateFormat.getCurrentDate());
+        }
+
+        // Server header
+        if (protocol != null) {
+            String server = protocol.getHttp11Protocol().getServer();
+            if (server == null) {
+                if (protocol.getHttp11Protocol().getServerRemoveAppProvidedValues()) {
+                    headers.removeHeader("server");
+                }
+            } else {
+                // server always overrides anything the app might set
+                headers.setValue("Server").setString(server);
+            }
         }
 
         // Exclude some HTTP header fields where the value is determined only

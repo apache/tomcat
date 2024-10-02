@@ -59,6 +59,8 @@ public abstract class LoggingBaseTest {
 
     private List<File> deleteOnTearDown = new ArrayList<>();
 
+    protected boolean ignoreTearDown = false;
+
     /**
      * Provides name of the currently executing test method.
      */
@@ -135,11 +137,15 @@ public abstract class LoggingBaseTest {
     public void tearDown() throws Exception {
         boolean deleted = true;
         for (File file : deleteOnTearDown) {
-            deleted = deleted & ExpandWar.delete(file);
+            boolean result = ExpandWar.delete(file);
+            if (!result) {
+                log.info("Failed to delete [" + file.getAbsolutePath() + "]");
+            }
+            deleted = deleted & result;
         }
         deleteOnTearDown.clear();
 
-        Assert.assertTrue("Failed to delete at least one file", deleted);
+        Assert.assertTrue("Failed to delete at least one file", ignoreTearDown || deleted);
     }
 
     @AfterClass

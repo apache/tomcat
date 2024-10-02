@@ -92,7 +92,8 @@ public class TestHttp2AccessLogs extends Http2TestBase {
         ByteBuffer trailerPayload = ByteBuffer.allocate(256);
 
         buildPostRequest(headersFrameHeader, headersPayload, false, null, -1, "/trailers", dataFrameHeader, dataPayload,
-                null, trailerFrameHeader, trailerPayload, 3);
+                null, true, 3);
+        buildTrailerHeaders(trailerFrameHeader, trailerPayload, 3);
 
         // Write the headers
         writeFrame(headersFrameHeader, headersPayload);

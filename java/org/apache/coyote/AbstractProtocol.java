@@ -444,10 +444,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
 
     public void removeWaitingProcessor(Processor processor) {
+        boolean result = waitingProcessors.remove(processor);
         if (getLog().isTraceEnabled()) {
-            getLog().trace(sm.getString("abstractProtocol.waitingProcessor.remove", processor));
+            getLog().trace(
+                    sm.getString("abstractProtocol.waitingProcessor.remove", processor, Boolean.valueOf(result)));
         }
-        waitingProcessors.remove(processor);
     }
 
 

@@ -18,9 +18,8 @@ package org.apache.jasper.compiler.tagplugin;
 
 
 /**
- * This interface allows the plugin author to make inquiries about the
- * properties of the current tag, and to use Jasper resources to generate
- * direct Java codes in place of tag handler invocations.
+ * This interface allows the plugin author to make inquiries about the properties of the current tag, and to use Jasper
+ * resources to generate direct Java codes in place of tag handler invocations.
  */
 
 public interface TagPluginContext {
@@ -31,6 +30,7 @@ public interface TagPluginContext {
 
     /**
      * @param attribute Name of the attribute
+     *
      * @return true if the attribute is specified in the tag
      */
     boolean isAttributeSpecified(String attribute);
@@ -42,47 +42,48 @@ public interface TagPluginContext {
 
     /**
      * Generate an import statement
+     *
      * @param s Name of the import class, '*' allowed.
      */
     void generateImport(String s);
 
     /**
-     * Generate a declaration in the of the generated class.  This can be
-     * used to declare an inner class, a method, or a class variable.
-     * @param id A unique ID identifying the declaration.  It is not
-     *           part of the declaration, and is used to ensure that the
-     *           declaration will only appear once.  If this method is
-     *           invoked with the same id more than once in the translation
-     *           unit, only the first declaration will be taken.
+     * Generate a declaration in the of the generated class. This can be used to declare an inner class, a method, or a
+     * class variable.
+     *
+     * @param id   A unique ID identifying the declaration. It is not part of the declaration, and is used to ensure
+     *                 that the declaration will only appear once. If this method is invoked with the same id more than
+     *                 once in the translation unit, only the first declaration will be taken.
      * @param text The text of the declaration.
      */
     void generateDeclaration(String id, String text);
 
     /**
      * Generate Java source code scriptlet
+     *
      * @param s the scriptlet (raw Java source)
      */
     void generateJavaSource(String s);
 
     /**
      * @param attribute The attribute name
-     * @return true if the attribute is specified and its value is a
-     *         translation-time constant.
+     *
+     * @return true if the attribute is specified and its value is a translation-time constant.
      */
     boolean isConstantAttribute(String attribute);
 
     /**
      * @param attribute The attribute name
-     * @return A string that is the value of a constant attribute.  Undefined
-     *         if the attribute is not a (translation-time) constant.
-     *         null if the attribute is not specified.
+     *
+     * @return A string that is the value of a constant attribute. Undefined if the attribute is not a
+     *             (translation-time) constant. null if the attribute is not specified.
      */
     String getConstantAttribute(String attribute);
 
     /**
-     * Generate codes to evaluate value of a attribute in the custom tag
-     * The codes is a Java expression.
-     * NOTE: Currently cannot handle attributes that are fragments.
+     * Generate codes to evaluate value of a attribute in the custom tag The codes is a Java expression. NOTE: Currently
+     * cannot handle attributes that are fragments.
+     *
      * @param attribute The specified attribute
      */
     void generateAttribute(String attribute);
@@ -93,42 +94,42 @@ public interface TagPluginContext {
     void generateBody();
 
     /**
-     * Abandon optimization for this tag handler, and instruct
-     * Jasper to generate the tag handler calls, as usual.
-     * Should be invoked if errors are detected, or when the tag body
-     * is deemed too complicated for optimization.
+     * Abandon optimization for this tag handler, and instruct Jasper to generate the tag handler calls, as usual.
+     * Should be invoked if errors are detected, or when the tag body is deemed too complicated for optimization.
      */
     void dontUseTagPlugin();
 
     /**
-     * Get the PluginContext for the parent of this custom tag.  NOTE:
-     * The operations available for PluginContext so obtained is limited
-     * to getPluginAttribute and setPluginAttribute, and queries (e.g.
-     * isScriptless().  There should be no calls to generate*().
-     * @return The pluginContext for the parent node.
-     *         null if the parent is not a custom tag, or if the pluginContext
-     *         if not available (because useTagPlugin is false, e.g).
+     * Get the PluginContext for the parent of this custom tag. NOTE: The operations available for PluginContext so
+     * obtained is limited to getPluginAttribute and setPluginAttribute, and queries (e.g. isScriptless(). There should
+     * be no calls to generate*().
+     *
+     * @return The pluginContext for the parent node. null if the parent is not a custom tag, or if the pluginContext if
+     *             not available (because useTagPlugin is false, e.g).
      */
     TagPluginContext getParentContext();
 
     /**
-     * Associate the attribute with a value in the current tagplugin context.
-     * The plugin attributes can be used for communication among tags that
-     * must work together as a group.  See &lt;c:when&gt; for an example.
-     * @param attr The attribute name
+     * Associate the attribute with a value in the current tagplugin context. The plugin attributes can be used for
+     * communication among tags that must work together as a group. See &lt;c:when&gt; for an example.
+     *
+     * @param attr  The attribute name
      * @param value The attribute value
      */
     void setPluginAttribute(String attr, Object value);
 
     /**
      * Get the value of an attribute in the current tagplugin context.
+     *
      * @param attr The attribute name
+     *
      * @return the attribute value
      */
     Object getPluginAttribute(String attr);
 
     /**
      * Is the tag being used inside a tag file?
+     *
      * @return <code>true</code> if inside a tag file
      */
     boolean isTagFile();

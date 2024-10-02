@@ -33,7 +33,7 @@ jobs:
       matrix:
         isMain:
           - ${{ contains(github.ref, 'main') }}
-        java: [ 17, 21, 22, 24-ea ]
+        java: [ 17, 21, 23, 24-ea ]
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         exclude:
           - isMain: true

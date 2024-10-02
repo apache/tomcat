@@ -22,40 +22,53 @@ public interface MembershipProvider {
 
     /**
      * Initialize the membership provider with the specified configuration.
+     *
      * @param properties configuration
+     *
      * @throws Exception if an error occurs
      */
     void init(Properties properties) throws Exception;
 
     /**
      * Start the membership provider.
-     * @param level the readiness level <BR>
-     * Channel.DEFAULT - will start all services <BR>
-     * Channel.MBR_RX_SEQ - starts the membership receiver <BR>
-     * Channel.MBR_TX_SEQ - starts the membership broadcaster <BR>
+     *
+     * @param level the readiness level
+     *                  <ul>
+     *                  <li>Channel.DEFAULT - will start all services</li>
+     *                  <li>Channel.MBR_RX_SEQ - starts the membership receiver</li>
+     *                  <li>Channel.MBR_TX_SEQ - starts the membership broadcaster</li>
+     *                  </ul>
+     *
      * @throws Exception if an error occurs
      */
     void start(int level) throws Exception;
 
     /**
      * Stop the membership provider.
-     * @param level the readiness level <BR>
-     * Channel.DEFAULT - will stop all services <BR>
-     * Channel.MBR_RX_SEQ - stops the membership receiver <BR>
-     * Channel.MBR_TX_SEQ - stops the membership broadcaster <BR>
+     *
+     * @param level the readiness level
+     *                  <ul>
+     *                  <li>Channel.DEFAULT - will stop all services</li>
+     *                  <li>Channel.MBR_RX_SEQ - stops the membership receiver</li>
+     *                  <li>Channel.MBR_TX_SEQ - stops the membership broadcaster</li>
+     *                  </ul>
+     *
      * @return {@code true} if successful
+     *
      * @throws Exception if an error occurs
      */
     boolean stop(int level) throws Exception;
 
     /**
      * Set the associated membership listener.
+     *
      * @param listener the listener
      */
     void setMembershipListener(MembershipListener listener);
 
     /**
      * Set the associated membership service.
+     *
      * @param service the service
      */
     void setMembershipService(MembershipService service);
@@ -67,13 +80,16 @@ public interface MembershipProvider {
 
     /**
      * Get the specified member from the associated membership.
+     *
      * @param mbr the member
+     *
      * @return the member
      */
     Member getMember(Member mbr);
 
     /**
      * Get the members from the associated membership.
+     *
      * @return the members
      */
     Member[] getMembers();

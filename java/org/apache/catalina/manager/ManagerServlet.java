@@ -1554,32 +1554,24 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
                 for (SSLHostConfig sslHostConfig : sslHostConfigs) {
-                    if (sslHostConfig.getOpenSslContext().longValue() == 0) {
-                        // Not set. Must be JSSE based.
-                        Set<SSLHostConfigCertificate> sslHostConfigCerts = sslHostConfig.getCertificates();
-                        for (SSLHostConfigCertificate sslHostConfigCert : sslHostConfigCerts) {
-                            String name = connector.toString() + "-" + sslHostConfig.getHostName() + "-" +
-                                    sslHostConfigCert.getType();
-                            List<String> certList = new ArrayList<>();
-                            SSLContext sslContext = sslHostConfigCert.getSslContext();
-                            String alias = sslHostConfigCert.getCertificateKeyAlias();
-                            if (alias == null) {
-                                alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
-                            }
-                            X509Certificate[] certs = sslContext.getCertificateChain(alias);
-                            if (certs == null) {
-                                certList.add(smClient.getString("managerServlet.certsNotAvailable"));
-                            } else {
-                                for (Certificate cert : certs) {
-                                    certList.add(cert.toString());
-                                }
-                            }
-                            result.put(name, certList);
-                        }
-                    } else {
+                    Set<SSLHostConfigCertificate> sslHostConfigCerts = sslHostConfig.getCertificates();
+                    for (SSLHostConfigCertificate sslHostConfigCert : sslHostConfigCerts) {
+                        String name = connector.toString() + "-" + sslHostConfig.getHostName() + "-" +
+                                sslHostConfigCert.getType();
                         List<String> certList = new ArrayList<>();
-                        certList.add(smClient.getString("managerServlet.certsNotAvailable"));
-                        String name = connector.toString() + "-" + sslHostConfig.getHostName();
+                        SSLContext sslContext = sslHostConfigCert.getSslContext();
+                        String alias = sslHostConfigCert.getCertificateKeyAlias();
+                        if (alias == null) {
+                            alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
+                        }
+                        X509Certificate[] certs = sslContext.getCertificateChain(alias);
+                        if (certs == null) {
+                            certList.add(smClient.getString("managerServlet.certsNotAvailable"));
+                        } else {
+                            for (Certificate cert : certs) {
+                                certList.add(cert.toString());
+                            }
+                        }
                         result.put(name, certList);
                     }
                 }
@@ -1604,21 +1596,16 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 for (SSLHostConfig sslHostConfig : sslHostConfigs) {
                     String name = connector.toString() + "-" + sslHostConfig.getHostName();
                     List<String> certList = new ArrayList<>();
-                    if (sslHostConfig.getOpenSslContext().longValue() == 0) {
-                        // Not set. Must be JSSE based.
-                        SSLContext sslContext = sslHostConfig.getCertificates().iterator().next().getSslContext();
-                        X509Certificate[] certs = sslContext.getAcceptedIssuers();
-                        if (certs == null) {
-                            certList.add(smClient.getString("managerServlet.certsNotAvailable"));
-                        } else if (certs.length == 0) {
-                            certList.add(smClient.getString("managerServlet.trustedCertsNotConfigured"));
-                        } else {
-                            for (Certificate cert : certs) {
-                                certList.add(cert.toString());
-                            }
-                        }
-                    } else {
+                    SSLContext sslContext = sslHostConfig.getCertificates().iterator().next().getSslContext();
+                    X509Certificate[] certs = sslContext.getAcceptedIssuers();
+                    if (certs == null) {
                         certList.add(smClient.getString("managerServlet.certsNotAvailable"));
+                    } else if (certs.length == 0) {
+                        certList.add(smClient.getString("managerServlet.trustedCertsNotConfigured"));
+                    } else {
+                        for (Certificate cert : certs) {
+                            certList.add(cert.toString());
+                        }
                     }
                     result.put(name, certList);
                 }

@@ -803,6 +803,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             authStatus = state.serverAuthContext.validateRequest(state.messageInfo, client, null);
         } catch (AuthException e) {
             log.debug(sm.getString("authenticator.loginFail"), e);
+            // Need to explicitly set the return code as the ServerAuthContext may not have done.
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return false;
         }
 

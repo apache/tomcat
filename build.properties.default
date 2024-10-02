@@ -130,15 +130,15 @@ base-maven.loc=https://repo.maven.apache.org/maven2
 # ----- Eclipse JDT, version 4.7 or later -----#
 # See https://cwiki.apache.org/confluence/display/TOMCAT/Managing+Tomcat%27s+Dependency+on+the+Eclipse+JDT+Core+Batch+Compiler
 #
-# Checksum is from "SHA512 Checksums for 4.31" link at
-# https://download.eclipse.org/eclipse/downloads/drops4/R-4.32-202406010610/
-# https://download.eclipse.org/eclipse/downloads/drops4/R-4.32-202406010610/checksum/eclipse-4.32-SUMSSHA512
+# Checksum is from "SHA512 Checksums for 4.33" link at
+# https://download.eclipse.org/eclipse/downloads/drops4/R-4.33-202409030240/
+# https://download.eclipse.org/eclipse/downloads/drops4/R-4.33-202409030240/checksum/eclipse-4.33-SUMSSHA512
 #
-jdt.version=4.32
-jdt.release=R-4.32-202406010610
+jdt.version=4.33
+jdt.release=R-4.33-202409030240
 jdt.checksum.enabled=true
 jdt.checksum.algorithm=SHA-512
-jdt.checksum.value=8937dede817b8c37f23e0b42162bdd0f722e34e40f75a35b9ca45a17bc78c1a0d65ddaa81b5e6916c7cd8895023a04dd6112031c952ab4584e72e6a1f35f1608
+jdt.checksum.value=8b99bf69dc13a8b58a5507818be9222887f33b7120f4e92bcae89af108d38b9412715f6fe749eec0c07fc9bde9d84e5f8deacd74030559fab22f14697c12a1a9
 jdt.home=${base.path}/ecj-${jdt.version}
 jdt.jar=${jdt.home}/ecj-${jdt.version}.jar
 # The download will be moved to the archive area eventually. We are taking care of that in advance.
@@ -242,10 +242,10 @@ objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
 
 # ----- byte-buddy, used by EasyMock, version 1.12.18 or later -----
-bytebuddy.version=1.15.0
+bytebuddy.version=1.15.3
 bytebuddy.checksum.enabled=true
 bytebuddy.checksum.algorithm=MD5|SHA-1
-bytebuddy.checksum.value=e830b0eae8ae0e4b7df4f4ddba23fbe1|a5b1159b91c5334015de0f22ab4b1188cd42bbff
+bytebuddy.checksum.value=3406712dd496bcda0136945c6e77711c|01b3069696cd9ed55d90b9114ffe3429035ff924
 bytebuddy.home=${base.path}/byte-buddy-${bytebuddy.version}
 bytebuddy.jar=${bytebuddy.home}/byte-buddy-${bytebuddy.version}.jar
 bytebuddy.loc=${base-maven.loc}/net/bytebuddy/byte-buddy/${bytebuddy.version}/byte-buddy-${bytebuddy.version}.jar
@@ -260,10 +260,10 @@ unboundid.jar=${unboundid.home}/unboundid-ldapsdk-${unboundid.version}.jar
 unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.version}/unboundid-ldapsdk-${unboundid.version}.jar
 
 # ----- Checkstyle, version 6.16 or later -----
-checkstyle.version=10.18.0
+checkstyle.version=10.18.2
 checkstyle.checksum.enabled=true
 checkstyle.checksum.algorithm=SHA-512
-checkstyle.checksum.value=4942c46443773ec31b2816249820e6825991f3ef0f7339e3f432692338cea4634811dc631c0d4b4c8d44205c7344603dab43e1196b50e9ab25206cda1921e1b4
+checkstyle.checksum.value=9c2be68e423fbbc301272c4a96824f84b8ccae23103e9653af3cea8546bc87695f17491a95daf66c19bfb1597cc3113e2656a5eb8256b0f5468d3cef56cc0e66
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
