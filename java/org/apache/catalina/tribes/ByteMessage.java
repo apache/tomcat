@@ -23,15 +23,17 @@ import java.io.ObjectOutput;
 
 /**
  * A byte message is not serialized and deserialized by the channel
- * instead it is sent as a byte array<br>
+ * instead it is sent as a byte array.
+ * <p>
  * By default Tribes uses java serialization when it receives an object
  * to be sent over the wire. Java serialization is not the most
  * efficient of serializing data, and Tribes might not even
  * have access to the correct class loaders to deserialize the object properly.
- * <br>
+ * <p>
  * The ByteMessage class is a class where the channel when it receives it will
  * not attempt to perform serialization, instead it will simply stream the <code>getMessage()</code>
- * bytes.<br>
+ * bytes.
+ * <p>
  * If you are using multiple applications on top of Tribes you should add some sort of header
  * so that you can decide with the <code>ChannelListener.accept()</code> whether this message was intended
  * for you.
@@ -44,8 +46,9 @@ public class ByteMessage implements Externalizable {
 
 
     /**
-     * Creates an empty byte message
-     * Constructor also for deserialization
+     * Creates an empty byte message.
+     * <p>
+     * Constructor also for deserialization.
      */
     public ByteMessage() {
     }
@@ -88,5 +91,4 @@ public class ByteMessage implements Externalizable {
             out.write(message,0,message.length);
         }
     }
-
 }

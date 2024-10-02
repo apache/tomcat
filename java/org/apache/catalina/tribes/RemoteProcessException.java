@@ -18,7 +18,7 @@ package org.apache.catalina.tribes;
 
 /**
  * Message thrown by a sender when USE_SYNC_ACK receives a FAIL_ACK_COMMAND.
- * <br>
+ * <p>
  * This means that the message was received on the remote node but the processing of the message failed.
  * This message will be embedded in a ChannelException.FaultyMember
  *
