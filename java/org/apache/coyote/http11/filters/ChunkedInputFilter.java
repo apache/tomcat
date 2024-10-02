@@ -201,10 +201,10 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
         // Handle some edge cases
         if (available == 1 && parseState == ParseState.CHUNK_BODY_CRLF) {
-             // Either just the CR or just the LF are left in the buffer. There is no data to read.
+            // Either just the CR or just the LF are left in the buffer. There is no data to read.
             available = 0;
         } else if (available == 2 && !crFound && parseState == ParseState.CHUNK_BODY_CRLF) {
-             // Just CRLF is left in the buffer. There is no data to read.
+            // Just CRLF is left in the buffer. There is no data to read.
             available = 0;
         }
 

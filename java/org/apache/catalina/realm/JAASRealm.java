@@ -603,7 +603,8 @@ public class JAASRealm extends RealmBase {
                 URL resource = Thread.currentThread().getContextClassLoader().getResource(configFile);
                 Configuration config = null;
                 if (resource == null) {
-                    try (ConfigurationSource.Resource configFileResource = ConfigFileLoader.getSource().getResource(configFile)) {
+                    try (ConfigurationSource.Resource configFileResource =
+                            ConfigFileLoader.getSource().getResource(configFile)) {
                         config = constructor.newInstance(configFileResource.getURI());
                         this.jaasConfigurationLoaded = true;
                     } catch (IOException ioe) {

@@ -658,7 +658,8 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             if (serverAuthConfig == null) {
                 synchronized (serverAuthConfigLock) {
                     if (serverAuthConfig == null) {
-                        serverAuthConfig = new SingleContextServerAuthConfig(serverAuthModule, this.appContext, handler);
+                        serverAuthConfig =
+                                new SingleContextServerAuthConfig(serverAuthModule, this.appContext, handler);
                     }
                 }
             }

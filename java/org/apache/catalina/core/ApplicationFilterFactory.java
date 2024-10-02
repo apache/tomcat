@@ -91,7 +91,7 @@ public final class ApplicationFilterFactory {
         // Acquire the information we will need to match filter mappings
         DispatcherType dispatcher = (DispatcherType) request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);
 
-        String requestPath = FilterUtil.getRequestPath(request) ;
+        String requestPath = FilterUtil.getRequestPath(request);
 
         String servletName = wrapper.getName();
 
