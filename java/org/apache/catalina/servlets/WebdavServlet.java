@@ -1693,7 +1693,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         if (!resource.isDirectory()) {
             if (!resource.delete()) {
-                resp.sendError(WebdavStatus.SC_METHOD_NOT_ALLOWED);
+                sendNotAllowed(req, resp);
                 return false;
             }
         } else {
