@@ -142,6 +142,11 @@
         Avoid store config backup loss when storing one configuration more than
         once per second. (remm)
       </fix>
+      <fix>
+        <bug>69359</bug>: <code>WebdavServlet</code> duplicates
+        <code>getRelativePath()</code> method from super class with
+        incorrect Javadoc. (michaelo)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
