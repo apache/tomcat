@@ -147,6 +147,11 @@
         <code>getRelativePath()</code> method from super class with
         incorrect Javadoc. (michaelo)
       </fix>
+      <fix>
+        <bug>69360</bug>: Inconsistent <code>DELETE</code> behavior between
+        <code>WebdavServlet</code> and <code>DefaultServlet</code>.
+        (michaelo)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
