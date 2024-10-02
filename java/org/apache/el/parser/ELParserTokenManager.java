@@ -58,10 +58,11 @@ public class ELParserTokenManager implements ELParserConstants {
         }
         switch (curChar) {
             case 123:
-                if ((active0 & 0x4L) != 0L)
+                if ((active0 & 0x4L) != 0L) {
                     return jjStopAtPos(1, 2);
-                else if ((active0 & 0x8L) != 0L)
+                } else if ((active0 & 0x8L) != 0L) {
                     return jjStopAtPos(1, 3);
+                }
                 break;
             default:
                 break;
@@ -80,22 +81,25 @@ public class ELParserTokenManager implements ELParserConstants {
         jjstateSet[0] = startState;
         int kind = 0x7fffffff;
         for (;;) {
-            if (++jjround == 0x7fffffff)
+            if (++jjround == 0x7fffffff) {
                 ReInitRounds();
+            }
             if (curChar < 64) {
                 long l = 1L << curChar;
                 do {
                     switch (jjstateSet[--i]) {
                         case 7:
                             if ((0xffffffe7ffffffffL & l) != 0L) {
-                                if (kind > 1)
+                                if (kind > 1) {
                                     kind = 1;
+                                }
                                 {
                                     jjCheckNAddStates(0, 4);
                                 }
                             } else if ((0x1800000000L & l) != 0L) {
-                                if (kind > 1)
+                                if (kind > 1) {
                                     kind = 1;
+                                }
                                 {
                                     jjCheckNAdd(5);
                                 }
@@ -110,10 +114,12 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 2:
-                            if ((0xffffffe7ffffffffL & l) == 0L)
+                            if ((0xffffffe7ffffffffL & l) == 0L) {
                                 break;
-                            if (kind > 1)
-                                kind = 1; {
+                            }
+                            if (kind > 1) {
+                                kind = 1;
+                            } {
                             jjCheckNAddStates(0, 4);
                         }
                             break;
@@ -128,18 +134,22 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 5:
-                            if ((0xffffffe7ffffffffL & l) == 0L)
+                            if ((0xffffffe7ffffffffL & l) == 0L) {
                                 break;
-                            if (kind > 1)
-                                kind = 1; {
+                            }
+                            if (kind > 1) {
+                                kind = 1;
+                            } {
                             jjCheckNAddStates(5, 8);
                         }
                             break;
                         case 6:
-                            if ((0x1800000000L & l) == 0L)
+                            if ((0x1800000000L & l) == 0L) {
                                 break;
-                            if (kind > 1)
-                                kind = 1; {
+                            }
+                            if (kind > 1) {
+                                kind = 1;
+                            } {
                             jjCheckNAddStates(9, 13);
                         }
                             break;
@@ -152,15 +162,17 @@ public class ELParserTokenManager implements ELParserConstants {
                 do {
                     switch (jjstateSet[--i]) {
                         case 7:
-                            if (kind > 1)
-                                kind = 1; {
+                            if (kind > 1) {
+                                kind = 1;
+                            } {
                             jjCheckNAddStates(0, 4);
                         }
                             if ((0xffffffffefffffffL & l) != 0L) {
                                 jjCheckNAddTwoStates(0, 1);
                             } else if (curChar == 92) {
-                                if (kind > 1)
+                                if (kind > 1) {
                                     kind = 1;
+                                }
                                 {
                                     jjCheckNAddStates(14, 17);
                                 }
@@ -172,16 +184,19 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 1:
-                            if (curChar != 92)
+                            if (curChar != 92) {
                                 break;
-                            if (kind > 1)
-                                kind = 1; {
+                            }
+                            if (kind > 1) {
+                                kind = 1;
+                            } {
                             jjCheckNAddStates(14, 17);
                         }
                             break;
                         case 2:
-                            if (kind > 1)
-                                kind = 1; {
+                            if (kind > 1) {
+                                kind = 1;
+                            } {
                             jjCheckNAddStates(0, 4);
                         }
                             break;
@@ -190,10 +205,12 @@ public class ELParserTokenManager implements ELParserConstants {
                         }
                             break;
                         case 5:
-                            if ((0xf7ffffffefffffffL & l) == 0L)
+                            if ((0xf7ffffffefffffffL & l) == 0L) {
                                 break;
-                            if (kind > 1)
-                                kind = 1; {
+                            }
+                            if (kind > 1) {
+                                kind = 1;
+                            } {
                             jjCheckNAddStates(5, 8);
                         }
                             break;
@@ -214,8 +231,9 @@ public class ELParserTokenManager implements ELParserConstants {
                                 jjCheckNAddTwoStates(0, 1);
                             }
                             if (jjCanMove_0(hiByte, i1, i2, l1, l2)) {
-                                if (kind > 1)
+                                if (kind > 1) {
                                     kind = 1;
+                                }
                                 {
                                     jjCheckNAddStates(0, 4);
                                 }
@@ -227,10 +245,12 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 2:
-                            if (!jjCanMove_0(hiByte, i1, i2, l1, l2))
+                            if (!jjCanMove_0(hiByte, i1, i2, l1, l2)) {
                                 break;
-                            if (kind > 1)
-                                kind = 1; {
+                            }
+                            if (kind > 1) {
+                                kind = 1;
+                            } {
                             jjCheckNAddStates(0, 4);
                         }
                             break;
@@ -240,18 +260,21 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 5:
-                            if (!jjCanMove_0(hiByte, i1, i2, l1, l2))
+                            if (!jjCanMove_0(hiByte, i1, i2, l1, l2)) {
                                 break;
-                            if (kind > 1)
-                                kind = 1; {
+                            }
+                            if (kind > 1) {
+                                kind = 1;
+                            } {
                             jjCheckNAddStates(5, 8);
                         }
                             break;
                         default:
-                            if (i1 == 0 || l1 == 0 || i2 == 0 || l2 == 0)
+                            if (i1 == 0 || l1 == 0 || i2 == 0 || l2 == 0) {
                                 break;
-                            else
+                            } else {
                                 break;
+                            }
                     }
                 } while (i != startsAt);
             }
@@ -261,8 +284,9 @@ public class ELParserTokenManager implements ELParserConstants {
                 kind = 0x7fffffff;
             }
             ++curPos;
-            if ((i = jjnewStateCnt) == (startsAt = 8 - (jjnewStateCnt = startsAt)))
+            if ((i = jjnewStateCnt) == (startsAt = 8 - (jjnewStateCnt = startsAt))) {
                 return curPos;
+            }
             try {
                 curChar = input_stream.readChar();
             } catch (java.io.IOException e) {
@@ -274,16 +298,18 @@ public class ELParserTokenManager implements ELParserConstants {
     private final int jjStopStringLiteralDfa_2(int pos, long active0) {
         switch (pos) {
             case 0:
-                if ((active0 & 0x20000L) != 0L)
+                if ((active0 & 0x20000L) != 0L) {
                     return 1;
+                }
                 if ((active0 & 0x141d555401c000L) != 0L) {
                     jjmatchedKind = 56;
                     return 30;
                 }
                 return -1;
             case 1:
-                if ((active0 & 0x41554000000L) != 0L)
+                if ((active0 & 0x41554000000L) != 0L) {
                     return 30;
+                }
                 if ((active0 & 0x1419400001c000L) != 0L) {
                     jjmatchedKind = 56;
                     jjmatchedPos = 1;
@@ -291,8 +317,9 @@ public class ELParserTokenManager implements ELParserConstants {
                 }
                 return -1;
             case 2:
-                if ((active0 & 0x14014000000000L) != 0L)
+                if ((active0 & 0x14014000000000L) != 0L) {
                     return 30;
+                }
                 if ((active0 & 0x18000001c000L) != 0L) {
                     jjmatchedKind = 56;
                     jjmatchedPos = 2;
@@ -300,8 +327,9 @@ public class ELParserTokenManager implements ELParserConstants {
                 }
                 return -1;
             case 3:
-                if ((active0 & 0x14000L) != 0L)
+                if ((active0 & 0x14000L) != 0L) {
                     return 30;
+                }
                 if ((active0 & 0x180000008000L) != 0L) {
                     jjmatchedKind = 56;
                     jjmatchedPos = 3;
@@ -309,8 +337,9 @@ public class ELParserTokenManager implements ELParserConstants {
                 }
                 return -1;
             case 4:
-                if ((active0 & 0x80000008000L) != 0L)
+                if ((active0 & 0x80000008000L) != 0L) {
                     return 30;
+                }
                 if ((active0 & 0x100000000000L) != 0L) {
                     jjmatchedKind = 56;
                     jjmatchedPos = 4;
@@ -442,34 +471,38 @@ public class ELParserTokenManager implements ELParserConstants {
         }
         switch (curChar) {
             case 38:
-                if ((active0 & 0x8000000000L) != 0L)
+                if ((active0 & 0x8000000000L) != 0L) {
                     return jjStopAtPos(1, 39);
+                }
                 break;
             case 61:
-                if ((active0 & 0x20000000L) != 0L)
+                if ((active0 & 0x20000000L) != 0L) {
                     return jjStopAtPos(1, 29);
-                else if ((active0 & 0x80000000L) != 0L)
+                } else if ((active0 & 0x80000000L) != 0L) {
                     return jjStopAtPos(1, 31);
-                else if ((active0 & 0x200000000L) != 0L)
+                } else if ((active0 & 0x200000000L) != 0L) {
                     return jjStopAtPos(1, 33);
-                else if ((active0 & 0x800000000L) != 0L)
+                } else if ((active0 & 0x800000000L) != 0L) {
                     return jjStopAtPos(1, 35);
-                else if ((active0 & 0x20000000000000L) != 0L)
+                } else if ((active0 & 0x20000000000000L) != 0L) {
                     return jjStopAtPos(1, 53);
+                }
                 break;
             case 62:
-                if ((active0 & 0x80000000000000L) != 0L)
+                if ((active0 & 0x80000000000000L) != 0L) {
                     return jjStopAtPos(1, 55);
+                }
                 break;
             case 97:
                 return jjMoveStringLiteralDfa2_2(active0, 0x8000L);
             case 101:
-                if ((active0 & 0x40000000L) != 0L)
+                if ((active0 & 0x40000000L) != 0L) {
                     return jjStartNfaWithStates_2(1, 30, 30);
-                else if ((active0 & 0x100000000L) != 0L)
+                } else if ((active0 & 0x100000000L) != 0L) {
                     return jjStartNfaWithStates_2(1, 32, 30);
-                else if ((active0 & 0x1000000000L) != 0L)
+                } else if ((active0 & 0x1000000000L) != 0L) {
                     return jjStartNfaWithStates_2(1, 36, 30);
+                }
                 break;
             case 105:
                 return jjMoveStringLiteralDfa2_2(active0, 0x4000000000000L);
@@ -480,24 +513,28 @@ public class ELParserTokenManager implements ELParserConstants {
             case 111:
                 return jjMoveStringLiteralDfa2_2(active0, 0x10004000000000L);
             case 113:
-                if ((active0 & 0x400000000L) != 0L)
+                if ((active0 & 0x400000000L) != 0L) {
                     return jjStartNfaWithStates_2(1, 34, 30);
+                }
                 break;
             case 114:
-                if ((active0 & 0x40000000000L) != 0L)
+                if ((active0 & 0x40000000000L) != 0L) {
                     return jjStartNfaWithStates_2(1, 42, 30);
+                }
                 return jjMoveStringLiteralDfa2_2(active0, 0x4000L);
             case 116:
-                if ((active0 & 0x4000000L) != 0L)
+                if ((active0 & 0x4000000L) != 0L) {
                     return jjStartNfaWithStates_2(1, 26, 30);
-                else if ((active0 & 0x10000000L) != 0L)
+                } else if ((active0 & 0x10000000L) != 0L) {
                     return jjStartNfaWithStates_2(1, 28, 30);
+                }
                 break;
             case 117:
                 return jjMoveStringLiteralDfa2_2(active0, 0x10000L);
             case 124:
-                if ((active0 & 0x20000000000L) != 0L)
+                if ((active0 & 0x20000000000L) != 0L) {
                     return jjStopAtPos(1, 41);
+                }
                 break;
             default:
                 break;
@@ -506,8 +543,9 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     private int jjMoveStringLiteralDfa2_2(long old0, long active0) {
-        if (((active0 &= old0)) == 0L)
+        if (((active0 &= old0)) == 0L) {
             return jjStartNfa_2(0, old0);
+        }
         try {
             curChar = input_stream.readChar();
         } catch (java.io.IOException e) {
@@ -516,10 +554,11 @@ public class ELParserTokenManager implements ELParserConstants {
         }
         switch (curChar) {
             case 100:
-                if ((active0 & 0x10000000000L) != 0L)
+                if ((active0 & 0x10000000000L) != 0L) {
                     return jjStartNfaWithStates_2(2, 40, 30);
-                else if ((active0 & 0x10000000000000L) != 0L)
+                } else if ((active0 & 0x10000000000000L) != 0L) {
                     return jjStartNfaWithStates_2(2, 52, 30);
+                }
                 break;
             case 108:
                 return jjMoveStringLiteralDfa3_2(active0, 0x18000L);
@@ -528,14 +567,16 @@ public class ELParserTokenManager implements ELParserConstants {
             case 115:
                 return jjMoveStringLiteralDfa3_2(active0, 0x100000000000L);
             case 116:
-                if ((active0 & 0x4000000000L) != 0L)
+                if ((active0 & 0x4000000000L) != 0L) {
                     return jjStartNfaWithStates_2(2, 38, 30);
+                }
                 break;
             case 117:
                 return jjMoveStringLiteralDfa3_2(active0, 0x4000L);
             case 118:
-                if ((active0 & 0x4000000000000L) != 0L)
+                if ((active0 & 0x4000000000000L) != 0L) {
                     return jjStartNfaWithStates_2(2, 50, 30);
+                }
                 break;
             default:
                 break;
@@ -544,8 +585,9 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     private int jjMoveStringLiteralDfa3_2(long old0, long active0) {
-        if (((active0 &= old0)) == 0L)
+        if (((active0 &= old0)) == 0L) {
             return jjStartNfa_2(1, old0);
+        }
         try {
             curChar = input_stream.readChar();
         } catch (java.io.IOException e) {
@@ -554,12 +596,14 @@ public class ELParserTokenManager implements ELParserConstants {
         }
         switch (curChar) {
             case 101:
-                if ((active0 & 0x4000L) != 0L)
+                if ((active0 & 0x4000L) != 0L) {
                     return jjStartNfaWithStates_2(3, 14, 30);
+                }
                 break;
             case 108:
-                if ((active0 & 0x10000L) != 0L)
+                if ((active0 & 0x10000L) != 0L) {
                     return jjStartNfaWithStates_2(3, 16, 30);
+                }
                 break;
             case 115:
                 return jjMoveStringLiteralDfa4_2(active0, 0x8000L);
@@ -572,8 +616,9 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     private int jjMoveStringLiteralDfa4_2(long old0, long active0) {
-        if (((active0 &= old0)) == 0L)
+        if (((active0 &= old0)) == 0L) {
             return jjStartNfa_2(2, old0);
+        }
         try {
             curChar = input_stream.readChar();
         } catch (java.io.IOException e) {
@@ -584,12 +629,14 @@ public class ELParserTokenManager implements ELParserConstants {
             case 97:
                 return jjMoveStringLiteralDfa5_2(active0, 0x100000000000L);
             case 101:
-                if ((active0 & 0x8000L) != 0L)
+                if ((active0 & 0x8000L) != 0L) {
                     return jjStartNfaWithStates_2(4, 15, 30);
+                }
                 break;
             case 121:
-                if ((active0 & 0x80000000000L) != 0L)
+                if ((active0 & 0x80000000000L) != 0L) {
                     return jjStartNfaWithStates_2(4, 43, 30);
+                }
                 break;
             default:
                 break;
@@ -598,8 +645,9 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     private int jjMoveStringLiteralDfa5_2(long old0, long active0) {
-        if (((active0 &= old0)) == 0L)
+        if (((active0 &= old0)) == 0L) {
             return jjStartNfa_2(3, old0);
+        }
         try {
             curChar = input_stream.readChar();
         } catch (java.io.IOException e) {
@@ -616,8 +664,9 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     private int jjMoveStringLiteralDfa6_2(long old0, long active0) {
-        if (((active0 &= old0)) == 0L)
+        if (((active0 &= old0)) == 0L) {
             return jjStartNfa_2(4, old0);
+        }
         try {
             curChar = input_stream.readChar();
         } catch (java.io.IOException e) {
@@ -634,8 +683,9 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     private int jjMoveStringLiteralDfa7_2(long old0, long active0) {
-        if (((active0 &= old0)) == 0L)
+        if (((active0 &= old0)) == 0L) {
             return jjStartNfa_2(5, old0);
+        }
         try {
             curChar = input_stream.readChar();
         } catch (java.io.IOException e) {
@@ -652,8 +702,9 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     private int jjMoveStringLiteralDfa8_2(long old0, long active0) {
-        if (((active0 &= old0)) == 0L)
+        if (((active0 &= old0)) == 0L) {
             return jjStartNfa_2(6, old0);
+        }
         try {
             curChar = input_stream.readChar();
         } catch (java.io.IOException e) {
@@ -670,8 +721,9 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     private int jjMoveStringLiteralDfa9_2(long old0, long active0) {
-        if (((active0 &= old0)) == 0L)
+        if (((active0 &= old0)) == 0L) {
             return jjStartNfa_2(7, old0);
+        }
         try {
             curChar = input_stream.readChar();
         } catch (java.io.IOException e) {
@@ -680,8 +732,9 @@ public class ELParserTokenManager implements ELParserConstants {
         }
         switch (curChar) {
             case 102:
-                if ((active0 & 0x100000000000L) != 0L)
+                if ((active0 & 0x100000000000L) != 0L) {
                     return jjStartNfaWithStates_2(9, 44, 30);
+                }
                 break;
             default:
                 break;
@@ -714,22 +767,25 @@ public class ELParserTokenManager implements ELParserConstants {
         jjstateSet[0] = startState;
         int kind = 0x7fffffff;
         for (;;) {
-            if (++jjround == 0x7fffffff)
+            if (++jjround == 0x7fffffff) {
                 ReInitRounds();
+            }
             if (curChar < 64) {
                 long l = 1L << curChar;
                 do {
                     switch (jjstateSet[--i]) {
                         case 0:
                             if ((0x3ff000000000000L & l) != 0L) {
-                                if (kind > 10)
+                                if (kind > 10) {
                                     kind = 10;
+                                }
                                 {
                                     jjCheckNAddStates(18, 22);
                                 }
                             } else if ((0x1800000000L & l) != 0L) {
-                                if (kind > 56)
+                                if (kind > 56) {
                                     kind = 56;
+                                }
                                 {
                                     jjCheckNAddTwoStates(28, 29);
                                 }
@@ -743,25 +799,29 @@ public class ELParserTokenManager implements ELParserConstants {
                             break;
                         case 30:
                             if ((0x3ff001000000000L & l) != 0L) {
-                                if (kind > 57)
+                                if (kind > 57) {
                                     kind = 57;
+                                }
                                 {
                                     jjCheckNAdd(29);
                                 }
                             }
                             if ((0x3ff001000000000L & l) != 0L) {
-                                if (kind > 56)
+                                if (kind > 56) {
                                     kind = 56;
+                                }
                                 {
                                     jjCheckNAdd(28);
                                 }
                             }
                             break;
                         case 1:
-                            if ((0x3ff000000000000L & l) == 0L)
+                            if ((0x3ff000000000000L & l) == 0L) {
                                 break;
-                            if (kind > 11)
-                                kind = 11; {
+                            }
+                            if (kind > 11) {
+                                kind = 11;
+                            } {
                             jjCheckNAddTwoStates(1, 2);
                         }
                             break;
@@ -771,10 +831,12 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 4:
-                            if ((0x3ff000000000000L & l) == 0L)
+                            if ((0x3ff000000000000L & l) == 0L) {
                                 break;
-                            if (kind > 11)
-                                kind = 11; {
+                            }
+                            if (kind > 11) {
+                                kind = 11;
+                            } {
                             jjCheckNAdd(4);
                         }
                             break;
@@ -794,8 +856,9 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 9:
-                            if (curChar == 34 && kind > 13)
+                            if (curChar == 34 && kind > 13) {
                                 kind = 13;
+                            }
                             break;
                         case 10:
                             if (curChar == 39) {
@@ -813,22 +876,27 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 14:
-                            if (curChar == 39 && kind > 13)
+                            if (curChar == 39 && kind > 13) {
                                 kind = 13;
+                            }
                             break;
                         case 15:
-                            if ((0x3ff000000000000L & l) == 0L)
+                            if ((0x3ff000000000000L & l) == 0L) {
                                 break;
-                            if (kind > 10)
-                                kind = 10; {
+                            }
+                            if (kind > 10) {
+                                kind = 10;
+                            } {
                             jjCheckNAddStates(18, 22);
                         }
                             break;
                         case 16:
-                            if ((0x3ff000000000000L & l) == 0L)
+                            if ((0x3ff000000000000L & l) == 0L) {
                                 break;
-                            if (kind > 10)
-                                kind = 10; {
+                            }
+                            if (kind > 10) {
+                                kind = 10;
+                            } {
                             jjCheckNAdd(16);
                         }
                             break;
@@ -838,18 +906,22 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 18:
-                            if (curChar != 46)
+                            if (curChar != 46) {
                                 break;
-                            if (kind > 11)
-                                kind = 11; {
+                            }
+                            if (kind > 11) {
+                                kind = 11;
+                            } {
                             jjCheckNAddTwoStates(19, 20);
                         }
                             break;
                         case 19:
-                            if ((0x3ff000000000000L & l) == 0L)
+                            if ((0x3ff000000000000L & l) == 0L) {
                                 break;
-                            if (kind > 11)
-                                kind = 11; {
+                            }
+                            if (kind > 11) {
+                                kind = 11;
+                            } {
                             jjCheckNAddTwoStates(19, 20);
                         }
                             break;
@@ -859,10 +931,12 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 22:
-                            if ((0x3ff000000000000L & l) == 0L)
+                            if ((0x3ff000000000000L & l) == 0L) {
                                 break;
-                            if (kind > 11)
-                                kind = 11; {
+                            }
+                            if (kind > 11) {
+                                kind = 11;
+                            } {
                             jjCheckNAdd(22);
                         }
                             break;
@@ -877,34 +951,42 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 26:
-                            if ((0x3ff000000000000L & l) == 0L)
+                            if ((0x3ff000000000000L & l) == 0L) {
                                 break;
-                            if (kind > 11)
-                                kind = 11; {
+                            }
+                            if (kind > 11) {
+                                kind = 11;
+                            } {
                             jjCheckNAdd(26);
                         }
                             break;
                         case 27:
-                            if ((0x1800000000L & l) == 0L)
+                            if ((0x1800000000L & l) == 0L) {
                                 break;
-                            if (kind > 56)
-                                kind = 56; {
+                            }
+                            if (kind > 56) {
+                                kind = 56;
+                            } {
                             jjCheckNAddTwoStates(28, 29);
                         }
                             break;
                         case 28:
-                            if ((0x3ff001000000000L & l) == 0L)
+                            if ((0x3ff001000000000L & l) == 0L) {
                                 break;
-                            if (kind > 56)
-                                kind = 56; {
+                            }
+                            if (kind > 56) {
+                                kind = 56;
+                            } {
                             jjCheckNAdd(28);
                         }
                             break;
                         case 29:
-                            if ((0x3ff001000000000L & l) == 0L)
+                            if ((0x3ff001000000000L & l) == 0L) {
                                 break;
-                            if (kind > 57)
-                                kind = 57; {
+                            }
+                            if (kind > 57) {
+                                kind = 57;
+                            } {
                             jjCheckNAdd(29);
                         }
                             break;
@@ -917,24 +999,28 @@ public class ELParserTokenManager implements ELParserConstants {
                 do {
                     switch (jjstateSet[--i]) {
                         case 0:
-                            if ((0x7fffffe87fffffeL & l) == 0L)
+                            if ((0x7fffffe87fffffeL & l) == 0L) {
                                 break;
-                            if (kind > 56)
-                                kind = 56; {
+                            }
+                            if (kind > 56) {
+                                kind = 56;
+                            } {
                             jjCheckNAddTwoStates(28, 29);
                         }
                             break;
                         case 30:
                             if ((0x7fffffe87fffffeL & l) != 0L) {
-                                if (kind > 57)
+                                if (kind > 57) {
                                     kind = 57;
+                                }
                                 {
                                     jjCheckNAdd(29);
                                 }
                             }
                             if ((0x7fffffe87fffffeL & l) != 0L) {
-                                if (kind > 56)
+                                if (kind > 56) {
                                     kind = 56;
+                                }
                                 {
                                     jjCheckNAdd(28);
                                 }
@@ -951,8 +1037,9 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 7:
-                            if (curChar == 92)
+                            if (curChar == 92) {
                                 jjstateSet[jjnewStateCnt++] = 8;
+                            }
                             break;
                         case 8:
                             if (curChar == 92) {
@@ -965,8 +1052,9 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 12:
-                            if (curChar == 92)
+                            if (curChar == 92) {
                                 jjstateSet[jjnewStateCnt++] = 13;
+                            }
                             break;
                         case 13:
                             if (curChar == 92) {
@@ -984,18 +1072,22 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 28:
-                            if ((0x7fffffe87fffffeL & l) == 0L)
+                            if ((0x7fffffe87fffffeL & l) == 0L) {
                                 break;
-                            if (kind > 56)
-                                kind = 56; {
+                            }
+                            if (kind > 56) {
+                                kind = 56;
+                            } {
                             jjCheckNAdd(28);
                         }
                             break;
                         case 29:
-                            if ((0x7fffffe87fffffeL & l) == 0L)
+                            if ((0x7fffffe87fffffeL & l) == 0L) {
                                 break;
-                            if (kind > 57)
-                                kind = 57; {
+                            }
+                            if (kind > 57) {
+                                kind = 57;
+                            } {
                             jjCheckNAdd(29);
                         }
                             break;
@@ -1012,24 +1104,28 @@ public class ELParserTokenManager implements ELParserConstants {
                 do {
                     switch (jjstateSet[--i]) {
                         case 0:
-                            if (!jjCanMove_1(hiByte, i1, i2, l1, l2))
+                            if (!jjCanMove_1(hiByte, i1, i2, l1, l2)) {
                                 break;
-                            if (kind > 56)
-                                kind = 56; {
+                            }
+                            if (kind > 56) {
+                                kind = 56;
+                            } {
                             jjCheckNAddTwoStates(28, 29);
                         }
                             break;
                         case 30:
                             if (jjCanMove_1(hiByte, i1, i2, l1, l2)) {
-                                if (kind > 56)
+                                if (kind > 56) {
                                     kind = 56;
+                                }
                                 {
                                     jjCheckNAdd(28);
                                 }
                             }
                             if (jjCanMove_1(hiByte, i1, i2, l1, l2)) {
-                                if (kind > 57)
+                                if (kind > 57) {
                                     kind = 57;
+                                }
                                 {
                                     jjCheckNAdd(29);
                                 }
@@ -1046,26 +1142,31 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 28:
-                            if (!jjCanMove_1(hiByte, i1, i2, l1, l2))
+                            if (!jjCanMove_1(hiByte, i1, i2, l1, l2)) {
                                 break;
-                            if (kind > 56)
-                                kind = 56; {
+                            }
+                            if (kind > 56) {
+                                kind = 56;
+                            } {
                             jjCheckNAdd(28);
                         }
                             break;
                         case 29:
-                            if (!jjCanMove_1(hiByte, i1, i2, l1, l2))
+                            if (!jjCanMove_1(hiByte, i1, i2, l1, l2)) {
                                 break;
-                            if (kind > 57)
-                                kind = 57; {
+                            }
+                            if (kind > 57) {
+                                kind = 57;
+                            } {
                             jjCheckNAdd(29);
                         }
                             break;
                         default:
-                            if (i1 == 0 || l1 == 0 || i2 == 0 || l2 == 0)
+                            if (i1 == 0 || l1 == 0 || i2 == 0 || l2 == 0) {
                                 break;
-                            else
+                            } else {
                                 break;
+                            }
                     }
                 } while (i != startsAt);
             }
@@ -1075,8 +1176,9 @@ public class ELParserTokenManager implements ELParserConstants {
                 kind = 0x7fffffff;
             }
             ++curPos;
-            if ((i = jjnewStateCnt) == (startsAt = 30 - (jjnewStateCnt = startsAt)))
+            if ((i = jjnewStateCnt) == (startsAt = 30 - (jjnewStateCnt = startsAt))) {
                 return curPos;
+            }
             try {
                 curChar = input_stream.readChar();
             } catch (java.io.IOException e) {
@@ -1088,16 +1190,18 @@ public class ELParserTokenManager implements ELParserConstants {
     private final int jjStopStringLiteralDfa_1(int pos, long active0) {
         switch (pos) {
             case 0:
-                if ((active0 & 0x20000L) != 0L)
+                if ((active0 & 0x20000L) != 0L) {
                     return 1;
+                }
                 if ((active0 & 0x141d555401c000L) != 0L) {
                     jjmatchedKind = 56;
                     return 30;
                 }
                 return -1;
             case 1:
-                if ((active0 & 0x41554000000L) != 0L)
+                if ((active0 & 0x41554000000L) != 0L) {
                     return 30;
+                }
                 if ((active0 & 0x1419400001c000L) != 0L) {
                     jjmatchedKind = 56;
                     jjmatchedPos = 1;
@@ -1105,8 +1209,9 @@ public class ELParserTokenManager implements ELParserConstants {
                 }
                 return -1;
             case 2:
-                if ((active0 & 0x14014000000000L) != 0L)
+                if ((active0 & 0x14014000000000L) != 0L) {
                     return 30;
+                }
                 if ((active0 & 0x18000001c000L) != 0L) {
                     jjmatchedKind = 56;
                     jjmatchedPos = 2;
@@ -1114,8 +1219,9 @@ public class ELParserTokenManager implements ELParserConstants {
                 }
                 return -1;
             case 3:
-                if ((active0 & 0x14000L) != 0L)
+                if ((active0 & 0x14000L) != 0L) {
                     return 30;
+                }
                 if ((active0 & 0x180000008000L) != 0L) {
                     jjmatchedKind = 56;
                     jjmatchedPos = 3;
@@ -1123,8 +1229,9 @@ public class ELParserTokenManager implements ELParserConstants {
                 }
                 return -1;
             case 4:
-                if ((active0 & 0x80000008000L) != 0L)
+                if ((active0 & 0x80000008000L) != 0L) {
                     return 30;
+                }
                 if ((active0 & 0x100000000000L) != 0L) {
                     jjmatchedKind = 56;
                     jjmatchedPos = 4;
@@ -1256,34 +1363,38 @@ public class ELParserTokenManager implements ELParserConstants {
         }
         switch (curChar) {
             case 38:
-                if ((active0 & 0x8000000000L) != 0L)
+                if ((active0 & 0x8000000000L) != 0L) {
                     return jjStopAtPos(1, 39);
+                }
                 break;
             case 61:
-                if ((active0 & 0x20000000L) != 0L)
+                if ((active0 & 0x20000000L) != 0L) {
                     return jjStopAtPos(1, 29);
-                else if ((active0 & 0x80000000L) != 0L)
+                } else if ((active0 & 0x80000000L) != 0L) {
                     return jjStopAtPos(1, 31);
-                else if ((active0 & 0x200000000L) != 0L)
+                } else if ((active0 & 0x200000000L) != 0L) {
                     return jjStopAtPos(1, 33);
-                else if ((active0 & 0x800000000L) != 0L)
+                } else if ((active0 & 0x800000000L) != 0L) {
                     return jjStopAtPos(1, 35);
-                else if ((active0 & 0x20000000000000L) != 0L)
+                } else if ((active0 & 0x20000000000000L) != 0L) {
                     return jjStopAtPos(1, 53);
+                }
                 break;
             case 62:
-                if ((active0 & 0x80000000000000L) != 0L)
+                if ((active0 & 0x80000000000000L) != 0L) {
                     return jjStopAtPos(1, 55);
+                }
                 break;
             case 97:
                 return jjMoveStringLiteralDfa2_1(active0, 0x8000L);
             case 101:
-                if ((active0 & 0x40000000L) != 0L)
+                if ((active0 & 0x40000000L) != 0L) {
                     return jjStartNfaWithStates_1(1, 30, 30);
-                else if ((active0 & 0x100000000L) != 0L)
+                } else if ((active0 & 0x100000000L) != 0L) {
                     return jjStartNfaWithStates_1(1, 32, 30);
-                else if ((active0 & 0x1000000000L) != 0L)
+                } else if ((active0 & 0x1000000000L) != 0L) {
                     return jjStartNfaWithStates_1(1, 36, 30);
+                }
                 break;
             case 105:
                 return jjMoveStringLiteralDfa2_1(active0, 0x4000000000000L);
@@ -1294,24 +1405,28 @@ public class ELParserTokenManager implements ELParserConstants {
             case 111:
                 return jjMoveStringLiteralDfa2_1(active0, 0x10004000000000L);
             case 113:
-                if ((active0 & 0x400000000L) != 0L)
+                if ((active0 & 0x400000000L) != 0L) {
                     return jjStartNfaWithStates_1(1, 34, 30);
+                }
                 break;
             case 114:
-                if ((active0 & 0x40000000000L) != 0L)
+                if ((active0 & 0x40000000000L) != 0L) {
                     return jjStartNfaWithStates_1(1, 42, 30);
+                }
                 return jjMoveStringLiteralDfa2_1(active0, 0x4000L);
             case 116:
-                if ((active0 & 0x4000000L) != 0L)
+                if ((active0 & 0x4000000L) != 0L) {
                     return jjStartNfaWithStates_1(1, 26, 30);
-                else if ((active0 & 0x10000000L) != 0L)
+                } else if ((active0 & 0x10000000L) != 0L) {
                     return jjStartNfaWithStates_1(1, 28, 30);
+                }
                 break;
             case 117:
                 return jjMoveStringLiteralDfa2_1(active0, 0x10000L);
             case 124:
-                if ((active0 & 0x20000000000L) != 0L)
+                if ((active0 & 0x20000000000L) != 0L) {
                     return jjStopAtPos(1, 41);
+                }
                 break;
             default:
                 break;
@@ -1320,8 +1435,9 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     private int jjMoveStringLiteralDfa2_1(long old0, long active0) {
-        if (((active0 &= old0)) == 0L)
+        if (((active0 &= old0)) == 0L) {
             return jjStartNfa_1(0, old0);
+        }
         try {
             curChar = input_stream.readChar();
         } catch (java.io.IOException e) {
@@ -1330,10 +1446,11 @@ public class ELParserTokenManager implements ELParserConstants {
         }
         switch (curChar) {
             case 100:
-                if ((active0 & 0x10000000000L) != 0L)
+                if ((active0 & 0x10000000000L) != 0L) {
                     return jjStartNfaWithStates_1(2, 40, 30);
-                else if ((active0 & 0x10000000000000L) != 0L)
+                } else if ((active0 & 0x10000000000000L) != 0L) {
                     return jjStartNfaWithStates_1(2, 52, 30);
+                }
                 break;
             case 108:
                 return jjMoveStringLiteralDfa3_1(active0, 0x18000L);
@@ -1342,14 +1459,16 @@ public class ELParserTokenManager implements ELParserConstants {
             case 115:
                 return jjMoveStringLiteralDfa3_1(active0, 0x100000000000L);
             case 116:
-                if ((active0 & 0x4000000000L) != 0L)
+                if ((active0 & 0x4000000000L) != 0L) {
                     return jjStartNfaWithStates_1(2, 38, 30);
+                }
                 break;
             case 117:
                 return jjMoveStringLiteralDfa3_1(active0, 0x4000L);
             case 118:
-                if ((active0 & 0x4000000000000L) != 0L)
+                if ((active0 & 0x4000000000000L) != 0L) {
                     return jjStartNfaWithStates_1(2, 50, 30);
+                }
                 break;
             default:
                 break;
@@ -1358,8 +1477,9 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     private int jjMoveStringLiteralDfa3_1(long old0, long active0) {
-        if (((active0 &= old0)) == 0L)
+        if (((active0 &= old0)) == 0L) {
             return jjStartNfa_1(1, old0);
+        }
         try {
             curChar = input_stream.readChar();
         } catch (java.io.IOException e) {
@@ -1368,12 +1488,14 @@ public class ELParserTokenManager implements ELParserConstants {
         }
         switch (curChar) {
             case 101:
-                if ((active0 & 0x4000L) != 0L)
+                if ((active0 & 0x4000L) != 0L) {
                     return jjStartNfaWithStates_1(3, 14, 30);
+                }
                 break;
             case 108:
-                if ((active0 & 0x10000L) != 0L)
+                if ((active0 & 0x10000L) != 0L) {
                     return jjStartNfaWithStates_1(3, 16, 30);
+                }
                 break;
             case 115:
                 return jjMoveStringLiteralDfa4_1(active0, 0x8000L);
@@ -1386,8 +1508,9 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     private int jjMoveStringLiteralDfa4_1(long old0, long active0) {
-        if (((active0 &= old0)) == 0L)
+        if (((active0 &= old0)) == 0L) {
             return jjStartNfa_1(2, old0);
+        }
         try {
             curChar = input_stream.readChar();
         } catch (java.io.IOException e) {
@@ -1398,12 +1521,14 @@ public class ELParserTokenManager implements ELParserConstants {
             case 97:
                 return jjMoveStringLiteralDfa5_1(active0, 0x100000000000L);
             case 101:
-                if ((active0 & 0x8000L) != 0L)
+                if ((active0 & 0x8000L) != 0L) {
                     return jjStartNfaWithStates_1(4, 15, 30);
+                }
                 break;
             case 121:
-                if ((active0 & 0x80000000000L) != 0L)
+                if ((active0 & 0x80000000000L) != 0L) {
                     return jjStartNfaWithStates_1(4, 43, 30);
+                }
                 break;
             default:
                 break;
@@ -1412,8 +1537,9 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     private int jjMoveStringLiteralDfa5_1(long old0, long active0) {
-        if (((active0 &= old0)) == 0L)
+        if (((active0 &= old0)) == 0L) {
             return jjStartNfa_1(3, old0);
+        }
         try {
             curChar = input_stream.readChar();
         } catch (java.io.IOException e) {
@@ -1430,8 +1556,9 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     private int jjMoveStringLiteralDfa6_1(long old0, long active0) {
-        if (((active0 &= old0)) == 0L)
+        if (((active0 &= old0)) == 0L) {
             return jjStartNfa_1(4, old0);
+        }
         try {
             curChar = input_stream.readChar();
         } catch (java.io.IOException e) {
@@ -1448,8 +1575,9 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     private int jjMoveStringLiteralDfa7_1(long old0, long active0) {
-        if (((active0 &= old0)) == 0L)
+        if (((active0 &= old0)) == 0L) {
             return jjStartNfa_1(5, old0);
+        }
         try {
             curChar = input_stream.readChar();
         } catch (java.io.IOException e) {
@@ -1466,8 +1594,9 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     private int jjMoveStringLiteralDfa8_1(long old0, long active0) {
-        if (((active0 &= old0)) == 0L)
+        if (((active0 &= old0)) == 0L) {
             return jjStartNfa_1(6, old0);
+        }
         try {
             curChar = input_stream.readChar();
         } catch (java.io.IOException e) {
@@ -1484,8 +1613,9 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     private int jjMoveStringLiteralDfa9_1(long old0, long active0) {
-        if (((active0 &= old0)) == 0L)
+        if (((active0 &= old0)) == 0L) {
             return jjStartNfa_1(7, old0);
+        }
         try {
             curChar = input_stream.readChar();
         } catch (java.io.IOException e) {
@@ -1494,8 +1624,9 @@ public class ELParserTokenManager implements ELParserConstants {
         }
         switch (curChar) {
             case 102:
-                if ((active0 & 0x100000000000L) != 0L)
+                if ((active0 & 0x100000000000L) != 0L) {
                     return jjStartNfaWithStates_1(9, 44, 30);
+                }
                 break;
             default:
                 break;
@@ -1521,22 +1652,25 @@ public class ELParserTokenManager implements ELParserConstants {
         jjstateSet[0] = startState;
         int kind = 0x7fffffff;
         for (;;) {
-            if (++jjround == 0x7fffffff)
+            if (++jjround == 0x7fffffff) {
                 ReInitRounds();
+            }
             if (curChar < 64) {
                 long l = 1L << curChar;
                 do {
                     switch (jjstateSet[--i]) {
                         case 0:
                             if ((0x3ff000000000000L & l) != 0L) {
-                                if (kind > 10)
+                                if (kind > 10) {
                                     kind = 10;
+                                }
                                 {
                                     jjCheckNAddStates(18, 22);
                                 }
                             } else if ((0x1800000000L & l) != 0L) {
-                                if (kind > 56)
+                                if (kind > 56) {
                                     kind = 56;
+                                }
                                 {
                                     jjCheckNAddTwoStates(28, 29);
                                 }
@@ -1550,25 +1684,29 @@ public class ELParserTokenManager implements ELParserConstants {
                             break;
                         case 30:
                             if ((0x3ff001000000000L & l) != 0L) {
-                                if (kind > 57)
+                                if (kind > 57) {
                                     kind = 57;
+                                }
                                 {
                                     jjCheckNAdd(29);
                                 }
                             }
                             if ((0x3ff001000000000L & l) != 0L) {
-                                if (kind > 56)
+                                if (kind > 56) {
                                     kind = 56;
+                                }
                                 {
                                     jjCheckNAdd(28);
                                 }
                             }
                             break;
                         case 1:
-                            if ((0x3ff000000000000L & l) == 0L)
+                            if ((0x3ff000000000000L & l) == 0L) {
                                 break;
-                            if (kind > 11)
-                                kind = 11; {
+                            }
+                            if (kind > 11) {
+                                kind = 11;
+                            } {
                             jjCheckNAddTwoStates(1, 2);
                         }
                             break;
@@ -1578,10 +1716,12 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 4:
-                            if ((0x3ff000000000000L & l) == 0L)
+                            if ((0x3ff000000000000L & l) == 0L) {
                                 break;
-                            if (kind > 11)
-                                kind = 11; {
+                            }
+                            if (kind > 11) {
+                                kind = 11;
+                            } {
                             jjCheckNAdd(4);
                         }
                             break;
@@ -1601,8 +1741,9 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 9:
-                            if (curChar == 34 && kind > 13)
+                            if (curChar == 34 && kind > 13) {
                                 kind = 13;
+                            }
                             break;
                         case 10:
                             if (curChar == 39) {
@@ -1620,22 +1761,27 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 14:
-                            if (curChar == 39 && kind > 13)
+                            if (curChar == 39 && kind > 13) {
                                 kind = 13;
+                            }
                             break;
                         case 15:
-                            if ((0x3ff000000000000L & l) == 0L)
+                            if ((0x3ff000000000000L & l) == 0L) {
                                 break;
-                            if (kind > 10)
-                                kind = 10; {
+                            }
+                            if (kind > 10) {
+                                kind = 10;
+                            } {
                             jjCheckNAddStates(18, 22);
                         }
                             break;
                         case 16:
-                            if ((0x3ff000000000000L & l) == 0L)
+                            if ((0x3ff000000000000L & l) == 0L) {
                                 break;
-                            if (kind > 10)
-                                kind = 10; {
+                            }
+                            if (kind > 10) {
+                                kind = 10;
+                            } {
                             jjCheckNAdd(16);
                         }
                             break;
@@ -1645,18 +1791,22 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 18:
-                            if (curChar != 46)
+                            if (curChar != 46) {
                                 break;
-                            if (kind > 11)
-                                kind = 11; {
+                            }
+                            if (kind > 11) {
+                                kind = 11;
+                            } {
                             jjCheckNAddTwoStates(19, 20);
                         }
                             break;
                         case 19:
-                            if ((0x3ff000000000000L & l) == 0L)
+                            if ((0x3ff000000000000L & l) == 0L) {
                                 break;
-                            if (kind > 11)
-                                kind = 11; {
+                            }
+                            if (kind > 11) {
+                                kind = 11;
+                            } {
                             jjCheckNAddTwoStates(19, 20);
                         }
                             break;
@@ -1666,10 +1816,12 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 22:
-                            if ((0x3ff000000000000L & l) == 0L)
+                            if ((0x3ff000000000000L & l) == 0L) {
                                 break;
-                            if (kind > 11)
-                                kind = 11; {
+                            }
+                            if (kind > 11) {
+                                kind = 11;
+                            } {
                             jjCheckNAdd(22);
                         }
                             break;
@@ -1684,34 +1836,42 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 26:
-                            if ((0x3ff000000000000L & l) == 0L)
+                            if ((0x3ff000000000000L & l) == 0L) {
                                 break;
-                            if (kind > 11)
-                                kind = 11; {
+                            }
+                            if (kind > 11) {
+                                kind = 11;
+                            } {
                             jjCheckNAdd(26);
                         }
                             break;
                         case 27:
-                            if ((0x1800000000L & l) == 0L)
+                            if ((0x1800000000L & l) == 0L) {
                                 break;
-                            if (kind > 56)
-                                kind = 56; {
+                            }
+                            if (kind > 56) {
+                                kind = 56;
+                            } {
                             jjCheckNAddTwoStates(28, 29);
                         }
                             break;
                         case 28:
-                            if ((0x3ff001000000000L & l) == 0L)
+                            if ((0x3ff001000000000L & l) == 0L) {
                                 break;
-                            if (kind > 56)
-                                kind = 56; {
+                            }
+                            if (kind > 56) {
+                                kind = 56;
+                            } {
                             jjCheckNAdd(28);
                         }
                             break;
                         case 29:
-                            if ((0x3ff001000000000L & l) == 0L)
+                            if ((0x3ff001000000000L & l) == 0L) {
                                 break;
-                            if (kind > 57)
-                                kind = 57; {
+                            }
+                            if (kind > 57) {
+                                kind = 57;
+                            } {
                             jjCheckNAdd(29);
                         }
                             break;
@@ -1724,24 +1884,28 @@ public class ELParserTokenManager implements ELParserConstants {
                 do {
                     switch (jjstateSet[--i]) {
                         case 0:
-                            if ((0x7fffffe87fffffeL & l) == 0L)
+                            if ((0x7fffffe87fffffeL & l) == 0L) {
                                 break;
-                            if (kind > 56)
-                                kind = 56; {
+                            }
+                            if (kind > 56) {
+                                kind = 56;
+                            } {
                             jjCheckNAddTwoStates(28, 29);
                         }
                             break;
                         case 30:
                             if ((0x7fffffe87fffffeL & l) != 0L) {
-                                if (kind > 57)
+                                if (kind > 57) {
                                     kind = 57;
+                                }
                                 {
                                     jjCheckNAdd(29);
                                 }
                             }
                             if ((0x7fffffe87fffffeL & l) != 0L) {
-                                if (kind > 56)
+                                if (kind > 56) {
                                     kind = 56;
+                                }
                                 {
                                     jjCheckNAdd(28);
                                 }
@@ -1758,8 +1922,9 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 7:
-                            if (curChar == 92)
+                            if (curChar == 92) {
                                 jjstateSet[jjnewStateCnt++] = 8;
+                            }
                             break;
                         case 8:
                             if (curChar == 92) {
@@ -1772,8 +1937,9 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 12:
-                            if (curChar == 92)
+                            if (curChar == 92) {
                                 jjstateSet[jjnewStateCnt++] = 13;
+                            }
                             break;
                         case 13:
                             if (curChar == 92) {
@@ -1791,18 +1957,22 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 28:
-                            if ((0x7fffffe87fffffeL & l) == 0L)
+                            if ((0x7fffffe87fffffeL & l) == 0L) {
                                 break;
-                            if (kind > 56)
-                                kind = 56; {
+                            }
+                            if (kind > 56) {
+                                kind = 56;
+                            } {
                             jjCheckNAdd(28);
                         }
                             break;
                         case 29:
-                            if ((0x7fffffe87fffffeL & l) == 0L)
+                            if ((0x7fffffe87fffffeL & l) == 0L) {
                                 break;
-                            if (kind > 57)
-                                kind = 57; {
+                            }
+                            if (kind > 57) {
+                                kind = 57;
+                            } {
                             jjCheckNAdd(29);
                         }
                             break;
@@ -1819,24 +1989,28 @@ public class ELParserTokenManager implements ELParserConstants {
                 do {
                     switch (jjstateSet[--i]) {
                         case 0:
-                            if (!jjCanMove_1(hiByte, i1, i2, l1, l2))
+                            if (!jjCanMove_1(hiByte, i1, i2, l1, l2)) {
                                 break;
-                            if (kind > 56)
-                                kind = 56; {
+                            }
+                            if (kind > 56) {
+                                kind = 56;
+                            } {
                             jjCheckNAddTwoStates(28, 29);
                         }
                             break;
                         case 30:
                             if (jjCanMove_1(hiByte, i1, i2, l1, l2)) {
-                                if (kind > 56)
+                                if (kind > 56) {
                                     kind = 56;
+                                }
                                 {
                                     jjCheckNAdd(28);
                                 }
                             }
                             if (jjCanMove_1(hiByte, i1, i2, l1, l2)) {
-                                if (kind > 57)
+                                if (kind > 57) {
                                     kind = 57;
+                                }
                                 {
                                     jjCheckNAdd(29);
                                 }
@@ -1853,26 +2027,31 @@ public class ELParserTokenManager implements ELParserConstants {
                             }
                             break;
                         case 28:
-                            if (!jjCanMove_1(hiByte, i1, i2, l1, l2))
+                            if (!jjCanMove_1(hiByte, i1, i2, l1, l2)) {
                                 break;
-                            if (kind > 56)
-                                kind = 56; {
+                            }
+                            if (kind > 56) {
+                                kind = 56;
+                            } {
                             jjCheckNAdd(28);
                         }
                             break;
                         case 29:
-                            if (!jjCanMove_1(hiByte, i1, i2, l1, l2))
+                            if (!jjCanMove_1(hiByte, i1, i2, l1, l2)) {
                                 break;
-                            if (kind > 57)
-                                kind = 57; {
+                            }
+                            if (kind > 57) {
+                                kind = 57;
+                            } {
                             jjCheckNAdd(29);
                         }
                             break;
                         default:
-                            if (i1 == 0 || l1 == 0 || i2 == 0 || l2 == 0)
+                            if (i1 == 0 || l1 == 0 || i2 == 0 || l2 == 0) {
                                 break;
-                            else
+                            } else {
                                 break;
+                            }
                     }
                 } while (i != startsAt);
             }
@@ -1882,8 +2061,9 @@ public class ELParserTokenManager implements ELParserConstants {
                 kind = 0x7fffffff;
             }
             ++curPos;
-            if ((i = jjnewStateCnt) == (startsAt = 30 - (jjnewStateCnt = startsAt)))
+            if ((i = jjnewStateCnt) == (startsAt = 30 - (jjnewStateCnt = startsAt))) {
                 return curPos;
+            }
             try {
                 curChar = input_stream.readChar();
             } catch (java.io.IOException e) {
@@ -1932,8 +2112,9 @@ public class ELParserTokenManager implements ELParserConstants {
             case 0:
                 return ((jjbitVec2[i2] & l2) != 0L);
             default:
-                if ((jjbitVec0[i1] & l1) != 0L)
+                if ((jjbitVec0[i1] & l1) != 0L) {
                     return true;
+                }
                 return false;
         }
     }
@@ -1951,8 +2132,9 @@ public class ELParserTokenManager implements ELParserConstants {
             case 61:
                 return ((jjbitVec8[i2] & l2) != 0L);
             default:
-                if ((jjbitVec3[i1] & l1) != 0L)
+                if ((jjbitVec3[i1] & l1) != 0L) {
                     return true;
+                }
                 return false;
         }
     }
@@ -1991,8 +2173,9 @@ public class ELParserTokenManager implements ELParserConstants {
                 case 1:
                     try {
                         input_stream.backup(0);
-                        while (curChar <= 32 && (0x100002600L & (1L << curChar)) != 0L)
+                        while (curChar <= 32 && (0x100002600L & (1L << curChar)) != 0L) {
                             curChar = input_stream.BeginToken();
+                        }
                     } catch (java.io.IOException e1) {
                         continue EOFLoop;
                     }
@@ -2006,8 +2189,9 @@ public class ELParserTokenManager implements ELParserConstants {
                 case 2:
                     try {
                         input_stream.backup(0);
-                        while (curChar <= 32 && (0x100002600L & (1L << curChar)) != 0L)
+                        while (curChar <= 32 && (0x100002600L & (1L << curChar)) != 0L) {
                             curChar = input_stream.BeginToken();
+                        }
                     } catch (java.io.IOException e1) {
                         continue EOFLoop;
                     }
@@ -2020,17 +2204,20 @@ public class ELParserTokenManager implements ELParserConstants {
                     break;
             }
             if (jjmatchedKind != 0x7fffffff) {
-                if (jjmatchedPos + 1 < curPos)
+                if (jjmatchedPos + 1 < curPos) {
                     input_stream.backup(curPos - jjmatchedPos - 1);
+                }
                 if ((jjtoToken[jjmatchedKind >> 6] & (1L << (jjmatchedKind & 077))) != 0L) {
                     matchedToken = jjFillToken();
                     TokenLexicalActions(matchedToken);
-                    if (jjnewLexState[jjmatchedKind] != -1)
+                    if (jjnewLexState[jjmatchedKind] != -1) {
                         curLexState = jjnewLexState[jjmatchedKind];
+                    }
                     return matchedToken;
                 } else {
-                    if (jjnewLexState[jjmatchedKind] != -1)
+                    if (jjnewLexState[jjmatchedKind] != -1) {
                         curLexState = jjnewLexState[jjmatchedKind];
+                    }
                     continue EOFLoop;
                 }
             }
@@ -2047,8 +2234,9 @@ public class ELParserTokenManager implements ELParserConstants {
                 if (curChar == '\n' || curChar == '\r') {
                     error_line++;
                     error_column = 0;
-                } else
+                } else {
                     error_column++;
+                }
             }
             if (!EOFSeen) {
                 input_stream.backup(1);
@@ -2128,8 +2316,9 @@ public class ELParserTokenManager implements ELParserConstants {
     /** Constructor. */
     public ELParserTokenManager(SimpleCharStream stream) {
 
-        if (SimpleCharStream.staticFlag)
+        if (SimpleCharStream.staticFlag) {
             throw new Error("ERROR: Cannot use a static CharStream class with a non-static lexical analyzer.");
+        }
 
         input_stream = stream;
     }
@@ -2154,8 +2343,9 @@ public class ELParserTokenManager implements ELParserConstants {
     private void ReInitRounds() {
         int i;
         jjround = 0x80000001;
-        for (i = 30; i-- > 0;)
+        for (i = 30; i-- > 0;) {
             jjrounds[i] = 0x80000000;
+        }
     }
 
     /** Reinitialise parser. */
@@ -2168,11 +2358,12 @@ public class ELParserTokenManager implements ELParserConstants {
 
     /** Switch to specified lex state. */
     public void SwitchTo(int lexState) {
-        if (lexState >= 3 || lexState < 0)
+        if (lexState >= 3 || lexState < 0) {
             throw new TokenMgrError("Error: Ignoring invalid lexical state : " + lexState + ". State unchanged.",
                     TokenMgrError.INVALID_LEXICAL_STATE);
-        else
+        } else {
             curLexState = lexState;
+        }
     }
 
 

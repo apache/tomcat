@@ -130,7 +130,6 @@ import org.xml.sax.SAXException;
  * mapping configuration above, the context will be accessible to normal users as before. Those users with the necessary
  * access will be able to edit content available via http://host:port/context/content using
  * http://host:port/context/webdavedit/content
- *
  * <p>
  * There are some known limitations of this Servlet due to it not implementing the PROPPATCH method. Details of these
  * limitations and progress towards addressing them are being tracked under

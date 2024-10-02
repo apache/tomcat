@@ -111,8 +111,8 @@ public final class PersistentProviderRegistrations {
         }
         if (!configParent.exists()) {
             if (!configParent.mkdirs()) {
-                throw new SecurityException(sm.getString("persistentProviderRegistrations.mkdirsFail",
-                        configParent.getAbsolutePath()));
+                throw new SecurityException(
+                        sm.getString("persistentProviderRegistrations.mkdirsFail", configParent.getAbsolutePath()));
             }
         }
 

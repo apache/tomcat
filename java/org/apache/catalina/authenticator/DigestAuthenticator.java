@@ -324,6 +324,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
      * @param quotesRequired <code>true</code> if quotes were required
      *
      * @return The unquoted string
+     *
      * @deprecated This will be removed in Tomcat 11 onwards. Unused.
      */
     @Deprecated
@@ -344,6 +345,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
      * @param quotedString The quoted string
      *
      * @return The unquoted string
+     *
      * @deprecated This will be removed in Tomcat 11 onwards. Unused.
      */
     @Deprecated

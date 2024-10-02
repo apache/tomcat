@@ -486,7 +486,9 @@ public class StatusTransformer {
 
     /**
      * Return the connector name without the port, for auto port connectors.
+     *
      * @param name the connector name
+     *
      * @return the name without the port for the auto connectors
      */
     protected static String getConnectorName(String name) {
