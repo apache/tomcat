@@ -1445,6 +1445,10 @@ FINE: Request "/docs/config/manager.html" with response status "200"
          <param-name>protocolHeader</param-name>
          <param-value>x-forwarded-proto</param-value>
        </init-param>
+       <init-param>
+         <param-name>requestIdHeader</param-name>
+         <param-value>x-request-id</param-value>
+       </init-param>
      </filter>]]></source>
     <p>Request values:</p>
     <table class="defaultTable">
@@ -1683,6 +1687,13 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         <p>Name of the HTTP Header read by this valve that holds the list of
         traversed IP addresses starting from the requesting client. If not
         specified, the default of <code>x-forwarded-for</code> is used.</p>
+      </attribute>
+
+      <attribute name="requestIdHeader" required="false">
+        <p>Name of the HTTP Header read by this valve that holds request ID
+        if passed by the Proxy server or requesting client. Request ID propagation
+        is disabled by default, but can be enabled by setting this attribute,
+        e.g. to <code>x-request-id</code>.</p>
       </attribute>
 
       <attribute name="internalProxies" required="false">

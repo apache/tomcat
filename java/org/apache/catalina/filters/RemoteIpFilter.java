@@ -107,6 +107,14 @@ import org.apache.tomcat.util.res.StringManager;
  * <td>x-forwarded-for</td>
  * </tr>
  * <tr>
+ * <td>requestIdHeader</td>
+ * <td>Name of the Http Header read by this servlet filter that holds a request ID passed by a proxy or the requesting
+ * client</td>
+ * <td>RequestIdHeader</td>
+ * <td>Compliant http header name</td>
+ * <td>x-request-id</td>
+ * </tr>
+ * <tr>
  * <td>internalProxies</td>
  * <td>Regular expression that matches the IP addresses of internal proxies. If they appear in the
  * <code>remoteIpHeader</code> value, they will be trusted and will not appear in the <code>proxiesHeader</code>
@@ -209,6 +217,10 @@ import org.apache.tomcat.util.res.StringManager;
  *    &lt;init-param&gt;
  *       &lt;param-name&gt;protocolHeader&lt;/param-name&gt;
  *       &lt;param-value&gt;x-forwarded-proto&lt;/param-value&gt;
+ *    &lt;/init-param&gt;
+ *    &lt;init-param&gt;
+ *       &lt;param-name&gt;requestIdHeader&lt;/param-name&gt;
+ *       &lt;param-value&gt;x-request-id&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  * &lt;/filter&gt;
  *
@@ -476,6 +488,8 @@ public class RemoteIpFilter extends GenericFilter {
 
         protected int serverPort;
 
+        protected String requestId;
+
         public XForwardedRequest(HttpServletRequest request) {
             super(request);
             this.localName = request.getLocalName();
@@ -569,6 +583,15 @@ public class RemoteIpFilter extends GenericFilter {
         }
 
         @Override
+        public String getRequestId() {
+            if (this.requestId != null) {
+                return this.requestId;
+            }
+
+            return super.getRequest().getRequestId();
+        }
+
+        @Override
         public String getScheme() {
             return scheme;
         }
@@ -615,6 +638,10 @@ public class RemoteIpFilter extends GenericFilter {
 
         public void setRemoteHost(String remoteHost) {
             this.remoteHost = remoteHost;
+        }
+
+        public void setRequestId(String requestId) {
+            this.requestId = requestId;
         }
 
         public void setScheme(String scheme) {
@@ -667,6 +694,8 @@ public class RemoteIpFilter extends GenericFilter {
 
     protected static final String REMOTE_IP_HEADER_PARAMETER = "remoteIpHeader";
 
+    protected static final String REQUEST_ID_HEADER_PARAMETER = "requestIdHeader";
+
     protected static final String TRUSTED_PROXIES_PARAMETER = "trustedProxies";
 
     protected static final String ENABLE_LOOKUPS_PARAMETER = "enableLookups";
@@ -716,6 +745,11 @@ public class RemoteIpFilter extends GenericFilter {
      * @see #setRemoteIpHeader(String)
      */
     private String remoteIpHeader = "X-Forwarded-For";
+
+    /**
+     * @see #setRequestIdHeader(String)
+     */
+    private String requestIdHeader = "";
 
     /**
      * @see #setRequestAttributesEnabled(boolean)
@@ -843,6 +877,14 @@ public class RemoteIpFilter extends GenericFilter {
                     }
                 }
             }
+
+            if (!requestIdHeader.isEmpty()) {
+                String requestIdHeaderValue = request.getHeader(requestIdHeader);
+                if (requestIdHeaderValue != null) {
+                    xRequest.setRequestId(requestIdHeaderValue);
+                }
+            }
+
             request.setAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE, Boolean.TRUE);
 
             if (log.isTraceEnabled()) {
@@ -1014,6 +1056,10 @@ public class RemoteIpFilter extends GenericFilter {
 
         if (getInitParameter(REMOTE_IP_HEADER_PARAMETER) != null) {
             setRemoteIpHeader(getInitParameter(REMOTE_IP_HEADER_PARAMETER));
+        }
+
+        if (getInitParameter(REQUEST_ID_HEADER_PARAMETER) != null) {
+            setRequestIdHeader(getInitParameter(REQUEST_ID_HEADER_PARAMETER));
         }
 
         if (getInitParameter(TRUSTED_PROXIES_PARAMETER) != null) {
@@ -1219,6 +1265,17 @@ public class RemoteIpFilter extends GenericFilter {
      */
     public void setRemoteIpHeader(String remoteIpHeader) {
         this.remoteIpHeader = remoteIpHeader;
+    }
+
+    /**
+     * <p>Name of the http header from which the request id is extracted.</p>
+     *
+     * <p>Request id propagation is disabled by default. Set a value, e.g. <code>X-Request-Id</code>, to enable it.</p>
+     *
+     * @param requestIdHeader The header name
+     */
+    public void setRequestIdHeader(String requestIdHeader) {
+        this.requestIdHeader = requestIdHeader;
     }
 
     /**
