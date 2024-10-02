@@ -1808,7 +1808,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             generatedXML.writeElement("D", "response", XMLWriter.OPENING);
 
             generatedXML.writeElement("D", "href", XMLWriter.OPENING);
-            generatedXML.writeText(getServletContext().getContextPath() + errorPath);
+            generatedXML.writeText(req.getContextPath() + errorPath);
             generatedXML.writeElement("D", "href", XMLWriter.CLOSING);
 
             generatedXML.writeElement("D", "status", XMLWriter.OPENING);
