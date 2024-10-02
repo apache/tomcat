@@ -225,7 +225,10 @@
       </update>
       <update>
         Update CheckStyle to 10.18.2. (markt)
-      </update>
+      </update>0      <add>
+        Improvements to French translations. (remm)
+      </add>
+      
     </changelog>
   </subsection>
 </section>
