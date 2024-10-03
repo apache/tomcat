@@ -40,10 +40,17 @@ public abstract class ELContext {
 
     private List<EvaluationListener> listeners;
 
-    private Deque<Map<String,Object>> lambdaArguments = new ArrayDeque<>();
+    private Deque<Map<String,Object>> lambdaArguments = null;
 
     public ELContext() {
         this.resolved = false;
+    }
+
+    private Deque<Map<String,Object>> getLambdaArguments() {
+        if (lambdaArguments == null) {
+            lambdaArguments = new ArrayDeque<>(4);
+        }
+        return lambdaArguments;
     }
 
     public void setPropertyResolved(boolean resolved) {
@@ -235,7 +242,7 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public boolean isLambdaArgument(String name) {
-        for (Map<String,Object> arguments : lambdaArguments) {
+        for (Map<String,Object> arguments : getLambdaArguments()) {
             if (arguments.containsKey(name)) {
                 return true;
             }
@@ -253,7 +260,7 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public Object getLambdaArgument(String name) {
-        for (Map<String,Object> arguments : lambdaArguments) {
+        for (Map<String,Object> arguments : getLambdaArguments()) {
             Object result = arguments.get(name);
             if (result != null) {
                 return result;
@@ -271,7 +278,7 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public void enterLambdaScope(Map<String,Object> arguments) {
-        lambdaArguments.push(arguments);
+        getLambdaArguments().push(arguments);
     }
 
     /**
@@ -280,7 +287,7 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public void exitLambdaScope() {
-        lambdaArguments.pop();
+        getLambdaArguments().pop();
     }
 
     /**
