@@ -155,6 +155,11 @@
         Add log warning if non wildcard mappings are used with the
         <code>WebdavServlet</code>. (remm)
       </fix>
+      <fix>
+        <bug>69362</bug>: Provide a better multi-status response when deleting a
+        collection via WebDAV fails. Empty directories that cannot be deleted
+        will now be included in the response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
