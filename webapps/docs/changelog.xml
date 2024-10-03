@@ -156,6 +156,10 @@
         Make <code>WebdavServlet</code> properly return the <code>Allow</code>
         header when deletion of a resource is not allowed. (michaelo)
       </fix>
+      <fix>
+        Add log warning if non wildcard mappings are used with the
+        <code>WebdavServlet</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
