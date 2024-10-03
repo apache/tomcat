@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Deque;
@@ -43,6 +44,7 @@ import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
@@ -259,6 +261,16 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     public void init() throws ServletException {
 
         super.init();
+
+        // Validate that the Servlet is only mapped to wildcard mappings
+        String servletName = getServletConfig().getServletName();
+        ServletRegistration servletRegistration = getServletConfig().getServletContext().getServletRegistration(servletName);
+        Collection<String> servletMappings = servletRegistration.getMappings();
+        for (String mapping : servletMappings) {
+            if (!mapping.endsWith("/*")) {
+                log(sm.getString("webdavservlet.nonWildcardMapping", mapping));
+            }
+        }
 
         if (getServletConfig().getInitParameter("secret") != null) {
             secret = getServletConfig().getInitParameter("secret");
