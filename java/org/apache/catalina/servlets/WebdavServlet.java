@@ -1466,14 +1466,14 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         // Cross-context operations aren't supported
-        String reqContextPath = req.getContextPath();
+        String reqContextPath = getPathPrefix(req);
         if (!destinationPath.startsWith(reqContextPath + "/")) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return false;
         }
 
         // Remove context path & servlet path
-        destinationPath = destinationPath.substring(reqContextPath.length() + req.getServletPath().length());
+        destinationPath = destinationPath.substring(reqContextPath.length());
 
         if (debug > 0) {
             log("Dest path: " + destinationPath);
@@ -1824,7 +1824,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             generatedXML.writeElement("D", "response", XMLWriter.OPENING);
 
             generatedXML.writeElement("D", "href", XMLWriter.OPENING);
-            generatedXML.writeText(req.getContextPath() + errorPath);
+            generatedXML.writeText(getPathPrefix(req) + errorPath);
             generatedXML.writeElement("D", "href", XMLWriter.CLOSING);
 
             generatedXML.writeElement("D", "status", XMLWriter.OPENING);
@@ -1866,7 +1866,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        String href = req.getContextPath() + req.getServletPath();
+        String href = getPathPrefix(req);
         if ((href.endsWith("/")) && (path.startsWith("/"))) {
             href += path.substring(1);
         } else {
