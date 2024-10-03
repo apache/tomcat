@@ -31,8 +31,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -1531,7 +1531,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         // Copying source to destination
 
-        Map<String,Integer> errorList = new HashMap<>();
+        Map<String,Integer> errorList = new LinkedHashMap<>();
 
         boolean infiniteCopy = true;
         String depthHeader = req.getHeader("Depth");
@@ -1712,7 +1712,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             }
         } else {
 
-            Map<String,Integer> errorList = new HashMap<>();
+            Map<String,Integer> errorList = new LinkedHashMap<>();
 
             deleteCollection(req, path, errorList);
             if (!resource.delete()) {
