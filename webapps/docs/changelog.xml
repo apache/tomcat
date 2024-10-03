@@ -123,24 +123,6 @@
         Remove default value (was <code>catalina</code>) for the
         <code>secret</code> init parameter of the WebDAV Servlet. (remm)
       </update>
-      <fix>
-        <bug>69359</bug>: <code>WebdavServlet</code> duplicates
-        <code>getRelativePath()</code> method from super class with
-        incorrect Javadoc. (michaelo)
-      </fix>
-      <fix>
-        <bug>69360</bug>: Inconsistent <code>DELETE</code> behavior between
-        <code>WebdavServlet</code> and <code>DefaultServlet</code>.
-        (michaelo)
-      </fix>
-      <fix>
-        Make <code>WebdavServlet</code> properly return the <code>Allow</code>
-        header when deletion of a resource is not allowed. (michaelo)
-      </fix>
-      <fix>
-        Add log warning if non wildcard mappings are used with the
-        <code>WebdavServlet</code>. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
