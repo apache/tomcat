@@ -161,6 +161,11 @@
         <code>WebdavServlet</code>. (remm)
       </fix>
       <fix>
+        <bug>69361</bug>: Ensure that the order of entires in a multi-status
+        response to a WebDAV is consistent with the order in which resources
+        were processed. (markt)
+      </fix>
+      <fix>
         <bug>69362</bug>: Provide a better multi-status response when deleting a
         collection via WebDAV fails. Empty directories that cannot be deleted
         will now be included in the response. (markt)
