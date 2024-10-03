@@ -205,6 +205,11 @@
         include AND or OR operations with more than two operands and expressions
         that use <code>not empty</code>. (markt)
       </fix>
+      <fix>
+        <bug>69348</bug>: Reduce memory consumption in <code>ELContext</code> by
+        using lazy initialization for the data structure used to track lambda
+        arguments. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
