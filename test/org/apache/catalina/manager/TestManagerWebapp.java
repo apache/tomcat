@@ -18,8 +18,10 @@ package org.apache.catalina.manager;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletResponse;
@@ -228,6 +230,12 @@ public class TestManagerWebapp extends TomcatBaseTest {
         tomcat.start();
 
         SimpleHttpClient client = new SimpleHttpClient() {
+            // 10s default too low for some CI systems
+            @Override
+            public void connect() throws UnknownHostException, IOException {
+                connect(30000,30000);
+            }
+
             @Override
             public boolean isResponseBodyOK() {
                 return true;
