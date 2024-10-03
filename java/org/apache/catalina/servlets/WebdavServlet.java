@@ -1716,7 +1716,21 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
             deleteCollection(req, path, errorList);
             if (!resource.delete()) {
-                errorList.put(path, Integer.valueOf(WebdavStatus.SC_METHOD_NOT_ALLOWED));
+                /*
+                 * See RFC 4918, section 9.6.1, last paragraph.
+                 *
+                 * If a child resource can't be deleted then the parent resource SHOULD NOT be included in the
+                 * multi-status response since the notice of the failure to delete the child implies that all
+                 * parent resources could also not be deleted.
+                 */
+                if (resources.list(path).length == 0) {
+                    /*
+                     * The resource could not be deleted. If the resource is a directory and it has no children (or all
+                     * those children have been successfully deleted) then it should be listed in the multi-status
+                     * response.
+                     */
+                    errorList.put(path, Integer.valueOf(WebdavStatus.SC_METHOD_NOT_ALLOWED));
+                }
             }
 
             if (!errorList.isEmpty()) {
