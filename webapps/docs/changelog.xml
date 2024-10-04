@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.1 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        <bug>69374</bug>: Properly separate between table header and body
+        in <code>DefaultServlet</code>'s listing. (michaelo)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0 (markt)" rtext="release in progress">
   <subsection name="Catalina">
