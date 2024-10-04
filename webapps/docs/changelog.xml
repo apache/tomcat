@@ -123,6 +123,10 @@
         Remove default value (was <code>catalina</code>) for the
         <code>secret</code> init parameter of the WebDAV Servlet. (remm)
       </update>
+      <update>
+        <bug>69374</bug>: Properly separate between table header and body
+        in <code>DefaultServlet</code>'s listing. (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
