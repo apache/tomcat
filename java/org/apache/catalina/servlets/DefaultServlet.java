@@ -1796,8 +1796,9 @@ public class DefaultServlet extends HttpServlet {
             order = null;
         }
         // Render the column headings
+        sb.append("<thead>\r\n");
         sb.append("<tr>\r\n");
-        sb.append("<td align=\"left\"><font size=\"+1\"><strong>");
+        sb.append("<th align=\"left\"><font size=\"+1\"><strong>");
         if (sortListings && null != request) {
             sb.append("<a href=\"?C=N;O=");
             sb.append(getOrderChar(order, 'N'));
@@ -1807,8 +1808,8 @@ public class DefaultServlet extends HttpServlet {
         } else {
             sb.append(sm.getString("directory.filename"));
         }
-        sb.append("</strong></font></td>\r\n");
-        sb.append("<td align=\"center\"><font size=\"+1\"><strong>");
+        sb.append("</strong></font></th>\r\n");
+        sb.append("<th align=\"center\"><font size=\"+1\"><strong>");
         if (sortListings && null != request) {
             sb.append("<a href=\"?C=S;O=");
             sb.append(getOrderChar(order, 'S'));
@@ -1818,8 +1819,8 @@ public class DefaultServlet extends HttpServlet {
         } else {
             sb.append(sm.getString("directory.size"));
         }
-        sb.append("</strong></font></td>\r\n");
-        sb.append("<td align=\"right\"><font size=\"+1\"><strong>");
+        sb.append("</strong></font></th>\r\n");
+        sb.append("<th align=\"right\"><font size=\"+1\"><strong>");
         if (sortListings && null != request) {
             sb.append("<a href=\"?C=M;O=");
             sb.append(getOrderChar(order, 'M'));
@@ -1829,14 +1830,16 @@ public class DefaultServlet extends HttpServlet {
         } else {
             sb.append(sm.getString("directory.lastModified"));
         }
-        sb.append("</strong></font></td>\r\n");
-        sb.append("</tr>");
+        sb.append("</strong></font></th>\r\n");
+        sb.append("</tr>\r\n");
+        sb.append("</thead>\r\n");
 
         if (null != sortManager && null != request) {
             sortManager.sort(entries, request.getQueryString());
         }
 
         boolean shade = false;
+        sb.append("<tbody>\r\n");
         for (WebResource childResource : entries) {
             String filename = childResource.getName();
             if (filename.equalsIgnoreCase("WEB-INF") || filename.equalsIgnoreCase("META-INF")) {
@@ -1882,6 +1885,7 @@ public class DefaultServlet extends HttpServlet {
 
             sb.append("</tr>\r\n");
         }
+        sb.append("</tbody>\r\n");
 
         // Render the page footer
         sb.append("</table>\r\n");
