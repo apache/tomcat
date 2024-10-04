@@ -127,6 +127,10 @@
         <bug>69374</bug>: Properly separate between table header and body
         in <code>DefaultServlet</code>'s listing. (michaelo)
       </update>
+      <update>
+        <bug>69373</bug>: Make <code>DefaultServlet</code>'s HTML listing
+        file last modified rendering better (flexible). (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
