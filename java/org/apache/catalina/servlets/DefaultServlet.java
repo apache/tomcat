@@ -73,6 +73,7 @@ import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.webresources.CachedResource;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.ResponseUtil;
 import org.apache.tomcat.util.http.parser.ContentRange;
 import org.apache.tomcat.util.http.parser.EntityTag;
@@ -1794,7 +1795,7 @@ public class DefaultServlet extends HttpServlet {
             sb.append("</tt></td>\r\n");
 
             sb.append("<td align=\"right\"><tt>");
-            sb.append(childResource.getLastModifiedHttp());
+            sb.append(renderTimestamp(childResource.getLastModified()));
             sb.append("</tt></td>\r\n");
 
             sb.append("</tr>\r\n");
@@ -1842,6 +1843,20 @@ public class DefaultServlet extends HttpServlet {
         }
 
         return ("" + leftSide + "." + rightSide + " KiB");
+
+    }
+
+
+    /**
+     * Render the specified file timestamp.
+     *
+     * @param timestamp File timestamp
+     *
+     * @return the formatted timestamp
+     */
+    protected String renderTimestamp(long timestamp) {
+
+        return FastHttpDateFormat.formatDate(timestamp);
 
     }
 
