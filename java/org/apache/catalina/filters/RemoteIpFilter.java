@@ -21,13 +21,9 @@ import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayDeque;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.FilterChain;
@@ -36,16 +32,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
-import org.apache.catalina.util.RequestUtil;
+import org.apache.catalina.connector.XForwardedRequest;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringUtils;
-import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.parser.Host;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -467,205 +461,6 @@ import org.apache.tomcat.util.res.StringManager;
 public class RemoteIpFilter extends GenericFilter {
 
     private static final long serialVersionUID = 1L;
-
-    public static class XForwardedRequest extends HttpServletRequestWrapper {
-
-        protected final Map<String,List<String>> headers;
-
-        protected String localName;
-
-        protected int localPort;
-
-        protected String remoteAddr;
-
-        protected String remoteHost;
-
-        protected String scheme;
-
-        protected boolean secure;
-
-        protected String serverName;
-
-        protected int serverPort;
-
-        protected String requestId;
-
-        public XForwardedRequest(HttpServletRequest request) {
-            super(request);
-            this.localName = request.getLocalName();
-            this.localPort = request.getLocalPort();
-            this.remoteAddr = request.getRemoteAddr();
-            this.remoteHost = request.getRemoteHost();
-            this.scheme = request.getScheme();
-            this.secure = request.isSecure();
-            this.serverName = request.getServerName();
-            this.serverPort = request.getServerPort();
-
-            headers = new HashMap<>();
-            for (Enumeration<String> headerNames = request.getHeaderNames(); headerNames.hasMoreElements();) {
-                String header = headerNames.nextElement();
-                headers.put(header, Collections.list(request.getHeaders(header)));
-            }
-        }
-
-        @Override
-        public long getDateHeader(String name) {
-            String value = getHeader(name);
-            if (value == null) {
-                return -1;
-            }
-            long date = FastHttpDateFormat.parseDate(value);
-            if (date == -1) {
-                throw new IllegalArgumentException(value);
-            }
-            return date;
-        }
-
-        @Override
-        public String getHeader(String name) {
-            Map.Entry<String,List<String>> header = getHeaderEntry(name);
-            if (header == null || header.getValue() == null || header.getValue().isEmpty()) {
-                return null;
-            }
-            return header.getValue().get(0);
-        }
-
-        protected Map.Entry<String,List<String>> getHeaderEntry(String name) {
-            for (Map.Entry<String,List<String>> entry : headers.entrySet()) {
-                if (entry.getKey().equalsIgnoreCase(name)) {
-                    return entry;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        public Enumeration<String> getHeaderNames() {
-            return Collections.enumeration(headers.keySet());
-        }
-
-        @Override
-        public Enumeration<String> getHeaders(String name) {
-            Map.Entry<String,List<String>> header = getHeaderEntry(name);
-            if (header == null || header.getValue() == null) {
-                return Collections.enumeration(Collections.<String>emptyList());
-            }
-            return Collections.enumeration(header.getValue());
-        }
-
-        @Override
-        public int getIntHeader(String name) {
-            String value = getHeader(name);
-            if (value == null) {
-                return -1;
-            }
-            return Integer.parseInt(value);
-        }
-
-        @Override
-        public String getLocalName() {
-            return localName;
-        }
-
-        @Override
-        public int getLocalPort() {
-            return localPort;
-        }
-
-        @Override
-        public String getRemoteAddr() {
-            return this.remoteAddr;
-        }
-
-        @Override
-        public String getRemoteHost() {
-            return this.remoteHost;
-        }
-
-        @Override
-        public String getRequestId() {
-            if (this.requestId != null) {
-                return this.requestId;
-            }
-
-            return super.getRequest().getRequestId();
-        }
-
-        @Override
-        public String getScheme() {
-            return scheme;
-        }
-
-        @Override
-        public String getServerName() {
-            return serverName;
-        }
-
-        @Override
-        public int getServerPort() {
-            return serverPort;
-        }
-
-        public void removeHeader(String name) {
-            Map.Entry<String,List<String>> header = getHeaderEntry(name);
-            if (header != null) {
-                headers.remove(header.getKey());
-            }
-        }
-
-        public void setHeader(String name, String value) {
-            List<String> values = Collections.singletonList(value);
-            Map.Entry<String,List<String>> header = getHeaderEntry(name);
-            if (header == null) {
-                headers.put(name, values);
-            } else {
-                header.setValue(values);
-            }
-
-        }
-
-        public void setLocalName(String localName) {
-            this.localName = localName;
-        }
-
-        public void setLocalPort(int localPort) {
-            this.localPort = localPort;
-        }
-
-        public void setRemoteAddr(String remoteAddr) {
-            this.remoteAddr = remoteAddr;
-        }
-
-        public void setRemoteHost(String remoteHost) {
-            this.remoteHost = remoteHost;
-        }
-
-        public void setRequestId(String requestId) {
-            this.requestId = requestId;
-        }
-
-        public void setScheme(String scheme) {
-            this.scheme = scheme;
-        }
-
-        public void setSecure(boolean secure) {
-            super.getRequest().setAttribute(Globals.REMOTE_IP_FILTER_SECURE, Boolean.valueOf(secure));
-        }
-
-        public void setServerName(String serverName) {
-            this.serverName = serverName;
-        }
-
-        public void setServerPort(int serverPort) {
-            this.serverPort = serverPort;
-        }
-
-        @Override
-        public StringBuffer getRequestURL() {
-            return RequestUtil.getRequestURL(this);
-        }
-    }
-
 
     protected static final String HTTP_SERVER_PORT_PARAMETER = "httpServerPort";
 
