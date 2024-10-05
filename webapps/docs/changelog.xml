@@ -115,6 +115,9 @@
         <bug>69373</bug>: Make <code>DefaultServlet</code>'s HTML listing
         file last modified rendering better (flexible). (michaelo)
       </update>
+      <update>
+        Improve HTML output of <code>DefaultServlet</code>. (michaelo)
+      </update>
     </changelog>
   </subsection>
 </section>
