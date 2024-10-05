@@ -123,6 +123,10 @@
         the base class. The primary advantage for doing this is less code to
         process <code>init-param</code> values. (markt)
       </scode>
+      <update>
+        <bug>69370</bug>: <code>DefaultServlet</code>'s HTML listing
+        uses incorrect labels. (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
