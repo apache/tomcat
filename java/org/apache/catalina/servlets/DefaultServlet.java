@@ -1744,7 +1744,8 @@ public class DefaultServlet extends HttpServlet {
         String rewrittenContextPath = rewriteUrl(contextPath);
 
         // Render the page header
-        sb.append("<!doctype html><html>\r\n");
+        sb.append("<!doctype html>\r\n");
+        sb.append("<html>\r\n");
         /*
          * TODO Activate this as soon as we use smClient with the request locales
          * sb.append("<!doctype html><html lang=\""); sb.append(smClient.getLocale().getLanguage()).append("\">\r\n");
@@ -1755,9 +1756,9 @@ public class DefaultServlet extends HttpServlet {
         sb.append("</title>\r\n");
         sb.append("<style>");
         sb.append(org.apache.catalina.util.TomcatCSS.TOMCAT_CSS);
-        sb.append("</style> ");
+        sb.append("</style>\r\n");
         sb.append("</head>\r\n");
-        sb.append("<body>");
+        sb.append("<body>\r\n");
         sb.append("<h1>");
         sb.append(sm.getString("directory.title", directoryWebappPath));
 
@@ -1785,8 +1786,8 @@ public class DefaultServlet extends HttpServlet {
             sb.append("</a>");
         }
 
-        sb.append("</h1>");
-        sb.append("<hr class=\"line\">");
+        sb.append("</h1>\r\n");
+        sb.append("<hr class=\"line\">\r\n");
 
         sb.append("<table width=\"100%\" cellspacing=\"0\"" + " cellpadding=\"5\" align=\"center\">\r\n");
 
@@ -1891,16 +1892,16 @@ public class DefaultServlet extends HttpServlet {
         // Render the page footer
         sb.append("</table>\r\n");
 
-        sb.append("<hr class=\"line\">");
+        sb.append("<hr class=\"line\">\r\n");
 
         String readme = getReadme(resource, encoding);
         if (readme != null) {
             sb.append(readme);
-            sb.append("<hr class=\"line\">");
+            sb.append("<hr class=\"line\">\r\n");
         }
 
         if (showServerInfo) {
-            sb.append("<h3>").append(ServerInfo.getServerInfo()).append("</h3>");
+            sb.append("<h3>").append(ServerInfo.getServerInfo()).append("</h3>\r\n");
         }
         sb.append("</body>\r\n");
         sb.append("</html>\r\n");
