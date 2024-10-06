@@ -46,7 +46,7 @@ thumbs.db
 Thumbs.db
 bin/setenv.*
 java/org/apache/catalina/startup/catalina.properties
+modules/**/target
 modules/jdbc-pool/bin
 modules/jdbc-pool/includes
-modules/openssl-foreign/target
 webapps/docs/jdbc-pool.xml
