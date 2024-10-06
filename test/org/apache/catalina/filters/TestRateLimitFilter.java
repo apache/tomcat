@@ -56,11 +56,10 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         MockFilterChain filterChain = new MockFilterChain();
         RateLimitFilter rateLimitFilter = testRateLimitFilter(filterDef, root);
 
-        FastRateLimiter tbc = (FastRateLimiter) rateLimitFilter.rateLimiter;
+        FastRateLimiter fastRateLimiter = (FastRateLimiter) rateLimitFilter.rateLimiter;
 
-        int allowedRequests = (int) Math.round(tbc.getBucketCounter().getRatio() * bucketRequests);
-
-        long sleepTime = tbc.getBucketCounter().getMillisUntilNextBucket();
+        int allowedRequests = fastRateLimiter.getRequests();
+        long sleepTime = fastRateLimiter.getBucketCounter().getMillisUntilNextBucket();
         System.out.printf("Sleeping %d millis for the next time bucket to start\n", Long.valueOf(sleepTime));
         Thread.sleep(sleepTime);
 
