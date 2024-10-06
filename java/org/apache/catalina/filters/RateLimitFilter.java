@@ -155,6 +155,12 @@ public class RateLimitFilter extends FilterBase {
 
 
     @Override
+    protected boolean isConfigProblemFatal() {
+        return true;
+    }
+
+
+    @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         super.init(filterConfig);
 
