@@ -118,6 +118,11 @@
       <update>
         Improve HTML output of <code>DefaultServlet</code>. (michaelo)
       </update>
+      <scode>
+        Refactor <code>RateLimitFilter</code> to use <code>FilterBase</code> as
+        the base class. The primary advantage for doing this is less code to
+        process <code>init-param</code> values. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
