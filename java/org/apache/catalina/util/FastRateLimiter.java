@@ -17,13 +17,14 @@
 
 package org.apache.catalina.util;
 
-import jakarta.servlet.FilterConfig;
-import org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor;
-
 import java.util.concurrent.ScheduledExecutorService;
 
+import jakarta.servlet.FilterConfig;
+
+import org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor;
+
 /**
- * A RateLimiter that compromises accuracy for speed in order to provide maximum throughput
+ * A RateLimiter that compromises accuracy for speed in order to provide maximum throughput.
  */
 public class FastRateLimiter implements RateLimiter {
 

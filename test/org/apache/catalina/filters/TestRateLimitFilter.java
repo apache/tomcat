@@ -24,7 +24,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 
-import org.apache.catalina.util.FastRateLimiter;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -33,6 +32,7 @@ import org.apache.catalina.filters.TestRemoteIpFilter.MockFilterChain;
 import org.apache.catalina.filters.TestRemoteIpFilter.MockHttpServletRequest;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.util.FastRateLimiter;
 import org.apache.tomcat.unittest.TesterResponse;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
