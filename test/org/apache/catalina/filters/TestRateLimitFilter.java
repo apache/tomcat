@@ -46,8 +46,8 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         int bucketDuration = 4;
 
         FilterDef filterDef = new FilterDef();
-        filterDef.addInitParameter(RateLimitFilter.PARAM_BUCKET_REQUESTS, String.valueOf(bucketRequests));
-        filterDef.addInitParameter(RateLimitFilter.PARAM_BUCKET_DURATION, String.valueOf(bucketDuration));
+        filterDef.addInitParameter("bucketRequests", String.valueOf(bucketRequests));
+        filterDef.addInitParameter("bucketDuration", String.valueOf(bucketDuration));
 
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", TEMP_DIR);

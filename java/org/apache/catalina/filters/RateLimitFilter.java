@@ -22,7 +22,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.GenericFilter;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -72,9 +71,7 @@ import org.apache.tomcat.util.res.StringManager;
  * requests from different IPs in the same bucket and will result in a self inflicted DoS attack.
  * </p>
  */
-public class RateLimitFilter extends GenericFilter {
-
-    private static final long serialVersionUID = 1L;
+public class RateLimitFilter extends FilterBase {
 
     /**
      * default duration in seconds
@@ -106,36 +103,6 @@ public class RateLimitFilter extends GenericFilter {
      */
     public static final String RATE_LIMIT_ATTRIBUTE_COUNT = "org.apache.catalina.filters.RateLimitFilter.Count";
 
-    /**
-     * init-param to set the bucket duration in seconds
-     */
-    public static final String PARAM_BUCKET_DURATION = "bucketDuration";
-
-    /**
-     * init-param to set the bucket number of requests
-     */
-    public static final String PARAM_BUCKET_REQUESTS = "bucketRequests";
-
-    /**
-     * init-param to set the enforce flag
-     */
-    public static final String PARAM_ENFORCE = "enforce";
-
-    /**
-     * init-param to set a custom status code if requests per duration exceeded
-     */
-    public static final String PARAM_STATUS_CODE = "statusCode";
-
-    /**
-     * init-param to set a class name that implements RateLimiter
-     */
-    public static final String PARAM_CLASS_NAME = "className";
-
-    /**
-     * init-param to set a custom status message if requests per duration exceeded
-     */
-    public static final String PARAM_STATUS_MESSAGE = "statusMessage";
-
     transient RateLimiter rateLimiter;
 
     private String rateLimitClassName = "org.apache.catalina.util.FastRateLimiter";
@@ -150,45 +117,46 @@ public class RateLimitFilter extends GenericFilter {
 
     private String statusMessage = DEFAULT_STATUS_MESSAGE;
 
+    private String filterName;
+
     private transient Log log = LogFactory.getLog(RateLimitFilter.class);
 
     private static final StringManager sm = StringManager.getManager(RateLimitFilter.class);
 
+
+    public void setBucketDuration(int bucketDuration) {
+        this.bucketDuration = bucketDuration;
+    }
+
+
+    public void setBucketRequests(int bucketRequests) {
+        this.bucketRequests = bucketRequests;
+    }
+
+
+    public void setEnforce(boolean enforce) {
+        this.enforce = enforce;
+    }
+
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+    }
+
+
+    public void setStatusMessage(String statusMessage) {
+        this.statusMessage = statusMessage;
+    }
+
+
+    public void setRateLimitClassName(String rateLimitClassName) {
+        this.rateLimitClassName = rateLimitClassName;
+    }
+
+
     @Override
-    public void init() throws ServletException {
-
-        FilterConfig config = getFilterConfig();
-
-        String param;
-        param = config.getInitParameter(PARAM_BUCKET_DURATION);
-        if (param != null) {
-            bucketDuration = Integer.parseInt(param);
-        }
-
-        param = config.getInitParameter(PARAM_BUCKET_REQUESTS);
-        if (param != null) {
-            bucketRequests = Integer.parseInt(param);
-        }
-
-        param = config.getInitParameter(PARAM_ENFORCE);
-        if (param != null) {
-            enforce = Boolean.parseBoolean(param);
-        }
-
-        param = config.getInitParameter(PARAM_STATUS_CODE);
-        if (param != null) {
-            statusCode = Integer.parseInt(param);
-        }
-
-        param = config.getInitParameter(PARAM_STATUS_MESSAGE);
-        if (param != null) {
-            statusMessage = param;
-        }
-
-        param = config.getInitParameter(PARAM_CLASS_NAME);
-        if (param != null) {
-            rateLimitClassName = param;
-        }
+    public void init(FilterConfig filterConfig) throws ServletException {
+        super.init(filterConfig);
 
         try {
             rateLimiter = (RateLimiter)Class.forName(rateLimitClassName).getConstructor().newInstance();
@@ -199,9 +167,11 @@ public class RateLimitFilter extends GenericFilter {
 
         rateLimiter.setDuration(bucketDuration);
         rateLimiter.setRequests(bucketRequests);
-        rateLimiter.setFilterConfig(super.getFilterConfig());
+        rateLimiter.setFilterConfig(filterConfig);
 
-        log.info(sm.getString("rateLimitFilter.initialized", super.getFilterName(),
+        filterName = filterConfig.getFilterName();
+
+        log.info(sm.getString("rateLimitFilter.initialized", filterName,
             Integer.valueOf(bucketRequests), Integer.valueOf(bucketDuration),
             Integer.valueOf(rateLimiter.getRequests()), Integer.valueOf(rateLimiter.getDuration()),
             (!enforce ? "Not " : "") + "enforcing"));
@@ -218,7 +188,7 @@ public class RateLimitFilter extends GenericFilter {
 
         if (reqCount > rateLimiter.getRequests()) {
 
-            log.warn(sm.getString("rateLimitFilter.maxRequestsExceeded", super.getFilterName(),
+            log.warn(sm.getString("rateLimitFilter.maxRequestsExceeded", filterName,
                 Integer.valueOf(reqCount), ipAddr, Integer.valueOf(rateLimiter.getRequests()),
                 Integer.valueOf(rateLimiter.getDuration())));
 
@@ -235,5 +205,11 @@ public class RateLimitFilter extends GenericFilter {
     public void destroy() {
         rateLimiter.destroy();
         super.destroy();
+    }
+
+
+    @Override
+    protected Log getLogger() {
+        return log;
     }
 }
