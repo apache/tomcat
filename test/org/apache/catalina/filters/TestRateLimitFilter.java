@@ -24,6 +24,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 
+import org.apache.catalina.util.FastRateLimiter;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -55,9 +56,11 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         MockFilterChain filterChain = new MockFilterChain();
         RateLimitFilter rateLimitFilter = testRateLimitFilter(filterDef, root);
 
-        int allowedRequests = (int) Math.round(rateLimitFilter.bucketCounter.getRatio() * bucketRequests);
+        FastRateLimiter tbc = (FastRateLimiter) rateLimitFilter.rateLimiter;
 
-        long sleepTime = rateLimitFilter.bucketCounter.getMillisUntilNextBucket();
+        int allowedRequests = (int) Math.round(tbc.getBucketCounter().getRatio() * bucketRequests);
+
+        long sleepTime = tbc.getBucketCounter().getMillisUntilNextBucket();
         System.out.printf("Sleeping %d millis for the next time bucket to start\n", Long.valueOf(sleepTime));
         Thread.sleep(sleepTime);
 

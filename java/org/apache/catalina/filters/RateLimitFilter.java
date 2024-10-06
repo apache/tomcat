@@ -18,7 +18,7 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
-import java.util.concurrent.ScheduledExecutorService;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -28,11 +28,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.util.TimeBucketCounter;
+import org.apache.catalina.util.RateLimiter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor;
 
 /**
  * <p>
@@ -46,11 +45,13 @@ import org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor;
  * the bucket time ends and a new bucket starts.
  * </p>
  * <p>
- * The filter is optimized for efficiency and low overhead, so it converts some configured values to more efficient
- * values. For example, a configuration of a 60 seconds time bucket is converted to 65.536 seconds. That allows for very
- * fast bucket calculation using bit shift arithmetic. In order to remain true to the user intent, the configured number
- * of requests is then multiplied by the same ratio, so a configuration of 100 Requests per 60 seconds, has the real
- * values of 109 Requests per 65 seconds.
+ * The RateLimiter implementation can be set via the <code>className</code> init param. The default implementation,
+ * <code>org.apache.catalina.util.FastRateLimiter</code>, is optimized for efficiency and low overhead so it converts
+ * some configured values to more efficient values. For example, a configuration of a 60 seconds time bucket is
+ * converted to 65.536 seconds. That allows for very fast bucket calculation using bit shift arithmetic. In order to
+ * remain true to the user intent, the configured number of requests is then multiplied by the same ratio, so a
+ * configuration of 100 Requests per 60 seconds, has the real values of 109 Requests per 65 seconds. You can specify
+ * a different class as long as it implements the <code>org.apache.catalina.util.RateLimiter</code> interface.
  * </p>
  * <p>
  * It is common to set up different restrictions for different URIs. For example, a login page or authentication script
@@ -126,13 +127,18 @@ public class RateLimitFilter extends GenericFilter {
     public static final String PARAM_STATUS_CODE = "statusCode";
 
     /**
+     * init-param to set a class name that implements RateLimiter
+     */
+    public static final String PARAM_CLASS_NAME = "className";
+
+    /**
      * init-param to set a custom status message if requests per duration exceeded
      */
     public static final String PARAM_STATUS_MESSAGE = "statusMessage";
 
-    transient TimeBucketCounter bucketCounter;
+    transient RateLimiter rateLimiter;
 
-    private int actualRequests;
+    private String rateLimitClassName = "org.apache.catalina.util.FastRateLimiter";
 
     private int bucketRequests = DEFAULT_BUCKET_REQUESTS;
 
@@ -147,20 +153,6 @@ public class RateLimitFilter extends GenericFilter {
     private transient Log log = LogFactory.getLog(RateLimitFilter.class);
 
     private static final StringManager sm = StringManager.getManager(RateLimitFilter.class);
-
-    /**
-     * @return the actual maximum allowed requests per time bucket
-     */
-    public int getActualRequests() {
-        return actualRequests;
-    }
-
-    /**
-     * @return the actual duration of a time bucket in milliseconds
-     */
-    public int getActualDurationInSeconds() {
-        return bucketCounter.getActualDuration() / 1000;
-    }
 
     @Override
     public void init() throws ServletException {
@@ -193,18 +185,26 @@ public class RateLimitFilter extends GenericFilter {
             statusMessage = param;
         }
 
-        ScheduledExecutorService executorService = (ScheduledExecutorService) getServletContext()
-                .getAttribute(ScheduledThreadPoolExecutor.class.getName());
-        if (executorService == null) {
-            executorService = new java.util.concurrent.ScheduledThreadPoolExecutor(1);
+        param = config.getInitParameter(PARAM_CLASS_NAME);
+        if (param != null) {
+            rateLimitClassName = param;
         }
-        bucketCounter = new TimeBucketCounter(bucketDuration, executorService);
 
-        actualRequests = (int) Math.round(bucketCounter.getRatio() * bucketRequests);
+        try {
+            rateLimiter = (RateLimiter)Class.forName(rateLimitClassName).getConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException | ClassNotFoundException e) {
+            throw new ServletException(e);
+        }
 
-        log.info(sm.getString("rateLimitFilter.initialized", super.getFilterName(), Integer.valueOf(bucketRequests),
-                Integer.valueOf(bucketDuration), Integer.valueOf(getActualRequests()),
-                Integer.valueOf(getActualDurationInSeconds()), (!enforce ? "Not " : "") + "enforcing"));
+        rateLimiter.setDuration(bucketDuration);
+        rateLimiter.setRequests(bucketRequests);
+        rateLimiter.setFilterConfig(super.getFilterConfig());
+
+        log.info(sm.getString("rateLimitFilter.initialized", super.getFilterName(),
+            Integer.valueOf(bucketRequests), Integer.valueOf(bucketDuration),
+            Integer.valueOf(rateLimiter.getRequests()), Integer.valueOf(rateLimiter.getDuration()),
+            (!enforce ? "Not " : "") + "enforcing"));
     }
 
     @Override
@@ -212,18 +212,20 @@ public class RateLimitFilter extends GenericFilter {
             throws IOException, ServletException {
 
         String ipAddr = request.getRemoteAddr();
-        int reqCount = bucketCounter.increment(ipAddr);
+        int reqCount = rateLimiter.increment(ipAddr);
 
         request.setAttribute(RATE_LIMIT_ATTRIBUTE_COUNT, Integer.valueOf(reqCount));
 
-        if (enforce && (reqCount > actualRequests)) {
+        if (reqCount > rateLimiter.getRequests()) {
 
-            ((HttpServletResponse) response).sendError(statusCode, statusMessage);
             log.warn(sm.getString("rateLimitFilter.maxRequestsExceeded", super.getFilterName(),
-                    Integer.valueOf(reqCount), ipAddr, Integer.valueOf(getActualRequests()),
-                    Integer.valueOf(getActualDurationInSeconds())));
+                Integer.valueOf(reqCount), ipAddr, Integer.valueOf(rateLimiter.getRequests()),
+                Integer.valueOf(rateLimiter.getDuration())));
 
-            return;
+            if (enforce) {
+                ((HttpServletResponse) response).sendError(statusCode, statusMessage);
+                return;
+            }
         }
 
         chain.doFilter(request, response);
@@ -231,7 +233,7 @@ public class RateLimitFilter extends GenericFilter {
 
     @Override
     public void destroy() {
-        this.bucketCounter.destroy();
+        rateLimiter.destroy();
         super.destroy();
     }
 }
