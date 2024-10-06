@@ -18,7 +18,6 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -166,8 +165,7 @@ public class RateLimitFilter extends FilterBase {
 
         try {
             rateLimiter = (RateLimiter)Class.forName(rateLimitClassName).getConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException | ClassNotFoundException e) {
+        } catch (ReflectiveOperationException e) {
             throw new ServletException(e);
         }
 
