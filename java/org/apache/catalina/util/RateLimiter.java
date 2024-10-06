@@ -27,9 +27,9 @@ public interface RateLimiter {
     int getDuration();
 
     /**
-     * sets the configured duration value in seconds
+     * Sets the configured duration value in seconds.
      *
-     * @param duration
+     * @param duration The duration of the time window in seconds
      */
     void setDuration(int duration);
 
@@ -39,29 +39,30 @@ public interface RateLimiter {
     int getRequests();
 
     /**
-     * sets the configured number of requests allowed per time window
+     * Sets the configured number of requests allowed per time window.
      *
-     * @param requests
+     * @param requests The number of requests per time window
      */
     void setRequests(int requests);
 
     /**
-     * increments the number of requests by the given ipAddress in the current time window
+     * Increments the number of requests by the given ipAddress in the current time window.
      *
      * @param ipAddress the ip address
+     *
      * @return the new value after incrementing
      */
     int increment(String ipAddress);
 
     /**
-     * cleanup no longer needed resources
+     * Cleanup no longer needed resources.
      */
     void destroy();
 
     /**
-     * pass the FilterConfig to configure the filter
+     * Pass the FilterConfig to configure the filter.
      *
-     * @param filterConfig
+     * @param filterConfig The FilterConfig used to configure the associated filter
      */
     void setFilterConfig(FilterConfig filterConfig);
 }
