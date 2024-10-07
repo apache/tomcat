@@ -170,7 +170,7 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
         }
         // Expose ssl_session (getId)
         byte [] ssl_session = session.getId();
-        if ( ssl_session == null) {
+        if (ssl_session == null || ssl_session.length == 0) {
             return null;
         }
         StringBuilder buf=new StringBuilder();

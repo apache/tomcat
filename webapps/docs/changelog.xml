@@ -125,6 +125,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Return null SSL session id on zero length byte array returned from the
+        SSL implementation. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0 (markt)" rtext="release in progress">
   <subsection name="Catalina">
