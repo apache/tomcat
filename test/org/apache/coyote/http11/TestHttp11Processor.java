@@ -813,8 +813,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, getStatus);
         Assert.assertEquals(HttpServletResponse.SC_OK, headStatus);
 
-        Assert.assertEquals(0, getBody.getLength());
-        Assert.assertEquals(0, headBody.getLength());
+        Assert.assertEquals(2, getBody.getLength());
+        Assert.assertEquals(2, headBody.getLength());
 
         if (getHeaders.containsKey("Content-Length")) {
             Assert.assertEquals(getHeaders.get("Content-Length"), headHeaders.get("Content-Length"));
@@ -830,10 +830,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.getWriter().print("OK");
         }
 
         @Override
         protected void doHead(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.getWriter().print("OK");
         }
     }
 
