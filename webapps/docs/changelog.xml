@@ -283,7 +283,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.95 (remm)" rtext="release in progress">
+<section name="Tomcat 9.0.95 (remm)" rtext="2024-09-17">
   <subsection name="Coyote">
     <changelog>
       <fix>
