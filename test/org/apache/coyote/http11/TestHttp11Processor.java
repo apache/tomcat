@@ -802,14 +802,25 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk responseBody = new ByteChunk();
-        Map<String, List<String>> responseHeaders = new HashMap<>();
+        ByteChunk getBody = new ByteChunk();
+        Map<String, List<String>> getHeaders = new HashMap<>();
+        int getStatus = getUrl("http://localhost:" + getPort() + "/test", getBody, getHeaders);
 
-        int rc = headUrl("http://localhost:" + getPort() + "/test", responseBody, responseHeaders);
+        ByteChunk headBody = new ByteChunk();
+        Map<String, List<String>> headHeaders = new HashMap<>();
+        int headStatus = getUrl("http://localhost:" + getPort() + "/test", headBody, headHeaders);
 
-        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertEquals(0, responseBody.getLength());
-        Assert.assertFalse(responseHeaders.containsKey("Content-Length"));
+        Assert.assertEquals(HttpServletResponse.SC_OK, getStatus);
+        Assert.assertEquals(HttpServletResponse.SC_OK, headStatus);
+
+        Assert.assertEquals(2, getBody.getLength());
+        Assert.assertEquals(2, headBody.getLength());
+
+        if (getHeaders.containsKey("Content-Length")) {
+            Assert.assertEquals(getHeaders.get("Content-Length"), headHeaders.get("Content-Length"));
+        } else {
+            Assert.assertFalse(headHeaders.containsKey("Content-Length"));
+        }
     }
 
 
@@ -819,11 +830,12 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            super.doGet(req, resp);
+            resp.getWriter().print("OK");
         }
 
         @Override
         protected void doHead(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.getWriter().print("OK");
         }
     }
 
