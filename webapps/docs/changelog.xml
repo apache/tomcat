@@ -152,6 +152,9 @@
         Return null SSL session id on zero length byte array returned from the
         SSL implementation. (remm)
       </fix>
+      <fix>
+        Skip OpenSSLConf with BoringSSL since it is unsupported. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
