@@ -174,14 +174,18 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 if (log.isTraceEnabled()) {
                     log.trace(sm.getString("openssl.makeConf"));
                 }
-                confCtx = SSL_CONF_CTX_new();
-                if (MemorySegment.NULL.equals(confCtx)) {
-                    throw new SSLException(sm.getString("openssl.errMakeConf", OpenSSLLibrary.getLastError()));
+                if (!openssl_h_Compatibility.BORINGSSL) {
+                    confCtx = SSL_CONF_CTX_new();
+                    if (MemorySegment.NULL.equals(confCtx)) {
+                        throw new SSLException(sm.getString("openssl.errMakeConf", OpenSSLLibrary.getLastError()));
+                    }
+                    SSL_CONF_CTX_set_flags(confCtx, SSL_CONF_FLAG_FILE() |
+                            SSL_CONF_FLAG_SERVER() |
+                            SSL_CONF_FLAG_CERTIFICATE() |
+                            SSL_CONF_FLAG_SHOW_ERRORS());
+                } else {
+                    log.error(sm.getString("opensslconf.unsupported"));
                 }
-                SSL_CONF_CTX_set_flags(confCtx, SSL_CONF_FLAG_FILE() |
-                        SSL_CONF_FLAG_SERVER() |
-                        SSL_CONF_FLAG_CERTIFICATE() |
-                        SSL_CONF_FLAG_SHOW_ERRORS());
             }
 
             // SSL protocol
@@ -1396,7 +1400,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 this.confCtx = confCtx.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena,
                         (MemorySegment t) -> SSL_CONF_CTX_free(t));
             } else {
-                this.confCtx = null;
+                this.confCtx = MemorySegment.NULL;
             }
         }
 
