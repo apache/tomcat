@@ -123,6 +123,9 @@ public class TestOpenSSLConf extends TomcatBaseTest {
 
         tomcat.start();
 
+        Assume.assumeFalse("BoringSSL does not support OpenSSLConf",
+                OpenSSLStatus.Name.BORINGSSL.equals(OpenSSLStatus.getName()));
+
         sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
         Assert.assertEquals("Wrong SSLHostConfigCount", 1, sslHostConfigs.length);
         return sslHostConfigs[0];
