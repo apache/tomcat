@@ -148,6 +148,10 @@
         <code>certificateKeystorePassword</code> attribute of a certificate.
         (remm)
       </update>
+      <fix>
+        Return null SSL session id on zero length byte array returned from the
+        SSL implementation. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
