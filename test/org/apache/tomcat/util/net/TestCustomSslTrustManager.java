@@ -24,6 +24,7 @@ import java.util.List;
 import javax.net.ssl.SSLException;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -35,6 +36,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 
 /**
  * The keys and certificates used in this file are all available in svn and were
@@ -116,6 +118,11 @@ public class TestCustomSslTrustManager extends TomcatBaseTest {
 
         // Start Tomcat
         tomcat.start();
+
+        Assume.assumeFalse("LibreSSL does not allow renegotiation",
+                OpenSSLStatus.Name.LIBRESSL.equals(OpenSSLStatus.getName()));
+        Assume.assumeFalse("BoringSSL does not allow TLS renegotiation",
+                OpenSSLStatus.Name.BORINGSSL.equals(OpenSSLStatus.getName()));
 
         TesterSupport.configureClientSsl();
 
