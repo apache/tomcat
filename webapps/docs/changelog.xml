@@ -134,6 +134,10 @@
       <fix>
         Skip OpenSSLConf with BoringSSL since it is unsupported. (remm)
       </fix>
+      <update>
+        Align buffer reuse of the OpenSSLEngine for tomcat-native with the FFM
+        code. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
