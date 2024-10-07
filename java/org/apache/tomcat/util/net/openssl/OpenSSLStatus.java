@@ -20,12 +20,21 @@ package org.apache.tomcat.util.net.openssl;
  * Holds OpenSSL status without the need to load other classes.
  */
 public class OpenSSLStatus {
+
+    /**
+     * OpenSSL library variant that has been identified
+     */
+    public enum Name {
+        OPENSSL, OPENSSL3, LIBRESSL, BORINGSSL, UNKNOWN
+    }
+
     private static volatile boolean libraryInitialized = false;
     private static volatile boolean initialized = false;
     private static volatile boolean available = false;
     private static volatile boolean useOpenSSL = true;
     private static volatile boolean instanceCreated = false;
     private static volatile long version = 0;
+    private static volatile Name name = Name.UNKNOWN;
 
 
     public static boolean isLibraryInitialized() {
@@ -80,6 +89,27 @@ public class OpenSSLStatus {
      */
     public static void setVersion(long version) {
         OpenSSLStatus.version = version;
+    }
+
+    /**
+     * @return the library name
+     */
+    public static Name getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public static void setName(Name name) {
+        OpenSSLStatus.name = name;
+    }
+
+    /**
+     * @return true if running with OpenSSL 3.0+
+     */
+    public static boolean isOpenSSL3() {
+        return Name.OPENSSL3.equals(name);
     }
 
 }
