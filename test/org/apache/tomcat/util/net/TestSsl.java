@@ -44,6 +44,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -62,6 +63,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
 /**
@@ -146,6 +148,10 @@ public class TestSsl extends TomcatBaseTest {
         TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
         tomcat.start();
+
+        Assume.assumeFalse("BoringSSL and LibreSSL return no session id",
+                OpenSSLStatus.Name.BORINGSSL.equals(OpenSSLStatus.getName()) || OpenSSLStatus.Name.LIBRESSL.equals(OpenSSLStatus.getName()));
+
         getUrl("https://localhost:" + getPort() + "/examples/servlets/servlet/HelloWorldExample");
         // SSL is the only source for the requested session ID, and SessionTrackingMode.SSL is set on examples
         Assert.assertNotNull(sessionId);

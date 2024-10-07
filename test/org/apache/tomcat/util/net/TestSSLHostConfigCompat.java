@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -36,6 +37,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.StoreType;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.TesterSupport.ClientSSLSocketFactory;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 
 /*
  * Tests compatibility of JSSE and OpenSSL settings.
@@ -291,6 +293,9 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         tomcat.start();
+
+        Assume.assumeFalse("BoringSSL removes support for many ciphers",
+                OpenSSLStatus.Name.BORINGSSL.equals(OpenSSLStatus.getName()));
 
         // Check a request can be made
         ByteChunk res = getUrl("https://localhost:" + getPort() + "/");
