@@ -29,12 +29,14 @@ import static org.apache.tomcat.util.openssl.openssl_h.SSL_get1_peer_certificate
  */
 public class openssl_h_Compatibility {
 
+    public static final boolean OPENSSL;
     public static final boolean OPENSSL3;
     public static final boolean BORINGSSL;
     public static final boolean LIBRESSL;
     static {
         String versionString = OpenSSL_version(0).getString(0);
-        OPENSSL3 = versionString.contains("OpenSSL") && OpenSSL_version_num() >= 0x3000000fL;
+        OPENSSL = versionString.contains("OpenSSL");
+        OPENSSL3 = OPENSSL && OpenSSL_version_num() >= 0x3000000fL;
         BORINGSSL = versionString.contains("BoringSSL");
         LIBRESSL = versionString.contains("LibreSSL");
     }
