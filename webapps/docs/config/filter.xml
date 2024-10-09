@@ -1033,7 +1033,13 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         Default is <code>true</code>.</p>
       </attribute>
 
-      <attribute name="rateLimitClassName" required="false">
+      <attribute name="exposeHeaders" required="false">
+        <p>Set to true to expose runtime information of rate limiter to 
+        http response header, for dubugging purpose only.
+        Default is <code>false</code>.</p>
+      </attribute>
+      
+      <attribute name="rateLimiterClassName" required="false">
         <p>The full class name of an implementation of the RateLimiter interface.
         Default is &quot;org.apache.catalina.util.FastRateLimiter&quot;.</p>
       </attribute>
@@ -1047,7 +1053,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         <p>The status message to return when a request is dropped.
         Default is &quot;Too many requests&quot;.</p>
       </attribute>
-
+      
     </attributes>
 
   </subsection>
