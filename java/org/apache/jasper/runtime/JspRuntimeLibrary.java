@@ -1083,6 +1083,13 @@ public class JspRuntimeLibrary {
         return out;
     }
 
+    @Deprecated
+    public static void releaseTag(Tag tag, InstanceManager instanceManager, boolean reused) {
+        // Caller ensures pool is non-null if reuse is true
+        if (!reused) {
+            releaseTag(tag, instanceManager);
+        }
+    }
 
     public static void releaseTag(Tag tag, InstanceManager instanceManager) {
         try {

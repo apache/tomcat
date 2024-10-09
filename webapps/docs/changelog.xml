@@ -136,6 +136,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Japser">
+    <changelog>
+      <fix>
+        Add back tag release method as deprecated in the runtime for compat
+        with old generated code. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.96 (remm)" rtext="2024-10-08">
   <subsection name="Catalina">
