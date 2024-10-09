@@ -18,7 +18,6 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicLong;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
