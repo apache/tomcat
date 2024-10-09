@@ -1069,16 +1069,20 @@ public class Response implements HttpServletResponse {
             return;
         }
 
-        setError();
+        if(103 == status) {
+            sendEarlyHints();
+        } else {
+            setError();
 
-        getCoyoteResponse().setStatus(status);
-        getCoyoteResponse().setMessage(message);
+            getCoyoteResponse().setStatus(status);
+            getCoyoteResponse().setMessage(message);
 
-        // Clear any data content that has been buffered
-        resetBuffer();
+            // Clear any data content that has been buffered
+            resetBuffer();
 
-        // Cause the response to be finished (from the application perspective)
-        setSuspended(true);
+            // Cause the response to be finished (from the application perspective)
+            setSuspended(true);
+        }
     }
 
 
@@ -1209,7 +1213,11 @@ public class Response implements HttpServletResponse {
             return;
         }
 
-        getCoyoteResponse().setStatus(status);
+        if(103 == status) {
+            sendEarlyHints();
+        } else {
+            getCoyoteResponse().setStatus(status);
+        }
     }
 
 

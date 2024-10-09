@@ -252,16 +252,24 @@ public class ResponseFacade implements HttpServletResponse {
     @Override
     public void sendError(int sc, String msg) throws IOException {
         checkCommitted("coyoteResponse.sendError.ise");
-        response.setAppCommitted(true);
-        response.sendError(sc, msg);
+        if(103 == sc) {
+            sendEarlyHints();
+        } else {
+            response.setAppCommitted(true);
+            response.sendError(sc, msg);
+        }
     }
 
 
     @Override
     public void sendError(int sc) throws IOException {
         checkCommitted("coyoteResponse.sendError.ise");
-        response.setAppCommitted(true);
-        response.sendError(sc);
+        if(103 == sc) {
+            sendEarlyHints();
+        } else {
+            response.setAppCommitted(true);
+            response.sendError(sc);
+        }
     }
 
 
@@ -332,7 +340,11 @@ public class ResponseFacade implements HttpServletResponse {
         if (isCommitted()) {
             return;
         }
-        response.setStatus(sc);
+        if(103 == sc) {
+            sendEarlyHints();
+        } else {
+            response.setStatus(sc);
+        }
     }
 
 
