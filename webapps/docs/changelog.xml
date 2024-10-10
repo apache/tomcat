@@ -126,6 +126,7 @@
         Remove default value (was <code>catalina</code>) for the
         <code>secret</code> init parameter of the WebDAV Servlet. (remm)
       </update>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <update>
         <bug>69374</bug>: Properly separate between table header and body
         in <code>DefaultServlet</code>'s listing. (michaelo)
@@ -159,6 +160,7 @@
         <code>certificateKeystorePassword</code> attribute of a certificate.
         (remm)
       </update>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Return null SSL session id on zero length byte array returned from the
         SSL implementation. (remm)
@@ -188,6 +190,7 @@
         <code>compilerTargetVM</code> have been updated to 21 to align with Java
         21 being the minimum Java version required for Tomcat 12. (markt)
       </update>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -195,6 +198,7 @@
       <update>
         Update Derby to 10.17.1.0. (markt)
       </update>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
 </section>
