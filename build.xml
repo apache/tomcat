@@ -104,11 +104,11 @@
   <!-- build output directory for generated reflectionless code -->
   <property name="tomcat.xreflect"       value="${tomcat.output}/xreflect"/>
 
-  <!-- Jakarta EE 12 platform requires Java 17+ -->
+  <!-- Jakarta EE 12 platform requires Java 21+ -->
   <!-- Keep in sync with webapps/docs/tomcat-docs.xsl -->
-  <property name="compile.release" value="17"/>
-  <property name="min.java.version" value="17"/>
-  <property name="build.java.version" value="17"/>
+  <property name="compile.release" value="21"/>
+  <property name="min.java.version" value="21"/>
+  <property name="build.java.version" value="21"/>
   <property name="release.java.version" value="22"/>
 
   <!-- Check Java Build Version -->
@@ -2416,7 +2416,7 @@
       <link href="../elapi"/>
       <link href="../websocketapi"/>
       <link href="../jaspicapi"/>
-      <link href="https://docs.oracle.com/en/java/javase/17/docs/api/"/>
+      <link href="https://docs.oracle.com/en/java/javase/21/docs/api/"/>
       <link href="https://jakarta.ee/specifications/platform/11/apidocs/"/>
       <packageset dir="${tomcat.dist}/src/java/">
         <include name="org/**"/>
