@@ -31,7 +31,6 @@ import java.net.URLClassLoader;
 import java.security.CodeSource;
 import java.security.Permission;
 import java.security.PermissionCollection;
-import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
@@ -123,50 +122,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
         JVM_THREAD_GROUP_NAMES.add(JVM_THREAD_GROUP_SYSTEM);
         JVM_THREAD_GROUP_NAMES.add("RMI Runtime");
-    }
-
-    protected class PrivilegedFindClassByName implements PrivilegedAction<Class<?>> {
-
-        private final String name;
-
-        PrivilegedFindClassByName(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public Class<?> run() {
-            return findClassInternal(name);
-        }
-    }
-
-
-    protected static final class PrivilegedGetClassLoader implements PrivilegedAction<ClassLoader> {
-
-        private final Class<?> clazz;
-
-        public PrivilegedGetClassLoader(Class<?> clazz) {
-            this.clazz = clazz;
-        }
-
-        @Override
-        public ClassLoader run() {
-            return clazz.getClassLoader();
-        }
-    }
-
-
-    protected final class PrivilegedJavaseGetResource implements PrivilegedAction<URL> {
-
-        private final String name;
-
-        public PrivilegedJavaseGetResource(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public URL run() {
-            return javaseClassLoader.getResource(name);
-        }
     }
 
 
