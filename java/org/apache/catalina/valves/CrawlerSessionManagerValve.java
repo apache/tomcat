@@ -175,6 +175,12 @@ public class CrawlerSessionManagerValve extends ValveBase {
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
 
+        if (request.getHost() == null || request.getContext() == null) {
+            // Request will have no session
+            getNext().invoke(request, response);
+            return;
+        }
+
         boolean isBot = false;
         String sessionId = null;
         String clientIp = request.getRemoteAddr();
