@@ -318,17 +318,16 @@ jsign.jar=${jsign.home}/jsign-${jsign.version}.jar
 jsign.loc=${base-maven.loc}/net/jsign/jsign/${jsign.version}/jsign-${jsign.version}.jar
 
 # ----- Derby, used by unit tests -----
-# 10.16.1.1 is the latest version that runs on Java 17
-derby.version=10.16.1.1
+derby.version=10.17.1.0
 derby.checksum.enabled=true
 derby.checksum.algorithm=MD5|SHA-1
-derby.checksum.value=d9c38ece80f4ec0756f54b06716a3dd6|f9ca2054b3e33ec3f3f19df4a7490352d82de54a
+derby.checksum.value=0665c8f3365fca01eb639e41f7685991|e90e61e8ee731614a9bafd3d81155e09fff5e80c
 derby-shared.checksum.enabled=true
 derby-shared.checksum.algorithm=MD5|SHA-1
-derby-shared.checksum.value=e423cba3150f195debaf7ff0d307ecf6|77a3ec6b9791c7c29c76148c5d56fc1f3f12d638
+derby-shared.checksum.value=ce2d7164d5cda8ac3a1ede81023814d4|e6eac60d1b80b3781dff97ccef88fa131043f2a5
 derby-tools.checksum.enabled=true
 derby-tools.checksum.algorithm=MD5|SHA-1
-derby-tools.checksum.value=25b138905deb681ff167a5a04d29c3c6|32a5335f9087022cd8ca5c85f35f8c844b1360a9
+derby-tools.checksum.value=ea7b7cba09a4056219e888bcdc1a3bb7|6d1a4e5e0f5c26516abbba85ece081506b9ad2e1
 
 derby.home=${base.path}/derby-${derby.version}
 derby.jar=${derby.home}/derby-${derby.version}.jar

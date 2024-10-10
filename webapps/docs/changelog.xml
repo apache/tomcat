@@ -190,6 +190,13 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update Derby to 10.17.1.0. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 </body>
 </document>
