@@ -142,7 +142,7 @@
       <attribute name="soTrafficClass" required="false">
        Sets the traffic class level for the socket, the value is between 0 and 255.
        Default value is <code>int soTrafficClass = 0x04 | 0x08 | 0x010;</code>
-       Different values are defined in <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/Socket.html#setTrafficClass(int)">
+       Different values are defined in <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setTrafficClass(int)">
        java.net.Socket#setTrafficClass(int)</a>.
       </attribute>
       <attribute name="tcpNoDelay" required="false">

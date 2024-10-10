@@ -145,7 +145,7 @@
         additionalparam="-breakiterator -notimestamp"
         verbose="false">
       <classpath refid="tomcat.jdbc.classpath"/>
-      <link href="https://docs.oracle.com/en/java/javase/17/docs/api/"/>
+      <link href="https://docs.oracle.com/en/java/javase/21/docs/api/"/>
       <sourcepath location="${basedir}/src/main/java"/>
     </javadoc>
     <!-- connection pool API  file-->

@@ -131,7 +131,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private volatile boolean destroyed;
 
     // Use an invalid cipherSuite until the handshake is completed
-    // See https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/net/ssl/SSLEngine.html#getSession()
+    // See https://docs.oracle.com/en/java/javase/21/docs/api/java.base/javax/net/ssl/SSLEngine.html#getSession()
     private volatile String version;
     private volatile String cipher;
     private volatile String applicationProtocol;

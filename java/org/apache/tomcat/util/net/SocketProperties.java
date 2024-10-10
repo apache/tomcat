@@ -152,7 +152,7 @@ public class SocketProperties {
 
     /**
      * Performance preferences according to
-     * https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)
+     * https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)
      * All three performance attributes must be set or the JVM defaults will be
      * used.
      */
@@ -160,7 +160,7 @@ public class SocketProperties {
 
     /**
      * Performance preferences according to
-     * https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)
+     * https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)
      * All three performance attributes must be set or the JVM defaults will be
      * used.
      */
@@ -168,7 +168,7 @@ public class SocketProperties {
 
     /**
      * Performance preferences according to
-     * https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)
+     * https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)
      * All three performance attributes must be set or the JVM defaults will be
      * used.
      */
