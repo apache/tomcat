@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.modeler;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -69,6 +70,7 @@ public class OperationInfo extends FeatureInfo {
         } else {
             this.impact = impact.toUpperCase(Locale.ENGLISH);
         }
+        afterNodeChanged();
     }
 
 
@@ -82,6 +84,7 @@ public class OperationInfo extends FeatureInfo {
 
     public void setRole(String role) {
         this.role = role;
+        afterNodeChanged();
     }
 
 
@@ -98,6 +101,7 @@ public class OperationInfo extends FeatureInfo {
 
     public void setReturnType(String returnType) {
         this.type = returnType;
+        afterNodeChanged();
     }
 
     /**
@@ -107,7 +111,7 @@ public class OperationInfo extends FeatureInfo {
         Lock readLock = parametersLock.readLock();
         readLock.lock();
         try {
-            return this.parameters;
+            return Arrays.copyOf(this.parameters, this.parameters.length);
         } finally {
             readLock.unlock();
         }
@@ -130,46 +134,43 @@ public class OperationInfo extends FeatureInfo {
             System.arraycopy(parameters, 0, results, 0, parameters.length);
             results[parameters.length] = parameter;
             parameters = results;
-            this.info = null;
+            afterNodeChanged();
         } finally {
             writeLock.unlock();
         }
     }
 
-
+    @Override
+    protected MBeanOperationInfo buildMBeanInfo() {
+        return createOperationInfo();
+    }
     /**
      * Create and return a <code>ModelMBeanOperationInfo</code> object that
      * corresponds to the attribute described by this instance.
      * @return the operation info
      */
-    MBeanOperationInfo createOperationInfo() {
-
-        // Return our cached information (if any)
-        if (info == null) {
-            // Create and return a new information object
-            int impact = MBeanOperationInfo.UNKNOWN;
-            if ("ACTION".equals(getImpact())) {
-                impact = MBeanOperationInfo.ACTION;
-            } else if ("ACTION_INFO".equals(getImpact())) {
-                impact = MBeanOperationInfo.ACTION_INFO;
-            } else if ("INFO".equals(getImpact())) {
-                impact = MBeanOperationInfo.INFO;
-            }
-
-            info = new MBeanOperationInfo(getName(), getDescription(),
-                                          getMBeanParameterInfo(),
-                                          getReturnType(), impact);
+    private MBeanOperationInfo createOperationInfo() {
+        // Create and return a new information object
+        int opsImpact;
+        if ("ACTION".equals(getImpact())) {
+            opsImpact = MBeanOperationInfo.ACTION;
+        } else if ("ACTION_INFO".equals(getImpact())) {
+            opsImpact = MBeanOperationInfo.ACTION_INFO;
+        } else if ("INFO".equals(getImpact())) {
+            opsImpact = MBeanOperationInfo.INFO;
+        } else {
+            opsImpact = MBeanOperationInfo.UNKNOWN;
         }
-        return (MBeanOperationInfo)info;
+
+        return new MBeanOperationInfo(getName(), getDescription(), getMBeanParameterInfo(), getReturnType(), opsImpact);
     }
 
-    protected MBeanParameterInfo[] getMBeanParameterInfo() {
+    private MBeanParameterInfo[] getMBeanParameterInfo() {
         ParameterInfo params[] = getSignature();
-        MBeanParameterInfo parameters[] =
-            new MBeanParameterInfo[params.length];
+        MBeanParameterInfo parameterBeans[] = new MBeanParameterInfo[params.length];
         for (int i = 0; i < params.length; i++) {
-            parameters[i] = params[i].createParameterInfo();
+            parameterBeans[i] = (MBeanParameterInfo) params[i].getLatestMBeanInfo();
         }
-        return parameters;
+        return parameterBeans;
     }
 }

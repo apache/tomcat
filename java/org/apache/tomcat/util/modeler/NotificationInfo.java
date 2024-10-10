@@ -16,9 +16,7 @@
  */
 package org.apache.tomcat.util.modeler;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.management.MBeanNotificationInfo;
 
@@ -34,53 +32,16 @@ public class NotificationInfo extends FeatureInfo {
 
     // ----------------------------------------------------- Instance Variables
 
-
-    /**
-     * The <code>ModelMBeanNotificationInfo</code> object that corresponds
-     * to this <code>NotificationInfo</code> instance.
-     */
-    transient MBeanNotificationInfo info = null;
-    protected String notifTypes[] = new String[0];
-    protected final ReadWriteLock notifTypesLock = new ReentrantReadWriteLock();
+    protected CopyOnWriteArrayList<String> notifTypes = new CopyOnWriteArrayList<>();
 
     // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Override the <code>description</code> property setter.
-     *
-     * @param description The new description
-     */
-    @Override
-    public void setDescription(String description) {
-        super.setDescription(description);
-        this.info = null;
-    }
-
-
-    /**
-     * Override the <code>name</code> property setter.
-     *
-     * @param name The new name
-     */
-    @Override
-    public void setName(String name) {
-        super.setName(name);
-        this.info = null;
-    }
 
 
     /**
      * @return the set of notification types for this MBean.
      */
     public String[] getNotifTypes() {
-        Lock readLock = notifTypesLock.readLock();
-        readLock.lock();
-        try {
-            return this.notifTypes;
-        } finally {
-            readLock.unlock();
-        }
+        return this.notifTypes.toArray(new String[0]);
     }
 
 
@@ -94,41 +55,15 @@ public class NotificationInfo extends FeatureInfo {
      */
     public void addNotifType(String notifType) {
 
-        Lock writeLock = notifTypesLock.writeLock();
-        writeLock.lock();
-        try {
-
-            String results[] = new String[notifTypes.length + 1];
-            System.arraycopy(notifTypes, 0, results, 0, notifTypes.length);
-            results[notifTypes.length] = notifType;
-            notifTypes = results;
-            this.info = null;
-        } finally {
-            writeLock.unlock();
-        }
+        this.notifTypes.add(notifType);
+        afterNodeChanged();
     }
 
 
-    /**
-     * Create and return a <code>ModelMBeanNotificationInfo</code> object that
-     * corresponds to the attribute described by this instance.
-     * @return the notification info
-     */
-    public MBeanNotificationInfo createNotificationInfo() {
-
-        // Return our cached information (if any)
-        if (info != null) {
-            return info;
-        }
-
-        // Create and return a new information object
-        info = new MBeanNotificationInfo
-            (getNotifTypes(), getName(), getDescription());
-        //Descriptor descriptor = info.getDescriptor();
-        //addFields(descriptor);
-        //info.setDescriptor(descriptor);
-        return info;
-
+    @Override
+    protected MBeanNotificationInfo buildMBeanInfo() {
+        return new MBeanNotificationInfo
+                (getNotifTypes(), getName(), getDescription());
     }
 
 
@@ -144,13 +79,7 @@ public class NotificationInfo extends FeatureInfo {
         sb.append(", description=");
         sb.append(description);
         sb.append(", notifTypes=");
-        Lock readLock = notifTypesLock.readLock();
-        readLock.lock();
-        try {
-            sb.append(notifTypes.length);
-        } finally {
-            readLock.unlock();
-        }
+        sb.append(notifTypes.size());
         sb.append(']');
         return sb.toString();
     }
