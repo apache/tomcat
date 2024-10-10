@@ -127,6 +127,10 @@
         <bug>69370</bug>: <code>DefaultServlet</code>'s HTML listing
         uses incorrect labels. (michaelo)
       </update>
+      <fix>
+        Avoid NPE in <code>CrawlerSessionManagerValve</code> for partially
+        mapped requests. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
