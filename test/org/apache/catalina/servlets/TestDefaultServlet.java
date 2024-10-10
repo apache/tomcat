@@ -680,4 +680,72 @@ public class TestDefaultServlet extends TomcatBaseTest {
         Assert.assertEquals(0, out.getLength());
         Assert.assertNull(resHeaders.get("Content-Length"));
     }
+
+ /*
+     * Test if a custom 404 page is configured,
+     * but the error jsp redirects to the project root
+     */
+    @Test
+    public void testRedirectToRoot() throws Exception {
+        File appDir = new File(getTemporaryDirectory(), "MyApp");
+        File webInf = new File(appDir, "WEB-INF");
+        addDeleteOnTearDown(appDir);
+        if (!webInf.mkdirs() && !webInf.isDirectory()) {
+            Assert.fail("Unable to create directory [" + webInf + "]");
+        }
+
+        File webxml = new File(appDir, "WEB-INF/web.xml");
+        try (FileOutputStream fos = new FileOutputStream(webxml);
+                Writer w = new OutputStreamWriter(fos, "UTF-8")) {
+                w.write("<?xml version='1.0' encoding='UTF-8'?>\n"
+                        + "<web-app xmlns='http://java.sun.com/xml/ns/j2ee' "
+                        + " xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'"
+                        + " xsi:schemaLocation='http://java.sun.com/xml/ns/j2ee "
+                        + " http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd'"
+                        + " version='2.4'>\n"
+                        + "<error-page>\n<error-code>404</error-code>\n"
+                        + "<location>/redirect.Jsp</location>\n</error-page>\n"
+                        + "</web-app>\n");
+        }
+
+        File redirectJsp = new File(appDir, "redirect.Jsp");
+        try (FileOutputStream fos = new FileOutputStream(redirectJsp);
+                Writer w = new OutputStreamWriter(fos, "UTF-8")) {
+                w.write("<html>\n<body>\n<% response.sendRedirect(\"/MyApp\"); %>\n</body>\n</html>\n");
+        }
+
+        File indexHtml = new File(appDir, "index.html");
+        try (FileOutputStream fos = new FileOutputStream(indexHtml);
+                Writer w = new OutputStreamWriter(fos, "UTF-8")) {
+                w.write("<html>\n<body>\n<h2>Hello World!</h2>\n</body>\n</html>\n");
+        }
+
+        Tomcat tomcat = getTomcatInstance();
+        String contextPath = "/MyApp";
+        tomcat.addWebapp(null, contextPath, appDir.getAbsolutePath());
+        tomcat.start();
+
+        TestCustomErrorClient client =
+                new TestCustomErrorClient(tomcat.getConnector().getLocalPort());
+
+        // Sanity
+        client.reset();
+        client.setRequest(new String[] {
+                "GET /MyApp/ HTTP/1.0" + CRLF + CRLF });
+        client.connect();
+        client.processRequest();
+        Assert.assertTrue(String.format("Client should have replied 200, but we got %s", 
+                client.getResponseLine()), 
+                client.isResponse200());
+        
+        // Actual Test
+        client.reset();
+        client.setRequest(new String[] {
+                "GET /MyApp/missing HTTP/1.0" + CRLF + CRLF });
+        client.connect();
+        client.processRequest();
+        Assert.assertTrue(String.format("Client should have replied 404, but we got %s", 
+                client.getResponseLine()), 
+                client.isResponse404());
+    }
 }
