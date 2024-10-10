@@ -18,7 +18,6 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
-import java.time.Instant;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.filters.TestRemoteIpFilter.MockFilterChain;
@@ -37,13 +36,13 @@ import jakarta.servlet.ServletException;
 
 public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
 
-    private void testRateLimitWith1Clients(boolean exposeHeaders,boolean enforce) throws Exception {
+    private void testRateLimitWith1Clients(boolean exposeHeaders, boolean enforce) throws Exception {
 
         int bucketRequests = 40;
         int bucketDuration = 4;
 
         FilterDef filterDef = new FilterDef();
-        filterDef.addInitParameter("bucketRequests",String.valueOf(bucketRequests));
+        filterDef.addInitParameter("bucketRequests", String.valueOf(bucketRequests));
         filterDef.addInitParameter("bucketDuration", String.valueOf(bucketDuration));
         filterDef.addInitParameter("enforce", String.valueOf(enforce));
         filterDef.addInitParameter("exposeHeaders", String.valueOf(exposeHeaders));
@@ -62,80 +61,73 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
         Thread.sleep(sleepTime);
 
 
-        TestClient tc1 = new TestClient(rateLimitFilter, filterChain, "10.20.20.5", 200, 5); // TPS: 5
+        TestClient tc1 = new TestClient(rateLimitFilter, filterChain, "10.20.20.5", 100, 5); // TPS: 5
         TestClient tc2 = new TestClient(rateLimitFilter, filterChain, "10.20.20.10", 200, 10); // TPS: 10
 
         TestClient tc3 = new TestClient(rateLimitFilter, filterChain, "10.20.20.20", 200, 20); // TPS: 20
         TestClient tc4 = new TestClient(rateLimitFilter, filterChain, "10.20.20.40", 200, 40); // TPS: 40
-
-        // Sleep for up to 5s for clients to complete
-        int count = 0;
-        while (count < 100 && (tc1.results[24] == 0 || tc2.results[49] == 0 || tc3.results[bucketRequests - 1] == 0 ||
-                tc3.results[bucketRequests] == 0 || tc4.results[bucketRequests - 1] == 0 ||
-                tc4.results[bucketRequests] == 0)) {
-            Thread.sleep(100);
-            count++;
-        }
+        tc1.join();
+        tc2.join();
+        tc3.join();
+        tc4.join();
         Assert.assertEquals(200, tc1.results[24]); // only 25 requests made in 5 seconds, all allowed
-        
+
         Assert.assertEquals(200, tc2.results[49]); // only 50 requests made in 5 seconds, all allowed
 
         Assert.assertEquals(200, tc3.results[39]); // first allowedRequests allowed
         int allowedRequests = rateLimitFilter.rateLimiter.getRequests();
-        
+
         if (enforce) {
             Assert.assertEquals(429, tc3.results[allowedRequests]); // subsequent requests dropped
         } else {
             Assert.assertEquals(200, tc3.results[allowedRequests]);
         }
-        
-        Assert.assertEquals(200, tc4.results[allowedRequests-1]); // first allowedRequests allowed
-        
+
+        Assert.assertEquals(200, tc4.results[allowedRequests - 1]); // first allowedRequests allowed
+
         if (enforce) {
             Assert.assertEquals(429, tc4.results[allowedRequests]); // subsequent requests dropped
         } else {
             Assert.assertEquals(200, tc4.results[allowedRequests]);
         }
-        
-        if(exposeHeaders) {
-            Assert.assertEquals(bucketDuration, tc1.durationHeader[24]);
-            if(enforce) {
-                Assert.assertTrue(tc1.remainingHeader[24]>=0);
-                Assert.assertTrue(tc1.currentHeader[24]<=allowedRequests);
-                
-                Assert.assertEquals(-1, tc3.remainingHeader[allowedRequests]);
-                Assert.assertTrue(tc3.currentHeader[allowedRequests]>allowedRequests);
-            } else {
-                Assert.assertEquals(Integer.MIN_VALUE,tc1.remainingHeader[24]);
-                Assert.assertTrue(tc1.currentHeader[24]>0);
-                
-                Assert.assertEquals(Integer.MIN_VALUE, tc3.remainingHeader[allowedRequests]);
-                Assert.assertTrue(tc3.currentHeader[allowedRequests]>allowedRequests);
+
+        if (exposeHeaders) {
+            Assert.assertTrue(tc3.rlpHeader[24].contains("q=" + allowedRequests));
+            Assert.assertTrue(tc3.rlpHeader[allowedRequests].contains("q=" + allowedRequests));
+            if (enforce) {
+                Assert.assertTrue(tc3.rlHeader[24].contains("r="));
+                Assert.assertFalse(tc3.rlHeader[24].contains("r=0"));
+
+                Assert.assertTrue(tc3.rlHeader[allowedRequests].contains("r=0"));
             }
         } else {
-            Assert.assertEquals(Integer.MIN_VALUE, tc1.durationHeader[24]);
-            Assert.assertEquals(Integer.MIN_VALUE, tc1.remainingHeader[24]);
-            Assert.assertEquals(Integer.MIN_VALUE, tc1.currentHeader[24]);
+            Assert.assertTrue(tc3.rlpHeader[24] == null);
+            Assert.assertTrue(tc3.rlHeader[24] == null);
+            Assert.assertTrue(tc3.rlpHeader[allowedRequests] == null);
+            Assert.assertTrue(tc3.rlHeader[allowedRequests] == null);
         }
     }
 
     @Test
     public void testExposeHeaderAndRerferenceRateLimitWith4Clients() throws Exception {
-        testRateLimitWith1Clients(true,false);
+        testRateLimitWith1Clients(true, false);
     }
+
     @Test
     public void testUnexposeHeaderAndRerferenceRateLimitWith4Clients() throws Exception {
-        testRateLimitWith1Clients(false,false);
+        testRateLimitWith1Clients(false, false);
     }
+
     @Test
     public void testExposeHeaderAndEnforceRateLimitWith4Clients() throws Exception {
-        testRateLimitWith1Clients(true,true);
+        testRateLimitWith1Clients(true, true);
     }
+
     @Test
     public void testUnexposeHeaderAndEnforceRateLimitWith4Clients() throws Exception {
-        testRateLimitWith1Clients(false,true);
+        testRateLimitWith1Clients(false, true);
     }
-    
+
     private RateLimitFilter testRateLimitFilter(FilterDef filterDef, Context root) throws ServletException {
 
         RateLimitFilter rateLimitFilter = new RateLimitFilter();
@@ -165,9 +157,8 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
         int sleep;
 
         int[] results;
-        int[] durationHeader;
-        int[] remainingHeader;
-        int[] currentHeader;
+        volatile String[] rlpHeader;
+        volatile String[] rlHeader;
 
         TestClient(RateLimitFilter filter, FilterChain filterChain, String ip, int requests, int rps) {
             this.filter = filter;
@@ -176,9 +167,8 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
             this.requests = requests;
             this.sleep = 1000 / rps;
             this.results = new int[requests];
-            this.durationHeader = new int[requests];
-            this.remainingHeader = new int[requests];
-            this.currentHeader = new int[requests];
+            this.rlpHeader = new String[requests];
+            this.rlHeader = new String[requests];
             super.setDaemon(true);
             super.start();
         }
@@ -194,30 +184,17 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
                     filter.doFilter(request, response, filterChain);
                     results[i] = response.getStatus();
 
-                    durationHeader[i] =
-                            tryParseIntHeader(response, RateLimitFilter.HEADER_WINDOW_SECOND, Integer.MIN_VALUE);
-                    remainingHeader[i] =
-                            tryParseIntHeader(response, RateLimitFilter.HEADER_REMAINING, Integer.MIN_VALUE);
-                    currentHeader[i] = tryParseIntHeader(response, RateLimitFilter.HEADER_CURRENT, Integer.MIN_VALUE);
-
-                    System.out.printf("%s %s: %s %d %d\n", ip, Instant.now(), Integer.valueOf(i + 1),
-                            Integer.valueOf(response.getStatus()),Integer.valueOf(currentHeader[i]));
+                    rlpHeader[i] = response.getHeader(RateLimitFilter.HEADER_RATE_LIMIT_POLICY);
+                    rlHeader[i] = response.getHeader(RateLimitFilter.HEADER_RATE_LIMIT);
                     
-                    if(results[i]!=200) {
+                    System.out.println(response);
+                    if (results[i] != 200) {
                         break;
                     }
                     sleep(sleep);
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
-            }
-        }
-
-        protected int tryParseIntHeader(TesterResponse resp, String header, int defaultValue) {
-            try {
-                return Integer.parseInt(resp.getHeader(header));
-            } catch (NumberFormatException e) {
-                return defaultValue;
             }
         }
     }

@@ -32,12 +32,27 @@ import org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor;
 import jakarta.servlet.FilterConfig;
 
 /**
- * A ExactRateLimiter that provides accurate rate control.
+ * An accurate fixed window limiter.
  */
 public class ExactRateLimiter implements RateLimiter {
 
+    private static final AtomicInteger refIndex = new AtomicInteger();
+
     public ExactRateLimiter() {
         super();
+        setPolicyName("exact-fixed" + refIndex.incrementAndGet());
+    }
+
+    private String policyName = null;
+
+    @Override
+    public String getPolicyName() {
+        return policyName;
+    }
+
+    @Override
+    public void setPolicyName(String name) {
+        this.policyName = name;
     }
 
     private static final Log log = LogFactory.getLog(ExactRateLimiter.class);
@@ -71,13 +86,16 @@ public class ExactRateLimiter implements RateLimiter {
 
     @Override
     public int increment(String identifier) {
-        long nowInSeconds = System.currentTimeMillis() / 1000L;
-        String key = getBucket(nowInSeconds) + BUCKET_KEY_DELIMITER + identifier;
+        String key = getBucket(System.currentTimeMillis()/1000L) + BUCKET_KEY_DELIMITER + identifier;
         AtomicInteger ai = map.computeIfAbsent(key, v -> new AtomicInteger());
         return ai.incrementAndGet();
     }
 
-    public final long getBucket(long nowInSeconds) {
+    /**
+     * @param nowInSeconds
+     * @return the bucket of specified seconds.
+     */
+    protected long getBucket(long nowInSeconds) {
         return nowInSeconds / duration;
     }
 
@@ -133,9 +151,8 @@ public class ExactRateLimiter implements RateLimiter {
             final long maxBucket = minBucket + 1;
             final String minBucketPrefix = minBucket + BUCKET_KEY_DELIMITER;
             final String maxBucketPrefix = maxBucket + BUCKET_KEY_DELIMITER;
-            ConcurrentHashMap.KeySetView<String,?> keys = map.keySet();
             // remove obsolete keys
-            keys.removeIf(k -> k.compareTo(minBucketPrefix) < 0 && k.compareTo(maxBucketPrefix) < 0);
+            map.keySet().removeIf(k -> k.compareTo(minBucketPrefix) < 0 && k.compareTo(maxBucketPrefix) < 0);
         }
     }
 

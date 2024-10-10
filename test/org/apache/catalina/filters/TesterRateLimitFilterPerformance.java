@@ -17,91 +17,117 @@
 
 package org.apache.catalina.filters;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.filters.TestRateLimitFilterWithExactRateLimiter.TesterResponseWithStatus;
-import org.apache.catalina.filters.TestRemoteIpFilter.MockFilterChain;
-import org.apache.catalina.filters.TestRemoteIpFilter.MockHttpServletRequest;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.unittest.TesterResponse;
+import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.junit.Test;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class TesterRateLimitFilterPerformance extends TomcatBaseTest {
 
-    @Test
-    public void testLimiterPerformance() throws Exception {
+    // int durationUnit = 4, durationMaxRequests = 300, runnerSeconds = 60;
+    // Thu Oct 10 18:09:36 CST 2024 No Limiter TPS: 2643 Fast Limiter TPS: 1389 Exact Limiter TPS: 1369
+    // int durationUnit = 4, durationMaxRequests = 180, runnerSeconds = 60;
+    // Thu Oct 10 18:18:36 CST 2024 No Limiter TPS: 2439 Fast Limiter TPS: 1325 Exact Limiter TPS: 1322
+
+    int durationUnit = 4, durationMaxRequests = 180, runnerSeconds = 60;
+    @Override
+    public void setUp() throws Exception {
+        // TODO Auto-generated method stub
+        super.setUp();
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", TEMP_DIR);
-        int tps = 0, times = 3, durationUnit = 4, durationMaxRequests = 120, runnerSeconds = 60;
+
+        HttpServlet mockServlet = new MyServlet();
+        Tomcat.addServlet(root, mockServlet.getClass().getName(), mockServlet);
+        root.addServletMappingDecoded("/mock/*", mockServlet.getClass().getName());
+        addRateLimitFilter(root, "org.apache.catalina.util.FastRateLimiter");
+        addRateLimitFilter(root, "org.apache.catalina.util.ExactRateLimiter");
+    }
+
+    protected void addRateLimitFilter(Context root, String rateLimiterClassName) {
+        String filterName = rateLimiterClassName + "-Filter";
+
+        FilterDef filterDef;
+        filterDef = new FilterDef();
+        filterDef.addInitParameter("bucketRequests", String.valueOf(durationMaxRequests));
+        filterDef.addInitParameter("bucketDuration", String.valueOf(durationUnit));
+        filterDef.addInitParameter("enforce", String.valueOf(true));
+        filterDef.addInitParameter("exposeHeaders", String.valueOf(false));
+        filterDef.addInitParameter("rateLimiterClassName", rateLimiterClassName);
+        filterDef.setFilterClass(RateLimitFilterOfPerformance.class.getName());
+        filterDef.setFilterName(filterName);
+        root.addFilterDef(filterDef);
+
+        FilterMap filterMap = new FilterMap();
+        filterMap.setFilterName(filterName);
+        filterMap.addURLPatternDecoded("/mock/" + rateLimiterClassName + "/*");
+        root.addFilterMap(filterMap);
+
+    }
+
+    @Test
+    public void testLimiterPerformance() throws Exception {
+        int tps = 0, times = 3;
 
         int fastLimiterThroughout = 0;
         int exactLimiterThroughout = 0;
         int noLimiterThroughout = 0;
 
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.start();
+
         tps = 0;
         for (int i = 0; i < times; i++) {
-            tomcat.start();
-            tps += runIt(root, null, durationMaxRequests, durationUnit, runnerSeconds);
-            tomcat.stop();
+            tps += runIt(null, runnerSeconds);
         }
         noLimiterThroughout = tps / times;
 
         tps = 0;
         for (int i = 0; i < times; i++) {
-            tomcat.start();
-            tps += runIt(root, "org.apache.catalina.util.FastRateLimiter", durationMaxRequests, durationUnit,
-                    runnerSeconds);
-            tomcat.stop();
+            tps += runIt("org.apache.catalina.util.FastRateLimiter", runnerSeconds);
         }
         fastLimiterThroughout = tps / times;
 
         tps = 0;
         for (int i = 0; i < times; i++) {
-            tomcat.start();
-            tps += runIt(root, "org.apache.catalina.util.ExactRateLimiter", durationMaxRequests, durationUnit,
-                    runnerSeconds);
-            tomcat.stop();
+            tps += runIt("org.apache.catalina.util.ExactRateLimiter", runnerSeconds);
         }
         exactLimiterThroughout = tps / times;
 
-
+        tomcat.stop();
         System.out.println(new Date() + "\tNo Limiter TPS:\t" + noLimiterThroughout + "\tFast Limiter TPS:\t" +
                 fastLimiterThroughout + "\tExact Limiter TPS:\t" + exactLimiterThroughout);
     }
 
-    int runIt(Context root, String limiterImplClz, int bucketRequests, int bucketDuration, int totalSeconds)
-            throws Exception {
-        FilterDef filterDef = new FilterDef();
-        filterDef.addInitParameter("bucketRequests", String.valueOf(bucketRequests));
-        filterDef.addInitParameter("bucketDuration", String.valueOf(bucketDuration));
-        filterDef.addInitParameter("enforce", String.valueOf(true));
-        filterDef.addInitParameter("exposeHeaders", String.valueOf(false));
-        filterDef.addInitParameter("rateLimiterClassName", limiterImplClz);
-
-        MockFilterChain filterChain = new MockFilterChain();
-        RateLimitFilter rateLimitFilter = null;
-        if (limiterImplClz != null) {
-            rateLimitFilter = buildRateLimitFilter(filterDef, root);
-        }
-
+    int runIt(String limiterImplClz, int totalSeconds) throws Exception {
         RequestClient[] clients = new RequestClient[8];
+        if (limiterImplClz == null || limiterImplClz.trim().isBlank()) {
+            limiterImplClz = "x";
+        }
         for (int i = 0; i < 8; i++) {
-            clients[i] = new RequestClient(rateLimitFilter, filterChain, 7, totalSeconds);
+            clients[i] = new RequestClient("/mock/" + limiterImplClz, totalSeconds);
         }
 
         long now = System.currentTimeMillis();
         long nowInSecond = now / 1000L;
-        long sleepTime = (nowInSecond / bucketDuration + 1L) * bucketDuration * 1000 - now;
-        System.out.printf("Sleeping %d millis for the next time bucket to start, rateLimitFilter:%s\n",
-                Long.valueOf(sleepTime), rateLimitFilter);
+        long sleepTime = (nowInSecond / durationUnit + 1L) * durationUnit * 1000 - now;
+        System.out.printf("Sleeping %d millis for the next time bucket to start\n", Long.valueOf(sleepTime));
         Thread.sleep(sleepTime);
 
         for (int i = 0; i < 8; i++) {
@@ -111,10 +137,6 @@ public class TesterRateLimitFilterPerformance extends TomcatBaseTest {
             clients[i].join();
         }
 
-        if (rateLimitFilter != null) {
-            rateLimitFilter.destroy();
-        }
-        removeRateLimitFilter(filterDef, root);
 
         long throughout = 0L;
         for (int i = 0; i < 8; i++) {
@@ -124,48 +146,13 @@ public class TesterRateLimitFilterPerformance extends TomcatBaseTest {
         return (int) (throughout / totalSeconds);
     }
 
-    private void removeRateLimitFilter(FilterDef filterDef, Context root) throws ServletException {
-
-        FilterMap[] maps = root.findFilterMaps();
-        for (FilterMap map : maps) {
-            if (RateLimitFilter.class.getName().equals(map.getFilterName())) {
-                root.removeFilterMap(map);
-            }
-        }
-        root.removeFilterDef(filterDef);
-    }
-
-    private RateLimitFilter buildRateLimitFilter(FilterDef filterDef, Context root) throws ServletException {
-
-        RateLimitFilter rateLimitFilter = new RateLimitFilter();
-        filterDef.setFilterClass(RateLimitFilter.class.getName());
-        filterDef.setFilter(rateLimitFilter);
-        filterDef.setFilterName(RateLimitFilter.class.getName());
-        root.addFilterDef(filterDef);
-
-        FilterMap filterMap = new FilterMap();
-        filterMap.setFilterName(RateLimitFilter.class.getName());
-        filterMap.addURLPatternDecoded("*");
-        root.addFilterMap(filterMap);
-
-        FilterConfig filterConfig = TesterFilterConfigs.generateFilterConfig(filterDef);
-
-        rateLimitFilter.init(filterConfig);
-
-        return rateLimitFilter;
-    }
-
     private class RequestClient extends Thread {
-        private int intervalInMillis;
         private int maxSeconds;
-        RateLimitFilter filter;
-        FilterChain filterChain;
         long totalRequests;
+        private String urlPrefix;
 
-        public RequestClient(RateLimitFilter filter, FilterChain filterChain, int intervalInMillis, int maxSeconds) {
-            this.filter = filter;
-            this.filterChain = filterChain;
-            this.intervalInMillis = intervalInMillis;
+        public RequestClient(String urlPrefix, int maxSeconds) {
+            this.urlPrefix = urlPrefix;
             this.maxSeconds = maxSeconds;
             setDaemon(true);
         }
@@ -175,23 +162,37 @@ public class TesterRateLimitFilterPerformance extends TomcatBaseTest {
             long now = System.currentTimeMillis();
             long maxTimestamp = now + maxSeconds * 1000L;
             for (totalRequests = 0; System.currentTimeMillis() < maxTimestamp; totalRequests++) {
-                MockHttpServletRequest request = new MockHttpServletRequest();
-                request.setRemoteAddr("192.168.0." + totalRequests % 32);
-                TesterResponse response = new TesterResponseWithStatus();
-                response.setRequest(request);
-
                 try {
-                    if (filter != null) {
-                        filter.doFilter(request, response, filterChain);
-                    } else {
-                        filterChain.doFilter(request, response);
-                    }
-
-                    Thread.sleep(intervalInMillis);
+                    Map<String,List<String>> reqHeader = new HashMap<>();
+                    List<String> remoteIps = new ArrayList<>();
+                    remoteIps.add("192.168.0." + (totalRequests % 16 + 1));
+                    reqHeader.put(X_CUST_IP, remoteIps);
+                    String url = "http://localhost:" + getPort() + urlPrefix + "/test" + totalRequests;
+                    getUrl(url, new ByteChunk(), reqHeader, new HashMap<String,List<String>>());
                 } catch (Throwable th) {
                     break;
                 }
             }
+        }
+    }
+
+    static final String X_CUST_IP = "x-req-ip";
+
+    static class MyServlet extends HttpServlet {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+        Random r = new Random();
+
+        @Override
+        protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            StringBuffer buf = new StringBuffer();
+            buf.append("Random value:").append(r.nextLong()).append("; Http headers:").append('\n');
+            req.getHeaderNames().asIterator().forEachRemaining(k -> {
+                buf.append("Key=").append(k).append("; Value=").append(req.getHeader(k)).append('\n');
+            });
+            resp.getWriter().write(buf.toString());
         }
     }
 }

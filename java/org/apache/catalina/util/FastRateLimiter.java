@@ -18,6 +18,7 @@
 package org.apache.catalina.util;
 
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jakarta.servlet.FilterConfig;
 
@@ -27,7 +28,11 @@ import org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor;
  * A RateLimiter that compromises accuracy for speed in order to provide maximum throughput.
  */
 public class FastRateLimiter implements RateLimiter {
-
+    private static final AtomicInteger refIndex = new AtomicInteger();
+    public FastRateLimiter() {
+        super();
+        setPolicyName("fast-fixed"+refIndex.incrementAndGet());
+    }
     TimeBucketCounter bucketCounter;
 
     int duration;
@@ -59,8 +64,8 @@ public class FastRateLimiter implements RateLimiter {
     }
 
     @Override
-    public int increment(String ipAddress) {
-        return bucketCounter.increment(ipAddress);
+    public int increment(String identifier) {
+        return bucketCounter.increment(identifier);
     }
 
     @Override
@@ -85,5 +90,15 @@ public class FastRateLimiter implements RateLimiter {
 
     public TimeBucketCounter getBucketCounter() {
         return bucketCounter;
+    }
+    private String policyName=null;
+    
+    @Override
+    public String getPolicyName() {
+        return policyName;
+    }
+    @Override
+    public void setPolicyName(String name) {
+        this.policyName = name;
     }
 }
