@@ -17,7 +17,11 @@
 package org.apache.tomcat.util.digester;
 
 
+import org.apache.juli.logging.Log;
 import org.xml.sax.Attributes;
+
+import java.net.URL;
+import java.net.URLClassLoader;
 
 
 /**
@@ -99,9 +103,19 @@ public class ObjectCreateRule extends Rule {
         }
 
         // Instantiate the new object and push it on the context stack
-        Class<?> clazz = digester.getClassLoader().loadClass(realClassName);
-        Object instance = clazz.getConstructor().newInstance();
-        digester.push(instance);
+        ClassLoader classLoader = digester.getClassLoader();
+        Object instance;
+        try{
+            Class<?> clazz = classLoader.loadClass(realClassName);
+            instance = clazz.getConstructor().newInstance();
+            digester.push(instance);
+        }catch (ClassNotFoundException t) {
+            Log log = digester.log;
+            log.warn(t.getMessage(), t);
+            showClassPath(classLoader, 0, log);
+            throw t;
+        }
+
 
         StringBuilder code = digester.getGeneratedCode();
         if (code != null) {
@@ -128,6 +142,51 @@ public class ObjectCreateRule extends Rule {
             }
         }
         return realClassName;
+    }
+
+    /**
+     * Logs the classpath URLs of the given {@link ClassLoader} and its parent class loaders
+     * recursively. This is useful for debugging the class loading mechanism.
+     *
+     * @param classLoader    the {@link ClassLoader} to inspect. If it is a {@link URLClassLoader},
+     *                       its URLs will be logged.
+     * @param antiRecursion  recursion depth counter to prevent infinite loops through parent class loaders.
+     *                       Stops recursion if it exceeds 7.
+     * @param log            the {@link Log} to record classpath information and recursion warnings.
+     *
+     * <p>If the class loader is a {@link URLClassLoader}, the method logs its URLs and proceeds to
+     * inspect its parent class loader, stopping if too many recursions occur.</p>
+     *
+     * @see URLClassLoader#getURLs()
+     */
+    public static void showClassPath(ClassLoader classLoader, int antiRecursion, Log log) {
+        StringBuffer extraInfo = new StringBuffer("ClassLoader " + classLoader + "\n");
+        if (classLoader instanceof URLClassLoader) {
+            URLClassLoader ucl = (URLClassLoader) classLoader;
+            URL[] urls = ucl.getURLs();
+            if (null == urls || 0 == urls.length) {
+                extraInfo.append("null == urls");
+            } else {
+                int i = 0;
+                for (i = 0; i < urls.length; i++) {
+                    URL url = urls[i];
+                    extraInfo.append(url.toString()).append(",\n");
+                }
+                log.warn(extraInfo);
+            }
+            ClassLoader parent = ucl.getParent();
+            if (null != parent) {
+                if (!parent.equals(ucl)) {
+                    if (7 < antiRecursion) {
+                        log.error("too many recursions");
+                    } else {
+                        antiRecursion++;
+                        log.warn("\nParent " + antiRecursion + ":");
+                        showClassPath(parent, antiRecursion, log);
+                    }
+                }
+            }
+        }
     }
 
 
@@ -165,6 +224,9 @@ public class ObjectCreateRule extends Rule {
         sb.append(']');
         return sb.toString();
     }
+
+
+
 
 
 }

@@ -5,8 +5,7 @@ import org.xml.sax.Attributes;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class TestObjectCreateRule {
@@ -73,7 +72,26 @@ public class TestObjectCreateRule {
         assertTrue(result.contains("attributeName=className"));
     }
 
-    // MockAttributes class to simulate the SAX Attributes without a mocking library
+    @Test
+    public void testBeginClassNotFoundException() throws Exception {
+        rule = new ObjectCreateRule("non.existent.Class", "className");
+        rule.setDigester(digester);
+
+        MockAttributes attributes = new MockAttributes();
+        attributes.setAttribute("className", "non.existent.Class");
+
+        try {
+            rule.begin("", "element", attributes);
+            fail("Expected ClassNotFoundException to be thrown");
+        } catch (ClassNotFoundException e) {
+            assertTrue(e.getMessage().contains("non.existent.Class"));
+        }
+
+        assertNull(digester.peek());
+    }
+
+
+
     private class MockAttributes implements Attributes {
 
         private String attributeName;
