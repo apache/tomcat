@@ -39,16 +39,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class TesterRateLimitFilterPerformance extends TomcatBaseTest {
-
-    // int durationUnit = 4, durationMaxRequests = 300, runnerSeconds = 60;
-    // Thu Oct 10 18:09:36 CST 2024 No Limiter TPS: 2643 Fast Limiter TPS: 1389 Exact Limiter TPS: 1369
-    // int durationUnit = 4, durationMaxRequests = 180, runnerSeconds = 60;
-    // Thu Oct 10 18:18:36 CST 2024 No Limiter TPS: 2439 Fast Limiter TPS: 1325 Exact Limiter TPS: 1322
-
-    int durationUnit = 4, durationMaxRequests = 180, runnerSeconds = 60;
+    int durationUnit = 4, durationMaxRequests = 10000, runnerSeconds = 60;
     @Override
     public void setUp() throws Exception {
-        // TODO Auto-generated method stub
         super.setUp();
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", TEMP_DIR);
@@ -116,11 +109,17 @@ public class TesterRateLimitFilterPerformance extends TomcatBaseTest {
     }
 
     int runIt(String limiterImplClz, int totalSeconds) throws Exception {
-        RequestClient[] clients = new RequestClient[8];
+        int maxThreads = Runtime.getRuntime().availableProcessors();
+        if(maxThreads>4) {
+            maxThreads = maxThreads/2;
+        }
+        RequestClient[] clients = new RequestClient[maxThreads];
+        
         if (limiterImplClz == null || limiterImplClz.trim().isBlank()) {
             limiterImplClz = "x";
         }
-        for (int i = 0; i < 8; i++) {
+        
+        for (int i = 0; i < maxThreads; i++) {
             clients[i] = new RequestClient("/mock/" + limiterImplClz, totalSeconds);
         }
 
@@ -130,16 +129,15 @@ public class TesterRateLimitFilterPerformance extends TomcatBaseTest {
         System.out.printf("Sleeping %d millis for the next time bucket to start\n", Long.valueOf(sleepTime));
         Thread.sleep(sleepTime);
 
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < maxThreads; i++) {
             clients[i].start();
         }
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < maxThreads; i++) {
             clients[i].join();
         }
 
-
         long throughout = 0L;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < maxThreads; i++) {
             throughout += clients[i].totalRequests;
         }
 

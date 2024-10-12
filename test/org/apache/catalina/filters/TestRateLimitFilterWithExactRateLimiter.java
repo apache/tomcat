@@ -61,11 +61,11 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
         Thread.sleep(sleepTime);
 
 
-        TestClient tc1 = new TestClient(rateLimitFilter, filterChain, "10.20.20.5", 100, 5); // TPS: 5
-        TestClient tc2 = new TestClient(rateLimitFilter, filterChain, "10.20.20.10", 200, 10); // TPS: 10
+        TestClient tc1 = new TestClient(rateLimitFilter, filterChain, "10.20.20.5", 50, 5); // TPS: 5
+        TestClient tc2 = new TestClient(rateLimitFilter, filterChain, "10.20.20.10", 100, 10); // TPS: 10
 
         TestClient tc3 = new TestClient(rateLimitFilter, filterChain, "10.20.20.20", 200, 20); // TPS: 20
-        TestClient tc4 = new TestClient(rateLimitFilter, filterChain, "10.20.20.40", 200, 40); // TPS: 40
+        TestClient tc4 = new TestClient(rateLimitFilter, filterChain, "10.20.20.40", 400, 40); // TPS: 40
         tc1.join();
         tc2.join();
         tc3.join();
@@ -97,7 +97,6 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
             if (enforce) {
                 Assert.assertTrue(tc3.rlHeader[24].contains("r="));
                 Assert.assertFalse(tc3.rlHeader[24].contains("r=0"));
-
                 Assert.assertTrue(tc3.rlHeader[allowedRequests].contains("r=0"));
             }
         } else {
@@ -186,8 +185,7 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
 
                     rlpHeader[i] = response.getHeader(RateLimitFilter.HEADER_RATE_LIMIT_POLICY);
                     rlHeader[i] = response.getHeader(RateLimitFilter.HEADER_RATE_LIMIT);
-                    
-                    System.out.println(response);
+
                     if (results[i] != 200) {
                         break;
                     }
