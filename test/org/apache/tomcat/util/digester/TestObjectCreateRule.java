@@ -21,7 +21,7 @@ public class TestObjectCreateRule {
     }
 
     @Test
-    public void testBegin_ObjectIsCreatedAndPushed() throws Exception {
+    public void testBeginObjectIsCreatedAndPushed() throws Exception {
         Attributes attributes = new MockAttributes();
 
         rule.begin("", "element", attributes);
@@ -32,7 +32,7 @@ public class TestObjectCreateRule {
     }
 
     @Test
-    public void testBegin_WithAttributeNameOverride() throws Exception {
+    public void testBeginWithAttributeNameOverride() throws Exception {
         rule = new ObjectCreateRule("java.lang.Object", "className");
         rule.setDigester(digester);
 
@@ -47,14 +47,14 @@ public class TestObjectCreateRule {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testBegin_NullClassNameThrowsException() throws Exception {
+    public void testBeginNullClassNameThrowsException() throws Exception {
         rule = new ObjectCreateRule(null);
         rule.setDigester(digester);
         rule.begin("", "element", new MockAttributes());
     }
 
     @Test
-    public void testEnd_ObjectIsPopped() throws Exception {
+    public void testEndObjectIsPopped() throws Exception {
         String instance = "Test Object";
         digester.push(instance);
 
@@ -89,8 +89,6 @@ public class TestObjectCreateRule {
 
         assertNull(digester.peek());
     }
-
-
 
     private class MockAttributes implements Attributes {
 
@@ -162,5 +160,4 @@ public class TestObjectCreateRule {
             return attributeValue;
         }
     }
-
 }
