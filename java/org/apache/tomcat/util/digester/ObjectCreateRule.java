@@ -145,17 +145,20 @@ public class ObjectCreateRule extends Rule {
     }
 
     /**
-     * Logs the classpath URLs of the given {@link ClassLoader} and its parent class loaders
-     * recursively. This is useful for debugging the class loading mechanism.
+     * Logs the classpath URLs of the given {@link ClassLoader} and
+     * its parent class loaders recursively. This is useful for
+     * debugging the class loading mechanism.
      *
-     * @param classLoader    the {@link ClassLoader} to inspect. If it is a {@link URLClassLoader},
+     * @param classLoader    the {@link ClassLoader} to inspect.
+     *                       If it is a {@link URLClassLoader},
      *                       its URLs will be logged.
-     * @param antiRecursion  recursion depth counter to prevent infinite loops through parent class loaders.
-     *                       Stops recursion if it exceeds 7.
-     * @param log            the {@link Log} to record classpath information and recursion warnings.
+     * @param antiRecursion  recursion depth counter to prevent infinite loops through parent
+     *                       class loaders. Stops recursion if it exceeds 7.
+     * @param log            the {@link Log} to record classpath information
+     *                       and recursion warnings.
      *
-     * <p>If the class loader is a {@link URLClassLoader}, the method logs its URLs and proceeds to
-     * inspect its parent class loader, stopping if too many recursions occur.</p>
+     * <p>If the class loader is a {@link URLClassLoader}, the method logs
+     *                       its URLs and proceeds to inspect its parent class loader, stopping if too many recursions occur.</p>
      *
      * @see URLClassLoader#getURLs()
      */
