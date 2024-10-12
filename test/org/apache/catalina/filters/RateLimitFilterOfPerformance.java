@@ -14,6 +14,8 @@ public class RateLimitFilterOfPerformance extends RateLimitFilter {
     }
     @Override
     protected String parseQuotaIdentifier(ServletRequest request) {
-        return ((HttpServletRequest)request).getHeader(TesterRateLimitFilterPerformance.X_CUST_IP);
+        return ((HttpServletRequest)request).getHeader(X_CUST_IP);
     }
+    
+    static final String X_CUST_IP = "x-req-ip";
 }

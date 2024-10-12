@@ -40,6 +40,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class TesterRateLimitFilterPerformance extends TomcatBaseTest {
     int durationUnit = 4, durationMaxRequests = 10000, runnerSeconds = 60;
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -109,16 +110,13 @@ public class TesterRateLimitFilterPerformance extends TomcatBaseTest {
     }
 
     int runIt(String limiterImplClz, int totalSeconds) throws Exception {
-        int maxThreads = Runtime.getRuntime().availableProcessors();
-        if(maxThreads>4) {
-            maxThreads = maxThreads/2;
-        }
+        int maxThreads = 8;
         RequestClient[] clients = new RequestClient[maxThreads];
-        
+
         if (limiterImplClz == null || limiterImplClz.trim().isBlank()) {
             limiterImplClz = "x";
         }
-        
+
         for (int i = 0; i < maxThreads; i++) {
             clients[i] = new RequestClient("/mock/" + limiterImplClz, totalSeconds);
         }
@@ -129,16 +127,16 @@ public class TesterRateLimitFilterPerformance extends TomcatBaseTest {
         System.out.printf("Sleeping %d millis for the next time bucket to start\n", Long.valueOf(sleepTime));
         Thread.sleep(sleepTime);
 
-        for (int i = 0; i < maxThreads; i++) {
-            clients[i].start();
+        for (RequestClient rc : clients) {
+            rc.start();
         }
-        for (int i = 0; i < maxThreads; i++) {
-            clients[i].join();
+        for (RequestClient rc : clients) {
+            rc.join();
         }
 
         long throughout = 0L;
-        for (int i = 0; i < maxThreads; i++) {
-            throughout += clients[i].totalRequests;
+        for (RequestClient rc : clients) {
+            throughout += rc.totalRequests;
         }
 
         return (int) (throughout / totalSeconds);
@@ -164,7 +162,7 @@ public class TesterRateLimitFilterPerformance extends TomcatBaseTest {
                     Map<String,List<String>> reqHeader = new HashMap<>();
                     List<String> remoteIps = new ArrayList<>();
                     remoteIps.add("192.168.0." + (totalRequests % 16 + 1));
-                    reqHeader.put(X_CUST_IP, remoteIps);
+                    reqHeader.put(RateLimitFilterOfPerformance.X_CUST_IP, remoteIps);
                     String url = "http://localhost:" + getPort() + urlPrefix + "/test" + totalRequests;
                     getUrl(url, new ByteChunk(), reqHeader, new HashMap<String,List<String>>());
                 } catch (Throwable th) {
@@ -174,7 +172,6 @@ public class TesterRateLimitFilterPerformance extends TomcatBaseTest {
         }
     }
 
-    static final String X_CUST_IP = "x-req-ip";
 
     static class MyServlet extends HttpServlet {
         /**
