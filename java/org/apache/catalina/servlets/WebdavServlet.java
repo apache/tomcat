@@ -686,7 +686,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        if (isLocked(req)) {
+        if (isLocked(null, req)) {
             resp.sendError(WebdavStatus.SC_LOCKED);
             return;
         }
@@ -722,7 +722,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        if (isLocked(req)) {
+        if (isLocked(path, req)) {
             resp.sendError(WebdavStatus.SC_LOCKED);
             return;
         }
@@ -761,24 +761,22 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        if (isLocked(req)) {
-            resp.sendError(WebdavStatus.SC_LOCKED);
-            return;
-        }
+        String path = getRelativePath(req);
 
-        deleteResource(req, resp);
+        deleteResource(path, req, resp);
     }
 
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        if (isLocked(req)) {
+        String path = getRelativePath(req);
+
+        if (isLocked(path, req)) {
             resp.sendError(WebdavStatus.SC_LOCKED);
             return;
         }
 
-        String path = getRelativePath(req);
         WebResource resource = resources.getResource(path);
         if (resource.isDirectory()) {
             sendNotAllowed(req, resp);
@@ -807,7 +805,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        copyResource(req, resp);
+        String path = getRelativePath(req);
+
+        copyResource(path, req, resp);
     }
 
 
@@ -826,14 +826,14 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        if (isLocked(req)) {
+        String path = getRelativePath(req);
+
+        if (isLocked(path, req)) {
             resp.sendError(WebdavStatus.SC_LOCKED);
             return;
         }
 
-        String path = getRelativePath(req);
-
-        if (copyResource(req, resp)) {
+        if (copyResource(path, req, resp)) {
             deleteResource(path, req, resp, false);
         }
     }
@@ -855,7 +855,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        if (isLocked(req)) {
+        String path = getRelativePath(req);
+
+        if (isLocked(path, req)) {
             resp.sendError(WebdavStatus.SC_LOCKED);
             return;
         }
@@ -1043,8 +1045,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 lock.owner = "";
             }
         }
-
-        String path = getRelativePath(req);
 
         lock.path = path;
 
@@ -1259,12 +1259,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        if (isLocked(req)) {
+        String path = getRelativePath(req);
+
+        if (isLocked(path, req)) {
             resp.sendError(WebdavStatus.SC_LOCKED);
             return;
         }
-
-        String path = getRelativePath(req);
 
         String lockTokenHeader = req.getHeader("Lock-Token");
         if (lockTokenHeader == null) {
@@ -1324,14 +1324,17 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * Check to see if a resource is currently write locked. The method will look at the "If" header to make sure the
      * client has give the appropriate lock tokens.
      *
+     * @param path The relative path
      * @param req Servlet request
      *
      * @return <code>true</code> if the resource is locked (and no appropriate lock token has been found for at least
      *             one of the non-shared locks which are present on the resource).
      */
-    private boolean isLocked(HttpServletRequest req) {
+    private boolean isLocked(String path, HttpServletRequest req) {
 
-        String path = getRelativePath(req);
+        if (path == null) {
+            path = getRelativePath(req);
+        }
 
         String ifHeader = req.getHeader("If");
         if (ifHeader == null) {
@@ -1406,6 +1409,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     /**
      * Copy a resource.
      *
+     * @param path  Path of the resource to copy
      * @param req  Servlet request
      * @param resp Servlet response
      *
@@ -1413,10 +1417,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      *
      * @throws IOException If an IO error occurs
      */
-    private boolean copyResource(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private boolean copyResource(String path, HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         // Check the source exists
-        String path = getRelativePath(req);
         WebResource source = resources.getResource(path);
         if (!source.exists()) {
             resp.sendError(WebdavStatus.SC_NOT_FOUND);
@@ -1655,6 +1658,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     /**
      * Delete a resource.
      *
+     * @param path      Path of the resource which is to be deleted
      * @param req  Servlet request
      * @param resp Servlet response
      *
@@ -1662,8 +1666,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      *
      * @throws IOException If an IO error occurs
      */
-    private boolean deleteResource(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String path = getRelativePath(req);
+    private boolean deleteResource(String path, HttpServletRequest req, HttpServletResponse resp) throws IOException {
         return deleteResource(path, req, resp, true);
     }
 
@@ -1683,17 +1686,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     private boolean deleteResource(String path, HttpServletRequest req, HttpServletResponse resp, boolean setStatus)
             throws IOException {
 
-        String ifHeader = req.getHeader("If");
-        if (ifHeader == null) {
-            ifHeader = "";
-        }
-
-        String lockTokenHeader = req.getHeader("Lock-Token");
-        if (lockTokenHeader == null) {
-            lockTokenHeader = "";
-        }
-
-        if (isLocked(path, ifHeader + lockTokenHeader)) {
+        if (isLocked(path, req)) {
             resp.sendError(WebdavStatus.SC_LOCKED);
             return false;
         }
@@ -1768,11 +1761,11 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         if (ifHeader == null) {
             ifHeader = "";
         }
-
         String lockTokenHeader = req.getHeader("Lock-Token");
         if (lockTokenHeader == null) {
             lockTokenHeader = "";
         }
+        String lockHeader = ifHeader + lockTokenHeader;
 
         String[] entries = resources.list(path);
 
@@ -1783,7 +1776,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             }
             childName += entry;
 
-            if (isLocked(childName, ifHeader + lockTokenHeader)) {
+            if (isLocked(childName, lockHeader)) {
 
                 errorList.put(childName, Integer.valueOf(WebdavStatus.SC_LOCKED));
 
