@@ -1144,6 +1144,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 if (addLock) {
                     lock.tokens.add(lockToken);
                     collectionLocks.add(lock);
+                    // Add the Lock-Token header as by RFC 2518 8.10.1
+                    // - only do this for newly created locks
+                    resp.addHeader("Lock-Token", "<opaquelocktoken:" + lockToken + ">");
                 }
 
             } else {
@@ -1190,7 +1193,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
             String ifHeader = req.getHeader("If");
             if (ifHeader == null) {
-                ifHeader = "";
+                // Bad request
+                resp.setStatus(WebdavStatus.SC_BAD_REQUEST);
             }
 
             // Checking resource locks
@@ -1234,7 +1238,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         generatedXML.writeElement("D", "prop", XMLWriter.CLOSING);
 
-        resp.setStatus(WebdavStatus.SC_OK);
         resp.setContentType("text/xml; charset=UTF-8");
         Writer writer = resp.getWriter();
         writer.write(generatedXML.toString());
@@ -1305,9 +1308,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     }
                 }
                 if (lock.tokens.isEmpty()) {
-                    collectionLocksList.remove();
+                    collectionLocks.remove(lock);
                     // Removing any lock-null resource which would be present
                     removeLockNull(path);
+                    break;
                 }
             }
         }
@@ -1498,6 +1502,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         if (destinationPath.startsWith(path) && destinationPath.charAt(path.length()) == '/' ||
                 path.startsWith(destinationPath) && path.charAt(destinationPath.length()) == '/') {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
+            return false;
+        }
+
+        // Check if destination is locked
+        if (isLocked(destinationPath, req)) {
+            resp.sendError(WebdavStatus.SC_LOCKED);
             return false;
         }
 
