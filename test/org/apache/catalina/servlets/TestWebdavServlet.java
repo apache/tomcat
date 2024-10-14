@@ -187,6 +187,249 @@ public class TestWebdavServlet extends TomcatBaseTest {
         SAXParserFactory.newInstance().newSAXParser().getXMLReader().parse(new InputSource(new StringReader(client.getResponseBody())));
     }
 
+    private static final String CONTENT = "FOOBAR";
+
+    private static final String LOCK_BODY =
+            "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" +
+            "<D:lockinfo xmlns:D='DAV:'>\n" +
+            "  <D:lockscope><D:exclusive/></D:lockscope>\n" +
+            "  <D:locktype><D:write/></D:locktype>\n" +
+            "  <D:owner>someone</D:owner>\n" +
+            "</D:lockinfo>";
+
+    @Test
+    public void testBasicOperations() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Create a temp webapp that can be safely written to
+        File tempWebapp = new File(getTemporaryDirectory(), "webdav-webapp");
+        Assert.assertTrue(tempWebapp.mkdirs());
+        Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
+        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
+        webdavServlet.addInitParameter("listings", "true");
+        webdavServlet.addInitParameter("secret", "foo");
+        webdavServlet.addInitParameter("readonly", "false");
+        ctxt.addServletMappingDecoded("/*", "webdav");
+        tomcat.start();
+
+        Client client = new Client();
+        client.setPort(getPort());
+
+        // Create a few files
+        client.setRequest(new String[] { "PUT /file1.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: 6" + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + CONTENT });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
+        client.setRequest(new String[] { "PUT /file2.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: 12" + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + CONTENT + CONTENT });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
+        client.setRequest(new String[] { "MKCOL /myfolder HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
+        client.setRequest(new String[] { "PUT /myfolder/file3.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: 6" + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + CONTENT });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
+        // Verify that listing the file works
+        client.setRequest(new String[] { "PROPFIND / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertTrue(client.getResponseBody().contains("<D:getcontentlength>12<"));
+
+        // Lock /myfolder
+        client.setRequest(new String[] { "LOCK /myfolder HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: " + LOCK_BODY.length() + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + LOCK_BODY });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+        String lockToken = null;
+        for (String header : client.getResponseHeaders()) {
+            if (header.startsWith("Lock-Token: ")) {
+                lockToken = header.substring("Lock-Token: ".length());
+            }
+        }
+        Assert.assertNotNull(lockToken);
+
+        // Try to add /myfolder/file4.txt to myfolder without lock token
+        client.setRequest(new String[] { "PUT /myfolder/file4.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: 6" + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + CONTENT });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_LOCKED, client.getStatusCode());
+
+        // Same but provide the lock token
+        client.setRequest(new String[] { "PUT /myfolder/file4.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: 6" + SimpleHttpClient.CRLF +
+                "Lock-Token: " + lockToken + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + CONTENT });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
+        // Add lock for /myfolder/file5.txt
+        client.setRequest(new String[] { "LOCK /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: " + LOCK_BODY.length() + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + LOCK_BODY });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_LOCKED, client.getStatusCode());
+
+        client.setRequest(new String[] { "LOCK /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: " + LOCK_BODY.length() + SimpleHttpClient.CRLF +
+                "Lock-Token: " + lockToken + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + LOCK_BODY });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+        String lockTokenFile = null;
+        for (String header : client.getResponseHeaders()) {
+            if (header.startsWith("Lock-Token: ")) {
+                lockTokenFile = header.substring("Lock-Token: ".length());
+            }
+        }
+        Assert.assertNotNull(lockTokenFile);
+
+        // Try to add /myfolder/file5.txt to myfolder with lock token but without lock null
+        client.setRequest(new String[] { "PUT /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: 6" + SimpleHttpClient.CRLF +
+                "Lock-Token: " + lockToken + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + CONTENT });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_LOCKED, client.getStatusCode());
+
+        // Same but with lock token and lock null
+        client.setRequest(new String[] { "PUT /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: 6" + SimpleHttpClient.CRLF +
+                "Lock-Token: " + lockToken + ", " + lockTokenFile + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + CONTENT });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
+        // Unlock for /myfolder/file5.txt
+        client.setRequest(new String[] { "UNLOCK /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Lock-Token: " + lockTokenFile + SimpleHttpClient.CRLF +
+                "If: " + lockToken + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_NO_CONTENT, client.getStatusCode());
+
+        // Copy /myfolder/file5.txt to /myfolder/file6.txt without lock (should not work)
+        client.setRequest(new String[] { "COPY /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Destination: /myfolder/file6.txt"  + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_LOCKED, client.getStatusCode());
+
+        // Delete /myfolder/file4.txt
+        client.setRequest(new String[] { "DELETE /myfolder/file4.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "If: " + lockToken + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_NO_CONTENT, client.getStatusCode());
+
+        // Copy /myfolder/file5.txt to /file7.txt without lock (should work)
+        client.setRequest(new String[] { "COPY /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Destination: /file7.txt"  + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
+        // Unlock /myfolder
+        client.setRequest(new String[] { "UNLOCK /myfolder HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Lock-Token: " + lockToken + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_NO_CONTENT, client.getStatusCode());
+
+        // Verify that everything created is there
+        client.setRequest(new String[] { "PROPFIND / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
+        Assert.assertFalse(client.getResponseBody().contains("/myfolder/file4.txt"));
+        Assert.assertTrue(client.getResponseBody().contains("/file7.txt"));
+
+        // Delete /myfolder
+        client.setRequest(new String[] { "DELETE /myfolder HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_NO_CONTENT, client.getStatusCode());
+
+        client.setRequest(new String[] { "PROPFIND / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
+        Assert.assertFalse(client.getResponseBody().contains("/myfolder"));
+
+    }
 
     private static final class Client extends SimpleHttpClient {
 
