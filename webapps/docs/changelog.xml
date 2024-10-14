@@ -146,6 +146,20 @@
         Avoid NPE in <code>CrawlerSessionManagerValve</code> for partially
         mapped requests. (remm)
       </fix>
+      <fix>
+        Add missing WebDAV <code>Lock-Token</code> header in the response when
+        locking a folder. (remm)
+      </fix>
+      <fix>
+        Invalid WebDAV lock requests should be rejected with 400. (remm)
+      </fix>
+      <fix>
+        Fix regression in WebDAV when attempting to unlock a collection. (remm)
+      </fix>
+      <fix>
+        Verify that destination is not locked for a WebDAV copy operation.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
