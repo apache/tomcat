@@ -166,6 +166,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update Byte Buddy to 1.15.4. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.31 (schultz)" rtext="2024-10-09">
   <subsection name="Catalina">
