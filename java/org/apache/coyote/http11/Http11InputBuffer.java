@@ -27,19 +27,19 @@ import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.HeaderUtil;
-import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.http.parser.HttpHeaderParser;
+import org.apache.tomcat.util.http.parser.HttpHeaderParser.HeaderDataSource;
+import org.apache.tomcat.util.http.parser.HttpHeaderParser.HeaderParseStatus;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * InputBuffer for HTTP that provides request header parsing as well as transfer
- * encoding.
+ * InputBuffer for HTTP that provides request header parsing as well as transfer encoding.
  */
-public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler {
+public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler, HeaderDataSource {
 
     // -------------------------------------------------------------- Constants
 
@@ -61,14 +61,6 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
 
     /**
-     * Headers of the associated request.
-     */
-    private final MimeHeaders headers;
-
-
-    private final boolean rejectIllegalHeader;
-
-    /**
      * State.
      */
     private volatile boolean parsingHeader;
@@ -87,8 +79,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
 
     /**
-     * Pos of the end of the header in the buffer, which is also the
-     * start of the body.
+     * Pos of the end of the header in the buffer, which is also the start of the body.
      */
     private int end;
 
@@ -106,8 +97,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
 
     /**
-     * Filter library.
-     * Note: Filter[Constants.CHUNKED_FILTER] is always the "chunked" filter.
+     * Filter library. Note: Filter[Constants.CHUNKED_FILTER] is always the "chunked" filter.
      */
     private InputFilter[] filterLibrary;
 
@@ -125,8 +115,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
 
     /**
-     * Parsing state - used for non blocking parsing so that
-     * when more data arrives, we can pick up where we left off.
+     * Parsing state - used for non blocking parsing so that when more data arrives, we can pick up where we left off.
      */
     private byte prevChr = 0;
     private byte chr = 0;
@@ -135,13 +124,11 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     private boolean parsingRequestLineEol = false;
     private int parsingRequestLineStart = 0;
     private int parsingRequestLineQPos = -1;
-    private HeaderParsePosition headerParsePos;
-    private final HeaderParseData headerData = new HeaderParseData();
     private final HttpParser httpParser;
+    private final HttpHeaderParser httpHeaderParser;
 
     /**
-     * Maximum allowed size of the HTTP request line plus headers plus any
-     * leading blank lines.
+     * Maximum allowed size of the HTTP request line plus headers plus any leading blank lines.
      */
     private final int headerBufferSize;
 
@@ -153,27 +140,26 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
     // ----------------------------------------------------------- Constructors
 
-    public Http11InputBuffer(Request request, int headerBufferSize,
-            boolean rejectIllegalHeader, HttpParser httpParser) {
+    public Http11InputBuffer(Request request, int headerBufferSize, HttpParser httpParser) {
 
         this.request = request;
-        headers = request.getMimeHeaders();
 
         this.headerBufferSize = headerBufferSize;
-        this.rejectIllegalHeader = rejectIllegalHeader;
         this.httpParser = httpParser;
 
         filterLibrary = new InputFilter[0];
         activeFilters = new InputFilter[0];
         lastActiveFilter = -1;
 
-        parsingHeader = true;
         parsingRequestLine = true;
         parsingRequestLinePhase = 0;
         parsingRequestLineEol = false;
         parsingRequestLineStart = 0;
         parsingRequestLineQPos = -1;
-        headerParsePos = HeaderParsePosition.HEADER_START;
+
+        parsingHeader = true;
+        httpHeaderParser = new HttpHeaderParser(this, request.getMimeHeaders(), true);
+
         swallowInput = true;
 
         inputStreamInputBuffer = new SocketInputBuffer();
@@ -254,8 +240,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     // ------------------------------------------------------- Protected Methods
 
     /**
-     * Recycle the input buffer. This should be called when closing the
-     * connection.
+     * Recycle the input buffer. This should be called when closing the connection.
      */
     void recycle() {
         wrapper = null;
@@ -271,12 +256,11 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
         chr = 0;
         prevChr = 0;
-        headerParsePos = HeaderParsePosition.HEADER_START;
         parsingRequestLinePhase = 0;
         parsingRequestLineEol = false;
         parsingRequestLineStart = 0;
         parsingRequestLineQPos = -1;
-        headerData.recycle();
+        httpHeaderParser.recycle();
         // Recycled last because they are volatile
         // All variables visible to this thread are guaranteed to be visible to
         // any other thread once that thread reads the same volatile. The first
@@ -287,10 +271,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
 
     /**
-     * End processing of current HTTP request.
-     * Note: All bytes of the current request should have been already
-     * consumed. This method only resets all the pointers so that we are ready
-     * to parse the next HTTP request.
+     * End processing of current HTTP request. Note: All bytes of the current request should have been already consumed.
+     * This method only resets all the pointers so that we are ready to parse the next HTTP request.
      */
     void nextRequest() {
         request.recycle();
@@ -316,30 +298,25 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         parsingHeader = true;
         swallowInput = true;
 
-        headerParsePos = HeaderParsePosition.HEADER_START;
         parsingRequestLine = true;
         parsingRequestLinePhase = 0;
         parsingRequestLineEol = false;
         parsingRequestLineStart = 0;
         parsingRequestLineQPos = -1;
-        headerData.recycle();
+        httpHeaderParser.recycle();
     }
 
 
     /**
-     * Read the request line. This function is meant to be used during the
-     * HTTP request header parsing. Do NOT attempt to read the request body
-     * using it.
+     * Read the request line. This function is meant to be used during the HTTP request header parsing. Do NOT attempt
+     * to read the request body using it.
      *
-     * @throws IOException If an exception occurs during the underlying socket
-     * read operations, or if the given buffer is not big enough to accommodate
-     * the whole line.
+     * @throws IOException If an exception occurs during the underlying socket read operations, or if the given buffer
+     *                         is not big enough to accommodate the whole line.
      *
-     * @return true if data is properly fed; false if no data is available
-     * immediately and thread should be freed
+     * @return true if data is properly fed; false if no data is available immediately and thread should be freed
      */
-    boolean parseRequestLine(boolean keptAlive, int connectionTimeout, int keepAliveTimeout)
-            throws IOException {
+    boolean parseRequestLine(boolean keptAlive, int connectionTimeout, int keepAliveTimeout) throws IOException {
 
         // check state
         if (!parsingRequestLine) {
@@ -358,15 +335,13 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                         wrapper.setReadTimeout(keepAliveTimeout);
                     }
                     if (!fill(false)) {
-                        // A read is pending, so no longer in initial state
-                        parsingRequestLinePhase = 1;
                         return false;
                     }
                     // At least one byte of the request has been received.
                     // Switch to the socket timeout.
                     wrapper.setReadTimeout(connectionTimeout);
                 }
-                if (!keptAlive && byteBuffer.position() == 0 && byteBuffer.limit() >= CLIENT_PREFACE_START.length - 1) {
+                if (!keptAlive && byteBuffer.position() == 0 && byteBuffer.limit() >= CLIENT_PREFACE_START.length) {
                     boolean prefaceMatch = true;
                     for (int i = 0; i < CLIENT_PREFACE_START.length && prefaceMatch; i++) {
                         if (CLIENT_PREFACE_START[i] != byteBuffer.get(i)) {
@@ -381,11 +356,12 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 }
                 // Set the start time once we start reading data (even if it is
                 // just skipping blank lines)
-                if (request.getStartTimeNanos() < 0) {
+                if (parsingRequestLinePhase == 0) {
+                    parsingRequestLinePhase = 1;
                     request.setStartTimeNanos(System.nanoTime());
                 }
                 chr = byteBuffer.get();
-            } while ((chr == Constants.CR) || (chr == Constants.LF));
+            } while (chr == Constants.CR || chr == Constants.LF);
             byteBuffer.position(byteBuffer.position() - 1);
 
             parsingRequestLineStart = byteBuffer.position();
@@ -432,7 +408,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     }
                 }
                 chr = byteBuffer.get();
-                if (!(chr == Constants.SP || chr == Constants.HT)) {
+                if (chr != Constants.SP && chr != Constants.HT) {
                     space = false;
                     byteBuffer.position(byteBuffer.position() - 1);
                 }
@@ -528,7 +504,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     }
                 }
                 byte chr = byteBuffer.get();
-                if (!(chr == Constants.SP || chr == Constants.HT)) {
+                if (chr != Constants.SP && chr != Constants.HT) {
                     space = false;
                     byteBuffer.position(byteBuffer.position() - 1);
                 }
@@ -571,9 +547,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 }
             }
 
-            if ((end - parsingRequestLineStart) > 0) {
-                request.protocol().setBytes(byteBuffer.array(), parsingRequestLineStart,
-                        end - parsingRequestLineStart);
+            if (end - parsingRequestLineStart > 0) {
+                request.protocol().setBytes(byteBuffer.array(), parsingRequestLineStart, end - parsingRequestLineStart);
                 parsingRequestLinePhase = 7;
             }
             // If no protocol is found, the ISE below will be triggered.
@@ -592,6 +567,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
     /**
      * Parse the HTTP headers.
+     *
+     * @throws IOException an underlying I/O error occurred
      */
     boolean parseHeaders() throws IOException {
         if (!parsingHeader) {
@@ -601,7 +578,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         HeaderParseStatus status = HeaderParseStatus.HAVE_MORE_HEADERS;
 
         do {
-            status = parseHeader();
+            status = httpHeaderParser.parseHeader();
             // Checking that
             // (1) Headers plus request line size does not exceed its limit
             // (2) There are enough bytes to avoid expanding the buffer when
@@ -610,7 +587,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             // limitation to enforce the meaning of headerBufferSize
             // From the way how buf is allocated and how blank lines are being
             // read, it should be enough to check (1) only.
-            if (byteBuffer.position() > headerBufferSize || byteBuffer.capacity() - byteBuffer.position() < socketReadBufferSize) {
+            if (byteBuffer.position() > headerBufferSize ||
+                    byteBuffer.capacity() - byteBuffer.position() < socketReadBufferSize) {
                 throw new IllegalArgumentException(sm.getString("iib.requestheadertoolarge.error"));
             }
         } while (status == HeaderParseStatus.HAVE_MORE_HEADERS);
@@ -635,7 +613,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         while (buffer.hasRemaining() && b != 0x20) {
             b = buffer.get();
         }
-        String result = HeaderUtil.toPrintableString(buffer.array(), buffer.arrayOffset() + startPos, buffer.position() - startPos);
+        String result = HeaderUtil.toPrintableString(buffer.array(), buffer.arrayOffset() + startPos,
+                buffer.position() - startPos);
         if (b != 0x20) {
             // Ran out of buffer rather than found a space
             result = result + "...";
@@ -665,10 +644,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
 
     /**
-     * Available bytes in the buffers for the current request.
+     * Available bytes in the buffers for the current request. Note that when requests are pipelined, the data in
+     * byteBuffer may relate to the next request rather than this one.
      *
-     * Note that when requests are pipelined, the data in byteBuffer may relate
-     * to the next request rather than this one.
+     * @return the amount of bytes available, 0 if none, and 1 if there was an IO error to trigger a read
      */
     int available(boolean read) {
         int available;
@@ -686,10 +665,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         // - the socket wrapper indicates a read is allowed
         //
         // Notes: 1. When pipelined requests are being used available may be
-        //        zero even when byteBuffer has data. This is because the data
-        //        in byteBuffer is for the next request. We don't want to
-        //        attempt a read in this case.
-        //        2. wrapper.hasDataToRead() is present to handle the NIO2 case
+        // zero even when byteBuffer has data. This is because the data
+        // in byteBuffer is for the next request. We don't want to
+        // attempt a read in this case.
+        // 2. wrapper.hasDataToRead() is present to handle the NIO2 case
         try {
             if (available == 0 && read && !byteBuffer.hasRemaining() && wrapper.hasDataToRead()) {
                 fill(false);
@@ -709,9 +688,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
 
     /**
-     * Has all of the request body been read? There are subtle differences
-     * between this and available() &gt; 0 primarily because of having to handle
-     * faking non-blocking reads with the blocking IO connector.
+     * Has all of the request body been read? There are subtle differences between this and available() &gt; 0 primarily
+     * because of having to handle faking non-blocking reads with the blocking IO connector.
+     *
+     * @return {@code true} if the request has been fully read
      */
     boolean isFinished() {
         // The active filters have the definitive information on whether or not
@@ -751,8 +731,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         wrapper = socketWrapper;
         wrapper.setAppReadBufHandler(this);
 
-        int bufLength = headerBufferSize +
-                wrapper.getSocketBufferHandler().getReadBuffer().capacity();
+        int bufLength = headerBufferSize + wrapper.getSocketBufferHandler().getReadBuffer().capacity();
         if (byteBuffer == null || byteBuffer.capacity() < bufLength) {
             byteBuffer = ByteBuffer.allocate(bufLength);
             byteBuffer.position(0).limit(0);
@@ -760,25 +739,29 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     }
 
 
+    @Override
+    public boolean fillHeaderBuffer() throws IOException {
+        // HTTP headers are always read using non-blocking IO.
+        return fill(false);
+    }
 
-    // --------------------------------------------------------- Private Methods
 
     /**
      * Attempts to read some data into the input buffer.
      *
-     * @return <code>true</code> if more data was added to the input buffer
-     *         otherwise <code>false</code>
+     * @param block Should blocking IO be used when filling the input buffer
+     *
+     * @return <code>true</code> if more data was added to the input buffer otherwise <code>false</code>
+     *
+     * @throws IOException if an IO error occurs while filling the input buffer
      */
     private boolean fill(boolean block) throws IOException {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Before fill(): parsingHeader: [" + parsingHeader +
-                    "], parsingRequestLine: [" + parsingRequestLine +
-                    "], parsingRequestLinePhase: [" + parsingRequestLinePhase +
-                    "], parsingRequestLineStart: [" + parsingRequestLineStart +
-                    "], byteBuffer.position(): [" + byteBuffer.position() +
-                    "], byteBuffer.limit(): [" + byteBuffer.limit() +
-                    "], end: [" + end + "]");
+        if (log.isTraceEnabled()) {
+            log.trace("Before fill(): parsingHeader: [" + parsingHeader + "], parsingRequestLine: [" +
+                    parsingRequestLine + "], parsingRequestLinePhase: [" + parsingRequestLinePhase +
+                    "], parsingRequestLineStart: [" + parsingRequestLineStart + "], byteBuffer.position(): [" +
+                    byteBuffer.position() + "], byteBuffer.limit(): [" + byteBuffer.limit() + "], end: [" + end + "]");
         }
 
         if (parsingHeader) {
@@ -826,9 +809,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             }
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Received ["
-                    + new String(byteBuffer.array(), byteBuffer.position(), byteBuffer.remaining(), StandardCharsets.ISO_8859_1) + "]");
+        if (log.isTraceEnabled()) {
+            log.trace("Received [" + new String(byteBuffer.array(), byteBuffer.position(), byteBuffer.remaining(),
+                    StandardCharsets.ISO_8859_1) + "]");
         }
 
         if (nRead > 0) {
@@ -842,337 +825,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     }
 
 
-    /**
-     * Parse an HTTP header.
-     *
-     * @return One of {@link HeaderParseStatus#NEED_MORE_DATA},
-     * {@link HeaderParseStatus#HAVE_MORE_HEADERS} or
-     * {@link HeaderParseStatus#DONE}.
-     */
-    private HeaderParseStatus parseHeader() throws IOException {
-
-        while (headerParsePos == HeaderParsePosition.HEADER_START) {
-
-            // Read new bytes if needed
-            if (byteBuffer.position() >= byteBuffer.limit()) {
-                if (!fill(false)) {
-                    return HeaderParseStatus.NEED_MORE_DATA;
-                }
-            }
-
-            prevChr = chr;
-            chr = byteBuffer.get();
-
-            if (chr == Constants.CR && prevChr != Constants.CR) {
-                // Possible start of CRLF - process the next byte.
-            } else if (chr == Constants.LF) {
-                // CRLF or LF is an acceptable line terminator
-                return HeaderParseStatus.DONE;
-            } else {
-                if (prevChr == Constants.CR) {
-                    // Must have read two bytes (first was CR, second was not LF)
-                    byteBuffer.position(byteBuffer.position() - 2);
-                } else {
-                    // Must have only read one byte
-                    byteBuffer.position(byteBuffer.position() - 1);
-                }
-                break;
-            }
-        }
-
-        if (headerParsePos == HeaderParsePosition.HEADER_START) {
-            // Mark the current buffer position
-            headerData.start = byteBuffer.position();
-            headerData.lineStart = headerData.start;
-            headerParsePos = HeaderParsePosition.HEADER_NAME;
-        }
-
-        //
-        // Reading the header name
-        // Header name is always US-ASCII
-        //
-
-        while (headerParsePos == HeaderParsePosition.HEADER_NAME) {
-
-            // Read new bytes if needed
-            if (byteBuffer.position() >= byteBuffer.limit()) {
-                if (!fill(false)) { // parse header
-                    return HeaderParseStatus.NEED_MORE_DATA;
-                }
-            }
-
-            int pos = byteBuffer.position();
-            chr = byteBuffer.get();
-            if (chr == Constants.COLON) {
-                headerParsePos = HeaderParsePosition.HEADER_VALUE_START;
-                headerData.headerValue = headers.addValue(byteBuffer.array(), headerData.start,
-                        pos - headerData.start);
-                pos = byteBuffer.position();
-                // Mark the current buffer position
-                headerData.start = pos;
-                headerData.realPos = pos;
-                headerData.lastSignificantChar = pos;
-                break;
-            } else if (!HttpParser.isToken(chr)) {
-                // Non-token characters are illegal in header names
-                // Parsing continues so the error can be reported in context
-                headerData.lastSignificantChar = pos;
-                byteBuffer.position(byteBuffer.position() - 1);
-                // skipLine() will handle the error
-                return skipLine();
-            }
-
-            // chr is next byte of header name. Convert to lowercase.
-            if ((chr >= Constants.A) && (chr <= Constants.Z)) {
-                byteBuffer.put(pos, (byte) (chr - Constants.LC_OFFSET));
-            }
-        }
-
-        // Skip the line and ignore the header
-        if (headerParsePos == HeaderParsePosition.HEADER_SKIPLINE) {
-            return skipLine();
-        }
-
-        //
-        // Reading the header value (which can be spanned over multiple lines)
-        //
-
-        while (headerParsePos == HeaderParsePosition.HEADER_VALUE_START ||
-               headerParsePos == HeaderParsePosition.HEADER_VALUE ||
-               headerParsePos == HeaderParsePosition.HEADER_MULTI_LINE) {
-
-            if (headerParsePos == HeaderParsePosition.HEADER_VALUE_START) {
-                // Skipping spaces
-                while (true) {
-                    // Read new bytes if needed
-                    if (byteBuffer.position() >= byteBuffer.limit()) {
-                        if (!fill(false)) {// parse header
-                            // HEADER_VALUE_START
-                            return HeaderParseStatus.NEED_MORE_DATA;
-                        }
-                    }
-
-                    chr = byteBuffer.get();
-                    if (!(chr == Constants.SP || chr == Constants.HT)) {
-                        headerParsePos = HeaderParsePosition.HEADER_VALUE;
-                        byteBuffer.position(byteBuffer.position() - 1);
-                        break;
-                    }
-                }
-            }
-            if (headerParsePos == HeaderParsePosition.HEADER_VALUE) {
-
-                // Reading bytes until the end of the line
-                boolean eol = false;
-                while (!eol) {
-
-                    // Read new bytes if needed
-                    if (byteBuffer.position() >= byteBuffer.limit()) {
-                        if (!fill(false)) {// parse header
-                            // HEADER_VALUE
-                            return HeaderParseStatus.NEED_MORE_DATA;
-                        }
-                    }
-
-                    prevChr = chr;
-                    chr = byteBuffer.get();
-                    if (chr == Constants.CR) {
-                        // Possible start of CRLF - process the next byte.
-                    } else if (chr == Constants.LF) {
-                        // CRLF or LF is an acceptable line terminator
-                        eol = true;
-                    } else if (prevChr == Constants.CR) {
-                        // Invalid value
-                        // Delete the header (it will be the most recent one)
-                        headers.removeHeader(headers.size() - 1);
-                        return skipLine();
-                    } else if (chr != Constants.HT && HttpParser.isControl(chr)) {
-                        // Invalid value
-                        // Delete the header (it will be the most recent one)
-                        headers.removeHeader(headers.size() - 1);
-                        return skipLine();
-                    } else if (chr == Constants.SP || chr == Constants.HT) {
-                        byteBuffer.put(headerData.realPos, chr);
-                        headerData.realPos++;
-                    } else {
-                        byteBuffer.put(headerData.realPos, chr);
-                        headerData.realPos++;
-                        headerData.lastSignificantChar = headerData.realPos;
-                    }
-                }
-
-                // Ignore whitespaces at the end of the line
-                headerData.realPos = headerData.lastSignificantChar;
-
-                // Checking the first character of the new line. If the character
-                // is a LWS, then it's a multiline header
-                headerParsePos = HeaderParsePosition.HEADER_MULTI_LINE;
-            }
-            // Read new bytes if needed
-            if (byteBuffer.position() >= byteBuffer.limit()) {
-                if (!fill(false)) {// parse header
-                    // HEADER_MULTI_LINE
-                    return HeaderParseStatus.NEED_MORE_DATA;
-                }
-            }
-
-            byte peek = byteBuffer.get(byteBuffer.position());
-            if (headerParsePos == HeaderParsePosition.HEADER_MULTI_LINE) {
-                if ((peek != Constants.SP) && (peek != Constants.HT)) {
-                    headerParsePos = HeaderParsePosition.HEADER_START;
-                    break;
-                } else {
-                    // Copying one extra space in the buffer (since there must
-                    // be at least one space inserted between the lines)
-                    byteBuffer.put(headerData.realPos, peek);
-                    headerData.realPos++;
-                    headerParsePos = HeaderParsePosition.HEADER_VALUE_START;
-                }
-            }
-        }
-        // Set the header value
-        headerData.headerValue.setBytes(byteBuffer.array(), headerData.start,
-                headerData.lastSignificantChar - headerData.start);
-        headerData.recycle();
-        return HeaderParseStatus.HAVE_MORE_HEADERS;
-    }
-
-
-    private HeaderParseStatus skipLine() throws IOException {
-        headerParsePos = HeaderParsePosition.HEADER_SKIPLINE;
-        boolean eol = false;
-
-        // Reading bytes until the end of the line
-        while (!eol) {
-
-            // Read new bytes if needed
-            if (byteBuffer.position() >= byteBuffer.limit()) {
-                if (!fill(false)) {
-                    return HeaderParseStatus.NEED_MORE_DATA;
-                }
-            }
-
-            int pos = byteBuffer.position();
-            prevChr = chr;
-            chr = byteBuffer.get();
-            if (chr == Constants.CR) {
-                // Skip
-            } else if (chr == Constants.LF) {
-                // CRLF or LF is an acceptable line terminator
-                eol = true;
-            } else {
-                headerData.lastSignificantChar = pos;
-            }
-        }
-        if (rejectIllegalHeader || log.isDebugEnabled()) {
-            String message = sm.getString("iib.invalidheader",
-                    HeaderUtil.toPrintableString(byteBuffer.array(), headerData.lineStart,
-                            headerData.lastSignificantChar - headerData.lineStart + 1));
-            if (rejectIllegalHeader) {
-                throw new IllegalArgumentException(message);
-            }
-            log.debug(message);
-        }
-
-        headerParsePos = HeaderParsePosition.HEADER_START;
-        return HeaderParseStatus.HAVE_MORE_HEADERS;
-    }
-
-
-    // ----------------------------------------------------------- Inner classes
-
-    private enum HeaderParseStatus {
-        DONE, HAVE_MORE_HEADERS, NEED_MORE_DATA
-    }
-
-
-    private enum HeaderParsePosition {
-        /**
-         * Start of a new header. A CRLF here means that there are no more
-         * headers. Any other character starts a header name.
-         */
-        HEADER_START,
-        /**
-         * Reading a header name. All characters of header are HTTP_TOKEN_CHAR.
-         * Header name is followed by ':'. No whitespace is allowed.<br>
-         * Any non-HTTP_TOKEN_CHAR (this includes any whitespace) encountered
-         * before ':' will result in the whole line being ignored.
-         */
-        HEADER_NAME,
-        /**
-         * Skipping whitespace before text of header value starts, either on the
-         * first line of header value (just after ':') or on subsequent lines
-         * when it is known that subsequent line starts with SP or HT.
-         */
-        HEADER_VALUE_START,
-        /**
-         * Reading the header value. We are inside the value. Either on the
-         * first line or on any subsequent line. We come into this state from
-         * HEADER_VALUE_START after the first non-SP/non-HT byte is encountered
-         * on the line.
-         */
-        HEADER_VALUE,
-        /**
-         * Before reading a new line of a header. Once the next byte is peeked,
-         * the state changes without advancing our position. The state becomes
-         * either HEADER_VALUE_START (if that first byte is SP or HT), or
-         * HEADER_START (otherwise).
-         */
-        HEADER_MULTI_LINE,
-        /**
-         * Reading all bytes until the next CRLF. The line is being ignored.
-         */
-        HEADER_SKIPLINE
-    }
-
-
-    private static class HeaderParseData {
-        /**
-         * The first character of the header line.
-         */
-        int lineStart = 0;
-        /**
-         * When parsing header name: first character of the header.<br>
-         * When skipping broken header line: first character of the header.<br>
-         * When parsing header value: first character after ':'.
-         */
-        int start = 0;
-        /**
-         * When parsing header name: not used (stays as 0).<br>
-         * When skipping broken header line: not used (stays as 0).<br>
-         * When parsing header value: starts as the first character after ':'.
-         * Then is increased as far as more bytes of the header are harvested.
-         * Bytes from buf[pos] are copied to buf[realPos]. Thus the string from
-         * [start] to [realPos-1] is the prepared value of the header, with
-         * whitespaces removed as needed.<br>
-         */
-        int realPos = 0;
-        /**
-         * When parsing header name: not used (stays as 0).<br>
-         * When skipping broken header line: last non-CR/non-LF character.<br>
-         * When parsing header value: position after the last not-LWS character.<br>
-         */
-        int lastSignificantChar = 0;
-        /**
-         * MB that will store the value of the header. It is null while parsing
-         * header name and is created after the name has been parsed.
-         */
-        MessageBytes headerValue = null;
-        public void recycle() {
-            lineStart = 0;
-            start = 0;
-            realPos = 0;
-            lastSignificantChar = 0;
-            headerValue = null;
-        }
-    }
-
-
     // ------------------------------------- InputStreamInputBuffer Inner Class
 
     /**
-     * This class is an input buffer which will read its data from an input
-     * stream.
+     * This class is an input buffer which will read its data from an input stream.
      */
     private class SocketInputBuffer implements InputBuffer {
 
@@ -1214,6 +870,12 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     @Override
     public ByteBuffer getByteBuffer() {
         return byteBuffer;
+    }
+
+
+    @Override
+    public ByteBuffer getHeaderByteBuffer() {
+        return getByteBuffer();
     }
 
 

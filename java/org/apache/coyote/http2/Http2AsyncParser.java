@@ -37,7 +37,8 @@ class Http2AsyncParser extends Http2Parser {
     private final Http2AsyncUpgradeHandler upgradeHandler;
     private volatile Throwable error = null;
 
-    Http2AsyncParser(String connectionId, Input input, Output output, SocketWrapperBase<?> socketWrapper, Http2AsyncUpgradeHandler upgradeHandler) {
+    Http2AsyncParser(String connectionId, Input input, Output output, SocketWrapperBase<?> socketWrapper,
+            Http2AsyncUpgradeHandler upgradeHandler) {
         super(connectionId, input, output);
         this.socketWrapper = socketWrapper;
         socketWrapper.getSocketBufferHandler().expand(input.getMaxFrameSize());
@@ -51,21 +52,23 @@ class Http2AsyncParser extends Http2Parser {
         ByteBuffer preface = ByteBuffer.wrap(prefaceData);
         ByteBuffer header = ByteBuffer.allocate(9);
         ByteBuffer framePayload = ByteBuffer.allocate(input.getMaxFrameSize());
-        PrefaceCompletionHandler handler = new PrefaceCompletionHandler(webConnection, stream, prefaceData, preface, header, framePayload);
-        socketWrapper.read(BlockingMode.NON_BLOCK, socketWrapper.getReadTimeout(), TimeUnit.MILLISECONDS, null,
-                handler, handler, preface, header, framePayload);
+        PrefaceCompletionHandler handler =
+                new PrefaceCompletionHandler(webConnection, stream, prefaceData, preface, header, framePayload);
+        socketWrapper.read(BlockingMode.NON_BLOCK, socketWrapper.getReadTimeout(), TimeUnit.MILLISECONDS, null, handler,
+                handler, preface, header, framePayload);
     }
 
 
     private class PrefaceCompletionHandler extends FrameCompletionHandler {
 
-        private boolean prefaceValidated = false;
-
         private final WebConnection webConnection;
         private final Stream stream;
         private final byte[] prefaceData;
 
-        private PrefaceCompletionHandler(WebConnection webConnection, Stream stream, byte[] prefaceData, ByteBuffer... buffers) {
+        private volatile boolean prefaceValidated = false;
+
+        private PrefaceCompletionHandler(WebConnection webConnection, Stream stream, byte[] prefaceData,
+                ByteBuffer... buffers) {
             super(FrameType.SETTINGS, buffers);
             this.webConnection = webConnection;
             this.stream = stream;
@@ -120,7 +123,8 @@ class Http2AsyncParser extends Http2Parser {
                 // Finish processing the connection
                 upgradeHandler.processConnectionCallback(webConnection, stream);
             } else {
-                upgradeHandler.closeConnection(new ConnectionException(error.getMessage(), Http2Error.PROTOCOL_ERROR, error));
+                upgradeHandler
+                        .closeConnection(new ConnectionException(error.getMessage(), Http2Error.PROTOCOL_ERROR, error));
             }
             // Continue reading frames
             upgradeHandler.upgradeDispatch(SocketEvent.OPEN_READ);
@@ -128,14 +132,14 @@ class Http2AsyncParser extends Http2Parser {
     }
 
     @Override
-    protected boolean readFrame(boolean block, FrameType expected)
-            throws IOException, Http2Exception {
+    protected boolean readFrame(boolean block, FrameType expected) throws IOException, Http2Exception {
         handleAsyncException();
         ByteBuffer header = ByteBuffer.allocate(9);
         ByteBuffer framePayload = ByteBuffer.allocate(input.getMaxFrameSize());
         FrameCompletionHandler handler = new FrameCompletionHandler(expected, header, framePayload);
-        CompletionState state =
-                socketWrapper.read(block ? BlockingMode.BLOCK : BlockingMode.NON_BLOCK, socketWrapper.getReadTimeout(), TimeUnit.MILLISECONDS, null, handler, handler, header, framePayload);
+        CompletionState state = socketWrapper.read(block ? BlockingMode.BLOCK : BlockingMode.NON_BLOCK,
+                block ? socketWrapper.getReadTimeout() : 0, TimeUnit.MILLISECONDS, null, handler, handler, header,
+                framePayload);
         if (state == CompletionState.ERROR || state == CompletionState.INLINE) {
             handleAsyncException();
             return true;
@@ -144,8 +148,7 @@ class Http2AsyncParser extends Http2Parser {
         }
     }
 
-    private void handleAsyncException()
-            throws IOException, Http2Exception {
+    private void handleAsyncException() throws IOException, Http2Exception {
         if (error != null) {
             Throwable error = this.error;
             this.error = null;
@@ -161,20 +164,20 @@ class Http2AsyncParser extends Http2Parser {
         }
     }
 
-    private class FrameCompletionHandler implements CompletionCheck, CompletionHandler<Long, Void> {
+    private class FrameCompletionHandler implements CompletionCheck, CompletionHandler<Long,Void> {
 
         private final FrameType expected;
         protected final ByteBuffer[] buffers;
 
-        private boolean parsedFrameHeader = false;
-        private boolean validated = false;
-        private CompletionState state = null;
-        protected int payloadSize;
-        protected int frameTypeId;
-        protected FrameType frameType;
-        protected int flags;
-        protected int streamId;
-        protected boolean streamException = false;
+        private volatile boolean parsedFrameHeader = false;
+        private volatile boolean validated = false;
+        private volatile CompletionState state = null;
+        protected volatile int payloadSize;
+        protected volatile int frameTypeId;
+        protected volatile FrameType frameType;
+        protected volatile int flags;
+        protected volatile int streamId;
+        protected volatile boolean streamException = false;
 
         private FrameCompletionHandler(FrameType expected, ByteBuffer... buffers) {
             this.expected = expected;
@@ -182,8 +185,7 @@ class Http2AsyncParser extends Http2Parser {
         }
 
         @Override
-        public CompletionHandlerCall callHandler(CompletionState state,
-                ByteBuffer[] buffers, int offset, int length) {
+        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers, int offset, int length) {
             if (offset != 0 || length != 2) {
                 try {
                     throw new IllegalArgumentException(sm.getString("http2Parser.invalidBuffers"));
@@ -195,7 +197,8 @@ class Http2AsyncParser extends Http2Parser {
             return validate(state, buffers[0], buffers[1]);
         }
 
-        protected CompletionHandlerCall validate(CompletionState state, ByteBuffer frameHeaderBuffer, ByteBuffer payload) {
+        protected CompletionHandlerCall validate(CompletionState state, ByteBuffer frameHeaderBuffer,
+                ByteBuffer payload) {
             if (!parsedFrameHeader) {
                 // The first buffer should be 9 bytes long
                 if (frameHeaderBuffer.position() < 9) {
@@ -244,70 +247,76 @@ class Http2AsyncParser extends Http2Parser {
                             swallowPayload(streamId, frameTypeId, payloadSize, false, payload);
                         } else {
                             switch (frameType) {
-                            case DATA:
-                                readDataFrame(streamId, flags, payloadSize, payload);
-                                break;
-                            case HEADERS:
-                                readHeadersFrame(streamId, flags, payloadSize, payload);
-                                break;
-                            case PRIORITY:
-                                readPriorityFrame(streamId, payload);
-                                break;
-                            case RST:
-                                readRstFrame(streamId, payload);
-                                break;
-                            case SETTINGS:
-                                readSettingsFrame(flags, payloadSize, payload);
-                                break;
-                            case PUSH_PROMISE:
-                                readPushPromiseFrame(streamId, flags, payloadSize, payload);
-                                break;
-                            case PING:
-                                readPingFrame(flags, payload);
-                                break;
-                            case GOAWAY:
-                                readGoawayFrame(payloadSize, payload);
-                                break;
-                            case WINDOW_UPDATE:
-                                readWindowUpdateFrame(streamId, payload);
-                                break;
-                            case CONTINUATION:
-                                readContinuationFrame(streamId, flags, payloadSize, payload);
-                                break;
-                            case UNKNOWN:
-                                readUnknownFrame(streamId, frameTypeId, flags, payloadSize, payload);
+                                case DATA:
+                                    readDataFrame(streamId, flags, payloadSize, payload);
+                                    break;
+                                case HEADERS:
+                                    readHeadersFrame(streamId, flags, payloadSize, payload);
+                                    break;
+                                case PRIORITY:
+                                    readPriorityFrame(streamId, payload);
+                                    break;
+                                case RST:
+                                    readRstFrame(streamId, payload);
+                                    break;
+                                case SETTINGS:
+                                    readSettingsFrame(flags, payloadSize, payload);
+                                    break;
+                                case PUSH_PROMISE:
+                                    readPushPromiseFrame(streamId, flags, payloadSize, payload);
+                                    break;
+                                case PING:
+                                    readPingFrame(flags, payload);
+                                    break;
+                                case GOAWAY:
+                                    readGoawayFrame(payloadSize, payload);
+                                    break;
+                                case WINDOW_UPDATE:
+                                    readWindowUpdateFrame(streamId, payload);
+                                    break;
+                                case CONTINUATION:
+                                    readContinuationFrame(streamId, flags, payloadSize, payload);
+                                    break;
+                                case PRIORITY_UPDATE:
+                                    readPriorityUpdateFrame(payloadSize, payload);
+                                    break;
+                                case UNKNOWN:
+                                    readUnknownFrame(streamId, frameTypeId, flags, payloadSize, payload);
                             }
                         }
-                        // See if there is a new 9 byte header and continue parsing if possible
-                        if (payload.remaining() >= 9) {
-                            int position = payload.position();
-                            payloadSize = ByteUtil.getThreeBytes(payload, position);
-                            frameTypeId = ByteUtil.getOneByte(payload, position + 3);
-                            frameType = FrameType.valueOf(frameTypeId);
-                            flags = ByteUtil.getOneByte(payload, position + 4);
-                            streamId = ByteUtil.get31Bits(payload, position + 5);
-                            streamException = false;
-                            if (payload.remaining() - 9 >= payloadSize) {
-                                continueParsing = true;
-                                // Now go over frame header
-                                payload.position(payload.position() + 9);
-                                try {
-                                    validateFrame(null, frameType, streamId, flags, payloadSize);
-                                } catch (StreamException e) {
-                                    error = e;
-                                    streamException = true;
-                                } catch (Http2Exception e) {
-                                    error = e;
-                                    continueParsing = false;
+                        if (!upgradeHandler.isOverheadLimitExceeded()) {
+                            // See if there is a new 9 byte header and continue parsing if possible
+                            if (payload.remaining() >= 9) {
+                                int position = payload.position();
+                                payloadSize = ByteUtil.getThreeBytes(payload, position);
+                                frameTypeId = ByteUtil.getOneByte(payload, position + 3);
+                                frameType = FrameType.valueOf(frameTypeId);
+                                flags = ByteUtil.getOneByte(payload, position + 4);
+                                streamId = ByteUtil.get31Bits(payload, position + 5);
+                                streamException = false;
+                                if (payload.remaining() - 9 >= payloadSize) {
+                                    continueParsing = true;
+                                    // Now go over frame header
+                                    payload.position(payload.position() + 9);
+                                    try {
+                                        validateFrame(null, frameType, streamId, flags, payloadSize);
+                                    } catch (StreamException e) {
+                                        error = e;
+                                        streamException = true;
+                                    } catch (Http2Exception e) {
+                                        error = e;
+                                        continueParsing = false;
+                                    }
                                 }
                             }
                         }
                     } while (continueParsing);
                 } catch (RuntimeException | IOException | Http2Exception e) {
                     error = e;
-                }
-                if (payload.hasRemaining()) {
-                    socketWrapper.unRead(payload);
+                } finally {
+                    if (payload.hasRemaining()) {
+                        socketWrapper.unRead(payload);
+                    }
                 }
             }
             if (state == CompletionState.DONE) {

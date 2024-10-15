@@ -20,16 +20,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.tomcat.util.codec.binary.Base64;
-
 /**
  * Utility class to decode MIME texts.
  *
- * @since 1.3
+ * @since FileUpload 1.3
  */
 public final class MimeUtility {
 
@@ -238,7 +237,7 @@ public final class MimeUtility {
             byte[] decodedData;
             // Base64 encoded?
             if (encoding.equals(BASE64_ENCODING_MARKER)) {
-                decodedData = Base64.decodeBase64(encodedText);
+                decodedData = Base64.getDecoder().decode(encodedText);
             } else if (encoding.equals(QUOTEDPRINTABLE_ENCODING_MARKER)) { // maybe quoted printable.
                 byte[] encodedData = encodedText.getBytes(StandardCharsets.US_ASCII);
                 QuotedPrintableDecoder.decode(encodedData, out);

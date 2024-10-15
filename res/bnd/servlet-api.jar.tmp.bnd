@@ -20,10 +20,12 @@ Bundle-SymbolicName: org.apache.tomcat-servlet-api
 Export-Package: \
     !jakarta.servlet.jsp.*,\
     jakarta.servlet.*;version=${servlet.spec.version}
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 Provide-Capability: \
     osgi.contract;\
-        osgi.contract=JavaServlet;\
+        osgi.contract=JakartaServlet;\
         version:Version=${servlet.spec.version};\
         uses:='${packages;NAMED;jakarta.servlet.*;NAMED;!jakarta.servlet.jsp.*}'
 

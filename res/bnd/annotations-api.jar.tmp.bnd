@@ -19,10 +19,12 @@ Bundle-Name: tomcat-annotations-api
 Bundle-SymbolicName: org.apache.tomcat-annotations-api
 Export-Package: \
     jakarta.annotation.*;version=${annotation.spec.version}
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 Provide-Capability: \
     osgi.contract;\
-        osgi.contract=JavaAnnotation;\
+        osgi.contract=JakartaAnnotations;\
         version:Version=${annotation.spec.version};\
         uses:='${packages;NAMED;jakarta.annotation.*}'
 

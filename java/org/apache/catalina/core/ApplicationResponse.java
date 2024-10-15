@@ -23,16 +23,14 @@ import jakarta.servlet.ServletResponseWrapper;
 
 
 /**
- * Wrapper around a <code>jakarta.servlet.ServletResponse</code>
- * that transforms an application response object (which might be the original
- * one passed to a servlet, or might be based on the 2.3
- * <code>jakarta.servlet.ServletResponseWrapper</code> class)
- * back into an internal <code>org.apache.catalina.Response</code>.
+ * Wrapper around a <code>jakarta.servlet.ServletResponse</code> that transforms an application response object (which
+ * might be the original one passed to a servlet, or might be based on the 2.3
+ * <code>jakarta.servlet.ServletResponseWrapper</code> class) back into an internal
+ * <code>org.apache.catalina.Response</code>.
  * <p>
- * <strong>WARNING</strong>:  Due to Java's lack of support for multiple
- * inheritance, all of the logic in <code>ApplicationResponse</code> is
- * duplicated in <code>ApplicationHttpResponse</code>.  Make sure that you
- * keep these two classes in synchronization when making changes!
+ * <strong>WARNING</strong>: Due to Java's lack of support for multiple inheritance, all of the logic in
+ * <code>ApplicationResponse</code> is duplicated in <code>ApplicationHttpResponse</code>. Make sure that you keep these
+ * two classes in synchronization when making changes!
  *
  * @author Craig R. McClanahan
  */
@@ -44,10 +42,10 @@ class ApplicationResponse extends ServletResponseWrapper {
      * Construct a new wrapped response around the specified servlet response.
      *
      * @param response The servlet response being wrapped
-     * @param included <code>true</code> if this response is being processed
-     *  by a <code>RequestDispatcher.include()</code> call
+     * @param included <code>true</code> if this response is being processed by a
+     *                     <code>RequestDispatcher.include()</code> call
      */
-    public ApplicationResponse(ServletResponse response, boolean included) {
+    ApplicationResponse(ServletResponse response, boolean included) {
 
         super(response);
         setIncluded(included);
@@ -59,8 +57,7 @@ class ApplicationResponse extends ServletResponseWrapper {
 
 
     /**
-     * Is this wrapped response the subject of an <code>include()</code>
-     * call?
+     * Is this wrapped response the subject of an <code>include()</code> call?
      */
     protected boolean included = false;
 
@@ -71,8 +68,7 @@ class ApplicationResponse extends ServletResponseWrapper {
     /**
      * Disallow <code>reset()</code> calls on a included response.
      *
-     * @exception IllegalStateException if the response has already
-     *  been committed
+     * @exception IllegalStateException if the response has already been committed
      */
     @Override
     public void reset() {
@@ -86,8 +82,7 @@ class ApplicationResponse extends ServletResponseWrapper {
 
 
     /**
-     * Disallow <code>setContentLength(int)</code> calls on an included
-     * response.
+     * Disallow <code>setContentLength(int)</code> calls on an included response.
      *
      * @param len The new content length
      */
@@ -102,8 +97,7 @@ class ApplicationResponse extends ServletResponseWrapper {
 
 
     /**
-     * Disallow <code>setContentLengthLong(long)</code> calls on an included
-     * response.
+     * Disallow <code>setContentLengthLong(long)</code> calls on an included response.
      *
      * @param len The new content length
      */

@@ -19,8 +19,6 @@ package org.apache.coyote.http2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,88 +38,75 @@ public class TestCancelledUpload extends Http2TestBase {
     public void testCancelledRequest() throws Exception {
         http2Connect();
 
-        LogManager.getLogManager().getLogger("org.apache.coyote.http2").setLevel(Level.ALL);
-        try {
-            ((AbstractHttp11Protocol<?>) http2Protocol.getHttp11Protocol()).setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
+        ((AbstractHttp11Protocol<?>) http2Protocol.getHttp11Protocol()).setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
 
-            int bodySize = 8192;
-            int bodyCount = 20;
+        int bodySize = 8192;
+        int bodyCount = 20;
 
-            byte[] headersFrameHeader = new byte[9];
-            ByteBuffer headersPayload = ByteBuffer.allocate(128);
-            byte[] dataFrameHeader = new byte[9];
-            ByteBuffer dataPayload = ByteBuffer.allocate(bodySize);
-            byte[] trailerFrameHeader = new byte[9];
-            ByteBuffer trailerPayload = ByteBuffer.allocate(256);
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        byte[] dataFrameHeader = new byte[9];
+        ByteBuffer dataPayload = ByteBuffer.allocate(bodySize);
+        byte[] trailerFrameHeader = new byte[9];
+        ByteBuffer trailerPayload = ByteBuffer.allocate(256);
 
-            buildPostRequest(headersFrameHeader, headersPayload, false, dataFrameHeader, dataPayload,
-                    null, trailerFrameHeader, trailerPayload, 3);
+        buildPostRequest(headersFrameHeader, headersPayload, false, dataFrameHeader, dataPayload, null, true, 3);
+        buildTrailerHeaders(trailerFrameHeader, trailerPayload, 3);
 
-            // Write the headers
-            writeFrame(headersFrameHeader, headersPayload);
-            // Body
-            for (int i = 0; i < bodyCount; i++) {
-                writeFrame(dataFrameHeader, dataPayload);
-            }
-
-            // Trailers
-            writeFrame(trailerFrameHeader, trailerPayload);
-
-            // The Server will process the request on a separate thread to the
-            // incoming frames.
-            // The request processing thread will:
-            // - read up to 128 bytes of request body
-            //   (and issue a window update for bytes read)
-            // - write a 403 response with no response body
-            // The connection processing thread will:
-            // - read the request body until the flow control window is exhausted
-            // - reset the stream if further DATA frames are received
-            parser.readFrame(true);
-
-            // Check for reset and exit if found
-            if (checkReset()) {
-                return;
-            }
-
-            // Not window update, not reset, must be the headers
-            Assert.assertEquals("3-HeadersStart\n" +
-                    "3-Header-[:status]-[403]\n" +
-                    "3-Header-[content-length]-[0]\n" +
-                    "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                    "3-HeadersEnd\n",
-                    output.getTrace());
-            output.clearTrace();
-            parser.readFrame(true);
-
-            // Check for reset and exit if found
-            if (checkReset()) {
-                return;
-            }
-
-            // Not window update, not reset, must be the response body
-            Assert.assertEquals("3-Body-0\n" +
-                    "3-EndOfStream\n",
-                    output.getTrace());
-            output.clearTrace();
-            parser.readFrame(true);
-
-            Assert.assertTrue(checkReset());
-
-            // If there are any more frames after this, ignore them
-        } finally {
-            LogManager.getLogManager().getLogger("org.apache.coyote.http2").setLevel(Level.INFO);
+        // Write the headers
+        writeFrame(headersFrameHeader, headersPayload);
+        // Body
+        for (int i = 0; i < bodyCount; i++) {
+            writeFrame(dataFrameHeader, dataPayload);
         }
+
+        // Trailers
+        writeFrame(trailerFrameHeader, trailerPayload);
+
+        // The Server will process the request on a separate thread to the
+        // incoming frames.
+        // The request processing thread will:
+        // - read up to 128 bytes of request body
+        // (and issue a window update for bytes read)
+        // - write a 403 response with no response body
+        // The connection processing thread will:
+        // - read the request body until the flow control window is exhausted
+        // - reset the stream if further DATA frames are received
+        parser.readFrame();
+
+        // Check for reset and exit if found
+        if (checkReset()) {
+            return;
+        }
+
+        // Not window update, not reset, must be the headers
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[403]\n" + "3-Header-[content-length]-[0]\n" +
+                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n", output.getTrace());
+        output.clearTrace();
+        parser.readFrame();
+
+        // Check for reset and exit if found
+        if (checkReset()) {
+            return;
+        }
+
+        // Not window update, not reset, must be the response body
+        Assert.assertEquals("3-Body-0\n" + "3-EndOfStream\n", output.getTrace());
+        output.clearTrace();
+        parser.readFrame();
+
+        Assert.assertTrue(checkReset());
+
+        // If there are any more frames after this, ignore them
     }
 
 
     /*
      * Looking for a RST frame with error type 3 (flow control error).
      *
-     * If there is a flow control window update for stream 0 it may be followed
-     * by one for stream 3.
+     * If there is a flow control window update for stream 0 it may be followed by one for stream 3.
      *
-     * If there is a flow control window update for stream 3 it will always be
-     * preceded by one for stream 0.
+     * If there is a flow control window update for stream 3 it will always be preceded by one for stream 0.
      */
     private boolean checkReset() throws IOException, Http2Exception {
         int lastConnectionFlowControlWindowUpdate = -1;
@@ -144,7 +129,7 @@ public class TestCancelledUpload extends Http2TestBase {
                 return false;
             }
             output.clearTrace();
-            parser.readFrame(true);
+            parser.readFrame();
         }
     }
 
@@ -154,7 +139,7 @@ public class TestCancelledUpload extends Http2TestBase {
         Tomcat tomcat = getTomcatInstance();
 
         // Retain '/simple' url-pattern since it enables code re-use
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "cancel", new CancelServlet());
         ctxt.addServletMappingDecoded("/simple", "cancel");
 
@@ -168,7 +153,7 @@ public class TestCancelledUpload extends Http2TestBase {
 
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            // Read upto 128 bytes and then return a 403 response
+            // Read up to 128 bytes and then return a 403 response
 
             InputStream is = req.getInputStream();
             byte[] buf = new byte[128];

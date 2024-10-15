@@ -21,11 +21,12 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.security.PermissionCheck;
 
 /**
  * Utils for introspection and reflection
@@ -56,8 +57,8 @@ public final class IntrospectionUtils {
     @SuppressWarnings("null") // setPropertyMethodVoid is not null when used
     public static boolean setProperty(Object o, String name, String value,
             boolean invokeSetProperty, StringBuilder actualMethod) {
-        if (log.isDebugEnabled()) {
-            log.debug("IntrospectionUtils: setProperty(" +
+        if (log.isTraceEnabled()) {
+            log.trace("IntrospectionUtils: setProperty(" +
                     o.getClass() + " " + name + "=" + value + ")");
         }
 
@@ -131,7 +132,7 @@ public final class IntrospectionUtils {
                             params[0] = InetAddress.getByName(value);
                         } catch (UnknownHostException exc) {
                             if (log.isDebugEnabled()) {
-                                log.debug("IntrospectionUtils: Unable to resolve host name:" + value);
+                                log.debug(sm.getString("introspectionUtils.hostResolutionFail", value));
                             }
                             ok = false;
                         }
@@ -140,8 +141,8 @@ public final class IntrospectionUtils {
                         }
                         // Unknown type
                     } else {
-                        if (log.isDebugEnabled()) {
-                            log.debug("IntrospectionUtils: Unknown type " +
+                        if (log.isTraceEnabled()) {
+                            log.trace("IntrospectionUtils: Unknown type " +
                                     paramType.getName());
                         }
                     }
@@ -307,7 +308,7 @@ public final class IntrospectionUtils {
             return value;
         }
         if (iterationCount >=20) {
-            log.warn("System property failed to update and remains [" + value + "]");
+            log.warn(sm.getString("introspectionUtils.tooManyIterations", value));
             return value;
         }
         StringBuilder sb = new StringBuilder();
@@ -332,14 +333,14 @@ public final class IntrospectionUtils {
                     continue;
                 }
                 String n = value.substring(pos + 2, endName);
-                String v = getProperty(n, staticProp, dynamicProp, classLoader);
+                String v = getProperty(n, staticProp, dynamicProp);
                 if (v == null) {
                     // {name:default}
                     int col = n.indexOf(":-");
                     if (col != -1) {
                         String dV = n.substring(col + 2);
                         n = n.substring(0, col);
-                        v = getProperty(n, staticProp, dynamicProp, classLoader);
+                        v = getProperty(n, staticProp, dynamicProp);
                         if (v == null) {
                             v = dV;
                         }
@@ -361,25 +362,20 @@ public final class IntrospectionUtils {
         if (newval.equals(value)) {
             return value;
         }
-        if (log.isDebugEnabled()) {
-            log.debug("IntrospectionUtils.replaceProperties iter on: " + newval);
+        if (log.isTraceEnabled()) {
+            log.trace("IntrospectionUtils.replaceProperties iter on: " + newval);
         }
         return replaceProperties(newval, staticProp, dynamicProp, classLoader, iterationCount+1);
     }
 
-    private static String getProperty(String name, Hashtable<Object, Object> staticProp,
-            PropertySource[] dynamicProp, ClassLoader classLoader) {
+    private static String getProperty(String name, Hashtable<Object, Object> staticProp, PropertySource[] dynamicProp) {
         String v = null;
         if (staticProp != null) {
             v = (String) staticProp.get(name);
         }
         if (v == null && dynamicProp != null) {
             for (PropertySource propertySource : dynamicProp) {
-                if (propertySource instanceof SecurePropertySource) {
-                    v = ((SecurePropertySource) propertySource).getProperty(name, classLoader);
-                } else {
-                    v = propertySource.getProperty(name);
-                }
+                v = propertySource.getProperty(name);
                 if (v != null) {
                     break;
                 }
@@ -407,7 +403,7 @@ public final class IntrospectionUtils {
         objectMethods.clear();
     }
 
-    private static final Hashtable<Class<?>,Method[]> objectMethods = new Hashtable<>();
+    private static final Map<Class<?>,Method[]> objectMethods = new ConcurrentHashMap<>();
 
     public static Method[] findMethods(Class<?> c) {
         Method methods[] = objectMethods.get(c);
@@ -420,15 +416,18 @@ public final class IntrospectionUtils {
         return methods;
     }
 
-    @SuppressWarnings("null") // params cannot be null when comparing lengths
     public static Method findMethod(Class<?> c, String name,
             Class<?> params[]) {
         Method methods[] = findMethods(c);
         for (Method method : methods) {
             if (method.getName().equals(name)) {
                 Class<?> methodParams[] = method.getParameterTypes();
-                if (params == null && methodParams.length == 0) {
-                    return method;
+                if (params == null) {
+                    if (methodParams.length == 0) {
+                        return method;
+                    } else {
+                        continue;
+                    }
                 }
                 if (params.length != methodParams.length) {
                     continue;
@@ -453,8 +452,8 @@ public final class IntrospectionUtils {
         if (target == null || methodN == null || param1 == null) {
             throw new IllegalArgumentException(sm.getString("introspectionUtils.nullParameter"));
         }
-        if (log.isDebugEnabled()) {
-            log.debug("IntrospectionUtils: callMethod1 " +
+        if (log.isTraceEnabled()) {
+            log.trace("IntrospectionUtils: callMethod1 " +
                     target.getClass().getName() + " " +
                     param1.getClass().getName() + " " + typeParam1);
         }
@@ -467,8 +466,7 @@ public final class IntrospectionUtils {
         }
         Method m = findMethod(target.getClass(), methodN, params);
         if (m == null) {
-            throw new NoSuchMethodException(target.getClass().getName() + " "
-                    + methodN);
+            throw new NoSuchMethodException(sm.getString("introspectionUtils.noMethod", methodN, target, target.getClass()));
         }
         try {
             return m.invoke(target, new Object[] { param1 });
@@ -484,27 +482,24 @@ public final class IntrospectionUtils {
         m = findMethod(target.getClass(), methodN, typeParams);
         if (m == null) {
             if (log.isDebugEnabled()) {
-                log.debug("IntrospectionUtils: Can't find method " + methodN +
-                        " in " + target + " CLASS " + target.getClass());
+                log.debug(sm.getString("introspectionUtils.noMethod", methodN, target, target.getClass()));
             }
             return null;
         }
         try {
             Object o = m.invoke(target, params);
 
-            if (log.isDebugEnabled()) {
-                // debug
+            if (log.isTraceEnabled()) {
                 StringBuilder sb = new StringBuilder();
-                sb.append(target.getClass().getName()).append('.')
-                        .append(methodN).append("( ");
+                sb.append(target.getClass().getName()).append('.').append(methodN).append('(');
                 for (int i = 0; i < params.length; i++) {
                     if (i > 0) {
                         sb.append(", ");
                     }
                     sb.append(params[i]);
                 }
-                sb.append(")");
-                log.debug("IntrospectionUtils:" + sb.toString());
+                sb.append(')');
+                log.trace("IntrospectionUtils:" + sb.toString());
             }
             return o;
         } catch (InvocationTargetException ie) {
@@ -535,15 +530,14 @@ public final class IntrospectionUtils {
                 result = InetAddress.getByName(object);
             } catch (UnknownHostException exc) {
                 if (log.isDebugEnabled()) {
-                    log.debug("IntrospectionUtils: Unable to resolve host name:" +
-                            object);
+                    log.debug(sm.getString("introspectionUtils.hostResolutionFail", object));
                 }
             }
 
             // Unknown type
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("IntrospectionUtils: Unknown type " +
+            if (log.isTraceEnabled()) {
+                log.trace("IntrospectionUtils: Unknown type " +
                         paramType.getName());
             }
         }
@@ -595,28 +589,7 @@ public final class IntrospectionUtils {
     // -------------------- Get property --------------------
     // This provides a layer of abstraction
 
-    public static interface PropertySource {
-        public String getProperty(String key);
-    }
-
-
-    public static interface SecurePropertySource extends PropertySource {
-
-        /**
-         * Obtain a property value, checking that code associated with the
-         * provided class loader has permission to access the property. If the
-         * {@code classLoader} is {@code null} or if {@code classLoader} does
-         * not implement {@link PermissionCheck} then the property value will be
-         * looked up <b>without</b> a call to
-         * {@link PermissionCheck#check(java.security.Permission)}
-         *
-         * @param key           The key of the requested property
-         * @param classLoader   The class loader associated with the code that
-         *                      trigger the property lookup
-         * @return The property value or {@code null} if it could not be found
-         *         or if {@link PermissionCheck#check(java.security.Permission)}
-         *         fails
-         */
-        public String getProperty(String key, ClassLoader classLoader);
+    public interface PropertySource {
+        String getProperty(String key);
     }
 }

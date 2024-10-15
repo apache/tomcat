@@ -47,11 +47,9 @@ public class TestStaticFieldELResolver {
     @Test
     public void testGetValue02() {
         StaticFieldELResolver resolver = new StaticFieldELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Object result = resolver.getValue(context, new ELClass(
-                TesterClass.class), PROPERTY01_NAME);
+        Object result = resolver.getValue(context, new ELClass(TesterClass.class), PROPERTY01_NAME);
 
         Assert.assertEquals(PROPERTY01_NAME, result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -70,8 +68,7 @@ public class TestStaticFieldELResolver {
      */
     @Test
     public void testGetValue04() {
-        doNegativeTest(new ELClass(TesterClass.class), new Object(),
-                MethodUnderTest.GET_VALUE);
+        doNegativeTest(new ELClass(TesterClass.class), new Object(), MethodUnderTest.GET_VALUE);
     }
 
     /**
@@ -112,11 +109,10 @@ public class TestStaticFieldELResolver {
     @Test
     public void testGetValue09() {
         StaticFieldELResolver resolver = new StaticFieldELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Object result = resolver.getValue(context, new ELClass(
-                MethodUnderTest.class), MethodUnderTest.GET_TYPE.toString());
+        Object result = resolver.getValue(context, new ELClass(MethodUnderTest.class),
+                MethodUnderTest.GET_TYPE.toString());
 
         Assert.assertEquals(MethodUnderTest.GET_TYPE, result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -137,11 +133,9 @@ public class TestStaticFieldELResolver {
     @Test(expected = PropertyNotWritableException.class)
     public void testSetValue02() {
         StaticFieldELResolver resolver = new StaticFieldELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        resolver.setValue(context, new ELClass(TesterClass.class),
-                PROPERTY01_NAME, PROPERTY01_VALUE);
+        resolver.setValue(context, new ELClass(TesterClass.class), PROPERTY01_NAME, PROPERTY01_VALUE);
     }
 
     /**
@@ -157,8 +151,7 @@ public class TestStaticFieldELResolver {
      */
     @Test
     public void testSetValue04() {
-        doNegativeTest(new ELClass(TesterClass.class), new Object(),
-                MethodUnderTest.SET_VALUE);
+        doNegativeTest(new ELClass(TesterClass.class), new Object(), MethodUnderTest.SET_VALUE);
     }
 
     /**
@@ -171,17 +164,14 @@ public class TestStaticFieldELResolver {
     }
 
     /**
-     * Tests that the propertyResolved is true when base is ELCLass and the
-     * property is String.
+     * Tests that the propertyResolved is true when base is ELCLass and the property is String.
      */
     @Test
     public void testIsReadOnly02() {
         StaticFieldELResolver resolver = new StaticFieldELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        boolean result = resolver.isReadOnly(context, new ELClass(
-                TesterClass.class), PROPERTY01_NAME);
+        boolean result = resolver.isReadOnly(context, new ELClass(TesterClass.class), PROPERTY01_NAME);
 
         Assert.assertTrue(result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -193,11 +183,9 @@ public class TestStaticFieldELResolver {
     @Test
     public void testIsReadOnly03() {
         StaticFieldELResolver resolver = new StaticFieldELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        boolean result = resolver.isReadOnly(context, new Object(),
-                PROPERTY01_NAME);
+        boolean result = resolver.isReadOnly(context, new Object(), PROPERTY01_NAME);
 
         Assert.assertTrue(result);
         Assert.assertFalse(context.isPropertyResolved());
@@ -209,11 +197,9 @@ public class TestStaticFieldELResolver {
     @Test
     public void testIsReadOnly04() {
         StaticFieldELResolver resolver = new StaticFieldELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        boolean result = resolver.isReadOnly(context, new ELClass(
-                TesterClass.class), new Object());
+        boolean result = resolver.isReadOnly(context, new ELClass(TesterClass.class), new Object());
 
         Assert.assertTrue(result);
         Assert.assertFalse(context.isPropertyResolved());
@@ -234,11 +220,9 @@ public class TestStaticFieldELResolver {
     @Test
     public void testGetType02() {
         StaticFieldELResolver resolver = new StaticFieldELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Class<?> result = resolver.getType(context, new ELClass(
-                TesterClass.class), PROPERTY01_NAME);
+        Class<?> result = resolver.getType(context, new ELClass(TesterClass.class), PROPERTY01_NAME);
 
         // Resolver is read-only so this should return null
         Assert.assertNull(result);
@@ -257,8 +241,7 @@ public class TestStaticFieldELResolver {
      */
     @Test
     public void testGetType04() {
-        doNegativeTest(new ELClass(TesterClass.class), new Object(),
-                MethodUnderTest.GET_TYPE);
+        doNegativeTest(new ELClass(TesterClass.class), new Object(), MethodUnderTest.GET_TYPE);
     }
 
     /**
@@ -299,11 +282,10 @@ public class TestStaticFieldELResolver {
     @Test
     public void testGetType09() {
         StaticFieldELResolver resolver = new StaticFieldELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Class<?> result = resolver.getType(context, new ELClass(
-                MethodUnderTest.class), MethodUnderTest.GET_TYPE.toString());
+        Class<?> result = resolver.getType(context, new ELClass(MethodUnderTest.class),
+                MethodUnderTest.GET_TYPE.toString());
 
         // Resolver is read-only so this should return null
         Assert.assertNull(result);
@@ -315,8 +297,7 @@ public class TestStaticFieldELResolver {
     @Test(expected = NullPointerException.class)
     public void testInvoke01() {
         StaticFieldELResolver resolver = new StaticFieldELResolver();
-        resolver.invoke(null, new Object(), new Object(), new Class<?>[] {},
-                new Object[] {});
+        resolver.invoke(null, new Object(), new Object(), new Class<?>[] {}, new Object[] {});
     }
 
     /**
@@ -325,11 +306,9 @@ public class TestStaticFieldELResolver {
     @Test
     public void testInvoke02() {
         StaticFieldELResolver resolver = new StaticFieldELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Object result = resolver.invoke(context,
-                new ELClass(TesterClass.class), METHOD01_NAME, null, null);
+        Object result = resolver.invoke(context, new ELClass(TesterClass.class), METHOD01_NAME, null, null);
 
         Assert.assertEquals(TesterClass.class, result.getClass());
         Assert.assertTrue(context.isPropertyResolved());
@@ -341,12 +320,10 @@ public class TestStaticFieldELResolver {
     @Test
     public void testInvoke03() {
         StaticFieldELResolver resolver = new StaticFieldELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Object result = resolver.invoke(context,
-                new ELClass(TesterClass.class), METHOD02_NAME,
-                new Class<?>[] {}, new Object[] {});
+        Object result = resolver.invoke(context, new ELClass(TesterClass.class), METHOD02_NAME, new Class<?>[] {},
+                new Object[] {});
 
         Assert.assertEquals(PROPERTY01_NAME, result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -365,8 +342,7 @@ public class TestStaticFieldELResolver {
      */
     @Test
     public void testInvoke05() {
-        doNegativeTest(new ELClass(TesterClass.class), new Object(),
-                MethodUnderTest.INVOKE);
+        doNegativeTest(new ELClass(TesterClass.class), new Object(), MethodUnderTest.INVOKE);
     }
 
     /**
@@ -391,75 +367,36 @@ public class TestStaticFieldELResolver {
     @Test
     public void testInvoke08() {
         StaticFieldELResolver resolver = new StaticFieldELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Object result = resolver.invoke(context,
-                new ELClass(TesterClass.class), METHOD04_NAME,
-                new Class<?>[] {}, new Object[] {});
+        Object result = resolver.invoke(context, new ELClass(TesterClass.class), METHOD04_NAME, new Class<?>[] {},
+                new Object[] {});
 
         Assert.assertNull(result);
         Assert.assertTrue(context.isPropertyResolved());
     }
 
-    private void doNegativeTest(Object elClass, Object trigger,
-            MethodUnderTest method) {
+    private void doNegativeTest(Object elClass, Object trigger, MethodUnderTest method) {
         StaticFieldELResolver resolver = new StaticFieldELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         Object result = null;
         switch (method) {
-        case GET_VALUE: {
-            result = resolver.getValue(context, elClass, trigger);
-            break;
-        }
-        case SET_VALUE: {
-            resolver.setValue(context, elClass, trigger, PROPERTY01_VALUE);
-            result = resolver.getValue(context, elClass, trigger);
-            break;
-        }
-        case GET_TYPE: {
-            result = resolver.getType(context, elClass, trigger);
-            break;
-        }
-        case INVOKE: {
-            result = resolver.invoke(context, elClass, trigger,
-                    new Class<?>[] { String.class }, new Object[] { "test" });
-            break;
-        }
-        default: {
-            // Should never happen
-            Assert.fail("Missing case for method");
-        }
-        }
-
-        Assert.assertNull(result);
-        Assert.assertFalse(context.isPropertyResolved());
-    }
-
-    private void doThrowableTest(String trigger, MethodUnderTest method,
-            boolean checkCause) {
-        StaticFieldELResolver resolver = new StaticFieldELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
-
-        ELException exception = null;
-        try {
-            switch (method) {
             case GET_VALUE: {
-                resolver.getValue(context, new ELClass(TesterClass.class),
-                        trigger);
+                result = resolver.getValue(context, elClass, trigger);
+                break;
+            }
+            case SET_VALUE: {
+                resolver.setValue(context, elClass, trigger, PROPERTY01_VALUE);
+                result = resolver.getValue(context, elClass, trigger);
                 break;
             }
             case GET_TYPE: {
-                resolver.getType(context, new ELClass(TesterClass.class),
-                        trigger);
+                result = resolver.getType(context, elClass, trigger);
                 break;
             }
             case INVOKE: {
-                resolver.invoke(context, new ELClass(TesterClass.class),
-                        trigger, new Class<?>[] { String.class },
+                result = resolver.invoke(context, elClass, trigger, new Class<?>[] { String.class },
                         new Object[] { "test" });
                 break;
             }
@@ -467,6 +404,36 @@ public class TestStaticFieldELResolver {
                 // Should never happen
                 Assert.fail("Missing case for method");
             }
+        }
+
+        Assert.assertNull(result);
+        Assert.assertFalse(context.isPropertyResolved());
+    }
+
+    private void doThrowableTest(String trigger, MethodUnderTest method, boolean checkCause) {
+        StaticFieldELResolver resolver = new StaticFieldELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        ELException exception = null;
+        try {
+            switch (method) {
+                case GET_VALUE: {
+                    resolver.getValue(context, new ELClass(TesterClass.class), trigger);
+                    break;
+                }
+                case GET_TYPE: {
+                    resolver.getType(context, new ELClass(TesterClass.class), trigger);
+                    break;
+                }
+                case INVOKE: {
+                    resolver.invoke(context, new ELClass(TesterClass.class), trigger, new Class<?>[] { String.class },
+                            new Object[] { "test" });
+                    break;
+                }
+                default: {
+                    // Should never happen
+                    Assert.fail("Missing case for method");
+                }
             }
 
         } catch (PropertyNotFoundException | MethodNotFoundException e) {
@@ -484,6 +451,9 @@ public class TestStaticFieldELResolver {
     }
 
     private enum MethodUnderTest {
-        GET_VALUE, SET_VALUE, GET_TYPE, INVOKE
+        GET_VALUE,
+        SET_VALUE,
+        GET_TYPE,
+        INVOKE
     }
 }

@@ -154,9 +154,9 @@
         <p>Please note that the session's <code>Principal</code> class as well
         as its descendant classes are all subject to the
         <strong>sessionAttributeValueClassNameFilter</strong>. If such a filter
-        is specified or a <code>SecurityManager</code> is enabled, the names of
-        the <code>Principal</code> class and descendant classes must match that
-        filter pattern in order to be restored.</p>
+        is specified the names of the <code>Principal</code> class and
+        descendant classes must match that filter pattern in order to be
+        restored.</p>
       </attribute>
 
       <attribute name="processExpiresFrequency" required="false">
@@ -196,7 +196,8 @@
 
       <attribute name="sessionAttributeNameFilter" required="false">
         <p>A regular expression used to filter which session attributes will be
-        distributed. An attribute will only be distributed if its name matches
+        serialized for clustering/replication, or storage to any persistent store.
+        An attribute will only be serialized if its name matches
         this pattern. If the pattern is zero length or <code>null</code>, all
         attributes are eligible for distribution. The pattern is anchored so the
         session attribute name must fully match the pattern. As an example, the
@@ -208,14 +209,13 @@
 
       <attribute name="sessionAttributeValueClassNameFilter" required="false">
         <p>A regular expression used to filter which session attributes will be
-        distributed. An attribute will only be distributed if the implementation
+        serialized for clustering/replication, or storage to any persistent store.
+        An attribute will only be serialized if the implementation
         class name of the value matches this pattern. If the pattern is zero
         length or <code>null</code>, all attributes are eligible for
         distribution. The pattern is anchored so the fully qualified class name
         must fully match the pattern. If not specified, the default value of
-        <code>null</code> will be used unless a <code>SecurityManager</code> is
-        enabled in which case the default will be
-        <code>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\$SerializablePrincipal|\\[Ljava.lang.String;</code>.</p>
+        <code>null</code> will be used.</p>
       </attribute>
 
       <attribute name="warnOnSessionAttributeFilterFailure" required="false">
@@ -224,8 +224,7 @@
         attribute, should this be logged at <code>WARN</code> level? If
         <code>WARN</code> level logging is disabled then it will be logged at
         <code>DEBUG</code>. The default value of this attribute is
-        <code>false</code> unless a <code>SecurityManager</code> is enabled in
-        which case the default will be <code>true</code>.</p>
+        <code>false</code>.</p>
       </attribute>
     </attributes>
 
@@ -296,9 +295,9 @@
         <p>Please note that the session's <code>Principal</code> class as well
         as its descendant classes are all subject to the
         <strong>sessionAttributeValueClassNameFilter</strong>. If such a filter
-        is specified or a <code>SecurityManager</code> is enabled, the names of
-        the <code>Principal</code> class and descendant classes must match that
-        filter pattern in order to be restored.</p>
+        is specified the names of the <code>Principal</code> class and
+        descendant classes must match that filter pattern in order to be
+        restored.</p>
       </attribute>
 
       <attribute name="processExpiresFrequency" required="false">
@@ -334,7 +333,8 @@
 
       <attribute name="sessionAttributeNameFilter" required="false">
         <p>A regular expression used to filter which session attributes will be
-        distributed. An attribute will only be distributed if its name matches
+        serialized for clustering/replication, or storage to any persistent store.
+        An attribute will only be serialized if its name matches
         this pattern. If the pattern is zero length or <code>null</code>, all
         attributes are eligible for distribution. The pattern is anchored so the
         session attribute name must fully match the pattern. As an example, the
@@ -346,14 +346,13 @@
 
       <attribute name="sessionAttributeValueClassNameFilter" required="false">
         <p>A regular expression used to filter which session attributes will be
-        distributed. An attribute will only be distributed if the implementation
+        serialized for clustering/replication, or storage to any persistent store.
+        An attribute will only be serialized if the implementation
         class name of the value matches this pattern. If the pattern is zero
         length or <code>null</code>, all attributes are eligible for
         distribution. The pattern is anchored so the fully qualified class name
         must fully match the pattern. If not specified, the default value of
-        <code>null</code> will be used unless a <code>SecurityManager</code> is
-        enabled in which case the default will be
-        <code>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\$SerializablePrincipal|\\[Ljava.lang.String;</code>.</p>
+        <code>null</code> will be used.</p>
       </attribute>
 
       <attribute name="warnOnSessionAttributeFilterFailure" required="false">
@@ -362,8 +361,7 @@
         attribute, should this be logged at <code>WARN</code> level? If
         <code>WARN</code> level logging is disabled then it will be logged at
         <code>DEBUG</code>. The default value of this attribute is
-        <code>false</code> unless a <code>SecurityManager</code> is enabled in
-        which case the default will be <code>true</code>.</p>
+        <code>false</code>.</p>
       </attribute>
     </attributes>
 

@@ -155,10 +155,6 @@
                description="Object that creates and destroys servlets, filters, and listeners. Include dependency injection and postConstruct/preDestroy handling"
                type="org.apache.tomcat.InstanceManager" />
 
-    <attribute name="javaVMs"
-               description="The Java virtual machines on which this module is running"
-               type="[Ljava.lang.String;"/>
-
     <attribute name="loader"
                description="Associated loader."
                type="org.apache.catalina.Loader" />
@@ -323,10 +319,6 @@
 
     <attribute name="unpackWAR"
                description="Unpack WAR property"
-               type="boolean"/>
-
-    <attribute name="useBloomFilterForArchives"
-               description="Use a bloom filter for archives lookups"
                type="boolean"/>
 
     <attribute name="useHttpOnly"

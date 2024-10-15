@@ -156,7 +156,8 @@
         <p>A regular expression defining paths to ignore when
         <code>autoDeploy</code> and <code>deployOnStartup</code> are set. This
         allows you to keep your configuration in a version control system, for
-        example, and not deploy a .svn or CVS folder that happens to be in the
+        example, and not deploy a <code>.svn</code>, <code>.git</code> or other
+        configuration control system folder that happens to be in the
         <code>appBase</code>.</p>
         <p>This regular expression is relative to <code>appBase</code>. It is
         also <em>anchored</em>, meaning the match is performed against the
@@ -278,14 +279,7 @@
         descriptor is present in <strong>xmlBase</strong> then the context will
         fail to start in case the descriptor contains necessary configuration
         for secure deployment (such as a RemoteAddrValve) which should not be
-        ignored. The default is <code>true</code> unless a security manager is
-        enabled when the default is <code>false</code>. When running under a
-        security manager this may be enabled on a per web application basis by
-        granting the
-        <code>org.apache.catalina.security.DeployXmlPermission</code> to the web
-        application. The Manager and Host Manager applications are granted this
-        permission by default so that they continue to work when running under a
-        security manager.</p>
+        ignored. The default is <code>true</code>.</p>
       </attribute>
 
       <attribute name="errorReportValveClass" required="false">
@@ -296,7 +290,8 @@
         implement the
         <code>org.apache.catalina.Valve</code> interface. If none is specified,
         the value <code>org.apache.catalina.valves.ErrorReportValve</code>
-        will be used by default.</p>
+        will be used by default. if set to an empty string, the error report
+        will be disabled.</p>
       </attribute>
 
       <attribute name="unpackWARs" required="false">

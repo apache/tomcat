@@ -16,10 +16,8 @@
  */
 package jakarta.el;
 
-import java.beans.FeatureDescriptor;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,7 +26,7 @@ public class ListELResolver extends ELResolver {
     private final boolean readOnly;
 
     // TODO - Handle the Lists created by List.of(). Multiple package private
-    //        classes. Java 9 + so a back-port would require JreCompat.
+    // classes. Java 9 + so a back-port would require JreCompat.
     private static final Class<?> UNMODIFIABLE = Collections.unmodifiableList(new ArrayList<>()).getClass();
 
     public ListELResolver() {
@@ -48,13 +46,11 @@ public class ListELResolver extends ELResolver {
             List<?> list = (List<?>) base;
             int idx = coerce(property);
             if (idx < 0 || idx >= list.size()) {
-                throw new PropertyNotFoundException(
-                        new ArrayIndexOutOfBoundsException(idx).getMessage());
+                throw new PropertyNotFoundException(new ArrayIndexOutOfBoundsException(idx).getMessage());
             }
 
             /*
-             * Not perfect as a custom list implementation may be read-only but
-             * consistent with isReadOnly().
+             * Not perfect as a custom list implementation may be read-only but consistent with isReadOnly().
              */
             if (list.getClass() == UNMODIFIABLE || readOnly) {
                 return null;
@@ -84,8 +80,7 @@ public class ListELResolver extends ELResolver {
     }
 
     @Override
-    public void setValue(ELContext context, Object base, Object property,
-            Object value) {
+    public void setValue(ELContext context, Object base, Object property, Object value) {
         Objects.requireNonNull(context);
 
         if (base instanceof List<?>) {
@@ -94,8 +89,8 @@ public class ListELResolver extends ELResolver {
             List<Object> list = (List<Object>) base;
 
             if (this.readOnly) {
-                throw new PropertyNotWritableException(Util.message(context,
-                        "resolverNotWritable", base.getClass().getName()));
+                throw new PropertyNotWritableException(
+                        Util.message(context, "resolverNotWritable", base.getClass().getName()));
             }
 
             int idx = coerce(property);
@@ -119,9 +114,7 @@ public class ListELResolver extends ELResolver {
             try {
                 int idx = coerce(property);
                 if (idx < 0 || idx >= list.size()) {
-                    throw new PropertyNotFoundException(
-                            new ArrayIndexOutOfBoundsException(idx)
-                                    .getMessage());
+                    throw new PropertyNotFoundException(new ArrayIndexOutOfBoundsException(idx).getMessage());
                 }
             } catch (IllegalArgumentException e) {
                 // ignore
@@ -132,12 +125,6 @@ public class ListELResolver extends ELResolver {
         return this.readOnly;
     }
 
-    @Deprecated(forRemoval = true, since = "EL 5.0")
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        return null;
-    }
-
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
         if (base instanceof List<?>) { // implies base != null
@@ -146,7 +133,7 @@ public class ListELResolver extends ELResolver {
         return null;
     }
 
-    private static final int coerce(Object property) {
+    private static int coerce(Object property) {
         if (property instanceof Number) {
             return ((Number) property).intValue();
         }
@@ -159,7 +146,6 @@ public class ListELResolver extends ELResolver {
         if (property instanceof String) {
             return Integer.parseInt((String) property);
         }
-        throw new IllegalArgumentException(property != null ?
-                property.toString() : "null");
+        throw new IllegalArgumentException(property != null ? property.toString() : "null");
     }
 }

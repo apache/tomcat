@@ -36,7 +36,7 @@ import org.apache.tomcat.dbcp.pool2.KeyedObjectPool;
  *
  * @since 2.0
  */
-class UserPassKey implements Serializable {
+final class UserPassKey implements Serializable {
     private static final long serialVersionUID = 5142970911626584817L;
 
     private final CharArray name;

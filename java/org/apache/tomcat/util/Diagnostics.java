@@ -123,8 +123,8 @@ public class Diagnostics {
         threadMXBean.setThreadContentionMonitoringEnabled(enable);
         boolean checkValue = threadMXBean.isThreadContentionMonitoringEnabled();
         if (enable != checkValue) {
-            log.error("Could not set threadContentionMonitoringEnabled to " +
-                      enable + ", got " + checkValue + " instead");
+            log.error(sm.getString("diagnostics.setPropertyFail", "threadContentionMonitoringEnabled",
+                    Boolean.valueOf(enable), Boolean.valueOf(checkValue)));
         }
     }
 
@@ -146,8 +146,8 @@ public class Diagnostics {
         threadMXBean.setThreadCpuTimeEnabled(enable);
         boolean checkValue = threadMXBean.isThreadCpuTimeEnabled();
         if (enable != checkValue) {
-            log.error("Could not set threadCpuTimeEnabled to " + enable +
-                      ", got " + checkValue + " instead");
+            log.error(sm.getString("diagnostics.setPropertyFail", "threadCpuTimeEnabled",
+                    Boolean.valueOf(enable), Boolean.valueOf(checkValue)));
         }
     }
 
@@ -167,8 +167,8 @@ public class Diagnostics {
         classLoadingMXBean.setVerbose(verbose);
         boolean checkValue = classLoadingMXBean.isVerbose();
         if (verbose != checkValue) {
-            log.error("Could not set verbose class loading to " + verbose +
-                      ", got " + checkValue + " instead");
+            log.error(sm.getString("diagnostics.setPropertyFail", "verboseClassLoading",
+                    Boolean.valueOf(verbose), Boolean.valueOf(checkValue)));
         }
     }
 
@@ -182,9 +182,9 @@ public class Diagnostics {
         loggingMXBean.setLoggerLevel(loggerName, levelName);
         String checkValue = loggingMXBean.getLoggerLevel(loggerName);
         if (!checkValue.equals(levelName)) {
-            log.error("Could not set logger level for logger '" +
-                      loggerName + "' to '" + levelName +
-                      "', got '" + checkValue + "' instead");
+            String propertyName = "loggerLevel[" + loggerName + "]";
+            log.error(sm.getString("diagnostics.setPropertyFail", propertyName,
+                    levelName, checkValue));
         }
     }
 
@@ -197,8 +197,8 @@ public class Diagnostics {
         memoryMXBean.setVerbose(verbose);
         boolean checkValue = memoryMXBean.isVerbose();
         if (verbose != checkValue) {
-            log.error("Could not set verbose garbage collection logging to " + verbose +
-                      ", got " + checkValue + " instead");
+            log.error(sm.getString("diagnostics.setPropertyFail", "verboseGarbageCollection",
+                    Boolean.valueOf(verbose), Boolean.valueOf(checkValue)));
         }
     }
 
@@ -374,7 +374,7 @@ public class Diagnostics {
                                                 true, true);
             if (tinfos != null) {
                 StringBuilder sb =
-                    new StringBuilder("Deadlock found between the following threads:");
+                    new StringBuilder(sm.getString("diagnostics.deadlockFound"));
                 sb.append(CRLF);
                 sb.append(getThreadDump(tinfos));
                 return sb.toString();
@@ -487,6 +487,7 @@ public class Diagnostics {
      * @param requestedSm the StringManager to use
      * @return the formatted JVM information text
      */
+    @SuppressWarnings("deprecation")
     public static String getVMInfo(StringManager requestedSm) {
         StringBuilder sb = new StringBuilder();
 

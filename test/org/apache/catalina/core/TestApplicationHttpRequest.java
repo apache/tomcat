@@ -182,7 +182,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         if (forwardQueryString == null) {
             Tomcat.addServlet(ctx, "forward", new ForwardServlet("/display"));
@@ -216,7 +216,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "forward", new ForwardServlet("/modify"));
         ctx.addServletMappingDecoded("/forward", "forward");
@@ -243,7 +243,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
 
         private final String target;
 
-        public ForwardServlet(String target) {
+        ForwardServlet(String target) {
             this.target = target;
         }
 
@@ -262,7 +262,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
 
         private Map<String,String[]> expected;
 
-        public DisplayParameterServlet(Map<String,String[]> expected) {
+        DisplayParameterServlet(Map<String,String[]> expected) {
             this.expected = expected;
         }
 

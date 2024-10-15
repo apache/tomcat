@@ -20,25 +20,39 @@ body {
     font-family: Arial, sans-serif;
 }
 
-h1, h2, h3, h4, h5, h6, p, ul, ol {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+ol {
     margin: 0 0 0.5em;
 }
+
 h1 {
     font-size: 18pt;
     margin: 0.5em 0 0;
 }
+
 h2 {
     font-size: 16pt;
 }
+
 h3 {
     font-size: 13pt;
 }
+
 h4 {
     font-size: 12pt;
 }
+
 h5 {
     font-size: 11pt;
 }
+
 p {
     font-size: 11pt
 }
@@ -49,6 +63,7 @@ ul {
     text-indent: 0;
     list-style: none;
 }
+
 li {
     margin: 0;
     padding: 0 0 0.25em;
@@ -109,15 +124,18 @@ a img {
     margin: 0 0 10px;
     padding: 0;
 }
+
 #navigation span {
     float: left;
 }
+
 #navigation span a {
     display: block;
     padding: 10px;
     font-weight: bold;
     text-shadow: 1px 1px 1px #fff;
 }
+
 #navigation span a:link,
 #navigation span a:visited,
 #navigation span a:hover,
@@ -125,6 +143,7 @@ a img {
     color: #666;
     text-decoration: none;
 }
+
 #navigation span#nav-help {
     float: right;
     margin-right: 0;
@@ -132,10 +151,12 @@ a img {
 
 #asf-box {
     height: 40px;
-    background: #fff url(asf-logo-wide.svg) no-repeat top right;}
+    background: #fff url(asf-logo-wide.svg) no-repeat top right;
+}
+
 #asf-box h1 {
-    padding: 0;
     margin: 0;
+    line-height: 1.5;
 }
 
 #upper {
@@ -148,6 +169,7 @@ a img {
     margin: 0 40px 20px;
     background-color: #9c9;
 }
+
 #congrats h2 {
     font-size: 14pt;
     padding: 0;
@@ -160,6 +182,7 @@ a img {
     width: 560px;
     color: #696;
 }
+
 #notice a:link,
 #notice a:visited,
 #notice a:hover,
@@ -167,16 +190,19 @@ a img {
     color: #090;
     text-decoration: none;
 }
+
 #notice img,
 #notice #tasks {
     float: left;
 }
+
 #tasks a:link,
 #tasks a:visited,
 #tasks a:hover,
 #tasks a:active {
     text-decoration: underline;
 }
+
 #notice img {
     margin-right: 20px;
 }
@@ -220,13 +246,16 @@ a img {
     margin: 20px 0;
     padding: 1px 10px;
 }
+
 #middle h3 {
     margin: 0 0 10px;
     color: #033;
 }
+
 #middle p {
     font-size: 10pt;
 }
+
 #middle a:link,
 #middle a:visited,
 #middle a:hover,
@@ -234,6 +263,7 @@ a img {
     color: #366;
     font-weight: bold;
 }
+
 #middle .col25 .container {
     padding: 0 0 1px;
 }
@@ -242,6 +272,7 @@ a img {
     float: left;
     width: 40%;
 }
+
 #security {
     float: right;
     width: 50%;
@@ -269,29 +300,36 @@ a img {
     color: #963;
     font-size: 14pt;
 }
+
 #lower h4 {
     font-size: 12pt;
 }
+
 #lower ul {
     padding: 0;
     margin: 0.5em 0;
 }
+
 #lower p,
 #lower li {
     font-size: 9pt;
     color: #753;
     margin: 0 0 0.1em;
 }
+
 #lower li {
     padding: 3px 5px;
 }
+
 #lower li strong {
     color: #a53;
 }
+
 #lower li#list-announce {
     border: 1px solid #f90;
     background-color: #ffe8c8;
 }
+
 #lower p {
     font-size: 10.5pt;
 }
@@ -302,9 +340,11 @@ a img {
     float: left;
     width: 32%;
 }
+
 #low-docs {
     margin: 0 0 0 2.2%;
 }
+
 #low-help {
     float: right;
 }
@@ -324,18 +364,22 @@ a img {
     color: #999;
     background-color: #eee;
 }
+
 #footer h4 {
     margin: 0 0 10px;
     font-size: 10pt;
 }
+
 #footer p {
     margin: 0 0 10px;
     font-size: 10pt;
 }
+
 #footer ul {
     margin: 6px 0 1px;
     padding: 0;
 }
+
 #footer li {
     margin: 0;
     font-size: 9pt;

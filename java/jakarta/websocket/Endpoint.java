@@ -21,17 +21,16 @@ public abstract class Endpoint {
     /**
      * Event that is triggered when a new session starts.
      *
-     * @param session   The new session.
-     * @param config    The configuration with which the Endpoint was
-     *                  configured.
+     * @param session The new session.
+     * @param config  The configuration with which the Endpoint was configured.
      */
     public abstract void onOpen(Session session, EndpointConfig config);
 
     /**
      * Event that is triggered when a session has closed.
      *
-     * @param session       The session
-     * @param closeReason   Why the session was closed
+     * @param session     The session
+     * @param closeReason Why the session was closed
      */
     public void onClose(Session session, CloseReason closeReason) {
         // NO-OP by default

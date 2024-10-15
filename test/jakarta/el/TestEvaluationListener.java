@@ -23,7 +23,7 @@ import jakarta.el.TesterEvaluationListener.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestEvaluationListener {
+public class TestEvaluationListener extends ELBaseTest {
 
 
     @Test
@@ -84,8 +84,7 @@ public class TestEvaluationListener {
         ExpressionFactory factory = ELManager.getExpressionFactory();
         ELContext context = new TesterELContext();
         String expression = "${1 + 1}";
-        ValueExpression ve =
-                factory.createValueExpression(context, expression, int.class);
+        ValueExpression ve = factory.createValueExpression(context, expression, int.class);
 
         TesterEvaluationListener listener = new TesterEvaluationListener();
         context.addEvaluationListener(listener);
@@ -110,8 +109,7 @@ public class TestEvaluationListener {
         ExpressionFactory factory = ELManager.getExpressionFactory();
         ELContext context = new TesterELContext(new CompositeELResolver());
         String expression = "${foo.bar + 1}";
-        ValueExpression ve =
-                factory.createValueExpression(context, expression, int.class);
+        ValueExpression ve = factory.createValueExpression(context, expression, int.class);
 
         TesterEvaluationListener listener = new TesterEvaluationListener();
         context.addEvaluationListener(listener);

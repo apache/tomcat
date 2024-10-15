@@ -32,7 +32,7 @@ public interface SessionListener extends EventListener {
      *
      * @param event SessionEvent that has occurred
      */
-    public void sessionEvent(SessionEvent event);
+    void sessionEvent(SessionEvent event);
 
 
 }

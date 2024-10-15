@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class Constants {
 
-    public static final String SPEC_VERSION = "3.1";
+    public static final String SPEC_VERSION = "4.0";
 
     /**
      * These classes/packages are automatically imported by the
@@ -58,12 +58,6 @@ public class Constants {
      * Default tag handler pool size.
      */
     public static final int MAX_POOL_SIZE = 5;
-
-    /**
-     * Has security been turned on?
-     */
-    public static final boolean IS_SECURITY_ENABLED =
-        (System.getSecurityManager() != null);
 
     /**
      * Name of the system property containing

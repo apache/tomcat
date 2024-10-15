@@ -255,9 +255,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                 ObjectName oname = getObjectName(getClass(),poolName);
                 JmxUtil.unregisterJmx(oname);
             }
-        } catch (MalformedObjectNameException e) {
-            log.warn("Jmx deregistration failed.",e);
-        } catch (RuntimeOperationsException e) {
+        } catch (MalformedObjectNameException | RuntimeOperationsException e) {
             log.warn("Jmx deregistration failed.",e);
         }
 
@@ -288,9 +286,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             } else {
                 log.warn(SlowQueryReport.class.getName()+ "- No JMX support, composite type was not found.");
             }
-        } catch (MalformedObjectNameException e) {
-            log.error("Jmx registration failed, no JMX data will be exposed for the query stats.",e);
-        } catch (RuntimeOperationsException e) {
+        } catch (MalformedObjectNameException | RuntimeOperationsException e) {
             log.error("Jmx registration failed, no JMX data will be exposed for the query stats.",e);
         }
     }

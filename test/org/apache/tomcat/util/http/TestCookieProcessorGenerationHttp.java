@@ -42,7 +42,7 @@ public class TestCookieProcessorGenerationHttp extends TomcatBaseTest {
     public void testUtf8CookieValue() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.setCookieProcessor(new Rfc6265CookieProcessor());
         Tomcat.addServlet(ctx, "test", new CookieServlet("\u0120"));
         ctx.addServletMappingDecoded("/test", "test");
@@ -70,7 +70,7 @@ public class TestCookieProcessorGenerationHttp extends TomcatBaseTest {
 
         private final String cookieValue;
 
-        public CookieServlet(String cookieValue) {
+        CookieServlet(String cookieValue) {
             this.cookieValue = cookieValue;
         }
 

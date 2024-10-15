@@ -16,14 +16,14 @@
  */
 package jakarta.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class CompositeELResolver extends ELResolver {
 
     private static final Class<?> SCOPED_ATTRIBUTE_EL_RESOLVER;
+    private static final Set<String> KNOWN_NON_TYPE_CONVERTING_RESOLVERS = new HashSet<>();
     static {
         Class<?> clazz = null;
         try {
@@ -32,34 +32,79 @@ public class CompositeELResolver extends ELResolver {
             // Ignore. This is expected if using the EL stand-alone
         }
         SCOPED_ATTRIBUTE_EL_RESOLVER = clazz;
+
+        // EL API Resolvers
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(ArrayELResolver.class.getName());
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(BeanELResolver.class.getName());
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(BeanNameELResolver.class.getName());
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(ListELResolver.class.getName());
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(MapELResolver.class.getName());
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(RecordELResolver.class.getName());
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(ResourceBundleELResolver.class.getName());
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add(StaticFieldELResolver.class.getName());
+        // JSP API Resolvers - referenced by name to avoid creating dependency
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("jakarta.servlet.jsp.el.ImplicitObjectELResolver");
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("jakarta.servlet.jsp.el.ImportELResolver");
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("jakarta.servlet.jsp.el.NotFoundELResolver");
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("jakarta.servlet.jsp.el.ScopedAttributeELResolver");
+        // Tomcat internal resolvers - referenced by name to avoid creating dependency
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("org.apache.jasper.el.JasperELResolver$GraalBeanELResolver");
+        KNOWN_NON_TYPE_CONVERTING_RESOLVERS.add("org.apache.el.stream.StreamELResolverImpl");
     }
 
-    private int size;
-
+    private int resolversSize;
     private ELResolver[] resolvers;
 
+    /*
+     * Use a separate array for ELResolvers that might implement type conversion as a performance optimisation. See
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=68119
+     */
+    private int typeConvertersSize;
+    private ELResolver[] typeConverters;
+
     public CompositeELResolver() {
-        this.size = 0;
-        this.resolvers = new ELResolver[8];
+        resolversSize = 0;
+        resolvers = new ELResolver[8];
+
+        typeConvertersSize = 0;
+        typeConverters = new ELResolver[0];
     }
 
     public void add(ELResolver elResolver) {
         Objects.requireNonNull(elResolver);
 
-        if (this.size >= this.resolvers.length) {
-            ELResolver[] nr = new ELResolver[this.size * 2];
-            System.arraycopy(this.resolvers, 0, nr, 0, this.size);
-            this.resolvers = nr;
+        /*
+         * resolversSize should never be larger than resolvers.length. If it ever is, the code will fail when execution
+         * reaches System.arraycopy with an IndexOutOfBoundsException.
+         */
+        if (resolversSize >= resolvers.length) {
+            ELResolver[] nr = new ELResolver[resolversSize * 2];
+            System.arraycopy(resolvers, 0, nr, 0, resolversSize);
+            resolvers = nr;
         }
-        this.resolvers[this.size++] = elResolver;
+        resolvers[resolversSize++] = elResolver;
+
+        if (KNOWN_NON_TYPE_CONVERTING_RESOLVERS.contains(elResolver.getClass().getName())) {
+            // Performance optimisation. ELResolver known not to perform type conversion
+            return;
+        }
+
+        if (typeConvertersSize == 0) {
+            typeConverters = new ELResolver[1];
+        } else if (typeConvertersSize == typeConverters.length) {
+            ELResolver[] expandedTypeConverters = new ELResolver[typeConvertersSize * 2];
+            System.arraycopy(typeConverters, 0, expandedTypeConverters, 0, typeConvertersSize);
+            typeConverters = expandedTypeConverters;
+        }
+        typeConverters[typeConvertersSize++] = elResolver;
     }
 
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
         context.setPropertyResolved(false);
-        int sz = this.size;
+        int sz = resolversSize;
         for (int i = 0; i < sz; i++) {
-            Object result = this.resolvers[i].getValue(context, base, property);
+            Object result = resolvers[i].getValue(context, base, property);
             if (context.isPropertyResolved()) {
                 return result;
             }
@@ -67,14 +112,10 @@ public class CompositeELResolver extends ELResolver {
         return null;
     }
 
-    /**
-     * @since EL 2.2
-     */
     @Override
-    public Object invoke(ELContext context, Object base, Object method,
-            Class<?>[] paramTypes, Object[] params) {
+    public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
         context.setPropertyResolved(false);
-        int sz = this.size;
+        int sz = this.resolversSize;
         for (int i = 0; i < sz; i++) {
             Object obj = this.resolvers[i].invoke(context, base, method, paramTypes, params);
             if (context.isPropertyResolved()) {
@@ -87,7 +128,7 @@ public class CompositeELResolver extends ELResolver {
     @Override
     public Class<?> getType(ELContext context, Object base, Object property) {
         context.setPropertyResolved(false);
-        int sz = this.size;
+        int sz = this.resolversSize;
         for (int i = 0; i < sz; i++) {
             Class<?> type = this.resolvers[i].getType(context, base, property);
             if (context.isPropertyResolved()) {
@@ -110,7 +151,7 @@ public class CompositeELResolver extends ELResolver {
     @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
         context.setPropertyResolved(false);
-        int sz = this.size;
+        int sz = this.resolversSize;
         for (int i = 0; i < sz; i++) {
             this.resolvers[i].setValue(context, base, property, value);
             if (context.isPropertyResolved()) {
@@ -122,7 +163,7 @@ public class CompositeELResolver extends ELResolver {
     @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         context.setPropertyResolved(false);
-        int sz = this.size;
+        int sz = this.resolversSize;
         for (int i = 0; i < sz; i++) {
             boolean readOnly = this.resolvers[i].isReadOnly(context, base, property);
             if (context.isPropertyResolved()) {
@@ -132,16 +173,10 @@ public class CompositeELResolver extends ELResolver {
         return false;
     }
 
-    @Deprecated(forRemoval = true, since = "EL 5.0")
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        return new FeatureIterator(context, base, this.resolvers, this.size);
-    }
-
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
         Class<?> commonType = null;
-        int sz = this.size;
+        int sz = this.resolversSize;
         for (int i = 0; i < sz; i++) {
             Class<?> type = this.resolvers[i].getCommonPropertyType(context, base);
             if (type != null && (commonType == null || commonType.isAssignableFrom(type))) {
@@ -154,83 +189,13 @@ public class CompositeELResolver extends ELResolver {
     @Override
     public <T> T convertToType(ELContext context, Object obj, Class<T> type) {
         context.setPropertyResolved(false);
-        int sz = this.size;
+        int sz = typeConvertersSize;
         for (int i = 0; i < sz; i++) {
-            T result = this.resolvers[i].convertToType(context, obj, type);
+            T result = this.typeConverters[i].convertToType(context, obj, type);
             if (context.isPropertyResolved()) {
                 return result;
             }
         }
         return null;
-    }
-
-    @Deprecated(forRemoval = true, since = "EL 5.0")
-    private static final class FeatureIterator implements Iterator<FeatureDescriptor> {
-
-        private final ELContext context;
-
-        private final Object base;
-
-        private final ELResolver[] resolvers;
-
-        private final int size;
-
-        private Iterator<FeatureDescriptor> itr;
-
-        private int idx;
-
-        private FeatureDescriptor next;
-
-        public FeatureIterator(ELContext context, Object base, ELResolver[] resolvers, int size) {
-            this.context = context;
-            this.base = base;
-            this.resolvers = resolvers;
-            this.size = size;
-
-            this.idx = 0;
-            this.guaranteeIterator();
-        }
-
-        private void guaranteeIterator() {
-            while (this.itr == null && this.idx < this.size) {
-                this.itr = this.resolvers[this.idx].getFeatureDescriptors(this.context, this.base);
-                this.idx++;
-            }
-        }
-
-        @Override
-        public boolean hasNext() {
-            if (this.next != null) {
-                return true;
-            }
-            if (this.itr != null) {
-                while (this.next == null && itr.hasNext()) {
-                    this.next = itr.next();
-                }
-            } else {
-                return false;
-            }
-            if (this.next == null) {
-                this.itr = null;
-                this.guaranteeIterator();
-            }
-            return hasNext();
-        }
-
-        @Override
-        public FeatureDescriptor next() {
-            if (!hasNext()) {
-                throw new NoSuchElementException();
-            }
-            FeatureDescriptor result = this.next;
-            this.next = null;
-            return result;
-
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
     }
 }

@@ -19,10 +19,8 @@ package org.apache.catalina.tribes.membership.cloud;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
-import java.security.AccessController;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivilegedAction;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +49,7 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     protected Instant startTime;
     protected MessageDigest md5;
 
-    protected Map<String, String> headers = new HashMap<>();
+    protected Map<String,String> headers = new HashMap<>();
 
     protected String localIp;
     protected int port;
@@ -68,13 +66,15 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
 
     /**
      * Get value of environment variable.
+     *
      * @param keys the environment variables
+     *
      * @return the env variables values, or null if not found
      */
     protected static String getEnv(String... keys) {
         String val = null;
         for (String key : keys) {
-            val = AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getenv(key));
+            val = System.getenv(key);
             if (val != null) {
                 break;
             }
@@ -83,8 +83,9 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     }
 
     /**
-     * Get the Kubernetes namespace, or "tomcat" if the Kubernetes environment variable
-     * cannot be found (with a warning log about the missing namespace).
+     * Get the Kubernetes namespace, or "tomcat" if the Kubernetes environment variable cannot be found (with a warning
+     * log about the missing namespace).
+     *
      * @return the namespace
      */
     protected String getNamespace() {
@@ -138,35 +139,39 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
 
     /**
      * Fetch current cluster members from the cloud orchestration.
+     *
      * @return the member array
      */
     protected abstract Member[] fetchMembers();
 
     /**
      * Add or remove specified member.
+     *
      * @param member the member to add
-     * @param add true if the member is added, false otherwise
+     * @param add    true if the member is added, false otherwise
      */
     protected void updateMember(Member member, boolean add) {
         if (add && !membership.memberAlive(member)) {
             return;
         }
         if (log.isDebugEnabled()) {
-            String message = add ? "Member added: " + member : "Member disappeared: " + member;
+            String message = add ? sm.getString("cloudMembershipProvider.add", member) :
+                    sm.getString("cloudMembershipProvider.remove", member);
             log.debug(message);
         }
         Runnable r = () -> {
-            String name = Thread.currentThread().getName();
+            Thread currentThread = Thread.currentThread();
+            String name = currentThread.getName();
             try {
                 String threadName = add ? "CloudMembership-memberAdded" : "CloudMembership-memberDisappeared";
-                Thread.currentThread().setName(threadName);
+                currentThread.setName(threadName);
                 if (add) {
                     membershipListener.memberAdded(member);
                 } else {
                     membershipListener.memberDisappeared(member);
                 }
             } finally {
-                Thread.currentThread().setName(name);
+                currentThread.setName(name);
             }
         };
         executor.execute(r);

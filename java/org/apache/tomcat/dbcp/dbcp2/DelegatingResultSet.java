@@ -97,7 +97,7 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
 
     /**
      * Creates a wrapper for the ResultSet which traces this ResultSet to the Connection which created it (via, for
-     * example DatabaseMetadata, and the code which created it.
+     * example DatabaseMetadata), and the code which created it.
      * <p>
      * Private to ensure all construction is {@link #wrapResultSet(Connection, ResultSet)}
      * </p>
@@ -277,7 +277,9 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
         }
     }
 
-    /** @deprecated Use {@link #getBigDecimal(int)} */
+    /**
+     * @deprecated Use {@link #getBigDecimal(int)}
+     */
     @Deprecated
     @Override
     public BigDecimal getBigDecimal(final int columnIndex, final int scale) throws SQLException {
@@ -299,7 +301,9 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
         }
     }
 
-    /** @deprecated Use {@link #getBigDecimal(String)} */
+    /**
+     * @deprecated Use {@link #getBigDecimal(String)}
+     */
     @Deprecated
     @Override
     public BigDecimal getBigDecimal(final String columnName, final int scale) throws SQLException {
@@ -990,7 +994,9 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
         }
     }
 
-    /** @deprecated Use {@link #getCharacterStream(int)} */
+    /**
+     * @deprecated Use {@link #getCharacterStream(int)}
+     */
     @Deprecated
     @Override
     public InputStream getUnicodeStream(final int columnIndex) throws SQLException {
@@ -1002,7 +1008,9 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
         }
     }
 
-    /** @deprecated Use {@link #getCharacterStream(String)} */
+    /**
+     * @deprecated Use {@link #getCharacterStream(String)}
+     */
     @Deprecated
     @Override
     public InputStream getUnicodeStream(final String columnName) throws SQLException {

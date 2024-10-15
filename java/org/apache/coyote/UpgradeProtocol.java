@@ -23,89 +23,76 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 public interface UpgradeProtocol {
 
     /**
-     * @param isSSLEnabled Is this for a connector that is configured to support
-     *                     TLS. Some protocols (e.g. HTTP/2) only support HTTP
-     *                     upgrade over non-secure connections.
-     * @return The name that clients will use to request an upgrade to this
-     *         protocol via an HTTP/1.1 upgrade request or <code>null</code> if
-     *         upgrade via an HTTP/1.1 upgrade request is not supported.
+     * @param isSSLEnabled Is this for a connector that is configured to support TLS. Some protocols (e.g. HTTP/2) only
+     *                         support HTTP upgrade over non-secure connections.
+     *
+     * @return The name that clients will use to request an upgrade to this protocol via an HTTP/1.1 upgrade request or
+     *             <code>null</code> if upgrade via an HTTP/1.1 upgrade request is not supported.
      */
-    public String getHttpUpgradeName(boolean isSSLEnabled);
+    String getHttpUpgradeName(boolean isSSLEnabled);
 
     /**
-     * @return The byte sequence as listed in the IANA registry for this
-     *         protocol or <code>null</code> if upgrade via ALPN is not
-     *         supported.
+     * @return The byte sequence as listed in the IANA registry for this protocol or <code>null</code> if upgrade via
+     *             ALPN is not supported.
      */
-    public byte[] getAlpnIdentifier();
+    byte[] getAlpnIdentifier();
 
     /**
-     * @return The name of the protocol as listed in the IANA registry if and
-     *         only if {@link #getAlpnIdentifier()} returns the UTF-8 encoding
-     *         of this name. If {@link #getAlpnIdentifier()} returns some other
-     *         byte sequence, then this method returns the empty string. If
-     *         upgrade via ALPN is not supported then <code>null</code> is
-     *         returned.
+     * @return The name of the protocol as listed in the IANA registry if and only if {@link #getAlpnIdentifier()}
+     *             returns the UTF-8 encoding of this name. If {@link #getAlpnIdentifier()} returns some other byte
+     *             sequence, then this method returns the empty string. If upgrade via ALPN is not supported then
+     *             <code>null</code> is returned.
      */
     /*
-     * Implementation note: If Tomcat ever supports ALPN for a protocol where
-     *                      the identifier is not the UTF-8 encoding of the name
-     *                      then some refactoring is going to be required.
+     * Implementation note: If Tomcat ever supports ALPN for a protocol where the identifier is not the UTF-8 encoding
+     * of the name then some refactoring is going to be required.
      *
-     * Implementation note: Tomcat assumes that the UTF-8 encoding of this name
-     *                      will not exceed 255 bytes. Tomcat's behaviour if
-     *                      longer names are used is undefined.
+     * Implementation note: Tomcat assumes that the UTF-8 encoding of this name will not exceed 255 bytes. Tomcat's
+     * behaviour if longer names are used is undefined.
      */
-    public String getAlpnName();
+    String getAlpnName();
 
     /**
-     * @param socketWrapper The socketWrapper for the connection that requires
-     *                      a processor
-     * @param adapter The Adapter instance that provides access to the standard
-     *                Engine/Host/Context/Wrapper processing chain
+     * @param socketWrapper The socketWrapper for the connection that requires a processor
+     * @param adapter       The Adapter instance that provides access to the standard Engine/Host/Context/Wrapper
+     *                          processing chain
      *
-     * @return A processor instance for processing a connection using this
-     *         protocol.
+     * @return A processor instance for processing a connection using this protocol.
      */
-    public Processor getProcessor(SocketWrapperBase<?> socketWrapper, Adapter adapter);
+    Processor getProcessor(SocketWrapperBase<?> socketWrapper, Adapter adapter);
 
 
     /**
      * @param socketWrapper The socket
-     * @param adapter The Adapter to use to configure the new upgrade handler
-     * @param request A copy (may be incomplete) of the request that triggered
-     *                the upgrade
+     * @param adapter       The Adapter to use to configure the new upgrade handler
+     * @param request       A copy (may be incomplete) of the request that triggered the upgrade
      *
      * @return An instance of the HTTP upgrade handler for this protocol
      */
-    public InternalHttpUpgradeHandler getInternalUpgradeHandler(SocketWrapperBase<?> socketWrapper, Adapter adapter, Request request);
+    InternalHttpUpgradeHandler getInternalUpgradeHandler(SocketWrapperBase<?> socketWrapper, Adapter adapter,
+            Request request);
 
 
     /**
-     * Allows the implementation to examine the request and accept or reject it
-     * based on what it finds.
+     * Allows the implementation to examine the request and accept or reject it based on what it finds.
      *
-     * @param request The request that included an upgrade header for this
-     *                protocol
+     * @param request The request that included an upgrade header for this protocol
      *
-     * @return <code>true</code> if the request is accepted, otherwise
-     *         <code>false</code>
+     * @return <code>true</code> if the request is accepted, otherwise <code>false</code>
      */
-    public boolean accept(Request request);
+    boolean accept(Request request);
 
 
     /**
-     * Configure the HTTP/1.1 protocol that this UpgradeProcotol is nested
-     * under. Connections passed to this UpgradeProtocol via HTTP upgrade will
-     * have been initially handled by this HTTP/1.1 protocol implementation.
+     * Configure the HTTP/1.1 protocol that this UpgradeProcotol is nested under. Connections passed to this
+     * UpgradeProtocol via HTTP upgrade will have been initially handled by this HTTP/1.1 protocol implementation.
      * <p>
      * The default implementation is a NO-OP.
      *
-     * @param protocol The HTTP/1.1 protocol implementation that will initially
-     *                 handle any connections passed to this UpgradeProtocol via
-     *                 the HTTP upgrade mechanism
+     * @param protocol The HTTP/1.1 protocol implementation that will initially handle any connections passed to this
+     *                     UpgradeProtocol via the HTTP upgrade mechanism
      */
-    public default void setHttp11Protocol(AbstractHttp11Protocol<?> protocol) {
+    default void setHttp11Protocol(AbstractHttp11Protocol<?> protocol) {
         // NO-OP
     }
 }

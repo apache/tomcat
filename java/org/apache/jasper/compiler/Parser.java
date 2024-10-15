@@ -70,9 +70,6 @@ class Parser implements TagConstants {
     private static final String JAVAX_BODY_CONTENT_PARAM =
         "JAVAX_BODY_CONTENT_PARAM";
 
-    private static final String JAVAX_BODY_CONTENT_PLUGIN =
-        "JAVAX_BODY_CONTENT_PLUGIN";
-
     private static final String JAVAX_BODY_CONTENT_TEMPLATE_TEXT =
         "JAVAX_BODY_CONTENT_TEMPLATE_TEXT";
 
@@ -268,7 +265,7 @@ class Parser implements TagConstants {
     }
 
     /**
-     * AttributeValueDouble ::= (QuotedChar - '"')* ('"' | <TRANSLATION_ERROR>)
+     * AttributeValueDouble ::= (QuotedChar - '"')* ('"' | &lt;TRANSLATION_ERROR>)
      * RTAttributeValueDouble ::= ((QuotedChar - '"')* - ((QuotedChar-'"')'%>"')
      * ('%>"' | TRANSLATION_ERROR)
      */
@@ -338,7 +335,15 @@ class Parser implements TagConstants {
         }
 
         try {
-            parserController.parse(file, parent, jar);
+            /*
+             * Include directive defined by 1.10.3 which references 1.2.1 for the file attribute. As per 1.2.1, paths
+             * starting with "/" are context relative.
+             */
+            if (file.startsWith("/")) {
+                parserController.parse(file, parent, null);
+            } else {
+                parserController.parse(file, parent, jar);
+            }
         } catch (FileNotFoundException ex) {
             err.jspError(start, "jsp.error.file.not.found", file);
         } catch (Exception ex) {
@@ -479,7 +484,7 @@ class Parser implements TagConstants {
             parseIncludeDirective(parent);
         } else if (reader.matches("taglib")) {
             if (directivesOnly) {
-                // No need to get the tagLibInfo objects. This alos suppresses
+                // No need to get the tagLibInfo objects. This also suppresses
                 // parsing of any tag files used in this tag file.
                 return;
             }
@@ -830,7 +835,7 @@ class Parser implements TagConstants {
     }
 
     /**
-     * Param ::= '<jsp:param' S Attributes S? EmptyBody S?
+     * Param ::= '&lt;jsp:param' S Attributes S? EmptyBody S?
      */
     private void parseParam(Node parent) throws JasperException {
         if (!reader.matches("<jsp:param")) {
@@ -971,7 +976,7 @@ class Parser implements TagConstants {
     }
 
     /*
-     * Parses OptionalBody, but also reused to parse bodies for plugin and param
+     * Parses OptionalBody, but also reused to parse bodies for param
      * since the syntax is identical (the only thing that differs substantially
      * is how to process the body, and thus we accept the body type as a
      * parameter).
@@ -1019,8 +1024,8 @@ class Parser implements TagConstants {
      * Attempts to parse 'JspAttributeAndBody' production. Returns true if it
      * matched, or false if not. Assumes EmptyBody is okay as well.
      *
-     * JspAttributeAndBody ::= ( '>' # S? ( '<jsp:attribute' NamedAttributes )? '<jsp:body' (
-     * JspBodyBody | <TRANSLATION_ERROR> ) S? ETag )
+     * JspAttributeAndBody ::= ( '>' # S? ( '&lt;jsp:attribute' NamedAttributes )? '&lt;jsp:body' (
+     * JspBodyBody | &lt;TRANSLATION_ERROR> ) S? ETag )
      */
     private boolean parseJspAttributeAndBody(Node parent, String tag,
             String bodyType) throws JasperException {
@@ -1057,64 +1062,6 @@ class Parser implements TagConstants {
     }
 
     /*
-     * Params ::= `>' S? ( ( `<jsp:body>' ( ( S? Param+ S? `</jsp:body>' ) |
-     * <TRANSLATION_ERROR> ) ) | Param+ ) '</jsp:params>'
-     */
-    private void parseJspParams(Node parent) throws JasperException {
-        Node jspParamsNode = new Node.ParamsAction(start, parent);
-        parseOptionalBody(jspParamsNode, "jsp:params", JAVAX_BODY_CONTENT_PARAM);
-    }
-
-    /*
-     * Fallback ::= '/>' | ( `>' S? `<jsp:body>' ( ( S? ( Char* - ( Char* `</jsp:body>' ) ) `</jsp:body>'
-     * S? ) | <TRANSLATION_ERROR> ) `</jsp:fallback>' ) | ( '>' ( Char* - (
-     * Char* '</jsp:fallback>' ) ) '</jsp:fallback>' )
-     */
-    private void parseFallBack(Node parent) throws JasperException {
-        Node fallBackNode = new Node.FallBackAction(start, parent);
-        parseOptionalBody(fallBackNode, "jsp:fallback",
-                JAVAX_BODY_CONTENT_TEMPLATE_TEXT);
-    }
-
-    /*
-     * For Plugin: StdActionContent ::= Attributes PluginBody
-     *
-     * PluginBody ::= EmptyBody | ( '>' S? ( '<jsp:attribute' NamedAttributes )? '<jsp:body' (
-     * JspBodyPluginTags | <TRANSLATION_ERROR> ) S? ETag ) | ( '>' S? PluginTags
-     * ETag )
-     *
-     * EmptyBody ::= '/>' | ( '>' ETag ) | ( '>' S? '<jsp:attribute'
-     * NamedAttributes ETag )
-     *
-     */
-    private void parsePlugin(Node parent) throws JasperException {
-        Attributes attrs = parseAttributes();
-        reader.skipSpaces();
-
-        Node pluginNode = new Node.PlugIn(attrs, start, parent);
-
-        parseOptionalBody(pluginNode, "jsp:plugin", JAVAX_BODY_CONTENT_PLUGIN);
-    }
-
-    /*
-     * PluginTags ::= ( '<jsp:params' Params S? )? ( '<jsp:fallback' Fallback?
-     * S? )?
-     */
-    private void parsePluginTags(Node parent) throws JasperException {
-        reader.skipSpaces();
-
-        if (reader.matches("<jsp:params")) {
-            parseJspParams(parent);
-            reader.skipSpaces();
-        }
-
-        if (reader.matches("<jsp:fallback")) {
-            parseFallBack(parent);
-            reader.skipSpaces();
-        }
-    }
-
-    /*
      * StandardAction ::= 'include' StdActionContent | 'forward'
      * StdActionContent | 'invoke' StdActionContent | 'doBody' StdActionContent |
      * 'getProperty' StdActionContent | 'setProperty' StdActionContent |
@@ -1146,18 +1093,12 @@ class Parser implements TagConstants {
             parseSetProperty(parent);
         } else if (reader.matches(USE_BEAN_ACTION)) {
             parseUseBean(parent);
-        } else if (reader.matches(PLUGIN_ACTION)) {
-            parsePlugin(parent);
         } else if (reader.matches(ELEMENT_ACTION)) {
             parseElement(parent);
         } else if (reader.matches(ATTRIBUTE_ACTION)) {
             err.jspError(start, "jsp.error.namedAttribute.invalidUse");
         } else if (reader.matches(BODY_ACTION)) {
             err.jspError(start, "jsp.error.jspbody.invalidUse");
-        } else if (reader.matches(FALLBACK_ACTION)) {
-            err.jspError(start, "jsp.error.fallback.invalidUse");
-        } else if (reader.matches(PARAMS_ACTION)) {
-            err.jspError(start, "jsp.error.params.invalidUse");
         } else if (reader.matches(PARAM_ACTION)) {
             err.jspError(start, "jsp.error.param.invalidUse");
         } else if (reader.matches(OUTPUT_ACTION)) {
@@ -1651,14 +1592,6 @@ class Parser implements TagConstants {
                 err.jspError(start, "jasper.error.emptybodycontent.nonempty",
                         tag);
             }
-        } else if (bodyType == JAVAX_BODY_CONTENT_PLUGIN) {
-            // (note the == since we won't recognize JAVAX_*
-            // from outside this module).
-            parsePluginTags(parent);
-            if (!reader.matchesETag(tag)) {
-                err.jspError(reader.mark(), "jsp.error.unterminated", "&lt;"
-                        + tag);
-            }
         } else if (bodyType.equalsIgnoreCase(TagInfo.BODY_CONTENT_JSP)
                 || bodyType.equalsIgnoreCase(TagInfo.BODY_CONTENT_SCRIPTLESS)
                 || (bodyType == JAVAX_BODY_CONTENT_PARAM)
@@ -1734,7 +1667,7 @@ class Parser implements TagConstants {
     }
 
     /**
-     * Determine the body type of <jsp:attribute> from the enclosing node
+     * Determine the body type of &lt;jsp:attribute> from the enclosing node
      */
     private String getAttributeBodyType(Node n, String name) {
 
@@ -1768,10 +1701,6 @@ class Parser implements TagConstants {
             }
         } else if (n instanceof Node.UseBean) {
             if ("beanName".equals(name)) {
-                return TagInfo.BODY_CONTENT_JSP;
-            }
-        } else if (n instanceof Node.PlugIn) {
-            if ("width".equals(name) || "height".equals(name)) {
                 return TagInfo.BODY_CONTENT_JSP;
             }
         } else if (n instanceof Node.ParamAction) {

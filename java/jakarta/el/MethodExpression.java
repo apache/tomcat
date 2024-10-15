@@ -25,15 +25,11 @@ public abstract class MethodExpression extends Expression {
      *
      * @return Information about the method that this expression resolves to
      *
-     * @throws NullPointerException
-     *              If the supplied context is <code>null</code>
-     * @throws PropertyNotFoundException
-     *              If a property/variable resolution failed because no match
-     *              was found or a match was found but was not readable
-     * @throws MethodNotFoundException
-     *              If no matching method can be found
-     * @throws ELException
-     *              Wraps any exception throw whilst resolving the property
+     * @throws NullPointerException      If the supplied context is <code>null</code>
+     * @throws PropertyNotFoundException If a property/variable resolution failed because no match was found or a match
+     *                                       was found but was not readable
+     * @throws MethodNotFoundException   If no matching method can be found
+     * @throws ELException               Wraps any exception throw whilst resolving the property
      */
     public abstract MethodInfo getMethodInfo(ELContext context);
 
@@ -43,21 +39,18 @@ public abstract class MethodExpression extends Expression {
      *
      * @return The result of invoking this method expression
      *
-     * @throws NullPointerException
-     *              If the supplied context is <code>null</code>
-     * @throws PropertyNotFoundException
-     *              If a property/variable resolution failed because no match
-     *              was found or a match was found but was not readable
-     * @throws MethodNotFoundException
-     *              If no matching method can be found
-     * @throws ELException
-     *              Wraps any exception throw whilst resolving the property or
-     *              coercion of the result to the expected return type fails
+     * @throws NullPointerException      If the supplied context is <code>null</code>
+     * @throws PropertyNotFoundException If a property/variable resolution failed because no match was found or a match
+     *                                       was found but was not readable
+     * @throws MethodNotFoundException   If no matching method can be found
+     * @throws ELException               Wraps any exception throw whilst resolving the property or coercion of the
+     *                                       result to the expected return type fails
      */
     public abstract Object invoke(ELContext context, Object[] params);
 
     /**
      * @return This default implementation always returns <code>false</code>
+     *
      * @since EL 3.0
      */
     public boolean isParametersProvided() {
@@ -66,22 +59,17 @@ public abstract class MethodExpression extends Expression {
     }
 
     /**
-     * Obtain the {@link MethodReference} for the method to which this method
-     * expression resolves.
+     * Obtain the {@link MethodReference} for the method to which this method expression resolves.
      *
      * @param context The EL context for this evaluation
      *
      * @return This default implementation always returns <code>null</code>
      *
-     * @throws NullPointerException
-     *              If the supplied context is <code>null</code>
-     * @throws PropertyNotFoundException
-     *              If a property/variable resolution failed because no match
-     *              was found or a match was found but was not readable
-     * @throws MethodNotFoundException
-     *              If no matching method can be found
-     * @throws ELException
-     *              Wraps any exception throw whilst resolving the property
+     * @throws NullPointerException      If the supplied context is <code>null</code>
+     * @throws PropertyNotFoundException If a property/variable resolution failed because no match was found or a match
+     *                                       was found but was not readable
+     * @throws MethodNotFoundException   If no matching method can be found
+     * @throws ELException               Wraps any exception throw whilst resolving the property
      *
      * @since EL 5.0
      */

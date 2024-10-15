@@ -25,7 +25,7 @@ import java.util.Properties;
  *
  * @since 2.7.0
  */
-class ConnectionFactoryFactory {
+final class ConnectionFactoryFactory {
 
     /**
      * Creates a new {@link DriverConnectionFactory} allowing for an override through
@@ -42,18 +42,19 @@ class ConnectionFactoryFactory {
         final Properties connectionProperties = basicDataSource.getConnectionProperties();
         final String url = basicDataSource.getUrl();
         // Set up the driver connection factory we will use
-        final String user = basicDataSource.getUsername();
+        final String user = basicDataSource.getUserName();
         if (user != null) {
             connectionProperties.put(Constants.KEY_USER, user);
         } else {
-            basicDataSource.log("DBCP DataSource configured without a 'username'");
+            basicDataSource.log(String.format("DBCP DataSource configured without a '%s'", Constants.KEY_USER));
         }
 
+        @SuppressWarnings("deprecation")
         final String pwd = basicDataSource.getPassword();
         if (pwd != null) {
-            connectionProperties.put("password", pwd);
+            connectionProperties.put(Constants.KEY_PASSWORD, pwd);
         } else {
-            basicDataSource.log("DBCP DataSource configured without a 'password'");
+            basicDataSource.log(String.format("DBCP DataSource configured without a '%s'", Constants.KEY_PASSWORD));
         }
         final String connectionFactoryClassName = basicDataSource.getConnectionFactoryClassName();
         if (connectionFactoryClassName != null) {

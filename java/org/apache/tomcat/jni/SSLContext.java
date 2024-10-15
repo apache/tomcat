@@ -20,10 +20,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** SSL Context
- *
- * @author Mladen Turk
- */
 public final class SSLContext {
 
     public static final byte[] DEFAULT_SESSION_ID_CONTEXT =
@@ -167,7 +163,7 @@ public final class SSLContext {
      * Point setCertificateFile at a PEM encoded certificate.  If
      * the certificate is encrypted, then you will be prompted for a
      * pass phrase.  Note that a kill -HUP will prompt again. A test
-     * certificate can be generated with `make certificate' under
+     * certificate can be generated with 'make certificate' under
      * built time. Keep in mind that if you've both a RSA and a DSA
      * certificate you can configure both in parallel (to also allow
      * the use of DSA ciphers, etc.)
@@ -364,7 +360,7 @@ public final class SSLContext {
      * select an OpenSSL SSLContext based on the host name requested by the
      * client.
      */
-    public static interface SNICallBack {
+    public interface SNICallBack {
 
         /**
          * This callback is made during the TLS handshake when the client uses
@@ -377,7 +373,7 @@ public final class SSLContext {
          *         SSLContext to use for the given host or zero if no SSLContext
          *         could be identified
          */
-        public long getSslContext(String sniHostName);
+        long getSslContext(String sniHostName);
     }
 
     /**

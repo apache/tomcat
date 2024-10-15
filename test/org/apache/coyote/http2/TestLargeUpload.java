@@ -30,16 +30,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.core.AprLifecycleListener;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.tomcat.util.net.TesterSupport;
@@ -47,26 +45,30 @@ import org.apache.tomcat.util.net.TesterSupport;
 @RunWith(Parameterized.class)
 public class TestLargeUpload extends Http2TestBase {
 
-    @Parameterized.Parameters(name = "{0}")
+    @Parameters(name = "{0}: {1} {2}]")
     public static Collection<Object[]> parameters() {
+        Collection<Object[]> baseData = data();
+
         List<Object[]> parameterSets = new ArrayList<>();
-        parameterSets.add(new Object[] {
-                "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
-        parameterSets.add(new Object[] {
-                "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
-        parameterSets.add(new Object[] {
-                "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+        for (Object[] base : baseData) {
+            parameterSets.add(new Object[] { base[0], base[1], "JSSE", Boolean.FALSE,
+                    "org.apache.tomcat.util.net.jsse.JSSEImplementation" });
+            parameterSets.add(new Object[] { base[0], base[1], "OpenSSL", Boolean.TRUE,
+                    "org.apache.tomcat.util.net.openssl.OpenSSLImplementation" });
+            parameterSets.add(new Object[] { base[0], base[1], "OpenSSL-FFM", Boolean.TRUE,
+                    "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" });
+        }
 
         return parameterSets;
     }
 
-    @Parameter(0)
+    @Parameter(2)
     public String connectorName;
 
-    @Parameter(1)
-    public boolean needApr;
+    @Parameter(3)
+    public boolean useOpenSSL;
 
-    @Parameter(2)
+    @Parameter(4)
     public String sslImplementationName;
 
 
@@ -90,8 +92,8 @@ public class TestLargeUpload extends Http2TestBase {
         byte[] trailerFrameHeader = new byte[9];
         ByteBuffer trailerPayload = ByteBuffer.allocate(256);
 
-        buildPostRequest(headersFrameHeader, headersPayload, false, dataFrameHeader, dataPayload,
-                null, trailerFrameHeader, trailerPayload, 3);
+        buildPostRequest(headersFrameHeader, headersPayload, false, dataFrameHeader, dataPayload, null, true, 3);
+        buildTrailerHeaders(trailerFrameHeader, trailerPayload, 3);
 
         // Write the headers
         writeFrame(headersFrameHeader, headersPayload);
@@ -118,7 +120,7 @@ public class TestLargeUpload extends Http2TestBase {
         Tomcat tomcat = getTomcatInstance();
 
         // Retain '/simple' url-pattern since it enables code re-use
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "read", new DataReadServlet());
         ctxt.addServletMappingDecoded("/simple", "read");
 
@@ -157,13 +159,6 @@ public class TestLargeUpload extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
-
-        if (needApr) {
-            AprLifecycleListener listener = new AprLifecycleListener();
-            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
-            StandardServer server = (StandardServer) tomcat.getServer();
-            server.addLifecycleListener(listener);
-        }
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
     }
 }

@@ -42,7 +42,6 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http2.Http2TestBase;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
-import org.apache.tomcat.util.compat.JreCompat;
 
 /*
  * Split into multiple tests as a single test takes so long it impacts the time
@@ -62,19 +61,19 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
             Integer.valueOf(511), Integer.valueOf(512), Integer.valueOf(513),
             Integer.valueOf(1023), Integer.valueOf(1024), Integer.valueOf(1025) };
 
-    @Parameter(0)
-    public boolean useLegacy;
-    @Parameter(1)
-    public int bufferSize;
     @Parameter(2)
-    public boolean useWriter;
+    public boolean useLegacy;
     @Parameter(3)
-    public int invalidWriteCount;
+    public int bufferSize;
     @Parameter(4)
-    public ResetType resetType;
+    public boolean useWriter;
     @Parameter(5)
-    public int validWriteCount;
+    public int invalidWriteCount;
     @Parameter(6)
+    public ResetType resetType;
+    @Parameter(7)
+    public int validWriteCount;
+    @Parameter(8)
     public boolean explicitFlush;
 
     @Test
@@ -95,7 +94,16 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
         rc = headUrl(path, out, headHeaders);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
-        // Headers should be the same (apart from Date)
+        // Headers should be the same part from:
+        // - Date header may be different
+        // Exclude some HTTP header fields where the value is determined only
+        // while generating the content as per section 9.3.2 of RFC 9110.
+        // (previously RFC 7231, section 4.3.2)
+        getHeaders.remove("content-length");
+        getHeaders.remove("content-range");
+        getHeaders.remove("trailer");
+        getHeaders.remove("transfer-encoding");
+
         Assert.assertEquals(getHeaders.size(), headHeaders.size());
         for (Map.Entry<String, List<String>> getHeader : getHeaders.entrySet()) {
             String headerName = getHeader.getKey();
@@ -128,11 +136,11 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
             writeFrame(frameHeaderGet, headersPayloadGet);
 
             // Want the headers frame for stream 3
-            parser.readFrame(true);
+            parser.readFrame();
             while (!output.getTrace().startsWith("3-HeadersStart\n")) {
                 debug.append(output.getTrace());
                 output.clearTrace();
-                parser.readFrame(true);
+                parser.readFrame();
             }
             String traceGet = output.getTrace();
             debug.append(output.getTrace());
@@ -145,11 +153,11 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
             writeFrame(frameHeaderHead, headersPayloadHead);
 
             // Want the headers frame for stream 5
-            parser.readFrame(true);
+            parser.readFrame();
             while (!output.getTrace().startsWith("5-HeadersStart\n")) {
                 debug.append(output.getTrace());
                 output.clearTrace();
-                parser.readFrame(true);
+                parser.readFrame();
             }
             String traceHead = output.getTrace();
             debug.append(output.getTrace());
@@ -158,15 +166,24 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
             String[] headHeaders = traceHead.split("\n");
 
             int i = 0;
+            int j = 0;
             for (; i < getHeaders.length; i++) {
-                // Headers should be the same, ignoring the first character which is the steam ID
-                Assert.assertEquals(getHeaders[i] + "\n" + traceGet + traceHead, '3', getHeaders[i].charAt(0));
-                Assert.assertEquals(headHeaders[i] + "\n" + traceGet + traceHead, '5', headHeaders[i].charAt(0));
-                Assert.assertEquals(traceGet + traceHead, getHeaders[i].substring(1), headHeaders[i].substring(1));
+                // Exclude some HTTP header fields where the value is determined
+                // only while generating the content as per section 9.3.2 of RFC
+                // 9110.
+                if (getHeaders[i].contains("content-length") || getHeaders[i].contains("content-range") ) {
+                    // Skip
+                } else {
+                    // Headers should be the same, ignoring the first character which is the steam ID
+                    Assert.assertEquals(getHeaders[i] + "\n" + traceGet + traceHead, '3', getHeaders[i].charAt(0));
+                    Assert.assertEquals(headHeaders[j] + "\n" + traceGet + traceHead, '5', headHeaders[j].charAt(0));
+                    Assert.assertEquals(traceGet + traceHead, getHeaders[i].substring(1), headHeaders[j].substring(1));
+                    j++;
+                }
             }
 
             // Stream 5 should have one more trace entry
-            Assert.assertEquals("5-EndOfStream", headHeaders[i]);
+            Assert.assertEquals("5-EndOfStream", headHeaders[j]);
         } catch (Exception t) {
             System.out.println(debug.toString());
             throw t;
@@ -180,7 +197,7 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        StandardContext ctxt = (StandardContext) tomcat.addContext("", null);
+        StandardContext ctxt = (StandardContext) getProgrammaticRootContext();
 
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
@@ -207,7 +224,7 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
         private final int validWriteCount;
         private final boolean explicitFlush;
 
-        public HeadTestServlet(int bufferSize, boolean useWriter, int invalidWriteCount, ResetType resetType,
+        HeadTestServlet(int bufferSize, boolean useWriter, int invalidWriteCount, ResetType resetType,
                 int validWriteCount, boolean explicitFlush) {
             this.bufferSize = bufferSize;
             this.useWriter = useWriter;
@@ -226,13 +243,12 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
             boolean resetBufferSize = false;
 
             if (Boolean.parseBoolean(getServletConfig().getInitParameter(LEGACY_DO_HEAD)) &&
-                    JreCompat.isJre19Available() && "HEAD".equals(req.getMethod()) && useWriter &&
-                    resetType != ResetType.NONE) {
+                    "HEAD".equals(req.getMethod()) && useWriter && resetType != ResetType.NONE) {
                 /*
-                 * Using legacy HEAD handling with a Writer on Java 19+.
+                 * Using legacy HEAD handling with a Writer.
+                 *
                  * HttpServlet wraps the response. The test is sensitive to
-                 * buffer sizes. The size of the buffer HttpServlet uses varies
-                 * with Java version. For the tests to pass the number of
+                 * buffer sizes. For the tests to pass the number of
                  * characters that can be written before the response is
                  * committed needs to be the same.
                  *
@@ -240,14 +256,8 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
                  * bytes. When a Writer is used, an additional 8192 byte buffer
                  * is used for char->byte.
                  *
-                 * With Java <19, the char->byte buffer used by HttpServlet
-                 * processing HEAD requests in legacy mode is created as a 8192
-                 * byte buffer which is consistent with the buffer Tomcat uses
-                 * internally.
-                 *
-                 * With Java 19+, the char->byte buffer used by HttpServlet
-                 * processing HEAD requests in legacy mode is created as a 512
-                 * byte buffer.
+                 * The char->byte buffer used by HttpServlet processing HEAD
+                 * requests in legacy mode is created as a 512 byte buffer.
                  *
                  * If the response isn't reset, none of this matters as it is
                  * just the size of the response buffer and the size of the
@@ -255,13 +265,12 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
                  * However, if the response is reset then things get interesting
                  * as the amount of response data that can be written before
                  * committing the response is the combination of the char->byte
-                 * buffer and the response buffer. Because the char->byte buffer
-                 * size in legacy mode varies with Java version, the size of the
-                 * response buffer needs to be adjusted to compensate so that
-                 * both GET and HEAD can write the same amount of data before
-                 * committing the response. To make matters worse, to obtain the
-                 * correct behaviour the response buffer size needs to be reset
-                 * back to 8192 after the reset.
+                 * buffer and the response buffer. The size of the response
+                 * buffer needs to be adjusted so that both GET and HEAD can
+                 * write the same amount of data before committing the response.
+                 * To make matters worse, to obtain the correct behaviour the
+                 * response buffer size needs to be reset back to 8192 after the
+                 * reset.
                  *
                  * This is why the legacy mode is problematic and the new
                  * approach of the container handling HEAD is better.
@@ -272,9 +281,7 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
                     adjustedBufferSize = originalBufferSize;
                 }
 
-                // Adjust for smaller initial char -> byte buffer in Java 19+
-                // originalBufferSize initial size in Java <19
-                // 512 initial size in Java 19+
+                // Adjust for smaller initial char -> byte buffer
                 adjustedBufferSize = adjustedBufferSize + originalBufferSize - 512;
 
                 resetBufferSize = true;
@@ -365,7 +372,7 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
     }
 
 
-    static enum ResetType {
+    enum ResetType {
         NONE,
         BUFFER,
         FULL

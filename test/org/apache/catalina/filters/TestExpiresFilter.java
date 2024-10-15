@@ -58,14 +58,11 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
         FilterDef filterDef = new FilterDef();
         filterDef.addInitParameter("ExpiresDefault", "access plus 1 month");
-        filterDef.addInitParameter("ExpiresByType text/html",
-                "access plus 1 month 15 days 2 hours");
-        filterDef.addInitParameter("ExpiresByType image/gif",
-                "modification plus 5 hours 3 minutes");
+        filterDef.addInitParameter("ExpiresByType text/html", "access plus 1 month 15 days 2 hours");
+        filterDef.addInitParameter("ExpiresByType image/gif", "modification plus 5 hours 3 minutes");
         filterDef.addInitParameter("ExpiresByType image/jpg", "A10000");
         filterDef.addInitParameter("ExpiresByType video/mpeg", "M20000");
-        filterDef.addInitParameter("ExpiresExcludedResponseStatusCodes",
-                "304, 503");
+        filterDef.addInitParameter("ExpiresExcludedResponseStatusCodes", "304, 503");
 
         ExpiresFilter expiresFilter = new ExpiresFilter();
 
@@ -88,20 +85,16 @@ public class TestExpiresFilter extends TomcatBaseTest {
             Assert.assertEquals(503, excludedResponseStatusCodes[1]);
 
             // VERIFY DEFAULT CONFIGURATION
-            ExpiresConfiguration expiresConfigurationDefault =
-                    expiresFilter.getDefaultExpiresConfiguration();
-            Assert.assertEquals(StartingPoint.ACCESS_TIME,
-                    expiresConfigurationDefault.getStartingPoint());
+            ExpiresConfiguration expiresConfigurationDefault = expiresFilter.getDefaultExpiresConfiguration();
+            Assert.assertEquals(StartingPoint.ACCESS_TIME, expiresConfigurationDefault.getStartingPoint());
             Assert.assertEquals(1, expiresConfigurationDefault.getDurations().size());
-            Assert.assertEquals(DurationUnit.MONTH,
-                    expiresConfigurationDefault.getDurations().get(0).getUnit());
+            Assert.assertEquals(DurationUnit.MONTH, expiresConfigurationDefault.getDurations().get(0).getUnit());
             Assert.assertEquals(1, expiresConfigurationDefault.getDurations().get(0).getAmount());
 
             // VERIFY TEXT/HTML
-            ExpiresConfiguration expiresConfigurationTextHtml =
-                    expiresFilter.getExpiresConfigurationByContentType().get("text/html");
-            Assert.assertEquals(StartingPoint.ACCESS_TIME,
-                    expiresConfigurationTextHtml.getStartingPoint());
+            ExpiresConfiguration expiresConfigurationTextHtml = expiresFilter.getExpiresConfigurationByContentType()
+                    .get("text/html");
+            Assert.assertEquals(StartingPoint.ACCESS_TIME, expiresConfigurationTextHtml.getStartingPoint());
 
             Assert.assertEquals(3, expiresConfigurationTextHtml.getDurations().size());
 
@@ -118,10 +111,9 @@ public class TestExpiresFilter extends TomcatBaseTest {
             Assert.assertEquals(2, twoHours.getAmount());
 
             // VERIFY IMAGE/GIF
-            ExpiresConfiguration expiresConfigurationImageGif =
-                    expiresFilter.getExpiresConfigurationByContentType().get("image/gif");
-            Assert.assertEquals(StartingPoint.LAST_MODIFICATION_TIME,
-                    expiresConfigurationImageGif.getStartingPoint());
+            ExpiresConfiguration expiresConfigurationImageGif = expiresFilter.getExpiresConfigurationByContentType()
+                    .get("image/gif");
+            Assert.assertEquals(StartingPoint.LAST_MODIFICATION_TIME, expiresConfigurationImageGif.getStartingPoint());
 
             Assert.assertEquals(2, expiresConfigurationImageGif.getDurations().size());
 
@@ -134,10 +126,9 @@ public class TestExpiresFilter extends TomcatBaseTest {
             Assert.assertEquals(3, threeMinutes.getAmount());
 
             // VERIFY IMAGE/JPG
-            ExpiresConfiguration expiresConfigurationImageJpg =
-                    expiresFilter.getExpiresConfigurationByContentType().get("image/jpg");
-            Assert.assertEquals(StartingPoint.ACCESS_TIME,
-                    expiresConfigurationImageJpg.getStartingPoint());
+            ExpiresConfiguration expiresConfigurationImageJpg = expiresFilter.getExpiresConfigurationByContentType()
+                    .get("image/jpg");
+            Assert.assertEquals(StartingPoint.ACCESS_TIME, expiresConfigurationImageJpg.getStartingPoint());
 
             Assert.assertEquals(1, expiresConfigurationImageJpg.getDurations().size());
 
@@ -146,10 +137,9 @@ public class TestExpiresFilter extends TomcatBaseTest {
             Assert.assertEquals(10000, tenThousandSeconds.getAmount());
 
             // VERIFY VIDEO/MPEG
-            ExpiresConfiguration expiresConfiguration =
-                    expiresFilter.getExpiresConfigurationByContentType().get("video/mpeg");
-            Assert.assertEquals(StartingPoint.LAST_MODIFICATION_TIME,
-                    expiresConfiguration.getStartingPoint());
+            ExpiresConfiguration expiresConfiguration = expiresFilter.getExpiresConfigurationByContentType()
+                    .get("video/mpeg");
+            Assert.assertEquals(StartingPoint.LAST_MODIFICATION_TIME, expiresConfiguration.getStartingPoint());
 
             Assert.assertEquals(1, expiresConfiguration.getDurations().size());
 
@@ -170,9 +160,8 @@ public class TestExpiresFilter extends TomcatBaseTest {
             private static final long serialVersionUID = 1L;
 
             @Override
-            protected void service(HttpServletRequest request,
-                    HttpServletResponse response) throws ServletException,
-                    IOException {
+            protected void service(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
                 response.setContentType("text/plain");
                 // no content is written in the response
             }
@@ -184,10 +173,10 @@ public class TestExpiresFilter extends TomcatBaseTest {
     @Test
     public void testParseExpiresConfigurationCombinedDuration() {
         ExpiresFilter expiresFilter = new ExpiresFilter();
-        ExpiresConfiguration actualConfiguration = expiresFilter.parseExpiresConfiguration("access plus 1 month 15 days 2 hours");
+        ExpiresConfiguration actualConfiguration = expiresFilter
+                .parseExpiresConfiguration("access plus 1 month 15 days 2 hours");
 
-        Assert.assertEquals(StartingPoint.ACCESS_TIME,
-                actualConfiguration.getStartingPoint());
+        Assert.assertEquals(StartingPoint.ACCESS_TIME, actualConfiguration.getStartingPoint());
 
         Assert.assertEquals(3, actualConfiguration.getDurations().size());
 
@@ -198,14 +187,11 @@ public class TestExpiresFilter extends TomcatBaseTest {
         ExpiresFilter expiresFilter = new ExpiresFilter();
         ExpiresConfiguration actualConfiguration = expiresFilter.parseExpiresConfiguration("access plus 2 hours");
 
-        Assert.assertEquals(StartingPoint.ACCESS_TIME,
-                actualConfiguration.getStartingPoint());
+        Assert.assertEquals(StartingPoint.ACCESS_TIME, actualConfiguration.getStartingPoint());
 
         Assert.assertEquals(1, actualConfiguration.getDurations().size());
-        Assert.assertEquals(2,
-                actualConfiguration.getDurations().get(0).getAmount());
-        Assert.assertEquals(DurationUnit.HOUR,
-                actualConfiguration.getDurations().get(0).getUnit());
+        Assert.assertEquals(2, actualConfiguration.getDurations().get(0).getAmount());
+        Assert.assertEquals(DurationUnit.HOUR, actualConfiguration.getDurations().get(0).getUnit());
 
     }
 
@@ -215,9 +201,8 @@ public class TestExpiresFilter extends TomcatBaseTest {
             private static final long serialVersionUID = 1L;
 
             @Override
-            protected void service(HttpServletRequest request,
-                    HttpServletResponse response) throws ServletException,
-                    IOException {
+            protected void service(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
                 response.setContentType("text/xml; charset=utf-8");
                 response.addHeader("Cache-Control", "private, max-age=232");
                 response.getWriter().print("Hello world");
@@ -233,9 +218,8 @@ public class TestExpiresFilter extends TomcatBaseTest {
             private static final long serialVersionUID = 1L;
 
             @Override
-            protected void service(HttpServletRequest request,
-                    HttpServletResponse response) throws ServletException,
-                    IOException {
+            protected void service(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
                 response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
                 response.addHeader("ETag", "W/\"1934-1269208821000\"");
                 response.addDateHeader("Date", System.currentTimeMillis());
@@ -251,9 +235,8 @@ public class TestExpiresFilter extends TomcatBaseTest {
             private static final long serialVersionUID = 1L;
 
             @Override
-            protected void service(HttpServletRequest request,
-                    HttpServletResponse response) throws ServletException,
-                    IOException {
+            protected void service(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
                 response.setContentType(null);
             }
         };
@@ -267,9 +250,8 @@ public class TestExpiresFilter extends TomcatBaseTest {
             private static final long serialVersionUID = 1L;
 
             @Override
-            protected void service(HttpServletRequest request,
-                    HttpServletResponse response) throws ServletException,
-                    IOException {
+            protected void service(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
                 response.setContentType("text/xml; charset=utf-8");
                 response.addDateHeader("Expires", System.currentTimeMillis());
                 response.getWriter().print("Hello world");
@@ -285,9 +267,8 @@ public class TestExpiresFilter extends TomcatBaseTest {
             private static final long serialVersionUID = 1L;
 
             @Override
-            protected void service(HttpServletRequest request,
-                    HttpServletResponse response) throws ServletException,
-                    IOException {
+            protected void service(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
                 response.setContentType("text/xml; charset=utf-8");
                 response.getWriter().print("Hello world");
             }
@@ -297,15 +278,13 @@ public class TestExpiresFilter extends TomcatBaseTest {
     }
 
     @Test
-    public void testUseContentTypeWithoutCharsetExpiresConfiguration()
-            throws Exception {
+    public void testUseContentTypeWithoutCharsetExpiresConfiguration() throws Exception {
         HttpServlet servlet = new HttpServlet() {
             private static final long serialVersionUID = 1L;
 
             @Override
-            protected void service(HttpServletRequest request,
-                    HttpServletResponse response) throws ServletException,
-                    IOException {
+            protected void service(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
                 response.setContentType("text/xml; charset=iso-8859-1");
                 response.getWriter().print("Hello world");
             }
@@ -320,9 +299,8 @@ public class TestExpiresFilter extends TomcatBaseTest {
             private static final long serialVersionUID = 1L;
 
             @Override
-            protected void service(HttpServletRequest request,
-                    HttpServletResponse response) throws ServletException,
-                    IOException {
+            protected void service(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
                 response.setContentType("image/jpeg");
                 response.getWriter().print("Hello world");
             }
@@ -337,9 +315,8 @@ public class TestExpiresFilter extends TomcatBaseTest {
             private static final long serialVersionUID = 1L;
 
             @Override
-            protected void service(HttpServletRequest request,
-                    HttpServletResponse response) throws ServletException,
-                    IOException {
+            protected void service(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
                 response.setContentType("image/jpeg");
                 response.addHeader("Cache-Control", "private");
 
@@ -356,9 +333,8 @@ public class TestExpiresFilter extends TomcatBaseTest {
             private static final long serialVersionUID = 1L;
 
             @Override
-            protected void service(HttpServletRequest request,
-                    HttpServletResponse response) throws ServletException,
-                    IOException {
+            protected void service(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
                 response.setContentType("text/json; charset=iso-8859-1");
                 response.getWriter().print("Hello world");
             }
@@ -367,13 +343,11 @@ public class TestExpiresFilter extends TomcatBaseTest {
         validate(servlet, Integer.valueOf(7 * 60));
     }
 
-    protected void validate(HttpServlet servlet, Integer expectedMaxAgeInSeconds)
-            throws Exception {
+    protected void validate(HttpServlet servlet, Integer expectedMaxAgeInSeconds) throws Exception {
         validate(servlet, expectedMaxAgeInSeconds, HttpServletResponse.SC_OK);
     }
 
-    protected void validate(HttpServlet servlet,
-            Integer expectedMaxAgeInSeconds, int expectedResponseStatusCode)
+    protected void validate(HttpServlet servlet, Integer expectedMaxAgeInSeconds, int expectedResponseStatusCode)
             throws Exception {
 
         // SETUP
@@ -383,14 +357,10 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
         FilterDef filterDef = new FilterDef();
         filterDef.addInitParameter("ExpiresDefault", "access plus 1 minute");
-        filterDef.addInitParameter("ExpiresByType text/xml;charset=utf-8",
-                "access plus 3 minutes");
-        filterDef.addInitParameter("ExpiresByType text/xml",
-                "access plus 5 minutes");
-        filterDef.addInitParameter("ExpiresByType text",
-                "access plus 7 minutes");
-        filterDef.addInitParameter("ExpiresExcludedResponseStatusCodes",
-                "304, 503");
+        filterDef.addInitParameter("ExpiresByType text/xml;charset=utf-8", "access plus 3 minutes");
+        filterDef.addInitParameter("ExpiresByType text/xml", "access plus 5 minutes");
+        filterDef.addInitParameter("ExpiresByType text", "access plus 7 minutes");
+        filterDef.addInitParameter("ExpiresExcludedResponseStatusCodes", "304, 503");
 
         filterDef.setFilterClass(ExpiresFilter.class.getName());
         filterDef.setFilterName(ExpiresFilter.class.getName());
@@ -413,7 +383,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
             // TEST
             ByteChunk bc = new ByteChunk();
-            Map<String,List<String>> responseHeaders = new HashMap<>();
+            Map<String, List<String>> responseHeaders = new HashMap<>();
             int rc = getUrl("http://localhost:" + getPort() + "/test", bc, responseHeaders);
 
             // VALIDATE
@@ -422,9 +392,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
             StringBuilder msg = new StringBuilder();
             for (Entry<String, List<String>> field : responseHeaders.entrySet()) {
                 for (String value : field.getValue()) {
-                    msg.append((field.getKey() == null ? "" : field.getKey() +
-                            ": ") +
-                            value + "\n");
+                    msg.append((field.getKey() == null ? "" : field.getKey() + ": ") + value + "\n");
                 }
             }
             System.out.println(msg);
@@ -437,13 +405,10 @@ public class TestExpiresFilter extends TomcatBaseTest {
                 actualMaxAgeInSeconds = null;
             } else {
                 actualMaxAgeInSeconds = null;
-                StringTokenizer cacheControlTokenizer = new StringTokenizer(
-                        cacheControlHeader, ",");
-                while (cacheControlTokenizer.hasMoreTokens() &&
-                        actualMaxAgeInSeconds == null) {
+                StringTokenizer cacheControlTokenizer = new StringTokenizer(cacheControlHeader, ",");
+                while (cacheControlTokenizer.hasMoreTokens() && actualMaxAgeInSeconds == null) {
                     String cacheDirective = cacheControlTokenizer.nextToken();
-                    StringTokenizer cacheDirectiveTokenizer = new StringTokenizer(
-                            cacheDirective, "=");
+                    StringTokenizer cacheDirectiveTokenizer = new StringTokenizer(cacheDirective, "=");
                     if (cacheDirectiveTokenizer.countTokens() == 2) {
                         String key = cacheDirectiveTokenizer.nextToken().trim();
                         String value = cacheDirectiveTokenizer.nextToken().trim();
@@ -455,8 +420,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
             }
 
             if (expectedMaxAgeInSeconds == null) {
-                Assert.assertNull("actualMaxAgeInSeconds '" +
-                        actualMaxAgeInSeconds + "' should be null",
+                Assert.assertNull("actualMaxAgeInSeconds '" + actualMaxAgeInSeconds + "' should be null",
                         actualMaxAgeInSeconds);
                 return;
             }
@@ -465,12 +429,9 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
             String contentType = getSingleHeader("Content-Type", responseHeaders);
 
-            int deltaInSeconds = Math.abs(actualMaxAgeInSeconds.intValue() -
-                    expectedMaxAgeInSeconds.intValue());
-            Assert.assertTrue("actualMaxAgeInSeconds: " +
-                    actualMaxAgeInSeconds + ", expectedMaxAgeInSeconds: " +
-                    expectedMaxAgeInSeconds + ", request time: " +
-                    timeBeforeInMillis + " for content type " +
+            int deltaInSeconds = Math.abs(actualMaxAgeInSeconds.intValue() - expectedMaxAgeInSeconds.intValue());
+            Assert.assertTrue("actualMaxAgeInSeconds: " + actualMaxAgeInSeconds + ", expectedMaxAgeInSeconds: " +
+                    expectedMaxAgeInSeconds + ", request time: " + timeBeforeInMillis + " for content type " +
                     contentType, deltaInSeconds < 3);
 
         } finally {
@@ -480,8 +441,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
     @Test
     public void testIntsToCommaDelimitedString() {
-        String actual = ExpiresFilter.intsToCommaDelimitedString(new int[] {
-                500, 503 });
+        String actual = ExpiresFilter.intsToCommaDelimitedString(new int[] { 500, 503 });
         String expected = "500, 503";
 
         Assert.assertEquals(expected, actual);
@@ -489,10 +449,8 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
 
     /*
-     * Tests Expires filter with:
-     * - per content type expires
-     * - no default
-     * - Default servlet returning 304s (without content-type)
+     * Tests Expires filter with: - per content type expires - no default - Default servlet returning 304s (without
+     * content-type)
      */
     @Test
     public void testBug63909() throws Exception {
@@ -519,22 +477,21 @@ public class TestExpiresFilter extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk bc = new ByteChunk();
-        Map<String,List<String>> requestHeaders = new CaseInsensitiveKeyMap<>();
+        Map<String, List<String>> requestHeaders = new CaseInsensitiveKeyMap<>();
         List<String> ifModifiedSinceValues = new ArrayList<>();
         ifModifiedSinceValues.add(FastHttpDateFormat.getCurrentDate());
         requestHeaders.put("If-Modified-Since", ifModifiedSinceValues);
-        Map<String,List<String>> responseHeaders = new CaseInsensitiveKeyMap<>();
+        Map<String, List<String>> responseHeaders = new CaseInsensitiveKeyMap<>();
 
-        int rc = getUrl("http://localhost:" + getPort() + "/test/bug6nnnn/bug69303.txt", bc, requestHeaders, responseHeaders);
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug6nnnn/bug69303.txt", bc, requestHeaders,
+                responseHeaders);
 
         Assert.assertEquals(HttpServletResponse.SC_NOT_MODIFIED, rc);
 
         StringBuilder msg = new StringBuilder();
         for (Entry<String, List<String>> field : responseHeaders.entrySet()) {
             for (String value : field.getValue()) {
-                msg.append((field.getKey() == null ? "" : field.getKey() +
-                        ": ") +
-                        value + "\n");
+                msg.append((field.getKey() == null ? "" : field.getKey() + ": ") + value + "\n");
             }
         }
         System.out.println(msg);
@@ -547,13 +504,10 @@ public class TestExpiresFilter extends TomcatBaseTest {
             actualMaxAgeInSeconds = null;
         } else {
             actualMaxAgeInSeconds = null;
-            StringTokenizer cacheControlTokenizer = new StringTokenizer(
-                    cacheControlHeader, ",");
-            while (cacheControlTokenizer.hasMoreTokens() &&
-                    actualMaxAgeInSeconds == null) {
+            StringTokenizer cacheControlTokenizer = new StringTokenizer(cacheControlHeader, ",");
+            while (cacheControlTokenizer.hasMoreTokens() && actualMaxAgeInSeconds == null) {
                 String cacheDirective = cacheControlTokenizer.nextToken();
-                StringTokenizer cacheDirectiveTokenizer = new StringTokenizer(
-                        cacheDirective, "=");
+                StringTokenizer cacheDirectiveTokenizer = new StringTokenizer(cacheDirective, "=");
                 if (cacheDirectiveTokenizer.countTokens() == 2) {
                     String key = cacheDirectiveTokenizer.nextToken().trim();
                     String value = cacheDirectiveTokenizer.nextToken().trim();

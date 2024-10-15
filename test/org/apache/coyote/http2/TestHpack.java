@@ -72,17 +72,21 @@ public class TestHpack {
 
     private static class HeadersListener implements HpackDecoder.HeaderEmitter {
         private final MimeHeaders headers;
-        public HeadersListener(MimeHeaders headers) {
+
+        HeadersListener(MimeHeaders headers) {
             this.headers = headers;
         }
+
         @Override
         public void emitHeader(String name, String value) {
             headers.setValue(name).setString(value);
         }
+
         @Override
         public void setHeaderException(StreamException streamException) {
             // NO-OP
         }
+
         @Override
         public void validateHeaders() throws StreamException {
             // NO-OP
@@ -100,7 +104,7 @@ public class TestHpack {
             // Skip the control characters except VTAB
             if (i == 9 || i > 31 && i < 127 || i > 127) {
                 try {
-                    doTestHeaderValueBug60451("foo" + Character.toString((char) i)  + "bar");
+                    doTestHeaderValueBug60451("foo" + Character.toString((char) i) + "bar");
                 } catch (Exception e) {
                     e.printStackTrace();
                     Assert.fail(e.getMessage() + "[" + i + "]");
@@ -109,7 +113,7 @@ public class TestHpack {
         }
     }
 
-    @Test(expected=HpackException.class)
+    @Test(expected = HpackException.class)
     public void testExcessiveStringLiteralPadding() throws Exception {
         MimeHeaders headers = new MimeHeaders();
         headers.setValue("X-test").setString("foobar");

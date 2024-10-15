@@ -38,12 +38,7 @@ public final class TesterMapRealm extends RealmBase {
     }
 
     public void addUserRole(String username, String role) {
-        List<String> userRoles = roles.get(username);
-        if (userRoles == null) {
-            userRoles = new ArrayList<>();
-            roles.put(username, userRoles);
-        }
-        userRoles.add(role);
+        roles.computeIfAbsent(username, k -> new ArrayList<>()).add(role);
     }
 
     @Override

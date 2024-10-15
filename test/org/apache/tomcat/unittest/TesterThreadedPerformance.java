@@ -19,6 +19,9 @@ package org.apache.tomcat.unittest;
 import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 
+/*
+ * Support class for threaded performance tests.
+ */
 public class TesterThreadedPerformance {
 
     private final int threadCount;
@@ -62,7 +65,7 @@ public class TesterThreadedPerformance {
         private final IntConsumer testTarget;
         private final int iterationCount;
 
-        public TesterThreadedPerformanceRunnable(IntConsumer testTarget, int iterationCount) {
+        TesterThreadedPerformanceRunnable(IntConsumer testTarget, int iterationCount) {
             this.testTarget = testTarget;
             this.iterationCount = iterationCount;
         }

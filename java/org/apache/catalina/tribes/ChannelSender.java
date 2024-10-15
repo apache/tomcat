@@ -20,64 +20,69 @@ import java.io.IOException;
 
 
 /**
- * ChannelReceiver Interface<br>
- * The <code>ChannelSender</code> interface is the data sender component
- * at the bottom layer, the IO layer (for layers see the javadoc for the {@link Channel} interface).<br>
- * The channel sender must support "silent" members, ie, be able to send a message to a member
- * that is not in the membership, but is part of the destination parameter
+ * The <code>ChannelSender</code> interface is the data sender component at the bottom layer, the IO layer (for layers
+ * see the {@link Channel} interface). The channel sender must support "silent" members, i.e., be able to send a message
+ * to a member that is not in the membership, but is part of the destination parameter
  */
-public interface ChannelSender extends Heartbeat
-{
+public interface ChannelSender extends Heartbeat {
     /**
      * Notify the sender of a member being added to the group.<br>
      * Optional. This can be an empty implementation, that does nothing
+     *
      * @param member Member
      */
-    public void add(Member member);
+    void add(Member member);
+
     /**
-     * Notification that a member has been removed or crashed.
-     * Can be used to clean up open connections etc
+     * Notification that a member has been removed or crashed. Can be used to clean up open connections etc
+     *
      * @param member Member
      */
-    public void remove(Member member);
+    void remove(Member member);
 
     /**
      * Start the channel sender
+     *
      * @throws IOException if preprocessing takes place and an error happens
      */
-    public void start() throws IOException;
+    void start() throws IOException;
 
     /**
      * Stop the channel sender
      */
-    public void stop();
+    void stop();
 
     /**
      * A channel heartbeat, use this method to clean up resources
      */
     @Override
-    public void heartbeat() ;
+    void heartbeat();
 
     /**
      * Send a message to one or more recipients.
-     * @param message ChannelMessage - the message to be sent
+     *
+     * @param message     ChannelMessage - the message to be sent
      * @param destination Member[] - the destinations
-     * @throws ChannelException - if an error happens, the ChannelSender MUST report
-     * individual send failures on a per member basis, using ChannelException.addFaultyMember
+     *
+     * @throws ChannelException - if an error happens, the ChannelSender MUST report individual send failures on a per
+     *                              member basis, using ChannelException.addFaultyMember
+     *
      * @see ChannelException#addFaultyMember(Member,java.lang.Exception)
      */
-    public void sendMessage(ChannelMessage message, Member[] destination) throws ChannelException;
+    void sendMessage(ChannelMessage message, Member[] destination) throws ChannelException;
 
     /**
      * Return the channel that is related to this ChannelSender
+     *
      * @return Channel
      */
-    public Channel getChannel();
+    Channel getChannel();
 
     /**
      * Set the channel that is related to this ChannelSender
+     *
      * @param channel The channel
      */
-    public void setChannel(Channel channel);
+    void setChannel(Channel channel);
 
 }

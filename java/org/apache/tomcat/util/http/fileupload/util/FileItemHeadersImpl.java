@@ -30,7 +30,7 @@ import org.apache.tomcat.util.http.fileupload.FileItemHeaders;
 /**
  * Default implementation of the {@link FileItemHeaders} interface.
  *
- * @since 1.2.1
+ * @since FileUpload 1.2.1
  */
 public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
 
@@ -45,9 +45,6 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
      */
     private final Map<String, List<String>> headerNameToValueListMap = new LinkedHashMap<>();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getHeader(final String name) {
         final String nameLower = name.toLowerCase(Locale.ENGLISH);
@@ -58,17 +55,11 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
         return headerValueList.get(0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<String> getHeaderNames() {
         return headerNameToValueListMap.keySet().iterator();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<String> getHeaders(final String name) {
         final String nameLower = name.toLowerCase(Locale.ENGLISH);
@@ -87,7 +78,8 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
      */
     public synchronized void addHeader(final String name, final String value) {
         final String nameLower = name.toLowerCase(Locale.ENGLISH);
-        List<String> headerValueList = headerNameToValueListMap.computeIfAbsent(nameLower, k -> new ArrayList<>());
+        final List<String> headerValueList = headerNameToValueListMap.
+                computeIfAbsent(nameLower, k -> new ArrayList<>());
         headerValueList.add(value);
     }
 

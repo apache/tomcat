@@ -62,8 +62,8 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testHIGH() throws Exception {
-        if (TesterOpenSSL.VERSION < 30100) {
-            // OpenSSL 3.1.x moved the CCM8 ciphers from high to medium
+        if (TesterOpenSSL.VERSION < 30200) {
+            // OpenSSL 3.2.x moved the CCM8 ciphers from high to medium
             testSpecification("HIGH:!AESCCM8");
         } else {
             testSpecification("HIGH");
@@ -73,8 +73,8 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testMEDIUM() throws Exception {
-        if (TesterOpenSSL.VERSION < 30100) {
-            // OpenSSL 3.1.x moved the CCM8 ciphers from high to medium
+        if (TesterOpenSSL.VERSION < 30200) {
+            // OpenSSL 3.2.x moved the CCM8 ciphers from high to medium
             testSpecification("MEDIUM:AESCCM8");
         } else {
             testSpecification("MEDIUM");
@@ -533,8 +533,8 @@ public class TestOpenSSLCipherConfigurationParser {
         // Tomcat 8 default as of 2014-08-04
         // This gets an A- from https://www.ssllabs.com/ssltest with no FS for
         // a number of the reference browsers
-        if (TesterOpenSSL.VERSION < 30100) {
-            // OpenSSL 3.1.x moved the CCM8 ciphers from high to medium
+        if (TesterOpenSSL.VERSION < 30200) {
+            // OpenSSL 3.2.x moved the CCM8 ciphers from high to medium
             testSpecification("HIGH:!AESCCM8:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
         } else {
             testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
@@ -555,6 +555,21 @@ public class TestOpenSSLCipherConfigurationParser {
         // EDH was introduced in 1.0.0
         testSpecification("EECDH+aRSA+SHA384:EECDH:EDH+aRSA:RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS");
     }
+
+
+    /*
+     * Cipher string extracted from https://bz.apache.org/bugzilla/show_bug.cgi?id=67628
+     */
+    @Test
+    public void testSpecification04() throws Exception {
+        if (TesterOpenSSL.VERSION < 30200) {
+            // OpenSSL 3.2.x moved the CCM8 ciphers from high to medium
+            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK:!DSS:!SHA1:!SHA256:!SHA384:!AESCCM8");
+        } else {
+            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK:!DSS:!SHA1:!SHA256:!SHA384:");
+        }
+    }
+
 
     private void testSpecification(String specification) throws Exception {
         // Filter out cipher suites that OpenSSL does not implement

@@ -27,22 +27,13 @@ import org.apache.tomcat.JarScanner;
 public class JarScannerSF extends StoreFactoryBase {
 
     /**
-     * Store the specified JarScanner properties and children
-     * (JarScannerFilter)
-     *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aJarScanner
-     *            JarScanner whose properties are being stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
+     * Store the specified JarScanner properties and children (JarScannerFilter)
+     * <p>
+     * {@inheritDoc}
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aJarScanner,
-            StoreDescription parentDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aJarScanner, StoreDescription parentDesc)
+            throws Exception {
         if (aJarScanner instanceof JarScanner) {
             JarScanner jarScanner = (JarScanner) aJarScanner;
             // Store nested <JarScanFilter> element

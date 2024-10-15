@@ -50,7 +50,6 @@
     {"name":"org.apache.jasper.resources.LocalStrings"},
     {"name":"org.apache.naming.LocalStrings"},
     {"name":"org.apache.naming.factory.LocalStrings"},
-    {"name":"org.apache.naming.factory.webservices.LocalStrings"},
     {"name":"org.apache.tomcat.dbcp.dbcp2.LocalStrings"},
     {"name":"org.apache.tomcat.util.LocalStrings"},
     {"name":"org.apache.tomcat.util.buf.LocalStrings"},
@@ -73,9 +72,13 @@
     {"name":"org.apache.tomcat.websocket.server.LocalStrings"}
   ],
   "resources":[
-    {"pattern":".*/mbeans-descriptors.xml$"},
-    {"pattern":".*/*.properties$"},
-    {"pattern":".*/*.dtd$"},
-    {"pattern":".*/*.xsd$"}
+    {"pattern":"^org/apache/tomcat/.*mbeans-descriptors\\.xml$"},
+    {"pattern":"^org/apache/catalina/.*mbeans-descriptors\\.xml$"},
+    {"pattern":"^org/apache/coyote/.*mbeans-descriptors\\.xml$"},
+    {"pattern":"^org/apache/catalina/.*\\.properties$"},
+    {"pattern":"^jakarta/servlet/resources/.*"},
+    {"pattern":"^org/apache/tomcat/.*\\.dtd$"},
+    {"pattern":"^org/apache/jasper/.*mbeans-descriptors\\.xml$"},
+    {"pattern":"^jakarta/servlet/jsp/resources/.*"}
   ]
 }

@@ -28,6 +28,7 @@ Export-Package: \
     org.apache.tomcat.util.http,\
     org.apache.tomcat.util.http.fileupload,\
     org.apache.tomcat.util.http.fileupload.disk,\
+    org.apache.tomcat.util.http.fileupload.impl,\
     org.apache.tomcat.util.http.fileupload.servlet,\
     org.apache.tomcat.util.http.fileupload.util,\
     org.apache.tomcat.util.http.parser,\
@@ -38,10 +39,11 @@ Export-Package: \
     org.apache.tomcat.util.net.jsse,\
     org.apache.tomcat.util.net.openssl,\
     org.apache.tomcat.util.net.openssl.ciphers
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -includepackage: \
     org.apache.tomcat.util.bcel,\
-    org.apache.tomcat.util.http.fileupload.impl,\
     org.apache.tomcat.util.http.fileupload.util.mime
 
 -jpms-module-info: \

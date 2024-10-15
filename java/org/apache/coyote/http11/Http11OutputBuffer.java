@@ -29,10 +29,9 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Provides buffering for the HTTP headers (allowing responses to be reset
- * before they have been committed) and the link to the Socket for writing the
- * headers (once committed) and the response body. Note that buffering of the
- * response body happens at a higher level.
+ * Provides buffering for the HTTP headers (allowing responses to be reset before they have been committed) and the link
+ * to the Socket for writing the headers (once committed) and the response body. Note that buffering of the response
+ * body happens at a higher level.
  */
 public class Http11OutputBuffer implements HttpOutputBuffer {
 
@@ -122,8 +121,8 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
     // ------------------------------------------------------------- Properties
 
     /**
-     * Add an output filter to the filter library. Note that calling this method
-     * resets the currently active filters to none.
+     * Add an output filter to the filter library. Note that calling this method resets the currently active filters to
+     * none.
      *
      * @param filter The filter to add
      */
@@ -152,8 +151,8 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
      * <p>
      * The filter does not have to be present in {@link #getFilters()}.
      * <p>
-     * A filter can only be added to a response once. If the filter has already
-     * been added to this response then this method will be a NO-OP.
+     * A filter can only be added to a response once. If the filter has already been added to this response then this
+     * method will be a NO-OP.
      *
      * @param filter The filter to add
      */
@@ -208,11 +207,7 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
 
     // ----------------------------------------------- HttpOutputBuffer Methods
 
-    /**
-     * Flush the response.
-     *
-     * @throws IOException an underlying I/O error occurred
-     */
+
     @Override
     public void flush() throws IOException {
         if (lastActiveFilter == -1) {
@@ -242,8 +237,8 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Reset the header buffer if an error occurs during the writing of the
-     * headers so the error response can be written.
+     * Reset the header buffer if an error occurs during the writing of the headers so the error response can be
+     * written.
      */
     void resetHeaderBuffer() {
         headerBuffer.position(0).limit(headerBuffer.capacity());
@@ -251,8 +246,7 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
 
 
     /**
-     * Recycle the output buffer. This should be called when closing the
-     * connection.
+     * Recycle the output buffer. This should be called when closing the connection.
      */
     public void recycle() {
         nextRequest();
@@ -261,10 +255,8 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
 
 
     /**
-     * End processing of current HTTP request.
-     * Note: All bytes of the current request should have been already
-     * consumed. This method only resets all the pointers so that we are ready
-     * to parse the next HTTP request.
+     * End processing of current HTTP request. Note: All bytes of the current request should have been already consumed.
+     * This method only resets all the pointers so that we are ready to parse the next HTTP request.
      */
     public void nextRequest() {
         // Recycle filters
@@ -308,7 +300,10 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
      */
     protected void commit() throws IOException {
         response.setCommitted(true);
+        writeHeaders();
+    }
 
+    protected void writeHeaders() throws IOException {
         if (headerBuffer.position() > 0) {
             // Sending the response header buffer
             headerBuffer.flip();
@@ -328,26 +323,27 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
 
     /**
      * Send the response status line.
+     *
+     * @param status The HTTP status code to include in the status line
      */
-    public void sendStatus() {
+    public void sendStatus(int status) {
         // Write protocol name
         write(Constants.HTTP_11_BYTES);
         headerBuffer.put(Constants.SP);
 
         // Write status code
-        int status = response.getStatus();
         switch (status) {
-        case 200:
-            write(Constants._200_BYTES);
-            break;
-        case 400:
-            write(Constants._400_BYTES);
-            break;
-        case 404:
-            write(Constants._404_BYTES);
-            break;
-        default:
-            write(status);
+            case 200:
+                write(Constants._200_BYTES);
+                break;
+            case 400:
+                write(Constants._400_BYTES);
+                break;
+            case 404:
+                write(Constants._404_BYTES);
+                break;
+            default:
+                write(status);
         }
 
         headerBuffer.put(Constants.SP);
@@ -363,7 +359,7 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
     /**
      * Send a header.
      *
-     * @param name Header name
+     * @param name  Header name
      * @param value Header value
      */
     public void sendHeader(MessageBytes name, MessageBytes value) {
@@ -383,9 +379,8 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
 
 
     /**
-     * This method will write the contents of the specified message bytes
-     * buffer to the output stream, without filtering. This method is meant to
-     * be used to write the response header.
+     * This method will write the contents of the specified message bytes buffer to the output stream, without
+     * filtering. This method is meant to be used to write the response header.
      *
      * @param mb data to be written
      */
@@ -397,14 +392,13 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
             // values will be OK. Strings using other encodings may be
             // corrupted.
             byte[] buffer = bc.getBuffer();
-            for (int i = bc.getOffset(); i < bc.getLength(); i++) {
+            for (int i = bc.getStart(); i < bc.getLength(); i++) {
                 // byte values are signed i.e. -128 to 127
                 // The values are used unsigned. 0 to 31 are CTLs so they are
                 // filtered (apart from TAB which is 9). 127 is a control (DEL).
                 // The values 128 to 255 are all OK. Converting those to signed
                 // gives -128 to -1.
-                if ((buffer[i] > -1 && buffer[i] <= 31 && buffer[i] != 9) ||
-                        buffer[i] == 127) {
+                if ((buffer[i] > -1 && buffer[i] <= 31 && buffer[i] != 9) || buffer[i] == 127) {
                     buffer[i] = ' ';
                 }
             }
@@ -414,9 +408,8 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
 
 
     /**
-     * This method will write the contents of the specified byte chunk to the
-     * output stream, without filtering. This method is meant to be used to
-     * write the response header.
+     * This method will write the contents of the specified byte chunk to the output stream, without filtering. This
+     * method is meant to be used to write the response header.
      *
      * @param bc data to be written
      */
@@ -429,9 +422,8 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
 
 
     /**
-     * This method will write the contents of the specified byte
-     * buffer to the output stream, without filtering. This method is meant to
-     * be used to write the response header.
+     * This method will write the contents of the specified byte buffer to the output stream, without filtering. This
+     * method is meant to be used to write the response header.
      *
      * @param b data to be written
      */
@@ -444,8 +436,8 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
 
 
     /**
-     * This method will write the specified integer to the output stream. This
-     * method is meant to be used to write the response header.
+     * This method will write the specified integer to the output stream. This method is meant to be used to write the
+     * response header.
      *
      * @param value data to be written
      */
@@ -455,43 +447,44 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
         int len = s.length();
         checkLengthBeforeWrite(len);
         for (int i = 0; i < len; i++) {
-            char c = s.charAt (i);
+            char c = s.charAt(i);
             headerBuffer.put((byte) c);
         }
     }
 
 
     /**
-     * Checks to see if there is enough space in the buffer to write the
-     * requested number of bytes.
+     * Checks to see if there is enough space in the buffer to write the requested number of bytes.
      */
     private void checkLengthBeforeWrite(int length) {
         // "+ 4": BZ 57509. Reserve space for CR/LF/COLON/SP characters that
         // are put directly into the buffer following this write operation.
         if (headerBuffer.position() + length + 4 > headerBuffer.capacity()) {
-            throw new HeadersTooLargeException(
-                    sm.getString("iob.responseheadertoolarge.error"));
+            throw new HeadersTooLargeException(sm.getString("iob.responseheadertoolarge.error"));
         }
     }
 
 
-    //------------------------------------------------------ Non-blocking writes
+    // ------------------------------------------------------ Non-blocking writes
 
     /**
      * Writes any remaining buffered data.
      *
-     * @param block     Should this method block until the buffer is empty
-     * @return  <code>true</code> if data remains in the buffer (which can only
-     *          happen in non-blocking mode) else <code>false</code>.
+     * @param block Should this method block until the buffer is empty
+     *
+     * @return <code>true</code> if data remains in the buffer (which can only happen in non-blocking mode) else
+     *             <code>false</code>.
+     *
      * @throws IOException Error writing data
      */
-    protected boolean flushBuffer(boolean block) throws IOException  {
+    protected boolean flushBuffer(boolean block) throws IOException {
         return socketWrapper.flush(block);
     }
 
 
     /**
      * Is standard Servlet blocking IO being used for output?
+     *
      * @return <code>true</code> if this is blocking IO
      */
     protected final boolean isBlocking() {
@@ -535,9 +528,6 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
      */
     protected class SocketOutputBuffer implements HttpOutputBuffer {
 
-        /**
-         * Write chunk.
-         */
         @Override
         public int doWrite(ByteBuffer chunk) throws IOException {
             try {
@@ -565,7 +555,7 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
 
         @Override
         public void end() throws IOException {
-            socketWrapper.flush(true);
+            socketWrapper.flush(response.getWriteListener() == null);
         }
 
         @Override

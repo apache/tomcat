@@ -116,11 +116,9 @@ final class ReflectionProperty implements Comparable<ReflectionProperty> {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("ReflectionProperty{");
-        sb.append("name='").append(propertyName).append('\'');
-        sb.append(", type=").append(propertyType);
-        sb.append('}');
-        return sb.toString();
+        return "ReflectionProperty{" + "name='" + propertyName + '\'' +
+            ", type=" + propertyType +
+            '}';
     }
 
     @Override

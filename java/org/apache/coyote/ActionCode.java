@@ -17,51 +17,58 @@
 package org.apache.coyote;
 
 /**
- * ActionCodes represent callbacks from the servlet container to the coyote
- * connector. Actions are implemented by ProtocolHandler, using the ActionHook
- * interface.
+ * ActionCodes represent callbacks from the servlet container to the coyote connector. Actions are implemented by
+ * ProtocolHandler, using the ActionHook interface.
  *
  * @see ProtocolHandler
  * @see ActionHook
+ *
  * @author Remy Maucherat
  */
 public enum ActionCode {
+
+    /**
+     * Acknowledge request, most often used for HTTP expectations.
+     */
     ACK,
+
+    /**
+     * Regular close.
+     */
     CLOSE,
+
+    /**
+     * Response commit, which means any initial bytes part of the response are going to be sent.
+     */
     COMMIT,
 
     /**
-     * A serious error occurred from which it is not possible to recover safely.
-     * Further attempts to write to the response should be ignored and the
-     * connection needs to be closed as soon as possible. This can also be used
-     * to forcibly close a connection if an error occurs after the response has
-     * been committed.
+     * A serious error occurred from which it is not possible to recover safely. Further attempts to write to the
+     * response should be ignored and the connection needs to be closed as soon as possible. This can also be used to
+     * forcibly close a connection if an error occurs after the response has been committed.
      */
     CLOSE_NOW,
 
     /**
-     * A flush() operation originated by the client ( i.e. a flush() on the
-     * servlet output stream or writer, called by a servlet ). Argument is the
-     * Response.
+     * A flush() operation originated by the client ( i.e. a flush() on the servlet output stream or writer, called by a
+     * servlet ). Argument is the Response.
      */
     CLIENT_FLUSH,
 
     /**
-     * Has the processor been placed into the error state? Note that the
-     * response may not have an appropriate error code set.
+     * Has the processor been placed into the error state? Note that the response may not have an appropriate error code
+     * set.
      */
     IS_ERROR,
 
     /**
-     * The processor may have been placed into an error state and some error
-     * states do not permit any further I/O. Is I/O currently allowed?
+     * The processor may have been placed into an error state and some error states do not permit any further I/O. Is
+     * I/O currently allowed?
      */
     IS_IO_ALLOWED,
 
     /**
-     * Hook called if swallowing request input should be disabled.
-     * Example: Cancel a large file upload.
-     *
+     * Hook called if swallowing request input should be disabled. Example: Cancel a large file upload.
      */
     DISABLE_SWALLOW_INPUT,
 
@@ -81,14 +88,12 @@ public enum ActionCode {
     REQ_PEER_ADDR_ATTRIBUTE,
 
     /**
-     * Callback for lazy evaluation - extract the SSL-related attributes
-     * including the client certificate if present.
+     * Callback for lazy evaluation - extract the SSL-related attributes including the client certificate if present.
      */
     REQ_SSL_ATTRIBUTE,
 
     /**
-     * Force a TLS re-handshake and make the resulting client certificate (if
-     * any) available as a request attribute.
+     * Force a TLS re-handshake and make the resulting client certificate (if any) available as a request attribute.
      */
     REQ_SSL_CERTIFICATE,
 
@@ -128,26 +133,22 @@ public enum ActionCode {
     ASYNC_START,
 
     /**
-     * Callback for an async call to
-     * {@link jakarta.servlet.AsyncContext#dispatch()}.
+     * Callback for an async call to {@link jakarta.servlet.AsyncContext#dispatch()}.
      */
     ASYNC_DISPATCH,
 
     /**
-     * Callback to indicate the the actual dispatch has started and that the
-     * async state needs change.
+     * Callback to indicate the the actual dispatch has started and that the async state needs change.
      */
     ASYNC_DISPATCHED,
 
     /**
-     * Callback for an async call to
-     * {@link jakarta.servlet.AsyncContext#start(Runnable)}.
+     * Callback for an async call to {@link jakarta.servlet.AsyncContext#start(Runnable)}.
      */
     ASYNC_RUN,
 
     /**
-     * Callback for an async call to
-     * {@link jakarta.servlet.AsyncContext#complete()}.
+     * Callback for an async call to {@link jakarta.servlet.AsyncContext#complete()}.
      */
     ASYNC_COMPLETE,
 
@@ -162,8 +163,7 @@ public enum ActionCode {
     ASYNC_ERROR,
 
     /**
-     * Callback for an async call to
-     * {@link jakarta.servlet.AsyncContext#setTimeout(long)}
+     * Callback for an async call to {@link jakarta.servlet.AsyncContext#setTimeout(long)}
      */
     ASYNC_SETTIMEOUT,
 
@@ -193,13 +193,13 @@ public enum ActionCode {
     ASYNC_IS_TIMINGOUT,
 
     /**
-    * Callback to determine if async is in error.
-    */
+     * Callback to determine if async is in error.
+     */
     ASYNC_IS_ERROR,
 
     /**
-     * Callback to trigger post processing. Typically only used during error
-     * handling to trigger essential processing that otherwise would be skipped.
+     * Callback to trigger post processing. Typically only used during error handling to trigger essential processing
+     * that otherwise would be skipped.
      */
     ASYNC_POST_PROCESS,
 
@@ -209,15 +209,13 @@ public enum ActionCode {
     UPGRADE,
 
     /**
-     * Indicator that Servlet is interested in being
-     * notified when data is available to be read.
+     * Indicator that Servlet is interested in being notified when data is available to be read.
      */
     NB_READ_INTEREST,
 
     /**
-     * Used with non-blocking writes to determine if a write is currently
-     * allowed (sets passed parameter to <code>true</code>) or not (sets passed
-     * parameter to <code>false</code>). If a write is not allowed then callback
+     * Used with non-blocking writes to determine if a write is currently allowed (sets passed parameter to
+     * <code>true</code>) or not (sets passed parameter to <code>false</code>). If a write is not allowed then callback
      * will be triggered at some future point when write becomes possible again.
      */
     NB_WRITE_INTEREST,
@@ -228,59 +226,55 @@ public enum ActionCode {
     REQUEST_BODY_FULLY_READ,
 
     /**
-     * Indicates that the container needs to trigger a call to onDataAvailable()
-     * for the registered non-blocking read listener.
+     * Indicates that the container needs to trigger a call to onDataAvailable() for the registered non-blocking read
+     * listener.
      */
     DISPATCH_READ,
 
     /**
-     * Indicates that the container needs to trigger a call to onWritePossible()
-     * for the registered non-blocking write listener.
+     * Indicates that the container needs to trigger a call to onWritePossible() for the registered non-blocking write
+     * listener.
      */
     DISPATCH_WRITE,
 
     /**
-     * Execute any non-blocking dispatches that have been registered via
-     * {@link #DISPATCH_READ} or {@link #DISPATCH_WRITE}. Typically required
-     * when the non-blocking listeners are configured on a thread where the
+     * Indicates that the container needs to trigger a call to onError() for the registered non-blocking write and/or
+     * read listener(s).
+     */
+    DISPATCH_ERROR,
+
+    /**
+     * Execute any non-blocking dispatches that have been registered via {@link #DISPATCH_READ} or
+     * {@link #DISPATCH_WRITE}. Typically required when the non-blocking listeners are configured on a thread where the
      * processing wasn't triggered by a read or write event on the socket.
      */
     DISPATCH_EXECUTE,
 
     /**
-     * Is server push supported and allowed for the current request?
-     */
-    IS_PUSH_SUPPORTED,
-
-    /**
-     * Push a request on behalf of the client of the current request.
-     */
-    PUSH_REQUEST,
-
-    /**
-     * Are the request trailer fields ready to be read? Note that this returns
-     * true if it is known that request trailer fields are not supported so an
-     * empty collection of trailers can then be read.
+     * Are the request trailer fields ready to be read? Note that this returns true if it is known that request trailer
+     * fields are not supported so an empty collection of trailers can then be read.
      */
     IS_TRAILER_FIELDS_READY,
 
     /**
-     * Are HTTP trailer fields supported for the current response? Note that
-     * once an HTTP/1.1 response has been committed, it will no longer support
-     * trailer fields.
+     * Are HTTP trailer fields supported for the current response? Note that once an HTTP/1.1 response has been
+     * committed, it will no longer support trailer fields.
      */
     IS_TRAILER_FIELDS_SUPPORTED,
 
     /**
-     * Obtain the request identifier for this request as defined by the protocol
-     * in use. Note that some protocols do not define such an identifier. E.g.
-     * this will be Stream ID for HTTP/2.
+     * Obtain the request identifier for this request as defined by the protocol in use. Note that some protocols do not
+     * define such an identifier. E.g. this will be Stream ID for HTTP/2.
      */
     PROTOCOL_REQUEST_ID,
 
     /**
-     * Obtain the servlet connection instance for the network connection
-     * supporting the current request.
+     * Obtain the servlet connection instance for the network connection supporting the current request.
      */
-    SERVLET_CONNECTION
+    SERVLET_CONNECTION,
+
+    /**
+     * Send an RFC 8297 Early Hints informational response.
+     */
+    EARLY_HINTS
 }

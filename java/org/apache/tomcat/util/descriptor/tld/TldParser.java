@@ -18,17 +18,13 @@ package org.apache.tomcat.util.descriptor.tld;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.AccessController;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.descriptor.Constants;
 import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.descriptor.XmlErrorHandler;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
-import org.apache.tomcat.util.security.PrivilegedGetTccl;
-import org.apache.tomcat.util.security.PrivilegedSetTccl;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -51,20 +47,10 @@ public class TldParser {
     }
 
     public TaglibXml parse(TldResourcePath path) throws IOException, SAXException {
-        ClassLoader original;
-        if (Constants.IS_SECURITY_ENABLED) {
-            PrivilegedGetTccl pa = new PrivilegedGetTccl();
-            original = AccessController.doPrivileged(pa);
-        } else {
-            original = Thread.currentThread().getContextClassLoader();
-        }
+        Thread currentThread = Thread.currentThread();
+        ClassLoader original = currentThread.getContextClassLoader();
         try (InputStream is = path.openStream()) {
-            if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa = new PrivilegedSetTccl(TldParser.class.getClassLoader());
-                AccessController.doPrivileged(pa);
-            } else {
-                Thread.currentThread().setContextClassLoader(TldParser.class.getClassLoader());
-            }
+            currentThread.setContextClassLoader(TldParser.class.getClassLoader());
             XmlErrorHandler handler = new XmlErrorHandler();
             digester.setErrorHandler(handler);
 
@@ -84,12 +70,7 @@ public class TldParser {
             return taglibXml;
         } finally {
             digester.reset();
-            if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa = new PrivilegedSetTccl(original);
-                AccessController.doPrivileged(pa);
-            } else {
-                Thread.currentThread().setContextClassLoader(original);
-            }
+            currentThread.setContextClassLoader(original);
         }
     }
 

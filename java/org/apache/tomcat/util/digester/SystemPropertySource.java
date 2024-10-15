@@ -16,36 +16,19 @@
  */
 package org.apache.tomcat.util.digester;
 
-import java.security.Permission;
-import java.util.PropertyPermission;
-
 import org.apache.tomcat.util.IntrospectionUtils;
-import org.apache.tomcat.util.security.PermissionCheck;
 
 /**
- * A {@link org.apache.tomcat.util.IntrospectionUtils.SecurePropertySource}
+ * A {@link org.apache.tomcat.util.IntrospectionUtils.PropertySource}
  * that uses system properties to resolve expressions.
  * This property source is always active by default.
  *
  * @see Digester
  */
-public class SystemPropertySource implements IntrospectionUtils.SecurePropertySource {
+public class SystemPropertySource implements IntrospectionUtils.PropertySource {
 
     @Override
     public String getProperty(String key) {
-        // For backward compatibility
-        return getProperty(key, null);
-    }
-
-    @Override
-    public String getProperty(String key, ClassLoader classLoader) {
-        if (classLoader instanceof PermissionCheck) {
-            Permission p = new PropertyPermission(key, "read");
-            if (!((PermissionCheck) classLoader).check(p)) {
-                return null;
-            }
-        }
         return System.getProperty(key);
     }
-
 }

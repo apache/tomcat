@@ -5011,7 +5011,7 @@ public enum Cipher {
      */
     private final int alg_bits;
 
-    private Cipher(int id, String openSSLAlias, KeyExchange kx, Authentication au, Encryption enc,
+    Cipher(int id, String openSSLAlias, KeyExchange kx, Authentication au, Encryption enc,
             MessageDigest mac, Protocol protocol, boolean export, EncryptionLevel level,
             boolean fipsCompatible, int strength_bits, int alg_bits, String[] jsseAltNames,
             String[] openSSlAltNames) {
@@ -5101,7 +5101,7 @@ public enum Cipher {
     private static final Map<Integer,Cipher> idMap = new HashMap<>();
 
     static {
-        for (Cipher cipher : Cipher.values()) {
+        for (Cipher cipher : values()) {
             int id = cipher.getId();
 
             if (id > 0 && id < 0xFFFF) {

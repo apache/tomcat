@@ -19,29 +19,26 @@ package jakarta.servlet.descriptor;
 import java.util.Collection;
 
 /**
- * This interface exposes the JSP specific configuration information obtain ed
- * from the deployment descriptors. It is primarily provided so that JSP
- * implementations do not have to parse deployment descriptors.
+ * This interface exposes the JSP specific configuration information obtain ed from the deployment descriptors. It is
+ * primarily provided so that JSP implementations do not have to parse deployment descriptors.
  *
  * @since Servlet 3.0
  */
 public interface JspConfigDescriptor {
 
     /**
-     * Provide the set of tag library descriptors obtained from the
-     * &lt;jsp-config&gt; elements in the web application's deployment
-     * descriptors.
+     * Provide the set of tag library descriptors obtained from the &lt;jsp-config&gt; elements in the web application's
+     * deployment descriptors.
      *
      * @return the tag library descriptors
      */
-    public Collection<TaglibDescriptor> getTaglibs();
+    Collection<TaglibDescriptor> getTaglibs();
 
     /**
-     * Provide the set of JSP property groups obtained from the
-     * &lt;jsp-config&gt; elements in the web application's deployment
-     * descriptors.
+     * Provide the set of JSP property groups obtained from the &lt;jsp-config&gt; elements in the web application's
+     * deployment descriptors.
      *
      * @return the JSP property groups
      */
-    public Collection<JspPropertyGroupDescriptor> getJspPropertyGroups();
+    Collection<JspPropertyGroupDescriptor> getJspPropertyGroups();
 }

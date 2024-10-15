@@ -53,8 +53,8 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  * {@link #getInputStream()} and process the file without attempting to load
  * it into memory, which may come handy with large files.
  *
- * <p>Temporary files, which are created for file items, should be
- * deleted later on.</p>
+ * <p>Temporary files, which are created for file items, will be deleted when
+ * the associated request is recycled.</p>
  *
  * @since FileUpload 1.1
  */
@@ -289,6 +289,7 @@ public class DiskFileItem
      * or {@code null} if the data cannot be read
      *
      * @throws UncheckedIOException if an I/O error occurs
+     * @throws ArithmeticException if the file {@code size} overflows an int
      */
     @Override
     public byte[] get() throws UncheckedIOException {
@@ -299,11 +300,11 @@ public class DiskFileItem
             return cachedContent != null ? cachedContent.clone() : new byte[0];
         }
 
-        byte[] fileData = new byte[(int) getSize()];
+        final byte[] fileData = new byte[Math.toIntExact(getSize())];
 
         try (InputStream fis = Files.newInputStream(dfos.getFile().toPath())) {
             IOUtils.readFully(fis, fileData);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new UncheckedIOException(e);
         }
         return fileData;
@@ -339,14 +340,14 @@ public class DiskFileItem
     @Override
     public String getString() {
         try {
-            byte[] rawData = get();
+            final byte[] rawData = get();
             String charset = getCharSet();
             if (charset == null) {
                 charset = defaultCharset;
             }
             return new String(rawData, charset);
         } catch (final IOException e) {
-            return new String(new byte[0]);
+            return "";
         }
     }
 
@@ -375,8 +376,6 @@ public class DiskFileItem
         if (isInMemory()) {
             try (OutputStream fout = Files.newOutputStream(file.toPath())) {
                 fout.write(get());
-            } catch (IOException e) {
-                throw new IOException("Unexpected output data");
             }
         } else {
             final File outputFile = getStoreLocation();
@@ -396,8 +395,7 @@ public class DiskFileItem
              * desired file.
              */
             if (file.exists() && !file.delete()) {
-                throw new FileUploadException(
-                        "Cannot write uploaded file to disk!");
+                throw new FileUploadException("Cannot write uploaded file to disk!");
             }
             if (!outputFile.renameTo(file)) {
                 BufferedInputStream in = null;
@@ -416,18 +414,18 @@ public class DiskFileItem
     }
 
     /**
-     * Deletes the underlying storage for a file item, including deleting any
-     * associated temporary disk file. Although this storage will be deleted
-     * automatically when the {@code FileItem} instance is garbage
-     * collected, this method can be used to ensure that this is done at an
-     * earlier time, thus preserving system resources.
+     * Deletes the underlying storage for a file item, including deleting any associated temporary disk file.
+     * This method can be used to ensure that this is done at an earlier time, thus preserving system resources.
      */
     @Override
     public void delete() {
         cachedContent = null;
         final File outputFile = getStoreLocation();
         if (outputFile != null && !isInMemory() && outputFile.exists()) {
-            outputFile.delete();
+            if (!outputFile.delete()) {
+                final String desc = "Cannot delete " + outputFile.toString();
+                throw new UncheckedIOException(desc, new IOException(desc));
+            }
         }
     }
 
@@ -437,7 +435,7 @@ public class DiskFileItem
      *
      * @return The name of the form field.
      *
-     * @see #setFieldName(java.lang.String)
+     * @see #setFieldName(String)
      *
      */
     @Override
@@ -533,23 +531,6 @@ public class DiskFileItem
     // ------------------------------------------------------ Protected methods
 
     /**
-     * Removes the file contents from the temporary storage.
-     */
-    @SuppressWarnings("deprecation") // Need Commons FileUpload to address this
-    @Override
-    protected void finalize() throws Throwable {
-        if (dfos == null || dfos.isInMemory()) {
-            return;
-        }
-        final File outputFile = dfos.getFile();
-
-        if (outputFile != null && outputFile.exists()) {
-            outputFile.delete();
-        }
-        super.finalize();
-    }
-
-    /**
      * Creates and returns a {@link java.io.File File} representing a uniquely
      * named temporary file in the configured repository path. The lifetime of
      * the file is tied to the lifetime of the {@code FileItem} instance;
@@ -603,8 +584,7 @@ public class DiskFileItem
     @Override
     public String toString() {
         return String.format("name=%s, StoreLocation=%s, size=%s bytes, isFormField=%s, FieldName=%s",
-                      getName(), getStoreLocation(), Long.valueOf(getSize()),
-                      Boolean.valueOf(isFormField()), getFieldName());
+                getName(), getStoreLocation(), Long.valueOf(getSize()), Boolean.valueOf(isFormField()), getFieldName());
     }
 
     /**

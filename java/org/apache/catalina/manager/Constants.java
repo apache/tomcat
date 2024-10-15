@@ -32,115 +32,115 @@ public class Constants {
     public static final String HTML_TAIL_SECTION;
 
     static {
+        //@formatter:off
         HTML_HEADER_SECTION =
-            "<html>\n" +
-            "<head>\n" +
-            "<link rel=\"stylesheet\" href=\"{0}/css/manager.css\">\n";
+                "<html>\n" +
+                "<head>\n" +
+                "<link rel=\"stylesheet\" href=\"{0}/css/manager.css\">\n";
 
         BODY_HEADER_SECTION =
-            "<title>{0}</title>\n" +
-            "</head>\n" +
-            "\n" +
-            "<body bgcolor=\"#FFFFFF\">\n" +
-            "\n" +
-            "<table cellspacing=\"4\" border=\"0\">\n" +
-            " <tr>\n" +
-            "  <td colspan=\"2\">\n" +
-            "   <a href=\"https://tomcat.apache.org/\" " + REL_EXTERNAL + ">\n" +
-            "    <img class='tomcat-logo' alt=\"The Tomcat Servlet/JSP Container\"\n" +
-            "         src=\"{0}/images/tomcat.svg\">\n" +
-            "   </a>\n" +
-            "   <a href=\"https://www.apache.org/\" " + REL_EXTERNAL + ">\n" +
-            "    <img border=\"0\" alt=\"The Apache Software Foundation\" align=\"right\"\n" +
-            "         src=\"{0}/images/asf-logo.svg\" style=\"width: 266px; height: 83px;\">\n" +
-            "   </a>\n" +
-            "  </td>\n" +
-            " </tr>\n" +
-            "</table>\n" +
-            "<hr size=\"1\" noshade=\"noshade\">\n" +
-            "<table cellspacing=\"4\" border=\"0\">\n" +
-            " <tr>\n" +
-            "  <td class=\"page-title\" bordercolor=\"#000000\" " +
-            "align=\"left\" nowrap>\n" +
-            "   <font size=\"+2\">{1}</font>\n" +
-            "  </td>\n" +
-            " </tr>\n" +
-            "</table>\n" +
-            "<br>\n" +
-            "\n";
+                "<title>{0}</title>\n" +
+                "</head>\n" +
+                "\n" +
+                "<body bgcolor=\"#FFFFFF\">\n" +
+                "\n" +
+                "<table cellspacing=\"4\" border=\"0\">\n" +
+                " <tr>\n" +
+                "  <td colspan=\"2\">\n" +
+                "   <a href=\"https://tomcat.apache.org/\" " + REL_EXTERNAL + ">\n" +
+                "    <img class='tomcat-logo' alt=\"The Tomcat Servlet/JSP Container\"\n" +
+                "         src=\"{0}/images/tomcat.svg\">\n" +
+                "   </a>\n" +
+                "   <a href=\"https://www.apache.org/\" " + REL_EXTERNAL + ">\n" +
+                "    <img border=\"0\" alt=\"The Apache Software Foundation\" align=\"right\"\n" +
+                "         src=\"{0}/images/asf-logo.svg\" style=\"width: 266px; height: 83px;\">\n" +
+                "   </a>\n" +
+                "  </td>\n" +
+                " </tr>\n" +
+                "</table>\n" +
+                "<hr size=\"1\" noshade=\"noshade\">\n" +
+                "<table cellspacing=\"4\" border=\"0\">\n" +
+                " <tr>\n" +
+                "  <td class=\"page-title\" bordercolor=\"#000000\" " +
+                "align=\"left\" nowrap>\n" +
+                "   <font size=\"+2\">{1}</font>\n" +
+                "  </td>\n" +
+                " </tr>\n" +
+                "</table>\n" +
+                "<br>\n" +
+                "\n";
 
         MESSAGE_SECTION =
-            "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
-            " <tr>\n" +
-            "  <td class=\"row-left\" width=\"10%\">" +
-            "<small><strong>{0}</strong></small>&nbsp;</td>\n" +
-            "  <td class=\"row-left\"><pre>{1}</pre></td>\n" +
-            " </tr>\n" +
-            "</table>\n" +
-            "<br>\n" +
-            "\n";
+                "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+                " <tr>\n" +
+                "  <td class=\"row-left\" width=\"10%\">" +
+                "<small><strong>{0}</strong></small>&nbsp;</td>\n" +
+                "  <td class=\"row-left\"><pre>{1}</pre></td>\n" +
+                " </tr>\n" +
+                "</table>\n" +
+                "<br>\n" +
+                "\n";
 
         MANAGER_SECTION =
-            "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
-            "<tr>\n" +
-            " <td colspan=\"4\" class=\"title\">{0}</td>\n" +
-            "</tr>\n" +
-            " <tr>\n" +
-            "  <td class=\"row-left\"><a href=\"{1}\">{2}</a></td>\n" +
-            "  <td class=\"row-center\"><a href=\"{3}\" " + REL_EXTERNAL + ">{4}</a></td>\n" +
-            "  <td class=\"row-center\"><a href=\"{5}\" " + REL_EXTERNAL + ">{6}</a></td>\n" +
-            "  <td class=\"row-right\"><a href=\"{7}\">{8}</a></td>\n" +
-            " </tr>\n" +
-            "</table>\n" +
-            "<br>\n" +
-            "\n";
+                "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+                "<tr>\n" +
+                " <td colspan=\"4\" class=\"title\">{0}</td>\n" +
+                "</tr>\n" +
+                " <tr>\n" +
+                "  <td class=\"row-left\"><a href=\"{1}\">{2}</a></td>\n" +
+                "  <td class=\"row-center\"><a href=\"{3}\" " + REL_EXTERNAL + ">{4}</a></td>\n" +
+                "  <td class=\"row-center\"><a href=\"{5}\" " + REL_EXTERNAL + ">{6}</a></td>\n" +
+                "  <td class=\"row-right\"><a href=\"{7}\">{8}</a></td>\n" +
+                " </tr>\n" +
+                "</table>\n" +
+                "<br>\n" +
+                "\n";
 
         SERVER_HEADER_SECTION =
-            "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
-            "<tr>\n" +
-            " <td colspan=\"8\" class=\"title\">{0}</td>\n" +
-            "</tr>\n" +
-            "<tr>\n" +
-            " <td class=\"header-center\"><small>{1}</small></td>\n" +
-            " <td class=\"header-center\"><small>{2}</small></td>\n" +
-            " <td class=\"header-center\"><small>{3}</small></td>\n" +
-            " <td class=\"header-center\"><small>{4}</small></td>\n" +
-            " <td class=\"header-center\"><small>{5}</small></td>\n" +
-            " <td class=\"header-center\"><small>{6}</small></td>\n" +
-            " <td class=\"header-center\"><small>{7}</small></td>\n" +
-            " <td class=\"header-center\"><small>{8}</small></td>\n" +
-            "</tr>\n";
+                "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+                "<tr>\n" +
+                " <td colspan=\"8\" class=\"title\">{0}</td>\n" +
+                "</tr>\n" +
+                "<tr>\n" +
+                " <td class=\"header-center\"><small>{1}</small></td>\n" +
+                " <td class=\"header-center\"><small>{2}</small></td>\n" +
+                " <td class=\"header-center\"><small>{3}</small></td>\n" +
+                " <td class=\"header-center\"><small>{4}</small></td>\n" +
+                " <td class=\"header-center\"><small>{5}</small></td>\n" +
+                " <td class=\"header-center\"><small>{6}</small></td>\n" +
+                " <td class=\"header-center\"><small>{7}</small></td>\n" +
+                " <td class=\"header-center\"><small>{8}</small></td>\n" +
+                "</tr>\n";
 
         SERVER_ROW_SECTION =
-            "<tr>\n" +
-            " <td class=\"row-center\"><small>{0}</small></td>\n" +
-            " <td class=\"row-center\"><small>{1}</small></td>\n" +
-            " <td class=\"row-center\"><small>{2}</small></td>\n" +
-            " <td class=\"row-center\"><small>{3}</small></td>\n" +
-            " <td class=\"row-center\"><small>{4}</small></td>\n" +
-            " <td class=\"row-center\"><small>{5}</small></td>\n" +
-            " <td class=\"row-center\"><small>{6}</small></td>\n" +
-            " <td class=\"row-center\"><small>{7}</small></td>\n" +
-            "</tr>\n" +
-            "</table>\n" +
-            "<br>\n" +
-            "\n";
+                "<tr>\n" +
+                " <td class=\"row-center\"><small>{0}</small></td>\n" +
+                " <td class=\"row-center\"><small>{1}</small></td>\n" +
+                " <td class=\"row-center\"><small>{2}</small></td>\n" +
+                " <td class=\"row-center\"><small>{3}</small></td>\n" +
+                " <td class=\"row-center\"><small>{4}</small></td>\n" +
+                " <td class=\"row-center\"><small>{5}</small></td>\n" +
+                " <td class=\"row-center\"><small>{6}</small></td>\n" +
+                " <td class=\"row-center\"><small>{7}</small></td>\n" +
+                "</tr>\n" +
+                "</table>\n" +
+                "<br>\n" +
+                "\n";
 
         HTML_TAIL_SECTION =
-            "<hr size=\"1\" noshade=\"noshade\">\n" +
-            "<center><font size=\"-1\" color=\"#525D76\">\n" +
-            " <em>Copyright &copy; 1999-2022, Apache Software Foundation</em>" +
-            "</font></center>\n" +
-            "\n" +
-            "</body>\n" +
-            "</html>";
+                "<hr size=\"1\" noshade=\"noshade\">\n" +
+                "<center><font size=\"-1\" color=\"#525D76\">\n" +
+                " <em>Copyright &copy; 1999-2024, Apache Software Foundation</em>" +
+                "</font></center>\n" +
+                "\n" +
+                "</body>\n" +
+                "</html>";
+        //@formatter:on
     }
 
-    public static final String CHARSET="utf-8";
+    public static final String CHARSET = "utf-8";
 
-    public static final String XML_DECLARATION =
-        "<?xml version=\"1.0\" encoding=\""+CHARSET+"\"?>";
+    public static final String XML_DECLARATION = "<?xml version=\"1.0\" encoding=\"" + CHARSET + "\"?>";
 
-    public static final String XML_STYLE =
-        "<?xml-stylesheet type=\"text/xsl\" href=\"{0}/xform.xsl\" ?>\n";
+    public static final String XML_STYLE = "<?xml-stylesheet type=\"text/xsl\" href=\"{0}/xform.xsl\" ?>\n";
 }

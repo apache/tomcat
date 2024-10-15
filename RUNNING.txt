@@ -20,16 +20,16 @@
             ===================================================
 
 Apache Tomcat @VERSION_MAJOR_MINOR@ requires a Java Standard Edition Runtime
-Environment (JRE) version 8 or later.
+Environment (JRE) version @MIN_JAVA_VERSION@ or later.
 
 =============================
-Running With JRE 8 Or Later
+Running With JRE @MIN_JAVA_VERSION@ Or Later
 =============================
 
 (1) Download and Install a Java SE Runtime Environment (JRE)
 
 (1.1) Download a Java SE Runtime Environment (JRE),
-      release version 8 or later, from
+      release version @MIN_JAVA_VERSION@ or later, from
       http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 (1.2) Install the JRE according to the instructions included with the
@@ -248,7 +248,8 @@ In CATALINA_BASE:
           The setenv scripts were described above. The tomcat-juli library
           is documented in the Logging chapter in the User Guide.
 
- * conf - Server configuration files (including server.xml)
+ * conf - Server configuration files (typically all of them, including
+          server.xml)
 
  * lib  - Libraries and classes, as explained below
 
@@ -422,8 +423,8 @@ To deactivate Apache Tomcat Native library:
 
 The binary file of Apache Tomcat Native library is usually named
 
-  - "tcnative-1.dll" on Windows
-  - "libtcnative-1.so" on *nix systems
+  - "tcnative-2.dll" on Windows
+  - "libtcnative-2.so" on *nix systems
 
 
 Apache Commons Daemon

@@ -38,8 +38,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 
 /**
- * Runs the Autobahn test suite in client mode for testing the WebSocket client
- * implementation.
+ * Runs the Autobahn test suite in client mode for testing the WebSocket client implementation.
  */
 public class TesterWsClientAutobahn {
 
@@ -73,8 +72,7 @@ public class TesterWsClientAutobahn {
     }
 
 
-    private static int getTestCaseCount(WebSocketContainer wsc)
-            throws Exception {
+    private static int getTestCaseCount(WebSocketContainer wsc) throws Exception {
 
         URI uri = new URI("ws://" + HOST + ":" + PORT + "/getCaseCount");
         CaseCountClient caseCountClient = new CaseCountClient();
@@ -83,10 +81,8 @@ public class TesterWsClientAutobahn {
     }
 
 
-    private static void executeTestCase(WebSocketContainer wsc, int testCase)
-            throws Exception {
-        URI uri = new URI("ws://" + HOST + ":" + PORT + "/runCase?case=" +
-                testCase + "&agent=" + USER_AGENT);
+    private static void executeTestCase(WebSocketContainer wsc, int testCase) throws Exception {
+        URI uri = new URI("ws://" + HOST + ":" + PORT + "/runCase?case=" + testCase + "&agent=" + USER_AGENT);
         TestCaseClient testCaseClient = new TestCaseClient();
 
         Extension permessageDeflate = new WsExtension("permessage-deflate");
@@ -94,8 +90,7 @@ public class TesterWsClientAutobahn {
         // Client only supports some values so there will be some failures here
         // Note Autobahn returns a 400 response if you provide a value for
         // client_max_window_bits
-        permessageDeflate.getParameters().add(
-                new WsExtensionParameter("client_max_window_bits", null));
+        permessageDeflate.getParameters().add(new WsExtensionParameter("client_max_window_bits", null));
         List<Extension> extensions = new ArrayList<>(1);
         extensions.add(permessageDeflate);
 
@@ -108,11 +103,9 @@ public class TesterWsClientAutobahn {
     }
 
 
-    private static void updateReports(WebSocketContainer wsc)
-            throws Exception {
+    private static void updateReports(WebSocketContainer wsc) throws Exception {
 
-        URI uri = new URI("ws://" + HOST + ":" + PORT +
-                "/updateReports?agent=" + USER_AGENT);
+        URI uri = new URI("ws://" + HOST + ":" + PORT + "/updateReports?agent=" + USER_AGENT);
         UpdateReportsClient updateReportsClient = new UpdateReportsClient();
         wsc.connectToServer(updateReportsClient, uri);
     }
@@ -170,8 +163,7 @@ public class TesterWsClientAutobahn {
         }
 
         @OnMessage
-        public void echoBinaryMessage(Session session, ByteBuffer bb,
-                boolean last) {
+        public void echoBinaryMessage(Session session, ByteBuffer bb, boolean last) {
             try {
                 if (session.isOpen()) {
                     session.getBasicRemote().sendBinary(bb, last);

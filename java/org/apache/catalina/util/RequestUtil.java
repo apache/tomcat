@@ -27,10 +27,8 @@ import jakarta.servlet.http.HttpServletRequest;
 public final class RequestUtil {
 
     /**
-     * Build an appropriate return value for
-     * {@link HttpServletRequest#getRequestURL()} based on the provided
-     * request object. Note that this will also work for instances of
-     * {@link jakarta.servlet.http.HttpServletRequestWrapper}.
+     * Build an appropriate return value for {@link HttpServletRequest#getRequestURL()} based on the provided request
+     * object. Note that this will also work for instances of {@link jakarta.servlet.http.HttpServletRequestWrapper}.
      *
      * @param request The request object for which the URL should be built
      *
@@ -48,8 +46,7 @@ public final class RequestUtil {
         url.append(scheme);
         url.append("://");
         url.append(request.getServerName());
-        if ((scheme.equals("http") && (port != 80))
-            || (scheme.equals("https") && (port != 443))) {
+        if ((scheme.equals("http") && (port != 80)) || (scheme.equals("https") && (port != 443))) {
             url.append(':');
             url.append(port);
         }

@@ -18,16 +18,18 @@ package org.apache.coyote.http2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Locale;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.res.StringManager;
 
 public class TestFlowControl extends Http2TestBase {
+
+    private static final StringManager sm = StringManager.getManager(TestFlowControl.class);
 
     /*
      * https://tomcat.markmail.org/thread/lijsebphms7hr3zj
@@ -35,7 +37,7 @@ public class TestFlowControl extends Http2TestBase {
     @Test
     public void testNotFound() throws Exception {
 
-        LogManager.getLogManager().getLogger("org.apache.coyote.http2").setLevel(Level.ALL);
+        Logger.getLogger("org.apache.coyote.http2").setLevel(Level.ALL);
         try {
             http2Connect();
 
@@ -81,11 +83,11 @@ public class TestFlowControl extends Http2TestBase {
 
             // Read the 404 error page
             // headers
-            parser.readFrame(true);
+            parser.readFrame();
             // body
-            parser.readFrame(true);
+            parser.readFrame();
             // reset (because the request body was not fully read)
-            parser.readFrame(true);
+            parser.readFrame();
 
             // Validate response
             // Response size varies as error page is generated and includes version
@@ -95,19 +97,13 @@ public class TestFlowControl extends Http2TestBase {
             int end = trace.indexOf("]", start);
             String contentLength = trace.substring(start, end);
             // Language will depend on locale
-            String language = Locale.getDefault().getLanguage();
+            String language = sm.getLocale().toLanguageTag();
 
-            Assert.assertEquals(
-                    "3-HeadersStart\n" +
-                    "3-Header-[:status]-[404]\n" +
-                    "3-Header-[content-type]-[text/html;charset=utf-8]\n" +
-                    "3-Header-[content-language]-[" + language + "]\n" +
-                    "3-Header-[content-length]-[" + contentLength + "]\n" +
-                    "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                    "3-HeadersEnd\n" +
-                    "3-Body-" + contentLength + "\n" +
-                    "3-EndOfStream\n" +
-                    "3-RST-[8]\n", output.getTrace());
+            Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[404]\n" +
+                    "3-Header-[content-type]-[text/html;charset=utf-8]\n" + "3-Header-[content-language]-[" + language +
+                    "]\n" + "3-Header-[content-length]-[" + contentLength + "]\n" +
+                    "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n" + "3-Body-" + contentLength +
+                    "\n" + "3-EndOfStream\n" + "3-RST-[0]\n", output.getTrace());
             output.clearTrace();
 
             // Write 3*16k=48k of request body
@@ -124,21 +120,21 @@ public class TestFlowControl extends Http2TestBase {
             writeFrame(dataFrameHeader, dataPayload);
             waitForWindowSize(0);
         } finally {
-            LogManager.getLogManager().getLogger("org.apache.coyote.http2").setLevel(Level.INFO);
+            Logger.getLogger("org.apache.coyote.http2").setLevel(Level.INFO);
         }
     }
 
 
     /*
-     * This might be unnecessary but given the potential for timing differences
-     * across different systems a more robust approach seems prudent.
+     * This might be unnecessary but given the potential for timing differences across different systems a more robust
+     * approach seems prudent.
      */
     private void waitForWindowSize(int streamId) throws Http2Exception, IOException {
         String prefix = streamId + "-WindowSize-";
         boolean found = false;
         String trace;
         do {
-            parser.readFrame(true);
+            parser.readFrame();
             trace = output.getTrace();
             output.clearTrace();
             found = trace.startsWith(prefix);

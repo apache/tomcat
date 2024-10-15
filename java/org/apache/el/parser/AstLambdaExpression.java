@@ -25,11 +25,10 @@ import jakarta.el.LambdaExpression;
 
 import org.apache.el.ValueExpressionImpl;
 import org.apache.el.lang.EvaluationContext;
+import org.apache.el.lang.LambdaExpressionNestedState;
 import org.apache.el.util.MessageFactory;
 
 public class AstLambdaExpression extends SimpleNode {
-
-    private NestedState nestedState = null;
 
     public AstLambdaExpression(int id) {
         super(id);
@@ -40,24 +39,29 @@ public class AstLambdaExpression extends SimpleNode {
 
         // Correct evaluation requires knowledge of the whole set of nested
         // expressions, not just the current expression
-        NestedState state = getNestedState();
+        LambdaExpressionNestedState state = ctx.getLambdaExpressionNestedState();
+        if (state == null) {
+            // This must be an outer lambda expression. Create and populate the
+            // state.
+            state = new LambdaExpressionNestedState();
+            populateNestedState(state);
+            ctx.setLambdaExpressionNestedState(state);
+        }
 
         // Check that there are not more sets of parameters than there are
         // nested expressions.
         int methodParameterSetCount = jjtGetNumChildren() - 2;
         if (methodParameterSetCount > state.getNestingCount()) {
-            throw new ELException(MessageFactory.get(
-                    "error.lambda.tooManyMethodParameterSets"));
+            throw new ELException(MessageFactory.get("error.lambda.tooManyMethodParameterSets"));
         }
 
         // First child is always parameters even if there aren't any
-        AstLambdaParameters formalParametersNode =
-                (AstLambdaParameters) children[0];
+        AstLambdaParameters formalParametersNode = (AstLambdaParameters) children[0];
         Node[] formalParamNodes = formalParametersNode.children;
 
         // Second child is a value expression
-        ValueExpressionImpl ve = new ValueExpressionImpl("", children[1],
-                ctx.getFunctionMapper(), ctx.getVariableMapper(), null);
+        ValueExpressionImpl ve =
+                new ValueExpressionImpl("", children[1], ctx.getFunctionMapper(), ctx.getVariableMapper(), null);
 
         // Build a LambdaExpression
         List<String> formalParameters = new ArrayList<>();
@@ -81,27 +85,22 @@ public class AstLambdaExpression extends SimpleNode {
         }
 
         /*
-         * This is a (possibly nested) lambda expression with one or more sets
-         * of parameters provided.
+         * This is a (possibly nested) lambda expression with one or more sets of parameters provided.
          *
-         * If there are more nested expressions than sets of parameters this may
-         * return a LambdaExpression.
+         * If there are more nested expressions than sets of parameters this may return a LambdaExpression.
          *
-         * If there are more sets of parameters than nested expressions an
-         * ELException will have been thrown by the check at the start of this
-         * method.
+         * If there are more sets of parameters than nested expressions an ELException will have been thrown by the
+         * check at the start of this method.
          */
 
         // Always have to invoke the outer-most expression
         int methodParameterIndex = 2;
-        Object result = le.invoke(((AstMethodParameters)
-                children[methodParameterIndex]).getParameters(ctx));
+        Object result = le.invoke(((AstMethodParameters) children[methodParameterIndex]).getParameters(ctx));
         methodParameterIndex++;
 
-        while (result instanceof LambdaExpression &&
-                methodParameterIndex < jjtGetNumChildren()) {
-            result = ((LambdaExpression) result).invoke(((AstMethodParameters)
-                    children[methodParameterIndex]).getParameters(ctx));
+        while (result instanceof LambdaExpression && methodParameterIndex < jjtGetNumChildren()) {
+            result = ((LambdaExpression) result)
+                    .invoke(((AstMethodParameters) children[methodParameterIndex]).getParameters(ctx));
             methodParameterIndex++;
         }
 
@@ -109,29 +108,15 @@ public class AstLambdaExpression extends SimpleNode {
     }
 
 
-    private NestedState getNestedState() {
-        if (nestedState == null) {
-            setNestedState(new NestedState());
-        }
-        return nestedState;
-    }
-
-
-    private void setNestedState(NestedState nestedState) {
-        if (this.nestedState != null) {
-            // Should never happen
-            throw new IllegalStateException(MessageFactory.get("error.lambda.wrongNestedState"));
-        }
-        this.nestedState = nestedState;
-
+    private void populateNestedState(LambdaExpressionNestedState lambdaExpressionNestedState) {
         // Increment the nesting count for the current expression
-        nestedState.incrementNestingCount();
+        lambdaExpressionNestedState.incrementNestingCount();
 
         if (jjtGetNumChildren() > 1) {
             Node firstChild = jjtGetChild(0);
             if (firstChild instanceof AstLambdaParameters) {
                 if (firstChild.jjtGetNumChildren() > 0) {
-                    nestedState.setHasFormalParameters();
+                    lambdaExpressionNestedState.setHasFormalParameters();
                 }
             } else {
                 // Can't be a lambda expression
@@ -139,7 +124,7 @@ public class AstLambdaExpression extends SimpleNode {
             }
             Node secondChild = jjtGetChild(1);
             if (secondChild instanceof AstLambdaExpression) {
-                ((AstLambdaExpression) secondChild).setNestedState(nestedState);
+                ((AstLambdaExpression) secondChild).populateNestedState(lambdaExpressionNestedState);
             }
         }
     }
@@ -154,29 +139,6 @@ public class AstLambdaExpression extends SimpleNode {
             result.append(n.toString());
         }
         return result.toString();
-    }
-
-
-    private static class NestedState {
-
-        private int nestingCount = 0;
-        private boolean hasFormalParameters = false;
-
-        private void incrementNestingCount() {
-            nestingCount++;
-        }
-
-        private int getNestingCount() {
-            return nestingCount;
-        }
-
-        private void setHasFormalParameters() {
-            hasFormalParameters = true;
-        }
-
-        private boolean getHasFormalParameters() {
-            return hasFormalParameters;
-        }
     }
 }
 /* JavaCC - OriginalChecksum=071159eff10c8e15ec612c765ae4480a (do not edit this line) */

@@ -25,7 +25,7 @@ import java.sql.SQLException;
  *
  * @since 2.7.0
  */
-class DriverFactory {
+final class DriverFactory {
 
     static Driver createDriver(final BasicDataSource basicDataSource) throws SQLException {
         // Load the JDBC driver class

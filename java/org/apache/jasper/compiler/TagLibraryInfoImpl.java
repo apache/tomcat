@@ -16,6 +16,7 @@
  */
 package org.apache.jasper.compiler;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -25,8 +26,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +46,7 @@ import jakarta.servlet.jsp.tagext.ValidationMessage;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.tomcat.Jar;
+import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.descriptor.tld.TagFileXml;
 import org.apache.tomcat.util.descriptor.tld.TagXml;
 import org.apache.tomcat.util.descriptor.tld.TaglibXml;
@@ -106,7 +108,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
     }
 
 
-    public TagLibraryInfoImpl(JspCompilationContext ctxt, ParserController pc,
+    TagLibraryInfoImpl(JspCompilationContext ctxt, ParserController pc,
             PageInfo pi, String prefix, String uriIn,
             TldResourcePath tldResourcePath, ErrorDispatcher err)
             throws JasperException {
@@ -255,7 +257,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             try {
                 // Can't use RequestUtils.normalize since that package is not
                 // available to Jasper.
-                uri = (new URI(uri)).normalize().toString();
+                uri = new URI(uri).normalize().toString();
                 if (uri.startsWith("../")) {
                     // Trying to go outside context root
                     err.jspError("jsp.error.taglibDirective.uriInvalid", uri);
@@ -268,6 +270,16 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         URL url = null;
         try {
             url = ctxt.getResource(uri);
+            if (url == null) {
+                throw new FileNotFoundException();
+            }
+            /*
+             *  When the TLD cache is built for a TLD contained within a JAR within a WAR, the jar form of the URL is
+             *  used for any nested JAR.
+             */
+            if (url.getProtocol().equals("war") && uri.endsWith(".jar")) {
+                url = UriUtil.warToJar(url);
+            }
         } catch (Exception ex) {
             err.jspError("jsp.error.tld.unable_to_get_jar", uri, ex.toString());
         }
@@ -349,7 +361,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             return null;
         }
 
-        Map<String, Object> initParams = new Hashtable<>(validatorXml.getInitParams());
+        Map<String, Object> initParams = new HashMap<>(validatorXml.getInitParams());
 
         try {
             Class<?> tlvClass = ctxt.getClassLoader().loadClass(validatorClass);

@@ -21,8 +21,7 @@ import java.util.Enumeration;
 
 
 /**
- * Abstraction of the set of users defined by the operating system on the
- * current server platform.
+ * Abstraction of the set of users defined by the operating system on the current server platform.
  *
  * @author Craig R. McClanahan
  */
@@ -35,7 +34,7 @@ public interface UserDatabase {
     /**
      * @return the UserConfig listener with which we are associated.
      */
-    public UserConfig getUserConfig();
+    UserConfig getUserConfig();
 
 
     /**
@@ -43,7 +42,7 @@ public interface UserDatabase {
      *
      * @param userConfig The new UserConfig listener
      */
-    public void setUserConfig(UserConfig userConfig);
+    void setUserConfig(UserConfig userConfig);
 
 
     // ------------------------------------------------------- Public Methods
@@ -54,13 +53,13 @@ public interface UserDatabase {
      *
      * @param user User for which a home directory should be retrieved
      */
-    public String getHome(String user);
+    String getHome(String user);
 
 
     /**
      * @return an enumeration of the usernames defined on this server.
      */
-    public Enumeration<String> getUsers();
+    Enumeration<String> getUsers();
 
 
 }

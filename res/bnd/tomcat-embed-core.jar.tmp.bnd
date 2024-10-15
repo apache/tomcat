@@ -38,7 +38,6 @@ Export-Package: \
     org.apache.catalina.security,\
     org.apache.catalina.servlets,\
     org.apache.catalina.session,\
-    org.apache.catalina.ssi,\
     org.apache.catalina.startup,\
     org.apache.catalina.users,\
     org.apache.catalina.util,\
@@ -87,9 +86,10 @@ Export-Package: \
     org.apache.tomcat.util.scan,\
     org.apache.tomcat.util.security,\
     org.apache.tomcat.util.threads
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -includepackage: \
-    org.apache.naming.factory.webservices,\
     org.apache.tomcat.util.bcel,\
     org.apache.tomcat.util.http.fileupload.util.mime,\
     org.apache.tomcat.util.json,\
@@ -100,11 +100,11 @@ Export-Package: \
 
 Provide-Capability: \
     osgi.contract;\
-        osgi.contract=JavaJASPIC;\
+        osgi.contract=JakartaAuthentication;\
         version:Version=${jaspic.spec.version};\
         uses:='${packages;NAMED;jakarta.security.auth.message.*}',\
     osgi.contract;\
-        osgi.contract=JavaServlet;\
+        osgi.contract=JakartaServlet;\
         version:Version=${servlet.spec.version};\
         uses:='${packages;NAMED;jakarta.servlet.*;NAMED;!jakarta.servlet.jsp.*}'
 
@@ -129,15 +129,15 @@ Provide-Capability: \
         access=32;\
         version=${Bundle-Version};\
         modules='\
-            jakarta.ejb-api,\
+            jakarta.ejb,\
             jakarta.mail,\
-            jakarta.persistence-api,\
-            jakarta.xml.rpc-api,\
+            jakarta.persistence,\
+            jakarta.xml.ws,\
             java.xml.ws'
 -jpms-module-info-options: \
     ${module.name};substitute=tomcat-embed-core,\
-    jakarta.ejb-api;static=true,\
+    jakarta.ejb;static=true,\
     jakarta.mail;static=true,\
-    jakarta.persistence-api;static=true,\
-    jakarta.xml.rpc-api;static=true,\
+    jakarta.persistence;static=true,\
+    jakarta.xml.ws;static=true,\
     java.xml.ws;static=true

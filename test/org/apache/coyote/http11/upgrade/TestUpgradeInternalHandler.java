@@ -86,7 +86,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("useAsyncIO", "true"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         UpgradeServlet servlet = new UpgradeServlet(upgradeHandlerClass);
         Tomcat.addServlet(ctx, "servlet", servlet);
@@ -129,7 +129,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
 
         private final Class<? extends HttpUpgradeHandler> upgradeHandlerClass;
 
-        public UpgradeServlet(Class<? extends HttpUpgradeHandler> upgradeHandlerClass) {
+        UpgradeServlet(Class<? extends HttpUpgradeHandler> upgradeHandlerClass) {
             this.upgradeHandlerClass = upgradeHandlerClass;
         }
 
@@ -146,7 +146,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
         private final Writer writer;
         private final BufferedReader reader;
 
-        public UpgradeConnection(Socket socket) {
+        UpgradeConnection(Socket socket) {
             this.socket = socket;
             InputStream is;
             OutputStream os;

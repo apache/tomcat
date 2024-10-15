@@ -22,14 +22,11 @@ package org.apache.catalina.tribes.util;
 public class ExceptionUtils {
 
     /**
-     * Checks whether the supplied Throwable is one that needs to be
-     * rethrown and swallows all others.
+     * Checks whether the supplied Throwable is one that needs to be rethrown and swallows all others.
+     *
      * @param t the Throwable to check
      */
     public static void handleThrowable(Throwable t) {
-        if (t instanceof ThreadDeath) {
-            throw (ThreadDeath) t;
-        }
         if (t instanceof StackOverflowError) {
             // Swallow silently - it should be recoverable
             return;

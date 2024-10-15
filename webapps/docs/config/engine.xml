@@ -93,12 +93,6 @@
         the generated session identifier, therefore allowing the front end
         proxy to always forward a particular session to the same Tomcat
         instance.</p>
-        <p>
-            Note that the <code>jvmRoute</code> can also be set using the
-            <code>jvmRoute</code> system property. The <code>jvmRoute</code>
-            set in an <code>&lt;Engine&gt;</code> attribute will override
-            any <code>jvmRoute</code> system property.
-        </p>
       </attribute>
 
       <attribute name="name" required="true">

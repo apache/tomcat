@@ -15,18 +15,49 @@
  * limitations under the License.
  */
 package org.apache.catalina.tribes.transport;
+
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 
-/**
- * @since 5.5.16
- */
-public interface MultiPointSender extends DataSender
-{
-    public void sendMessage(Member[] destination, ChannelMessage data) throws ChannelException;
-    public void setMaxRetryAttempts(int attempts);
-    public void setDirectBuffer(boolean directBuf);
-    public void add(Member member);
-    public void remove(Member member);
+public interface MultiPointSender extends DataSender {
+
+    /**
+     * Send the specified message.
+     *
+     * @param destination the message destinations
+     * @param data        the data to send
+     *
+     * @throws ChannelException if an error occurs
+     */
+    void sendMessage(Member[] destination, ChannelMessage data) throws ChannelException;
+
+    /**
+     * Set the maximum retry attempts.
+     *
+     * @param attempts the retry count
+     */
+    void setMaxRetryAttempts(int attempts);
+
+    /**
+     * Configure the use of a direct buffer.
+     *
+     * @param directBuf {@code true} to use a direct buffer
+     */
+    void setDirectBuffer(boolean directBuf);
+
+    /**
+     * Send to the specified member.
+     *
+     * @param member the member
+     */
+    void add(Member member);
+
+    /**
+     * Stop sending to the specified member.
+     *
+     * @param member the member
+     */
+    void remove(Member member);
+
 }

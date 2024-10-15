@@ -17,7 +17,6 @@
 package org.apache.coyote.http2;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import org.apache.coyote.http2.Http2TestBase.TestOutput;
 
@@ -26,60 +25,18 @@ import org.apache.coyote.http2.Http2TestBase.TestOutput;
  */
 public class TesterHttp2Parser extends Http2Parser {
 
-    private final TestOutput output;
-
     TesterHttp2Parser(String connectionId, Input input, TestOutput output) {
         super(connectionId, input, output);
-        this.output = output;
     }
 
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * <b>Note:</b> The test implementation always uses blocking IO for both the initial read and the remainder.
+     */
     @Override
-    public boolean readFrame(boolean block) throws Http2Exception, IOException {
-        return super.readFrame(block);
-    }
-
-    @Override
-    protected void readPushPromiseFrame(int streamId, int flags, int payloadSize, ByteBuffer buffer) throws Http2Exception, IOException {
-
-        // Parse flags used in this method
-        boolean hasPadding = Flags.hasPadding(flags);
-        boolean headersEndStream = Flags.isEndOfStream(flags);
-
-        // Padding size
-        int paddingSize = 0;
-        if (hasPadding) {
-            byte[] bPadSize = new byte[1];
-            if (buffer == null) {
-                input.fill(true, bPadSize);
-            } else {
-                buffer.get(bPadSize);
-            }
-            paddingSize = ByteUtil.getOneByte(bPadSize, 0);
-        }
-
-        // Pushed stream ID
-        byte[] bPushedStreamId = new byte[4];
-        if (buffer == null) {
-            input.fill(true, bPushedStreamId);
-        } else {
-            buffer.get(bPushedStreamId);
-        }
-        int pushedStreamId = ByteUtil.get31Bits(bPushedStreamId, 0);
-
-        output.pushPromise(streamId, pushedStreamId);
-
-        int headerSize = payloadSize - 4 - paddingSize;
-        if (hasPadding) {
-            headerSize--;
-        }
-
-        HpackDecoder hpackDecoder = output.getHpackDecoder();
-        hpackDecoder.setHeaderEmitter(output.headersStart(pushedStreamId, headersEndStream));
-
-        readHeaderPayload(pushedStreamId, headerSize, buffer);
-
-        if (hasPadding) {
-            swallowPayload(streamId, FrameType.PUSH_PROMISE.getId(), paddingSize, true, buffer);
-        }
+    public boolean readFrame() throws Http2Exception, IOException {
+        return super.readFrame();
     }
 }

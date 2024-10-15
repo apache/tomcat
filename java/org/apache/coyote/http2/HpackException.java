@@ -17,8 +17,7 @@
 package org.apache.coyote.http2;
 
 /**
- * Exception that is thrown when the HPACK compress context is broken. In this
- * case the connection must be closed.
+ * Exception that is thrown when the HPACK compress context is broken. In this case the connection must be closed.
  */
 class HpackException extends Exception {
 
@@ -27,6 +26,7 @@ class HpackException extends Exception {
     HpackException(String message) {
         super(message);
     }
+
     HpackException() {
         super();
     }

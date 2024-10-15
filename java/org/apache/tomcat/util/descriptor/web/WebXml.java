@@ -85,12 +85,15 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      * to know as the action that the specification requires (see 8.2.2 1.e and
      * 2.c) varies depending on the ordering method used.
      */
-    private boolean duplicated = false;
+    private final List<String> duplicates = new ArrayList<>();
     public boolean isDuplicated() {
-        return duplicated;
+        return !duplicates.isEmpty();
     }
-    public void setDuplicated(boolean duplicated) {
-        this.duplicated = duplicated;
+    public void addDuplicate(String duplicate) {
+        this.duplicates.add(duplicate);
+    }
+    public List<String> getDuplicates() {
+        return new ArrayList<>(this.duplicates);
     }
 
     /**
@@ -190,6 +193,10 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             case "6.0":
                 majorVersion = 6;
                 minorVersion = 0;
+                break;
+            case "6.1":
+                majorVersion = 6;
+                minorVersion = 1;
                 break;
             default:
                 log.warn(sm.getString("webXml.version.unknown", version));
@@ -763,6 +770,9 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             } else if ("6.0".equals(version)) {
                 javaeeNamespace = XmlIdentifiers.JAKARTAEE_10_NS;
                 webXmlSchemaLocation = XmlIdentifiers.WEB_60_XSD;
+            } else if ("6.1".equals(version)) {
+                javaeeNamespace = XmlIdentifiers.JAKARTAEE_11_NS;
+                webXmlSchemaLocation = XmlIdentifiers.WEB_61_XSD;
             }
             sb.append("<web-app xmlns=\"");
             sb.append(javaeeNamespace);
@@ -2143,7 +2153,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             Set<String> requestedOrder = getAbsoluteOrdering();
 
             for (String requestedName : requestedOrder) {
-                if (WebXml.ORDER_OTHERS.equals(requestedName)) {
+                if (ORDER_OTHERS.equals(requestedName)) {
                     // Add all fragments not named explicitly at this point
                     for (Entry<String, WebXml> entry : fragments.entrySet()) {
                         if (!requestedOrder.contains(entry.getKey())) {
@@ -2166,8 +2176,10 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             // Stage 0. Check there were no fragments with duplicate names
             for (WebXml fragment : fragments.values()) {
                 if (fragment.isDuplicated()) {
+                    List<String> duplicates = fragment.getDuplicates();
+                    duplicates.add(0, fragment.getURL().toString());
                     throw new IllegalArgumentException(
-                            sm.getString("webXml.duplicateFragment", fragment.getName()));
+                            sm.getString("webXml.duplicateFragment", fragment.getName(), duplicates));
                 }
             }
             // Stage 1. Make all dependencies bi-directional - this makes the

@@ -28,8 +28,7 @@ import jakarta.security.auth.message.config.ServerAuthConfig;
 
 /**
  * Basic implementation primarily intended for use when using third-party
- * {@link jakarta.security.auth.message.module.ServerAuthModule} implementations
- * that only provide the module.
+ * {@link jakarta.security.auth.message.module.ServerAuthModule} implementations that only provide the module.
  */
 public class SimpleAuthConfigProvider implements AuthConfigProvider {
 
@@ -48,19 +47,18 @@ public class SimpleAuthConfigProvider implements AuthConfigProvider {
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation does not support client-side authentication and
-     * therefore always returns {@code null}.
+     * This implementation does not support client-side authentication and therefore always returns {@code null}.
      */
     @Override
-    public ClientAuthConfig getClientAuthConfig(String layer, String appContext,
-            CallbackHandler handler) throws AuthException {
+    public ClientAuthConfig getClientAuthConfig(String layer, String appContext, CallbackHandler handler)
+            throws AuthException {
         return null;
     }
 
 
     @Override
-    public ServerAuthConfig getServerAuthConfig(String layer, String appContext,
-            CallbackHandler handler) throws AuthException {
+    public ServerAuthConfig getServerAuthConfig(String layer, String appContext, CallbackHandler handler)
+            throws AuthException {
         ServerAuthConfig serverAuthConfig = this.serverAuthConfig;
         if (serverAuthConfig == null) {
             synchronized (this) {
@@ -74,8 +72,8 @@ public class SimpleAuthConfigProvider implements AuthConfigProvider {
     }
 
 
-    protected ServerAuthConfig createServerAuthConfig(String layer, String appContext,
-            CallbackHandler handler, Map<String,Object> properties) {
+    protected ServerAuthConfig createServerAuthConfig(String layer, String appContext, CallbackHandler handler,
+            Map<String,Object> properties) {
         return new SimpleServerAuthConfig(layer, appContext, handler, properties);
     }
 

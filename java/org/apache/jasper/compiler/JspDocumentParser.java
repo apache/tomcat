@@ -19,7 +19,6 @@ package org.apache.jasper.compiler;
 import java.io.CharArrayWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.security.AccessController;
 import java.util.Collection;
 
 import javax.xml.parsers.SAXParser;
@@ -36,8 +35,6 @@ import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.descriptor.LocalResolver;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
-import org.apache.tomcat.util.security.PrivilegedGetTccl;
-import org.apache.tomcat.util.security.PrivilegedSetTccl;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -114,7 +111,7 @@ class JspDocumentParser
     /*
      * Constructor
      */
-    public JspDocumentParser(
+    JspDocumentParser(
         ParserController pc,
         String path,
         boolean isTagFile,
@@ -635,9 +632,6 @@ class JspDocumentParser
         charBuffer = null;
     }
 
-    /*
-     * Receives notification of the end of an element.
-     */
     @Override
     public void endElement(String uri, String localName, String qName)
         throws SAXException {
@@ -715,11 +709,6 @@ class JspDocumentParser
         }
     }
 
-    /*
-     * Receives the document locator.
-     *
-     * @param locator the document locator
-     */
     @Override
     public void setDocumentLocator(Locator locator) {
         this.locator = locator;
@@ -799,25 +788,16 @@ class JspDocumentParser
         inDTD = false;
     }
 
-    /*
-     * Receives notification of a non-recoverable error.
-     */
     @Override
     public void fatalError(SAXParseException e) throws SAXException {
         throw e;
     }
 
-    /*
-     * Receives notification of a recoverable error.
-     */
     @Override
     public void error(SAXParseException e) throws SAXException {
         throw e;
     }
 
-    /*
-     * Receives notification of the start of a Namespace mapping.
-     */
     @Override
     public void startPrefixMapping(String prefix, String uri)
         throws SAXException {
@@ -846,9 +826,6 @@ class JspDocumentParser
         }
     }
 
-    /*
-     * Receives notification of the end of a Namespace mapping.
-     */
     @Override
     public void endPrefixMapping(String prefix) throws SAXException {
 
@@ -1029,23 +1006,6 @@ class JspDocumentParser
                     taglibAttrs,
                     start,
                     current);
-        } else if (localName.equals(PARAMS_ACTION)) {
-            node =
-                new Node.ParamsAction(
-                    qName,
-                    nonTaglibXmlnsAttrs,
-                    taglibAttrs,
-                    start,
-                    current);
-        } else if (localName.equals(PLUGIN_ACTION)) {
-            node =
-                new Node.PlugIn(
-                    qName,
-                    nonTaglibAttrs,
-                    nonTaglibXmlnsAttrs,
-                    taglibAttrs,
-                    start,
-                    current);
         } else if (localName.equals(TEXT_ACTION)) {
             node =
                 new Node.JspText(
@@ -1170,14 +1130,6 @@ class JspDocumentParser
                 new Node.JspElement(
                     qName,
                     nonTaglibAttrs,
-                    nonTaglibXmlnsAttrs,
-                    taglibAttrs,
-                    start,
-                    current);
-        } else if (localName.equals(FALLBACK_ACTION)) {
-            node =
-                new Node.FallBackAction(
-                    qName,
                     nonTaglibXmlnsAttrs,
                     taglibAttrs,
                     start,
@@ -1456,22 +1408,10 @@ class JspDocumentParser
         JspDocumentParser jspDocParser)
         throws Exception {
 
-        ClassLoader original;
-        if (Constants.IS_SECURITY_ENABLED) {
-            PrivilegedGetTccl pa = new PrivilegedGetTccl();
-            original = AccessController.doPrivileged(pa);
-        } else {
-            original = Thread.currentThread().getContextClassLoader();
-        }
+        Thread currentThread = Thread.currentThread();
+        ClassLoader original = currentThread.getContextClassLoader();
         try {
-            if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa =
-                        new PrivilegedSetTccl(JspDocumentParser.class.getClassLoader());
-                AccessController.doPrivileged(pa);
-            } else {
-                Thread.currentThread().setContextClassLoader(
-                        JspDocumentParser.class.getClassLoader());
-            }
+            currentThread.setContextClassLoader(JspDocumentParser.class.getClassLoader());
 
             SAXParserFactory factory = SAXParserFactory.newInstance();
 
@@ -1501,12 +1441,7 @@ class JspDocumentParser
 
             return saxParser;
         } finally {
-            if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa = new PrivilegedSetTccl(original);
-                AccessController.doPrivileged(pa);
-            } else {
-                Thread.currentThread().setContextClassLoader(original);
-            }
+            currentThread.setContextClassLoader(original);
         }
     }
 

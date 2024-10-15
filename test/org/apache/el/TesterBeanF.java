@@ -40,13 +40,13 @@ public class TesterBeanF {
 
 
     @SuppressWarnings("unused")
-    public String doTest(TesterEnum param1, TesterEnum... param2 ) {
+    public String doTest(TesterEnum param1, TesterEnum... param2) {
         return "Enum-VEnum";
     }
 
 
     @SuppressWarnings("unused")
-    public String doTest(TesterEnum param1, String... param2 ) {
+    public String doTest(TesterEnum param1, String... param2) {
         return "Enum-VString";
     }
 
@@ -70,13 +70,13 @@ public class TesterBeanF {
 
 
     @SuppressWarnings("unused")
-    public String doTest(String param1, TesterEnum... param2 ) {
+    public String doTest(String param1, TesterEnum... param2) {
         return "String-VEnum";
     }
 
 
     @SuppressWarnings("unused")
-    public String doTest(String param1, String... param2 ) {
+    public String doTest(String param1, String... param2) {
         return "String-VString";
     }
 }

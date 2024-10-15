@@ -44,7 +44,7 @@ public class TestResponse extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add  servlet
         Tomcat.addServlet(ctx, "CharsetServlet", new CharsetServlet());
@@ -95,7 +95,7 @@ public class TestResponse extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add  servlet
         Tomcat.addServlet(ctx, "ContentTypeServlet", new ContentTypeServlet());
@@ -118,7 +118,7 @@ public class TestResponse extends TomcatBaseTest {
         String contentType = getSingleHeader("Content-Type", responseHeaders);
         StringBuilder expected = new StringBuilder("text/plain;");
         if (withSpace) {
-            expected.append(" ");
+            expected.append(' ');
         }
         expected.append("v=1;charset=UTF-8");
         Assert.assertEquals(expected.toString() , contentType);

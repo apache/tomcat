@@ -19,15 +19,17 @@ Bundle-Name: tomcat-jsp-api
 Bundle-SymbolicName: org.apache.tomcat-jsp-api
 Export-Package: \
     jakarta.servlet.jsp.*;version=${jsp.spec.version}
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 Provide-Capability: \
     osgi.contract;\
-        osgi.contract=JavaJSP;\
+        osgi.contract=JakartaServerPages;\
         version:Version=${jsp.spec.version};\
         uses:='${packages;NAMED;jakarta.servlet.jsp.*}'
 
 -namesection: jakarta/servlet/jsp*/;\
-    Specification-Title=Jakarta Server Pages;\
+    Specification-Title=Jakarta Pages;\
     Specification-Version=${jsp.spec.version};\
     Specification-Vendor=Eclipse Foundation;\
     Implementation-Title=jakarta.servlet.jsp;\

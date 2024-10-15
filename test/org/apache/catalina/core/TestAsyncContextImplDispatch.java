@@ -82,7 +82,7 @@ public class TestAsyncContextImplDispatch extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Wrapper w1 = Tomcat.addServlet(ctx, "target", new TesterServlet());
         w1.setAsyncSupported(targetAsyncSupported);

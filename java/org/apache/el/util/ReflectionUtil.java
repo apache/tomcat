@@ -19,8 +19,6 @@ package org.apache.el.util;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,12 +38,11 @@ import org.apache.el.lang.EvaluationContext;
  */
 public class ReflectionUtil {
 
-    protected static final String[] PRIMITIVE_NAMES = new String[] { "boolean",
-            "byte", "char", "double", "float", "int", "long", "short", "void" };
+    protected static final String[] PRIMITIVE_NAMES =
+            new String[] { "boolean", "byte", "char", "double", "float", "int", "long", "short", "void" };
 
-    protected static final Class<?>[] PRIMITIVES = new Class[] { boolean.class,
-            byte.class, char.class, double.class, float.class, int.class,
-            long.class, short.class, Void.TYPE };
+    protected static final Class<?>[] PRIMITIVES = new Class[] { boolean.class, byte.class, char.class, double.class,
+            float.class, int.class, long.class, short.class, Void.TYPE };
 
     private ReflectionUtil() {
         super();
@@ -59,10 +56,10 @@ public class ReflectionUtil {
         if (c == null) {
             if (name.endsWith("[]")) {
                 String nc = name.substring(0, name.length() - 2);
-                c = Class.forName(nc, true, getContextClassLoader());
+                c = Class.forName(nc, true, Thread.currentThread().getContextClassLoader());
                 c = Array.newInstance(c, 0).getClass();
             } else {
-                c = Class.forName(name, true, getContextClassLoader());
+                c = Class.forName(name, true, Thread.currentThread().getContextClassLoader());
             }
         }
         return c;
@@ -80,10 +77,12 @@ public class ReflectionUtil {
 
     /**
      * Converts an array of Class names to Class types.
-     * @param s  The array of class names
-     * @return An array of Class instance where the element at index i in the
-     *         result is an instance of the class with the name at index i in
-     *         the input
+     *
+     * @param s The array of class names
+     *
+     * @return An array of Class instance where the element at index i in the result is an instance of the class with
+     *             the name at index i in the input
+     *
      * @throws ClassNotFoundException If a class of a given name cannot be found
      */
     public static Class<?>[] toTypeArray(String[] s) throws ClassNotFoundException {
@@ -99,9 +98,11 @@ public class ReflectionUtil {
 
     /**
      * Converts an array of Class types to Class names.
+     *
      * @param c The array of class instances
-     * @return An array of Class names where the element at index i in the
-     *         result is the name of the class instance at index i in the input
+     *
+     * @return An array of Class names where the element at index i in the result is the name of the class instance at
+     *             index i in the input
      */
     public static String[] toTypeNameArray(Class<?>[] c) {
         if (c == null) {
@@ -116,32 +117,30 @@ public class ReflectionUtil {
 
     /**
      * Returns a method based on the criteria.
-     * @param ctx the context in which the expression is being evaluated
-     * @param base the object that owns the method
-     * @param property the name of the method
-     * @param paramTypes the parameter types to use
+     *
+     * @param ctx         the context in which the expression is being evaluated
+     * @param base        the object that owns the method
+     * @param property    the name of the method
+     * @param paramTypes  the parameter types to use
      * @param paramValues the parameter values
+     *
      * @return the method specified
-     * @throws MethodNotFoundException If a method cannot be found that matches
-     *         the given criteria
+     *
+     * @throws MethodNotFoundException If a method cannot be found that matches the given criteria
      */
     /*
-     * This class duplicates code in jakarta.el.Util. When making changes keep
-     * the code in sync.
+     * This class duplicates code in jakarta.el.Util. When making changes keep the code in sync.
      */
     @SuppressWarnings("null")
-    public static Method getMethod(EvaluationContext ctx, Object base, Object property,
-            Class<?>[] paramTypes, Object[] paramValues)
-            throws MethodNotFoundException {
+    public static Method getMethod(EvaluationContext ctx, Object base, Object property, Class<?>[] paramTypes,
+            Object[] paramValues) throws MethodNotFoundException {
 
         if (base == null || property == null) {
-            throw new MethodNotFoundException(MessageFactory.get(
-                    "error.method.notfound", base, property,
-                    paramString(paramTypes)));
+            throw new MethodNotFoundException(
+                    MessageFactory.get("error.method.notfound", base, property, paramString(paramTypes)));
         }
 
-        String methodName = (property instanceof String) ? (String) property
-                : property.toString();
+        String methodName = (property instanceof String) ? (String) property : property.toString();
 
         int paramCount;
         if (paramTypes == null) {
@@ -168,17 +167,16 @@ public class ReflectionUtil {
                 // Method has wrong number of parameters
                 continue;
             }
-            if (m.isVarArgs() && paramCount < mParamCount -1) {
+            if (m.isVarArgs() && paramCount < mParamCount - 1) {
                 // Method has wrong number of parameters
                 continue;
             }
-            if (m.isVarArgs() && paramCount == mParamCount && paramValues != null &&
-                    paramValues.length > paramCount && !paramTypes[mParamCount -1].isArray()) {
+            if (m.isVarArgs() && paramCount == mParamCount && paramValues != null && paramValues.length > paramCount &&
+                    !paramTypes[mParamCount - 1].isArray()) {
                 // Method arguments don't match
                 continue;
             }
-            if (m.isVarArgs() && paramCount > mParamCount && paramValues != null &&
-                    paramValues.length != paramCount) {
+            if (m.isVarArgs() && paramCount > mParamCount && paramValues != null && paramValues.length != paramCount) {
                 // Might match a different varargs method
                 continue;
             }
@@ -252,11 +250,16 @@ public class ReflectionUtil {
             // If a method is found where every parameter matches exactly,
             // and no vars args are present, return it
             if (exactMatch == paramCount && varArgsMatch == 0) {
-                return getMethod(base.getClass(), base, m);
+                Method result = getMethod(base.getClass(), base, m);
+                if (result == null) {
+                    throw new MethodNotFoundException(
+                            MessageFactory.get("error.method.notfound", base, property, paramString(paramTypes)));
+                }
+                return result;
             }
 
-            candidates.put(m, new MatchResult(
-                    m.isVarArgs(), exactMatch, assignableMatch, coercibleMatch, varArgsMatch, m.isBridge()));
+            candidates.put(m, new MatchResult(m.isVarArgs(), exactMatch, assignableMatch, coercibleMatch, varArgsMatch,
+                    m.isBridge()));
         }
 
         // Look for the method that has the highest number of parameters where
@@ -264,7 +267,7 @@ public class ReflectionUtil {
         MatchResult bestMatch = new MatchResult(true, 0, 0, 0, 0, true);
         Method match = null;
         boolean multiple = false;
-        for (Map.Entry<Method, MatchResult> entry : candidates.entrySet()) {
+        for (Map.Entry<Method,MatchResult> entry : candidates.entrySet()) {
             int cmp = entry.getValue().compareTo(bestMatch);
             if (cmp > 0 || match == null) {
                 bestMatch = entry.getValue();
@@ -286,28 +289,29 @@ public class ReflectionUtil {
             if (match == null) {
                 // If multiple methods have the same matching number of parameters
                 // the match is ambiguous so throw an exception
-                throw new MethodNotFoundException(MessageFactory.get(
-                        "error.method.ambiguous", base, property,
-                        paramString(paramTypes)));
-                }
+                throw new MethodNotFoundException(
+                        MessageFactory.get("error.method.ambiguous", base, property, paramString(paramTypes)));
+            }
         }
 
         // Handle case where no match at all was found
         if (match == null) {
-            throw new MethodNotFoundException(MessageFactory.get(
-                        "error.method.notfound", base, property,
-                        paramString(paramTypes)));
+            throw new MethodNotFoundException(
+                    MessageFactory.get("error.method.notfound", base, property, paramString(paramTypes)));
         }
 
-        return getMethod(base.getClass(), base, match);
+        Method result = getMethod(base.getClass(), base, match);
+        if (result == null) {
+            throw new MethodNotFoundException(
+                    MessageFactory.get("error.method.notfound", base, property, paramString(paramTypes)));
+        }
+        return result;
     }
 
     /*
-     * This class duplicates code in jakarta.el.Util. When making changes keep
-     * the code in sync.
+     * This class duplicates code in jakarta.el.Util. When making changes keep the code in sync.
      */
-    private static Method resolveAmbiguousMethod(Set<Method> candidates,
-            Class<?>[] paramTypes) {
+    private static Method resolveAmbiguousMethod(Set<Method> candidates, Class<?>[] paramTypes) {
         // Identify which parameter isn't an exact match
         Method m = candidates.iterator().next();
 
@@ -328,12 +332,11 @@ public class ReflectionUtil {
         }
 
         for (Method c : candidates) {
-           if (c.getParameterTypes()[nonMatchIndex] ==
-                   paramTypes[nonMatchIndex]) {
-               // Methods have different non-matching parameters
-               // Result is ambiguous
-               return null;
-           }
+            if (c.getParameterTypes()[nonMatchIndex] == paramTypes[nonMatchIndex]) {
+                // Methods have different non-matching parameters
+                // Result is ambiguous
+                return null;
+            }
         }
 
         // Can't be null
@@ -353,8 +356,7 @@ public class ReflectionUtil {
         if (Number.class.isAssignableFrom(nonMatchClass)) {
             for (Method c : candidates) {
                 Class<?> candidateType = c.getParameterTypes()[nonMatchIndex];
-                if (Number.class.isAssignableFrom(candidateType) ||
-                        candidateType.isPrimitive()) {
+                if (Number.class.isAssignableFrom(candidateType) || candidateType.isPrimitive()) {
                     if (match == null) {
                         match = c;
                     } else {
@@ -371,8 +373,7 @@ public class ReflectionUtil {
 
 
     /*
-     * This class duplicates code in jakarta.el.Util. When making changes keep
-     * the code in sync.
+     * This class duplicates code in jakarta.el.Util. When making changes keep the code in sync.
      */
     private static boolean isAssignableFrom(Class<?> src, Class<?> target) {
         // src will always be an object
@@ -409,12 +410,11 @@ public class ReflectionUtil {
 
 
     /*
-     * This class duplicates code in jakarta.el.Util. When making changes keep
-     * the code in sync.
+     * This class duplicates code in jakarta.el.Util. When making changes keep the code in sync.
      */
     private static boolean isCoercibleFrom(EvaluationContext ctx, Object src, Class<?> target) {
         // TODO: This isn't pretty but it works. Significant refactoring would
-        //       be required to avoid the exception.
+        // be required to avoid the exception.
         try {
             ELSupport.coerceToType(ctx, src, target);
         } catch (ELException e) {
@@ -425,15 +425,11 @@ public class ReflectionUtil {
 
 
     /*
-     * This class duplicates code in jakarta.el.Util. When making changes keep
-     * the code in sync.
+     * This class duplicates code in jakarta.el.Util. When making changes keep the code in sync.
      */
     private static Method getMethod(Class<?> type, Object base, Method m) {
-        // If base is null, method MUST be static
-        // If base is non-null, method may be static or non-static
-        if (m == null ||
-                (Modifier.isPublic(type.getModifiers()) &&
-                        (m.canAccess(base) || base != null && m.canAccess(null)))) {
+        if (m == null || (Modifier.isPublic(type.getModifiers()) &&
+                (Modifier.isStatic(m.getModifiers()) && m.canAccess(null) || m.canAccess(base)))) {
             return m;
         }
         Class<?>[] interfaces = type.getInterfaces();
@@ -465,7 +461,7 @@ public class ReflectionUtil {
     }
 
 
-    private static final String paramString(Class<?>[] types) {
+    private static String paramString(Class<?>[] types) {
         if (types != null) {
             StringBuilder sb = new StringBuilder();
             for (Class<?> type : types) {
@@ -484,30 +480,8 @@ public class ReflectionUtil {
     }
 
 
-    private static ClassLoader getContextClassLoader() {
-        ClassLoader tccl;
-        if (System.getSecurityManager() != null) {
-            PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
-            tccl = AccessController.doPrivileged(pa);
-        } else {
-            tccl = Thread.currentThread().getContextClassLoader();
-        }
-
-        return tccl;
-    }
-
-
-    private static class PrivilegedGetTccl implements PrivilegedAction<ClassLoader> {
-        @Override
-        public ClassLoader run() {
-            return Thread.currentThread().getContextClassLoader();
-        }
-    }
-
-
     /*
-     * This class duplicates code in jakarta.el.Util. When making changes keep
-     * the code in sync.
+     * This class duplicates code in jakarta.el.Util. When making changes keep the code in sync.
      */
     private static class MatchResult implements Comparable<MatchResult> {
 
@@ -518,7 +492,7 @@ public class ReflectionUtil {
         private final int varArgsCount;
         private final boolean bridge;
 
-        public MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount, int varArgsCount,
+        MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount, int varArgsCount,
                 boolean bridge) {
             this.varArgs = varArgs;
             this.exactCount = exactCount;
@@ -581,14 +555,13 @@ public class ReflectionUtil {
 
         @Override
         public boolean equals(Object o) {
-            return o == this || (null != o &&
-                    this.getClass().equals(o.getClass()) &&
-                    ((MatchResult)o).getExactCount() == this.getExactCount() &&
-                    ((MatchResult)o).getAssignableCount() == this.getAssignableCount() &&
-                    ((MatchResult)o).getCoercible() == this.getCoercible() &&
-                    ((MatchResult)o).getVarArgsCount() == this.getVarArgsCount() &&
-                    ((MatchResult)o).isVarArgs() == this.isVarArgs() &&
-                    ((MatchResult)o).isBridge() == this.isBridge());
+            return o == this || (null != o && this.getClass().equals(o.getClass()) &&
+                    ((MatchResult) o).getExactCount() == this.getExactCount() &&
+                    ((MatchResult) o).getAssignableCount() == this.getAssignableCount() &&
+                    ((MatchResult) o).getCoercible() == this.getCoercible() &&
+                    ((MatchResult) o).getVarArgsCount() == this.getVarArgsCount() &&
+                    ((MatchResult) o).isVarArgs() == this.isVarArgs() &&
+                    ((MatchResult) o).isBridge() == this.isBridge());
         }
 
         @Override

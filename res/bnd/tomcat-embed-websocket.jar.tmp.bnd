@@ -21,6 +21,8 @@ Export-Package: \
     jakarta.websocket.*;version=${websocket.spec.version},\
     org.apache.tomcat.websocket,\
     org.apache.tomcat.websocket.server
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -includepackage: \
     org.apache.tomcat.websocket.pojo
@@ -29,7 +31,7 @@ Export-Package: \
 
 Provide-Capability: \
     osgi.contract;\
-        osgi.contract=JavaWebSockets;\
+        osgi.contract=JakartaWebSocket;\
         version:Version=${websocket.spec.version};\
         uses:='${packages;NAMED;jakarta.websocket.*}'
 

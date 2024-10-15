@@ -17,8 +17,7 @@
 package org.apache.coyote.http2;
 
 /**
- * Represents the remote connection settings: i.e. the settings the server must
- * use when communicating with the client.
+ * Represents the remote connection settings: i.e. the settings the server must use when communicating with the client.
  */
 class ConnectionSettingsRemote extends ConnectionSettingsBase<ConnectionException> {
 

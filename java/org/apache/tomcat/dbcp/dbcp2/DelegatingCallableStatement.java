@@ -97,7 +97,9 @@ public class DelegatingCallableStatement extends DelegatingPreparedStatement imp
         }
     }
 
-    /** @deprecated Use {@link #getBigDecimal(int)} or {@link #getBigDecimal(String)} */
+    /**
+     * @deprecated Use {@link #getBigDecimal(int)} or {@link #getBigDecimal(String)}
+     */
     @Override
     @Deprecated
     public BigDecimal getBigDecimal(final int parameterIndex, final int scale) throws SQLException {

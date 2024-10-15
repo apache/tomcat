@@ -27,13 +27,12 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Startup event listener for an <b>Engine</b> that configures the properties
- * of that Engine, and the associated defined contexts.
+ * Startup event listener for an <b>Engine</b> that configures the properties of that Engine, and the associated defined
+ * contexts.
  *
  * @author Craig R. McClanahan
  */
-public class EngineConfig
-    implements LifecycleListener {
+public class EngineConfig implements LifecycleListener {
 
 
     private static final Log log = LogFactory.getLog(EngineConfig.class);
@@ -50,8 +49,7 @@ public class EngineConfig
     /**
      * The string resources for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
     // --------------------------------------------------------- Public Methods
@@ -91,8 +89,8 @@ public class EngineConfig
      */
     protected void start() {
 
-        if (engine.getLogger().isDebugEnabled()) {
-            engine.getLogger().debug(sm.getString("engineConfig.start"));
+        if (engine.getLogger().isTraceEnabled()) {
+            engine.getLogger().trace(sm.getString("engineConfig.start"));
         }
 
     }
@@ -103,8 +101,8 @@ public class EngineConfig
      */
     protected void stop() {
 
-        if (engine.getLogger().isDebugEnabled()) {
-            engine.getLogger().debug(sm.getString("engineConfig.stop"));
+        if (engine.getLogger().isTraceEnabled()) {
+            engine.getLogger().trace(sm.getString("engineConfig.stop"));
         }
 
     }

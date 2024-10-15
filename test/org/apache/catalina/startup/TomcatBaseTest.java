@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -64,7 +65,6 @@ import org.apache.catalina.webresources.StandardRoot;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
-import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.util.scan.StandardJarScanFilter;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 
@@ -73,13 +73,6 @@ import org.apache.tomcat.util.scan.StandardJarScanner;
  * don't have to keep writing the cleanup code.
  */
 public abstract class TomcatBaseTest extends LoggingBaseTest {
-
-    /*
-     * Ensures APR Library.initialize() and Library.terminate() don't interfere
-     * with the calls from the Lifecycle listener and trigger a JVM crash
-     */
-    @SuppressWarnings("unused")
-    private static final boolean ignored = TesterSupport.OPENSSL_AVAILABLE;
 
     // Used by parameterized tests. Defined here to reduce duplication.
     protected static final Boolean[] booleans = new Boolean[] { Boolean.FALSE, Boolean.TRUE };
@@ -136,6 +129,16 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         return tomcat;
     }
 
+
+    public Context getProgrammaticRootContext() {
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+        // Disable class path scanning - it slows the tests down by almost an order of magnitude
+        ((StandardJarScanner) ctx.getJarScanner()).setScanClassPath(false);
+        return ctx;
+    }
+
+
     /*
      * Sub-classes need to know port so they can connect
      */
@@ -182,8 +185,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         tomcat.setBaseDir(catalinaBase.getAbsolutePath());
         tomcat.getHost().setAppBase(appBase.getAbsolutePath());
 
-        accessLogEnabled = Boolean.parseBoolean(
-            System.getProperty("tomcat.test.accesslog", "false"));
+        accessLogEnabled = Boolean.getBoolean("tomcat.test.accesslog");
         if (accessLogEnabled) {
             String accessLogDirectory = System
                     .getProperty("tomcat.test.reports");
@@ -516,7 +518,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                      h.hasMoreElements();) {
                     value.append(h.nextElement());
                     if (h.hasMoreElements()) {
-                        value.append(";");
+                        value.append(';');
                     }
                 }
                 out.println("HEADER:" + name + ": " + value);
@@ -539,7 +541,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                 for (int j = 0; j < m; j++) {
                     value.append(values[j]);
                     if (j < m - 1) {
-                        value.append(";");
+                        value.append(';');
                     }
                 }
                 out.println("PARAM/" + name + ": " + value);
@@ -660,7 +662,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                 Map<String, List<String>> reqHead, Map<String, List<String>> resHead, String method,
                 boolean followRedirects) throws IOException {
 
-        URL url = new URL(path);
+        URL url = URI.create(path).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setUseCaches(false);
         connection.setReadTimeout(readTimeout);
@@ -754,7 +756,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                 Map<String, List<String>> reqHead,
                 Map<String, List<String>> resHead) throws IOException {
 
-        URL url = new URL(path);
+        URL url = URI.create(path).toURL();
         HttpURLConnection connection =
             (HttpURLConnection) url.openConnection();
         connection.setDoOutput(true);

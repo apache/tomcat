@@ -20,8 +20,6 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -43,6 +41,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.sql.XAConnection;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -51,7 +51,6 @@ import org.apache.juli.logging.LogFactory;
  * The ConnectionPool uses a {@link PoolProperties} object for storing all the meta information about the connection pool.
  * As the underlying implementation, the connection pool uses {@link java.util.concurrent.BlockingQueue} to store active and idle connections.
  * A custom implementation of a fair {@link FairBlockingQueue} blocking queue is provided with the connection pool itself.
- * @version 1.0
  */
 public class ConnectionPool {
 
@@ -114,7 +113,7 @@ public class ConnectionPool {
     /**
      * Executor service used to cancel Futures
      */
-    private ThreadPoolExecutor cancellator = new ThreadPoolExecutor(0,1,1000,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
+    private ThreadPoolExecutor cancellator = new ThreadPoolExecutor(0,1,1000,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<>());
 
     /**
      * reference to the JMX mbean
@@ -372,8 +371,10 @@ public class ConnectionPool {
         //cache the constructor
         if (proxyClassConstructor == null ) {
             Class<?> proxyClass = xa ?
-                Proxy.getProxyClass(ConnectionPool.class.getClassLoader(), new Class[] {java.sql.Connection.class,javax.sql.PooledConnection.class, javax.sql.XAConnection.class}) :
-                Proxy.getProxyClass(ConnectionPool.class.getClassLoader(), new Class[] {java.sql.Connection.class,javax.sql.PooledConnection.class});
+                    Proxy.getProxyClass(ConnectionPool.class.getClassLoader(),
+                            new Class[] {Connection.class, javax.sql.PooledConnection.class, XAConnection.class}) :
+                    Proxy.getProxyClass(ConnectionPool.class.getClassLoader(),
+                            new Class[] {Connection.class, javax.sql.PooledConnection.class});
             proxyClassConstructor = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
         }
         return proxyClassConstructor;
@@ -1091,7 +1092,7 @@ public class ConnectionPool {
                     long time = con.getTimestamp();
                     long now = System.currentTimeMillis();
                     if (shouldAbandon() && (now - time) > con.getAbandonTimeout()) {
-                        busy.remove(con);
+                        locked.remove();
                         abandon(con);
                         setToNull = true;
                     } else if (sto > 0 && (now - time) > (sto * 1000L)) {
@@ -1142,7 +1143,7 @@ public class ConnectionPool {
                     if (shouldReleaseIdle(now, con, time)) {
                         releasedIdleCount.incrementAndGet();
                         release(con);
-                        idle.remove(con);
+                        unlocked.remove();
                         setToNull = true;
                     } else {
                         //do nothing
@@ -1205,7 +1206,8 @@ public class ConnectionPool {
                         release = !reconnectIfExpired(con) || !con.validate(PooledConnection.VALIDATE_IDLE);
                     }
                     if (release) {
-                        idle.remove(con);
+                        releasedIdleCount.incrementAndGet();
+                        unlocked.remove();
                         release(con);
                     }
                 } finally {
@@ -1397,7 +1399,7 @@ public class ConnectionPool {
     }
 
     /**
-     * Tread safe wrapper around a future for the regular queue
+     * Thread safe wrapper around a future for the regular queue
      * This one retrieves the pooled connection object
      * and performs the initialization according to
      * interceptors and validation rules.
@@ -1460,7 +1462,9 @@ public class ConnectionPool {
                 if (configured.compareAndSet(false, true)) {
                     try {
                         pc = borrowConnection(System.currentTimeMillis(),pc, null, null);
-                        result = ConnectionPool.this.setupConnection(pc);
+                        if (pc != null) {
+                            result = ConnectionPool.this.setupConnection(pc);
+                        }
                     } catch (SQLException x) {
                         cause = x;
                     } finally {
@@ -1502,11 +1506,13 @@ public class ConnectionPool {
         public void run() {
             try {
                 Connection con = get(); //complete this future
-                con.close(); //return to the pool
+                if (con != null) {
+                    con.close(); //return to the pool
+                }
             }catch (ExecutionException ex) {
                 //we can ignore this
             }catch (Exception x) {
-                ConnectionPool.log.error("Unable to cancel ConnectionFuture.",x);
+                log.error("Unable to cancel ConnectionFuture.",x);
             }
         }
 
@@ -1527,8 +1533,9 @@ public class ConnectionPool {
                 // Create the timer thread in a PrivilegedAction so that a
                 // reference to the web application class loader is not created
                 // via Thread.inheritedAccessControlContext
-                PrivilegedAction<Timer> pa = new PrivilegedNewTimer();
-                poolCleanTimer = AccessController.doPrivileged(pa);
+                poolCleanTimer = new Timer("Tomcat JDBC Pool Cleaner[" +
+                        System.identityHashCode(ConnectionPool.class.getClassLoader()) + ":"+
+                        System.currentTimeMillis() + "]", true);
             } finally {
                 Thread.currentThread().setContextClassLoader(loader);
             }
@@ -1550,15 +1557,8 @@ public class ConnectionPool {
         }
     }
 
-    private static class PrivilegedNewTimer implements PrivilegedAction<Timer> {
-        @Override
-        public Timer run() {
-            return new Timer("Tomcat JDBC Pool Cleaner["+ System.identityHashCode(ConnectionPool.class.getClassLoader()) + ":"+
-                    System.currentTimeMillis() + "]", true);
-        }
-    }
-
-    public static Set<TimerTask> getPoolCleaners() {
+    // Testing use only
+    public static synchronized Set<TimerTask> getPoolCleaners() {
         return Collections.<TimerTask>unmodifiableSet(cleaners);
     }
 
@@ -1566,7 +1566,8 @@ public class ConnectionPool {
         return poolVersion.get();
     }
 
-    public static Timer getPoolTimer() {
+    // Testing use only
+    public static synchronized Timer getPoolTimer() {
         return poolCleanTimer;
     }
 

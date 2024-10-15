@@ -26,7 +26,7 @@ public class TestUriTemplate {
     @Test
     public void testBasic() throws Exception {
         UriTemplate t = new UriTemplate("/{a}/{b}");
-        Map<String,String> result = t.match(new UriTemplate("/foo/bar"));
+        Map<String, String> result = t.match(new UriTemplate("/foo/bar"));
 
         Assert.assertEquals(2, result.size());
         Assert.assertTrue(result.containsKey("a"));
@@ -39,40 +39,40 @@ public class TestUriTemplate {
     @Test
     public void testOneOfTwo() throws Exception {
         UriTemplate t = new UriTemplate("/{a}/{b}");
-        Map<String,String> result = t.match(new UriTemplate("/foo"));
+        Map<String, String> result = t.match(new UriTemplate("/foo"));
         Assert.assertNull(result);
     }
 
 
-    @Test(expected=jakarta.websocket.DeploymentException.class)
+    @Test(expected = jakarta.websocket.DeploymentException.class)
     public void testBasicPrefix() throws Exception {
         @SuppressWarnings("unused")
         UriTemplate t = new UriTemplate("/x{a}/y{b}");
     }
 
 
-    @Test(expected=jakarta.websocket.DeploymentException.class)
+    @Test(expected = jakarta.websocket.DeploymentException.class)
     public void testPrefixOneOfTwo() throws Exception {
         UriTemplate t = new UriTemplate("/x{a}/y{b}");
         t.match(new UriTemplate("/xfoo"));
     }
 
 
-    @Test(expected=jakarta.websocket.DeploymentException.class)
+    @Test(expected = jakarta.websocket.DeploymentException.class)
     public void testPrefixTwoOfTwo() throws Exception {
         UriTemplate t = new UriTemplate("/x{a}/y{b}");
         t.match(new UriTemplate("/ybar"));
     }
 
 
-    @Test(expected=jakarta.websocket.DeploymentException.class)
+    @Test(expected = jakarta.websocket.DeploymentException.class)
     public void testQuote1() throws Exception {
         UriTemplate t = new UriTemplate("/.{a}");
         t.match(new UriTemplate("/yfoo"));
     }
 
 
-    @Test(expected=jakarta.websocket.DeploymentException.class)
+    @Test(expected = jakarta.websocket.DeploymentException.class)
     public void testQuote2() throws Exception {
         @SuppressWarnings("unused")
         UriTemplate t = new UriTemplate("/.{a}");
@@ -82,7 +82,7 @@ public class TestUriTemplate {
     @Test
     public void testNoParams() throws Exception {
         UriTemplate t = new UriTemplate("/foo/bar");
-        Map<String,String> result = t.match(new UriTemplate("/foo/bar"));
+        Map<String, String> result = t.match(new UriTemplate("/foo/bar"));
 
         Assert.assertEquals(0, result.size());
     }
@@ -91,7 +91,7 @@ public class TestUriTemplate {
     @Test
     public void testSpecExample1_01() throws Exception {
         UriTemplate t = new UriTemplate("/a/b");
-        Map<String,String> result = t.match(new UriTemplate("/a/b"));
+        Map<String, String> result = t.match(new UriTemplate("/a/b"));
 
         Assert.assertEquals(0, result.size());
     }
@@ -100,7 +100,7 @@ public class TestUriTemplate {
     @Test
     public void testSpecExample1_02() throws Exception {
         UriTemplate t = new UriTemplate("/a/b");
-        Map<String,String> result = t.match(new UriTemplate("/a"));
+        Map<String, String> result = t.match(new UriTemplate("/a"));
 
         Assert.assertNull(result);
     }
@@ -109,7 +109,7 @@ public class TestUriTemplate {
     @Test
     public void testSpecExample1_03() throws Exception {
         UriTemplate t = new UriTemplate("/a/b");
-        Map<String,String> result = t.match(new UriTemplate("/a/bb"));
+        Map<String, String> result = t.match(new UriTemplate("/a/bb"));
 
         Assert.assertNull(result);
     }
@@ -118,7 +118,7 @@ public class TestUriTemplate {
     @Test
     public void testSpecExample2_01() throws Exception {
         UriTemplate t = new UriTemplate("/a/{var}");
-        Map<String,String> result = t.match(new UriTemplate("/a/b"));
+        Map<String, String> result = t.match(new UriTemplate("/a/b"));
 
         Assert.assertEquals(1, result.size());
         Assert.assertEquals("b", result.get("var"));
@@ -128,7 +128,7 @@ public class TestUriTemplate {
     @Test
     public void testSpecExample2_02() throws Exception {
         UriTemplate t = new UriTemplate("/a/{var}");
-        Map<String,String> result = t.match(new UriTemplate("/a/apple"));
+        Map<String, String> result = t.match(new UriTemplate("/a/apple"));
 
         Assert.assertEquals(1, result.size());
         Assert.assertEquals("apple", result.get("var"));
@@ -138,7 +138,7 @@ public class TestUriTemplate {
     @Test
     public void testSpecExample2_03() throws Exception {
         UriTemplate t = new UriTemplate("/a/{var}");
-        Map<String,String> result = t.match(new UriTemplate("/a"));
+        Map<String, String> result = t.match(new UriTemplate("/a"));
 
         Assert.assertNull(result);
     }
@@ -147,13 +147,13 @@ public class TestUriTemplate {
     @Test
     public void testSpecExample2_04() throws Exception {
         UriTemplate t = new UriTemplate("/a/{var}");
-        Map<String,String> result = t.match(new UriTemplate("/a/b/c"));
+        Map<String, String> result = t.match(new UriTemplate("/a/b/c"));
 
         Assert.assertNull(result);
     }
 
 
-    @Test(expected=jakarta.websocket.DeploymentException.class)
+    @Test(expected = jakarta.websocket.DeploymentException.class)
     public void testDuplicate01() throws Exception {
         @SuppressWarnings("unused")
         UriTemplate t = new UriTemplate("/{var}/{var}");
@@ -163,7 +163,7 @@ public class TestUriTemplate {
     @Test
     public void testDuplicate02() throws Exception {
         UriTemplate t = new UriTemplate("/{a}/{b}");
-        Map<String,String> result = t.match(new UriTemplate("/x/x"));
+        Map<String, String> result = t.match(new UriTemplate("/x/x"));
 
         Assert.assertEquals(2, result.size());
         Assert.assertEquals("x", result.get("a"));
@@ -173,7 +173,7 @@ public class TestUriTemplate {
 
     public void testEgMailingList01() throws Exception {
         UriTemplate t = new UriTemplate("/a/{var}");
-        Map<String,String> result = t.match(new UriTemplate("/a/b/"));
+        Map<String, String> result = t.match(new UriTemplate("/a/b/"));
 
         Assert.assertNull(result);
     }
@@ -181,7 +181,7 @@ public class TestUriTemplate {
 
     public void testEgMailingList02() throws Exception {
         UriTemplate t = new UriTemplate("/a/{var}");
-        Map<String,String> result = t.match(new UriTemplate("/a/"));
+        Map<String, String> result = t.match(new UriTemplate("/a/"));
 
         Assert.assertNull(result);
     }
@@ -190,43 +190,43 @@ public class TestUriTemplate {
     @Test
     public void testEgMailingList03() throws Exception {
         UriTemplate t = new UriTemplate("/a/{var}");
-        Map<String,String> result = t.match(new UriTemplate("/a"));
+        Map<String, String> result = t.match(new UriTemplate("/a"));
 
         Assert.assertNull(result);
     }
 
 
-    @Test(expected=jakarta.websocket.DeploymentException.class)
+    @Test(expected = jakarta.websocket.DeploymentException.class)
     public void testEgMailingList04() throws Exception {
         UriTemplate t = new UriTemplate("/a/{var1}/{var2}");
         @SuppressWarnings("unused")
-        Map<String,String> result = t.match(new UriTemplate("/a//c"));
+        Map<String, String> result = t.match(new UriTemplate("/a//c"));
     }
 
 
-    @Test(expected=jakarta.websocket.DeploymentException.class)
+    @Test(expected = jakarta.websocket.DeploymentException.class)
     public void testEgMailingList05() throws Exception {
         UriTemplate t = new UriTemplate("/a/{var}/");
         @SuppressWarnings("unused")
-        Map<String,String> result = t.match(new UriTemplate("/a/b/"));
+        Map<String, String> result = t.match(new UriTemplate("/a/b/"));
     }
 
 
-    @Test(expected=jakarta.websocket.DeploymentException.class)
+    @Test(expected = jakarta.websocket.DeploymentException.class)
     public void testSpecIssue194a() throws Exception {
         @SuppressWarnings("unused")
         UriTemplate t = new UriTemplate("/a/../b");
     }
 
 
-    @Test(expected=jakarta.websocket.DeploymentException.class)
+    @Test(expected = jakarta.websocket.DeploymentException.class)
     public void testSpecIssue194b() throws Exception {
         @SuppressWarnings("unused")
         UriTemplate t = new UriTemplate("/./b");
     }
 
 
-    @Test(expected=jakarta.websocket.DeploymentException.class)
+    @Test(expected = jakarta.websocket.DeploymentException.class)
     public void testSpecIssue194c() throws Exception {
         @SuppressWarnings("unused")
         UriTemplate t = new UriTemplate("//b");

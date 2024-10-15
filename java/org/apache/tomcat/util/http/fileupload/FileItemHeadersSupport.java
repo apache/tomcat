@@ -20,7 +20,7 @@ package org.apache.tomcat.util.http.fileupload;
  * Interface that will indicate that {@link FileItem} or {@link FileItemStream}
  * implementations will accept the headers read for the item.
  *
- * @since 1.2.1
+ * @since FileUpload 1.2.1
  *
  * @see FileItem
  * @see FileItemStream

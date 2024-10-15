@@ -27,7 +27,6 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 
 import jakarta.security.auth.message.callback.CallerPrincipalCallback;
 import jakarta.security.auth.message.callback.GroupPrincipalCallback;
@@ -49,8 +48,8 @@ public class TestJaspicCallbackHandlerInAuthenticator {
 
     @Test
     public void testCustomCallbackHandlerCreation() throws Exception {
-        testCallbackHandlerCreation("org.apache.catalina.authenticator.TestCallbackHandlerImpl",
-                TestCallbackHandlerImpl.class);
+        testCallbackHandlerCreation("org.apache.catalina.authenticator.TesterCallbackHandlerImpl",
+                TesterCallbackHandlerImpl.class);
     }
 
 
@@ -68,6 +67,12 @@ public class TestJaspicCallbackHandlerInAuthenticator {
     }
 
 
+    /*
+     * This shouldn't happen in real usage. In the very unlikely event there is more than one CallerPrincipalCallback,
+     * it should return the same Principal each time.
+     *
+     * If there are multiple CallerPrincipalCallbacks, Tomcat uses the name from the most recent.
+     */
     @Test
     public void testCallerPrincipalCallback() throws Exception {
         CallbackHandler callbackHandler = createCallbackHandler(null);
@@ -82,29 +87,43 @@ public class TestJaspicCallbackHandlerInAuthenticator {
         });
         callbackHandler.handle(new Callback[] { cpc2 });
         Set<Object> credentials = clientSubject.getPrivateCredentials();
-        Assert.assertTrue(credentials.size() == 2);
-        Set<String> names = new HashSet<>(Arrays.asList(new String[] { "name1", "name2" }));
+        Assert.assertTrue(credentials.size() == 1);
+        Set<String> names = new HashSet<>(Arrays.asList(new String[] { "name2" }));
         for (Object o : credentials) {
             names.remove(((GenericPrincipal) o).getName());
         }
         Assert.assertTrue(names.isEmpty());
     }
 
+
+    /*
+     * This shouldn't happen in real usage. In the very unlikely event there is more than one GroupPrincipalCallback,
+     * the groups from each should be merged into the final Principal.
+     *
+     * If there are multiple CallerPrincipalCallbacks, Tomcat uses the name from the most recent.
+     */
     @Test
     public void testGroupPrincipalCallback() throws Exception {
         CallbackHandler callbackHandler = createCallbackHandler(null);
         Subject clientSubject = new Subject();
         CallerPrincipalCallback cpc = new CallerPrincipalCallback(clientSubject, "name");
-        GroupPrincipalCallback gpc = new GroupPrincipalCallback(clientSubject,
+        GroupPrincipalCallback gpc1 = new GroupPrincipalCallback(clientSubject,
                 new String[] { "group1", "group2" });
-        callbackHandler.handle(new Callback[] { cpc, gpc });
+        callbackHandler.handle(new Callback[] { cpc, gpc1 });
+        GroupPrincipalCallback gpc2 = new GroupPrincipalCallback(clientSubject,
+                new String[] { "group3", "group4" });
+        callbackHandler.handle(new Callback[] { cpc, gpc2 });
         Set<Object> credentials = clientSubject.getPrivateCredentials();
         Assert.assertTrue(credentials.size() == 1);
         GenericPrincipal gp = (GenericPrincipal) credentials.iterator().next();
         Assert.assertEquals("name", gp.getName());
+        Assert.assertEquals(4, gp.getRoles().length);
         Assert.assertTrue(gp.hasRole("group1"));
         Assert.assertTrue(gp.hasRole("group2"));
+        Assert.assertTrue(gp.hasRole("group3"));
+        Assert.assertTrue(gp.hasRole("group4"));
     }
+
 
     @Test
     public void testPasswordValidationCallback() throws Exception {
@@ -184,19 +203,5 @@ public class TestJaspicCallbackHandlerInAuthenticator {
         protected Principal getPrincipal(String username) {
             return new GenericPrincipal(username);
         }
-    }
-}
-
-
-class TestCallbackHandlerImpl implements CallbackHandler {
-
-    public TestCallbackHandlerImpl() {
-        // Default constructor required by reflection
-    }
-
-
-    @Override
-    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-        // don't have to do anything; needed only for instantiation
     }
 }

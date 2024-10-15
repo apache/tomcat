@@ -19,15 +19,74 @@ package org.apache.catalina.tribes.transport;
 import java.io.IOException;
 
 public interface DataSender {
-    public void connect() throws IOException;
-    public void disconnect();
-    public boolean isConnected();
-    public void setRxBufSize(int size);
-    public void setTxBufSize(int size);
-    public boolean keepalive();
-    public void setTimeout(long timeout);
-    public void setKeepAliveCount(int maxRequests);
-    public void setKeepAliveTime(long keepAliveTimeInMs);
-    public int getRequestCount();
-    public long getConnectTime();
+
+    /**
+     * Connect.
+     *
+     * @throws IOException when an error occurs
+     */
+    void connect() throws IOException;
+
+    /**
+     * Disconnect.
+     */
+    void disconnect();
+
+    /**
+     * @return {@code true} if connected
+     */
+    boolean isConnected();
+
+    /**
+     * Set the receive buffer size.
+     *
+     * @param size the new size
+     */
+    void setRxBufSize(int size);
+
+    /**
+     * Set the transmit buffer size.
+     *
+     * @param size the new size
+     */
+    void setTxBufSize(int size);
+
+    /**
+     * Keepalive.
+     *
+     * @return {@code true} if kept alive
+     */
+    boolean keepalive();
+
+    /**
+     * Set the socket timeout.
+     *
+     * @param timeout in ms
+     */
+    void setTimeout(long timeout);
+
+    /**
+     * Set the amount of requests during which to keepalive.
+     *
+     * @param maxRequests the amount of requests
+     */
+    void setKeepAliveCount(int maxRequests);
+
+    /**
+     * Set the keepalive time.
+     *
+     * @param keepAliveTimeInMs the time in ms
+     */
+    void setKeepAliveTime(long keepAliveTimeInMs);
+
+    /**
+     * @return the request count
+     */
+    int getRequestCount();
+
+    /**
+     * @return the time to connect
+     */
+    long getConnectTime();
+
 }

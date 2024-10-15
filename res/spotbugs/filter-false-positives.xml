@@ -141,6 +141,12 @@
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
   </Match>
   <Match>
+  </Match>
+    <!-- NPE is expected if Connector definition is invalid -->
+    <Class name="org.apache.catalina.connector.Connector"/>
+    <Method name="startInternal"/>
+    <Bug pattern="NP_NULL_ON_SOME_PATH"/>
+  <Match>
     <!-- req.getRemoteUser(), req.getAuthType(), request.getQueryString() can
     return null because o.a.t.util.buf.MessageBytes.toString() can return NULL
     -->
@@ -185,6 +191,12 @@
     <Class name="org.apache.catalina.core.AsyncContextImpl"/>
     <Method name="logDebug"/>
     <Bug code="RCN"/>
+  </Match>
+  <Match>
+    <!-- Sync isn't guarding this object -->
+    <Class name="org.apache.catalina.core.ContainerBase"/>
+    <Method name="setStartStopThreads"/>
+    <Bug pattern="IS2_INCONSISTENT_SYNC"/>
   </Match>
   <Match>
     <!-- Exception caught deliberately -->
@@ -304,6 +316,11 @@
       <Method name="waitForSendAllSessions" />
     </Or>
     <Bug code="DE" />
+  </Match>
+  <Match>
+    <!-- Unit test confirms public no-arg constructor is not required -->
+    <Class name="org.apache.catalina.ha.session.DeltaRequest$AttributeInfo" />
+    <Pattern code="SE_NO_SUITABLE_CONSTRUCTOR_FOR_EXTERNALIZATION" />
   </Match>
   <Match>
     <!-- False positive caused by additional method syncs -->
@@ -755,6 +772,12 @@
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
   </Match>
   <Match>
+    <!-- Not an issue. Initialisation is as intended. -->
+    <Class name="org.apache.catalina.tribes.util.JreCompat"/>
+    <Method name="&lt;clinit&gt;"/>
+    <Bug pattern="IC_SUPERCLASS_USES_SUBCLASS_DURING_INITIALIZATION" />
+  </Match>
+  <Match>
     <!-- Random is SecureRandom and will be used multiple times. -->
     <Class name="org.apache.catalina.tribes.util.UUIDGenerator"/>
     <Or>
@@ -848,6 +871,12 @@
     <Bug code="RCN"/>
   </Match>
   <Match>
+    <!-- Deliberately ignored -->
+    <Class name="org.apache.catalina.valves.rewrite.RewriteValve"/>
+    <Method name="parse"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
+  </Match>
+  <Match>
     <!-- request.getQueryString() can be null because
     o.a.t.util.buf.MessageBytes.toString() can return NULL -->
     <Class name="org.apache.catalina.valves.StuckThreadDetectionValve"/>
@@ -868,6 +897,15 @@
       <Field name="cachedContent"/>
     </Or>
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
+  </Match>
+  <Match>
+    <!-- Delegation to URL methods is deliberate -->
+    <Class name="org.apache.catalina.webresources.CachedResource$CachedResourceURLStreamHandler"/>
+    <Or>
+      <Method name="equals"/>
+      <Method name="hashCode"/>
+    </Or>
+    <Bug pattern="DMI_BLOCKING_METHODS_ON_URL"/>
   </Match>
   <Match>
     <!-- Class lock is not an instance lock -->
@@ -925,6 +963,16 @@
     <Bug pattern="VO_VOLATILE_INCREMENT" />
   </Match>
   <Match>
+    <!-- False positive. Affects 4.7.3. May affect other versions. -->
+    <Class name="org.apache.coyote.http2.HpackDecoder" />
+    <Method name="handleMaxMemorySizeChange" />
+    <Or>
+      <Field name="currentMemorySize" />
+      <Field name="filledTableSlots" />
+    </Or>
+    <Bug pattern="SA_FIELD_SELF_ASSIGNMENT" />
+  </Match>
+  <Match>
     <!-- Number being tested is unsigned. -->
     <Class name="org.apache.coyote.http2.Http2UpgradeHandler" />
     <Method name="createRemoteStream" />
@@ -944,6 +992,12 @@
       <Bug pattern="NN_NAKED_NOTIFY" />
       <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
     </Or>
+  </Match>
+  <Match>
+    <!-- Switch fall-through is intentional. -->
+    <Class name="org.apache.coyote.http2.Http2UpgradeHandler" />
+    <Method name="upgradeDispatch" />
+     <Bug pattern="SF_SWITCH_FALLTHROUGH" />
   </Match>
   <Match>
     <!-- Return value is intentionally ignored. -->
@@ -1101,8 +1155,14 @@
     <Bug code="ES"/>
   </Match>
   <Match>
+    <!--  Cast is safe -->
+    <Class name="org.apache.juli.AsyncFileHandler$DropLastPolicy"/>
+    <Method name="rejectedExecution"/>
+    <Bug pattern="BC_UNCONFIRMED_CAST"/>
+  </Match>
+  <Match>
     <!--  Dummy thread -->
-    <Class name="org.apache.juli.AsyncFileHandler$LoggerThread"/>
+    <Class name="org.apache.juli.AsyncFileHandler$LoggerExecutorService"/>
     <Method name="deregisterHandler"/>
     <Bug pattern="DM_USELESS_THREAD"/>
   </Match>
@@ -1151,13 +1211,6 @@
     <Bug pattern="DE_MIGHT_IGNORE" />
   </Match>
   <Match>
-    <!-- Simpler to catch Exception than to create dummy implementations of the
-         necessary exception hierarchy -->
-    <Class name="org.apache.naming.factory.webservices.ServiceProxy" />
-    <Method name="&lt;init&gt;"/>
-    <Bug code="ST" />
-  </Match>
-  <Match>
     <!-- Class name needs to start with a lower case letter in this case -->
     <Class name="org.apache.naming.java.javaURLContextFactory" />
     <Bug code="Nm" />
@@ -1202,15 +1255,23 @@
   </Match>
   <Match>
     <!-- SQL construction is necessary for pooled statements -->
+    <Class name="org.apache.tomcat.dbcp.dbcp2.PStmtKey" />
     <Or>
-      <Class name="org.apache.tomcat.dbcp.dbcp2.PStmtKey$PreparedStatementSQL" />
-      <Class name="org.apache.tomcat.dbcp.dbcp2.PStmtKey$PreparedStatementWithAutoGeneratedKeys" />
-      <Class name="org.apache.tomcat.dbcp.dbcp2.PStmtKey$PreparedStatementWithColumnIndexes" />
-      <Class name="org.apache.tomcat.dbcp.dbcp2.PStmtKey$PreparedStatementWithColumnNames" />
-      <Class name="org.apache.tomcat.dbcp.dbcp2.PStmtKey$PreparedStatementWithResultSetConcurrency" />
-      <Class name="org.apache.tomcat.dbcp.dbcp2.PStmtKey$PreparedStatementWithResultSetHoldability" />
+      <!-- Names reported via IDE -->
+      <Method name="lambda$3" />
+      <Method name="lambda$4" />
+      <Method name="lambda$5" />
+      <Method name="lambda$6" />
+      <Method name="lambda$7" />
+      <Method name="lambda$8" />
+      <!-- Names reported via Ant -->
+      <Method name="lambda$static$3" />
+      <Method name="lambda$static$4" />
+      <Method name="lambda$static$5" />
+      <Method name="lambda$static$6" />
+      <Method name="lambda$static$7" />
+      <Method name="lambda$static$8" />
     </Or>
-    <Method name="createStatement" />
     <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
   </Match>
   <Match>
@@ -1390,6 +1451,12 @@
     </Or>
     <Method name="toString"/>
     <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Switch fall-through is intentional. -->
+    <Class name="org.apache.tomcat.util.buf.MessageBytes"/>
+    <Method name="toChars"/>
+    <Bug pattern="SF_SWITCH_FALLTHROUGH" />
   </Match>
   <Match>
     <!-- Returning null here is fine -->
@@ -1719,6 +1786,15 @@
     <Field name="buffers" />
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
   </Match>
+  <Match>
+    <!-- Locks are released then re-obtained which is the opposite order to normal. -->
+    <Class name="org.apache.tomcat.websocket.server.WsRemoteEndpointImplServer" />
+    <Method name="acquireMessagePartInProgressSemaphore" />
+    <Or>
+      <Bug pattern="UL_UNRELEASED_LOCK" />
+      <Bug pattern="UL_UNRELEASED_LOCK_EXCEPTION_PATH" />
+    </Or>
+  </Match>
 
   <!-- Example code -->
   <Match>
@@ -1795,6 +1871,12 @@
 
 
   <!-- Test code -->
+  <Match>
+    <!-- null is used deliberately -->
+    <Class name="jakarta.el.TestBeanSupport$InvalidIs03Bean" />
+    <Method name="isValue"/>
+    <Bug pattern="NP_BOOLEAN_RETURN_NULL"/>
+  </Match>
   <Match>
     <!-- Code is deliberately unused -->
     <Class name="jakarta.el.TestImportHandler" />
@@ -1969,6 +2051,15 @@
     <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI$NBReadWithDispatchServlet$1"/>
     <Method name="onDataAvailable"/>
     <Bug pattern="RR_NOT_CHECKED"/>
+  </Match>
+  <Match>
+    <!-- Test class not intended to be serialized -->
+    <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI$NBWriteWithCloseServlet"/>
+    <Or>
+      <Field name="afterCloseLatch"/>
+      <Field name="beforeCloseLatch"/>
+    </Or>
+    <Bug pattern="SE_BAD_FIELD"/>
   </Match>
   <Match>
     <!-- Not single use -->
@@ -2216,17 +2307,20 @@
   </Match>
   <Match>
     <!-- Deliberate hack for the purposes of the test -->
-    <Class name="org.apache.coyote.http11.filters.TestChunkedInputFilter$BodyReadServlet"/>
+    <Class name="org.apache.coyote.TestIoTimeouts$EchoListener"/>
+    <Field name="t"/>
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Or>
+      <Class name="org.apache.coyote.http11.filters.TestChunkedInputFilter$BodyReadServlet"/>
+      <Class name="org.apache.coyote.http11.filters.TestChunkedInputFilter$EchoHeaderServlet"/>
+    </Or>
     <Or>
       <Field name="countRead"/>
       <Field name="exceptionDuringRead"/>
     </Or>
-    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
-  </Match>
-  <Match>
-    <!-- Deliberate hack for the purposes of the test -->
-    <Class name="org.apache.coyote.http11.filters.TestChunkedInputFilter$EchoHeaderServlet"/>
-    <Field name="exceptionDuringRead"/>
     <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
   </Match>
   <Match>
@@ -2453,6 +2547,12 @@
     <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" />
   </Match>
   <Match>
+    <!-- NPE here is OK - it signals the test isn't configured correctly -->
+    <Class name="org.apache.tomcat.util.http.parser.TesterHttpWgStructuredField" />
+    <Method name="doTestDirectory" />
+    <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE" />
+  </Match>
+  <Match>
     <!-- Object not used as this is a performance test -->
     <Class name="org.apache.tomcat.util.http.TesterParametersPerformance" />
     <Method name="doCreateString" />
@@ -2488,6 +2588,30 @@
     </Or>
   </Match>
   <Match>
+    <!-- Array contents is not mutated -->
+    <Class name="org.apache.tomcat.websocket.pojo.TestEncodingDecoding$MsgByte"/>
+    <Field name="data"/>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestClose" />
+    <Method name="setUp" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestWsRemoteEndpointImplServerDeadlock" />
+    <Method name="testTemporaryDeadlockOnClientClose" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestWsRemoteEndpointImplServerDeadlock$Bug66508Endpoint" />
+    <Method name="onOpen" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
     <!-- Return value of latch is intentionally ignored -->
     <Or>
       <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClient"/>
@@ -2513,18 +2637,6 @@
       <Field name="running" />
       <Field name="timeout" />
     </Or>
-    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
-  </Match>
-  <Match>
-    <!-- Array contents is not mutated -->
-    <Class name="org.apache.tomcat.websocket.pojo.TestEncodingDecoding$MsgByte"/>
-    <Field name="data"/>
-    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
-  </Match>
-  <Match>
-    <!-- Statics are used deliberately as they are simpler -->
-    <Class name="org.apache.tomcat.websocket.server.TestClose" />
-    <Method name="setUp" />
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
   </Match>
   <Match>

@@ -145,6 +145,14 @@ public class TestHttpParser {
 
 
     @Test
+    public void testUnquoteInvalid01() {
+        // Note: Test string is also Java escaped
+        String shortText = "aaa\\";
+        Assert.assertNull(shortText, HttpParser.unquote(shortText));
+    }
+
+
+    @Test
     public void testTokenStringNull() {
         Assert.assertFalse(HttpParser.isToken(null));
     }

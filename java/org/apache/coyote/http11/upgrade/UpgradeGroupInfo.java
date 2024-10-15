@@ -16,95 +16,112 @@
  */
 package org.apache.coyote.http11.upgrade;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.LongAdder;
 
 import org.apache.tomcat.util.modeler.BaseModelMBean;
 
 /**
- *  This aggregates the data collected from each UpgradeInfo instance.
+ * This aggregates the data collected from each UpgradeInfo instance.
  */
 public class UpgradeGroupInfo extends BaseModelMBean {
 
-    private final List<UpgradeInfo> upgradeInfos = new ArrayList<>();
+    private final Set<UpgradeInfo> upgradeInfos = (new ConcurrentHashMap<UpgradeInfo,Boolean>()).keySet(Boolean.TRUE);
 
-    private long deadBytesReceived = 0;
-    private long deadBytesSent = 0;
-    private long deadMsgsReceived = 0;
-    private long deadMsgsSent = 0;
+    private LongAdder deadBytesReceived = new LongAdder();
+    private LongAdder deadBytesSent = new LongAdder();
+    private LongAdder deadMsgsReceived = new LongAdder();
+    private LongAdder deadMsgsSent = new LongAdder();
 
 
-    public synchronized void addUpgradeInfo(UpgradeInfo ui) {
+    public void addUpgradeInfo(UpgradeInfo ui) {
         upgradeInfos.add(ui);
     }
 
 
-    public synchronized void removeUpgradeInfo(UpgradeInfo ui) {
+    public void removeUpgradeInfo(UpgradeInfo ui) {
         if (ui != null) {
-            deadBytesReceived += ui.getBytesReceived();
-            deadBytesSent += ui.getBytesSent();
-            deadMsgsReceived += ui.getMsgsReceived();
-            deadMsgsSent += ui.getMsgsSent();
+            deadBytesReceived.add(ui.getBytesReceived());
+            deadBytesSent.add(ui.getBytesSent());
+            deadMsgsReceived.add(ui.getMsgsReceived());
+            deadMsgsSent.add(ui.getMsgsSent());
 
             upgradeInfos.remove(ui);
         }
     }
 
 
-    public synchronized long getBytesReceived() {
-        long bytes = deadBytesReceived;
+    public long getBytesReceived() {
+        long bytes = deadBytesReceived.longValue();
         for (UpgradeInfo ui : upgradeInfos) {
             bytes += ui.getBytesReceived();
         }
         return bytes;
     }
-    public synchronized void setBytesReceived(long bytesReceived) {
-        deadBytesReceived = bytesReceived;
+
+    public void setBytesReceived(long bytesReceived) {
+        deadBytesReceived.reset();
+        if (bytesReceived != 0) {
+            deadBytesReceived.add(bytesReceived);
+        }
         for (UpgradeInfo ui : upgradeInfos) {
             ui.setBytesReceived(bytesReceived);
         }
     }
 
 
-    public synchronized long getBytesSent() {
-        long bytes = deadBytesSent;
+    public long getBytesSent() {
+        long bytes = deadBytesSent.longValue();
         for (UpgradeInfo ui : upgradeInfos) {
             bytes += ui.getBytesSent();
         }
         return bytes;
     }
-    public synchronized void setBytesSent(long bytesSent) {
-        deadBytesSent = bytesSent;
+
+    public void setBytesSent(long bytesSent) {
+        deadBytesSent.reset();
+        if (bytesSent != 0) {
+            deadBytesSent.add(bytesSent);
+        }
         for (UpgradeInfo ui : upgradeInfos) {
             ui.setBytesSent(bytesSent);
         }
     }
 
 
-    public synchronized long getMsgsReceived() {
-        long msgs = deadMsgsReceived;
+    public long getMsgsReceived() {
+        long msgs = deadMsgsReceived.longValue();
         for (UpgradeInfo ui : upgradeInfos) {
             msgs += ui.getMsgsReceived();
         }
         return msgs;
     }
-    public synchronized void setMsgsReceived(long msgsReceived) {
-        deadMsgsReceived = msgsReceived;
+
+    public void setMsgsReceived(long msgsReceived) {
+        deadMsgsReceived.reset();
+        if (msgsReceived != 0) {
+            deadMsgsReceived.add(msgsReceived);
+        }
         for (UpgradeInfo ui : upgradeInfos) {
             ui.setMsgsReceived(msgsReceived);
         }
     }
 
 
-    public synchronized long getMsgsSent() {
-        long msgs = deadMsgsSent;
+    public long getMsgsSent() {
+        long msgs = deadMsgsSent.longValue();
         for (UpgradeInfo ui : upgradeInfos) {
             msgs += ui.getMsgsSent();
         }
         return msgs;
     }
-    public synchronized void setMsgsSent(long msgsSent) {
-        deadMsgsSent = msgsSent;
+
+    public void setMsgsSent(long msgsSent) {
+        deadMsgsSent.reset();
+        if (msgsSent != 0) {
+            deadMsgsSent.add(msgsSent);
+        }
         for (UpgradeInfo ui : upgradeInfos) {
             ui.setMsgsSent(msgsSent);
         }

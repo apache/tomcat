@@ -22,20 +22,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to indicate that the {@link jakarta.servlet.Servlet} on
- * which it is declared expects requests to made using the {@code
+ * This annotation is used to indicate that the {@link jakarta.servlet.Servlet} on which it is declared expects requests
+ * to made using the {@code
  * multipart/form-data} MIME type. <br>
  * <br>
- *
  * {@link jakarta.servlet.http.Part} components of a given {@code
- * multipart/form-data} request are retrieved by a Servlet annotated with
- * {@code MultipartConfig} by calling
+ * multipart/form-data} request are retrieved by a Servlet annotated with {@code MultipartConfig} by calling
  * {@link jakarta.servlet.http.HttpServletRequest#getPart} or
  * {@link jakarta.servlet.http.HttpServletRequest#getParts}.<br>
  * <br>
- *
  * E.g. <code>@WebServlet("/upload")}</code><br>
- *
  * <code>@MultipartConfig()</code> <code>public class UploadServlet extends
  * HttpServlet ... } </code><br>
  *

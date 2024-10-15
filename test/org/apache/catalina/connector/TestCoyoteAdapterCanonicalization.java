@@ -220,7 +220,7 @@ public class TestCoyoteAdapterCanonicalization extends TomcatBaseTest {
 
         private final String expected;
 
-        public Client(int port, String expected) {
+        Client(int port, String expected) {
             this.expected = expected;
             setPort(port);
             setRequestPause(0);

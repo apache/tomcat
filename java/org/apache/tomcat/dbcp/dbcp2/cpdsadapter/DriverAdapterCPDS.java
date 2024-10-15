@@ -37,7 +37,6 @@ import javax.naming.spi.ObjectFactory;
 import javax.sql.ConnectionPoolDataSource;
 import javax.sql.PooledConnection;
 
-import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.apache.tomcat.dbcp.dbcp2.Constants;
 import org.apache.tomcat.dbcp.dbcp2.DelegatingPreparedStatement;
 import org.apache.tomcat.dbcp.dbcp2.PStmtKey;
@@ -50,50 +49,75 @@ import org.apache.tomcat.dbcp.pool2.impl.GenericKeyedObjectPoolConfig;
 /**
  * <p>
  * An adapter for JDBC drivers that do not include an implementation of {@link javax.sql.ConnectionPoolDataSource}, but
- * still include a {@link java.sql.DriverManager} implementation. <code>ConnectionPoolDataSource</code>s are not used
- * within general applications. They are used by <code>DataSource</code> implementations that pool
- * <code>Connection</code>s, such as {@link org.apache.tomcat.dbcp.dbcp2.datasources.SharedPoolDataSource}. A J2EE container
- * will normally provide some method of initializing the <code>ConnectionPoolDataSource</code> whose attributes are
+ * still include a {@link java.sql.DriverManager} implementation. {@code ConnectionPoolDataSource}s are not used
+ * within general applications. They are used by {@code DataSource} implementations that pool
+ * {@code Connection}s, such as {@link org.apache.tomcat.dbcp.dbcp2.datasources.SharedPoolDataSource}. A J2EE container
+ * will normally provide some method of initializing the {@code ConnectionPoolDataSource} whose attributes are
  * presented as bean getters/setters and then deploying it via JNDI. It is then available as a source of physical
- * connections to the database, when the pooling <code>DataSource</code> needs to create a new physical connection.
+ * connections to the database, when the pooling {@code DataSource} needs to create a new physical connection.
  * </p>
  * <p>
  * Although normally used within a JNDI environment, the DriverAdapterCPDS can be instantiated and initialized as any
- * bean and then attached directly to a pooling <code>DataSource</code>. <code>Jdbc2PoolDataSource</code> can use the
- * <code>ConnectionPoolDataSource</code> with or without the use of JNDI.
+ * bean and then attached directly to a pooling {@code DataSource}. {@code Jdbc2PoolDataSource} can use the
+ * {@code ConnectionPoolDataSource} with or without the use of JNDI.
  * </p>
  * <p>
- * The DriverAdapterCPDS also provides <code>PreparedStatement</code> pooling which is not generally available in jdbc2
- * <code>ConnectionPoolDataSource</code> implementation, but is addressed within the jdbc3 specification. The
- * <code>PreparedStatement</code> pool in DriverAdapterCPDS has been in the dbcp package for some time, but it has not
+ * The DriverAdapterCPDS also provides {@code PreparedStatement} pooling which is not generally available in jdbc2
+ * {@code ConnectionPoolDataSource} implementation, but is addressed within the JDBC 3 specification. The
+ * {@code PreparedStatement} pool in DriverAdapterCPDS has been in the DBCP package for some time, but it has not
  * undergone extensive testing in the configuration used here. It should be considered experimental and can be toggled
  * with the poolPreparedStatements attribute.
  * </p>
  * <p>
- * The <a href="package-summary.html">package documentation</a> contains an example using catalina and JNDI. The
+ * The <a href="package-summary.html">package documentation</a> contains an example using Apache Catalina and JNDI. The
  * <a href="../datasources/package-summary.html">datasources package documentation</a> shows how to use
- * <code>DriverAdapterCPDS</code> as a source for <code>Jdbc2PoolDataSource</code> without the use of JNDI.
+ * {@code DriverAdapterCPDS} as a source for {@code Jdbc2PoolDataSource} without the use of JNDI.
  * </p>
  *
  * @since 2.0
  */
 public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceable, Serializable, ObjectFactory {
 
+    private static final String KEY_MIN_EVICTABLE_IDLE_DURATION = "minEvictableIdleDuration";
+
+    private static final String KEY_DURATION_BETWEEN_EVICTION_RUNS = "durationBetweenEvictionRuns";
+
+    private static final String KEY_LOGIN_TIMEOUT = "loginTimeout";
+
+    private static final String KEY_URL = "url";
+
+    private static final String KEY_DRIVER = "driver";
+
+    private static final String KEY_DESCRIPTION = "description";
+
+    private static final String KEY_ACCESS_TO_UNDERLYING_CONNECTION_ALLOWED = "accessToUnderlyingConnectionAllowed";
+
+    private static final String KEY_MAX_PREPARED_STATEMENTS = "maxPreparedStatements";
+
+    private static final String KEY_MIN_EVICTABLE_IDLE_TIME_MILLIS = "minEvictableIdleTimeMillis";
+
+    private static final String KEY_NUM_TESTS_PER_EVICTION_RUN = "numTestsPerEvictionRun";
+
+    private static final String KEY_TIME_BETWEEN_EVICTION_RUNS_MILLIS = "timeBetweenEvictionRunsMillis";
+
+    private static final String KEY_MAX_IDLE = "maxIdle";
+
+    private static final String KEY_POOL_PREPARED_STATEMENTS = "poolPreparedStatements";
+
     private static final long serialVersionUID = -4820523787212147844L;
 
-    private static final String GET_CONNECTION_CALLED = "A PooledConnection was already requested from this source, "
-        + "further initialization is not allowed.";
+    private static final String GET_CONNECTION_CALLED = "A PooledConnection was already requested from this source, further initialization is not allowed.";
 
     static {
-        // Attempt to prevent deadlocks - see DBCP - 272
+        // Attempt to prevent deadlocks - see DBCP-272
         DriverManager.getDrivers();
     }
 
     /** Description */
     private String description;
 
-    /** Url name */
-    private String url;
+    /** Connection string */
+    private String connectionString;
 
     /** User name */
     private String userName;
@@ -113,7 +137,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     // PreparedStatement pool properties
     private boolean poolPreparedStatements;
     private int maxIdle = 10;
-    private Duration durationBetweenEvictionRuns = BaseObjectPoolConfig.DEFAULT_TIME_BETWEEN_EVICTION_RUNS;
+    private Duration durationBetweenEvictionRuns = BaseObjectPoolConfig.DEFAULT_DURATION_BETWEEN_EVICTION_RUNS;
     private int numTestsPerEvictionRun = -1;
     private Duration minEvictableIdleDuration = BaseObjectPoolConfig.DEFAULT_MIN_EVICTABLE_IDLE_DURATION;
 
@@ -272,24 +296,23 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      * Implements {@link ObjectFactory} to create an instance of this class
      */
     @Override
-    public Object getObjectInstance(final Object refObj, final Name name, final Context context,
-        final Hashtable<?, ?> env) throws Exception {
+    public Object getObjectInstance(final Object refObj, final Name name, final Context context, final Hashtable<?, ?> env) throws ClassNotFoundException {
         // The spec says to return null if we can't create an instance
         // of the reference
         DriverAdapterCPDS cpds = null;
         if (refObj instanceof Reference) {
             final Reference ref = (Reference) refObj;
             if (ref.getClassName().equals(getClass().getName())) {
-                RefAddr ra = ref.get("description");
+                RefAddr ra = ref.get(KEY_DESCRIPTION);
                 if (isNotEmpty(ra)) {
                     setDescription(getStringContent(ra));
                 }
 
-                ra = ref.get("driver");
+                ra = ref.get(KEY_DRIVER);
                 if (isNotEmpty(ra)) {
                     setDriver(getStringContent(ra));
                 }
-                ra = ref.get("url");
+                ra = ref.get(KEY_URL);
                 if (isNotEmpty(ra)) {
                     setUrl(getStringContent(ra));
                 }
@@ -302,36 +325,36 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
                     setPassword(getStringContent(ra));
                 }
 
-                ra = ref.get("poolPreparedStatements");
+                ra = ref.get(KEY_POOL_PREPARED_STATEMENTS);
                 if (isNotEmpty(ra)) {
                     setPoolPreparedStatements(getBooleanContentString(ra));
                 }
-                ra = ref.get("maxIdle");
+                ra = ref.get(KEY_MAX_IDLE);
                 if (isNotEmpty(ra)) {
                     setMaxIdle(getIntegerStringContent(ra));
                 }
 
-                ra = ref.get("timeBetweenEvictionRunsMillis");
+                ra = ref.get(KEY_TIME_BETWEEN_EVICTION_RUNS_MILLIS);
                 if (isNotEmpty(ra)) {
                     setTimeBetweenEvictionRunsMillis(getIntegerStringContent(ra));
                 }
 
-                ra = ref.get("numTestsPerEvictionRun");
+                ra = ref.get(KEY_NUM_TESTS_PER_EVICTION_RUN);
                 if (isNotEmpty(ra)) {
                     setNumTestsPerEvictionRun(getIntegerStringContent(ra));
                 }
 
-                ra = ref.get("minEvictableIdleTimeMillis");
+                ra = ref.get(KEY_MIN_EVICTABLE_IDLE_TIME_MILLIS);
                 if (isNotEmpty(ra)) {
                     setMinEvictableIdleTimeMillis(getIntegerStringContent(ra));
                 }
 
-                ra = ref.get("maxPreparedStatements");
+                ra = ref.get(KEY_MAX_PREPARED_STATEMENTS);
                 if (isNotEmpty(ra)) {
                     setMaxPreparedStatements(getIntegerStringContent(ra));
                 }
 
-                ra = ref.get("accessToUnderlyingConnectionAllowed");
+                ra = ref.get(KEY_ACCESS_TO_UNDERLYING_CONNECTION_ALLOWED);
                 if (isNotEmpty(ra)) {
                     setAccessToUnderlyingConnectionAllowed(getBooleanContentString(ra));
                 }
@@ -363,7 +386,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      * @since 2.4.0
      */
     public char[] getPasswordCharArray() {
-        return userPassword == null ? null : userPassword.clone();
+        return Utils.clone(userPassword);
     }
 
     /**
@@ -381,33 +404,19 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      * @param pooledUserPassword password to be used fur the connection
      */
     @Override
-    public PooledConnection getPooledConnection(final String pooledUserName, final String pooledUserPassword)
-        throws SQLException {
+    public PooledConnection getPooledConnection(final String pooledUserName, final String pooledUserPassword) throws SQLException {
         getConnectionCalled = true;
-        PooledConnectionImpl pooledConnection = null;
-        // Workaround for buggy WebLogic 5.1 class loader - ignore the exception upon first invocation.
-        try {
-            if (connectionProperties != null) {
-                update(connectionProperties, Constants.KEY_USER, pooledUserName);
-                update(connectionProperties, Constants.KEY_PASSWORD, pooledUserPassword);
-                pooledConnection = new PooledConnectionImpl(
-                    DriverManager.getConnection(getUrl(), connectionProperties));
-            } else {
-                pooledConnection = new PooledConnectionImpl(
-                    DriverManager.getConnection(getUrl(), pooledUserName, pooledUserPassword));
-            }
-            pooledConnection.setAccessToUnderlyingConnectionAllowed(isAccessToUnderlyingConnectionAllowed());
-        } catch (final ClassCircularityError e) {
-            if (connectionProperties != null) {
-                pooledConnection = new PooledConnectionImpl(
-                    DriverManager.getConnection(getUrl(), connectionProperties));
-            } else {
-                pooledConnection = new PooledConnectionImpl(
-                    DriverManager.getConnection(getUrl(), pooledUserName, pooledUserPassword));
-            }
-            pooledConnection.setAccessToUnderlyingConnectionAllowed(isAccessToUnderlyingConnectionAllowed());
+        if (connectionProperties != null) {
+            update(connectionProperties, Constants.KEY_USER, pooledUserName);
+            update(connectionProperties, Constants.KEY_PASSWORD, pooledUserPassword);
         }
-        KeyedObjectPool<PStmtKey, DelegatingPreparedStatement> stmtPool = null;
+        // Workaround for buggy WebLogic 5.1 class loader - ignore ClassCircularityError upon first invocation.
+        PooledConnectionImpl pooledConnection = null;
+        try {
+            pooledConnection = getPooledConnectionImpl(pooledUserName, pooledUserPassword);
+        } catch (final ClassCircularityError e) {
+            pooledConnection = getPooledConnectionImpl(pooledUserName, pooledUserPassword);
+        }
         if (isPoolPreparedStatements()) {
             final GenericKeyedObjectPoolConfig<DelegatingPreparedStatement> config = new GenericKeyedObjectPoolConfig<>();
             config.setMaxTotalPerKey(Integer.MAX_VALUE);
@@ -419,7 +428,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
                 // evictor settings are the same as the connection pool settings.
                 config.setTimeBetweenEvictionRuns(getDurationBetweenEvictionRuns());
                 config.setNumTestsPerEvictionRun(getNumTestsPerEvictionRun());
-                config.setMinEvictableIdleTime(getMinEvictableIdleDuration());
+                config.setMinEvictableIdleDuration(getMinEvictableIdleDuration());
             } else {
                 // Since there is a limit, create a prepared statement pool without an eviction thread;
                 // pool has LRU functionality so when the limit is reached, 15% of the pool is cleared.
@@ -427,11 +436,22 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
                 config.setMaxTotal(getMaxPreparedStatements());
                 config.setTimeBetweenEvictionRuns(Duration.ofMillis(-1));
                 config.setNumTestsPerEvictionRun(0);
-                config.setMinEvictableIdleTime(Duration.ZERO);
+                config.setMinEvictableIdleDuration(Duration.ZERO);
             }
-            stmtPool = new GenericKeyedObjectPool<>(pooledConnection, config);
+            final KeyedObjectPool<PStmtKey, DelegatingPreparedStatement> stmtPool = new GenericKeyedObjectPool<>(pooledConnection, config);
             pooledConnection.setStatementPool(stmtPool);
         }
+        return pooledConnection;
+    }
+
+    private PooledConnectionImpl getPooledConnectionImpl(final String pooledUserName, final String pooledUserPassword) throws SQLException {
+        PooledConnectionImpl pooledConnection;
+        if (connectionProperties != null) {
+            pooledConnection = new PooledConnectionImpl(DriverManager.getConnection(getUrl(), connectionProperties));
+        } else {
+            pooledConnection = new PooledConnectionImpl(DriverManager.getConnection(getUrl(), pooledUserName, pooledUserPassword));
+        }
+        pooledConnection.setAccessToUnderlyingConnectionAllowed(isAccessToUnderlyingConnectionAllowed());
         return pooledConnection;
     }
 
@@ -445,25 +465,25 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
 
         final Reference ref = new Reference(getClass().getName(), factory, null);
 
-        ref.add(new StringRefAddr("description", getDescription()));
-        ref.add(new StringRefAddr("driver", getDriver()));
-        ref.add(new StringRefAddr("loginTimeout", String.valueOf(getLoginTimeout())));
+        ref.add(new StringRefAddr(KEY_DESCRIPTION, getDescription()));
+        ref.add(new StringRefAddr(KEY_DRIVER, getDriver()));
+        ref.add(new StringRefAddr(KEY_LOGIN_TIMEOUT, String.valueOf(getLoginTimeout())));
         ref.add(new StringRefAddr(Constants.KEY_PASSWORD, getPassword()));
         ref.add(new StringRefAddr(Constants.KEY_USER, getUser()));
-        ref.add(new StringRefAddr("url", getUrl()));
+        ref.add(new StringRefAddr(KEY_URL, getUrl()));
 
-        ref.add(new StringRefAddr("poolPreparedStatements", String.valueOf(isPoolPreparedStatements())));
-        ref.add(new StringRefAddr("maxIdle", String.valueOf(getMaxIdle())));
-        ref.add(new StringRefAddr("numTestsPerEvictionRun", String.valueOf(getNumTestsPerEvictionRun())));
-        ref.add(new StringRefAddr("maxPreparedStatements", String.valueOf(getMaxPreparedStatements())));
+        ref.add(new StringRefAddr(KEY_POOL_PREPARED_STATEMENTS, String.valueOf(isPoolPreparedStatements())));
+        ref.add(new StringRefAddr(KEY_MAX_IDLE, String.valueOf(getMaxIdle())));
+        ref.add(new StringRefAddr(KEY_NUM_TESTS_PER_EVICTION_RUN, String.valueOf(getNumTestsPerEvictionRun())));
+        ref.add(new StringRefAddr(KEY_MAX_PREPARED_STATEMENTS, String.valueOf(getMaxPreparedStatements())));
         //
         // Pair of current and deprecated.
-        ref.add(new StringRefAddr("durationBetweenEvictionRuns", String.valueOf(getDurationBetweenEvictionRuns())));
-        ref.add(new StringRefAddr("timeBetweenEvictionRunsMillis", String.valueOf(getTimeBetweenEvictionRunsMillis())));
+        ref.add(new StringRefAddr(KEY_DURATION_BETWEEN_EVICTION_RUNS, String.valueOf(getDurationBetweenEvictionRuns())));
+        ref.add(new StringRefAddr(KEY_TIME_BETWEEN_EVICTION_RUNS_MILLIS, String.valueOf(getTimeBetweenEvictionRunsMillis())));
         //
         // Pair of current and deprecated.
-        ref.add(new StringRefAddr("minEvictableIdleDuration", String.valueOf(getMinEvictableIdleDuration())));
-        ref.add(new StringRefAddr("minEvictableIdleTimeMillis", String.valueOf(getMinEvictableIdleTimeMillis())));
+        ref.add(new StringRefAddr(KEY_MIN_EVICTABLE_IDLE_DURATION, String.valueOf(getMinEvictableIdleDuration())));
+        ref.add(new StringRefAddr(KEY_MIN_EVICTABLE_IDLE_TIME_MILLIS, String.valueOf(getMinEvictableIdleTimeMillis())));
 
         return ref;
     }
@@ -486,12 +506,12 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     }
 
     /**
-     * Gets the value of url used to locate the database for this datasource.
+     * Gets the value of connection string used to locate the database for this data source.
      *
-     * @return value of url.
+     * @return value of connection string.
      */
     public String getUrl() {
-        return url;
+        return connectionString;
     }
 
     /**
@@ -517,7 +537,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     }
 
     /**
-     * Whether to toggle the pooling of <code>PreparedStatement</code>s
+     * Whether to toggle the pooling of {@code PreparedStatement}s
      *
      * @return value of poolPreparedStatements.
      */
@@ -538,11 +558,11 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     /**
      * Sets the connection properties passed to the JDBC driver.
      * <p>
-     * If <code>props</code> contains "user" and/or "password" properties, the corresponding instance properties are
+     * If {@code props} contains "user" and/or "password" properties, the corresponding instance properties are
      * set. If these properties are not present, they are filled in using {@link #getUser()}, {@link #getPassword()}
      * when {@link #getPooledConnection()} is called, or using the actual parameters to the method call when
      * {@link #getPooledConnection(String, String)} is called. Calls to {@link #setUser(String)} or
-     * {@link #setPassword(String)} overwrite the values of these properties if <code>connectionProperties</code> is not
+     * {@link #setPassword(String)} overwrite the values of these properties if {@code connectionProperties} is not
      * null.
      * </p>
      *
@@ -553,11 +573,13 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
         assertInitializationAllowed();
         connectionProperties = props;
         if (connectionProperties != null) {
-            if (connectionProperties.containsKey(Constants.KEY_USER)) {
-                setUser(connectionProperties.getProperty(Constants.KEY_USER));
+            final String user = connectionProperties.getProperty(Constants.KEY_USER);
+            if (user != null) {
+                setUser(user);
             }
-            if (connectionProperties.containsKey(Constants.KEY_PASSWORD)) {
-                setPassword(connectionProperties.getProperty(Constants.KEY_PASSWORD));
+            final String password = connectionProperties.getProperty(Constants.KEY_PASSWORD);
+            if (password != null) {
+                setPassword(password);
             }
         }
     }
@@ -675,7 +697,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      * Sets the number of statements to examine during each run of the idle object evictor thread (if any).
      * <p>
      * When a negative value is supplied,
-     * <code>ceil({@link BasicDataSource#getNumIdle})/abs({@link #getNumTestsPerEvictionRun})</code> tests will be run.
+     * {@code ceil({@link BasicDataSource#getNumIdle})/abs({@link #getNumTestsPerEvictionRun})} tests will be run.
      * I.e., when the value is <i>-n</i>, roughly one <i>n</i>th of the idle objects will be tested per run.
      * </p>
      *
@@ -714,7 +736,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     }
 
     /**
-     * Whether to toggle the pooling of <code>PreparedStatement</code>s
+     * Whether to toggle the pooling of {@code PreparedStatement}s
      *
      * @param poolPreparedStatements true to pool statements.
      * @throws IllegalStateException if {@link #getPooledConnection()} has been called
@@ -741,14 +763,14 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     }
 
     /**
-     * Sets the value of URL string used to locate the database for this datasource.
+     * Sets the value of URL string used to locate the database for this data source.
      *
-     * @param url Value to assign to url.
+     * @param connectionString Value to assign to connection string.
      * @throws IllegalStateException if {@link #getPooledConnection()} has been called
      */
-    public void setUrl(final String url) {
+    public void setUrl(final String connectionString) {
         assertInitializationAllowed();
-        this.url = url;
+        this.connectionString = connectionString;
     }
 
     /**
@@ -773,10 +795,10 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
         final StringBuilder builder = new StringBuilder(super.toString());
         builder.append("[description=");
         builder.append(description);
-        builder.append(", url=");
+        builder.append(", connectionString=");
         // TODO What if the connection string contains a 'user' or 'password' query parameter but that connection string
         // is not in a legal URL format?
-        builder.append(url);
+        builder.append(connectionString);
         builder.append(", driver=");
         builder.append(driver);
         builder.append(", loginTimeout=");

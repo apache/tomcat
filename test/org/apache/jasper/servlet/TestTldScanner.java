@@ -19,6 +19,7 @@ package org.apache.jasper.servlet;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -116,7 +117,7 @@ public class TestTldScanner extends TomcatBaseTest {
     private static void scan(TldScanner.TldScannerCallback callback, File webapp, String path)
             throws Exception {
         String fullPath = new File(webapp, path).toURI().toString();
-        URL jarUrl = new URL("jar:" + fullPath + "!/");
+        URL jarUrl = URI.create("jar:" + fullPath + "!/").toURL();
         try (Jar jar = JarFactory.newInstance(jarUrl)) {
             callback.scan(jar, path, true);
         }

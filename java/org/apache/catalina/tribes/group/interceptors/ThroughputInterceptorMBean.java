@@ -20,35 +20,35 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public interface ThroughputInterceptorMBean {
 
-    public int getOptionFlag();
+    int getOptionFlag();
 
     // Attributes
-    public int getInterval();
+    int getInterval();
 
-    public void setInterval(int interval);
+    void setInterval(int interval);
 
     // stats
-    public double getLastCnt();
+    double getLastCnt();
 
-    public double getMbAppTx();
+    double getMbAppTx();
 
-    public double getMbRx();
+    double getMbRx();
 
-    public double getMbTx();
+    double getMbTx();
 
-    public AtomicLong getMsgRxCnt();
+    AtomicLong getMsgRxCnt();
 
-    public AtomicLong getMsgTxCnt();
+    AtomicLong getMsgTxCnt();
 
-    public AtomicLong getMsgTxErr();
+    AtomicLong getMsgTxErr();
 
-    public long getRxStart();
+    long getRxStart();
 
-    public double getTimeTx();
+    double getTimeTx();
 
-    public long getTxStart();
+    long getTxStart();
 
     // Operations
-    public void report(double timeTx);
+    void report(double timeTx);
 
 }

@@ -185,7 +185,7 @@ public class TestDefaultServletPut extends TomcatBaseTest {
 
     private static class PutClient extends SimpleHttpClient {
 
-        public PutClient(int port) {
+        PutClient(int port) {
             setPort(port);
         }
 

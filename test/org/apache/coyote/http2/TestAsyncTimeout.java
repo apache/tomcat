@@ -45,7 +45,7 @@ public class TestAsyncTimeout extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         // This is the target of the HTTP/2 upgrade request
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
@@ -79,9 +79,9 @@ public class TestAsyncTimeout extends Http2TestBase {
         writeFrame(frameHeader, headersPayload);
 
         // Headers
-        parser.readFrame(true);
+        parser.readFrame();
         // Body
-        parser.readFrame(true);
+        parser.readFrame();
 
         // Check that the expected text was received
         String trace = output.getTrace();
@@ -102,8 +102,7 @@ public class TestAsyncTimeout extends Http2TestBase {
         }
 
         @Override
-        protected void doGet(HttpServletRequest request, HttpServletResponse response)
-                throws IOException {
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
             // The idea of this test is that the timeout kicks in after 2
             // seconds and stops the async thread early rather than letting it
@@ -132,7 +131,7 @@ public class TestAsyncTimeout extends Http2TestBase {
         private final AtomicBoolean completeCalled;
         private volatile boolean running = true;
 
-        public Ticker(AsyncContext asyncContext, AtomicBoolean completeCalled) {
+        Ticker(AsyncContext asyncContext, AtomicBoolean completeCalled) {
             this.asyncContext = asyncContext;
             this.completeCalled = completeCalled;
         }
@@ -150,7 +149,7 @@ public class TestAsyncTimeout extends Http2TestBase {
                 // If the test works running will be set to false before
                 // counter reaches 50.
                 while (running && counter < 50) {
-                    Thread.sleep(100);
+                    sleep(100);
                     counter++;
                     pw.print("Tick " + counter);
                 }
@@ -174,7 +173,7 @@ public class TestAsyncTimeout extends Http2TestBase {
         private final Ticker ticker;
         private final AtomicBoolean completeCalled;
 
-        public TimeoutListener(CountDownLatch latch, Ticker ticker, AtomicBoolean completeCalled) {
+        TimeoutListener(CountDownLatch latch, Ticker ticker, AtomicBoolean completeCalled) {
             this.latch = latch;
             this.ticker = ticker;
             this.completeCalled = completeCalled;

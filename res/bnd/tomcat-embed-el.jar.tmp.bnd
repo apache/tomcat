@@ -22,6 +22,8 @@ Export-Package: \
     org.apache.el,\
     org.apache.el.lang,\
     org.apache.el.parser
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -includepackage: \
     org.apache.el.stream,\
@@ -31,7 +33,7 @@ Export-Package: \
 
 Provide-Capability: \
     osgi.contract;\
-        osgi.contract=JavaEL;\
+        osgi.contract=JakartaExpressionLanguage;\
         version:Version=${el.spec.version};\
         uses:='${packages;NAMED;jakarta.el.*}'
 

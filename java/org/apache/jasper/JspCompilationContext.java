@@ -140,7 +140,7 @@ public class JspCompilationContext {
 
     /* ==================== Methods to override ==================== */
 
-    /** ---------- Class path and loader ---------- */
+    // ---------- Class path and loader ----------
 
     /**
      * @return the classpath that is passed off to the Java compiler.
@@ -178,8 +178,7 @@ public class JspCompilationContext {
 
     public ClassLoader getJspLoader() {
         if( jspLoader == null ) {
-            jspLoader = new JasperLoader(new URL[] {baseUrl}, getClassLoader(),
-                    basePackageName, rctxt.getPermissionCollection());
+            jspLoader = new JasperLoader(new URL[] {baseUrl}, getClassLoader(), basePackageName);
         }
         return jspLoader;
     }
@@ -189,7 +188,7 @@ public class JspCompilationContext {
     }
 
 
-    /** ---------- Input/Output  ---------- */
+    // ---------- Input/Output  ----------
 
     /**
      * The output directory to generate code into.  The output directory
@@ -257,7 +256,7 @@ public class JspCompilationContext {
         return jspCompiler;
     }
 
-    /** ---------- Access resources in the webapp ---------- */
+    // ---------- Access resources in the webapp ----------
 
     /**
      * Get the full value of a URI relative to this compilations context
@@ -689,9 +688,9 @@ public class JspCompilationContext {
         try {
             File base = options.getScratchDir();
             baseUrl = base.toURI().toURL();
-            outputDir = base.getAbsolutePath() + File.separator + path +
-                    File.separator;
+            outputDir = base.getAbsolutePath() + File.separator + path + File.separator;
             if (!makeOutputDir()) {
+                log.error(Localizer.getMessage("jsp.error.outputfolder.detail", outputDir));
                 throw new IllegalStateException(Localizer.getMessage("jsp.error.outputfolder"));
             }
         } catch (MalformedURLException e) {

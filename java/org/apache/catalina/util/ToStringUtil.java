@@ -21,8 +21,7 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Manager;
 
 /**
- * Utility class used to help generate return values for calls to
- * {@link Object#toString()}.
+ * Utility class used to help generate return values for calls to {@link Object#toString()}.
  */
 public class ToStringUtil {
 
@@ -46,8 +45,7 @@ public class ToStringUtil {
     }
 
 
-    private static final String containedToString(Object contained, Object container,
-            String containerTypeName) {
+    private static String containedToString(Object contained, Object container, String containerTypeName) {
         StringBuilder sb = new StringBuilder(contained.getClass().getSimpleName());
         sb.append('[');
         if (container == null) {

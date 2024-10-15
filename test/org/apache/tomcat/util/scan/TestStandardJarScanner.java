@@ -19,6 +19,7 @@ package org.apache.tomcat.util.scan;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class TestStandardJarScanner {
                 URLClassLoader urlClassLoader;
                 try {
                     urlClassLoader = new URLClassLoader(
-                            new URL[] { new URL("http://felix.extensions:9/") });
+                            new URL[] { URI.create("http://felix.extensions:9/").toURL() });
                 } catch (MalformedURLException e) {
                     throw new RuntimeException(e);
                 }

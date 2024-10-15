@@ -16,7 +16,8 @@
  */
 package org.apache.catalina;
 
-public interface Executor extends java.util.concurrent.Executor, Lifecycle {
+import java.util.concurrent.ExecutorService;
 
-    public String getName();
+public interface Executor extends ExecutorService, Lifecycle {
+    String getName();
 }

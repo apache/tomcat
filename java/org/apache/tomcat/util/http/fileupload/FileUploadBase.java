@@ -19,12 +19,12 @@ package org.apache.tomcat.util.http.fileupload;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.tomcat.util.http.fileupload.impl.FileCountLimitExceededException;
 import org.apache.tomcat.util.http.fileupload.impl.FileItemIteratorImpl;
 import org.apache.tomcat.util.http.fileupload.impl.FileUploadIOException;
 import org.apache.tomcat.util.http.fileupload.impl.IOFileUploadException;
@@ -47,30 +47,6 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  * else.</p>
  */
 public abstract class FileUploadBase {
-
-    // ---------------------------------------------------------- Class methods
-
-    /**
-     * <p>Utility method that determines whether the request contains multipart
-     * content.</p>
-     *
-     * <p><strong>NOTE:</strong>This method will be moved to the
-     * {@code ServletFileUpload} class after the FileUpload 1.1 release.
-     * Unfortunately, since this method is static, it is not possible to
-     * provide its replacement until this method is removed.</p>
-     *
-     * @param ctx The request context to be evaluated. Must be non-null.
-     *
-     * @return {@code true} if the request is multipart;
-     *         {@code false} otherwise.
-     */
-    public static final boolean isMultipartContent(final RequestContext ctx) {
-        final String contentType = ctx.getContentType();
-        if (contentType == null) {
-            return false;
-        }
-        return contentType.toLowerCase(Locale.ENGLISH).startsWith(MULTIPART);
-    }
 
     // ----------------------------------------------------- Manifest constants
 
@@ -127,6 +103,12 @@ public abstract class FileUploadBase {
      * to {@link #sizeMax}. A value of -1 indicates no maximum.
      */
     private long fileSizeMax = -1;
+
+    /**
+     * The maximum permitted number of files that may be uploaded in a single
+     * request. A value of -1 indicates no maximum.
+     */
+    private long fileCountMax = -1;
 
     /**
      * The content encoding to use when reading part headers.
@@ -205,6 +187,24 @@ public abstract class FileUploadBase {
     }
 
     /**
+     * Returns the maximum number of files allowed in a single request.
+     *
+     * @return The maximum number of files allowed in a single request.
+     */
+    public long getFileCountMax() {
+        return fileCountMax;
+    }
+
+    /**
+     * Sets the maximum number of files allowed per request.
+     *
+     * @param fileCountMax The new limit. {@code -1} means no limit.
+     */
+    public void setFileCountMax(final long fileCountMax) {
+        this.fileCountMax = fileCountMax;
+    }
+
+    /**
      * Retrieves the character encoding used when reading the headers of an
      * individual part. When not specified, or {@code null}, the request
      * encoding is used. If that is also not specified, or {@code null},
@@ -278,6 +278,10 @@ public abstract class FileUploadBase {
                     "No FileItemFactory has been set.");
             final byte[] buffer = new byte[Streams.DEFAULT_BUFFER_SIZE];
             while (iter.hasNext()) {
+                if (items.size() == fileCountMax) {
+                    // The next item will exceed the limit.
+                    throw new FileCountLimitExceededException(ATTACHMENT, getFileCountMax());
+                }
                 final FileItemStream item = iter.next();
                 // Don't use getName() here to prevent an InvalidFileNameException.
                 final String fileName = item.getName();
@@ -314,34 +318,6 @@ public abstract class FileUploadBase {
         }
     }
 
-    /**
-     * Processes an <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>
-     * compliant {@code multipart/form-data} stream.
-     *
-     * @param ctx The context for the request to be parsed.
-     *
-     * @return A map of {@code FileItem} instances parsed from the request.
-     *
-     * @throws FileUploadException if there are problems reading/parsing
-     *                             the request or storing files.
-     *
-     * @since 1.3
-     */
-    public Map<String, List<FileItem>> parseParameterMap(final RequestContext ctx)
-            throws FileUploadException {
-        final List<FileItem> items = parseRequest(ctx);
-        final Map<String, List<FileItem>> itemsMap = new HashMap<>(items.size());
-
-        for (final FileItem fileItem : items) {
-            final String fieldName = fileItem.getFieldName();
-            List<FileItem> mappedItems = itemsMap.computeIfAbsent(fieldName, k -> new ArrayList<>());
-
-            mappedItems.add(fileItem);
-        }
-
-        return itemsMap;
-    }
-
     // ------------------------------------------------------ Protected methods
 
     /**
@@ -362,7 +338,7 @@ public abstract class FileUploadBase {
         if (boundaryStr == null) {
             return null;
         }
-        byte[] boundary;
+        final byte[] boundary;
         boundary = boundaryStr.getBytes(StandardCharsets.ISO_8859_1);
         return boundary;
     }
@@ -531,8 +507,7 @@ public abstract class FileUploadBase {
             return;
         }
         final String headerName = header.substring(0, colonOffset).trim();
-        final String headerValue =
-            header.substring(colonOffset + 1).trim();
+        final String headerValue = header.substring(colonOffset + 1).trim();
         headers.addHeader(headerName, headerValue);
     }
 

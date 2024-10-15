@@ -86,7 +86,7 @@ public class TestGroupChannelMemberArrival {
                     arrivalLengthErrors.append(listener.members.size());
                     arrivalLengthErrors.append("] but should have been [");
                     arrivalLengthErrors.append(channels.length - 1);
-                    arrivalLengthErrors.append("]");
+                    arrivalLengthErrors.append(']');
                     arrivalLengthErrors.append('\n');
                 }
             }

@@ -133,7 +133,7 @@
       <p>The examples web application should always be removed from any security
       sensitive installation. While the examples web application does not
       contain any known vulnerabilities, it is known to contain features
-      (particularly the cookie examples that display the contents of all
+      (particularly the cookie examples that display the contents of all cookies
       received and allow new cookies to be set) that may be used by an attacker
       in conjunction with a vulnerability in another application deployed on the
       Tomcat instance to obtain additional information that would otherwise be
@@ -179,43 +179,10 @@
   </section>
 
   <section name="Security manager">
-    <p>Enabling the security manager causes web applications to be run in a
-    sandbox, significantly limiting a web application's ability to perform
-    malicious actions such as calling System.exit(), establishing network
-    connections or accessing the file system outside of the web application's
-    root and temporary directories. However, it should be noted that there are
-    some malicious actions, such as triggering high CPU consumption via an
-    infinite loop, that the security manager cannot prevent.</p>
-
-    <p>Enabling the security manager is usually done to limit the potential
-    impact, should an attacker find a way to compromise a trusted web
-    application . A security manager may also be used to reduce the risks of
-    running untrusted web applications (e.g. in hosting environments) but it
-    should be noted that the security manager only reduces the risks of
-    running untrusted web applications, it does not eliminate them. If running
-    multiple untrusted web applications, it is recommended that each web
-    application is deployed to a separate Tomcat instance (and ideally separate
-    hosts) to reduce the ability of a malicious web application impacting the
-    availability of other applications.</p>
-
-    <p>Tomcat is tested with the security manager enabled; but the majority of
-    Tomcat users do not run with a security manager, so Tomcat is not as well
-    user-tested in this configuration. There have been, and continue to be,
-    bugs reported that are triggered by running under a security manager.</p>
-
-    <p>The restrictions imposed by a security manager are likely to break most
-    applications if the security manager is enabled. The security manager should
-    not be used without extensive testing. Ideally, the use of a security
-    manager should be introduced at the start of the development cycle as it can
-    be time-consuming to track down and fix issues caused by enabling a security
-    manager for a mature application.</p>
-
-    <p>Enabling the security manager changes the defaults for the following
-    settings:</p>
-    <ul>
-      <li>The default value for the <strong>deployXML</strong> attribute of the
-      <strong>Host</strong> element is changed to <code>false</code>.</li>
-    </ul>
+    <p>Support for running under a security manager has been removed for Tomcat
+    11 onwards. Similar (arguably better) functionality maybe obtained by
+    running a single web application on a dedicated Tomcat instance in a
+    dedicated environment such as a container or VM.</p>
   </section>
 
   <section name="server.xml">
@@ -249,8 +216,11 @@
       <p>By default, a non-TLS, HTTP/1.1 connector is configured on port 8080.
       Connectors that will not be used should be removed from server.xml.</p>
 
-      <p>AJP Connectors should only be used on trusted networks or be
-      appropriately secured with a suitable <code>secret</code> attribute.</p>
+      <p>AJP is a clear text protocol. AJP Connectors should normally only be
+      used on trusted networks. If used on an untrusted network, use of the
+      <code>secret</code> attribute will limit access to authorised clients but
+      the <code>secret</code> attribute will be visible to anyone who can
+      observe network traffic.</p>
 
       <p>AJP Connectors block forwarded requests with unknown request
       attributes. Known safe and/or expected attributes may be allowed by
@@ -290,20 +260,27 @@
 
       <p>The <strong>maxPostSize</strong> attribute controls the maximum size
       of a POST request that will be parsed for parameters. The parameters are
-      cached for the duration of the request so this is limited to 2MB by
+      cached for the duration of the request so this is limited to 2 MiB by
       default to reduce exposure to a DOS attack.</p>
 
       <p>The <strong>maxSavePostSize</strong> attribute controls the saving of
       the request body during FORM and CLIENT-CERT authentication and HTTP/1.1
-      upgrade. For FORM authentication, the request body is cached for the
-      duration of the authentication (which may be many minutes) so this is
-      limited to 4KB by default to reduce exposure to a DOS attack.</p>
+      upgrade. For FORM authentication, the request body is cached in the HTTP
+      session for the duration of the authentication so the cached request body
+      is limited to 4 KiB by default to reduce exposure to a DOS attack. To
+      further reduce exposure to a DoS attack by limiting the permitted duration
+      of the FORM authentication, a reduced session timeout is used if the
+      session is created by the FORM authentication. This reduced timeout is
+      controlled by the <code>authenticationSessionTimeout</code> attribute of
+      the <a href="config/valve.html#Form_Authenticator_Valve">FORM
+      authenticator</a>.</p>
 
-      <p>The <strong>maxParameterCount</strong> attribute controls the
-      maximum number of parameter and value pairs (GET plus POST) that can
-      be parsed and stored in the request. Excessive parameters are ignored.
-      If you want to reject such requests, configure a
-      <a href="config/filter.html">FailedRequestFilter</a>.</p>
+      <p>The <strong>maxParameterCount</strong> attribute controls the maximum
+      total number of request parameters (including uploaded files) obtained
+      from the query string and, for POST requests, the request body if the
+      content type is <code>application/x-www-form-urlencoded</code> or
+      <code>multipart/form-data</code>. Requests with excessive parameters are
+      rejected.</p>
 
       <p>The <strong>xpoweredBy</strong> attribute controls whether or not the
       X-Powered-By HTTP header is sent with each request. If sent, the value of
@@ -398,6 +375,13 @@
       <code>/*</code>. It should also be noted the RFC6265 section 8.5 makes it
       clear that different paths should not be considered sufficient to isolate
       cookies from other applications.</p>
+
+      <p>When <strong>antiResourceLocking</strong> is enabled, Tomcat will copy
+      the unpacked web application to the directory defined by the
+      <code>java.io.tmpdir</code> system property
+      (<code>$CATALINA_BASE/temp</code> by default). This location should be
+      secured with appropriate file permissions - typically read/write for the
+      Tomcat user and no access for other users.</p>
     </subsection>
 
     <subsection name="Valves">
@@ -470,6 +454,19 @@
       the <strong>JDBCStore</strong> is able to access the persisted session
       data. In particular, the <strong>JDBCStore</strong> should not be
       accessible via any credentials available to a web application.</p>
+
+      <p>Manager implementations that persist sessions to storage or replicate
+      sessions in a cluster typically use Java serialization. While the session
+      data is considered trusted (since the application is trusted), system
+      administrators may wish to consider placing restrictions on the Java
+      serialization. This can be done using the
+      <strong>sessionAttributeValueClassNameFilter</strong> attribute. A
+      safe starting value for this attribute is
+      <code>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\$SerializablePrincipal|\\[Ljava.lang.String;</code> which
+      can then be adjusted to meet the needs of the application. If setting a
+      value for <strong>sessionAttributeValueClassNameFilter</strong> it is
+      recommended that <strong>warnOnSessionAttributeFilterFailure</strong> is
+      set to <code>true</code>.</p>
     </subsection>
 
     <subsection name="Cluster">
@@ -531,11 +528,6 @@
     information on the potential risks and mitigations may be found by
     following the links in the <a href="cgi-howto.html">CGI How To</a>.</p>
 
-    <p><a href="config/filter.html">FailedRequestFilter</a>
-    can be configured and used to reject requests that had errors during
-    request parameter parsing. Without the filter the default behaviour is
-    to ignore invalid or excessive parameters.</p>
-
     <p><a href="config/filter.html">HttpHeaderSecurityFilter</a> can be
     used to add headers to responses to improve security. If clients access
     Tomcat directly, then you probably want to enable this filter and all the
@@ -544,16 +536,39 @@
     to be co-ordinated with any headers that the reverse proxy sets.</p>
   </section>
 
+  <section name="Embedded Tomcat">
+    <p>When using embedded Tomcat, the typical defaults provided by the scripts,
+    server.xml and other configuration are not set. Users of embedded Tomcat may
+    wish to consider the following:</p>
+    <ul>
+      <li>The listeners normally configured in server.xml, including
+      <code>org.apache.catalina.security.SecurityListener</code>, will not be
+      configured by default. They must be explicitly enabled if required.</li>
+      <li>The <code>java.io.tmpdir</code> will not be set (it is normally set to
+      <code>$CATALINA_BASE/temp</code>). This directory is used for various
+      temporary files that may be security sensitive including file uploads and
+      a copy of the web application if anti-resource locking is enabled.
+      Consider setting the <code>java.io.tmpdir</code> system property to an
+      appropriately secured directory.</li>
+    </ul>
+  </section>
+
   <section name="General">
     <p>BASIC and FORM authentication pass user names and passwords in clear
     text. Web applications using these authentication mechanisms with clients
     connecting over untrusted networks should use SSL.</p>
 
-    <p>The session cookie for a session with an authenticated user are nearly
-    as useful as the user's password to an attacker and in nearly all
-    circumstances should be afforded the same level of protection as the
-    password itself. This usually means authenticating over SSL and continuing
-    to use SSL until the session ends.</p>
+    <p>The session cookie for a session with an authenticated user is nearly as
+    useful as the user's password to an attacker and should be afforded the same
+    level of protection as the password itself. This usually means
+    authenticating over SSL and continuing to use SSL until the session
+    ends.</p>
+
+    <p>Tomcat's implementation of the Servlet API's file upload support may use
+    the directory defined by the <code>java.io.tmpdir</code> system property
+    (<code>$CATALINA_BASE/temp</code> by default) to store temporary files. This
+    location should be secured with appropriate file permissions - typically
+    read/write for the Tomcat user and no access for other users.</p>
   </section>
 
 </body>

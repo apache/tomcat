@@ -503,10 +503,10 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
     private boolean matchPattern(String path, String pattern) {
 
         // Normalize the argument strings
-        if ((path == null) || (path.length() == 0)) {
+        if (path == null || path.length() == 0) {
             path = "/";
         }
-        if ((pattern == null) || (pattern.length() == 0)) {
+        if (pattern == null || pattern.length() == 0) {
             pattern = "/";
         }
 
@@ -682,12 +682,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
                             }
                         } else {
                             // Build the union of methods for this pattern
-                            Set<String> m = urlMethodMap.get(pattern);
-                            if (m == null) {
-                                m = new HashSet<>();
-                                urlMethodMap.put(pattern, m);
-                            }
-                            m.addAll(Arrays.asList(methods));
+                            urlMethodMap.computeIfAbsent(pattern, k -> new HashSet<>()).addAll(Arrays.asList(methods));
                         }
                     }
                 }

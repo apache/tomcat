@@ -89,7 +89,11 @@
 
     <attribute name="allowTrace" required="false">
       <p>A boolean value which can be used to enable or disable the TRACE
-      HTTP method. If not specified, this attribute is set to false.</p>
+      HTTP method. If not specified, this attribute is set to false. As per RFC
+      7231 section 4.3.8, cookie and authorization headers will be excluded from
+      the response to the TRACE request. If you wish to include these, you can
+      implement the <code>doTrace()</code> method for the target Servlet and
+      gain full control over the response.</p>
     </attribute>
 
     <attribute name="asyncTimeout" required="false">
@@ -103,8 +107,7 @@
       of the facade objects that isolate the container internal request
       processing objects. If set to <code>true</code> the facades will be
       set for garbage collection after every request, otherwise they will be
-      reused. This setting has no effect when the security manager is enabled.
-      If not specified, this attribute is set to <code>true</code>.</p>
+      reused. If not specified, this attribute is set to <code>true</code>.</p>
     </attribute>
 
     <attribute name="enableLookups" required="false">
@@ -145,21 +148,21 @@
     </attribute>
 
     <attribute name="maxParameterCount" required="false">
-      <p>The maximum number of parameter and value pairs (GET plus POST) which
-      will be automatically parsed by the container. Parameter and value pairs
-      beyond this limit will be ignored. A value of less than 0 means no limit.
-      If not specified, a default of 10000 is used. Note that
-      <code>FailedRequestFilter</code> <a href="filter.html">filter</a> can be
-      used to reject requests that hit the limit.</p>
+      <p>The maximum total number of request parameters (including uploaded
+      files) obtained from the query string and, for POST requests, the request
+      body if the content type is
+      <code>application/x-www-form-urlencoded</code> or
+      <code>multipart/form-data</code>. Requests that exceed this limit will be
+      rejected. A value of less than 0 means no limit. If not specified, a
+      default of 1000 is used.</p>
     </attribute>
 
     <attribute name="maxPostSize" required="false">
       <p>The maximum size in bytes of the POST which will be handled by
       the container FORM URL parameter parsing. The limit can be disabled by
-      setting this attribute to a value less than zero. If not specified, this
-      attribute is set to 2097152 (2 megabytes). Note that the
-      <a href="filter.html#Failed_Request_Filter"><code>FailedRequestFilter</code></a>
-      can be used to reject requests that exceed this limit.</p>
+      setting this attribute to a value less than zero. Requests that exceed
+      this limit will be rejected. If not specified, this attribute is set to
+      2097152 (2 MiB).</p>
     </attribute>
 
     <attribute name="maxSavePostSize" required="false">
@@ -174,7 +177,7 @@
       authentication request expires. The limit can be disabled by setting this
       attribute to -1. Setting the attribute to zero will disable the saving of
       POST data during authentication. If not specified, this attribute is set
-      to 4096 (4 kilobytes).</p>
+      to 4096 (4 KiB).</p>
     </attribute>
 
     <attribute name="parseBodyMethods" required="false">
@@ -316,14 +319,6 @@
       value is 100.</p>
     </attribute>
 
-    <attribute name="acceptorThreadCount" required="false">
-      <p>The number of threads to be used to accept connections. Increase this
-      value on a multi CPU machine, although you would never really need more
-      than <code>2</code>. Also, with a lot of non keep alive connections, you
-      might want to increase this value as well. Default value is
-      <code>1</code>.</p>
-    </attribute>
-
     <attribute name="acceptorThreadPriority" required="false">
       <p>The priority of the acceptor threads. The threads used to accept
       new connections. The default value is <code>5</code> (the value of the
@@ -382,10 +377,11 @@
     </attribute>
 
     <attribute name="bindOnInit" required="false">
-      <p>Controls when the socket used by the connector is bound. By default it
-      is bound when the connector is initiated and unbound when the connector is
-      destroyed. If set to <code>false</code>, the socket will be bound when the
-      connector is started and unbound when it is stopped.</p>
+      <p>Controls when the socket used by the connector is bound. If set to
+      <code>true</code> it is bound when the connector is initiated and unbound
+      when the connector is destroyed. If set to <code>false</code>, the socket
+      will be bound when the connector is started and unbound when it is
+      stopped. If not specified, the default is <code>true</code>.</p>
     </attribute>
 
     <attribute name="clientCertProvider" required="false">
@@ -568,6 +564,13 @@
       <code>false</code>.</p>
     </attribute>
 
+    <attribute name="useVirtualThreads" required="false">
+      <p>(bool) Use this attribute to enable or disable usage of virtual threads
+      with the internal executor. If an executor is associated with this
+      connector, this attribute is ignored. The default value is
+      <code>false</code>.</p>
+    </attribute>
+
   </attributes>
 
   </subsection>
@@ -627,19 +630,19 @@
       </attribute>
       <attribute name="socket.performanceConnectionTime" required="false">
         <p>(int)The first value for the performance settings. See
-        <a href="http://docs.oracle.com/javase/6/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
+        <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)">Socket Performance Options</a>
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
       </attribute>
       <attribute name="socket.performanceLatency" required="false">
         <p>(int)The second value for the performance settings. See
-        <a href="http://docs.oracle.com/javase/6/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
+        <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)">Socket Performance Options</a>
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
       </attribute>
       <attribute name="socket.performanceBandwidth" required="false">
         <p>(int)The third value for the performance settings. See
-        <a href="http://docs.oracle.com/javase/6/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
+        <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)">Socket Performance Options</a>
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
       </attribute>
@@ -703,27 +706,20 @@
         application write buffer size + network read buffer size +
         network write buffer size</code><br/>
         The value is in bytes, the default value is <code>1024*1024*100</code>
-        (100MB).</p>
+        (100 MiB).</p>
       </attribute>
 
       <attribute name="socket.processorCache" required="false">
         <p>(int)Tomcat will cache SocketProcessor objects to reduce garbage
         collection. The integer value specifies how many objects to keep in the
-        cache at most. The default is <code>500</code>. Other values are
-        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
-      </attribute>
-
-      <attribute name="socket.keyCache" required="false">
-        <p>(int)Tomcat will cache KeyAttachment objects to reduce garbage
-        collection. The integer value specifies how many objects to keep in the
-        cache at most. The default is <code>500</code>. Other values are
+        cache at most. The default is <code>0</code>. Other values are
         <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
       </attribute>
 
       <attribute name="socket.eventCache" required="false">
         <p>(int)Tomcat will cache PollerEvent objects to reduce garbage
         collection. The integer value specifies how many objects to keep in the
-        cache at most. The default is <code>500</code>. Other values are
+        cache at most. The default is <code>0</code>. Other values are
         <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
       </attribute>
 
@@ -783,7 +779,7 @@
       <attribute name="socket.processorCache" required="false">
         <p>(int)Tomcat will cache SocketProcessor objects to reduce garbage
         collection. The integer value specifies how many objects to keep in the
-        cache at most. The default is <code>500</code>. Other values are
+        cache at most. The default is <code>0</code>. Other values are
         <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
       </attribute>
 

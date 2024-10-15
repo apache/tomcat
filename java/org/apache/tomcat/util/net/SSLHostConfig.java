@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.KeyStore;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -71,11 +73,11 @@ public class SSLHostConfig implements Serializable {
 
     private String hostName = DEFAULT_SSL_HOST_NAME;
 
-    private transient Long openSslConfContext = Long.valueOf(0);
+    private transient volatile Long openSslConfContext = Long.valueOf(0);
     // OpenSSL can handle multiple certs in a single config so the reference to
     // the context is here at the virtual host level. JSSE can't so the
     // reference is held on the certificate.
-    private transient Long openSslContext = Long.valueOf(0);
+    private transient volatile Long openSslContext = Long.valueOf(0);
 
     private boolean tls13RenegotiationAvailable = false;
 
@@ -657,7 +659,7 @@ public class SSLHostConfig implements Serializable {
             if (truststoreFile != null){
                 try {
                     result = SSLUtilBase.getStore(getTruststoreType(), getTruststoreProvider(),
-                            getTruststoreFile(), getTruststorePassword());
+                            getTruststoreFile(), getTruststorePassword(), null);
                 } catch (IOException ioe) {
                     Throwable cause = ioe.getCause();
                     if (cause instanceof UnrecoverableKeyException) {
@@ -666,7 +668,7 @@ public class SSLHostConfig implements Serializable {
                                 cause);
                         // Re-try
                         result = SSLUtilBase.getStore(getTruststoreType(), getTruststoreProvider(),
-                                getTruststoreFile(), null);
+                                getTruststoreFile(), null, null);
                     } else {
                         // Something else went wrong - re-throw
                         throw ioe;
@@ -758,6 +760,30 @@ public class SSLHostConfig implements Serializable {
 
     // --------------------------------------------------------- Support methods
 
+    public Set<X509Certificate> certificatesExpiringBefore(Date date) {
+        Set<X509Certificate> result = new HashSet<>();
+        Set<SSLHostConfigCertificate> sslHostConfigCertificates = getCertificates();
+        for (SSLHostConfigCertificate sslHostConfigCertificate : sslHostConfigCertificates) {
+            SSLContext sslContext = sslHostConfigCertificate.getSslContext();
+            if (sslContext != null) {
+                String alias = sslHostConfigCertificate.getCertificateKeyAlias();
+                if (alias == null) {
+                    alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
+                }
+                X509Certificate[] certificates = sslContext.getCertificateChain(alias);
+                if (certificates != null && certificates.length > 0) {
+                    X509Certificate certificate = certificates[0];
+                    Date expirationDate = certificate.getNotAfter();
+                    if (date.after(expirationDate)) {
+                        result.add(certificate);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+
     public static String adjustRelativePath(String path) throws FileNotFoundException {
         // Empty or null path can't point to anything useful. The assumption is
         // that the value is deliberately empty / null so leave it that way.
@@ -793,7 +819,7 @@ public class SSLHostConfig implements Serializable {
 
         private final boolean optional;
 
-        private CertificateVerification(boolean optional) {
+        CertificateVerification(boolean optional) {
             this.optional = optional;
         }
 

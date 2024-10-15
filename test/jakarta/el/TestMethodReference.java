@@ -29,7 +29,7 @@ public class TestMethodReference {
     public void testGetAnnotationInfo01() {
         // None
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         TesterBean bean = new TesterBean("myBean");
 
@@ -49,7 +49,7 @@ public class TestMethodReference {
     public void testGetAnnotationInfo02() {
         // @BeanProperty with defaults
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         TesterBean bean = new TesterBean("myBean");
 

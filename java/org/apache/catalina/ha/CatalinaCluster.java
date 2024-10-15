@@ -26,85 +26,121 @@ import org.apache.catalina.tribes.Member;
 
 
 /**
- * A <b>CatalinaCluster</b> interface allows to plug in and out the
- * different cluster implementations
+ * A <b>CatalinaCluster</b> interface allows to plug in and out the different cluster implementations
  */
 public interface CatalinaCluster extends Cluster {
-    // ----------------------------------------------------- Instance Variables
 
     /**
      * Sends a message to all the members in the cluster
+     *
      * @param msg ClusterMessage
      */
-    public void send(ClusterMessage msg);
+    void send(ClusterMessage msg);
 
     /**
      * Sends a message to a specific member in the cluster.
      *
-     * @param msg ClusterMessage
+     * @param msg  ClusterMessage
      * @param dest Member
      */
-    public void send(ClusterMessage msg, Member dest);
+    void send(ClusterMessage msg, Member dest);
 
     /**
      * Sends a message with the specified sendOptions to a specific member in the cluster.
      *
-     * @param msg ClusterMessage
-     * @param dest Member
+     * @param msg         ClusterMessage
+     * @param dest        Member
      * @param sendOptions sendOptions
      */
-    public void send(ClusterMessage msg, Member dest, int sendOptions);
+    void send(ClusterMessage msg, Member dest, int sendOptions);
 
     /**
      * @return <code>true</code> if the cluster has members.
      */
-    public boolean hasMembers();
+    boolean hasMembers();
 
     /**
      * @return an array containing all the members currently participating in the cluster.
      */
-    public Member[] getMembers();
+    Member[] getMembers();
 
     /**
      * @return the member that represents this node.
      */
-    public Member getLocalMember();
+    Member getLocalMember();
 
-    public void addValve(Valve valve);
+    /**
+     * Add cluster valve. Cluster Valves are only add to container when cluster is started.
+     *
+     * @param valve The new cluster Valve.
+     */
+    void addValve(Valve valve);
 
-    public void addClusterListener(ClusterListener listener);
+    /**
+     * Add cluster message listener and register cluster to this listener.
+     *
+     * @param listener The new listener
+     */
+    void addClusterListener(ClusterListener listener);
 
-    public void removeClusterListener(ClusterListener listener);
+    /**
+     * Remove message listener and deregister Cluster from listener.
+     *
+     * @param listener The listener to remove
+     */
+    void removeClusterListener(ClusterListener listener);
 
-    public void setClusterDeployer(ClusterDeployer deployer);
+    /**
+     * Set a new Deployer, must be set before the cluster started.
+     *
+     * @param deployer The associated deployer
+     */
+    void setClusterDeployer(ClusterDeployer deployer);
 
-    public ClusterDeployer getClusterDeployer();
+    /**
+     * @return the current Deployer
+     */
+    ClusterDeployer getClusterDeployer();
 
     /**
      * @return The map of managers
      */
-    public Map<String,ClusterManager> getManagers();
+    Map<String,ClusterManager> getManagers();
 
     /**
      * Get Manager
+     *
      * @param name The manager name
+     *
      * @return The manager
      */
-    public Manager getManager(String name);
+    Manager getManager(String name);
 
     /**
      * Get a new cluster name for a manager.
-     * @param name Override name (optional)
+     *
+     * @param name    Override name (optional)
      * @param manager The manager
+     *
      * @return the manager name in the cluster
      */
-    public String getManagerName(String name, Manager manager);
+    String getManagerName(String name, Manager manager);
 
-    public Valve[] getValves();
+    /**
+     * @return the current cluster valves
+     */
+    Valve[] getValves();
 
-    public void setChannel(Channel channel);
+    /**
+     * Set the channel associated with the cluster.
+     *
+     * @param channel the channel
+     */
+    void setChannel(Channel channel);
 
-    public Channel getChannel();
-
+    /**
+     * @return the channel associated with the cluster
+     */
+    Channel getChannel();
 
 }

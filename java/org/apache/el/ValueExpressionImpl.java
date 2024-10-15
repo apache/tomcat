@@ -39,43 +39,32 @@ import org.apache.el.util.ReflectionUtil;
 
 /**
  * An <code>Expression</code> that can get or set a value.
- *
  * <p>
- * In previous incarnations of this API, expressions could only be read.
- * <code>ValueExpression</code> objects can now be used both to retrieve a
- * value and to set a value. Expressions that can have a value set on them are
- * referred to as l-value expressions. Those that cannot are referred to as
- * r-value expressions. Not all r-value expressions can be used as l-value
- * expressions (e.g. <code>"${1+1}"</code> or
- * <code>"${firstName} ${lastName}"</code>). See the EL Specification for
- * details. Expressions that cannot be used as l-values must always return
- * <code>true</code> from <code>isReadOnly()</code>.
+ * In previous incarnations of this API, expressions could only be read. <code>ValueExpression</code> objects can now be
+ * used both to retrieve a value and to set a value. Expressions that can have a value set on them are referred to as
+ * l-value expressions. Those that cannot are referred to as r-value expressions. Not all r-value expressions can be
+ * used as l-value expressions (e.g. <code>"${1+1}"</code> or <code>"${firstName} ${lastName}"</code>). See the EL
+ * Specification for details. Expressions that cannot be used as l-values must always return <code>true</code> from
+ * <code>isReadOnly()</code>.
  * </p>
- *
  * <p>
- * The {@link jakarta.el.ExpressionFactory#createValueExpression} method
- * can be used to parse an expression string and return a concrete instance
- * of <code>ValueExpression</code> that encapsulates the parsed expression.
- * The {@link FunctionMapper} is used at parse time, not evaluation time,
- * so one is not needed to evaluate an expression using this class.
- * However, the {@link ELContext} is needed at evaluation time.</p>
- *
- * <p>The {@link #getValue}, {@link #setValue}, {@link #isReadOnly} and
- * {@link #getType} methods will evaluate the expression each time they are
- * called. The {@link jakarta.el.ELResolver} in the <code>ELContext</code> is used
- * to resolve the top-level variables and to determine the behavior of the
- * <code>.</code> and <code>[]</code> operators. For any of the four methods,
- * the {@link jakarta.el.ELResolver#getValue} method is used to resolve all
- * properties up to but excluding the last one. This provides the
- * <code>base</code> object. At the last resolution, the
- * <code>ValueExpression</code> will call the corresponding
- * {@link jakarta.el.ELResolver#getValue}, {@link jakarta.el.ELResolver#setValue},
- * {@link jakarta.el.ELResolver#isReadOnly} or {@link jakarta.el.ELResolver#getType}
- * method, depending on which was called on the <code>ValueExpression</code>.
+ * The {@link jakarta.el.ExpressionFactory#createValueExpression} method can be used to parse an expression string and
+ * return a concrete instance of <code>ValueExpression</code> that encapsulates the parsed expression. The
+ * {@link FunctionMapper} is used at parse time, not evaluation time, so one is not needed to evaluate an expression
+ * using this class. However, the {@link ELContext} is needed at evaluation time.
  * </p>
- *
- * <p>See the notes about comparison, serialization and immutability in
- * the {@link jakarta.el.Expression} javadocs.
+ * <p>
+ * The {@link #getValue}, {@link #setValue}, {@link #isReadOnly} and {@link #getType} methods will evaluate the
+ * expression each time they are called. The {@link jakarta.el.ELResolver} in the <code>ELContext</code> is used to
+ * resolve the top-level variables and to determine the behavior of the <code>.</code> and <code>[]</code> operators.
+ * For any of the four methods, the {@link jakarta.el.ELResolver#getValue} method is used to resolve all properties up
+ * to but excluding the last one. This provides the <code>base</code> object. At the last resolution, the
+ * <code>ValueExpression</code> will call the corresponding {@link jakarta.el.ELResolver#getValue},
+ * {@link jakarta.el.ELResolver#setValue}, {@link jakarta.el.ELResolver#isReadOnly} or
+ * {@link jakarta.el.ELResolver#getType} method, depending on which was called on the <code>ValueExpression</code>.
+ * </p>
+ * <p>
+ * See the notes about comparison, serialization and immutability in the {@link jakarta.el.Expression} javadocs.
  *
  * @see jakarta.el.ELResolver
  * @see jakarta.el.Expression
@@ -84,8 +73,7 @@ import org.apache.el.util.ReflectionUtil;
  *
  * @author Jacob Hookom [jacob@hookom.net]
  */
-public final class ValueExpressionImpl extends ValueExpression implements
-        Externalizable {
+public final class ValueExpressionImpl extends ValueExpression implements Externalizable {
 
     private Class<?> expectedType;
 
@@ -101,8 +89,8 @@ public final class ValueExpressionImpl extends ValueExpression implements
         super();
     }
 
-    public ValueExpressionImpl(String expr, Node node, FunctionMapper fnMapper,
-            VariableMapper varMapper, Class<?> expectedType) {
+    public ValueExpressionImpl(String expr, Node node, FunctionMapper fnMapper, VariableMapper varMapper,
+            Class<?> expectedType) {
         this.expr = expr;
         this.node = node;
         this.fnMapper = fnMapper;
@@ -110,11 +98,6 @@ public final class ValueExpressionImpl extends ValueExpression implements
         this.expectedType = expectedType;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof ValueExpressionImpl)) {
@@ -127,23 +110,16 @@ public final class ValueExpressionImpl extends ValueExpression implements
         return this.getNode().equals(((ValueExpressionImpl) obj).getNode());
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see jakarta.el.ValueExpression#getExpectedType()
-     */
     @Override
     public Class<?> getExpectedType() {
         return this.expectedType;
     }
 
     /**
-     * Returns the type the result of the expression will be coerced to after
-     * evaluation.
+     * Returns the type the result of the expression will be coerced to after evaluation.
      *
-     * @return the <code>expectedType</code> passed to the
-     *         <code>ExpressionFactory.createValueExpression</code> method
-     *         that created this <code>ValueExpression</code>.
+     * @return the <code>expectedType</code> passed to the <code>ExpressionFactory.createValueExpression</code> method
+     *             that created this <code>ValueExpression</code>.
      *
      * @see jakarta.el.Expression#getExpressionString()
      */
@@ -159,33 +135,19 @@ public final class ValueExpressionImpl extends ValueExpression implements
         return this.node;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see jakarta.el.ValueExpression#getType(jakarta.el.ELContext)
-     */
     @Override
-    public Class<?> getType(ELContext context) throws PropertyNotFoundException,
-            ELException {
-        EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
-                this.varMapper);
+    public Class<?> getType(ELContext context) throws PropertyNotFoundException, ELException {
+        EvaluationContext ctx = new EvaluationContext(context, this.fnMapper, this.varMapper);
         context.notifyBeforeEvaluation(getExpressionString());
         Class<?> result = this.getNode().getType(ctx);
         context.notifyAfterEvaluation(getExpressionString());
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see jakarta.el.ValueExpression#getValue(jakarta.el.ELContext)
-     */
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getValue(ELContext context) throws PropertyNotFoundException,
-            ELException {
-        EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
-                this.varMapper);
+    public <T> T getValue(ELContext context) throws PropertyNotFoundException, ELException {
+        EvaluationContext ctx = new EvaluationContext(context, this.fnMapper, this.varMapper);
         context.notifyBeforeEvaluation(getExpressionString());
         Object value = this.getNode().getValue(ctx);
         if (this.expectedType != null) {
@@ -195,21 +157,11 @@ public final class ValueExpressionImpl extends ValueExpression implements
         return (T) value;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return this.getNode().hashCode();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see jakarta.el.ValueExpression#isLiteralText()
-     */
     @Override
     public boolean isLiteralText() {
         try {
@@ -219,16 +171,9 @@ public final class ValueExpressionImpl extends ValueExpression implements
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see jakarta.el.ValueExpression#isReadOnly(jakarta.el.ELContext)
-     */
     @Override
-    public boolean isReadOnly(ELContext context)
-            throws PropertyNotFoundException, ELException {
-        EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
-                this.varMapper);
+    public boolean isReadOnly(ELContext context) throws PropertyNotFoundException, ELException {
+        EvaluationContext ctx = new EvaluationContext(context, this.fnMapper, this.varMapper);
         context.notifyBeforeEvaluation(getExpressionString());
         boolean result = this.getNode().isReadOnly(ctx);
         context.notifyAfterEvaluation(getExpressionString());
@@ -236,8 +181,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
     }
 
     @Override
-    public void readExternal(ObjectInput in) throws IOException,
-            ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         this.expr = in.readUTF();
         String type = in.readUTF();
         if (!type.isEmpty()) {
@@ -247,18 +191,10 @@ public final class ValueExpressionImpl extends ValueExpression implements
         this.varMapper = (VariableMapper) in.readObject();
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see jakarta.el.ValueExpression#setValue(jakarta.el.ELContext,
-     *      java.lang.Object)
-     */
     @Override
     public void setValue(ELContext context, Object value)
-            throws PropertyNotFoundException, PropertyNotWritableException,
-            ELException {
-        EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
-                this.varMapper);
+            throws PropertyNotFoundException, PropertyNotWritableException, ELException {
+        EvaluationContext ctx = new EvaluationContext(context, this.fnMapper, this.varMapper);
         context.notifyBeforeEvaluation(getExpressionString());
         this.getNode().setValue(ctx, value);
         context.notifyAfterEvaluation(getExpressionString());
@@ -267,24 +203,19 @@ public final class ValueExpressionImpl extends ValueExpression implements
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeUTF(this.expr);
-        out.writeUTF((this.expectedType != null) ? this.expectedType.getName()
-                : "");
+        out.writeUTF((this.expectedType != null) ? this.expectedType.getName() : "");
         out.writeObject(this.fnMapper);
         out.writeObject(this.varMapper);
     }
 
     @Override
     public String toString() {
-        return "ValueExpression["+this.expr+"]";
+        return "ValueExpression[" + this.expr + "]";
     }
 
-    /**
-     * @since EL 2.2
-     */
     @Override
     public ValueReference getValueReference(ELContext context) {
-        EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
-                this.varMapper);
+        EvaluationContext ctx = new EvaluationContext(context, this.fnMapper, this.varMapper);
         context.notifyBeforeEvaluation(getExpressionString());
         ValueReference result = this.getNode().getValueReference(ctx);
         context.notifyAfterEvaluation(getExpressionString());

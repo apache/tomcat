@@ -32,9 +32,10 @@ public class TestThreadNameCache {
         final CountDownLatch cacheLatch = new CountDownLatch(1);
 
         OneLineFormatter olf = new OneLineFormatter();
-        Method getThreadName = olf.getClass().getDeclaredMethod("getThreadName", int.class);
+        Method getThreadName = olf.getClass().getDeclaredMethod("getThreadName", long.class);
         getThreadName.setAccessible(true);
         Thread thread = new Thread() {
+            @SuppressWarnings("deprecation")
             @Override
             public void run() {
                 setName(THREAD_NAME);

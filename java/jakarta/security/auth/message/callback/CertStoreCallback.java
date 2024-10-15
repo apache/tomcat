@@ -21,8 +21,7 @@ import java.security.cert.CertStore;
 import javax.security.auth.callback.Callback;
 
 /**
- * Callback that enables a runtime to inform authentication modules of the
- * CertStore to use.
+ * Callback that enables a runtime to inform authentication modules of the CertStore to use.
  */
 public class CertStoreCallback implements Callback {
 

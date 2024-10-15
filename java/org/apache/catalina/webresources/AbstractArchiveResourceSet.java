@@ -41,6 +41,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
     protected final Object archiveLock = new Object();
     private long archiveUseCount = 0;
     private JarContents jarContents;
+    private boolean retainBloomFilterForArchives = false;
 
     protected final void setBaseUrl(URL baseUrl) {
         this.baseUrl = baseUrl;
@@ -68,18 +69,15 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
         ArrayList<String> result = new ArrayList<>();
         if (path.startsWith(webAppMount)) {
-            String pathInJar =
-                    getInternalPath() + path.substring(webAppMount.length());
+            String pathInJar = getInternalPath() + path.substring(webAppMount.length());
             // Always strip off the leading '/' to get the JAR path
             if (pathInJar.length() > 0 && pathInJar.charAt(0) == '/') {
                 pathInJar = pathInJar.substring(1);
             }
             for (String name : getArchiveEntries(false).keySet()) {
-                if (name.length() > pathInJar.length() &&
-                        name.startsWith(pathInJar)) {
+                if (name.length() > pathInJar.length() && name.startsWith(pathInJar)) {
                     if (name.charAt(name.length() - 1) == '/') {
-                        name = name.substring(
-                                pathInJar.length(), name.length() - 1);
+                        name = name.substring(pathInJar.length(), name.length() - 1);
                     } else {
                         name = name.substring(pathInJar.length());
                     }
@@ -101,10 +99,9 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
             if (webAppMount.startsWith(path)) {
                 int i = webAppMount.indexOf('/', path.length());
                 if (i == -1) {
-                    return new String[] {webAppMount.substring(path.length())};
+                    return new String[] { webAppMount.substring(path.length()) };
                 } else {
-                    return new String[] {
-                            webAppMount.substring(path.length(), i)};
+                    return new String[] { webAppMount.substring(path.length(), i) };
                 }
             }
         }
@@ -118,8 +115,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
         ResourceSet<String> result = new ResourceSet<>();
         if (path.startsWith(webAppMount)) {
-            String pathInJar =
-                    getInternalPath() + path.substring(webAppMount.length());
+            String pathInJar = getInternalPath() + path.substring(webAppMount.length());
             // Always strip off the leading '/' to get the JAR path and make
             // sure it ends in '/'
             if (pathInJar.length() > 0) {
@@ -159,25 +155,21 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
 
     /**
-     * Obtain the map of entries in the archive. May return null in which case
-     * {@link #getArchiveEntry(String)} should be used.
+     * Obtain the map of entries in the archive. May return null in which case {@link #getArchiveEntry(String)} should
+     * be used.
      *
-     * @param single Is this request being make to support a single lookup? If
-     *               false, a map will always be returned. If true,
-     *               implementations may use this as a hint in determining the
-     *               optimum way to respond.
+     * @param single Is this request being make to support a single lookup? If false, a map will always be returned. If
+     *                   true, implementations may use this as a hint in determining the optimum way to respond.
      *
-     * @return The archives entries mapped to their names or null if
-     *         {@link #getArchiveEntry(String)} should be used.
+     * @return The archives entries mapped to their names or null if {@link #getArchiveEntry(String)} should be used.
      */
     protected abstract Map<String,JarEntry> getArchiveEntries(boolean single);
 
 
     /**
-     * Obtain a single entry from the archive. For performance reasons,
-     * {@link #getArchiveEntries(boolean)} should always be called first and the
-     * archive entry looked up in the map if one is returned. Only if that call
-     * returns null should this method be used.
+     * Obtain a single entry from the archive. For performance reasons, {@link #getArchiveEntries(boolean)} should
+     * always be called first and the archive entry looked up in the map if one is returned. Only if that call returns
+     * null should this method be used.
      *
      * @param pathInArchive The path in the archive of the entry required
      *
@@ -197,8 +189,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         checkPath(path);
 
         if (is == null) {
-            throw new NullPointerException(
-                    sm.getString("dirResourceSet.writeNpe"));
+            throw new NullPointerException(sm.getString("dirResourceSet.writeNpe"));
         }
 
         return false;
@@ -211,10 +202,11 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         WebResourceRoot root = getRoot();
 
         /*
-         * If jarContents reports that this resource definitely does not contain
-         * the path, we can end this method and move on to the next jar.
+         * If jarContents reports that this resource definitely does not contain the path, we can end this method and
+         * move on to the next jar.
          */
-        if (jarContents != null && !jarContents.mightContainResource(path, webAppMount)) {
+        if (jarContents != null && !jarContents
+                .mightContainResource(getInternalPath().isEmpty() ? path : getInternalPath() + path, webAppMount)) {
             return new EmptyResource(root, path);
         }
 
@@ -223,22 +215,18 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
          *
          * The path parameter passed into this method always starts with '/'.
          *
-         * The path parameter passed into this method may or may not end with a
-         * '/'. JarFile.getEntry() will return a matching directory entry
-         * whether or not the name ends in a '/'. However, if the entry is
-         * requested without the '/' subsequent calls to JarEntry.isDirectory()
-         * will return false.
+         * The path parameter passed into this method may or may not end with a '/'. JarFile.getEntry() will return a
+         * matching directory entry whether or not the name ends in a '/'. However, if the entry is requested without
+         * the '/' subsequent calls to JarEntry.isDirectory() will return false.
          *
-         * Paths in JARs never start with '/'. Leading '/' need to be removed
-         * before any JarFile.getEntry() call.
+         * Paths in JARs never start with '/'. Leading '/' need to be removed before any JarFile.getEntry() call.
          */
 
         // If the JAR has been mounted below the web application root, return
         // an empty resource for requests outside of the mount point.
 
         if (path.startsWith(webAppMount)) {
-            String pathInJar = getInternalPath() + path.substring(
-                    webAppMount.length());
+            String pathInJar = getInternalPath() + path.substring(webAppMount.length());
             // Always strip off the leading '/' to get the JAR path
             if (pathInJar.length() > 0 && pathInJar.charAt(0) == '/') {
                 pathInJar = pathInJar.substring(1);
@@ -249,8 +237,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                 if (!path.endsWith("/")) {
                     path = path + "/";
                 }
-                return new JarResourceRoot(root, new File(getBase()),
-                        baseUrlString, path);
+                return new JarResourceRoot(root, new File(getBase()), baseUrlString, path);
             } else {
                 JarEntry jarEntry = null;
                 if (isMultiRelease()) {
@@ -289,8 +276,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
     protected abstract boolean isMultiRelease();
 
-    protected abstract WebResource createArchiveResource(JarEntry jarEntry,
-            String webAppPath, Manifest manifest);
+    protected abstract WebResource createArchiveResource(JarEntry jarEntry, String webAppPath, Manifest manifest);
 
     @Override
     public final boolean isReadOnly() {
@@ -304,8 +290,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
             return;
         }
 
-        throw new IllegalArgumentException(
-                sm.getString("abstractArchiveResourceSet.setReadOnlyFalse"));
+        throw new IllegalArgumentException(sm.getString("abstractArchiveResourceSet.setReadOnlyFalse"));
     }
 
     protected JarFile openJarFile() throws IOException {
@@ -313,8 +298,9 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
             if (archive == null) {
                 archive = new JarFile(new File(getBase()), true, ZipFile.OPEN_READ, Runtime.version());
                 WebResourceRoot root = getRoot();
-                if ((root.getContext() != null) && root.getContext().getUseBloomFilterForArchives()) {
+                if (root.getArchiveIndexStrategyEnum().getUsesBloom()) {
                     jarContents = new JarContents(archive);
+                    retainBloomFilterForArchives = root.getArchiveIndexStrategyEnum().getRetain();
                 }
             }
             archiveUseCount++;
@@ -339,7 +325,9 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                 }
                 archive = null;
                 archiveEntries = null;
-                jarContents = null;
+                if (!retainBloomFilterForArchives) {
+                    jarContents = null;
+                }
             }
         }
     }

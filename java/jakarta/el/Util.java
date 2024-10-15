@@ -22,8 +22,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,14 +42,11 @@ class Util {
     private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 
     /**
-     * Checks whether the supplied Throwable is one that needs to be
-     * rethrown and swallows all others.
+     * Checks whether the supplied Throwable is one that needs to be rethrown and swallows all others.
+     *
      * @param t the Throwable to check
      */
     static void handleThrowable(Throwable t) {
-        if (t instanceof ThreadDeath) {
-            throw (ThreadDeath) t;
-        }
         if (t instanceof VirtualMachineError) {
             throw (VirtualMachineError) t;
         }
@@ -70,8 +65,7 @@ class Util {
                 return "";
             }
         }
-        ResourceBundle bundle = ResourceBundle.getBundle(
-                "jakarta.el.LocalStrings", locale);
+        ResourceBundle bundle = ResourceBundle.getBundle("jakarta.el.LocalStrings", locale);
         try {
             String template = bundle.getString(name);
             if (props != null) {
@@ -85,15 +79,15 @@ class Util {
 
 
     private static final CacheValue nullTcclFactory = new CacheValue();
-    private static final Map<CacheKey, CacheValue> factoryCache = new ConcurrentHashMap<>();
+    private static final Map<CacheKey,CacheValue> factoryCache = new ConcurrentHashMap<>();
 
     /**
-     * Provides a per class loader cache of ExpressionFactory instances without
-     * pinning any in memory as that could trigger a memory leak.
+     * Provides a per class loader cache of ExpressionFactory instances without pinning any in memory as that could
+     * trigger a memory leak.
      */
     static ExpressionFactory getExpressionFactory() {
 
-        ClassLoader tccl = getContextClassLoader();
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 
         CacheValue cacheValue = null;
         ExpressionFactory factory = null;
@@ -139,15 +133,14 @@ class Util {
 
 
     /**
-     * Key used to cache default ExpressionFactory information per class
-     * loader. The class loader reference is never {@code null}, because
-     * {@code null} tccl is handled separately.
+     * Key used to cache default ExpressionFactory information per class loader. The class loader reference is never
+     * {@code null}, because {@code null} tccl is handled separately.
      */
     private static class CacheKey {
         private final int hash;
         private final WeakReference<ClassLoader> ref;
 
-        public CacheKey(ClassLoader key) {
+        CacheKey(ClassLoader key) {
             hash = key.hashCode();
             ref = new WeakReference<>(key);
         }
@@ -177,7 +170,7 @@ class Util {
         private final ReadWriteLock lock = new ReentrantReadWriteLock();
         private WeakReference<ExpressionFactory> ref;
 
-        public CacheValue() {
+        CacheValue() {
         }
 
         public ReadWriteLock getLock() {
@@ -195,16 +188,14 @@ class Util {
 
 
     /*
-     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
-     * making changes keep the code in sync.
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
      */
-    static Method findMethod(ELContext context, Class<?> clazz, Object base, String methodName,
-            Class<?>[] paramTypes, Object[] paramValues) {
+    static Method findMethod(ELContext context, Class<?> clazz, Object base, String methodName, Class<?>[] paramTypes,
+            Object[] paramValues) {
 
         if (clazz == null || methodName == null) {
             throw new MethodNotFoundException(
-                    message(null, "util.method.notfound", clazz, methodName,
-                    paramString(paramTypes)));
+                    message(null, "util.method.notfound", clazz, methodName, paramString(paramTypes)));
         }
 
         if (paramTypes == null) {
@@ -221,12 +212,11 @@ class Util {
     }
 
     /*
-     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
-     * making changes keep the code in sync.
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
      */
     @SuppressWarnings("null")
-    private static <T> Wrapper<T> findWrapper(ELContext context, Class<?> clazz, List<Wrapper<T>> wrappers,
-            String name, Class<?>[] paramTypes, Object[] paramValues) {
+    private static <T> Wrapper<T> findWrapper(ELContext context, Class<?> clazz, List<Wrapper<T>> wrappers, String name,
+            Class<?>[] paramTypes, Object[] paramValues) {
 
         Map<Wrapper<T>,MatchResult> candidates = new HashMap<>();
 
@@ -247,17 +237,16 @@ class Util {
                 // Method has wrong number of parameters
                 continue;
             }
-            if (w.isVarArgs() && paramCount < mParamCount -1) {
+            if (w.isVarArgs() && paramCount < mParamCount - 1) {
                 // Method has wrong number of parameters
                 continue;
             }
-            if (w.isVarArgs() && paramCount == mParamCount && paramValues != null &&
-                    paramValues.length > paramCount && !paramTypes[mParamCount -1].isArray()) {
+            if (w.isVarArgs() && paramCount == mParamCount && paramValues != null && paramValues.length > paramCount &&
+                    !paramTypes[mParamCount - 1].isArray()) {
                 // Method arguments don't match
                 continue;
             }
-            if (w.isVarArgs() && paramCount > mParamCount && paramValues != null &&
-                    paramValues.length != paramCount) {
+            if (w.isVarArgs() && paramCount > mParamCount && paramValues != null && paramValues.length != paramCount) {
                 // Might match a different varargs method
                 continue;
             }
@@ -334,8 +323,8 @@ class Util {
                 return w;
             }
 
-            candidates.put(w, new MatchResult(
-                    w.isVarArgs(), exactMatch, assignableMatch, coercibleMatch, varArgsMatch, w.isBridge()));
+            candidates.put(w, new MatchResult(w.isVarArgs(), exactMatch, assignableMatch, coercibleMatch, varArgsMatch,
+                    w.isBridge()));
         }
 
         // Look for the method that has the highest number of parameters where
@@ -343,7 +332,7 @@ class Util {
         MatchResult bestMatch = new MatchResult(true, 0, 0, 0, 0, true);
         Wrapper<T> match = null;
         boolean multiple = false;
-        for (Map.Entry<Wrapper<T>, MatchResult> entry : candidates.entrySet()) {
+        for (Map.Entry<Wrapper<T>,MatchResult> entry : candidates.entrySet()) {
             int cmp = entry.getValue().compareTo(bestMatch);
             if (cmp > 0 || match == null) {
                 bestMatch = entry.getValue();
@@ -365,24 +354,22 @@ class Util {
             if (match == null) {
                 // If multiple methods have the same matching number of parameters
                 // the match is ambiguous so throw an exception
-                throw new MethodNotFoundException(message(
-                        null, "util.method.ambiguous", clazz, name,
-                        paramString(paramTypes)));
+                throw new MethodNotFoundException(
+                        message(null, "util.method.ambiguous", clazz, name, paramString(paramTypes)));
             }
         }
 
         // Handle case where no match at all was found
         if (match == null) {
-            throw new MethodNotFoundException(message(
-                        null, "util.method.notfound", clazz, name,
-                        paramString(paramTypes)));
+            throw new MethodNotFoundException(
+                    message(null, "util.method.notfound", clazz, name, paramString(paramTypes)));
         }
 
         return match;
     }
 
 
-    private static final String paramString(Class<?>[] types) {
+    private static String paramString(Class<?>[] types) {
         if (types != null) {
             StringBuilder sb = new StringBuilder();
             for (Class<?> type : types) {
@@ -402,11 +389,9 @@ class Util {
 
 
     /*
-     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
-     * making changes keep the code in sync.
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
      */
-    private static <T> Wrapper<T> resolveAmbiguousWrapper(Set<Wrapper<T>> candidates,
-            Class<?>[] paramTypes) {
+    private static <T> Wrapper<T> resolveAmbiguousWrapper(Set<Wrapper<T>> candidates, Class<?>[] paramTypes) {
         // Identify which parameter isn't an exact match
         Wrapper<T> w = candidates.iterator().next();
 
@@ -451,8 +436,7 @@ class Util {
         if (Number.class.isAssignableFrom(nonMatchClass)) {
             for (Wrapper<T> c : candidates) {
                 Class<?> candidateType = c.getParameterTypes()[nonMatchIndex];
-                if (Number.class.isAssignableFrom(candidateType) ||
-                        candidateType.isPrimitive()) {
+                if (Number.class.isAssignableFrom(candidateType) || candidateType.isPrimitive()) {
                     if (match == null) {
                         match = c;
                     } else {
@@ -469,8 +453,7 @@ class Util {
 
 
     /*
-     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
-     * making changes keep the code in sync.
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
      */
     static boolean isAssignableFrom(Class<?> src, Class<?> target) {
         // src will always be an object
@@ -507,12 +490,13 @@ class Util {
 
 
     /*
-     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
-     * making changes keep the code in sync.
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
      */
     private static boolean isCoercibleFrom(ELContext context, Object src, Class<?> target) {
-        // TODO: This isn't pretty but it works. Significant refactoring would
-        //       be required to avoid the exception.
+        /*
+         * TODO: This isn't pretty but it works. Significant refactoring would be required to avoid the exception. See
+         * also OptionalELResolver.convertToType().
+         */
         try {
             context.convertToType(src, target);
         } catch (ELException e) {
@@ -540,15 +524,11 @@ class Util {
 
 
     /*
-     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
-     * making changes keep the code in sync.
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
      */
     static Method getMethod(Class<?> type, Object base, Method m) {
-        // If base is null, method MUST be static
-        // If base is non-null, method may be static or non-static
-        if (m == null ||
-                (Modifier.isPublic(type.getModifiers()) &&
-                        (canAccess(base, m) || base != null && canAccess(null, m)))) {
+        if (m == null || (Modifier.isPublic(type.getModifiers()) &&
+                (Modifier.isStatic(m.getModifiers()) && canAccess(null, m) || canAccess(base, m)))) {
             return m;
         }
         Class<?>[] interfaces = type.getInterfaces();
@@ -587,8 +567,7 @@ class Util {
 
         if (clazz == null) {
             throw new MethodNotFoundException(
-                    message(null, "util.method.notfound", null, methodName,
-                    paramString(paramTypes)));
+                    message(null, "util.method.notfound", null, methodName, paramString(paramTypes)));
         }
 
         if (paramTypes == null) {
@@ -604,9 +583,8 @@ class Util {
         Constructor<?> constructor = wrapper.unWrap();
 
         if (!Modifier.isPublic(clazz.getModifiers()) || !canAccess(null, constructor)) {
-            throw new MethodNotFoundException(message(
-                    null, "util.method.notfound", clazz, methodName,
-                    paramString(paramTypes)));
+            throw new MethodNotFoundException(
+                    message(null, "util.method.notfound", clazz, methodName, paramString(paramTypes)));
         }
 
         return constructor;
@@ -622,7 +600,7 @@ class Util {
     }
 
 
-    static Object[] buildParameters(ELContext context, Class<?>[] parameterTypes, boolean isVarArgs,Object[] params) {
+    static Object[] buildParameters(ELContext context, Class<?>[] parameterTypes, boolean isVarArgs, Object[] params) {
         Object[] parameters = null;
         if (parameterTypes.length > 0) {
             parameters = new Object[parameterTypes.length];
@@ -655,19 +633,6 @@ class Util {
     }
 
 
-    static ClassLoader getContextClassLoader() {
-        ClassLoader tccl;
-        if (System.getSecurityManager() != null) {
-            PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
-            tccl = AccessController.doPrivileged(pa);
-        } else {
-            tccl = Thread.currentThread().getContextClassLoader();
-        }
-
-        return tccl;
-    }
-
-
     private abstract static class Wrapper<T> {
 
         public static List<Wrapper<Method>> wrap(Method[] methods, String name) {
@@ -689,8 +654,11 @@ class Util {
         }
 
         public abstract T unWrap();
+
         public abstract Class<?>[] getParameterTypes();
+
         public abstract boolean isVarArgs();
+
         public abstract boolean isBridge();
     }
 
@@ -698,7 +666,7 @@ class Util {
     private static class MethodWrapper extends Wrapper<Method> {
         private final Method m;
 
-        public MethodWrapper(Method m) {
+        MethodWrapper(Method m) {
             this.m = m;
         }
 
@@ -726,7 +694,7 @@ class Util {
     private static class ConstructorWrapper extends Wrapper<Constructor<?>> {
         private final Constructor<?> c;
 
-        public ConstructorWrapper(Constructor<?> c) {
+        ConstructorWrapper(Constructor<?> c) {
             this.c = c;
         }
 
@@ -752,8 +720,7 @@ class Util {
     }
 
     /*
-     * This class duplicates code in org.apache.el.util.ReflectionUtil. When
-     * making changes keep the code in sync.
+     * This class duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
      */
     private static class MatchResult implements Comparable<MatchResult> {
 
@@ -764,7 +731,7 @@ class Util {
         private final int varArgsCount;
         private final boolean bridge;
 
-        public MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount, int varArgsCount,
+        MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount, int varArgsCount,
                 boolean bridge) {
             this.varArgs = varArgs;
             this.exactCount = exactCount;
@@ -827,14 +794,13 @@ class Util {
 
         @Override
         public boolean equals(Object o) {
-            return o == this || (null != o &&
-                    this.getClass().equals(o.getClass()) &&
-                    ((MatchResult)o).getExactCount() == this.getExactCount() &&
-                    ((MatchResult)o).getAssignableCount() == this.getAssignableCount() &&
-                    ((MatchResult)o).getCoercibleCount() == this.getCoercibleCount() &&
-                    ((MatchResult)o).getVarArgsCount() == this.getVarArgsCount() &&
-                    ((MatchResult)o).isVarArgs() == this.isVarArgs() &&
-                    ((MatchResult)o).isBridge() == this.isBridge());
+            return o == this || (null != o && this.getClass().equals(o.getClass()) &&
+                    ((MatchResult) o).getExactCount() == this.getExactCount() &&
+                    ((MatchResult) o).getAssignableCount() == this.getAssignableCount() &&
+                    ((MatchResult) o).getCoercibleCount() == this.getCoercibleCount() &&
+                    ((MatchResult) o).getVarArgsCount() == this.getVarArgsCount() &&
+                    ((MatchResult) o).isVarArgs() == this.isVarArgs() &&
+                    ((MatchResult) o).isBridge() == this.isBridge());
         }
 
         @Override
@@ -848,14 +814,6 @@ class Util {
             result = prime * result + (varArgs ? 1231 : 1237);
             result = prime * result + varArgsCount;
             return result;
-        }
-    }
-
-
-    private static class PrivilegedGetTccl implements PrivilegedAction<ClassLoader> {
-        @Override
-        public ClassLoader run() {
-            return Thread.currentThread().getContextClassLoader();
         }
     }
 }

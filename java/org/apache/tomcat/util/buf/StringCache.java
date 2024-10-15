@@ -16,14 +16,18 @@
  */
 package org.apache.tomcat.util.buf;
 
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.CodingErrorAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.TreeMap;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This class implements a String cache for ByteChunk and CharChunk.
@@ -34,6 +38,7 @@ public class StringCache {
 
 
     private static final Log log = LogFactory.getLog(StringCache.class);
+    private static final StringManager sm = StringManager.getManager(StringCache.class);
 
 
     // ------------------------------------------------------- Static Variables
@@ -42,32 +47,27 @@ public class StringCache {
     /**
      * Enabled ?
      */
-    protected static boolean byteEnabled = ("true".equals(System.getProperty(
-            "tomcat.util.buf.StringCache.byte.enabled", "false")));
+    protected static boolean byteEnabled = Boolean.getBoolean("tomcat.util.buf.StringCache.byte.enabled");
 
 
-    protected static boolean charEnabled = ("true".equals(System.getProperty(
-            "tomcat.util.buf.StringCache.char.enabled", "false")));
+    protected static boolean charEnabled = Boolean.getBoolean("tomcat.util.buf.StringCache.char.enabled");
 
 
-    protected static int trainThreshold = Integer.parseInt(System.getProperty(
-            "tomcat.util.buf.StringCache.trainThreshold", "20000"));
+    protected static int trainThreshold =
+            Integer.getInteger("tomcat.util.buf.StringCache.trainThreshold", 20000).intValue();
 
 
-    protected static int cacheSize = Integer.parseInt(System.getProperty(
-            "tomcat.util.buf.StringCache.cacheSize", "200"));
+    protected static int cacheSize = Integer.getInteger("tomcat.util.buf.StringCache.cacheSize", 200).intValue();
 
 
     protected static final int maxStringSize =
-            Integer.parseInt(System.getProperty(
-                    "tomcat.util.buf.StringCache.maxStringSize", "128"));
+            Integer.getInteger("tomcat.util.buf.StringCache.maxStringSize", 128).intValue();
 
 
-   /**
+    /**
      * Statistics hash map for byte chunk.
      */
-    protected static final HashMap<ByteEntry,int[]> bcStats =
-            new HashMap<>(cacheSize);
+    protected static final HashMap<ByteEntry,int[]> bcStats = new HashMap<>(cacheSize);
 
 
     /**
@@ -85,8 +85,7 @@ public class StringCache {
     /**
      * Statistics hash map for char chunk.
      */
-    protected static final HashMap<CharEntry,int[]> ccStats =
-            new HashMap<>(cacheSize);
+    protected static final HashMap<CharEntry,int[]> ccStats = new HashMap<>(cacheSize);
 
 
     /**
@@ -214,11 +213,22 @@ public class StringCache {
 
 
     public static String toString(ByteChunk bc) {
+        try {
+            return toString(bc, CodingErrorAction.REPLACE, CodingErrorAction.REPLACE);
+        } catch (CharacterCodingException e) {
+            // Unreachable code. Use of REPLACE above means the exception will never be thrown.
+            throw new IllegalStateException(e);
+        }
+    }
+
+
+    public static String toString(ByteChunk bc, CodingErrorAction malformedInputAction,
+            CodingErrorAction unmappableCharacterAction) throws CharacterCodingException {
 
         // If the cache is null, then either caching is disabled, or we're
         // still training
         if (bcCache == null) {
-            String value = bc.toStringInternal();
+            String value = bc.toStringInternal(malformedInputAction, unmappableCharacterAction);
             if (byteEnabled && (value.length() < maxStringSize)) {
                 // If training, everything is synced
                 synchronized (bcStats) {
@@ -234,20 +244,13 @@ public class StringCache {
                     if (bcCount > trainThreshold) {
                         long t1 = System.currentTimeMillis();
                         // Sort the entries according to occurrence
-                        TreeMap<Integer,ArrayList<ByteEntry>> tempMap =
-                                new TreeMap<>();
+                        TreeMap<Integer,ArrayList<ByteEntry>> tempMap = new TreeMap<>();
                         for (Entry<ByteEntry,int[]> item : bcStats.entrySet()) {
                             ByteEntry entry = item.getKey();
                             int[] countA = item.getValue();
                             Integer count = Integer.valueOf(countA[0]);
                             // Add to the list for that count
-                            ArrayList<ByteEntry> list = tempMap.get(count);
-                            if (list == null) {
-                                // Create list
-                                list = new ArrayList<>();
-                                tempMap.put(count, list);
-                            }
-                            list.add(entry);
+                            tempMap.computeIfAbsent(count, k -> new ArrayList<>()).add(entry);
                         }
                         // Allocate array of the right size
                         int size = bcStats.size();
@@ -264,15 +267,12 @@ public class StringCache {
                             ArrayList<ByteEntry> list = tempMap.get(key);
                             for (int i = 0; i < list.size() && n < size; i++) {
                                 ByteEntry entry = list.get(i);
-                                tempChunk.setBytes(entry.name, 0,
-                                        entry.name.length);
-                                int insertPos = findClosest(tempChunk,
-                                        tempbcCache, n);
+                                tempChunk.setBytes(entry.name, 0, entry.name.length);
+                                int insertPos = findClosest(tempChunk, tempbcCache, n);
                                 if (insertPos == n) {
                                     tempbcCache[n + 1] = entry;
                                 } else {
-                                    System.arraycopy(tempbcCache, insertPos + 1,
-                                            tempbcCache, insertPos + 2,
+                                    System.arraycopy(tempbcCache, insertPos + 1, tempbcCache, insertPos + 2,
                                             n - insertPos - 1);
                                     tempbcCache[insertPos + 1] = entry;
                                 }
@@ -285,8 +285,7 @@ public class StringCache {
                         bcCache = tempbcCache;
                         if (log.isDebugEnabled()) {
                             long t2 = System.currentTimeMillis();
-                            log.debug("ByteCache generation time: " +
-                                    (t2 - t1) + "ms");
+                            log.debug(sm.getString("stringCache.byteTime", Long.valueOf(t2 - t1)));
                         }
                     } else {
                         bcCount++;
@@ -299,10 +298,11 @@ public class StringCache {
                             int start = bc.getStart();
                             // Create byte array and copy bytes
                             entry.name = new byte[bc.getLength()];
-                            System.arraycopy(bc.getBuffer(), start, entry.name,
-                                    0, end - start);
+                            System.arraycopy(bc.getBuffer(), start, entry.name, 0, end - start);
                             // Set encoding
                             entry.charset = bc.getCharset();
+                            entry.malformedInputAction = malformedInputAction;
+                            entry.unmappableCharacterAction = unmappableCharacterAction;
                             // Initialize occurrence count to one
                             count = new int[1];
                             count[0] = 1;
@@ -318,9 +318,9 @@ public class StringCache {
         } else {
             accessCount++;
             // Find the corresponding String
-            String result = find(bc);
+            String result = find(bc, malformedInputAction, unmappableCharacterAction);
             if (result == null) {
-                return bc.toStringInternal();
+                return bc.toStringInternal(malformedInputAction, unmappableCharacterAction);
             }
             // Note: We don't care about safety for the stats
             hitCount++;
@@ -351,19 +351,13 @@ public class StringCache {
                     if (ccCount > trainThreshold) {
                         long t1 = System.currentTimeMillis();
                         // Sort the entries according to occurrence
-                        TreeMap<Integer,ArrayList<CharEntry>> tempMap =
-                                new TreeMap<>();
+                        TreeMap<Integer,ArrayList<CharEntry>> tempMap = new TreeMap<>();
                         for (Entry<CharEntry,int[]> item : ccStats.entrySet()) {
                             CharEntry entry = item.getKey();
                             int[] countA = item.getValue();
                             Integer count = Integer.valueOf(countA[0]);
                             // Add to the list for that count
-                            ArrayList<CharEntry> list = tempMap.get(count);
-                            if (list == null) {
-                                // Create list
-                                list = new ArrayList<>();
-                                tempMap.put(count, list);
-                            }
+                            ArrayList<CharEntry> list = tempMap.computeIfAbsent(count, k -> new ArrayList<>());
                             list.add(entry);
                         }
                         // Allocate array of the right size
@@ -381,15 +375,12 @@ public class StringCache {
                             ArrayList<CharEntry> list = tempMap.get(key);
                             for (int i = 0; i < list.size() && n < size; i++) {
                                 CharEntry entry = list.get(i);
-                                tempChunk.setChars(entry.name, 0,
-                                        entry.name.length);
-                                int insertPos = findClosest(tempChunk,
-                                        tempccCache, n);
+                                tempChunk.setChars(entry.name, 0, entry.name.length);
+                                int insertPos = findClosest(tempChunk, tempccCache, n);
                                 if (insertPos == n) {
                                     tempccCache[n + 1] = entry;
                                 } else {
-                                    System.arraycopy(tempccCache, insertPos + 1,
-                                            tempccCache, insertPos + 2,
+                                    System.arraycopy(tempccCache, insertPos + 1, tempccCache, insertPos + 2,
                                             n - insertPos - 1);
                                     tempccCache[insertPos + 1] = entry;
                                 }
@@ -402,8 +393,7 @@ public class StringCache {
                         ccCache = tempccCache;
                         if (log.isDebugEnabled()) {
                             long t2 = System.currentTimeMillis();
-                            log.debug("CharCache generation time: " +
-                                    (t2 - t1) + "ms");
+                            log.debug(sm.getString("stringCache.charTime", Long.valueOf(t2 - t1)));
                         }
                     } else {
                         ccCount++;
@@ -416,8 +406,7 @@ public class StringCache {
                             int start = cc.getStart();
                             // Create char array and copy chars
                             entry.name = new char[cc.getLength()];
-                            System.arraycopy(cc.getBuffer(), start, entry.name,
-                                    0, end - start);
+                            System.arraycopy(cc.getBuffer(), start, entry.name, 0, end - start);
                             // Initialize occurrence count to one
                             count = new int[1];
                             count[0] = 1;
@@ -450,8 +439,10 @@ public class StringCache {
 
     /**
      * Compare given byte chunk with byte array.
-     * @param name The name to compare
+     *
+     * @param name      The name to compare
      * @param compareTo The compared to data
+     *
      * @return -1, 0 or +1 if inferior, equal, or superior to the String.
      */
     protected static final int compare(ByteChunk name, byte[] compareTo) {
@@ -484,15 +475,20 @@ public class StringCache {
 
 
     /**
-     * Find an entry given its name in the cache and return the associated
-     * String.
-     * @param name The name to find
+     * Find an entry given its name in the cache and return the associated String.
+     *
+     * @param name                      The name to find
+     * @param malformedInputAction      Action to take if an malformed input is encountered
+     * @param unmappableCharacterAction Action to take if an unmappable character is encountered
+     *
      * @return the corresponding value
      */
-    protected static final String find(ByteChunk name) {
+    protected static final String find(ByteChunk name, CodingErrorAction malformedInputAction,
+        CodingErrorAction unmappableCharacterAction) {
         int pos = findClosest(name, bcCache, bcCache.length);
-        if ((pos < 0) || (compare(name, bcCache[pos].name) != 0)
-                || !(name.getCharset().equals(bcCache[pos].charset))) {
+        if ((pos < 0) || (compare(name, bcCache[pos].name) != 0) || !(name.getCharset().equals(bcCache[pos].charset)) ||
+                !malformedInputAction.equals(bcCache[pos].malformedInputAction) ||
+                !unmappableCharacterAction.equals(bcCache[pos].unmappableCharacterAction)) {
             return null;
         } else {
             return bcCache[pos].value;
@@ -501,16 +497,16 @@ public class StringCache {
 
 
     /**
-     * Find an entry given its name in a sorted array of map elements.
-     * This will return the index for the closest inferior or equal item in the
-     * given array.
-     * @param name The name to find
+     * Find an entry given its name in a sorted array of map elements. This will return the index for the closest
+     * inferior or equal item in the given array.
+     *
+     * @param name  The name to find
      * @param array The array in which to look
-     * @param len The effective length of the array
+     * @param len   The effective length of the array
+     *
      * @return the position of the best match
      */
-    protected static final int findClosest(ByteChunk name, ByteEntry[] array,
-            int len) {
+    protected static final int findClosest(ByteChunk name, ByteEntry[] array, int len) {
 
         int a = 0;
         int b = len - 1;
@@ -553,8 +549,10 @@ public class StringCache {
 
     /**
      * Compare given char chunk with char array.
-     * @param name The name to compare
+     *
+     * @param name      The name to compare
      * @param compareTo The compared to data
+     *
      * @return -1, 0 or +1 if inferior, equal, or superior to the String.
      */
     protected static final int compare(CharChunk name, char[] compareTo) {
@@ -587,9 +585,10 @@ public class StringCache {
 
 
     /**
-     * Find an entry given its name in the cache and return the associated
-     * String.
+     * Find an entry given its name in the cache and return the associated String.
+     *
      * @param name The name to find
+     *
      * @return the corresponding value
      */
     protected static final String find(CharChunk name) {
@@ -603,16 +602,16 @@ public class StringCache {
 
 
     /**
-     * Find an entry given its name in a sorted array of map elements.
-     * This will return the index for the closest inferior or equal item in the
-     * given array.
-     * @param name The name to find
+     * Find an entry given its name in a sorted array of map elements. This will return the index for the closest
+     * inferior or equal item in the given array.
+     *
+     * @param name  The name to find
      * @param array The array in which to look
-     * @param len The effective length of the array
+     * @param len   The effective length of the array
+     *
      * @return the position of the best match
      */
-    protected static final int findClosest(CharChunk name, CharEntry[] array,
-            int len) {
+    protected static final int findClosest(CharChunk name, CharEntry[] array, int len) {
 
         int a = 0;
         int b = len - 1;
@@ -622,7 +621,7 @@ public class StringCache {
             return -1;
         }
 
-        if (compare(name, array[0].name) < 0 ) {
+        if (compare(name, array[0].name) < 0) {
             return -1;
         }
         if (b == 0) {
@@ -655,29 +654,40 @@ public class StringCache {
 
     // -------------------------------------------------- ByteEntry Inner Class
 
-
     private static class ByteEntry {
 
         private byte[] name = null;
         private Charset charset = null;
+        private CodingErrorAction malformedInputAction = null;
+        private CodingErrorAction unmappableCharacterAction = null;
         private String value = null;
 
         @Override
         public String toString() {
             return value;
         }
+
         @Override
         public int hashCode() {
-            return value.hashCode();
-        }
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof ByteEntry) {
-                return value.equals(((ByteEntry) obj).value);
-            }
-            return false;
+            return Objects.hash(malformedInputAction, unmappableCharacterAction, value);
         }
 
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            ByteEntry other = (ByteEntry) obj;
+            return Objects.equals(malformedInputAction, other.malformedInputAction) &&
+                    Objects.equals(unmappableCharacterAction, other.unmappableCharacterAction) &&
+                    Objects.equals(value, other.value);
+        }
     }
 
 
@@ -693,10 +703,12 @@ public class StringCache {
         public String toString() {
             return value;
         }
+
         @Override
         public int hashCode() {
             return value.hashCode();
         }
+
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof CharEntry) {

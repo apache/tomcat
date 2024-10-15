@@ -32,17 +32,14 @@ import jakarta.websocket.server.ServerEndpoint;
 import jakarta.websocket.server.ServerEndpointConfig;
 
 /**
- * Registers an interest in any class that is annotated with
- * {@link ServerEndpoint} so that Endpoint can be published via the WebSocket
- * server.
+ * Registers an interest in any class that is annotated with {@link ServerEndpoint} so that Endpoint can be published
+ * via the WebSocket server.
  */
-@HandlesTypes({ServerEndpoint.class, ServerApplicationConfig.class,
-        Endpoint.class})
+@HandlesTypes({ ServerEndpoint.class, ServerApplicationConfig.class, Endpoint.class })
 public class WsSci implements ServletContainerInitializer {
 
     @Override
-    public void onStartup(Set<Class<?>> clazzes, ServletContext ctx)
-            throws ServletException {
+    public void onStartup(Set<Class<?>> clazzes, ServletContext ctx) throws ServletException {
 
         WsServerContainer sc = init(ctx, true);
 
@@ -61,10 +58,8 @@ public class WsSci implements ServletContainerInitializer {
             wsPackage = wsPackage.substring(0, wsPackage.lastIndexOf('.') + 1);
             for (Class<?> clazz : clazzes) {
                 int modifiers = clazz.getModifiers();
-                if (!Modifier.isPublic(modifiers) ||
-                        Modifier.isAbstract(modifiers) ||
-                        Modifier.isInterface(modifiers) ||
-                        !isExported(clazz)) {
+                if (!Modifier.isPublic(modifiers) || Modifier.isAbstract(modifiers) ||
+                        Modifier.isInterface(modifiers) || !isExported(clazz)) {
                     // Non-public, abstract, interface or not in an exported
                     // package - skip it.
                     continue;
@@ -74,13 +69,11 @@ public class WsSci implements ServletContainerInitializer {
                     continue;
                 }
                 if (ServerApplicationConfig.class.isAssignableFrom(clazz)) {
-                    serverApplicationConfigs.add(
-                            (ServerApplicationConfig) clazz.getConstructor().newInstance());
+                    serverApplicationConfigs.add((ServerApplicationConfig) clazz.getConstructor().newInstance());
                 }
                 if (Endpoint.class.isAssignableFrom(clazz)) {
                     @SuppressWarnings("unchecked")
-                    Class<? extends Endpoint> endpoint =
-                            (Class<? extends Endpoint>) clazz;
+                    Class<? extends Endpoint> endpoint = (Class<? extends Endpoint>) clazz;
                     scannedEndpointClazzes.add(endpoint);
                 }
                 if (clazz.isAnnotationPresent(ServerEndpoint.class)) {
@@ -99,14 +92,11 @@ public class WsSci implements ServletContainerInitializer {
             filteredPojoEndpoints.addAll(scannedPojoEndpoints);
         } else {
             for (ServerApplicationConfig config : serverApplicationConfigs) {
-                Set<ServerEndpointConfig> configFilteredEndpoints =
-                        config.getEndpointConfigs(scannedEndpointClazzes);
+                Set<ServerEndpointConfig> configFilteredEndpoints = config.getEndpointConfigs(scannedEndpointClazzes);
                 if (configFilteredEndpoints != null) {
                     filteredEndpointConfigs.addAll(configFilteredEndpoints);
                 }
-                Set<Class<?>> configFilteredPojos =
-                        config.getAnnotatedEndpointClasses(
-                                scannedPojoEndpoints);
+                Set<Class<?>> configFilteredPojos = config.getAnnotatedEndpointClasses(scannedPojoEndpoints);
                 if (configFilteredPojos != null) {
                     filteredPojoEndpoints.addAll(configFilteredPojos);
                 }
@@ -135,13 +125,11 @@ public class WsSci implements ServletContainerInitializer {
     }
 
 
-    static WsServerContainer init(ServletContext servletContext,
-            boolean initBySciMechanism) {
+    static WsServerContainer init(ServletContext servletContext, boolean initBySciMechanism) {
 
         WsServerContainer sc = new WsServerContainer(servletContext);
 
-        servletContext.setAttribute(
-                Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE, sc);
+        servletContext.setAttribute(Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE, sc);
 
         servletContext.addListener(new WsSessionListener(sc));
         // Can't register the ContextListener again if the ContextListener is

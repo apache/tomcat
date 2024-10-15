@@ -106,6 +106,6 @@ public class DataSourceConnectionFactory implements ConnectionFactory {
      * @since 2.6.0
      */
     public char[] getUserPassword() {
-        return userPassword == null ? null : userPassword.clone();
+        return Utils.clone(userPassword);
     }
 }

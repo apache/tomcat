@@ -426,6 +426,13 @@
         used.</p>
       </attribute>
 
+      <attribute name="ignoreAnnotations" required="false">
+        <p>Set to <code>true</code> to have Tomcat ignore all annotations
+        present on classes.</p>
+        <p>If not specified, the default value of <code>false</code> is
+        used.</p>
+      </attribute>
+
       <attribute name="logEffectiveWebXml" required="false">
         <p>Set to <code>true</code> if you want the effective web.xml used for a
         web application to be logged (at INFO level) when the application
@@ -596,6 +603,13 @@
         attribute is <code>false</code>.</p>
       </attribute>
 
+      <attribute name="suspendWrappedResponseAfterForward" required="false">
+        <p>If the value of this flag is <code>true</code>, Catalina will
+        suspend wrapped responses after a forward, instead of closing them.
+        If not specified, the default value of the flag is
+        <code>true</code>.</p>
+      </attribute>
+
       <attribute name="swallowAbortedUploads" required="false">
         <p>Set to <code>false</code> if Tomcat should <b>not</b> read any
         additional request body data for aborted uploads and instead abort the
@@ -638,18 +652,17 @@
         penalty.</p>
       </attribute>
 
-      <attribute name="useBloomFilterForArchives" required="false">
-        <p>If this is <code>true</code> then a bloom filter will be used to
-        speed up archive lookups. This can be beneficial to the deployment
-        speed to web applications that contain very large amount of JARs.</p>
-        <p>If not specified, the default value of <code>false</code> will be
-        used.</p>
-      </attribute>
-
       <attribute name="useHttpOnly" required="false">
        <p>Should the HttpOnly flag be set on session cookies to prevent client
           side script from accessing the session ID? Defaults to
           <code>true</code>.</p>
+      </attribute>
+
+      <attribute name="usePartitioned" required="false">
+       <p>Should the Partitioned flag be set on session cookies? Defaults to <code>false</code>.</p>
+       <p>Note: The name of the attribute used to indicate a partitioned cookie as part of
+       <a href="https://developers.google.com/privacy-sandbox/3pcd#partitioned">CHIPS</a> is not defined by an RFC and
+       may change in a non-backwards compatible way once equivalent functionality is included in an RFC.</p>
       </attribute>
 
       <attribute name="useRelativeRedirects" required="false">
@@ -788,21 +801,6 @@
         keep-alive timer thread will stop on its own once the keep-alives all
         expire however, on a busy system that might not happen for some time. If
         not specified, the default value of <code>true</code> will be used.</p>
-      </attribute>
-
-      <attribute name="clearReferencesObjectStreamClassCaches" required="false">
-        <p>If <code>true</code>, when the web application is stopped Tomcat
-        looks for <code>SoftReference</code>s to classes loaded by the web
-        application in the <code>ObjectStreamClass</code> class used for
-        serialization and clears any <code>SoftReference</code>s it finds. This
-        feature uses reflection to identify the <code>SoftReference</code>s and
-        therefore requires that the command line option
-        <code>-XaddExports:java.base/java.io=ALL-UNNAMED</code> is set. If not
-        specified, the default value of <code>true</code> will be used.</p>
-        <p>The memory leak associated with <code>ObjectStreamClass</code> has
-        been fixed in Java 19 onwards, Java 17.0.4 onwards and Java 11.0.16
-        onwards. The check will be disabled when running on a version
-        of Java that contains the fix.</p>
       </attribute>
 
       <attribute name="clearReferencesRmiTargets" required="false">
@@ -1155,7 +1153,7 @@
 
       <attribute name="value" required="true">
         <p>The parameter value that will be presented to the application
-        when requested from the JNDI context.  This value must be convertable
+        when requested from the JNDI context.  This value must be convertible
         to the Java type defined by the <code>type</code> attribute.</p>
       </attribute>
 
@@ -1366,8 +1364,8 @@
        two additional attributes to allow a shared data source to be used with different credentials.
        When these two additional attributes are used in combination with the <code>javax.sql.DataSource</code>
        type, different contexts can share a global data source with different credentials.
-       Under the hood, what happens is that a call to <a href="http://docs.oracle.com/javase/7/docs/api/javax/sql/DataSource.html#getConnection()"><code>getConnection()</code></a>
-       is simply translated to a call <a href="http://docs.oracle.com/javase/7/docs/api/javax/sql/DataSource.html#getConnection(java.lang.String,%20java.lang.String)">
+       Under the hood, what happens is that a call to <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/javax/sql/DataSource.html#getConnection())"><code>getConnection()</code></a>
+       is simply translated to a call <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/javax/sql/DataSource.html#getConnection(java.lang.String,java.lang.String)">
        <code>getConnection(username, password)</code></a> on the global data source. This is an easy way to get code to be transparent to what schemas are being used,
        yet be able to control connections (or pools) in the global configuration.
     </p>

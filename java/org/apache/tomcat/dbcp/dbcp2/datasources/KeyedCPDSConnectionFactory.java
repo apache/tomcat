@@ -21,7 +21,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -44,7 +43,7 @@ import org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject;
  *
  * @since 2.0
  */
-class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserPassKey, PooledConnectionAndInfo>,
+final class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserPassKey, PooledConnectionAndInfo>,
         ConnectionEventListener, PooledConnectionManager {
 
     private static final String NO_KEY_MESSAGE = "close() was called on a Connection, but "
@@ -82,7 +81,7 @@ class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserPassKey
      *            whether a rollback should be issued after {@link #validateObject validating} {@link Connection}s.
      * @since 2.10.0
      */
-    public KeyedCPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery,
+    KeyedCPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery,
             final Duration validationQueryTimeoutSeconds, final boolean rollbackAfterValidation) {
         this.cpds = cpds;
         this.validationQuery = validationQuery;
@@ -106,13 +105,13 @@ class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserPassKey
      * @deprecated Use {@link #KeyedCPDSConnectionFactory(ConnectionPoolDataSource, String, Duration, boolean)}.
      */
     @Deprecated
-    public KeyedCPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery,
+    KeyedCPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery,
             final int validationQueryTimeoutSeconds, final boolean rollbackAfterValidation) {
         this(cpds, validationQuery, Duration.ofSeconds(validationQueryTimeoutSeconds), rollbackAfterValidation);
     }
 
     @Override
-    public void activateObject(final UserPassKey key, final PooledObject<PooledConnectionAndInfo> p) throws Exception {
+    public void activateObject(final UserPassKey key, final PooledObject<PooledConnectionAndInfo> p) throws SQLException {
         validateLifetime(p);
     }
 
@@ -187,7 +186,7 @@ class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserPassKey
      * Closes the PooledConnection and stops listening for events from it.
      */
     @Override
-    public void destroyObject(final UserPassKey key, final PooledObject<PooledConnectionAndInfo> p) throws Exception {
+    public void destroyObject(final UserPassKey key, final PooledObject<PooledConnectionAndInfo> p) throws SQLException {
         final PooledConnection pooledConnection = p.getObject().getPooledConnection();
         pooledConnection.removeConnectionEventListener(this);
         pcMap.remove(pooledConnection);
@@ -206,7 +205,7 @@ class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserPassKey
     /**
      * Invalidates the PooledConnection in the pool. The KeyedCPDSConnectionFactory closes the connection and pool
      * counters are updated appropriately. Also clears any idle instances associated with the user name that was used to
-     * create the PooledConnection. Connections associated with this user are not affected and they will not be
+     * create the PooledConnection. Connections associated with this user are not affected, and they will not be
      * automatically closed on return to the pool.
      */
     @Override
@@ -224,10 +223,6 @@ class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserPassKey
         }
     }
 
-    // ***********************************************************************
-    // java.sql.ConnectionEventListener implementation
-    // ***********************************************************************
-
     /**
      * Creates a new {@code PooledConnectionAndInfo} from the given {@code UserPassKey}.
      *
@@ -235,10 +230,10 @@ class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserPassKey
      *            {@code UserPassKey} containing user credentials
      * @throws SQLException
      *             if the connection could not be created.
-     * @see org.apache.tomcat.dbcp.pool2.KeyedPooledObjectFactory#makeObject(java.lang.Object)
+     * @see org.apache.tomcat.dbcp.pool2.KeyedPooledObjectFactory#makeObject(Object)
      */
     @Override
-    public synchronized PooledObject<PooledConnectionAndInfo> makeObject(final UserPassKey userPassKey) throws Exception {
+    public synchronized PooledObject<PooledConnectionAndInfo> makeObject(final UserPassKey userPassKey) throws SQLException {
         PooledConnection pooledConnection = null;
         final String userName = userPassKey.getUserName();
         final String password = userPassKey.getPassword();
@@ -262,7 +257,7 @@ class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserPassKey
     }
 
     @Override
-    public void passivateObject(final UserPassKey key, final PooledObject<PooledConnectionAndInfo> p) throws Exception {
+    public void passivateObject(final UserPassKey key, final PooledObject<PooledConnectionAndInfo> p) throws SQLException {
         validateLifetime(p);
     }
 
@@ -317,13 +312,8 @@ class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserPassKey
         this.pool = pool;
     }
 
-    private void validateLifetime(final PooledObject<PooledConnectionAndInfo> p) throws Exception {
-        if (maxConnLifetime.compareTo(Duration.ZERO) > 0) {
-            final Duration lifetimeDuration = Duration.between(p.getCreateInstant(), Instant.now());
-            if (lifetimeDuration.compareTo(maxConnLifetime) > 0) {
-                throw new Exception(Utils.getMessage("connectionFactory.lifetimeExceeded", lifetimeDuration, maxConnLifetime));
-            }
-        }
+    private void validateLifetime(final PooledObject<PooledConnectionAndInfo> pooledObject) throws SQLException {
+        Utils.validateLifetime(pooledObject, maxConnLifetime);
     }
 
     /**

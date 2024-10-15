@@ -28,12 +28,12 @@ public interface TaglibDescriptor {
      *
      * @return the URI for the tag library
      */
-    public String getTaglibURI();
+    String getTaglibURI();
 
     /**
      * Obtain the location of the tag library.
      *
      * @return the location of the tag library
      */
-    public String getTaglibLocation();
+    String getTaglibLocation();
 }

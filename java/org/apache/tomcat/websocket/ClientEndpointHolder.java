@@ -23,5 +23,6 @@ import org.apache.tomcat.InstanceManager;
 
 public interface ClientEndpointHolder {
     String getClassName();
+
     Endpoint getInstance(InstanceManager instanceManager) throws DeploymentException;
 }

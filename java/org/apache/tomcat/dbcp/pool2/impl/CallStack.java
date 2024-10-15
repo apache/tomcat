@@ -26,7 +26,6 @@ import org.apache.tomcat.dbcp.pool2.UsageTracking;
  * {@linkplain UsageTracking usage tracking} so that different JVMs and configurations can use more efficient strategies
  * for obtaining the current call stack depending on metadata needs.
  *
- * @see CallStackUtils
  * @since 2.4.3
  */
 public interface CallStack {
@@ -50,5 +49,5 @@ public interface CallStack {
      * @param writer a PrintWriter to write the current stack trace to if available
      * @return true if a stack trace was available to print or false if nothing was printed
      */
-    boolean printStackTrace(final PrintWriter writer);
+    boolean printStackTrace(PrintWriter writer);
 }

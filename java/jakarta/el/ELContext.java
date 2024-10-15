@@ -16,11 +16,13 @@
  */
 package jakarta.el;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -30,7 +32,7 @@ public abstract class ELContext {
 
     private Locale locale;
 
-    private Map<Class<?>, Object> map;
+    private Map<Class<?>,Object> map;
 
     private boolean resolved;
 
@@ -38,10 +40,17 @@ public abstract class ELContext {
 
     private List<EvaluationListener> listeners;
 
-    private Deque<Map<String,Object>> lambdaArguments = new LinkedList<>();
+    private Deque<Map<String,Object>> lambdaArguments = null;
 
     public ELContext() {
         this.resolved = false;
+    }
+
+    private Deque<Map<String,Object>> getLambdaArguments() {
+        if (lambdaArguments == null) {
+            lambdaArguments = new ArrayDeque<>(4);
+        }
+        return lambdaArguments;
     }
 
     public void setPropertyResolved(boolean resolved) {
@@ -71,8 +80,7 @@ public abstract class ELContext {
      * @param key           The key under which to store the object
      * @param contextObject The object to add
      *
-     * @throws NullPointerException
-     *              If the supplied key or context is <code>null</code>
+     * @throws NullPointerException If the supplied key or context is <code>null</code>
      */
     public void putContext(Class<?> key, Object contextObject) {
         Objects.requireNonNull(key);
@@ -92,8 +100,7 @@ public abstract class ELContext {
      *
      * @return The value of the context object associated with the given key
      *
-     * @throws NullPointerException
-     *              If the supplied key is <code>null</code>
+     * @throws NullPointerException If the supplied key is <code>null</code>
      */
     public Object getContext(Class<?> key) {
         Objects.requireNonNull(key);
@@ -106,8 +113,7 @@ public abstract class ELContext {
     public abstract ELResolver getELResolver();
 
     /**
-     * Obtain the ImportHandler for this ELContext, creating one if necessary.
-     * This method is not thread-safe.
+     * Obtain the ImportHandler for this ELContext, creating one if necessary. This method is not thread-safe.
      *
      * @return the ImportHandler for this ELContext.
      *
@@ -226,18 +232,17 @@ public abstract class ELContext {
     }
 
     /**
-     * Determine if the specified name is recognised as the name of a lambda
-     * argument.
+     * Determine if the specified name is recognised as the name of a lambda argument.
      *
      * @param name The name of the lambda argument
      *
-     * @return <code>true</code> if the name is recognised as the name of a
-     *         lambda argument, otherwise <code>false</code>
+     * @return <code>true</code> if the name is recognised as the name of a lambda argument, otherwise
+     *             <code>false</code>
      *
      * @since EL 3.0
      */
     public boolean isLambdaArgument(String name) {
-        for (Map<String,Object> arguments : lambdaArguments) {
+        for (Map<String,Object> arguments : getLambdaArguments()) {
             if (arguments.containsKey(name)) {
                 return true;
             }
@@ -255,7 +260,7 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public Object getLambdaArgument(String name) {
-        for (Map<String,Object> arguments : lambdaArguments) {
+        for (Map<String,Object> arguments : getLambdaArguments()) {
             Object result = arguments.get(name);
             if (result != null) {
                 return result;
@@ -265,39 +270,36 @@ public abstract class ELContext {
     }
 
     /**
-     * Called when starting to evaluate a lambda expression so that the
-     * arguments are available to the EL context during evaluation.
+     * Called when starting to evaluate a lambda expression so that the arguments are available to the EL context during
+     * evaluation.
      *
-     * @param arguments The arguments in scope for the current lambda
-     *                  expression.
+     * @param arguments The arguments in scope for the current lambda expression.
+     *
      * @since EL 3.0
      */
     public void enterLambdaScope(Map<String,Object> arguments) {
-        lambdaArguments.push(arguments);
+        getLambdaArguments().push(arguments);
     }
 
     /**
-     * Called after evaluating a lambda expression to signal that the arguments
-     * are no longer required.
+     * Called after evaluating a lambda expression to signal that the arguments are no longer required.
      *
      * @since EL 3.0
      */
     public void exitLambdaScope() {
-        lambdaArguments.pop();
+        getLambdaArguments().pop();
     }
 
     /**
      * Coerce the supplied object to the requested type.
      *
      * @param <T>  The type to which the object should be coerced
-     *
      * @param obj  The object to be coerced
      * @param type The type to which the object should be coerced
      *
      * @return An instance of the requested type.
      *
-     * @throws ELException
-     *              If the conversion fails
+     * @throws ELException If the conversion fails
      *
      * @since EL 3.0
      */
@@ -317,6 +319,71 @@ public abstract class ELContext {
             setPropertyResolved(originalResolved);
         }
 
+        if (obj instanceof LambdaExpression && isFunctionalInterface(type)) {
+            ((LambdaExpression) obj).setELContext(this);
+        }
+
         return ELManager.getExpressionFactory().coerceToType(obj, type);
+    }
+
+
+    /*
+     * Copied from org.apache.el.lang.ELSupport - keep in sync
+     */
+    static boolean isFunctionalInterface(Class<?> type) {
+
+        if (!type.isInterface()) {
+            return false;
+        }
+
+        boolean foundAbstractMethod = false;
+        Method[] methods = type.getMethods();
+        for (Method method : methods) {
+            if (Modifier.isAbstract(method.getModifiers())) {
+                // Abstract methods that override one of the public methods
+                // of Object don't count
+                if (overridesObjectMethod(method)) {
+                    continue;
+                }
+                if (foundAbstractMethod) {
+                    // Found more than one
+                    return false;
+                } else {
+                    foundAbstractMethod = true;
+                }
+            }
+        }
+        return foundAbstractMethod;
+    }
+
+
+    /*
+     * Copied from org.apache.el.lang.ELSupport - keep in sync
+     */
+    private static boolean overridesObjectMethod(Method method) {
+        // There are three methods that can be overridden
+        if ("equals".equals(method.getName())) {
+            if (method.getReturnType().equals(boolean.class)) {
+                if (method.getParameterCount() == 1) {
+                    if (method.getParameterTypes()[0].equals(Object.class)) {
+                        return true;
+                    }
+                }
+            }
+        } else if ("hashCode".equals(method.getName())) {
+            if (method.getReturnType().equals(int.class)) {
+                if (method.getParameterCount() == 0) {
+                    return true;
+                }
+            }
+        } else if ("toString".equals(method.getName())) {
+            if (method.getReturnType().equals(String.class)) {
+                if (method.getParameterCount() == 0) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

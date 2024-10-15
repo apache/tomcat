@@ -17,8 +17,7 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
-import java.security.Principal;
-import java.security.PrivilegedActionException;
+import java.util.Arrays;
 import java.util.Set;
 
 import jakarta.servlet.Filter;
@@ -27,20 +26,15 @@ import jakarta.servlet.Servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Globals;
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Implementation of <code>jakarta.servlet.FilterChain</code> used to manage
- * the execution of a set of filters for a particular request.  When the
- * set of defined filters has all been executed, the next call to
- * <code>doFilter()</code> will execute the servlet's <code>service()</code>
- * method itself.
+ * Implementation of <code>jakarta.servlet.FilterChain</code> used to manage the execution of a set of filters for a
+ * particular request. When the set of defined filters has all been executed, the next call to <code>doFilter()</code>
+ * will execute the servlet's <code>service()</code> method itself.
  *
  * @author Craig R. McClanahan
  */
@@ -66,8 +60,7 @@ public final class ApplicationFilterChain implements FilterChain {
 
 
     /**
-     * The int which is used to maintain the current position
-     * in the filter chain.
+     * The int which is used to maintain the current position in the filter chain.
      */
     private int pos = 0;
 
@@ -100,94 +93,23 @@ public final class ApplicationFilterChain implements FilterChain {
     private static final StringManager sm = StringManager.getManager(ApplicationFilterChain.class);
 
 
-    /**
-     * Static class array used when the SecurityManager is turned on and
-     * <code>doFilter</code> is invoked.
-     */
-    private static final Class<?>[] classType = new Class[]{
-        ServletRequest.class, ServletResponse.class, FilterChain.class};
-
-    /**
-     * Static class array used when the SecurityManager is turned on and
-     * <code>service</code> is invoked.
-     */
-    private static final Class<?>[] classTypeUsedInService = new Class[]{
-        ServletRequest.class, ServletResponse.class};
-
-
     // ---------------------------------------------------- FilterChain Methods
 
-    /**
-     * Invoke the next filter in this chain, passing the specified request
-     * and response.  If there are no more filters in this chain, invoke
-     * the <code>service()</code> method of the servlet itself.
-     *
-     * @param request The servlet request we are processing
-     * @param response The servlet response we are creating
-     *
-     * @exception IOException if an input/output error occurs
-     * @exception ServletException if a servlet exception occurs
-     */
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response)
-        throws IOException, ServletException {
-
-        if( Globals.IS_SECURITY_ENABLED ) {
-            final ServletRequest req = request;
-            final ServletResponse res = response;
-            try {
-                java.security.AccessController.doPrivileged(
-                        (java.security.PrivilegedExceptionAction<Void>) () -> {
-                            internalDoFilter(req,res);
-                            return null;
-                        }
-                );
-            } catch( PrivilegedActionException pe) {
-                Exception e = pe.getException();
-                if (e instanceof ServletException) {
-                    throw (ServletException) e;
-                } else if (e instanceof IOException) {
-                    throw (IOException) e;
-                } else if (e instanceof RuntimeException) {
-                    throw (RuntimeException) e;
-                } else {
-                    throw new ServletException(e.getMessage(), e);
-                }
-            }
-        } else {
-            internalDoFilter(request,response);
-        }
-    }
-
-    private void internalDoFilter(ServletRequest request,
-                                  ServletResponse response)
-        throws IOException, ServletException {
-
+    public void doFilter(ServletRequest request, ServletResponse response) throws IOException, ServletException {
         // Call the next filter if there is one
         if (pos < n) {
             ApplicationFilterConfig filterConfig = filters[pos++];
             try {
                 Filter filter = filterConfig.getFilter();
 
-                if (request.isAsyncSupported() && "false".equalsIgnoreCase(
-                        filterConfig.getFilterDef().getAsyncSupported())) {
+                if (request.isAsyncSupported() && !(filterConfig.getFilterDef().getAsyncSupportedBoolean())) {
                     request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, Boolean.FALSE);
                 }
-                if( Globals.IS_SECURITY_ENABLED ) {
-                    final ServletRequest req = request;
-                    final ServletResponse res = response;
-                    Principal principal =
-                        ((HttpServletRequest) req).getUserPrincipal();
-
-                    Object[] args = new Object[]{req, res, this};
-                    SecurityUtil.doAsPrivilege ("doFilter", filter, classType, args, principal);
-                } else {
-                    filter.doFilter(request, response, this);
-                }
+                filter.doFilter(request, response, this);
             } catch (IOException | ServletException | RuntimeException e) {
                 throw e;
             } catch (Throwable e) {
-                e = ExceptionUtils.unwrapInvocationTargetException(e);
                 ExceptionUtils.handleThrowable(e);
                 throw new ServletException(sm.getString("filterChain.filter"), e);
             }
@@ -202,30 +124,13 @@ public final class ApplicationFilterChain implements FilterChain {
             }
 
             if (request.isAsyncSupported() && !servletSupportsAsync) {
-                request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR,
-                        Boolean.FALSE);
+                request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, Boolean.FALSE);
             }
             // Use potentially wrapped request from this point
-            if ((request instanceof HttpServletRequest) &&
-                    (response instanceof HttpServletResponse) &&
-                    Globals.IS_SECURITY_ENABLED ) {
-                final ServletRequest req = request;
-                final ServletResponse res = response;
-                Principal principal =
-                    ((HttpServletRequest) req).getUserPrincipal();
-                Object[] args = new Object[]{req, res};
-                SecurityUtil.doAsPrivilege("service",
-                                           servlet,
-                                           classTypeUsedInService,
-                                           args,
-                                           principal);
-            } else {
-                servlet.service(request, response);
-            }
+            servlet.service(request, response);
         } catch (IOException | ServletException | RuntimeException e) {
             throw e;
         } catch (Throwable e) {
-            e = ExceptionUtils.unwrapInvocationTargetException(e);
             ExceptionUtils.handleThrowable(e);
             throw new ServletException(sm.getString("filterChain.servlet"), e);
         } finally {
@@ -238,8 +143,7 @@ public final class ApplicationFilterChain implements FilterChain {
 
 
     /**
-     * The last request passed to a servlet for servicing from the current
-     * thread.
+     * The last request passed to a servlet for servicing from the current thread.
      *
      * @return The last request to be serviced.
      */
@@ -249,8 +153,7 @@ public final class ApplicationFilterChain implements FilterChain {
 
 
     /**
-     * The last response passed to a servlet for servicing from the current
-     * thread.
+     * The last response passed to a servlet for servicing from the current thread.
      *
      * @return The last response to be serviced.
      */
@@ -269,17 +172,14 @@ public final class ApplicationFilterChain implements FilterChain {
     void addFilter(ApplicationFilterConfig filterConfig) {
 
         // Prevent the same filter being added multiple times
-        for(ApplicationFilterConfig filter:filters) {
-            if(filter==filterConfig) {
+        for (int i = 0; i < n; i++) {
+            if (filters[i] == filterConfig) {
                 return;
             }
         }
 
         if (n == filters.length) {
-            ApplicationFilterConfig[] newFilters =
-                new ApplicationFilterConfig[n + INCREMENT];
-            System.arraycopy(filters, 0, newFilters, 0, n);
-            filters = newFilters;
+            filters = Arrays.copyOf(filters, n + INCREMENT);
         }
         filters[n++] = filterConfig;
 
@@ -330,17 +230,15 @@ public final class ApplicationFilterChain implements FilterChain {
 
 
     /**
-     * Identifies the Filters, if any, in this FilterChain that do not support
-     * async.
+     * Identifies the Filters, if any, in this FilterChain that do not support async.
      *
-     * @param result The Set to which the fully qualified class names of each
-     *               Filter in this FilterChain that does not support async will
-     *               be added
+     * @param result The Set to which the fully qualified class names of each Filter in this FilterChain that does not
+     *                   support async will be added
      */
     public void findNonAsyncFilters(Set<String> result) {
-        for (int i = 0; i < n ; i++) {
+        for (int i = 0; i < n; i++) {
             ApplicationFilterConfig filter = filters[i];
-            if ("false".equalsIgnoreCase(filter.getFilterDef().getAsyncSupported())) {
+            if (!(filter.getFilterDef().getAsyncSupportedBoolean())) {
                 result.add(filter.getFilterClass());
             }
         }

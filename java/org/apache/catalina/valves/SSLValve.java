@@ -33,20 +33,20 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.UDecoder;
 
 /**
- * When using mod_proxy_http, the client SSL information is not included in the
- * protocol (unlike mod_jk and mod_proxy_ajp). To make the client SSL
- * information available to Tomcat, some additional configuration is required.
- * In httpd, mod_headers is used to add the SSL information as HTTP headers. In
- * Tomcat, this valve is used to read the information from the HTTP headers and
- * insert it into the request.<p>
- *
- * <b>Note: Ensure that the headers are always set by httpd for all requests to
- * prevent a client spoofing SSL information by sending fake headers. </b><p>
- *
+ * When using mod_proxy_http, the client SSL information is not included in the protocol (unlike mod_jk and
+ * mod_proxy_ajp). To make the client SSL information available to Tomcat, some additional configuration is required. In
+ * httpd, mod_headers is used to add the SSL information as HTTP headers. In Tomcat, this valve is used to read the
+ * information from the HTTP headers and insert it into the request.
+ * <p>
+ * <b>Note: Ensure that the headers are always set by httpd for all requests to prevent a client spoofing SSL
+ * information by sending fake headers. </b>
+ * <p>
  * In httpd.conf add the following:
+ *
  * <pre>
  * &lt;IfModule ssl_module&gt;
  *   RequestHeader set SSL_CLIENT_CERT "%{SSL_CLIENT_CERT}s"
+ *   RequestHeader set SSL_SECURE_PROTOCOL "%{SSL_PROTOCOL}s"
  *   RequestHeader set SSL_CIPHER "%{SSL_CIPHER}s"
  *   RequestHeader set SSL_SESSION_ID "%{SSL_SESSION_ID}s"
  *   RequestHeader set SSL_CIPHER_USEKEYSIZE "%{SSL_CIPHER_USEKEYSIZE}s"
@@ -54,6 +54,7 @@ import org.apache.tomcat.util.buf.UDecoder;
  * </pre>
  *
  * In server.xml, configure this valve under the Engine element in server.xml:
+ *
  * <pre>
  * &lt;Engine ...&gt;
  *   &lt;Valve className="org.apache.catalina.valves.SSLValve" /&gt;
@@ -67,11 +68,12 @@ public class SSLValve extends ValveBase {
 
     private String sslClientCertHeader = "ssl_client_cert";
     private String sslClientEscapedCertHeader = "ssl_client_escaped_cert";
+    private String sslSecureProtocolHeader = "ssl_secure_protocol";
     private String sslCipherHeader = "ssl_cipher";
     private String sslSessionIdHeader = "ssl_session_id";
     private String sslCipherUserKeySizeHeader = "ssl_cipher_usekeysize";
 
-    //------------------------------------------------------ Constructor
+    // ------------------------------------------------------ Constructor
     public SSLValve() {
         super(true);
     }
@@ -91,6 +93,14 @@ public class SSLValve extends ValveBase {
 
     public void setSslClientEscapedCertHeader(String sslClientEscapedCertHeader) {
         this.sslClientEscapedCertHeader = sslClientEscapedCertHeader;
+    }
+
+    public String getSslSecureProtocolHeader() {
+        return sslSecureProtocolHeader;
+    }
+
+    public void setSslSecureProtocolHeader(String sslSecureProtocolHeader) {
+        this.sslSecureProtocolHeader = sslSecureProtocolHeader;
     }
 
     public String getSslCipherHeader() {
@@ -134,20 +144,15 @@ public class SSLValve extends ValveBase {
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
         /*
-         * Known behaviours of reverse proxies that are handled by the
-         * processing below:
-         * - mod_header converts the '\n' into ' '
-         * - nginx converts the '\n' into multiple ' '
-         * - nginx ssl_client_escaped_cert uses "uri component" escaping,
-         *   keeping only ALPHA, DIGIT, "-", ".", "_", "~"
+         * Known behaviours of reverse proxies that are handled by the processing below: - mod_header converts the '\n'
+         * into ' ' - nginx converts the '\n' into multiple ' ' - nginx ssl_client_escaped_cert uses "uri component"
+         * escaping, keeping only ALPHA, DIGIT, "-", ".", "_", "~"
          *
-         * The code assumes that the trimmed header value starts with
-         * '-----BEGIN CERTIFICATE-----' and ends with
+         * The code assumes that the trimmed header value starts with '-----BEGIN CERTIFICATE-----' and ends with
          * '-----END CERTIFICATE-----'.
          *
-         * Note: As long as the BEGIN marker and the rest of the content are on
-         *       separate lines, the CertificateFactory is tolerant of any
-         *       additional whitespace.
+         * Note: As long as the BEGIN marker and the rest of the content are on separate lines, the CertificateFactory
+         * is tolerant of any additional whitespace.
          */
         String headerValue;
         String headerEscapedValue = mygetHeader(request, sslClientEscapedCertHeader);
@@ -162,11 +167,9 @@ public class SSLValve extends ValveBase {
                 String body = headerValue.substring(27);
                 String header = "-----BEGIN CERTIFICATE-----\n";
                 String strcerts = header.concat(body);
-                ByteArrayInputStream bais = new ByteArrayInputStream(
-                        strcerts.getBytes(StandardCharsets.ISO_8859_1));
+                ByteArrayInputStream bais = new ByteArrayInputStream(strcerts.getBytes(StandardCharsets.ISO_8859_1));
                 X509Certificate jsseCerts[] = null;
-                String providerName = (String) request.getConnector().getProperty(
-                        "clientCertProvider");
+                String providerName = (String) request.getConnector().getProperty("clientCertProvider");
                 try {
                     CertificateFactory cf;
                     if (providerName == null) {
@@ -180,11 +183,14 @@ public class SSLValve extends ValveBase {
                 } catch (java.security.cert.CertificateException e) {
                     log.warn(sm.getString("sslValve.certError", strcerts), e);
                 } catch (NoSuchProviderException e) {
-                    log.error(sm.getString(
-                            "sslValve.invalidProvider", providerName), e);
+                    log.error(sm.getString("sslValve.invalidProvider", providerName), e);
                 }
                 request.setAttribute(Globals.CERTIFICATES_ATTR, jsseCerts);
             }
+        }
+        headerValue = mygetHeader(request, sslSecureProtocolHeader);
+        if (headerValue != null) {
+            request.setAttribute(Globals.SECURE_PROTOCOL_ATTR, headerValue);
         }
         headerValue = mygetHeader(request, sslCipherHeader);
         if (headerValue != null) {

@@ -31,52 +31,50 @@ import org.apache.catalina.Session;
 import org.apache.tomcat.util.ExceptionUtils;
 
 /**
- * Utility methods on HttpSessions...
+ * Utility methods on HttpSessions.
+ *
  * @author C&eacute;drik LIME
  */
 public class SessionUtils {
 
-    /**
-     *
-     */
     private SessionUtils() {
         super();
     }
 
     /**
-     * The session attributes key under which the user's selected
-     * <code>java.util.Locale</code> is stored, if any.
+     * The session attributes key under which the user's selected <code>java.util.Locale</code> is stored, if any.
      */
     // org.apache.struts.Globals.LOCALE_KEY
     private static final String STRUTS_LOCALE_KEY = "org.apache.struts.action.LOCALE";//$NON-NLS-1$
     // jakarta.servlet.jsp.jstl.core.Config.FMT_LOCALE
-    private static final String JSTL_LOCALE_KEY   = "jakarta.servlet.jsp.jstl.fmt.locale";//$NON-NLS-1$
+    private static final String JSTL_LOCALE_KEY = "jakarta.servlet.jsp.jstl.fmt.locale";//$NON-NLS-1$
     // org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME
     private static final String SPRING_LOCALE_KEY = "org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE";//$NON-NLS-1$
     /**
      * Lower and upper-case strings will be dynamically generated. Put mid-capitalised strings here!
      */
-    private static final String[] LOCALE_TEST_ATTRIBUTES = new String[] {
-        STRUTS_LOCALE_KEY, SPRING_LOCALE_KEY, JSTL_LOCALE_KEY, "Locale", "java.util.Locale" };
+    private static final String[] LOCALE_TEST_ATTRIBUTES =
+            new String[] { STRUTS_LOCALE_KEY, SPRING_LOCALE_KEY, JSTL_LOCALE_KEY, "Locale", "java.util.Locale" };
     /**
-     * For efficient operation, list the attributes here with the typically used
-     * capitalisation. This will be tried first and then the auto-generated
-     * upper and lower case versions will be tried.
+     * For efficient operation, list the attributes here with the typically used capitalisation. This will be tried
+     * first and then the auto-generated upper and lower case versions will be tried.
      */
-    private static final String[] USER_TEST_ATTRIBUTES = new String[] {
-        "Login", "User", "userName", "UserName", "Utilisateur",
-        "SPRING_SECURITY_LAST_USERNAME"};
+    private static final String[] USER_TEST_ATTRIBUTES =
+            new String[] { "Login", "User", "userName", "UserName", "Utilisateur", "SPRING_SECURITY_LAST_USERNAME" };
 
     /**
-     * Try to get user locale from the session, if possible.
-     * IMPLEMENTATION NOTE: this method has explicit support for Tapestry 3, Struts 1.x and Spring
-     * JSF check the browser meta tag "accept languages" to choose what language to display.
+     * Try to get user locale from the session, if possible. IMPLEMENTATION NOTE: this method has explicit support for
+     * Tapestry 3, Struts 1.x and Spring JSF check the browser meta tag "accept languages" to choose what language to
+     * display.
+     *
      * @param in_session The session
+     *
      * @return the locale
      */
     public static Locale guessLocaleFromSession(final Session in_session) {
         return guessLocaleFromSession(in_session.getSession());
     }
+
     public static Locale guessLocaleFromSession(final HttpSession in_session) {
         if (null == in_session) {
             return null;
@@ -121,15 +119,14 @@ public class SessionUtils {
                 Object probableEngine = tapestryArray.get(0);
                 if (null != probableEngine) {
                     try {
-                        Method readMethod = probableEngine.getClass().getMethod("getLocale", (Class<?>[])null);//$NON-NLS-1$
+                        Method readMethod = probableEngine.getClass().getMethod("getLocale", (Class<?>[]) null);//$NON-NLS-1$
                         // Call the property getter and return the value
                         Object possibleLocale = readMethod.invoke(probableEngine, (Object[]) null);
                         if (possibleLocale instanceof Locale) {
                             locale = (Locale) possibleLocale;
                         }
                     } catch (Exception e) {
-                        Throwable t = ExceptionUtils
-                                .unwrapInvocationTargetException(e);
+                        Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
                         ExceptionUtils.handleThrowable(t);
                         // stay silent
                     }
@@ -156,14 +153,16 @@ public class SessionUtils {
 
             return locale;
         } catch (IllegalStateException ise) {
-            //ignore: invalidated session
+            // ignore: invalidated session
             return null;
         }
     }
 
     /**
      * Try to get user from the session, if possible.
+     *
      * @param in_session The session
+     *
      * @return the user
      */
     public static Object guessUserFromSession(final Session in_session) {
@@ -223,7 +222,7 @@ public class SessionUtils {
 
             return user;
         } catch (IllegalStateException ise) {
-            //ignore: invalidated session
+            // ignore: invalidated session
             return null;
         }
     }
@@ -234,27 +233,28 @@ public class SessionUtils {
             long diffMilliSeconds = in_session.getThisAccessedTime() - in_session.getCreationTime();
             return diffMilliSeconds;
         } catch (IllegalStateException ise) {
-            //ignore: invalidated session
+            // ignore: invalidated session
             return -1;
         }
     }
 
     public static long getTTLForSession(Session in_session) {
         try {
-            long diffMilliSeconds = (1000*in_session.getMaxInactiveInterval()) - (System.currentTimeMillis() - in_session.getThisAccessedTime());
+            long diffMilliSeconds = 1000 * in_session.getMaxInactiveInterval() -
+                    (System.currentTimeMillis() - in_session.getThisAccessedTime());
             return diffMilliSeconds;
         } catch (IllegalStateException ise) {
-            //ignore: invalidated session
+            // ignore: invalidated session
             return -1;
         }
     }
 
     public static long getInactiveTimeForSession(Session in_session) {
         try {
-            long diffMilliSeconds =  System.currentTimeMillis() - in_session.getThisAccessedTime();
+            long diffMilliSeconds = System.currentTimeMillis() - in_session.getThisAccessedTime();
             return diffMilliSeconds;
         } catch (IllegalStateException ise) {
-            //ignore: invalidated session
+            // ignore: invalidated session
             return -1;
         }
     }

@@ -17,49 +17,44 @@
 package org.apache.juli;
 
 /**
- * An interface intended for use by class loaders associated with a web
- * application that enables them to provide additional information to JULI about
- * the web application with which they are associated. For any web application
- * the combination of {@link #getWebappName()}, {@link #getHostName()} and
- * {@link #getServiceName()} must be unique.
+ * An interface intended for use by class loaders associated with a web application that enables them to provide
+ * additional information to JULI about the web application with which they are associated. For any web application the
+ * combination of {@link #getWebappName()}, {@link #getHostName()} and {@link #getServiceName()} must be unique.
  */
 public interface WebappProperties {
 
     /**
-     * Returns a name for the logging system to use for the web application, if
-     * any, associated with the class loader.
+     * Returns a name for the logging system to use for the web application, if any, associated with the class loader.
      *
-     * @return The name to use for the web application or null if none is
-     *         available.
+     * @return The name to use for the web application or null if none is available.
      */
     String getWebappName();
 
     /**
-     * Returns a name for the logging system to use for the Host where the
-     * web application, if any, associated with the class loader is deployed.
+     * Returns a name for the logging system to use for the Host where the web application, if any, associated with the
+     * class loader is deployed.
      *
-     * @return The name to use for the Host where the web application is
-     * deployed or null if none is available.
+     * @return The name to use for the Host where the web application is deployed or null if none is available.
      */
     String getHostName();
 
     /**
-     * Returns a name for the logging system to use for the Service where the
-     * Host, if any, associated with the class loader is deployed.
+     * Returns a name for the logging system to use for the Service where the Host, if any, associated with the class
+     * loader is deployed.
      *
-     * @return The name to use for the Service where the Host is deployed or
-     * null if none is available.
+     * @return The name to use for the Service where the Host is deployed or null if none is available.
      */
     String getServiceName();
 
     /**
-     * Enables JULI to determine if the web application includes a local
-     * configuration without JULI having to look for the file which it may not
-     * have permission to do when running under a SecurityManager.
+     * Enables JULI to determine if the web application includes a local configuration without JULI having to look for
+     * the file which it may not have permission to do when running under a SecurityManager.
      *
-     * @return {@code true} if the web application includes a logging
-     *         configuration at the standard location of
-     *         /WEB-INF/classes/logging.properties.
+     * @return {@code true} if the web application includes a logging configuration at the standard location of
+     *             /WEB-INF/classes/logging.properties.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     boolean hasLoggingConfig();
 }

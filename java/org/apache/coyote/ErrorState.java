@@ -24,28 +24,24 @@ public enum ErrorState {
     NONE(false, 0, true, true),
 
     /**
-     * The current request/response is in an error state and while it is safe to
-     * complete the current response it is not safe to continue to use the
-     * existing connection which must be closed once the response has been
-     * completed. For multiplexed protocols, the channel must be closed when the
-     * current request/response completes but the connection may continue.
+     * The current request/response is in an error state and while it is safe to complete the current response it is not
+     * safe to continue to use the existing connection which must be closed once the response has been completed. For
+     * multiplexed protocols, the channel must be closed when the current request/response completes but the connection
+     * may continue.
      */
     CLOSE_CLEAN(true, 1, true, true),
 
     /**
-     * The current request/response is in an error state and it is not safe to
-     * continue to use them. For multiplexed protocols (such as HTTP/2) the
-     * stream/channel must be closed immediately but the connection may
-     * continue. For non-multiplexed protocols (AJP, HTTP/1.x) the current
-     * connection must be closed.
+     * The current request/response is in an error state and it is not safe to continue to use them. For multiplexed
+     * protocols (such as HTTP/2) the stream/channel must be closed immediately but the connection may continue. For
+     * non-multiplexed protocols (AJP, HTTP/1.x) the current connection must be closed.
      */
     CLOSE_NOW(true, 2, false, true),
 
     /**
-     * An error has been detected that impacts the underlying network
-     * connection. It is not safe to continue using the network connection which
-     * must be closed immediately. For multiplexed protocols (such as HTTP/2)
-     * this impacts all multiplexed channels.
+     * An error has been detected that impacts the underlying network connection. It is not safe to continue using the
+     * network connection which must be closed immediately. For multiplexed protocols (such as HTTP/2) this impacts all
+     * multiplexed channels.
      */
     CLOSE_CONNECTION_NOW(true, 3, false, false);
 
@@ -54,8 +50,7 @@ public enum ErrorState {
     private final boolean ioAllowed;
     private final boolean connectionIoAllowed;
 
-    private ErrorState(boolean error, int severity, boolean ioAllowed,
-            boolean connectionIoAllowed) {
+    ErrorState(boolean error, int severity, boolean ioAllowed, boolean connectionIoAllowed) {
         this.error = error;
         this.severity = severity;
         this.ioAllowed = ioAllowed;
@@ -67,13 +62,11 @@ public enum ErrorState {
     }
 
     /**
-     * Compare this ErrorState with the provided ErrorState and return the most
-     * severe.
+     * Compare this ErrorState with the provided ErrorState and return the most severe.
      *
      * @param input The error state to compare to this one
      *
-     * @return The most severe error state from the the provided error state and
-     *         this one
+     * @return The most severe error state from the the provided error state and this one
      */
     public ErrorState getMostSevere(ErrorState input) {
         if (input.severity > this.severity) {

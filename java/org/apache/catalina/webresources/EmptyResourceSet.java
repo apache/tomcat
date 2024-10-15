@@ -29,10 +29,9 @@ import org.apache.catalina.WebResourceSet;
 import org.apache.catalina.util.LifecycleBase;
 
 /**
- * A {@link WebResourceSet} implementation that is not backed by a file system
- * and behaves as if it has no resources available. This is  primarily used in
- * embedded mode when the web application is configured entirely
- * programmatically and does not use any static resources from the file system.
+ * A {@link WebResourceSet} implementation that is not backed by a file system and behaves as if it has no resources
+ * available. This is primarily used in embedded mode when the web application is configured entirely programmatically
+ * and does not use any static resources from the file system.
  */
 public class EmptyResourceSet extends LifecycleBase implements WebResourceSet {
 
@@ -134,8 +133,7 @@ public class EmptyResourceSet extends LifecycleBase implements WebResourceSet {
     /**
      * {@inheritDoc}
      * <p>
-     * Calls to this method will be ignored as this implementation always read
-     * only.
+     * Calls to this method will be ignored as this implementation always read only.
      */
     @Override
     public void setReadOnly(boolean readOnly) {

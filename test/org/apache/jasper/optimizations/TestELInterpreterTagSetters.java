@@ -520,7 +520,7 @@ public class TestELInterpreterTagSetters extends TomcatBaseTest {
         private final String name;
         private volatile ELInterpreter elInterpreter = null;
 
-        public ELInterpreterWrapper(boolean optimised, String name) {
+        ELInterpreterWrapper(boolean optimised, String name) {
             this.optimised = optimised;
             this.name = name;
         }

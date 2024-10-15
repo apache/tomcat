@@ -25,9 +25,7 @@ public class TestELResolver {
     public void testConvertToType01() {
         ELContext context = new TesterELContext();
 
-        ValueExpression ve =
-                ELManager.getExpressionFactory().createValueExpression(
-                        context, "1", String.class);
+        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(context, "1", String.class);
 
         String result = (String) ve.getValue(context);
 
@@ -39,9 +37,7 @@ public class TestELResolver {
     public void testConvertToType02() {
         ELContext context = new TesterELContext(new TesterELResolverOne());
 
-        ValueExpression ve =
-                ELManager.getExpressionFactory().createValueExpression(
-                        context, "1", String.class);
+        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(context, "1", String.class);
 
         String result = (String) ve.getValue(context);
 
@@ -53,9 +49,7 @@ public class TestELResolver {
     public void testConvertToType03() {
         ELContext context = new TesterELContext(new TesterELResolverOne());
 
-        ValueExpression ve =
-                ELManager.getExpressionFactory().createValueExpression(
-                        context, "2", String.class);
+        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(context, "2", String.class);
 
         String result = (String) ve.getValue(context);
 
@@ -68,9 +62,7 @@ public class TestELResolver {
         CompositeELResolver resolver = new CompositeELResolver();
         ELContext context = new TesterELContext(resolver);
 
-        ValueExpression ve =
-                ELManager.getExpressionFactory().createValueExpression(
-                        context, "2", String.class);
+        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(context, "2", String.class);
 
         String result = (String) ve.getValue(context);
 
@@ -85,9 +77,7 @@ public class TestELResolver {
         resolver.add(new TesterELResolverTwo());
         ELContext context = new TesterELContext(resolver);
 
-        ValueExpression ve =
-                ELManager.getExpressionFactory().createValueExpression(
-                        context, "1", String.class);
+        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(context, "1", String.class);
 
         String result = (String) ve.getValue(context);
 
@@ -102,9 +92,7 @@ public class TestELResolver {
         resolver.add(new TesterELResolverTwo());
         ELContext context = new TesterELContext(resolver);
 
-        ValueExpression ve =
-                ELManager.getExpressionFactory().createValueExpression(
-                        context, "2", String.class);
+        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(context, "2", String.class);
 
         String result = (String) ve.getValue(context);
 
@@ -119,9 +107,7 @@ public class TestELResolver {
         resolver.add(new TesterELResolverTwo());
         ELContext context = new TesterELContext(resolver);
 
-        ValueExpression ve =
-                ELManager.getExpressionFactory().createValueExpression(
-                        context, "3", String.class);
+        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(context, "3", String.class);
 
         String result = (String) ve.getValue(context);
 
@@ -133,8 +119,8 @@ public class TestELResolver {
     public void testDefaultConvertToType() {
         ELContext context = new TesterELContext(new StaticFieldELResolver());
 
-        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(
-                        context, "${!Boolean.FALSE}", Boolean.class);
+        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(context, "${!Boolean.FALSE}",
+                Boolean.class);
 
         Boolean result = (Boolean) ve.getValue(context);
 

@@ -173,23 +173,8 @@ public class TesterPageContext extends PageContext {
     }
 
     @Override
-    @Deprecated
-    public jakarta.servlet.jsp.el.ExpressionEvaluator getExpressionEvaluator() {
-        // NO-OP
-        return null;
-    }
-
-    @Override
     public ELContext getELContext() {
         // NO-OP
         return null;
     }
-
-    @Override
-    @Deprecated
-    public jakarta.servlet.jsp.el.VariableResolver getVariableResolver() {
-        // NO-OP
-        return null;
-    }
-
 }

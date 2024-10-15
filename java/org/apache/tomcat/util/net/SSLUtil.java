@@ -29,13 +29,13 @@ import javax.net.ssl.TrustManager;
  */
 public interface SSLUtil {
 
-    public SSLContext createSSLContext(List<String> negotiableProtocols) throws Exception;
+    SSLContext createSSLContext(List<String> negotiableProtocols) throws Exception;
 
-    public KeyManager[] getKeyManagers() throws Exception;
+    KeyManager[] getKeyManagers() throws Exception;
 
-    public TrustManager[] getTrustManagers() throws Exception;
+    TrustManager[] getTrustManagers() throws Exception;
 
-    public void configureSessionContext(SSLSessionContext sslSessionContext);
+    void configureSessionContext(SSLSessionContext sslSessionContext);
 
     /**
      * The set of enabled protocols is the intersection of the implemented
@@ -49,7 +49,7 @@ public interface SSLUtil {
      * @throws IllegalArgumentException  If there is no intersection between the
      *         implemented and configured protocols
      */
-    public String[] getEnabledProtocols() throws IllegalArgumentException;
+    String[] getEnabledProtocols() throws IllegalArgumentException;
 
     /**
      * The set of enabled ciphers is the intersection of the implemented ciphers
@@ -65,18 +65,18 @@ public interface SSLUtil {
      * @throws IllegalArgumentException  If there is no intersection between the
      *         implemented and configured ciphers
      */
-    public String[] getEnabledCiphers() throws IllegalArgumentException;
+    String[] getEnabledCiphers() throws IllegalArgumentException;
 
     /**
      * Optional interface that can be implemented by
      * {@link javax.net.ssl.SSLEngine}s to indicate that they support ALPN and
      * can provided the protocol agreed with the client.
      */
-    public interface ProtocolInfo {
+    interface ProtocolInfo {
         /**
          * ALPN information.
          * @return the protocol selected using ALPN
          */
-        public String getNegotiatedProtocol();
+        String getNegotiatedProtocol();
     }
 }

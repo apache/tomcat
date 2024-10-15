@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -103,10 +102,6 @@ public class JspC extends Task implements Options {
         // the Validator uses this to access the EL ExpressionFactory
         JspFactory.setDefaultFactory(new JspFactoryImpl());
     }
-
-    @Deprecated
-    public static final String DEFAULT_IE_CLASS_ID =
-            "clsid:8AD9C840-044E-11D1-B3E9-00805F499D93";
 
     // Logger
     private static final Log log = LogFactory.getLog(JspC.class);
@@ -202,8 +197,8 @@ public class JspC extends Task implements Options {
 
     protected String compiler = null;
 
-    protected String compilerTargetVM = "11";
-    protected String compilerSourceVM = "11";
+    protected String compilerTargetVM = "21";
+    protected String compilerSourceVM = "21";
 
     protected boolean classDebugInfo = true;
 
@@ -227,7 +222,7 @@ public class JspC extends Task implements Options {
     /**
      * The pages.
      */
-    protected final List<String> pages = new Vector<>();
+    protected final List<String> pages = new ArrayList<>();
 
     /**
      * Needs better documentation, this data member does.
@@ -294,13 +289,8 @@ public class JspC extends Task implements Options {
                 } else {
                     jspc.execute();
                 }
-            } catch (JasperException je) {
-                System.err.println(je);
-                if (jspc.dieLevel != NO_DIE_LEVEL) {
-                    System.exit(jspc.dieLevel);
-                }
-            } catch (BuildException je) {
-                System.err.println(je);
+            } catch (JasperException | BuildException e) {
+                System.err.println(e);
                 if (jspc.dieLevel != NO_DIE_LEVEL) {
                     System.exit(jspc.dieLevel);
                 }
@@ -487,9 +477,6 @@ public class JspC extends Task implements Options {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isPoolingEnabled() {
         return poolingEnabled;
@@ -503,9 +490,6 @@ public class JspC extends Task implements Options {
         this.poolingEnabled = poolingEnabled;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isXpoweredBy() {
         return xpoweredBy;
@@ -538,9 +522,6 @@ public class JspC extends Task implements Options {
         return -1;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean getErrorOnUseBeanInvalidClassAttribute() {
         return errorOnUseBeanInvalidClassAttribute;
@@ -555,9 +536,6 @@ public class JspC extends Task implements Options {
         errorOnUseBeanInvalidClassAttribute = b;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean getMappedFile() {
         return mappedFile;
@@ -575,18 +553,12 @@ public class JspC extends Task implements Options {
         classDebugInfo=b;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean getClassDebugInfo() {
         // compile with debug info
         return classDebugInfo;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isCaching() {
         return caching;
@@ -602,9 +574,6 @@ public class JspC extends Task implements Options {
         this.caching = caching;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Map<String, TagLibraryInfo> getCache() {
         return cache;
@@ -648,9 +617,6 @@ public class JspC extends Task implements Options {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isSmapSuppressed() {
         return smapSuppressed;
@@ -664,9 +630,6 @@ public class JspC extends Task implements Options {
         this.smapSuppressed = smapSuppressed;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isSmapDumped() {
         return smapDumped;
@@ -694,25 +657,16 @@ public class JspC extends Task implements Options {
         this.genStringAsCharArray = genStringAsCharArray;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean genStringAsCharArray() {
         return genStringAsCharArray;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public File getScratchDir() {
         return scratchDir;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getCompiler() {
         return compiler;
@@ -728,17 +682,11 @@ public class JspC extends Task implements Options {
         compiler=c;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getCompilerClassName() {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getCompilerTargetVM() {
         return compilerTargetVM;
@@ -754,9 +702,6 @@ public class JspC extends Task implements Options {
         compilerTargetVM = vm;
     }
 
-    /**
-     * {@inheritDoc}
-     */
      @Override
     public String getCompilerSourceVM() {
          return compilerSourceVM;
@@ -772,9 +717,6 @@ public class JspC extends Task implements Options {
         compilerSourceVM = vm;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public TldCache getTldCache() {
         return tldCache;
@@ -801,9 +743,6 @@ public class JspC extends Task implements Options {
         javaEncoding = encodingName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean getFork() {
         return fork;
@@ -813,9 +752,6 @@ public class JspC extends Task implements Options {
         this.fork = fork;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getClassPath() {
         if( classPath != null ) {
@@ -852,7 +788,7 @@ public class JspC extends Task implements Options {
     protected void addExtension(final String extension) {
         if(extension != null) {
             if(extensions == null) {
-                extensions = new Vector<>();
+                extensions = new ArrayList<>();
             }
 
             extensions.add(extension);
@@ -1091,17 +1027,11 @@ public class JspC extends Task implements Options {
         return failOnError;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JspConfig getJspConfig() {
         return jspConfig;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public TagPluginManager getTagPluginManager() {
         return tagPluginManager;
@@ -1135,8 +1065,7 @@ public class JspC extends Task implements Options {
         throws IOException
     {
         if (log.isDebugEnabled()) {
-            log.debug("Generating web mapping for file " + file
-                      + " using compilation context " + clctxt);
+            log.debug(Localizer.getMessage("jspc.generatingMapping", file, clctxt));
         }
 
         String className = clctxt.getServletClassName();
@@ -1300,10 +1229,11 @@ public class JspC extends Task implements Options {
     protected void processFile(String file) throws JasperException {
 
         if (log.isDebugEnabled()) {
-            log.debug("Processing file: " + file);
+            log.debug(Localizer.getMessage("jspc.processing", file));
         }
 
         ClassLoader originalClassLoader = null;
+        Thread currentThread = Thread.currentThread();
 
         try {
             // set up a scratch/output dir if none is provided
@@ -1328,8 +1258,8 @@ public class JspC extends Task implements Options {
                 clctxt.setBasePackageName(targetPackage);
             }
 
-            originalClassLoader = Thread.currentThread().getContextClassLoader();
-            Thread.currentThread().setContextClassLoader(loader);
+            originalClassLoader = currentThread.getContextClassLoader();
+            currentThread.setContextClassLoader(loader);
 
             clctxt.setClassLoader(loader);
             clctxt.setClassPath(classPath);
@@ -1342,7 +1272,7 @@ public class JspC extends Task implements Options {
             // the .java file
             if( clc.isOutDated(compile) ) {
                 if (log.isDebugEnabled()) {
-                    log.debug(jspUri + " is out dated, compiling...");
+                    log.debug(Localizer.getMessage("jspc.outdated", jspUri));
                 }
 
                 clc.compile(compile, true);
@@ -1351,7 +1281,7 @@ public class JspC extends Task implements Options {
             // Generate mapping
             generateWebMapping( file, clctxt );
             if ( showSuccess ) {
-                log.info( "Built File: " + file );
+                log.info(Localizer.getMessage("jspc.built", file));
             }
 
         } catch (JasperException je) {
@@ -1373,8 +1303,8 @@ public class JspC extends Task implements Options {
             }
             throw new JasperException(e);
         } finally {
-            if(originalClassLoader != null) {
-                Thread.currentThread().setContextClassLoader(originalClassLoader);
+            if (originalClassLoader != null) {
+                currentThread.setContextClassLoader(originalClassLoader);
             }
         }
     }
@@ -1419,7 +1349,7 @@ public class JspC extends Task implements Options {
     @Override
     public void execute() {
         if(log.isDebugEnabled()) {
-            log.debug("execute() starting for " + pages.size() + " pages.");
+            log.debug(Localizer.getMessage("jspc.start", Integer.toString(pages.size())));
         }
 
         try {
@@ -1752,8 +1682,7 @@ public class JspC extends Task implements Options {
             }
         }
 
-        URL urlsA[]=new URL[urls.size()];
-        urls.toArray(urlsA);
+        URL[] urlsA = urls.toArray(new URL[0]);
         loader = new URLClassLoader(urlsA, this.getClass().getClassLoader());
         return loader;
     }

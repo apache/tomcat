@@ -405,7 +405,7 @@ public class TestAuthConfigFactoryImpl {
         private String layerNotified;
         private String appContextNotified;
 
-        public SimpleRegistrationListener(String layer, String appContext) {
+        SimpleRegistrationListener(String layer, String appContext) {
             this.layer = layer;
             this.appContext = appContext;
         }

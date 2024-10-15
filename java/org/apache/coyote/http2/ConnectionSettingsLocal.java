@@ -19,16 +19,13 @@ package org.apache.coyote.http2;
 import java.util.Map;
 
 /**
- * Represents the local connection settings i.e. the settings the client is
- * expected to use when communicating with the server. There will be a delay
- * between calling a setter and the setting taking effect at the client. When a
- * setter is called, the new value is added to the set of pending settings. Once
- * the ACK is received, the new value is moved to the current settings. While
- * waiting for the ACK, the getters will return the most lenient / generous /
- * relaxed of the current setting and the pending setting. This class does not
- * validate the values passed to the setters. If an invalid value is used the
- * client will respond (almost certainly by closing the connection) as defined
- * in the HTTP/2 specification.
+ * Represents the local connection settings i.e. the settings the client is expected to use when communicating with the
+ * server. There will be a delay between calling a setter and the setting taking effect at the client. When a setter is
+ * called, the new value is added to the set of pending settings. Once the ACK is received, the new value is moved to
+ * the current settings. While waiting for the ACK, the getters will return the most lenient / generous / relaxed of the
+ * current setting and the pending setting. This class does not validate the values passed to the setters. If an invalid
+ * value is used the client will respond (almost certainly by closing the connection) as defined in the HTTP/2
+ * specification.
  */
 class ConnectionSettingsLocal extends ConnectionSettingsBase<IllegalArgumentException> {
 

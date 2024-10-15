@@ -31,7 +31,7 @@ public class SynchronizedStack<T> {
     private static final int DEFAULT_LIMIT = -1;
 
     private int size;
-    private final int limit;
+    private int limit;
 
     /*
      * Points to the next available object in the stack
@@ -52,7 +52,7 @@ public class SynchronizedStack<T> {
             this.size = size;
         }
         this.limit = limit;
-        stack = new Object[size];
+        stack = new Object[this.size];
     }
 
 
@@ -87,6 +87,10 @@ public class SynchronizedStack<T> {
             }
         }
         index = -1;
+    }
+
+    public synchronized void setLimit(int limit) {
+        this.limit = limit;
     }
 
     private void expand() {

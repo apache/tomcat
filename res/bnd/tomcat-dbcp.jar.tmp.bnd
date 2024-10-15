@@ -24,6 +24,8 @@ Export-Package: \
     org.apache.tomcat.dbcp.dbcp2,\
     org.apache.tomcat.dbcp.pool2,\
     org.apache.tomcat.dbcp.pool2.impl
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -jpms-module-info: \
     ${module.name};\

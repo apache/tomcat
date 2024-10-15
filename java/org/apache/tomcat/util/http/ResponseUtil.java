@@ -108,7 +108,7 @@ public class ResponseUtil {
     }
 
 
-    private static interface Adapter {
+    private interface Adapter {
 
         Collection<String> getHeaders(String name);
 
@@ -121,7 +121,7 @@ public class ResponseUtil {
     private static final class HeaderAdapter implements Adapter {
         private final MimeHeaders headers;
 
-        public HeaderAdapter(MimeHeaders headers) {
+        HeaderAdapter(MimeHeaders headers) {
             this.headers = headers;
         }
 
@@ -150,7 +150,7 @@ public class ResponseUtil {
     private static final class ResponseAdapter implements Adapter {
         private final HttpServletResponse response;
 
-        public ResponseAdapter(HttpServletResponse response) {
+        ResponseAdapter(HttpServletResponse response) {
             this.response = response;
         }
 

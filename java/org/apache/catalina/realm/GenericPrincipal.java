@@ -30,8 +30,8 @@ import org.apache.catalina.TomcatPrincipal;
 import org.ietf.jgss.GSSCredential;
 
 /**
- * Generic implementation of <strong>java.security.Principal</strong> that
- * is available for use by <code>Realm</code> implementations.
+ * Generic implementation of <strong>java.security.Principal</strong> that is available for use by <code>Realm</code>
+ * implementations.
  *
  * @author Craig R. McClanahan
  */
@@ -43,8 +43,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     // ----------------------------------------------------------- Constructors
 
     /**
-     * Construct a new Principal, associated with the specified Realm, for the
-     * specified username, with no roles.
+     * Construct a new Principal, associated with the specified Realm, for the specified username, with no roles.
      *
      * @param name The username of the user represented by this Principal
      */
@@ -53,10 +52,10 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     }
 
     /**
-     * Construct a new Principal, associated with the specified Realm, for the
-     * specified username, with the specified role names (as Strings).
+     * Construct a new Principal, associated with the specified Realm, for the specified username, with the specified
+     * role names (as Strings).
      *
-     * @param name The username of the user represented by this Principal
+     * @param name  The username of the user represented by this Principal
      * @param roles List of roles (must be Strings) possessed by this user
      */
     public GenericPrincipal(String name, List<String> roles) {
@@ -64,105 +63,46 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     }
 
     /**
-     * Construct a new Principal, associated with the specified Realm, for the
-     * specified username, with the specified role names (as Strings).
+     * Construct a new Principal, associated with the specified Realm, for the specified username, with the specified
+     * role names (as Strings).
      *
-     * @param name The username of the user represented by this Principal
-     * @param password  Unused
-     * @param roles List of roles (must be Strings) possessed by this user
-     *
-     * @deprecated This method will be removed in Tomcat 11 onwards
+     * @param name          The username of the user represented by this Principal
+     * @param roles         List of roles (must be Strings) possessed by this user
+     * @param userPrincipal - the principal to be returned from the request getUserPrincipal call if not null; if null,
+     *                          this will be returned
      */
-    @Deprecated
-    public GenericPrincipal(String name, String password, List<String> roles) {
-        this(name, roles, null);
-    }
-
-    /**
-     * Construct a new Principal, associated with the specified Realm, for the
-     * specified username, with the specified role names (as Strings).
-     *
-     * @param name The username of the user represented by this Principal
-     * @param roles List of roles (must be Strings) possessed by this user
-     * @param userPrincipal - the principal to be returned from the request
-     *        getUserPrincipal call if not null; if null, this will be returned
-     */
-    public GenericPrincipal(String name, List<String> roles,
-            Principal userPrincipal) {
+    public GenericPrincipal(String name, List<String> roles, Principal userPrincipal) {
         this(name, roles, userPrincipal, null);
     }
 
     /**
-     * Construct a new Principal, associated with the specified Realm, for the
-     * specified username, with the specified role names (as Strings).
+     * Construct a new Principal, associated with the specified Realm, for the specified username, with the specified
+     * role names (as Strings).
      *
-     * @param name The username of the user represented by this Principal
-     * @param password Unused
-     * @param roles List of roles (must be Strings) possessed by this user
-     * @param userPrincipal - the principal to be returned from the request
-     *        getUserPrincipal call if not null; if null, this will be returned
-     *
-     * @deprecated This method will be removed in Tomcat 11 onwards
+     * @param name          The username of the user represented by this Principal
+     * @param roles         List of roles (must be Strings) possessed by this user
+     * @param userPrincipal - the principal to be returned from the request getUserPrincipal call if not null; if null,
+     *                          this will be returned
+     * @param loginContext  - If provided, this will be used to log out the user at the appropriate time
      */
-    @Deprecated
-    public GenericPrincipal(String name, String password, List<String> roles,
-            Principal userPrincipal) {
-        this(name, roles, userPrincipal, null);
-    }
-
-    /**
-     * Construct a new Principal, associated with the specified Realm, for the
-     * specified username, with the specified role names (as Strings).
-     *
-     * @param name The username of the user represented by this Principal
-     * @param roles List of roles (must be Strings) possessed by this user
-     * @param userPrincipal - the principal to be returned from the request
-     *        getUserPrincipal call if not null; if null, this will be returned
-     * @param loginContext  - If provided, this will be used to log out the user
-     *        at the appropriate time
-     */
-    public GenericPrincipal(String name, List<String> roles,
-            Principal userPrincipal, LoginContext loginContext) {
+    public GenericPrincipal(String name, List<String> roles, Principal userPrincipal, LoginContext loginContext) {
         this(name, roles, userPrincipal, loginContext, null, null);
     }
 
     /**
-     * Construct a new Principal, associated with the specified Realm, for the
-     * specified username, with the specified role names (as Strings).
+     * Construct a new Principal, associated with the specified Realm, for the specified username, with the specified
+     * role names (as Strings).
      *
-     * @param name The username of the user represented by this Principal
-     * @param password Unused
-     * @param roles List of roles (must be Strings) possessed by this user
-     * @param userPrincipal - the principal to be returned from the request
-     *        getUserPrincipal call if not null; if null, this will be returned
-     * @param loginContext  - If provided, this will be used to log out the user
-     *        at the appropriate time
-     *
-     * @deprecated This method will be removed in Tomcat 11 onwards
-     */
-    @Deprecated
-    public GenericPrincipal(String name, String password, List<String> roles,
-            Principal userPrincipal, LoginContext loginContext) {
-        this(name, roles, userPrincipal, loginContext, null, null);
-    }
-
-    /**
-     * Construct a new Principal, associated with the specified Realm, for the
-     * specified username, with the specified role names (as Strings).
-     *
-     * @param name The username of the user represented by this Principal
-     * @param roles List of roles (must be Strings) possessed by this user
-     * @param userPrincipal - the principal to be returned from the request
-     *        getUserPrincipal call if not null; if null, this will be returned
-     * @param loginContext  - If provided, this will be used to log out the user
-     *        at the appropriate time
+     * @param name          The username of the user represented by this Principal
+     * @param roles         List of roles (must be Strings) possessed by this user
+     * @param userPrincipal - the principal to be returned from the request getUserPrincipal call if not null; if null,
+     *                          this will be returned
+     * @param loginContext  - If provided, this will be used to log out the user at the appropriate time
      * @param gssCredential - If provided, the user's delegated credentials
-     * @param attributes - If provided, additional attributes associated with
-     *        this Principal
+     * @param attributes    - If provided, additional attributes associated with this Principal
      */
-    public GenericPrincipal(String name, List<String> roles,
-            Principal userPrincipal, LoginContext loginContext,
-            GSSCredential gssCredential, Map<String, Object> attributes) {
+    public GenericPrincipal(String name, List<String> roles, Principal userPrincipal, LoginContext loginContext,
+            GSSCredential gssCredential, Map<String,Object> attributes) {
         super();
         this.name = name;
         this.userPrincipal = userPrincipal;
@@ -177,29 +117,6 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         this.loginContext = loginContext;
         this.gssCredential = gssCredential;
         this.attributes = attributes != null ? Collections.unmodifiableMap(attributes) : null;
-    }
-
-
-    /**
-     * Construct a new Principal, associated with the specified Realm, for the
-     * specified username, with the specified role names (as Strings).
-     *
-     * @param name The username of the user represented by this Principal
-     * @param password Unused
-     * @param roles List of roles (must be Strings) possessed by this user
-     * @param userPrincipal - the principal to be returned from the request
-     *        getUserPrincipal call if not null; if null, this will be returned
-     * @param loginContext  - If provided, this will be used to log out the user
-     *        at the appropriate time
-     * @param gssCredential - If provided, the user's delegated credentials
-     *
-     * @deprecated This method will be removed in Tomcat 11 onwards
-     */
-    @Deprecated
-    public GenericPrincipal(String name, String password, List<String> roles,
-            Principal userPrincipal, LoginContext loginContext,
-            GSSCredential gssCredential) {
-        this(name, roles, userPrincipal, loginContext, gssCredential, null);
     }
 
 
@@ -241,8 +158,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
 
 
     /**
-     * The JAAS LoginContext, if any, used to authenticate this Principal.
-     * Kept so we can call logout().
+     * The JAAS LoginContext, if any, used to authenticate this Principal. Kept so we can call logout().
      */
     protected final transient LoginContext loginContext;
 
@@ -256,6 +172,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     public GSSCredential getGssCredential() {
         return this.gssCredential;
     }
+
     protected void setGssCredential(GSSCredential gssCredential) {
         this.gssCredential = gssCredential;
     }
@@ -263,7 +180,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     /**
      * The additional attributes associated with this Principal.
      */
-    protected final Map<String, Object> attributes;
+    protected final Map<String,Object> attributes;
 
 
     // ---------------------------------------------------------- Public Methods
@@ -273,8 +190,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
      *
      * @param role Role to be tested
      *
-     * @return <code>true</code> if this Principal has been assigned the given
-     *         role, otherwise <code>false</code>
+     * @return <code>true</code> if this Principal has been assigned the given role, otherwise <code>false</code>
      */
     public boolean hasRole(String role) {
         if ("*".equals(role)) { // Special 2.4 role meaning everyone
@@ -287,10 +203,6 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     }
 
 
-    /**
-     * Return a String representation of this object, which exposes only
-     * information that should be public.
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("GenericPrincipal[");
@@ -345,10 +257,9 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         private final String name;
         private final String[] roles;
         private final Principal principal;
-        private final Map<String, Object> attributes;
+        private final Map<String,Object> attributes;
 
-        public SerializablePrincipal(String name, String[] roles,
-                Principal principal, Map<String, Object> attributes) {
+        SerializablePrincipal(String name, String[] roles, Principal principal, Map<String,Object> attributes) {
             this.name = name;
             this.roles = roles;
             if (principal instanceof Serializable) {
@@ -360,8 +271,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         }
 
         private Object readResolve() {
-            return new GenericPrincipal(name, Arrays.asList(roles), principal, null, null,
-                    attributes);
+            return new GenericPrincipal(name, Arrays.asList(roles), principal, null, null, attributes);
         }
     }
 }

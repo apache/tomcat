@@ -24,8 +24,7 @@ public abstract class EvaluationListener {
     /**
      * Fired before the evaluation of the expression.
      *
-     * @param context    The EL context in which the expression will be
-     *                   evaluated
+     * @param context    The EL context in which the expression will be evaluated
      * @param expression The expression that will be evaluated
      */
     public void beforeEvaluation(ELContext context, String expression) {

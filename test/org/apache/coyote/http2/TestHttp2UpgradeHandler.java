@@ -34,7 +34,7 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
         Tomcat.addServlet(ctxt, "large", new LargeHeaderServlet());
@@ -53,20 +53,14 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
         writeFrame(frameHeader, headersPayload);
 
         // Headers
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
         // Body
-        parser.readFrame(true);
+        parser.readFrame();
 
-        Assert.assertEquals(
-                "3-HeadersStart\n" +
-                "3-Header-[:status]-[200]\n" +
-                "3-Header-[x-ignore]-[...]\n" +
-                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
-                "3-Header-[content-length]-[2]\n" +
-                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "3-HeadersEnd\n" +
-                "3-Body-2\n" +
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[200]\n" + "3-Header-[x-ignore]-[...]\n" +
+                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" + "3-Header-[content-length]-[2]\n" +
+                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n" + "3-Body-2\n" +
                 "3-EndOfStream\n", output.getTrace());
     }
 
@@ -124,7 +118,7 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "ReadRequestBodyServlet", new ReadRequestBodyServlet());
         ctxt.addServletMappingDecoded("/", "ReadRequestBodyServlet");
 
@@ -136,14 +130,9 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
 
         openClientConnection();
 
-        byte[] upgradeRequest = ((usePost ? "POST" : "GET") +
-                " /" + (useReader ? "?useReader=true " : " ") + "HTTP/1.1\r\n" +
-                "Host: localhost:" + getPort() + "\r\n" +
-                "Content-Length: 18\r\n" +
-                "Connection: Upgrade,HTTP2-Settings\r\n" +
-                "Upgrade: h2c\r\n" +
-                EMPTY_HTTP2_SETTINGS_HEADER +
-                "\r\n" +
+        byte[] upgradeRequest = ((usePost ? "POST" : "GET") + " /" + (useReader ? "?useReader=true " : " ") +
+                "HTTP/1.1\r\n" + "Host: localhost:" + getPort() + "\r\n" + "Content-Length: 18\r\n" +
+                "Connection: Upgrade,HTTP2-Settings\r\n" + "Upgrade: h2c\r\n" + EMPTY_HTTP2_SETTINGS_HEADER + "\r\n" +
                 "Small request body").getBytes(StandardCharsets.ISO_8859_1);
         os.write(upgradeRequest);
         os.flush();
@@ -165,25 +154,67 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
             // - ping
             // - headers (for response)
             // - data (for response body)
-            parser.readFrame(true);
-            parser.readFrame(true);
-            parser.readFrame(true);
-            parser.readFrame(true);
-            parser.readFrame(true);
+            parser.readFrame();
+            parser.readFrame();
+            parser.readFrame();
+            parser.readFrame();
+            parser.readFrame();
 
-            Assert.assertEquals("0-Settings-[3]-[200]\n" +
-                    "0-Settings-End\n" +
-                    "0-Settings-Ack\n" +
-                    "0-Ping-[0,0,0,0,0,0,0,1]\n" +
-                    "1-HeadersStart\n" +
-                    "1-Header-[:status]-[200]\n" +
-                    "1-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
-                    "1-Header-[content-length]-[39]\n" +
-                    "1-Header-[date]-[" + DEFAULT_DATE + "]\n" +
-                    "1-HeadersEnd\n" +
-                    "1-Body-39\n" +
-                    "1-EndOfStream\n"
-                    , output.getTrace());
+            Assert.assertEquals("0-Settings-[3]-[200]\n" + "0-Settings-End\n" + "0-Settings-Ack\n" +
+                    "0-Ping-[0,0,0,0,0,0,0,1]\n" + "1-HeadersStart\n" + "1-Header-[:status]-[200]\n" +
+                    "1-Header-[content-type]-[text/plain;charset=UTF-8]\n" + "1-Header-[content-length]-[39]\n" +
+                    "1-Header-[date]-[" + DEFAULT_DATE + "]\n" + "1-HeadersEnd\n" + "1-Body-39\n" + "1-EndOfStream\n",
+                    output.getTrace());
+        }
+    }
+
+
+    @Test
+    public void testActiveConnectionCountAndClientTimeout() throws Exception {
+
+        enableHttp2(2, false, 10000, 10000, 4000, 2000, 2000);
+
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctxt = getProgrammaticRootContext();
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMappingDecoded("/simple", "simple");
+
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse(2);
+
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        byte[] dataFrameHeader = new byte[9];
+        ByteBuffer dataFramePayload = ByteBuffer.allocate(128);
+
+        // Should be able to make more than 2 requests even if they timeout
+        // since they should be removed from active connections once they
+        // timeout
+        for (int stream = 3; stream < 8; stream += 2) {
+            // Don't write the body. Allow the read to timeout.
+            buildPostRequest(frameHeader, headersPayload, false, dataFrameHeader, dataFramePayload, null, stream);
+            writeFrame(frameHeader, headersPayload);
+
+            // 400 response (triggered by IOException trying to read body that never arrived)
+            parser.readFrame();
+            Assert.assertTrue(output.getTrace(),
+                    output.getTrace().startsWith(stream + "-HeadersStart\n" + stream + "-Header-[:status]-[400]\n"));
+            output.clearTrace();
+
+            // reset frame
+            parser.readFrame();
+            Assert.assertEquals(stream + "-RST-[11]\n", output.getTrace());
+            output.clearTrace();
+
+            // Prepare buffers for re-use
+            headersPayload.clear();
+            dataFramePayload.clear();
         }
     }
 }

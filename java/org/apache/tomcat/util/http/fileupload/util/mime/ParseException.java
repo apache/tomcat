@@ -17,7 +17,7 @@
 package org.apache.tomcat.util.http.fileupload.util.mime;
 
 /**
- * @since 1.3
+ * @since FileUpload 1.3
  */
 final class ParseException extends Exception {
 

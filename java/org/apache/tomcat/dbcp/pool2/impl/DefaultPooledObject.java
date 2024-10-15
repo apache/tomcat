@@ -130,9 +130,7 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
         }
         if (state == PooledObjectState.EVICTION_RETURN_TO_HEAD) {
             state = PooledObjectState.IDLE;
-            if (!idleQueue.offerFirst(this)) {
-                // TODO - Should never happen
-            }
+            idleQueue.offerFirst(this);
         }
 
         return false;
@@ -306,11 +304,9 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
      */
     @Override
     public void setRequireFullStackTrace(final boolean requireFullStackTrace) {
-        borrowedBy = CallStackUtils.newCallStack("'Pooled object created' " +
-            "yyyy-MM-dd HH:mm:ss Z 'by the following code has not been returned to the pool:'",
-            true, requireFullStackTrace);
-        usedBy = CallStackUtils.newCallStack("The last code to use this object was:",
-            false, requireFullStackTrace);
+        borrowedBy = new ThrowableCallStack("'Pooled object created' " +
+            "yyyy-MM-dd HH:mm:ss Z 'by the following code has not been returned to the pool:'", true);
+        usedBy = new ThrowableCallStack("The last code to use this object was:", false);
     }
 
     @Override

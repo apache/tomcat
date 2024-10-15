@@ -25,26 +25,31 @@ import org.apache.tomcat.util.net.Nio2Endpoint;
 /**
  * HTTP/1.1 protocol implementation using NIO2.
  */
-public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> {
+public class Http11Nio2Protocol extends AbstractHttp11Protocol<Nio2Channel> {
 
     private static final Log log = LogFactory.getLog(Http11Nio2Protocol.class);
 
 
     public Http11Nio2Protocol() {
-        super(new Nio2Endpoint());
+        this(new Nio2Endpoint());
+    }
+
+
+    public Http11Nio2Protocol(Nio2Endpoint endpoint) {
+        super(endpoint);
     }
 
 
     @Override
-    protected Log getLog() { return log; }
+    protected Log getLog() {
+        return log;
+    }
 
-
-    // ----------------------------------------------------- JMX related methods
 
     @Override
     protected String getNamePrefix() {
         if (isSSLEnabled()) {
-            return "https-" + getSslImplementationShortName()+ "-nio2";
+            return "https-" + getSslImplementationShortName() + "-nio2";
         } else {
             return "http-nio2";
         }

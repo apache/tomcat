@@ -40,13 +40,13 @@ public final class Ascii {
      */
     static {
         for (int i = 0; i < 256; i++) {
-            toLower[i] = (byte)i;
+            toLower[i] = (byte) i;
         }
 
         for (int lc = 'a'; lc <= 'z'; lc++) {
             int uc = lc + 'A' - 'a';
 
-            toLower[uc] = (byte)lc;
+            toLower[uc] = (byte) lc;
         }
 
         for (int d = '0'; d <= '9'; d++) {
@@ -56,7 +56,9 @@ public final class Ascii {
 
     /**
      * Returns the lower case equivalent of the specified ASCII character.
+     *
      * @param c The char
+     *
      * @return the lower case equivalent char
      */
     public static int toLower(int c) {
@@ -65,6 +67,7 @@ public final class Ascii {
 
     /**
      * @return <code>true</code> if the specified ASCII character is a digit.
+     *
      * @param c The char
      */
     private static boolean isDigit(int c) {
@@ -73,15 +76,16 @@ public final class Ascii {
 
     /**
      * Parses an unsigned long from the specified subarray of bytes.
-     * @param b the bytes to parse
+     *
+     * @param b   the bytes to parse
      * @param off the start offset of the bytes
      * @param len the length of the bytes
+     *
      * @return the long value
+     *
      * @exception NumberFormatException if the long format was invalid
      */
-    public static long parseLong(byte[] b, int off, int len)
-        throws NumberFormatException
-    {
+    public static long parseLong(byte[] b, int off, int len) throws NumberFormatException {
         int c;
 
         if (b == null || len <= 0 || !isDigit(c = b[off++])) {
@@ -90,8 +94,7 @@ public final class Ascii {
 
         long n = c - '0';
         while (--len > 0) {
-            if (isDigit(c = b[off++]) &&
-                    (n < OVERFLOW_LIMIT || (n == OVERFLOW_LIMIT && (c - '0') < 8))) {
+            if (isDigit(c = b[off++]) && (n < OVERFLOW_LIMIT || (n == OVERFLOW_LIMIT && (c - '0') < 8))) {
                 n = n * 10 + c - '0';
             } else {
                 throw new NumberFormatException();

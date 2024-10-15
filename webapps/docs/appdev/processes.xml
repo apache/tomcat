@@ -43,11 +43,10 @@ multiple programmers involved, as long as you have an appropriate source code
 control system and internal team rules about who is working on what parts
 of the application at any given time.</p>
 
-<p>The task descriptions below assume that you will be using CVS for source
-code control, and that you have already configured access to the appropriate
-CVS repository.  Instructions for doing this are beyond the scope of this
-manual.  If you are using a different source code control environment, you
-will need to figure out the corresponding commands for your system.</p>
+<p>The task descriptions below do not assume any particular source code control
+system but simply identify when and what source code control tasks are typically
+performed. You will need to idenitfy the appropriate source code control
+commands for your system.</p>
 
 
 <subsection name="One-Time Setup of Ant and Tomcat for Development">
@@ -83,10 +82,8 @@ be using.  The directory structure is described in <a href="source.html">the
 previous section</a>, or you can use the
 <a href="sample/">sample application</a> as a starting point.</p>
 
-<p>Create your project source directory, and define it within your CVS
-repository.  This might be done by a series of commands like this, where
-<code>{project}</code> is the name under which your project should be
-stored in the CVS repository, and {username} is your login username:</p>
+<p>Create your project source directory, and define it within your source code
+control system. This might be done by a series of commands like this:</p>
 <source><![CDATA[cd {my home directory}
 mkdir myapp <-- Assumed "project source directory"
 cd myapp
@@ -94,14 +91,12 @@ mkdir docs
 mkdir src
 mkdir web
 mkdir web/WEB-INF
-cvs import -m "Initial Project Creation" {project} \
-    {username} start]]></source>
+cvs or svn or git ... <-- Add this structure to the appropriate repository
+]]></source>
 
-<p>Now, to verify that it was created correctly in CVS, we will perform a
-checkout of the new project:</p>
-<source><![CDATA[cd ..
-mv myapp myapp.bu
-cvs checkout {project}]]></source>
+<p>To verify that the project was created correctly in the source code control
+repository, you may wish to check out the project to a separate directory and
+confirm that all the expected contents are present.</p>
 
 <p>Next, you will need to create and check in an initial version of the
 <code>build.xml</code> script to be used for development.  For getting
@@ -111,12 +106,8 @@ or code it from scratch.</p>
 <source><![CDATA[cd {my home directory}
 cd myapp
 emacs build.xml     <-- if you want a real editor :-)
-cvs add build.xml
-cvs commit]]></source>
-
-<p>Until you perform the CVS commit, your changes are local to your own
-development directory.  Committing makes those changes visible to other
-developers on your team that are sharing the same CVS repository.</p>
+cvs or svn or git ... <-- Add this file to the repository
+]]></source>
 
 <p>The next step is to customize the Ant <em>properties</em> that are
 named in the <code>build.xml</code> script.  This is done by creating a
@@ -137,8 +128,8 @@ manager.username=myusername
 manager.password=mypassword</source>
 
 <p>In general, you will <strong>not</strong> want to check the
-<code>build.properties</code> file in to the CVS repository, because it
-is unique to each developer's environment.</p>
+<code>build.properties</code> file in to the source code control repository,
+because it is unique to each developer's environment.</p>
 
 <p>Now, create the initial version of the web application deployment
 descriptor.  You can base <code>web.xml</code> on the
@@ -146,8 +137,8 @@ descriptor.  You can base <code>web.xml</code> on the
 <source><![CDATA[cd {my home directory}
 cd myapp/web/WEB-INF
 emacs web.xml
-cvs add web.xml
-cvs commit]]></source>
+cvs or svn or git ... <-- Add this file to the repository
+]]></source>
 
 Note that this is only an example web.xml file.  The full definition
 of the deployment descriptor file is in the
@@ -164,35 +155,30 @@ As described in <a href="source.html">Source Organization</a>, newly created
 source files should be located in the appropriate subdirectory, under your
 project source directory.</p>
 
-<p>Whenever you wish to refresh your development directory to reflect the
-work performed by other developers, you will ask CVS to do it for you:</p>
-<source><![CDATA[cd {my home directory}
-cd myapp
-cvs update -dP]]></source>
+<p>You should regularly refresh your development directory to reflect the
+work performed by other developers.</p>
 
-<p>To create a new file, go to the appropriate directory, create the file,
-and register it with CVS.  When you are satisfied with it's contents (after
-building and testing is successful), commit the new file to the repository.
-For example, to create a new JSP page:</p>
+<p>To create a new file, go to the appropriate directory and create the file.
+When you are satisfied with its contents (after building and testing is
+successful), add the new file to the repository. For example, to create a new
+JSP page:</p>
 <source><![CDATA[cd {my home directory}
 cd myapp/web        <-- Ultimate destination is document root
 emacs mypage.jsp
-cvs add mypage.jsp
 ... build and test the application ...
-cvs commit]]></source>
+cvs or svn or git ... <-- Add this file to the repository
+]]></source>
 
-<p>Java source code that is defined in packages must be organized in a
-directory hierarchy (under the <strong>src/</strong> subdirectory) that
-matches the package names.  For example, a Java class named
+<p>Java source code that is defined in packages must be organized in a directory
+hierarchy (under the <strong>src/</strong> subdirectory) that matches the
+package names.  For example, a Java class named
 <code>com.mycompany.mypackage.MyClass.java</code> should be stored in file
 <code>src/com/mycompany/mypackage/MyClass.java</code>.
-Whenever you create a new subdirectory, don't forget to
-register it with CVS.</p>
+Whenever you create a new file, don't forget to add it to the source code
+control system.</p>
 
 <p>To edit an existing source file, you will generally just start editing
-and testing, then commit the changed file when everything works.  Although
-CVS can be configured to required you to "check out" or "lock" a file you
-are going to be modifying, this is generally not used.</p>
+and testing, then commit the changed file when everything works.</p>
 
 </subsection>
 
@@ -249,9 +235,9 @@ a pattern like this:</p>
 <li><p><em>Modify and rebuild as needed</em>.  As you discover that changes
     are required, make those changes in the original <strong>source</strong>
     files, not in the output build directory, and re-issue the
-    <code>ant compile</code> command.  This ensures that your changes will
-    be available to be saved (via <code>cvs commit</code>) later on --
-    the output build directory is deleted and recreated as necessary.
+    <code>ant compile</code> command.  This ensures that your changes will be
+    available to be saved (via your chosen source code control system) later on
+    -- the output build directory is deleted and recreated as necessary.
     </p></li>
 <li><p><em>Reload the application</em>.  Tomcat will recognize changes in
     JSP pages automatically, but it will continue to use the old versions
@@ -280,10 +266,10 @@ following general steps are required:</p>
 <li><p>Issue the command <code>ant all</code> from the project source
     directory, to rebuild everything from scratch one last time.
     </p></li>
-<li><p>Use the <code>cvs tag</code> command to create an identifier for
-    all of the source files utilized to create this release.  This allows
-    you to reliably reconstruct a release (from sources) at a later
-    time.
+<li><p>Use the source code control system to tag the current state of the code
+    to create an identifier for all of the source files utilized to create this
+    release.  This allows you to reliably reconstruct a release (from sources)
+    at a later time.
     </p></li>
 <li><p>Issue the command <code>ant dist</code> to create a distributable
     web application archive (WAR) file, as well as a JAR file containing

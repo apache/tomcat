@@ -47,16 +47,3 @@
     <jsp:setProperty name="bean2" property="intPrimitive" value="1" />
   </jsp:body>
 </bugs:TesterDynamicTag>
-<bugs:TesterDynamicTag bugs:x="foo">
-  <jsp:attribute name="attribute04">
-  </jsp:attribute>
-  <jsp:body>
-    <jsp:plugin code="" type="bean" jreversion="1.5">
-       <jsp:params>
-         <jsp:param name="object" value="bar"/>
-         <jsp:param name="type" value="bar"/>
-         <jsp:param name="foo" value="bar"/>
-       </jsp:params>
-    </jsp:plugin>
-  </jsp:body>
-</bugs:TesterDynamicTag>

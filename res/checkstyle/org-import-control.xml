@@ -112,6 +112,7 @@
     <allow pkg="org.apache.jasper"/>
     <allow pkg="org.apache.juli"/>
     <allow pkg="org.apache.tomcat" exact-match="true"/>
+    <allow pkg="org.apache.tomcat.util.buf"/>
     <allow pkg="org.apache.tomcat.util.descriptor"/>
     <allow pkg="org.apache.tomcat.util.scan"/>
     <allow pkg="org.apache.tomcat.util.security"/>
@@ -126,6 +127,7 @@
     <allow pkg="javax.wsdl"/>
     <allow pkg="org.apache.juli"/>
     <allow pkg="org.apache.naming"/>
+    <allow class="org.apache.tomcat.util.ExceptionUtils"/>
     <allow class="org.apache.tomcat.util.buf.UDecoder"/>
     <allow class="org.apache.tomcat.util.buf.UEncoder"/>
     <allow class="org.apache.tomcat.util.http.FastHttpDateFormat"/>

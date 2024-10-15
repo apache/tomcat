@@ -16,21 +16,18 @@
  */
 package org.apache.el.parser;
 
-import java.io.StringReader;
-
+import jakarta.el.ELBaseTest;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.ValueExpression;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.jasper.el.ELContextImpl;
-import org.apache.tomcat.util.collections.SynchronizedStack;
 
-public class TestELParser {
+public class TestELParser extends ELBaseTest {
 
     @Test
     public void testBug49081() {
@@ -64,7 +61,7 @@ public class TestELParser {
     @Test
     public void testJavaKeyWordSuffix() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         TesterBeanA beanA = new TesterBeanA();
         beanA.setInt("five");
@@ -86,7 +83,7 @@ public class TestELParser {
     @Test
     public void testJavaKeyWordIdentifier() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         TesterBeanA beanA = new TesterBeanA();
         beanA.setInt("five");
@@ -177,7 +174,7 @@ public class TestELParser {
 
     private void doTestBug56179(int parenthesesCount, String innerExpr) {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         ValueExpression var =
             factory.createValueExpression(Boolean.TRUE, Boolean.class);
@@ -186,13 +183,13 @@ public class TestELParser {
         StringBuilder expr = new StringBuilder();
         expr.append("${");
         for (int i = 0; i < parenthesesCount; i++) {
-            expr.append("(");
+            expr.append('(');
         }
         expr.append(innerExpr);
         for (int i = 0; i < parenthesesCount; i++) {
-            expr.append(")");
+            expr.append(')');
         }
-        expr.append("}");
+        expr.append('}');
         ValueExpression ve = factory.createValueExpression(
                 context, expr.toString(), String.class);
 
@@ -203,7 +200,7 @@ public class TestELParser {
     @Test
     public void bug56185() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         TesterBeanC beanC = new TesterBeanC();
         ValueExpression var =
@@ -222,69 +219,12 @@ public class TestELParser {
 
     private void testExpression(String expression, String expected) {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         ValueExpression ve = factory.createValueExpression(
                 context, expression, String.class);
 
         String result = (String) ve.getValue(context);
         Assert.assertEquals(expected, result);
-    }
-
-    /*
-     * Test to explore if re-using Parser instances is faster.
-     *
-     * Tests on my laptop show:
-     * - overhead by introducing the stack is in the noise for parsing even the
-     *   simplest expression
-     * - efficiency from re-using the ELParser is measurable for even a single
-     *   reuse of the parser
-     * - with large numbers of parses (~10k) performance for a trivial parse is
-     *   three times faster
-     * - around the 100 iterations mark GC overhead adds significant noise to
-     *   the results - for consistent results you either need fewer parses to
-     *   avoid triggering GC or more parses so the GC effects are evenly
-     *   distributed between the runs
-     *
-     * Note that the test is single threaded.
-     */
-    @Ignore
-    @Test
-    public void testParserPerformance() throws ParseException {
-        final int runs = 20;
-        final int parseIterations = 10000;
-
-
-        for (int j = 0; j < runs; j ++) {
-            long start = System.nanoTime();
-            SynchronizedStack<ELParser> stack = new SynchronizedStack<>();
-
-            for (int i = 0; i < parseIterations; i ++) {
-                ELParser parser = stack.pop();
-                if (parser == null) {
-                    parser = new ELParser(new StringReader("${'foo'}"));
-                } else {
-                    parser.ReInit(new StringReader("${'foo'}"));
-                }
-                parser.CompositeExpression();
-                stack.push(parser);
-            }
-            long end = System.nanoTime();
-
-            System.out.println(parseIterations +
-                    " iterations using ELParser.ReInit(...) took " + (end - start) + "ns");
-        }
-
-        for (int j = 0; j < runs; j ++) {
-            long start = System.nanoTime();
-            for (int i = 0; i < parseIterations; i ++) {
-                ELParser parser = new ELParser(new StringReader("${'foo'}"));
-                parser.CompositeExpression();
-            }
-            long end = System.nanoTime();
-
-            System.out.println(parseIterations +
-                    " iterations using    new ELParser(...) took " + (end - start) + "ns");
-        }
     }
 }

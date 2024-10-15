@@ -20,9 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
@@ -32,13 +29,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.jasper.Constants;
 import org.apache.jasper.EmbeddedServletOptions;
 import org.apache.jasper.Options;
 import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.runtime.ExceptionUtils;
-import org.apache.jasper.security.SecurityUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.PeriodicEventListener;
@@ -76,9 +71,6 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
     private String jspFile;
 
 
-    /*
-     * Initializes this JspServlet.
-     */
     @Override
     public void init(ServletConfig config) throws ServletException {
 
@@ -89,11 +81,6 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
         // Initialize the JSP Runtime Context
         // Check for a custom Options implementation
         String engineOptionsName = config.getInitParameter("engineOptionsClass");
-        if (Constants.IS_SECURITY_ENABLED && engineOptionsName != null) {
-            log.info(Localizer.getMessage(
-                    "jsp.info.ignoreSetting", "engineOptionsClass", engineOptionsName));
-            engineOptionsName = null;
-        }
         if (engineOptionsName != null) {
             // Instantiate the indicated Options implementation
             try {
@@ -126,21 +113,8 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                 throw new ServletException(Localizer.getMessage("jsp.error.no.jsp", jspFile), e);
             }
             try {
-                if (SecurityUtil.isPackageProtectionEnabled()){
-                   AccessController.doPrivileged((PrivilegedExceptionAction<Object>) () -> {
-                       serviceJspFile(null, null, jspFile, true);
-                       return null;
-                   });
-                } else {
-                    serviceJspFile(null, null, jspFile, true);
-                }
+                serviceJspFile(null, null, jspFile, true);
             } catch (IOException e) {
-                throw new ServletException(Localizer.getMessage("jsp.error.precompilation", jspFile), e);
-            } catch (PrivilegedActionException e) {
-                Throwable t = e.getCause();
-                if (t instanceof ServletException) {
-                    throw (ServletException)t;
-                }
                 throw new ServletException(Localizer.getMessage("jsp.error.precompilation", jspFile), e);
             }
         }
@@ -314,13 +288,13 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             }
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("JspEngine --> " + jspUri);
-            log.debug("\t     ServletPath: " + request.getServletPath());
-            log.debug("\t        PathInfo: " + request.getPathInfo());
-            log.debug("\t        RealPath: " + context.getRealPath(jspUri));
-            log.debug("\t      RequestURI: " + request.getRequestURI());
-            log.debug("\t     QueryString: " + request.getQueryString());
+        if (log.isTraceEnabled()) {
+            log.trace("JspEngine --> " + jspUri);
+            log.trace("\t     ServletPath: " + request.getServletPath());
+            log.trace("\t        PathInfo: " + request.getPathInfo());
+            log.trace("\t        RealPath: " + context.getRealPath(jspUri));
+            log.trace("\t      RequestURI: " + request.getRequestURI());
+            log.trace("\t     QueryString: " + request.getQueryString());
         }
 
         try {
@@ -337,8 +311,8 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
     @Override
     public void destroy() {
-        if (log.isDebugEnabled()) {
-            log.debug("JspServlet.destroy()");
+        if (log.isTraceEnabled()) {
+            log.trace("JspServlet.destroy()");
         }
 
         rctxt.destroy();

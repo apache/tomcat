@@ -31,7 +31,7 @@
             border: 1px solid #CCCCCC;
             border-right-color: #999999;
             border-bottom-color: #999999;
-            height: 170px;
+            height: 600px;
             overflow-y: scroll;
             padding: 5px;
             width: 100%;
@@ -42,7 +42,7 @@
             margin: 0;
         }
     ]]></style>
-    <script type="application/javascript"><![CDATA[
+    <script type="text/javascript"><![CDATA[
         "use strict";
 
         var Chat = {};
@@ -102,7 +102,7 @@
             p.style.wordWrap = 'break-word';
             p.innerHTML = message;
             console.appendChild(p);
-            while (console.childNodes.length > 25) {
+            while (console.childNodes.length > 100) {
                 console.removeChild(console.firstChild);
             }
             console.scrollTop = console.scrollHeight;

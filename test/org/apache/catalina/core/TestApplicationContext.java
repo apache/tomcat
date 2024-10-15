@@ -184,7 +184,7 @@ public class TestApplicationContext extends TomcatBaseTest {
         Context bar = tomcat.addContext("/bar", null);
         bar.addLifecycleListener(new SetIdListener("bar"));
 
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addLifecycleListener(new SetIdListener("ROOT"));
         ctx.setCrossContext(true);
 
@@ -235,7 +235,7 @@ public class TestApplicationContext extends TomcatBaseTest {
 
         private final String id;
 
-        public SetIdListener(String id) {
+        SetIdListener(String id) {
             this.id = id;
         }
 
@@ -290,7 +290,7 @@ public class TestApplicationContext extends TomcatBaseTest {
         private final String targetContextPath;
         private final String targetPath;
 
-        public SetAttributeServlet(String targetPath, String targetContextPath) {
+        SetAttributeServlet(String targetPath, String targetContextPath) {
             this.targetPath = targetPath;
             this.targetContextPath = targetContextPath;
         }

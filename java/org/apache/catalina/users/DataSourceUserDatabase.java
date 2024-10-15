@@ -61,17 +61,17 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      */
     protected final String id;
 
-    protected final ConcurrentHashMap<String, User> createdUsers = new ConcurrentHashMap<>();
-    protected final ConcurrentHashMap<String, User> modifiedUsers = new ConcurrentHashMap<>();
-    protected final ConcurrentHashMap<String, User> removedUsers = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,User> createdUsers = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,User> modifiedUsers = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,User> removedUsers = new ConcurrentHashMap<>();
 
-    protected final ConcurrentHashMap<String, Group> createdGroups = new ConcurrentHashMap<>();
-    protected final ConcurrentHashMap<String, Group> modifiedGroups = new ConcurrentHashMap<>();
-    protected final ConcurrentHashMap<String, Group> removedGroups = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,Group> createdGroups = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,Group> modifiedGroups = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,Group> removedGroups = new ConcurrentHashMap<>();
 
-    protected final ConcurrentHashMap<String, Role> createdRoles = new ConcurrentHashMap<>();
-    protected final ConcurrentHashMap<String, Role> modifiedRoles = new ConcurrentHashMap<>();
-    protected final ConcurrentHashMap<String, Role> removedRoles = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,Role> createdRoles = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,Role> modifiedRoles = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,Role> removedRoles = new ConcurrentHashMap<>();
 
 
     // ----------------------------------------------------- Instance Variables
@@ -144,7 +144,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
 
     /**
-     * The column in the role and group tables for the decription
+     * The column in the role and group tables for the description
      */
     protected String roleAndGroupDescriptionCol = null;
 
@@ -269,7 +269,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      *
      * @param roleNameCol The column name
      */
-    public void setRoleNameCol( String roleNameCol ) {
+    public void setRoleNameCol(String roleNameCol) {
         this.roleNameCol = roleNameCol;
     }
 
@@ -285,8 +285,8 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      *
      * @param userCredCol The column name
      */
-    public void setUserCredCol( String userCredCol ) {
-       this.userCredCol = userCredCol;
+    public void setUserCredCol(String userCredCol) {
+        this.userCredCol = userCredCol;
     }
 
     /**
@@ -301,8 +301,8 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      *
      * @param userNameCol The column name
      */
-    public void setUserNameCol( String userNameCol ) {
-       this.userNameCol = userNameCol;
+    public void setUserNameCol(String userNameCol) {
+        this.userNameCol = userNameCol;
     }
 
     /**
@@ -317,7 +317,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      *
      * @param userRoleTable The table name
      */
-    public void setUserRoleTable( String userRoleTable ) {
+    public void setUserRoleTable(String userRoleTable) {
         this.userRoleTable = userRoleTable;
     }
 
@@ -333,8 +333,8 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      *
      * @param userTable The table name
      */
-    public void setUserTable( String userTable ) {
-      this.userTable = userTable;
+    public void setUserTable(String userTable) {
+        this.userTable = userTable;
     }
 
 
@@ -461,31 +461,30 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
         try {
             groupsReadLock.lock();
             try {
-                HashMap<String, Group> groups = new HashMap<>();
+                HashMap<String,Group> groups = new HashMap<>();
                 groups.putAll(createdGroups);
                 groups.putAll(modifiedGroups);
 
-                Connection dbConnection = openConnection();
-                if (dbConnection != null && preparedAllGroups != null) {
-                    try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAllGroups)) {
-                        try (ResultSet rs = stmt.executeQuery()) {
-                            while (rs.next()) {
-                                String groupName = rs.getString(1);
-                                if (groupName != null) {
-                                    if (!groups.containsKey(groupName) && !removedGroups.containsKey(groupName)) {
-                                        Group group = findGroupInternal(dbConnection, groupName);
-                                        if (group != null) {
-                                            groups.put(groupName, group);
+                try (Connection dbConnection = openConnection()) {
+                    if (dbConnection != null && preparedAllGroups != null) {
+                        try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAllGroups)) {
+                            try (ResultSet rs = stmt.executeQuery()) {
+                                while (rs.next()) {
+                                    String groupName = rs.getString(1);
+                                    if (groupName != null) {
+                                        if (!groups.containsKey(groupName) && !removedGroups.containsKey(groupName)) {
+                                            Group group = findGroupInternal(dbConnection, groupName);
+                                            if (group != null) {
+                                                groups.put(groupName, group);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    } catch (SQLException e) {
-                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                    } finally {
-                        closeConnection(dbConnection);
                     }
+                } catch (SQLException e) {
+                    log.error(sm.getString("dataSourceUserDatabase.exception"), e);
                 }
                 return groups.values().iterator();
             } finally {
@@ -502,31 +501,30 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
         try {
             rolesReadLock.lock();
             try {
-                HashMap<String, Role> roles = new HashMap<>();
+                HashMap<String,Role> roles = new HashMap<>();
                 roles.putAll(createdRoles);
                 roles.putAll(modifiedRoles);
 
-                Connection dbConnection = openConnection();
-                if (dbConnection != null && preparedAllRoles != null) {
-                    try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAllRoles)) {
-                        try (ResultSet rs = stmt.executeQuery()) {
-                            while (rs.next()) {
-                                String roleName = rs.getString(1);
-                                if (roleName != null) {
-                                    if (!roles.containsKey(roleName) && !removedRoles.containsKey(roleName)) {
-                                        Role role = findRoleInternal(dbConnection, roleName);
-                                        if (role != null) {
-                                            roles.put(roleName, role);
+                try (Connection dbConnection = openConnection()) {
+                    if (dbConnection != null && preparedAllRoles != null) {
+                        try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAllRoles)) {
+                            try (ResultSet rs = stmt.executeQuery()) {
+                                while (rs.next()) {
+                                    String roleName = rs.getString(1);
+                                    if (roleName != null) {
+                                        if (!roles.containsKey(roleName) && !removedRoles.containsKey(roleName)) {
+                                            Role role = findRoleInternal(dbConnection, roleName);
+                                            if (role != null) {
+                                                roles.put(roleName, role);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    } catch (SQLException e) {
-                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                    } finally {
-                        closeConnection(dbConnection);
                     }
+                } catch (SQLException e) {
+                    log.error(sm.getString("dataSourceUserDatabase.exception"), e);
                 }
                 return roles.values().iterator();
             } finally {
@@ -543,7 +541,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
         try {
             usersReadLock.lock();
             try {
-                HashMap<String, User> users = new HashMap<>();
+                HashMap<String,User> users = new HashMap<>();
                 users.putAll(createdUsers);
                 users.putAll(modifiedUsers);
 
@@ -936,10 +934,9 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
         if (log.isDebugEnabled()) {
             // As there are lots of parameters to configure, log some debug to help out
-            log.debug("DataSource UserDatabase features: User<->Role ["
-                    + Boolean.toString(userRoleTable != null && roleNameCol != null)
-                    + "], Roles [" + Boolean.toString(isRoleStoreDefined())
-                    + "], Groups [" + Boolean.toString(isRoleStoreDefined()) + "]");
+            log.debug(sm.getString("dataSourceUserDatabase.features",
+                    Boolean.toString(userRoleTable != null && roleNameCol != null),
+                    Boolean.toString(isRoleStoreDefined()), Boolean.toString(isGroupStoreDefined())));
         }
 
         dbWriteLock.lock();
@@ -948,7 +945,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             StringBuilder temp = new StringBuilder("SELECT ");
             temp.append(userCredCol);
             if (userFullNameCol != null) {
-                temp.append(",").append(userFullNameCol);
+                temp.append(',').append(userFullNameCol);
             }
             temp.append(" FROM ");
             temp.append(userTable);
@@ -994,7 +991,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 temp = new StringBuilder("SELECT ");
                 temp.append(groupNameCol);
                 if (roleAndGroupDescriptionCol != null) {
-                    temp.append(",").append(roleAndGroupDescriptionCol);
+                    temp.append(',').append(roleAndGroupDescriptionCol);
                 }
                 temp.append(" FROM ");
                 temp.append(groupTable);
@@ -1015,7 +1012,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 temp = new StringBuilder("SELECT ");
                 temp.append(roleNameCol);
                 if (roleAndGroupDescriptionCol != null) {
-                    temp.append(",").append(roleAndGroupDescriptionCol);
+                    temp.append(',').append(roleAndGroupDescriptionCol);
                 }
                 temp.append(" FROM ");
                 temp.append(roleTable);
@@ -1571,16 +1568,18 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
     /**
      * Only use groups if the tables are fully defined.
+     *
      * @return true when groups are used
      */
     protected boolean isGroupStoreDefined() {
-        return groupTable != null && userGroupTable != null && groupNameCol != null
-                && groupRoleTable != null && isRoleStoreDefined();
+        return groupTable != null && userGroupTable != null && groupNameCol != null && groupRoleTable != null &&
+                isRoleStoreDefined();
     }
 
 
     /**
      * Only use roles if the tables are fully defined.
+     *
      * @return true when roles are used
      */
     protected boolean isRoleStoreDefined() {

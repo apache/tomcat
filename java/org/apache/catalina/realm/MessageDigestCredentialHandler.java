@@ -21,33 +21,32 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Base64;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.HexUtils;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 
 /**
  * This credential handler supports the following forms of stored passwords:
  * <ul>
- * <li><b>encodedCredential</b> - a hex encoded digest of the password digested
- *     using the configured digest</li>
- * <li><b>{MD5}encodedCredential</b> - a Base64 encoded MD5 digest of the
- *     password</li>
- * <li><b>{SHA}encodedCredential</b> - a Base64 encoded SHA1 digest of the
- *     password</li>
- * <li><b>{SSHA}encodedCredential</b> - 20 byte Base64 encoded SHA1 digest
- *     followed by variable length salt.
- *     <pre>{SSHA}&lt;sha-1 digest:20&gt;&lt;salt:n&gt;</pre></li>
- * <li><b>salt$iterationCount$encodedCredential</b> - a hex encoded salt,
- *     iteration code and a hex encoded credential, each separated by $</li>
- * </ul>
+ * <li><b>encodedCredential</b> - a hex encoded digest of the password digested using the configured digest</li>
+ * <li><b>{MD5}encodedCredential</b> - a Base64 encoded MD5 digest of the password</li>
+ * <li><b>{SHA}encodedCredential</b> - a Base64 encoded SHA1 digest of the password</li>
+ * <li><b>{SSHA}encodedCredential</b> - 20 byte Base64 encoded SHA1 digest followed by variable length salt.
  *
+ * <pre>
+ * {SSHA}&lt;sha-1 digest:20&gt;&lt;salt:n&gt;
+ * </pre>
+ *
+ * </li>
+ * <li><b>salt$iterationCount$encodedCredential</b> - a hex encoded salt, iteration code and a hex encoded credential,
+ * each separated by $</li>
+ * </ul>
  * <p>
- * If the stored password form does not include an iteration count then an
- * iteration count of 1 is used.
+ * If the stored password form does not include an iteration count then an iteration count of 1 is used.
  * <p>
  * If the stored password form does not include salt then no salt is used.
  */
@@ -109,9 +108,9 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
                 // Server is storing digested passwords with a prefix indicating
                 // the digest type
                 String base64ServerDigest = storedCredentials.substring(5);
-                byte[] userDigest = ConcurrentMessageDigest.digest(
-                        getAlgorithm(), inputCredentials.getBytes(StandardCharsets.ISO_8859_1));
-                String base64UserDigest = Base64.encodeBase64String(userDigest);
+                byte[] userDigest = ConcurrentMessageDigest.digest(getAlgorithm(),
+                        inputCredentials.getBytes(StandardCharsets.ISO_8859_1));
+                String base64UserDigest = Base64.getEncoder().encodeToString(userDigest);
 
                 return DigestCredentialHandlerBase.equals(base64UserDigest, base64ServerDigest, false);
             } else if (storedCredentials.startsWith("{SSHA}")) {
@@ -119,7 +118,7 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
                 // Need to convert the salt to bytes to apply it to the user's
                 // digested password.
                 String serverDigestPlusSalt = storedCredentials.substring(6);
-                byte[] serverDigestPlusSaltBytes = Base64.decodeBase64(serverDigestPlusSalt);
+                byte[] serverDigestPlusSaltBytes = Base64.getDecoder().decode(serverDigestPlusSalt);
 
                 // Extract the first 20 bytes containing the SHA-1 digest
                 final int digestLength = 20;
@@ -134,8 +133,7 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
                 // Generate the digested form of the user provided password
                 // using the salt
                 byte[] userDigestBytes = ConcurrentMessageDigest.digest(getAlgorithm(),
-                        inputCredentials.getBytes(StandardCharsets.ISO_8859_1),
-                        serverSaltBytes);
+                        inputCredentials.getBytes(StandardCharsets.ISO_8859_1), serverSaltBytes);
 
                 return Arrays.equals(userDigestBytes, serverDigestBytes);
             } else if (storedCredentials.indexOf('$') > -1) {

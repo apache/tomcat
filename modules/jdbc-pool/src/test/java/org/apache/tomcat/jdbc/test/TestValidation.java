@@ -54,7 +54,7 @@ public class TestValidation extends DefaultTestCase {
         datasource.setMinIdle(1);
         datasource.setMaxIdle(1);
         datasource.setMaxActive(2);
-        // Validation interval is disabled by default to ensure validation occurs everytime
+        // Validation interval is disabled by default to ensure validation occurs every time
         datasource.setValidationInterval(-1);
         // No validation query by default
         datasource.setValidationQuery(null);
@@ -490,7 +490,7 @@ public class TestValidation extends DefaultTestCase {
 
     /* ------- Helper mock classes ----- */
 
-    public static enum ValidationOutcome {
+    public enum ValidationOutcome {
         SUCCESS,  // Validation returns true
         FAILURE,  // Validation returns false
         EXCEPTION // Validation throws an unexpected exception

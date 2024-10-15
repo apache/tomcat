@@ -48,25 +48,19 @@ public class DirResourceSet extends AbstractFileResourceSet {
     }
 
     /**
-     * Creates a new {@link org.apache.catalina.WebResourceSet} based on a
-     * directory.
+     * Creates a new {@link org.apache.catalina.WebResourceSet} based on a directory.
      *
-     * @param root          The {@link WebResourceRoot} this new
-     *                          {@link org.apache.catalina.WebResourceSet} will
-     *                          be added to.
-     * @param webAppMount   The path within the web application at which this
-     *                          {@link org.apache.catalina.WebResourceSet} will
-     *                          be mounted. For example, to add a directory of
-     *                          JARs to a web application, the directory would
-     *                          be mounted at "/WEB-INF/lib/"
-     * @param base          The absolute path to the directory on the file
-     *                          system from which the resources will be served.
-     * @param internalPath  The path within this new {@link
-     *                          org.apache.catalina.WebResourceSet} where
-     *                          resources will be served from.
+     * @param root         The {@link WebResourceRoot} this new {@link org.apache.catalina.WebResourceSet} will be added
+     *                         to.
+     * @param webAppMount  The path within the web application at which this {@link org.apache.catalina.WebResourceSet}
+     *                         will be mounted. For example, to add a directory of JARs to a web application, the
+     *                         directory would be mounted at "/WEB-INF/lib/"
+     * @param base         The absolute path to the directory on the file system from which the resources will be
+     *                         served.
+     * @param internalPath The path within this new {@link org.apache.catalina.WebResourceSet} where resources will be
+     *                         served from.
      */
-    public DirResourceSet(WebResourceRoot root, String webAppMount, String base,
-            String internalPath) {
+    public DirResourceSet(WebResourceRoot root, String webAppMount, String base, String internalPath) {
         super(internalPath);
         setRoot(root);
         setWebAppMount(webAppMount);
@@ -77,8 +71,7 @@ public class DirResourceSet extends AbstractFileResourceSet {
             f = new File(f, "/WEB-INF/classes/META-INF/resources");
 
             if (f.isDirectory()) {
-                root.createWebResourceSet(ResourceSetType.RESOURCE_JAR, "/",
-                         f.getAbsolutePath(), null, "/");
+                root.createWebResourceSet(ResourceSetType.RESOURCE_JAR, "/", f.getAbsolutePath(), null, "/");
             }
         }
 
@@ -136,10 +129,9 @@ public class DirResourceSet extends AbstractFileResourceSet {
             if (webAppMount.startsWith(path)) {
                 int i = webAppMount.indexOf('/', path.length());
                 if (i == -1) {
-                    return new String[] {webAppMount.substring(path.length())};
+                    return new String[] { webAppMount.substring(path.length()) };
                 } else {
-                    return new String[] {
-                            webAppMount.substring(path.length(), i)};
+                    return new String[] { webAppMount.substring(path.length(), i) };
                 }
             }
             return EMPTY_STRING_ARRAY;
@@ -172,8 +164,10 @@ public class DirResourceSet extends AbstractFileResourceSet {
                                 // path that was contributed by 'f' and check
                                 // that what is left does not contain a symlink.
                                 absPath = entry.getAbsolutePath().substring(f.getAbsolutePath().length());
-                                if (entry.getCanonicalPath().length() >= f.getCanonicalPath().length()) {
-                                    canPath = entry.getCanonicalPath().substring(f.getCanonicalPath().length());
+                                String entryCanPath = entry.getCanonicalPath();
+                                String fCanPath = f.getCanonicalPath();
+                                if (entryCanPath.length() >= fCanPath.length()) {
+                                    canPath = entryCanPath.substring(fCanPath.length());
                                     if (absPath.equals(canPath)) {
                                         symlink = false;
                                     }
@@ -239,8 +233,7 @@ public class DirResourceSet extends AbstractFileResourceSet {
         checkPath(path);
 
         if (is == null) {
-            throw new NullPointerException(
-                    sm.getString("dirResourceSet.writeNpe"));
+            throw new NullPointerException(sm.getString("dirResourceSet.writeNpe"));
         }
 
         if (isReadOnly()) {
@@ -284,12 +277,12 @@ public class DirResourceSet extends AbstractFileResourceSet {
     @Override
     protected void checkType(File file) {
         if (file.isDirectory() == false) {
-            throw new IllegalArgumentException(sm.getString("dirResourceSet.notDirectory",
-                    getBase(), File.separator, getInternalPath()));
+            throw new IllegalArgumentException(
+                    sm.getString("dirResourceSet.notDirectory", getBase(), File.separator, getInternalPath()));
         }
     }
 
-    //-------------------------------------------------------- Lifecycle methods
+    // -------------------------------------------------------- Lifecycle methods
     @Override
     protected void initInternal() throws LifecycleException {
         super.initInternal();

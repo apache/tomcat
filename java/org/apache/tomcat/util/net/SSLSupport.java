@@ -26,53 +26,63 @@ public interface SSLSupport {
     /**
      * The Request attribute key for the cipher suite.
      */
-    public static final String CIPHER_SUITE_KEY =
+    String SECURE_PROTOCOL_KEY =
+            "jakarta.servlet.request.secure_protocol";
+
+
+    /**
+     * The Request attribute key for the cipher suite.
+     */
+    String CIPHER_SUITE_KEY =
             "jakarta.servlet.request.cipher_suite";
 
     /**
      * The Request attribute key for the key size.
      */
-    public static final String KEY_SIZE_KEY = "jakarta.servlet.request.key_size";
+    String KEY_SIZE_KEY = "jakarta.servlet.request.key_size";
 
     /**
      * The Request attribute key for the client certificate chain.
      */
-    public static final String CERTIFICATE_KEY =
+    String CERTIFICATE_KEY =
             "jakarta.servlet.request.X509Certificate";
 
     /**
      * The Request attribute key for the session id.
      * This one is a Tomcat extension to the Servlet spec.
      */
-    public static final String SESSION_ID_KEY =
+    String SESSION_ID_KEY =
             "jakarta.servlet.request.ssl_session_id";
 
     /**
      * The request attribute key for the session manager.
      * This one is a Tomcat extension to the Servlet spec.
      */
-    public static final String SESSION_MGR =
+    String SESSION_MGR =
             "jakarta.servlet.request.ssl_session_mgr";
 
     /**
      * The request attribute key under which the String indicating the protocol
      * that created the SSL socket is recorded - e.g. TLSv1 or TLSv1.2 etc.
+     *
+     * @deprecated Replaced by {@link #SECURE_PROTOCOL_KEY}. This constant will be removed in Tomcat 12.
      */
-    public static final String PROTOCOL_VERSION_KEY =
+    @Deprecated
+    String PROTOCOL_VERSION_KEY =
             "org.apache.tomcat.util.net.secure_protocol_version";
 
     /**
      * The request attribute key under which the String indicating the ciphers
      * requested by the client are recorded.
      */
-    public static final String REQUESTED_CIPHERS_KEY =
+    String REQUESTED_CIPHERS_KEY =
             "org.apache.tomcat.util.net.secure_requested_ciphers";
 
     /**
      * The request attribute key under which the String indicating the protocols
      * requested by the client are recorded.
      */
-    public static final String REQUESTED_PROTOCOL_VERSIONS_KEY =
+    String REQUESTED_PROTOCOL_VERSIONS_KEY =
             "org.apache.tomcat.util.net.secure_requested_protocol_versions";
 
     /**
@@ -83,7 +93,7 @@ public interface SSLSupport {
      *
      * @throws IOException If an error occurs trying to obtain the cipher suite
      */
-    public String getCipherSuite() throws IOException;
+    String getCipherSuite() throws IOException;
 
     /**
      * The client certificate chain (if any).
@@ -95,7 +105,7 @@ public interface SSLSupport {
      * @throws IOException If an error occurs trying to obtain the certificate
      *                     chain
      */
-    public X509Certificate[] getPeerCertificateChain() throws IOException;
+    X509Certificate[] getPeerCertificateChain() throws IOException;
 
     /**
      * The server certificate chain (if any) that were sent to the peer.
@@ -104,7 +114,7 @@ public interface SSLSupport {
      *         certificate first, followed by those of any certificate
      *         authorities
      */
-    public default X509Certificate[] getLocalCertificateChain() {
+    default X509Certificate[] getLocalCertificateChain() {
         return null;
     }
 
@@ -126,7 +136,7 @@ public interface SSLSupport {
      *
      * @throws IOException If an error occurs trying to obtain the key size
      */
-    public Integer getKeySize() throws IOException;
+    Integer getKeySize() throws IOException;
 
     /**
      * The current session Id.
@@ -135,7 +145,7 @@ public interface SSLSupport {
      *
      * @throws IOException If an error occurs trying to obtain the session ID
      */
-    public String getSessionId() throws IOException;
+    String getSessionId() throws IOException;
 
     /**
      * @return the protocol String indicating how the SSL socket was created
@@ -144,23 +154,21 @@ public interface SSLSupport {
      * @throws IOException If an error occurs trying to obtain the protocol
      *   information from the socket
      */
-    public String getProtocol() throws IOException;
+    String getProtocol() throws IOException;
 
     /**
-     *
      * @return the list of SSL/TLS protocol versions requested by the client
      *
      * @throws IOException If an error occurs trying to obtain the client
      *   requested protocol information from the socket
      */
-    public String getRequestedProtocols() throws IOException;
+    String getRequestedProtocols() throws IOException;
 
     /**
-    *
     * @return the list of SSL/TLS ciphers requested by the client
     *
      * @throws IOException If an error occurs trying to obtain the client
      *   request cipher information from the socket
     */
-   public String getRequestedCiphers() throws IOException;
+   String getRequestedCiphers() throws IOException;
 }

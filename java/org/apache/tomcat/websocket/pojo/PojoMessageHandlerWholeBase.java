@@ -35,24 +35,22 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsSession;
 
 /**
- * Common implementation code for the POJO whole message handlers. All the real
- * work is done in this class and in the superclass.
+ * Common implementation code for the POJO whole message handlers. All the real work is done in this class and in the
+ * superclass.
  *
- * @param <T>   The type of message to handle
+ * @param <T> The type of message to handle
  */
-public abstract class PojoMessageHandlerWholeBase<T>
-        extends PojoMessageHandlerBase<T> implements MessageHandler.Whole<T> {
+public abstract class PojoMessageHandlerWholeBase<T> extends PojoMessageHandlerBase<T>
+        implements MessageHandler.Whole<T> {
 
-    private final Log log = LogFactory.getLog(PojoMessageHandlerWholeBase.class);  // must not be static
+    private final Log log = LogFactory.getLog(PojoMessageHandlerWholeBase.class); // must not be static
     private static final StringManager sm = StringManager.getManager(PojoMessageHandlerWholeBase.class);
 
     protected final List<Decoder> decoders = new ArrayList<>();
 
-    public PojoMessageHandlerWholeBase(Object pojo, Method method,
-            Session session, Object[] params, int indexPayload,
+    public PojoMessageHandlerWholeBase(Object pojo, Method method, Session session, Object[] params, int indexPayload,
             boolean convert, int indexSession, long maxMessageSize) {
-        super(pojo, method, session, params, indexPayload, convert,
-                indexSession, maxMessageSize);
+        super(pojo, method, session, params, indexPayload, convert, indexSession, maxMessageSize);
     }
 
 
@@ -71,8 +69,7 @@ public abstract class PojoMessageHandlerWholeBase<T>
     public final void onMessage(T message) {
 
         if (params.length == 1 && params[0] instanceof DecodeException) {
-            ((WsSession) session).getLocal().onError(session,
-                    (DecodeException) params[0]);
+            ((WsSession) session).getLocal().onError(session, (DecodeException) params[0]);
             return;
         }
 
@@ -103,8 +100,10 @@ public abstract class PojoMessageHandlerWholeBase<T>
         Object result = null;
         try {
             result = method.invoke(pojo, parameters);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            handlePojoMethodException(e);
+        } catch (InvocationTargetException e) {
+            handlePojoMethodInvocationTargetException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
         processResult(result);
     }

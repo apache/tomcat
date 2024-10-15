@@ -24,9 +24,8 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.x500.X500Principal;
 
 /**
- * Callback that enables an authentication module to request a certificate chain
- * and private key from the runtime. The information specifying the chain and
- * key may be an alias, a digest, a subject key, or an issuer ID. Other request
+ * Callback that enables an authentication module to request a certificate chain and private key from the runtime. The
+ * information specifying the chain and key may be an alias, a digest, a subject key, or an issuer ID. Other request
  * types may be supported.
  */
 public class PrivateKeyCallback implements Callback {
@@ -56,7 +55,7 @@ public class PrivateKeyCallback implements Callback {
         return chain;
     }
 
-    public static interface Request {
+    public interface Request {
     }
 
     public static class AliasRequest implements Request {

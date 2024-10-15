@@ -18,6 +18,7 @@ package org.apache.catalina.authenticator;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,6 @@ import org.apache.catalina.startup.TesterServletEncodeUrl;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
@@ -668,7 +668,7 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
             String userCredentials = username + ":" + password;
             byte[] credentialsBytes =
                     userCredentials.getBytes(StandardCharsets.ISO_8859_1);
-            String base64auth = Base64.encodeBase64String(credentialsBytes);
+            String base64auth = Base64.getEncoder().encodeToString(credentialsBytes);
             credentials= method + " " + base64auth;
         }
 

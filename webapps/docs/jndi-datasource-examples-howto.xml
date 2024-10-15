@@ -72,7 +72,7 @@ the section about Automatic Application Deployment in the latter reference.
 <section name="DriverManager, the service provider mechanism and memory leaks">
 
 <p><code>java.sql.DriverManager</code> supports the
-<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/sql/DriverManager.html">service
+<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/DriverManager.html">service
 provider</a> mechanism. This feature is that all the available JDBC drivers
 that announce themselves by providing a <code>META-INF/services/java.sql.Driver</code>
 file are automatically discovered, loaded and registered,
@@ -87,7 +87,7 @@ that is included with Apache Tomcat solves this by triggering the driver scan
 during Tomcat startup. This is enabled by default. It means that only
 libraries visible to the common class loader and its parents will be scanned for
 database drivers. This include drivers in <code>$CATALINA_HOME/lib</code>,
-<code>$CATALINA_BASE/lib</code>, the class path and the modeul path. Drivers
+<code>$CATALINA_BASE/lib</code>, the class path and the module path. Drivers
 packaged in web applications (in <code>WEB-INF/lib</code>) and in the shared
 class loader (where configured) will not be visible and will not be loaded
 automatically. If you are considering disabling this feature, note that the scan
@@ -298,8 +298,8 @@ resource to your <a href="config/context.html">Context</a>.</p>
 <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
-  version="6.0">
+                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_1.xsd"
+  version="6.1">
   <description>MySQL Test App</description>
   <resource-ref>
       <description>DB Connection</description>

@@ -64,7 +64,7 @@ public class ManagedConcurrentWeakHashMap<K, V> extends AbstractMap<K, V> implem
         private final int hash;
         private boolean dead;
 
-        public Key(Object key, ReferenceQueue<Object> queue) {
+        Key(Object key, ReferenceQueue<Object> queue) {
             super(key, queue);
             hash = key.hashCode();
         }

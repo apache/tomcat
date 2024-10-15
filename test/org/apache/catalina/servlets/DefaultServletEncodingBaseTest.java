@@ -258,7 +258,7 @@ public abstract class DefaultServletEncodingBaseTest extends TomcatBaseTest {
         private final String includeTarget;
         private final boolean useWriter;
 
-        public EncodingServlet(String outputEncoding, boolean callSetCharacterEncoding,
+        EncodingServlet(String outputEncoding, boolean callSetCharacterEncoding,
                 String includeTarget, boolean useWriter) {
             this.outputEncoding = outputEncoding;
             this.callSetCharacterEncoding = callSetCharacterEncoding;

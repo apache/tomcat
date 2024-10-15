@@ -24,9 +24,8 @@ import java.util.Locale;
 import javax.net.SocketFactory;
 
 /**
- * AJP client that is not (yet) a full AJP client implementation as it just
- * provides the functionality required for the unit tests. The client uses
- * blocking IO throughout.
+ * AJP client that is not (yet) a full AJP client implementation as it just provides the functionality required for the
+ * unit tests. The client uses blocking IO throughout.
  */
 public class SimpleAjpClient {
 
@@ -39,8 +38,7 @@ public class SimpleAjpClient {
         ajpCping.appendByte(Constants.JK_AJP13_CPING_REQUEST);
         ajpCping.end();
         AJP_CPING = new byte[ajpCping.getLen()];
-        System.arraycopy(ajpCping.getBuffer(), 0, AJP_CPING, 0,
-                ajpCping.getLen());
+        System.arraycopy(ajpCping.getBuffer(), 0, AJP_CPING, 0, ajpCping.getLen());
     }
 
     private final int packetSize;
@@ -349,20 +347,16 @@ public class SimpleAjpClient {
     /*
      * Sends an TesterAjpMessage to the server and returns the response message.
      */
-    public TesterAjpMessage sendMessage(TesterAjpMessage headers)
-            throws IOException {
+    public TesterAjpMessage sendMessage(TesterAjpMessage headers) throws IOException {
         return sendMessage(headers, null);
     }
 
-    public TesterAjpMessage sendMessage(TesterAjpMessage headers,
-            TesterAjpMessage body) throws IOException {
+    public TesterAjpMessage sendMessage(TesterAjpMessage headers, TesterAjpMessage body) throws IOException {
         // Send the headers
-        socket.getOutputStream().write(
-                headers.getBuffer(), 0, headers.getLen());
+        socket.getOutputStream().write(headers.getBuffer(), 0, headers.getLen());
         if (body != null) {
             // Send the body of present
-            socket.getOutputStream().write(
-                    body.getBuffer(), 0, body.getLen());
+            socket.getOutputStream().write(body.getBuffer(), 0, body.getLen());
         }
         // Read the response
         return readMessage();
@@ -398,18 +392,15 @@ public class SimpleAjpClient {
             return message;
         } else {
             if (messageLength > buf.length) {
-                throw new IllegalArgumentException("Message too long [" +
-                        Integer.valueOf(messageLength) +
-                        "] for buffer length [" +
-                        Integer.valueOf(buf.length) + "]");
+                throw new IllegalArgumentException("Message too long [" + Integer.valueOf(messageLength) +
+                        "] for buffer length [" + Integer.valueOf(buf.length) + "]");
             }
             read(is, buf, Constants.H_SIZE, messageLength);
             return message;
         }
     }
 
-    protected boolean read(InputStream is, byte[] buf, int pos, int n)
-        throws IOException {
+    protected boolean read(InputStream is, byte[] buf, int pos, int n) throws IOException {
 
         int read = 0;
         int res = 0;

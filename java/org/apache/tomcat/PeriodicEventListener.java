@@ -20,5 +20,5 @@ public interface PeriodicEventListener {
     /**
      * Execute a periodic task, such as reloading, etc.
      */
-    public void periodicEvent();
+    void periodicEvent();
 }

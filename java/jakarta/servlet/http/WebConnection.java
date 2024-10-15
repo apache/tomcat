@@ -22,16 +22,14 @@ import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletOutputStream;
 
 /**
- * The interface used by an {@link HttpUpgradeHandler} to interact with an upgraded
- * HTTP connection.
+ * The interface used by an {@link HttpUpgradeHandler} to interact with an upgraded HTTP connection.
  *
  * @since Servlet 3.1
  */
 public interface WebConnection extends AutoCloseable {
 
     /**
-     * Provides access to the {@link ServletInputStream} for reading data from
-     * the client.
+     * Provides access to the {@link ServletInputStream} for reading data from the client.
      *
      * @return the input stream
      *
@@ -40,8 +38,7 @@ public interface WebConnection extends AutoCloseable {
     ServletInputStream getInputStream() throws IOException;
 
     /**
-     * Provides access to the {@link ServletOutputStream} for writing data to
-     * the client.
+     * Provides access to the {@link ServletOutputStream} for writing data to the client.
      *
      * @return the output stream
      *

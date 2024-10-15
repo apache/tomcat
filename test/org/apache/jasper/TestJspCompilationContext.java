@@ -71,4 +71,58 @@ public class TestJspCompilationContext extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertTrue(body.toString().contains("00 - OK"));
     }
+
+
+    /*
+     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=69135
+     */
+    @Test
+    public void testTagFileInJarIncludesValid() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk body = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug6nnnn/bug69135.jsp", body, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        // Context relative include (starts with "/")
+        Assert.assertTrue(body.toString(), body.toString().contains("00 - OK"));
+
+        // Resource relative include (does not start with "/")
+        Assert.assertTrue(body.toString(), body.toString().contains("01 - OK"));
+    }
+
+
+    /*
+     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=69135
+     */
+    @Test
+    public void testTagFileInJarIncludesInvalidJar() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk body = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug6nnnn/bug69135-invalid-jar.jsp", body, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+    }
+
+
+    /*
+     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=69135
+     */
+    @Test
+    public void testTagFileInJarIncludesInvalidJarEscape() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk body = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug6nnnn/bug69135-invalid-jar-escape.jsp", body, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+    }
 }

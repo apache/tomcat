@@ -18,8 +18,8 @@
 <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
-  version="6.0"
+                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_1.xsd"
+  version="6.1"
   metadata-complete="true">
 
   <display-name>Tomcat Manager Application</display-name>
@@ -52,8 +52,15 @@
       <param-value>true</param-value>
     </init-param>
     -->
+    <!-- Uncomment this to set a sub-title for the manager web application main
+         page. It must be XML escaped, valid HTML.
+    <init-param>
+      <param-name>htmlSubTitle</param-name>
+      <param-value>Sub-Title</param-value>
+    </init-param>
+    -->
     <multipart-config>
-      <!-- 50MB max -->
+      <!-- 50 MiB max -->
       <max-file-size>52428800</max-file-size>
       <max-request-size>52428800</max-request-size>
       <file-size-threshold>0</file-size-threshold>

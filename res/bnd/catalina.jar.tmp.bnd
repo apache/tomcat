@@ -45,24 +45,23 @@ Export-Package: \
     org.apache.catalina.webresources.war,\
     org.apache.catalina.manager.util,\
     org.apache.catalina
-
--includepackage: \
-    org.apache.naming.factory.webservices
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -jpms-module-info: \
     ${module.name};\
         access=32;\
         version=${Bundle-Version};\
         modules='\
-            jakarta.ejb-api,\
+            jakarta.ejb,\
             jakarta.mail,\
-            jakarta.persistence-api,\
-            jakarta.xml.rpc-api,\
+            jakarta.persistence,\
+            jakarta.xml.ws,\
             java.xml.ws'
 -jpms-module-info-options: \
     ${module.name};substitute=catalina,\
-    jakarta.ejb-api;static=true,\
+    jakarta.ejb;static=true,\
     jakarta.mail;static=true,\
-    jakarta.persistence-api;static=true,\
-    jakarta.xml.rpc-api;static=true,\
+    jakarta.persistence;static=true,\
+    jakarta.xml.ws;static=true,\
     java.xml.ws;static=true

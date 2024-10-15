@@ -28,67 +28,58 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.SessionConfig;
 
 /**
- * <p>A Valve to detect situations where a load-balanced node receiving a
- * request has been deactivated by the load balancer (JK_LB_ACTIVATION=DIS)
- * and the incoming request has no valid session.</p>
+ * <p>
+ * A Valve to detect situations where a load-balanced node receiving a request has been deactivated by the load balancer
+ * (JK_LB_ACTIVATION=DIS) and the incoming request has no valid session.
+ * </p>
+ * <p>
+ * In these cases, the user's session cookie should be removed if it exists, any ";jsessionid" parameter should be
+ * removed from the request URI, and the client should be redirected to the same URI. This will cause the load-balanced
+ * to re-balance the client to another server.
+ * </p>
+ * <p>
+ * All this work is required because when the activation state of a node is DISABLED, the load-balancer will still send
+ * requests to the node if they appear to have a session on that node. Since mod_jk doesn't actually know whether the
+ * session id is valid, it will send the request blindly to the disabled node, which makes it take much longer to drain
+ * the node than strictly necessary.
+ * </p>
+ * <p>
+ * For testing purposes, a special cookie can be configured and used by a client to ignore the normal behavior of this
+ * Valve and allow a client to get a new session on a DISABLED node. See {@link #setIgnoreCookieName} and
+ * {@link #setIgnoreCookieValue} to configure those values.
+ * </p>
+ * <p>
+ * This Valve should be installed earlier in the Valve pipeline than any authentication valves, as the redirection
+ * should take place before an authentication valve would save a request to a protected resource.
+ * </p>
  *
- * <p>In these cases, the user's session cookie should be removed if it exists,
- * any ";jsessionid" parameter should be removed from the request URI,
- * and the client should be redirected to the same URI. This will cause the
- * load-balanced to re-balance the client to another server.</p>
- *
- * <p>All this work is required because when the activation state of a node is
- * DISABLED, the load-balancer will still send requests to the node if they
- * appear to have a session on that node. Since mod_jk doesn't actually know
- * whether the session id is valid, it will send the request blindly to
- * the disabled node, which makes it take much longer to drain the node
- * than strictly necessary.</p>
- *
- * <p>For testing purposes, a special cookie can be configured and used
- * by a client to ignore the normal behavior of this Valve and allow
- * a client to get a new session on a DISABLED node. See
- * {@link #setIgnoreCookieName} and {@link #setIgnoreCookieValue}
- * to configure those values.</p>
- *
- * <p>This Valve should be installed earlier in the Valve pipeline than any
- * authentication valves, as the redirection should take place before an
- * authentication valve would save a request to a protected resource.</p>
- *
- * @see <a href="https://tomcat.apache.org/connectors-doc/generic_howto/loadbalancers.html">Load
- *      balancer documentation</a>
+ * @see <a href="https://tomcat.apache.org/connectors-doc/generic_howto/loadbalancers.html">Load balancer
+ *          documentation</a>
  */
 public class LoadBalancerDrainingValve extends ValveBase {
 
     /**
-     * The request attribute key where the load-balancer's activation state
-     * can be found.
+     * The request attribute key where the load-balancer's activation state can be found.
      */
     public static final String ATTRIBUTE_KEY_JK_LB_ACTIVATION = "JK_LB_ACTIVATION";
 
     /**
-     * The HTTP response code that will be used to redirect the request
-     * back to the load-balancer for re-balancing. Defaults to 307
-     * (TEMPORARY_REDIRECT).
-     *
-     * HTTP status code 305 (USE_PROXY) might be an option, here. too.
+     * The HTTP response code that will be used to redirect the request back to the load-balancer for re-balancing.
+     * Defaults to 307 (TEMPORARY_REDIRECT). HTTP status code 305 (USE_PROXY) might be an option, here. too.
      */
     private int _redirectStatusCode = HttpServletResponse.SC_TEMPORARY_REDIRECT;
 
     /**
-     * The name of the cookie which can be set to ignore the "draining" action
-     * of this Filter. This will allow a client to contact the server without
-     * being re-balanced to another server. The expected cookie value can be set
-     * in the {@link #_ignoreCookieValue}. The cookie name and value must match
-     * to avoid being re-balanced.
+     * The name of the cookie which can be set to ignore the "draining" action of this Filter. This will allow a client
+     * to contact the server without being re-balanced to another server. The expected cookie value can be set in the
+     * {@link #_ignoreCookieValue}. The cookie name and value must match to avoid being re-balanced.
      */
     private String _ignoreCookieName;
 
     /**
-     * The value of the cookie which can be set to ignore the "draining" action
-     * of this Filter. This will allow a client to contact the server without
-     * being re-balanced to another server. The expected cookie name can be set
-     * in the {@link #_ignoreCookieName}. The cookie name and value must match
-     * to avoid being re-balanced.
+     * The value of the cookie which can be set to ignore the "draining" action of this Filter. This will allow a client
+     * to contact the server without being re-balanced to another server. The expected cookie name can be set in the
+     * {@link #_ignoreCookieName}. The cookie name and value must match to avoid being re-balanced.
      */
     private String _ignoreCookieValue;
 
@@ -101,9 +92,8 @@ public class LoadBalancerDrainingValve extends ValveBase {
     //
 
     /**
-     * Sets the HTTP response code that will be used to redirect the request
-     * back to the load-balancer for re-balancing. Defaults to 307
-     * (TEMPORARY_REDIRECT).
+     * Sets the HTTP response code that will be used to redirect the request back to the load-balancer for re-balancing.
+     * Defaults to 307 (TEMPORARY_REDIRECT).
      *
      * @param code The code to use for the redirect
      */
@@ -112,9 +102,8 @@ public class LoadBalancerDrainingValve extends ValveBase {
     }
 
     /**
-     * Gets the name of the cookie that can be used to override the
-     * re-balancing behavior of this Valve when the current node is
-     * in the DISABLED activation state.
+     * Gets the name of the cookie that can be used to override the re-balancing behavior of this Valve when the current
+     * node is in the DISABLED activation state.
      *
      * @return The cookie name used to ignore normal processing rules.
      *
@@ -125,15 +114,11 @@ public class LoadBalancerDrainingValve extends ValveBase {
     }
 
     /**
-     * Sets the name of the cookie that can be used to override the
-     * re-balancing behavior of this Valve when the current node is
-     * in the DISABLED activation state.
+     * Sets the name of the cookie that can be used to override the re-balancing behavior of this Valve when the current
+     * node is in the DISABLED activation state. There is no default value for this setting: the ability to override the
+     * re-balancing behavior of this Valve is <i>disabled</i> by default.
      *
-     * There is no default value for this setting: the ability to override
-     * the re-balancing behavior of this Valve is <i>disabled</i> by default.
-     *
-     * @param cookieName The cookie name to use to ignore normal
-     *                   processing rules.
+     * @param cookieName The cookie name to use to ignore normal processing rules.
      *
      * @see #getIgnoreCookieValue
      */
@@ -142,9 +127,8 @@ public class LoadBalancerDrainingValve extends ValveBase {
     }
 
     /**
-     * Gets the expected value of the cookie that can be used to override the
-     * re-balancing behavior of this Valve when the current node is
-     * in the DISABLED activation state.
+     * Gets the expected value of the cookie that can be used to override the re-balancing behavior of this Valve when
+     * the current node is in the DISABLED activation state.
      *
      * @return The cookie value used to ignore normal processing rules.
      *
@@ -155,14 +139,11 @@ public class LoadBalancerDrainingValve extends ValveBase {
     }
 
     /**
-     * Sets the expected value of the cookie that can be used to override the
-     * re-balancing behavior of this Valve when the current node is
-     * in the DISABLED activation state. The "ignore" cookie's value
-     * <b>must</b> be exactly equal to this value in order to allow
-     * the client to override the re-balancing behavior.
+     * Sets the expected value of the cookie that can be used to override the re-balancing behavior of this Valve when
+     * the current node is in the DISABLED activation state. The "ignore" cookie's value <b>must</b> be exactly equal to
+     * this value in order to allow the client to override the re-balancing behavior.
      *
-     * @param cookieValue The cookie value to use to ignore normal
-     *                    processing rules.
+     * @param cookieValue The cookie value to use to ignore normal processing rules.
      *
      * @see #getIgnoreCookieValue
      */
@@ -172,11 +153,11 @@ public class LoadBalancerDrainingValve extends ValveBase {
 
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
-        if  ("DIS".equals(request.getAttribute(ATTRIBUTE_KEY_JK_LB_ACTIVATION)) &&
+        if ("DIS".equals(request.getAttribute(ATTRIBUTE_KEY_JK_LB_ACTIVATION)) &&
                 !request.isRequestedSessionIdValid()) {
 
             if (containerLog.isDebugEnabled()) {
-                containerLog.debug("Load-balancer is in DISABLED state; draining this node");
+                containerLog.debug(sm.getString("loadBalancerDrainingValve.draining"));
             }
 
             boolean ignoreRebalance = false;
@@ -196,10 +177,8 @@ public class LoadBalancerDrainingValve extends ValveBase {
                     if (sessionCookieName.equals(cookieName) &&
                             request.getRequestedSessionId().equals(cookie.getValue())) {
                         sessionCookie = cookie;
-                    } else if (null != _ignoreCookieName &&
-                            _ignoreCookieName.equals(cookieName) &&
-                            null != _ignoreCookieValue &&
-                            _ignoreCookieValue.equals(cookie.getValue())) {
+                    } else if (null != _ignoreCookieName && _ignoreCookieName.equals(cookieName) &&
+                            null != _ignoreCookieValue && _ignoreCookieValue.equals(cookie.getValue())) {
                         // The client presenting a valid ignore-cookie value?
                         ignoreRebalance = true;
                     }
@@ -208,8 +187,7 @@ public class LoadBalancerDrainingValve extends ValveBase {
 
             if (ignoreRebalance) {
                 if (containerLog.isDebugEnabled()) {
-                    containerLog.debug("Client is presenting a valid " + _ignoreCookieName +
-                            " cookie, re-balancing is being skipped");
+                    containerLog.debug(sm.getString("loadBalancerDrainingValve.skip", _ignoreCookieName));
                 }
 
                 getNext().invoke(request, response);
@@ -224,7 +202,8 @@ public class LoadBalancerDrainingValve extends ValveBase {
                 sessionCookie.setMaxAge(0); // Delete
                 sessionCookie.setValue(""); // Purge the cookie's value
                 // Replicate logic used to set secure attribute for session cookies
-                SessionCookieConfig sessionCookieConfig = request.getContext().getServletContext().getSessionCookieConfig();
+                SessionCookieConfig sessionCookieConfig =
+                        request.getContext().getServletContext().getSessionCookieConfig();
                 sessionCookie.setSecure(request.isSecure() || sessionCookieConfig.isSecure());
                 response.addCookie(sessionCookie);
             }

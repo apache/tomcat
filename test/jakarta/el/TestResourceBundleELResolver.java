@@ -16,9 +16,7 @@
  */
 package jakarta.el;
 
-import java.beans.FeatureDescriptor;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.ListResourceBundle;
 import java.util.ResourceBundle;
 
@@ -32,19 +30,16 @@ public class TestResourceBundleELResolver {
     @Test
     public void bug53001() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         ResourceBundle rb = new TesterResourceBundle();
 
-        ValueExpression var = factory.createValueExpression(rb,
-                ResourceBundle.class);
+        ValueExpression var = factory.createValueExpression(rb, ResourceBundle.class);
         context.getVariableMapper().setVariable("rb", var);
 
-        ValueExpression ve = factory.createValueExpression(context,
-                "${rb.keys}", String.class);
+        ValueExpression ve = factory.createValueExpression(context, "${rb.keys}", String.class);
 
-        MethodExpression me = factory.createMethodExpression(context,
-                "${rb.getKeys()}", Enumeration.class, null);
+        MethodExpression me = factory.createMethodExpression(context, "${rb.getKeys()}", Enumeration.class, null);
 
         // Ensure we are specification compliant
         String result1 = (String) ve.getValue(context);
@@ -80,13 +75,11 @@ public class TestResourceBundleELResolver {
     }
 
     /**
-     * Tests that a valid property is not resolved if base is not
-     * ResourceBundle.
+     * Tests that a valid property is not resolved if base is not ResourceBundle.
      */
     @Test
     public void testGetValue02() {
-        doNegativeTest(new Object(), new Object(), MethodUnderTest.GET_VALUE,
-                true);
+        doNegativeTest(new Object(), new Object(), MethodUnderTest.GET_VALUE, true);
     }
 
     /**
@@ -95,8 +88,7 @@ public class TestResourceBundleELResolver {
     @Test
     public void testGetValue03() {
         ResourceBundleELResolver resolver = new ResourceBundleELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         ResourceBundle resourceBundle = new TesterResourceBundle();
         Object result = resolver.getValue(context, resourceBundle, "key1");
@@ -125,24 +117,20 @@ public class TestResourceBundleELResolver {
     }
 
     /**
-     * Tests that a valid property is not resolved if base is not
-     * ResourceBundle.
+     * Tests that a valid property is not resolved if base is not ResourceBundle.
      */
     @Test
     public void testGetType02() {
-        doNegativeTest(new Object(), new Object(), MethodUnderTest.GET_TYPE,
-                true);
+        doNegativeTest(new Object(), new Object(), MethodUnderTest.GET_TYPE, true);
     }
 
     /**
-     * Tests that null will be returned when base is ResourceBundle. Checks that
-     * the propertyResolved is true.
+     * Tests that null will be returned when base is ResourceBundle. Checks that the propertyResolved is true.
      */
     @Test
     public void testGetType03() {
         ResourceBundleELResolver resolver = new ResourceBundleELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         ResourceBundle resourceBundle = new TesterResourceBundle();
         Class<?> result = resolver.getType(context, resourceBundle, "key1");
@@ -165,8 +153,7 @@ public class TestResourceBundleELResolver {
      */
     @Test
     public void testSetValue02() {
-        doNegativeTest(new Object(), new Object(), MethodUnderTest.SET_VALUE,
-                false);
+        doNegativeTest(new Object(), new Object(), MethodUnderTest.SET_VALUE, false);
     }
 
     /**
@@ -175,8 +162,7 @@ public class TestResourceBundleELResolver {
     @Test(expected = PropertyNotWritableException.class)
     public void testSetValue03() {
         ResourceBundleELResolver resolver = new ResourceBundleELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         ResourceBundle resourceBundle = new TesterResourceBundle();
         resolver.setValue(context, resourceBundle, new Object(), new Object());
@@ -192,17 +178,14 @@ public class TestResourceBundleELResolver {
     }
 
     /**
-     * Tests that the propertyResolved is false and readOnly is false if base is
-     * not ResourceBundle.
+     * Tests that the propertyResolved is false and readOnly is false if base is not ResourceBundle.
      */
     @Test
     public void testIsReadOnly02() {
         ResourceBundleELResolver resolver = new ResourceBundleELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        boolean result = resolver.isReadOnly(context, new Object(),
-                new Object());
+        boolean result = resolver.isReadOnly(context, new Object(), new Object());
 
         Assert.assertFalse(result);
         Assert.assertFalse(context.isPropertyResolved());
@@ -214,71 +197,22 @@ public class TestResourceBundleELResolver {
     @Test
     public void testIsReadOnly03() {
         ResourceBundleELResolver resolver = new ResourceBundleELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         ResourceBundle resourceBundle = new TesterResourceBundle();
-        boolean result = resolver.isReadOnly(context, resourceBundle,
-                new Object());
+        boolean result = resolver.isReadOnly(context, resourceBundle, new Object());
 
         Assert.assertTrue(result);
         Assert.assertTrue(context.isPropertyResolved());
     }
 
-    /**
-     * Tests that a valid FeatureDescriptors are not returned if base is not
-     * ResourceBundle.
-     */
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
-    @Test
-    public void testGetFeatureDescriptors01() {
-        ResourceBundleELResolver resolver = new ResourceBundleELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
-
-        Iterator<FeatureDescriptor> result = resolver.getFeatureDescriptors(
-                context, new Object());
-
-        Assert.assertNull(result);
-    }
-
-    /**
-     * Tests that a valid FeatureDescriptors are returned.
-     */
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
-    @Test
-    public void testGetFeatureDescriptors02() {
-        ResourceBundleELResolver resolver = new ResourceBundleELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
-
-        ResourceBundle resourceBundle = new TesterResourceBundle(
-                new Object[][] { { "key", "value" } });
-        Iterator<FeatureDescriptor> result = resolver.getFeatureDescriptors(
-                context, resourceBundle);
-
-        while (result.hasNext()) {
-            FeatureDescriptor featureDescriptor = result.next();
-            Assert.assertEquals("key", featureDescriptor.getDisplayName());
-            Assert.assertEquals("key", featureDescriptor.getName());
-            Assert.assertEquals("", featureDescriptor.getShortDescription());
-            Assert.assertFalse(featureDescriptor.isExpert());
-            Assert.assertFalse(featureDescriptor.isHidden());
-            Assert.assertTrue(featureDescriptor.isPreferred());
-            Assert.assertEquals(String.class,
-                    featureDescriptor.getValue(ELResolver.TYPE));
-            Assert.assertEquals(Boolean.TRUE, featureDescriptor
-                    .getValue(ELResolver.RESOLVABLE_AT_DESIGN_TIME));
-        }
-    }
-
     private static class TesterResourceBundle extends ListResourceBundle {
 
-        public TesterResourceBundle() {
+        TesterResourceBundle() {
             this(new Object[][] { { "key1", "value1" }, { "key2", "value2" } });
         }
 
-        public TesterResourceBundle(Object[][] contents) {
+        TesterResourceBundle(Object[][] contents) {
             this.contents = contents;
         }
 
@@ -290,30 +224,28 @@ public class TestResourceBundleELResolver {
         private Object[][] contents;
     }
 
-    private void doNegativeTest(Object base, Object trigger,
-            MethodUnderTest method, boolean checkResult) {
+    private void doNegativeTest(Object base, Object trigger, MethodUnderTest method, boolean checkResult) {
         ResourceBundleELResolver resolver = new ResourceBundleELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         Object result = null;
         switch (method) {
-        case GET_VALUE: {
-            result = resolver.getValue(context, base, trigger);
-            break;
-        }
-        case SET_VALUE: {
-            resolver.setValue(context, base, trigger, new Object());
-            break;
-        }
-        case GET_TYPE: {
-            result = resolver.getType(context, base, trigger);
-            break;
-        }
-        default: {
-            // Should never happen
-            Assert.fail("Missing case for method");
-        }
+            case GET_VALUE: {
+                result = resolver.getValue(context, base, trigger);
+                break;
+            }
+            case SET_VALUE: {
+                resolver.setValue(context, base, trigger, new Object());
+                break;
+            }
+            case GET_TYPE: {
+                result = resolver.getType(context, base, trigger);
+                break;
+            }
+            default: {
+                // Should never happen
+                Assert.fail("Missing case for method");
+            }
         }
 
         if (checkResult) {
@@ -323,6 +255,8 @@ public class TestResourceBundleELResolver {
     }
 
     private enum MethodUnderTest {
-        GET_VALUE, SET_VALUE, GET_TYPE
+        GET_VALUE,
+        SET_VALUE,
+        GET_TYPE
     }
 }

@@ -47,7 +47,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Traces order of events across multiple components
         StringBuilder trace = new StringBuilder();
@@ -94,7 +94,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Traces order of events across multiple components
         StringBuilder trace = new StringBuilder();
@@ -155,7 +155,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
 
         private StringBuilder sb;
 
-        public Bug51653ErrorPage(StringBuilder sb) {
+        Bug51653ErrorPage(StringBuilder sb) {
             this.sb = sb;
         }
 
@@ -175,7 +175,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
 
         private StringBuilder sb;
 
-        public Bug51653RequestListener(StringBuilder sb) {
+        Bug51653RequestListener(StringBuilder sb) {
             this.sb = sb;
         }
 
@@ -234,7 +234,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
         final Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        final Context ctx = tomcat.addContext("", null);
+        final Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "echo", new EchoBodyServlet());
         ctx.addServletMappingDecoded("/echo", "echo");

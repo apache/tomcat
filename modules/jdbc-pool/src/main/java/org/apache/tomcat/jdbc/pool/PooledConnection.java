@@ -36,7 +36,6 @@ import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 /**
  * Represents a pooled connection
  * and holds a reference to the {@link java.sql.Connection} object
- * @version 1.0
  */
 public class PooledConnection implements PooledConnectionMBean {
     /**
@@ -309,7 +308,7 @@ public class PooledConnection implements PooledConnectionMBean {
                         ).getConstructor().newInstance();
                 }
             }
-        } catch (java.lang.Exception cn) {
+        } catch (Exception cn) {
             if (log.isDebugEnabled()) {
                 log.debug("Unable to instantiate JDBC driver.", cn);
             }
@@ -368,7 +367,6 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     *
      * @return true if connect() was called successfully and disconnect has not yet been called
      */
     @Override
@@ -454,20 +452,15 @@ public class PooledConnection implements PooledConnectionMBean {
      * @param action The validation action
      */
     private boolean doValidate(int action) {
-        if (action == PooledConnection.VALIDATE_BORROW &&
-            poolProperties.isTestOnBorrow()) {
+        if (action == VALIDATE_BORROW && poolProperties.isTestOnBorrow()) {
           return true;
-        } else if (action == PooledConnection.VALIDATE_RETURN &&
-                 poolProperties.isTestOnReturn()) {
+        } else if (action == VALIDATE_RETURN && poolProperties.isTestOnReturn()) {
           return true;
-        } else if (action == PooledConnection.VALIDATE_IDLE &&
-                 poolProperties.isTestWhileIdle()) {
+        } else if (action == VALIDATE_IDLE && poolProperties.isTestWhileIdle()) {
           return true;
-        } else if (action == PooledConnection.VALIDATE_INIT &&
-                 poolProperties.isTestOnConnect()) {
+        } else if (action == VALIDATE_INIT && poolProperties.isTestOnConnect()) {
           return true;
-        } else if (action == PooledConnection.VALIDATE_INIT &&
-                 poolProperties.getInitSQL()!=null) {
+        } else if (action == VALIDATE_INIT && poolProperties.getInitSQL()!=null) {
           return true;
         } else {
           return false;

@@ -22,12 +22,12 @@ import java.util.Iterator;
 
 
 /**
- * Abstract representation of a user in a {@link UserDatabase}.  Each user is
- * optionally associated with a set of {@link Group}s through which they inherit
- * additional security roles, and is optionally assigned a set of specific
+ * Abstract representation of a user in a {@link UserDatabase}. Each user is optionally associated with a set of
+ * {@link Group}s through which they inherit additional security roles, and is optionally assigned a set of specific
  * {@link Role}s.
  *
  * @author Craig R. McClanahan
+ *
  * @since 4.1
  */
 public interface User extends Principal {
@@ -39,7 +39,7 @@ public interface User extends Principal {
     /**
      * @return the full name of this user.
      */
-    public String getFullName();
+    String getFullName();
 
 
     /**
@@ -47,59 +47,55 @@ public interface User extends Principal {
      *
      * @param fullName The new full name
      */
-    public void setFullName(String fullName);
+    void setFullName(String fullName);
 
 
     /**
      * @return the set of {@link Group}s to which this user belongs.
      */
-    public Iterator<Group> getGroups();
+    Iterator<Group> getGroups();
 
 
     /**
-     * @return the logon password of this user, optionally prefixed with the
-     * identifier of an encoding scheme surrounded by curly braces, such as
-     * <code>{md5}xxxxx</code>.
+     * @return the logon password of this user, optionally prefixed with the identifier of an encoding scheme surrounded
+     *             by curly braces, such as <code>{md5}xxxxx</code>.
      */
-    public String getPassword();
+    String getPassword();
 
 
     /**
-     * Set the logon password of this user, optionally prefixed with the
-     * identifier of an encoding scheme surrounded by curly braces, such as
-     * <code>{md5}xxxxx</code>.
+     * Set the logon password of this user, optionally prefixed with the identifier of an encoding scheme surrounded by
+     * curly braces, such as <code>{md5}xxxxx</code>.
      *
      * @param password The new logon password
      */
-    public void setPassword(String password);
+    void setPassword(String password);
 
 
     /**
      * @return the set of {@link Role}s assigned specifically to this user.
      */
-    public Iterator<Role> getRoles();
+    Iterator<Role> getRoles();
 
 
     /**
      * @return the {@link UserDatabase} within which this User is defined.
      */
-    public UserDatabase getUserDatabase();
+    UserDatabase getUserDatabase();
 
 
     /**
-     * @return the logon username of this user, which must be unique
-     * within the scope of a {@link UserDatabase}.
+     * @return the logon username of this user, which must be unique within the scope of a {@link UserDatabase}.
      */
-    public String getUsername();
+    String getUsername();
 
 
     /**
-     * Set the logon username of this user, which must be unique within
-     * the scope of a {@link UserDatabase}.
+     * Set the logon username of this user, which must be unique within the scope of a {@link UserDatabase}.
      *
      * @param username The new logon username
      */
-    public void setUsername(String username);
+    void setUsername(String username);
 
 
     // --------------------------------------------------------- Public Methods
@@ -110,7 +106,7 @@ public interface User extends Principal {
      *
      * @param group The new group
      */
-    public void addGroup(Group group);
+    void addGroup(Group group);
 
 
     /**
@@ -118,27 +114,28 @@ public interface User extends Principal {
      *
      * @param role The new role
      */
-    public void addRole(Role role);
+    void addRole(Role role);
 
 
     /**
      * Is this user in the specified {@link Group}?
      *
      * @param group The group to check
+     *
      * @return <code>true</code> if the user is in the specified group
      */
-    public boolean isInGroup(Group group);
+    boolean isInGroup(Group group);
 
 
     /**
-     * Is this user specifically assigned the specified {@link Role}?  This
-     * method does <strong>NOT</strong> check for roles inherited based on
-     * {@link Group} membership.
+     * Is this user specifically assigned the specified {@link Role}? This method does <strong>NOT</strong> check for
+     * roles inherited based on {@link Group} membership.
      *
      * @param role The role to check
+     *
      * @return <code>true</code> if the user has the specified role
      */
-    public boolean isInRole(Role role);
+    boolean isInRole(Role role);
 
 
     /**
@@ -146,13 +143,13 @@ public interface User extends Principal {
      *
      * @param group The old group
      */
-    public void removeGroup(Group group);
+    void removeGroup(Group group);
 
 
     /**
      * Remove all {@link Group}s from those this user belongs to.
      */
-    public void removeGroups();
+    void removeGroups();
 
 
     /**
@@ -160,13 +157,13 @@ public interface User extends Principal {
      *
      * @param role The old role
      */
-    public void removeRole(Role role);
+    void removeRole(Role role);
 
 
     /**
      * Remove all {@link Role}s from those assigned to this user.
      */
-    public void removeRoles();
+    void removeRoles();
 
 
 }

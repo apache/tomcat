@@ -62,8 +62,7 @@ public final class AstFunction extends SimpleNode {
     }
 
     @Override
-    public Class<?> getType(EvaluationContext ctx)
-            throws ELException {
+    public Class<?> getType(EvaluationContext ctx) throws ELException {
 
         FunctionMapper fnMapper = ctx.getFunctionMapper();
 
@@ -73,15 +72,13 @@ public final class AstFunction extends SimpleNode {
         }
         Method m = fnMapper.resolveFunction(this.prefix, this.localName);
         if (m == null) {
-            throw new ELException(MessageFactory.get("error.fnMapper.method",
-                    this.getOutputName()));
+            throw new ELException(MessageFactory.get("error.fnMapper.method", this.getOutputName()));
         }
         return m.getReturnType();
     }
 
     @Override
-    public Object getValue(EvaluationContext ctx)
-            throws ELException {
+    public Object getValue(EvaluationContext ctx) throws ELException {
 
         FunctionMapper fnMapper = ctx.getFunctionMapper();
 
@@ -93,8 +90,8 @@ public final class AstFunction extends SimpleNode {
 
         if (m == null && this.prefix.length() == 0) {
             // TODO: Do we need to think about precedence of the various ways
-            //       a lambda expression may be obtained from something that
-            //       the parser thinks is a function?
+            // a lambda expression may be obtained from something that
+            // the parser thinks is a function?
             Object obj = null;
             if (ctx.isLambdaArgument(this.localName)) {
                 obj = ctx.getLambdaArgument(this.localName);
@@ -115,18 +112,15 @@ public final class AstFunction extends SimpleNode {
             if (obj instanceof LambdaExpression) {
                 // Build arguments
                 int i = 0;
-                while (obj instanceof LambdaExpression &&
-                        i < jjtGetNumChildren()) {
+                while (obj instanceof LambdaExpression && i < jjtGetNumChildren()) {
                     Node args = jjtGetChild(i);
-                    obj = ((LambdaExpression) obj).invoke(
-                            ((AstMethodParameters) args).getParameters(ctx));
+                    obj = ((LambdaExpression) obj).invoke(((AstMethodParameters) args).getParameters(ctx));
                     i++;
                 }
                 if (i < jjtGetNumChildren()) {
                     // Haven't consumed all the sets of parameters therefore
                     // there were too many sets of parameters
-                    throw new ELException(MessageFactory.get(
-                            "error.lambda.tooManyMethodParameterSets"));
+                    throw new ELException(MessageFactory.get("error.lambda.tooManyMethodParameterSets"));
                 }
                 return obj;
             }
@@ -139,22 +133,19 @@ public final class AstFunction extends SimpleNode {
             }
             obj = ctx.getImportHandler().resolveStatic(this.localName);
             if (obj != null) {
-                return ctx.getELResolver().invoke(ctx, new ELClass((Class<?>) obj), this.localName,
-                        null, ((AstMethodParameters) this.children[0]).getParameters(ctx));
+                return ctx.getELResolver().invoke(ctx, new ELClass((Class<?>) obj), this.localName, null,
+                        ((AstMethodParameters) this.children[0]).getParameters(ctx));
             }
         }
 
         if (m == null) {
-            throw new ELException(MessageFactory.get("error.fnMapper.method",
-                    this.getOutputName()));
+            throw new ELException(MessageFactory.get("error.fnMapper.method", this.getOutputName()));
         }
 
         // Not a lambda expression so must be a function. Check there is just a
         // single set of method parameters
         if (this.jjtGetNumChildren() != 1) {
-            throw new ELException(MessageFactory.get(
-                    "error.function.tooManyMethodParameterSets",
-                    getOutputName()));
+            throw new ELException(MessageFactory.get("error.function.tooManyMethodParameterSets", getOutputName()));
         }
 
         Node parameters = jjtGetChild(0);
@@ -173,15 +164,14 @@ public final class AstFunction extends SimpleNode {
                         if (inputParameterCount < methodParameterCount) {
                             params[i] = new Object[] { null };
                         } else if (inputParameterCount == methodParameterCount &&
-                                paramTypes[i].isArray()) {
+                                isArray(parameters.jjtGetChild(i).getValue(ctx))) {
                             params[i] = parameters.jjtGetChild(i).getValue(ctx);
                         } else {
-                            Object[] varargs =
-                                    new Object[inputParameterCount - methodParameterCount + 1];
+                            Object[] varargs = new Object[inputParameterCount - methodParameterCount + 1];
                             Class<?> target = paramTypes[i].getComponentType();
                             for (int j = i; j < inputParameterCount; j++) {
-                                varargs[j-i] = parameters.jjtGetChild(j).getValue(ctx);
-                                varargs[j-i] = ELSupport.coerceToType(ctx, varargs[j-i], target);
+                                varargs[j - i] = parameters.jjtGetChild(j).getValue(ctx);
+                                varargs[j - i] = ELSupport.coerceToType(ctx, varargs[j - i], target);
                             }
                             params[i] = varargs;
                         }
@@ -191,28 +181,31 @@ public final class AstFunction extends SimpleNode {
                     params[i] = ELSupport.coerceToType(ctx, params[i], paramTypes[i]);
                 }
             } catch (ELException ele) {
-                throw new ELException(MessageFactory.get("error.function", this
-                        .getOutputName()), ele);
+                throw new ELException(MessageFactory.get("error.function", this.getOutputName()), ele);
             }
         }
         try {
             result = m.invoke(null, params);
         } catch (IllegalAccessException iae) {
-            throw new ELException(MessageFactory.get("error.function", this
-                    .getOutputName()), iae);
+            throw new ELException(MessageFactory.get("error.function", this.getOutputName()), iae);
         } catch (InvocationTargetException ite) {
             Throwable cause = ite.getCause();
-            if (cause instanceof ThreadDeath) {
-                throw (ThreadDeath) cause;
-            }
             if (cause instanceof VirtualMachineError) {
                 throw (VirtualMachineError) cause;
             }
-            throw new ELException(MessageFactory.get("error.function", this
-                    .getOutputName()), cause);
+            throw new ELException(MessageFactory.get("error.function", this.getOutputName()), cause);
         }
         return result;
     }
+
+
+    private boolean isArray(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        return obj.getClass().isArray();
+    }
+
 
     public void setLocalName(String localName) {
         this.localName = localName;
@@ -224,8 +217,7 @@ public final class AstFunction extends SimpleNode {
 
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return ELParserTreeConstants.jjtNodeName[id] + "[" + this.getOutputName() + "]";
     }
 }

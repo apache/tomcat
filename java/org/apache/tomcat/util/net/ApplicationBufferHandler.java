@@ -24,9 +24,9 @@ import java.nio.ByteBuffer;
  */
 public interface ApplicationBufferHandler {
 
-    static final ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);
+    ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);
 
-    static ApplicationBufferHandler EMPTY = new ApplicationBufferHandler() {
+    ApplicationBufferHandler EMPTY = new ApplicationBufferHandler() {
         @Override
         public void expand(int newSize) {
         }
@@ -39,10 +39,21 @@ public interface ApplicationBufferHandler {
         }
     };
 
-    public void setByteBuffer(ByteBuffer buffer);
+    /**
+     * Set the byte buffer.
+     * @param buffer the byte buffer
+     */
+    void setByteBuffer(ByteBuffer buffer);
 
-    public ByteBuffer getByteBuffer();
+    /**
+     * @return the byte buffer
+     */
+    ByteBuffer getByteBuffer();
 
-    public void expand(int size);
+    /**
+     * Expand the byte buffer to at least the given size. Some implementations may not implement this.
+     * @param size the desired size
+     */
+    void expand(int size);
 
 }

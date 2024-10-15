@@ -49,7 +49,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
  * significantly extends the length of a test run when using multiple test
  * threads.
  */
-public class TestWsWebSocketContainerTimeoutServer  extends WsWebSocketContainerBaseTest {
+public class TestWsWebSocketContainerTimeoutServer extends WsWebSocketContainerBaseTest {
 
     @Test
     public void testWriteTimeoutServerContainer() throws Exception {
@@ -65,34 +65,29 @@ public class TestWsWebSocketContainerTimeoutServer  extends WsWebSocketContainer
 
     private static volatile boolean timeoutOnContainer = false;
 
-    private void doTestWriteTimeoutServer(boolean setTimeoutOnContainer)
-            throws Exception {
+    private void doTestWriteTimeoutServer(boolean setTimeoutOnContainer) throws Exception {
 
         /*
-         * Note: There are all sorts of horrible uses of statics in this test
-         *       because the API uses classes and the tests really need access
-         *       to the instances which simply isn't possible.
+         * Note: There are all sorts of horrible uses of statics in this test because the API uses classes and the tests
+         * really need access to the instances which simply isn't possible.
          */
         timeoutOnContainer = setTimeoutOnContainer;
 
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(ConstantTxConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
-        WebSocketContainer wsContainer =
-                ContainerProvider.getWebSocketContainer();
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
         tomcat.start();
 
-        Session wsSession = wsContainer.connectToServer(
-                TesterProgrammaticEndpoint.class,
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
-                new URI("ws://" + getHostName() + ":" + getPort() +
-                        ConstantTxConfig.PATH));
+                new URI("ws://" + getHostName() + ":" + getPort() + ConstantTxConfig.PATH));
 
         wsSession.addMessageHandler(new BlockingBinaryHandler());
 
@@ -105,23 +100,24 @@ public class TestWsWebSocketContainerTimeoutServer  extends WsWebSocketContainer
             loops++;
         }
 
+        // Set a short session close timeout (milliseconds)
+        wsSession.getUserProperties().put(
+            org.apache.tomcat.websocket.Constants.SESSION_CLOSE_TIMEOUT_PROPERTY, Long.valueOf(2000));
         // Close the client session, primarily to allow the
         // BackgroundProcessManager to shut down.
         wsSession.close();
 
         // Check the right exception was thrown
         Assert.assertNotNull(ConstantTxEndpoint.getException());
-        Assert.assertEquals(ExecutionException.class,
-                ConstantTxEndpoint.getException().getClass());
+        Assert.assertEquals(ExecutionException.class, ConstantTxEndpoint.getException().getClass());
         Assert.assertNotNull(ConstantTxEndpoint.getException().getCause());
-        Assert.assertEquals(SocketTimeoutException.class,
-                ConstantTxEndpoint.getException().getCause().getClass());
+        Assert.assertEquals(SocketTimeoutException.class, ConstantTxEndpoint.getException().getCause().getClass());
 
         // Check correct time passed
         Assert.assertTrue(ConstantTxEndpoint.getTimeout() >= TIMEOUT_MS);
 
         // Check the timeout wasn't too long
-        Assert.assertTrue(ConstantTxEndpoint.getTimeout() < TIMEOUT_MS*2);
+        Assert.assertTrue(ConstantTxEndpoint.getTimeout() < TIMEOUT_MS * 2);
     }
 
 
@@ -132,12 +128,10 @@ public class TestWsWebSocketContainerTimeoutServer  extends WsWebSocketContainer
         @Override
         public void contextInitialized(ServletContextEvent sce) {
             super.contextInitialized(sce);
-            ServerContainer sc =
-                    (ServerContainer) sce.getServletContext().getAttribute(
-                            org.apache.tomcat.websocket.server.Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
+            ServerContainer sc = (ServerContainer) sce.getServletContext().getAttribute(
+                    org.apache.tomcat.websocket.server.Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
             try {
-                sc.addEndpoint(ServerEndpointConfig.Builder.create(
-                        ConstantTxEndpoint.class, PATH).build());
+                sc.addEndpoint(ServerEndpointConfig.Builder.create(ConstantTxEndpoint.class, PATH).build());
                 if (timeoutOnContainer) {
                     sc.setAsyncSendTimeout(TIMEOUT_MS);
                 }
@@ -175,8 +169,7 @@ public class TestWsWebSocketContainerTimeoutServer  extends WsWebSocketContainer
             try {
                 while (true) {
                     lastSend = System.currentTimeMillis();
-                    Future<Void> f = session.getAsyncRemote().sendBinary(
-                            ByteBuffer.wrap(MESSAGE_BINARY_4K));
+                    Future<Void> f = session.getAsyncRemote().sendBinary(ByteBuffer.wrap(MESSAGE_BINARY_4K));
                     f.get();
                 }
             } catch (ExecutionException | InterruptedException e) {

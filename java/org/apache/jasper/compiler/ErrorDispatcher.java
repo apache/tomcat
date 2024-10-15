@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -266,7 +267,13 @@ public class ErrorDispatcher {
             if (jspcMode) {
                 // Get the full URL of the resource that caused the error
                 try {
-                    file = where.getURL().toString();
+                    URL url = where.getURL();
+                    if (url != null) {
+                        file = url.toString();
+                    } else {
+                        // Fallback to using context-relative path
+                        file = where.getFile();
+                    }
                 } catch (MalformedURLException me) {
                     // Fallback to using context-relative path
                     file = where.getFile();
@@ -373,8 +380,7 @@ public class ErrorDispatcher {
 
         JavacErrorDetail[] errDetails = null;
         if (errors.size() > 0) {
-            errDetails = new JavacErrorDetail[errors.size()];
-            errors.toArray(errDetails);
+            errDetails = errors.toArray(new JavacErrorDetail[0]);
         }
 
         return errDetails;
@@ -482,7 +488,7 @@ public class ErrorDispatcher {
          *
          * @param lineNum Source line number in the generated servlet code
          */
-        public ErrorVisitor(int lineNum) {
+        ErrorVisitor(int lineNum) {
             this.lineNum = lineNum;
         }
 

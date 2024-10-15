@@ -31,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import jakarta.servlet.ServletConnection;
@@ -61,7 +60,7 @@ public abstract class SocketWrapperBase<E> {
 
     private E socket;
     private final AbstractEndpoint<E,?> endpoint;
-    private final Lock lock = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
 
     protected final AtomicBoolean closed = new AtomicBoolean(false);
 
@@ -158,7 +157,7 @@ public abstract class SocketWrapperBase<E> {
         return endpoint;
     }
 
-    public Lock getLock() {
+    public ReentrantLock getLock() {
         return lock;
     }
 
@@ -369,8 +368,8 @@ public abstract class SocketWrapperBase<E> {
             remaining = Math.min(remaining, len);
             readBuffer.get(b, off, remaining);
 
-            if (log.isDebugEnabled()) {
-                log.debug("Socket: [" + this + "], Read from buffer: [" + remaining + "]");
+            if (log.isTraceEnabled()) {
+                log.trace("Socket: [" + this + "], Read from buffer: [" + remaining + "]");
             }
         }
         return remaining;
@@ -383,8 +382,8 @@ public abstract class SocketWrapperBase<E> {
         socketBufferHandler.configureReadBufferForRead();
         int nRead = transfer(socketBufferHandler.getReadBuffer(), to);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Socket: [" + this + "], Read from buffer: [" + nRead + "]");
+        if (log.isTraceEnabled()) {
+            log.trace("Socket: [" + this + "], Read from buffer: [" + nRead + "]");
         }
         return nRead;
     }
@@ -904,7 +903,7 @@ public abstract class SocketWrapperBase<E> {
          *
          * @return The call, if any, to make to the completion handler
          */
-        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
+        CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
                 int offset, int length);
     }
 

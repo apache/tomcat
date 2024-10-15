@@ -46,7 +46,7 @@ public class TestWsPingPongMessages extends WebSocketBaseTest {
     public void testPingPongMessages() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
 
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
@@ -54,17 +54,14 @@ public class TestWsPingPongMessages extends WebSocketBaseTest {
 
         tomcat.start();
 
-        WebSocketContainer wsContainer = ContainerProvider
-                .getWebSocketContainer();
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
-        Session wsSession = wsContainer.connectToServer(
-                TesterProgrammaticEndpoint.class, ClientEndpointConfig.Builder
-                        .create().build(), new URI("ws://localhost:"
-                        + getPort() + TesterEchoServer.Config.PATH_ASYNC));
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
+                ClientEndpointConfig.Builder.create().build(),
+                new URI("ws://localhost:" + getPort() + TesterEchoServer.Config.PATH_ASYNC));
 
         CountDownLatch latch = new CountDownLatch(1);
-        TesterEndpoint tep = (TesterEndpoint) wsSession.getUserProperties()
-                .get("endpoint");
+        TesterEndpoint tep = (TesterEndpoint) wsSession.getUserProperties().get("endpoint");
         tep.setLatch(latch);
 
         PongMessageHandler handler = new PongMessageHandler(latch);
@@ -73,12 +70,10 @@ public class TestWsPingPongMessages extends WebSocketBaseTest {
 
         boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
         Assert.assertTrue(latchResult);
-        Assert.assertArrayEquals(applicationData.array(),
-                (handler.getMessages().peek()).getApplicationData().array());
+        Assert.assertArrayEquals(applicationData.array(), (handler.getMessages().peek()).getApplicationData().array());
     }
 
-    public static class PongMessageHandler extends
-            TesterMessageCountClient.BasicHandler<PongMessage> {
+    public static class PongMessageHandler extends TesterMessageCountClient.BasicHandler<PongMessage> {
         public PongMessageHandler(CountDownLatch latch) {
             super(latch);
         }

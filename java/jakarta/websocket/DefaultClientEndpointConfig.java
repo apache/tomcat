@@ -33,11 +33,8 @@ final class DefaultClientEndpointConfig implements ClientEndpointConfig {
     private final Configurator configurator;
 
 
-    DefaultClientEndpointConfig(List<String> preferredSubprotocols,
-            List<Extension> extensions,
-            List<Class<? extends Encoder>> encoders,
-            List<Class<? extends Decoder>> decoders,
-            SSLContext sslContext,
+    DefaultClientEndpointConfig(List<String> preferredSubprotocols, List<Extension> extensions,
+            List<Class<? extends Encoder>> encoders, List<Class<? extends Decoder>> decoders, SSLContext sslContext,
             Configurator configurator) {
         this.preferredSubprotocols = preferredSubprotocols;
         this.extensions = extensions;
@@ -79,7 +76,7 @@ final class DefaultClientEndpointConfig implements ClientEndpointConfig {
 
 
     @Override
-    public final Map<String, Object> getUserProperties() {
+    public Map<String,Object> getUserProperties() {
         return userProperties;
     }
 

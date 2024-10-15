@@ -99,15 +99,14 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
             return null;
         }
 
-        // Ensure that the file is not outside the fileBase. This should not be
-        // possible for standard requests (the request is normalized early in
-        // the request processing) but might be possible for some access via the
-        // Servlet API (RequestDispatcher, HTTP/2 push etc.) therefore these
-        // checks are retained as an additional safety measure
-        // absoluteBase has been normalized so absPath needs to be normalized as
-        // well.
+        /*
+         * Ensure that the file is not outside the fileBase. This should not be possible for standard requests (the
+         * request is normalized early in the request processing) but might be possible for some access via the Servlet
+         * API (e.g. RequestDispatcher) therefore these checks are retained as an additional safety measure absoluteBase
+         * has been normalized so absPath needs to be normalized as well.
+         */
         String absPath = normalize(file.getAbsolutePath());
-        if (absoluteBase.length() > absPath.length()) {
+        if (absPath == null || absoluteBase.length() > absPath.length()) {
             return null;
         }
 
@@ -117,13 +116,18 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         absPath = absPath.substring(absoluteBase.length());
         canPath = canPath.substring(canonicalBase.length());
 
+        // The remaining request path must start with '/' if it has non-zero length
+        if (canPath.length() > 0 && canPath.charAt(0) != File.separatorChar) {
+            return null;
+        }
+
         // Case sensitivity check
         // The normalized requested path should be an exact match the equivalent
         // canonical path. If it is not, possible reasons include:
         // - case differences on case insensitive file systems
         // - Windows removing a trailing ' ' or '.' from the file name
         //
-        // In all cases, a mis-match here results in the resource not being
+        // In all cases, a mismatch here results in the resource not being
         // found
         //
         // absPath is normalized so canPath needs to be normalized as well
@@ -146,10 +150,9 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
 
 
     protected void logIgnoredSymlink(String contextPath, String absPath, String canPath) {
-        String msg = sm.getString("abstractFileResourceSet.canonicalfileCheckFailed",
-                contextPath, absPath, canPath);
+        String msg = sm.getString("abstractFileResourceSet.canonicalfileCheckFailed", contextPath, absPath, canPath);
         // Log issues with configuration files at a higher level
-        if(absPath.startsWith("/META-INF/") || absPath.startsWith("/WEB-INF/")) {
+        if (absPath.startsWith("/META-INF/") || absPath.startsWith("/WEB-INF/")) {
             log.error(msg);
         } else {
             log.warn(msg);
@@ -170,8 +173,8 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
                 // there are known problems for file names with these characters
                 // when using File#getCanonicalPath().
                 // Note: There are additional characters that are disallowed in
-                //       Windows file names but these are not known to cause
-                //       problems when using File#getCanonicalPath().
+                // Windows file names but these are not known to cause
+                // problems when using File#getCanonicalPath().
                 return true;
             }
         }
@@ -179,7 +182,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         // level APIs are used to create the files that bypass various checks.
         // File names that end in ' ' are known to cause problems when using
         // File#getCanonicalPath().
-        if (name.charAt(len -1) == ' ') {
+        if (name.charAt(len - 1) == ' ') {
             return true;
         }
         return false;
@@ -187,11 +190,9 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
 
 
     /**
-     * Return a context-relative path, beginning with a "/", that represents
-     * the canonical version of the specified path after ".." and "." elements
-     * are resolved out.  If the specified path attempts to go outside the
-     * boundaries of the current context (i.e. too many ".." path elements
-     * are present), return <code>null</code> instead.
+     * Return a context-relative path, beginning with a "/", that represents the canonical version of the specified path
+     * after ".." and "." elements are resolved out. If the specified path attempts to go outside the boundaries of the
+     * current context (i.e. too many ".." path elements are present), return <code>null</code> instead.
      *
      * @param path Path to be normalized
      */
@@ -219,7 +220,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
     }
 
 
-    //-------------------------------------------------------- Lifecycle methods
+    // -------------------------------------------------------- Lifecycle methods
 
     @Override
     protected void initInternal() throws LifecycleException {

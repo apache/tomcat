@@ -19,8 +19,8 @@ package org.apache.tomcat.websocket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import jakarta.websocket.ClientEndpointConfig;
 import jakarta.websocket.Extension;
 
 /**
@@ -42,54 +42,20 @@ public class Constants {
     static final byte INTERNAL_OPCODE_FLUSH = 0x18;
 
     // Buffers
-    static final int DEFAULT_BUFFER_SIZE = Integer.getInteger(
-            "org.apache.tomcat.websocket.DEFAULT_BUFFER_SIZE", 8 * 1024)
-            .intValue();
+    static final int DEFAULT_BUFFER_SIZE = Integer
+            .getInteger("org.apache.tomcat.websocket.DEFAULT_BUFFER_SIZE", 8 * 1024).intValue();
 
     // Client connection
     /**
-     * Property name to set to configure the value that is passed to
-     * {@link javax.net.ssl.SSLEngine#setEnabledProtocols(String[])}. The value
-     * should be a comma separated string.
-     *
-     * @deprecated This will be removed in Tomcat 11.
-     *             Use {@link ClientEndpointConfig#getSSLContext()}
+     * Property name to set to configure the timeout (in milliseconds) when establishing a WebSocket connection to
+     * server. The default is {@link #IO_TIMEOUT_MS_DEFAULT}.
      */
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
-    public static final String SSL_PROTOCOLS_PROPERTY =
-            "org.apache.tomcat.websocket.SSL_PROTOCOLS";
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
-    public static final String SSL_TRUSTSTORE_PROPERTY =
-            "org.apache.tomcat.websocket.SSL_TRUSTSTORE";
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
-    public static final String SSL_TRUSTSTORE_PWD_PROPERTY =
-            "org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD";
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
-    public static final String SSL_TRUSTSTORE_PWD_DEFAULT = "changeit";
-    /**
-     * Property name to set to configure used SSLContext. The value should be an
-     * instance of SSLContext. If this property is present, the SSL_TRUSTSTORE*
-     * properties are ignored.
-     *
-     * @deprecated This will be removed in Tomcat 11.
-     *             Use {@link ClientEndpointConfig#getSSLContext()}
-     */
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
-    public static final String SSL_CONTEXT_PROPERTY =
-            "org.apache.tomcat.websocket.SSL_CONTEXT";
-    /**
-     * Property name to set to configure the timeout (in milliseconds) when
-     * establishing a WebSocket connection to server. The default is
-     * {@link #IO_TIMEOUT_MS_DEFAULT}.
-     */
-    public static final String IO_TIMEOUT_MS_PROPERTY =
-            "org.apache.tomcat.websocket.IO_TIMEOUT_MS";
+    public static final String IO_TIMEOUT_MS_PROPERTY = "org.apache.tomcat.websocket.IO_TIMEOUT_MS";
     public static final long IO_TIMEOUT_MS_DEFAULT = 5000;
 
     // RFC 2068 recommended a limit of 5
     // Most browsers have a default limit of 20
-    public static final String MAX_REDIRECTIONS_PROPERTY =
-            "org.apache.tomcat.websocket.MAX_REDIRECTIONS";
+    public static final String MAX_REDIRECTIONS_PROPERTY = "org.apache.tomcat.websocket.MAX_REDIRECTIONS";
     public static final int MAX_REDIRECTIONS_DEFAULT = 20;
 
     // HTTP upgrade header names and values
@@ -102,29 +68,42 @@ public class Constants {
     public static final String LOCATION_HEADER_NAME = "Location";
     public static final String AUTHORIZATION_HEADER_NAME = "Authorization";
     public static final String WWW_AUTHENTICATE_HEADER_NAME = "WWW-Authenticate";
+    public static final String PROXY_AUTHORIZATION_HEADER_NAME = "Proxy-Authorization";
+    public static final String PROXY_AUTHENTICATE_HEADER_NAME = "Proxy-Authenticate";
     public static final String WS_VERSION_HEADER_NAME = "Sec-WebSocket-Version";
     public static final String WS_VERSION_HEADER_VALUE = "13";
     public static final String WS_KEY_HEADER_NAME = "Sec-WebSocket-Key";
     public static final String WS_PROTOCOL_HEADER_NAME = "Sec-WebSocket-Protocol";
     public static final String WS_EXTENSIONS_HEADER_NAME = "Sec-WebSocket-Extensions";
 
-    /// HTTP redirection status codes
+    // HTTP status codes
     public static final int MULTIPLE_CHOICES = 300;
     public static final int MOVED_PERMANENTLY = 301;
     public static final int FOUND = 302;
     public static final int SEE_OTHER = 303;
     public static final int USE_PROXY = 305;
     public static final int TEMPORARY_REDIRECT = 307;
+    public static final int UNAUTHORIZED = 401;
+    public static final int PROXY_AUTHENTICATION_REQUIRED = 407;
 
     // Configuration for Origin header in client
-    static final String DEFAULT_ORIGIN_HEADER_VALUE =
-            System.getProperty("org.apache.tomcat.websocket.DEFAULT_ORIGIN_HEADER_VALUE");
+    static final String DEFAULT_ORIGIN_HEADER_VALUE = System
+            .getProperty("org.apache.tomcat.websocket.DEFAULT_ORIGIN_HEADER_VALUE");
 
     // Configuration for blocking sends
-    public static final String BLOCKING_SEND_TIMEOUT_PROPERTY =
-            "org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT";
+    public static final String BLOCKING_SEND_TIMEOUT_PROPERTY = "org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT";
     // Milliseconds so this is 20 seconds
     public static final long DEFAULT_BLOCKING_SEND_TIMEOUT = 20 * 1000;
+
+    // Configuration for session close timeout
+    public static final String SESSION_CLOSE_TIMEOUT_PROPERTY = "org.apache.tomcat.websocket.SESSION_CLOSE_TIMEOUT";
+    // Default is 30 seconds - setting is in milliseconds
+    public static final long DEFAULT_SESSION_CLOSE_TIMEOUT = TimeUnit.SECONDS.toMillis(30);
+
+    // Configuration for session close timeout
+    public static final String ABNORMAL_SESSION_CLOSE_SEND_TIMEOUT_PROPERTY = "org.apache.tomcat.websocket.ABNORMAL_SESSION_CLOSE_SEND_TIMEOUT";
+    // Default is 50 milliseconds - setting is in milliseconds
+    public static final long DEFAULT_ABNORMAL_SESSION_CLOSE_SEND_TIMEOUT = 50;
 
     // Configuration for read idle timeout on WebSocket session
     public static final String READ_IDLE_TIMEOUT_MS = "org.apache.tomcat.websocket.READ_IDLE_TIMEOUT_MS";
@@ -133,15 +112,16 @@ public class Constants {
     public static final String WRITE_IDLE_TIMEOUT_MS = "org.apache.tomcat.websocket.WRITE_IDLE_TIMEOUT_MS";
 
     // Configuration for background processing checks intervals
-    static final int DEFAULT_PROCESS_PERIOD = Integer.getInteger(
-            "org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10)
-            .intValue();
+    static final int DEFAULT_PROCESS_PERIOD = Integer
+            .getInteger("org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10).intValue();
 
     public static final String WS_AUTHENTICATION_USER_NAME = "org.apache.tomcat.websocket.WS_AUTHENTICATION_USER_NAME";
     public static final String WS_AUTHENTICATION_PASSWORD = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PASSWORD";
+    public static final String WS_AUTHENTICATION_REALM = "org.apache.tomcat.websocket.WS_AUTHENTICATION_REALM";
 
-    public static final boolean STRICT_SPEC_COMPLIANCE =
-            Boolean.getBoolean("org.apache.tomcat.websocket.STRICT_SPEC_COMPLIANCE");
+    public static final String WS_AUTHENTICATION_PROXY_USER_NAME = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_USER_NAME";
+    public static final String WS_AUTHENTICATION_PROXY_PASSWORD = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_PASSWORD";
+    public static final String WS_AUTHENTICATION_PROXY_REALM = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_REALM";
 
     public static final List<Extension> INSTALLED_EXTENSIONS;
 

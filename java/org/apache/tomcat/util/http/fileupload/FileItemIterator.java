@@ -27,7 +27,8 @@ import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException;
  * {@link FileUploadBase#getItemIterator(RequestContext)}.
  */
 public interface FileItemIterator {
-    /** Returns the maximum size of a single file. An {@link FileSizeLimitExceededException}
+    /**
+     * Returns the maximum size of a single file. An {@link FileSizeLimitExceededException}
      * will be thrown, if there is an uploaded file, which is exceeding this value.
      * By default, this value will be copied from the {@link FileUploadBase#getFileSizeMax()
      * FileUploadBase} object, however, the user may replace the default value with a
@@ -36,7 +37,8 @@ public interface FileItemIterator {
      */
     long getFileSizeMax();
 
-    /** Sets the maximum size of a single file. An {@link FileSizeLimitExceededException}
+    /**
+     * Sets the maximum size of a single file. An {@link FileSizeLimitExceededException}
      * will be thrown, if there is an uploaded file, which is exceeding this value.
      * By default, this value will be copied from the {@link FileUploadBase#getFileSizeMax()
      * FileUploadBase} object, however, the user may replace the default value with a
@@ -47,7 +49,8 @@ public interface FileItemIterator {
      */
     void setFileSizeMax(long pFileSizeMax);
 
-    /** Returns the maximum size of the complete HTTP request. A {@link SizeLimitExceededException}
+    /**
+     * Returns the maximum size of the complete HTTP request. A {@link SizeLimitExceededException}
      * will be thrown, if the HTTP request will exceed this value.
      * By default, this value will be copied from the {@link FileUploadBase#getSizeMax()
      * FileUploadBase} object, however, the user may replace the default value with a
@@ -56,7 +59,8 @@ public interface FileItemIterator {
      */
     long getSizeMax();
 
-    /** Returns the maximum size of the complete HTTP request. A {@link SizeLimitExceededException}
+    /**
+     * Returns the maximum size of the complete HTTP request. A {@link SizeLimitExceededException}
      * will be thrown, if the HTTP request will exceed this value.
      * By default, this value will be copied from the {@link FileUploadBase#getSizeMax()
      * FileUploadBase} object, however, the user may replace the default value with a

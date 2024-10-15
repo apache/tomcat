@@ -29,11 +29,10 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.core.AprLifecycleListener;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 
 /**
  * The keys and certificates used in this file are all available in svn and were
@@ -51,7 +50,7 @@ public class TestClientCert extends TomcatBaseTest {
         parameterSets.add(new Object[] {
                 "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
         parameterSets.add(new Object[] {
-                "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+                "OpenSSL-FFM", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
 
         return parameterSets;
     }
@@ -60,7 +59,7 @@ public class TestClientCert extends TomcatBaseTest {
     public String connectorName;
 
     @Parameter(1)
-    public boolean needApr;
+    public boolean useOpenSSL;
 
     @Parameter(2)
     public String sslImplementationName;
@@ -86,6 +85,11 @@ public class TestClientCert extends TomcatBaseTest {
         }
 
         getTomcatInstance().start();
+
+        Assume.assumeFalse("LibreSSL does not allow renegotiation",
+                OpenSSLStatus.Name.LIBRESSL.equals(OpenSSLStatus.getName()));
+        Assume.assumeFalse("BoringSSL does not allow TLS renegotiation",
+                OpenSSLStatus.Name.BORINGSSL.equals(OpenSSLStatus.getName()));
 
         // Unprotected resource
         ByteChunk res = getUrl("https://localhost:" + getPort() + "/unprotected");
@@ -127,6 +131,13 @@ public class TestClientCert extends TomcatBaseTest {
     }
 
     @Test
+    public void testClientCertPostZero() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.getConnector().setMaxSavePostSize(0);
+        doTestClientCertPost(1024, false);
+    }
+
+    @Test
     public void testClientCertPostSmaller() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         int bodySize = tomcat.getConnector().getMaxSavePostSize() / 2;
@@ -149,7 +160,13 @@ public class TestClientCert extends TomcatBaseTest {
 
     private void doTestClientCertPost(int bodySize, boolean expectProtectedFail)
             throws Exception {
-        getTomcatInstance().start();
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.start();
+
+        Assume.assumeFalse("LibreSSL does not allow renegotiation",
+                OpenSSLStatus.Name.LIBRESSL.equals(OpenSSLStatus.getName()));
+        Assume.assumeFalse("BoringSSL does not allow TLS renegotiation",
+                OpenSSLStatus.Name.BORINGSSL.equals(OpenSSLStatus.getName()));
 
         byte[] body = new byte[bodySize];
         Arrays.fill(body, TesterSupport.DATA);
@@ -188,10 +205,16 @@ public class TestClientCert extends TomcatBaseTest {
             // POST body buffer fails so TLS handshake never happens
             Assert.assertEquals(0, count);
         } else {
+            int expectedBodySize;
+            if (tomcat.getConnector().getMaxSavePostSize() == 0) {
+                expectedBodySize = 0;
+            } else {
+                expectedBodySize = bodySize;
+            }
             Assert.assertTrue("Checking requested client issuer against " +
                     TesterSupport.getClientAuthExpectedIssuer(),
                     TesterSupport.checkLastClientAuthRequestedIssuers());
-            Assert.assertEquals("OK-" + bodySize, res.toString());
+            Assert.assertEquals("OK-" + expectedBodySize, res.toString());
         }
     }
 
@@ -205,13 +228,6 @@ public class TestClientCert extends TomcatBaseTest {
 
         TesterSupport.configureClientSsl();
 
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
-
-        if (needApr) {
-            AprLifecycleListener listener = new AprLifecycleListener();
-            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
-            StandardServer server = (StandardServer) tomcat.getServer();
-            server.addLifecycleListener(listener);
-        }
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
     }
 }

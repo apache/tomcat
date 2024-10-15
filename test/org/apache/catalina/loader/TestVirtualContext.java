@@ -29,12 +29,12 @@ import org.junit.Test;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.core.JreMemoryLeakPreventionListener;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.util.IOTools;
 import org.apache.catalina.webresources.StandardRoot;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 
 public class TestVirtualContext extends TomcatBaseTest {
@@ -267,7 +267,7 @@ public class TestVirtualContext extends TomcatBaseTest {
                 FileOutputStream annotatedServletClassOutputStream = new FileOutputStream(new File(
                         targetPackageForAnnotatedClass, MyAnnotatedServlet.class.getSimpleName()
                                 + ".class"))) {
-            IOUtils.copy(annotatedServletClassInputStream, annotatedServletClassOutputStream);
+            IOTools.flow(annotatedServletClassInputStream, annotatedServletClassOutputStream);
         }
 
         ctx.setResources(new StandardRoot(ctx));
@@ -303,7 +303,7 @@ public class TestVirtualContext extends TomcatBaseTest {
         tomcat.start();
         assertPageContains("/test/annotatedServlet", MyAnnotatedServlet.MESSAGE);
         tomcat.stop();
-        FileUtils.deleteDirectory(additionWebInfClasses);
+        ExpandWar.delete(additionWebInfClasses);
         Assert.assertTrue("Failed to clean up [" + tempFile + "]", tempFile.delete());
     }
 

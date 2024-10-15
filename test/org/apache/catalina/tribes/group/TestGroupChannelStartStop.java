@@ -24,9 +24,6 @@ import org.junit.Test;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 
-/**
- * @version 1.0
- */
 public class TestGroupChannelStartStop {
     private GroupChannel channel = null;
     private int udpPort = 45543;

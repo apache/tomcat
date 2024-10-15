@@ -26,16 +26,14 @@ import jakarta.el.CompositeELResolver;
 import jakarta.el.ELContext;
 import jakarta.el.ELManager;
 import jakarta.el.ELResolver;
-import jakarta.el.ExpressionFactory;
 import jakarta.el.FunctionMapper;
 import jakarta.el.ListELResolver;
 import jakarta.el.MapELResolver;
+import jakarta.el.RecordELResolver;
 import jakarta.el.ResourceBundleELResolver;
 import jakarta.el.StaticFieldELResolver;
 import jakarta.el.ValueExpression;
 import jakarta.el.VariableMapper;
-
-import org.apache.jasper.Constants;
 
 /**
  * Implementation of ELContext
@@ -80,19 +78,16 @@ public class ELContextImpl extends ELContext {
     private static final ELResolver DefaultResolver;
 
     static {
-        if (Constants.IS_SECURITY_ENABLED) {
-            DefaultResolver = null;
-        } else {
-            DefaultResolver = new CompositeELResolver();
-            ((CompositeELResolver) DefaultResolver).add(
-                    ELManager.getExpressionFactory().getStreamELResolver());
-            ((CompositeELResolver) DefaultResolver).add(new StaticFieldELResolver());
-            ((CompositeELResolver) DefaultResolver).add(new MapELResolver());
-            ((CompositeELResolver) DefaultResolver).add(new ResourceBundleELResolver());
-            ((CompositeELResolver) DefaultResolver).add(new ListELResolver());
-            ((CompositeELResolver) DefaultResolver).add(new ArrayELResolver());
-            ((CompositeELResolver) DefaultResolver).add(new BeanELResolver());
-        }
+        DefaultResolver = new CompositeELResolver();
+        ((CompositeELResolver) DefaultResolver).add(
+                ELManager.getExpressionFactory().getStreamELResolver());
+        ((CompositeELResolver) DefaultResolver).add(new StaticFieldELResolver());
+        ((CompositeELResolver) DefaultResolver).add(new MapELResolver());
+        ((CompositeELResolver) DefaultResolver).add(new ResourceBundleELResolver());
+        ((CompositeELResolver) DefaultResolver).add(new ListELResolver());
+        ((CompositeELResolver) DefaultResolver).add(new ArrayELResolver());
+        ((CompositeELResolver) DefaultResolver).add(new RecordELResolver());
+        ((CompositeELResolver) DefaultResolver).add(new BeanELResolver());
     }
 
     private final ELResolver resolver;
@@ -101,8 +96,8 @@ public class ELContextImpl extends ELContext {
 
     private VariableMapper variableMapper;
 
-    public ELContextImpl(ExpressionFactory factory) {
-        this(getDefaultResolver(factory));
+    public ELContextImpl() {
+        this(getDefaultResolver());
     }
 
     public ELContextImpl(ELResolver resolver) {
@@ -135,19 +130,7 @@ public class ELContextImpl extends ELContext {
         this.variableMapper = variableMapper;
     }
 
-    public static ELResolver getDefaultResolver(ExpressionFactory factory) {
-        if (Constants.IS_SECURITY_ENABLED) {
-            CompositeELResolver defaultResolver = new CompositeELResolver();
-            defaultResolver.add(factory.getStreamELResolver());
-            defaultResolver.add(new StaticFieldELResolver());
-            defaultResolver.add(new MapELResolver());
-            defaultResolver.add(new ResourceBundleELResolver());
-            defaultResolver.add(new ListELResolver());
-            defaultResolver.add(new ArrayELResolver());
-            defaultResolver.add(new BeanELResolver());
-            return defaultResolver;
-        } else {
-            return DefaultResolver;
-        }
+    public static ELResolver getDefaultResolver() {
+        return DefaultResolver;
     }
 }

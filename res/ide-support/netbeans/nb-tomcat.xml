@@ -19,7 +19,7 @@
   Supplementary build targets for the Tomcat project under NetBeans.
   Use the project root as basedir to be consistent with standard build.
 -->
-<project basedir=".." name="Tomcat_8.0">
+<project basedir=".." name="Tomcat_@VERSION_MAJOR_MINOR@">
 
   <!--
        load the standard and user Tomcat build properties now,

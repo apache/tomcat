@@ -26,32 +26,26 @@ import java.util.ResourceBundle;
 import java.util.TreeMap;
 
 /**
- * Creates a cookie, a small amount of information sent by a servlet to a Web
- * browser, saved by the browser, and later sent back to the server. A cookie's
- * value can uniquely identify a client, so cookies are commonly used for
- * session management.
+ * Creates a cookie, a small amount of information sent by a servlet to a Web browser, saved by the browser, and later
+ * sent back to the server. A cookie's value can uniquely identify a client, so cookies are commonly used for session
+ * management.
  * <p>
- * A cookie has a name, a single value, and optional attributes such as a
- * comment, path and domain qualifiers, a maximum age, and a version number.
- * Some Web browsers have bugs in how they handle the optional attributes, so
- * use them sparingly to improve the interoperability of your servlets.
+ * A cookie has a name, a single value, and optional attributes such as a comment, path and domain qualifiers, a maximum
+ * age, and a version number. Some Web browsers have bugs in how they handle the optional attributes, so use them
+ * sparingly to improve the interoperability of your servlets.
  * <p>
- * The servlet sends cookies to the browser by using the
- * {@link HttpServletResponse#addCookie} method, which adds fields to HTTP
- * response headers to send cookies to the browser, one at a time. The browser
- * is expected to support 20 cookies for each Web server, 300 cookies total, and
- * may limit cookie size to 4 KB each.
+ * The servlet sends cookies to the browser by using the {@link HttpServletResponse#addCookie} method, which adds fields
+ * to HTTP response headers to send cookies to the browser, one at a time. The browser is expected to support 50 cookies
+ * for each domain, 3000 cookies total, and may limit cookie size to 4 KiB each.
  * <p>
- * The browser returns cookies to the servlet by adding fields to HTTP request
- * headers. Cookies can be retrieved from a request by using the
- * {@link HttpServletRequest#getCookies} method. Several cookies might have the
- * same name but different path attributes.
+ * The browser returns cookies to the servlet by adding fields to HTTP request headers. Cookies can be retrieved from a
+ * request by using the {@link HttpServletRequest#getCookies} method. Several cookies might have the same name but
+ * different path attributes.
  * <p>
- * Cookies affect the caching of the Web pages that use them. HTTP 1.0 does not
- * cache pages that use cookies created with this class. This class does not
- * support the cache control defined with HTTP 1.1.
+ * Cookies affect the caching of the Web pages that use them. HTTP 1.0 does not cache pages that use cookies created
+ * with this class. This class does not support the cache control defined with HTTP 1.1.
  * <p>
- * This class supports both the RFC 6265 specification.
+ * This class supports the RFC 6265 specification.
  */
 public class Cookie implements Cloneable, Serializable {
 
@@ -59,6 +53,8 @@ public class Cookie implements Cloneable, Serializable {
     private static final ResourceBundle LSTRINGS = ResourceBundle.getBundle(LSTRING_FILE);
 
     private static final CookieNameValidator validation = new RFC6265Validator();
+
+    private static final String EMPTY_STRING = "";
 
     private static final long serialVersionUID = 2L;
 
@@ -88,16 +84,14 @@ public class Cookie implements Cloneable, Serializable {
      * <p>
      * The cookie's name cannot be changed after creation.
      * <p>
-     * The value can be anything the server chooses to send. Its value is
-     * probably of interest only to the server. The cookie's value can be
-     * changed after creation with the <code>setValue</code> method.
+     * The value can be anything the server chooses to send. Its value is probably of interest only to the server. The
+     * cookie's value can be changed after creation with the <code>setValue</code> method.
      *
-     * @param name
-     *            a <code>String</code> specifying the name of the cookie
-     * @param value
-     *            a <code>String</code> specifying the value of the cookie
-     * @throws IllegalArgumentException
-     *             if the cookie name contains illegal characters
+     * @param name  a <code>String</code> specifying the name of the cookie
+     * @param value a <code>String</code> specifying the value of the cookie
+     *
+     * @throws IllegalArgumentException if the cookie name contains illegal characters
+     *
      * @see #setValue
      */
     public Cookie(String name, String value) {
@@ -110,7 +104,7 @@ public class Cookie implements Cloneable, Serializable {
     /**
      * If called, this method has no effect.
      *
-     * @param purpose   ignored
+     * @param purpose ignored
      *
      * @see #getComment
      *
@@ -142,9 +136,8 @@ public class Cookie implements Cloneable, Serializable {
      * <p>
      * By default, cookies are only returned to the server that sent them.
      *
-     * @param pattern
-     *            a <code>String</code> containing the domain name within which
-     *            this cookie is visible
+     * @param pattern a <code>String</code> containing the domain name within which this cookie is visible
+     *
      * @see #getDomain
      */
     public void setDomain(String pattern) {
@@ -161,6 +154,7 @@ public class Cookie implements Cloneable, Serializable {
      * Returns the domain name set for this cookie.
      *
      * @return a <code>String</code> containing the domain name
+     *
      * @see #setDomain
      */
     public String getDomain() {
@@ -171,18 +165,15 @@ public class Cookie implements Cloneable, Serializable {
     /**
      * Sets the maximum age of the cookie in seconds.
      * <p>
-     * A positive value indicates that the cookie will expire after that many
-     * seconds have passed. Note that the value is the <i>maximum</i> age when
-     * the cookie will expire, not the cookie's current age.
+     * A positive value indicates that the cookie will expire after that many seconds have passed. Note that the value
+     * is the <i>maximum</i> age when the cookie will expire, not the cookie's current age.
      * <p>
-     * A negative value means that the cookie is not stored persistently and
-     * will be deleted when the Web browser exits. A zero value causes the
-     * cookie to be deleted.
+     * A negative value means that the cookie is not stored persistently and will be deleted when the Web browser exits.
+     * A zero value causes the cookie to be deleted.
      *
-     * @param expiry
-     *            an integer specifying the maximum age of the cookie in
-     *            seconds; if negative, means the cookie is not stored; if zero,
-     *            deletes the cookie
+     * @param expiry an integer specifying the maximum age of the cookie in seconds; if negative, means the cookie is
+     *                   not stored; if zero, deletes the cookie
+     *
      * @see #getMaxAge
      */
     public void setMaxAge(int expiry) {
@@ -191,12 +182,12 @@ public class Cookie implements Cloneable, Serializable {
 
 
     /**
-     * Returns the maximum age of the cookie, specified in seconds, By default,
-     * <code>-1</code> indicating the cookie will persist until browser
-     * shutdown.
+     * Returns the maximum age of the cookie, specified in seconds, By default, <code>-1</code> indicating the cookie
+     * will persist until browser shutdown.
      *
-     * @return an integer specifying the maximum age of the cookie in seconds; if
-     *         negative, means the cookie persists until browser shutdown
+     * @return an integer specifying the maximum age of the cookie in seconds; if negative, means the cookie persists
+     *             until browser shutdown
+     *
      * @see #setMaxAge
      */
     public int getMaxAge() {
@@ -210,17 +201,14 @@ public class Cookie implements Cloneable, Serializable {
 
 
     /**
-     * Specifies a path for the cookie to which the client should return the
-     * cookie.
+     * Specifies a path for the cookie to which the client should return the cookie.
      * <p>
-     * The cookie is visible to all the pages in the directory you specify, and
-     * all the pages in that directory's subdirectories. A cookie's path must
-     * include the servlet that set the cookie, for example, <i>/catalog</i>,
-     * which makes the cookie visible to all directories on the server under
-     * <i>/catalog</i>.
+     * The cookie is visible to all the pages in the directory you specify, and all the pages in that directory's
+     * subdirectories. A cookie's path must include the servlet that set the cookie, for example, <i>/catalog</i>, which
+     * makes the cookie visible to all directories on the server under <i>/catalog</i>.
      *
-     * @param uri
-     *            a <code>String</code> specifying a path
+     * @param uri a <code>String</code> specifying a path
+     *
      * @see #getPath
      */
     public void setPath(String uri) {
@@ -229,11 +217,11 @@ public class Cookie implements Cloneable, Serializable {
 
 
     /**
-     * Returns the path on the server to which the browser returns this cookie.
-     * The cookie is visible to all subpaths on the server.
+     * Returns the path on the server to which the browser returns this cookie. The cookie is visible to all subpaths on
+     * the server.
      *
-     * @return a <code>String</code> specifying a path that contains a servlet
-     *         name, for example, <i>/catalog</i>
+     * @return a <code>String</code> specifying a path that contains a servlet name, for example, <i>/catalog</i>
+     *
      * @see #setPath
      */
     public String getPath() {
@@ -242,39 +230,35 @@ public class Cookie implements Cloneable, Serializable {
 
 
     /**
-     * Indicates to the browser whether the cookie should only be sent using a
-     * secure protocol, such as HTTPS or SSL.
+     * Indicates to the browser whether the cookie should only be sent using a secure protocol, such as HTTPS or SSL.
      * <p>
      * The default value is <code>false</code>.
      *
-     * @param flag
-     *            if <code>true</code>, sends the cookie from the browser to the
-     *            server only when using a secure protocol; if
-     *            <code>false</code>, sent on any protocol
+     * @param flag if <code>true</code>, sends the cookie from the browser to the server only when using a secure
+     *                 protocol; if <code>false</code>, sent on any protocol
+     *
      * @see #getSecure
      */
     public void setSecure(boolean flag) {
-        setAttributeInternal(SECURE, Boolean.toString(flag));
+        setAttributeInternal(SECURE, EMPTY_STRING);
     }
 
 
     /**
-     * Returns <code>true</code> if the browser is sending cookies only over a
-     * secure protocol, or <code>false</code> if the browser can send cookies
-     * using any protocol.
+     * Returns <code>true</code> if the browser is sending cookies only over a secure protocol, or <code>false</code> if
+     * the browser can send cookies using any protocol.
      *
-     * @return <code>true</code> if the browser uses a secure protocol;
-     *         otherwise, <code>false</code>
+     * @return <code>true</code> if the browser uses a secure protocol; otherwise, <code>false</code>
+     *
      * @see #setSecure
      */
     public boolean getSecure() {
-        return Boolean.parseBoolean(getAttribute(SECURE));
+        return EMPTY_STRING.equals(getAttribute(SECURE));
     }
 
 
     /**
-     * Returns the name of the cookie. The name cannot be changed after
-     * creation.
+     * Returns the name of the cookie. The name cannot be changed after creation.
      *
      * @return a <code>String</code> specifying the cookie's name
      */
@@ -284,16 +268,15 @@ public class Cookie implements Cloneable, Serializable {
 
 
     /**
-     * Assigns a new value to a cookie after the cookie is created. If you use a
-     * binary value, you may want to use BASE64 encoding.
+     * Assigns a new value to a cookie after the cookie is created. If you use a binary value, you may want to use
+     * BASE64 encoding.
      * <p>
-     * With Version 0 cookies, values should not contain white space, brackets,
-     * parentheses, equals signs, commas, double quotes, slashes, question
-     * marks, at signs, colons, and semicolons. Empty values may not behave the
-     * same way on all browsers.
+     * With Version 0 cookies, values should not contain white space, brackets, parentheses, equals signs, commas,
+     * double quotes, slashes, question marks, at signs, colons, and semicolons. Empty values may not behave the same
+     * way on all browsers.
      *
-     * @param newValue
-     *            a <code>String</code> specifying the new value
+     * @param newValue a <code>String</code> specifying the new value
+     *
      * @see #getValue
      * @see Cookie
      */
@@ -306,6 +289,7 @@ public class Cookie implements Cloneable, Serializable {
      * Returns the value of the cookie.
      *
      * @return a <code>String</code> containing the cookie's present value
+     *
      * @see #setValue
      * @see Cookie
      */
@@ -345,8 +329,7 @@ public class Cookie implements Cloneable, Serializable {
 
 
     /**
-     * Overrides the standard <code>java.lang.Object.clone</code> method to
-     * return a copy of this cookie.
+     * Overrides the standard <code>java.lang.Object.clone</code> method to return a copy of this cookie.
      */
     @Override
     public Object clone() {
@@ -359,44 +342,40 @@ public class Cookie implements Cloneable, Serializable {
 
 
     /**
-     * Sets the flag that controls if this cookie will be hidden from scripts on
-     * the client side.
+     * Sets the flag that controls if this cookie will be hidden from scripts on the client side.
      *
-     * @param httpOnly  The new value of the flag
+     * @param httpOnly The new value of the flag
      *
      * @since Servlet 3.0
      */
     public void setHttpOnly(boolean httpOnly) {
-        setAttributeInternal(HTTP_ONLY, Boolean.toString(httpOnly));
+        setAttributeInternal(HTTP_ONLY, EMPTY_STRING);
     }
 
 
     /**
-     * Gets the flag that controls if this cookie will be hidden from scripts on
-     * the client side.
+     * Gets the flag that controls if this cookie will be hidden from scripts on the client side.
      *
-     * @return  <code>true</code> if the cookie is hidden from scripts, else
-     *          <code>false</code>
+     * @return <code>true</code> if the cookie is hidden from scripts, else <code>false</code>
+     *
      * @since Servlet 3.0
      */
     public boolean isHttpOnly() {
-        return Boolean.parseBoolean(getAttribute(HTTP_ONLY));
+        return EMPTY_STRING.equals(getAttribute(HTTP_ONLY));
     }
 
 
     /**
-     * Sets the value for the given cookie attribute. When a value is set via
-     * this method, the value returned by the attribute specific getter (if any)
-     * must be consistent with the value set via this method.
+     * Sets the value for the given cookie attribute. When a value is set via this method, the value returned by the
+     * attribute specific getter (if any) must be consistent with the value set via this method.
      *
      * @param name  Name of attribute to set
      * @param value Value of attribute
      *
-     * @throws IllegalArgumentException If the attribute name is null or
-     *         contains any characters not permitted for use in Cookie names.
-     *
-     * @throws NumberFormatException If the attribute is known to be numerical
-     *         but the provided value cannot be parsed to a number.
+     * @throws IllegalArgumentException If the attribute name is null or contains any characters not permitted for use
+     *                                      in Cookie names.
+     * @throws NumberFormatException    If the attribute is known to be numerical but the provided value cannot be
+     *                                      parsed to a number.
      *
      * @since Servlet 6.0
      */
@@ -432,16 +411,19 @@ public class Cookie implements Cloneable, Serializable {
             }
         }
 
-        attributes.put(name, value);
+        if (value == null) {
+            attributes.remove(name);
+        } else {
+            attributes.put(name, value);
+        }
     }
 
 
     /**
-     * Obtain the value for a given attribute. Values returned from this method
-     * must be consistent with the values set and returned by the attribute
-     * specific getters and setters in this class.
+     * Obtain the value for a given attribute. Values returned from this method must be consistent with the values set
+     * and returned by the attribute specific getters and setters in this class.
      *
-     * @param name  Name of attribute to return
+     * @param name Name of attribute to return
      *
      * @return Value of specified attribute
      *
@@ -457,8 +439,7 @@ public class Cookie implements Cloneable, Serializable {
 
 
     /**
-     * Obtain the Map of attributes and values (excluding version) for this
-     * cookie.
+     * Obtain the Map of attributes and values (excluding version) for this cookie.
      *
      * @return A read-only Map of attributes to values, excluding version.
      *

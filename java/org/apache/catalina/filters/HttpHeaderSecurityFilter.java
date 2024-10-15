@@ -31,8 +31,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * Provides a single configuration point for security measures that required the
- * addition of one or more HTTP headers to the response.
+ * Provides a single configuration point for security measures that required the addition of one or more HTTP headers to
+ * the response.
  */
 public class HttpHeaderSecurityFilter extends FilterBase {
 
@@ -60,11 +60,6 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     private static final String BLOCK_CONTENT_TYPE_SNIFFING_HEADER_VALUE = "nosniff";
     private boolean blockContentTypeSniffingEnabled = true;
 
-    // Cross-site scripting filter protection
-    private static final String XSS_PROTECTION_HEADER_NAME = "X-XSS-Protection";
-    private static final String XSS_PROTECTION_HEADER_VALUE = "1; mode=block";
-    private boolean xssProtectionEnabled = true;
-
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         super.init(filterConfig);
@@ -91,8 +86,8 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-            FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
 
         if (response instanceof HttpServletResponse) {
             HttpServletResponse httpResponse = (HttpServletResponse) response;
@@ -115,11 +110,6 @@ public class HttpHeaderSecurityFilter extends FilterBase {
             if (blockContentTypeSniffingEnabled) {
                 httpResponse.setHeader(BLOCK_CONTENT_TYPE_SNIFFING_HEADER_NAME,
                         BLOCK_CONTENT_TYPE_SNIFFING_HEADER_VALUE);
-            }
-
-            // cross-site scripting filter protection
-            if (xssProtectionEnabled) {
-                httpResponse.setHeader(XSS_PROTECTION_HEADER_NAME, XSS_PROTECTION_HEADER_VALUE);
             }
         }
 
@@ -222,8 +212,7 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     }
 
 
-    public void setBlockContentTypeSniffingEnabled(
-            boolean blockContentTypeSniffingEnabled) {
+    public void setBlockContentTypeSniffingEnabled(boolean blockContentTypeSniffingEnabled) {
         this.blockContentTypeSniffingEnabled = blockContentTypeSniffingEnabled;
     }
 
@@ -239,16 +228,6 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     }
 
 
-    public boolean isXssProtectionEnabled() {
-        return xssProtectionEnabled;
-    }
-
-
-    public void setXssProtectionEnabled(boolean xssProtectionEnabled) {
-        this.xssProtectionEnabled = xssProtectionEnabled;
-    }
-
-
     private enum XFrameOption {
         DENY("DENY"),
         SAME_ORIGIN("SAMEORIGIN"),
@@ -257,7 +236,7 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
         private final String headerValue;
 
-        private XFrameOption(String headerValue) {
+        XFrameOption(String headerValue) {
             this.headerValue = headerValue;
         }
 

@@ -29,8 +29,8 @@ import org.apache.tomcat.JarScannerCallback;
 import org.xml.sax.InputSource;
 
 /**
-* Callback handling a web-fragment.xml descriptor.
-*/
+ * Callback handling a web-fragment.xml descriptor.
+ */
 public class FragmentJarScannerCallback implements JarScannerCallback {
 
     private static final String FRAGMENT_LOCATION =
@@ -136,7 +136,7 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
             // this name as having a duplicate so Tomcat can handle it
             // correctly when the fragments are being ordered.
             String duplicateName = fragment.getName();
-            fragments.get(duplicateName).setDuplicated(true);
+            fragments.get(duplicateName).addDuplicate(url.toString());
             // Rename the current fragment so it doesn't clash
             fragment.setName(url.toString());
         }

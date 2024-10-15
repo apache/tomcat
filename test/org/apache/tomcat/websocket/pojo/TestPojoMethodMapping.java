@@ -56,20 +56,18 @@ public class TestPojoMethodMapping extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(ServerConfigListener.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
-        WebSocketContainer wsContainer =
-                ContainerProvider.getWebSocketContainer();
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
 
         tomcat.start();
 
         SimpleClient client = new SimpleClient();
-        URI uri = new URI("ws://localhost:" + getPort() + "/" + PARAM_ONE +
-                "/" + PARAM_TWO + "/" + PARAM_THREE);
+        URI uri = new URI("ws://localhost:" + getPort() + "/" + PARAM_ONE + "/" + PARAM_TWO + "/" + PARAM_THREE);
 
         Session session = wsContainer.connectToServer(client, uri);
         session.getBasicRemote().sendText("NO-OP");
@@ -98,29 +96,25 @@ public class TestPojoMethodMapping extends TomcatBaseTest {
     }
 
 
-    @ServerEndpoint(value="/{one}/{two}/{three}",
-            configurator=SingletonConfigurator.class)
+    @ServerEndpoint(value = "/{one}/{two}/{three}", configurator = SingletonConfigurator.class)
     public static final class Server {
 
         private final List<String> errors = new ArrayList<>();
         private volatile boolean closed;
 
         @OnOpen
-        public void onOpen(@PathParam("one") String p1, @PathParam("two")int p2,
-                @PathParam("three")boolean p3) {
+        public void onOpen(@PathParam("one") String p1, @PathParam("two") int p2, @PathParam("three") boolean p3) {
             checkParams("onOpen", p1, p2, p3);
         }
 
         @OnMessage
-        public void onMessage(@SuppressWarnings("unused") String msg,
-                @PathParam("one") String p1, @PathParam("two")int p2,
-                @PathParam("three")boolean p3) {
+        public void onMessage(@SuppressWarnings("unused") String msg, @PathParam("one") String p1,
+                @PathParam("two") int p2, @PathParam("three") boolean p3) {
             checkParams("onMessage", p1, p2, p3);
         }
 
         @OnClose
-        public void onClose(@PathParam("one") String p1,
-                @PathParam("two")int p2, @PathParam("three")boolean p3) {
+        public void onClose(@PathParam("one") String p1, @PathParam("two") int p2, @PathParam("three") boolean p3) {
             checkParams("onClose", p1, p2, p3);
             closed = true;
         }
@@ -141,8 +135,7 @@ public class TestPojoMethodMapping extends TomcatBaseTest {
 
         private void checkParam(String method, String expected, String actual) {
             if (!expected.equals(actual)) {
-                errors.add("Method [" + method + "]. Expected [" + expected +
-                        "] was + [" + actual + "]");
+                errors.add("Method [" + method + "]. Expected [" + expected + "] was + [" + actual + "]");
             }
         }
     }

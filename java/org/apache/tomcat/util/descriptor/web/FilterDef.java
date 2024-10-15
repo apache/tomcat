@@ -162,8 +162,14 @@ public class FilterDef implements Serializable {
 
     public void setAsyncSupported(String asyncSupported) {
         this.asyncSupported = asyncSupported;
+        asyncSupportedBoolean = !("false".equalsIgnoreCase(asyncSupported));
     }
 
+    private boolean asyncSupportedBoolean = true;
+
+    public boolean getAsyncSupportedBoolean() {
+        return asyncSupportedBoolean;
+    }
 
     // --------------------------------------------------------- Public Methods
 

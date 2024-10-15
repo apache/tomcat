@@ -38,12 +38,9 @@ final class DefaultServerEndpointConfig implements ServerEndpointConfig {
     private final Configurator serverEndpointConfigurator;
     private final Map<String,Object> userProperties = new ConcurrentHashMap<>();
 
-    DefaultServerEndpointConfig(
-            Class<?> endpointClass, String path,
-            List<String> subprotocols, List<Extension> extensions,
-            List<Class<? extends Encoder>> encoders,
-            List<Class<? extends Decoder>> decoders,
-            Configurator serverEndpointConfigurator) {
+    DefaultServerEndpointConfig(Class<?> endpointClass, String path, List<String> subprotocols,
+            List<Extension> extensions, List<Class<? extends Encoder>> encoders,
+            List<Class<? extends Decoder>> decoders, Configurator serverEndpointConfigurator) {
         this.endpointClass = endpointClass;
         this.path = path;
         this.subprotocols = subprotocols;
@@ -79,17 +76,17 @@ final class DefaultServerEndpointConfig implements ServerEndpointConfig {
     }
 
     @Override
-    public final Map<String, Object> getUserProperties() {
+    public Map<String,Object> getUserProperties() {
         return userProperties;
     }
 
     @Override
-    public final List<String> getSubprotocols() {
+    public List<String> getSubprotocols() {
         return subprotocols;
     }
 
     @Override
-    public final List<Extension> getExtensions() {
+    public List<Extension> getExtensions() {
         return extensions;
     }
 }

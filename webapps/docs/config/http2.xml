@@ -80,6 +80,14 @@
 
   <attributes>
 
+    <attribute name="discardRequestsAndResponses" required="false">
+      <p>A boolean value which can be used to enable or disable the recycling
+      of the container internal request and response processing objects. If set
+      to <code>true</code> the request and response objects will be set for
+      garbage collection after every request, otherwise they will be reused.
+      If not specified, this attribute is set to <code>false</code>.</p>
+    </attribute>
+
     <attribute name="initialWindowSize" required="false">
       <p>Controls the initial size of the flow control window for streams that
       Tomcat advertises to clients. If not specified, the default value of
@@ -139,12 +147,19 @@
       count starts at <code>-10 * overheadCountFactor</code>. The count is
       decreased by 20 for each data frame sent or received and each headers frame
       received. The count is increased by the <code>overheadCountFactor</code>
-      for each setting received, priority frame received and ping received. If
+      for each setting, priority, priority update and ping frame received. If
       the overhead count exceeds zero, the connection is closed. A value of less
       than <code>1</code> disables this protection. In normal usage a value of
       approximately <code>20</code> or higher will close the connection before
       any streams can complete. If not specified, a default value of
       <code>10</code> will be used.</p>
+    </attribute>
+
+    <attribute name="overheadResetFactor" required="false">
+      <p>The amount by which the overhead count (see
+      <strong>overheadCountFactor</strong>) will be increased for each reset
+      frame received. If not specified, a default value of <code>50</code> will
+      be used. A value of less than zero will be treated as zero.</p>
     </attribute>
 
     <attribute name="overheadDataThreshold" required="false">
@@ -196,6 +211,12 @@
     <attribute name="useSendfile" required="false">
       <p>Use this boolean attribute to enable or disable sendfile capability.
       The default value is <code>true</code>.</p>
+      <p>This setting is ignored, and the sendfile capability disabled, if the
+      <strong>useAsyncIO</strong> attribute of the associated
+      <strong>Connector</strong> is set to <code>false</code>.</p>
+      <p>The HTTP/2 sendfile capability uses <a
+      href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/MappedByteBuffer.html"
+      >MappedByteBuffer</a> which is known to cause file locking on Windows.</p>
     </attribute>
 
     <attribute name="writeTimeout" required="false">
@@ -207,8 +228,8 @@
 
   </attributes>
 
-  <p>The HTTP/2 upgrade protocol will also inherit the following limits from the
-  <a href="http.html">HTTP Connector</a> it is nested with:</p>
+  <p>The HTTP/2 upgrade protocol will also inherit the following attributes from
+  the <a href="http.html">HTTP Connector</a> within which it is nested:</p>
 
   <ul>
     <li>allowedTrailerHeaders</li>
@@ -223,6 +244,8 @@
     <li>maxSavePostSize</li>
     <li>maxTrailerSize</li>
     <li>noCompressionUserAgents</li>
+    <li>server</li>
+    <li>serverRemoveAppProvidedValues</li>
   </ul>
 
   </subsection>

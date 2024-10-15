@@ -37,7 +37,7 @@ import org.apache.tomcat.util.buf.UriUtil;
  */
 public interface ConfigurationSource {
 
-    public static final ConfigurationSource DEFAULT = new ConfigurationSource() {
+    ConfigurationSource DEFAULT = new ConfigurationSource() {
         protected final File userDir = new File(System.getProperty("user.dir"));
         protected final URI userDirUri = userDir.toURI();
         @Override
@@ -84,7 +84,7 @@ public interface ConfigurationSource {
      * Represents a resource: a stream to the resource associated with
      * its URI.
      */
-    public class Resource implements AutoCloseable {
+    class Resource implements AutoCloseable {
         private final InputStream inputStream;
         private final URI uri;
         public Resource(InputStream inputStream, URI uri) {
@@ -122,7 +122,7 @@ public interface ConfigurationSource {
      * @return the server.xml as an InputStream
      * @throws IOException if an error occurs or if the resource does not exist
      */
-    public default Resource getServerXml()
+    default Resource getServerXml()
             throws IOException {
         return getConfResource("server.xml");
     }
@@ -133,7 +133,7 @@ public interface ConfigurationSource {
      * @return the web.xml as an InputStream
      * @throws IOException if an error occurs or if the resource does not exist
      */
-    public default Resource getSharedWebXml()
+    default Resource getSharedWebXml()
             throws IOException {
         return getConfResource("web.xml");
     }
@@ -144,7 +144,7 @@ public interface ConfigurationSource {
      * @return the resource as an InputStream
      * @throws IOException if an error occurs or if the resource does not exist
      */
-    public default Resource getConfResource(String name)
+    default Resource getConfResource(String name)
             throws IOException {
         String fullName = "conf/" + name;
         return getResource(fullName);
@@ -156,7 +156,7 @@ public interface ConfigurationSource {
      * @return the resource
      * @throws IOException if an error occurs or if the resource does not exist
      */
-    public Resource getResource(String name)
+    Resource getResource(String name)
             throws IOException;
 
     /**
@@ -165,6 +165,6 @@ public interface ConfigurationSource {
      * @param name The resource name
      * @return a URI representing the resource location
      */
-    public URI getURI(String name);
+    URI getURI(String name);
 
 }

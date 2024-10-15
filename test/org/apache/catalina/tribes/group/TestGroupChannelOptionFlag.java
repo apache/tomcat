@@ -24,8 +24,10 @@ import org.junit.Test;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelInterceptor;
+import org.apache.tomcat.util.res.StringManager;
 
 public class TestGroupChannelOptionFlag {
+    private final StringManager sm = StringManager.getManager(TestGroupChannelOptionFlag.class);
     private GroupChannel channel = null;
 
     @Before
@@ -47,6 +49,8 @@ public class TestGroupChannelOptionFlag {
 
     @Test
     public void testOptionConflict() throws Exception {
+        String errorMsgRegx = getTestOptionErrorMsgRegx();
+
         boolean error = false;
         channel.setOptionCheck(true);
         ChannelInterceptor i = new TestInterceptor();
@@ -57,9 +61,9 @@ public class TestGroupChannelOptionFlag {
         channel.addInterceptor(i);
         try {
             channel.start(Channel.DEFAULT);
-        }catch ( ChannelException x ) {
-            if (x.getMessage().contains("option flag conflict")) {
-              error = true;
+        } catch (ChannelException x) {
+            if (x.getMessage().matches(errorMsgRegx)) {
+                error = true;
             }
         }
         Assert.assertTrue(error);
@@ -67,6 +71,8 @@ public class TestGroupChannelOptionFlag {
 
     @Test
     public void testOptionNoConflict() throws Exception {
+        String errorMsgRegx = getTestOptionErrorMsgRegx();
+
         boolean error = false;
         channel.setOptionCheck(true);
         ChannelInterceptor i = new TestInterceptor();
@@ -80,12 +86,18 @@ public class TestGroupChannelOptionFlag {
         channel.addInterceptor(i);
         try {
             channel.start(Channel.DEFAULT);
-        }catch ( ChannelException x ) {
-            if (x.getMessage().contains("option flag conflict")) {
-              error = true;
+        } catch (ChannelException x) {
+            if (x.getMessage().matches(errorMsgRegx)) {
+                error = true;
             }
         }
         Assert.assertFalse(error);
+    }
+
+    private String getTestOptionErrorMsgRegx() {
+        String errorMsgRegx = sm.getString("groupChannel.optionFlag.conflict", ".+").replace("[", "\\[");
+        errorMsgRegx += "; No faulty members identified.";
+        return errorMsgRegx;
     }
 
     public static class TestInterceptor extends ChannelInterceptorBase {

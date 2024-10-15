@@ -26,10 +26,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author Peter Rossbach
- */
 @WebServlet(value = "/annotation/overwrite", name = "param", initParams = {
         @WebInitParam(name = "foo", value = "Hello"),
         @WebInitParam(name = "bar", value = "World!") }, displayName = "param", description = "param", largeIcon = "paramLarge.png", smallIcon = "paramSmall.png", loadOnStartup = 0, asyncSupported = false)

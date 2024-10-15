@@ -26,6 +26,10 @@ import java.nio.channels.AsynchronousSocketChannel;
 
 import javax.management.ObjectName;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Properties that can be set in the &lt;Connector&gt; element
  * in server.xml. All properties are prefixed with &quot;socket.&quot;
@@ -33,10 +37,13 @@ import javax.management.ObjectName;
  */
 public class SocketProperties {
 
+    private static final Log log = LogFactory.getLog(SocketProperties.class);
+    private static final StringManager sm = StringManager.getManager(SocketProperties.class);
+
     /**
      * Enable/disable socket processor cache, this bounded cache stores
      * SocketProcessor objects to reduce GC
-     * Default is 500
+     * Default is 0
      * -1 is unlimited
      * 0 is disabled
      */
@@ -45,7 +52,7 @@ public class SocketProperties {
     /**
      * Enable/disable poller event cache, this bounded cache stores
      * PollerEvent objects to reduce GC for the poller
-     * Default is 500
+     * Default is 0
      * -1 is unlimited
      * 0 is disabled
      * &gt;0 the max number of objects to keep in cache.
@@ -78,13 +85,13 @@ public class SocketProperties {
 
     /**
      * The application read buffer size in bytes.
-     * Default value is rxBufSize
+     * Default value is 8192
      */
     protected int appReadBufSize = 8192;
 
     /**
      * The application write buffer size in bytes
-     * Default value is txBufSize
+     * Default value is 8192
      */
     protected int appWriteBufSize = 8192;
 
@@ -145,7 +152,7 @@ public class SocketProperties {
 
     /**
      * Performance preferences according to
-     * http://docs.oracle.com/javase/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)
+     * https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)
      * All three performance attributes must be set or the JVM defaults will be
      * used.
      */
@@ -153,7 +160,7 @@ public class SocketProperties {
 
     /**
      * Performance preferences according to
-     * http://docs.oracle.com/javase/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)
+     * https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)
      * All three performance attributes must be set or the JVM defaults will be
      * used.
      */
@@ -161,7 +168,7 @@ public class SocketProperties {
 
     /**
      * Performance preferences according to
-     * http://docs.oracle.com/javase/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)
+     * https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)
      * All three performance attributes must be set or the JVM defaults will be
      * used.
      */
@@ -451,7 +458,11 @@ public class SocketProperties {
     }
 
     public void setUnlockTimeout(int unlockTimeout) {
-        this.unlockTimeout = unlockTimeout;
+        if (unlockTimeout > 0) {
+            this.unlockTimeout = unlockTimeout;
+        } else {
+            log.warn(sm.getString("socketProperties.negativeUnlockTimeout"));
+        }
     }
 
     /**

@@ -35,7 +35,7 @@ public final class FastHttpDateFormat {
 
 
     private static final int CACHE_SIZE =
-        Integer.parseInt(System.getProperty("org.apache.tomcat.util.http.FastHttpDateFormat.CACHE_SIZE", "1000"));
+            Integer.getInteger("org.apache.tomcat.util.http.FastHttpDateFormat.CACHE_SIZE", 1000).intValue();
 
 
     // HTTP date formats
@@ -57,14 +57,14 @@ public final class FastHttpDateFormat {
         FORMAT_OBSOLETE_RFC850 = new ConcurrentDateFormat(DATE_OBSOLETE_RFC850, Locale.US, tz);
         FORMAT_OBSOLETE_ASCTIME = new ConcurrentDateFormat(DATE_OBSOLETE_ASCTIME, Locale.US, tz);
 
-        httpParseFormats = new ConcurrentDateFormat[] {
-                FORMAT_RFC5322, FORMAT_OBSOLETE_RFC850, FORMAT_OBSOLETE_ASCTIME };
+        httpParseFormats =
+                new ConcurrentDateFormat[] { FORMAT_RFC5322, FORMAT_OBSOLETE_RFC850, FORMAT_OBSOLETE_ASCTIME };
     }
 
     /**
      * Instant on which the currentDate object was generated.
      */
-    private static volatile long currentDateGenerated = 0L;
+    private static volatile long currentDateGeneratedInSeconds = 0L;
 
 
     /**
@@ -76,13 +76,13 @@ public final class FastHttpDateFormat {
     /**
      * Formatter cache.
      */
-    private static final Map<Long, String> formatCache = new ConcurrentHashMap<>(CACHE_SIZE);
+    private static final Map<Long,String> formatCache = new ConcurrentHashMap<>(CACHE_SIZE);
 
 
     /**
      * Parser cache.
      */
-    private static final Map<String, Long> parseCache = new ConcurrentHashMap<>(CACHE_SIZE);
+    private static final Map<String,Long> parseCache = new ConcurrentHashMap<>(CACHE_SIZE);
 
 
     // --------------------------------------------------------- Public Methods
@@ -90,14 +90,15 @@ public final class FastHttpDateFormat {
 
     /**
      * Get the current date in HTTP format.
+     *
      * @return the HTTP date
      */
-    public static final String getCurrentDate() {
-        long now = System.currentTimeMillis();
-        // Handle case where time moves backwards (e.g. system time corrected)
-        if (Math.abs(now - currentDateGenerated) > 1000) {
-            currentDate = FORMAT_RFC5322.format(new Date(now));
-            currentDateGenerated = now;
+    public static String getCurrentDate() {
+        // according rfc5322, date/time data is accurate to the second.
+        long nowInSeconds = System.currentTimeMillis() / 1000L;
+        if (nowInSeconds != currentDateGeneratedInSeconds) {
+            currentDate = FORMAT_RFC5322.format(new Date(nowInSeconds * 1000L));
+            currentDateGeneratedInSeconds = nowInSeconds;
         }
         return currentDate;
     }
@@ -105,10 +106,12 @@ public final class FastHttpDateFormat {
 
     /**
      * Get the HTTP format of the specified date.
+     *
      * @param value The date
+     *
      * @return the HTTP date
      */
-    public static final String formatDate(long value) {
+    public static String formatDate(long value) {
         Long longValue = Long.valueOf(value);
         String cachedDate = formatCache.get(longValue);
         if (cachedDate != null) {
@@ -123,11 +126,12 @@ public final class FastHttpDateFormat {
 
     /**
      * Try to parse the given date as an HTTP date.
+     *
      * @param value The HTTP date
-     * @return the date as a long or <code>-1</code> if the value cannot be
-     *         parsed
+     *
+     * @return the date as a long or <code>-1</code> if the value cannot be parsed
      */
-    public static final long parseDate(String value) {
+    public static long parseDate(String value) {
 
         Long cachedDate = parseCache.get(value);
         if (cachedDate != null) {

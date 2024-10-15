@@ -46,7 +46,7 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
      *
      * @since 2.0
      */
-    private class PoolGuardConnectionWrapper<D extends Connection> extends DelegatingConnection<D> {
+    private final class PoolGuardConnectionWrapper<D extends Connection> extends DelegatingConnection<D> {
 
         PoolGuardConnectionWrapper(final D delegate) {
             super(delegate);
@@ -121,11 +121,9 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
      * @since 2.1
      */
     @Override
-    public void close() throws RuntimeException, SQLException {
+    public void close() throws SQLException {
         try {
             pool.close();
-        } catch (final RuntimeException rte) {
-            throw new RuntimeException(Utils.getMessage("pool.close.fail"), rte);
         } catch (final Exception e) {
             throw new SQLException(Utils.getMessage("pool.close.fail"), e);
         }
@@ -163,7 +161,7 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
      *             always thrown
      */
     @Override
-    public Connection getConnection(final String uname, final String passwd) throws SQLException {
+    public Connection getConnection(final String userName, final String password) throws SQLException {
         throw new UnsupportedOperationException();
     }
 

@@ -26,10 +26,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author Peter Rossbach
- */
 @WebServlet(name = "param1", initParams = {
         @WebInitParam(name = "foo", value = "Hello"),
         @WebInitParam(name = "bar", value = "World!") })

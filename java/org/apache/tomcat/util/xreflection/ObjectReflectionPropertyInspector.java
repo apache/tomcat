@@ -62,7 +62,7 @@ public final class ObjectReflectionPropertyInspector {
         );
     }
 
-    private static final Set<Class<?>> getKnownClasses() throws ClassNotFoundException {
+    private static Set<Class<?>> getKnownClasses() throws ClassNotFoundException {
         return
             Collections.unmodifiableSet(new LinkedHashSet<>(
                     Arrays.asList(
@@ -86,7 +86,6 @@ public final class ObjectReflectionPropertyInspector {
                         Class.forName("org.apache.coyote.ajp.AbstractAjpProtocol"),
                         Class.forName("org.apache.coyote.ajp.AjpNio2Protocol"),
                         Class.forName("org.apache.coyote.ajp.AjpNioProtocol"),
-                        Class.forName("org.apache.coyote.http11.AbstractHttp11JsseProtocol"),
                         Class.forName("org.apache.coyote.http11.AbstractHttp11Protocol"),
                         Class.forName("org.apache.coyote.http11.Http11Nio2Protocol"),
                         Class.forName("org.apache.coyote.http11.Http11NioProtocol"),
@@ -98,6 +97,7 @@ public final class ObjectReflectionPropertyInspector {
                         Class.forName("org.apache.tomcat.util.modeler.OperationInfo"),
                         Class.forName("org.apache.tomcat.util.modeler.ParameterInfo"),
                         Class.forName("org.apache.tomcat.util.net.AbstractEndpoint"),
+                        Class.forName("org.apache.tomcat.util.net.AbstractNetworkChannelEndpoint"),
                         Class.forName("org.apache.tomcat.util.net.Nio2Endpoint"),
                         Class.forName("org.apache.tomcat.util.net.NioEndpoint"),
                         Class.forName("org.apache.tomcat.util.net.SocketProperties")

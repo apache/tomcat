@@ -34,12 +34,10 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class IdentityInputFilter implements InputFilter, ApplicationBufferHandler {
 
-    private static final StringManager sm = StringManager.getManager(
-            IdentityInputFilter.class.getPackage().getName());
+    private static final StringManager sm = StringManager.getManager(IdentityInputFilter.class);
 
 
     // -------------------------------------------------------------- Constants
-
 
     protected static final String ENCODING_NAME = "identity";
     protected static final ByteChunk ENCODING = new ByteChunk();
@@ -47,15 +45,12 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
 
     // ----------------------------------------------------- Static Initializer
 
-
     static {
-        ENCODING.setBytes(ENCODING_NAME.getBytes(StandardCharsets.ISO_8859_1),
-                0, ENCODING_NAME.length());
+        ENCODING.setBytes(ENCODING_NAME.getBytes(StandardCharsets.ISO_8859_1), 0, ENCODING_NAME.length());
     }
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * Content length.
@@ -130,7 +125,7 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
 
 
     /**
-     * Read the content length from the request.
+     * {@inheritDoc} Read the content length from the request.
      */
     @Override
     public void setRequest(Request request) {
@@ -150,7 +145,7 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
 
             int nread = buffer.doRead(this);
             tempRead = null;
-            if (nread > 0 ) {
+            if (nread > 0) {
                 swallowed += nread;
                 remaining = remaining - nread;
                 if (maxSwallowSizeExceeded && swallowed > maxSwallowSize) {
@@ -170,9 +165,6 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
     }
 
 
-    /**
-     * Amount of bytes still available in a buffer.
-     */
     @Override
     public int available() {
         // No data buffered here. Try the next filter in the chain.
@@ -180,18 +172,12 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
     }
 
 
-    /**
-     * Set the next buffer in the filter pipeline.
-     */
     @Override
     public void setBuffer(InputBuffer buffer) {
         this.buffer = buffer;
     }
 
 
-    /**
-     * Make the filter ready to process the next request.
-     */
     @Override
     public void recycle() {
         contentLength = -1;
@@ -199,10 +185,6 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
     }
 
 
-    /**
-     * Return the name of the associated encoding; Here, the value is
-     * "identity".
-     */
     @Override
     public ByteChunk getEncodingName() {
         return ENCODING;

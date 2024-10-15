@@ -99,15 +99,6 @@
                  type="java.lang.String"/>
     </operation>
 
-    <operation name="addServiced"
-               description="DEPRECATED: Add a web application to the serviced list to show it is being serviced by another component"
-               impact="ACTION"
-               returnType="void">
-      <parameter name="name"
-                 description="Application name"
-                 type="java.lang.String"/>
-    </operation>
-
     <operation name="check"
                description="Check a web application name for updates"
                impact="ACTION"
@@ -134,15 +125,6 @@
 
     <operation name="isDeployed"
                description="Was this web application deployed by this component"
-               impact="ACTION"
-               returnType="boolean">
-      <parameter name="name"
-                 description="Application name"
-                 type="java.lang.String"/>
-    </operation>
-
-    <operation name="isServiced"
-               description="DEPRECATED: Is a web application serviced by another component"
                impact="ACTION"
                returnType="boolean">
       <parameter name="name"

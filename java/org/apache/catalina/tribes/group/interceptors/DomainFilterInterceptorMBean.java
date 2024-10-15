@@ -18,12 +18,12 @@ package org.apache.catalina.tribes.group.interceptors;
 
 public interface DomainFilterInterceptorMBean {
 
-    public int getOptionFlag();
+    int getOptionFlag();
 
-    public byte[] getDomain();
+    byte[] getDomain();
 
-    public int getLogInterval();
+    int getLogInterval();
 
-    public void setLogInterval(int logInterval);
+    void setLogInterval(int logInterval);
 
 }

@@ -16,14 +16,15 @@
  */
 package org.apache.jasper.compiler;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import jakarta.el.ExpressionFactory;
 import jakarta.servlet.jsp.tagext.TagLibraryInfo;
@@ -40,14 +41,14 @@ import org.apache.jasper.JspCompilationContext;
 
 class PageInfo {
 
-    private final Vector<String> imports;
+    private final List<String> imports;
     private final Map<String,Long> dependants;
 
     private final BeanRepository beanRepository;
     private final Set<String> varInfoNames;
     private final HashMap<String,TagLibraryInfo> taglibsMap;
     private final HashMap<String, String> jspPrefixMapper;
-    private final HashMap<String, LinkedList<String>> xmlPrefixMapper;
+    private final HashMap<String, Deque<String>> xmlPrefixMapper;
     private final HashMap<String, Mark> nonCustomTagPrefixMap;
     private final String jspFile;
     private static final String defaultLanguage = "java";
@@ -61,8 +62,6 @@ class PageInfo {
     private int buffer = 8*1024;
     private String autoFlush;
     private boolean isAutoFlush = true;
-    private String isThreadSafeValue;
-    private boolean isThreadSafe = true;
     private String isErrorPageValue;
     private boolean isErrorPage = false;
     private String errorPage = null;
@@ -95,7 +94,7 @@ class PageInfo {
     private boolean hasJspRoot = false;
     private Collection<String> includePrelude;
     private Collection<String> includeCoda;
-    private final Vector<String> pluginDcls;  // Id's for tagplugin declarations
+    private final List<String> pluginDcls;  // Id's for tagplugin declarations
 
     // JSP 2.2
     private boolean errorOnUndeclaredNamespace = false;
@@ -117,13 +116,13 @@ class PageInfo {
         this.xmlPrefixMapper = new HashMap<>();
         this.nonCustomTagPrefixMap = new HashMap<>();
         this.dependants = new HashMap<>();
-        this.includePrelude = new Vector<>();
-        this.includeCoda = new Vector<>();
-        this.pluginDcls = new Vector<>();
+        this.includePrelude = new ArrayList<>();
+        this.includeCoda = new ArrayList<>();
+        this.pluginDcls = new ArrayList<>();
         this.prefixes = new HashSet<>();
 
         // Enter standard imports
-        this.imports = new Vector<>(Constants.STANDARD_IMPORTS);
+        this.imports = new ArrayList<>(Constants.STANDARD_IMPORTS);
     }
 
     public boolean isTagFile() {
@@ -337,12 +336,8 @@ class PageInfo {
      * @param uri The URI to be pushed onto the stack
      */
     public void pushPrefixMapping(String prefix, String uri) {
-        LinkedList<String> stack = xmlPrefixMapper.get(prefix);
-        if (stack == null) {
-            stack = new LinkedList<>();
-            xmlPrefixMapper.put(prefix, stack);
-        }
-        stack.addFirst(uri);
+        // Must be LinkedList as it needs to accept nulls
+        xmlPrefixMapper.computeIfAbsent(prefix, k -> new LinkedList<>()).addFirst(uri);
     }
 
     /*
@@ -352,7 +347,7 @@ class PageInfo {
      * @param prefix The prefix whose stack of URIs is to be popped
      */
     public void popPrefixMapping(String prefix) {
-        LinkedList<String> stack = xmlPrefixMapper.get(prefix);
+        Deque<String> stack = xmlPrefixMapper.get(prefix);
         stack.removeFirst();
     }
 
@@ -367,7 +362,7 @@ class PageInfo {
 
         String uri = null;
 
-        LinkedList<String> stack = xmlPrefixMapper.get(prefix);
+        Deque<String> stack = xmlPrefixMapper.get(prefix);
         if (stack == null || stack.size() == 0) {
             uri = jspPrefixMapper.get(prefix);
         } else {
@@ -538,32 +533,6 @@ class PageInfo {
 
     public boolean isAutoFlush() {
         return isAutoFlush;
-    }
-
-
-    /*
-     * isThreadSafe
-     */
-    public void setIsThreadSafe(String value, Node n, ErrorDispatcher err)
-        throws JasperException {
-
-        if ("true".equalsIgnoreCase(value)) {
-            isThreadSafe = true;
-        } else if ("false".equalsIgnoreCase(value)) {
-            isThreadSafe = false;
-        } else {
-            err.jspError(n, "jsp.error.page.invalid.isthreadsafe");
-        }
-
-        isThreadSafeValue = value;
-    }
-
-    public String getIsThreadSafe() {
-        return isThreadSafeValue;
-    }
-
-    public boolean isThreadSafe() {
-        return isThreadSafe;
     }
 
 

@@ -22,11 +22,11 @@ import org.apache.catalina.tribes.Member;
 
 /**
  * A response object holds a message from a responding partner.
- * @version 1.0
  */
 public class Response {
     private Member source;
     private Serializable message;
+
     public Response() {
     }
 

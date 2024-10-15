@@ -107,7 +107,11 @@ enter it here:
       }
       type = type.replaceFirst("^java\\.lang\\.", "");
 %>
-<tr><td><%= name %></td><td><%= value %></td><td><%= type %></td>
+<tr>
+  <td><%= util.HTMLFilter.filter(name) %></td>
+  <td><%= util.HTMLFilter.filter(String.valueOf(value)) %></td>
+  <td><%= util.HTMLFilter.filter(type) %></td>
+</tr>
 <%
     }
 %>
@@ -139,7 +143,10 @@ To add some data to the authenticated session, enter it here:
   while (names.hasMoreElements()) {
     String name = names.nextElement();
 %>
-<tr><td><%= name %></td><td><%= session.getAttribute(name) %></td>
+<tr>
+  <td><%= util.HTMLFilter.filter(name) %></td>
+  <td><%= util.HTMLFilter.filter(String.valueOf(session.getAttribute(name))) %></td>
+</tr>
 <%
   }
 %>

@@ -164,19 +164,11 @@ public class Acceptor<U> implements Runnable {
     }
 
 
-    /**
-     * Signals the Acceptor to stop, optionally waiting for that stop process
-     * to complete before returning. If a wait is requested and the stop does
-     * not complete in that time a warning will be logged.
-     *
-     * @param waitSeconds The time to wait in seconds. Use a value less than
-     *                    zero for no wait.
-     */
-    public void stop(int waitSeconds) {
+    public void stopMillis(int waitMilliseconds) {
         stopCalled = true;
-        if (waitSeconds > 0) {
+        if (waitMilliseconds > 0) {
             try {
-                if (!stopLatch.await(waitSeconds, TimeUnit.SECONDS)) {
+                if (!stopLatch.await(waitMilliseconds, TimeUnit.MILLISECONDS)) {
                    log.warn(sm.getString("acceptor.stop.fail", getThreadName()));
                 }
             } catch (InterruptedException e) {

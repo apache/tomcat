@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 10.1 Maven Deployment" default="" basedir="."
+<project name="Tomcat 12.0 Maven Deployment" default="" basedir="."
          xmlns:resolver="antlib:org.apache.maven.resolver.ant"
          xmlns:if="ant:if"
          xmlns:unless="ant:unless">
@@ -79,7 +79,7 @@
         <param name="pom" value="${tomcat.pom.path}/@{pom}"/>
         <param name="src" value="@{src}"/>
         <param name="src.skip" value="@{src.skip}"/>
-        <param name="maven.deploy.version" value="${maven.asf.release.deploy.version}-dev"/>
+        <param name="maven.deploy.version" value="${maven.asf.release.deploy.version}-SNAPSHOT"/>
       </antcall>
     </sequential>
   </macrodef>
@@ -213,6 +213,7 @@
     <delete file="${pom}.tmp"/>
     <delete file="${pom}.asc"/>
     <delete file="${file}.zip.asc"/>
+    <delete file="${file}-windows-x64.zip.asc"/>
     <delete file="${file}.tar.gz.asc"/>
 
     <!--replace the version in the pom-->
@@ -227,6 +228,10 @@
       <param name="file.in" value="${file}.zip" />
       <param name="file.out" value="${file}.zip.asc" />
     </antcall>
+      <antcall target="-sign" >
+        <param name="file.in" value="${file}-windows-x64.zip" />
+        <param name="file.out" value="${file}-windows-x64.zip.asc" />
+      </antcall>
     <antcall target="-sign" >
       <param name="file.in" value="${file}.tar.gz" />
       <param name="file.out" value="${file}.tar.gz.asc" />
@@ -245,6 +250,8 @@
       </remoterepo>
       <artifact file="${file}.zip" type="zip"/>
       <artifact file="${file}.zip.asc" type="zip.asc" if:set="gpg.passphrase"/>
+      <artifact file="${file}-windows-x64.zip" type="zip" classifier="windows-x64"/>
+      <artifact file="${file}-windows-x64.zip.asc" type="zip.asc" classifier="windows-x64" if:set="gpg.passphrase"/>
       <artifact file="${file}.tar.gz" type="tar.gz"/>
       <artifact file="${file}.tar.gz.asc" type="tar.gz.asc" if:set="gpg.passphrase"/>
       <artifact file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
@@ -253,6 +260,7 @@
     <delete file="${pom}.tmp"/>
     <delete file="${pom}.asc"/>
     <delete file="${file}.zip.asc"/>
+    <delete file="${file}-windows-x64.zip.asc"/>
     <delete file="${file}.tar.gz.asc"/>
   </target>
 
@@ -345,10 +353,11 @@
      <doMavenInstall artifactId="tomcat-util"/>
      <doMavenInstall artifactId="tomcat-util-scan"/>
      <doMavenInstall artifactId="tomcat-coyote"/>
+     <doMavenInstall artifactId="tomcat-coyote-ffm"/>
      <doMavenInstall artifactId="tomcat-dbcp"/>
      <doMavenInstall artifactId="tomcat-websocket"/>
 
-     <!-- Emedded jars -->
+     <!-- Embedded jars -->
      <doMavenInstall artifactId="tomcat-embed-core"
          groupId="org.apache.tomcat.embed"
          file="${tomcat.embed.path}/tomcat-embed-core.jar"
@@ -452,6 +461,7 @@
     <doMavenDeploy artifactId="tomcat-util"/>
     <doMavenDeploy artifactId="tomcat-util-scan"/>
     <doMavenDeploy artifactId="tomcat-coyote"/>
+    <doMavenDeploy artifactId="tomcat-coyote-ffm"/>
     <doMavenDeploy artifactId="tomcat-dbcp"/>
     <doMavenDeploy artifactId="tomcat-websocket"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-cs"/>
@@ -464,7 +474,7 @@
     <doMavenDeployNoSrc artifactId="tomcat-i18n-ru"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-zh-CN"/>
 
-    <!-- Emedded jars -->
+    <!-- Embedded jars -->
     <!-- Skip DBCP - optional and can use standard ones above -->
     <doMavenDeploy artifactId="tomcat-embed-core"
         groupId="org.apache.tomcat.embed"
@@ -504,7 +514,7 @@
       <param name="maven.repo.repositoryId"
              value="${maven.snapshot.repo.repositoryId}"/>
       <param name="maven.repo.url" value="${maven.snapshot.repo.url}"/>
-      <param name="maven.deploy.version" value="10.1.0-SNAPSHOT"/>
+      <param name="maven.deploy.version" value="${maven.asf.release.deploy.version}-SNAPSHOT"/>
       <param name="maven.deploy.binary.version"
              value="${maven.asf.release.deploy.version}-dev"/>
     </antcall>

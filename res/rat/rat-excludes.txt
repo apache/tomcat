@@ -46,7 +46,7 @@
 
   - files used simply to ensure directories are not empty
 
-  - *.bmp, *.dia files are binary
+  - *.bmp, *.dia and *.vpd files are binary
     (*.gif, *.jpg are also binary, but are automatically detected by RAT as
     ones, so no explicit configuration is needed)
 
@@ -69,14 +69,25 @@ output/deployer/deployer-howto.html
 **/MANIFEST.MF
 **/*.manifest
 
+output/dist/webapps/docs/*/copy.svg
 output/dist/webapps/docs/*/element-list
 output/dist/webapps/docs/*/jquery/**
+output/dist/webapps/docs/*/legal/**
 output/dist/webapps/docs/*/member-search-index.js
+output/dist/webapps/docs/*/module-search-index.js
 output/dist/webapps/docs/*/package-search-index.js
-output/dist/webapps/docs/*/search.js
-output/dist/webapps/docs/*/type-search-index.js
+output/dist/webapps/docs/*/resource-files/**
 output/dist/webapps/docs/*/script.js
+output/dist/webapps/docs/*/script-dir/**
+output/dist/webapps/docs/*/script-files/**
+output/dist/webapps/docs/*/search.js
+output/dist/webapps/docs/*/search-page.js
+output/dist/webapps/docs/*/tag-search-index.js
+output/dist/webapps/docs/*/type-search-index.js
 
+output/dist/src/test/org/apache/tomcat/util/net/jsse/key-password
+output/dist/src/test/org/apache/tomcat/util/net/key-password
+output/dist/src/test/org/apache/tomcat/util/net/keystore-password
 output/dist/src/test/webapp/404.html
 output/dist/src/test/webapp/index.html.br
 output/dist/src/test/webapp/bug49nnn/bug49464-cp1252.txt
@@ -86,10 +97,16 @@ output/dist/src/test/webapp/bug49nnn/bug49464-utf-8-bom.txt
 output/dist/src/test/webapp/bug49nnn/bug49464-utf-8.txt
 output/dist/src/test/webapp/bug53257/*.txt
 output/dist/src/test/webapp/bug53257/foo bar/foobar.txt
+output/dist/src/test/webapp/bug66609/a&a.txt
+output/dist/src/test/webapp/bug66609/b'b.txt
+output/dist/src/test/webapp/jsp/ok.html
 output/dist/src/test/webapp-fragments/WEB-INF/classes/*.txt
 output/dist/src/test/webresources/dir1/d1/d1-f1.txt
 output/dist/src/test/webresources/dir1/d2/d2-f1.txt
 output/dist/src/test/webresources/dir1/*.txt
+test/org/apache/tomcat/util/net/jsse/key-password
+test/org/apache/tomcat/util/net/key-password
+test/org/apache/tomcat/util/net/keystore-password
 test/webapp/404.html
 test/webapp/index.html.br
 test/webapp/bug49nnn/bug49464-cp1252.txt
@@ -99,6 +116,9 @@ test/webapp/bug49nnn/bug49464-utf-8-bom.txt
 test/webapp/bug49nnn/bug49464-utf-8.txt
 test/webapp/bug53257/*.txt
 test/webapp/bug53257/foo bar/foobar.txt
+test/webapp/bug66609/a&a.txt
+test/webapp/bug66609/b'b.txt
+test/webapp/jsp/ok.html
 test/webapp-fragments/WEB-INF/classes/*.txt
 test/webresources/dir1/d1/d1-f1.txt
 test/webresources/dir1/d2/d2-f1.txt
@@ -110,9 +130,9 @@ test/webresources/dir1/*.txt
 build.properties
 res/maven/mvn.properties
 
-output/dist/confinstall/tomcat-users_2.xml
-output/dist/src/res/confinstall/tomcat-users_2.xml
-res/confinstall/tomcat-users_2.xml
+output/dist/src/res/install-win/tomcat-users_2.xml
+output/dist/tomcat-users_2.xml
+res/install-win/tomcat-users_2.xml
 
 java/jakarta/servlet/resources/javaee_5.xsd
 java/jakarta/servlet/resources/javaee_6.xsd
@@ -120,6 +140,7 @@ java/jakarta/servlet/resources/javaee_7.xsd
 java/jakarta/servlet/resources/javaee_8.xsd
 java/jakarta/servlet/resources/jakartaee_9.xsd
 java/jakarta/servlet/resources/jakartaee_10.xsd
+java/jakarta/servlet/resources/jakartaee_11.xsd
 java/jakarta/servlet/resources/javaee_web_services_1_2.xsd
 java/jakarta/servlet/resources/javaee_web_services_1_3.xsd
 java/jakarta/servlet/resources/javaee_web_services_1_4.xsd
@@ -132,29 +153,35 @@ java/jakarta/servlet/resources/jsp_2_2.xsd
 java/jakarta/servlet/resources/jsp_2_3.xsd
 java/jakarta/servlet/resources/jsp_3_0.xsd
 java/jakarta/servlet/resources/jsp_3_1.xsd
+java/jakarta/servlet/resources/jsp_4_0.xsd
 java/jakarta/servlet/resources/web-app_3_0.xsd
 java/jakarta/servlet/resources/web-app_3_1.xsd
 java/jakarta/servlet/resources/web-app_4_0.xsd
 java/jakarta/servlet/resources/web-app_5_0.xsd
 java/jakarta/servlet/resources/web-app_6_0.xsd
+java/jakarta/servlet/resources/web-app_6_1.xsd
 java/jakarta/servlet/resources/web-common_3_0.xsd
 java/jakarta/servlet/resources/web-common_3_1.xsd
 java/jakarta/servlet/resources/web-common_4_0.xsd
 java/jakarta/servlet/resources/web-common_5_0.xsd
 java/jakarta/servlet/resources/web-common_6_0.xsd
+java/jakarta/servlet/resources/web-common_6_1.xsd
 java/jakarta/servlet/resources/web-fragment_3_0.xsd
 java/jakarta/servlet/resources/web-fragment_3_1.xsd
 java/jakarta/servlet/resources/web-fragment_4_0.xsd
 java/jakarta/servlet/resources/web-fragment_5_0.xsd
 java/jakarta/servlet/resources/web-fragment_6_0.xsd
+java/jakarta/servlet/resources/web-fragment_6_1.xsd
 java/jakarta/servlet/resources/web-jsptaglibrary_3_0.xsd
 java/jakarta/servlet/resources/web-jsptaglibrary_3_1.xsd
+java/jakarta/servlet/resources/web-jsptaglibrary_4_0.xsd
 output/classes/jakarta/servlet/resources/javaee_5.xsd
 output/classes/jakarta/servlet/resources/javaee_6.xsd
 output/classes/jakarta/servlet/resources/javaee_7.xsd
 output/classes/jakarta/servlet/resources/javaee_8.xsd
 output/classes/jakarta/servlet/resources/jakartaee_9.xsd
 output/classes/jakarta/servlet/resources/jakartaee_10.xsd
+output/classes/jakarta/servlet/resources/jakartaee_11.xsd
 output/classes/jakarta/servlet/resources/javaee_web_services_1_2.xsd
 output/classes/jakarta/servlet/resources/javaee_web_services_1_3.xsd
 output/classes/jakarta/servlet/resources/javaee_web_services_1_4.xsd
@@ -168,29 +195,35 @@ output/classes/jakarta/servlet/resources/jsp_2_2.xsd
 output/classes/jakarta/servlet/resources/jsp_2_3.xsd
 output/classes/jakarta/servlet/resources/jsp_3_0.xsd
 output/classes/jakarta/servlet/resources/jsp_3_1.xsd
+output/classes/jakarta/servlet/resources/jsp_4_0.xsd
 output/classes/jakarta/servlet/resources/web-app_3_0.xsd
 output/classes/jakarta/servlet/resources/web-app_3_1.xsd
 output/classes/jakarta/servlet/resources/web-app_4_0.xsd
 output/classes/jakarta/servlet/resources/web-app_5_0.xsd
 output/classes/jakarta/servlet/resources/web-app_6_0.xsd
+output/classes/jakarta/servlet/resources/web-app_6_1.xsd
 output/classes/jakarta/servlet/resources/web-common_3_0.xsd
 output/classes/jakarta/servlet/resources/web-common_3_1.xsd
 output/classes/jakarta/servlet/resources/web-common_4_0.xsd
 output/classes/jakarta/servlet/resources/web-common_5_0.xsd
 output/classes/jakarta/servlet/resources/web-common_6_0.xsd
+output/classes/jakarta/servlet/resources/web-common_6_1.xsd
 output/classes/jakarta/servlet/resources/web-fragment_3_0.xsd
 output/classes/jakarta/servlet/resources/web-fragment_3_1.xsd
 output/classes/jakarta/servlet/resources/web-fragment_4_0.xsd
 output/classes/jakarta/servlet/resources/web-fragment_5_0.xsd
 output/classes/jakarta/servlet/resources/web-fragment_6_0.xsd
+output/classes/jakarta/servlet/resources/web-fragment_6_1.xsd
 output/classes/jakarta/servlet/resources/web-jsptaglibrary_3_0.xsd
 output/classes/jakarta/servlet/resources/web-jsptaglibrary_3_1.xsd
+output/classes/jakarta/servlet/resources/web-jsptaglibrary_4_0.xsd
 output/dist/src/java/jakarta/servlet/resources/javaee_5.xsd
 output/dist/src/java/jakarta/servlet/resources/javaee_6.xsd
 output/dist/src/java/jakarta/servlet/resources/javaee_7.xsd
 output/dist/src/java/jakarta/servlet/resources/javaee_8.xsd
 output/dist/src/java/jakarta/servlet/resources/jakartaee_9.xsd
 output/dist/src/java/jakarta/servlet/resources/jakartaee_10.xsd
+output/dist/src/java/jakarta/servlet/resources/jakartaee_11.xsd
 output/dist/src/java/jakarta/servlet/resources/javaee_web_services_1_2.xsd
 output/dist/src/java/jakarta/servlet/resources/javaee_web_services_1_3.xsd
 output/dist/src/java/jakarta/servlet/resources/javaee_web_services_1_4.xsd
@@ -203,23 +236,28 @@ output/dist/src/java/jakarta/servlet/resources/jsp_2_2.xsd
 output/dist/src/java/jakarta/servlet/resources/jsp_2_3.xsd
 output/dist/src/java/jakarta/servlet/resources/jsp_3_0.xsd
 output/dist/src/java/jakarta/servlet/resources/jsp_3_1.xsd
+output/dist/src/java/jakarta/servlet/resources/jsp_4_0.xsd
 output/dist/src/java/jakarta/servlet/resources/web-app_3_0.xsd
 output/dist/src/java/jakarta/servlet/resources/web-app_3_1.xsd
 output/dist/src/java/jakarta/servlet/resources/web-app_4_0.xsd
 output/dist/src/java/jakarta/servlet/resources/web-app_5_0.xsd
 output/dist/src/java/jakarta/servlet/resources/web-app_6_0.xsd
+output/dist/src/java/jakarta/servlet/resources/web-app_6_1.xsd
 output/dist/src/java/jakarta/servlet/resources/web-common_3_0.xsd
 output/dist/src/java/jakarta/servlet/resources/web-common_3_1.xsd
 output/dist/src/java/jakarta/servlet/resources/web-common_4_0.xsd
 output/dist/src/java/jakarta/servlet/resources/web-common_5_0.xsd
 output/dist/src/java/jakarta/servlet/resources/web-common_6_0.xsd
+output/dist/src/java/jakarta/servlet/resources/web-common_6_1.xsd
 output/dist/src/java/jakarta/servlet/resources/web-fragment_3_0.xsd
 output/dist/src/java/jakarta/servlet/resources/web-fragment_3_1.xsd
 output/dist/src/java/jakarta/servlet/resources/web-fragment_4_0.xsd
 output/dist/src/java/jakarta/servlet/resources/web-fragment_5_0.xsd
 output/dist/src/java/jakarta/servlet/resources/web-fragment_6_0.xsd
+output/dist/src/java/jakarta/servlet/resources/web-fragment_6_1.xsd
 output/dist/src/java/jakarta/servlet/resources/web-jsptaglibrary_3_0.xsd
 output/dist/src/java/jakarta/servlet/resources/web-jsptaglibrary_3_1.xsd
+output/dist/src/java/jakarta/servlet/resources/web-jsptaglibrary_4_0.xsd
 
 output/dist/src/res/checkstyle/header-al2.txt
 res/checkstyle/header-al2.txt
@@ -229,9 +267,10 @@ output/dist/temp/safeToDelete.tmp
 
 **/*.bmp
 **/*.dia
+**/*.vpd
 
 **/*.md
 
 output/res/checkstyle/*
 
-tomcat-10.1.x/**
+tomcat-12.0.x/**

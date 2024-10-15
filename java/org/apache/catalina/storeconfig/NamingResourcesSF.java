@@ -34,20 +34,12 @@ import org.apache.tomcat.util.descriptor.web.ContextResourceLink;
 public class NamingResourcesSF extends StoreFactoryBase {
     private static Log log = LogFactory.getLog(NamingResourcesSF.class);
 
-    /**
-     * Store the only the NamingResources elements
-     *
-     * @see NamingResourcesSF#storeChildren(PrintWriter, int, Object, StoreDescription)
-     */
     @Override
-    public void store(PrintWriter aWriter, int indent, Object aElement)
-            throws Exception {
-        StoreDescription elementDesc = getRegistry().findDescription(
-                aElement.getClass());
+    public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
+        StoreDescription elementDesc = getRegistry().findDescription(aElement.getClass());
         if (elementDesc != null) {
-            if (log.isDebugEnabled()) {
-                log.debug("store " + elementDesc.getTag() + "( " + aElement
-                        + " )");
+            if (log.isTraceEnabled()) {
+                log.trace("store " + elementDesc.getTag() + "( " + aElement + " )");
             }
             storeChildren(aWriter, indent, aElement, elementDesc);
         } else {
@@ -57,25 +49,12 @@ public class NamingResourcesSF extends StoreFactoryBase {
 
     /**
      * Store the specified NamingResources properties.
-     *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aElement
-     *            Object whose properties are being stored
-     * @param elementDesc
-     *            element descriptor
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
-     *
-     * @see org.apache.catalina.storeconfig.StoreFactoryBase#storeChildren(java.io.PrintWriter,
-     *      int, java.lang.Object, StoreDescription)
+     * <p>
+     * {@inheritDoc}
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aElement,
-            StoreDescription elementDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aElement, StoreDescription elementDesc)
+            throws Exception {
 
         if (aElement instanceof NamingResourcesImpl) {
             NamingResourcesImpl resources = (NamingResourcesImpl) aElement;

@@ -40,6 +40,7 @@ import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
+import org.apache.tomcat.util.descriptor.web.ErrorPage;
 
 /**
  * Test case for {@link Request}.
@@ -52,7 +53,7 @@ public class TestResponse extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new Bug49598Servlet());
         ctx.addServletMappingDecoded("/", "servlet");
@@ -108,7 +109,7 @@ public class TestResponse extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new CharsetServlet());
         ctx.addServletMappingDecoded("/", "servlet");
@@ -147,7 +148,7 @@ public class TestResponse extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new Bug52811Servlet());
         ctx.addServletMappingDecoded("/", "servlet");
@@ -163,7 +164,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062a() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("./bar.html");
@@ -176,7 +177,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062b() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute(".");
@@ -188,7 +189,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062c() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("..");
@@ -200,7 +201,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062d() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute(".././..");
@@ -212,7 +213,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test(expected=IllegalArgumentException.class)
     public void testBug53062e() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         resp.toAbsolute("../../..");
@@ -222,7 +223,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062f() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("bar.html");
@@ -235,7 +236,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062g() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("bar.html?x=/../");
@@ -248,7 +249,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062h() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("bar.html?x=/../../");
@@ -262,7 +263,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062i() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("./.?x=/../../");
@@ -275,7 +276,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062j() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("./..?x=/../../");
@@ -287,7 +288,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062k() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("./..?x=/../..");
@@ -301,7 +302,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062l() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("bar.html#/../");
@@ -314,7 +315,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062m() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("bar.html#/../../");
@@ -327,7 +328,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062n() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("./.#/../../");
@@ -340,7 +341,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062o() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("./..#/../../");
@@ -352,7 +353,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53062p() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.toAbsolute("./..#/../..");
@@ -365,7 +366,7 @@ public class TestResponse extends TomcatBaseTest {
         Request req = new TesterRequest(true);
         req.setRequestedSessionId("1234");
         req.setRequestedSessionURL(true);
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.encodeURL(location);
@@ -472,7 +473,7 @@ public class TestResponse extends TomcatBaseTest {
         Request req = new TesterRequest(true);
         req.setRequestedSessionId("1234");
         req.setRequestedSessionURL(true);
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.encodeRedirectURL(location);
@@ -599,11 +600,9 @@ public class TestResponse extends TomcatBaseTest {
         // Note: Not sufficient for testing relative -> absolute
         Connector connector = new Connector();
         org.apache.coyote.Response cResponse = new org.apache.coyote.Response();
-        Response response = new Response();
-        response.setCoyoteResponse(cResponse);
-        Request request = new Request(connector);
+        Response response = new Response(cResponse);
         org.apache.coyote.Request cRequest = new org.apache.coyote.Request();
-        request.setCoyoteRequest(cRequest);
+        Request request = new Request(connector, cRequest);
         Context context = new TesterContext();
         request.getMappingData().context = context;
         response.setRequest(request);
@@ -617,7 +616,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53469a() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.encodeURL("../bar.html");
@@ -629,7 +628,7 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testBug53469b() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         String result = resp.encodeURL("../../../../bar.html");
@@ -645,7 +644,7 @@ public class TestResponse extends TomcatBaseTest {
     private static final String TEXT_ISO_8859_1 = TEXT + ";charset=" + ISO_8859_1;
     private static final String TEXT_UTF_8 = TEXT + ";charset=" + UTF_8;
     private static final String TEXT_UNKNOWN = TEXT + ";charset=" + UNKNOWN;
-    private static final Locale UNDETERMINED = new Locale("und");
+    private static final Locale UNDETERMINED = Locale.forLanguageTag("xxx");
 
     @Test
     public void testSetCharacterEncoding01() {
@@ -705,7 +704,7 @@ public class TestResponse extends TomcatBaseTest {
         Assert.assertEquals(ISO_8859_1, response.getCharacterEncoding());
         response.setCharacterEncoding(UTF_8);
         Assert.assertEquals(UTF_8, response.getCharacterEncoding());
-        response.setCharacterEncoding(null);
+        response.setCharacterEncoding((String) null);
         Assert.assertEquals(ISO_8859_1, response.getCharacterEncoding());
     }
 
@@ -923,7 +922,7 @@ public class TestResponse extends TomcatBaseTest {
         Assert.assertEquals(UTF_8, response.getCharacterEncoding());
 
         // Reset
-        response.setCharacterEncoding(null);
+        response.setCharacterEncoding((String) null);
         Assert.assertEquals(ISO_8859_1, response.getCharacterEncoding());
 
         // setLocale is over-ridden by setCharacterEncoding
@@ -959,15 +958,33 @@ public class TestResponse extends TomcatBaseTest {
         Assert.assertEquals(ISO_8859_1, response.getCharacterEncoding());
     }
 
+    @Test
+    public void testStatusChange() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "servlet", new ErrorPageServlet());
+        ctx.addServletMappingDecoded("/error", "servlet");
+        ErrorPage servletErrorPage = new ErrorPage();
+        servletErrorPage.setErrorCode(404);
+        servletErrorPage.setLocation("/error");
+        ctx.addErrorPage(servletErrorPage);
+
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/missing", new ByteChunk(), null);
+        Assert.assertEquals(202, rc);
+    }
 
     private Response setupResponse() {
         Connector connector = new Connector();
         org.apache.coyote.Response cResponse = new org.apache.coyote.Response();
-        Response response = new Response();
-        response.setCoyoteResponse(cResponse);
-        Request request = new Request(connector);
+        Response response = new Response(cResponse);
         org.apache.coyote.Request cRequest = new org.apache.coyote.Request();
-        request.setCoyoteRequest(cRequest);
+        Request request = new Request(connector, cRequest);
         Context context = new TesterContext();
         request.getMappingData().context = context;
         response.setRequest(request);
@@ -1000,5 +1017,18 @@ public class TestResponse extends TomcatBaseTest {
             }
         }
 
+    }
+
+    private static final class ErrorPageServlet extends HttpServlet {
+        private static final long serialVersionUID = 1L;
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            if (resp.getStatus() == 404) {
+                resp.setStatus(202);
+            } else {
+                resp.setStatus(500);
+            }
+        }
     }
 }

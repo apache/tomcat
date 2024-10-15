@@ -23,52 +23,52 @@ import org.apache.tomcat.util.net.NioEndpoint;
 
 
 /**
- * Abstract the protocol implementation, including threading, etc.
- * Processor is single threaded and specific to stream-based protocols,
- * will not fit Jk protocols like JNI.
- *
- * @author Remy Maucherat
- * @author Costin Manolache
+ * HTTP/1.1 protocol implementation using NIO.
  */
-public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
+public class Http11NioProtocol extends AbstractHttp11Protocol<NioChannel> {
 
     private static final Log log = LogFactory.getLog(Http11NioProtocol.class);
 
 
     public Http11NioProtocol() {
-        super(new NioEndpoint());
+        this(new NioEndpoint());
+    }
+
+
+    public Http11NioProtocol(NioEndpoint endpoint) {
+        super(endpoint);
     }
 
 
     @Override
-    protected Log getLog() { return log; }
+    protected Log getLog() {
+        return log;
+    }
 
 
     // -------------------- Pool setup --------------------
 
     public void setSelectorTimeout(long timeout) {
-        ((NioEndpoint)getEndpoint()).setSelectorTimeout(timeout);
+        ((NioEndpoint) getEndpoint()).setSelectorTimeout(timeout);
     }
 
     public long getSelectorTimeout() {
-        return ((NioEndpoint)getEndpoint()).getSelectorTimeout();
+        return ((NioEndpoint) getEndpoint()).getSelectorTimeout();
     }
 
     public void setPollerThreadPriority(int threadPriority) {
-        ((NioEndpoint)getEndpoint()).setPollerThreadPriority(threadPriority);
+        ((NioEndpoint) getEndpoint()).setPollerThreadPriority(threadPriority);
     }
 
     public int getPollerThreadPriority() {
-      return ((NioEndpoint)getEndpoint()).getPollerThreadPriority();
+        return ((NioEndpoint) getEndpoint()).getPollerThreadPriority();
     }
 
-
-    // ----------------------------------------------------- JMX related methods
 
     @Override
     protected String getNamePrefix() {
         if (isSSLEnabled()) {
-            return "https-" + getSslImplementationShortName()+ "-nio";
+            return "https-" + getSslImplementationShortName() + "-nio";
         } else {
             return "http-nio";
         }

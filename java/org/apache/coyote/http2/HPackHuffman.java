@@ -32,8 +32,8 @@ public class HPackHuffman {
     /**
      * array based tree representation of a huffman code.
      * <p/>
-     * the high two bytes corresponds to the tree node if the bit is set, and the low two bytes for if it is clear
-     * if the high bit is set it is a terminal node, otherwise it contains the next node position.
+     * the high two bytes corresponds to the tree node if the bit is set, and the low two bytes for if it is clear if
+     * the high bit is set it is a terminal node, otherwise it contains the next node position.
      */
     private static final int[] DECODING_TABLE;
 
@@ -305,13 +305,13 @@ public class HPackHuffman {
         codes[256] = new HuffmanCode(0x3fffffff, 30);
         HUFFMAN_CODES = codes;
 
-        //lengths determined by experimentation, just set it to something large then see how large it actually ends up
+        // lengths determined by experimentation, just set it to something large then see how large it actually ends up
         int[] codingTree = new int[256];
-        //the current position in the tree
+        // the current position in the tree
         int pos = 0;
-        int allocated = 1; //the next position to allocate to
-        //map of the current state at a given position
-        //only used while building the tree
+        int allocated = 1; // the next position to allocate to
+        // map of the current state at a given position
+        // only used while building the tree
         HuffmanCode[] currentCode = new HuffmanCode[256];
         currentCode[0] = new HuffmanCode(0, 0);
 
@@ -327,7 +327,7 @@ public class HPackHuffman {
             int newVal = 0;
             boolean highTerminal = allCodes.remove(high);
             if (highTerminal) {
-                //bah, linear search
+                // bah, linear search
                 int i = 0;
                 for (i = 0; i < codes.length; ++i) {
                     if (codes[i].equals(high)) {
@@ -343,7 +343,7 @@ public class HPackHuffman {
             newVal <<= 16;
             boolean lowTerminal = allCodes.remove(low);
             if (lowTerminal) {
-                //bah, linear search
+                // bah, linear search
                 int i = 0;
                 for (i = 0; i < codes.length; ++i) {
                     if (codes[i].equals(low)) {
@@ -363,18 +363,16 @@ public class HPackHuffman {
     }
 
     /**
-     * Decodes a huffman encoded string into the target StringBuilder. There
-     * must be enough space left in the buffer for this method to succeed.
+     * Decodes a huffman encoded string into the target StringBuilder. There must be enough space left in the buffer for
+     * this method to succeed.
      *
      * @param data   The byte buffer
      * @param length The length of data from the buffer to decode
      * @param target The target for the decompressed data
      *
-     * @throws HpackException If the Huffman encoded value in HPACK headers did
-     *                        not end with EOS padding
+     * @throws HpackException If the Huffman encoded value in HPACK headers did not end with EOS padding
      */
-    public static void decode(ByteBuffer data, int length, StringBuilder target)
-            throws HpackException {
+    public static void decode(ByteBuffer data, int length, StringBuilder target) throws HpackException {
         assert data.remaining() >= length;
         int treePos = 0;
         boolean eosBits = true;
@@ -385,7 +383,7 @@ public class HPackHuffman {
             while (bitPos >= 0) {
                 int val = DECODING_TABLE[treePos];
                 if (((1 << bitPos) & b) == 0) {
-                    //bit not set, we want the lower part of the tree
+                    // bit not set, we want the lower part of the tree
                     if ((val & LOW_TERMINAL_BIT) == 0) {
                         treePos = val & LOW_MASK;
                         eosBits = false;
@@ -399,7 +397,7 @@ public class HPackHuffman {
                     if (eosBits) {
                         eosBitCount++;
                     }
-                    //bit not set, we want the lower part of the tree
+                    // bit not set, we want the lower part of the tree
                     if ((val & HIGH_TERMINAL_BIT) == 0) {
                         treePos = (val >> 16) & LOW_MASK;
                     } else {
@@ -417,24 +415,22 @@ public class HPackHuffman {
             }
         }
         if (eosBitCount > 7) {
-            throw new HpackException(sm.getString(
-                    "hpackhuffman.stringLiteralTooMuchPadding"));
+            throw new HpackException(sm.getString("hpackhuffman.stringLiteralTooMuchPadding"));
         }
         if (!eosBits) {
-            throw new HpackException(sm.getString(
-                    "hpackhuffman.huffmanEncodedHpackValueDidNotEndWithEOS"));
+            throw new HpackException(sm.getString("hpackhuffman.huffmanEncodedHpackValueDidNotEndWithEOS"));
         }
     }
 
 
     /**
-     * Encodes the given string into the buffer. If there is not enough space in
-     * the buffer, or the encoded version is bigger than the original it will
-     * return false and not modify the buffers position.
+     * Encodes the given string into the buffer. If there is not enough space in the buffer, or the encoded version is
+     * bigger than the original it will return false and not modify the buffers position.
      *
-     * @param buffer   The buffer to encode into
-     * @param toEncode The string to encode
+     * @param buffer         The buffer to encode into
+     * @param toEncode       The string to encode
      * @param forceLowercase If the string should be encoded in lower case
+     *
      * @return true if encoding succeeded
      */
     public static boolean encode(ByteBuffer buffer, String toEncode, boolean forceLowercase) {
@@ -442,17 +438,17 @@ public class HPackHuffman {
             return false;
         }
         int start = buffer.position();
-        //this sucks, but we need to put the length first
-        //and we don't really have any option but to calculate it in advance to make sure we have left enough room
-        //so we end up iterating twice
+        // this sucks, but we need to put the length first
+        // and we don't really have any option but to calculate it in advance to make sure we have left enough room
+        // so we end up iterating twice
         int length = 0;
         for (int i = 0; i < toEncode.length(); ++i) {
             char c = toEncode.charAt(i);
             if (c > 255) {
-                throw new IllegalArgumentException(sm.getString("hpack.invalidCharacter",
-                        Character.toString(c), Integer.valueOf(c)));
+                throw new IllegalArgumentException(
+                        sm.getString("hpack.invalidCharacter", Character.toString(c), Integer.valueOf(c)));
             }
-            if(forceLowercase) {
+            if (forceLowercase) {
                 c = Hpack.toLower(c);
             }
             HuffmanCode code = HUFFMAN_CODES[c];
@@ -468,16 +464,16 @@ public class HPackHuffman {
         byte currentBufferByte = 0;
         for (int i = 0; i < toEncode.length(); ++i) {
             char c = toEncode.charAt(i);
-            if(forceLowercase) {
+            if (forceLowercase) {
                 c = Hpack.toLower(c);
             }
             HuffmanCode code = HUFFMAN_CODES[c];
             if (code.length + bytePos <= 8) {
-                //it fits in the current byte
+                // it fits in the current byte
                 currentBufferByte |= ((code.value & 0xFF) << 8 - (code.length + bytePos));
                 bytePos += code.length;
             } else {
-                //it does not fit, it may need up to 4 bytes
+                // it does not fit, it may need up to 4 bytes
                 int val = code.value;
                 int rem = code.length;
                 while (rem > 0) {
@@ -511,14 +507,14 @@ public class HPackHuffman {
                 bytePos = 0;
             }
             if (buffer.position() - start > toEncode.length()) {
-                //the encoded version is longer than the original
-                //just return false
+                // the encoded version is longer than the original
+                // just return false
                 buffer.position(start);
                 return false;
             }
         }
         if (bytePos > 0) {
-            //add the EOS bytes if we have not finished on a single byte
+            // add the EOS bytes if we have not finished on a single byte
             if (!buffer.hasRemaining()) {
                 buffer.position(start);
                 return false;
@@ -583,10 +579,7 @@ public class HPackHuffman {
 
         @Override
         public String toString() {
-            return "HuffmanCode{" +
-                    "value=" + value +
-                    ", length=" + length +
-                    '}';
+            return "HuffmanCode{" + "value=" + value + ", length=" + length + '}';
         }
     }
 }

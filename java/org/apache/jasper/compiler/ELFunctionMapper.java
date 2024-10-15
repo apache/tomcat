@@ -16,8 +16,6 @@
  */
 package org.apache.jasper.compiler;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,9 +25,7 @@ import java.util.Set;
 
 import jakarta.servlet.jsp.tagext.FunctionInfo;
 
-import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
-import org.apache.tomcat.util.security.PrivilegedGetTccl;
 
 /**
  * This class generates functions mappers for the EL expressions in the page.
@@ -110,13 +106,6 @@ public class ELFunctionMapper {
         @Override
         public void visit(Node.UseBean n) throws JasperException {
             doMap(n.getBeanName());
-            visitBody(n);
-        }
-
-        @Override
-        public void visit(Node.PlugIn n) throws JasperException {
-            doMap(n.getHeight());
-            doMap(n.getWidth());
             visitBody(n);
         }
 
@@ -310,13 +299,7 @@ public class ELFunctionMapper {
         private String getCanonicalName(String className) throws JasperException {
             Class<?> clazz;
 
-            ClassLoader tccl;
-            if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
-                tccl = AccessController.doPrivileged(pa);
-            } else {
-                tccl = Thread.currentThread().getContextClassLoader();
-            }
+            ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 
             try {
                 clazz = Class.forName(className, false, tccl);

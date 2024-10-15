@@ -23,6 +23,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Used when multiple {@link Resource} annotations are required.
+ *
  * @since Common Annotations 1.0
  */
 @Documented
@@ -33,5 +35,5 @@ public @interface Resources {
     /**
      * @return a Resource[] with the value of this Resources
      */
-    public Resource[] value();
+    Resource[] value();
 }

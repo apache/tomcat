@@ -25,7 +25,7 @@ public class TesterBeanNameResolver extends BeanNameResolver {
     public static final String THROWABLE_TRIGGER_NAME = "throwable";
     public static final String READ_ONLY_NAME = "readonly";
 
-    private Map<String,Object> beans = new HashMap<>();
+    private Map<String, Object> beans = new HashMap<>();
     private boolean allowCreate = true;
 
 
@@ -36,8 +36,7 @@ public class TesterBeanNameResolver extends BeanNameResolver {
     }
 
     @Override
-    public void setBeanValue(String beanName, Object value)
-            throws PropertyNotWritableException {
+    public void setBeanValue(String beanName, Object value) throws PropertyNotWritableException {
         checkTriggers(beanName);
         if (allowCreate || beans.containsKey(beanName)) {
             beans.put(beanName, value);

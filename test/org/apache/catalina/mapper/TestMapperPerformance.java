@@ -21,20 +21,15 @@ import org.junit.Test;
 
 import org.apache.tomcat.util.buf.MessageBytes;
 
+/*
+ * This is an absolute performance test with an upper limit. Therefore it is executed as part of a standard test run.
+ */
 public class TestMapperPerformance extends TestMapper {
 
     @Test
     public void testPerformance() throws Exception {
-        String[] requestedHostNames = new String[] {
-                "xxxxxxxxxxx",
-                "iowejoiejfoiew",
-                "iowejoiejfoiex",
-                "owefojiwefoi",
-                "owefojiwefoix",
-                "qwerty.net",
-                "foo.net",
-                "zzz.com",
-                "abc.com"};
+        String[] requestedHostNames = new String[] { "xxxxxxxxxxx", "iowejoiejfoiew", "iowejoiejfoiex", "owefojiwefoi",
+                "owefojiwefoix", "qwerty.net", "foo.net", "zzz.com", "abc.com" };
 
         for (String requestedHostName : requestedHostNames) {
             testPerformance(requestedHostName);

@@ -67,9 +67,9 @@ public abstract class AbstractInputStreamJar implements Jar {
                 // Skip base entries where there is a multi-release entry
                 // Skip multi-release entries that are not being used
                 while (entry != null &&
-                        (mrMap.keySet().contains(entry.getName()) ||
+                        (mrMap.containsKey(entry.getName()) ||
                                 entry.getName().startsWith("META-INF/versions/") &&
-                                !mrMap.values().contains(entry.getName()))) {
+                                !mrMap.containsValue(entry.getName()))) {
                     entry = jarInputStream.getNextJarEntry();
                 }
             } else {

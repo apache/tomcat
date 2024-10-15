@@ -35,17 +35,9 @@ import org.apache.tomcat.util.buf.MessageBytes;
  */
 public class HealthCheckValve extends ValveBase {
 
-    private static final String UP =
-            "{\n" +
-            "  \"status\": \"UP\",\n" +
-            "  \"checks\": []\n" +
-            "}";
+    private static final String UP = "{\n" + "  \"status\": \"UP\",\n" + "  \"checks\": []\n" + "}";
 
-    private static final String DOWN =
-            "{\n" +
-            "  \"status\": \"DOWN\",\n" +
-            "  \"checks\": []\n" +
-            "}";
+    private static final String DOWN = "{\n" + "  \"status\": \"DOWN\",\n" + "  \"checks\": []\n" + "}";
 
     private String path = "/health";
 
@@ -80,16 +72,14 @@ public class HealthCheckValve extends ValveBase {
     }
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         super.startInternal();
         context = (getContainer() instanceof Context);
     }
 
     @Override
-    public void invoke(Request request, Response response)
-            throws IOException, ServletException {
-        MessageBytes urlMB =
-                context ? request.getRequestPathMB() : request.getDecodedRequestURIMB();
+    public void invoke(Request request, Response response) throws IOException, ServletException {
+        MessageBytes urlMB = context ? request.getRequestPathMB() : request.getDecodedRequestURIMB();
         if (urlMB.equals(path)) {
             response.setContentType("application/json");
             if (!checkContainersAvailable || isAvailable(getContainer())) {

@@ -21,6 +21,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
+import java.util.Objects;
 
 /**
  * <p>
@@ -51,8 +52,8 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
      */
     public DelegatingDatabaseMetaData(final DelegatingConnection<?> connection,
             final DatabaseMetaData databaseMetaData) {
-        this.connection = connection;
-        this.databaseMetaData = databaseMetaData;
+        this.connection = Objects.requireNonNull(connection, "connection");
+        this.databaseMetaData = Objects.requireNonNull(databaseMetaData, "databaseMetaData");
     }
 
     @Override
@@ -1893,8 +1894,6 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
             return false;
         }
     }
-
-    /* JDBC_4_ANT_KEY_END */
 
     @Override
     public <T> T unwrap(final Class<T> iface) throws SQLException {

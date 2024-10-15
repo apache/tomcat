@@ -335,6 +335,44 @@ public class TestELSupport {
     }
 
 
+    /*
+     * Note: The following tests use compareTo(). When the target object (Long or String) is examined by reflection
+     * both compareTo(Object) and compareTo(Long)/compareTo(String) methods will be found as potential matches. The
+     * method matching rules (see section 1.2.1.2 of the specification) require that overload resolution has a higher
+     * precedence than coercion resolution so it is always the compareTo(Object) method that will be used for the
+     * following tests resulting in a ClassCastException (which is wrapped in an ELException).
+     */
+
+    @Test(expected = ELException.class)
+    public void testCoercetoFunctionalInterface07() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testPredicateB");
+        // This should trigger an exception as String isn't assignable to Long
+        Object result = elp.eval("testPredicateB(x -> x.compareTo('data') == 0)");
+        Assert.assertEquals("BLOCK", result);
+    }
+
+
+    @Test(expected = ELException.class)
+    public void testCoercetoFunctionalInterface08() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testPredicateA");
+        // This should trigger an exception as Long isn't assignable to String
+        Object result = elp.eval("testPredicateA(x -> x.compareTo(1234) == 0)");
+        Assert.assertEquals("BLOCK", result);
+    }
+
+
+    @Test(expected = ELException.class)
+    public void testCoercetoFunctionalInterface09() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testPredicateB");
+        // This should trigger an exception as String isn't assignable to Long despite this String being coercible
+        Object result = elp.eval("testPredicateB(x -> x.compareTo('1234') == 0)");
+        Assert.assertEquals("BLOCK", result);
+    }
+
+
     public static String testPredicateA(Predicate<String> filter) {
         String s = "data";
         if (filter.test(s)) {
@@ -431,33 +469,33 @@ public class TestELSupport {
     }
 
 
-    private static interface FunctionalA<T> extends Predicate<T> {
+    private interface FunctionalA<T> extends Predicate<T> {
     }
 
 
-    private static interface FunctionalB<T> extends Predicate<T> {
-        public void extra();
+    private interface FunctionalB<T> extends Predicate<T> {
+        void extra();
     }
 
 
-    private static interface FunctionalC<T> extends Predicate<T> {
+    private interface FunctionalC<T> extends Predicate<T> {
         @SuppressWarnings("unused")
-        public default void extra() {
+        default void extra() {
         }
     }
 
 
-    private static interface FunctionalD<T> extends Predicate<T> {
+    private interface FunctionalD<T> extends Predicate<T> {
         @Override
-        public String toString();
+        String toString();
         @Override
-        public int hashCode();
+        int hashCode();
         @Override
-        public boolean equals(Object o);
+        boolean equals(Object o);
     }
 
 
-    private static interface FunctionalE<T> extends Predicate<T> {
-        public boolean equals(String s);
+    private interface FunctionalE<T> extends Predicate<T> {
+        boolean equals(String s);
     }
 }

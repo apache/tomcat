@@ -52,7 +52,7 @@ public class StoreRegistry {
     private static Log log = LogFactory.getLog(StoreRegistry.class);
     private static StringManager sm = StringManager.getManager(StoreRegistry.class);
 
-    private Map<String, StoreDescription> descriptors = new HashMap<>();
+    private Map<String,StoreDescription> descriptors = new HashMap<>();
 
     private String encoding = "UTF-8";
 
@@ -61,15 +61,11 @@ public class StoreRegistry {
     private String version;
 
     // Access Information
-    private static Class<?> interfaces[] = { CatalinaCluster.class,
-            ChannelSender.class, ChannelReceiver.class, Channel.class,
-            MembershipService.class, ClusterDeployer.class, Realm.class,
-            Manager.class, DirContext.class, LifecycleListener.class,
-            Valve.class, ClusterListener.class, MessageListener.class,
-            DataSender.class, ChannelInterceptor.class, Member.class,
-            WebResourceRoot.class, WebResourceSet.class,
-            CredentialHandler.class, UpgradeProtocol.class,
-            CookieProcessor.class };
+    private static Class<?> interfaces[] = { CatalinaCluster.class, ChannelSender.class, ChannelReceiver.class,
+            Channel.class, MembershipService.class, ClusterDeployer.class, Realm.class, Manager.class, DirContext.class,
+            LifecycleListener.class, Valve.class, ClusterListener.class, MessageListener.class, DataSender.class,
+            ChannelInterceptor.class, Member.class, WebResourceRoot.class, WebResourceSet.class,
+            CredentialHandler.class, UpgradeProtocol.class, CookieProcessor.class };
 
     /**
      * @return the name
@@ -100,15 +96,15 @@ public class StoreRegistry {
     }
 
     /**
-     * Find a description for id. Handle interface search when no direct match
-     * found.
+     * Find a description for id. Handle interface search when no direct match found.
      *
      * @param id The class name
+     *
      * @return the description
      */
     public StoreDescription findDescription(String id) {
-        if (log.isDebugEnabled()) {
-            log.debug("search descriptor " + id);
+        if (log.isTraceEnabled()) {
+            log.trace("search descriptor " + id);
         }
         StoreDescription desc = descriptors.get(id);
         if (desc == null) {
@@ -129,10 +125,9 @@ public class StoreRegistry {
         }
         if (log.isDebugEnabled()) {
             if (desc != null) {
-                log.debug("find descriptor " + id + "#" + desc.getTag() + "#"
-                        + desc.getStoreFactoryClass());
+                log.trace("find descriptor " + id + "#" + desc.getTag() + "#" + desc.getStoreFactoryClass());
             } else {
-                log.debug(("Can't find descriptor for key " + id));
+                log.debug(sm.getString("registry.noDescriptor", id));
             }
         }
         return desc;
@@ -142,6 +137,7 @@ public class StoreRegistry {
      * Find Description by class.
      *
      * @param aClass The class
+     *
      * @return the description
      */
     public StoreDescription findDescription(Class<?> aClass) {
@@ -152,6 +148,7 @@ public class StoreRegistry {
      * Find factory from class name.
      *
      * @param aClassName The class name
+     *
      * @return the factory
      */
     public IStoreFactory findStoreFactory(String aClassName) {
@@ -168,6 +165,7 @@ public class StoreRegistry {
      * Find factory from class.
      *
      * @param aClass The class
+     *
      * @return the factory
      */
     public IStoreFactory findStoreFactory(Class<?> aClass) {
@@ -185,9 +183,8 @@ public class StoreRegistry {
             key = desc.getTagClass();
         }
         descriptors.put(key, desc);
-        if (log.isDebugEnabled()) {
-            log.debug("register store descriptor " + key + "#" + desc.getTag()
-                    + "#" + desc.getTagClass());
+        if (log.isTraceEnabled()) {
+            log.trace("register store descriptor " + key + "#" + desc.getTag() + "#" + desc.getTagClass());
         }
     }
 
@@ -195,6 +192,7 @@ public class StoreRegistry {
      * Unregister a description.
      *
      * @param desc The description
+     *
      * @return the description, or <code>null</code> if it was not registered
      */
     public StoreDescription unregisterDescription(StoreDescription desc) {
@@ -216,6 +214,7 @@ public class StoreRegistry {
 
     /**
      * Set the encoding to use when writing the configuration files.
+     *
      * @param string The encoding
      */
     public void setEncoding(String string) {

@@ -35,7 +35,7 @@ public class TesterBeanB {
         return "Hello " + to + " from " + name;
     }
 
-    public String echo(String...strings) {
+    public String echo(String... strings) {
         if (strings == null) {
             return null;
         }

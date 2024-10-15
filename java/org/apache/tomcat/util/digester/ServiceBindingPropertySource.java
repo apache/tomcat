@@ -16,19 +16,21 @@
  */
 package org.apache.tomcat.util.digester;
 
-import java.io.FilePermission;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.Permission;
 
 import org.apache.tomcat.util.IntrospectionUtils;
-import org.apache.tomcat.util.security.PermissionCheck;
 
 /**
- * A {@link org.apache.tomcat.util.IntrospectionUtils.SecurePropertySource}
+ * A {@link org.apache.tomcat.util.IntrospectionUtils.PropertySource}
  * that uses Kubernetes service bindings to resolve expressions.
+ *
+ * <p>
+ *   The Kubernetes service binding specification can be found at
+ *   <a href="https://servicebinding.io/">https://servicebinding.io/</a>.
+ * </p>
  *
  * <p><strong>Usage example:</strong></p>
  *
@@ -42,6 +44,7 @@ import org.apache.tomcat.util.security.PermissionCheck;
  *                                            /keyFile
  *                                            /file
  *                                            /chainFile
+ *                                            /keyPassword
  * </pre>
  * <pre>
  *   {@code
@@ -49,9 +52,18 @@ import org.apache.tomcat.util.security.PermissionCheck;
  *           <Certificate certificateKeyFile="${custom-certificate.keyFile}"
  *                        certificateFile="${custom-certificate.file}"
  *                        certificateChainFile="${custom-certificate.chainFile}"
+ *                        certificateKeyPassword="${chomp:custom-certificate.keyPassword}"
  *                        type="RSA" />
  *     </SSLHostConfig> }
  * </pre>
+ *
+ * <p>
+ *   The optional <code>chomp:</code> prefix will cause the ServiceBindingPropertySource
+ *   to trim a single newline (<code>\r\n</code>, <code>\r</code>, or <code>\n</code>)
+ *   from the end of the file, if it exists. This is a convenience for hand-edited
+ *   files/values where removing a trailing newline is difficult, and trailing
+ *   whitespace changes the meaning of the value.
+ * </p>
  *
  * How to configure:
  * <pre>
@@ -73,29 +85,22 @@ import org.apache.tomcat.util.security.PermissionCheck;
  * @see <a href="https://tomcat.apache.org/tomcat-9.0-doc/config/systemprops.html#Property_replacements">Tomcat
  *      Configuration Reference System Properties</a>
  */
-public class ServiceBindingPropertySource implements IntrospectionUtils.SecurePropertySource {
+public class ServiceBindingPropertySource implements IntrospectionUtils.PropertySource {
 
     private static final String SERVICE_BINDING_ROOT_ENV_VAR = "SERVICE_BINDING_ROOT";
 
     @Override
     public String getProperty(String key) {
-        return null;
-    }
-
-    @Override
-    public String getProperty(String key, ClassLoader classLoader) {
-        // can we determine the service binding root
-        if (classLoader instanceof PermissionCheck) {
-            Permission p = new RuntimePermission("getenv." + SERVICE_BINDING_ROOT_ENV_VAR, null);
-            if (!((PermissionCheck) classLoader).check(p)) {
-                return null;
-            }
-        }
-
         // get the root to search from
         String serviceBindingRoot = System.getenv(SERVICE_BINDING_ROOT_ENV_VAR);
         if (serviceBindingRoot == null) {
             return null;
+        }
+
+        boolean chomp = false;
+        if (key.startsWith("chomp:")) {
+            chomp = true;
+            key = key.substring(6); // Remove the "chomp:" prefix
         }
 
         // we expect the keys to be in the format $SERVICE_BINDING_ROOT/<binding-name>/<key>
@@ -105,14 +110,28 @@ public class ServiceBindingPropertySource implements IntrospectionUtils.SecurePr
         }
 
         Path path = Paths.get(serviceBindingRoot, parts[0], parts[1]);
+
+        if (!path.toFile().exists()) {
+            return null;
+        }
+
         try {
-            if (classLoader instanceof PermissionCheck) {
-                Permission p = new FilePermission(path.toString(), "read");
-                if (!((PermissionCheck) classLoader).check(p)) {
-                    return null;
+            byte[] bytes = Files.readAllBytes(path);
+
+            int length = bytes.length;
+
+            if (chomp) {
+                if(length > 1 && bytes[length - 2] == '\r' && bytes[length - 1] == '\n') {
+                    length -= 2;
+                } else if (length > 0) {
+                    byte c = bytes[length - 1];
+                    if (c == '\r' || c == '\n') {
+                        length -= 1;
+                    }
                 }
             }
-            return new String(Files.readAllBytes(path));
+
+            return new String(bytes, 0, length);
         } catch (IOException e) {
             return null;
         }

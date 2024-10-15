@@ -53,20 +53,18 @@ public class ELManager {
     }
 
     public void mapFunction(String prefix, String function, Method method) {
-        getELContext().getFunctionMapper().mapFunction(
-                prefix, function, method);
+        getELContext().getFunctionMapper().mapFunction(prefix, function, method);
     }
 
     public void setVariable(String variable, ValueExpression expression) {
         getELContext().getVariableMapper().setVariable(variable, expression);
     }
 
-    public void importStatic(String staticMemberName)
-            throws jakarta.el.ELException {
+    public void importStatic(String staticMemberName) throws ELException {
         getELContext().getImportHandler().importStatic(staticMemberName);
     }
 
-    public void importClass(String className) throws jakarta.el.ELException {
+    public void importClass(String className) throws ELException {
         getELContext().getImportHandler().importClass(className);
     }
 

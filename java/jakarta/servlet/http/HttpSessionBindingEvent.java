@@ -17,14 +17,11 @@
 package jakarta.servlet.http;
 
 /**
- * Events of this type are either sent to an object that implements
- * {@link HttpSessionBindingListener} when it is bound or unbound from a
- * session, or to an {@link HttpSessionAttributeListener} that has been
- * configured in the deployment descriptor when any attribute is bound, unbound
- * or replaced in a session.
+ * Events of this type are either sent to an object that implements {@link HttpSessionBindingListener} when it is bound
+ * or unbound from a session, or to an {@link HttpSessionAttributeListener} that has been configured in the deployment
+ * descriptor when any attribute is bound, unbound or replaced in a session.
  * <p>
- * The session binds the object by a call to
- * <code>HttpSession.setAttribute</code> and unbinds the object by a call to
+ * The session binds the object by a call to <code>HttpSession.setAttribute</code> and unbinds the object by a call to
  * <code>HttpSession.removeAttribute</code>.
  *
  * @see HttpSession
@@ -36,24 +33,22 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
     private static final long serialVersionUID = 1L;
 
     /**
-     *  The name to which the object is being bound or unbound.
+     * The name to which the object is being bound or unbound.
      */
     private final String name;
 
     /**
-     *  The object is being bound or unbound.
+     * The object is being bound or unbound.
      */
     private final Object value;
 
     /**
-     * Constructs an event that notifies an object that it has been bound to or
-     * unbound from a session. To receive the event, the object must implement
-     * {@link HttpSessionBindingListener}.
+     * Constructs an event that notifies an object that it has been bound to or unbound from a session. To receive the
+     * event, the object must implement {@link HttpSessionBindingListener}.
      *
-     * @param session
-     *            the session to which the object is bound or unbound
-     * @param name
-     *            the name with which the object is bound or unbound
+     * @param session the session to which the object is bound or unbound
+     * @param name    the name with which the object is bound or unbound
+     *
      * @see #getName()
      * @see #getSession()
      */
@@ -64,22 +59,18 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
     }
 
     /**
-     * Constructs an event that notifies an object that it has been bound to or
-     * unbound from a session. To receive the event, the object must implement
-     * {@link HttpSessionBindingListener}.
+     * Constructs an event that notifies an object that it has been bound to or unbound from a session. To receive the
+     * event, the object must implement {@link HttpSessionBindingListener}.
      *
-     * @param session
-     *            the session to which the object is bound or unbound
-     * @param name
-     *            the name with which the object is bound or unbound
-     * @param value
-     *            the object that is bound or unbound
+     * @param session the session to which the object is bound or unbound
+     * @param name    the name with which the object is bound or unbound
+     * @param value   the object that is bound or unbound
+     *
      * @see #getName()
      * @see #getSession()
      * @see #getValue()
      */
-    public HttpSessionBindingEvent(HttpSession session, String name,
-            Object value) {
+    public HttpSessionBindingEvent(HttpSession session, String name, Object value) {
         super(session);
         this.name = name;
         this.value = value;
@@ -87,6 +78,7 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
 
     /**
      * Get the session that changed.
+     *
      * @return The session that changed
      */
     @Override
@@ -95,24 +87,20 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
     }
 
     /**
-     * Returns the name with which the attribute is bound to or unbound from the
-     * session.
+     * Returns the name with which the attribute is bound to or unbound from the session.
      *
-     * @return a string specifying the name with which the object is bound to or
-     *         unbound from the session
+     * @return a string specifying the name with which the object is bound to or unbound from the session
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Returns the value of the attribute that has been added, removed or
-     * replaced.
+     * Returns the value of the attribute that has been added, removed or replaced.
      *
-     * @return If the attribute was added (or bound), this is the value of the
-     *         attribute. If the attribute was removed (or unbound), this is the
-     *         value of the removed attribute. If the attribute was replaced,
-     *         this is the old value of the attribute.
+     * @return If the attribute was added (or bound), this is the value of the attribute. If the attribute was removed
+     *             (or unbound), this is the value of the removed attribute. If the attribute was replaced, this is the
+     *             old value of the attribute.
      *
      * @since Servlet 2.3
      */

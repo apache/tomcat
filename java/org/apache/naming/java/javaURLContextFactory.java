@@ -40,7 +40,7 @@ import org.apache.naming.SelectorContext;
  * <li>Setting an environment variable named Context.URL_PKG_PREFIXES with
  * its value including the org.apache.naming package name.
  * More detail about this can be found in the JNDI documentation :
- * {@link javax.naming.spi.NamingManager#getURLContext(java.lang.String, java.util.Hashtable)}.</li>
+ * {@link javax.naming.spi.NamingManager#getURLContext(String, java.util.Hashtable)}.</li>
  * </ul>
  *
  * @author Remy Maucherat
@@ -74,7 +74,14 @@ public class javaURLContextFactory
 
 
     /**
-     * Crete a new Context's instance.
+     * Create a new Context's instance.
+     * @param obj unused
+     * @param name unused
+     * @param nameCtx unused
+     * @param environment the environment used
+     * @return a selector context if the thread or classloader are bound, and
+     *   null otherwise
+     * @throws NamingException not thrown by this implementationm
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -91,6 +98,10 @@ public class javaURLContextFactory
 
     /**
      * Get a new (writable) initial context.
+     * @param environment the environment used
+     * @return a selector context if the thread or classloader are bound, and
+     *   a shared writable context otherwise
+     * @throws NamingException not thrown by this implementationm
      */
     @SuppressWarnings("unchecked")
     @Override

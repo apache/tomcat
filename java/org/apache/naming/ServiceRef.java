@@ -16,7 +16,8 @@
  */
 package org.apache.naming;
 
-import java.util.Vector;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.naming.StringRefAddr;
 
@@ -75,10 +76,10 @@ public class ServiceRef extends AbstractRef {
 
 
     /**
-     * The vector to save the handler Reference objects, because they can't be
+     * The list to save the handler Reference objects, because they can't be
      * saved in the addrs vector.
      */
-    private final Vector<HandlerRef> handlers = new Vector<>();
+    private final List<HandlerRef> handlers = new CopyOnWriteArrayList<>();
 
 
     public ServiceRef(String refname, String serviceInterface, String[] serviceQname,

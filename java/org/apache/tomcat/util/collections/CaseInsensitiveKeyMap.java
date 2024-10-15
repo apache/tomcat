@@ -96,7 +96,7 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
 
         private final Set<Entry<Key,V>> entrySet;
 
-        public EntrySet(Set<Map.Entry<Key,V>> entrySet) {
+        EntrySet(Set<Map.Entry<Key,V>> entrySet) {
             this.entrySet = entrySet;
         }
 
@@ -116,7 +116,7 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
 
         private final Iterator<Entry<Key,V>> iterator;
 
-        public EntryIterator(Iterator<Entry<Key,V>> iterator) {
+        EntryIterator(Iterator<Entry<Key,V>> iterator) {
             this.iterator = iterator;
         }
 
@@ -143,7 +143,7 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
         private final String key;
         private final V value;
 
-        public EntryImpl(String key, V value) {
+        EntryImpl(String key, V value) {
             this.key = key;
             this.value = value;
         }

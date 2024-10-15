@@ -45,7 +45,8 @@ public class CertificateCreateRule extends Rule {
 
         StringBuilder code = digester.getGeneratedCode();
         if (code != null) {
-            code.append(SSLHostConfigCertificate.class.getName()).append(' ').append(digester.toVariableName(certificate));
+            code.append(SSLHostConfigCertificate.class.getName()).append(' ')
+                    .append(digester.toVariableName(certificate));
             code.append(" = new ").append(SSLHostConfigCertificate.class.getName());
             code.append('(').append(digester.toVariableName(sslHostConfig));
             code.append(", ").append(Type.class.getName().replace('$', '.')).append('.').append(type).append(");");
@@ -54,15 +55,6 @@ public class CertificateCreateRule extends Rule {
     }
 
 
-    /**
-     * Process the end of this element.
-     *
-     * @param namespace the namespace URI of the matching element, or an
-     *   empty string if the parser is not namespace aware or the element has
-     *   no namespace
-     * @param name the local name if the parser is namespace aware, or just
-     *   the element name otherwise
-     */
     @Override
     public void end(String namespace, String name) throws Exception {
         digester.pop();

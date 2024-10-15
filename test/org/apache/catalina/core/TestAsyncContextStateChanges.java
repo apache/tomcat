@@ -99,7 +99,7 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         AsyncServlet bug63816Servlet = new AsyncServlet();
         Wrapper wrapper = Tomcat.addServlet(ctx, "bug63816Servlet", bug63816Servlet);
@@ -213,7 +213,7 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
                      * this does mean that there is a real chance of an ISE. We
                      * may need to increase this delay for some CI systems.
                      */
-                    Thread.sleep(1000);
+                    sleep(1000);
                 } catch (InterruptedException e) {
                     // Ignore
                 }
@@ -354,7 +354,7 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
         final boolean none;
         final boolean error;
 
-        private AsyncEnd(boolean none, boolean error) {
+        AsyncEnd(boolean none, boolean error) {
             this.none = none;
             this.error = error;
         }

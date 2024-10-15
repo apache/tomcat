@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.dbcp.pool2.impl;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.AbstractQueue;
@@ -311,7 +313,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * Creates a {@code LinkedBlockingDeque} with a capacity of
      * {@link Integer#MAX_VALUE}.
      */
-    public LinkedBlockingDeque() {
+    LinkedBlockingDeque() {
         this(Integer.MAX_VALUE);
     }
 
@@ -321,7 +323,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * @param fairness true means threads waiting on the deque should be served
      * as if waiting in a FIFO request queue
      */
-    public LinkedBlockingDeque(final boolean fairness) {
+    LinkedBlockingDeque(final boolean fairness) {
         this(Integer.MAX_VALUE, fairness);
     }
 
@@ -338,7 +340,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
-    public LinkedBlockingDeque(final Collection<? extends E> c) {
+    LinkedBlockingDeque(final Collection<? extends E> c) {
         this(Integer.MAX_VALUE);
         lock.lock(); // Never contended, but necessary for visibility
         try {
@@ -359,7 +361,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * @param capacity the capacity of this deque
      * @throws IllegalArgumentException if {@code capacity} is less than 1
      */
-    public LinkedBlockingDeque(final int capacity) {
+    LinkedBlockingDeque(final int capacity) {
         this(capacity, false);
     }
 
@@ -372,7 +374,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * as if waiting in a FIFO request queue
      * @throws IllegalArgumentException if {@code capacity} is less than 1
      */
-    public LinkedBlockingDeque(final int capacity, final boolean fairness) {
+    LinkedBlockingDeque(final int capacity, final boolean fairness) {
         if (capacity <= 0) {
             throw new IllegalArgumentException();
         }
@@ -382,18 +384,12 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         notFull = lock.newCondition();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean add(final E e) {
         addLast(e);
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addFirst(final E e) {
         if (!offerFirst(e)) {
@@ -403,9 +399,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
 
     // BlockingDeque methods
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addLast(final E e) {
         if (!offerLast(e)) {
@@ -462,9 +455,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<E> descendingIterator() {
         return new DescendingItr();
@@ -538,9 +528,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         return getFirst();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public E getFirst() {
         final E x = peekFirst();
@@ -550,9 +537,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         return x;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public E getLast() {
         final E x = peekLast();
@@ -672,9 +656,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean offer(final E e) {
         return offerLast(e);
@@ -719,9 +700,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         return offerLast(e, timeout, unit);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean offerFirst(final E e) {
         Objects.requireNonNull(e, "e");
@@ -781,9 +759,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         return offerFirst(e, PoolImplUtils.toDuration(timeout, unit));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean offerLast(final E e) {
         Objects.requireNonNull(e, "e");
@@ -981,7 +956,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         lock.lockInterruptibly();
         try {
             E x;
-            while ( (x = unlinkLast()) == null) {
+            while ((x = unlinkLast()) == null) {
                 if (nanos <= 0) {
                     return null;
                 }
@@ -1008,17 +983,11 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         return pollLast(PoolImplUtils.toDuration(timeout, unit));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public E pop() {
         return removeFirst();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void push(final E e) {
         addFirst(e);
@@ -1093,8 +1062,8 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * deserialize it).
      * @param s the stream
      */
-    private void readObject(final java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(final ObjectInputStream s)
+        throws IOException, ClassNotFoundException {
         s.defaultReadObject();
         count = 0;
         first = null;
@@ -1102,8 +1071,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         // Read in all elements and place in queue
         for (;;) {
             @SuppressWarnings("unchecked")
-            final
-            E item = (E)s.readObject();
+            final E item = (E)s.readObject();
             if (item == null) {
                 break;
             }
@@ -1175,9 +1143,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         return removeFirstOccurrence(o);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public E removeFirst() {
         final E x = pollFirst();
@@ -1247,9 +1212,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public E removeLast() {
         final E x = pollLast();
@@ -1319,7 +1281,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         lock.lock();
         try {
             E x;
-            while ( (x = unlinkFirst()) == null) {
+            while ((x = unlinkFirst()) == null) {
                 notEmpty.await();
             }
             return x;
@@ -1339,7 +1301,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         lock.lock();
         try {
             E x;
-            while ( (x = unlinkLast()) == null) {
+            while ((x = unlinkLast()) == null) {
                 notEmpty.await();
             }
             return x;
@@ -1379,9 +1341,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @SuppressWarnings("unchecked")
     @Override
     public <T> T[] toArray(T[] a) {
@@ -1498,8 +1457,9 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * @serialData The capacity (int), followed by elements (each an
      * {@code Object}) in the proper order, followed by a null
      * @param s the stream
+     * @throws  IOException if I/O errors occur while writing to the underlying {@code OutputStream}
      */
-    private void writeObject(final java.io.ObjectOutputStream s) throws java.io.IOException {
+    private void writeObject(final java.io.ObjectOutputStream s) throws IOException {
         lock.lock();
         try {
             // Write out capacity and any hidden stuff

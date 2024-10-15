@@ -16,10 +16,9 @@
  */
 package org.apache.jasper.el;
 
-import java.beans.FeatureDescriptor;
 import java.lang.reflect.Method;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jakarta.el.ArrayELResolver;
@@ -31,6 +30,7 @@ import jakarta.el.ELResolver;
 import jakarta.el.ListELResolver;
 import jakarta.el.MapELResolver;
 import jakarta.el.PropertyNotFoundException;
+import jakarta.el.RecordELResolver;
 import jakarta.el.ResourceBundleELResolver;
 import jakarta.el.StaticFieldELResolver;
 import jakarta.servlet.jsp.el.ImplicitObjectELResolver;
@@ -72,6 +72,7 @@ public class JasperELResolver extends CompositeELResolver {
         if (JspRuntimeLibrary.GRAAL) {
             add(new GraalBeanELResolver());
         }
+        add(new RecordELResolver());
         add(new BeanELResolver());
         add(new ScopedAttributeELResolver());
         add(new ImportELResolver());
@@ -177,7 +178,7 @@ public class JasperELResolver extends CompositeELResolver {
     /*
      * Copied from org.apache.el.lang.ELSupport#coerceToString(ELContext,Object)
      */
-    private static final String coerceToString(final Object obj) {
+    private static String coerceToString(final Object obj) {
         if (obj == null) {
             return "";
         } else if (obj instanceof String) {
@@ -193,11 +194,15 @@ public class JasperELResolver extends CompositeELResolver {
      * Extend ELResolver for Graal to avoid bean info use if possible,
      * as BeanELResolver needs manual reflection configuration.
      */
-    private static class GraalBeanELResolver extends ELResolver {
+    public static class GraalBeanELResolver extends ELResolver {
 
         @Override
         public Object getValue(ELContext context, Object base,
                 Object property) {
+            Objects.requireNonNull(context);
+            if (base == null || property == null) {
+                return null;
+            }
             Object value = null;
             Method method = getReadMethod(base.getClass(), property.toString());
             if (method != null) {
@@ -216,10 +221,11 @@ public class JasperELResolver extends CompositeELResolver {
         @Override
         public void setValue(ELContext context, Object base, Object property,
                 Object value) {
-            if (base == null) {
+            Objects.requireNonNull(context);
+            if (base == null || property == null) {
                 return;
             }
-            Method method = getWriteMethod(base.getClass(), property.toString());
+            Method method = getWriteMethod(base.getClass(), property.toString(), value.getClass());
             if (method != null) {
                 context.setPropertyResolved(base, property);
                 try {
@@ -234,37 +240,45 @@ public class JasperELResolver extends CompositeELResolver {
         @Override
         public boolean isReadOnly(ELContext context, Object base,
                 Object property) {
+            Objects.requireNonNull(context);
+            if (base == null || property == null) {
+                return false;
+            }
             Class<?> beanClass = base.getClass();
             String prop = property.toString();
-            return (getReadMethod(beanClass, prop) != null)
-                    && (getWriteMethod(beanClass, prop) != null);
+            Method readMethod = getReadMethod(beanClass, prop);
+            return readMethod == null || !(getWriteMethod(beanClass, prop, readMethod.getReturnType()) != null);
         }
 
-        public static Method getReadMethod(Class<?> beanClass, String prop) {
-            Method result = null;
-            String setter = "get" + capitalize(prop);
+        private static Method getReadMethod(Class<?> beanClass, String prop) {
             Method methods[] = beanClass.getMethods();
+            String isGetter = "is" + capitalize(prop);
+            String getter = "get" + capitalize(prop);
             for (Method method : methods) {
-                if (setter.equals(method.getName())) {
-                    return method;
+                if (method.getParameterCount() == 0) {
+                    if (isGetter.equals(method.getName()) && method.getReturnType().equals(boolean.class)) {
+                        return method;
+                    } else if (getter.equals(method.getName())) {
+                        return method;
+                    }
                 }
             }
-            return result;
+            return null;
         }
 
-        public static Method getWriteMethod(Class<?> beanClass, String prop) {
-            Method result = null;
+        private static Method getWriteMethod(Class<?> beanClass, String prop, Class<?> valueClass) {
             String setter = "set" + capitalize(prop);
             Method methods[] = beanClass.getMethods();
             for (Method method : methods) {
-                if (setter.equals(method.getName())) {
+                if (method.getParameterCount() == 1 && setter.equals(method.getName())
+                        && (valueClass == null || valueClass.isAssignableFrom(method.getParameterTypes()[0]))) {
                     return method;
                 }
             }
-            return result;
+            return null;
         }
 
-        public static String capitalize(String name) {
+        private static String capitalize(String name) {
             if (name == null || name.length() == 0) {
                 return name;
             }
@@ -280,13 +294,10 @@ public class JasperELResolver extends CompositeELResolver {
         }
 
         @Override
-        public Iterator<FeatureDescriptor> getFeatureDescriptors(
-                ELContext context, Object base) {
-            return null;
-        }
-
-        @Override
         public Class<?> getCommonPropertyType(ELContext context, Object base) {
+            if (base != null) {
+                return Object.class;
+            }
             return null;
         }
     }

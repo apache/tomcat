@@ -375,17 +375,6 @@ public class JspUtil {
         /*
          * Build up the base call to the interpreter.
          */
-        // XXX - We use a proprietary call to the interpreter for now
-        // as the current standard machinery is inefficient and requires
-        // lots of wrappers and adapters. This should all clear up once
-        // the EL interpreter moves out of JSTL and into its own project.
-        // In the future, this should be replaced by code that calls
-        // ExpressionEvaluator.parseExpression() and then cache the resulting
-        // expression objects. The interpreterCall would simply select
-        // one of the pre-cached expressions and evaluate it.
-        // Note that PageContextImpl implements VariableResolver and
-        // the generated Servlet/SimpleTag implements FunctionMapper, so
-        // that machinery is already in place (mroth).
         targetType = toJavaSourceType(targetType);
         StringBuilder call = new StringBuilder(
                 "("
@@ -649,7 +638,7 @@ public class JspUtil {
                     "jsp.error.file.not.found", fname));
         }
 
-        return new BufferedInputStream(in, JspUtil.JSP_INPUT_STREAM_BUFFER_SIZE);
+        return new BufferedInputStream(in, JSP_INPUT_STREAM_BUFFER_SIZE);
     }
 
     public static InputSource getInputSource(String fname, Jar jar, JspCompilationContext ctxt)
@@ -786,7 +775,7 @@ public class JspUtil {
      *
      * @return Legal Java identifier corresponding to the given identifier
      */
-    private static final String makeJavaIdentifier(String identifier,
+    private static String makeJavaIdentifier(String identifier,
             boolean periodToUnderscore) {
         StringBuilder modifiedIdentifier = new StringBuilder(identifier.length());
         if (!Character.isJavaIdentifierStart(identifier.charAt(0))) {

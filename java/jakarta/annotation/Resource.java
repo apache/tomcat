@@ -23,9 +23,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Indicates a resource required by the application. Annotated classes will be used as resources. Annotated fields
+ * and/or methods will have resources injected.
+ *
  * @since Common Annotations 1.0
  */
-@Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
+@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(Resources.class)
 public @interface Resource {
@@ -33,7 +36,7 @@ public @interface Resource {
     /**
      * The AuthenticationType, either CONTAINER or APPLICATION
      */
-    public enum AuthenticationType {
+    enum AuthenticationType {
         /**
          * Container authentication
          */
@@ -47,39 +50,39 @@ public @interface Resource {
     /**
      * @return a String with the name of the resource
      */
-    public String name() default "";
+    String name() default "";
 
     /**
      * Uses generics since Common Annotations 1.2.
      *
      * @return The type for instances of this resource
      */
-    public Class<?> type() default Object.class;
+    Class<?> type() default Object.class;
 
     /**
      * @return the AuthenticationType of the resource default CONTAINER
      */
-    public AuthenticationType authenticationType() default AuthenticationType.CONTAINER;
+    AuthenticationType authenticationType() default AuthenticationType.CONTAINER;
 
     /**
      * @return true (default) if the resource is shareable, or false if not
      */
-    public boolean shareable() default true;
+    boolean shareable() default true;
 
     /**
      * @return a string with the description for the resource
      */
-    public String description() default "";
+    String description() default "";
 
     /**
      * @return a string with the mappedName of the resource
      */
-    public String mappedName() default "";
+    String mappedName() default "";
 
     /**
      * @since Common Annotations 1.1
      *
      * @return The name of the entry, if any, to use for this resource
      */
-    public String lookup() default "";
+    String lookup() default "";
 }

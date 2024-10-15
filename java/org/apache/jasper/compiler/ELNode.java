@@ -190,7 +190,7 @@ abstract class ELNode {
         private String mapName = null;    // The function map associated this EL
         private final List<ELNode> list;
 
-        public Nodes() {
+        Nodes() {
             list = new ArrayList<>();
         }
 

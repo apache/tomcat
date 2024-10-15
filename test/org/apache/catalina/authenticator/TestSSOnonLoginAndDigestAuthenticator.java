@@ -30,11 +30,11 @@ import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
-import org.apache.tomcat.util.security.MD5Encoder;
 
 /**
  * Test DigestAuthenticator and NonLoginAuthenticator when a
@@ -385,7 +385,7 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
             respHeaders.get(AuthenticatorBase.AUTH_HEADER_NAME);
 
         // Assume there is only one
-        String authHeader = authHeaders.iterator().next();
+        String authHeader = authHeaders.get(0);
         String searchFor = token + AUTH_PREFIX;
         int start = authHeader.indexOf(searchFor) + searchFor.length();
         int end = authHeader.indexOf(AUTH_SUFFIX, start);
@@ -412,15 +412,15 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
         String a1 = user + ":" + realm + ":" + pwd;
         String a2 = "GET:" + uri;
 
-        String md5a1 = digest(a1);
-        String md5a2 = digest(a2);
+        String digestA1 = digest(a1);
+        String digestA2 = digest(a2);
 
         String response;
         if (qop == null) {
-            response = md5a1 + ":" + nonce + ":" + md5a2;
+            response = digestA1 + ":" + nonce + ":" + digestA2;
         } else {
-            response = md5a1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" +
-                    qop + ":" + md5a2;
+            response = digestA1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" +
+                    qop + ":" + digestA2;
         }
 
         String md5response = digest(response);
@@ -457,7 +457,7 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
     }
 
     private static String digest(String input) {
-        return MD5Encoder.encode(ConcurrentMessageDigest.digestMD5(
+        return HexUtils.toHexString(ConcurrentMessageDigest.digestMD5(
                 input.getBytes(StandardCharsets.UTF_8)));
     }
 

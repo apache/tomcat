@@ -27,20 +27,15 @@ import org.apache.tomcat.util.res.StringManager;
  * As task queue specifically designed to run with a thread pool executor. The
  * task queue is optimised to properly utilize threads within a thread pool
  * executor. If you use a normal queue, the executor will spawn threads when
- * there are idle threads and you wont be able to force items onto the queue
+ * there are idle threads and you won't be able to force items onto the queue
  * itself.
  */
 public class TaskQueue extends LinkedBlockingQueue<Runnable> {
 
     private static final long serialVersionUID = 1L;
     protected static final StringManager sm = StringManager.getManager(TaskQueue.class);
-    private static final int DEFAULT_FORCED_REMAINING_CAPACITY = -1;
 
     private transient volatile ThreadPoolExecutor parent = null;
-
-    // No need to be volatile. This is written and read in a single thread
-    // (when stopping a context and firing the listeners)
-    private int forcedRemainingCapacity = -1;
 
     public TaskQueue() {
         super();
@@ -82,15 +77,15 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> {
             return super.offer(o);
         }
         //we are maxed out on threads, simply queue the object
-        if (parent.getPoolSize() == parent.getMaximumPoolSize()) {
+        if (parent.getPoolSizeNoLock() == parent.getMaximumPoolSize()) {
             return super.offer(o);
         }
         //we have idle threads, just add it to the queue
-        if (parent.getSubmittedCount()<=(parent.getPoolSize())) {
+        if (parent.getSubmittedCount() <= parent.getPoolSizeNoLock()) {
             return super.offer(o);
         }
         //if we have less threads than maximum force creation of a new thread
-        if (parent.getPoolSize()<parent.getMaximumPoolSize()) {
+        if (parent.getPoolSizeNoLock() < parent.getMaximumPoolSize()) {
             return false;
         }
         //if we reached here, we need to add it to the queue
@@ -121,25 +116,4 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> {
         }
         return super.take();
     }
-
-    @Override
-    public int remainingCapacity() {
-        if (forcedRemainingCapacity > DEFAULT_FORCED_REMAINING_CAPACITY) {
-            // ThreadPoolExecutor.setCorePoolSize checks that
-            // remainingCapacity==0 to allow to interrupt idle threads
-            // I don't see why, but this hack allows to conform to this
-            // "requirement"
-            return forcedRemainingCapacity;
-        }
-        return super.remainingCapacity();
-    }
-
-    public void setForcedRemainingCapacity(int forcedRemainingCapacity) {
-        this.forcedRemainingCapacity = forcedRemainingCapacity;
-    }
-
-    void resetForcedRemainingCapacity() {
-        this.forcedRemainingCapacity = DEFAULT_FORCED_REMAINING_CAPACITY;
-    }
-
 }

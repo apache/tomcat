@@ -78,7 +78,7 @@ class JspReader {
      * @throws FileNotFoundException If the JSP file is not found (or is unreadable)
      * @throws IOException If an IO-level error occurs, e.g. reading the file
      */
-    public JspReader(JspCompilationContext ctxt,
+    JspReader(JspCompilationContext ctxt,
                      String fname,
                      String encoding,
                      Jar jar,
@@ -100,7 +100,7 @@ class JspReader {
      *
      * @throws JasperException If an error occurs parsing the JSP file
      */
-    public JspReader(JspCompilationContext ctxt,
+    JspReader(JspCompilationContext ctxt,
                      String fname,
                      InputStreamReader reader,
                      ErrorDispatcher err)
@@ -127,7 +127,7 @@ class JspReader {
                     reader.close();
                 } catch (Exception any) {
                     if(log.isDebugEnabled()) {
-                        log.debug("Exception closing reader: ", any);
+                        log.debug(Localizer.getMessage("jsp.error.file.close"), any);
                     }
                 }
             }
@@ -487,7 +487,7 @@ class JspReader {
      * Skip until the given end tag is matched in the stream.
      * When returned, the context is positioned past the end of the tag.
      *
-     * @param tag The name of the tag whose ETag (</tag>) to match.
+     * @param tag The name of the tag whose ETag (&lt;/tag>) to match.
      * @return A non-null <code>Mark</code> instance (positioned immediately
      *               before the ETag) if found, <strong>null</strong> otherwise.
      */

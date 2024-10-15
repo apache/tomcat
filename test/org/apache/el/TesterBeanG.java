@@ -17,9 +17,8 @@
 package org.apache.el;
 
 /**
- * Test cases based on https://bz.apache.org/bugzilla/show_bug.cgi?id=65358
- * BeanG is BeanF with all the methods that use Enum parameters removed so that
- * the EL caller always has to coerce the Enum to String.
+ * Test cases based on https://bz.apache.org/bugzilla/show_bug.cgi?id=65358 BeanG is BeanF with all the methods that use
+ * Enum parameters removed so that the EL caller always has to coerce the Enum to String.
  */
 public class TesterBeanG {
 
@@ -36,7 +35,7 @@ public class TesterBeanG {
 
 
     @SuppressWarnings("unused")
-    public String doTest(String param1, String... param2 ) {
+    public String doTest(String param1, String... param2) {
         return "String-VString";
     }
 }

@@ -213,9 +213,6 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             }
         } catch (InvocationTargetException ie) {
             Throwable cause = ie.getCause();
-            if (cause instanceof ThreadDeath) {
-                throw (ThreadDeath) cause;
-            }
             if (cause instanceof VirtualMachineError) {
                 throw (VirtualMachineError) cause;
             }

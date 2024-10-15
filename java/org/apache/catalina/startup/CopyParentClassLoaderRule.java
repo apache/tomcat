@@ -25,10 +25,8 @@ import org.xml.sax.Attributes;
 
 
 /**
- * <p>Rule that copies the <code>parentClassLoader</code> property from the
- * next-to-top item on the stack (which must be a <code>Container</code>)
- * to the top item on the stack (which must also be a
- * <code>Container</code>).</p>
+ * Rule that copies the <code>parentClassLoader</code> property from the next-to-top item on the stack (which must be a
+ * <code>Container</code>) to the top item on the stack (which must also be a <code>Container</code>).
  *
  * @author Craig R. McClanahan
  */
@@ -48,26 +46,16 @@ public class CopyParentClassLoaderRule extends Rule {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Handle the beginning of an XML element.
-     *
-     * @param attributes The attributes of this element
-     *
-     * @exception Exception if a processing error occurs
-     */
     @Override
-    public void begin(String namespace, String name, Attributes attributes)
-        throws Exception {
+    public void begin(String namespace, String name, Attributes attributes) throws Exception {
 
-        if (digester.getLogger().isDebugEnabled()) {
-            digester.getLogger().debug("Copying parent class loader");
+        if (digester.getLogger().isTraceEnabled()) {
+            digester.getLogger().trace("Copying parent class loader");
         }
         Container child = (Container) digester.peek(0);
         Object parent = digester.peek(1);
-        Method method =
-            parent.getClass().getMethod("getParentClassLoader", new Class[0]);
-        ClassLoader classLoader =
-            (ClassLoader) method.invoke(parent, new Object[0]);
+        Method method = parent.getClass().getMethod("getParentClassLoader", new Class[0]);
+        ClassLoader classLoader = (ClassLoader) method.invoke(parent, new Object[0]);
         child.setParentClassLoader(classLoader);
 
         StringBuilder code = digester.getGeneratedCode();

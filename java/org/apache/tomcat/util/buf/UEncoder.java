@@ -21,27 +21,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.BitSet;
 
 /**
- * Efficient implementation of a UTF-8 encoder.
- * This class is not thread safe - you need one encoder per thread.
- * The encoder will save and recycle the internal objects, avoiding
- * garbage.
- *
- * You can add extra characters that you want preserved, for example
- * while encoding a URL you can add "/".
+ * Efficient implementation of a UTF-8 encoder. This class is not thread safe - you need one encoder per thread. The
+ * encoder will save and recycle the internal objects, avoiding garbage. You can add extra characters that you want
+ * preserved, for example while encoding a URL you can add "/".
  *
  * @author Costin Manolache
  */
 public final class UEncoder {
 
     public enum SafeCharsSet {
-        WITH_SLASH("/"), DEFAULT("");
+        WITH_SLASH("/"),
+        DEFAULT("");
+
         private final BitSet safeChars;
 
         private BitSet getSafeChars() {
             return this.safeChars;
         }
 
-        private SafeCharsSet(String additionalSafeChars) {
+        SafeCharsSet(String additionalSafeChars) {
             safeChars = initialSafeChars();
             for (char c : additionalSafeChars.toCharArray()) {
                 safeChars.set(c);
@@ -51,11 +49,11 @@ public final class UEncoder {
 
     // Not static - the set may differ ( it's better than adding
     // an extra check for "/", "+", etc
-    private BitSet safeChars=null;
-    private C2BConverter c2b=null;
-    private ByteChunk bb=null;
-    private CharChunk cb=null;
-    private CharChunk output=null;
+    private BitSet safeChars = null;
+    private C2BConverter c2b = null;
+    private ByteChunk bb = null;
+    private CharChunk cb = null;
+    private CharChunk output = null;
 
     /**
      * Create a UEncoder with an unmodifiable safe character set.
@@ -66,76 +64,74 @@ public final class UEncoder {
         this.safeChars = safeCharsSet.getSafeChars();
     }
 
-   /**
-    * URL Encode string, using a specified encoding.
-    *
-    * @param s string to be encoded
-    * @param start the beginning index, inclusive
-    * @param end the ending index, exclusive
-    *
-    * @return A new CharChunk contained the URL encoded string
-    *
-    * @throws IOException If an I/O error occurs
-    */
-   public CharChunk encodeURL(String s, int start, int end)
-       throws IOException {
-       if (c2b == null) {
-           bb = new ByteChunk(8); // small enough.
-           cb = new CharChunk(2); // small enough.
-           output = new CharChunk(64); // small enough.
-           c2b = new C2BConverter(StandardCharsets.UTF_8);
-       } else {
-           bb.recycle();
-           cb.recycle();
-           output.recycle();
-       }
+    /**
+     * URL Encode string, using a specified encoding.
+     *
+     * @param s     string to be encoded
+     * @param start the beginning index, inclusive
+     * @param end   the ending index, exclusive
+     *
+     * @return A new CharChunk contained the URL encoded string
+     *
+     * @throws IOException If an I/O error occurs
+     */
+    public CharChunk encodeURL(String s, int start, int end) throws IOException {
+        if (c2b == null) {
+            bb = new ByteChunk(8); // small enough.
+            cb = new CharChunk(2); // small enough.
+            output = new CharChunk(64); // small enough.
+            c2b = new C2BConverter(StandardCharsets.UTF_8);
+        } else {
+            bb.recycle();
+            cb.recycle();
+            output.recycle();
+        }
 
-       for (int i = start; i < end; i++) {
-           char c = s.charAt(i);
-           if (safeChars.get(c)) {
-               output.append(c);
-           } else {
-               cb.append(c);
-               c2b.convert(cb, bb);
+        for (int i = start; i < end; i++) {
+            char c = s.charAt(i);
+            if (safeChars.get(c)) {
+                output.append(c);
+            } else {
+                cb.append(c);
+                c2b.convert(cb, bb);
 
-               // "surrogate" - UTF is _not_ 16 bit, but 21 !!!!
-               // ( while UCS is 31 ). Amazing...
-               if (c >= 0xD800 && c <= 0xDBFF) {
-                   if ((i+1) < end) {
-                       char d = s.charAt(i+1);
-                       if (d >= 0xDC00 && d <= 0xDFFF) {
-                           cb.append(d);
-                           c2b.convert(cb, bb);
-                           i++;
-                       }
-                   }
-               }
+                // "surrogate" - UTF is _not_ 16 bit, but 21 !!!!
+                // ( while UCS is 31 ). Amazing...
+                if (c >= 0xD800 && c <= 0xDBFF) {
+                    if ((i + 1) < end) {
+                        char d = s.charAt(i + 1);
+                        if (d >= 0xDC00 && d <= 0xDFFF) {
+                            cb.append(d);
+                            c2b.convert(cb, bb);
+                            i++;
+                        }
+                    }
+                }
 
-               urlEncode(output, bb);
-               cb.recycle();
-               bb.recycle();
-           }
-       }
+                urlEncode(output, bb);
+                cb.recycle();
+                bb.recycle();
+            }
+        }
 
-       return output;
-   }
+        return output;
+    }
 
-   protected void urlEncode(CharChunk out, ByteChunk bb)
-       throws IOException {
-       byte[] bytes = bb.getBuffer();
-       for (int j = bb.getStart(); j < bb.getEnd(); j++) {
-           out.append('%');
-           char ch = Character.forDigit((bytes[j] >> 4) & 0xF, 16);
-           out.append(ch);
-           ch = Character.forDigit(bytes[j] & 0xF, 16);
-           out.append(ch);
-       }
-   }
+    protected void urlEncode(CharChunk out, ByteChunk bb) throws IOException {
+        byte[] bytes = bb.getBuffer();
+        for (int j = bb.getStart(); j < bb.getEnd(); j++) {
+            out.append('%');
+            char ch = Character.forDigit((bytes[j] >> 4) & 0xF, 16);
+            out.append(ch);
+            ch = Character.forDigit(bytes[j] & 0xF, 16);
+            out.append(ch);
+        }
+    }
 
     // -------------------- Internal implementation --------------------
 
     private static BitSet initialSafeChars() {
-        BitSet initialSafeChars=new BitSet(128);
+        BitSet initialSafeChars = new BitSet(128);
         int i;
         for (i = 'a'; i <= 'z'; i++) {
             initialSafeChars.set(i);
@@ -146,7 +142,7 @@ public final class UEncoder {
         for (i = '0'; i <= '9'; i++) {
             initialSafeChars.set(i);
         }
-        //safe
+        // safe
         initialSafeChars.set('$');
         initialSafeChars.set('-');
         initialSafeChars.set('_');
@@ -154,8 +150,8 @@ public final class UEncoder {
 
         // Dangerous: someone may treat this as " "
         // RFC1738 does allow it, it's not reserved
-        //    initialSafeChars.set('+');
-        //extra
+        // initialSafeChars.set('+');
+        // extra
         initialSafeChars.set('!');
         initialSafeChars.set('*');
         initialSafeChars.set('\'');

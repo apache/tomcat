@@ -31,18 +31,18 @@ import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 
 /**
- * This listener must be declared in server.xml as a Server listener, possibly optional.
- * It will register a lifecycle listener on all contexts. This is an alternative to
- * adding a Listener in context.xml with more flexibility.
+ * This listener must be declared in server.xml as a Server listener, possibly optional. It will register a lifecycle
+ * listener on all contexts. This is an alternative to adding a Listener in context.xml with more flexibility.
  */
 public abstract class FrameworkListener implements LifecycleListener, ContainerListener {
 
-    protected final ConcurrentHashMap<Context, LifecycleListener> contextListeners =
-            new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<Context,LifecycleListener> contextListeners = new ConcurrentHashMap<>();
 
     /**
      * Create a lifecycle listener which will then be added to the specified context.
+     *
      * @param context the associated Context
+     *
      * @return the lifecycle listener
      */
     protected abstract LifecycleListener createLifecycleListener(Context context);
@@ -50,8 +50,7 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
         Lifecycle lifecycle = event.getLifecycle();
-        if (Lifecycle.BEFORE_START_EVENT.equals(event.getType()) &&
-                lifecycle instanceof Server) {
+        if (Lifecycle.BEFORE_START_EVENT.equals(event.getType()) && lifecycle instanceof Server) {
             Server server = (Server) lifecycle;
             registerListenersForServer(server);
         }

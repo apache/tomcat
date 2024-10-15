@@ -30,7 +30,7 @@ public class MessageInfoImpl implements MessageInfo {
 
     public static final String IS_MANDATORY = "jakarta.security.auth.message.MessagePolicy.isMandatory";
 
-    private final Map<String, Object> map = new HashMap<>();
+    private final Map<String,Object> map = new HashMap<>();
     private HttpServletRequest request;
     private HttpServletResponse response;
 
@@ -61,8 +61,8 @@ public class MessageInfoImpl implements MessageInfo {
     @Override
     public void setRequestMessage(Object request) {
         if (!(request instanceof HttpServletRequest)) {
-            throw new IllegalArgumentException(sm.getString("authenticator.jaspic.badRequestType",
-                    request.getClass().getName()));
+            throw new IllegalArgumentException(
+                    sm.getString("authenticator.jaspic.badRequestType", request.getClass().getName()));
         }
         this.request = (HttpServletRequest) request;
     }
@@ -70,8 +70,8 @@ public class MessageInfoImpl implements MessageInfo {
     @Override
     public void setResponseMessage(Object response) {
         if (!(response instanceof HttpServletResponse)) {
-            throw new IllegalArgumentException(sm.getString("authenticator.jaspic.badResponseType",
-                    response.getClass().getName()));
+            throw new IllegalArgumentException(
+                    sm.getString("authenticator.jaspic.badResponseType", response.getClass().getName()));
         }
         this.response = (HttpServletResponse) response;
     }

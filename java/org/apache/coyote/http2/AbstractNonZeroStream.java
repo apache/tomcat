@@ -17,26 +17,16 @@
 package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
-import java.util.Iterator;
-
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Base class for all streams other than stream 0, the connection. Primarily
- * provides functionality shared between full Stream and RecycledStream.
+ * Base class for all streams other than stream 0, the connection. Primarily provides functionality shared between full
+ * Stream and RecycledStream.
  */
 abstract class AbstractNonZeroStream extends AbstractStream {
-
-    private static final Log log = LogFactory.getLog(AbstractNonZeroStream.class);
-    private static final StringManager sm = StringManager.getManager(AbstractNonZeroStream.class);
 
     protected static final ByteBuffer ZERO_LENGTH_BYTEBUFFER = ByteBuffer.allocate(0);
 
     protected final StreamStateMachine state;
-
-    private volatile int weight = Constants.DEFAULT_WEIGHT;
 
 
     AbstractNonZeroStream(String connectionId, Integer identifier) {
@@ -51,109 +41,41 @@ abstract class AbstractNonZeroStream extends AbstractStream {
     }
 
 
-    @Override
-    final int getWeight() {
-        return weight;
-    }
-
-
-    /*
-     * General method used when reprioritising a stream and care needs to be
-     * taken not to create circular references.
-     *
-     * Changes to the priority tree need to be sychronized at the connection
-     * level. This is the caller's responsibility.
+    /**
+     * @return {@code true} if the state indicates a close
      */
-    final void rePrioritise(AbstractStream parent, boolean exclusive, int weight) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.reprioritisation.debug",
-                    getConnectionId(), getIdAsString(), Boolean.toString(exclusive),
-                    parent.getIdAsString(), Integer.toString(weight)));
-        }
-
-        // Check if new parent is a descendant of this stream
-        if (isDescendant(parent)) {
-            parent.detachFromParent();
-            // Cast is always safe since any descendant of this stream must be
-            // an instance of Stream
-            getParentStream().addChild((Stream) parent);
-        }
-
-        if (exclusive) {
-            // Need to move children of the new parent to be children of this
-            // stream. Slightly convoluted to avoid concurrent modification.
-            Iterator<AbstractNonZeroStream> parentsChildren = parent.getChildStreams().iterator();
-            while (parentsChildren.hasNext()) {
-                AbstractNonZeroStream parentsChild = parentsChildren.next();
-                parentsChildren.remove();
-                this.addChild(parentsChild);
-            }
-        }
-        detachFromParent();
-        parent.addChild(this);
-        this.weight = weight;
-    }
-
-
-    /*
-     * Used when removing closed streams from the tree and we know there is no
-     * need to check for circular references.
-     *
-     * Changes to the priority tree need to be sychronized at the connection
-     * level. This is the caller's responsibility.
-     */
-    final void rePrioritise(AbstractStream parent, int weight) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.reprioritisation.debug",
-                    getConnectionId(), getIdAsString(), Boolean.FALSE,
-                    parent.getIdAsString(), Integer.toString(weight)));
-        }
-
-        parent.addChild(this);
-        this.weight = weight;
-    }
-
-
-    /*
-     * Used when "recycling" a stream and replacing a Stream instance with a
-     * RecycledStream instance.
-     *
-     * Replace this stream with the provided stream in the parent/child
-     * hierarchy.
-     *
-     * Changes to the priority tree need to be sychronized at the connection
-     * level. This is the caller's responsibility.
-     */
-    void replaceStream(AbstractNonZeroStream replacement) {
-        getParentStream().addChild(replacement);
-        detachFromParent();
-        for (AbstractNonZeroStream child : getChildStreams()) {
-            replacement.addChild(child);
-        }
-        getChildStreams().clear();
-        replacement.weight = weight;
-    }
-
-
     final boolean isClosedFinal() {
         return state.isClosedFinal();
     }
 
 
+    /**
+     * Check the frame type against the state
+     *
+     * @param frameType the type
+     *
+     * @throws Http2Exception if an error is detected
+     */
     final void checkState(FrameType frameType) throws Http2Exception {
         state.checkFrameType(frameType);
     }
 
 
     /**
-     * Obtain the ByteBuffer to store DATA frame payload data for this stream
-     * that has been received from the client.
+     * Obtain the ByteBuffer to store DATA frame payload data for this stream that has been received from the client.
      *
-     * @return {@code null} if the DATA frame payload can be swallowed, or a
-     *         ByteBuffer with at least enough space remaining for the current
-     *         flow control window for stream data from the client.
+     * @return {@code null} if the DATA frame payload can be swallowed, or a ByteBuffer with at least enough space
+     *             remaining for the current flow control window for stream data from the client.
      */
-    abstract ByteBuffer getInputByteBuffer();
+    abstract ByteBuffer getInputByteBuffer(boolean create);
 
+
+    /**
+     * Notify that some data has been received.
+     *
+     * @param payloadSize the byte count
+     *
+     * @throws Http2Exception if an error is detected
+     */
     abstract void receivedData(int payloadSize) throws Http2Exception;
 }

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
 import jakarta.servlet.jsp.el.ImplicitObjectELResolver;
 
@@ -32,7 +33,7 @@ import org.apache.jasper.runtime.JspRuntimeLibrary;
 
 public class TestJasperELResolver {
 
-    private static final int STANDARD_RESOLVERS_COUNT = 11;
+    private static final int STANDARD_RESOLVERS_COUNT = 12;
 
     @Test
     public void testConstructorNone() throws Exception {
@@ -69,11 +70,48 @@ public class TestJasperELResolver {
                 Integer.valueOf(((AtomicInteger) getField("resolversSize", resolver)).get()));
     }
 
-    private static final Object getField(String name, Object target)
+    private static Object getField(String name, Object target)
             throws NoSuchFieldException, SecurityException,
             IllegalArgumentException, IllegalAccessException {
         Field field = target.getClass().getDeclaredField(name);
         field.setAccessible(true);
         return field.get(target);
+    }
+
+    @Test
+    public void testGraalResolver() throws Exception {
+        ELResolver resolver = new JasperELResolver.GraalBeanELResolver();
+        ELContext context = new ELContextImpl(resolver);
+        Assert.assertEquals("foo", resolver.getValue(context, new TestBean(), "foo"));
+        Assert.assertEquals(Boolean.TRUE, resolver.getValue(context, new TestBean(), "foo2"));
+        Assert.assertEquals("bla", resolver.getValue(context, new TestBean(), "bla"));
+        Assert.assertNull(resolver.getValue(context, new TestBean(), "foobar"));
+        Assert.assertNull(resolver.getValue(context, new TestBean(), "bar"));
+        Assert.assertFalse(resolver.isReadOnly(context, new TestBean(), "foo"));
+        Assert.assertTrue(resolver.isReadOnly(context, new TestBean(), "bla"));
+    }
+
+    public static class TestBean {
+        public String getFoo() {
+            return "foo";
+        }
+        public void setFoo(@SuppressWarnings("unused") String foo) {
+        }
+        public boolean isFoo2() {
+            return true;
+        }
+        public void setFoo2(@SuppressWarnings("unused") boolean foo) {
+        }
+        public String getBar(@SuppressWarnings("unused") boolean i) {
+            return "bar";
+        }
+        public String isFoobar() {
+            return "foobar";
+        }
+        public String getBla() {
+            return "bla";
+        }
+        public void setBla(@SuppressWarnings("unused") Object bla) {
+        }
     }
 }

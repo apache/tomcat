@@ -48,21 +48,8 @@ public class FileUpload
      * A factory must be
      * configured, using {@code setFileItemFactory()}, before attempting
      * to parse requests.
-     *
-     * @see #FileUpload(FileItemFactory)
      */
     public FileUpload() {
-    }
-
-    /**
-     * Constructs an instance of this class which uses the supplied factory to
-     * create {@code FileItem} instances.
-     *
-     * @see #FileUpload()
-     * @param fileItemFactory The factory to use for creating file items.
-     */
-    public FileUpload(final FileItemFactory fileItemFactory) {
-        this.fileItemFactory = fileItemFactory;
     }
 
     // ----------------------------------------------------- Property accessors

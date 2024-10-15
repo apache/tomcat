@@ -24,11 +24,9 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Extended implementation of <strong>HashSet</strong> that includes a
- * <code>locked</code> property.  This class can be used to safely expose
- * resource path sets to user classes without having to clone them in order
- * to avoid modifications.  When first created, a <code>ResourceMap</code>
- * is not locked.
+ * Extended implementation of <strong>HashSet</strong> that includes a <code>locked</code> property. This class can be
+ * used to safely expose resource path sets to user classes without having to clone them in order to avoid
+ * modifications. When first created, a <code>ResourceMap</code> is not locked.
  *
  * @param <T> The type of elements in the Set
  *
@@ -40,8 +38,7 @@ public final class ResourceSet<T> extends HashSet<T> {
 
     // ----------------------------------------------------------- Constructors
     /**
-     * Construct a new, empty set with the default initial capacity and
-     * load factor.
+     * Construct a new, empty set with the default initial capacity and load factor.
      */
     public ResourceSet() {
 
@@ -51,8 +48,7 @@ public final class ResourceSet<T> extends HashSet<T> {
 
 
     /**
-     * Construct a new, empty set with the specified initial capacity and
-     * default load factor.
+     * Construct a new, empty set with the specified initial capacity and default load factor.
      *
      * @param initialCapacity The initial capacity of this set
      */
@@ -64,11 +60,10 @@ public final class ResourceSet<T> extends HashSet<T> {
 
 
     /**
-     * Construct a new, empty set with the specified initial capacity and
-     * load factor.
+     * Construct a new, empty set with the specified initial capacity and load factor.
      *
      * @param initialCapacity The initial capacity of this set
-     * @param loadFactor The load factor of this set
+     * @param loadFactor      The load factor of this set
      */
     public ResourceSet(int initialCapacity, float loadFactor) {
 
@@ -119,42 +114,36 @@ public final class ResourceSet<T> extends HashSet<T> {
     /**
      * The string manager for this package.
      */
-    private static final StringManager sm =
-        StringManager.getManager("org.apache.catalina.util");
+    private static final StringManager sm = StringManager.getManager("org.apache.catalina.util");
 
 
     // --------------------------------------------------------- Public Methods
 
 
     /**
-     * Add the specified element to this set if it is not already present.
-     * Return <code>true</code> if the element was added.
+     * {@inheritDoc}
      *
-     * @param o The object to be added
-     *
-     * @exception IllegalStateException if this ResourceSet is locked
+     * @exception IllegalStateException if this set is currently locked
      */
     @Override
     public boolean add(T o) {
         if (locked) {
-            throw new IllegalStateException
-              (sm.getString("resourceSet.locked"));
+            throw new IllegalStateException(sm.getString("resourceSet.locked"));
         }
         return super.add(o);
     }
 
 
     /**
-     * Remove all of the elements from this set.
+     * {@inheritDoc}
      *
-     * @exception IllegalStateException if this ResourceSet is locked
+     * @exception IllegalStateException if this set is currently locked
      */
     @Override
     public void clear() {
 
         if (locked) {
-            throw new IllegalStateException
-              (sm.getString("resourceSet.locked"));
+            throw new IllegalStateException(sm.getString("resourceSet.locked"));
         }
         super.clear();
 
@@ -162,18 +151,14 @@ public final class ResourceSet<T> extends HashSet<T> {
 
 
     /**
-     * Remove the given element from this set if it is present.
-     * Return <code>true</code> if the element was removed.
+     * {@inheritDoc}
      *
-     * @param o The object to be removed
-     *
-     * @exception IllegalStateException if this ResourceSet is locked
+     * @exception IllegalStateException if this set is currently locked
      */
     @Override
     public boolean remove(Object o) {
         if (locked) {
-            throw new IllegalStateException
-              (sm.getString("resourceSet.locked"));
+            throw new IllegalStateException(sm.getString("resourceSet.locked"));
         }
         return super.remove(o);
     }

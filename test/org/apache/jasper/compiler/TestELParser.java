@@ -30,21 +30,18 @@ import org.apache.jasper.compiler.ELNode.Nodes;
 import org.apache.jasper.compiler.ELParser.TextBuilder;
 
 /**
- * You will need to keep your wits about you when working with this class. Keep
- * in mind the following:
+ * You will need to keep your wits about you when working with this class. Keep in mind the following:
  * <ul>
  * <li>If in doubt, read the EL and JSP specifications. Twice.</li>
- * <li>The escaping rules are complex and subtle. The explanation below (as well
- *     as the tests and the implementation) may have missed an edge case despite
- *     trying hard not to.
- * <li>The strings passed to {@link #doTestParser(String,String)} are Java
- *     escaped in the source code and will be unescaped before being used.</li>
- * <li>LiteralExpressions always occur outside of "${...}" and "#{...}". Literal
- *     expressions escape '$' and '#' with '\\'</li>
- * <li>LiteralStrings always occur inside "${...}" or "#{...}". Literal strings
- *     escape '\'', '\"' and '\\' with '\\'. Escaping '\"' is optional if the
- *     literal string is delimited by '\''. Escaping '\'' is optional if the
- *     literal string is delimited by '\"'.</li>
+ * <li>The escaping rules are complex and subtle. The explanation below (as well as the tests and the implementation)
+ * may have missed an edge case despite trying hard not to.
+ * <li>The strings passed to {@link #doTestParser(String,String)} are Java escaped in the source code and will be
+ * unescaped before being used.</li>
+ * <li>LiteralExpressions always occur outside of "${...}" and "#{...}". Literal expressions escape '$' and '#' with
+ * '\\'</li>
+ * <li>LiteralStrings always occur inside "${...}" or "#{...}". Literal strings escape '\'', '\"' and '\\' with '\\'.
+ * Escaping '\"' is optional if the literal string is delimited by '\''. Escaping '\'' is optional if the literal string
+ * is delimited by '\"'.</li>
  * </ul>
  */
 public class TestELParser {
@@ -285,7 +282,8 @@ public class TestELParser {
         doTestParser(input, expected, input);
     }
 
-    private void doTestParser(String input, String expectedResult, String expectedBuilderOutput) throws JasperException {
+    private void doTestParser(String input, String expectedResult, String expectedBuilderOutput)
+            throws JasperException {
 
         ELException elException = null;
         String elResult = null;

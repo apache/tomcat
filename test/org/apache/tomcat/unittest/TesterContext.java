@@ -416,6 +416,16 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public boolean getUsePartitioned() {
+        return false;
+    }
+
+    @Override
+    public void setUsePartitioned(boolean usePartitioned) {
+        // NO-OP
+    }
+
+    @Override
     public String getSessionCookieDomain() {
         return null;
     }
@@ -1211,7 +1221,17 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public ClassLoader bind(ClassLoader originalClassLoader) {
+        return null;
+    }
+
+    @Override
     public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
+        // NO-OP
+    }
+
+    @Override
+    public void unbind(ClassLoader originalClassLoader) {
         // NO-OP
     }
 
@@ -1306,15 +1326,14 @@ public class TesterContext implements Context {
     @Override
     public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {}
 
-    boolean useBloomFilterForArchives = false;
     @Override
-    public boolean getUseBloomFilterForArchives() {
-        return useBloomFilterForArchives;
-    }
+    public boolean getMetadataComplete() { return false; }
+    @Override
+    public void setMetadataComplete(boolean metadataComplete) { /* NO-OP */ }
 
     @Override
-    public void setUseBloomFilterForArchives(boolean useBloomFilterForArchives) {
-        this.useBloomFilterForArchives = useBloomFilterForArchives;
-    }
+    public boolean getSuspendWrappedResponseAfterForward() { return true; }
+    @Override
+    public void setSuspendWrappedResponseAfterForward(boolean suspendWrappedResponseAfterForward) {}
 
 }

@@ -85,7 +85,7 @@ public class TestStringInterpreterTagSetters extends TomcatBaseTest {
         private final String name;
         private volatile StringInterpreter stringInterpreter = null;
 
-        public StringInterpreterWrapper(boolean optimised, String name) {
+        StringInterpreterWrapper(boolean optimised, String name) {
             this.optimised = optimised;
             this.name = name;
         }

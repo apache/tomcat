@@ -37,15 +37,6 @@
     {"name":"org.apache.tomcat.util.threads.LocalStrings"}
   ],
   "resources":[
-    {"pattern":".*/Authenticators.properties$"},
-    {"pattern":".*/MimeTypeMappings.properties$"},
-    {"pattern":".*/catalina.properties$"},
-    {"pattern":".*/CharsetMapperDefault.properties$"},
-    {"pattern":".*/ServerInfo.properties$"},
-    {"pattern":".*/RestrictedServlets.properties$"},
-    {"pattern":".*/RestrictedListeners.properties$"},
-    {"pattern":".*/RestrictedFilters.properties$"},
-    {"pattern":".*/*.dtd$"},
-    {"pattern":".*/*.xsd$"}
+    {"pattern":"^org/apache/catalina/.*\\.properties$"}
   ]
 }

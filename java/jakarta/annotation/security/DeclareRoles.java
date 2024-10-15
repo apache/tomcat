@@ -33,5 +33,5 @@ public @interface DeclareRoles {
     /**
      * @return a String[] with the roles
      */
-    public String[] value();
+    String[] value();
 }

@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<%@page session="false" contentType="text/html; charset=ISO-8859-1" %>
+<%@page session="false" contentType="text/html; charset=UTF-8" %>
 <%@page import="java.util.Enumeration" %>
 <%@page import="jakarta.servlet.http.HttpSession" %>
 <%@page import="org.apache.catalina.Session" %>
@@ -45,13 +45,13 @@
            "?path=" + path + "&version=" + version));
 %>
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <meta http-equiv="pragma" content="no-cache"/><!-- HTTP 1.0 -->
     <meta http-equiv="cache-control" content="no-cache,must-revalidate"/><!-- HTTP 1.1 -->
     <meta http-equiv="expires" content="0"/><!-- 0 is an invalid value and should be treated as 'now' -->
     <meta http-equiv="content-language" content="en"/>
     <meta name="author" content="Cedrik LIME"/>
-    <meta name="copyright" content="copyright 2005-2022 the Apache Software Foundation"/>
+    <meta name="copyright" content="copyright 2005-2024 the Apache Software Foundation"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
     <title>Sessions Administration: details for <%= currentSessionId %></title>
 </head>

@@ -28,10 +28,9 @@ import javax.management.NotificationListener;
 
 
 /**
- * <p>Implementation of <code>NotificationBroadcaster</code> for attribute
+ * Implementation of <code>NotificationBroadcaster</code> for attribute
  * change notifications.  This class is used by <code>BaseModelMBean</code> to
  * handle notifications of attribute change events to interested listeners.
- *</p>
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
@@ -168,7 +167,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
 
 class BaseNotificationBroadcasterEntry {
 
-    public BaseNotificationBroadcasterEntry(NotificationListener listener,
+    BaseNotificationBroadcasterEntry(NotificationListener listener,
                                             NotificationFilter filter,
                                             Object handback) {
         this.listener = listener;

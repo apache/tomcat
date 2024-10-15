@@ -53,14 +53,14 @@ import org.apache.tomcat.dbcp.pool2.SwallowedExceptionListener;
  * Base class that provides common functionality for {@link GenericObjectPool}
  * and {@link GenericKeyedObjectPool}. The primary reason this class exists is
  * reduce code duplication between the two pool implementations.
+ * <p>
+ * Concrete implementations of this class are expected to be thread-safe.
+ * </p>
  *
  * @param <T> Type of element pooled in this pool.
- *
- * This class is intended to be thread-safe.
- *
  * @since 2.0
  */
-public abstract class BaseGenericObjectPool<T> extends BaseObject {
+public abstract class BaseGenericObjectPool<T> extends BaseObject implements AutoCloseable {
 
     /**
      * The idle object eviction iterator. Holds a reference to the idle objects.
@@ -128,6 +128,9 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
             scheduledFuture.cancel(false);
         }
 
+        BaseGenericObjectPool<T> owner() {
+            return BaseGenericObjectPool.this;
+        }
 
         /**
          * Run pool maintenance.  Evict objects qualifying for eviction and then
@@ -139,8 +142,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
          */
         @Override
         public void run() {
-            final ClassLoader savedClassLoader =
-                    Thread.currentThread().getContextClassLoader();
+            final ClassLoader savedClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 if (factoryClassLoader != null) {
                     // Set the class loader for the factory
@@ -158,9 +160,9 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
                 // Evict from the pool
                 try {
                     evict();
-                } catch(final Exception e) {
+                } catch (final Exception e) {
                     swallowException(e);
-                } catch(final OutOfMemoryError oome) {
+                } catch (final OutOfMemoryError oome) {
                     // Log problem but give evictor thread a chance to continue
                     // in case error is recoverable
                     oome.printStackTrace(System.err);
@@ -177,7 +179,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
             }
         }
 
-
         /**
          * Sets the scheduled future.
          *
@@ -185,6 +186,11 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
          */
         void setScheduledFuture(final ScheduledFuture<?> scheduledFuture) {
             this.scheduledFuture = scheduledFuture;
+        }
+
+        @Override
+        public String toString() {
+            return getClass().getName() + " [scheduledFuture=" + scheduledFuture + "]";
         }
 
     }
@@ -207,7 +213,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
          *
          * @param instance object to wrap
          */
-        public IdentityWrapper(final T instance) {
+        IdentityWrapper(final T instance) {
             this.instance = instance;
         }
 
@@ -243,24 +249,22 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      * Maintains a cache of values for a single metric and reports
      * statistics on the cached values.
      */
-    private class StatsStore {
+    private static class StatsStore {
 
-        private static final int NULL = -1;
+        private static final int NONE = -1;
         private final AtomicLong[] values;
         private final int size;
         private int index;
 
         /**
-         * Constructs a StatsStore with the given cache size.
+         * Constructs a new instance with the given cache size.
          *
          * @param size number of values to maintain in the cache.
          */
         StatsStore(final int size) {
             this.size = size;
-            values = new AtomicLong[size];
-            for (int i = 0; i < size; i++) {
-                values[i] = new AtomicLong(NULL);
-            }
+            this.values = new AtomicLong[size];
+            Arrays.setAll(values, i -> new AtomicLong(NONE));
         }
 
         void add(final Duration value) {
@@ -282,15 +286,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
         }
 
         /**
-         * Gets the current values as a List.
-         *
-         * @return the current values as a List.
-         */
-        synchronized List<AtomicLong> getCurrentValues() {
-            return Arrays.stream(values, 0, index).collect(Collectors.toList());
-        }
-
-        /**
          * Gets the mean of the cached values.
          *
          * @return the mean of the cache, truncated to long
@@ -300,7 +295,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
             int counter = 0;
             for (int i = 0; i < size; i++) {
                 final long value = values[i].get();
-                if (value != NULL) {
+                if (value != NONE) {
                     counter++;
                     result = result * ((counter - 1) / (double) counter) + value / (double) counter;
                 }
@@ -308,12 +303,30 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
             return (long) result;
         }
 
+        /**
+         * Gets the mean Duration of the cached values.
+         *
+         * @return the mean Duration of the cache, truncated to long milliseconds of a Duration.
+         */
+        Duration getMeanDuration() {
+            return Duration.ofMillis(getMean());
+        }
+
+        /**
+         * Gets the current values as a List.
+         *
+         * @return the current values as a List.
+         */
+        synchronized List<AtomicLong> getValues() {
+            return Arrays.stream(values, 0, index).collect(Collectors.toList());
+        }
+
         @Override
         public String toString() {
             final StringBuilder builder = new StringBuilder();
             builder.append("StatsStore [");
             // Only append what's been filled in.
-            builder.append(getCurrentValues());
+            builder.append(getValues());
             builder.append("], size=");
             builder.append(size);
             builder.append(", index=");
@@ -342,7 +355,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     private volatile boolean testOnBorrow = BaseObjectPoolConfig.DEFAULT_TEST_ON_BORROW;
     private volatile boolean testOnReturn = BaseObjectPoolConfig.DEFAULT_TEST_ON_RETURN;
     private volatile boolean testWhileIdle = BaseObjectPoolConfig.DEFAULT_TEST_WHILE_IDLE;
-    private volatile Duration durationBetweenEvictionRuns = BaseObjectPoolConfig.DEFAULT_TIME_BETWEEN_EVICTION_RUNS;
+    private volatile Duration durationBetweenEvictionRuns = BaseObjectPoolConfig.DEFAULT_DURATION_BETWEEN_EVICTION_RUNS;
     private volatile int numTestsPerEvictionRun = BaseObjectPoolConfig.DEFAULT_NUM_TESTS_PER_EVICTION_RUN;
 
     private volatile Duration minEvictableIdleDuration = BaseObjectPoolConfig.DEFAULT_MIN_EVICTABLE_IDLE_DURATION;
@@ -445,6 +458,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      * Closes the pool, destroys the remaining idle objects and, if registered
      * in JMX, deregisters it.
      */
+    @Override
     public abstract void close();
 
     /**
@@ -502,7 +516,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * The total number of objects successfully borrowed from this pool over the
+     * Gets the total number of objects successfully borrowed from this pool over the
      * lifetime of the pool.
      * @return the borrowed object count
      */
@@ -511,7 +525,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * The total number of objects created for this pool over the lifetime of
+     * Gets the total number of objects created for this pool over the lifetime of
      * the pool.
      * @return the created object count
      */
@@ -520,7 +534,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * Provides the stack trace for the call that created this pool. JMX
+     * Gets the stack trace for the call that created this pool. JMX
      * registration may trigger a memory leak so it is important that pools are
      * deregistered when no longer used by calling the {@link #close()} method.
      * This method is provided to assist with identifying code that creates but
@@ -532,7 +546,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * The total number of objects destroyed by this pool as a result of failing
+     * Gets the total number of objects destroyed by this pool as a result of failing
      * validation during {@code borrowObject()} over the lifetime of the
      * pool.
      * @return validation destroyed object count
@@ -542,7 +556,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * The total number of objects destroyed by the evictor associated with this
+     * Gets the total number of objects destroyed by the evictor associated with this
      * pool over the lifetime of the pool.
      * @return the evictor destroyed object count
      */
@@ -551,7 +565,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * The total number of objects destroyed by this pool over the lifetime of
+     * Gets the total number of objects destroyed by this pool over the lifetime of
      * the pool.
      * @return the destroyed object count
      */
@@ -650,7 +664,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * Provides the name under which the pool has been registered with the
+     * Gets the name under which the pool has been registered with the
      * platform MBean server or {@code null} if the pool has not been
      * registered.
      * @return the JMX name
@@ -691,8 +705,21 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
 
     /**
      * Gets the maximum time a thread has waited to borrow objects from the pool.
+     *
      * @return maximum wait time in milliseconds since the pool was created
+     * @since 2.12.0
      */
+    public final Duration getMaxBorrowWaitDuration() {
+        return maxBorrowWaitDuration.get();
+    }
+
+    /**
+     * Gets the maximum time a thread has waited to borrow objects from the pool.
+     *
+     * @return maximum wait time in milliseconds since the pool was created
+     * @deprecated Use {@link #getMaxBorrowWaitDuration()}.
+     */
+    @Deprecated
     public final long getMaxBorrowWaitTimeMillis() {
         return maxBorrowWaitDuration.get().toMillis();
     }
@@ -705,7 +732,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      *
      * @return the cap on the total number of object instances managed by the
      *         pool.
-     *
      * @see #setMaxTotal
      */
     public final int getMaxTotal() {
@@ -750,31 +776,76 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * The mean time objects are active for based on the last {@link
+     * Gets the mean time objects are active for based on the last {@link
      * #MEAN_TIMING_STATS_CACHE_SIZE} objects returned to the pool.
      * @return mean time an object has been checked out from the pool among
-     * recently returned objects
+     * recently returned objects.
+     *
+     * @since 2.12.0
      */
+    public final Duration getMeanActiveDuration() {
+        return activeTimes.getMeanDuration();
+    }
+
+    /**
+     * Gets the mean time objects are active for based on the last {@link
+     * #MEAN_TIMING_STATS_CACHE_SIZE} objects returned to the pool.
+     * @return mean time an object has been checked out from the pool among
+     * recently returned objects.
+     *
+     * @deprecated Use {@link #getMeanActiveDuration()}.
+     */
+    @Deprecated
     public final long getMeanActiveTimeMillis() {
         return activeTimes.getMean();
     }
 
     /**
-     * The mean time threads wait to borrow an object based on the last {@link
+     * Gets the mean time threads wait to borrow an object based on the last {@link
      * #MEAN_TIMING_STATS_CACHE_SIZE} objects borrowed from the pool.
+     *
      * @return mean time in milliseconds that a recently served thread has had
-     * to wait to borrow an object from the pool
+     * to wait to borrow an object from the pool.
+     * @since 2.12.0
      */
+    public final Duration getMeanBorrowWaitDuration() {
+        return waitTimes.getMeanDuration();
+    }
+
+    /**
+     * Gets the mean time threads wait to borrow an object based on the last {@link
+     * #MEAN_TIMING_STATS_CACHE_SIZE} objects borrowed from the pool.
+     *
+     * @return mean time in milliseconds that a recently served thread has had
+     * to wait to borrow an object from the pool.
+     * @deprecated Use {@link #getMeanBorrowWaitDuration()}.
+     */
+    @Deprecated
     public final long getMeanBorrowWaitTimeMillis() {
         return waitTimes.getMean();
     }
 
     /**
-     * The mean time objects are idle for based on the last {@link
+     * Gets the mean time objects are idle for based on the last {@link
      * #MEAN_TIMING_STATS_CACHE_SIZE} objects borrowed from the pool.
+     *
      * @return mean time an object has been idle in the pool among recently
-     * borrowed objects
+     * borrowed objects.
+     * @since 2.12.0
      */
+    public final Duration getMeanIdleDuration() {
+        return idleTimes.getMeanDuration();
+    }
+
+    /**
+     * Gets the mean time objects are idle for based on the last {@link
+     * #MEAN_TIMING_STATS_CACHE_SIZE} objects borrowed from the pool.
+     *
+     * @return mean time an object has been idle in the pool among recently
+     * borrowed objects.
+     * @deprecated Use {@link #getMeanIdleDuration()}.
+     */
+    @Deprecated
     public final long getMeanIdleTimeMillis() {
         return idleTimes.getMean();
     }
@@ -796,7 +867,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     /**
      * Gets the minimum amount of time an object may sit idle in the pool
      * before it is eligible for eviction by the idle object evictor (if any -
-     * see {@link #setTimeBetweenEvictionRuns(Duration)}). When non-positive,
+     * see {@link #setDurationBetweenEvictionRuns(Duration)}). When non-positive,
      * no objects will be evicted from the pool due to idle time alone.
      *
      * @return minimum amount of time an object may sit idle in the pool before
@@ -813,7 +884,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     /**
      * Gets the minimum amount of time an object may sit idle in the pool
      * before it is eligible for eviction by the idle object evictor (if any -
-     * see {@link #setTimeBetweenEvictionRuns(Duration)}). When non-positive,
+     * see {@link #setDurationBetweenEvictionRuns(Duration)}). When non-positive,
      * no objects will be evicted from the pool due to idle time alone.
      *
      * @return minimum amount of time an object may sit idle in the pool before
@@ -848,7 +919,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * The number of instances currently idle in this pool.
+     * Gets the number of instances currently idle in this pool.
      * @return count of instances available for checkout from the pool
      */
     public abstract int getNumIdle();
@@ -934,7 +1005,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * The total number of objects returned to this pool over the lifetime of
+     * Gets the total number of objects returned to this pool over the lifetime of
      * the pool. This excludes attempts to return the same object multiple
      * times.
      * @return the returned object count
@@ -946,7 +1017,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     /**
      * Gets the minimum amount of time an object may sit idle in the pool
      * before it is eligible for eviction by the idle object evictor (if any -
-     * see {@link #setTimeBetweenEvictionRuns(Duration)}),
+     * see {@link #setDurationBetweenEvictionRuns(Duration)}),
      * with the extra condition that at least {@code minIdle} object
      * instances remain in the pool. This setting is overridden by
      * {@link #getMinEvictableIdleTime} (that is, if
@@ -956,7 +1027,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      * @return minimum amount of time an object may sit idle in the pool before
      *         it is eligible for eviction if minIdle instances are available
      *
-     * @see #setSoftMinEvictableIdle(Duration)
+     * @see #setSoftMinEvictableIdleDuration(Duration)
      * @since 2.11.0
      */
     public final Duration getSoftMinEvictableIdleDuration() {
@@ -966,7 +1037,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     /**
      * Gets the minimum amount of time an object may sit idle in the pool
      * before it is eligible for eviction by the idle object evictor (if any -
-     * see {@link #setTimeBetweenEvictionRuns(Duration)}),
+     * see {@link #setDurationBetweenEvictionRuns(Duration)}),
      * with the extra condition that at least {@code minIdle} object
      * instances remain in the pool. This setting is overridden by
      * {@link #getMinEvictableIdleTime} (that is, if
@@ -976,7 +1047,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      * @return minimum amount of time an object may sit idle in the pool before
      *         it is eligible for eviction if minIdle instances are available
      *
-     * @see #setSoftMinEvictableIdle(Duration)
+     * @see #setSoftMinEvictableIdleDuration(Duration)
      * @since 2.10.0
      * @deprecated Use {@link #getSoftMinEvictableIdleDuration}.
      */
@@ -1035,10 +1106,10 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
                         "maxTotal=%s, maxWaitDuration=%s, minEvictableIdleDuration=%s, numTestsPerEvictionRun=%s, returnedCount=%s, " +
                         "softMinEvictableIdleDuration=%s, testOnBorrow=%s, testOnCreate=%s, testOnReturn=%s, testWhileIdle=%s, " +
                         "durationBetweenEvictionRuns=%s, waitTimes=%s",
-                activeTimes.getCurrentValues(), blockWhenExhausted, borrowedCount.get(), closed, createdCount.get(), destroyedByBorrowValidationCount.get(),
-                destroyedByEvictorCount.get(), evictorShutdownTimeoutDuration, fairness, idleTimes.getCurrentValues(), lifo, maxBorrowWaitDuration.get(),
+                activeTimes.getValues(), blockWhenExhausted, borrowedCount.get(), closed, createdCount.get(), destroyedByBorrowValidationCount.get(),
+                destroyedByEvictorCount.get(), evictorShutdownTimeoutDuration, fairness, idleTimes.getValues(), lifo, maxBorrowWaitDuration.get(),
                 maxTotal, maxWaitDuration, minEvictableIdleDuration, numTestsPerEvictionRun, returnedCount, softMinEvictableIdleDuration, testOnBorrow,
-                testOnCreate, testOnReturn, testWhileIdle, durationBetweenEvictionRuns, waitTimes.getCurrentValues());
+                testOnCreate, testOnReturn, testWhileIdle, durationBetweenEvictionRuns, waitTimes.getValues());
     }
 
     /**
@@ -1105,7 +1176,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     /**
      * Gets whether objects sitting idle in the pool will be validated by the
      * idle object evictor (if any - see
-     * {@link #setTimeBetweenEvictionRuns(Duration)}). Validation is performed
+     * {@link #setDurationBetweenEvictionRuns(Duration)}). Validation is performed
      * by the {@code validateObject()} method of the factory associated
      * with the pool. If the object fails to validate, it will be removed from
      * the pool and destroyed.
@@ -1150,10 +1221,8 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
         return durationBetweenEvictionRuns.toMillis();
     }
 
-    // Monitoring (primarily JMX) related methods
-
     /**
-     * Gets whether or not abandoned object removal is configured for this pool.
+     * Tests whether or not abandoned object removal is configured for this pool.
      *
      * @return true if this pool is configured to detect and remove
      * abandoned objects
@@ -1164,7 +1233,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * Has this pool instance been closed.
+     * Tests whether this pool instance been closed.
      * @return {@code true} when this pool has been closed.
      */
     public final boolean isClosed() {
@@ -1204,9 +1273,14 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
                 } else {
                     objName = new ObjectName(base + jmxNamePrefix + i);
                 }
-                mbs.registerMBean(this, objName);
-                newObjectName = objName;
-                registered = true;
+                if (!mbs.isRegistered(objName)) {
+                    mbs.registerMBean(this, objName);
+                    newObjectName = objName;
+                    registered = true;
+                } else {
+                    // Increment the index and try again
+                    i++;
+                }
             } catch (final MalformedObjectNameException e) {
                 if (BaseObjectPoolConfig.DEFAULT_JMX_NAME_PREFIX.equals(
                         jmxNamePrefix) && jmxNameBase.equals(base)) {
@@ -1283,7 +1357,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * Initializes the receiver with the given configuration.
+     * Sets the receiver with the given configuration.
      *
      * @param config Initialization source.
      */
@@ -1296,9 +1370,9 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
         setTestOnReturn(config.getTestOnReturn());
         setTestWhileIdle(config.getTestWhileIdle());
         setNumTestsPerEvictionRun(config.getNumTestsPerEvictionRun());
-        setMinEvictableIdle(config.getMinEvictableIdleDuration());
-        setTimeBetweenEvictionRuns(config.getDurationBetweenEvictionRuns());
-        setSoftMinEvictableIdle(config.getSoftMinEvictableIdleDuration());
+        setMinEvictableIdleDuration(config.getMinEvictableIdleDuration());
+        setDurationBetweenEvictionRuns(config.getDurationBetweenEvictionRuns());
+        setSoftMinEvictableIdleDuration(config.getSoftMinEvictableIdleDuration());
         final EvictionPolicy<T> policy = config.getEvictionPolicy();
         if (policy == null) {
             // Use the class name (pre-2.6.0 compatible)
@@ -1308,6 +1382,24 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
             setEvictionPolicy(policy);
         }
         setEvictorShutdownTimeout(config.getEvictorShutdownTimeoutDuration());
+    }
+
+    /**
+     * Sets the number of milliseconds to sleep between runs of the idle object evictor thread.
+     * <ul>
+     * <li>When positive, the idle object evictor thread starts.</li>
+     * <li>When null or non-positive, no idle object evictor thread runs.</li>
+     * </ul>
+     *
+     * @param timeBetweenEvictionRuns
+     *            duration to sleep between evictor runs
+     *
+     * @see #getDurationBetweenEvictionRuns()
+     * @since 2.12.0
+     */
+    public final void setDurationBetweenEvictionRuns(final Duration timeBetweenEvictionRuns) {
+        this.durationBetweenEvictionRuns = PoolImplUtils.nonNull(timeBetweenEvictionRuns, BaseObjectPoolConfig.DEFAULT_DURATION_BETWEEN_EVICTION_RUNS);
+        startEvictor(this.durationBetweenEvictionRuns);
     }
 
     /**
@@ -1326,6 +1418,20 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      *
      * @param className Eviction policy class name.
      * @param classLoader Load the class from this class loader.
+     * @throws LinkageError if the linkage fails
+     * @throws ExceptionInInitializerError if the initialization provoked by this method fails
+     * @throws ClassNotFoundException if the class cannot be located by the specified class loader
+     * @throws IllegalAccessException if this {@code Constructor} object is enforcing Java language access control and the underlying constructor is
+     *         inaccessible.
+     * @throws IllegalArgumentException if the number of actual and formal parameters differ; if an unwrapping conversion for primitive arguments fails; or if,
+     *         after possible unwrapping, a parameter value cannot be converted to the corresponding formal parameter type by a method invocation conversion; if
+     *         this constructor pertains to an enum type.
+     * @throws InstantiationException if the class that declares the underlying constructor represents an abstract class.
+     * @throws InvocationTargetException if the underlying constructor throws an exception.
+     * @throws ExceptionInInitializerError if the initialization provoked by this method fails.
+     * @throws NoSuchMethodException if a matching method is not found.
+     * @throws SecurityException If a security manage is present and the caller's class loader is not the same as or an ancestor of the class loader for the
+     *         current class and invocation of {@link SecurityManager#checkPackageAccess s.checkPackageAccess()} denies access to the package of this class.
      */
     @SuppressWarnings("unchecked")
     private void setEvictionPolicy(final String className, final ClassLoader classLoader)
@@ -1388,7 +1494,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
 
     /**
      * Sets the timeout that will be used when waiting for the Evictor to shutdown if this pool is closed and it is the
-     * only pool still using the the value for the Evictor.
+     * only pool still using the value for the Evictor.
      *
      * @param evictorShutdownTimeout the timeout in milliseconds that will be used while waiting for the Evictor
      *                                     to shut down.
@@ -1400,7 +1506,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
 
     /**
      * Sets the timeout that will be used when waiting for the Evictor to shutdown if this pool is closed and it is the
-     * only pool still using the the value for the Evictor.
+     * only pool still using the value for the Evictor.
      *
      * @param evictorShutdownTimeoutMillis the timeout in milliseconds that will be used while waiting for the Evictor
      *                                     to shut down.
@@ -1498,7 +1604,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     /**
      * Sets the minimum amount of time an object may sit idle in the pool
      * before it is eligible for eviction by the idle object evictor (if any -
-     * see {@link #setTimeBetweenEvictionRuns(Duration)}). When non-positive,
+     * see {@link #setDurationBetweenEvictionRuns(Duration)}). When non-positive,
      * no objects will be evicted from the pool due to idle time alone.
      *
      * @param minEvictableIdleTime
@@ -1508,7 +1614,9 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      * @see #getMinEvictableIdleTime
      * @see #setTimeBetweenEvictionRuns
      * @since 2.11.0
+     * @deprecated Use {@link #setMinEvictableIdleDuration(Duration)}.
      */
+    @Deprecated
     public final void setMinEvictableIdle(final Duration minEvictableIdleTime) {
         this.minEvictableIdleDuration = PoolImplUtils.nonNull(minEvictableIdleTime, BaseObjectPoolConfig.DEFAULT_MIN_EVICTABLE_IDLE_DURATION);
     }
@@ -1516,7 +1624,25 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     /**
      * Sets the minimum amount of time an object may sit idle in the pool
      * before it is eligible for eviction by the idle object evictor (if any -
-     * see {@link #setTimeBetweenEvictionRuns(Duration)}). When non-positive,
+     * see {@link #setDurationBetweenEvictionRuns(Duration)}). When non-positive,
+     * no objects will be evicted from the pool due to idle time alone.
+     *
+     * @param minEvictableIdleTime
+     *            minimum amount of time an object may sit idle in the pool
+     *            before it is eligible for eviction
+     *
+     * @see #getMinEvictableIdleTime
+     * @see #setTimeBetweenEvictionRuns
+     * @since 2.12.0
+     */
+    public final void setMinEvictableIdleDuration(final Duration minEvictableIdleTime) {
+        this.minEvictableIdleDuration = PoolImplUtils.nonNull(minEvictableIdleTime, BaseObjectPoolConfig.DEFAULT_MIN_EVICTABLE_IDLE_DURATION);
+    }
+
+    /**
+     * Sets the minimum amount of time an object may sit idle in the pool
+     * before it is eligible for eviction by the idle object evictor (if any -
+     * see {@link #setDurationBetweenEvictionRuns(Duration)}). When non-positive,
      * no objects will be evicted from the pool due to idle time alone.
      *
      * @param minEvictableIdleTime
@@ -1526,7 +1652,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      * @see #getMinEvictableIdleTime
      * @see #setTimeBetweenEvictionRuns
      * @since 2.10.0
-     * @deprecated Use {@link #setMinEvictableIdle(Duration)}.
+     * @deprecated Use {@link #setMinEvictableIdleDuration(Duration)}.
      */
     @Deprecated
     public final void setMinEvictableIdleTime(final Duration minEvictableIdleTime) {
@@ -1575,7 +1701,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     /**
      * Sets the minimum amount of time an object may sit idle in the pool
      * before it is eligible for eviction by the idle object evictor (if any -
-     * see {@link #setTimeBetweenEvictionRuns(Duration)}),
+     * see {@link #setDurationBetweenEvictionRuns(Duration)}),
      * with the extra condition that at least {@code minIdle} object
      * instances remain in the pool. This setting is overridden by
      * {@link #getMinEvictableIdleTime} (that is, if
@@ -1589,7 +1715,9 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      *
      * @see #getSoftMinEvictableIdleTimeMillis
      * @since 2.11.0
+     * @deprecated Use {@link #setSoftMinEvictableIdleDuration(Duration)}.
      */
+    @Deprecated
     public final void setSoftMinEvictableIdle(final Duration softMinEvictableIdleTime) {
         this.softMinEvictableIdleDuration = PoolImplUtils.nonNull(softMinEvictableIdleTime, BaseObjectPoolConfig.DEFAULT_SOFT_MIN_EVICTABLE_IDLE_DURATION);
     }
@@ -1597,7 +1725,29 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     /**
      * Sets the minimum amount of time an object may sit idle in the pool
      * before it is eligible for eviction by the idle object evictor (if any -
-     * see {@link #setTimeBetweenEvictionRuns(Duration)}),
+     * see {@link #setDurationBetweenEvictionRuns(Duration)}),
+     * with the extra condition that at least {@code minIdle} object
+     * instances remain in the pool. This setting is overridden by
+     * {@link #getMinEvictableIdleTime} (that is, if
+     * {@link #getMinEvictableIdleTime} is positive, then
+     * {@link #getSoftMinEvictableIdleTime} is ignored).
+     *
+     * @param softMinEvictableIdleTime
+     *            minimum amount of time an object may sit idle in the pool
+     *            before it is eligible for eviction if minIdle instances are
+     *            available
+     *
+     * @see #getSoftMinEvictableIdleTimeMillis
+     * @since 2.12.0
+     */
+    public final void setSoftMinEvictableIdleDuration(final Duration softMinEvictableIdleTime) {
+        this.softMinEvictableIdleDuration = PoolImplUtils.nonNull(softMinEvictableIdleTime, BaseObjectPoolConfig.DEFAULT_SOFT_MIN_EVICTABLE_IDLE_DURATION);
+    }
+
+    /**
+     * Sets the minimum amount of time an object may sit idle in the pool
+     * before it is eligible for eviction by the idle object evictor (if any -
+     * see {@link #setDurationBetweenEvictionRuns(Duration)}),
      * with the extra condition that at least {@code minIdle} object
      * instances remain in the pool. This setting is overridden by
      * {@link #getMinEvictableIdleTime} (that is, if
@@ -1611,7 +1761,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      *
      * @see #getSoftMinEvictableIdleTimeMillis
      * @since 2.10.0
-     * @deprecated Use {@link #setSoftMinEvictableIdle(Duration)}.
+     * @deprecated Use {@link #setSoftMinEvictableIdleDuration(Duration)}.
      */
     @Deprecated
     public final void setSoftMinEvictableIdleTime(final Duration softMinEvictableIdleTime) {
@@ -1634,7 +1784,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      *            available
      *
      * @see #getSoftMinEvictableIdleTimeMillis
-     * @deprecated Use {@link #setSoftMinEvictableIdle(Duration)}.
+     * @deprecated Use {@link #setSoftMinEvictableIdleDuration(Duration)}.
      */
     @Deprecated
     public final void setSoftMinEvictableIdleTimeMillis(final long softMinEvictableIdleTimeMillis) {
@@ -1642,7 +1792,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * The listener used (if any) to receive notifications of exceptions
+     * Sets the listener used (if any) to receive notifications of exceptions
      * unavoidably swallowed by the pool.
      *
      * @param swallowedExceptionListener    The listener or {@code null}
@@ -1710,7 +1860,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     /**
      * Sets whether objects sitting idle in the pool will be validated by the
      * idle object evictor (if any - see
-     * {@link #setTimeBetweenEvictionRuns(Duration)}). Validation is performed
+     * {@link #setDurationBetweenEvictionRuns(Duration)}). Validation is performed
      * by the {@code validateObject()} method of the factory associated
      * with the pool. If the object fails to validate, it will be removed from
      * the pool and destroyed.  Note that setting this property has no effect
@@ -1739,9 +1889,11 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      *
      * @see #getDurationBetweenEvictionRuns()
      * @since 2.10.0
+     * @deprecated Use {@link #setDurationBetweenEvictionRuns(Duration)}.
      */
+    @Deprecated
     public final void setTimeBetweenEvictionRuns(final Duration timeBetweenEvictionRuns) {
-        this.durationBetweenEvictionRuns = PoolImplUtils.nonNull(timeBetweenEvictionRuns, BaseObjectPoolConfig.DEFAULT_TIME_BETWEEN_EVICTION_RUNS);
+        this.durationBetweenEvictionRuns = PoolImplUtils.nonNull(timeBetweenEvictionRuns, BaseObjectPoolConfig.DEFAULT_DURATION_BETWEEN_EVICTION_RUNS);
         startEvictor(this.durationBetweenEvictionRuns);
     }
 
@@ -1756,7 +1908,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      *            number of milliseconds to sleep between evictor runs
      *
      * @see #getDurationBetweenEvictionRuns()
-     * @deprecated Use {@link #setTimeBetweenEvictionRuns(Duration)}.
+     * @deprecated Use {@link #setDurationBetweenEvictionRuns(Duration)}.
      */
     @Deprecated
     public final void setTimeBetweenEvictionRunsMillis(final long timeBetweenEvictionRunsMillis) {
@@ -1819,7 +1971,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
             listener.onSwallowException(swallowException);
         } catch (final VirtualMachineError e) {
             throw e;
-        } catch (final Throwable t) {
+        } catch (final Throwable ignored) {
             // Ignore. Enjoy the irony.
         }
     }
@@ -1909,9 +2061,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
         Duration currentMaxDuration;
         do {
             currentMaxDuration = maxBorrowWaitDuration.get();
-//            if (currentMaxDuration >= waitDuration) {
-//                break;
-//            }
             if (currentMaxDuration.compareTo(waitDuration) >= 0) {
                 break;
             }

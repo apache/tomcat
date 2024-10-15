@@ -36,16 +36,14 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Startup event listener for a <b>Host</b> that configures Contexts (web
- * applications) for all defined "users" who have a web application in a
- * directory with the specified name in their home directories.  The context
- * path of each deployed application will be set to <code>~xxxxx</code>, where
- * xxxxx is the username of the owning user for that web application
+ * Startup event listener for a <b>Host</b> that configures Contexts (web applications) for all defined "users" who have
+ * a web application in a directory with the specified name in their home directories. The context path of each deployed
+ * application will be set to <code>~xxxxx</code>, where xxxxx is the username of the owning user for that web
+ * application
  *
  * @author Craig R. McClanahan
  */
-public final class UserConfig
-    implements LifecycleListener {
+public final class UserConfig implements LifecycleListener {
 
 
     private static final Log log = LogFactory.getLog(UserConfig.class);
@@ -87,15 +85,13 @@ public final class UserConfig
     /**
      * The string resources for this package.
      */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
     /**
      * The Java class name of the user database class we should use.
      */
-    private String userClass =
-        "org.apache.catalina.startup.PasswdUserDatabase";
+    private String userClass = "org.apache.catalina.startup.PasswdUserDatabase";
 
     /**
      * A regular expression defining user who deployment is allowed.
@@ -192,6 +188,7 @@ public final class UserConfig
 
     /**
      * Set the user database class name for this component.
+     *
      * @param userClass The user database class name
      */
     public void setUserClass(String userClass) {
@@ -251,7 +248,7 @@ public final class UserConfig
 
 
     /**
-     * Process the START event for an associated Host.
+     * Process the START and STOP events for an associated Host.
      *
      * @param event The lifecycle event that has occurred
      */
@@ -280,13 +277,13 @@ public final class UserConfig
 
 
     /**
-     * Deploy a web application for any user who has a web application present
-     * in a directory with a specified name within their home directory.
+     * Deploy a web application for any user who has a web application present in a directory with a specified name
+     * within their home directory.
      */
     private void deploy() {
 
-        if (host.getLogger().isDebugEnabled()) {
-            host.getLogger().debug(sm.getString("userConfig.deploying"));
+        if (host.getLogger().isTraceEnabled()) {
+            host.getLogger().trace(sm.getString("userConfig.deploying"));
         }
 
         // Load the user database object for this host
@@ -325,8 +322,8 @@ public final class UserConfig
 
 
     /**
-     * Deploy a web application for the specified user if they have such an
-     * application in the defined directory within their home directory.
+     * Deploy a web application for the specified user if they have such an application in the defined directory within
+     * their home directory.
      *
      * @param user Username owning the application to be deployed
      * @param home Home directory of this user
@@ -390,8 +387,7 @@ public final class UserConfig
     /**
      * Test allow and deny rules for the provided user.
      *
-     * @return <code>true</code> if this user is allowed to deploy,
-     *         <code>false</code> otherwise
+     * @return <code>true</code> if this user is allowed to deploy, <code>false</code> otherwise
      */
     private boolean isDeployAllowed(String user) {
         if (deny != null && deny.matcher(user).matches()) {
@@ -413,10 +409,10 @@ public final class UserConfig
         private String user;
         private String home;
 
-        public DeployUserDirectory(UserConfig config, String user, String home) {
+        DeployUserDirectory(UserConfig config, String user, String home) {
             this.config = config;
             this.user = user;
-            this.home= home;
+            this.home = home;
         }
 
         @Override

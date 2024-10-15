@@ -118,9 +118,9 @@ public class Stockticker implements Runnable {
         }
 
 
-    public static interface TickListener {
-        public void tick(Stock stock);
-        public void shutdown();
+    public interface TickListener {
+        void tick(Stock stock);
+        void shutdown();
     }
 
     public static final class Stock implements Cloneable {

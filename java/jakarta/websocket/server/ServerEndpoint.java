@@ -30,8 +30,8 @@ public @interface ServerEndpoint {
 
     /**
      * URI or URI-template that the annotated class should be mapped to.
-     * @return The URI or URI-template that the annotated class should be mapped
-     *         to.
+     *
+     * @return The URI or URI-template that the annotated class should be mapped to.
      */
     String value();
 
@@ -41,6 +41,5 @@ public @interface ServerEndpoint {
 
     Class<? extends Encoder>[] encoders() default {};
 
-    public Class<? extends ServerEndpointConfig.Configurator> configurator()
-            default ServerEndpointConfig.Configurator.class;
+    Class<? extends ServerEndpointConfig.Configurator> configurator() default ServerEndpointConfig.Configurator.class;
 }

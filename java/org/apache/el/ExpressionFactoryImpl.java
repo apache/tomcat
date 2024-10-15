@@ -25,6 +25,7 @@ import jakarta.el.ValueExpression;
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.ExpressionBuilder;
 import org.apache.el.stream.StreamELResolverImpl;
+import org.apache.el.util.ExceptionUtils;
 import org.apache.el.util.MessageFactory;
 
 
@@ -33,8 +34,12 @@ import org.apache.el.util.MessageFactory;
  *
  * @author Jacob Hookom [jacob@hookom.net]
  */
-@aQute.bnd.annotation.spi.ServiceProvider(value=ExpressionFactory.class)
+@aQute.bnd.annotation.spi.ServiceProvider(value = ExpressionFactory.class)
 public class ExpressionFactoryImpl extends ExpressionFactory {
+
+    static {
+        ExceptionUtils.preload();
+    }
 
     @Override
     public <T> T coerceToType(Object obj, Class<T> type) {
@@ -42,31 +47,25 @@ public class ExpressionFactoryImpl extends ExpressionFactory {
     }
 
     @Override
-    public MethodExpression createMethodExpression(ELContext context,
-            String expression, Class<?> expectedReturnType,
+    public MethodExpression createMethodExpression(ELContext context, String expression, Class<?> expectedReturnType,
             Class<?>[] expectedParamTypes) {
         ExpressionBuilder builder = new ExpressionBuilder(expression, context);
-        return builder.createMethodExpression(expectedReturnType,
-                expectedParamTypes);
+        return builder.createMethodExpression(expectedReturnType, expectedParamTypes);
     }
 
     @Override
-    public ValueExpression createValueExpression(ELContext context,
-            String expression, Class<?> expectedType) {
+    public ValueExpression createValueExpression(ELContext context, String expression, Class<?> expectedType) {
         if (expectedType == null) {
-            throw new NullPointerException(MessageFactory
-                    .get("error.value.expectedType"));
+            throw new NullPointerException(MessageFactory.get("error.value.expectedType"));
         }
         ExpressionBuilder builder = new ExpressionBuilder(expression, context);
         return builder.createValueExpression(expectedType);
     }
 
     @Override
-    public ValueExpression createValueExpression(Object instance,
-            Class<?> expectedType) {
+    public ValueExpression createValueExpression(Object instance, Class<?> expectedType) {
         if (expectedType == null) {
-            throw new NullPointerException(MessageFactory
-                    .get("error.value.expectedType"));
+            throw new NullPointerException(MessageFactory.get("error.value.expectedType"));
         }
         return new ValueExpressionLiteral(instance, expectedType);
     }

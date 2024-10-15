@@ -33,10 +33,6 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-
-/**
- * @version 1.0
- */
 public class GzipInterceptor extends ChannelInterceptorBase implements GzipInterceptorMBean {
 
     private static final Log log = LogFactory.getLog(GzipInterceptor.class);
@@ -85,20 +81,20 @@ public class GzipInterceptor extends ChannelInterceptorBase implements GzipInter
                     countCompressedTX.incrementAndGet();
                     compressedSizeTX.addAndGet(data.length);
                 }
-            } else if (statsEnabled){
+            } else if (statsEnabled) {
                 countUncompressedTX.incrementAndGet();
                 uncompressedSizeTX.addAndGet(data.length);
             }
 
             msg.getMessage().trim(msg.getMessage().getLength());
-            msg.getMessage().append(data,0,data.length);
+            msg.getMessage().append(data, 0, data.length);
             super.sendMessage(destination, msg, payload);
 
             int currentCount = count.incrementAndGet();
             if (statsEnabled && interval > 0 && currentCount % interval == 0) {
                 report();
             }
-        } catch ( IOException x ) {
+        } catch (IOException x) {
             log.error(sm.getString("gzipInterceptor.compress.failed"));
             throw new ChannelException(x);
         }
@@ -126,15 +122,15 @@ public class GzipInterceptor extends ChannelInterceptorBase implements GzipInter
             }
 
             msg.getMessage().trim(msg.getMessage().getLength());
-            msg.getMessage().append(data,0,data.length);
+            msg.getMessage().append(data, 0, data.length);
             super.messageReceived(msg);
 
             int currentCount = count.incrementAndGet();
             if (statsEnabled && interval > 0 && currentCount % interval == 0) {
                 report();
             }
-        } catch ( IOException x ) {
-            log.error(sm.getString("gzipInterceptor.decompress.failed"),x);
+        } catch (IOException x) {
+            log.error(sm.getString("gzipInterceptor.decompress.failed"), x);
         }
     }
 
@@ -150,13 +146,14 @@ public class GzipInterceptor extends ChannelInterceptorBase implements GzipInter
 
 
     /**
-     * @param data  Data to decompress
-     * @return      Decompressed data
+     * @param data Data to decompress
+     *
+     * @return Decompressed data
+     *
      * @throws IOException Compression error
      */
     public static byte[] decompress(byte[] data) throws IOException {
-        ByteArrayOutputStream bout =
-            new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
+        ByteArrayOutputStream bout = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
         ByteArrayInputStream bin = new ByteArrayInputStream(data);
         GZIPInputStream gin = new GZIPInputStream(bin);
         byte[] tmp = new byte[DEFAULT_BUFFER_SIZE];
@@ -174,10 +171,8 @@ public class GzipInterceptor extends ChannelInterceptorBase implements GzipInter
         log.info(sm.getString("gzipInterceptor.report", Integer.valueOf(getCount()),
                 Integer.valueOf(getCountCompressedTX()), Integer.valueOf(getCountUncompressedTX()),
                 Integer.valueOf(getCountCompressedRX()), Integer.valueOf(getCountUncompressedRX()),
-                Long.valueOf(getSizeTX()), Long.valueOf(getCompressedSizeTX()),
-                Long.valueOf(getUncompressedSizeTX()),
-                Long.valueOf(getSizeRX()), Long.valueOf(getCompressedSizeRX()),
-                Long.valueOf(getUncompressedSizeRX())));
+                Long.valueOf(getSizeTX()), Long.valueOf(getCompressedSizeTX()), Long.valueOf(getUncompressedSizeTX()),
+                Long.valueOf(getSizeRX()), Long.valueOf(getCompressedSizeRX()), Long.valueOf(getUncompressedSizeRX())));
     }
 
 

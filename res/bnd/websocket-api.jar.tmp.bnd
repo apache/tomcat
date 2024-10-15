@@ -19,10 +19,12 @@ Bundle-Name: tomcat-websocket-api
 Bundle-SymbolicName: org.apache.tomcat-websocket-api
 Export-Package: \
     jakarta.websocket.server.*;version=${websocket.spec.version}
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 Provide-Capability: \
     osgi.contract;\
-        osgi.contract=JavaWebSockets;\
+        osgi.contract=JakartaWebSocket;\
         version:Version=${websocket.spec.version};\
         uses:='${packages;NAMED;jakarta.websocket.*}'
 
@@ -35,7 +37,7 @@ Require-Capability: \
     osgi.ee;\
         filter:="(&(osgi.ee=JavaSE)(version=1.8))"
 
--namesection: jakarta/websocket*/;\
+-namesection: jakarta/websocket/server*/;\
     Specification-Title=Jakarta WebSocket;\
     Specification-Version=${websocket.spec.version}${websocket.revision};\
     Specification-Vendor=Eclipse Foundation;\

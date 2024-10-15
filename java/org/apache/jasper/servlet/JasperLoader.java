@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.CodeSource;
-import java.security.PermissionCollection;
 
 /**
  * Class loader for loading servlet class files (corresponding to JSP files)
@@ -32,15 +30,10 @@ import java.security.PermissionCollection;
  */
 public class JasperLoader extends URLClassLoader {
 
-    private final PermissionCollection permissionCollection;
-    private final SecurityManager securityManager;
     private final String packageName;
 
-    public JasperLoader(URL[] urls, ClassLoader parent,
-            String packageName, PermissionCollection permissionCollection) {
+    public JasperLoader(URL[] urls, ClassLoader parent, String packageName) {
         super(urls, parent);
-        this.permissionCollection = permissionCollection;
-        this.securityManager = System.getSecurityManager();
         this.packageName = packageName;
     }
 
@@ -98,24 +91,6 @@ public class JasperLoader extends URLClassLoader {
             return clazz;
         }
 
-        // (.5) Permission to access this class when using a SecurityManager
-        if (securityManager != null) {
-            int dot = name.lastIndexOf('.');
-            if (dot >= 0) {
-                try {
-                    // Do not call the security manager since by default, we grant that package.
-                    if (!"org.apache.jasper.runtime".equalsIgnoreCase(name.substring(0,dot))){
-                        securityManager.checkPackageAccess(name.substring(0,dot));
-                    }
-                } catch (SecurityException se) {
-                    String error = "Security Violation, attempt to use " +
-                        "Restricted Class: " + name;
-                    se.printStackTrace();
-                    throw new ClassNotFoundException(error);
-                }
-            }
-        }
-
         if( !name.startsWith(packageName + '.') ) {
             // Class is not in org.apache.jsp, therefore, have our
             // parent load it
@@ -133,7 +108,7 @@ public class JasperLoader extends URLClassLoader {
     /**
      * Delegate to parent
      *
-     * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)
+     * @see java.lang.ClassLoader#getResourceAsStream(String)
      */
     @Override
     public InputStream getResourceAsStream(String name) {
@@ -149,21 +124,5 @@ public class JasperLoader extends URLClassLoader {
             }
         }
         return is;
-    }
-
-
-    /**
-     * Get the Permissions for a CodeSource.
-     *
-     * Since this ClassLoader is only used for a JSP page in
-     * a web application context, we just return our preset
-     * PermissionCollection for the web app context.
-     *
-     * @param codeSource Code source where the code was loaded from
-     * @return PermissionCollection for CodeSource
-     */
-    @Override
-    public final PermissionCollection getPermissions(CodeSource codeSource) {
-        return permissionCollection;
     }
 }

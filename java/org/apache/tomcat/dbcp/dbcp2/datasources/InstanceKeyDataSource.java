@@ -34,36 +34,37 @@ import javax.sql.ConnectionPoolDataSource;
 import javax.sql.DataSource;
 import javax.sql.PooledConnection;
 
+import org.apache.tomcat.dbcp.dbcp2.Utils;
 import org.apache.tomcat.dbcp.pool2.impl.BaseObjectPoolConfig;
 import org.apache.tomcat.dbcp.pool2.impl.GenericKeyedObjectPoolConfig;
 import org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool;
 
 /**
  * <p>
- * The base class for <code>SharedPoolDataSource</code> and <code>PerUserPoolDataSource</code>. Many of the
+ * The base class for {@code SharedPoolDataSource} and {@code PerUserPoolDataSource}. Many of the
  * configuration properties are shared and defined here. This class is declared public in order to allow particular
  * usage with commons-beanutils; do not make direct use of it outside of <em>commons-dbcp2</em>.
  * </p>
  *
  * <p>
- * A J2EE container will normally provide some method of initializing the <code>DataSource</code> whose attributes are
+ * A J2EE container will normally provide some method of initializing the {@code DataSource} whose attributes are
  * presented as bean getters/setters and then deploying it via JNDI. It is then available to an application as a source
  * of pooled logical connections to the database. The pool needs a source of physical connections. This source is in the
- * form of a <code>ConnectionPoolDataSource</code> that can be specified via the {@link #setDataSourceName(String)} used
+ * form of a {@code ConnectionPoolDataSource} that can be specified via the {@link #setDataSourceName(String)} used
  * to lookup the source via JNDI.
  * </p>
  *
  * <p>
  * Although normally used within a JNDI environment, A DataSource can be instantiated and initialized as any bean. In
- * this case the <code>ConnectionPoolDataSource</code> will likely be instantiated in a similar manner. This class
+ * this case the {@code ConnectionPoolDataSource} will likely be instantiated in a similar manner. This class
  * allows the physical source of connections to be attached directly to this pool using the
  * {@link #setConnectionPoolDataSource(ConnectionPoolDataSource)} method.
  * </p>
  *
  * <p>
  * The dbcp package contains an adapter, {@link org.apache.tomcat.dbcp.dbcp2.cpdsadapter.DriverAdapterCPDS}, that can be
- * used to allow the use of <code>DataSource</code>'s based on this class with JDBC driver implementations that do not
- * supply a <code>ConnectionPoolDataSource</code>, but still provide a {@link java.sql.Driver} implementation.
+ * used to allow the use of {@code DataSource}'s based on this class with JDBC driver implementations that do not
+ * supply a {@code ConnectionPoolDataSource}, but still provide a {@link java.sql.Driver} implementation.
  * </p>
  *
  * <p>
@@ -125,7 +126,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     private boolean defaultTestOnBorrow = BaseObjectPoolConfig.DEFAULT_TEST_ON_BORROW;
     private boolean defaultTestOnReturn = BaseObjectPoolConfig.DEFAULT_TEST_ON_RETURN;
     private boolean defaultTestWhileIdle = BaseObjectPoolConfig.DEFAULT_TEST_WHILE_IDLE;
-    private Duration defaultDurationBetweenEvictionRuns = BaseObjectPoolConfig.DEFAULT_TIME_BETWEEN_EVICTION_RUNS;
+    private Duration defaultDurationBetweenEvictionRuns = BaseObjectPoolConfig.DEFAULT_DURATION_BETWEEN_EVICTION_RUNS;
 
     // Connection factory properties
     private String validationQuery;
@@ -159,7 +160,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
      * Closes the connection pool being maintained by this datasource.
      */
     @Override
-    public abstract void close() throws Exception;
+    public abstract void close() throws SQLException;
 
     private void closeDueToException(final PooledConnectionAndInfo info) {
         if (info != null) {
@@ -185,13 +186,13 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     /**
      * Attempts to retrieve a database connection using {@link #getPooledConnectionAndInfo(String, String)} with the
      * provided user name and password. The password on the {@code PooledConnectionAndInfo} instance returned by
-     * <code>getPooledConnectionAndInfo</code> is compared to the <code>password</code> parameter. If the comparison
+     * {@code getPooledConnectionAndInfo} is compared to the {@code password} parameter. If the comparison
      * fails, a database connection using the supplied user name and password is attempted. If the connection attempt
      * fails, an SQLException is thrown, indicating that the given password did not match the password used to create
      * the pooled connection. If the connection attempt succeeds, this means that the database password has been
-     * changed. In this case, the <code>PooledConnectionAndInfo</code> instance retrieved with the old password is
-     * destroyed and the <code>getPooledConnectionAndInfo</code> is repeatedly invoked until a
-     * <code>PooledConnectionAndInfo</code> instance with the new password is returned.
+     * changed. In this case, the {@code PooledConnectionAndInfo} instance retrieved with the old password is
+     * destroyed and the {@code getPooledConnectionAndInfo} is repeatedly invoked until a
+     * {@code PooledConnectionAndInfo} instance with the new password is returned.
      */
     @Override
     public Connection getConnection(final String userName, final String userPassword) throws SQLException {
@@ -263,11 +264,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
             connection.clearWarnings();
             return connection;
         } catch (final SQLException ex) {
-            try {
-                connection.close();
-            } catch (final Exception exc) {
-                getLogWriter().println("ignoring exception during close: " + exc);
-            }
+            Utils.close(connection, e -> getLogWriter().println("ignoring exception during close: " + e));
             throw ex;
         }
     }
@@ -668,7 +665,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
 
     /**
      * Gets the value of defaultAutoCommit, which defines the state of connections handed out from this pool. The value
-     * can be changed on the Connection using Connection.setAutoCommit(boolean). The default is <code>null</code> which
+     * can be changed on the Connection using Connection.setAutoCommit(boolean). The default is {@code null} which
      * will use the default value for the drive.
      *
      * @return value of defaultAutoCommit.
@@ -679,7 +676,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
 
     /**
      * Gets the value of defaultReadOnly, which defines the state of connections handed out from this pool. The value
-     * can be changed on the Connection using Connection.setReadOnly(boolean). The default is <code>null</code> which
+     * can be changed on the Connection using Connection.setReadOnly(boolean). The default is {@code null} which
      * will use the default value for the drive.
      *
      * @return value of defaultReadOnly.
@@ -744,7 +741,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
 
     /**
      * Sets the value of defaultAutoCommit, which defines the state of connections handed out from this pool. The value
-     * can be changed on the Connection using Connection.setAutoCommit(boolean). The default is <code>null</code> which
+     * can be changed on the Connection using Connection.setAutoCommit(boolean). The default is {@code null} which
      * will use the default value for the drive.
      *
      * @param defaultAutoCommit
@@ -904,7 +901,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
 
     /**
      * Sets the value of defaultReadOnly, which defines the state of connections handed out from this pool. The value
-     * can be changed on the Connection using Connection.setReadOnly(boolean). The default is <code>null</code> which
+     * can be changed on the Connection using Connection.setReadOnly(boolean). The default is {@code null} which
      * will use the default value for the drive.
      *
      * @param defaultReadOnly
@@ -1236,7 +1233,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (final SQLException e) {
+                } catch (final SQLException ignored) {
                     // at least we could connect
                 }
             }
@@ -1327,5 +1324,4 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
         }
         throw new SQLException(this + " is not a wrapper for " + iface);
     }
-    /* JDBC_4_ANT_KEY_END */
 }

@@ -30,43 +30,35 @@ import org.apache.catalina.connector.Response;
 import org.apache.juli.logging.Log;
 
 /**
- * Implementation of a Valve that performs filtering based on comparing the
- * appropriate request property (selected based on which subclass you choose
- * to configure into your Container's pipeline) against the regular expressions
- * configured for this Valve.
+ * Implementation of a Valve that performs filtering based on comparing the appropriate request property (selected based
+ * on which subclass you choose to configure into your Container's pipeline) against the regular expressions configured
+ * for this Valve.
  * <p>
- * This valve is configured by setting the <code>allow</code> and/or
- * <code>deny</code> properties to a regular expressions (in the syntax
- * supported by {@link Pattern}) to which the appropriate request property will
- * be compared. Evaluation proceeds as follows:
+ * This valve is configured by setting the <code>allow</code> and/or <code>deny</code> properties to a regular
+ * expressions (in the syntax supported by {@link Pattern}) to which the appropriate request property will be compared.
+ * Evaluation proceeds as follows:
  * <ul>
- * <li>The subclass extracts the request property to be filtered, and
- *     calls the common <code>process()</code> method.
- * <li>If there is a deny expression configured, the property will be compared
- *     to the expression. If a match is found, this request will be rejected
- *     with a "Forbidden" HTTP response.</li>
- * <li>If there is a allow expression configured, the property will be compared
- *     to each such expression.  If a match is found, this request will be
- *     allowed to pass through to the next Valve in the current pipeline.</li>
- * <li>If a deny expression was specified but no allow expression, allow this
- *     request to pass through (because none of the deny expressions matched
- *     it).
+ * <li>The subclass extracts the request property to be filtered, and calls the common <code>process()</code> method.
+ * <li>If there is a deny expression configured, the property will be compared to the expression. If a match is found,
+ * this request will be rejected with a "Forbidden" HTTP response.</li>
+ * <li>If there is a allow expression configured, the property will be compared to each such expression. If a match is
+ * found, this request will be allowed to pass through to the next Valve in the current pipeline.</li>
+ * <li>If a deny expression was specified but no allow expression, allow this request to pass through (because none of
+ * the deny expressions matched it).
  * <li>The request will be rejected with a "Forbidden" HTTP response.</li>
  * </ul>
  * <p>
- * As an option the valve can generate an invalid <code>authenticate</code>
- * header instead of denying the request. This can be combined with the
- * context attribute <code>preemptiveAuthentication="true"</code> and an
- * authenticator to force authentication instead of denial.
+ * As an option the valve can generate an invalid <code>authenticate</code> header instead of denying the request. This
+ * can be combined with the context attribute <code>preemptiveAuthentication="true"</code> and an authenticator to force
+ * authentication instead of denial.
  * <p>
- * This Valve may be attached to any Container, depending on the granularity
- * of the filtering you wish to perform.
+ * This Valve may be attached to any Container, depending on the granularity of the filtering you wish to perform.
  *
  * @author Craig R. McClanahan
  */
 public abstract class RequestFilterValve extends ValveBase {
 
-    //------------------------------------------------------ Constructor
+    // ------------------------------------------------------ Constructor
     public RequestFilterValve() {
         super(true);
     }
@@ -81,17 +73,14 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
-     * The current allow configuration value that may or may not compile into a
-     * valid {@link Pattern}.
+     * The current allow configuration value that may or may not compile into a valid {@link Pattern}.
      */
     protected volatile String allowValue = null;
 
 
     /**
-     * Helper variable to catch configuration errors.
-     * It is <code>true</code> by default, but becomes <code>false</code>
-     * if there was an attempt to assign an invalid value to the
-     * <code>allow</code> pattern.
+     * Helper variable to catch configuration errors. It is <code>true</code> by default, but becomes <code>false</code>
+     * if there was an attempt to assign an invalid value to the <code>allow</code> pattern.
      */
     protected volatile boolean allowValid = true;
 
@@ -103,45 +92,39 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
-     * The current deny configuration value that may or may not compile into a
-     * valid {@link Pattern}.
+     * The current deny configuration value that may or may not compile into a valid {@link Pattern}.
      */
     protected volatile String denyValue = null;
 
 
     /**
-     * Helper variable to catch configuration errors.
-     * It is <code>true</code> by default, but becomes <code>false</code>
-     * if there was an attempt to assign an invalid value to the
-     * <code>deny</code> pattern.
+     * Helper variable to catch configuration errors. It is <code>true</code> by default, but becomes <code>false</code>
+     * if there was an attempt to assign an invalid value to the <code>deny</code> pattern.
      */
     protected volatile boolean denyValid = true;
 
 
     /**
-     * The HTTP response status code that is used when rejecting denied
-     * request. It is 403 by default, but may be changed to be 404.
+     * The HTTP response status code that is used when rejecting denied request. It is 403 by default, but may be
+     * changed to be 404.
      */
     protected int denyStatus = HttpServletResponse.SC_FORBIDDEN;
 
     /**
-     * <p>If <code>invalidAuthenticationWhenDeny</code> is true
-     * and the context has <code>preemptiveAuthentication</code>
-     * set, set an invalid authorization header to trigger basic auth
-     * instead of denying the request..
+     * <p>
+     * If <code>invalidAuthenticationWhenDeny</code> is true and the context has <code>preemptiveAuthentication</code>
+     * set, set an invalid authorization header to trigger basic auth instead of denying the request..
      */
     private boolean invalidAuthenticationWhenDeny = false;
 
     /**
-     * Flag deciding whether we add the server connector port to the property
-     * compared in the filtering method. The port will be appended
-     * using a ";" as a separator.
+     * Flag deciding whether we add the server connector port to the property compared in the filtering method. The port
+     * will be appended using a ";" as a separator.
      */
     private volatile boolean addConnectorPort = false;
 
     /**
-     * Flag deciding whether we use the connection peer address
-     * or the remote address. This makes a dfifference when
+     * Flag deciding whether we use the connection peer address or the remote address. This makes a dfifference when
      * using AJP or the RemoteIpValve.
      */
     private volatile boolean usePeerAddress = false;
@@ -150,8 +133,9 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
-     * Return the regular expression used to test for allowed requests for this
-     * Valve, if any; otherwise, return <code>null</code>.
+     * Return the regular expression used to test for allowed requests for this Valve, if any; otherwise, return
+     * <code>null</code>.
+     *
      * @return the regular expression
      */
     public String getAllow() {
@@ -160,8 +144,7 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
-     * Set the regular expression used to test for allowed requests for this
-     * Valve, if any.
+     * Set the regular expression used to test for allowed requests for this Valve, if any.
      *
      * @param allow The new allow expression
      */
@@ -184,8 +167,9 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
-     * Return the regular expression used to test for denied requests for this
-     * Valve, if any; otherwise, return <code>null</code>.
+     * Return the regular expression used to test for denied requests for this Valve, if any; otherwise, return
+     * <code>null</code>.
+     *
      * @return the regular expression
      */
     public String getDeny() {
@@ -194,8 +178,7 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
-     * Set the regular expression used to test for denied requests for this
-     * Valve, if any.
+     * Set the regular expression used to test for denied requests for this Valve, if any.
      *
      * @param deny The new deny expression
      */
@@ -218,9 +201,9 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
-     * Returns {@code false} if the last change to the {@code allow} pattern did
-     * not apply successfully. E.g. if the pattern is syntactically
-     * invalid.
+     * Returns {@code false} if the last change to the {@code allow} pattern did not apply successfully. E.g. if the
+     * pattern is syntactically invalid.
+     *
      * @return <code>false</code> if the current pattern is invalid
      */
     public final boolean isAllowValid() {
@@ -229,9 +212,9 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
-     * Returns {@code false} if the last change to the {@code deny} pattern did
-     * not apply successfully. E.g. if the pattern is syntactically
-     * invalid.
+     * Returns {@code false} if the last change to the {@code deny} pattern did not apply successfully. E.g. if the
+     * pattern is syntactically invalid.
+     *
      * @return <code>false</code> if the current pattern is invalid
      */
     public final boolean isDenyValid() {
@@ -249,6 +232,7 @@ public abstract class RequestFilterValve extends ValveBase {
 
     /**
      * Set response status code that is used to reject denied request.
+     *
      * @param denyStatus The status code
      */
     public void setDenyStatus(int denyStatus) {
@@ -266,6 +250,7 @@ public abstract class RequestFilterValve extends ValveBase {
 
     /**
      * Set invalidAuthenticationWhenDeny property.
+     *
      * @param value <code>true</code> to handle a deny by setting an invalid auth header
      */
     public void setInvalidAuthenticationWhenDeny(boolean value) {
@@ -274,9 +259,9 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
-     * Get the flag deciding whether we add the server connector port to the
-     * property compared in the filtering method. The port will be appended
-     * using a ";" as a separator.
+     * Get the flag deciding whether we add the server connector port to the property compared in the filtering method.
+     * The port will be appended using a ";" as a separator.
+     *
      * @return <code>true</code> to add the connector port
      */
     public boolean getAddConnectorPort() {
@@ -285,9 +270,8 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
-     * Set the flag deciding whether we add the server connector port to the
-     * property compared in the filtering method. The port will be appended
-     * using a ";" as a separator.
+     * Set the flag deciding whether we add the server connector port to the property compared in the filtering method.
+     * The port will be appended using a ";" as a separator.
      *
      * @param addConnectorPort The new flag
      */
@@ -297,9 +281,9 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
-     * Get the flag deciding whether we use the connection peer address
-     * or the remote address. This makes a dfifference when
-     * using AJP or the RemoteIpValve.
+     * Get the flag deciding whether we use the connection peer address or the remote address. This makes a dfifference
+     * when using AJP or the RemoteIpValve.
+     *
      * @return <code>true</code> if we use the connection peer address
      */
     public boolean getUsePeerAddress() {
@@ -308,9 +292,8 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
-     * Set the flag deciding whether we use the connection peer address
-     * or the remote address. This makes a dfifference when
-     * using AJP or the RemoteIpValve.
+     * Set the flag deciding whether we use the connection peer address or the remote address. This makes a dfifference
+     * when using AJP or the RemoteIpValve.
      *
      * @param usePeerAddress The new flag
      */
@@ -321,20 +304,18 @@ public abstract class RequestFilterValve extends ValveBase {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Extract the desired request property, and pass it (along with the
-     * specified request and response objects) to the protected
-     * <code>process()</code> method to perform the actual filtering.
-     * This method must be implemented by a concrete subclass.
+     * Extract the desired request property, and pass it (along with the specified request and response objects) to the
+     * protected <code>process()</code> method to perform the actual filtering. This method must be implemented by a
+     * concrete subclass.
      *
-     * @param request The servlet request to be processed
+     * @param request  The servlet request to be processed
      * @param response The servlet response to be created
      *
-     * @exception IOException if an input/output error occurs
+     * @exception IOException      if an input/output error occurs
      * @exception ServletException if a servlet error occurs
      */
     @Override
-    public abstract void invoke(Request request, Response response)
-        throws IOException, ServletException;
+    public abstract void invoke(Request request, Response response) throws IOException, ServletException;
 
 
     // ------------------------------------------------------ Protected Methods
@@ -344,35 +325,31 @@ public abstract class RequestFilterValve extends ValveBase {
     protected void initInternal() throws LifecycleException {
         super.initInternal();
         if (!allowValid || !denyValid) {
-            throw new LifecycleException(
-                    sm.getString("requestFilterValve.configInvalid"));
+            throw new LifecycleException(sm.getString("requestFilterValve.configInvalid"));
         }
     }
 
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         if (!allowValid || !denyValid) {
-            throw new LifecycleException(
-                    sm.getString("requestFilterValve.configInvalid"));
+            throw new LifecycleException(sm.getString("requestFilterValve.configInvalid"));
         }
         super.startInternal();
     }
 
 
     /**
-     * Perform the filtering that has been configured for this Valve, matching
-     * against the specified request property.
+     * Perform the filtering that has been configured for this Valve, matching against the specified request property.
      *
      * @param property The request property on which to filter
-     * @param request The servlet request to be processed
+     * @param request  The servlet request to be processed
      * @param response The servlet response to be processed
      *
-     * @exception IOException if an input/output error occurs
+     * @exception IOException      if an input/output error occurs
      * @exception ServletException if a servlet error occurs
      */
-    protected void process(String property, Request request, Response response)
-            throws IOException, ServletException {
+    protected void process(String property, Request request, Response response) throws IOException, ServletException {
 
         if (isAllowed(property)) {
             getNext().invoke(request, response);
@@ -380,8 +357,7 @@ public abstract class RequestFilterValve extends ValveBase {
         }
 
         if (getLog().isDebugEnabled()) {
-            getLog().debug(sm.getString("requestFilterValve.deny",
-                    request.getRequestURI(), property));
+            getLog().debug(sm.getString("requestFilterValve.deny", request.getRequestURI(), property));
         }
 
         // Deny this request
@@ -394,17 +370,17 @@ public abstract class RequestFilterValve extends ValveBase {
 
     /**
      * Reject the request that was denied by this valve.
-     * <p>If <code>invalidAuthenticationWhenDeny</code> is true
-     * and the context has <code>preemptiveAuthentication</code>
+     * <p>
+     * If <code>invalidAuthenticationWhenDeny</code> is true and the context has <code>preemptiveAuthentication</code>
      * set, set an invalid authorization header to trigger basic auth.
      *
-     * @param request The servlet request to be processed
+     * @param request  The servlet request to be processed
      * @param response The servlet response to be processed
-     * @exception IOException if an input/output error occurs
+     *
+     * @exception IOException      if an input/output error occurs
      * @exception ServletException if a servlet error occurs
      */
-    protected void denyRequest(Request request, Response response)
-            throws IOException, ServletException {
+    protected void denyRequest(Request request, Response response) throws IOException, ServletException {
         if (invalidAuthenticationWhenDeny) {
             Context context = request.getContext();
             if (context != null && context.getPreemptiveAuthentication()) {
@@ -420,12 +396,12 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     /**
-     * Perform the test implemented by this Valve, matching against the
-     * specified request property value. This method is public so that it can be
-     * called through JMX, e.g. to test whether certain IP address is allowed or
-     * denied by the valve configuration.
+     * Perform the test implemented by this Valve, matching against the specified request property value. This method is
+     * public so that it can be called through JMX, e.g. to test whether certain IP address is allowed or denied by the
+     * valve configuration.
      *
      * @param property The request property value on which to filter
+     *
      * @return <code>true</code> if the request is allowed
      */
     public boolean isAllowed(String property) {

@@ -17,17 +17,14 @@
 package org.apache.coyote.http2;
 
 import java.util.logging.Level;
-import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Unit tests for Section 6.1 of
- * <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>.
- * <br>
- * The order of tests in this class is aligned with the order of the
- * requirements in the RFC.
+ * Unit tests for Section 6.1 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
+ * The order of tests in this class is aligned with the order of the requirements in the RFC.
  */
 public class TestHttp2Section_6_1 extends Http2TestBase {
 
@@ -41,22 +38,18 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
         sendSimplePostRequest(3, null);
         readSimplePostResponse(false);
 
-        Assert.assertEquals("0-WindowSize-[128]\n" +
-                "3-WindowSize-[128]\n" +
-                "3-HeadersStart\n" +
-                "3-Header-[:status]-[200]\n" +
-                "3-Header-[content-length]-[128]\n" +
-                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "3-HeadersEnd\n" +
-                "3-Body-128\n" +
-                "3-EndOfStream\n", output.getTrace());
+        Assert.assertEquals(
+                "0-WindowSize-[128]\n" + "3-WindowSize-[128]\n" + "3-HeadersStart\n" + "3-Header-[:status]-[200]\n" +
+                        "3-Header-[content-length]-[128]\n" + "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
+                        "3-HeadersEnd\n" + "3-Body-128\n" + "3-EndOfStream\n",
+                output.getTrace());
     }
 
 
     @Test
     public void testDataFrameWithPadding() throws Exception {
-        LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.ALL);
-        LogManager.getLogManager().getLogger("org.apache.tomcat.util.net").setLevel(Level.ALL);
+        Logger.getLogger("org.apache.coyote").setLevel(Level.ALL);
+        Logger.getLogger("org.apache.tomcat.util.net").setLevel(Level.ALL);
         try {
             http2Connect();
 
@@ -79,23 +72,18 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
             trace = trace.replace(paddingWindowUpdate, "");
 
             // The stream window update may or may not be present depending on
-            //  timing. Remove it if present.
+            // timing. Remove it if present.
             if (trace.contains("3-WindowSize-[9]\n")) {
                 trace = trace.replace("3-WindowSize-[9]\n", "");
             }
 
-            Assert.assertEquals("0-WindowSize-[119]\n" +
-                    "3-WindowSize-[119]\n" +
-                    "3-HeadersStart\n" +
-                    "3-Header-[:status]-[200]\n" +
-                    "3-Header-[content-length]-[119]\n" +
-                    "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                    "3-HeadersEnd\n" +
-                    "3-Body-119\n" +
+            Assert.assertEquals("0-WindowSize-[119]\n" + "3-WindowSize-[119]\n" + "3-HeadersStart\n" +
+                    "3-Header-[:status]-[200]\n" + "3-Header-[content-length]-[119]\n" +
+                    "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n" + "3-Body-119\n" +
                     "3-EndOfStream\n", trace);
         } finally {
-            LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.INFO);
-            LogManager.getLogManager().getLogger("org.apache.tomcat.util.net").setLevel(Level.INFO);
+            Logger.getLogger("org.apache.coyote").setLevel(Level.INFO);
+            Logger.getLogger("org.apache.tomcat.util.net").setLevel(Level.INFO);
         }
     }
 
@@ -184,20 +172,16 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
         trace = trace.replace(paddingWindowUpdate, "");
 
         // The stream window update may or may not be present depending on
-        //  timing. Remove it if present.
+        // timing. Remove it if present.
         paddingWindowUpdate = "3-WindowSize-[1]\n";
         if (trace.contains(paddingWindowUpdate)) {
             trace = trace.replace(paddingWindowUpdate, "");
         }
 
-        Assert.assertEquals("0-WindowSize-[127]\n" +
-                "3-WindowSize-[127]\n" +
-                "3-HeadersStart\n" +
-                "3-Header-[:status]-[200]\n" +
-                "3-Header-[content-length]-[127]\n" +
-                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "3-HeadersEnd\n" +
-                "3-Body-127\n" +
-                "3-EndOfStream\n", trace);
+        Assert.assertEquals(
+                "0-WindowSize-[127]\n" + "3-WindowSize-[127]\n" + "3-HeadersStart\n" + "3-Header-[:status]-[200]\n" +
+                        "3-Header-[content-length]-[127]\n" + "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
+                        "3-HeadersEnd\n" + "3-Body-127\n" + "3-EndOfStream\n",
+                trace);
     }
 }

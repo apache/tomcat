@@ -17,7 +17,10 @@
 package org.apache.tomcat.util.buf;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.regex.Pattern;
 
@@ -27,10 +30,9 @@ import java.util.regex.Pattern;
 public final class UriUtil {
 
     private static final char[] HEX =
-        {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+            { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
     private static final Pattern PATTERN_EXCLAMATION_MARK = Pattern.compile("!/");
-    private static final Pattern PATTERN_CARET = Pattern.compile("\\^/");
     private static final Pattern PATTERN_ASTERISK = Pattern.compile("\\*/");
     private static final Pattern PATTERN_CUSTOM;
     private static final String REPLACE_CUSTOM;
@@ -68,13 +70,12 @@ public final class UriUtil {
 
 
     /**
-     * Determine if the character is allowed in the scheme of a URI.
-     * See RFC 2396, Section 3.1
+     * Determine if the character is allowed in the scheme of a URI. See RFC 2396, Section 3.1
      *
      * @param c The character to test
      *
-     * @return {@code true} if a the character is allowed, otherwise {code
-     *         @false}
+     * @return {@code true} if a the character is allowed, otherwise {@code
+     *         false}
      */
     private static boolean isSchemeChar(char c) {
         return Character.isLetterOrDigit(c) || c == '+' || c == '-' || c == '.';
@@ -90,11 +91,11 @@ public final class UriUtil {
      */
     public static boolean hasScheme(CharSequence uri) {
         int len = uri.length();
-        for(int i=0; i < len ; i++) {
+        for (int i = 0; i < len; i++) {
             char c = uri.charAt(i);
-            if(c == ':') {
+            if (c == ':') {
                 return i > 0;
-            } else if(!UriUtil.isSchemeChar(c)) {
+            } else if (!isSchemeChar(c)) {
                 return false;
             }
         }
@@ -102,22 +103,22 @@ public final class UriUtil {
     }
 
 
-    public static URL buildJarUrl(File jarFile) throws MalformedURLException {
+    public static URL buildJarUrl(File jarFile) throws IOException {
         return buildJarUrl(jarFile, null);
     }
 
 
-    public static URL buildJarUrl(File jarFile, String entryPath) throws MalformedURLException {
+    public static URL buildJarUrl(File jarFile, String entryPath) throws IOException {
         return buildJarUrl(jarFile.toURI().toString(), entryPath);
     }
 
 
-    public static URL buildJarUrl(String fileUrlString) throws MalformedURLException {
+    public static URL buildJarUrl(String fileUrlString) throws IOException {
         return buildJarUrl(fileUrlString, null);
     }
 
 
-    public static URL buildJarUrl(String fileUrlString, String entryPath) throws MalformedURLException {
+    public static URL buildJarUrl(String fileUrlString, String entryPath) throws IOException {
         String safeString = makeSafeForJarUrl(fileUrlString);
         StringBuilder sb = new StringBuilder();
         sb.append(safeString);
@@ -125,38 +126,46 @@ public final class UriUtil {
         if (entryPath != null) {
             sb.append(makeSafeForJarUrl(entryPath));
         }
-        return new URL("jar", null, -1, sb.toString());
+        URI uri;
+        try {
+            // Have to use the single argument constructor as that is the only one that doesn't escape input.
+            uri = new URI("jar:" + sb.toString());
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
+        return uri.toURL();
     }
 
 
-    public static URL buildJarSafeUrl(File file) throws MalformedURLException {
+    public static URL buildJarSafeUrl(File file) throws IOException {
         String safe = makeSafeForJarUrl(file.toURI().toString());
-        return new URL(safe);
+        URI uri;
+        try {
+            uri = new URI(safe);
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
+        return uri.toURL();
     }
 
 
     /*
-     * When testing on markt's desktop each iteration was taking ~1420ns when
-     * using String.replaceAll().
+     * When testing on markt's desktop each iteration was taking ~1420ns when using String.replaceAll().
      *
-     * Switching the implementation to use pre-compiled patterns and
-     * Pattern.matcher(input).replaceAll(replacement) reduced this by ~10%.
+     * Switching the implementation to use pre-compiled patterns and Pattern.matcher(input).replaceAll(replacement)
+     * reduced this by ~10%.
      *
-     * Note: Given the very small absolute time of a single iteration, even for
-     *       a web application with 1000 JARs this is only going to add ~3ms.
-     *       It is therefore unlikely that further optimisation will be
-     *       necessary.
+     * Note: Given the very small absolute time of a single iteration, even for a web application with 1000 JARs this is
+     * only going to add ~3ms. It is therefore unlikely that further optimisation will be necessary.
      */
     /*
-     * Pulled out into a separate method in case we need to handle other unusual
-     * sequences in the future.
+     * Pulled out into a separate method in case we need to handle other unusual sequences in the future.
      */
     private static String makeSafeForJarUrl(String input) {
         // Since "!/" has a special meaning in a JAR URL, make sure that the
         // sequence is properly escaped if present.
         String tmp = PATTERN_EXCLAMATION_MARK.matcher(input).replaceAll("%21/");
-        // Tomcat's custom jar:war: URL handling treats */ and ^/ as special
-        tmp = PATTERN_CARET.matcher(tmp).replaceAll("%5e/");
+        // Tomcat's custom jar:war: URL handling treats */ as special
         tmp = PATTERN_ASTERISK.matcher(tmp).replaceAll("%2a/");
         if (PATTERN_CUSTOM != null) {
             tmp = PATTERN_CUSTOM.matcher(tmp).replaceAll(REPLACE_CUSTOM);
@@ -166,27 +175,29 @@ public final class UriUtil {
 
 
     /**
-     * Convert a URL of the form <code>war:file:...</code> to
-     * <code>jar:file:...</code>.
+     * Convert a URL of the form <code>war:file:...</code> to <code>jar:file:...</code>.
      *
      * @param warUrl The WAR URL to convert
      *
      * @return The equivalent JAR URL
      *
-     * @throws MalformedURLException If the conversion fails
+     * @throws IOException If the conversion fails
      */
-    public static URL warToJar(URL warUrl) throws MalformedURLException {
+    public static URL warToJar(URL warUrl) throws IOException {
         // Assumes that the spec is absolute and starts war:file:/...
         String file = warUrl.getFile();
         if (file.contains("*/")) {
             file = file.replaceFirst("\\*/", "!/");
-        } else if (file.contains("^/")) {
-            file = file.replaceFirst("\\^/", "!/");
         } else if (PATTERN_CUSTOM != null) {
             file = file.replaceFirst(PATTERN_CUSTOM.pattern(), "!/");
         }
-
-        return new URL("jar", warUrl.getHost(), warUrl.getPort(), file);
+        URI uri;
+        try {
+            uri = new URI("jar", file, null);
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
+        return uri.toURL();
     }
 
 
@@ -196,13 +207,11 @@ public final class UriUtil {
 
 
     /**
-     * Does the provided path start with <code>file:/</code> or
-     * <code>&lt;protocol&gt;://</code>.
+     * Does the provided path start with <code>file:/</code> or <code>&lt;protocol&gt;://</code>.
      *
      * @param path The path to test
      *
-     * @return {@code true} if the supplied path starts with once of the
-     *         recognised sequences.
+     * @return {@code true} if the supplied path starts with once of the recognised sequences.
      */
     public static boolean isAbsoluteURI(String path) {
         // Special case as only a single /
@@ -227,5 +236,35 @@ public final class UriUtil {
             return true;
         }
         return false;
+    }
+
+
+    /**
+     * Replicates the behaviour of {@link URI#resolve(String)} and adds support for URIs of the form
+     * {@code jar:file:/... }.
+     *
+     * @param base   The base URI to resolve against
+     * @param target The path to resolve
+     *
+     * @return The resulting URI as per {@link URI#resolve(String)}
+     *
+     * @throws MalformedURLException If the base URI cannot be converted to a URL
+     * @throws URISyntaxException    If the resulting URL cannot be converted to a URI
+     */
+    public static URI resolve(URI base, String target) throws MalformedURLException, URISyntaxException {
+        if (base.getScheme().equals("jar")) {
+            /*
+             * Previously used: new URL(base.toURL(), target).toURI() This delegated the work to the jar stream handler
+             * which correctly resolved the target against the base.
+             *
+             * Deprecation of all the URL constructors mean a different approach is required.
+             */
+            URI fileUri = new URI(base.getSchemeSpecificPart());
+            URI fileUriResolved = fileUri.resolve(target);
+
+            return new URI("jar:" + fileUriResolved.toString());
+        } else {
+            return base.resolve(target);
+        }
     }
 }

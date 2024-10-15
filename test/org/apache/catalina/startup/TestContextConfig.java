@@ -159,7 +159,7 @@ public class TestContextConfig extends TomcatBaseTest {
 
         private String servletName;
 
-        public CustomDefaultServletSCI(String servletName) {
+        CustomDefaultServletSCI(String servletName) {
             this.servletName = servletName;
         }
 

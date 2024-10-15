@@ -54,7 +54,7 @@ public class TesterBean {
     }
 
     public int[] getValueB() {
-        return new int[] {1,2,3,4,5};
+        return new int[] { 1, 2, 3, 4, 5 };
     }
 
     public void setValueC(Integer[] values) {

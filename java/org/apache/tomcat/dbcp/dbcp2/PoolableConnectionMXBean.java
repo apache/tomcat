@@ -24,14 +24,13 @@ import java.sql.SQLException;
  * @since 2.0
  */
 public interface PoolableConnectionMXBean {
-    // Methods
+
     void clearCachedState();
 
     void clearWarnings() throws SQLException;
 
     void close() throws SQLException;
 
-    // Read-write properties
     boolean getAutoCommit() throws SQLException;
 
     boolean getCacheState();
@@ -42,12 +41,10 @@ public interface PoolableConnectionMXBean {
 
     String getSchema() throws SQLException;
 
-    // SQLWarning getWarnings() throws SQLException;
     String getToString();
 
     int getTransactionIsolation() throws SQLException;
 
-    // Read-only properties
     boolean isClosed() throws SQLException;
 
     boolean isReadOnly() throws SQLException;

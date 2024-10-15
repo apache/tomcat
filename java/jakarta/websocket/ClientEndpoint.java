@@ -27,8 +27,10 @@ import jakarta.websocket.ClientEndpointConfig.Configurator;
 @Target(ElementType.TYPE)
 public @interface ClientEndpoint {
     String[] subprotocols() default {};
+
     Class<? extends Decoder>[] decoders() default {};
+
     Class<? extends Encoder>[] encoders() default {};
-    public Class<? extends Configurator> configurator()
-            default Configurator.class;
+
+    Class<? extends Configurator> configurator() default Configurator.class;
 }

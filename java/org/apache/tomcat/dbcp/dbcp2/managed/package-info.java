@@ -29,7 +29,7 @@
  * transaction is committed or rolled back the enlisted connections are
  * committed or rolled back.
  * </p>
-
+ *
  * <p>
  * This package supports full XADataSources and non-XA data sources using
  * local transaction semantics. non-XA data sources commit and rollback as

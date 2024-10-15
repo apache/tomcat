@@ -455,7 +455,7 @@
     </attribute>
 
     <attribute name="abandonWhenPercentageFull" required="false">
-      <p>(int) Connections that have been abandoned (timed out) wont get closed and reported up unless
+      <p>(int) Connections that have been abandoned (timed out) won't get closed and reported up unless
          the number of connections in use are above the percentage defined by <code>abandonWhenPercentageFull</code>.
          The value should be between 0-100.
          The default value is <code>0</code>, which implies that connections are eligible for closure as soon
@@ -510,13 +510,13 @@
     </attribute>
     <attribute name="alternateUsernameAllowed" required="false">
       <p>(boolean) By default, the jdbc-pool will ignore the
-         <a href="http://docs.oracle.com/javase/6/docs/api/javax/sql/DataSource.html#getConnection(java.lang.String,%20java.lang.String)"><code>DataSource.getConnection(username,password)</code></a>
+         <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/javax/sql/DataSource.html#getConnection(java.lang.String,java.lang.String)"><code>DataSource.getConnection(username,password)</code></a>
          call, and simply return a previously pooled connection under the globally configured properties <code>username</code> and <code>password</code>, for performance reasons.
       </p>
       <p>
          The pool can however be configured to allow use of different credentials
          each time a connection is requested.  To enable the functionality described in the
-         <a href="http://docs.oracle.com/javase/6/docs/api/javax/sql/DataSource.html#getConnection(java.lang.String,%20java.lang.String)"><code>DataSource.getConnection(username,password)</code></a>
+         <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/javax/sql/DataSource.html#getConnection(java.lang.String,java.lang.String)"><code>DataSource.getConnection(username,password)</code></a>
          call, simply set the property <code>alternateUsernameAllowed</code>
          to <code>true</code>.<br />
          Should you request a connection with the credentials user1/password1 and the connection
@@ -724,7 +724,7 @@
   <subsection name="org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx">
     <p>Extends the <code>SlowQueryReport</code> and in addition to log entries it issues JMX notification
        for monitoring tools to react to. Inherits all the attributes from its parent class.
-       This class uses Tomcat's JMX engine so it wont work outside of the Tomcat container.
+       This class uses Tomcat's JMX engine so it won't work outside of the Tomcat container.
        By default, JMX notifications are sent through the ConnectionPool mbean if it is enabled.
        The <code>SlowQueryReportJmx</code> can also register an MBean if <code>notifyPool=false</code>
     </p>

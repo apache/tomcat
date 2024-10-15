@@ -32,15 +32,15 @@ import org.apache.tomcat.dbcp.pool2.impl.GenericKeyedObjectPoolConfig;
 
 /**
  * <p>
- * A pooling <code>DataSource</code> appropriate for deployment within J2EE environment. There are many configuration
+ * A pooling {@code DataSource} appropriate for deployment within J2EE environment. There are many configuration
  * options, most of which are defined in the parent class. All users (based on user name) share a single maximum number
  * of Connections in this data source.
  * </p>
  *
  * <p>
  * User passwords can be changed without re-initializing the data source. When a
- * <code>getConnection(user name, password)</code> request is processed with a password that is different from those
- * used to create connections in the pool associated with <code>user name</code>, an attempt is made to create a new
+ * {@code getConnection(user name, password)} request is processed with a password that is different from those
+ * used to create connections in the pool associated with {@code user name}, an attempt is made to create a new
  * connection using the supplied password and if this succeeds, idle connections created using the old password are
  * destroyed and new connections are created using the new password.
  * </p>
@@ -68,7 +68,7 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
      * Closes pool being maintained by this data source.
      */
     @Override
-    public void close() throws Exception {
+    public void close() throws SQLException {
         if (pool != null) {
             pool.close();
         }
@@ -145,7 +145,7 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
      * Supports Serialization interface.
      *
      * @param in
-     *            a <code>java.io.ObjectInputStream</code> value
+     *            a {@link java.io.ObjectInputStream} value
      * @throws IOException
      *             if an error occurs
      * @throws ClassNotFoundException
@@ -177,10 +177,10 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
         config.setMaxTotal(getMaxTotal());
         config.setMaxTotalPerKey(getDefaultMaxTotal());
         config.setMaxWait(getDefaultMaxWait());
-        config.setMinEvictableIdleTime(getDefaultMinEvictableIdleDuration());
+        config.setMinEvictableIdleDuration(getDefaultMinEvictableIdleDuration());
         config.setMinIdlePerKey(getDefaultMinIdle());
         config.setNumTestsPerEvictionRun(getDefaultNumTestsPerEvictionRun());
-        config.setSoftMinEvictableIdleTime(getDefaultSoftMinEvictableIdleDuration());
+        config.setSoftMinEvictableIdleDuration(getDefaultSoftMinEvictableIdleDuration());
         config.setTestOnCreate(getDefaultTestOnCreate());
         config.setTestOnBorrow(getDefaultTestOnBorrow());
         config.setTestOnReturn(getDefaultTestOnReturn());

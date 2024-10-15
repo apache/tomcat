@@ -34,22 +34,13 @@ import org.apache.catalina.ha.ClusterValve;
 public class StandardHostSF extends StoreFactoryBase {
 
     /**
-     * Store the specified Host properties and children
-     * (Listener,Alias,Realm,Valve,Cluster, Context)
-     *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aHost
-     *            Host whose properties are being stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
+     * Store the specified Host properties and children (Listener,Alias,Realm,Valve,Cluster, Context)
+     * <p>
+     * {@inheritDoc}
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aHost,
-            StoreDescription parentDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aHost, StoreDescription parentDesc)
+            throws Exception {
         if (aHost instanceof StandardHost) {
             StandardHost host = (StandardHost) aHost;
             // Store nested <Listener> elements
@@ -58,8 +49,7 @@ public class StandardHostSF extends StoreFactoryBase {
 
             // Store nested <Alias> elements
             String aliases[] = host.findAliases();
-            getStoreAppender().printTagArray(aWriter, "Alias", indent + 2,
-                    aliases);
+            getStoreAppender().printTagArray(aWriter, "Alias", indent + 2, aliases);
 
             // Store nested <Realm> element
             Realm realm = host.getRealm();
@@ -75,8 +65,8 @@ public class StandardHostSF extends StoreFactoryBase {
 
             // Store nested <Valve> elements
             Valve valves[] = host.getPipeline().getValves();
-            if(valves != null && valves.length > 0 ) {
-                List<Valve> hostValves = new ArrayList<>() ;
+            if (valves != null && valves.length > 0) {
+                List<Valve> hostValves = new ArrayList<>();
                 for (Valve valve : valves) {
                     if (!(valve instanceof ClusterValve)) {
                         hostValves.add(valve);

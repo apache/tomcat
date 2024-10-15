@@ -39,9 +39,13 @@ public class TestCookieParsing extends TomcatBaseTest {
     private static final String[] COOKIES_WITH_EQUALS = new String[] {
             "name=equals=middle", "name==equalsstart", "name=equalsend=" };
 
-    private static final String[] COOKIES_WITH_NAME_ONLY = new String[] {
-            "bob", "bob=" };
-    private static final String COOKIES_WITH_NAME_ONLY_CONCAT = "bob=bob=";
+    private static final String[] COOKIES_WITH_NAME_OR_VALUE_ONLY = new String[] { "bob=", "bob", "=bob" };
+
+    // First two are treated as name and no value, third is invalid (therefore ignored)
+    private static final String COOKIES_WITH_NAME_OR_VALUE_ONLY_NAME_CONCAT = "bob=bob=";
+
+    // First is treated as name and no value, second is ignored and third is invalid (therefore ignored)
+    private static final String COOKIES_WITH_NAME_OR_VALUE_ONLY_IGNORE_CONCAT = "bob=";
 
     private static final String[] COOKIES_WITH_SEPS = new String[] {
             "name=val/ue" };
@@ -70,11 +74,30 @@ public class TestCookieParsing extends TomcatBaseTest {
 
 
     @Test
-    public void testRfc6265NameOnly() throws Exception {
-        // Always allows equals
-        TestCookieParsingClient client = new TestCookieParsingClient(
-                new Rfc6265CookieProcessor(), COOKIES_WITH_NAME_ONLY,
-                COOKIES_WITH_NAME_ONLY_CONCAT);
+    public void testRfc6265NameOrValueOnlyName() throws Exception {
+        doTestRfc6265WithoutEquals("name", COOKIES_WITH_NAME_OR_VALUE_ONLY_NAME_CONCAT);
+    }
+
+
+    @Test
+    public void testRfc6265NameOrValueOnlyIgnore() throws Exception {
+        doTestRfc6265WithoutEquals("ignore", COOKIES_WITH_NAME_OR_VALUE_ONLY_IGNORE_CONCAT);
+    }
+
+
+    @Test
+    public void testRfc6265NameOrValueOnlyDefault() throws Exception {
+        doTestRfc6265WithoutEquals(null, COOKIES_WITH_NAME_OR_VALUE_ONLY_IGNORE_CONCAT);
+    }
+
+
+    private void doTestRfc6265WithoutEquals(String cookiesWithoutEquals, String expected) throws Exception {
+        Rfc6265CookieProcessor cookieProcessor = new Rfc6265CookieProcessor();
+        if (cookiesWithoutEquals != null) {
+            cookieProcessor.setCookiesWithoutEquals(cookiesWithoutEquals);
+        }
+        TestCookieParsingClient client = new TestCookieParsingClient(cookieProcessor, COOKIES_WITH_NAME_OR_VALUE_ONLY,
+                expected);
         client.doRequest();
     }
 
@@ -130,12 +153,12 @@ public class TestCookieParsing extends TomcatBaseTest {
         private final boolean echoHeader;
 
 
-        public TestCookieParsingClient(CookieProcessor cookieProcessor,
+        TestCookieParsingClient(CookieProcessor cookieProcessor,
                 String[] cookies, String expected) {
             this(cookieProcessor, false, cookies, expected);
         }
 
-        public TestCookieParsingClient(CookieProcessor cookieProcessor,
+        TestCookieParsingClient(CookieProcessor cookieProcessor,
                 boolean echoHeader, String[] cookies, String expected) {
             this.cookieProcessor = cookieProcessor;
             this.echoHeader = echoHeader;

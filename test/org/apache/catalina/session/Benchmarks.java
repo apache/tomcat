@@ -126,7 +126,7 @@ public class Benchmarks {
         private ManagerBase mgr;
         private int count;
 
-        public TestThreadGenerateSessionId(ManagerBase mgr, int count) {
+        TestThreadGenerateSessionId(ManagerBase mgr, int count) {
             this.mgr = mgr;
             this.count = count;
         }
@@ -223,7 +223,7 @@ public class Benchmarks {
         private ManagerBase mgr;
         private int count;
 
-        public TestThreadCreateSession(ManagerBase mgr, int count) {
+        TestThreadCreateSession(ManagerBase mgr, int count) {
             this.mgr = mgr;
             this.count = count;
         }

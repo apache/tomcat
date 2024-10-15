@@ -25,16 +25,13 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Provides a background processing mechanism that triggers roughly once a
- * second. The class maintains a thread that only runs when there is at least
- * one instance of {@link BackgroundProcess} registered.
+ * Provides a background processing mechanism that triggers roughly once a second. The class maintains a thread that
+ * only runs when there is at least one instance of {@link BackgroundProcess} registered.
  */
 public class BackgroundProcessManager {
 
-    private final Log log =
-            LogFactory.getLog(BackgroundProcessManager.class);
-    private static final StringManager sm =
-            StringManager.getManager(BackgroundProcessManager.class);
+    private final Log log = LogFactory.getLog(BackgroundProcessManager.class);
+    private static final StringManager sm = StringManager.getManager(BackgroundProcessManager.class);
     private static final BackgroundProcessManager instance;
 
 
@@ -60,8 +57,7 @@ public class BackgroundProcessManager {
         synchronized (processesLock) {
             if (processes.size() == 0) {
                 wsBackgroundThread = new WsBackgroundThread(this);
-                wsBackgroundThread.setContextClassLoader(
-                        this.getClass().getClassLoader());
+                wsBackgroundThread.setContextClassLoader(this.getClass().getClassLoader());
                 wsBackgroundThread.setDaemon(true);
                 wsBackgroundThread.start();
             }
@@ -91,8 +87,7 @@ public class BackgroundProcessManager {
                 process.backgroundProcess();
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                log.error(sm.getString(
-                        "backgroundProcessManager.processFailed"), t);
+                log.error(sm.getString("backgroundProcessManager.processFailed"), t);
             }
         }
     }
@@ -124,7 +119,7 @@ public class BackgroundProcessManager {
         private final BackgroundProcessManager manager;
         private volatile boolean running = true;
 
-        public WsBackgroundThread(BackgroundProcessManager manager) {
+        WsBackgroundThread(BackgroundProcessManager manager) {
             setName("WebSocket background processing");
             this.manager = manager;
         }
@@ -133,7 +128,7 @@ public class BackgroundProcessManager {
         public void run() {
             while (running) {
                 try {
-                    Thread.sleep(1000);
+                    sleep(1000);
                 } catch (InterruptedException e) {
                     // Ignore
                 }

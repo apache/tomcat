@@ -28,13 +28,10 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 
-
 /**
- * The object reader object is an object used in conjunction with
- * java.nio TCP messages. This object stores the message bytes in a
- * <code>XByteBuffer</code> until a full package has been received.
- * This object uses an XByteBuffer which is an extendable object buffer that also allows
- * for message encoding and decoding.
+ * The object reader object is an object used in conjunction with java.nio TCP messages. This object stores the message
+ * bytes in a <code>XByteBuffer</code> until a full package has been received. This object uses an XByteBuffer which is
+ * an extendable object buffer that also allows for message encoding and decoding.
  */
 public class ObjectReader {
 
@@ -51,8 +48,10 @@ public class ObjectReader {
     public ObjectReader(int packetSize) {
         this.buffer = new XByteBuffer(packetSize, true);
     }
+
     /**
      * Creates an <code>ObjectReader</code> for a TCP NIO socket channel
+     *
      * @param channel - the channel to be read.
      */
     public ObjectReader(SocketChannel channel) {
@@ -61,13 +60,14 @@ public class ObjectReader {
 
     /**
      * Creates an <code>ObjectReader</code> for a TCP socket
+     *
      * @param socket Socket
      */
     public ObjectReader(Socket socket) {
-        try{
+        try {
             this.buffer = new XByteBuffer(socket.getReceiveBufferSize(), true);
-        }catch ( IOException x ) {
-            //unable to get buffer size
+        } catch (IOException x) {
+            // unable to get buffer size
             log.warn(sm.getString("objectReader.retrieveFailed.socketReceiverBufferSize",
                     Integer.toString(Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE)));
             this.buffer = new XByteBuffer(Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE, true);
@@ -90,33 +90,35 @@ public class ObjectReader {
 
     /**
      * Append new bytes to buffer.
+     *
      * @see XByteBuffer#countPackages()
-     * @param data new transfer buffer
-     * @param len length in buffer
+     *
+     * @param data  new transfer buffer
+     * @param len   length in buffer
      * @param count whether to return the count
+     *
      * @return number of messages that was sent to callback (or -1 if count == false)
      */
     public int append(ByteBuffer data, int len, boolean count) {
-       buffer.append(data,len);
-       int pkgCnt = -1;
-       if ( count ) {
-        pkgCnt = buffer.countPackages();
-    }
-       return pkgCnt;
-   }
-
-     public int append(byte[] data,int off,int len, boolean count) {
-        buffer.append(data,off,len);
+        buffer.append(data, len);
         int pkgCnt = -1;
-        if ( count ) {
+        if (count) {
+            pkgCnt = buffer.countPackages();
+        }
+        return pkgCnt;
+    }
+
+    public int append(byte[] data, int off, int len, boolean count) {
+        buffer.append(data, off, len);
+        int pkgCnt = -1;
+        if (count) {
             pkgCnt = buffer.countPackages();
         }
         return pkgCnt;
     }
 
     /**
-     * Send buffer to cluster listener (callback).
-     * Is message complete receiver send message to callback?
+     * Send buffer to cluster listener (callback). Is message complete receiver send message to callback?
      *
      * @see org.apache.catalina.tribes.transport.ReceiverBase#messageDataReceived(ChannelMessage)
      * @see XByteBuffer#doesPackageExist()
@@ -127,7 +129,7 @@ public class ObjectReader {
     public ChannelMessage[] execute() {
         int pkgCnt = buffer.countPackages();
         ChannelMessage[] result = new ChannelMessage[pkgCnt];
-        for (int i=0; i<pkgCnt; i++)  {
+        for (int i = 0; i < pkgCnt; i++) {
             ChannelMessage data = buffer.extractPackage(true);
             result[i] = data;
         }
@@ -140,10 +142,12 @@ public class ObjectReader {
 
 
     public boolean hasPackage() {
-        return buffer.countPackages(true)>0;
+        return buffer.countPackages(true) > 0;
     }
+
     /**
      * Returns the number of packages that the reader has read
+     *
      * @return int
      */
     public int count() {

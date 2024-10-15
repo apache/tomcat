@@ -57,7 +57,7 @@ package org.apache.tomcat.dbcp.pool2;
  * {@link KeyedPooledObjectFactory} must be thread-safe. The only promise
  * an {@link KeyedObjectPool} makes is that the same instance of an object will
  * not be passed to more than one method of a
- * {@code KeyedPoolableObjectFactory} at a time.
+ * {@code KeyedPooledObjectFactory} at a time.
  * <p>
  * While clients of a {@link KeyedObjectPool} borrow and return instances of
  * the underlying value type V, the factory methods act on instances of
@@ -67,7 +67,6 @@ package org.apache.tomcat.dbcp.pool2;
  * </p>
  *
  * @see KeyedObjectPool
- * @see BaseKeyedPooledObjectFactory
  *
  * @param <K> The type of keys managed by this factory.
  * @param <V> Type of element managed by this factory.

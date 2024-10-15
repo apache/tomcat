@@ -19,35 +19,35 @@ package org.apache.catalina.valves.rewrite;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Interface for user defined lookup/replacement logic that can be defined in
- * a {@code rewrite.config} file by a {@code RewriteMap} directive. Such a map
- * can then be used by a {@code RewriteRule} defined in the same file.
+ * Interface for user defined lookup/replacement logic that can be defined in a {@code rewrite.config} file by a
+ * {@code RewriteMap} directive. Such a map can then be used by a {@code RewriteRule} defined in the same file.
  * <p>
  * An example {@code rewrite.config} file could look like:
+ *
  * <pre>
  * RewriteMap uc example.UpperCaseMap
  *
  * RewriteRule ^/(.*)$ ${uc:$1}
  * </pre>
  *
- * One parameter can be optionally appended to the {@code RewriteMap} directive.
- * This could be used &ndash; for example &ndash; to specify a name of a file, that
- * contains a lookup table used by the implementation of the map.
+ * One parameter can be optionally appended to the {@code RewriteMap} directive. This could be used &ndash; for example
+ * &ndash; to specify a name of a file, that contains a lookup table used by the implementation of the map.
  */
 public interface RewriteMap {
 
     /**
-     * Optional parameter that can be defined through the {@code RewriteMap}
-     * directive in the {@code rewrite.config} file.
+     * Optional parameter that can be defined through the {@code RewriteMap} directive in the {@code rewrite.config}
+     * file.
      *
      * @param params the optional parameter
+     *
      * @return value is currently ignored
      */
-    public String setParameters(String params);
+    String setParameters(String params);
 
     /**
-     * Optional parameters that can be defined through the {@code RewriteMap}
-     * directive in the {@code rewrite.config} file.
+     * Optional parameters that can be defined through the {@code RewriteMap} directive in the {@code rewrite.config}
+     * file.
      * <p>
      * This method will be called, if there are more than one parameters defined.
      *
@@ -66,11 +66,12 @@ public interface RewriteMap {
 
     /**
      * Maps a key to a replacement value.<br>
-     * The method is free to return {@code null} to indicate, that the default
-     * value from the {@code RewriteRule} directive should be used.
+     * The method is free to return {@code null} to indicate, that the default value from the {@code RewriteRule}
+     * directive should be used.
      *
      * @param key used by the actual implementation to generate a mapped value
+     *
      * @return mapped value or {@code null}
      */
-    public String lookup(String key);
+    String lookup(String key);
 }

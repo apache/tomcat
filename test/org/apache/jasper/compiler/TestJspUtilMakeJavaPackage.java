@@ -33,19 +33,19 @@ public class TestJspUtilMakeJavaPackage {
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
 
-        parameterSets.add(new Object[] { "/foo", "foo"});
-        parameterSets.add(new Object[] { "//foo", "foo"});
-        parameterSets.add(new Object[] { "//foo//", "foo"});
-        parameterSets.add(new Object[] { "/foo//", "foo"});
-        parameterSets.add(new Object[] { "/foo/", "foo"});
-        parameterSets.add(new Object[] { "foo/", "foo"});
+        parameterSets.add(new Object[] { "/foo", "foo" });
+        parameterSets.add(new Object[] { "//foo", "foo" });
+        parameterSets.add(new Object[] { "//foo//", "foo" });
+        parameterSets.add(new Object[] { "/foo//", "foo" });
+        parameterSets.add(new Object[] { "/foo/", "foo" });
+        parameterSets.add(new Object[] { "foo/", "foo" });
 
-        parameterSets.add(new Object[] { "/foo/bar", "foo.bar"});
-        parameterSets.add(new Object[] { "//foo/bar", "foo.bar"});
-        parameterSets.add(new Object[] { "//foo//bar", "foo.bar"});
-        parameterSets.add(new Object[] { "/foo//bar", "foo.bar"});
-        parameterSets.add(new Object[] { "/foo/bar", "foo.bar"});
-        parameterSets.add(new Object[] { "foo/bar", "foo.bar"});
+        parameterSets.add(new Object[] { "/foo/bar", "foo.bar" });
+        parameterSets.add(new Object[] { "//foo/bar", "foo.bar" });
+        parameterSets.add(new Object[] { "//foo//bar", "foo.bar" });
+        parameterSets.add(new Object[] { "/foo//bar", "foo.bar" });
+        parameterSets.add(new Object[] { "/foo/bar", "foo.bar" });
+        parameterSets.add(new Object[] { "foo/bar", "foo.bar" });
 
         return parameterSets;
     }

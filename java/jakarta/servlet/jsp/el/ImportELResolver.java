@@ -16,9 +16,6 @@
  */
 package jakarta.servlet.jsp.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.Objects;
 
 import jakarta.el.ELClass;
@@ -27,8 +24,7 @@ import jakarta.el.ELResolver;
 import jakarta.el.ImportHandler;
 
 /**
- * Providers resolution of imports and static imports in the Jakarta Server
- * Pages ELResolver chain.
+ * Providers resolution of imports and static imports in the Jakarta Pages ELResolver chain.
  *
  * @since JSP 3.1
  */
@@ -43,9 +39,16 @@ public class ImportELResolver extends ELResolver {
             key = Class.forName("org.apache.el.parser.AstIdentifier");
         } catch (Exception e) {
             // Ignore: Expected if not running on Tomcat. Not a problem since
-            //         this just allows a short-cut.
+            // this just allows a short-cut.
         }
         AST_IDENTIFIER_KEY = key;
+    }
+
+    /**
+     * Default constructor.
+     */
+    public ImportELResolver() {
+        super();
     }
 
     @Override
@@ -86,8 +89,8 @@ public class ImportELResolver extends ELResolver {
                         if (clazz != null) {
                             try {
                                 result = clazz.getField(key).get(null);
-                            } catch (IllegalArgumentException | IllegalAccessException |
-                                    NoSuchFieldException | SecurityException e) {
+                            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException |
+                                    SecurityException e) {
                                 // Most (all?) of these should have been
                                 // prevented by the checks when the import
                                 // was defined.
@@ -125,12 +128,6 @@ public class ImportELResolver extends ELResolver {
 
         // In normal usage, ScopedAttributeELResolver will have responded.
         return false;
-    }
-
-    @Deprecated(forRemoval = true, since = "JSP 3.1")
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        return Collections.emptyIterator();
     }
 
     @Override

@@ -22,16 +22,13 @@ import java.nio.charset.StandardCharsets;
 import org.junit.Test;
 
 /**
- * Unit tests for Section 3.2 of
- * <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>.
- * <br>
- * The order of tests in this class is aligned with the order of the
- * requirements in the RFC.
+ * Unit tests for Section 3.2 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
+ * The order of tests in this class is aligned with the order of the requirements in the RFC.
  */
 public class TestHttp2Section_3_2 extends Http2TestBase {
 
     // Note: Tests for zero/multiple HTTP2-Settings fields can be found below
-    //       in the tests for section 3.2.1
+    // in the tests for section 3.2.1
 
     // TODO: Test initial requests with bodies of various sizes
 
@@ -54,21 +51,21 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
     }
 
 
-    @Test(timeout=10000)
+    @Test(timeout = 10000)
     public void testConnectionNoPreface() throws Exception {
         setupAsFarAsUpgrade();
 
         // If we don't send the preface the server should kill the connection.
         try {
             // Make the parser read something.
-            parser.readFrame(true);
+            parser.readFrame();
         } catch (IOException ioe) {
             // Expected because the server is going to drop the connection.
         }
     }
 
 
-    @Test(timeout=10000)
+    @Test(timeout = 10000)
     public void testConnectionIncompletePrefaceStart() throws Exception {
         setupAsFarAsUpgrade();
 
@@ -78,25 +75,24 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
         os.flush();
         try {
             // Make the parser read something.
-            parser.readFrame(true);
+            parser.readFrame();
         } catch (IOException ioe) {
             // Expected because the server is going to drop the connection.
         }
     }
 
 
-    @Test(timeout=10000)
+    @Test(timeout = 10000)
     public void testConnectionInvalidPrefaceStart() throws Exception {
         setupAsFarAsUpgrade();
 
         // If we send an incomplete preface the server should kill the
         // connection.
-        os.write("xxxxxxxxx-xxxxxxxxx-xxxxxxxxx-xxxxxxxxxx".getBytes(
-                StandardCharsets.ISO_8859_1));
+        os.write("xxxxxxxxx-xxxxxxxxx-xxxxxxxxx-xxxxxxxxxx".getBytes(StandardCharsets.ISO_8859_1));
         os.flush();
         try {
             // Make the parser read something.
-            parser.readFrame(true);
+            parser.readFrame();
         } catch (IOException ioe) {
             // Expected because the server is going to drop the connection.
         }
@@ -104,7 +100,7 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
 
 
     @Test
-    public void testConnectionUpgradeFirstResponse() throws Exception{
+    public void testConnectionUpgradeFirstResponse() throws Exception {
         super.http2Connect();
     }
 
@@ -117,14 +113,14 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
     }
 
 
-    //------------------------------------------------------------ Section 3.2.1
+    // ------------------------------------------------------------ Section 3.2.1
 
     @Test
     public void testZeroHttp2Settings() throws Exception {
         enableHttp2();
         configureAndStartWebApplication();
         openClientConnection();
-        doHttpUpgrade(Http2TestBase.DEFAULT_CONNECTION_HEADER_VALUE, "h2c", "", false);
+        doHttpUpgrade(DEFAULT_CONNECTION_HEADER_VALUE, "h2c", "", false);
         parseHttp11Response();
     }
 
@@ -134,9 +130,8 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
         enableHttp2();
         configureAndStartWebApplication();
         openClientConnection();
-        doHttpUpgrade(Http2TestBase.DEFAULT_CONNECTION_HEADER_VALUE, "h2c",
-                Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER +
-                Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER, false);
+        doHttpUpgrade(DEFAULT_CONNECTION_HEADER_VALUE, "h2c", EMPTY_HTTP2_SETTINGS_HEADER + EMPTY_HTTP2_SETTINGS_HEADER,
+                false);
         parseHttp11Response();
     }
 
@@ -146,7 +141,7 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
         enableHttp2();
         configureAndStartWebApplication();
         openClientConnection();
-        doHttpUpgrade("Upgrade", "h2c", Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER, false);
+        doHttpUpgrade("Upgrade", "h2c", EMPTY_HTTP2_SETTINGS_HEADER, false);
         parseHttp11Response();
     }
 
@@ -156,8 +151,7 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
         enableHttp2();
         configureAndStartWebApplication();
         openClientConnection();
-        doHttpUpgrade("Upgrade\r\nConnection: HTTP2-Settings", "h2c",
-                Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER, true);
+        doHttpUpgrade("Upgrade\r\nConnection: HTTP2-Settings", "h2c", EMPTY_HTTP2_SETTINGS_HEADER, true);
         sendClientPreface();
         validateHttp2InitialResponse();
     }
@@ -168,8 +162,7 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
         enableHttp2();
         configureAndStartWebApplication();
         openClientConnection();
-        doHttpUpgrade("HTTP2-Settings\r\nConnection: Upgrade", "h2c",
-                Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER, true);
+        doHttpUpgrade("HTTP2-Settings\r\nConnection: Upgrade", "h2c", EMPTY_HTTP2_SETTINGS_HEADER, true);
         sendClientPreface();
         validateHttp2InitialResponse();
     }

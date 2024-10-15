@@ -41,8 +41,8 @@ import java.util.logging.Logger;
 import javax.sql.CommonDataSource;
 
 /**
- * Defines bridge methods to JDBC 4.1 (Java 7) methods to allow call sites to operate safely (without
- * {@link AbstractMethodError}) when using a JDBC driver written for JDBC 4.0 (Java 6).
+ * Defines bridge methods to JDBC 4.1 (Java 7 or above) methods to allow call sites to operate safely (without
+ * {@link AbstractMethodError}) when using a JDBC driver written for JDBC 4.0 (Java 6 or above).
  * <p>
  * There should be no need to this kind of code for JDBC 4.2 in Java 8 due to JDBC's use of default methods.
  * </p>
@@ -458,7 +458,7 @@ public class Jdbc41Bridge {
             throws SQLException {
         try {
             connection.setNetworkTimeout(executor, milliseconds);
-        } catch (final AbstractMethodError e) {
+        } catch (final AbstractMethodError ignored) {
             // do nothing
         }
     }
@@ -480,7 +480,7 @@ public class Jdbc41Bridge {
     public static void setSchema(final Connection connection, final String schema) throws SQLException {
         try {
             connection.setSchema(schema);
-        } catch (final AbstractMethodError e) {
+        } catch (final AbstractMethodError ignored) {
             // do nothing
         }
     }

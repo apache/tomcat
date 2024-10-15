@@ -16,6 +16,7 @@
  */
 package org.apache.juli;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -28,19 +29,29 @@ public class TestOneLineFormatterPerformance {
     @Test
     public void testDateFormat() throws Exception {
 
+        DateFormat stringFormatImpl =  new StringFormatImpl();
+        long stringFormatImplTime = doTestDateFormat(stringFormatImpl);
+
+        DateFormat dateFormatCacheImpl =  new DateFormatCacheImpl();
+        long dateFormatCacheImplTime = doTestDateFormat(dateFormatCacheImpl);
+
+        Assert.assertTrue("String#format was faster that DateFormatCache",
+                dateFormatCacheImplTime < stringFormatImplTime);
+    }
+
+
+    private long doTestDateFormat(DateFormat df) {
         int iters = 1000000;
-        DateFormat[] dfs = new DateFormat[] { new StringFormatImpl(), new DateFormatCacheImpl() };
 
-        for (DateFormat df : dfs) {
-            long start = System.nanoTime();
-            for (int i = 0; i < iters; i++) {
-                df.format(System.nanoTime());
-            }
-            long end = System.nanoTime();
-            System.out.println(
-                    "Impl: [" + df.getClass().getName() + "] took [" + (end-start) + "] ns");
+        long start = System.nanoTime();
+        for (int i = 0; i < iters; i++) {
+            df.format(System.nanoTime());
         }
+        long end = System.nanoTime();
+        System.out.println(
+                "Impl: [" + df.getClass().getName() + "] took [" + (end - start) + "] ns");
 
+        return end - start;
     }
 
 
@@ -62,7 +73,7 @@ public class TestOneLineFormatterPerformance {
 
         private final DateFormatCache cache;
 
-        public DateFormatCacheImpl() {
+        DateFormatCacheImpl() {
             cache = new DateFormatCache(5, "dd-MMM-yyyy HH:mm:ss",  null);
         }
 

@@ -37,7 +37,7 @@
 #    new web.xml.
 # B) Mime type differences for the same extension between httpd
 #    and Tomcat that are not part of TOMCAT_KEEP are logged.
-#    They will be overwritten wit the httpd definition in the generated
+#    They will be overwritten with the httpd definition in the generated
 #    new web.xml. If you want to keep their Tomcat definition, add them
 #    to TOMCAT_KEEP and run the script again. If you want to use the
 #    definitions from httpd, commit the generated new web.xml.
@@ -94,7 +94,6 @@ my %TOMCAT_ONLY = qw(
     qtif image/x-quicktime
     shtml text/x-server-parsed-html
     ulw audio/basic
-    wasm application/wasm
     z application/x-compress
 );
 

@@ -17,7 +17,8 @@
 package websocket.drawboard;
 
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.CloseReason.CloseCodes;
@@ -43,8 +44,7 @@ public class Client {
      * Contains the messages which are buffered until the previous
      * send operation has finished.
      */
-    private final LinkedList<AbstractWebsocketMessage> messagesToSend =
-            new LinkedList<>();
+    private final Deque<AbstractWebsocketMessage> messagesToSend = new ArrayDeque<>();
     /**
      * If this client is currently sending a messages asynchronously.
      */

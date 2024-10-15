@@ -31,23 +31,15 @@ public class ManagerSF extends StoreFactoryBase {
 
     private static Log log = LogFactory.getLog(ManagerSF.class);
 
-    /**
-     * Store the only the Manager elements
-     *
-     * @see NamingResourcesSF#storeChildren(PrintWriter, int, Object, StoreDescription)
-     */
     @Override
-    public void store(PrintWriter aWriter, int indent, Object aElement)
-            throws Exception {
-        StoreDescription elementDesc = getRegistry().findDescription(
-                aElement.getClass());
+    public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
+        StoreDescription elementDesc = getRegistry().findDescription(aElement.getClass());
         if (elementDesc != null) {
             if (aElement instanceof StandardManager) {
                 StandardManager manager = (StandardManager) aElement;
                 if (!isDefaultManager(manager)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("factory.storeTag", elementDesc
-                                .getTag(), aElement));
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("factory.storeTag", elementDesc.getTag(), aElement));
                     }
                     super.store(aWriter, indent, aElement);
                 }
@@ -56,24 +48,21 @@ public class ManagerSF extends StoreFactoryBase {
             }
         } else {
             if (log.isWarnEnabled()) {
-                log.warn(sm.getString("factory.storeNoDescriptor", aElement
-                        .getClass()));
+                log.warn(sm.getString("factory.storeNoDescriptor", aElement.getClass()));
             }
         }
     }
 
     /**
-     * Is this an instance of the default <code>Manager</code> configuration,
-     * with all-default properties?
+     * Is this an instance of the default <code>Manager</code> configuration, with all-default properties?
      *
-     * @param smanager
-     *            Manager to be tested
+     * @param smanager Manager to be tested
+     *
      * @return <code>true</code> if this is an instance of the default manager
      */
     protected boolean isDefaultManager(StandardManager smanager) {
 
-        if (!"SESSIONS.ser".equals(smanager.getPathname())
-                || (smanager.getMaxActiveSessions() != -1)) {
+        if (!"SESSIONS.ser".equals(smanager.getPathname()) || (smanager.getMaxActiveSessions() != -1)) {
             return false;
         }
         return true;
@@ -81,8 +70,8 @@ public class ManagerSF extends StoreFactoryBase {
     }
 
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aManager,
-            StoreDescription parentDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aManager, StoreDescription parentDesc)
+            throws Exception {
         if (aManager instanceof Manager) {
             Manager manager = (Manager) aManager;
             // Store nested <SessionIdGenerator> element;

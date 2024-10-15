@@ -16,15 +16,15 @@
  */
 package jakarta.el;
 
-import java.beans.FeatureDescriptor;
 import java.lang.reflect.Array;
-import java.util.Iterator;
 import java.util.Objects;
 
 /**
  * Standard ELResolver for working with arrays.
  */
 public class ArrayELResolver extends ELResolver {
+
+    private static final String LENGTH_PROPERTY_NAME = "length";
 
     private final boolean readOnly;
 
@@ -38,8 +38,7 @@ public class ArrayELResolver extends ELResolver {
     /**
      * Creates an instance of the standard array resolver.
      *
-     * @param readOnly  {@code true} if the created instance should be read-only
-     *                  otherwise false.
+     * @param readOnly {@code true} if the created instance should be read-only otherwise false.
      */
     public ArrayELResolver(boolean readOnly) {
         this.readOnly = readOnly;
@@ -51,6 +50,12 @@ public class ArrayELResolver extends ELResolver {
 
         if (base != null && base.getClass().isArray()) {
             context.setPropertyResolved(base, property);
+
+            if (LENGTH_PROPERTY_NAME.equals(property)) {
+                // Always read-only
+                return null;
+            }
+
             try {
                 int idx = coerce(property);
                 checkBounds(base, idx);
@@ -58,8 +63,8 @@ public class ArrayELResolver extends ELResolver {
                 // ignore
             }
             /*
-             * The resolver may have been created in read-only mode but the
-             * array and its elements will always be read-write.
+             * The resolver may have been created in read-only mode but the array and its elements will always be
+             * read-write.
              */
             if (readOnly) {
                 return null;
@@ -76,6 +81,9 @@ public class ArrayELResolver extends ELResolver {
 
         if (base != null && base.getClass().isArray()) {
             context.setPropertyResolved(base, property);
+            if (LENGTH_PROPERTY_NAME.equals(property)) {
+                return Integer.valueOf(Array.getLength(base));
+            }
             int idx = coerce(property);
             if (idx < 0 || idx >= Array.getLength(base)) {
                 return null;
@@ -87,24 +95,26 @@ public class ArrayELResolver extends ELResolver {
     }
 
     @Override
-    public void setValue(ELContext context, Object base, Object property,
-            Object value) {
+    public void setValue(ELContext context, Object base, Object property, Object value) {
         Objects.requireNonNull(context);
 
         if (base != null && base.getClass().isArray()) {
             context.setPropertyResolved(base, property);
 
+            if (LENGTH_PROPERTY_NAME.equals(property)) {
+                throw new PropertyNotWritableException(
+                        Util.message(context, "propertyNotWritable", base.getClass().getName(), property));
+            }
+
             if (this.readOnly) {
-                throw new PropertyNotWritableException(Util.message(context,
-                        "resolverNotWritable", base.getClass().getName()));
+                throw new PropertyNotWritableException(
+                        Util.message(context, "resolverNotWritable", base.getClass().getName()));
             }
 
             int idx = coerce(property);
             checkBounds(base, idx);
-            if (value != null && !Util.isAssignableFrom(value.getClass(),
-                    base.getClass().getComponentType())) {
-                throw new ClassCastException(Util.message(context,
-                        "objectNotAssignable", value.getClass().getName(),
+            if (value != null && !Util.isAssignableFrom(value.getClass(), base.getClass().getComponentType())) {
+                throw new ClassCastException(Util.message(context, "objectNotAssignable", value.getClass().getName(),
                         base.getClass().getComponentType().getName()));
             }
             Array.set(base, idx, value);
@@ -117,6 +127,10 @@ public class ArrayELResolver extends ELResolver {
 
         if (base != null && base.getClass().isArray()) {
             context.setPropertyResolved(base, property);
+            if (LENGTH_PROPERTY_NAME.equals(property)) {
+                // Always read-only
+                return true;
+            }
             try {
                 int idx = coerce(property);
                 checkBounds(base, idx);
@@ -128,12 +142,6 @@ public class ArrayELResolver extends ELResolver {
         return this.readOnly;
     }
 
-    @Deprecated(forRemoval = true, since = "EL 5.0")
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        return null;
-    }
-
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
         if (base != null && base.getClass().isArray()) {
@@ -142,14 +150,13 @@ public class ArrayELResolver extends ELResolver {
         return null;
     }
 
-    private static final void checkBounds(Object base, int idx) {
+    private static void checkBounds(Object base, int idx) {
         if (idx < 0 || idx >= Array.getLength(base)) {
-            throw new PropertyNotFoundException(
-                    new ArrayIndexOutOfBoundsException(idx).getMessage());
+            throw new PropertyNotFoundException(new ArrayIndexOutOfBoundsException(idx).getMessage());
         }
     }
 
-    private static final int coerce(Object property) {
+    private static int coerce(Object property) {
         if (property instanceof Number) {
             return ((Number) property).intValue();
         }
@@ -162,8 +169,7 @@ public class ArrayELResolver extends ELResolver {
         if (property instanceof String) {
             return Integer.parseInt((String) property);
         }
-        throw new IllegalArgumentException(property != null ?
-                property.toString() : "null");
+        throw new IllegalArgumentException(property != null ? property.toString() : "null");
     }
 
 }

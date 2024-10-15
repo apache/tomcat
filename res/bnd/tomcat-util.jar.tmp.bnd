@@ -27,6 +27,8 @@ Export-Package: \
     org.apache.tomcat.util.res,\
     org.apache.tomcat.util.security,\
     org.apache.tomcat.util.threads
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -includepackage: \
     org.apache.tomcat.util.json

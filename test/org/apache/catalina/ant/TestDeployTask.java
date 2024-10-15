@@ -52,7 +52,6 @@ public class TestDeployTask extends TomcatBaseTest {
         testExecute(deployTask, new File("test/deployment/context.war").toURI().toString());
         testExecute(deployTask, new File("test/deployment/context.war").getAbsolutePath());
         testExecute(deployTask, "jar:" + new File("test/deployment/context.jar").toURI().toString() + "!/context.war");
-        testExecute(deployTask, "file:./test/deployment/dir with spaces/context.war");
         testExecute(deployTask, new File("test/deployment/dir with spaces/context.war").toURI().toString());
         testExecute(deployTask, new File("test/deployment/dir with spaces/context.war").getAbsolutePath());
         testExecute(deployTask, "jar:" + new File("test/deployment/dir with spaces/context.jar").toURI().toString()
@@ -74,8 +73,16 @@ public class TestDeployTask extends TomcatBaseTest {
         testExecute(deployTask, "sc:./test/deployment/context.war");
     }
 
+    @Test(expected = BuildException.class)
+    public void bug58086d() {
+        DeployTask deployTask = new DeployTask();
+        setDefaults(deployTask);
+        testExecute(deployTask, "file:./test/deployment/dir with spaces/context.war");
+    }
+
+
     @Test
-    public void bug58086d() throws Exception {
+    public void bug58086e() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         File root = new File("test/deployment");

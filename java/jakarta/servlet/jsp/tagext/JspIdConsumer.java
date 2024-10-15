@@ -17,8 +17,7 @@
 package jakarta.servlet.jsp.tagext;
 
 /**
- * Interface that allows tag handlers to be provided with a unique (within the
- * scope of the web application) ID.
+ * Interface that allows tag handlers to be provided with a unique (within the scope of the web application) ID.
  */
 public interface JspIdConsumer {
 
@@ -27,5 +26,5 @@ public interface JspIdConsumer {
      *
      * @param jspId The unique Id
      */
-    public void setJspId(String jspId);
+    void setJspId(String jspId);
 }

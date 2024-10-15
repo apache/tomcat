@@ -34,6 +34,7 @@ import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
@@ -53,8 +54,10 @@ public class Http2Protocol implements UpgradeProtocol {
     // Maximum amount of streams which can be concurrently executed over
     // a single connection
     static final int DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION = 20;
-
+    // Default factor used when adjusting overhead count for overhead frames
     static final int DEFAULT_OVERHEAD_COUNT_FACTOR = 10;
+    // Default factor used when adjusting overhead count for reset frames
+    static final int DEFAULT_OVERHEAD_RESET_FACTOR = 50;
     // Not currently configurable. This makes the practical limit for
     // overheadCountFactor to be ~20. The exact limit will vary with traffic
     // patterns.
@@ -85,6 +88,7 @@ public class Http2Protocol implements UpgradeProtocol {
     private int maxHeaderCount = Constants.DEFAULT_MAX_HEADER_COUNT;
     private int maxTrailerCount = Constants.DEFAULT_MAX_TRAILER_COUNT;
     private int overheadCountFactor = DEFAULT_OVERHEAD_COUNT_FACTOR;
+    private int overheadResetFactor = DEFAULT_OVERHEAD_RESET_FACTOR;
     private int overheadContinuationThreshold = DEFAULT_OVERHEAD_CONTINUATION_THRESHOLD;
     private int overheadDataThreshold = DEFAULT_OVERHEAD_DATA_THRESHOLD;
     private int overheadWindowUpdateThreshold = DEFAULT_OVERHEAD_WINDOW_UPDATE_THRESHOLD;
@@ -95,6 +99,18 @@ public class Http2Protocol implements UpgradeProtocol {
     private AbstractHttp11Protocol<?> http11Protocol = null;
 
     private RequestGroupInfo global = new RequestGroupInfo();
+
+    /*
+     * Setting discardRequestsAndResponses can have a significant performance impact. The magnitude of the impact is
+     * very application dependent but with a simple Spring Boot application[1] returning a short JSON response running
+     * on markt's desktop in 2024 the difference was 108k req/s with this set to true compared to 124k req/s with this
+     * set to false. The larger the response and/or the larger the request processing time, the smaller the performance
+     * impact of this setting.
+     *
+     * [1] https://github.com/markt-asf/spring-boot-http2
+     */
+    private boolean discardRequestsAndResponses = false;
+    private final SynchronizedStack<Request> recycledRequestsAndResponses = new SynchronizedStack<>();
 
     @Override
     public String getHttpUpgradeName(boolean isSSLEnabled) {
@@ -126,11 +142,10 @@ public class Http2Protocol implements UpgradeProtocol {
 
 
     @Override
-    public InternalHttpUpgradeHandler getInternalUpgradeHandler(SocketWrapperBase<?> socketWrapper,
-            Adapter adapter, Request coyoteRequest) {
-        return socketWrapper.hasAsyncIO()
-                ? new Http2AsyncUpgradeHandler(this, adapter, coyoteRequest, socketWrapper)
-                : new Http2UpgradeHandler(this, adapter, coyoteRequest, socketWrapper);
+    public InternalHttpUpgradeHandler getInternalUpgradeHandler(SocketWrapperBase<?> socketWrapper, Adapter adapter,
+            Request coyoteRequest) {
+        return socketWrapper.hasAsyncIO() ? new Http2AsyncUpgradeHandler(this, adapter, coyoteRequest, socketWrapper) :
+                new Http2UpgradeHandler(this, adapter, coyoteRequest, socketWrapper);
     }
 
 
@@ -291,6 +306,20 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
 
+    public int getOverheadResetFactor() {
+        return overheadResetFactor;
+    }
+
+
+    public void setOverheadResetFactor(int overheadResetFactor) {
+        if (overheadResetFactor < 0) {
+            this.overheadResetFactor = 0;
+        } else {
+            this.overheadResetFactor = overheadResetFactor;
+        }
+    }
+
+
     public int getOverheadContinuationThreshold() {
         return overheadContinuationThreshold;
     }
@@ -349,6 +378,7 @@ public class Http2Protocol implements UpgradeProtocol {
     @Override
     public void setHttp11Protocol(AbstractHttp11Protocol<?> http11Protocol) {
         this.http11Protocol = http11Protocol;
+        recycledRequestsAndResponses.setLimit(http11Protocol.getMaxConnections());
 
         try {
             ObjectName oname = this.http11Protocol.getONameForUpgrade(getUpgradeProtocolName());
@@ -373,5 +403,37 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public RequestGroupInfo getGlobal() {
         return global;
+    }
+
+
+    public boolean getDiscardRequestsAndResponses() {
+        return discardRequestsAndResponses;
+    }
+
+
+    public void setDiscardRequestsAndResponses(boolean discardRequestsAndResponses) {
+        this.discardRequestsAndResponses = discardRequestsAndResponses;
+    }
+
+
+    Request popRequestAndResponse() {
+        Request requestAndResponse = null;
+        if (!discardRequestsAndResponses) {
+            requestAndResponse = recycledRequestsAndResponses.pop();
+        }
+        if (requestAndResponse == null) {
+            requestAndResponse = new Request();
+            Response response = new Response();
+            requestAndResponse.setResponse(response);
+        }
+        return requestAndResponse;
+    }
+
+
+    void pushRequestAndResponse(Request requestAndResponse) {
+        requestAndResponse.recycle();
+        if (!discardRequestsAndResponses) {
+            recycledRequestsAndResponses.push(requestAndResponse);
+        }
     }
 }

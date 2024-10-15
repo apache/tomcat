@@ -22,11 +22,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Unit tests for Section 6.9 of
- * <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>.
- * <br>
- * The order of tests in this class is aligned with the order of the
- * requirements in the RFC.
+ * Unit tests for Section 6.9 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
+ * The order of tests in this class is aligned with the order of the requirements in the RFC.
  */
 public class TestHttp2Section_6_9 extends Http2TestBase {
 
@@ -44,13 +41,12 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
     public void testZeroWindowUpdateStream() throws Exception {
         http2Connect();
 
-        sendSimplePostRequest(3,  null,  false);
+        sendSimplePostRequest(3, null, false);
         sendWindowUpdate(3, 0);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
-        Assert.assertEquals("3-RST-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]\n",
-                output.getTrace());
+        Assert.assertEquals("3-RST-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]\n", output.getTrace());
     }
 
 
@@ -69,7 +65,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
 
 
     // TODO: Test always accounting for changes in flow control windows even if
-    //       the frame is in error.
+    // the frame is in error.
 
 
     @Test
@@ -97,24 +93,32 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         // Default connection window size is 64k - 1. Initial request will have
         // used 8k (56k -1).
 
-        // Use up the remaining connection window. These requests require 56k
-        // but there is only 56k - 1 available.
-        for (int i = 3; i < 17; i += 2) {
+        // Use up the remaining connection window. These requests require 48k.
+        for (int i = 3; i < 15; i += 2) {
             sendSimpleGetRequest(i);
             readSimpleGetResponse();
+            Assert.assertEquals(getSimpleResponseTrace(i), output.getTrace());
+            output.clearTrace();
         }
+        // This request requires 8k but there is only 8k-1 available
+        sendSimpleGetRequest(15);
+        readSimpleGetResponse();
+        String expected = getResponseBodyFrameTrace(15, 200, "application/octet-stream", null, "8191", "8192");
+        // No end of stream
+        expected = expected.substring(0, expected.length() - "15-EndOfStream\n".length());
+        Assert.assertEquals(expected, output.getTrace());
         output.clearTrace();
 
         // It should be possible to send a request that generates an empty
         // response at this point
         sendEmptyGetRequest(17);
         // Headers
-        parser.readFrame(true);
+        parser.readFrame();
         // Body
-        parser.readFrame(true);
+        parser.readFrame();
 
         // Release Stream 15 which is waiting for a single byte.
-        sendWindowUpdate(0,  1024);
+        sendWindowUpdate(0, 1024);
 
         Assert.assertEquals(getEmptyResponseTrace(17), output.getTrace());
     }
@@ -125,15 +129,14 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         http2Connect();
 
         // Set up stream 3
-        sendSimplePostRequest(3,  null,  false);
+        sendSimplePostRequest(3, null, false);
 
         // Super size the flow control window.
         sendWindowUpdate(3, (1 << 31) - 1);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
-        Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]\n",
-                output.getTrace());
+        Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]\n", output.getTrace());
     }
 
 
@@ -161,8 +164,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         byte[] dataFrameHeader = new byte[9];
         ByteBuffer dataPayload = ByteBuffer.allocate(8 * 1024);
 
-        buildPostRequest(headersFrameHeader, headersPayload, false,
-                dataFrameHeader, dataPayload, null, 3);
+        buildPostRequest(headersFrameHeader, headersPayload, false, dataFrameHeader, dataPayload, null, 3);
 
         // Write the headers
         writeFrame(headersFrameHeader, headersPayload);
@@ -171,7 +173,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         // window.
         sendSettings(0, false, new SettingValue(4, 4 * 1024));
         // Ack
-        parser.readFrame(true);
+        parser.readFrame();
         Assert.assertEquals("0-Settings-Ack\n", output.getTrace());
         output.clearTrace();
 
@@ -179,31 +181,25 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         writeFrame(dataFrameHeader, dataPayload);
 
         // Window size updates after reading POST body
-        parser.readFrame(true);
-        parser.readFrame(true);
-        Assert.assertEquals(
-                "0-WindowSize-[8192]\n" +
-                "3-WindowSize-[8192]\n",
-                output.getTrace());
+        parser.readFrame();
+        parser.readFrame();
+        Assert.assertEquals("0-WindowSize-[8192]\n" + "3-WindowSize-[8192]\n", output.getTrace());
         output.clearTrace();
 
         // Read stream 3 headers and first part of body
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
         Assert.assertEquals(
-                "3-HeadersStart\n" +
-                "3-Header-[:status]-[200]\n" +
-                "3-Header-[content-length]-[8192]\n" +
-                "3-Header-[date]-["+ DEFAULT_DATE + "]\n" +
-                "3-HeadersEnd\n" +
-                "3-Body-4096\n", output.getTrace());
-                output.clearTrace();
+                "3-HeadersStart\n" + "3-Header-[:status]-[200]\n" + "3-Header-[content-length]-[8192]\n" +
+                        "3-Header-[date]-[" + DEFAULT_DATE + "]\n" + "3-HeadersEnd\n" + "3-Body-4096\n",
+                output.getTrace());
+        output.clearTrace();
 
         // Now use a settings frame to further reduce the size of the flow
         // control window. This should make the stream 3 window negative
         sendSettings(0, false, new SettingValue(4, 2 * 1024));
         // Ack
-        parser.readFrame(true);
+        parser.readFrame();
         Assert.assertEquals("0-Settings-Ack\n", output.getTrace());
         output.clearTrace();
 
@@ -211,32 +207,24 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         // window. The stream 3 window should still be negative
         sendSettings(0, false, new SettingValue(4, 3 * 1024));
         // Ack
-        parser.readFrame(true);
+        parser.readFrame();
         Assert.assertEquals("0-Settings-Ack\n", output.getTrace());
         output.clearTrace();
 
         // Do a POST that won't be affected by the above limit
         sendSimplePostRequest(5, null);
         // Window size updates after reading POST body
-        parser.readFrame(true);
-        parser.readFrame(true);
-        Assert.assertEquals(
-                "0-WindowSize-[128]\n" +
-                "5-WindowSize-[128]\n",
-                output.getTrace());
+        parser.readFrame();
+        parser.readFrame();
+        Assert.assertEquals("0-WindowSize-[128]\n" + "5-WindowSize-[128]\n", output.getTrace());
         output.clearTrace();
         // Headers + body
-        parser.readFrame(true);
-        parser.readFrame(true);
-        Assert.assertEquals(
-                "5-HeadersStart\n" +
-                "5-Header-[:status]-[200]\n" +
-                "5-Header-[content-length]-[128]\n" +
-                "5-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "5-HeadersEnd\n" +
-                "5-Body-128\n" +
+        parser.readFrame();
+        parser.readFrame();
+        Assert.assertEquals("5-HeadersStart\n" + "5-Header-[:status]-[200]\n" + "5-Header-[content-length]-[128]\n" +
+                "5-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "5-HeadersEnd\n" + "5-Body-128\n" +
                 "5-EndOfStream\n", output.getTrace());
-                output.clearTrace();
+        output.clearTrace();
 
         // Now use a settings frame to restore the size of the flow control
         // window.
@@ -244,7 +232,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
 
         // Settings ack and stream 3 body are written from different threads.
         // Order depends on server side timing. Handle both possibilities.
-        parser.readFrame(true);
+        parser.readFrame();
         String trace = output.getTrace();
         String settingsAck = "0-Settings-Ack\n";
         String endOfStreamThree = "3-Body-4096\n3-EndOfStream\n";
@@ -252,13 +240,13 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         if (settingsAck.equals(trace)) {
             // Ack the end of stream 3
             output.clearTrace();
-            parser.readFrame(true);
+            parser.readFrame();
             Assert.assertEquals(endOfStreamThree, output.getTrace());
         } else {
             // End of stream 3 thenack
             Assert.assertEquals(endOfStreamThree, output.getTrace());
             output.clearTrace();
-            parser.readFrame(true);
+            parser.readFrame();
             Assert.assertEquals(settingsAck, output.getTrace());
         }
         output.clearTrace();
@@ -270,17 +258,16 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         http2Connect();
 
         // Set up stream 3
-        sendSimplePostRequest(3,  null,  false);
+        sendSimplePostRequest(3, null, false);
 
         // Increase the flow control window but keep it under the limit
         sendWindowUpdate(3, 1 << 30);
 
         // Now increase beyond the limit via a settings frame
-        sendSettings(0, false, new SettingValue(4,  1 << 30));
+        sendSettings(0, false, new SettingValue(4, 1 << 30));
         // Ack
-        parser.readFrame(true);
-        Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]\n",
-                output.getTrace());
+        parser.readFrame();
+        Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]\n", output.getTrace());
 
     }
 }

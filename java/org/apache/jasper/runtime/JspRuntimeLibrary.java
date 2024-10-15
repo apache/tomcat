@@ -990,9 +990,13 @@ public class JspRuntimeLibrary {
 
         String resourcePath = getContextRelativePath(request, relativePath);
         RequestDispatcher rd = request.getRequestDispatcher(resourcePath);
-
-        rd.include(request,
-                   new ServletResponseWrapperInclude(response, out));
+        if (rd != null) {
+            rd.include(request,
+                    new ServletResponseWrapperInclude(response, out));
+        } else {
+            throw new JasperException(
+                    Localizer.getMessage("jsp.error.include.exception", resourcePath));
+        }
 
     }
 
@@ -1080,15 +1084,7 @@ public class JspRuntimeLibrary {
     }
 
 
-    public static void releaseTag(Tag tag, InstanceManager instanceManager, boolean reused) {
-        // Caller ensures pool is non-null if reuse is true
-        if (!reused) {
-            releaseTag(tag, instanceManager);
-        }
-    }
-
-
-    protected static void releaseTag(Tag tag, InstanceManager instanceManager) {
+    public static void releaseTag(Tag tag, InstanceManager instanceManager) {
         try {
             tag.release();
         } catch (Throwable t) {

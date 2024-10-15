@@ -25,24 +25,22 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequestWrapper;
 
 /**
- * Provides a convenient implementation of the HttpServletRequest interface that
- * can be subclassed by developers wishing to adapt the request to a Servlet.
- * This class implements the Wrapper or Decorator pattern. Methods default to
- * calling through to the wrapped request object.
+ * Provides a convenient implementation of the HttpServletRequest interface that can be subclassed by developers wishing
+ * to adapt the request to a Servlet. This class implements the Wrapper or Decorator pattern. Methods default to calling
+ * through to the wrapped request object.
  *
  * @see jakarta.servlet.http.HttpServletRequest
+ *
  * @since Servlet 2.3
  */
-public class HttpServletRequestWrapper extends ServletRequestWrapper implements
-        HttpServletRequest {
+public class HttpServletRequestWrapper extends ServletRequestWrapper implements HttpServletRequest {
 
     /**
      * Constructs a request object wrapping the given request.
      *
      * @param request The request to wrap
      *
-     * @throws java.lang.IllegalArgumentException
-     *             if the request is null
+     * @throws java.lang.IllegalArgumentException if the request is null
      */
     public HttpServletRequestWrapper(HttpServletRequest request) {
         super(request);
@@ -53,8 +51,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getAuthType() on the
-     * wrapped request object.
+     * The default behavior of this method is to return getAuthType() on the wrapped request object.
      */
     @Override
     public String getAuthType() {
@@ -62,8 +59,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getCookies() on the
-     * wrapped request object.
+     * The default behavior of this method is to return getCookies() on the wrapped request object.
      */
     @Override
     public Cookie[] getCookies() {
@@ -71,8 +67,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getDateHeader(String
-     * name) on the wrapped request object.
+     * The default behavior of this method is to return getDateHeader(String name) on the wrapped request object.
      */
     @Override
     public long getDateHeader(String name) {
@@ -80,8 +75,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getHeader(String name)
-     * on the wrapped request object.
+     * The default behavior of this method is to return getHeader(String name) on the wrapped request object.
      */
     @Override
     public String getHeader(String name) {
@@ -89,8 +83,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getHeaders(String name)
-     * on the wrapped request object.
+     * The default behavior of this method is to return getHeaders(String name) on the wrapped request object.
      */
     @Override
     public Enumeration<String> getHeaders(String name) {
@@ -98,8 +91,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getHeaderNames() on the
-     * wrapped request object.
+     * The default behavior of this method is to return getHeaderNames() on the wrapped request object.
      */
     @Override
     public Enumeration<String> getHeaderNames() {
@@ -107,8 +99,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getIntHeader(String
-     * name) on the wrapped request object.
+     * The default behavior of this method is to return getIntHeader(String name) on the wrapped request object.
      */
     @Override
     public int getIntHeader(String name) {
@@ -116,9 +107,8 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return
-     * {@link HttpServletRequest#getHttpServletMapping()} on the wrapped request
-     * object.
+     * The default behavior of this method is to return {@link HttpServletRequest#getHttpServletMapping()} on the
+     * wrapped request object.
      *
      * @since Servlet 4.0
      */
@@ -128,8 +118,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getMethod() on the
-     * wrapped request object.
+     * The default behavior of this method is to return getMethod() on the wrapped request object.
      */
     @Override
     public String getMethod() {
@@ -137,8 +126,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getPathInfo() on the
-     * wrapped request object.
+     * The default behavior of this method is to return getPathInfo() on the wrapped request object.
      */
     @Override
     public String getPathInfo() {
@@ -146,8 +134,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getPathTranslated() on
-     * the wrapped request object.
+     * The default behavior of this method is to return getPathTranslated() on the wrapped request object.
      */
     @Override
     public String getPathTranslated() {
@@ -155,8 +142,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getContextPath() on the
-     * wrapped request object.
+     * The default behavior of this method is to return getContextPath() on the wrapped request object.
      */
     @Override
     public String getContextPath() {
@@ -164,8 +150,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getQueryString() on the
-     * wrapped request object.
+     * The default behavior of this method is to return getQueryString() on the wrapped request object.
      */
     @Override
     public String getQueryString() {
@@ -173,8 +158,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getRemoteUser() on the
-     * wrapped request object.
+     * The default behavior of this method is to return getRemoteUser() on the wrapped request object.
      */
     @Override
     public String getRemoteUser() {
@@ -182,8 +166,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return isUserInRole(String
-     * role) on the wrapped request object.
+     * The default behavior of this method is to return isUserInRole(String role) on the wrapped request object.
      */
     @Override
     public boolean isUserInRole(String role) {
@@ -191,8 +174,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getUserPrincipal() on
-     * the wrapped request object.
+     * The default behavior of this method is to return getUserPrincipal() on the wrapped request object.
      */
     @Override
     public java.security.Principal getUserPrincipal() {
@@ -200,8 +182,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getRequestedSessionId()
-     * on the wrapped request object.
+     * The default behavior of this method is to return getRequestedSessionId() on the wrapped request object.
      */
     @Override
     public String getRequestedSessionId() {
@@ -209,8 +190,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getRequestURI() on the
-     * wrapped request object.
+     * The default behavior of this method is to return getRequestURI() on the wrapped request object.
      */
     @Override
     public String getRequestURI() {
@@ -218,8 +198,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getRequestURL() on the
-     * wrapped request object.
+     * The default behavior of this method is to return getRequestURL() on the wrapped request object.
      */
     @Override
     public StringBuffer getRequestURL() {
@@ -227,8 +206,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getServletPath() on the
-     * wrapped request object.
+     * The default behavior of this method is to return getServletPath() on the wrapped request object.
      */
     @Override
     public String getServletPath() {
@@ -236,8 +214,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getSession(boolean
-     * create) on the wrapped request object.
+     * The default behavior of this method is to return getSession(boolean create) on the wrapped request object.
      */
     @Override
     public HttpSession getSession(boolean create) {
@@ -245,8 +222,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getSession() on the
-     * wrapped request object.
+     * The default behavior of this method is to return getSession() on the wrapped request object.
      */
     @Override
     public HttpSession getSession() {
@@ -254,8 +230,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to call changeSessionId() on the
-     * wrapped request object.
+     * The default behavior of this method is to call changeSessionId() on the wrapped request object.
      *
      * @since Servlet 3.1
      */
@@ -265,8 +240,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return
-     * isRequestedSessionIdValid() on the wrapped request object.
+     * The default behavior of this method is to return isRequestedSessionIdValid() on the wrapped request object.
      */
     @Override
     public boolean isRequestedSessionIdValid() {
@@ -274,8 +248,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return
-     * isRequestedSessionIdFromCookie() on the wrapped request object.
+     * The default behavior of this method is to return isRequestedSessionIdFromCookie() on the wrapped request object.
      */
     @Override
     public boolean isRequestedSessionIdFromCookie() {
@@ -283,8 +256,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return
-     * isRequestedSessionIdFromURL() on the wrapped request object.
+     * The default behavior of this method is to return isRequestedSessionIdFromURL() on the wrapped request object.
      */
     @Override
     public boolean isRequestedSessionIdFromURL() {
@@ -294,24 +266,21 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     /**
      * {@inheritDoc}
      * <p>
-     * The default behavior of this method is to return
-     * {@link HttpServletRequest#authenticate(HttpServletResponse)}
-     * on the wrapped request object.
+     * The default behavior of this method is to return {@link HttpServletRequest#authenticate(HttpServletResponse)} on
+     * the wrapped request object.
      *
      * @since Servlet 3.0
      */
     @Override
-    public boolean authenticate(HttpServletResponse response)
-            throws IOException, ServletException {
+    public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
         return this._getHttpServletRequest().authenticate(response);
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * The default behavior of this method is to return
-     * {@link HttpServletRequest#login(String, String)}
-     * on the wrapped request object.
+     * The default behavior of this method is to return {@link HttpServletRequest#login(String, String)} on the wrapped
+     * request object.
      *
      * @since Servlet 3.0
      */
@@ -323,9 +292,8 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     /**
      * {@inheritDoc}
      * <p>
-     * The default behavior of this method is to return
-     * {@link HttpServletRequest#logout()}
-     * on the wrapped request object.
+     * The default behavior of this method is to return {@link HttpServletRequest#logout()} on the wrapped request
+     * object.
      *
      * @since Servlet 3.0
      */
@@ -337,56 +305,54 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     /**
      * {@inheritDoc}
      * <p>
-     * The default behavior of this method is to return
-     * {@link HttpServletRequest#getParts()}
-     * on the wrapped request object.
+     * The default behavior of this method is to return {@link HttpServletRequest#getParts()} on the wrapped request
+     * object.
      *
      * @since Servlet 3.0
      */
     @Override
-    public Collection<Part> getParts() throws IOException,
-            ServletException {
+    public Collection<Part> getParts() throws IOException, ServletException {
         return this._getHttpServletRequest().getParts();
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * The default behavior of this method is to return
-     * {@link HttpServletRequest#getPart(String)}
-     * on the wrapped request object.
+     * The default behavior of this method is to return {@link HttpServletRequest#getPart(String)} on the wrapped
+     * request object.
      *
      * @since Servlet 3.0
      */
     @Override
-    public Part getPart(String name) throws IOException,
-            ServletException {
+    public Part getPart(String name) throws IOException, ServletException {
         return this._getHttpServletRequest().getPart(name);
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * The default behavior of this method is to return
-     * {@link HttpServletRequest#upgrade(Class)} on the wrapped request object.
+     * The default behavior of this method is to return {@link HttpServletRequest#upgrade(Class)} on the wrapped request
+     * object.
      *
      * @since Servlet 3.1
      */
     @Override
-    public <T extends HttpUpgradeHandler> T upgrade(
-            Class<T> httpUpgradeHandlerClass) throws IOException, ServletException {
+    public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass)
+            throws IOException, ServletException {
         return this._getHttpServletRequest().upgrade(httpUpgradeHandlerClass);
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * The default behavior of this method is to return
-     * {@link HttpServletRequest#newPushBuilder()} on the wrapped request
-     * object.
+     * The default behavior of this method is to return {@link HttpServletRequest#newPushBuilder()} on the wrapped
+     * request object.
      *
      * @since Servlet 4.0
+     *
+     * @deprecated In favor of 103 early hints
      */
+    @Deprecated
     @Override
     public PushBuilder newPushBuilder() {
         return this._getHttpServletRequest().newPushBuilder();
@@ -395,9 +361,8 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     /**
      * {@inheritDoc}
      * <p>
-     * The default behavior of this method is to return
-     * {@link HttpServletRequest#getTrailerFields()} on the wrapped request
-     * object.
+     * The default behavior of this method is to return {@link HttpServletRequest#getTrailerFields()} on the wrapped
+     * request object.
      *
      * @since Servlet 4.0
      */
@@ -410,9 +375,8 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     /**
      * {@inheritDoc}
      * <p>
-     * The default behavior of this method is to return
-     * {@link HttpServletRequest#isTrailerFieldsReady()} on the wrapped request
-     * object.
+     * The default behavior of this method is to return {@link HttpServletRequest#isTrailerFieldsReady()} on the wrapped
+     * request object.
      *
      * @since Servlet 4.0
      */

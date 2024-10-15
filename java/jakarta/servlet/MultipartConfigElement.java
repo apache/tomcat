@@ -1,27 +1,26 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package jakarta.servlet;
 
 import jakarta.servlet.annotation.MultipartConfig;
 
 /**
- * The programmatic equivalent of
- * {@link jakarta.servlet.annotation.MultipartConfig} used to configure
- * multi-part handling for a Servlet when registering a Servlet via code.
+ * The programmatic equivalent of {@link jakarta.servlet.annotation.MultipartConfig} used to configure multi-part
+ * handling for a Servlet when registering a Servlet via code.
  *
  * @since Servlet 3.0
  */
@@ -33,10 +32,10 @@ public class MultipartConfigElement {
     private final int fileSizeThreshold;// = 0;
 
     /**
-     * Create a programmatic multi-part configuration with a specific location
-     * and defaults for the remaining configuration elements.
+     * Create a programmatic multi-part configuration with a specific location and defaults for the remaining
+     * configuration elements.
      *
-     * @param location          The temporary location to store files
+     * @param location The temporary location to store files
      */
     public MultipartConfigElement(String location) {
         // Keep empty string default if location is null
@@ -51,18 +50,15 @@ public class MultipartConfigElement {
     }
 
     /**
-     * Create a programmatic multi-part configuration from the individual
-     * configuration elements.
+     * Create a programmatic multi-part configuration from the individual configuration elements.
      *
      * @param location          The temporary location to store files
      * @param maxFileSize       The maximum permitted size for a single file
      * @param maxRequestSize    The maximum permitted size for a request
-     * @param fileSizeThreshold The size above which the file is save in the
-     *                              temporary location rather than retained in
+     * @param fileSizeThreshold The size above which the file is save in the temporary location rather than retained in
      *                              memory.
      */
-    public MultipartConfigElement(String location, long maxFileSize,
-            long maxRequestSize, int fileSizeThreshold) {
+    public MultipartConfigElement(String location, long maxFileSize, long maxRequestSize, int fileSizeThreshold) {
         // Keep empty string default if location is null
         if (location != null) {
             this.location = location;
@@ -83,8 +79,7 @@ public class MultipartConfigElement {
     /**
      * Create a programmatic configuration from an annotation.
      *
-     * @param annotation The source annotation to copy to create the
-     *                   programmatic equivalent.
+     * @param annotation The source annotation to copy to create the programmatic equivalent.
      */
     public MultipartConfigElement(MultipartConfig annotation) {
         location = annotation.location();
@@ -121,11 +116,9 @@ public class MultipartConfigElement {
     }
 
     /**
-     * Obtain the size above which the file is save in the temporary location
-     * rather than retained in memory.
+     * Obtain the size above which the file is save in the temporary location rather than retained in memory.
      *
-     * @return the size above which the file is save in the temporary location
-     * rather than retained in memory.
+     * @return the size above which the file is save in the temporary location rather than retained in memory.
      */
     public int getFileSizeThreshold() {
         return fileSizeThreshold;

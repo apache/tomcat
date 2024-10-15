@@ -24,8 +24,7 @@ public class MessageHandlerResult {
     private final MessageHandlerResultType type;
 
 
-    public MessageHandlerResult(MessageHandler handler,
-            MessageHandlerResultType type) {
+    public MessageHandlerResult(MessageHandler handler, MessageHandlerResultType type) {
         this.handler = handler;
         this.type = type;
     }

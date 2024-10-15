@@ -20,8 +20,8 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 
 /**
- * A callback enabling an authentication module to request a secret key from the
- * runtime, by supplying an alias. Other request types may also be supported.
+ * A callback enabling an authentication module to request a secret key from the runtime, by supplying an alias. Other
+ * request types may also be supported.
  */
 public class SecretKeyCallback implements Callback {
 
@@ -44,7 +44,7 @@ public class SecretKeyCallback implements Callback {
         return key;
     }
 
-    public static interface Request {
+    public interface Request {
     }
 
     public static class AliasRequest implements Request {

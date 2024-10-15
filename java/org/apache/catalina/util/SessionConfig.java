@@ -26,42 +26,29 @@ public class SessionConfig {
     private static final String DEFAULT_SESSION_PARAMETER_NAME = "jsessionid";
 
     /**
-     * Determine the name to use for the session cookie for the provided
-     * context.
+     * Determine the name to use for the session cookie for the provided context.
+     *
      * @param context The context
+     *
      * @return the cookie name for the context
      */
     public static String getSessionCookieName(Context context) {
-
-        String result = getConfiguredSessionCookieName(context);
-
-        if (result == null) {
-            result = DEFAULT_SESSION_COOKIE_NAME;
-        }
-
-        return result;
+        return getConfiguredSessionCookieName(context, DEFAULT_SESSION_COOKIE_NAME);
     }
 
     /**
-     * Determine the name to use for the session path parameter for the provided
-     * context.
+     * Determine the name to use for the session path parameter for the provided context.
+     *
      * @param context The context
+     *
      * @return the parameter name for the session
      */
     public static String getSessionUriParamName(Context context) {
-
-        String result = getConfiguredSessionCookieName(context);
-
-        if (result == null) {
-            result = DEFAULT_SESSION_PARAMETER_NAME;
-        }
-
-        return result;
+        return getConfiguredSessionCookieName(context, DEFAULT_SESSION_PARAMETER_NAME);
     }
 
 
-    private static String getConfiguredSessionCookieName(Context context) {
-
+    private static String getConfiguredSessionCookieName(Context context, String defaultName) {
         // Priority is:
         // 1. Cookie name defined in context
         // 2. Cookie name configured for app
@@ -72,23 +59,21 @@ public class SessionConfig {
                 return cookieName;
             }
 
-            SessionCookieConfig scc =
-                context.getServletContext().getSessionCookieConfig();
+            SessionCookieConfig scc = context.getServletContext().getSessionCookieConfig();
             cookieName = scc.getName();
             if (cookieName != null && cookieName.length() > 0) {
                 return cookieName;
             }
         }
-
-        return null;
+        return defaultName;
     }
 
 
     /**
-     * Determine the value to use for the session cookie path for the provided
-     * context.
+     * Determine the value to use for the session cookie path for the provided context.
      *
      * @param context The context
+     *
      * @return the parameter name for the session
      */
     public static String getSessionCookiePath(Context context) {

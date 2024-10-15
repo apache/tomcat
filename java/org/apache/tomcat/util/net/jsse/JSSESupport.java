@@ -35,19 +35,16 @@ import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.res.StringManager;
 
-/** JSSESupport
-
-   Concrete implementation class for JSSE
-   Support classes.
-
-   This will only work with JDK 1.2 and up since it
-   depends on JDK 1.2's certificate support
-
-   @author EKR
-   @author Craig R. McClanahan
-   Parts cribbed from JSSECertCompat
-   Parts cribbed from CertificatesValve
-*/
+/**
+ * JSSESupport.
+ *
+ * Concrete implementation class for JSSE Support classes.
+ *
+ * @author EKR
+ * @author Craig R. McClanahan
+ * Parts cribbed from JSSECertCompat
+ * Parts cribbed from CertificatesValve
+ */
 public class JSSESupport implements SSLSupport, SSLSessionManager {
 
     private static final Log log = LogFactory.getLog(JSSESupport.class);
@@ -99,7 +96,7 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     }
 
     @Override
-    public java.security.cert.X509Certificate[] getPeerCertificateChain() throws IOException {
+    public X509Certificate[] getPeerCertificateChain() throws IOException {
         // Look up the current SSLSession
         if (session == null) {
             return null;
@@ -117,29 +114,24 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     }
 
 
-    private static java.security.cert.X509Certificate[] convertCertificates(Certificate[] certs) {
+    private static X509Certificate[] convertCertificates(Certificate[] certs) {
         if( certs==null ) {
             return null;
         }
 
-        java.security.cert.X509Certificate [] x509Certs =
-            new java.security.cert.X509Certificate[certs.length];
+        X509Certificate [] x509Certs = new X509Certificate[certs.length];
         for(int i=0; i < certs.length; i++) {
-            if (certs[i] instanceof java.security.cert.X509Certificate ) {
+            if (certs[i] instanceof X509Certificate ) {
                 // always currently true with the JSSE 1.1.x
-                x509Certs[i] = (java.security.cert.X509Certificate) certs[i];
+                x509Certs[i] = (X509Certificate) certs[i];
             } else {
                 try {
                     byte [] buffer = certs[i].getEncoded();
-                    CertificateFactory cf =
-                        CertificateFactory.getInstance("X.509");
-                    ByteArrayInputStream stream =
-                        new ByteArrayInputStream(buffer);
-                    x509Certs[i] = (java.security.cert.X509Certificate)
-                            cf.generateCertificate(stream);
+                    CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                    ByteArrayInputStream stream = new ByteArrayInputStream(buffer);
+                    x509Certs[i] = (X509Certificate) cf.generateCertificate(stream);
                 } catch(Exception ex) {
-                    log.info(sm.getString(
-                            "jsseSupport.certTranslationError", certs[i]), ex);
+                    log.info(sm.getString("jsseSupport.certTranslationError", certs[i]), ex);
                     return null;
                 }
             }
@@ -178,7 +170,7 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
         }
         // Expose ssl_session (getId)
         byte [] ssl_session = session.getId();
-        if ( ssl_session == null) {
+        if (ssl_session == null || ssl_session.length == 0) {
             return null;
         }
         StringBuilder buf=new StringBuilder();
@@ -222,7 +214,7 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
         if (additionalAttributes == null) {
             return null;
         }
-        return StringUtils.join(additionalAttributes.get(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY));
+        return StringUtils.join(additionalAttributes.get(REQUESTED_PROTOCOL_VERSIONS_KEY));
     }
 
     @Override
@@ -230,7 +222,7 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
         if (additionalAttributes == null) {
             return null;
         }
-        return StringUtils.join(additionalAttributes.get(SSLSupport.REQUESTED_CIPHERS_KEY));
+        return StringUtils.join(additionalAttributes.get(REQUESTED_CIPHERS_KEY));
     }
 }
 

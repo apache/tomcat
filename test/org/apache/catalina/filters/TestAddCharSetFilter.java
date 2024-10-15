@@ -88,13 +88,12 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
         doTest(encoding, expected, 1, false);
     }
 
-    private void doTest(String encoding, String expected, int mode, boolean useSetContentType)
-            throws Exception {
+    private void doTest(String encoding, String expected, int mode, boolean useSetContentType) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add the Servlet
         CharsetServlet servlet = new CharsetServlet(mode, useSetContentType);
@@ -130,14 +129,13 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
         private final int mode;
         private final boolean useSetContentType;
 
-        public CharsetServlet(int mode, boolean useSetContentType) {
+        CharsetServlet(int mode, boolean useSetContentType) {
             this.mode = mode;
             this.useSetContentType = useSetContentType;
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             String value;
             switch (mode) {

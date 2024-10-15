@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +37,7 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
@@ -50,7 +52,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         // Map the async servlet to /simple so we can re-use the HTTP/2 handling
         // logic from the super class.
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
         Wrapper w = Tomcat.addServlet(ctxt, "async", new AsyncComplete());
@@ -72,16 +74,11 @@ public class TestStreamProcessor extends Http2TestBase {
         readSimpleGetResponse();
         // Flush before startAsync means body is written in two packets so an
         // additional frame needs to be read
-        parser.readFrame(true);
+        parser.readFrame();
 
-        Assert.assertEquals(
-                "3-HeadersStart\n" +
-                "3-Header-[:status]-[200]\n" +
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[200]\n" +
                 "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
-                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "3-HeadersEnd\n" +
-                "3-Body-17\n" +
-                "3-Body-8\n" +
+                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n" + "3-Body-17\n" + "3-Body-8\n" +
                 "3-EndOfStream\n", output.getTrace());
     }
 
@@ -94,7 +91,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         // Map the async servlet to /simple so we can re-use the HTTP/2 handling
         // logic from the super class.
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
         Wrapper w = Tomcat.addServlet(ctxt, "async", new AsyncDispatch());
@@ -151,7 +148,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         writeFrame(frameHeader, headersPayload);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         StringBuilder expected = new StringBuilder();
         expected.append("3-HeadersStart\n");
@@ -164,6 +161,55 @@ public class TestStreamProcessor extends Http2TestBase {
         }
         expected.append("3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n");
         expected.append("3-HeadersEnd\n");
+        expected.append("3-EndOfStream\n");
+
+        Assert.assertEquals(expected.toString(), output.getTrace());
+    }
+
+
+    @Test
+    public void testPrepareHeadersNoContent() throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        Context ctxt = tomcat.addWebapp(null, "", appDir.getAbsolutePath());
+
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMappingDecoded("/simple", "simple");
+        Tomcat.addServlet(ctxt, "noContent", new NoContentServlet());
+        ctxt.addServletMappingDecoded("/noContent", "noContent");
+
+
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        List<Header> headers = new ArrayList<>(3);
+        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":path", "/noContent"));
+        headers.add(new Header(":authority", "localhost:" + getPort()));
+
+        buildGetRequest(frameHeader, headersPayload, null, headers, 3);
+
+        writeFrame(frameHeader, headersPayload);
+
+        parser.readFrame();
+
+        StringBuilder expected = new StringBuilder();
+        expected.append("3-HeadersStart\n");
+        expected.append("3-Header-[:status]-[204]\n");
+        expected.append("3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n");
+        expected.append("3-HeadersEnd\n");
+        expected.append("3-EndOfStream\n");
 
         Assert.assertEquals(expected.toString(), output.getTrace());
     }
@@ -201,7 +247,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         writeFrame(frameHeader, headersPayload);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         StringBuilder expected = new StringBuilder();
         expected.append("3-HeadersStart\n");
@@ -246,7 +292,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         writeFrame(frameHeader, headersPayload);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         StringBuilder expected = new StringBuilder();
         expected.append("3-HeadersStart\n");
@@ -290,7 +336,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         writeFrame(frameHeader, headersPayload);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         StringBuilder expected = new StringBuilder();
         expected.append("3-HeadersStart\n");
@@ -334,7 +380,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         writeFrame(frameHeader, headersPayload);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         StringBuilder expected = new StringBuilder();
         expected.append("3-HeadersStart\n");
@@ -380,7 +426,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         writeFrame(frameHeader, headersPayload);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         StringBuilder expected = new StringBuilder();
         expected.append("3-HeadersStart\n");
@@ -455,7 +501,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
         Tomcat.addServlet(ctxt, "compression", new CompressionServlet());
@@ -490,15 +536,9 @@ public class TestStreamProcessor extends Http2TestBase {
 
         readSimpleGetResponse();
 
-        Assert.assertEquals(
-                "3-HeadersStart\n" +
-                "3-Header-[:status]-[200]\n" +
-                "3-Header-[vary]-[accept-encoding]\n" +
-                "3-Header-[content-encoding]-[gzip]\n" +
-                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
-                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "3-HeadersEnd\n" +
-                "3-Body-97\n" +
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[200]\n" + "3-Header-[vary]-[accept-encoding]\n" +
+                "3-Header-[content-encoding]-[gzip]\n" + "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
+                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n" + "3-Body-97\n" +
                 "3-EndOfStream\n", output.getTrace());
     }
 
@@ -508,8 +548,7 @@ public class TestStreamProcessor extends Http2TestBase {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             // Generate content type that is compressible
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
@@ -524,6 +563,240 @@ public class TestStreamProcessor extends Http2TestBase {
             for (int i = 0; i < count; i++) {
                 os.write('X');
             }
+        }
+    }
+
+
+    @Test
+    public void testConnect() throws Exception {
+        http2Connect();
+
+        List<Header> headers = new ArrayList<>(4);
+        headers.add(new Header(":method", "CONNECT"));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":authority", "example.local"));
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, headers, 3);
+
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("3-Header-[:status]-[501]"));
+    }
+
+
+    @Test
+    public void testEarlyHints() throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctxt = getProgrammaticRootContext();
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMappingDecoded("/simple", "simple");
+        Tomcat.addServlet(ctxt, "ehs", new EarlyHintsServlet());
+        ctxt.addServletMappingDecoded("/ehs", "ehs");
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        // Disable overhead protection for window update as it breaks some tests
+        http2Protocol.setOverheadWindowUpdateThreshold(0);
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, 3, "/ehs");
+
+        // Write the headers
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[103]\n" +
+                "3-Header-[link]-[</style.css>; rel=preload; as=style]\n" + "3-HeadersEnd\n", output.getTrace());
+        output.clearTrace();
+
+        parser.readFrame();
+        parser.readFrame();
+
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[200]\n" +
+                "3-Header-[link]-[</style.css>; rel=preload; as=style]\n" +
+                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
+                "3-Header-[content-length]-[2]\n" +
+                "3-Header-[date]-[" + DEFAULT_DATE + "]\n" + "3-HeadersEnd\n" + "3-Body-2\n" + "3-EndOfStream\n",
+                output.getTrace());
+    }
+
+
+    private static class EarlyHintsServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.addHeader("Link", "</style.css>; rel=preload; as=style");
+
+            ((ResponseFacade) resp).sendEarlyHints();
+
+            resp.setCharacterEncoding(StandardCharsets.UTF_8);
+            resp.setContentType("text/plain");
+
+            resp.getWriter().write("OK");
+        }
+    }
+
+
+    @Test
+    public void testServerHeaderDefault() throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctxt = getProgrammaticRootContext();
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMappingDecoded("/simple", "simple");
+        Tomcat.addServlet(ctxt, "server", new ServerHeaderServlet());
+        ctxt.addServletMappingDecoded("/server", "server");
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        // Disable overhead protection for window update as it breaks some tests
+        http2Protocol.setOverheadWindowUpdateThreshold(0);
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, 3, "/server");
+
+        // Write the headers
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+        parser.readFrame();
+
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[200]\n" +
+                "3-Header-[server]-[TestServerApp]\n" +
+                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
+                "3-Header-[content-length]-[2]\n" +
+                "3-Header-[date]-[" + DEFAULT_DATE + "]\n" + "3-HeadersEnd\n" + "3-Body-2\n" + "3-EndOfStream\n",
+                output.getTrace());
+    }
+
+
+    @Test
+    public void testServerHeaderRemove() throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        tomcat.getConnector().setProperty("serverRemoveAppProvidedValues", "true");
+
+        Context ctxt = getProgrammaticRootContext();
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMappingDecoded("/simple", "simple");
+        Tomcat.addServlet(ctxt, "server", new ServerHeaderServlet());
+        ctxt.addServletMappingDecoded("/server", "server");
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        // Disable overhead protection for window update as it breaks some tests
+        http2Protocol.setOverheadWindowUpdateThreshold(0);
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, 3, "/server");
+
+        // Write the headers
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+        parser.readFrame();
+
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[200]\n" +
+                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
+                "3-Header-[content-length]-[2]\n" +
+                "3-Header-[date]-[" + DEFAULT_DATE + "]\n" + "3-HeadersEnd\n" + "3-Body-2\n" + "3-EndOfStream\n",
+                output.getTrace());
+    }
+
+
+    @Test
+    public void testServerHeaderForce() throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctxt = getProgrammaticRootContext();
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMappingDecoded("/simple", "simple");
+        Tomcat.addServlet(ctxt, "server", new ServerHeaderServlet());
+        ctxt.addServletMappingDecoded("/server", "server");
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        /*
+         * This adds the server header to every response. Set this after the initial response has been validated to
+         * avoid having to update the validation code to account for the additional server header.
+         */
+        tomcat.getConnector().setProperty("server", "TestServerForce");
+
+        // Disable overhead protection for window update as it breaks some tests
+        http2Protocol.setOverheadWindowUpdateThreshold(0);
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, 3, "/server");
+
+        // Write the headers
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+        parser.readFrame();
+
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[200]\n" +
+                "3-Header-[server]-[TestServerForce]\n" +
+                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
+                "3-Header-[content-length]-[2]\n" +
+                "3-Header-[date]-[" + DEFAULT_DATE + "]\n" + "3-HeadersEnd\n" + "3-Body-2\n" + "3-EndOfStream\n",
+                output.getTrace());
+    }
+
+
+    private static class ServerHeaderServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.addHeader("server", "TestServerApp");
+
+            resp.setCharacterEncoding(StandardCharsets.UTF_8);
+            resp.setContentType("text/plain");
+
+            resp.getWriter().write("OK");
         }
     }
 }

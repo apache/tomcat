@@ -24,14 +24,16 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.json.JSONFilter;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * <p>Implementation of a Valve that outputs error jsons.</p>
- *
- * <p>This Valve should be attached at the Host level, although it will work
- * if attached to a Context.</p>
- *
+ * <p>
+ * Implementation of a Valve that outputs error jsons.
+ * </p>
+ * <p>
+ * This Valve should be attached at the Host level, although it will work if attached to a Context.
+ * </p>
  */
 public class JsonErrorReportValve extends ErrorReportValve {
 
@@ -47,7 +49,7 @@ public class JsonErrorReportValve extends ErrorReportValve {
         // Do nothing on a 1xx, 2xx and 3xx status
         // Do nothing if anything has been written already
         // Do nothing if the response hasn't been explicitly marked as in error
-        //    and that error has not been reported.
+        // and that error has not been reported.
         if (statusCode < 400 || response.getContentWritten() > 0 || !response.setErrorReported()) {
             return;
         }
@@ -81,11 +83,9 @@ public class JsonErrorReportValve extends ErrorReportValve {
                 description = smClient.getString("errorReportValve.noDescription");
             }
         }
-        String jsonReport = "{\n" +
-                            "  \"type\": \"" + type + "\",\n" +
-                            "  \"message\": \"" + message + "\",\n" +
-                            "  \"description\": \"" + description + "\"\n" +
-                            "}";
+        String jsonReport = "{\n" + "  \"type\": \"" + JSONFilter.escape(type) + "\",\n" + "  \"message\": \"" +
+                JSONFilter.escape(message) + "\",\n" + "  \"description\": \"" + JSONFilter.escape(description) +
+                "\"\n" + "}";
         try {
             try {
                 response.setContentType("application/json");
@@ -93,7 +93,7 @@ public class JsonErrorReportValve extends ErrorReportValve {
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 if (container.getLogger().isDebugEnabled()) {
-                    container.getLogger().debug("status.setContentType", t);
+                    container.getLogger().debug(sm.getString("errorReportValve.contentTypeFail"), t);
                 }
             }
             Writer writer = response.getReporter();

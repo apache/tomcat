@@ -38,97 +38,83 @@ public class TestUtil {
 
     @Test
     public void testGetMessageTypeSimple() {
-        Assert.assertEquals(
-                String.class, Util.getMessageType(new SimpleMessageHandler()));
+        Assert.assertEquals(String.class, Util.getMessageType(new SimpleMessageHandler()));
     }
 
 
     @Test
     public void testGetMessageTypeSubclass() {
-        Assert.assertEquals(String.class,
-                Util.getMessageType(new SubSimpleMessageHandler()));
+        Assert.assertEquals(String.class, Util.getMessageType(new SubSimpleMessageHandler()));
     }
 
 
     @Test
     public void testGetMessageTypeGenericSubclass() {
-        Assert.assertEquals(String.class,
-                Util.getMessageType(new GenericSubMessageHandler()));
+        Assert.assertEquals(String.class, Util.getMessageType(new GenericSubMessageHandler()));
     }
 
 
     @Test
     public void testGetMessageTypeGenericMultipleSubclass() {
-        Assert.assertEquals(String.class,
-                Util.getMessageType(new GenericMultipleSubSubMessageHandler()));
+        Assert.assertEquals(String.class, Util.getMessageType(new GenericMultipleSubSubMessageHandler()));
     }
 
 
     @Test
     public void testGetMessageTypeGenericMultipleSubclassSwap() {
-        Assert.assertEquals(String.class,
-                Util.getMessageType(new GenericMultipleSubSubSwapMessageHandler()));
+        Assert.assertEquals(String.class, Util.getMessageType(new GenericMultipleSubSubSwapMessageHandler()));
     }
 
 
     @Test
     public void testGetEncoderTypeSimple() {
-        Assert.assertEquals(
-                String.class, Util.getEncoderType(SimpleEncoder.class));
+        Assert.assertEquals(String.class, Util.getEncoderType(SimpleEncoder.class));
     }
 
 
     @Test
     public void testGetEncoderTypeSubclass() {
-        Assert.assertEquals(String.class,
-                Util.getEncoderType(SubSimpleEncoder.class));
+        Assert.assertEquals(String.class, Util.getEncoderType(SubSimpleEncoder.class));
     }
 
 
     @Test
     public void testGetEncoderTypeGenericSubclass() {
-        Assert.assertEquals(String.class,
-                Util.getEncoderType(GenericSubEncoder.class));
+        Assert.assertEquals(String.class, Util.getEncoderType(GenericSubEncoder.class));
     }
 
 
     @Test
     public void testGetEncoderTypeGenericMultipleSubclass() {
-        Assert.assertEquals(String.class,
-                Util.getEncoderType(GenericMultipleSubSubEncoder.class));
+        Assert.assertEquals(String.class, Util.getEncoderType(GenericMultipleSubSubEncoder.class));
     }
 
 
     @Test
     public void testGetEncoderTypeGenericMultipleSubclassSwap() {
-        Assert.assertEquals(String.class,
-                Util.getEncoderType(GenericMultipleSubSubSwapEncoder.class));
+        Assert.assertEquals(String.class, Util.getEncoderType(GenericMultipleSubSubSwapEncoder.class));
     }
 
 
     @Test
     public void testGetEncoderTypeSimpleWithGenericType() {
-        Assert.assertEquals(List.class,
-                Util.getEncoderType(SimpleEncoderWithGenericType.class));
+        Assert.assertEquals(List.class, Util.getEncoderType(SimpleEncoderWithGenericType.class));
     }
 
 
     @Test
     public void testGenericArrayEncoderString() {
-        Assert.assertEquals(String[].class,
-                Util.getEncoderType(GenericArrayEncoderString.class));
+        Assert.assertEquals(String[].class, Util.getEncoderType(GenericArrayEncoderString.class));
     }
 
 
     @Test
     public void testGenericArraySubEncoderString() {
-        Assert.assertEquals(String[][].class,
-                Util.getEncoderType(GenericArraySubEncoderString.class));
+        Assert.assertEquals(String[][].class, Util.getEncoderType(GenericArraySubEncoderString.class));
     }
 
 
-    private static class SimpleMessageHandler
-            implements MessageHandler.Whole<String> {
+    private static class SimpleMessageHandler implements MessageHandler.Whole<String> {
         @Override
         public void onMessage(String message) {
             // NO-OP
@@ -152,23 +138,20 @@ public class TestUtil {
     }
 
 
-    private static interface Foo<T> {
+    private interface Foo<T> {
         void doSomething(T thing);
     }
 
 
-    private abstract static class GenericMultipleMessageHandler<A,B>
-            implements MessageHandler.Whole<A>, Foo<B> {
+    private abstract static class GenericMultipleMessageHandler<A, B> implements MessageHandler.Whole<A>, Foo<B> {
     }
 
 
-    private abstract static class GenericMultipleSubMessageHandler<X,Y>
-            extends GenericMultipleMessageHandler<X,Y> {
+    private abstract static class GenericMultipleSubMessageHandler<X, Y> extends GenericMultipleMessageHandler<X, Y> {
     }
 
 
-    private static class GenericMultipleSubSubMessageHandler
-            extends GenericMultipleSubMessageHandler<String,Boolean> {
+    private static class GenericMultipleSubSubMessageHandler extends GenericMultipleSubMessageHandler<String, Boolean> {
 
         @Override
         public void onMessage(String message) {
@@ -182,13 +165,13 @@ public class TestUtil {
     }
 
 
-    private abstract static class GenericMultipleSubSwapMessageHandler<Y,X>
-            extends GenericMultipleMessageHandler<X,Y> {
+    private abstract static class GenericMultipleSubSwapMessageHandler<Y, X>
+            extends GenericMultipleMessageHandler<X, Y> {
     }
 
 
     private static class GenericMultipleSubSubSwapMessageHandler
-            extends GenericMultipleSubSwapMessageHandler<Boolean,String> {
+            extends GenericMultipleSubSwapMessageHandler<Boolean, String> {
 
         @Override
         public void onMessage(String message) {
@@ -249,8 +232,7 @@ public class TestUtil {
     }
 
 
-    private abstract static class GenericMultipleEncoder<A,B>
-            implements Encoder.Text<A>, Foo<B> {
+    private abstract static class GenericMultipleEncoder<A, B> implements Encoder.Text<A>, Foo<B> {
 
         @Override
         public void init(EndpointConfig endpointConfig) {
@@ -264,13 +246,11 @@ public class TestUtil {
     }
 
 
-    private abstract static class GenericMultipleSubEncoder<X,Y>
-            extends GenericMultipleEncoder<X,Y> {
+    private abstract static class GenericMultipleSubEncoder<X, Y> extends GenericMultipleEncoder<X, Y> {
     }
 
 
-    private static class GenericMultipleSubSubEncoder
-            extends GenericMultipleSubEncoder<String,Boolean> {
+    private static class GenericMultipleSubSubEncoder extends GenericMultipleSubEncoder<String, Boolean> {
 
         @Override
         public String encode(String object) throws EncodeException {
@@ -285,13 +265,11 @@ public class TestUtil {
     }
 
 
-    private abstract static class GenericMultipleSubSwapEncoder<Y,X>
-            extends GenericMultipleEncoder<X,Y> {
+    private abstract static class GenericMultipleSubSwapEncoder<Y, X> extends GenericMultipleEncoder<X, Y> {
     }
 
 
-    private static class GenericMultipleSubSubSwapEncoder
-            extends GenericMultipleSubSwapEncoder<Boolean,String> {
+    private static class GenericMultipleSubSubSwapEncoder extends GenericMultipleSubSwapEncoder<Boolean, String> {
 
         @Override
         public String encode(String object) throws EncodeException {
@@ -305,8 +283,7 @@ public class TestUtil {
     }
 
 
-    private static class SimpleEncoderWithGenericType
-            implements Encoder.Text<List<String>> {
+    private static class SimpleEncoderWithGenericType implements Encoder.Text<List<String>> {
 
         @Override
         public void init(EndpointConfig endpointConfig) {
@@ -418,8 +395,7 @@ public class TestUtil {
 
     @Test
     public void testParseExtensionHeaderMultiple02() {
-        doTestParseExtensionHeaderMultiple(
-                " ext ; a = 1 ; b = 2 , ext2 ; c ; d = xyz , ext3 ");
+        doTestParseExtensionHeaderMultiple(" ext ; a = 1 ; b = 2 , ext2 ; c ; d = xyz , ext3 ");
     }
 
     private void doTestParseExtensionHeaderMultiple(String header) {
@@ -457,12 +433,12 @@ public class TestUtil {
         Assert.assertEquals(0, params3.size());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testParseExtensionHeaderInvalid01() {
         Util.parseExtensionHeader(new ArrayList<>(), "ext;a=\"1;b=2");
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testParseExtensionHeaderInvalid02() {
         Util.parseExtensionHeader(new ArrayList<>(), "ext;a=1\";b=2");
     }

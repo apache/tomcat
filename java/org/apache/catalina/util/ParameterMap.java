@@ -26,18 +26,16 @@ import java.util.Set;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Implementation of <strong>java.util.Map</strong> that includes a
- * <code>locked</code> property.  This class can be used to safely expose
- * Catalina internal parameter map objects to user classes without having
- * to clone them in order to avoid modifications.  When first created, a
- * <code>ParameterMap</code> instance is not locked.
+ * Implementation of <strong>java.util.Map</strong> that includes a <code>locked</code> property. This class can be used
+ * to safely expose Catalina internal parameter map objects to user classes without having to clone them in order to
+ * avoid modifications. When first created, a <code>ParameterMap</code> instance is not locked.
  *
  * @param <K> The type of Key
  * @param <V> The type of Value
  *
  * @author Craig R. McClanahan
  */
-public final class ParameterMap<K,V> implements Map<K,V>, Serializable {
+public final class ParameterMap<K, V> implements Map<K,V>, Serializable {
 
     private static final long serialVersionUID = 2L;
 
@@ -47,8 +45,7 @@ public final class ParameterMap<K,V> implements Map<K,V>, Serializable {
 
 
     /**
-     * Construct a new, empty map with the default initial capacity and
-     * load factor.
+     * Construct a new, empty map with the default initial capacity and load factor.
      */
     public ParameterMap() {
         delegatedMap = new LinkedHashMap<>();
@@ -57,8 +54,7 @@ public final class ParameterMap<K,V> implements Map<K,V>, Serializable {
 
 
     /**
-     * Construct a new, empty map with the specified initial capacity and
-     * default load factor.
+     * Construct a new, empty map with the specified initial capacity and default load factor.
      *
      * @param initialCapacity The initial capacity of this map
      */
@@ -69,11 +65,10 @@ public final class ParameterMap<K,V> implements Map<K,V>, Serializable {
 
 
     /**
-     * Construct a new, empty map with the specified initial capacity and
-     * load factor.
+     * Construct a new, empty map with the specified initial capacity and load factor.
      *
      * @param initialCapacity The initial capacity of this map
-     * @param loadFactor The load factor of this map
+     * @param loadFactor      The load factor of this map
      */
     public ParameterMap(int initialCapacity, float loadFactor) {
         delegatedMap = new LinkedHashMap<>(initialCapacity, loadFactor);
@@ -88,6 +83,19 @@ public final class ParameterMap<K,V> implements Map<K,V>, Serializable {
      */
     public ParameterMap(Map<K,V> map) {
         delegatedMap = new LinkedHashMap<>(map);
+        unmodifiableDelegatedMap = Collections.unmodifiableMap(delegatedMap);
+    }
+
+
+    /**
+     * Optimised constructor for ParameterMap.
+     *
+     * @see "https://bz.apache.org/bugzilla/show_bug.cgi?id=69285"
+     *
+     * @param map Map whose contents are duplicated in the new map
+     */
+    public ParameterMap(ParameterMap<K,V> map) {
+        delegatedMap = new LinkedHashMap<>(map.delegatedMap);
         unmodifiableDelegatedMap = Collections.unmodifiableMap(delegatedMap);
     }
 
@@ -210,8 +218,7 @@ public final class ParameterMap<K,V> implements Map<K,V>, Serializable {
     /**
      * {@inheritDoc}
      * <p>
-     * Returns an <strong>unmodifiable</strong> {@link Set} view of the keys
-     * contained in this map if it is locked.
+     * Returns an <strong>unmodifiable</strong> {@link Set} view of the keys contained in this map if it is locked.
      */
     @Override
     public Set<K> keySet() {
@@ -226,8 +233,8 @@ public final class ParameterMap<K,V> implements Map<K,V>, Serializable {
     /**
      * {@inheritDoc}
      * <p>
-     * Returns an <strong>unmodifiable</strong> {@link Collection} view of the
-     * values contained in this map if it is locked.
+     * Returns an <strong>unmodifiable</strong> {@link Collection} view of the values contained in this map if it is
+     * locked.
      */
     @Override
     public Collection<V> values() {
@@ -242,11 +249,10 @@ public final class ParameterMap<K,V> implements Map<K,V>, Serializable {
     /**
      * {@inheritDoc}
      * <p>
-     * Returns an <strong>unmodifiable</strong> {@link Set} view of the mappings
-     * contained in this map if it is locked.
+     * Returns an <strong>unmodifiable</strong> {@link Set} view of the mappings contained in this map if it is locked.
      */
     @Override
-    public Set<java.util.Map.Entry<K, V>> entrySet() {
+    public Set<Map.Entry<K,V>> entrySet() {
         if (locked) {
             return unmodifiableDelegatedMap.entrySet();
         }

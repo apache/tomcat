@@ -19,8 +19,8 @@ package org.apache.catalina.util;
 import java.util.Locale;
 
 /**
- * Utility class to manage context names so there is one place where the
- * conversions between baseName, path and version take place.
+ * Utility class to manage context names so there is one place where the conversions between baseName, path and version
+ * take place.
  */
 public final class ContextName {
     public static final String ROOT_NAME = "ROOT";
@@ -34,13 +34,11 @@ public final class ContextName {
 
 
     /**
-     * Creates an instance from a context name, display name, base name,
-     * directory name, WAR name or context.xml name.
+     * Creates an instance from a context name, display name, base name, directory name, WAR name or context.xml name.
      *
-     * @param name  The name to use as the basis for this object
-     * @param stripFileExtension    If a .war or .xml file extension is present
-     *                              at the end of the provided name should it be
-     *                              removed?
+     * @param name               The name to use as the basis for this object
+     * @param stripFileExtension If a .war or .xml file extension is present at the end of the provided name should it
+     *                               be removed?
      */
     public ContextName(String name, boolean stripFileExtension) {
 
@@ -62,10 +60,9 @@ public final class ContextName {
         }
 
         // Remove any file extensions
-        if (stripFileExtension &&
-                (tmp1.toLowerCase(Locale.ENGLISH).endsWith(".war") ||
-                        tmp1.toLowerCase(Locale.ENGLISH).endsWith(".xml"))) {
-            tmp1 = tmp1.substring(0, tmp1.length() -4);
+        if (stripFileExtension && (tmp1.toLowerCase(Locale.ENGLISH).endsWith(".war") ||
+                tmp1.toLowerCase(Locale.ENGLISH).endsWith(".xml"))) {
+            tmp1 = tmp1.substring(0, tmp1.length() - 4);
         }
 
         baseName = tmp1;
@@ -97,8 +94,8 @@ public final class ContextName {
     /**
      * Construct an instance from a path and version.
      *
-     * @param path      Context path to use
-     * @param version   Context version to use
+     * @param path    Context path to use
+     * @param version Context version to use
      */
     public ContextName(String path, String version) {
         // Path should never be null, '/' or '/ROOT'
@@ -127,8 +124,7 @@ public final class ContextName {
         if (this.path.isEmpty()) {
             tmp.append(ROOT_NAME);
         } else {
-            tmp.append(this.path.substring(1).replace('/',
-                    FWD_SLASH_REPLACEMENT));
+            tmp.append(this.path.substring(1).replace('/', FWD_SLASH_REPLACEMENT));
         }
         if (!this.version.isEmpty()) {
             tmp.append(VERSION_MARKER);
@@ -176,8 +172,8 @@ public final class ContextName {
 
 
     /**
-     * Extract the final component of the given path which is assumed to be a
-     * base name and generate a {@link ContextName} from that base name.
+     * Extract the final component of the given path which is assumed to be a base name and generate a
+     * {@link ContextName} from that base name.
      *
      * @param path The path that ends in a base name
      *
@@ -185,7 +181,7 @@ public final class ContextName {
      */
     public static ContextName extractFromPath(String path) {
         // Convert '\' to '/'
-        path = path.replaceAll("\\\\", "/");
+        path = path.replace("\\", "/");
         // Remove trailing '/'. Use while just in case a value ends in ///
         while (path.endsWith("/")) {
             path = path.substring(0, path.length() - 1);

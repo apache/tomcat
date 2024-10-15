@@ -79,7 +79,7 @@ public final class Room {
 
         private final char flag;
 
-        private MessageType(char flag) {
+        MessageType(char flag) {
             this.flag = flag;
         }
 
@@ -316,7 +316,7 @@ public final class Room {
                     String s = String.valueOf(p.getLastReceivedMessageId())
                             + "," + msg.toString();
                     if (i > 0) {
-                        sb.append("|");
+                        sb.append('|');
                     }
 
                     sb.append(s);

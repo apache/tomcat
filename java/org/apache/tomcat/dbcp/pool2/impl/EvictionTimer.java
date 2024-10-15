@@ -17,8 +17,6 @@
 package org.apache.tomcat.dbcp.pool2.impl;
 
 import java.lang.ref.WeakReference;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -57,11 +55,7 @@ class EvictionTimer {
         public Thread newThread(final Runnable runnable) {
             final Thread thread = new Thread(null, runnable, "commons-pool-evictor");
             thread.setDaemon(true); // POOL-363 - Required for applications using Runtime.addShutdownHook().
-            AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-                thread.setContextClassLoader(EvictorThreadFactory.class.getClassLoader());
-                return null;
-            });
-
+            thread.setContextClassLoader(EvictorThreadFactory.class.getClassLoader());
             return thread;
         }
     }
@@ -74,13 +68,14 @@ class EvictionTimer {
         @Override
         public void run() {
             synchronized (EvictionTimer.class) {
-                for (final Entry<WeakReference<Runnable>, WeakRunner> entry : taskMap.entrySet()) {
+                for (final Entry<WeakReference<BaseGenericObjectPool<?>.Evictor>, WeakRunner<BaseGenericObjectPool<?>.Evictor>> entry : TASK_MAP
+                        .entrySet()) {
                     if (entry.getKey().get() == null) {
                         executor.remove(entry.getValue());
-                        taskMap.remove(entry.getKey());
+                        TASK_MAP.remove(entry.getKey());
                     }
                 }
-                if (taskMap.isEmpty() && executor != null) {
+                if (TASK_MAP.isEmpty() && executor != null) {
                     executor.shutdown();
                     executor.setCorePoolSize(0);
                     executor = null;
@@ -92,17 +87,18 @@ class EvictionTimer {
     /**
      * Runnable that runs the referent of a weak reference. When the referent is no
      * no longer reachable, run is no-op.
+     * @param <R> The kind of Runnable.
      */
-    private static class WeakRunner implements Runnable {
+    private static class WeakRunner<R extends Runnable> implements Runnable {
 
-        private final WeakReference<Runnable> ref;
+        private final WeakReference<R> ref;
 
         /**
          * Constructs a new instance to track the given reference.
          *
          * @param ref the reference to track.
          */
-        private WeakRunner(final WeakReference<Runnable> ref) {
+        private WeakRunner(final WeakReference<R> ref) {
            this.ref = ref;
         }
 
@@ -113,7 +109,7 @@ class EvictionTimer {
                 task.run();
             } else {
                 executor.remove(this);
-                taskMap.remove(ref);
+                TASK_MAP.remove(ref);
             }
         }
     }
@@ -123,7 +119,9 @@ class EvictionTimer {
     private static ScheduledThreadPoolExecutor executor; //@GuardedBy("EvictionTimer.class")
 
     /** Keys are weak references to tasks, values are runners managed by executor. */
-    private static final HashMap<WeakReference<Runnable>, WeakRunner> taskMap = new HashMap<>(); // @GuardedBy("EvictionTimer.class")
+    private static final HashMap<
+        WeakReference<BaseGenericObjectPool<?>.Evictor>,
+        WeakRunner<BaseGenericObjectPool<?>.Evictor>> TASK_MAP = new HashMap<>(); // @GuardedBy("EvictionTimer.class")
 
     /**
      * Removes the specified eviction task from the timer.
@@ -140,7 +138,7 @@ class EvictionTimer {
             evictor.cancel();
             remove(evictor);
         }
-        if (!restarting && executor != null && taskMap.isEmpty()) {
+        if (!restarting && executor != null && TASK_MAP.isEmpty()) {
             executor.shutdown();
             try {
                 executor.awaitTermination(timeout.toMillis(), TimeUnit.MILLISECONDS);
@@ -157,7 +155,16 @@ class EvictionTimer {
      * @return the number of eviction tasks under management.
      */
     static synchronized int getNumTasks() {
-        return taskMap.size();
+        return TASK_MAP.size();
+    }
+
+    /**
+     * Gets the task map. Keys are weak references to tasks, values are runners managed by executor.
+     *
+     * @return the task map.
+     */
+    static HashMap<WeakReference<BaseGenericObjectPool<?>.Evictor>, WeakRunner<BaseGenericObjectPool<?>.Evictor>> getTaskMap() {
+        return TASK_MAP;
     }
 
     /**
@@ -167,10 +174,10 @@ class EvictionTimer {
      * @param evictor Eviction task to remove
      */
     private static void remove(final BaseGenericObjectPool<?>.Evictor evictor) {
-        for (final Entry<WeakReference<Runnable>, WeakRunner> entry : taskMap.entrySet()) {
+        for (final Entry<WeakReference<BaseGenericObjectPool<?>.Evictor>, WeakRunner<BaseGenericObjectPool<?>.Evictor>> entry : TASK_MAP.entrySet()) {
             if (entry.getKey().get() == evictor) {
                 executor.remove(entry.getValue());
-                taskMap.remove(entry.getKey());
+                TASK_MAP.remove(entry.getKey());
                 break;
             }
         }
@@ -194,12 +201,12 @@ class EvictionTimer {
             executor.setRemoveOnCancelPolicy(true);
             executor.scheduleAtFixedRate(new Reaper(), delay.toMillis(), period.toMillis(), TimeUnit.MILLISECONDS);
         }
-        final WeakReference<Runnable> ref = new WeakReference<>(task);
-        final WeakRunner runner = new WeakRunner(ref);
+        final WeakReference<BaseGenericObjectPool<?>.Evictor> ref = new WeakReference<>(task);
+        final WeakRunner<BaseGenericObjectPool<?>.Evictor> runner = new WeakRunner<>(ref);
         final ScheduledFuture<?> scheduledFuture = executor.scheduleWithFixedDelay(runner, delay.toMillis(),
                 period.toMillis(), TimeUnit.MILLISECONDS);
         task.setScheduledFuture(scheduledFuture);
-        taskMap.put(ref, runner);
+        TASK_MAP.put(ref, runner);
     }
 
     /** Prevents instantiation */
@@ -216,4 +223,5 @@ class EvictionTimer {
         builder.append("EvictionTimer []");
         return builder.toString();
     }
+
 }

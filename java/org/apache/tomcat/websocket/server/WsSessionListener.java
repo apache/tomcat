@@ -19,7 +19,7 @@ package org.apache.tomcat.websocket.server;
 import jakarta.servlet.http.HttpSessionEvent;
 import jakarta.servlet.http.HttpSessionListener;
 
-public class WsSessionListener implements HttpSessionListener{
+public class WsSessionListener implements HttpSessionListener {
 
     private final WsServerContainer wsServerContainer;
 

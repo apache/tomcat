@@ -23,8 +23,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.catalina.connector.Request;
 
 /**
- * An <b>Authenticator</b> and <b>Valve</b> implementation that checks
- * only security constraints not involving user authentication.
+ * An <b>Authenticator</b> and <b>Valve</b> implementation that checks only security constraints not involving user
+ * authentication.
  *
  * @author Craig R. McClanahan
  */
@@ -35,47 +35,44 @@ public final class NonLoginAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * <p>Authenticate the user making this request, based on the fact that no
-     * <code>login-config</code> has been defined for the container.</p>
-     *
-     * <p>This implementation means "login the user even though there is no
-     * self-contained way to establish a security Principal for that user".</p>
-     *
-     * <p>This method is called by the AuthenticatorBase super class to
-     * establish a Principal for the user BEFORE the container security
-     * constraints are examined, i.e. it is not yet known whether the user
-     * will eventually be permitted to access the requested resource.
-     * Therefore, it is necessary to always return <code>true</code> to
-     * indicate the user has not failed authentication.</p>
-     *
-     * <p>There are two cases:</p>
+     * <p>
+     * Authenticate the user making this request, based on the fact that no <code>login-config</code> has been defined
+     * for the container.
+     * </p>
+     * <p>
+     * This implementation means "login the user even though there is no self-contained way to establish a security
+     * Principal for that user".
+     * </p>
+     * <p>
+     * This method is called by the AuthenticatorBase super class to establish a Principal for the user BEFORE the
+     * container security constraints are examined, i.e. it is not yet known whether the user will eventually be
+     * permitted to access the requested resource. Therefore, it is necessary to always return <code>true</code> to
+     * indicate the user has not failed authentication.
+     * </p>
+     * <p>
+     * There are two cases:
+     * </p>
      * <ul>
-     * <li>without SingleSignon: a Session instance does not yet exist
-     *     and there is no <code>auth-method</code> to authenticate the
-     *     user, so leave Request's Principal as null.
-     *     Note: AuthenticatorBase will later examine the security constraints
-     *           to determine whether the resource is accessible by a user
-     *           without a security Principal and Role (i.e. unauthenticated).
-     * </li>
-     * <li>with SingleSignon: if the user has already authenticated via
-     *     another container (using its own login configuration), then
-     *     associate this Session with the SSOEntry so it inherits the
-     *     already-established security Principal and associated Roles.
-     *     Note: This particular session will become a full member of the
-     *           SingleSignOnEntry Session collection and so will potentially
-     *           keep the SSOE "alive", even if all the other properly
-     *           authenticated Sessions expire first... until it expires too.
-     * </li>
+     * <li>without SingleSignon: a Session instance does not yet exist and there is no <code>auth-method</code> to
+     * authenticate the user, so leave Request's Principal as null. Note: AuthenticatorBase will later examine the
+     * security constraints to determine whether the resource is accessible by a user without a security Principal and
+     * Role (i.e. unauthenticated).</li>
+     * <li>with SingleSignon: if the user has already authenticated via another container (using its own login
+     * configuration), then associate this Session with the SSOEntry so it inherits the already-established security
+     * Principal and associated Roles. Note: This particular session will become a full member of the SingleSignOnEntry
+     * Session collection and so will potentially keep the SSOE "alive", even if all the other properly authenticated
+     * Sessions expire first... until it expires too.</li>
      * </ul>
      *
      * @param request  Request we are processing
      * @param response Response we are creating
+     *
      * @return boolean to indicate whether the user is authenticated
+     *
      * @exception IOException if an input/output error occurs
      */
     @Override
-    protected boolean doAuthenticate(Request request, HttpServletResponse response)
-        throws IOException {
+    protected boolean doAuthenticate(Request request, HttpServletResponse response) throws IOException {
 
         // Don't try and use SSO to authenticate since there is no auth
         // configured for this web application
@@ -93,17 +90,13 @@ public final class NonLoginAuthenticator extends AuthenticatorBase {
         // to say the user is now authenticated because access to
         // protected resources will only be allowed with a matching role.
         // i.e. SC_FORBIDDEN (403 status) will be generated later.
-        if (containerLog.isDebugEnabled()) {
-            containerLog.debug("User authenticated without any roles");
+        if (containerLog.isTraceEnabled()) {
+            containerLog.trace("User authenticated without any roles");
         }
         return true;
     }
 
 
-    /**
-     * Return the authentication method, which is vendor-specific and
-     * not defined by HttpServletRequest.
-     */
     @Override
     protected String getAuthMethod() {
         return "NONE";

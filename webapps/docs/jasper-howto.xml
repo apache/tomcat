@@ -37,7 +37,7 @@
 <section name="Introduction">
 
 <p>Tomcat <version-major-minor/> uses the Jasper 2 JSP Engine to implement
-the <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">JavaServer Pages 2.3</a>
+the <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Jakarta Pages 4.0</a>
 specification.</p>
 
 <p>Jasper 2 has been redesigned to significantly improve performance over
@@ -106,10 +106,10 @@ set then <code>setenv.[sh|bat]</code> should be used to add
 to the <code>CLASSPATH</code> environment variable.</li>
 
 <li><strong>compilerSourceVM</strong> - What JDK version are the source files
-compatible with? (Default value: <code>11</code>)</li>
+compatible with? (Default value: <code>21</code>)</li>
 
 <li><strong>compilerTargetVM</strong> - What JDK version are the generated files
-compatible with? (Default value: <code>11</code>)</li>
+compatible with? (Default value: <code>21</code>)</li>
 
 <li><strong>development</strong> - Is Jasper used in development mode? If true,
 the frequency at which JSPs are checked for modification may be specified via
@@ -132,7 +132,7 @@ default <code>true</code>.
 
 <li><strong>engineOptionsClass</strong> - Allows specifying the Options class
 used to configure Jasper. If not present, the default EmbeddedServletOptions
-will be used. This option is ignored if running under a SecurityManager.
+will be used.
 </li>
 
 <li><strong>errorOnUseBeanInvalidClassAttribute</strong> - Should Jasper issue
@@ -181,7 +181,7 @@ may be expensive and could lead to excessive resource usage.</li>
 
 <li><strong>scratchdir</strong> - What scratch directory should we use when
 compiling JSP pages? Default is the work directory for the current web
-application. This option is ignored if running under a SecurityManager.</li>
+application.</li>
 
 <li><strong>suppressSmap</strong> - Should the generation of SMAP info for JSR45
 debugging be suppressed? <code>true</code> or <code>false</code>, default
@@ -499,7 +499,7 @@ with Jasper.
 The second extension point is the Expression Language interpreter. Alternative
 interpreters may be configured through the <code>ServletContext</code>. See the
 <code>ELInterpreterFactory</code> javadoc for details of how to configure an
-alternative EL interpreter. A alternative interpreter primarily targetting tag
+alternative EL interpreter. A alternative interpreter primarily targeting tag
 settings is provided at
 <code>org.apache.jasper.optimizations.ELInterpreterTagSetters</code>. See the
 javadoc for details of the optimisations and the impact they have on

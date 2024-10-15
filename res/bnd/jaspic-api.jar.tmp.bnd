@@ -19,10 +19,12 @@ Bundle-Name: tomcat-jaspic-api
 Bundle-SymbolicName: org.apache.tomcat-jaspic-api
 Export-Package: \
     jakarta.security.auth.message.*;version=${jaspic.spec.version}
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 Provide-Capability: \
     osgi.contract;\
-        osgi.contract=JavaJASPIC;\
+        osgi.contract=JakartaAuthentication;\
         version:Version=${jaspic.spec.version};\
         uses:='${packages;NAMED;jakarta.security.auth.message.*}'
 

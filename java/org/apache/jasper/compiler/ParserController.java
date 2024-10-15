@@ -20,7 +20,10 @@ import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Stack;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
@@ -41,6 +44,7 @@ import org.xml.sax.Attributes;
 class ParserController implements TagConstants {
 
     private static final String CHARSET = "charset=";
+    private static final String TAGS_IN_JAR_LOCATION = "/META-INF/tags/";
 
     private final JspCompilationContext ctxt;
     private final Compiler compiler;
@@ -55,7 +59,7 @@ class ParserController implements TagConstants {
      * A stack to keep track of the 'current base directory'
      * for include directives that refer to relative paths.
      */
-    private final Stack<String> baseDirStack = new Stack<>();
+    private final Deque<String> baseDirStack = new ArrayDeque<>();
 
     private boolean isEncodingSpecifiedInProlog;
     private boolean isBomPresent;
@@ -70,7 +74,7 @@ class ParserController implements TagConstants {
     /*
      * Constructor
      */
-    public ParserController(JspCompilationContext ctxt, Compiler compiler) {
+    ParserController(JspCompilationContext ctxt, Compiler compiler) {
         this.ctxt = ctxt;
         this.compiler = compiler;
         this.err = compiler.getErrorDispatcher();
@@ -184,6 +188,7 @@ class ParserController implements TagConstants {
      * @param jar  The JAR file from which to read the JSP page or tag file,
      * or null if the JSP page or tag file is to be read from the filesystem
      */
+    @SuppressWarnings("null") // jar can't be null if processingTagInJar is true
     private Node.Nodes doParse(String inFileName, Node parent, Jar jar)
             throws FileNotFoundException, JasperException, IOException {
 
@@ -192,7 +197,22 @@ class ParserController implements TagConstants {
         isBomPresent = false;
         isDefaultPageEncoding = false;
 
-        String absFileName = resolveFileName(inFileName);
+        boolean processingTagInJar = jar != null && baseDirStack.peekFirst() != null &&
+                baseDirStack.peekFirst().startsWith(TAGS_IN_JAR_LOCATION);
+        String absFileName = null;
+        try {
+            absFileName = resolveFileName(inFileName);
+        } catch (URISyntaxException e) {
+            err.jspError("jsp.error.invalid.includeInTagFileJar", inFileName, jar.getJarFileURL().toString());
+        }
+        if (processingTagInJar && !absFileName.startsWith(TAGS_IN_JAR_LOCATION)) {
+            /*
+             * An included file is being parsed that was included from the standard location for tag files in JAR but
+             * tries to escape that location to either somewhere in the JAR not under the standard location or outside
+             * of the JAR. Neither of these are permitted.
+             */
+            err.jspError("jsp.error.invalid.includeInTagFileJar", inFileName, jar.getJarFileURL().toString());
+        }
         String jspConfigPageEnc = getJspConfigPageEncoding(absFileName);
 
         // Figure out what type of JSP document and encoding type we are
@@ -247,7 +267,7 @@ class ParserController implements TagConstants {
             }
         }
 
-        baseDirStack.pop();
+        baseDirStack.remove();
 
         return parsedPage;
     }
@@ -452,8 +472,8 @@ class ParserController implements TagConstants {
                 continue;
             }
 
-            // compare for "tag ", so we don't match "taglib"
-            if (jspReader.matches("tag ") || jspReader.matches("page")) {
+            // Want to match tag and page but not taglib
+            if (jspReader.matches("tag") && !jspReader.matches("lib") || jspReader.matches("page")) {
 
                 jspReader.skipSpaces();
                 Attributes attrs = Parser.parseAttributes(this, jspReader);
@@ -515,14 +535,15 @@ class ParserController implements TagConstants {
      * The 'root' file is always an 'absolute' path, so no need to put an
      * initial value in the baseDirStack.
      */
-    private String resolveFileName(String inFileName) {
+    private String resolveFileName(String inFileName) throws URISyntaxException {
         String fileName = inFileName.replace('\\', '/');
         boolean isAbsolute = fileName.startsWith("/");
-        fileName = isAbsolute ? fileName
-                : baseDirStack.peek() + fileName;
-        String baseDir =
-            fileName.substring(0, fileName.lastIndexOf('/') + 1);
-        baseDirStack.push(baseDir);
+        if (!isAbsolute) {
+            URI uri = new URI(baseDirStack.peekFirst() + fileName);
+            fileName = uri.normalize().toString();
+        }
+        String baseDir = fileName.substring(0, fileName.lastIndexOf('/') + 1);
+        baseDirStack.addFirst(baseDir);
         return fileName;
     }
 

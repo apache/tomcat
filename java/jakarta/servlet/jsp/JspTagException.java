@@ -17,21 +17,18 @@
 package jakarta.servlet.jsp;
 
 /**
- * Exception to be used by a Tag Handler to indicate some unrecoverable error.
- * This error is to be caught by the top level of the JSP page and will result
- * in an error page.
+ * Exception to be used by a Tag Handler to indicate some unrecoverable error. This error is to be caught by the top
+ * level of the JSP page and will result in an error page.
  */
 public class JspTagException extends JspException {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Constructs a new JspTagException with the specified message. The message
-     * can be written to the server log and/or displayed for the user.
+     * Constructs a new JspTagException with the specified message. The message can be written to the server log and/or
+     * displayed for the user.
      *
-     * @param msg
-     *            a <code>String</code> specifying the text of the exception
-     *            message
+     * @param msg a <code>String</code> specifying the text of the exception message
      */
     public JspTagException(String msg) {
         super(msg);
@@ -45,17 +42,13 @@ public class JspTagException extends JspException {
     }
 
     /**
-     * Constructs a new JspTagException when the JSP Tag needs to throw an
-     * exception and include a message about the "root cause" exception that
-     * interfered with its normal operation, including a description message.
+     * Constructs a new JspTagException when the JSP Tag needs to throw an exception and include a message about the
+     * "root cause" exception that interfered with its normal operation, including a description message.
      *
-     * @param message
-     *            a <code>String</code> containing the text of the exception
-     *            message
-     * @param rootCause
-     *            the <code>Throwable</code> exception that interfered with the
-     *            JSP Tag's normal operation, making this JSP Tag exception
-     *            necessary
+     * @param message   a <code>String</code> containing the text of the exception message
+     * @param rootCause the <code>Throwable</code> exception that interfered with the JSP Tag's normal operation, making
+     *                      this JSP Tag exception necessary
+     *
      * @since JSP 2.0
      */
     public JspTagException(String message, Throwable rootCause) {
@@ -63,20 +56,17 @@ public class JspTagException extends JspException {
     }
 
     /**
-     * Constructs a new JSP Tag exception when the JSP Tag needs to throw an
-     * exception and include a message about the "root cause" exception that
-     * interfered with its normal operation. The exception's message is based on
-     * the localized message of the underlying exception.
+     * Constructs a new JSP Tag exception when the JSP Tag needs to throw an exception and include a message about the
+     * "root cause" exception that interfered with its normal operation. The exception's message is based on the
+     * localized message of the underlying exception.
      * <p>
-     * This method calls the <code>getLocalizedMessage</code> method on the
-     * <code>Throwable</code> exception to get a localized exception message.
-     * When subclassing <code>JspTagException</code>, this method can be
-     * overridden to create an exception message designed for a specific locale.
+     * This method calls the <code>getLocalizedMessage</code> method on the <code>Throwable</code> exception to get a
+     * localized exception message. When subclassing <code>JspTagException</code>, this method can be overridden to
+     * create an exception message designed for a specific locale.
      *
-     * @param rootCause
-     *            the <code>Throwable</code> exception that interfered with the
-     *            JSP Tag's normal operation, making the JSP Tag exception
-     *            necessary
+     * @param rootCause the <code>Throwable</code> exception that interfered with the JSP Tag's normal operation, making
+     *                      the JSP Tag exception necessary
+     *
      * @since JSP 2.0
      */
     public JspTagException(Throwable rootCause) {

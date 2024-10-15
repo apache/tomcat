@@ -35,20 +35,12 @@ public class StandardEngineSF extends StoreFactoryBase {
 
     /**
      * Store the specified Engine properties.
-     *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aEngine
-     *            Object whose properties are being stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
+     * <p>
+     * {@inheritDoc}
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aEngine,
-            StoreDescription parentDesc) throws Exception {
+    public void storeChildren(PrintWriter aWriter, int indent, Object aEngine, StoreDescription parentDesc)
+            throws Exception {
         if (aEngine instanceof StandardEngine) {
             StandardEngine engine = (StandardEngine) aEngine;
             // Store nested <Listener> elements
@@ -69,8 +61,8 @@ public class StandardEngineSF extends StoreFactoryBase {
 
             // Store nested <Valve> elements
             Valve valves[] = engine.getPipeline().getValves();
-            if(valves != null && valves.length > 0 ) {
-                List<Valve> engineValves = new ArrayList<>() ;
+            if (valves != null && valves.length > 0) {
+                List<Valve> engineValves = new ArrayList<>();
                 for (Valve valve : valves) {
                     if (!(valve instanceof ClusterValve)) {
                         engineValves.add(valve);
@@ -88,6 +80,6 @@ public class StandardEngineSF extends StoreFactoryBase {
             Container children[] = engine.findChildren();
             storeElementArray(aWriter, indent, children);
 
-       }
+        }
     }
 }

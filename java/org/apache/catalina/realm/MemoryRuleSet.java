@@ -22,8 +22,9 @@ import org.apache.tomcat.util.digester.RuleSet;
 import org.xml.sax.Attributes;
 
 /**
- * <p><strong>RuleSet</strong> for recognizing the users defined in the
- * XML file processed by <code>MemoryRealm</code>.</p>
+ * <p>
+ * <strong>RuleSet</strong> for recognizing the users defined in the XML file processed by <code>MemoryRealm</code>.
+ * </p>
  *
  * @author Craig R. McClanahan
  */
@@ -41,8 +42,7 @@ public class MemoryRuleSet implements RuleSet {
     // ------------------------------------------------------------ Constructor
 
     /**
-     * Construct an instance of this <code>RuleSet</code> with the default
-     * matching pattern prefix.
+     * Construct an instance of this <code>RuleSet</code> with the default matching pattern prefix.
      */
     public MemoryRuleSet() {
         this("tomcat-users/");
@@ -50,11 +50,9 @@ public class MemoryRuleSet implements RuleSet {
 
 
     /**
-     * Construct an instance of this <code>RuleSet</code> with the specified
-     * matching pattern prefix.
+     * Construct an instance of this <code>RuleSet</code> with the specified matching pattern prefix.
      *
-     * @param prefix Prefix for matching pattern rules (including the
-     *  trailing slash character)
+     * @param prefix Prefix for matching pattern rules (including the trailing slash character)
      */
     public MemoryRuleSet(String prefix) {
         this.prefix = prefix;
@@ -64,15 +62,6 @@ public class MemoryRuleSet implements RuleSet {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * <p>Add the set of Rule instances defined in this RuleSet to the
-     * specified <code>Digester</code> instance, associating them with
-     * our namespace URI (if any).  This method should only be called
-     * by a Digester instance.</p>
-     *
-     * @param digester Digester instance to which the new Rule instances
-     *  should be added.
-     */
     @Override
     public void addRuleInstances(Digester digester) {
 
@@ -93,7 +82,7 @@ final class MemoryUserRule extends Rule {
     /**
      * Construct a new instance of this <code>Rule</code>.
      */
-    public MemoryUserRule() {
+    MemoryUserRule() {
         // No initialisation required
     }
 
@@ -104,8 +93,7 @@ final class MemoryUserRule extends Rule {
      * @param attributes The attribute list for this element
      */
     @Override
-    public void begin(String namespace, String name, Attributes attributes)
-        throws Exception {
+    public void begin(String namespace, String name, Attributes attributes) throws Exception {
 
         String username = attributes.getValue("username");
         if (username == null) {
@@ -114,8 +102,7 @@ final class MemoryUserRule extends Rule {
         String password = attributes.getValue("password");
         String roles = attributes.getValue("roles");
 
-        MemoryRealm realm =
-            (MemoryRealm) digester.peek(digester.getCount() - 1);
+        MemoryRealm realm = (MemoryRealm) digester.peek(digester.getCount() - 1);
         realm.addUser(username, password, roles);
 
     }

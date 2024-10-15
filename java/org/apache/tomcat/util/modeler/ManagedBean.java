@@ -76,8 +76,8 @@ public class ManagedBean implements java.io.Serializable {
     private NotificationInfo notifications[] = new NotificationInfo[0];
     protected String type = null;
 
-    /** Constructor. Will add default attributes.
-     *
+    /**
+     * Constructor. Will add default attributes.
      */
     public ManagedBean() {
         AttributeInfo ai=new AttributeInfo();
@@ -95,9 +95,7 @@ public class ManagedBean implements java.io.Serializable {
      * @return the collection of attributes for this MBean.
      */
     public AttributeInfo[] getAttributes() {
-        AttributeInfo result[] = new AttributeInfo[attributes.size()];
-        attributes.values().toArray(result);
-        return result;
+        return attributes.values().toArray(new AttributeInfo[0]);
     }
 
 
@@ -197,9 +195,7 @@ public class ManagedBean implements java.io.Serializable {
      * @return the collection of operations for this MBean.
      */
     public OperationInfo[] getOperations() {
-        OperationInfo[] result = new OperationInfo[operations.size()];
-        operations.values().toArray(result);
-        return result;
+        return operations.values().toArray(new OperationInfo[0]);
     }
 
 

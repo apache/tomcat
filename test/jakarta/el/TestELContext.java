@@ -53,9 +53,8 @@ public class TestELContext {
     }
 
     /**
-     * Tests that the context object will be added to the map with context
-     * objects. The key is used as unique identifier of the context object in
-     * the map.
+     * Tests that the context object will be added to the map with context objects. The key is used as unique identifier
+     * of the context object in the map.
      */
     @Test
     public void testPutContext03() {
@@ -68,8 +67,7 @@ public class TestELContext {
     }
 
     /**
-     * Tests that propertyResolved will be set to true and the corresponding
-     * listeners will be notified.
+     * Tests that propertyResolved will be set to true and the corresponding listeners will be notified.
      */
     @Test
     public void testSetPropertyResolved() {
@@ -135,8 +133,7 @@ public class TestELContext {
     }
 
     /**
-     * Tests that if there is no ELResolver the standard coercions will be
-     * invoked.
+     * Tests that if there is no ELResolver the standard coercions will be invoked.
      */
     @Test
     public void testConvertToType02() {
@@ -147,13 +144,12 @@ public class TestELContext {
         Object result = elContext.convertToType("test", String.class);
         Assert.assertEquals("test", result);
 
-        Assert.assertTrue(originalPropertyResolved == elContext
-                .isPropertyResolved());
+        Assert.assertTrue(originalPropertyResolved == elContext.isPropertyResolved());
     }
 
     /**
-     * Tests that if there is ELResolver it will handle the conversion. If this
-     * resolver cannot return a result the standard coercions will be invoked.
+     * Tests that if there is ELResolver it will handle the conversion. If this resolver cannot return a result the
+     * standard coercions will be invoked.
      */
     @Test
     public void testConvertToType03() {
@@ -164,12 +160,10 @@ public class TestELContext {
 
         Object result = elContext.convertToType("1", String.class);
         Assert.assertEquals("ONE", result);
-        Assert.assertTrue(originalPropertyResolved == elContext
-                .isPropertyResolved());
+        Assert.assertTrue(originalPropertyResolved == elContext.isPropertyResolved());
 
         result = elContext.convertToType("test", String.class);
         Assert.assertEquals("test", result);
-        Assert.assertTrue(originalPropertyResolved == elContext
-                .isPropertyResolved());
+        Assert.assertTrue(originalPropertyResolved == elContext.isPropertyResolved());
     }
 }

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import jakarta.servlet.AsyncContext;
@@ -40,15 +41,20 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
+import org.apache.tomcat.util.net.TesterSupport.SimpleServlet;
 
 public class TestHttpServlet extends TomcatBaseTest {
 
+    /*
+     * Nature of test has changed from original bug report since content-length
+     * is no longer returned for HEAD requests as allowed by RFC 9110.
+     */
     @Test
     public void testBug53454() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
 
         // Map the test Servlet
         LargeBodyServlet largeBodyServlet = new LargeBodyServlet();
@@ -62,8 +68,7 @@ public class TestHttpServlet extends TomcatBaseTest {
                resHeaders);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertEquals(LargeBodyServlet.RESPONSE_LENGTH,
-                resHeaders.get("Content-Length").get(0));
+        Assert.assertNull(resHeaders.get("Content-Length"));
     }
 
 
@@ -89,7 +94,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
 
         Bug57602ServletOuter outer = new Bug57602ServletOuter();
         Tomcat.addServlet(ctx, "Bug57602ServletOuter", outer);
@@ -161,7 +166,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
 
         Wrapper w = Tomcat.addServlet(ctx, "TestServlet", servlet);
         // Not all need/use this but it is simpler to set it for all
@@ -176,6 +181,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         int rc = getUrl(path, out, getHeaders);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        removeGeneratingContentHeaders(getHeaders);
         out.recycle();
 
         Map<String,List<String>> headHeaders = new HashMap<>();
@@ -202,6 +208,18 @@ public class TestHttpServlet extends TomcatBaseTest {
     }
 
 
+    /*
+     * Removes headers that are not expected to appear in the response to the
+     * equivalent HEAD request.
+     */
+    private void removeGeneratingContentHeaders(Map<String,List<String>> headers) {
+        headers.remove("content-length");
+        headers.remove("content-range");
+        headers.remove("trailer");
+        headers.remove("transfer-encoding");
+    }
+
+
     @Test
     public void testDoOptions() throws Exception {
         doTestDoOptions(new OptionsServlet(), "GET, HEAD, OPTIONS");
@@ -218,7 +236,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
 
         // Map the test Servlet
         Tomcat.addServlet(ctx, "servlet", servlet);
@@ -293,9 +311,67 @@ public class TestHttpServlet extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testTrace() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.getConnector().setAllowTrace(true);
+
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        // Map the test Servlet
+        Tomcat.addServlet(ctx, "servlet", new SimpleServlet());
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        tomcat.start();
+
+        TraceClient client = new TraceClient();
+        client.setPort(getPort());
+        client.setRequest(new String[] {
+                "TRACE / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "X-aaa: a1, a2" + SimpleHttpClient.CRLF +
+                "X-aaa: a3" + SimpleHttpClient.CRLF +
+                "Cookie: c1-v1" + SimpleHttpClient.CRLF +
+                "Authorization: not-a-real-credential" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF});
+        client.setUseContentLength(true);
+
+        client.connect();
+        client.sendRequest();
+        client.readResponse(true);
+
+        String body = client.getResponseBody();
+
+        System.out.println(body);
+
+        Assert.assertTrue(client.getResponseLine(), client.isResponse200());
+        // Far from perfect but good enough
+        body = body.toLowerCase(Locale.ENGLISH);
+        Assert.assertTrue(body.contains("a1"));
+        Assert.assertTrue(body.contains("a2"));
+        Assert.assertTrue(body.contains("a3"));
+        // Sensitive headers (cookies, WWW-Authenticate) must not be reflected
+        // (since RFC 7231)
+        Assert.assertFalse(body.contains("cookie"));
+        Assert.assertFalse(body.contains("authorization"));
+
+        client.disconnect();
+    }
+
+
+    private static final class TraceClient extends SimpleHttpClient {
+
+        @Override
+        public boolean isResponseBodyOK() {
+            return true;
+        }
+    }
+
+
     private class Client extends SimpleHttpClient {
 
-        public Client(String request, boolean isHttp09) {
+        Client(String request, boolean isHttp09) {
             setRequest(new String[] {request});
             setUseHttp09(isHttp09);
         }
@@ -389,7 +465,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         private final boolean useWriter;
 
-        public ResetBufferServlet(boolean useWriter) {
+        ResetBufferServlet(boolean useWriter) {
             this.useWriter = useWriter;
         }
 
@@ -420,7 +496,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         private final boolean useWriter;
 
-        public ResetServlet(boolean useWriter) {
+        ResetServlet(boolean useWriter) {
             this.useWriter = useWriter;
         }
 
@@ -455,7 +531,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         private final int bytesToWrite;
 
-        public NonBlockingWriteServlet(int bytesToWrite) {
+        NonBlockingWriteServlet(int bytesToWrite) {
             this.bytesToWrite = bytesToWrite;
         }
 
@@ -474,7 +550,7 @@ public class TestHttpServlet extends TomcatBaseTest {
             private final ServletOutputStream sos;
             private int bytesToWrite;
 
-            public NonBlockingWriteListener(AsyncContext ac, int bytesToWrite) throws IOException {
+            NonBlockingWriteListener(AsyncContext ac, int bytesToWrite) throws IOException {
                 this.ac = ac;
                 this.sos = ac.getResponse().getOutputStream();
                 this.bytesToWrite = bytesToWrite;

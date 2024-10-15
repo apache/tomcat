@@ -18,18 +18,18 @@ package jakarta.el;
 
 import org.junit.Test;
 
+/*
+ * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
+ * excluded due to the name starting Tester...
+ */
 public class TesterImportHandlerPerformance {
 
     /*
-     * This test is looking at the cost of looking up a class when the standard
-     * JSP package imports are present:
-     * - java.lang
-     * - jakarta.servlet
-     * - jakarta.servlet.http
-     * - jakarta.servlet.jsp
+     * This test is looking at the cost of looking up a class when the standard JSP package imports are present: -
+     * java.lang - jakarta.servlet - jakarta.servlet.http - jakarta.servlet.jsp
      *
-     * Before optimisation, this test took ~4.6s on markt's desktop
-     * After optimisation, this test took ~0.05s on markt's desktop
+     * Before optimisation, this test took ~4.6s on markt's desktop After optimisation, this test took ~0.05s on markt's
+     * desktop
      */
     @Test
     public void testBug62453() throws Exception {
@@ -42,7 +42,7 @@ public class TesterImportHandlerPerformance {
             long start = System.nanoTime();
             ih.resolveClass("unknown");
             long end = System.nanoTime();
-            totalTime += (end -start);
+            totalTime += (end - start);
         }
         System.out.println("Time taken: " + totalTime + "ns");
     }

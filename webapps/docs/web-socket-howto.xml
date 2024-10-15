@@ -64,6 +64,23 @@
    the timeout to use in milliseconds. For an infinite timeout, use
    <code>-1</code>.</p>
 
+<p>The time Tomcat waits for a peer to send a WebSocket session close message
+   after Tomcat has sent a close message to the peer defaults to 30000
+   milliseconds (30 seconds). This may be changed by setting the property
+   <code>org.apache.tomcat.websocket.SESSION_CLOSE_TIMEOUT</code> in the user
+   properties collection attached to the WebSocket session. The value assigned
+   to this property should be a <code>Long</code> and represents the timeout to
+   use in milliseconds. Values less than or equal to zero will be ignored.</p>
+
+<p>The write timeout Tomcat uses when writing a session close message when the
+   close is abnormal defaults to 50 milliseconds. This may be changed by setting
+   the property
+   <code>org.apache.tomcat.websocket.ABNORMAL_SESSION_CLOSE_SEND_TIMEOUT</code>
+   in the user properties collection attached to the WebSocket session. The
+   value assigned to this property should be a <code>Long</code> and represents
+   the timeout to use in milliseconds. Values less than or equal to zero will be
+   ignored.</p>
+
 <p>In addition to the <code>Session.setMaxIdleTimeout(long)</code> method which
    is part of the Jakarta WebSocket API, Tomcat provides greater control of the
    timing out the session due to lack of activity. Setting the property
@@ -95,16 +112,6 @@
    <code>org.apache.tomcat.websocket.textBufferSize</code> to the desired value
    in bytes.</p>
 
-<p>The Java WebSocket specification 1.0 does not permit programmatic deployment
-   after the first endpoint has started a WebSocket handshake. By default,
-   Tomcat continues to permit additional programmatic deployment. This
-   behavior is controlled by the
-   <code>org.apache.tomcat.websocket.noAddAfterHandshake</code> servlet context
-   initialization parameter. The default may be changed by setting the
-   <code>org.apache.tomcat.websocket.STRICT_SPEC_COMPLIANCE</code> system
-   property to <code>true</code> but any explicit setting on the servlet context
-   will always take priority.</p>
-
 <p>When using the WebSocket client to connect to server endpoints, the timeout
    for IO operations while establishing the connection is controlled by the
    <code>userProperties</code> of the provided
@@ -113,43 +120,47 @@
    timeout as a <code>String</code> in milliseconds. The default is 5000 (5
    seconds).</p>
 
-<p>When using the WebSocket client to connect to secure server endpoints, the
-   client SSL configuration should be configured via
-   <code>jakarta.websocket.ClientEndpointConfig.getSSLContext()</code>. Tomcat
-   10.1.x still supports the pre-WebSocket 2.1 configuration method where TLS
-   configuration was via the <code>userProperties</code> of the provided
-   <code>jakarta.websocket.ClientEndpointConfig</code>. However, this approach
-   is deprecated and will be removed in Tomcat 11. The following user properties
-   are supported:</p>
-   <ul>
-     <li><code>org.apache.tomcat.websocket.SSL_CONTEXT</code></li>
-     <li><code>org.apache.tomcat.websocket.SSL_PROTOCOLS</code></li>
-     <li><code>org.apache.tomcat.websocket.SSL_TRUSTSTORE</code></li>
-     <li><code>org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD</code></li>
-   </ul>
-   <p>The default truststore password is <code>changeit</code>.</p>
-
-<p>If the <code>org.apache.tomcat.websocket.SSL_CONTEXT</code> property is
-   set then the <code>org.apache.tomcat.websocket.SSL_TRUSTSTORE</code> and
-   <code>org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD</code> properties
-   will be ignored.</p>
-
-<p>For secure server end points, host name verification is enabled by default.
-   To bypass this verification (not recommended), it is necessary to provide a
-   custom <code>SSLContext</code> via the
-   <code>org.apache.tomcat.websocket.SSL_CONTEXT</code> user property. The
-   custom <code>SSLContext</code> must be configured with a custom
-   <code>TrustManager</code> that extends
-   <code>javax.net.ssl.X509ExtendedTrustManager</code>. The desired verification
-   (or lack of verification) can then be controlled by appropriate
-   implementations of the individual abstract methods.</p>
-
 <p>When using the WebSocket client to connect to server endpoints, the number of
    HTTP redirects that the client will follow is controlled by the
    <code>userProperties</code> of the provided
    <code>jakarta.websocket.ClientEndpointConfig</code>. The property is
    <ocde>org.apache.tomcat.websocket.MAX_REDIRECTIONS</ocde>. The default value
-   is 20. Redirection support can be disabled by configuring a value of zero.</p>
+   is 20. Redirection support can be disabled by configuring a value of zero.
+   </p>
+
+<p>When using the WebSocket client to connect to a server endpoint that requires
+   BASIC or DIGEST authentication, the following user properties must be set:
+   </p>
+   <ul>
+     <li><code>org.apache.tomcat.websocket.WS_AUTHENTICATION_USER_NAME</code>
+     </li>
+     <li><code>org.apache.tomcat.websocket.WS_AUTHENTICATION_PASSWORD</code>
+     </li>
+   </ul>
+   <p>Optionally, the WebSocket client can be configured only to send
+   credentials if the server authentication challenge includes a specific realm
+   by defining that realm in the optional user property:</p>
+   <ul>
+     <li><code>org.apache.tomcat.websocket.WS_AUTHENTICATION_REALM</code></li>
+   </ul>
+
+<p>When using the WebSocket client to connect to a server endpoint via a forward
+   proxy (also known as a gateway) that requires BASIC or DIGEST authentication,
+   the following user properties must be set:
+   </p>
+   <ul>
+     <li><code>org.apache.tomcat.websocket.WS_PROXY_AUTHENTICATION_USER_NAME
+     </code></li>
+     <li><code>org.apache.tomcat.websocket.WS_PROXY_AUTHENTICATION_PASSWORD
+     </code></li>
+   </ul>
+   <p>Optionally, the WebSocket client can be configured only to send
+   credentials if the server authentication challenge includes a specific realm
+   by defining that realm in the optional user property:</p>
+   <ul>
+     <li><code>org.apache.tomcat.websocket.WS_PROXY_AUTHENTICATION_REALM</code>
+     </li>
+   </ul>
 
 </section>
 

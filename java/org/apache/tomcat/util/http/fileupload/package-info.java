@@ -30,8 +30,7 @@
  * While this package provides the generic functionality for file uploads,
  * these classes are not typically used directly. Instead, normal usage
  * involves one of the provided extensions of
- * {@link org.apache.tomcat.util.http.fileupload.FileUpload FileUpload} such as
- * {@link org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload ServletFileUpload}
+ * {@link org.apache.tomcat.util.http.fileupload.FileUpload FileUpload}
  * together with a factory for
  * {@link org.apache.tomcat.util.http.fileupload.FileItem FileItem} instances,
  * such as
