@@ -173,6 +173,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>69399</bug>: Fix regression caused by the improvement
+        <bug>69333</bug> which caused the tag <code>release</code> to be called
+        when using tag pooling, and to be skipped when not using it.
+        Patch submitted by Michal Sobkiewicz. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
