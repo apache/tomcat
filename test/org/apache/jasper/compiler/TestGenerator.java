@@ -545,6 +545,25 @@ public class TestGenerator extends TomcatBaseTest {
         }
     }
 
+    private static boolean tagTesterTagReleaseReleased = false;
+
+    public static class TesterTagRelease extends TesterTag {
+        private String data;
+
+        public String getData() {
+            return data;
+        }
+
+        public void setData(String data) {
+            this.data = data;
+        }
+
+        @Override
+        public void release() {
+            tagTesterTagReleaseReleased = true;
+        }
+    }
+
     public static class DataPropertyEditor extends PropertyEditorSupport {
     }
 
@@ -950,6 +969,38 @@ public class TestGenerator extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() + "/test/bug6nnnn/bug65390.jsp", body, null);
 
         Assert.assertEquals(body.toString(), HttpServletResponse.SC_OK, rc);
+    }
+
+    @Test
+    public void testTagReleaseWithPooling() throws Exception {
+        doTestTagRelease(true);
+    }
+
+    @Test
+    public void testTagReleaseWithoutPooling() throws Exception {
+        doTestTagRelease(false);
+    }
+
+    public void doTestTagRelease(boolean enablePooling) throws Exception {
+        tagTesterTagReleaseReleased = false;
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+        ctxt.addServletContainerInitializer(new JasperInitializer(), null);
+
+        Tomcat.initWebappDefaults(ctxt);
+        Wrapper w = (Wrapper) ctxt.findChild("jsp");
+        w.addInitParameter("enablePooling", String.valueOf(enablePooling));
+
+        tomcat.start();
+
+        getUrl("http://localhost:" + getPort() + "/jsp/generator/release.jsp");
+        if (enablePooling) {
+            Assert.assertFalse(tagTesterTagReleaseReleased);
+        } else {
+            Assert.assertTrue(tagTesterTagReleaseReleased);
+        }
     }
 
     private void doTestJsp(String jspName) throws Exception {
